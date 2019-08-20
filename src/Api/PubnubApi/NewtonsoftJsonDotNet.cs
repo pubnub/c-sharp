@@ -1314,6 +1314,111 @@ namespace PubnubApi
                 ret = (T)Convert.ChangeType(result, typeof(PNHeartbeatResult), CultureInfo.InvariantCulture);
 #endregion
             }
+            else if (typeof(T) == typeof(PNCreateUserResult))
+            {
+                #region "PNCreateUserResult"
+                PNCreateUserResult result = PNCreateUserJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNCreateUserResult), CultureInfo.InvariantCulture);
+                #endregion
+            }
+            else if (typeof(T) == typeof(PNUpdateUserResult))
+            {
+                #region "PNUpdateUserResult"
+                PNUpdateUserResult result = PNUpdateUserJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNUpdateUserResult), CultureInfo.InvariantCulture);
+                #endregion
+            }
+            else if (typeof(T) == typeof(PNDeleteUserResult))
+            {
+                #region "PNDeleteUserResult"
+                PNDeleteUserResult ack = new PNDeleteUserResult();
+                ret = (T)Convert.ChangeType(ack, typeof(PNDeleteUserResult), CultureInfo.InvariantCulture);
+                #endregion
+            }
+            else if (typeof(T) == typeof(PNGetUsersResult))
+            {
+                #region "PNGetUsersResult"
+                PNGetUsersResult result = PNGetUsersJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNGetUsersResult), CultureInfo.InvariantCulture);
+                #endregion
+            }
+            else if (typeof(T) == typeof(PNGetUserResult))
+            {
+                #region "PNGetUserResult"
+                PNGetUserResult result = PNGetUserJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNGetUserResult), CultureInfo.InvariantCulture);
+                #endregion
+            }
+            else if (typeof(T) == typeof(PNCreateSpaceResult))
+            {
+                #region "PNCreateSpaceResult"
+                PNCreateSpaceResult result = PNCreateSpaceJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNCreateSpaceResult), CultureInfo.InvariantCulture);
+                #endregion
+            }
+            else if (typeof(T) == typeof(PNUpdateSpaceResult))
+            {
+                #region "PNUpdateSpaceResult"
+                PNUpdateSpaceResult result = PNUpdateSpaceJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNUpdateSpaceResult), CultureInfo.InvariantCulture);
+                #endregion
+            }
+            else if (typeof(T) == typeof(PNDeleteSpaceResult))
+            {
+                #region "PNDeleteUserResult"
+                PNDeleteSpaceResult ack = new PNDeleteSpaceResult();
+                ret = (T)Convert.ChangeType(ack, typeof(PNDeleteSpaceResult), CultureInfo.InvariantCulture);
+                #endregion
+            }
+            else if (typeof(T) == typeof(PNGetSpacesResult))
+            {
+                #region "PNGetSpacesResult"
+                PNGetSpacesResult result = PNGetSpacesJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNGetSpacesResult), CultureInfo.InvariantCulture);
+                #endregion
+            }
+            else if (typeof(T) == typeof(PNGetSpaceResult))
+            {
+                #region "PNGetSpaceResult"
+                PNGetSpaceResult result = PNGetSpaceJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNGetSpaceResult), CultureInfo.InvariantCulture);
+                #endregion
+            }
+            else if (typeof(T) == typeof(PNMembershipsResult))
+            {
+                #region "PNMembershipsResult"
+                PNMembershipsResult result = PNMembershipsJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNMembershipsResult), CultureInfo.InvariantCulture);
+                #endregion
+            }
+            else if (typeof(T) == typeof(PNMembersResult))
+            {
+                #region "PNMembersResult"
+                PNMembersResult result = PNMembersJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNMembersResult), CultureInfo.InvariantCulture);
+                #endregion
+            }
+            else if (typeof(T) == typeof(PNGetMembershipsResult))
+            {
+                #region "PNGetMembershipsResult"
+                PNGetMembershipsResult result = PNGetMembershipsJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNGetMembershipsResult), CultureInfo.InvariantCulture);
+                #endregion
+            }
+            else if (typeof(T) == typeof(PNGetMembersResult))
+            {
+                #region "PNGetMembersResult"
+                PNGetMembersResult result = PNGetMembersJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNGetMembersResult), CultureInfo.InvariantCulture);
+                #endregion
+            }
+            else if (typeof(T) == typeof(PNObjectApiEventResult))
+            {
+                #region "PNGetMembersResult"
+                PNObjectApiEventResult result = PNObjectApiEventJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNObjectApiEventResult), CultureInfo.InvariantCulture);
+                #endregion
+            }
             else
             {
                 System.Diagnostics.Debug.WriteLine("DeserializeToObject<T>(list) => NO MATCH");

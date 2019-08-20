@@ -131,6 +131,48 @@
     <Compile Include="..\..\Api\PubnubApi\EndPoint\MessageCountsOperation.cs">
       <Link>LinkedSourceCode\EndPoint\MessageCountsOperation.cs</Link>
     </Compile>
+    <Compile Include="..\..\Api\PubnubApi\EndPoint\Objects\CreateSpaceOperation.cs">
+      <Link>LinkedSourceCode\EndPoint\Objects\CreateSpaceOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\EndPoint\Objects\CreateUserOperation.cs">
+      <Link>LinkedSourceCode\EndPoint\Objects\CreateUserOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\EndPoint\Objects\DeleteSpaceOperation.cs">
+      <Link>LinkedSourceCode\EndPoint\Objects\DeleteSpaceOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\EndPoint\Objects\DeleteUserOperation.cs">
+      <Link>LinkedSourceCode\EndPoint\Objects\DeleteUserOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\EndPoint\Objects\GetMembershipsOperation.cs">
+      <Link>LinkedSourceCode\EndPoint\Objects\GetMembershipsOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\EndPoint\Objects\GetMembersOperation.cs">
+      <Link>LinkedSourceCode\EndPoint\Objects\GetMembersOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\EndPoint\Objects\GetSpaceOperation.cs">
+      <Link>LinkedSourceCode\EndPoint\Objects\GetSpaceOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\EndPoint\Objects\GetSpacesOperation.cs">
+      <Link>LinkedSourceCode\EndPoint\Objects\GetSpacesOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\EndPoint\Objects\GetUserOperation.cs">
+      <Link>LinkedSourceCode\EndPoint\Objects\GetUserOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\EndPoint\Objects\GetUsersOperation.cs">
+      <Link>LinkedSourceCode\EndPoint\Objects\GetUsersOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\EndPoint\Objects\MembershipsOperation.cs">
+      <Link>LinkedSourceCode\EndPoint\Objects\MembershipsOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\EndPoint\Objects\MembersOperation.cs">
+      <Link>LinkedSourceCode\EndPoint\Objects\MembersOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\EndPoint\Objects\UpdateSpaceOperation.cs">
+      <Link>LinkedSourceCode\EndPoint\Objects\UpdateSpaceOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\EndPoint\Objects\UpdateUserOperation.cs">
+      <Link>LinkedSourceCode\EndPoint\Objects\UpdateUserOperation.cs</Link>
+    </Compile>
     <Compile Include="..\..\Api\PubnubApi\EndPoint\OtherOperation.cs">
       <Link>LinkedSourceCode\EndPoint\OtherOperation.cs</Link>
     </Compile>
@@ -197,6 +239,12 @@
     <Compile Include="..\..\Api\PubnubApi\Enum\PNLogVerbosity.cs">
       <Link>LinkedSourceCode\Enum\PNLogVerbosity.cs</Link>
     </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Enum\PNMemberField.cs">
+      <Link>LinkedSourceCode\Enum\PNMemberField.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Enum\PNMembershipField.cs">
+      <Link>LinkedSourceCode\Enum\PNMembershipField.cs</Link>
+    </Compile>
     <Compile Include="..\..\Api\PubnubApi\Enum\PNOperationType.cs">
       <Link>LinkedSourceCode\Enum\PNOperationType.cs</Link>
     </Compile>
@@ -245,6 +293,48 @@
     <Compile Include="..\..\Api\PubnubApi\Interface\IUrlRequestBuilder.cs">
       <Link>LinkedSourceCode\Interface\IUrlRequestBuilder.cs</Link>
     </Compile>
+    <Compile Include="..\..\Api\PubnubApi\JsonDataParse\JsonDataParseInternalUtil.cs">
+      <Link>LinkedSourceCode\JsonDataParse\JsonDataParseInternalUtil.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNCreateSpaceJsonDataParse.cs">
+      <Link>LinkedSourceCode\JsonDataParse\PNCreateSpaceJsonDataParse.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNCreateUserJsonDataParse.cs">
+      <Link>LinkedSourceCode\JsonDataParse\PNCreateUserJsonDataParse.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNGetMembershipsJsonDataParse.cs">
+      <Link>LinkedSourceCode\JsonDataParse\PNGetMembershipsJsonDataParse.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNGetMembersJsonDataParse.cs">
+      <Link>LinkedSourceCode\JsonDataParse\PNGetMembersJsonDataParse.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNGetSpaceJsonDataParse.cs">
+      <Link>LinkedSourceCode\JsonDataParse\PNGetSpaceJsonDataParse.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNGetSpacesJsonDataParse.cs">
+      <Link>LinkedSourceCode\JsonDataParse\PNGetSpacesJsonDataParse.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNGetUserJsonDataParse.cs">
+      <Link>LinkedSourceCode\JsonDataParse\PNGetUserJsonDataParse.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNGetUsersJsonDataParse.cs">
+      <Link>LinkedSourceCode\JsonDataParse\PNGetUsersJsonDataParse.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNMembershipsJsonDataParse.cs">
+      <Link>LinkedSourceCode\JsonDataParse\PNMembershipsJsonDataParse.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNMembersJsonDataParse.cs">
+      <Link>LinkedSourceCode\JsonDataParse\PNMembersJsonDataParse.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNObjectApiEventJsonDataParse.cs">
+      <Link>LinkedSourceCode\JsonDataParse\PNObjectApiEventJsonDataParse.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNUpdateSpaceJsonDataParse.cs">
+      <Link>LinkedSourceCode\JsonDataParse\PNUpdateSpaceJsonDataParse.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNUpdateUserJsonDataParse.cs">
+      <Link>LinkedSourceCode\JsonDataParse\PNUpdateUserJsonDataParse.cs</Link>
+    </Compile>
     <Compile Include="..\..\Api\PubnubApi\Log\LoggingMethod.cs">
       <Link>LinkedSourceCode\Log\LoggingMethod.cs</Link>
     </Compile>
@@ -290,6 +380,69 @@
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\History\PNMessageCountResult.cs">
       <Link>LinkedSourceCode\Model\Consumer\History\PNMessageCountResult.cs</Link>
     </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNCreateSpaceResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Objects\PNCreateSpaceResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNCreateUserResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Objects\PNCreateUserResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNDeleteSpaceResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Objects\PNDeleteSpaceResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNDeleteUserResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Objects\PNDeleteUserResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNGetMembershipsResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Objects\PNGetMembershipsResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNGetMembersResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Objects\PNGetMembersResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNGetSpaceResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Objects\PNGetSpaceResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNGetSpacesResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Objects\PNGetSpacesResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNGetUserResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Objects\PNGetUserResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNGetUsersResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Objects\PNGetUsersResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNMember.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Objects\PNMember.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNMembership.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Objects\PNMembership.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNMembershipsItemResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Objects\PNMembershipsItemResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNMembershipsResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Objects\PNMembershipsResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNMembersItemResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Objects\PNMembersItemResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNMembersResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Objects\PNMembersResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNPage.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Objects\PNPage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNSpaceResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Objects\PNSpaceResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNUpdateSpaceResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Objects\PNUpdateSpaceResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNUpdateUserResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Objects\PNUpdateUserResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNUserResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Objects\PNUserResult.cs</Link>
+    </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\PNErrorData.cs">
       <Link>LinkedSourceCode\Model\Consumer\PNErrorData.cs</Link>
     </Compile>
@@ -320,11 +473,17 @@
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Pubsub\PNMessageResult.cs">
       <Link>LinkedSourceCode\Model\Consumer\Pubsub\PNMessageResult.cs</Link>
     </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Pubsub\PNObjectApiEventResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Pubsub\PNObjectApiEventResult.cs</Link>
+    </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Pubsub\PNPresenceEventResult.cs">
       <Link>LinkedSourceCode\Model\Consumer\Pubsub\PNPresenceEventResult.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Pubsub\PNPublishResult.cs">
       <Link>LinkedSourceCode\Model\Consumer\Pubsub\PNPublishResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Pubsub\PNSignalResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Pubsub\PNSignalResult.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Push\PNPushAddChannelResult.cs">
       <Link>LinkedSourceCode\Model\Consumer\Push\PNPushAddChannelResult.cs</Link>
@@ -367,6 +526,48 @@
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Derived\History\PNMessageCountResultExt.cs">
       <Link>LinkedSourceCode\Model\Derived\History\PNMessageCountResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\Objects\PNCreateSpaceResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\Objects\PNCreateSpaceResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\Objects\PNCreateUserResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\Objects\PNCreateUserResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\Objects\PNDeleteSpaceResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\Objects\PNDeleteSpaceResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\Objects\PNDeleteUserResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\Objects\PNDeleteUserResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\Objects\PNGetMembershipsResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\Objects\PNGetMembershipsResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\Objects\PNGetMembersResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\Objects\PNGetMembersResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\Objects\PNGetSpaceResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\Objects\PNGetSpaceResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\Objects\PNGetSpacesResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\Objects\PNGetSpacesResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\Objects\PNGetUserResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\Objects\PNGetUserResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\Objects\PNGetUsersResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\Objects\PNGetUsersResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\Objects\PNMembershipsResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\Objects\PNMembershipsResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\Objects\PNMembersResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\Objects\PNMembersResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\Objects\PNUpdateSpaceResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\Objects\PNUpdateSpaceResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\Objects\PNUpdateUserResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\Objects\PNUpdateUserResultExt.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Derived\PNTimeResultExt.cs">
       <Link>LinkedSourceCode\Model\Derived\PNTimeResultExt.cs</Link>
@@ -504,6 +705,9 @@
     <Compile Include="WhenGrantIsRequested.cs" />
     <Compile Include="WhenMessageCountIsRequested.cs" />
     <Compile Include="WhenMessageDeletedFromChannel.cs" />
+    <Compile Include="WhenObjectMember.cs" />
+    <Compile Include="WhenObjectMembership.cs" />
+    <Compile Include="WhenObjectSpace.cs" />
     <Compile Include="WhenPushIsRequested.cs" />
     <Compile Include="WhenSubscribedToAChannel.cs" />
     <Compile Include="WhenSubscribedToAChannel2.cs" />
@@ -512,6 +716,7 @@
     <Compile Include="WhenSubscribedToWildcardChannel.cs" />
     <Compile Include="WhenUnsubscribedToAChannel.cs" />
     <Compile Include="WhenUnsubscribedToAChannelGroup.cs" />
+    <Compile Include="WhenObjectUser.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -532,12 +737,7 @@
       <Name>MockServer</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="LinkedSourceCode\EndPoint\Objects\" />
-    <Folder Include="LinkedSourceCode\JsonDataParse\" />
-    <Folder Include="LinkedSourceCode\Model\Consumer\Objects\" />
-    <Folder Include="LinkedSourceCode\Model\Derived\Objects\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" />
   <Target Name="EnsureBclBuildImported" BeforeTargets="BeforeBuild" Condition="'$(BclBuildImported)' == ''">

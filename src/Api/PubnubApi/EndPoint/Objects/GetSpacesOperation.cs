@@ -1,0 +1,149 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using PubnubApi.Interface;
+using System.Threading.Tasks;
+using System.Threading;
+using System.Net;
+
+namespace PubnubApi.EndPoint
+{
+    public class GetSpacesOperation : PubnubCoreBase
+    {
+        private readonly PNConfiguration config;
+        private readonly IJsonPluggableLibrary jsonLibrary;
+        private readonly IPubnubUnitTest unit;
+        private readonly IPubnubLog pubnubLog;
+        private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
+
+        private int limit = -1;
+        private bool includeCount = false;
+        private bool includeCustom = false;
+        private PNPage page;
+
+        private PNCallback<PNGetSpacesResult> savedCallback;
+        private Dictionary<string, object> queryParam;
+
+        public GetSpacesOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, instance)
+        {
+            config = pubnubConfig;
+            jsonLibrary = jsonPluggableLibrary;
+            unit = pubnubUnit;
+            pubnubLog = log;
+            pubnubTelemetryMgr = telemetryManager;
+
+            if (instance != null)
+            {
+                if (!ChannelRequest.ContainsKey(instance.InstanceId))
+                {
+                    ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
+                }
+                if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
+                {
+                    ChannelInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+                }
+                if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId))
+                {
+                    ChannelGroupInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+                }
+            }
+        }
+
+        public GetSpacesOperation Page(PNPage bookmarkPage)
+        {
+            this.page = bookmarkPage;
+            return this;
+        }
+
+        public GetSpacesOperation Limit(int numberOfSpaces)
+        {
+            this.limit = numberOfSpaces;
+            return this;
+        }
+
+        public GetSpacesOperation IncludeCount(bool includeTotalCount)
+        {
+            this.includeCount = includeTotalCount;
+            return this;
+        }
+
+        public GetSpacesOperation IncludeCustom(bool includeCustomData)
+        {
+            this.includeCustom = includeCustomData;
+            return this;
+        }
+
+        public GetSpacesOperation QueryParam(Dictionary<string, object> customQueryParam)
+        {
+            this.queryParam = customQueryParam;
+            return this;
+        }
+
+        public void Execute(PNCallback<PNGetSpacesResult> callback)
+        {
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+            Task.Factory.StartNew(() =>
+            {
+                this.savedCallback = callback;
+                GetSpaceList(this.page, this.limit, this.includeCount, this.includeCustom, this.queryParam, savedCallback);
+            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
+#else
+            new Thread(() =>
+            {
+                this.savedCallback = callback;
+                GetSpaceList(this.page, this.limit, this.includeCount, this.includeCustom, this.queryParam, savedCallback);
+            })
+            { IsBackground = true }.Start();
+#endif
+        }
+
+        internal void Retry()
+        {
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+            Task.Factory.StartNew(() =>
+            {
+                GetSpaceList(this.page, this.limit, this.includeCount, this.includeCustom, this.queryParam, savedCallback);
+            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
+#else
+            new Thread(() =>
+            {
+                GetSpaceList(this.page, this.limit, this.includeCount, this.includeCustom, this.queryParam, savedCallback);
+            })
+            { IsBackground = true }.Start();
+#endif
+        }
+
+        private void GetSpaceList(PNPage page, int limit, bool includeCount, bool includeCustom, Dictionary<string, object> externalQueryParam, PNCallback<PNGetSpacesResult> callback)
+        {
+            if (callback == null)
+            {
+                throw new ArgumentException("Missing callback");
+            }
+            if (page == null) { page = new PNPage(); }
+
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            Uri request = urlBuilder.BuildGetAllSpacesRequest(page.Next, page.Prev, limit, includeCount, includeCustom, externalQueryParam);
+
+            RequestState<PNGetSpacesResult> requestState = new RequestState<PNGetSpacesResult>();
+            requestState.ResponseType = PNOperationType.PNGetSpacesOperation;
+            requestState.PubnubCallback = callback;
+            requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
+
+            string json = "";
+
+            requestState.UsePostMethod = false;
+            json = UrlProcessRequest<PNGetSpacesResult>(request, requestState, false);
+
+            if (!string.IsNullOrEmpty(json))
+            {
+                List<object> result = ProcessJsonResponse<PNGetSpacesResult>(requestState, json);
+                ProcessResponseCallbacks(result, requestState);
+            }
+        }
+
+    }
+
+}

@@ -309,7 +309,7 @@ namespace PubNubMessaging.Tests
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
 
             SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
-                (o, m) =>
+                delegate(Pubnub o, PNSignalResult<object> m)
                 {
                     Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m));
                     if (m != null)
@@ -322,7 +322,7 @@ namespace PubNubMessaging.Tests
                         subscribeManualEvent.Set();
                     }
                 },
-                (o, s) => {
+                delegate(Pubnub o, PNStatus s) {
                     Debug.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
                     if (s.StatusCode != 200 || s.Error)
                     {

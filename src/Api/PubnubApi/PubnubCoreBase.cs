@@ -721,7 +721,34 @@ namespace PubnubApi
                                         payloadContainer.Add(currentMessageChannel);
                                     }
 
-                                    if (currentMessageChannel.Contains("-pnpres"))
+                                    if (currentMessage.MessageType == 1)
+                                    {
+                                        ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
+                                        PNMessageResult<T> pnMessageResult = responseBuilder.JsonToObject<PNMessageResult<T>>(payloadContainer, true);
+                                        if (pnMessageResult != null)
+                                        {
+                                            PNSignalResult<T> signalMessage = new PNSignalResult<T>
+                                            {
+                                                Channel = pnMessageResult.Channel,
+                                                Message = pnMessageResult.Message,
+                                                Subscription = pnMessageResult.Subscription,
+                                                Timetoken = pnMessageResult.Timetoken,
+                                                UserMetadata = pnMessageResult.UserMetadata,
+                                                Publisher = pnMessageResult.Publisher
+                                            };
+                                            Announce(signalMessage);
+                                        }
+                                    }
+                                    else if (currentMessage.MessageType == 2)
+                                    {
+                                        ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
+                                        PNObjectApiEventResult objectApiEvent = responseBuilder.JsonToObject<PNObjectApiEventResult>(payloadContainer, true);
+                                        if (objectApiEvent != null)
+                                        {
+                                            Announce(objectApiEvent);
+                                        }
+                                    }
+                                    else if (currentMessageChannel.Contains("-pnpres"))
                                     {
                                         ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
                                         PNPresenceEventResult presenceEvent = responseBuilder.JsonToObject<PNPresenceEventResult>(payloadContainer, true);
@@ -740,7 +767,7 @@ namespace PubnubApi
                                         PNMessageResult<T> userMessage = responseBuilder.JsonToObject<PNMessageResult<T>>(payloadContainer, true);
                                         if (userMessage != null)
                                         {
-                                            Announce(currentMessage.MessageType, userMessage);
+                                            Announce(userMessage);
                                         }
                                     }
 
@@ -791,6 +818,11 @@ namespace PubnubApi
                     case PNOperationType.PNUpdateSpaceOperation:
                     case PNOperationType.PNDeleteSpaceOperation:
                     case PNOperationType.PNGetSpacesOperation:
+                    case PNOperationType.PNGetSpaceOperation:
+                    case PNOperationType.PNMembershipsOperation:
+                    case PNOperationType.PNMembersOperation:
+                    case PNOperationType.PNGetMembershipsOperation:
+                    case PNOperationType.PNGetMembersOperation:
                         if (result != null && result.Count > 0)
                         {
                             ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
@@ -2059,21 +2091,26 @@ namespace PubnubApi
             
         }
 
-        internal void Announce<T>(int messageType, PNMessageResult<T> message)
+        internal void Announce<T>(PNMessageResult<T> message)
         {
             if (PubnubInstance != null && SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
             {
                 List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
                 for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
                 {
-                    if (messageType == 1)
-                    {
-                        callbackList[listenerIndex].Signal(PubnubInstance, message);
-                    }
-                    else
-                    {
-                        callbackList[listenerIndex].Message(PubnubInstance, message);
-                    }
+                    callbackList[listenerIndex].Message(PubnubInstance, message);
+                }
+            }
+        }
+
+        internal void Announce<T>(PNSignalResult<T> message)
+        {
+            if (PubnubInstance != null && SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
+            {
+                List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
+                for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
+                {
+                    callbackList[listenerIndex].Signal(PubnubInstance, message);
                 }
             }
         }
@@ -2088,6 +2125,19 @@ namespace PubnubApi
                     callbackList[listenerIndex].Presence(PubnubInstance, presence);
                 }
             }
+        }
+
+        internal void Announce(PNObjectApiEventResult objectApiEvent)
+        {
+            if (PubnubInstance != null && SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
+            {
+                List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
+                for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
+                {
+                    callbackList[listenerIndex].ObjectEvent(PubnubInstance, objectApiEvent);
+                }
+            }
+
         }
 
     }

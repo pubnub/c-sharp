@@ -71,7 +71,7 @@ namespace PubnubApiDemo
             Console.ForegroundColor = ConsoleColor.Blue;
             if (origin.Trim() == "")
             {
-                origin = "ps.pndsn.com";
+                origin = "ingress.bronze.aws-pdx-1.ps.pn:81";//"ps.pndsn.com";
                 Console.WriteLine("Default Origin selected");
             }
             else
@@ -124,7 +124,7 @@ namespace PubnubApiDemo
             else
             {
                 Console.WriteLine("Default demo subscribe key provided");
-                subscribeKey = "demo-36";
+                subscribeKey = "sub-c-10b61350-bec7-11e9-a375-f698c1d99dce";// "sub -c-8d06a312-b368-11e9-a263-9678fa0c1c24";// "demo-36";
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -139,7 +139,7 @@ namespace PubnubApiDemo
             else
             {
                 Console.WriteLine("Default demo publish key provided");
-                publishKey = "demo-36";
+                publishKey = "pub-c-c933d864-0585-42aa-8749-073db4b821ee";// "pub -c-113d4fde-1ebe-4202-8543-7a40468dd279";// "demo-36";
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -154,7 +154,7 @@ namespace PubnubApiDemo
             else
             {
                 Console.WriteLine("Default demo Secret key provided");
-                secretKey = "demo-36";
+                secretKey = "";// "sec-c-M2MzNzkxYTQtNDliYS00YjhiLWJkMDctMDU1OWI5OTBkMmQ5";// "demo-36";
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -275,19 +275,31 @@ namespace PubnubApiDemo
             //config.EnableTelemetry = false;
 
             pubnub = new Pubnub(config);
+            //Add listener to receive published messages and presence events
             pubnub.AddListener(new SubscribeCallbackExt(
-                (pnObj, pubMsg) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(pubMsg)); },
-                (pnObj, presenceEventObj) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(presenceEventObj)); },
-                (pnObj, pnStatus) =>
-                {
-                    Console.WriteLine("{0} {1} {2}", pnStatus.Operation, pnStatus.Category, pnStatus.StatusCode);
-                }));
+                delegate (Pubnub pnObj, PNMessageResult<object> pubMsg) { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(pubMsg)); },
+                delegate (Pubnub pnObj, PNPresenceEventResult presenceEvnt) { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(presenceEvnt)); },
+                delegate (Pubnub pnObj, PNStatus pnStatus) { Console.WriteLine("{0} {1} {2}", pnStatus.Operation, pnStatus.Category, pnStatus.StatusCode); }
+                ));
 
-            pubnub.AddListener(new SubscribeCallbackExt( 
-                (pnObj, signalMsg) => { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(signalMsg)); }, 
-                (pnObj, pnStatus) => {
-                    Console.WriteLine("{0} {1} {2}", pnStatus.Operation, pnStatus.Category, pnStatus.StatusCode);
-                }));
+            //Add listener to receive signal messages
+            pubnub.AddListener(new SubscribeCallbackExt(
+                delegate (Pubnub pnObj, PNSignalResult<object> signalMsg) { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(signalMsg)); },
+                delegate (Pubnub pnObj, PNStatus pnStatus) { Console.WriteLine("{0} {1} {2}", pnStatus.Operation, pnStatus.Category, pnStatus.StatusCode); }
+                ));
+
+            //Add listener to receive ObjectAPI event messages
+            pubnub.AddListener(new SubscribeCallbackExt(
+                delegate (Pubnub pnObj, PNObjectApiEventResult objectApiEventObj) 
+                {
+                    if (objectApiEventObj.Type == "user") { /* got user related event. */ }
+                    else if (objectApiEventObj.Type == "space") { /* got space related event. */ }
+                    else if (objectApiEventObj.Type == "membership") { /* got membership related event. */ }
+                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(objectApiEventObj));
+                },
+                delegate (Pubnub pnObj, PNStatus pnStatus) { Console.WriteLine("{0} {1} {2}", pnStatus.Operation, pnStatus.Category, pnStatus.StatusCode); }
+                ));
+
             bool exitFlag = false;
             string channel = "";
             string channelGroup = "";
@@ -296,7 +308,7 @@ namespace PubnubApiDemo
             Console.WriteLine("");
             while (!exitFlag)
             {
-                if (currentUserChoice < 1 || (currentUserChoice > 41 && currentUserChoice != 99))
+                if (currentUserChoice < 1 || (currentUserChoice > 53 && currentUserChoice != 99))
                 {
                     StringBuilder menuOptionsStringBuilder = new StringBuilder();
                     menuOptionsStringBuilder.AppendLine("ENTER 1 FOR Subscribe channel/channelgroup");
@@ -331,6 +343,18 @@ namespace PubnubApiDemo
                     menuOptionsStringBuilder.AppendLine("Enter 39 FOR Channel Group - Remove channel/group/namespace");
                     menuOptionsStringBuilder.AppendLine("Enter 40 FOR Channel Group - Get channel(s)/namespace(s)");
                     menuOptionsStringBuilder.AppendLine("Enter 41 FOR Signal");
+                    menuOptionsStringBuilder.AppendLine("Enter 42 FOR Create User");
+                    menuOptionsStringBuilder.AppendLine("Enter 43 FOR Get User(s)");
+                    menuOptionsStringBuilder.AppendLine("Enter 44 FOR Delete User");
+                    menuOptionsStringBuilder.AppendLine("Enter 45 FOR Update User");
+                    menuOptionsStringBuilder.AppendLine("Enter 46 FOR Create Space");
+                    menuOptionsStringBuilder.AppendLine("Enter 47 FOR Get Space(s)");
+                    menuOptionsStringBuilder.AppendLine("Enter 48 FOR Delete Space");
+                    menuOptionsStringBuilder.AppendLine("Enter 49 FOR Update Space");
+                    menuOptionsStringBuilder.AppendLine("Enter 50 FOR Add/Update/Remove Memberships");
+                    menuOptionsStringBuilder.AppendLine("Enter 51 FOR Add/Update/Remove Members");
+                    menuOptionsStringBuilder.AppendLine("Enter 52 FOR Get Memberships");
+                    menuOptionsStringBuilder.AppendLine("Enter 53 FOR Get Members");
                     menuOptionsStringBuilder.AppendLine("ENTER 99 FOR EXIT OR QUIT");
                     Console.WriteLine(menuOptionsStringBuilder.ToString());
                     userinput = Console.ReadLine();
@@ -344,6 +368,7 @@ namespace PubnubApiDemo
                     case "1":
                         Console.WriteLine("Enter CHANNEL name for subscribe. Use comma to enter multiple channels." + Environment.NewLine + "NOTE: If you want to consider only Channel Group(s), just hit ENTER");
                         channel = Console.ReadLine();
+                        channel = channel + ",pnuser-pandu-id-test,pandu-space-id,pnuser-pandu-my-id0";
 
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Channel = {0}", channel));
@@ -1378,6 +1403,299 @@ namespace PubnubApiDemo
                                     .Message(signalMsg)
                                     .Execute(new PNPublishResultExt((r, s) => { if (s.Error) { Console.WriteLine(s.ErrorData.Information); } else { Console.WriteLine(r.Timetoken); } }));
                             }
+                        }
+                        break;
+                    case "42":
+                        //for (int index=0; index < 6; index++)
+                        //{
+                        //    Dictionary<string, object> mycust = new Dictionary<string, object>();
+                        //    mycust.Add("color-"+index.ToString(), "red-" + index.ToString());
+                        //    pubnub.CreateUser()
+                        //        .Id("pandu-id-" + index.ToString())
+                        //        .Name("pandu-name-" + index.ToString())
+                        //        .ProfileUrl("pandu-url-" + index.ToString())
+                        //        .ExternalId("pandu-externalid-" + index.ToString())
+                        //        .Email("pandu-" + index.ToString() + "@pubnub.com")
+                        //        .CustomObject(mycust)
+                        //        .Execute(new PNCreateUserResultExt((r, s) => {
+                        //            if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
+                        //            else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
+                        //        }
+                        //        ));
+                        //}
+                        Dictionary<string, object> mycust = new Dictionary<string, object>();
+                        mycust.Add("color", "red");
+                        pubnub.CreateUser()
+                                .Id("pandu-id-test")
+                                .Name("pandu-name-test")
+                                //.ProfileUrl("pandu-url-test")
+                                //.ExternalId("pandu-externalid-")
+                                //.Email("pandu@pubnub.com")
+                                .CustomObject(mycust)
+                                .Execute(new PNCreateUserResultExt((r, s) => {
+                                    if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
+                                    else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
+                                }
+                                ));
+                        break;
+                    case "43":
+                        Console.WriteLine("Enter User Id to retrieve User, else press ENTER.");
+                        string singleUserId = Console.ReadLine();
+
+                        if (!string.IsNullOrWhiteSpace(singleUserId))
+                        {
+                            pubnub.GetUser()
+                                .UserId(singleUserId)
+                                .IncludeCustom(true)
+                                .Execute(new PNGetUserResultExt((r, s) => {
+                                    if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
+                                    else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
+                                }
+                                ));
+                        }
+                        else
+                        {
+                            pubnub.GetUsers()
+                                .IncludeCount(true)
+                                .IncludeCustom(true)
+                                //.Limit(2)
+                                .Page(new PNPage() { Next = "", Prev = "" })
+                                .Execute(new PNGetUsersResultExt((r, s) => {
+                                    if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
+                                    else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
+                                }
+                                ));
+                        }
+                        break;
+                    case "44":
+                        Console.WriteLine("Enter User Id to delete User.");
+                        string deleteUserId = Console.ReadLine();
+                        if (!string.IsNullOrWhiteSpace(deleteUserId))
+                        {
+                            pubnub.DeleteUser()
+                                .Id(deleteUserId)
+                                .Execute(new PNDeleteUserResultExt((r, s) => {
+                                    if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
+                                    else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
+                                }
+                                ));
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid User Id. Try again.");
+                        }
+                        break;
+                    case "45":
+                        Dictionary<string, object> myUpdcust = new Dictionary<string, object>();
+                        myUpdcust.Add("color111", "green111");
+                        pubnub.UpdateUser()
+                            .Id("pandu-id-test")
+                            .Name("pandu-name-edited3")
+                            //.ProfileUrl("pandu-url-edited3")
+                            .ExternalId("pandu-externalid-edited3")
+                            //.Email("pandu@pubnub.com-edited3")
+                            .CustomObject(myUpdcust)
+                            .Execute(new PNUpdateUserResultExt((r, s) => {
+                                if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
+                                else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
+                            }
+                            ));
+                        break;
+                    case "46":
+                        //for (int index = 0; index < 6; index++)
+                        //{
+                        //    Dictionary<string, object> mySpacecust = new Dictionary<string, object>();
+                        //    mySpacecust.Add("space-color-" + index.ToString(), "space-red-" + index.ToString());
+                        //    pubnub.CreateSpace()
+                        //        .Id("pandu-space-id-" + index.ToString())
+                        //        .Name("pandu-space-name-" + index.ToString())
+                        //        .Description("pandu-space-description-" + index.ToString())
+                        //        .CustomObject(mySpacecust)
+                        //        .Execute(new PNCreateSpaceResultExt((r, s) => {
+                        //            if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
+                        //            else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
+                        //        }
+                        //        ));
+                        //}
+                        Dictionary<string, object> mySpacecust = new Dictionary<string, object>();
+                        mySpacecust.Add("space-color", "space-red");
+                        pubnub.CreateSpace()
+                            .Id("pandu-space-id")
+                            .Name("pandu-space-name")
+                            .Description("pandu-space-description")
+                            .CustomObject(mySpacecust)
+                            .Execute(new PNCreateSpaceResultExt((r, s) =>
+                            {
+                                if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
+                                else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
+                            }
+                            ));
+                        break;
+                    case "47":
+                        Console.WriteLine("Enter Space Id to retrieve specific Space, else press ENTER.");
+                        string singleSpaceId = Console.ReadLine();
+
+                        if (!string.IsNullOrWhiteSpace(singleSpaceId))
+                        {
+                            pubnub.GetSpace()
+                                .SpaceId(singleSpaceId)
+                                .IncludeCustom(true)
+                                .Execute(new PNGetSpaceResultExt((r, s) => {
+                                    if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
+                                    else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
+                                }
+                                ));
+                        }
+                        else
+                        {
+                            pubnub.GetSpaces()
+                                .IncludeCount(true)
+                                .IncludeCustom(true)
+                                //.Limit(2)
+                                .Page(new PNPage() { Next = "", Prev = "" })
+                                .Execute(new PNGetSpacesResultExt((r, s) => {
+                                    if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
+                                    else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
+                                }
+                                ));
+                        }
+                        break;
+                    case "48":
+                        Console.WriteLine("Enter Space Id to delete Space.");
+                        string deleteSpaceId = Console.ReadLine();
+                        if (!string.IsNullOrWhiteSpace(deleteSpaceId))
+                        {
+                            pubnub.DeleteSpace()
+                                .Id(deleteSpaceId)
+                                .Execute(new PNDeleteSpaceResultExt((r, s) => {
+                                    if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
+                                    else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
+                                }
+                                ));
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid Space Id. Try again.");
+                        }
+                        break;
+                    case "49":
+                        Dictionary<string, object> mySpaceUpdcust = new Dictionary<string, object>();
+                        mySpaceUpdcust.Add("space-color-edited-222", "space-red-edited-222");
+                        pubnub.UpdateSpace()
+                            .Id("pandu-space-id")
+                            .Name("pandu-space-name-edited")
+                            .Description("pandu-space-description-edited")
+                            .CustomObject(mySpaceUpdcust)
+                            .Execute(new PNUpdateSpaceResultExt((r, s) => {
+                                if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
+                                else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
+                            }
+                            ));
+                        break;
+                    case "50":
+                        List<PNMembership> addList = new List<PNMembership>();
+                        addList.Add(new PNMembership() { SpaceId = "pandu-space-id", Custom = new Dictionary<string, object>() { { "foo-000", "bar-000" } } });
+                        //addList.Add(new PNMembership() { SpaceId = "pandu-space-id-1" });
+                        //addList.Add(new PNMembership() { SpaceId = "pandu-space-id-2" });
+                        //addList.Add(new PNMembership() { SpaceId = "pandu-space-id-3" });
+                        List<PNMembership> updateList = new List<PNMembership>();
+                        //updateList.Add(new PNMembership() { SpaceId = "pandu-space-id", Custom = new Dictionary<string, object>() { { "foo-000", "bar-000" } } });
+                        //updateList.Add(new PNMembership() { SpaceId = "pandu-space-id-1", Custom = new Dictionary<string, object>() { { "fun", "boo" } } });
+                        //updateList.Add(new PNMembership() { SpaceId = "pandu-space-id-2", Custom = new Dictionary<string, object>() { { "foo2", "bar2" } } });
+                        //updateList.Add(new PNMembership() { SpaceId = "pandu-space-id-3", Custom = new Dictionary<string, object>() { { "fun3", "boo3" } } });
+                        List<string> removeList = new List<string>();
+                        //removeList.Add("pandu-space-id");
+                        //removeList.Add("pandu-space-id-3");
+
+                        pubnub.Memberships()
+                            .UserId("pandu-id-test")
+                            .Add(addList)
+                            .Update(updateList)
+                            .Remove(removeList)
+                            //.Include(new PNMembershipField[] { PNMembershipField.CUSTOM, PNMembershipField.SPACE, PNMembershipField.SPACE_CUSTOM })
+                            .IncludeCount(true)
+                            //.Limit(2)
+                            .Page(new PNPage() { Next = "", Prev = "" })
+                            .Execute(new PNMembershipsResultExt((r, s) => {
+                                if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
+                                else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
+                            }
+                            ));
+                        break;
+                    case "51":
+                        List<PNMember> addMemberList = new List<PNMember>();
+                        addMemberList.Add(new PNMember() { UserId = "pandu-id-test" });
+                        //addMemberList.Add(new PNMember() { UserId = "pandu-id-1" });
+                        //addMemberList.Add(new PNMember() { UserId = "pandu-id-2" });
+                        //addMemberList.Add(new PNMember() { UserId = "pandu-id-3" });
+
+                        List<PNMember> updMemberList = new List<PNMember>();
+                        //updMemberList.Add(new PNMember() { UserId = "pandu-id-test", Custom = new Dictionary<string, object>() { { "foo-0", "bar-0" } } });
+                        //updMemberList.Add(new PNMember() { UserId = "pandu-id-1", Custom = new Dictionary<string, object>() { { "foo-1", "bar-1" } } });
+                        //updMemberList.Add(new PNMember() { UserId = "pandu-id-2", Custom = new Dictionary<string, object>() { { "foo-2", "bar-2" } } });
+                        //updMemberList.Add(new PNMember() { UserId = "pandu-id-3", Custom = new Dictionary<string, object>() { { "foo-3", "bar-3" } } });
+
+                        List<string> remMemberList = new List<string>();
+                        //remMemberList.Add("pandu-id-test");
+                        //remMemberList.Add("pandu-id-1");
+
+                        pubnub.Members()
+                            .SpaceId("pandu-space-id")
+                            .Add(addMemberList)
+                            .Update(updMemberList)
+                            .Remove(remMemberList)
+                            .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.USER, PNMemberField.USER_CUSTOM })
+                            .IncludeCount(true)
+                            //.Limit(2)
+                            .Page(new PNPage() { Next = "", Prev = "" })
+                            .Execute(new PNMembersResultExt((r, s) => {
+                                if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
+                                else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
+                            }
+                            ));
+                        break;
+                    case "52":
+                        Console.WriteLine("Enter User Id to Get Memberships.");
+                        string getMembershipsUserId = Console.ReadLine();
+                        if (!string.IsNullOrEmpty(getMembershipsUserId))
+                        {
+                            pubnub.GetMemberships()
+                                .UserId(getMembershipsUserId)
+                                .Include(new PNMembershipField[] { PNMembershipField.CUSTOM, PNMembershipField.SPACE, PNMembershipField.SPACE_CUSTOM })
+                                .IncludeCount(true)
+                                //.Limit(2)
+                                .Page(new PNPage() { Next = "", Prev = "" })
+                                .Execute(new PNGetMembershipsResultExt((r, s) => {
+                                    if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
+                                    else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
+                                }
+                                ));
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid UserId!!!");
+                        }
+                        break;
+                    case "53":
+                        Console.WriteLine("Enter Space Id to Get Members.");
+                        string getMembersSpaceId = Console.ReadLine();
+                        if (!string.IsNullOrEmpty(getMembersSpaceId))
+                        {
+                            pubnub.GetMembers()
+                                .SpaceId(getMembersSpaceId)
+                                .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.USER, PNMemberField.USER_CUSTOM })
+                                .IncludeCount(true)
+                                //.Limit(2)
+                                .Page(new PNPage() { Next = "", Prev = "" })
+                                .Execute(new PNGetMembersResultExt((r, s) => {
+                                    if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
+                                    else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
+                                }
+                                ));
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid SpaceId!!!");
                         }
                         break;
                     default:

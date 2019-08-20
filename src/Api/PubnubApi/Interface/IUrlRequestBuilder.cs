@@ -58,5 +58,33 @@ namespace PubnubApi.Interface
         Uri BuildPresenceHeartbeatRequest(string[] channels, string[] channelGroups, string jsonUserState);
 
         Uri BuildMessageCountsRequest(string[] channels, long[] timetokens, Dictionary<string, object> externalQueryParam);
+
+        Uri BuildCreateUserRequest(string userId, string userName, string userExternalId, string userProfileUrl, string userEmail, Dictionary<string, object> userCustom, Dictionary<string, object> externalQueryParam);
+
+        Uri BuildUpdateUserRequest(string userId, string userName, string userExternalId, string userProfileUrl, string userEmail, Dictionary<string, object> userCustom, Dictionary<string, object> externalQueryParam);
+
+        Uri BuildDeleteUserRequest(string userId, Dictionary<string, object> externalQueryParam);
+
+        Uri BuildGetAllUsersRequest(string start, string end, int limit, bool includeCount, bool includeCustom, Dictionary<string, object> externalQueryParam);
+
+        Uri BuildGetSingleUserRequest(string userId, bool includeCustom, Dictionary<string, object> externalQueryParam);
+
+        Uri BuildCreateSpaceRequest(string spaceId, string spaceName, string spaceDescription, Dictionary<string, object> spaceCustom, Dictionary<string, object> externalQueryParam);
+
+        Uri BuildUpdateSpaceRequest(string spaceId, string spaceName, string spaceDescription, Dictionary<string, object> spaceCustom, Dictionary<string, object> externalQueryParam);
+
+        Uri BuildDeleteSpaceRequest(string spaceId, Dictionary<string, object> externalQueryParam);
+
+        Uri BuildGetAllSpacesRequest(string start, string end, int limit, bool includeCount, bool includeCustom, Dictionary<string, object> externalQueryParam);
+
+        Uri BuildGetSingleSpaceRequest(string spaceId, bool includeCustom, Dictionary<string, object> externalQueryParam);
+
+        Uri BuildUpdateSpaceMembershipsWithUserRequest(string userId, Dictionary<string, object> custom, string start, string end, int limit, bool includeCount, string includeOptions, Dictionary<string, object> externalQueryParam);
+
+        Uri BuildMembersAddUpdateRemoveRequest(string spaceId, Dictionary<string, object> custom, string start, string end, int limit, bool includeCount, string includeOptions, Dictionary<string, object> externalQueryParam);
+
+        Uri BuildGetAllMembershipsRequest(string userId, string start, string end, int limit, bool includeCount, string includeOptions, Dictionary<string, object> externalQueryParam);
+
+        Uri BuildGetAllMembersRequest(string spaceId, string start, string end, int limit, bool includeCount, string includeOptions, Dictionary<string, object> externalQueryParam);
     }
 }

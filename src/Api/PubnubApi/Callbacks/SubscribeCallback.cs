@@ -10,6 +10,8 @@ namespace PubnubApi
 
         public abstract void Presence(Pubnub pubnub, PNPresenceEventResult presence);
 
-        public abstract void Signal<T>(Pubnub pubnub, PNMessageResult<T> signal);
+        public abstract void Signal<T>(Pubnub pubnub, PNSignalResult<T> signal);
+
+        public abstract void ObjectEvent(Pubnub pubnub, PNObjectApiEventResult objectEvent);
     }
 }

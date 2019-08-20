@@ -549,7 +549,12 @@ namespace PubNubMessaging.Tests
             {
             }
 
-            public override void Signal<T>(Pubnub pubnub, PNMessageResult<T> signal)
+            public override void Signal<T>(Pubnub pubnub, PNSignalResult<T> signal)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override void ObjectEvent(Pubnub pubnub, PNObjectApiEventResult objectEvent)
             {
                 throw new NotImplementedException();
             }

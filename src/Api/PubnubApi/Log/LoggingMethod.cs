@@ -22,6 +22,10 @@ namespace PubnubApi
 					System.Diagnostics.Debug.WriteLine(ex.ToString());
 				}
 			}
+            else
+            {
+                System.Diagnostics.Debug.WriteLine(logText);
+            }
 		}
 	}
 	#endregion

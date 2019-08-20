@@ -32,6 +32,7 @@ namespace PubnubApi
         PNUpdateSpaceOperation,
         PNDeleteSpaceOperation,
         PNGetSpacesOperation,
+        PNGetSpaceOperation,
 
         PNMembershipsOperation,
         PNMembersOperation,
