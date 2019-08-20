@@ -15,15 +15,15 @@ namespace PubnubApi
                 Dictionary<string, object> dicObj = JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[listIndex]);
                 if (dicObj != null && dicObj.Count > 0)
                 {
+                    result = new PNGetUsersResult();
                     if (dicObj.ContainsKey("data") && dicObj["data"] != null)
                     {
-                        result = new PNGetUsersResult();
                         result.Users = new List<PNUserResult>();
 
                         Dictionary<string, object> getUserDataDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(dicObj["data"]);
                         if (getUserDataDic != null && getUserDataDic.Count > 0)
                         {
-                            var user = new PNUserResult()
+                            var user = new PNUserResult
                             {
                                 Id = (getUserDataDic.ContainsKey("id") && getUserDataDic["id"] != null) ? getUserDataDic["id"].ToString() : "",
                                 Name = (getUserDataDic.ContainsKey("name") && getUserDataDic["name"] != null) ? getUserDataDic["name"].ToString() : "",
@@ -49,7 +49,7 @@ namespace PubnubApi
                                     Dictionary<string, object> userDataDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(userDataArray[index]);
                                     if (userDataDic != null && userDataDic.Count > 0)
                                     {
-                                        var usrData = new PNUserResult()
+                                        var usrData = new PNUserResult
                                         {
                                             Id = (userDataDic.ContainsKey("id") && userDataDic["id"] != null) ? userDataDic["id"].ToString() : "",
                                             Name = (userDataDic.ContainsKey("name") && userDataDic["name"] != null) ? userDataDic["name"].ToString() : "",

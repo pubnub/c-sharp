@@ -18,7 +18,7 @@ namespace PubnubApi.EndPoint
         private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 
         private string spcId = "";
-        private bool includeCustom = false;
+        private bool includeCustom;
 
         private PNCallback<PNGetSpaceResult> savedCallback;
         private Dictionary<string, object> queryParam;

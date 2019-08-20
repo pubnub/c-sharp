@@ -15,9 +15,9 @@ namespace PubnubApi
                 Dictionary<string, object> dicObj = JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[listIndex]);
                 if (dicObj != null && dicObj.Count > 0)
                 {
+                    result = new PNMembershipsResult();
                     if (dicObj.ContainsKey("data") && dicObj["data"] != null)
                     {
-                        result = new PNMembershipsResult();
                         result.Memberships = new List<PNMembershipsItemResult>();
 
                         object[] spaceArray = JsonDataParseInternalUtil.ConvertToObjectArray(dicObj["data"]);
@@ -28,7 +28,7 @@ namespace PubnubApi
                                 Dictionary<string, object> getMbrshipItemDataDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(spaceArray[index]);
                                 if (getMbrshipItemDataDic != null && getMbrshipItemDataDic.Count > 0)
                                 {
-                                    var mbrshipItem = new PNMembershipsItemResult()
+                                    var mbrshipItem = new PNMembershipsItemResult
                                     {
                                         SpaceId = (getMbrshipItemDataDic.ContainsKey("id") && getMbrshipItemDataDic["id"] != null) ? getMbrshipItemDataDic["id"].ToString() : "",
                                         Created = (getMbrshipItemDataDic.ContainsKey("created") && getMbrshipItemDataDic["created"] != null) ? getMbrshipItemDataDic["created"].ToString() : "",
@@ -43,7 +43,7 @@ namespace PubnubApi
                                         Dictionary<string, object> spaceDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(getMbrshipItemDataDic["space"]);
                                         if (spaceDic != null && spaceDic.Count > 0)
                                         {
-                                            var spaceResult = new PNGetSpaceResult()
+                                            var spaceResult = new PNGetSpaceResult
                                             {
                                                 Id = (spaceDic.ContainsKey("id") && spaceDic["id"] != null) ? spaceDic["id"].ToString() : "",
                                                 Name = (spaceDic.ContainsKey("name") && spaceDic["name"] != null) ? spaceDic["name"].ToString() : "",

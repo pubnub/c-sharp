@@ -17,12 +17,9 @@ namespace PubnubApi.EndPoint
         private readonly IPubnubLog pubnubLog;
         private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 
-        //private string start = "";
-        //private string end = "";
         private string usrId = "";
         private int limit = -1;
-        private bool includeCount = false;
-        //private bool commandDelimitedIncludeOptions = false;
+        private bool includeCount;
         private string commandDelimitedIncludeOptions = "";
         private PNPage page;
 
@@ -134,11 +131,13 @@ namespace PubnubApi.EndPoint
             {
                 throw new ArgumentException("Missing callback");
             }
-            if (page == null) { page = new PNPage(); }
+            PNPage internalPage;
+            if (page == null) { internalPage = new PNPage(); }
+            else { internalPage = page; }
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildGetAllMembershipsRequest(userId, page.Next, page.Prev, limit, includeCount, includeOptions, externalQueryParam);
+            Uri request = urlBuilder.BuildGetAllMembershipsRequest(userId, internalPage.Next, internalPage.Prev, limit, includeCount, includeOptions, externalQueryParam);
 
             RequestState<PNGetMembershipsResult> requestState = new RequestState<PNGetMembershipsResult>();
             requestState.ResponseType = PNOperationType.PNGetMembershipsOperation;
@@ -158,7 +157,7 @@ namespace PubnubApi.EndPoint
             }
         }
 
-        private string MapEnumValueToEndpoint(string enumValue)
+        private static string MapEnumValueToEndpoint(string enumValue)
         {
             string ret = "";
             if (enumValue.ToLowerInvariant() == "custom")

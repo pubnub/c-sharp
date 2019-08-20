@@ -18,7 +18,7 @@ namespace PubnubApi
                 Dictionary<string, object> userDataDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(getUserDicObj["data"]);
                 if (userDataDic != null && userDataDic.Count > 0)
                 {
-                    var usrData = new PNGetUserResult()
+                    var usrData = new PNGetUserResult
                     {
                         Id = (userDataDic.ContainsKey("id") && userDataDic["id"] != null) ? userDataDic["id"].ToString() : "",
                         Name = (userDataDic.ContainsKey("name") && userDataDic["name"] != null) ? userDataDic["name"].ToString() : "",

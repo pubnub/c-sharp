@@ -15,9 +15,9 @@ namespace PubnubApi
                 Dictionary<string, object> dicObj = JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[listIndex]);
                 if (dicObj != null && dicObj.Count > 0)
                 {
+                    result = new PNGetMembersResult();
                     if (dicObj.ContainsKey("data") && dicObj["data"] != null)
                     {
-                        result = new PNGetMembersResult();
                         result.Members = new List<PNMembersItemResult>();
 
                         object[] userArray = JsonDataParseInternalUtil.ConvertToObjectArray(dicObj["data"]);
@@ -28,7 +28,7 @@ namespace PubnubApi
                                 Dictionary<string, object> getMbrItemDataDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(userArray[index]);
                                 if (getMbrItemDataDic != null && getMbrItemDataDic.Count > 0)
                                 {
-                                    var mbrItem = new PNMembersItemResult()
+                                    var mbrItem = new PNMembersItemResult
                                     {
                                         UserId = (getMbrItemDataDic.ContainsKey("id") && getMbrItemDataDic["id"] != null) ? getMbrItemDataDic["id"].ToString() : "",
                                         Created = (getMbrItemDataDic.ContainsKey("created") && getMbrItemDataDic["created"] != null) ? getMbrItemDataDic["created"].ToString() : "",
@@ -43,7 +43,7 @@ namespace PubnubApi
                                         Dictionary<string, object> userDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(getMbrItemDataDic["space"]);
                                         if (userDic != null && userDic.Count > 0)
                                         {
-                                            var userResult = new PNUserResult()
+                                            var userResult = new PNUserResult
                                             {
                                                 Id = (userDic.ContainsKey("id") && userDic["id"] != null) ? userDic["id"].ToString() : "",
                                                 Name = (userDic.ContainsKey("name") && userDic["name"] != null) ? userDic["name"].ToString() : "",

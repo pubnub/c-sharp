@@ -17,7 +17,7 @@ namespace PubnubApi.EndPoint
         private readonly IPubnubLog pubnubLog;
         private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 
-        private bool includeCustom = false;
+        private bool includeCustom;
         private string usrId = "";
 
         private PNCallback<PNGetUserResult> savedCallback;

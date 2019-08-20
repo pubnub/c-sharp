@@ -148,7 +148,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildUpdateUserRequest(userId, userName, userExternalId, userProfileUrl, userEmail, userCustom, externalQueryParam);
+            Uri request = urlBuilder.BuildUpdateUserRequest(userId, userCustom, externalQueryParam);
 
             RequestState<PNUpdateUserResult> requestState = new RequestState<PNUpdateUserResult>();
             requestState.ResponseType = PNOperationType.PNUpdateUserOperation;

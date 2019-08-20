@@ -1062,7 +1062,7 @@ namespace PubnubApi
             return BuildRestApiRequest(url, currentType, queryParams);
         }
 
-        Uri IUrlRequestBuilder.BuildCreateUserRequest(string userId, string userName, string userExternalId, string userProfileUrl, string userEmail, Dictionary<string, object> userCustom, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildCreateUserRequest(Dictionary<string, object> userCustom, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PNCreateUserOperation;
 
@@ -1093,7 +1093,7 @@ namespace PubnubApi
             return BuildRestApiRequest(url, currentType, queryParams);
         }
 
-        Uri IUrlRequestBuilder.BuildUpdateUserRequest(string userId, string userName, string userExternalId, string userProfileUrl, string userEmail, Dictionary<string, object> userCustom, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildUpdateUserRequest(string userId, Dictionary<string, object> userCustom, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PNUpdateUserOperation;
 
@@ -1235,7 +1235,7 @@ namespace PubnubApi
             return BuildRestApiRequest(url, currentType, queryParams);
         }
 
-        Uri IUrlRequestBuilder.BuildCreateSpaceRequest(string spaceId, string spaceName, string spaceDescription, Dictionary<string, object> spaceCustom, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildCreateSpaceRequest(Dictionary<string, object> spaceCustom, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PNCreateSpaceOperation;
 
@@ -1266,7 +1266,7 @@ namespace PubnubApi
             return BuildRestApiRequest(url, currentType, queryParams);
         }
 
-        Uri IUrlRequestBuilder.BuildUpdateSpaceRequest(string spaceId, string spaceName, string spaceDescription, Dictionary<string, object> spaceCustom, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildUpdateSpaceRequest(string spaceId, Dictionary<string, object> spaceCustom, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PNUpdateUserOperation;
 
@@ -1408,7 +1408,7 @@ namespace PubnubApi
             return BuildRestApiRequest(url, currentType, queryParams);
         }
 
-        Uri IUrlRequestBuilder.BuildUpdateSpaceMembershipsWithUserRequest(string userId, Dictionary<string, object> custom, string start, string end, int limit, bool includeCount, string includeOptions, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildUpdateSpaceMembershipsWithUserRequest(string userId, string start, string end, int limit, bool includeCount, string includeOptions, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PNMembershipsOperation;
 
@@ -1457,7 +1457,7 @@ namespace PubnubApi
             return BuildRestApiRequest(url, currentType, queryParams);
         }
 
-        Uri IUrlRequestBuilder.BuildMembersAddUpdateRemoveRequest(string spaceId, Dictionary<string, object> custom, string start, string end, int limit, bool includeCount, string includeOptions, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildMembersAddUpdateRemoveRequest(string spaceId, string start, string end, int limit, bool includeCount, string includeOptions, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PNMembersOperation;
 

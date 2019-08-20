@@ -134,7 +134,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildCreateSpaceRequest(spaceId, spaceName, spaceDescription, spaceCustom, externalQueryParam);
+            Uri request = urlBuilder.BuildCreateSpaceRequest(spaceCustom, externalQueryParam);
 
             RequestState<PNCreateSpaceResult> requestState = new RequestState<PNCreateSpaceResult>();
             requestState.ResponseType = PNOperationType.PNCreateSpaceOperation;

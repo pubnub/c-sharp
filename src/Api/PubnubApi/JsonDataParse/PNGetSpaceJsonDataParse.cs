@@ -18,7 +18,7 @@ namespace PubnubApi
                 Dictionary<string, object> getSpaceDataDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(getSpaceDicObj["data"]);
                 if (getSpaceDataDic != null && getSpaceDataDic.Count > 0)
                 {
-                    var user = new PNGetSpaceResult()
+                    var user = new PNGetSpaceResult
                     {
                         Id = (getSpaceDataDic.ContainsKey("id") && getSpaceDataDic["id"] != null) ? getSpaceDataDic["id"].ToString() : "",
                         Name = (getSpaceDataDic.ContainsKey("name") && getSpaceDataDic["name"] != null) ? getSpaceDataDic["name"].ToString() : "",

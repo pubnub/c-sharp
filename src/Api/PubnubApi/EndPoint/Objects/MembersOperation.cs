@@ -26,7 +26,7 @@ namespace PubnubApi.EndPoint
         private string commandDelimitedIncludeOptions = "";
         private PNPage page;
         private int limit = -1;
-        private bool includeCount = false;
+        private bool includeCount;
 
         private PNCallback<PNMembersResult> savedCallback;
         private Dictionary<string, object> queryParam;
@@ -177,14 +177,13 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing userCallback");
             }
 
-            if (page == null)
-            {
-                page = new PNPage();
-            }
+            PNPage internalPage;
+            if (page == null) { internalPage = new PNPage(); }
+            else { internalPage = page; }
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildMembersAddUpdateRemoveRequest(spaceId, custom, page.Next, page.Prev, limit, includeCount, includeOptions, externalQueryParam);
+            Uri request = urlBuilder.BuildMembersAddUpdateRemoveRequest(spaceId, internalPage.Next, internalPage.Prev, limit, includeCount, includeOptions, externalQueryParam);
 
             RequestState<PNMembersResult> requestState = new RequestState<PNMembersResult>();
             requestState.ResponseType = PNOperationType.PNMembersOperation;
@@ -211,7 +210,7 @@ namespace PubnubApi.EndPoint
                 {
                     if (!string.IsNullOrEmpty(removeMemberList[index]))
                     {
-                        removeMbrFormat.Add(new PNDeleteMember() { UserId = removeMemberList[index] });
+                        removeMbrFormat.Add(new PNDeleteMember { UserId = removeMemberList[index] });
                     }
                 }
                 messageEnvelope.Add("remove", removeMbrFormat);
@@ -230,7 +229,7 @@ namespace PubnubApi.EndPoint
             }
         }
 
-        private string MapEnumValueToEndpoint(string enumValue)
+        private static string MapEnumValueToEndpoint(string enumValue)
         {
             string ret = "";
             if (enumValue.ToLowerInvariant() == "custom")

@@ -26,7 +26,7 @@ namespace PubnubApi.EndPoint
         private string commandDelimitedIncludeOptions = "";
         private PNPage page;
         private int limit = -1;
-        private bool includeCount = false;
+        private bool includeCount;
 
         private PNCallback<PNMembershipsResult> savedCallback;
         private Dictionary<string, object> queryParam;
@@ -177,14 +177,13 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing userCallback");
             }
 
-            if (page == null)
-            {
-                page = new PNPage();
-            }
+            PNPage internalPage;
+            if (page == null) { internalPage = new PNPage(); }
+            else { internalPage = page; }
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildUpdateSpaceMembershipsWithUserRequest(userId, custom, page.Next, page.Prev, limit, includeCount, includeOptions, externalQueryParam);
+            Uri request = urlBuilder.BuildUpdateSpaceMembershipsWithUserRequest(userId, internalPage.Next, internalPage.Prev, limit, includeCount, includeOptions, externalQueryParam);
 
             RequestState<PNMembershipsResult> requestState = new RequestState<PNMembershipsResult>();
             requestState.ResponseType = PNOperationType.PNMembershipsOperation;
@@ -211,7 +210,7 @@ namespace PubnubApi.EndPoint
                 {
                     if (!string.IsNullOrEmpty(removeMembership[index]))
                     {
-                        removeMbrshipFormat.Add(new PNDeleteMembership() { SpaceId = removeMembership[index] });
+                        removeMbrshipFormat.Add(new PNDeleteMembership { SpaceId = removeMembership[index] });
                     }
                 }
                 messageEnvelope.Add("remove", removeMbrshipFormat);
@@ -230,7 +229,7 @@ namespace PubnubApi.EndPoint
             }
         }
 
-        private string MapEnumValueToEndpoint(string enumValue)
+        private static string MapEnumValueToEndpoint(string enumValue)
         {
             string ret = "";
             if (enumValue.ToLowerInvariant() == "custom")

@@ -15,15 +15,15 @@ namespace PubnubApi
                 Dictionary<string, object> dicObj = JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[listIndex]);
                 if (dicObj != null && dicObj.Count > 0)
                 {
+                    result = new PNGetSpacesResult();
                     if (dicObj.ContainsKey("data") && dicObj["data"] != null)
                     {
-                        result = new PNGetSpacesResult();
                         result.Spaces = new List<PNSpaceResult>();
 
                         Dictionary<string, object> getSpaceDataDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(dicObj["data"]);
                         if (getSpaceDataDic != null && getSpaceDataDic.Count > 0)
                         {
-                            var user = new PNSpaceResult()
+                            var user = new PNSpaceResult
                             {
                                 Id = (getSpaceDataDic.ContainsKey("id") && getSpaceDataDic["id"] != null) ? getSpaceDataDic["id"].ToString() : "",
                                 Name = (getSpaceDataDic.ContainsKey("name") && getSpaceDataDic["name"] != null) ? getSpaceDataDic["name"].ToString() : "",
@@ -47,7 +47,7 @@ namespace PubnubApi
                                     Dictionary<string, object> spaceDataDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(spaceDataArray[index]);
                                     if (spaceDataDic != null && spaceDataDic.Count > 0)
                                     {
-                                        var spcData = new PNSpaceResult()
+                                        var spcData = new PNSpaceResult
                                         {
                                             Id = (spaceDataDic.ContainsKey("id") && spaceDataDic["id"] != null) ? spaceDataDic["id"].ToString() : "",
                                             Name = (spaceDataDic.ContainsKey("name") && spaceDataDic["name"] != null) ? spaceDataDic["name"].ToString() : "",

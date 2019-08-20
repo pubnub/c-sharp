@@ -18,8 +18,8 @@ namespace PubnubApi.EndPoint
         private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 
         private int limit = -1;
-        private bool includeCount = false;
-        private bool includeCustom = false;
+        private bool includeCount;
+        private bool includeCustom;
         private PNPage page;
 
         private PNCallback<PNGetUsersResult> savedCallback;
@@ -120,11 +120,13 @@ namespace PubnubApi.EndPoint
             {
                 throw new ArgumentException("Missing callback");
             }
-            if (page == null) { page = new PNPage(); }
+            PNPage internalPage;
+            if (page == null) { internalPage = new PNPage(); }
+            else { internalPage = page; }
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildGetAllUsersRequest(page.Next, page.Prev, limit, includeCount, includeCustom, externalQueryParam);
+            Uri request = urlBuilder.BuildGetAllUsersRequest(internalPage.Next, internalPage.Prev, limit, includeCount, includeCustom, externalQueryParam);
 
             RequestState<PNGetUsersResult> requestState = new RequestState<PNGetUsersResult>();
             requestState.ResponseType = PNOperationType.PNGetUsersOperation;

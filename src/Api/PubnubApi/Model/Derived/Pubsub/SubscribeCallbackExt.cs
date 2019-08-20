@@ -13,9 +13,6 @@ namespace PubnubApi
         readonly Action<Pubnub, PNPresenceEventResult> presenceAction;
         readonly Action<Pubnub, PNSignalResult<object>> signalAction;
         readonly Action<Pubnub, PNStatus> statusAction;
-        //readonly Action<Pubnub, PNUserEventResult> userAction;
-        //readonly Action<Pubnub, PNSpaceEventResult> spaceAction;
-        //readonly Action<Pubnub, PNMembershipEventResult> membershipAction;
         readonly Action<Pubnub, PNObjectApiEventResult> objectApiAction;
 
         public SubscribeCallbackExt(Action<Pubnub, PNMessageResult<object>> messageCallback, Action<Pubnub, PNPresenceEventResult> presenceCallback, Action<Pubnub, PNStatus> statusCallback)
@@ -24,9 +21,6 @@ namespace PubnubApi
             this.presenceAction = presenceCallback;
             this.statusAction = statusCallback;
             this.signalAction = null;
-            //this.userAction = null;
-            //this.spaceAction = null;
-            //this.membershipAction = null;
             this.objectApiAction = null;
         }
 
@@ -34,26 +28,10 @@ namespace PubnubApi
         {
             this.subscribeAction = null;
             this.presenceAction = null;
-            //this.userAction = null;
-            //this.spaceAction = null;
-            //this.membershipAction = null;
             this.statusAction = statusCallback;
             this.signalAction = signalCallback;
             this.objectApiAction = null;
         }
-
-        //public SubscribeCallbackExt(Action<Pubnub, PNUserEventResult> userCallback, Action<Pubnub, PNSpaceEventResult> spaceCallback, Action<Pubnub, PNMembershipEventResult> membershipCallback, Action<Pubnub, PNStatus> statusCallback)
-        //{
-        //    this.subscribeAction = null;
-        //    this.presenceAction = null;
-        //    this.signalAction = null;
-        //    this.statusAction = statusCallback;
-        //    this.userAction = userCallback;
-        //    this.spaceAction = spaceCallback;
-        //    this.membershipAction = membershipCallback;
-        //    this.objectApiAction = null;
-
-        //}
 
         public SubscribeCallbackExt(Action<Pubnub, PNObjectApiEventResult> objectApiCallback, Action<Pubnub, PNStatus> statusCallback)
         {
@@ -61,9 +39,6 @@ namespace PubnubApi
             this.presenceAction = null;
             this.signalAction = null;
             this.statusAction = statusCallback;
-            //this.userAction = null;
-            //this.spaceAction = null;
-            //this.membershipAction = null;
             this.objectApiAction = objectApiCallback;
 
         }
@@ -103,21 +78,6 @@ namespace PubnubApi
 
             signalAction?.Invoke(pubnub, message1);
         }
-
-        //public override void User(Pubnub pubnub, PNUserEventResult userEvent)
-        //{
-        //    userAction?.Invoke(pubnub, userEvent);
-        //}
-
-        //public override void Space(Pubnub pubnub, PNSpaceEventResult spaceEvent)
-        //{
-        //    spaceAction?.Invoke(pubnub, spaceEvent);
-        //}
-
-        //public override void Membership(Pubnub pubnub, PNMembershipEventResult membershipEvent)
-        //{
-        //    membershipAction?.Invoke(pubnub, membershipEvent);
-        //}
 
         public override void ObjectEvent(Pubnub pubnub, PNObjectApiEventResult objectEvent)
         {

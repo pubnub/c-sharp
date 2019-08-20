@@ -17,12 +17,9 @@ namespace PubnubApi.EndPoint
         private readonly IPubnubLog pubnubLog;
         private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 
-        //private string start = "";
-        //private string end = "";
         private string spcId = "";
         private int limit = -1;
-        private bool includeCount = false;
-        //private bool commandDelimitedIncludeOptions = false;
+        private bool includeCount;
         private string commandDelimitedIncludeOptions = "";
         private PNPage page;
 
@@ -65,18 +62,6 @@ namespace PubnubApi.EndPoint
             this.page = bookmarkPage;
             return this;
         }
-
-        //public GetMembersOperation PageNext(string bookmarkNext)
-        //{
-        //    this.start = bookmarkNext;
-        //    return this;
-        //}
-
-        //public GetMembersOperation PagePrev(string bookmarkPrev)
-        //{
-        //    this.end = bookmarkPrev;
-        //    return this;
-        //}
 
         public GetMembersOperation Limit(int numberOfObjects)
         {
@@ -146,11 +131,13 @@ namespace PubnubApi.EndPoint
             {
                 throw new ArgumentException("Missing callback");
             }
-            if (page == null) { page = new PNPage(); }
+            PNPage internalPage;
+            if (page == null) { internalPage = new PNPage(); }
+            else { internalPage = page; }
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildGetAllMembersRequest(spaceId, page.Next, page.Prev, limit, includeCount, includeOptions, externalQueryParam);
+            Uri request = urlBuilder.BuildGetAllMembersRequest(spaceId, internalPage.Next, internalPage.Prev, limit, includeCount, includeOptions, externalQueryParam);
 
             RequestState<PNGetMembersResult> requestState = new RequestState<PNGetMembersResult>();
             requestState.ResponseType = PNOperationType.PNGetMembersOperation;
@@ -170,7 +157,7 @@ namespace PubnubApi.EndPoint
             }
         }
 
-        private string MapEnumValueToEndpoint(string enumValue)
+        private static string MapEnumValueToEndpoint(string enumValue)
         {
             string ret = "";
             if (enumValue.ToLowerInvariant() == "custom")
