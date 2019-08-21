@@ -14,9 +14,15 @@ namespace PubnubApi
             Dictionary<string, object> objectEventDicObj = JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[0]);
             if (objectEventDicObj != null)
             {
-                result = new PNObjectApiEventResult();
+                if (result == null)
+                {
+                    result = new PNObjectApiEventResult();
+                }
 
-                result.Event = objectEventDicObj["event"].ToString();
+                if (objectEventDicObj.ContainsKey("event") && objectEventDicObj["event"] != null)
+                {
+                    result.Event = objectEventDicObj["event"].ToString();
+                }
 
                 if (listObject.Count > 2)
                 {
@@ -27,48 +33,48 @@ namespace PubnubApi
                     }
                 }
 
-                if (objectEventDicObj.ContainsKey("type"))
+                if (objectEventDicObj.ContainsKey("type") && objectEventDicObj["type"] != null)
                 {
                     result.Type = objectEventDicObj["type"].ToString();
                 }
 
-                if (objectEventDicObj.ContainsKey("data"))
+                if (objectEventDicObj.ContainsKey("data") && objectEventDicObj["data"] != null)
                 {
                     Dictionary<string, object> dataDic = objectEventDicObj["data"] as Dictionary<string, object>;
                     if (dataDic != null)
                     {
                         if (result.Type.ToLowerInvariant() == "user" && dataDic.ContainsKey("id"))
                         {
-                            result.UserId = dataDic["id"].ToString();
+                            result.UserId = dataDic["id"] != null ? dataDic["id"].ToString() : null;
                             result.User = new PNUserResult
                             {
-                                Id = dataDic["id"].ToString(),
+                                Id = dataDic["id"] != null ? dataDic["id"].ToString() : null,
                                 Name = (dataDic.ContainsKey("name") && dataDic["name"] != null) ? dataDic["name"].ToString() : null,
                                 ExternalId = (dataDic.ContainsKey("externalId") && dataDic["externalId"] != null) ? dataDic["externalId"].ToString() : null,
                                 ProfileUrl = (dataDic.ContainsKey("profileUrl") && dataDic["profileUrl"] != null) ? dataDic["profileUrl"].ToString() : null,
                                 Email = (dataDic.ContainsKey("email") && dataDic["email"] != null) ? dataDic["email"].ToString() : null,
                                 Custom = (dataDic.ContainsKey("custom") && dataDic["custom"] != null) ? JsonDataParseInternalUtil.ConvertToDictionaryObject(dataDic["custom"]) : null,
-                                Created = (dataDic.ContainsKey("created") && dataDic["created"] != null) ? dataDic["created"].ToString() : "",
-                                Updated = (dataDic.ContainsKey("updated") && dataDic["updated"] != null) ? dataDic["updated"].ToString() : ""
+                                Created = (dataDic.ContainsKey("created") && dataDic["created"] != null) ? dataDic["created"].ToString() : null,
+                                Updated = (dataDic.ContainsKey("updated") && dataDic["updated"] != null) ? dataDic["updated"].ToString() : null
                             };
                         }
                         else if (result.Type.ToLowerInvariant() == "space" && dataDic.ContainsKey("id"))
                         {
-                            result.SpaceId = dataDic["id"].ToString();
+                            result.SpaceId = dataDic["id"] != null ? dataDic["id"].ToString() : null;
                             result.Space = new PNSpaceResult
                             {
-                                Id = dataDic["id"].ToString(),
+                                Id = dataDic["id"] != null ? dataDic["id"].ToString() : null,
                                 Name = (dataDic.ContainsKey("name") && dataDic["name"] != null) ? dataDic["name"].ToString() : null,
                                 Description = (dataDic.ContainsKey("description") && dataDic["description"] != null) ? dataDic["description"].ToString() : null,
                                 Custom = (dataDic.ContainsKey("custom") && dataDic["custom"] != null) ? JsonDataParseInternalUtil.ConvertToDictionaryObject(dataDic["custom"]) : null,
-                                Created = (dataDic.ContainsKey("created") && dataDic["created"] != null) ? dataDic["created"].ToString() : "",
-                                Updated = (dataDic.ContainsKey("updated") && dataDic["updated"] != null) ? dataDic["updated"].ToString() : ""
+                                Created = (dataDic.ContainsKey("created") && dataDic["created"] != null) ? dataDic["created"].ToString() : null,
+                                Updated = (dataDic.ContainsKey("updated") && dataDic["updated"] != null) ? dataDic["updated"].ToString() : null
                             };
                         }
                         else if (result.Type.ToLowerInvariant() == "membership" && dataDic.ContainsKey("userId") && dataDic.ContainsKey("spaceId"))
                         {
-                            result.UserId = dataDic["userId"].ToString();
-                            result.SpaceId = dataDic["spaceId"].ToString();
+                            result.UserId = dataDic["userId"] != null ? dataDic["userId"].ToString() : null;
+                            result.SpaceId = dataDic["spaceId"] != null ? dataDic["spaceId"].ToString() : null;
                         }
                     }
                 }

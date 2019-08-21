@@ -15,7 +15,10 @@ namespace PubnubApi
                 Dictionary<string, object> dicObj = JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[listIndex]);
                 if (dicObj != null && dicObj.Count > 0)
                 {
-                    result = new PNGetSpacesResult();
+                    if (result == null)
+                    {
+                        result = new PNGetSpacesResult();
+                    }
                     if (dicObj.ContainsKey("data") && dicObj["data"] != null)
                     {
                         result.Spaces = new List<PNSpaceResult>();
@@ -25,11 +28,11 @@ namespace PubnubApi
                         {
                             var user = new PNSpaceResult
                             {
-                                Id = (getSpaceDataDic.ContainsKey("id") && getSpaceDataDic["id"] != null) ? getSpaceDataDic["id"].ToString() : "",
-                                Name = (getSpaceDataDic.ContainsKey("name") && getSpaceDataDic["name"] != null) ? getSpaceDataDic["name"].ToString() : "",
-                                Description = (getSpaceDataDic.ContainsKey("description") && getSpaceDataDic["description"] != null) ? getSpaceDataDic["description"].ToString() : "",
-                                Created = (getSpaceDataDic.ContainsKey("created") && getSpaceDataDic["created"] != null) ? getSpaceDataDic["created"].ToString() : "",
-                                Updated = (getSpaceDataDic.ContainsKey("updated") && getSpaceDataDic["updated"] != null) ? getSpaceDataDic["updated"].ToString() : ""
+                                Id = (getSpaceDataDic.ContainsKey("id") && getSpaceDataDic["id"] != null) ? getSpaceDataDic["id"].ToString() : null,
+                                Name = (getSpaceDataDic.ContainsKey("name") && getSpaceDataDic["name"] != null) ? getSpaceDataDic["name"].ToString() : null,
+                                Description = (getSpaceDataDic.ContainsKey("description") && getSpaceDataDic["description"] != null) ? getSpaceDataDic["description"].ToString() : null,
+                                Created = (getSpaceDataDic.ContainsKey("created") && getSpaceDataDic["created"] != null) ? getSpaceDataDic["created"].ToString() : null,
+                                Updated = (getSpaceDataDic.ContainsKey("updated") && getSpaceDataDic["updated"] != null) ? getSpaceDataDic["updated"].ToString() : null
                             };
                             if (getSpaceDataDic.ContainsKey("custom"))
                             {
@@ -49,11 +52,11 @@ namespace PubnubApi
                                     {
                                         var spcData = new PNSpaceResult
                                         {
-                                            Id = (spaceDataDic.ContainsKey("id") && spaceDataDic["id"] != null) ? spaceDataDic["id"].ToString() : "",
-                                            Name = (spaceDataDic.ContainsKey("name") && spaceDataDic["name"] != null) ? spaceDataDic["name"].ToString() : "",
-                                            Description = (spaceDataDic.ContainsKey("description") && spaceDataDic["description"] != null) ? spaceDataDic["description"].ToString() : "",
-                                            Created = (spaceDataDic.ContainsKey("created") && spaceDataDic["created"] != null) ? spaceDataDic["created"].ToString() : "",
-                                            Updated = (spaceDataDic.ContainsKey("updated") && spaceDataDic["updated"] != null) ? spaceDataDic["updated"].ToString() : ""
+                                            Id = (spaceDataDic.ContainsKey("id") && spaceDataDic["id"] != null) ? spaceDataDic["id"].ToString() : null,
+                                            Name = (spaceDataDic.ContainsKey("name") && spaceDataDic["name"] != null) ? spaceDataDic["name"].ToString() : null,
+                                            Description = (spaceDataDic.ContainsKey("description") && spaceDataDic["description"] != null) ? spaceDataDic["description"].ToString() : null,
+                                            Created = (spaceDataDic.ContainsKey("created") && spaceDataDic["created"] != null) ? spaceDataDic["created"].ToString() : null,
+                                            Updated = (spaceDataDic.ContainsKey("updated") && spaceDataDic["updated"] != null) ? spaceDataDic["updated"].ToString() : null
                                         };
 
                                         if (spaceDataDic.ContainsKey("custom"))

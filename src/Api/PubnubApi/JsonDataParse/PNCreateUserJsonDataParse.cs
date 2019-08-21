@@ -18,8 +18,8 @@ namespace PubnubApi
                 Dictionary<string, object> getCreateUserDataDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(createUserDicObj["data"]);
                 if (getCreateUserDataDic != null && getCreateUserDataDic.Count > 0)
                 {
-                    result.Id = getCreateUserDataDic.ContainsKey("id") ? getCreateUserDataDic["id"].ToString() : "";
-                    result.Name = getCreateUserDataDic.ContainsKey("name") ? getCreateUserDataDic["name"].ToString() : "";
+                    result.Id = getCreateUserDataDic.ContainsKey("id") && getCreateUserDataDic["id"] != null ? getCreateUserDataDic["id"].ToString() : null;
+                    result.Name = getCreateUserDataDic.ContainsKey("name") && getCreateUserDataDic["name"] != null ? getCreateUserDataDic["name"].ToString() : null;
                     result.ExternalId = getCreateUserDataDic.ContainsKey("externalId") && getCreateUserDataDic["externalId"] != null ? getCreateUserDataDic["externalId"].ToString() : null;
                     result.ProfileUrl = getCreateUserDataDic.ContainsKey("profileUrl") && getCreateUserDataDic["profileUrl"] != null ? getCreateUserDataDic["profileUrl"].ToString() : null;
                     result.Email = getCreateUserDataDic.ContainsKey("email") && getCreateUserDataDic["email"] != null ? getCreateUserDataDic["email"].ToString() : null;

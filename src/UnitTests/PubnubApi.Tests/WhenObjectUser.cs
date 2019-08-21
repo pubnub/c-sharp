@@ -351,10 +351,7 @@ namespace PubNubMessaging.Tests
             pubnub.Unsubscribe<string>().Channels(new string[] { "pnuser-" + userId }).Execute();
             pubnub.RemoveListener(eventListener);
 
-            if (!receivedDeleteEvent || !receivedUpdateEvent)
-            {
-                Assert.IsTrue(receivedMessage, "User events Failed");
-            }
+            Assert.IsTrue(receivedDeleteEvent && receivedUpdateEvent, "User events Failed");
 
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;

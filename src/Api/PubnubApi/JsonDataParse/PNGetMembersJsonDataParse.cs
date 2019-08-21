@@ -15,7 +15,10 @@ namespace PubnubApi
                 Dictionary<string, object> dicObj = JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[listIndex]);
                 if (dicObj != null && dicObj.Count > 0)
                 {
-                    result = new PNGetMembersResult();
+                    if (result == null)
+                    {
+                        result = new PNGetMembersResult();
+                    }
                     if (dicObj.ContainsKey("data") && dicObj["data"] != null)
                     {
                         result.Members = new List<PNMembersItemResult>();
@@ -30,28 +33,28 @@ namespace PubnubApi
                                 {
                                     var mbrItem = new PNMembersItemResult
                                     {
-                                        UserId = (getMbrItemDataDic.ContainsKey("id") && getMbrItemDataDic["id"] != null) ? getMbrItemDataDic["id"].ToString() : "",
-                                        Created = (getMbrItemDataDic.ContainsKey("created") && getMbrItemDataDic["created"] != null) ? getMbrItemDataDic["created"].ToString() : "",
-                                        Updated = (getMbrItemDataDic.ContainsKey("updated") && getMbrItemDataDic["updated"] != null) ? getMbrItemDataDic["updated"].ToString() : ""
+                                        UserId = (getMbrItemDataDic.ContainsKey("id") && getMbrItemDataDic["id"] != null) ? getMbrItemDataDic["id"].ToString() : null,
+                                        Created = (getMbrItemDataDic.ContainsKey("created") && getMbrItemDataDic["created"] != null) ? getMbrItemDataDic["created"].ToString() : null,
+                                        Updated = (getMbrItemDataDic.ContainsKey("updated") && getMbrItemDataDic["updated"] != null) ? getMbrItemDataDic["updated"].ToString() : null
                                     };
                                     if (getMbrItemDataDic.ContainsKey("custom"))
                                     {
                                         mbrItem.Custom = JsonDataParseInternalUtil.ConvertToDictionaryObject(getMbrItemDataDic["custom"]);
                                     }
-                                    if (getMbrItemDataDic.ContainsKey("user"))
+                                    if (getMbrItemDataDic.ContainsKey("user") && getMbrItemDataDic["user"] != null)
                                     {
-                                        Dictionary<string, object> userDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(getMbrItemDataDic["space"]);
+                                        Dictionary<string, object> userDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(getMbrItemDataDic["user"]);
                                         if (userDic != null && userDic.Count > 0)
                                         {
                                             var userResult = new PNUserResult
                                             {
-                                                Id = (userDic.ContainsKey("id") && userDic["id"] != null) ? userDic["id"].ToString() : "",
-                                                Name = (userDic.ContainsKey("name") && userDic["name"] != null) ? userDic["name"].ToString() : "",
-                                                ExternalId = (userDic.ContainsKey("externalId") && userDic["externalId"] != null) ? userDic["externalId"].ToString() : "",
-                                                ProfileUrl = (userDic.ContainsKey("profileUrl") && userDic["profileUrl"] != null) ? userDic["profileUrl"].ToString() : "",
-                                                Email = (userDic.ContainsKey("email") && userDic["email"] != null) ? userDic["email"].ToString() : "",
-                                                Created = (userDic.ContainsKey("created") && userDic["created"] != null) ? userDic["created"].ToString() : "",
-                                                Updated = (userDic.ContainsKey("updated") && userDic["updated"] != null) ? userDic["updated"].ToString() : ""
+                                                Id = (userDic.ContainsKey("id") && userDic["id"] != null) ? userDic["id"].ToString() : null,
+                                                Name = (userDic.ContainsKey("name") && userDic["name"] != null) ? userDic["name"].ToString() : null,
+                                                ExternalId = (userDic.ContainsKey("externalId") && userDic["externalId"] != null) ? userDic["externalId"].ToString() : null,
+                                                ProfileUrl = (userDic.ContainsKey("profileUrl") && userDic["profileUrl"] != null) ? userDic["profileUrl"].ToString() : null,
+                                                Email = (userDic.ContainsKey("email") && userDic["email"] != null) ? userDic["email"].ToString() : null,
+                                                Created = (userDic.ContainsKey("created") && userDic["created"] != null) ? userDic["created"].ToString() : null,
+                                                Updated = (userDic.ContainsKey("updated") && userDic["updated"] != null) ? userDic["updated"].ToString() : null
                                             };
                                             if (userDic.ContainsKey("custom"))
                                             {

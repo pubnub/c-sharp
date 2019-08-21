@@ -15,7 +15,10 @@ namespace PubnubApi
                 Dictionary<string, object> dicObj = JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[listIndex]);
                 if (dicObj != null && dicObj.Count > 0)
                 {
-                    result = new PNGetMembershipsResult();
+                    if (result == null)
+                    {
+                        result = new PNGetMembershipsResult();
+                    }
                     if (dicObj.ContainsKey("data") && dicObj["data"] != null)
                     {
                         result.Memberships = new List<PNMembershipsItemResult>();
@@ -30,26 +33,26 @@ namespace PubnubApi
                                 {
                                     var mbrshipItem = new PNMembershipsItemResult
                                     {
-                                        SpaceId = (getMbrshipItemDataDic.ContainsKey("id") && getMbrshipItemDataDic["id"] != null) ? getMbrshipItemDataDic["id"].ToString() : "",
-                                        Created = (getMbrshipItemDataDic.ContainsKey("created") && getMbrshipItemDataDic["created"] != null) ? getMbrshipItemDataDic["created"].ToString() : "",
-                                        Updated = (getMbrshipItemDataDic.ContainsKey("updated") && getMbrshipItemDataDic["updated"] != null) ? getMbrshipItemDataDic["updated"].ToString() : ""
+                                        SpaceId = (getMbrshipItemDataDic.ContainsKey("id") && getMbrshipItemDataDic["id"] != null) ? getMbrshipItemDataDic["id"].ToString() : null,
+                                        Created = (getMbrshipItemDataDic.ContainsKey("created") && getMbrshipItemDataDic["created"] != null) ? getMbrshipItemDataDic["created"].ToString() : null,
+                                        Updated = (getMbrshipItemDataDic.ContainsKey("updated") && getMbrshipItemDataDic["updated"] != null) ? getMbrshipItemDataDic["updated"].ToString() : null
                                     };
                                     if (getMbrshipItemDataDic.ContainsKey("custom"))
                                     {
                                         mbrshipItem.Custom = JsonDataParseInternalUtil.ConvertToDictionaryObject(getMbrshipItemDataDic["custom"]);
                                     }
-                                    if (getMbrshipItemDataDic.ContainsKey("space"))
+                                    if (getMbrshipItemDataDic.ContainsKey("space") && getMbrshipItemDataDic["space"] != null)
                                     {
                                         Dictionary<string, object> spaceDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(getMbrshipItemDataDic["space"]);
                                         if (spaceDic != null && spaceDic.Count > 0)
                                         {
                                             var spaceResult = new PNGetSpaceResult
                                             {
-                                                Id = (spaceDic.ContainsKey("id") && spaceDic["id"] != null) ? spaceDic["id"].ToString() : "",
-                                                Name = (spaceDic.ContainsKey("name") && spaceDic["name"] != null) ? spaceDic["name"].ToString() : "",
-                                                Description = (spaceDic.ContainsKey("description") && spaceDic["description"] != null) ? spaceDic["description"].ToString() : "",
-                                                Created = (spaceDic.ContainsKey("created") && spaceDic["created"] != null) ? spaceDic["created"].ToString() : "",
-                                                Updated = (spaceDic.ContainsKey("updated") && spaceDic["updated"] != null) ? spaceDic["updated"].ToString() : ""
+                                                Id = (spaceDic.ContainsKey("id") && spaceDic["id"] != null) ? spaceDic["id"].ToString() : null,
+                                                Name = (spaceDic.ContainsKey("name") && spaceDic["name"] != null) ? spaceDic["name"].ToString() : null,
+                                                Description = (spaceDic.ContainsKey("description") && spaceDic["description"] != null) ? spaceDic["description"].ToString() : null,
+                                                Created = (spaceDic.ContainsKey("created") && spaceDic["created"] != null) ? spaceDic["created"].ToString() : null,
+                                                Updated = (spaceDic.ContainsKey("updated") && spaceDic["updated"] != null) ? spaceDic["updated"].ToString() : null
                                             };
                                             if (spaceDic.ContainsKey("custom"))
                                             {

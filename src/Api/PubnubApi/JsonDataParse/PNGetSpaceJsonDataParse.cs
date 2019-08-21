@@ -20,11 +20,11 @@ namespace PubnubApi
                 {
                     var user = new PNGetSpaceResult
                     {
-                        Id = (getSpaceDataDic.ContainsKey("id") && getSpaceDataDic["id"] != null) ? getSpaceDataDic["id"].ToString() : "",
-                        Name = (getSpaceDataDic.ContainsKey("name") && getSpaceDataDic["name"] != null) ? getSpaceDataDic["name"].ToString() : "",
-                        Description = (getSpaceDataDic.ContainsKey("description") && getSpaceDataDic["description"] != null) ? getSpaceDataDic["description"].ToString() : "",
-                        Created = (getSpaceDataDic.ContainsKey("created") && getSpaceDataDic["created"] != null) ? getSpaceDataDic["created"].ToString() : "",
-                        Updated = (getSpaceDataDic.ContainsKey("updated") && getSpaceDataDic["updated"] != null) ? getSpaceDataDic["updated"].ToString() : ""
+                        Id = (getSpaceDataDic.ContainsKey("id") && getSpaceDataDic["id"] != null) ? getSpaceDataDic["id"].ToString() : null,
+                        Name = (getSpaceDataDic.ContainsKey("name") && getSpaceDataDic["name"] != null) ? getSpaceDataDic["name"].ToString() : null,
+                        Description = (getSpaceDataDic.ContainsKey("description") && getSpaceDataDic["description"] != null) ? getSpaceDataDic["description"].ToString() : null,
+                        Created = (getSpaceDataDic.ContainsKey("created") && getSpaceDataDic["created"] != null) ? getSpaceDataDic["created"].ToString() : null,
+                        Updated = (getSpaceDataDic.ContainsKey("updated") && getSpaceDataDic["updated"] != null) ? getSpaceDataDic["updated"].ToString() : null
                     };
                     if (getSpaceDataDic.ContainsKey("custom"))
                     {

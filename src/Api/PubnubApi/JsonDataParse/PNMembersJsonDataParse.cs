@@ -15,7 +15,10 @@ namespace PubnubApi
                 Dictionary<string, object> dicObj = JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[listIndex]);
                 if (dicObj != null && dicObj.Count > 0)
                 {
-                    result = new PNMembersResult();
+                    if (result == null)
+                    {
+                        result = new PNMembersResult();
+                    }
                     if (dicObj.ContainsKey("data") && dicObj["data"] != null)
                     {
                         result.Members = new List<PNMembersItemResult>();
