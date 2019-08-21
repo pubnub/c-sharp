@@ -9,7 +9,7 @@ changelog:
       - type: Improvement
         text: Modified Signal listener message type to PNSignalResult.
       - type: Improvement
-        text: Added ObjectAPI feature.
+        text: Added ObjectsAPI feature.
   - version: 4.0.32.0
     date: August 08, 2019
     changes:
@@ -391,8 +391,23 @@ features:
     - SUBSCRIBE-FILTER-EXPRESSION
     - SUBSCRIBE-PUBLISHER-UUID
     - SUBSCRIBE-SIGNAL-LISTENER
+    - SUBSCRIBE-OBJECTS-LISTENER
   signal:
     - SIGNAL-SEND
+  objects:
+    - OBJECTS-GET-USERS
+    - OBJECTS-GET-USER
+    - OBJECTS-CREATE-USER
+    - OBJECTS-UPDATE-USER
+    - OBJECTS-DELETE-USER
+    - OBJECTS-GET-SPACES
+    - OBJECTS-CREATE-SPACE
+    - OBJECTS-GET-SPACE
+    - OBJECTS-UPDATE-SPACE
+    - OBJECTS-GET-SPACE-MEMBERSHIP
+    - OBJECTS-UPDATE-SPACE-MEMBERSHIP
+    - OBJECTS-GET-MEMBERS
+    - OBJECTS-UPDATE-MEMBERS
   others:
     - TELEMETRY
     - QUERY-PARAM    
