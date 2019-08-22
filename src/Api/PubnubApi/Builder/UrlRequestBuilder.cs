@@ -1062,6 +1062,550 @@ namespace PubnubApi
             return BuildRestApiRequest(url, currentType, queryParams);
         }
 
+        Uri IUrlRequestBuilder.BuildCreateUserRequest(Dictionary<string, object> userCustom, Dictionary<string, object> externalQueryParam)
+        {
+            PNOperationType currentType = PNOperationType.PNCreateUserOperation;
+
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("objects");
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("users");
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+            if (userCustom != null)
+            {
+                requestQueryStringParams.Add("include", "custom");
+            }
+            if (externalQueryParam != null && externalQueryParam.Count > 0)
+            {
+                foreach (KeyValuePair<string, object> kvp in externalQueryParam)
+                {
+                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    {
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                    }
+                }
+            }
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest(url, currentType, queryParams);
+        }
+
+        Uri IUrlRequestBuilder.BuildUpdateUserRequest(string userId, Dictionary<string, object> userCustom, Dictionary<string, object> externalQueryParam)
+        {
+            PNOperationType currentType = PNOperationType.PNUpdateUserOperation;
+
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("objects");
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("users");
+            url.Add(userId);
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+            if (userCustom != null)
+            {
+                requestQueryStringParams.Add("include", "custom");
+            }
+            if (externalQueryParam != null && externalQueryParam.Count > 0)
+            {
+                foreach (KeyValuePair<string, object> kvp in externalQueryParam)
+                {
+                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    {
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                    }
+                }
+            }
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest(url, currentType, queryParams);
+        }
+
+        Uri IUrlRequestBuilder.BuildDeleteUserRequest(string userId, Dictionary<string, object> externalQueryParam)
+        {
+            PNOperationType currentType = PNOperationType.PNDeleteUserOperation;
+
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("objects");
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("users");
+            url.Add(string.IsNullOrEmpty(userId) ? "" : userId);
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+            if (externalQueryParam != null && externalQueryParam.Count > 0)
+            {
+                foreach (KeyValuePair<string, object> kvp in externalQueryParam)
+                {
+                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    {
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                    }
+                }
+            }
+
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest(url, currentType, queryParams);
+        }
+
+        Uri IUrlRequestBuilder.BuildGetAllUsersRequest(string start, string end, int limit, bool includeCount, bool includeCustom, Dictionary<string, object> externalQueryParam)
+        {
+            PNOperationType currentType = PNOperationType.PNGetUsersOperation;
+
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("objects");
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("users");
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+            if (!string.IsNullOrEmpty(start))
+            {
+                requestQueryStringParams.Add("start", UriUtil.EncodeUriComponent(false, start, currentType, false, false, false));
+            }
+            if (!string.IsNullOrEmpty(end))
+            {
+                requestQueryStringParams.Add("end", UriUtil.EncodeUriComponent(false, end, currentType, false, false, false));
+            }
+            if (limit >= 0)
+            {
+                requestQueryStringParams.Add("limit", limit.ToString(CultureInfo.InvariantCulture));
+            }
+            if (includeCount)
+            {
+                requestQueryStringParams.Add("count", "true");
+            }
+            if (includeCustom)
+            {
+                requestQueryStringParams.Add("include", "custom");
+            }
+
+            if (externalQueryParam != null && externalQueryParam.Count > 0)
+            {
+                foreach (KeyValuePair<string, object> kvp in externalQueryParam)
+                {
+                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    {
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                    }
+                }
+            }
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest(url, currentType, queryParams);
+        }
+
+        Uri IUrlRequestBuilder.BuildGetSingleUserRequest(string userId, bool includeCustom, Dictionary<string, object> externalQueryParam)
+        {
+            PNOperationType currentType = PNOperationType.PNGetUserOperation;
+
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("objects");
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("users");
+            url.Add(string.IsNullOrEmpty(userId) ? "": userId);
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+            if (includeCustom)
+            {
+                requestQueryStringParams.Add("include", "custom");
+            }
+
+            if (externalQueryParam != null && externalQueryParam.Count > 0)
+            {
+                foreach (KeyValuePair<string, object> kvp in externalQueryParam)
+                {
+                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    {
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                    }
+                }
+            }
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest(url, currentType, queryParams);
+        }
+
+        Uri IUrlRequestBuilder.BuildCreateSpaceRequest(Dictionary<string, object> spaceCustom, Dictionary<string, object> externalQueryParam)
+        {
+            PNOperationType currentType = PNOperationType.PNCreateSpaceOperation;
+
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("objects");
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("spaces");
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+            if (spaceCustom != null)
+            {
+                requestQueryStringParams.Add("include", "custom");
+            }
+            if (externalQueryParam != null && externalQueryParam.Count > 0)
+            {
+                foreach (KeyValuePair<string, object> kvp in externalQueryParam)
+                {
+                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    {
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                    }
+                }
+            }
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest(url, currentType, queryParams);
+        }
+
+        Uri IUrlRequestBuilder.BuildUpdateSpaceRequest(string spaceId, Dictionary<string, object> spaceCustom, Dictionary<string, object> externalQueryParam)
+        {
+            PNOperationType currentType = PNOperationType.PNUpdateUserOperation;
+
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("objects");
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("spaces");
+            url.Add(spaceId);
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+            if (spaceCustom != null)
+            {
+                requestQueryStringParams.Add("include", "custom");
+            }
+            if (externalQueryParam != null && externalQueryParam.Count > 0)
+            {
+                foreach (KeyValuePair<string, object> kvp in externalQueryParam)
+                {
+                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    {
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                    }
+                }
+            }
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest(url, currentType, queryParams);
+        }
+
+        Uri IUrlRequestBuilder.BuildDeleteSpaceRequest(string spaceId, Dictionary<string, object> externalQueryParam)
+        {
+            PNOperationType currentType = PNOperationType.PNDeleteSpaceOperation;
+
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("objects");
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("spaces");
+            url.Add(string.IsNullOrEmpty(spaceId) ? "" : spaceId);
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+            if (externalQueryParam != null && externalQueryParam.Count > 0)
+            {
+                foreach (KeyValuePair<string, object> kvp in externalQueryParam)
+                {
+                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    {
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                    }
+                }
+            }
+
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest(url, currentType, queryParams);
+        }
+
+        Uri IUrlRequestBuilder.BuildGetAllSpacesRequest(string start, string end, int limit, bool includeCount, bool includeCustom, Dictionary<string, object> externalQueryParam)
+        {
+            PNOperationType currentType = PNOperationType.PNGetSpacesOperation;
+
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("objects");
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("spaces");
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+            if (!string.IsNullOrEmpty(start))
+            {
+                requestQueryStringParams.Add("start", UriUtil.EncodeUriComponent(false, start, currentType, false, false, false));
+            }
+            if (!string.IsNullOrEmpty(end))
+            {
+                requestQueryStringParams.Add("end", UriUtil.EncodeUriComponent(false, end, currentType, false, false, false));
+            }
+            if (limit >= 0)
+            {
+                requestQueryStringParams.Add("limit", limit.ToString(CultureInfo.InvariantCulture));
+            }
+            if (includeCount)
+            {
+                requestQueryStringParams.Add("count", "true");
+            }
+            if (includeCustom)
+            {
+                requestQueryStringParams.Add("include", "custom");
+            }
+
+            if (externalQueryParam != null && externalQueryParam.Count > 0)
+            {
+                foreach (KeyValuePair<string, object> kvp in externalQueryParam)
+                {
+                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    {
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                    }
+                }
+            }
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest(url, currentType, queryParams);
+        }
+
+        Uri IUrlRequestBuilder.BuildGetSingleSpaceRequest(string spaceId, bool includeCustom, Dictionary<string, object> externalQueryParam)
+        {
+            PNOperationType currentType = PNOperationType.PNGetSpaceOperation;
+
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("objects");
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("spaces");
+            url.Add(string.IsNullOrEmpty(spaceId) ? "" : spaceId);
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+            if (includeCustom)
+            {
+                requestQueryStringParams.Add("include", "custom");
+            }
+
+            if (externalQueryParam != null && externalQueryParam.Count > 0)
+            {
+                foreach (KeyValuePair<string, object> kvp in externalQueryParam)
+                {
+                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    {
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                    }
+                }
+            }
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest(url, currentType, queryParams);
+        }
+
+        Uri IUrlRequestBuilder.BuildUpdateSpaceMembershipsWithUserRequest(string userId, string start, string end, int limit, bool includeCount, string includeOptions, Dictionary<string, object> externalQueryParam)
+        {
+            PNOperationType currentType = PNOperationType.PNMembershipsOperation;
+
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("objects");
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("users");
+            url.Add(string.IsNullOrEmpty(userId) ? "" : userId);
+            url.Add("spaces");
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+            if (!string.IsNullOrEmpty(start))
+            {
+                requestQueryStringParams.Add("start", UriUtil.EncodeUriComponent(false, start, currentType, false, false, false));
+            }
+            if (!string.IsNullOrEmpty(end))
+            {
+                requestQueryStringParams.Add("end", UriUtil.EncodeUriComponent(false, end, currentType, false, false, false));
+            }
+            if (limit >= 0)
+            {
+                requestQueryStringParams.Add("limit", limit.ToString(CultureInfo.InvariantCulture));
+            }
+            if (includeCount)
+            {
+                requestQueryStringParams.Add("count", "true");
+            }
+            if (!string.IsNullOrEmpty(includeOptions))
+            {
+                requestQueryStringParams.Add("include", UriUtil.EncodeUriComponent(false, includeOptions, currentType, true, false, false));
+            }
+            if (externalQueryParam != null && externalQueryParam.Count > 0)
+            {
+                foreach (KeyValuePair<string, object> kvp in externalQueryParam)
+                {
+                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    {
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                    }
+                }
+            }
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest(url, currentType, queryParams);
+        }
+
+        Uri IUrlRequestBuilder.BuildMembersAddUpdateRemoveRequest(string spaceId, string start, string end, int limit, bool includeCount, string includeOptions, Dictionary<string, object> externalQueryParam)
+        {
+            PNOperationType currentType = PNOperationType.PNMembersOperation;
+
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("objects");
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("spaces");
+            url.Add(string.IsNullOrEmpty(spaceId) ? "" : spaceId);
+            url.Add("users");
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+            if (!string.IsNullOrEmpty(start))
+            {
+                requestQueryStringParams.Add("start", UriUtil.EncodeUriComponent(false, start, currentType, false, false, false));
+            }
+            if (!string.IsNullOrEmpty(end))
+            {
+                requestQueryStringParams.Add("end", UriUtil.EncodeUriComponent(false, end, currentType, false, false, false));
+            }
+            if (limit >= 0)
+            {
+                requestQueryStringParams.Add("limit", limit.ToString(CultureInfo.InvariantCulture));
+            }
+            if (includeCount)
+            {
+                requestQueryStringParams.Add("count", "true");
+            }
+            if (!string.IsNullOrEmpty(includeOptions))
+            {
+                requestQueryStringParams.Add("include", UriUtil.EncodeUriComponent(false, includeOptions, currentType, true, false, false));
+            }
+            if (externalQueryParam != null && externalQueryParam.Count > 0)
+            {
+                foreach (KeyValuePair<string, object> kvp in externalQueryParam)
+                {
+                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    {
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                    }
+                }
+            }
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest(url, currentType, queryParams);
+        }
+
+        Uri IUrlRequestBuilder.BuildGetAllMembershipsRequest(string userId, string start, string end, int limit, bool includeCount, string includeOptions, Dictionary<string, object> externalQueryParam)
+        {
+            PNOperationType currentType = PNOperationType.PNGetMembershipsOperation;
+
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("objects");
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("users");
+            url.Add(string.IsNullOrEmpty(userId) ? "" : userId);
+            url.Add("spaces");
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+            if (!string.IsNullOrEmpty(start))
+            {
+                requestQueryStringParams.Add("start", UriUtil.EncodeUriComponent(false, start, currentType, false, false, false));
+            }
+            if (!string.IsNullOrEmpty(end))
+            {
+                requestQueryStringParams.Add("end", UriUtil.EncodeUriComponent(false, end, currentType, false, false, false));
+            }
+            if (limit >= 0)
+            {
+                requestQueryStringParams.Add("limit", limit.ToString(CultureInfo.InvariantCulture));
+            }
+            if (includeCount)
+            {
+                requestQueryStringParams.Add("count", "true");
+            }
+            if (!string.IsNullOrEmpty(includeOptions))
+            {
+                requestQueryStringParams.Add("include", UriUtil.EncodeUriComponent(false, includeOptions, currentType, true, false, false));
+            }
+
+            if (externalQueryParam != null && externalQueryParam.Count > 0)
+            {
+                foreach (KeyValuePair<string, object> kvp in externalQueryParam)
+                {
+                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    {
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                    }
+                }
+            }
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest(url, currentType, queryParams);
+        }
+
+        Uri IUrlRequestBuilder.BuildGetAllMembersRequest(string spaceId, string start, string end, int limit, bool includeCount, string includeOptions, Dictionary<string, object> externalQueryParam)
+        {
+            PNOperationType currentType = PNOperationType.PNGetMembersOperation;
+
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("objects");
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("spaces");
+            url.Add(string.IsNullOrEmpty(spaceId) ? "" : spaceId);
+            url.Add("users");
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+            if (!string.IsNullOrEmpty(start))
+            {
+                requestQueryStringParams.Add("start", UriUtil.EncodeUriComponent(false, start, currentType, false, false, false));
+            }
+            if (!string.IsNullOrEmpty(end))
+            {
+                requestQueryStringParams.Add("end", UriUtil.EncodeUriComponent(false, end, currentType, false, false, false));
+            }
+            if (limit >= 0)
+            {
+                requestQueryStringParams.Add("limit", limit.ToString(CultureInfo.InvariantCulture));
+            }
+            if (includeCount)
+            {
+                requestQueryStringParams.Add("count", "true");
+            }
+            if (!string.IsNullOrEmpty(includeOptions))
+            {
+                requestQueryStringParams.Add("include", UriUtil.EncodeUriComponent(false, includeOptions, currentType, true, false, false));
+            }
+
+            if (externalQueryParam != null && externalQueryParam.Count > 0)
+            {
+                foreach (KeyValuePair<string, object> kvp in externalQueryParam)
+                {
+                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    {
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                    }
+                }
+            }
+            string queryString = BuildQueryString(currentType, url, requestQueryStringParams);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest(url, currentType, queryParams);
+        }
+
         private Dictionary<string, string> GenerateCommonQueryParams(PNOperationType type)
         {
             long timeStamp = TranslateUtcDateTimeToSeconds(DateTime.UtcNow);

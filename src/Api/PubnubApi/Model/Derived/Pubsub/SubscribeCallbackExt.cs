@@ -11,8 +11,9 @@ namespace PubnubApi
     {
         readonly Action<Pubnub, PNMessageResult<object>> subscribeAction;
         readonly Action<Pubnub, PNPresenceEventResult> presenceAction;
-        readonly Action<Pubnub, PNMessageResult<object>> signalAction;
+        readonly Action<Pubnub, PNSignalResult<object>> signalAction;
         readonly Action<Pubnub, PNStatus> statusAction;
+        readonly Action<Pubnub, PNObjectApiEventResult> objectApiAction;
 
         public SubscribeCallbackExt(Action<Pubnub, PNMessageResult<object>> messageCallback, Action<Pubnub, PNPresenceEventResult> presenceCallback, Action<Pubnub, PNStatus> statusCallback)
         {
@@ -20,14 +21,26 @@ namespace PubnubApi
             this.presenceAction = presenceCallback;
             this.statusAction = statusCallback;
             this.signalAction = null;
+            this.objectApiAction = null;
         }
 
-        public SubscribeCallbackExt(Action<Pubnub, PNMessageResult<object>> signalCallback, Action<Pubnub, PNStatus> statusCallback)
+        public SubscribeCallbackExt(Action<Pubnub, PNSignalResult<object>> signalCallback, Action<Pubnub, PNStatus> statusCallback)
         {
             this.subscribeAction = null;
             this.presenceAction = null;
             this.statusAction = statusCallback;
             this.signalAction = signalCallback;
+            this.objectApiAction = null;
+        }
+
+        public SubscribeCallbackExt(Action<Pubnub, PNObjectApiEventResult> objectApiCallback, Action<Pubnub, PNStatus> statusCallback)
+        {
+            this.subscribeAction = null;
+            this.presenceAction = null;
+            this.signalAction = null;
+            this.statusAction = statusCallback;
+            this.objectApiAction = objectApiCallback;
+
         }
 
         public override void Message<T>(Pubnub pubnub, PNMessageResult<T> message)
@@ -53,9 +66,9 @@ namespace PubnubApi
             statusAction?.Invoke(pubnub, status);
         }
 
-        public override void Signal<T>(Pubnub pubnub, PNMessageResult<T> signalMessage)
+        public override void Signal<T>(Pubnub pubnub, PNSignalResult<T> signalMessage)
         {
-            PNMessageResult<object> message1 = new PNMessageResult<object>();
+            PNSignalResult<object> message1 = new PNSignalResult<object>();
             message1.Channel = signalMessage.Channel;
             message1.Message = (T)(object)signalMessage.Message;
             message1.Subscription = signalMessage.Subscription;
@@ -64,6 +77,11 @@ namespace PubnubApi
             message1.Publisher = signalMessage.Publisher;
 
             signalAction?.Invoke(pubnub, message1);
+        }
+
+        public override void ObjectEvent(Pubnub pubnub, PNObjectApiEventResult objectEvent)
+        {
+            objectApiAction?.Invoke(pubnub, objectEvent);
         }
     }
 }

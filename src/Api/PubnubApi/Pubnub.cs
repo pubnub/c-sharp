@@ -18,7 +18,7 @@ namespace PubnubApi
 
         private readonly string instanceId;
 
-        private static string sdkVersion = "PubNubCSharp4.0.32.0";
+        private static string sdkVersion = "PubNubCSharp4.0.33.0";
 
         private object savedSubscribeOperation;
         private readonly string savedSdkVerion;
@@ -164,6 +164,89 @@ namespace PubnubApi
             return auditPushChannelOperation;
         }
 
+        public EndPoint.CreateUserOperation CreateUser()
+        {
+            EndPoint.CreateUserOperation createUserOperation = new EndPoint.CreateUserOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
+            return createUserOperation;
+        }
+
+        public EndPoint.UpdateUserOperation UpdateUser()
+        {
+            EndPoint.UpdateUserOperation updateUserOperation = new EndPoint.UpdateUserOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
+            return updateUserOperation;
+        }
+
+        public EndPoint.DeleteUserOperation DeleteUser()
+        {
+            EndPoint.DeleteUserOperation deleteUserOperation = new EndPoint.DeleteUserOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
+            return deleteUserOperation;
+        }
+
+        public EndPoint.GetUsersOperation GetUsers()
+        {
+            EndPoint.GetUsersOperation getUsersOperation = new EndPoint.GetUsersOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
+            return getUsersOperation;
+        }
+
+        public EndPoint.GetUserOperation GetUser()
+        {
+            EndPoint.GetUserOperation getUserOperation = new EndPoint.GetUserOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
+            return getUserOperation;
+        }
+
+        public EndPoint.CreateSpaceOperation CreateSpace()
+        {
+            EndPoint.CreateSpaceOperation createSpaceOperation = new EndPoint.CreateSpaceOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
+            return createSpaceOperation;
+        }
+
+        public EndPoint.UpdateSpaceOperation UpdateSpace()
+        {
+            EndPoint.UpdateSpaceOperation updateSpaceOperation = new EndPoint.UpdateSpaceOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
+            return updateSpaceOperation;
+        }
+
+        public EndPoint.DeleteSpaceOperation DeleteSpace()
+        {
+            EndPoint.DeleteSpaceOperation deleteSpaceOperation = new EndPoint.DeleteSpaceOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
+            return deleteSpaceOperation;
+        }
+
+        public EndPoint.GetSpacesOperation GetSpaces()
+        {
+            EndPoint.GetSpacesOperation getAllSpacesOperation = new EndPoint.GetSpacesOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
+            return getAllSpacesOperation;
+        }
+
+        public EndPoint.GetSpaceOperation GetSpace()
+        {
+            EndPoint.GetSpaceOperation getSingleSpaceOperation = new EndPoint.GetSpaceOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
+            return getSingleSpaceOperation;
+        }
+
+        public EndPoint.MembershipsOperation Memberships()
+        {
+            EndPoint.MembershipsOperation membershipOperation = new EndPoint.MembershipsOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
+            return membershipOperation;
+        }
+
+        public EndPoint.MembersOperation Members()
+        {
+            EndPoint.MembersOperation membersOperation = new EndPoint.MembersOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
+            return membersOperation;
+        }
+
+        public EndPoint.GetMembershipsOperation GetMemberships()
+        {
+            EndPoint.GetMembershipsOperation getMembershipOperation = new EndPoint.GetMembershipsOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
+            return getMembershipOperation;
+        }
+
+        public EndPoint.GetMembersOperation GetMembers()
+        {
+            EndPoint.GetMembersOperation getMembersOperation = new EndPoint.GetMembersOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
+            return getMembersOperation;
+        }
         #endregion
 
         #region "PubNub API Channel Group Methods"

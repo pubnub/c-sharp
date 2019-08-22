@@ -1,8 +1,15 @@
 name: c-sharp
-version: "4.0.32.0"
+version: "4.0.33.0"
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog: 
+  - version: 4.0.33.0
+    date: August 22, 2019
+    changes:
+      - type: Improvement
+        text: Modified Signal listener message type to PNSignalResult.
+      - type: Improvement
+        text: Added ObjectsAPI feature.
   - version: 4.0.32.0
     date: August 08, 2019
     changes:
@@ -384,14 +391,29 @@ features:
     - SUBSCRIBE-FILTER-EXPRESSION
     - SUBSCRIBE-PUBLISHER-UUID
     - SUBSCRIBE-SIGNAL-LISTENER
+    - SUBSCRIBE-OBJECTS-LISTENER
   signal:
     - SIGNAL-SEND
+  objects:
+    - OBJECTS-GET-USERS
+    - OBJECTS-GET-USER
+    - OBJECTS-CREATE-USER
+    - OBJECTS-UPDATE-USER
+    - OBJECTS-DELETE-USER
+    - OBJECTS-GET-SPACES
+    - OBJECTS-CREATE-SPACE
+    - OBJECTS-GET-SPACE
+    - OBJECTS-UPDATE-SPACE
+    - OBJECTS-GET-SPACE-MEMBERSHIP
+    - OBJECTS-UPDATE-SPACE-MEMBERSHIP
+    - OBJECTS-GET-MEMBERS
+    - OBJECTS-UPDATE-MEMBERS
   others:
     - TELEMETRY
     - QUERY-PARAM    
 supported-platforms:
   - 
-    version: Pubnub 'C#' 4.0.32.0
+    version: Pubnub 'C#' 4.0.33.0
     platforms:
       - Windows 10 and up
       - Windows Server 2008 and up
@@ -401,7 +423,7 @@ supported-platforms:
       - .Net Framework 4.5
       - .Net Framework 4.6.1+
   - 
-    version: PubnubPCL 'C#' 4.0.32.0
+    version: PubnubPCL 'C#' 4.0.33.0
     platforms:
       - Xamarin.Android
       - Xamarin.iOS
@@ -419,7 +441,7 @@ supported-platforms:
       - .Net Standard 2.0
       - .Net Core
   - 
-    version: PubnubUWP 'C#' 4.0.32.0
+    version: PubnubUWP 'C#' 4.0.33.0
     platforms:
       - Windows Phone 10
       - Universal Windows Apps
