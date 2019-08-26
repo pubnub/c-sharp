@@ -18,7 +18,7 @@ namespace PubnubApi
 
         private readonly string instanceId;
 
-        private static string sdkVersion = "PubNubCSharp4.0.33.0";
+        private static string sdkVersion = "PubNubCSharp4.0.34.0";
 
         private object savedSubscribeOperation;
         private readonly string savedSdkVerion;
@@ -224,15 +224,15 @@ namespace PubnubApi
             return getSingleSpaceOperation;
         }
 
-        public EndPoint.MembershipsOperation Memberships()
+        public EndPoint.ManageMembershipsOperation Memberships()
         {
-            EndPoint.MembershipsOperation membershipOperation = new EndPoint.MembershipsOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
+            EndPoint.ManageMembershipsOperation membershipOperation = new EndPoint.ManageMembershipsOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
             return membershipOperation;
         }
 
-        public EndPoint.MembersOperation Members()
+        public EndPoint.ManageMembersOperation Members()
         {
-            EndPoint.MembersOperation membersOperation = new EndPoint.MembersOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
+            EndPoint.ManageMembersOperation membersOperation = new EndPoint.ManageMembersOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
             return membersOperation;
         }
 

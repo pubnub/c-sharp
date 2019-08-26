@@ -1410,7 +1410,7 @@ namespace PubnubApi
 
         Uri IUrlRequestBuilder.BuildUpdateSpaceMembershipsWithUserRequest(string userId, string start, string end, int limit, bool includeCount, string includeOptions, Dictionary<string, object> externalQueryParam)
         {
-            PNOperationType currentType = PNOperationType.PNMembershipsOperation;
+            PNOperationType currentType = PNOperationType.PNManageMembershipsOperation;
 
             List<string> url = new List<string>();
             url.Add("v1");
@@ -1459,7 +1459,7 @@ namespace PubnubApi
 
         Uri IUrlRequestBuilder.BuildMembersAddUpdateRemoveRequest(string spaceId, string start, string end, int limit, bool includeCount, string includeOptions, Dictionary<string, object> externalQueryParam)
         {
-            PNOperationType currentType = PNOperationType.PNMembersOperation;
+            PNOperationType currentType = PNOperationType.PNManageMembersOperation;
 
             List<string> url = new List<string>();
             url.Add("v1");

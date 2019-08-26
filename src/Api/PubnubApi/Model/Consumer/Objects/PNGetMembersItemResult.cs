@@ -5,11 +5,11 @@ using System.Text;
 
 namespace PubnubApi
 {
-    public class PNMembershipsItemResult
+    public class PNGetMembersItemResult
     {
-        public string SpaceId { get; set; }
+        public string UserId { get; set; }
         public Dictionary<string, object> Custom { get; set; }
-        public PNSpaceResult Space { get; set; }
+        public PNUserResult User { get; set; }
         public string Created { get; set; }
         public string Updated { get; set; }
     }

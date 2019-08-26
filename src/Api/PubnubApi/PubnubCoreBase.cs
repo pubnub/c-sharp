@@ -819,8 +819,8 @@ namespace PubnubApi
                     case PNOperationType.PNDeleteSpaceOperation:
                     case PNOperationType.PNGetSpacesOperation:
                     case PNOperationType.PNGetSpaceOperation:
-                    case PNOperationType.PNMembershipsOperation:
-                    case PNOperationType.PNMembersOperation:
+                    case PNOperationType.PNManageMembershipsOperation:
+                    case PNOperationType.PNManageMembersOperation:
                     case PNOperationType.PNGetMembershipsOperation:
                     case PNOperationType.PNGetMembersOperation:
                         if (result != null && result.Count > 0)

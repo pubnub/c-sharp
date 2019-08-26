@@ -34,8 +34,8 @@ namespace PubnubApi
         PNGetSpacesOperation,
         PNGetSpaceOperation,
 
-        PNMembershipsOperation,
-        PNMembersOperation,
+        PNManageMembershipsOperation,
+        PNManageMembersOperation,
         PNGetMembershipsOperation,
         PNGetMembersOperation,
 

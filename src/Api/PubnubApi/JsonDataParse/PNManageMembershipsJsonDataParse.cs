@@ -7,9 +7,9 @@ namespace PubnubApi
 {
     internal static class PNMembershipsJsonDataParse
     {
-        internal static PNMembershipsResult GetObject(List<object> listObject)
+        internal static PNManageMembershipsResult GetObject(List<object> listObject)
         {
-            PNMembershipsResult result = null;
+            PNManageMembershipsResult result = null;
             for (int listIndex = 0; listIndex < listObject.Count; listIndex++)
             {
                 Dictionary<string, object> dicObj = JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[listIndex]);
@@ -17,11 +17,11 @@ namespace PubnubApi
                 {
                     if (result == null)
                     {
-                        result = new PNMembershipsResult();
+                        result = new PNManageMembershipsResult();
                     }
                     if (dicObj.ContainsKey("data") && dicObj["data"] != null)
                     {
-                        result.Memberships = new List<PNMembershipsItemResult>();
+                        result.Memberships = new List<PNManageMembershipsItemResult>();
 
                         object[] spaceArray = JsonDataParseInternalUtil.ConvertToObjectArray(dicObj["data"]);
                         if (spaceArray != null && spaceArray.Length > 0)
@@ -31,7 +31,7 @@ namespace PubnubApi
                                 Dictionary<string, object> getMbrshipItemDataDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(spaceArray[index]);
                                 if (getMbrshipItemDataDic != null && getMbrshipItemDataDic.Count > 0)
                                 {
-                                    var mbrshipItem = new PNMembershipsItemResult
+                                    var mbrshipItem = new PNManageMembershipsItemResult
                                     {
                                         SpaceId = (getMbrshipItemDataDic.ContainsKey("id") && getMbrshipItemDataDic["id"] != null) ? getMbrshipItemDataDic["id"].ToString() : null,
                                         Created = (getMbrshipItemDataDic.ContainsKey("created") && getMbrshipItemDataDic["created"] != null) ? getMbrshipItemDataDic["created"].ToString() : null,

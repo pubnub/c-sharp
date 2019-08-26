@@ -161,11 +161,11 @@
     <Compile Include="..\..\Api\PubnubApi\EndPoint\Objects\GetUsersOperation.cs">
       <Link>LinkedSourceCode\EndPoint\Objects\GetUsersOperation.cs</Link>
     </Compile>
-    <Compile Include="..\..\Api\PubnubApi\EndPoint\Objects\MembershipsOperation.cs">
-      <Link>LinkedSourceCode\EndPoint\Objects\MembershipsOperation.cs</Link>
+    <Compile Include="..\..\Api\PubnubApi\EndPoint\Objects\ManageMembershipsOperation.cs">
+      <Link>LinkedSourceCode\EndPoint\Objects\ManageMembershipsOperation.cs</Link>
     </Compile>
-    <Compile Include="..\..\Api\PubnubApi\EndPoint\Objects\MembersOperation.cs">
-      <Link>LinkedSourceCode\EndPoint\Objects\MembersOperation.cs</Link>
+    <Compile Include="..\..\Api\PubnubApi\EndPoint\Objects\ManageMembersOperation.cs">
+      <Link>LinkedSourceCode\EndPoint\Objects\ManageMembersOperation.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\EndPoint\Objects\UpdateSpaceOperation.cs">
       <Link>LinkedSourceCode\EndPoint\Objects\UpdateSpaceOperation.cs</Link>
@@ -392,8 +392,14 @@
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNDeleteUserResult.cs">
       <Link>LinkedSourceCode\Model\Consumer\Objects\PNDeleteUserResult.cs</Link>
     </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNGetMembershipsItemResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Objects\PNGetMembershipsItemResult.cs</Link>
+    </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNGetMembershipsResult.cs">
       <Link>LinkedSourceCode\Model\Consumer\Objects\PNGetMembershipsResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNGetMembersItemResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Objects\PNGetMembersItemResult.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNGetMembersResult.cs">
       <Link>LinkedSourceCode\Model\Consumer\Objects\PNGetMembersResult.cs</Link>
@@ -410,23 +416,23 @@
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNGetUsersResult.cs">
       <Link>LinkedSourceCode\Model\Consumer\Objects\PNGetUsersResult.cs</Link>
     </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNManageMembershipsItemResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Objects\PNManageMembershipsItemResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNManageMembershipsResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Objects\PNManageMembershipsResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNManageMembersItemResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Objects\PNManageMembersItemResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNManageMembersResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Objects\PNManageMembersResult.cs</Link>
+    </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNMember.cs">
       <Link>LinkedSourceCode\Model\Consumer\Objects\PNMember.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNMembership.cs">
       <Link>LinkedSourceCode\Model\Consumer\Objects\PNMembership.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNMembershipsItemResult.cs">
-      <Link>LinkedSourceCode\Model\Consumer\Objects\PNMembershipsItemResult.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNMembershipsResult.cs">
-      <Link>LinkedSourceCode\Model\Consumer\Objects\PNMembershipsResult.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNMembersItemResult.cs">
-      <Link>LinkedSourceCode\Model\Consumer\Objects\PNMembersItemResult.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNMembersResult.cs">
-      <Link>LinkedSourceCode\Model\Consumer\Objects\PNMembersResult.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNPage.cs">
       <Link>LinkedSourceCode\Model\Consumer\Objects\PNPage.cs</Link>

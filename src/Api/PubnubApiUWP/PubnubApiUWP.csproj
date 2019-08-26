@@ -15,7 +15,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubUWP</PackageId>
-    <PackageVersion>4.0.33.0</PackageVersion>
+    <PackageVersion>4.0.34.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -214,8 +214,8 @@ Added ObjectsAPI feature.</PackageReleaseNotes>
     <Compile Include="..\PubnubApi\EndPoint\Objects\GetSpacesOperation.cs" Link="EndPoint\Objects\GetSpacesOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\Objects\GetUserOperation.cs" Link="EndPoint\Objects\GetUserOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\Objects\GetUsersOperation.cs" Link="EndPoint\Objects\GetUsersOperation.cs" />
-    <Compile Include="..\PubnubApi\EndPoint\Objects\MembershipsOperation.cs" Link="EndPoint\Objects\MembershipsOperation.cs" />
-    <Compile Include="..\PubnubApi\EndPoint\Objects\MembersOperation.cs" Link="EndPoint\Objects\MembersOperation.cs" />
+    <Compile Include="..\PubnubApi\EndPoint\Objects\ManageMembershipsOperation.cs" Link="EndPoint\Objects\ManageMembershipsOperation.cs" />
+    <Compile Include="..\PubnubApi\EndPoint\Objects\ManageMembersOperation.cs" Link="EndPoint\Objects\ManageMembersOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\Objects\UpdateSpaceOperation.cs" Link="EndPoint\Objects\UpdateSpaceOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\Objects\UpdateUserOperation.cs" Link="EndPoint\Objects\UpdateUserOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\OtherOperation.cs">
@@ -335,8 +335,8 @@ Added ObjectsAPI feature.</PackageReleaseNotes>
     <Compile Include="..\PubnubApi\JsonDataParse\PNGetSpacesJsonDataParse.cs" Link="JsonDataParse\PNGetSpacesJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNGetUserJsonDataParse.cs" Link="JsonDataParse\PNGetUserJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNGetUsersJsonDataParse.cs" Link="JsonDataParse\PNGetUsersJsonDataParse.cs" />
-    <Compile Include="..\PubnubApi\JsonDataParse\PNMembershipsJsonDataParse.cs" Link="JsonDataParse\PNMembershipsJsonDataParse.cs" />
-    <Compile Include="..\PubnubApi\JsonDataParse\PNMembersJsonDataParse.cs" Link="JsonDataParse\PNMembersJsonDataParse.cs" />
+    <Compile Include="..\PubnubApi\JsonDataParse\PNManageMembershipsJsonDataParse.cs" Link="JsonDataParse\PNManageMembershipsJsonDataParse.cs" />
+    <Compile Include="..\PubnubApi\JsonDataParse\PNManageMembersJsonDataParse.cs" Link="JsonDataParse\PNManageMembersJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNObjectApiEventJsonDataParse.cs" Link="JsonDataParse\PNObjectApiEventJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNUpdateSpaceJsonDataParse.cs" Link="JsonDataParse\PNUpdateSpaceJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNUpdateUserJsonDataParse.cs" Link="JsonDataParse\PNUpdateUserJsonDataParse.cs" />
@@ -385,18 +385,20 @@ Added ObjectsAPI feature.</PackageReleaseNotes>
     <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNCreateUserResult.cs" Link="Model\Consumer\Objects\PNCreateUserResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNDeleteSpaceResult.cs" Link="Model\Consumer\Objects\PNDeleteSpaceResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNDeleteUserResult.cs" Link="Model\Consumer\Objects\PNDeleteUserResult.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNGetMembershipsItemResult.cs" Link="Model\Consumer\Objects\PNGetMembershipsItemResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNGetMembershipsResult.cs" Link="Model\Consumer\Objects\PNGetMembershipsResult.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNGetMembersItemResult.cs" Link="Model\Consumer\Objects\PNGetMembersItemResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNGetMembersResult.cs" Link="Model\Consumer\Objects\PNGetMembersResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNGetSpaceResult.cs" Link="Model\Consumer\Objects\PNGetSpaceResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNGetSpacesResult.cs" Link="Model\Consumer\Objects\PNGetSpacesResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNGetUserResult.cs" Link="Model\Consumer\Objects\PNGetUserResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNGetUsersResult.cs" Link="Model\Consumer\Objects\PNGetUsersResult.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNManageMembershipsItemResult.cs" Link="Model\Consumer\Objects\PNManageMembershipsItemResult.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNManageMembershipsResult.cs" Link="Model\Consumer\Objects\PNManageMembershipsResult.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNManageMembersItemResult.cs" Link="Model\Consumer\Objects\PNManageMembersItemResult.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNManageMembersResult.cs" Link="Model\Consumer\Objects\PNManageMembersResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNMember.cs" Link="Model\Consumer\Objects\PNMember.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNMembership.cs" Link="Model\Consumer\Objects\PNMembership.cs" />
-    <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNMembershipsItemResult.cs" Link="Model\Consumer\Objects\PNMembershipsItemResult.cs" />
-    <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNMembershipsResult.cs" Link="Model\Consumer\Objects\PNMembershipsResult.cs" />
-    <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNMembersItemResult.cs" Link="Model\Consumer\Objects\PNMembersItemResult.cs" />
-    <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNMembersResult.cs" Link="Model\Consumer\Objects\PNMembersResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNPage.cs" Link="Model\Consumer\Objects\PNPage.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNSpaceResult.cs" Link="Model\Consumer\Objects\PNSpaceResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNUpdateSpaceResult.cs" Link="Model\Consumer\Objects\PNUpdateSpaceResult.cs" />
@@ -488,8 +490,8 @@ Added ObjectsAPI feature.</PackageReleaseNotes>
     <Compile Include="..\PubnubApi\Model\Derived\Objects\PNGetSpacesResultExt.cs" Link="Model\Derived\Objects\PNGetSpacesResultExt.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\Objects\PNGetUserResultExt.cs" Link="Model\Derived\Objects\PNGetUserResultExt.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\Objects\PNGetUsersResultExt.cs" Link="Model\Derived\Objects\PNGetUsersResultExt.cs" />
-    <Compile Include="..\PubnubApi\Model\Derived\Objects\PNMembershipsResultExt.cs" Link="Model\Derived\Objects\PNMembershipsResultExt.cs" />
-    <Compile Include="..\PubnubApi\Model\Derived\Objects\PNMembersResultExt.cs" Link="Model\Derived\Objects\PNMembersResultExt.cs" />
+    <Compile Include="..\PubnubApi\Model\Derived\Objects\PNManageMembershipsResultExt.cs" Link="Model\Derived\Objects\PNManageMembershipsResultExt.cs" />
+    <Compile Include="..\PubnubApi\Model\Derived\Objects\PNManageMembersResultExt.cs" Link="Model\Derived\Objects\PNManageMembersResultExt.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\Objects\PNUpdateSpaceResultExt.cs" Link="Model\Derived\Objects\PNUpdateSpaceResultExt.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\Objects\PNUpdateUserResultExt.cs" Link="Model\Derived\Objects\PNUpdateUserResultExt.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\PNTimeResultExt.cs">
