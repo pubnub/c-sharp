@@ -210,13 +210,13 @@ namespace PubNubMessaging.Tests
                 manualEvent = new ManualResetEvent(false);
                 #region "Memberships Add"
                 System.Diagnostics.Debug.WriteLine("pubnub.Memberships() ADD STARTED");
-                pubnub.Memberships().UserId(userId)
+                pubnub.ManageMemberships().UserId(userId)
                     .Add(new List<PNMembership>()
                             {
                             new PNMembership() { SpaceId = spaceId1 },
                             new PNMembership() { SpaceId = spaceId2 }
                     })
-                    .Execute(new PNMembershipsResultExt((r, s) =>
+                    .Execute(new PNManageMembershipsResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
@@ -240,13 +240,13 @@ namespace PubNubMessaging.Tests
                 manualEvent = new ManualResetEvent(false);
                 #region "Memberships Update"
                 System.Diagnostics.Debug.WriteLine("pubnub.Memberships() UPDATE STARTED");
-                pubnub.Memberships().UserId(userId)
+                pubnub.ManageMemberships().UserId(userId)
                     .Update(new List<PNMembership>()
                             {
                             new PNMembership() { SpaceId = spaceId1, Custom = new Dictionary<string, object>(){ { "color", "green1" } } },
                             new PNMembership() { SpaceId = spaceId2, Custom = new Dictionary<string, object>(){ { "color", "green2" } } }
                     })
-                    .Execute(new PNMembershipsResultExt((r, s) =>
+                    .Execute(new PNManageMembershipsResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
@@ -270,9 +270,9 @@ namespace PubNubMessaging.Tests
                 manualEvent = new ManualResetEvent(false);
                 #region "Memberships Remove"
                 System.Diagnostics.Debug.WriteLine("pubnub.Memberships() REMOVE STARTED");
-                pubnub.Memberships().UserId(userId)
+                pubnub.ManageMemberships().UserId(userId)
                     .Remove(new List<string>() { spaceId2 })
-                    .Execute(new PNMembershipsResultExt((r, s) =>
+                    .Execute(new PNManageMembershipsResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
@@ -384,7 +384,7 @@ namespace PubNubMessaging.Tests
             pubnub.AddListener(eventListener);
 
             ManualResetEvent manualEvent = new ManualResetEvent(false);
-            pubnub.Subscribe<string>().Channels(new string[] { "pnuser-"+userId, spaceId1, spaceId2 }).Execute();
+            pubnub.Subscribe<string>().Channels(new string[] { userId, spaceId1, spaceId2 }).Execute();
             manualEvent.WaitOne(2000);
 
 
@@ -478,13 +478,13 @@ namespace PubNubMessaging.Tests
                 manualEvent = new ManualResetEvent(false);
                 #region "Memberships Add"
                 System.Diagnostics.Debug.WriteLine("pubnub.Memberships() ADD STARTED");
-                pubnub.Memberships().UserId(userId)
+                pubnub.ManageMemberships().UserId(userId)
                     .Add(new List<PNMembership>()
                             {
                             new PNMembership() { SpaceId = spaceId1 },
                             new PNMembership() { SpaceId = spaceId2 }
                     })
-                    .Execute(new PNMembershipsResultExt((r, s) =>
+                    .Execute(new PNManageMembershipsResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
@@ -508,13 +508,13 @@ namespace PubNubMessaging.Tests
                 manualEvent = new ManualResetEvent(false);
                 #region "Memberships Update/Remove"
                 System.Diagnostics.Debug.WriteLine("pubnub.Memberships() UPDATE/REMOVE STARTED");
-                pubnub.Memberships().UserId(userId)
+                pubnub.ManageMemberships().UserId(userId)
                     .Update(new List<PNMembership>()
                             {
                             new PNMembership() { SpaceId = spaceId1, Custom = new Dictionary<string, object>(){ { "color", "green1" } } }
                     })
                     .Remove(new List<string>() { spaceId2 })
-                    .Execute(new PNMembershipsResultExt((r, s) =>
+                    .Execute(new PNManageMembershipsResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
@@ -530,6 +530,8 @@ namespace PubNubMessaging.Tests
                 #endregion
                 manualEvent.WaitOne(manualResetEventWaitTimeout);
             }
+
+            Thread.Sleep(2000);
 
             pubnub.Unsubscribe<string>().Channels(new string[] { "pnuser-" + userId, spaceId1, spaceId2 }).Execute();
             pubnub.RemoveListener(eventListener);

@@ -641,6 +641,7 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
+                Secure = false,
                 CipherKey = "enigma",
                 Uuid = "mytestuuid"
             };

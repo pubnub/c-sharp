@@ -54,6 +54,7 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
+                Secure = false,
                 Uuid = "mytestuuid",
             };
 
@@ -86,7 +87,7 @@ namespace PubNubMessaging.Tests
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
                 pubnub.Grant().Channels(new [] { channelName }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(false).Execute(new GrantResult());
-                grantManualEvent.WaitOne();
+                grantManualEvent.WaitOne(5000);
             }
 
 
@@ -115,6 +116,7 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
+                Secure = false,
                 Uuid = "mytestuuid",
             };
 
@@ -144,8 +146,9 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                pubnub.Grant().Channels(new [] { channelName }).Read(true).Write(true).Manage(false).Execute(new GrantResult());
-                grantManualEvent.WaitOne();
+                pubnub.Grant().Channels(new [] { channelName }).Read(true).Write(true).Manage(false)
+                    .Execute(new GrantResult());
+                grantManualEvent.WaitOne(5000);
             }
 
 

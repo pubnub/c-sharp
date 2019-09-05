@@ -132,7 +132,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildHistoryRequest(channel, start, end, count, reverse, includeToken, externalQueryParam);
+            Uri request = urlBuilder.BuildHistoryRequest("GET", "", channel, start, end, count, reverse, includeToken, externalQueryParam);
 
             RequestState<PNHistoryResult> requestState = new RequestState<PNHistoryResult>();
             requestState.Channels = new [] { channel };

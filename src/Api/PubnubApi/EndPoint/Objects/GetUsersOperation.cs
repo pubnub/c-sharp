@@ -126,7 +126,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildGetAllUsersRequest(internalPage.Next, internalPage.Prev, limit, includeCount, includeCustom, externalQueryParam);
+            Uri request = urlBuilder.BuildGetAllUsersRequest("GET", "", internalPage.Next, internalPage.Prev, limit, includeCount, includeCustom, externalQueryParam);
 
             RequestState<PNGetUsersResult> requestState = new RequestState<PNGetUsersResult>();
             requestState.ResponseType = PNOperationType.PNGetUsersOperation;

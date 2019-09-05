@@ -107,6 +107,9 @@
     <Compile Include="..\..\Api\PubnubApi\EndPoint\Access\GrantOperation.cs">
       <Link>LinkedSourceCode\EndPoint\Access\GrantOperation.cs</Link>
     </Compile>
+    <Compile Include="..\..\Api\PubnubApi\EndPoint\Access\GrantV2Operation.cs">
+      <Link>LinkedSourceCode\EndPoint\Access\GrantV2Operation.cs</Link>
+    </Compile>
     <Compile Include="..\..\Api\PubnubApi\EndPoint\ChannelGroup\AddChannelsToChannelGroupOperation.cs">
       <Link>LinkedSourceCode\EndPoint\ChannelGroup\AddChannelsToChannelGroupOperation.cs</Link>
     </Compile>
@@ -233,6 +236,12 @@
     <Compile Include="..\..\Api\PubnubApi\EndPoint\TimeOperation.cs">
       <Link>LinkedSourceCode\EndPoint\TimeOperation.cs</Link>
     </Compile>
+    <Compile Include="..\..\Api\PubnubApi\EndPoint\TokenManager.cs">
+      <Link>LinkedSourceCode\EndPoint\TokenManager.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Enum\GrantBitFlag.cs">
+      <Link>LinkedSourceCode\Enum\GrantBitFlag.cs</Link>
+    </Compile>
     <Compile Include="..\..\Api\PubnubApi\Enum\PNHeartbeatNotificationOption.cs">
       <Link>LinkedSourceCode\Enum\PNHeartbeatNotificationOption.cs</Link>
     </Compile>
@@ -320,11 +329,14 @@
     <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNGetUsersJsonDataParse.cs">
       <Link>LinkedSourceCode\JsonDataParse\PNGetUsersJsonDataParse.cs</Link>
     </Compile>
-    <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNMembershipsJsonDataParse.cs">
-      <Link>LinkedSourceCode\JsonDataParse\PNMembershipsJsonDataParse.cs</Link>
+    <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNGrantTokenJsonDataParse.cs">
+      <Link>LinkedSourceCode\JsonDataParse\PNGrantTokenJsonDataParse.cs</Link>
     </Compile>
-    <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNMembersJsonDataParse.cs">
-      <Link>LinkedSourceCode\JsonDataParse\PNMembersJsonDataParse.cs</Link>
+    <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNManageMembershipsJsonDataParse.cs">
+      <Link>LinkedSourceCode\JsonDataParse\PNManageMembershipsJsonDataParse.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNManageMembersJsonDataParse.cs">
+      <Link>LinkedSourceCode\JsonDataParse\PNManageMembersJsonDataParse.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNObjectApiEventJsonDataParse.cs">
       <Link>LinkedSourceCode\JsonDataParse\PNObjectApiEventJsonDataParse.cs</Link>
@@ -352,6 +364,12 @@
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\AccessManager\PNAccessManagerKeysData.cs">
       <Link>LinkedSourceCode\Model\Consumer\AccessManager\PNAccessManagerKeysData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\AccessManager\PNAccessManagerTokenResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\AccessManager\PNAccessManagerTokenResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\AccessManager\PNResourcePermission.cs">
+      <Link>LinkedSourceCode\Model\Consumer\AccessManager\PNResourcePermission.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\ChannelGroup\PNChannelGroupsAddChannelResult.cs">
       <Link>LinkedSourceCode\Model\Consumer\ChannelGroup\PNChannelGroupsAddChannelResult.cs</Link>
@@ -509,6 +527,9 @@
     <Compile Include="..\..\Api\PubnubApi\Model\Derived\AccessManager\PNAccessManagerGrantResultExt.cs">
       <Link>LinkedSourceCode\Model\Derived\AccessManager\PNAccessManagerGrantResultExt.cs</Link>
     </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\AccessManager\PNAccessManagerTokenResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\AccessManager\PNAccessManagerTokenResultExt.cs</Link>
+    </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Derived\ChannelGroup\PNChannelGroupsAddChannelResultExt.cs">
       <Link>LinkedSourceCode\Model\Derived\ChannelGroup\PNChannelGroupsAddChannelResultExt.cs</Link>
     </Compile>
@@ -563,11 +584,11 @@
     <Compile Include="..\..\Api\PubnubApi\Model\Derived\Objects\PNGetUsersResultExt.cs">
       <Link>LinkedSourceCode\Model\Derived\Objects\PNGetUsersResultExt.cs</Link>
     </Compile>
-    <Compile Include="..\..\Api\PubnubApi\Model\Derived\Objects\PNMembershipsResultExt.cs">
-      <Link>LinkedSourceCode\Model\Derived\Objects\PNMembershipsResultExt.cs</Link>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\Objects\PNManageMembershipsResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\Objects\PNManageMembershipsResultExt.cs</Link>
     </Compile>
-    <Compile Include="..\..\Api\PubnubApi\Model\Derived\Objects\PNMembersResultExt.cs">
-      <Link>LinkedSourceCode\Model\Derived\Objects\PNMembersResultExt.cs</Link>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\Objects\PNManageMembersResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\Objects\PNManageMembersResultExt.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Derived\Objects\PNUpdateSpaceResultExt.cs">
       <Link>LinkedSourceCode\Model\Derived\Objects\PNUpdateSpaceResultExt.cs</Link>

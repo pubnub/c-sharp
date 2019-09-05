@@ -214,7 +214,7 @@ namespace PubnubApi
             }
 
             PubnubApi.Interface.IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(pubnubConfig, jsonLib, unit, pubnubLog, null);
-            Uri requestUri = urlBuilder.BuildTimeRequest(null);
+            Uri requestUri = urlBuilder.BuildTimeRequest("GET", "", null);
             try
             {
                 bool gotTimeResp = false;

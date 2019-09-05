@@ -78,7 +78,7 @@ namespace PubnubApi.EndPoint
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
 
-            Uri request = urlBuilder.BuildGetAllChannelGroupRequest(externalQueryParam);
+            Uri request = urlBuilder.BuildGetAllChannelGroupRequest("GET", "", externalQueryParam);
 
             RequestState<PNChannelGroupsListAllResult> requestState = new RequestState<PNChannelGroupsListAllResult>();
             requestState.ResponseType = PNOperationType.ChannelGroupAllGet;

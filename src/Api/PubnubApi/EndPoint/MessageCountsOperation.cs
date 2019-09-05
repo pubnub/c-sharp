@@ -104,7 +104,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildMessageCountsRequest(channels, timetokens, externalQueryParam);
+            Uri request = urlBuilder.BuildMessageCountsRequest("GET", "", channels, timetokens, externalQueryParam);
 
             RequestState<PNMessageCountResult> requestState = new RequestState<PNMessageCountResult>();
             requestState.Channels = channels;

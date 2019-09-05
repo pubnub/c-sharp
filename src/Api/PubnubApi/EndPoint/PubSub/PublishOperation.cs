@@ -199,9 +199,10 @@ namespace PubnubApi.EndPoint
                 return;
             }
 
+            string requestMethodName = (this.httpPost) ? "POST" : "GET";
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildPublishRequest(channel, message, storeInHistory, ttl, metaData, httpPost, null, externalQueryParam);
+            Uri request = urlBuilder.BuildPublishRequest(requestMethodName, "", channel, message, storeInHistory, ttl, metaData, null, externalQueryParam);
 
             RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>();
             requestState.Channels = new [] { channel };

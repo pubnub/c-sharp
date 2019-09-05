@@ -15,6 +15,7 @@ namespace PubNubMessaging.Tests
         private static int manualResetEventWaitTimeout = 310 * 1000;
         private static Pubnub pubnub;
         private static Server server;
+        private static string grantToken = "";
 
         [TestFixtureSetUp]
         public static void Init()
@@ -25,6 +26,7 @@ namespace PubNubMessaging.Tests
             MockServer.LoggingMethod.MockServerLog = unitLog;
             server.Start();
 
+            /*
             if (!PubnubCommon.PAMEnabled) { return; }
 
             if (PubnubCommon.PAMEnabled && string.IsNullOrEmpty(PubnubCommon.SecretKey))
@@ -41,7 +43,6 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
-                AuthKey = authKey,
                 Uuid = "mytestuuid",
                 Secure = false
             };
@@ -51,7 +52,7 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent grantManualEvent = new ManualResetEvent(false);
             pubnub.Grant().Channels(new[] { channel }).AuthKeys(new[] { authKey }).Read(true).Write(true).Manage(true).TTL(20)
-                .Execute(new PNAccessManagerGrantResultExt(
+                .Execute(new PNAccessManagerTokenResultExt(
                                 (r, s) =>
                                 {
                                     try
@@ -60,15 +61,14 @@ namespace PubNubMessaging.Tests
                                         if (r != null)
                                         {
                                             Debug.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
-                                            if (r.Channels != null && r.Channels.Count > 0)
+                                            if (!string.IsNullOrEmpty(r.Token))
                                             {
-                                                var read = r.Channels[channel][authKey].ReadEnabled;
-                                                var write = r.Channels[channel][authKey].WriteEnabled;
-                                                if (read && write) { receivedGrantMessage = true; }
+                                                grantToken = r.Token;
+                                                receivedGrantMessage = true;
                                             }
                                         }
                                     }
-                                    catch { /* ignore */  }
+                                    catch {   }
                                     finally
                                     {
                                         grantManualEvent.Set();
@@ -77,12 +77,13 @@ namespace PubNubMessaging.Tests
 
             if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
 
-            grantManualEvent.WaitOne();
+            grantManualEvent.WaitOne(9000);
 
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedGrantMessage, "WhenAMessageIsPublished Grant access failed.");
+    */
         }
 
         [TestFixtureTearDown]
@@ -104,14 +105,17 @@ namespace PubNubMessaging.Tests
 
             bool receivedMessage = false;
 
-            string userId = "pandu-ut-uid";
+            string userId = "id0";
 
             PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Uuid = "mytestuuid",
-                Secure = false
+                //AuthKey = grantToken,
+                Secure = false,
+                IncludeInstanceIdentifier = false,
+                IncludeRequestIdentifier = false
             };
             if (PubnubCommon.PAMEnabled)
             {
@@ -179,7 +183,7 @@ namespace PubNubMessaging.Tests
                 #region "GetUser"
                 System.Diagnostics.Debug.WriteLine("pubnub.GetUser() STARTED");
                 pubnub.GetUser().UserId(userId).IncludeCustom(true)
-                    .Execute(new PNGetUserResultExt((r,s)=> 
+                    .Execute(new PNGetUserResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
@@ -208,7 +212,7 @@ namespace PubNubMessaging.Tests
                         {
                             pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
                             List<PNUserResult> userList = r.Users;
-                            if (userList != null && userList.Count > 0 && userList.Find(x=> x.Id == userId) != null)
+                            if (userList != null && userList.Count > 0 && userList.Find(x => x.Id == userId) != null)
                             {
                                 receivedMessage = true;
                             }
@@ -285,7 +289,7 @@ namespace PubNubMessaging.Tests
             pubnub.AddListener(eventListener);
 
             ManualResetEvent manualEvent = new ManualResetEvent(false);
-            pubnub.Subscribe<string>().Channels(new string[] { "pnuser-"+userId }).Execute();
+            pubnub.Subscribe<string>().Channels(new string[] { userId }).Execute();
             manualEvent.WaitOne(2000);
 
             manualEvent = new ManualResetEvent(false);

@@ -80,7 +80,7 @@ namespace PubnubApi.EndPoint
         {
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildTimeRequest(externalQueryParam);
+            Uri request = urlBuilder.BuildTimeRequest("GET", "", externalQueryParam);
 
             RequestState<PNTimeResult> requestState = new RequestState<PNTimeResult>();
             requestState.Channels = null;

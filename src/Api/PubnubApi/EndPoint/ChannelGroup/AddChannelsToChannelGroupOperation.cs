@@ -110,7 +110,7 @@ namespace PubnubApi.EndPoint
 
             string channelsCommaDelimited = string.Join(",", channels.OrderBy(x => x).ToArray());
 
-            Uri request = urlBuilder.BuildAddChannelsToChannelGroupRequest(channelsCommaDelimited, nameSpace, groupName, externalQueryParam);
+            Uri request = urlBuilder.BuildAddChannelsToChannelGroupRequest("GET", "", channelsCommaDelimited, nameSpace, groupName, externalQueryParam);
 
             RequestState<PNChannelGroupsAddChannelResult> requestState = new RequestState<PNChannelGroupsAddChannelResult>();
             requestState.ResponseType = PNOperationType.PNAddChannelsToGroupOperation;

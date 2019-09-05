@@ -150,9 +150,10 @@ namespace PubnubApi.EndPoint
             Dictionary<string, string> urlParam = new Dictionary<string, string>();
             urlParam.Add("norep", "true");
 
+            string requestMethodName = (this.httpPost) ? "POST" : "GET";
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildPublishRequest(channel, message, storeInHistory, ttl, metaData, httpPost, urlParam, externalQueryParam);
+            Uri request = urlBuilder.BuildPublishRequest(requestMethodName, "", channel, message, storeInHistory, ttl, metaData, urlParam, externalQueryParam);
 
             RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>();
             requestState.Channels = new [] { channel };

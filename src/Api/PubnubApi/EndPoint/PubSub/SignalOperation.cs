@@ -123,7 +123,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildSignalRequest(channel, message, metaData, false, externalQueryParam);
+            Uri request = urlBuilder.BuildSignalRequest("GET", "", channel, message, metaData, externalQueryParam);
 
             RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>();
             requestState.Channels = new[] { channel };

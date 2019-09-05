@@ -132,17 +132,11 @@ namespace PubnubApi.EndPoint
             }
 
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildUpdateSpaceRequest(spaceId, spaceCustom, externalQueryParam);
-
             RequestState<PNUpdateSpaceResult> requestState = new RequestState<PNUpdateSpaceResult>();
             requestState.ResponseType = PNOperationType.PNUpdateSpaceOperation;
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;
-
-            string json = "";
 
             requestState.UsePatchMethod = true;
             Dictionary<string, object> messageEnvelope = new Dictionary<string, object>();
@@ -153,8 +147,13 @@ namespace PubnubApi.EndPoint
             {
                 messageEnvelope.Add("custom", spaceCustom);
             }
-            string postMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
-            json = UrlProcessRequest<PNUpdateSpaceResult>(request, requestState, false, postMessage);
+            string patchMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
+
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            Uri request = urlBuilder.BuildUpdateSpaceRequest("PATCH", patchMessage, spaceId, spaceCustom, externalQueryParam);
+
+            string json = UrlProcessRequest<PNUpdateSpaceResult>(request, requestState, false, patchMessage);
 
             if (!string.IsNullOrEmpty(json))
             {

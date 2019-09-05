@@ -113,7 +113,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildDeleteUserRequest(userId, externalQueryParam);
+            Uri request = urlBuilder.BuildDeleteUserRequest("DELETE", "", userId, externalQueryParam);
 
             RequestState<PNDeleteUserResult> requestState = new RequestState<PNDeleteUserResult>();
             requestState.ResponseType = PNOperationType.PNDeleteUserOperation;

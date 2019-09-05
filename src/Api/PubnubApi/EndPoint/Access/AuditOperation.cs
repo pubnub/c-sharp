@@ -107,7 +107,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildAuditAccessRequest(channel, channelGroup, authKeysCommaDelimited, externalQueryParam);
+            Uri request = urlBuilder.BuildAuditAccessRequest("GET", "", channel, channelGroup, authKeysCommaDelimited, externalQueryParam);
 
             RequestState<PNAccessManagerAuditResult> requestState = new RequestState<PNAccessManagerAuditResult>();
             if (!string.IsNullOrEmpty(channel))

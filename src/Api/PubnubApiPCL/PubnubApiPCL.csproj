@@ -77,6 +77,7 @@ Added ObjectsAPI feature.</PackageReleaseNotes>
     <Compile Include="..\PubnubApi\EndPoint\Access\GrantOperation.cs">
       <Link>EndPoint\Access\GrantOperation.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\Access\GrantV2Operation.cs" Link="EndPoint\Access\GrantV2Operation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\ChannelGroup\AddChannelsToChannelGroupOperation.cs">
       <Link>EndPoint\ChannelGroup\AddChannelsToChannelGroupOperation.cs</Link>
     </Compile>
@@ -163,6 +164,8 @@ Added ObjectsAPI feature.</PackageReleaseNotes>
     <Compile Include="..\PubnubApi\EndPoint\TimeOperation.cs">
       <Link>EndPoint\TimeOperation.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\TokenManager.cs" Link="EndPoint\TokenManager.cs" />
+    <Compile Include="..\PubnubApi\Enum\GrantBitFlag.cs" Link="Enum\GrantBitFlag.cs" />
     <Compile Include="..\PubnubApi\Enum\PNHeartbeatNotificationOption.cs">
       <Link>Enum\PNHeartbeatNotificationOption.cs</Link>
     </Compile>
@@ -228,6 +231,7 @@ Added ObjectsAPI feature.</PackageReleaseNotes>
     <Compile Include="..\PubnubApi\JsonDataParse\PNGetSpacesJsonDataParse.cs" Link="JsonDataParse\PNGetSpacesJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNGetUserJsonDataParse.cs" Link="JsonDataParse\PNGetUserJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNGetUsersJsonDataParse.cs" Link="JsonDataParse\PNGetUsersJsonDataParse.cs" />
+    <Compile Include="..\PubnubApi\JsonDataParse\PNGrantTokenJsonDataParse.cs" Link="JsonDataParse\PNGrantTokenJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNManageMembershipsJsonDataParse.cs" Link="JsonDataParse\PNManageMembershipsJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNManageMembersJsonDataParse.cs" Link="JsonDataParse\PNManageMembersJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNObjectApiEventJsonDataParse.cs" Link="JsonDataParse\PNObjectApiEventJsonDataParse.cs" />
@@ -251,6 +255,8 @@ Added ObjectsAPI feature.</PackageReleaseNotes>
     <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNAccessManagerKeysData.cs">
       <Link>Model\Consumer\AccessManager\PNAccessManagerKeysData.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNAccessManagerTokenResult.cs" Link="Model\Consumer\AccessManager\PNAccessManagerTokenResult.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNResourcePermission.cs" Link="Model\Consumer\AccessManager\PNResourcePermission.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\ChannelGroup\PNChannelGroupsAddChannelResult.cs">
       <Link>Model\Consumer\ChannelGroup\PNChannelGroupsAddChannelResult.cs</Link>
     </Compile>
@@ -353,6 +359,7 @@ Added ObjectsAPI feature.</PackageReleaseNotes>
     <Compile Include="..\PubnubApi\Model\Derived\AccessManager\PNAccessManagerGrantResultExt.cs">
       <Link>Model\Derived\AccessManager\PNAccessManagerGrantResultExt.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\AccessManager\PNAccessManagerTokenResultExt.cs" Link="Model\Derived\AccessManager\PNAccessManagerTokenResultExt.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\ChannelGroup\PNChannelGroupsAddChannelResultExt.cs">
       <Link>Model\Derived\ChannelGroup\PNChannelGroupsAddChannelResultExt.cs</Link>
     </Compile>

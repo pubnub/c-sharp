@@ -96,7 +96,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildGetChannelsPushRequest(pushType, pushToken, externalQueryParam);
+            Uri request = urlBuilder.BuildGetChannelsPushRequest("GET", "", pushType, pushToken, externalQueryParam);
 
             RequestState<PNPushListProvisionsResult> requestState = new RequestState<PNPushListProvisionsResult>();
             requestState.ResponseType = PNOperationType.PushGet;

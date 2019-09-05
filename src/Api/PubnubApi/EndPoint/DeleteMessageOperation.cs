@@ -111,7 +111,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildDeleteMessageRequest(channel, start, end, externalQueryParam);
+            Uri request = urlBuilder.BuildDeleteMessageRequest("DELETE", "", channel, start, end, externalQueryParam);
 
             RequestState<PNDeleteMessageResult> requestState = new RequestState<PNDeleteMessageResult>();
             requestState.Channels = new [] { channel };

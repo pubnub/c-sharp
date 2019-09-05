@@ -132,17 +132,11 @@ namespace PubnubApi.EndPoint
             }
 
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildCreateSpaceRequest(spaceCustom, externalQueryParam);
-
             RequestState<PNCreateSpaceResult> requestState = new RequestState<PNCreateSpaceResult>();
             requestState.ResponseType = PNOperationType.PNCreateSpaceOperation;
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;
-
-            string json = "";
 
             requestState.UsePostMethod = true;
             Dictionary<string, object> messageEnvelope = new Dictionary<string, object>();
@@ -157,7 +151,12 @@ namespace PubnubApi.EndPoint
                 messageEnvelope.Add("custom", spaceCustom);
             }
             string postMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
-            json = UrlProcessRequest<PNCreateSpaceResult>(request, requestState, false, postMessage);
+
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            Uri request = urlBuilder.BuildCreateSpaceRequest("POST", postMessage, spaceCustom, externalQueryParam);
+
+            string json = UrlProcessRequest<PNCreateSpaceResult>(request, requestState, false, postMessage);
 
             if (!string.IsNullOrEmpty(json))
             {

@@ -15,10 +15,12 @@ namespace PubNubMessaging.Tests
                 #pragma warning restore CS0162 // Unreachable code detected
 
                 IPubnubUnitTest unitTest = new PubnubUnitTest();
-                unitTest.Timetoken = 1356998400;
+                unitTest.Timetoken = 1567581283;
                 unitTest.RequestId = "myRequestId";
                 unitTest.InternetAvailable = true;
-                unitTest.SdkVersion = "PubNub CSharp";
+                unitTest.SdkVersion = "PubNub-Go/4.2.7";
+                unitTest.IncludePnsdk = true;
+                unitTest.IncludeUuid = true;
 
                 pubnub = new Pubnub(pnConfiguration);
 
@@ -26,7 +28,8 @@ namespace PubNubMessaging.Tests
             }
             else
             {
-                pnConfiguration.Origin = "ps.pndsn.com";
+                pnConfiguration.Origin = "ingress.bronze.aws-pdx-1.ps.pn";// "ps.pndsn.com";
+                pnConfiguration.Secure = false;
                 pubnub = new Pubnub(pnConfiguration);
             }
             return pubnub;

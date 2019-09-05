@@ -117,7 +117,7 @@ namespace PubNubMessaging.Tests
             };
             if (PubnubCommon.PAMEnabled)
             {
-                config.AuthKey = authKey;
+                config.SecretKey = PubnubCommon.SecretKey;
             }
 
             pubnub = createPubNubInstance(config);
@@ -172,10 +172,13 @@ namespace PubNubMessaging.Tests
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                //SecretKey = PubnubCommon.SecretKey,
                 Uuid = "mytestuuid",
                 Secure = true
             };
+            if (PubnubCommon.PAMEnabled)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
 
             pubnub = createPubNubInstance(config);
 

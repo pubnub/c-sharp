@@ -122,7 +122,14 @@ namespace PubnubApi
             return grantOperation;
         }
 
-		public EndPoint.SetStateOperation SetPresenceState()
+        public EndPoint.GrantV2Operation GrantV2()
+        {
+            EndPoint.GrantV2Operation grantOperation = new EndPoint.GrantV2Operation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
+            grantOperation.CurrentPubnubInstance(this);
+            return grantOperation;
+        }
+
+        public EndPoint.SetStateOperation SetPresenceState()
 		{
             EndPoint.SetStateOperation setStateOperation = new EndPoint.SetStateOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
             setStateOperation.CurrentPubnubInstance(this);
@@ -224,13 +231,13 @@ namespace PubnubApi
             return getSingleSpaceOperation;
         }
 
-        public EndPoint.ManageMembershipsOperation Memberships()
+        public EndPoint.ManageMembershipsOperation ManageMemberships()
         {
             EndPoint.ManageMembershipsOperation membershipOperation = new EndPoint.ManageMembershipsOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
             return membershipOperation;
         }
 
-        public EndPoint.ManageMembersOperation Members()
+        public EndPoint.ManageMembersOperation ManageMembers()
         {
             EndPoint.ManageMembersOperation membersOperation = new EndPoint.ManageMembersOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
             return membersOperation;

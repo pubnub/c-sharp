@@ -90,7 +90,7 @@ namespace PubnubApi.EndPoint
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
 
-            Uri request = urlBuilder.BuildRemoveChannelsFromChannelGroupRequest(null, "", groupName, externalQueryParam);
+            Uri request = urlBuilder.BuildRemoveChannelsFromChannelGroupRequest("GET", "", null, "", groupName, externalQueryParam);
 
             RequestState<PNChannelGroupsDeleteGroupResult> requestState = new RequestState<PNChannelGroupsDeleteGroupResult>();
             requestState.ResponseType = PNOperationType.PNRemoveGroupOperation;

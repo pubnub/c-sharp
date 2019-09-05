@@ -145,18 +145,11 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing userCallback");
             }
 
-
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildCreateUserRequest(userCustom, externalQueryParam);
-
             RequestState<PNCreateUserResult> requestState = new RequestState<PNCreateUserResult>();
             requestState.ResponseType = PNOperationType.PNCreateUserOperation;
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;
-
-            string json = "";
 
             requestState.UsePostMethod = true;
             Dictionary<string, object> messageEnvelope = new Dictionary<string, object>();
@@ -179,7 +172,12 @@ namespace PubnubApi.EndPoint
                 messageEnvelope.Add("custom", userCustom);
             }
             string postMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
-            json = UrlProcessRequest<PNCreateUserResult>(request, requestState, false, postMessage);
+
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            Uri request = urlBuilder.BuildCreateUserRequest("POST", postMessage, userCustom, externalQueryParam);
+
+            string json = UrlProcessRequest<PNCreateUserResult>(request, requestState, false, postMessage);
 
             if (!string.IsNullOrEmpty(json))
             {

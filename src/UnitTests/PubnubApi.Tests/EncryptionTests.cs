@@ -585,9 +585,25 @@ namespace PubNubMessaging.Tests
             string message = "Pubnub Messaging 1";
 
             string signature = crypto.PubnubAccessManagerSign(secretKey, message);
+            System.Diagnostics.Debug.WriteLine("TestPAMSignature = " + signature);
 
             Assert.AreEqual("mIoxTVM2WAM5j-M2vlp9bVblDLoZQI5XIoYyQ48U0as=", signature);
         }
+
+        [Test]
+        public void TestPAMv3Signature()
+        {
+            PubnubCrypto crypto = new PubnubCrypto("");
+            string secretKey = "wMfbo9G0xVUG8yfTfYw5qIdfJkTd7A";
+            string message = "POST\ndemo\n/v3/pam/demo/grant\nPoundsSterling=%C2%A313.37&timestamp=123456789\n{\n  \"ttl\": 1440,\n  \"permissions\": {\n    \"resources\" : {\n      \"channels\": {\n        \"inbox-jay\": 3\n      },\n      \"groups\": {},\n      \"users\": {},\n      \"spaces\": {}\n    },\n    \"patterns\" : {\n      \"channels\": {},\n      \"groups\": {},\n      \"users\": {},\n      \"spaces\": {}\n    },\n    \"meta\": {\n      \"user-id\": \"jay@example.com\",\n      \"contains-unicode\": \"The 💩 test.\"\n    }\n  }\n}";
+
+            string signature = crypto.PubnubAccessManagerSign(secretKey, message);
+            signature = string.Format("v2.{0}", signature.TrimEnd(new char[] { '=' }));
+            System.Diagnostics.Debug.WriteLine("TestPAMv3Signature = " + signature);
+
+            Assert.AreEqual("v2.k80LsDMD-sImA8rCBj-ntRKhZ8mSjHY8Ivngt9W3Yc4", signature);
+        }
+
 
         public static string EncodeNonAsciiCharacters(string value)
         {

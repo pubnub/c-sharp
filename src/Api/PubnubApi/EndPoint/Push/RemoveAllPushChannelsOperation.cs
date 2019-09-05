@@ -96,7 +96,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildUnregisterDevicePushRequest(pushType, pushToken, externalQueryParam);
+            Uri request = urlBuilder.BuildUnregisterDevicePushRequest("GET", "", pushType, pushToken, externalQueryParam);
 
             RequestState<PNPushRemoveAllChannelsResult> requestState = new RequestState<PNPushRemoveAllChannelsResult>();
             requestState.ResponseType = PNOperationType.PushUnregister;

@@ -111,7 +111,7 @@ namespace PubnubApi.EndPoint
             string channelsCommaDelimited = string.Join(",", channels.OrderBy(x => x).ToArray());
 
 
-            Uri request = urlBuilder.BuildRemoveChannelsFromChannelGroupRequest(channelsCommaDelimited, nameSpace, groupName, externalQueryParam);
+            Uri request = urlBuilder.BuildRemoveChannelsFromChannelGroupRequest("GET", "", channelsCommaDelimited, nameSpace, groupName, externalQueryParam);
 
             RequestState<PNChannelGroupsRemoveChannelResult> requestState = new RequestState<PNChannelGroupsRemoveChannelResult>();
             requestState.ResponseType = PNOperationType.PNRemoveChannelsFromGroupOperation;

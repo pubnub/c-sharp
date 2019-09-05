@@ -110,10 +110,9 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing userCallback");
             }
 
-
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildDeleteSpaceRequest(spaceId, externalQueryParam);
+            Uri request = urlBuilder.BuildDeleteSpaceRequest("DELETE", "", spaceId, externalQueryParam);
 
             RequestState<PNDeleteSpaceResult> requestState = new RequestState<PNDeleteSpaceResult>();
             requestState.ResponseType = PNOperationType.PNDeleteSpaceOperation;

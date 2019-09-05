@@ -181,17 +181,11 @@ namespace PubnubApi.EndPoint
             if (page == null) { internalPage = new PNPage(); }
             else { internalPage = page; }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildMembersAddUpdateRemoveRequest(spaceId, internalPage.Next, internalPage.Prev, limit, includeCount, includeOptions, externalQueryParam);
-
             RequestState<PNManageMembersResult> requestState = new RequestState<PNManageMembersResult>();
             requestState.ResponseType = PNOperationType.PNManageMembersOperation;
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;
-
-            string json = "";
 
             requestState.UsePatchMethod = true;
             Dictionary<string, object> messageEnvelope = new Dictionary<string, object>();
@@ -220,7 +214,12 @@ namespace PubnubApi.EndPoint
                 messageEnvelope.Add("custom", custom);
             }
             string patchMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
-            json = UrlProcessRequest<PNManageMembersResult>(request, requestState, false, patchMessage);
+
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            Uri request = urlBuilder.BuildMembersAddUpdateRemoveRequest("PATCH", patchMessage, spaceId, internalPage.Next, internalPage.Prev, limit, includeCount, includeOptions, externalQueryParam);
+
+            string json = UrlProcessRequest<PNManageMembersResult>(request, requestState, false, patchMessage);
 
             if (!string.IsNullOrEmpty(json))
             {

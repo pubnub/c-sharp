@@ -111,7 +111,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildRemoveChannelPushRequest(channel, pushType, pushToken, externalQueryParam);
+            Uri request = urlBuilder.BuildRemoveChannelPushRequest("GET", "", channel, pushType, pushToken, externalQueryParam);
 
             RequestState<PNPushRemoveChannelResult> requestState = new RequestState<PNPushRemoveChannelResult>();
             requestState.Channels = new [] { channel };
