@@ -549,7 +549,7 @@ namespace PubnubApi
 
         Uri IUrlRequestBuilder.BuildGrantV3AccessRequest(string requestMethod, string requestBody, Dictionary<string, object> externalQueryParam)
         {
-            PNOperationType currentType = PNOperationType.PNAccessManagerGrant;
+            PNOperationType currentType = PNOperationType.PNAccessManagerGrantToken;
 
             List<string> url = new List<string>();
             url.Add("v3");
@@ -1696,7 +1696,7 @@ namespace PubnubApi
                 }
 
                 if (type != PNOperationType.PNTimeOperation
-                        && type != PNOperationType.PNAccessManagerGrant && type != PNOperationType.ChannelGroupGrantAccess
+                        && type != PNOperationType.PNAccessManagerGrant && type != PNOperationType.PNAccessManagerGrantToken && type != PNOperationType.ChannelGroupGrantAccess
                         && type != PNOperationType.PNAccessManagerAudit && type != PNOperationType.ChannelGroupAuditAccess)
                 {
                     if (!string.IsNullOrEmpty(this.pubnubConfig.AuthKey))

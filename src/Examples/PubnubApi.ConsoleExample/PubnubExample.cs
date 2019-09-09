@@ -681,149 +681,139 @@ namespace PubnubApiDemo
                         break;
 
                     case "8":
-pubnub.Grant()
-    .Channels(new[] { "my_channel" })
-    .ChannelGroups(new[] { "my_channelgroup" })
-    .Users(new[] { "my_userid" })
-    .Spaces(new[] { "my_spaceid" })
-    .Read(true)
-    .Write(true)
-    .TTL(10)
-    .Execute(new PNAccessManagerTokenResultExt((result, status) => { }));
-
                         //pubnub.Grant()
-                        //    .Channels(new string[] { "pamv3channel" })
-                        //    //.Users(new string[] { "user-1"})
-                        //    //.Spaces(new string[] { "space-1"})
-                        //    .Read(true)
-                        //    .Write(true)
-                        //    .Delete(true)
-                        //    .Manage(true)
+                        //    .Channels(new Dictionary<string, PNResourcePermission>() {
+                        //        { "my_ch", new PNResourcePermission() { Read = true, Write = true } } })
+                        //    .Channels(new Dictionary<string, PNResourcePermission>() {
+                        //        { "^topic-[0-9a-f]*$", new PNResourcePermission() { Read = true, Write = true } },
+                        //        { "^topic-[0-9a-f]*-pnpres$", new PNResourcePermission() { Read = true } }},
+                        //        true)
+                        //    .ChannelGroups(new Dictionary<string, PNResourcePermission>() {
+                        //        { "my_cg1", new PNResourcePermission() { Read = true } },
+                        //        { "my_cg2", new PNResourcePermission() { Read = true } } })
+                        //    .Users(new Dictionary<string, PNResourcePermission>() {
+                        //        { "my_user1", new PNResourcePermission() { Read = true, Write = true, Create = true } } })
+                        //    .Spaces(new Dictionary<string, PNResourcePermission>() {
+                        //        { "my_space1", new PNResourcePermission() { Read = true, Write = true, Delete = true } } })
                         //    .TTL(10)
-                        //    .Execute(new PNAccessManagerTokenResultExt(
-                        //        (r, s) =>
+                        //    .Execute(new PNAccessManagerTokenResultExt((result, status) => 
+                        //    {
+                        //        if (result != null)
                         //        {
-                        //            if (r != null)
-                        //            {
-                        //                Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
-                        //            }
-                        //            else if (s != null)
-                        //            {
-                        //                Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
-                        //            }
-                        //        })
-                        //        );
-                        //Console.WriteLine("Enter CHANNEL name(s) for PAM Grant.");
-                        //channel = Console.ReadLine();
+                        //            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                        //        }
+                        //    }));
+                        Console.WriteLine("Enter CHANNEL name(s) for PAM Grant.");
+                        channel = Console.ReadLine();
 
-                        //if (channel.Trim().Length <= 0)
-                        //{
-                        //    channel = "";
-                        //}
+                        if (channel.Trim().Length <= 0)
+                        {
+                            channel = "";
+                        }
 
-                        //Console.WriteLine("Enter CHANNEL GROUP name(s) for PAM Grant.");
-                        //channelGroup = Console.ReadLine();
-                        //if (channelGroup.Trim().Length <= 0)
-                        //{
-                        //    channelGroup = "";
-                        //}
+                        Console.WriteLine("Enter CHANNEL GROUP name(s) for PAM Grant.");
+                        channelGroup = Console.ReadLine();
+                        if (channelGroup.Trim().Length <= 0)
+                        {
+                            channelGroup = "";
+                        }
 
-                        //if (channel.Trim().Length <= 0 && channelGroup.Trim().Length <= 0)
-                        //{
-                        //    Console.WriteLine("Channel or ChannelGroup not provided. Please try again.");
-                        //    break;
-                        //}
-                        //string[] channelList = channel.Split(',');
-                        //string[] channelGroupList = channelGroup.Split(',');
+                        if (channel.Trim().Length <= 0 && channelGroup.Trim().Length <= 0)
+                        {
+                            Console.WriteLine("Channel or ChannelGroup not provided. Please try again.");
+                            break;
+                        }
+                        string[] channelList = channel.Split(',');
+                        string[] channelGroupList = channelGroup.Split(',');
 
-                        //Console.WriteLine("Enter the auth_key for PAM Grant (optional)" + Environment.NewLine + "Press Enter Key if there is no auth_key at this time.");
-                        //string authGrant = Console.ReadLine();
-                        //string[] authKeyList = authGrant.Split(',');
+                        Console.WriteLine("Enter the auth_key for PAM Grant (optional)" + Environment.NewLine + "Press Enter Key if there is no auth_key at this time.");
+                        string authGrant = Console.ReadLine();
+                        string[] authKeyList = authGrant.Split(',');
 
-                        //Console.WriteLine("Read Access? Enter Y for Yes (default), N for No.");
-                        //string readAccess = Console.ReadLine();
-                        //bool read = (readAccess.ToLower() == "n") ? false : true;
+                        Console.WriteLine("Read Access? Enter Y for Yes (default), N for No.");
+                        string readAccess = Console.ReadLine();
+                        bool read = (readAccess.ToLower() == "n") ? false : true;
 
-                        //bool write = false;
-                        //if (channel.Trim().Length > 0)
-                        //{
-                        //    Console.WriteLine("Write Access? Enter Y for Yes (default), N for No.");
-                        //    string writeAccess = Console.ReadLine();
-                        //    write = (writeAccess.ToLower() == "n") ? false : true;
-                        //}
+                        bool write = false;
+                        if (channel.Trim().Length > 0)
+                        {
+                            Console.WriteLine("Write Access? Enter Y for Yes (default), N for No.");
+                            string writeAccess = Console.ReadLine();
+                            write = (writeAccess.ToLower() == "n") ? false : true;
+                        }
 
-                        //bool delete = false;
-                        //if (channel.Trim().Length > 0)
-                        //{
-                        //    Console.WriteLine("Delete Access? Enter Y for Yes (default), N for No.");
-                        //    string deleteAccess = Console.ReadLine();
-                        //    delete = (deleteAccess.ToLower() == "n") ? false : true;
-                        //}
+                        bool delete = false;
+                        if (channel.Trim().Length > 0)
+                        {
+                            Console.WriteLine("Delete Access? Enter Y for Yes (default), N for No.");
+                            string deleteAccess = Console.ReadLine();
+                            delete = (deleteAccess.ToLower() == "n") ? false : true;
+                        }
 
-                        //bool manage = false;
-                        //if (channelGroup.Trim().Length > 0)
-                        //{
-                        //    Console.WriteLine("Manage Access? Enter Y for Yes (default), N for No.");
-                        //    string manageAccess = Console.ReadLine();
-                        //    manage = (manageAccess.ToLower() == "n") ? false : true;
-                        //}
-                        //Console.WriteLine("How many minutes do you want to allow Grant Access? Enter the number of minutes." + Environment.NewLine + "Default = 1440 minutes (24 hours). Press ENTER now to accept default value.");
-                        //int grantTimeLimitInMinutes;
-                        //string grantTimeLimit = Console.ReadLine();
-                        //if (string.IsNullOrEmpty(grantTimeLimit.Trim()))
-                        //{
-                        //    grantTimeLimitInMinutes = 1440;
-                        //}
-                        //else
-                        //{
-                        //    Int32.TryParse(grantTimeLimit, out grantTimeLimitInMinutes);
-                        //    if (grantTimeLimitInMinutes < 0) grantTimeLimitInMinutes = 1440;
-                        //}
+                        bool manage = false;
+                        if (channelGroup.Trim().Length > 0)
+                        {
+                            Console.WriteLine("Manage Access? Enter Y for Yes (default), N for No.");
+                            string manageAccess = Console.ReadLine();
+                            manage = (manageAccess.ToLower() == "n") ? false : true;
+                        }
+                        Console.WriteLine("How many minutes do you want to allow Grant Access? Enter the number of minutes." + Environment.NewLine + "Default = 1440 minutes (24 hours). Press ENTER now to accept default value.");
+                        int grantTimeLimitInMinutes;
+                        string grantTimeLimit = Console.ReadLine();
+                        if (string.IsNullOrEmpty(grantTimeLimit.Trim()))
+                        {
+                            grantTimeLimitInMinutes = 1440;
+                        }
+                        else
+                        {
+                            Int32.TryParse(grantTimeLimit, out grantTimeLimitInMinutes);
+                            if (grantTimeLimitInMinutes < 0) grantTimeLimitInMinutes = 1440;
+                        }
 
-                        //Console.ForegroundColor = ConsoleColor.Blue;
-                        //StringBuilder pamGrantStringBuilder = new StringBuilder();
-                        //pamGrantStringBuilder.AppendLine(string.Format("Channel = {0}", channel));
-                        //pamGrantStringBuilder.AppendLine(string.Format("ChannelGroup = {0}", channelGroup));
-                        //pamGrantStringBuilder.AppendLine(string.Format("auth_key = {0}", authGrant));
-                        //pamGrantStringBuilder.AppendLine(string.Format("Read Access = {0}", read.ToString()));
-                        //if (channel.Trim().Length > 0)
-                        //{
-                        //    pamGrantStringBuilder.AppendLine(string.Format("Write Access = {0}", write.ToString()));
-                        //    pamGrantStringBuilder.AppendLine(string.Format("Delete Access = {0}", delete.ToString()));
-                        //}
-                        //if (channelGroup.Trim().Length > 0)
-                        //{
-                        //    pamGrantStringBuilder.AppendLine(string.Format("Manage Access = {0}", manage.ToString()));
-                        //}
-                        //pamGrantStringBuilder.AppendLine(string.Format("Grant Access Time Limit = {0}", grantTimeLimitInMinutes.ToString()));
-                        //Console.WriteLine(pamGrantStringBuilder.ToString());
-                        //Console.ResetColor();
-                        //Console.WriteLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        StringBuilder pamGrantStringBuilder = new StringBuilder();
+                        pamGrantStringBuilder.AppendLine(string.Format("Channel = {0}", channel));
+                        pamGrantStringBuilder.AppendLine(string.Format("ChannelGroup = {0}", channelGroup));
+                        pamGrantStringBuilder.AppendLine(string.Format("auth_key = {0}", authGrant));
+                        pamGrantStringBuilder.AppendLine(string.Format("Read Access = {0}", read.ToString()));
+                        if (channel.Trim().Length > 0)
+                        {
+                            pamGrantStringBuilder.AppendLine(string.Format("Write Access = {0}", write.ToString()));
+                            pamGrantStringBuilder.AppendLine(string.Format("Delete Access = {0}", delete.ToString()));
+                        }
+                        if (channelGroup.Trim().Length > 0)
+                        {
+                            pamGrantStringBuilder.AppendLine(string.Format("Manage Access = {0}", manage.ToString()));
+                        }
+                        pamGrantStringBuilder.AppendLine(string.Format("Grant Access Time Limit = {0}", grantTimeLimitInMinutes.ToString()));
+                        Console.WriteLine(pamGrantStringBuilder.ToString());
+                        Console.ResetColor();
+                        Console.WriteLine();
 
-                        //Console.WriteLine("Running PamGrant()");
+                        Console.WriteLine("Running PamGrant()");
 
-                        //pubnub.Grant()
-                        //    .Channels(channelList)
-                        //    .ChannelGroups(channelGroupList)
-                        //    .AuthKeys(authKeyList)
-                        //    .Read(read)
-                        //    .Write(write)
-                        //    .Delete(delete)
-                        //    .Manage(manage)
-                        //    .TTL(grantTimeLimitInMinutes)
-                        //    .Execute(new PNAccessManagerGrantResultExt(
-                        //        (r, s) =>
-                        //        {
-                        //            if (r != null)
-                        //            {
-                        //                Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
-                        //            }
-                        //            else if (s != null)
-                        //            {
-                        //                Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
-                        //            }
-                        //        })
-                        //        );
+                        pubnub.Grant()
+                            .Channels(channelList)
+                            .ChannelGroups(channelGroupList)
+                            .AuthKeys(authKeyList)
+                            .Read(read)
+                            .Write(write)
+                            .Delete(delete)
+                            .Manage(manage)
+                            .TTL(grantTimeLimitInMinutes)
+                            .Execute(new PNAccessManagerGrantResultExt(
+                                (r, s) =>
+                                {
+                                    if (r != null)
+                                    {
+                                        Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                    }
+                                    else if (s != null)
+                                    {
+                                        Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
+                                    }
+                                })
+                                );
                         break;
                     case "9":
                         Console.WriteLine("Enter CHANNEL name for PAM Audit" + Environment.NewLine + "To enter CHANNEL GROUP name, just hit ENTER");

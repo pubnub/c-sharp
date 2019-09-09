@@ -107,8 +107,8 @@
     <Compile Include="..\..\Api\PubnubApi\EndPoint\Access\GrantOperation.cs">
       <Link>LinkedSourceCode\EndPoint\Access\GrantOperation.cs</Link>
     </Compile>
-    <Compile Include="..\..\Api\PubnubApi\EndPoint\Access\GrantV2Operation.cs">
-      <Link>LinkedSourceCode\EndPoint\Access\GrantV2Operation.cs</Link>
+    <Compile Include="..\..\Api\PubnubApi\EndPoint\Access\GrantTokenOperation.cs">
+      <Link>LinkedSourceCode\EndPoint\Access\GrantTokenOperation.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\EndPoint\ChannelGroup\AddChannelsToChannelGroupOperation.cs">
       <Link>LinkedSourceCode\EndPoint\ChannelGroup\AddChannelsToChannelGroupOperation.cs</Link>

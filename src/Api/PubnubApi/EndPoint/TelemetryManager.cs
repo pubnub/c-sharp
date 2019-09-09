@@ -91,6 +91,9 @@ namespace PubnubApi.EndPoint
                 case PNOperationType.PushUnregister:
                     endpoint = "l_push";
                     break;
+                case PNOperationType.PNAccessManagerGrantToken:
+                    endpoint = "l_pamv3";
+                    break;
                 case PNOperationType.PNAccessManagerAudit:
                 case PNOperationType.PNAccessManagerGrant:
                     endpoint = "l_pam";

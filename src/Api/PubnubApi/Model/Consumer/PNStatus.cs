@@ -57,6 +57,16 @@ namespace PubnubApi
                             }
                         }
                         break;
+                    case PNOperationType.PNAccessManagerGrantToken:
+                        if (savedEndpointOperation is GrantTokenOperation)
+                        {
+                            GrantTokenOperation endpoint = savedEndpointOperation as GrantTokenOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
                     case PNOperationType.PNAccessManagerGrant:
                         if (savedEndpointOperation is GrantOperation)
                         {

@@ -115,16 +115,16 @@ namespace PubnubApi
             return auditOperation;
         }
 
-		public EndPoint.GrantOperation Grant()
+		public EndPoint.GrantTokenOperation GrantToken()
 		{
-            EndPoint.GrantOperation grantOperation = new EndPoint.GrantOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
+            EndPoint.GrantTokenOperation grantOperation = new EndPoint.GrantTokenOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
             grantOperation.CurrentPubnubInstance(this);
             return grantOperation;
         }
 
-        public EndPoint.GrantV2Operation GrantV2()
+        public EndPoint.GrantOperation Grant()
         {
-            EndPoint.GrantV2Operation grantOperation = new EndPoint.GrantV2Operation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
+            EndPoint.GrantOperation grantOperation = new EndPoint.GrantOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
             grantOperation.CurrentPubnubInstance(this);
             return grantOperation;
         }

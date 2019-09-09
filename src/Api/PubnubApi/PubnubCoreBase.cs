@@ -792,6 +792,7 @@ namespace PubnubApi
                     case PNOperationType.PNMessageCountsOperation:
                     case PNOperationType.PNHereNowOperation:
                     case PNOperationType.PNWhereNowOperation:
+                    case PNOperationType.PNAccessManagerGrantToken:
                     case PNOperationType.PNAccessManagerGrant:
                     case PNOperationType.PNAccessManagerAudit:
                     case PNOperationType.RevokeAccess:
@@ -1321,6 +1322,7 @@ namespace PubnubApi
                                 result.Add(whereNowDictionary);
                                 result.Add(multiChannel);
                                 break;
+                            case PNOperationType.PNAccessManagerGrantToken:
                             case PNOperationType.PNAccessManagerGrant:
                             case PNOperationType.PNAccessManagerAudit:
                             case PNOperationType.RevokeAccess:

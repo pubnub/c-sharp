@@ -184,7 +184,7 @@ Added ObjectsAPI feature.</PackageReleaseNotes>
     <Compile Include="..\PubnubApi\EndPoint\Access\GrantOperation.cs">
       <Link>EndPoint\Access\GrantOperation.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\EndPoint\Access\GrantV2Operation.cs" Link="EndPoint\Access\GrantV2Operation.cs" />
+    <Compile Include="..\PubnubApi\EndPoint\Access\GrantTokenOperation.cs" Link="EndPoint\Access\GrantTokenOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\ChannelGroup\AddChannelsToChannelGroupOperation.cs">
       <Link>EndPoint\ChannelGroup\AddChannelsToChannelGroupOperation.cs</Link>
     </Compile>

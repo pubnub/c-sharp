@@ -58,6 +58,7 @@ namespace PubnubApi
         PNHereNowOperation,
         PNGetStateOperation,
         PNAccessManagerAudit,
+        PNAccessManagerGrantToken,
         PNAccessManagerGrant
     }
 }

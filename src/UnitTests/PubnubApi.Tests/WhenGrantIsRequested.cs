@@ -87,46 +87,6 @@ namespace PubNubMessaging.Tests
 
             if (PubnubCommon.PAMEnabled)
             {
-Dictionary<string, PNResourcePermission> channelResources = new Dictionary<string, PNResourcePermission>();
-channelResources.Add("ch1", new PNResourcePermission() { Read = true, Write = true, Manage = true, Delete = true, Create = true });
-channelResources.Add("ch2", new PNResourcePermission() { Read = true, Write = true, Manage = true, Delete = true, Create = true });
-
-Dictionary<string, PNResourcePermission> channelGroupResources = new Dictionary<string, PNResourcePermission>();
-channelGroupResources.Add("cg1", new PNResourcePermission() { Read = true, Write = true, Manage = true, Delete = true, Create = true });
-channelGroupResources.Add("cg2", new PNResourcePermission() { Read = true, Write = true, Manage = true, Delete = true, Create = true });
-
-Dictionary<string, PNResourcePermission> userResources = new Dictionary<string, PNResourcePermission>();
-userResources.Add("user1", new PNResourcePermission() { Read = true, Write = true, Manage = true, Delete = true, Create = true });
-userResources.Add("user2", new PNResourcePermission() { Read = true, Write = true, Manage = true, Delete = true, Create = true });
-
-Dictionary<string, PNResourcePermission> spaceResources = new Dictionary<string, PNResourcePermission>();
-spaceResources.Add("space1", new PNResourcePermission() { Read = true, Write = true, Manage = true, Delete = true, Create = true });
-spaceResources.Add("space2", new PNResourcePermission() { Read = true, Write = true, Manage = true, Delete = true, Create = true });
-
-/* PAMv2 Grant */
-pubnub.Grant()
-    .Channels(new string[] { "my_ch" }) //Declared Obsolete. Overloaded Channels() method.
-    .ChannelGroups(new string[] { "my_cg1", "my_cg2" }) //Declared Obsolete. Overloaded ChannelGroups() method.
-    .Read(true) //Declared Obsolete
-    .Write(true) //Declared Obsolete
-    .TTL(10)
-    .Execute(new PNAccessManagerGrantResultExt((result, status) => { })); //Declared Obsolete. Overloaded Execute() method.
-
-
-/* PAMv3 Grant */
-pubnub.Grant()
-    .Channels(new Dictionary<string, PNResourcePermission>() {
-        { "my_ch", new PNResourcePermission() { Read = true, Write = true } } })
-    .ChannelGroups(new Dictionary<string, PNResourcePermission>() {
-        { "my_cg1", new PNResourcePermission() { Read = true } },
-        { "my_cg2", new PNResourcePermission() { Read = true, Write = true } } })
-    .Users(new Dictionary<string, PNResourcePermission>() {
-        { "my_user1", new PNResourcePermission() { Read = true, Write = true, Create = true } } })
-    .Spaces(new Dictionary<string, PNResourcePermission>() {
-        { "my_space1", new PNResourcePermission() { Read = true, Write = true, Delete = true } } })
-    .TTL(10)
-    .Execute(new PNAccessManagerTokenResultExt((result, status) => { }));
-
                 grantManualEvent = new ManualResetEvent(false);
                 pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(false).TTL(5).Execute(new GrantResult());
                 Thread.Sleep(1000);
@@ -597,7 +557,7 @@ pubnub.Grant()
         }
 
         [Test]
-        public static void ThenPAMv3ChannelShouldReturnSuccess()
+        public static void ThenPAMv3ChannelShouldReturnTokenSuccess()
         {
             server.ClearRequests();
 
@@ -686,10 +646,9 @@ pubnub.Grant()
             {
                 
                 grantManualEvent = new ManualResetEvent(false);
-                pubnub.Grant()
-                    .Channels(new[] { "inbox-jay" })
-                    .Read(true)
-                    .Write(true)
+                pubnub.GrantToken()
+                    .Channels(new Dictionary<string, PNResourcePermission>() {
+                                { "inbox-jay", new PNResourcePermission() { Read = true, Write = true } } })
                     .TTL(1440)
                     .QueryParam(new System.Collections.Generic.Dictionary<string, object>() { { "PoundsSterling", "£13.37" } })
                     .Meta(new System.Collections.Generic.Dictionary<string, object>() { { "user-id", "jay@example.com" }, { "contains-unicode", "The 💩 test." } })
@@ -698,6 +657,20 @@ pubnub.Grant()
                         if (result != null)
                         {
                             System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                            string token = result.Token;
+                            //string paddedToken = string.Format("{0}==", token);
+                            //token = token.TrimEnd(new char[] { '=' });
+                            try
+                            {
+                                token = token.Replace('_', '/').Replace('-','+').PadRight(4 * ((token.Length + 3) / 4), '=');
+                                byte[] tokenByteArray = Convert.FromBase64String(token);
+                                var jsonPermission = System.Text.Encoding.UTF8.GetString(tokenByteArray);
+                                System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(jsonPermission));
+                            }
+                            catch (Exception ex)
+                            {
+                                System.Diagnostics.Debug.WriteLine(ex.ToString());
+                            }
                             receivedGrantMessage = true;
                         }
                         grantManualEvent.Set();
@@ -712,131 +685,6 @@ pubnub.Grant()
                 pubnub = null;
                 Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenPAMv3ChannelShouldReturnSuccess failed.");
 
-            }
-            else
-            {
-                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenPAMv3ChannelShouldReturnSuccess.");
-            }
-        }
-
-        [Test]
-        public static void ThenGoPAMv3ChannelShouldReturnSuccess()
-        {
-            server.ClearRequests();
-
-            currentUnitTestCase = "ThenGoPAMv3ChannelShouldReturnSuccess";
-
-            receivedGrantMessage = false;
-
-            PNConfiguration config = new PNConfiguration
-            {
-                PublishKey = "pub-c-03f156ea-a2e3-4c35-a733-9535824be897",
-                SubscribeKey = "sub-c-d7da9e58-c997-11e9-a139-dab2c75acd6f",
-                SecretKey = "sec-c-MmUxNTZjMmYtNzFkNS00ODkzLWE2YjctNmQ4YzE5NWNmZDA3",
-                Uuid = "pn-939dce40-b482-48dd-9077-989439ec3198",
-                Secure = false,
-                EnableTelemetry = false,
-                IncludeInstanceIdentifier = false,
-                IncludeRequestIdentifier = false
-            };
-
-            pubnub = createPubNubInstance(config);
-
-            server.RunOnHttps(config.Secure);
-            string expected = "";
-
-            List<string> channelList = new List<string>();
-            List<string> channelGroupList = new List<string>();
-            List<string> authList = new List<string>();
-
-            List<string> userList = new List<string>();
-            List<string> spaceList = new List<string>();
-
-            Dictionary<string, int> chBitmaskPermDic = new Dictionary<string, int>();
-            chBitmaskPermDic.Add("channel-7921374", 7);
-
-            Dictionary<string, int> cgBitmaskPermDic = new Dictionary<string, int>();
-            cgBitmaskPermDic.Add("cg-3125640", 19);
-            cgBitmaskPermDic.Add("cg-6504767", 23);
-
-            Dictionary<string, int> userBitmaskPermDic = new Dictionary<string, int>();
-            userBitmaskPermDic.Add("u-8410992", 15);
-
-            Dictionary<string, int> spaceBitmaskPermDic = new Dictionary<string, int>();
-            spaceBitmaskPermDic.Add("s-8117729", 31);
-
-            Dictionary<string, object> resourcesDic = new Dictionary<string, object>();
-            resourcesDic.Add("channels", chBitmaskPermDic);
-            resourcesDic.Add("groups", cgBitmaskPermDic);
-            resourcesDic.Add("users", userBitmaskPermDic);
-            resourcesDic.Add("spaces", spaceBitmaskPermDic);
-
-
-            Dictionary<string, int> dummyBitmaskPermDic = new Dictionary<string, int>();
-
-            Dictionary<string, object> patternsDic = new Dictionary<string, object>();
-            patternsDic.Add("channels", dummyBitmaskPermDic);
-            patternsDic.Add("groups", dummyBitmaskPermDic);
-            patternsDic.Add("users", dummyBitmaskPermDic);
-            patternsDic.Add("spaces", dummyBitmaskPermDic);
-
-            Dictionary<string, object> meta = new Dictionary<string, object>();
-
-            Dictionary<string, object> permissionDic = new Dictionary<string, object>();
-            permissionDic.Add("resources", resourcesDic);
-            permissionDic.Add("patterns", patternsDic);
-            permissionDic.Add("meta", meta);
-
-            Dictionary<string, object> messageEnvelope = new Dictionary<string, object>();
-            messageEnvelope.Add("ttl", 10);
-            messageEnvelope.Add("permissions", permissionDic);
-            string postMessage = Newtonsoft.Json.JsonConvert.SerializeObject(messageEnvelope);
-
-            server.AddRequest(new Request()
-                    .WithMethod("POST")
-                    .WithPath(string.Format("/v3/pam/{0}/grant", config.SubscribeKey))
-                    .WithContent(postMessage)
-                    .WithParameter("PoundsSterling", "£13.37")
-                    .WithParameter("timestamp", "123456789")
-                    .WithParameter("signature", "v2.k80LsDMD-sImA8rCBj-ntRKhZ8mSjHY8Ivngt9W3Yc4")
-                    .WithResponse(expected)
-                    .WithStatusCode(System.Net.HttpStatusCode.OK));
-
-            if (PubnubCommon.PAMEnabled)
-            {
-
-                grantManualEvent = new ManualResetEvent(false);
-                pubnub.Grant()
-                    .Channels(new Dictionary<string, PNResourcePermission>() {
-                        { "my_ch", new PNResourcePermission() { Read = true, Write = true } } })
-                    .ChannelGroups(new Dictionary<string, PNResourcePermission>() {
-                        { "my_cg1", new PNResourcePermission() { Read = true } },
-                        { "my_cg2", new PNResourcePermission() { Read = true, Write = true } } })
-                    .Users(new Dictionary<string, PNResourcePermission>() {
-                        { "my_user1", new PNResourcePermission() { Read = true, Write = true, Create = true } } })
-                    .Spaces(new Dictionary<string, PNResourcePermission>() {
-                        { "my_space1", new PNResourcePermission() { Read = true, Write = true, Delete = true } } })
-                    .TTL(10)
-                    //.QueryParam(new System.Collections.Generic.Dictionary<string, object>() { { "poundsSterling", "£13.37" } })
-                    //.Meta(new System.Collections.Generic.Dictionary<string, object>() { { "user-id", "jay@example.com" }, { "contains-unicode", "The 💩 test." } })
-                    .Execute(new PNAccessManagerTokenResultExt((result, status) =>
-                    {
-                        if (result != null)
-                        {
-                            System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-                            receivedGrantMessage = true;
-                        }
-                        grantManualEvent.Set();
-                    }));
-
-                Thread.Sleep(1000);
-
-                grantManualEvent.WaitOne();
-
-                pubnub.Destroy();
-                pubnub.PubnubUnitTest = null;
-                pubnub = null;
-                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenPAMv3ChannelShouldReturnSuccess failed.");
             }
             else
             {
