@@ -213,7 +213,7 @@ namespace PubnubApi
                 channelGroups = state.ChannelGroups;
             }
 
-            PubnubApi.Interface.IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(pubnubConfig, jsonLib, unit, pubnubLog, null);
+            PubnubApi.Interface.IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(pubnubConfig, jsonLib, unit, pubnubLog, null, null);
             Uri requestUri = urlBuilder.BuildTimeRequest("GET", "", null);
             try
             {

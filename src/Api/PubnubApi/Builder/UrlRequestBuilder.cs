@@ -16,14 +16,16 @@ namespace PubnubApi
         private readonly IPubnubLog pubnubLog;
         private string pubnubInstanceId = "";
         private readonly EndPoint.TelemetryManager telemetryMgr;
+        private readonly EndPoint.TokenManager tokenMgr;
 
-        public UrlRequestBuilder(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager pubnubTelemetryMgr)
+        public UrlRequestBuilder(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager pubnubTelemetryMgr, EndPoint.TokenManager pubnubTokenMgr)
         {
             this.pubnubConfig = config;
             this.jsonLib = jsonPluggableLibrary;
             this.pubnubUnitTest = pubnubUnitTest;
             this.pubnubLog = log;
             this.telemetryMgr = pubnubTelemetryMgr;
+            this.tokenMgr = pubnubTokenMgr;
         }
 
         string IUrlRequestBuilder.PubnubInstanceId
@@ -1092,7 +1094,7 @@ namespace PubnubApi
             return BuildRestApiRequest(url, currentType, queryParams);
         }
 
-        Uri IUrlRequestBuilder.BuildCreateUserRequest(string requestMethod, string requestBody, Dictionary<string, object> userCustom, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildCreateUserRequest(string requestMethod, string requestBody, string userId, Dictionary<string, object> userCustom, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PNCreateUserOperation;
 
@@ -1117,7 +1119,7 @@ namespace PubnubApi
                     }
                 }
             }
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
+            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true, "user", userId, false);
             string queryParams = string.Format("?{0}", queryString);
 
             return BuildRestApiRequest(url, currentType, queryParams);
@@ -1149,7 +1151,7 @@ namespace PubnubApi
                     }
                 }
             }
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
+            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true, "user", userId, false);
             string queryParams = string.Format("?{0}", queryString);
 
             return BuildRestApiRequest(url, currentType, queryParams);
@@ -1178,7 +1180,7 @@ namespace PubnubApi
                 }
             }
 
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
+            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true, "user", userId, false);
             string queryParams = string.Format("?{0}", queryString);
 
             return BuildRestApiRequest(url, currentType, queryParams);
@@ -1226,7 +1228,7 @@ namespace PubnubApi
                     }
                 }
             }
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
+            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true, "user", "", true);
             string queryParams = string.Format("?{0}", queryString);
 
             return BuildRestApiRequest(url, currentType, queryParams);
@@ -1259,7 +1261,7 @@ namespace PubnubApi
                     }
                 }
             }
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
+            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true, "user", userId, false);
             string queryParams = string.Format("?{0}", queryString);
 
             return BuildRestApiRequest(url, currentType, queryParams);
@@ -1636,7 +1638,7 @@ namespace PubnubApi
             return BuildRestApiRequest(url, currentType, queryParams);
         }
 
-        private Dictionary<string, string> GenerateCommonQueryParams(PNOperationType type)
+        private Dictionary<string, string> GenerateCommonQueryParams(PNOperationType type, string resourceType, string resourceId, bool checkResourcePattern)
         {
             long timeStamp = TranslateUtcDateTimeToSeconds(DateTime.UtcNow);
             string requestid = Guid.NewGuid().ToString();
@@ -1699,7 +1701,26 @@ namespace PubnubApi
                         && type != PNOperationType.PNAccessManagerGrant && type != PNOperationType.PNAccessManagerGrantToken && type != PNOperationType.ChannelGroupGrantAccess
                         && type != PNOperationType.PNAccessManagerAudit && type != PNOperationType.ChannelGroupAuditAccess)
                 {
-                    if (!string.IsNullOrEmpty(this.pubnubConfig.AuthKey))
+                    if (type == PNOperationType.PNCreateUserOperation || type == PNOperationType.PNCreateSpaceOperation
+                        || type == PNOperationType.PNUpdateUserOperation || type == PNOperationType.PNUpdateSpaceOperation
+                        || type == PNOperationType.PNDeleteUserOperation || type == PNOperationType.PNDeleteSpaceOperation
+                        || type == PNOperationType.PNGetUserOperation || type == PNOperationType.PNGetSpaceOperation
+                        || type == PNOperationType.PNGetUsersOperation || type == PNOperationType.PNGetSpacesOperation
+                        || type == PNOperationType.PNGetMembersOperation || type == PNOperationType.PNGetMembershipsOperation
+                        || type == PNOperationType.PNManageMembersOperation || type == PNOperationType.PNManageMembershipsOperation)
+                    {
+                        string resourceToken = tokenMgr.GetToken(resourceType, resourceId);
+                        if (string.IsNullOrEmpty(resourceId) && checkResourcePattern)
+                        {
+                            resourceToken = tokenMgr.GetToken(resourceType, resourceId, checkResourcePattern);
+                        }
+                        else
+                        {
+                            resourceToken = tokenMgr.GetToken(resourceType, resourceId);
+                        }
+                        ret.Add("auth", UriUtil.EncodeUriComponent(false, resourceToken, type, false, false, false));
+                    }
+                    else if (!string.IsNullOrEmpty(this.pubnubConfig.AuthKey))
                     {
                         ret.Add("auth", UriUtil.EncodeUriComponent(false, this.pubnubConfig.AuthKey, type, false, false, false));
                     }
@@ -1719,8 +1740,16 @@ namespace PubnubApi
 
             PubnubCrypto pubnubCrypto = new PubnubCrypto((opType != PNOperationType.PNSignalOperation) ? this.pubnubConfig.CipherKey : "", this.pubnubConfig, this.pubnubLog);
             signature = pubnubCrypto.PubnubAccessManagerSign(this.pubnubConfig.SecretKey, string_to_sign.ToString());
-            System.Diagnostics.Debug.WriteLine("string_to_sign = " + string_to_sign);
-            System.Diagnostics.Debug.WriteLine("signature = " + signature);
+            if (this.pubnubLog != null && this.pubnubConfig != null)
+            {
+                LoggingMethod.WriteToLog(pubnubLog, "string_to_sign = " + string_to_sign, pubnubConfig.LogVerbosity);
+                LoggingMethod.WriteToLog(pubnubLog, "signature = " + signature, pubnubConfig.LogVerbosity);
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("string_to_sign = " + string_to_sign);
+                System.Diagnostics.Debug.WriteLine("signature = " + signature);
+            }
             return signature;
         }
 
@@ -1738,12 +1767,23 @@ namespace PubnubApi
             signature = pubnubCrypto.PubnubAccessManagerSign(this.pubnubConfig.SecretKey, string_to_sign.ToString());
             //signature = string.Format("v2.{0}", signature.TrimEnd(new char[] { '=' }));
             signature = string.Format("v2.{0}", signature.TrimEnd(new char[] { '=' }));
-            System.Diagnostics.Debug.WriteLine("string_to_sign = " + string_to_sign);
-            System.Diagnostics.Debug.WriteLine("signature = " + signature);
+            if (this.pubnubLog != null && this.pubnubConfig != null)
+            {
+                LoggingMethod.WriteToLog(pubnubLog, "string_to_sign = " + string_to_sign, pubnubConfig.LogVerbosity);
+                LoggingMethod.WriteToLog(pubnubLog, "signature = " + signature, pubnubConfig.LogVerbosity);
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("string_to_sign = " + string_to_sign);
+                System.Diagnostics.Debug.WriteLine("signature = " + signature);
+            }
             return signature;
         }
-
         private string BuildQueryString(string requestMethod, string requestBody, PNOperationType type, List<string> urlComponentList, Dictionary<string, string> queryStringParamDic, bool isPamV3Sign)
+        {
+            return BuildQueryString(requestMethod, requestBody, type, urlComponentList, queryStringParamDic, isPamV3Sign, "", "", false);
+        }
+        private string BuildQueryString(string requestMethod, string requestBody, PNOperationType type, List<string> urlComponentList, Dictionary<string, string> queryStringParamDic, bool isPamV3Sign, string resourceType, string resourceId, bool checkResourcePattern)
         {
             string queryString = "";
 
@@ -1755,7 +1795,7 @@ namespace PubnubApi
                     internalQueryStringParamDic = queryStringParamDic;
                 }
 
-                Dictionary<string, string> commonQueryStringParams = GenerateCommonQueryParams(type);
+                Dictionary<string, string> commonQueryStringParams = GenerateCommonQueryParams(type, resourceType, resourceId, checkResourcePattern);
                 Dictionary<string, string> queryStringParams = new Dictionary<string, string>(commonQueryStringParams.Concat(internalQueryStringParamDic).GroupBy(item => item.Key).ToDictionary(item => item.Key, item => item.First().Value));
 
                 string queryToSign = string.Join("&", queryStringParams.OrderBy(kvp => kvp.Key, StringComparer.Ordinal).Select(kvp => string.Format("{0}={1}", kvp.Key, kvp.Value)).ToArray());

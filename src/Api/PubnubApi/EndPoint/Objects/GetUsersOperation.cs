@@ -16,6 +16,7 @@ namespace PubnubApi.EndPoint
         private readonly IPubnubUnitTest unit;
         private readonly IPubnubLog pubnubLog;
         private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
+        private readonly EndPoint.TokenManager pubnubTokenMgr;
 
         private int limit = -1;
         private bool includeCount;
@@ -25,13 +26,14 @@ namespace PubnubApi.EndPoint
         private PNCallback<PNGetUsersResult> savedCallback;
         private Dictionary<string, object> queryParam;
 
-        public GetUsersOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, instance)
+        public GetUsersOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
             pubnubLog = log;
             pubnubTelemetryMgr = telemetryManager;
+            pubnubTokenMgr = tokenManager;
 
             if (instance != null)
             {
@@ -124,7 +126,7 @@ namespace PubnubApi.EndPoint
             if (page == null) { internalPage = new PNPage(); }
             else { internalPage = page; }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
             Uri request = urlBuilder.BuildGetAllUsersRequest("GET", "", internalPage.Next, internalPage.Prev, limit, includeCount, includeCustom, externalQueryParam);
 

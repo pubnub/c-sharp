@@ -48,6 +48,7 @@ namespace PubnubApi
         private static IPubnubUnitTest unitTest;
         private static ConcurrentDictionary<string, IPubnubLog> pubnubLog { get; } = new ConcurrentDictionary<string, IPubnubLog>();
         private static EndPoint.TelemetryManager pubnubTelemetryMgr;
+        private static EndPoint.TokenManager pubnubTokenMgr;
         private static EndPoint.DuplicationManager pubnubSubscribeDuplicationManager { get; set; }
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
         private static HttpClient httpClientSubscribe { get; set; }
@@ -148,7 +149,7 @@ namespace PubnubApi
             set;
         } = new ConcurrentDictionary<string, DateTime>();
 
-        protected PubnubCoreBase(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, Pubnub instance)
+        protected PubnubCoreBase(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance)
         {
             if (pubnubConfiguation == null)
             {
@@ -156,15 +157,15 @@ namespace PubnubApi
             }
             if (jsonPluggableLibrary == null)
             {
-                InternalConstructor(pubnubConfiguation, new NewtonsoftJsonDotNet(pubnubConfiguation,log), pubnubUnitTest, log, telemetryManager, instance);
+                InternalConstructor(pubnubConfiguation, new NewtonsoftJsonDotNet(pubnubConfiguation,log), pubnubUnitTest, log, telemetryManager, tokenManager, instance);
             }
             else
             {
-                InternalConstructor(pubnubConfiguation, jsonPluggableLibrary, pubnubUnitTest, log, telemetryManager, instance);
+                InternalConstructor(pubnubConfiguation, jsonPluggableLibrary, pubnubUnitTest, log, telemetryManager, tokenManager, instance);
             }
         }
 
-        private void InternalConstructor(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, Pubnub instance)
+        private void InternalConstructor(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance)
         {
             PubnubInstance = instance;
             pubnubConfig.AddOrUpdate(instance.InstanceId, pubnubConfiguation, (k,o)=> pubnubConfiguation);
@@ -172,6 +173,7 @@ namespace PubnubApi
             unitTest = pubnubUnitTest;
             pubnubLog.AddOrUpdate(instance.InstanceId, log, (k, o) => log);
             pubnubTelemetryMgr = telemetryManager;
+            pubnubTokenMgr = tokenManager;
             pubnubSubscribeDuplicationManager = new EndPoint.DuplicationManager(pubnubConfiguation, jsonPluggableLibrary, log);
 
             CurrentUuid = pubnubConfiguation.Uuid;
@@ -828,6 +830,10 @@ namespace PubnubApi
                         {
                             ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
                             T userResult = responseBuilder.JsonToObject<T>(result, true);
+                            if (userResult != null && typeof(T) == typeof(PNAccessManagerTokenResult))
+                            {
+                                PNAccessManagerTokenResult tokenResult = (PNAccessManagerTokenResult)Convert.ChangeType(userResult, typeof(PNAccessManagerTokenResult), CultureInfo.InvariantCulture);
+                            }
 
                             StatusBuilder statusBuilder = new StatusBuilder(currentConfig, jsonLib);
                             PNStatus status = statusBuilder.CreateStatusResponse(type, PNStatusCategory.PNAcknowledgmentCategory, asyncRequestState, (int)HttpStatusCode.OK, null);

@@ -17,6 +17,7 @@ namespace PubnubApi.EndPoint
         private readonly IPubnubUnitTest unit;
         private readonly IPubnubLog pubnubLog;
         private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
+        private readonly EndPoint.TokenManager pubnubTokenMgr;
 
         private Dictionary<string, PNResourcePermission> pubnubChannelNames = new Dictionary<string, PNResourcePermission>();
         private Dictionary<string, PNResourcePermission> pubnubChannelGroupNames = new Dictionary<string, PNResourcePermission>();
@@ -32,63 +33,14 @@ namespace PubnubApi.EndPoint
         private Dictionary<string, object> queryParam;
         private Dictionary<string, object> grantMeta;
 
-        public GrantTokenOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, instance)
+        public GrantTokenOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
             pubnubLog = log;
             pubnubTelemetryMgr = telemetryManager;
-        }
-
-        public GrantTokenOperation Channels(Dictionary<string, PNResourcePermission> channelPermissions)
-        {
-            if (channelPermissions != null)
-            {
-                this.pubnubChannelNames = channelPermissions;
-            }
-            return this;
-        }
-
-        public GrantTokenOperation Channels(Dictionary<string, PNResourcePermission> channelPermissions, bool pattern)
-        {
-            if (channelPermissions != null)
-            {
-                if (pattern)
-                {
-                    this.pubnubChannelNamesPattern = channelPermissions;
-                }
-                else
-                {
-                    this.pubnubChannelNames = channelPermissions;
-                }
-            }
-            return this;
-        }
-
-        public GrantTokenOperation ChannelGroups(Dictionary<string, PNResourcePermission> channelGroupPermissions)
-        {
-            if (channelGroupPermissions != null)
-            {
-                this.pubnubChannelGroupNames = channelGroupPermissions;
-            }
-            return this;
-        }
-
-        public GrantTokenOperation ChannelGroups(Dictionary<string, PNResourcePermission> channelGroupPermissions, bool pattern)
-        {
-            if (channelGroupPermissions != null)
-            {
-                if (pattern)
-                {
-                    this.pubnubChannelGroupNamesPattern = channelGroupPermissions;
-                }
-                else
-                {
-                    this.pubnubChannelGroupNames = channelGroupPermissions;
-                }
-            }
-            return this;
+            pubnubTokenMgr = tokenManager;
         }
 
         public GrantTokenOperation Users(Dictionary<string, PNResourcePermission> userPermissions)
@@ -332,7 +284,7 @@ namespace PubnubApi.EndPoint
             messageEnvelope.Add("permissions", permissionDic);
             string postMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
             Uri request = urlBuilder.BuildGrantV3AccessRequest("POST", postMessage, externalQueryParam);
 

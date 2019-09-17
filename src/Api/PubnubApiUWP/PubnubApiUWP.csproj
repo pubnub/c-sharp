@@ -172,6 +172,18 @@ Added ObjectsAPI feature.</PackageReleaseNotes>
     <Compile Include="..\PubnubApi\Callbacks\SubscribeCallback.cs">
       <Link>Callbacks\SubscribeCallback.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\CBOR\CBORDecoder.cs" Link="CBOR\CBORDecoder.cs" />
+    <Compile Include="..\PubnubApi\CBOR\CBORDecoderExtensions.cs" Link="CBOR\CBORDecoderExtensions.cs" />
+    <Compile Include="..\PubnubApi\CBOR\ItemHeader.cs" Link="CBOR\ItemHeader.cs" />
+    <Compile Include="..\PubnubApi\CBOR\ItemTag.cs" Link="CBOR\ItemTag.cs" />
+    <Compile Include="..\PubnubApi\CBOR\MajorType.cs" Link="CBOR\MajorType.cs" />
+    <Compile Include="..\PubnubApi\CBOR\Tags\Base64Tag.cs" Link="CBOR\Tags\Base64Tag.cs" />
+    <Compile Include="..\PubnubApi\CBOR\Tags\BigIntegerTag.cs" Link="CBOR\Tags\BigIntegerTag.cs" />
+    <Compile Include="..\PubnubApi\CBOR\Tags\CBORItemTag.cs" Link="CBOR\Tags\CBORItemTag.cs" />
+    <Compile Include="..\PubnubApi\CBOR\Tags\TagRegistry.cs" Link="CBOR\Tags\TagRegistry.cs" />
+    <Compile Include="..\PubnubApi\CBOR\Tags\UnknownTag.cs" Link="CBOR\Tags\UnknownTag.cs" />
+    <Compile Include="..\PubnubApi\CBOR\Tags\UriTag.cs" Link="CBOR\Tags\UriTag.cs" />
+    <Compile Include="..\PubnubApi\CBOR\UndefinedValue.cs" Link="CBOR\UndefinedValue.cs" />
     <Compile Include="..\PubnubApi\ClientNetworkStatus.cs">
       <Link>ClientNetworkStatus.cs</Link>
     </Compile>
@@ -363,6 +375,7 @@ Added ObjectsAPI feature.</PackageReleaseNotes>
       <Link>Model\Consumer\AccessManager\PNAccessManagerKeysData.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNAccessManagerTokenResult.cs" Link="Model\Consumer\AccessManager\PNAccessManagerTokenResult.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNGrantToken.cs" Link="Model\Consumer\AccessManager\PNGrantToken.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNResourcePermission.cs" Link="Model\Consumer\AccessManager\PNResourcePermission.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\ChannelGroup\PNChannelGroupsAddChannelResult.cs">
       <Link>Model\Consumer\ChannelGroup\PNChannelGroupsAddChannelResult.cs</Link>
@@ -629,6 +642,7 @@ Added ObjectsAPI feature.</PackageReleaseNotes>
     <None Include="pubnub.snk" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="CBOR\Tags\" />
     <Folder Include="EndPoint\Objects\" />
     <Folder Include="Model\Consumer\DeleteMessage\" />
     <Folder Include="Model\Consumer\Objects\" />

@@ -29,7 +29,7 @@ namespace PubNubMessaging.Tests
             else
             {
                 pnConfiguration.Origin = "ingress.bronze.aws-pdx-1.ps.pn";// "ps.pndsn.com";
-                pnConfiguration.Secure = false;
+                //pnConfiguration.Secure = false;
                 pubnub = new Pubnub(pnConfiguration);
             }
             return pubnub;

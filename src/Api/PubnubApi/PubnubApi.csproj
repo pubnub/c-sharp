@@ -68,6 +68,7 @@ Added ObjectsAPI feature.</PackageReleaseNotes>
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <Reference Include="System" />
+    <Reference Include="System.Core" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net40'">
@@ -79,6 +80,7 @@ Added ObjectsAPI feature.</PackageReleaseNotes>
     </PackageReference>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Numerics" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net45'">
@@ -87,6 +89,7 @@ Added ObjectsAPI feature.</PackageReleaseNotes>
     </PackageReference>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Numerics" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
@@ -95,6 +98,7 @@ Added ObjectsAPI feature.</PackageReleaseNotes>
     </PackageReference>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Numerics" />
   </ItemGroup>
 
 </Project>

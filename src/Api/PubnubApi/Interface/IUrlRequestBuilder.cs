@@ -61,7 +61,7 @@ namespace PubnubApi.Interface
 
         Uri BuildMessageCountsRequest(string requestMethod, string requestBody, string[] channels, long[] timetokens, Dictionary<string, object> externalQueryParam);
 
-        Uri BuildCreateUserRequest(string requestMethod, string requestBody, Dictionary<string, object> userCustom, Dictionary<string, object> externalQueryParam);
+        Uri BuildCreateUserRequest(string requestMethod, string requestBody, string userId, Dictionary<string, object> userCustom, Dictionary<string, object> externalQueryParam);
 
         Uri BuildUpdateUserRequest(string requestMethod, string requestBody, string userId, Dictionary<string, object> userCustom, Dictionary<string, object> externalQueryParam);
 

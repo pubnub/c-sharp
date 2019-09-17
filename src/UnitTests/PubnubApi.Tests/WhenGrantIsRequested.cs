@@ -7,9 +7,27 @@ using System.Text;
 using System.Linq;
 using System.Diagnostics;
 using System.Collections.Generic;
+using PubnubApi.CBOR;
 
 namespace PubNubMessaging.Tests
 {
+    public class PNRes
+    {
+        public Dictionary<string, object> usr { get; set; }
+        public Dictionary<string, object> chan { get; set; }
+        public Dictionary<string, object> spc { get; set; }
+        public Dictionary<string, object> grp { get; set; }
+    }
+    public class PNCbor
+    {
+        public int v { get; set; }
+        public long t { get; set; }
+        public int ttl { get; set; }
+        public PNRes res { get; set; }
+        public PNRes pat { get; set; }
+        public byte[] sig { get; set; }
+        public Dictionary<string, object> meta { get; set; }
+    }
     [TestFixture]
     public class WhenGrantIsRequested : TestHarness
     {
@@ -556,6 +574,14 @@ namespace PubNubMessaging.Tests
             }
         }
 
+        public static byte[] HexStringToByteArray(string hex)
+        {
+            return Enumerable.Range(0, hex.Length)
+                             .Where(x => x % 2 == 0)
+                             .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
+                             .ToArray();
+        }
+
         [Test]
         public static void ThenPAMv3ChannelShouldReturnTokenSuccess()
         {
@@ -573,7 +599,8 @@ namespace PubNubMessaging.Tests
                 Secure = false,
                 EnableTelemetry = false,
                 IncludeInstanceIdentifier = false,
-                IncludeRequestIdentifier = false
+                IncludeRequestIdentifier = true,
+                Uuid = "csharpuuid"
             };
 
             pubnub = createPubNubInstance(config);
@@ -646,32 +673,68 @@ namespace PubNubMessaging.Tests
             {
                 
                 grantManualEvent = new ManualResetEvent(false);
+
                 pubnub.GrantToken()
-                    .Channels(new Dictionary<string, PNResourcePermission>() {
-                                { "inbox-jay", new PNResourcePermission() { Read = true, Write = true } } })
-                    .TTL(1440)
-                    .QueryParam(new System.Collections.Generic.Dictionary<string, object>() { { "PoundsSterling", "£13.37" } })
-                    .Meta(new System.Collections.Generic.Dictionary<string, object>() { { "user-id", "jay@example.com" }, { "contains-unicode", "The 💩 test." } })
+                            .Users(new Dictionary<string, PNResourcePermission>() {
+                                { "myuser1", new PNResourcePermission() { Read = true, Write = true, Create = true } } })
+                            .Spaces(new Dictionary<string, PNResourcePermission>() {
+                                { "myspace1", new PNResourcePermission() { Read = true, Write = true, Delete = true } } })
+                            .TTL(100)
+                    //.QueryParam(new System.Collections.Generic.Dictionary<string, object>() { { "PoundsSterling", "£13.37" } })
+                    //.Meta(new System.Collections.Generic.Dictionary<string, object>() { { "user-id", "jay@example.com" }, { "contains-unicode", "The 💩 test." } })
                     .Execute(new PNAccessManagerTokenResultExt((result, status)=> 
                     {
                         if (result != null)
                         {
-                            System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-                            string token = result.Token;
-                            //string paddedToken = string.Format("{0}==", token);
-                            //token = token.TrimEnd(new char[] { '=' });
                             try
                             {
-                                token = token.Replace('_', '/').Replace('-','+').PadRight(4 * ((token.Length + 3) / 4), '=');
+                                string token = result.Token;
+                                token = token.Replace('_', '/').Replace('-', '+').TrimEnd(new char[] { '=' });//.PadRight(4 * ((token.Length + 3) / 4), '=');
                                 byte[] tokenByteArray = Convert.FromBase64String(token);
-                                var jsonPermission = System.Text.Encoding.UTF8.GetString(tokenByteArray);
-                                System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(jsonPermission));
+                                System.IO.MemoryStream stream = new System.IO.MemoryStream(tokenByteArray);
+
+                                object cborItemListObj = stream.DecodeAllCBORItems();
+                                if (cborItemListObj != null)
+                                {
+                                    System.Diagnostics.Debug.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(cborItemListObj));
+
+                                    List<object> cborItemList = cborItemListObj as List<object>;
+                                    if (cborItemList != null && cborItemList.Count > 0)
+                                    {
+                                        object tokenItem = cborItemList[0];
+                                        System.Diagnostics.Debug.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(tokenItem));
+                                    }
+                                }
+
+                                /* ONE */
+                                //var dahomeyRawcborData = Dahomey.Cbor.Cbor.DeserializeAsync<Dahomey.Cbor.ObjectModel.CborObject>(stream,Dahomey.Cbor.CborOptions.Default).Result;
+                                //if (dahomeyRawcborData != null && dahomeyRawcborData.Count > 0)
+                                //{
+                                //    foreach(Dahomey.Cbor.ObjectModel.CborValue val in dahomeyRawcborData.Keys)
+                                //    {
+                                //        uint num = uint.Parse(val.ToString().Replace("h'", "").Replace("'",""), System.Globalization.NumberStyles.AllowHexSpecifier);
+                                //        byte[] tempArray = BitConverter.GetBytes(num);
+                                //        string test = BitConverter.ToString(tempArray);
+                                //        System.Diagnostics.Debug.WriteLine("test = " + test);
+                                //    }
+                                //}
+                                //string dahomeyByteStringKeyData =  dahomeyRawcborData.ToString();
+                                //System.Diagnostics.Debug.WriteLine("dahomeyRawcborData = " + dahomeyByteStringKeyData);
+
+                                //PeterO.Cbor.CBORObject peterCborObj = PeterO.Cbor.CBORObject.DecodeFromBytes(tokenByteArray, PeterO.Cbor.CBOREncodeOptions.Default);
+                                //string peteroByteStringKeyData = peterCborObj.ToString();
+                                //System.Diagnostics.Debug.WriteLine("peterCborObj = " + peteroByteStringKeyData);
+
                             }
                             catch (Exception ex)
                             {
                                 System.Diagnostics.Debug.WriteLine(ex.ToString());
                             }
                             receivedGrantMessage = true;
+                        }
+                        else
+                        {
+                            System.Diagnostics.Debug.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(status));
                         }
                         grantManualEvent.Set();
                     }));
