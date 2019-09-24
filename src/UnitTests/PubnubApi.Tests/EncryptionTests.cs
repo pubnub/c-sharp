@@ -157,8 +157,6 @@ namespace PubNubMessaging.Tests
                 Pubnub pubnub = new Pubnub(config);
                 PNGrantToken pnGrant = pubnub.ParseToken(token);
 
-                string cborFormat = pubnub.EncodeTokenToCBOR(pnGrant);
-
                 if (pnGrant != null)
                 {
                     actual = Newtonsoft.Json.JsonConvert.SerializeObject(pnGrant);

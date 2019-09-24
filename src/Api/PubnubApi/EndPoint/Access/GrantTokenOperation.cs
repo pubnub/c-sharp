@@ -18,17 +18,16 @@ namespace PubnubApi.EndPoint
         private readonly IPubnubLog pubnubLog;
         private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
         private readonly EndPoint.TokenManager pubnubTokenMgr;
-        private readonly Pubnub currentPubnubInstance;
 
-        private Dictionary<string, PNResourcePermission> pubnubChannelNames = new Dictionary<string, PNResourcePermission>();
-        private Dictionary<string, PNResourcePermission> pubnubChannelGroupNames = new Dictionary<string, PNResourcePermission>();
+        private readonly  Dictionary<string, PNResourcePermission> pubnubChannelNames = new Dictionary<string, PNResourcePermission>();
+        private readonly Dictionary<string, PNResourcePermission> pubnubChannelGroupNames = new Dictionary<string, PNResourcePermission>();
         private Dictionary<string, PNResourcePermission> pubnubUsers = new Dictionary<string, PNResourcePermission>();
         private Dictionary<string, PNResourcePermission> pubnubSpaces = new Dictionary<string, PNResourcePermission>();
 
-        private Dictionary<string, PNResourcePermission> pubnubChannelNamesPattern = new Dictionary<string, PNResourcePermission>();
-        private Dictionary<string, PNResourcePermission> pubnubChannelGroupNamesPattern = new Dictionary<string, PNResourcePermission>();
-        private Dictionary<string, PNResourcePermission> pubnubUsersPattern = new Dictionary<string, PNResourcePermission>() { {"^$", new PNResourcePermission { Read=true } } };
-        private Dictionary<string, PNResourcePermission> pubnubSpacesPattern = new Dictionary<string, PNResourcePermission>() { { "^$", new PNResourcePermission { Read = true } } };
+        private readonly Dictionary<string, PNResourcePermission> pubnubChannelNamesPattern = new Dictionary<string, PNResourcePermission>();
+        private readonly Dictionary<string, PNResourcePermission> pubnubChannelGroupNamesPattern = new Dictionary<string, PNResourcePermission>();
+        private Dictionary<string, PNResourcePermission> pubnubUsersPattern = new Dictionary<string, PNResourcePermission> { {"^$", new PNResourcePermission { Read=true } } };
+        private Dictionary<string, PNResourcePermission> pubnubSpacesPattern = new Dictionary<string, PNResourcePermission> { { "^$", new PNResourcePermission { Read = true } } };
         private long grantTTL = -1;
         private PNCallback<PNAccessManagerTokenResult> savedCallbackGrantToken;
         private Dictionary<string, object> queryParam;
@@ -43,7 +42,20 @@ namespace PubnubApi.EndPoint
             pubnubLog = log;
             pubnubTelemetryMgr = telemetryManager;
             pubnubTokenMgr = tokenManager;
-            currentPubnubInstance = instance;
+            PubnubInstance = instance;
+
+            if (!ChannelRequest.ContainsKey(instance.InstanceId))
+            {
+                ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
+            }
+            if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
+            {
+                ChannelInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+            }
+            if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId))
+            {
+                ChannelGroupInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+            }
         }
 
         public GrantTokenOperation Users(Dictionary<string, PNResourcePermission> userPermissions)
@@ -121,7 +133,6 @@ namespace PubnubApi.EndPoint
             this.pamv2AuthenticationKey = pamv2AuthKey;
             return this;
         }
-
 
         public GrantTokenOperation QueryParam(Dictionary<string, object> customQueryParam)
         {
@@ -319,12 +330,12 @@ namespace PubnubApi.EndPoint
                     {
 
                         TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
-                        EndPoint.GrantOperation pamv2GrantOperation = new GrantOperation(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, currentPubnubInstance);
+                        EndPoint.GrantOperation pamv2GrantOperation = new GrantOperation(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, PubnubInstance);
                         pamv2GrantOperation
                             .Channels(usersPermission.Keys.Concat(spacesPermission.Keys).ToArray())
                             .Read(true)
                             .TTL(ttl)
-                            .AuthKeys(new string[] { this.pamv2AuthenticationKey })
+                            .AuthKeys(new [] { this.pamv2AuthenticationKey })
                             .Execute(new PNAccessManagerGrantResultExt((pamv2Result, pamv2Status) => 
                             {
                                 if (pamv2Result != null && !pamv2Status.Error)
@@ -339,24 +350,6 @@ namespace PubnubApi.EndPoint
                         tcs.Task.Wait(config.NonSubscribeRequestTimeout * 1000);
                     }
                 }
-            }
-        }
-
-        internal void CurrentPubnubInstance(Pubnub instance)
-        {
-            PubnubInstance = instance;
-
-            if (!ChannelRequest.ContainsKey(instance.InstanceId))
-            {
-                ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
-            }
-            if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
-            {
-                ChannelInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
-            }
-            if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId))
-            {
-                ChannelGroupInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
             }
         }
 

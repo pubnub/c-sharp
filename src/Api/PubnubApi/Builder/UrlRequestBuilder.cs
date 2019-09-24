@@ -62,7 +62,7 @@ namespace PubnubApi
                 }
             }
 
-            string queryString = BuildQueryString(requestMethod, "", currentType, url, requestQueryStringParams, true);
+            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
             string queryParams = string.Format("?{0}", queryString);
 
             return BuildRestApiRequest(url, currentType, queryParams);
@@ -123,13 +123,13 @@ namespace PubnubApi
                     }
                 }
             }
-            string queryString = BuildQueryString(requestMethod, "", currentType, url, requestQueryStringParams, true);
+            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
             string queryParams = string.Format("?{0}", queryString);
 
             return BuildRestApiRequest(url, currentType, queryParams);
         }
 
-        Uri IUrlRequestBuilder.BuildMultiChannelLeaveRequest(string requestMethod, string requestBody, string[] channels, string[] channelGroups, string uuid, string jsonUserState, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildMultiChannelLeaveRequest(string requestMethod, string requestBody, string[] channels, string[] channelGroups, string jsonUserState, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.Leave;
             string multiChannel = (channels != null && channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : ",";
@@ -172,7 +172,7 @@ namespace PubnubApi
                 }
             }
 
-            string queryString = BuildQueryString(requestMethod, "", currentType, url, requestQueryStringParams, true);
+            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
             string queryParams = string.Format("?{0}", queryString);
 
             return BuildRestApiRequest(url, currentType, queryParams);
@@ -1770,7 +1770,7 @@ namespace PubnubApi
 
             PubnubCrypto pubnubCrypto = new PubnubCrypto((opType != PNOperationType.PNSignalOperation) ? this.pubnubConfig.CipherKey : "", this.pubnubConfig, this.pubnubLog);
             signature = pubnubCrypto.PubnubAccessManagerSign(this.pubnubConfig.SecretKey, string_to_sign.ToString());
-            signature = string.Format("v2.{0}", signature.TrimEnd(new char[] { '=' }));
+            signature = string.Format("v2.{0}", signature.TrimEnd(new [] { '=' }));
             if (this.pubnubLog != null && this.pubnubConfig != null)
             {
                 LoggingMethod.WriteToLog(pubnubLog, "string_to_sign = " + string_to_sign, pubnubConfig.LogVerbosity);

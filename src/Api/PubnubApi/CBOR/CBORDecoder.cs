@@ -9,7 +9,7 @@ using System.Collections;
 namespace PubnubApi.CBOR
 {
     // Reference: https://github.com/KSLcom/CBOR.NET
-    public class CBORDecoder
+    public class CBORDecoder : IDisposable
     {
         Stream buffer;
         public CBORDecoder(Stream s)
@@ -33,8 +33,6 @@ namespace PubnubApi.CBOR
         {
             buffer = s;
         }
-
-
 
         public object ReadItem()
         {
@@ -87,7 +85,6 @@ namespace PubnubApi.CBOR
                     dataItem = Encoding.UTF8.GetString(data, 0, data.Length);
                     break;
                 case MajorType.ARRAY:
-                    //ArrayList array = new ArrayList();
                     List<object> array = new List<object>();
                     if (header.indefinite == false)
                     {
@@ -153,6 +150,8 @@ namespace PubnubApi.CBOR
                                 return null;
                             case 23:
                                 return new UndefinedValue();
+                            default:
+                                return new UndefinedValue();
                         }
                     }
 
@@ -164,9 +163,7 @@ namespace PubnubApi.CBOR
 
                     if (header.additionalInfo == 25)
                     {
-                        //Half halfValue = Half.ToHalf(BitConverter.GetBytes(header.value), 0);
-
-                        //dataItem = (float)halfValue;
+                        throw new NotImplementedException("header.additionalInfo=25; Half implementation not done. Contact support.");
                     }
                     else if (header.additionalInfo == 26)
                     {
@@ -180,9 +177,11 @@ namespace PubnubApi.CBOR
                     }
                     else
                     {
-                        throw new Exception();
+                        throw new NotSupportedException("header.additionalInfo value not supported");
                     }
                     // unknown simple value type
+                    break;
+                default:
                     break;
             }
 
@@ -239,6 +238,7 @@ namespace PubnubApi.CBOR
 
             return items;
         }
+
         public ItemHeader ReadHeader()
         {
             ItemHeader header = new ItemHeader();
@@ -310,12 +310,31 @@ namespace PubnubApi.CBOR
         {
             byte[] buff = new byte[8];
 
-            buffer.Read(buff, 0, size);
-
-            Array.Reverse(buff, 0, size);
+            int bytesRead = buffer.Read(buff, 0, size);
+            if (bytesRead > 0)
+            {
+                Array.Reverse(buff, 0, size);
+            }
 
             return BitConverter.ToUInt64(buff, 0);
 
         }
+
+        #region IDisposable Support
+        private bool disposedValue;
+
+        protected virtual void DisposeInternal(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                disposedValue = true;
+            }
+        }
+
+        void IDisposable.Dispose()
+        {
+            DisposeInternal(true);
+        }
+        #endregion
     }
 }

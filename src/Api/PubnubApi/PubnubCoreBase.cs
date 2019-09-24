@@ -155,17 +155,18 @@ namespace PubnubApi
             {
                 throw new ArgumentException("PNConfiguration missing");
             }
+            pubnubTokenMgr = tokenManager;
             if (jsonPluggableLibrary == null)
             {
-                InternalConstructor(pubnubConfiguation, new NewtonsoftJsonDotNet(pubnubConfiguation,log), pubnubUnitTest, log, telemetryManager, tokenManager, instance);
+                InternalConstructor(pubnubConfiguation, new NewtonsoftJsonDotNet(pubnubConfiguation,log), pubnubUnitTest, log, telemetryManager, instance);
             }
             else
             {
-                InternalConstructor(pubnubConfiguation, jsonPluggableLibrary, pubnubUnitTest, log, telemetryManager, tokenManager, instance);
+                InternalConstructor(pubnubConfiguation, jsonPluggableLibrary, pubnubUnitTest, log, telemetryManager, instance);
             }
         }
 
-        private void InternalConstructor(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance)
+        private void InternalConstructor(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, Pubnub instance)
         {
             PubnubInstance = instance;
             pubnubConfig.AddOrUpdate(instance.InstanceId, pubnubConfiguation, (k,o)=> pubnubConfiguation);
@@ -173,7 +174,6 @@ namespace PubnubApi
             unitTest = pubnubUnitTest;
             pubnubLog.AddOrUpdate(instance.InstanceId, log, (k, o) => log);
             pubnubTelemetryMgr = telemetryManager;
-            pubnubTokenMgr = tokenManager;
             pubnubSubscribeDuplicationManager = new EndPoint.DuplicationManager(pubnubConfiguation, jsonPluggableLibrary, log);
 
             CurrentUuid = pubnubConfiguation.Uuid;
@@ -830,10 +830,6 @@ namespace PubnubApi
                         {
                             ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
                             T userResult = responseBuilder.JsonToObject<T>(result, true);
-                            if (userResult != null && typeof(T) == typeof(PNAccessManagerTokenResult))
-                            {
-                                PNAccessManagerTokenResult tokenResult = (PNAccessManagerTokenResult)Convert.ChangeType(userResult, typeof(PNAccessManagerTokenResult), CultureInfo.InvariantCulture);
-                            }
 
                             StatusBuilder statusBuilder = new StatusBuilder(currentConfig, jsonLib);
                             PNStatus status = statusBuilder.CreateStatusResponse(type, PNStatusCategory.PNAcknowledgmentCategory, asyncRequestState, (int)HttpStatusCode.OK, null);

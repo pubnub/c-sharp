@@ -4,7 +4,7 @@ namespace PubnubApi.CBOR
 {
     public abstract class ItemTag
     {
-        public ulong tagNumber;
+        public ulong tagNumber { get; set; }
         public abstract object processData(object data);
         public abstract bool isDataSupported(object data);
     }

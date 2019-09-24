@@ -119,7 +119,6 @@ namespace PubnubApi
 		public EndPoint.GrantTokenOperation GrantToken()
 		{
             EndPoint.GrantTokenOperation grantOperation = new EndPoint.GrantTokenOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
-            grantOperation.CurrentPubnubInstance(this);
             return grantOperation;
         }
 
@@ -612,7 +611,7 @@ namespace PubnubApi
             CheckRequiredConfigValues();
             if (config != null && string.IsNullOrEmpty(config.SecretKey) && config.EnableTokenManager)
             {
-                tokenManager = new EndPoint.TokenManager(pubnubConfig, jsonPluggableLibrary, pubnubLog);
+                tokenManager = new EndPoint.TokenManager(pubnubConfig, jsonPluggableLibrary, pubnubLog, this.InstanceId);
             }
             if (config != null && pubnubLog != null)
             {

@@ -81,7 +81,7 @@ namespace PubnubApi.EndPoint
                     string channelsJsonState = BuildJsonUserState(currentChannels, currentChannelGroups, false);
                     IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
                     urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-                    Uri request = urlBuilder.BuildMultiChannelLeaveRequest("GET", "", currentChannels, currentChannelGroups, config.Uuid, channelsJsonState, externalQueryParam);
+                    Uri request = urlBuilder.BuildMultiChannelLeaveRequest("GET", "", currentChannels, currentChannelGroups, channelsJsonState, externalQueryParam);
 
                     RequestState<T> requestState = new RequestState<T>();
                     requestState.Channels = currentChannels;
@@ -241,7 +241,7 @@ namespace PubnubApi.EndPoint
                             string channelsJsonState = BuildJsonUserState(validChannels.ToArray(), validChannelGroups.ToArray(), false);
                             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
                             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-                            Uri request = urlBuilder.BuildMultiChannelLeaveRequest("GET", "", validChannels.ToArray(), validChannelGroups.ToArray(), config.Uuid, channelsJsonState, externalQueryParam);
+                            Uri request = urlBuilder.BuildMultiChannelLeaveRequest("GET", "", validChannels.ToArray(), validChannelGroups.ToArray(), channelsJsonState, externalQueryParam);
 
                             RequestState<T> requestState = new RequestState<T>();
                             requestState.Channels = new [] { channel };

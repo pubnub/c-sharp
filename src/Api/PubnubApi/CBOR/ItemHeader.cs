@@ -8,7 +8,7 @@ namespace PubnubApi.CBOR
 {
     public class ItemHeader
     {
-        public List<ItemTag> tags = new List<ItemTag>();
+        public List<ItemTag> tags { get; set; } = new List<ItemTag>();
         public MajorType majorType { get; set; }
         public ulong additionalInfo { get; set; }
         public ulong value { get; set; }
@@ -29,7 +29,7 @@ namespace PubnubApi.CBOR
 
         internal static byte[] GetIndefiniteHeader(MajorType type)
         {
-            return new byte[] { (byte)(((byte)type) << 5 | 31) };
+            return new [] { (byte)(((byte)type) << 5 | 31) };
         }
 
         internal byte[] ToByteArray()
@@ -69,7 +69,7 @@ namespace PubnubApi.CBOR
                 {
                     ms.WriteByte((byte)(((byte)majorType) << 5 | 27));
 
-                    byte[] valueBytes = BitConverter.GetBytes((ulong)value);
+                    byte[] valueBytes = BitConverter.GetBytes(value);
                     Array.Reverse(valueBytes);
 
                     ms.Write(valueBytes, 0, valueBytes.Length);

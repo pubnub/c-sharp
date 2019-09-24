@@ -7,8 +7,14 @@ namespace PubnubApi.CBOR.Tags
 {
     public class TagRegistry
     {
-        public static Dictionary<ulong, Type> tagMap = new Dictionary<ulong, Type>();
-        public static bool isInit = false;
+        private static Dictionary<ulong, Type> tagMap { get; set; } = new Dictionary<ulong, Type>();
+
+        public static bool isInit;
+
+        protected TagRegistry()
+        {
+
+        }
 
         public static void RegisterTagTypes()
         {
@@ -51,6 +57,7 @@ namespace PubnubApi.CBOR.Tags
                     }
                     catch (Exception)
                     {
+                        /* Ignore until we need it */
                     }
                 }
             }

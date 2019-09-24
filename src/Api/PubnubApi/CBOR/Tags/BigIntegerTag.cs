@@ -8,7 +8,7 @@ namespace PubnubApi.CBOR.Tags
 {
     public class BigIntegerTag : ItemTag
     {
-        public static ulong[] TAG_NUM = new ulong[] { 2, 3 };
+        public static ulong[] TAG_NUM { get; set; } = new ulong[] { 2, 3 };
         public BigIntegerTag(ulong tagId)
         {
             this.tagNumber = tagId;
@@ -35,15 +35,19 @@ namespace PubnubApi.CBOR.Tags
 
         public override bool isDataSupported(object data)
         {
+            bool ret = false;
             try
             {
-                byte[] dataCast = (byte[])data;
-                return true;
+                if (((byte[])data).Length >= 0)
+                {
+                    ret = true;
+                }
             }
             catch (Exception)
             {
-                return false;
+                ret = false;
             }
+            return ret;
         }
     }
 }

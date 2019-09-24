@@ -4,7 +4,7 @@ namespace PubnubApi.CBOR.Tags
 {
     internal class CBORItemTag : ItemTag
     {
-        public static ulong[] TAG_NUM = new ulong[] { 24 };
+        public static ulong[] TAG_NUM { get; set; } = new ulong[] { 24 };
 
         public CBORItemTag(ulong tagNum)
         {

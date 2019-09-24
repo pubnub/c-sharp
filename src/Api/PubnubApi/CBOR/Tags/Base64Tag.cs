@@ -7,7 +7,7 @@ namespace PubnubApi.CBOR.Tags
 {
     internal class Base64Tag : ItemTag
     {
-        public static ulong[] TAG_NUM = new ulong[] { 33, 34 };
+        public static ulong[] TAG_NUM { get; set; } = new ulong[] { 33, 34 };
 
         public Base64Tag(ulong tagNum)
         {
