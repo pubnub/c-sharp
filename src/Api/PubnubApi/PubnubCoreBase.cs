@@ -48,7 +48,7 @@ namespace PubnubApi
         private static IPubnubUnitTest unitTest;
         private static ConcurrentDictionary<string, IPubnubLog> pubnubLog { get; } = new ConcurrentDictionary<string, IPubnubLog>();
         private static EndPoint.TelemetryManager pubnubTelemetryMgr;
-        private static EndPoint.TokenManager pubnubTokenMgr;
+        private readonly EndPoint.TokenManager pubnubTokenMgr;
         private static EndPoint.DuplicationManager pubnubSubscribeDuplicationManager { get; set; }
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
         private static HttpClient httpClientSubscribe { get; set; }
@@ -155,7 +155,7 @@ namespace PubnubApi
             {
                 throw new ArgumentException("PNConfiguration missing");
             }
-            pubnubTokenMgr = tokenManager;
+            this.pubnubTokenMgr = tokenManager;
             if (jsonPluggableLibrary == null)
             {
                 InternalConstructor(pubnubConfiguation, new NewtonsoftJsonDotNet(pubnubConfiguation,log), pubnubUnitTest, log, telemetryManager, instance);
@@ -1794,7 +1794,7 @@ namespace PubnubApi
             }
         }
 
-        protected static void TerminateTokenManager()
+        protected void TerminateTokenManager()
         {
             if (pubnubTokenMgr != null)
             {

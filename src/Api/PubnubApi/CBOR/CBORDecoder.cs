@@ -182,6 +182,7 @@ namespace PubnubApi.CBOR
                     // unknown simple value type
                     break;
                 default:
+                    dataItem = null;
                     break;
             }
 

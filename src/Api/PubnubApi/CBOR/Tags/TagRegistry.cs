@@ -9,7 +9,7 @@ namespace PubnubApi.CBOR.Tags
     {
         private static Dictionary<ulong, Type> tagMap { get; set; } = new Dictionary<ulong, Type>();
 
-        public static bool isInit;
+        private static bool isInit { get; set; }
 
         protected TagRegistry()
         {
