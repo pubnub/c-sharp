@@ -353,7 +353,7 @@ namespace PubnubApi.EndPoint
             }
         }
 
-        private int CalculateGrantBitMaskValue(bool read, bool write, bool manage, bool delete, bool create)
+        private static int CalculateGrantBitMaskValue(bool read, bool write, bool manage, bool delete, bool create)
         {
             int result = 0;
 

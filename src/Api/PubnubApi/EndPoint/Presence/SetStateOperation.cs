@@ -33,6 +33,37 @@ namespace PubnubApi.EndPoint
             pubnubLog = log;
             pubnubTelemetryMgr = telemetryManager;
             pubnubTokenMgr = tokenManager;
+
+            PubnubInstance = instance;
+
+            if (!ChannelRequest.ContainsKey(instance.InstanceId))
+            {
+                ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
+            }
+            if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
+            {
+                ChannelInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+            }
+            if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId))
+            {
+                ChannelGroupInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+            }
+            if (!ChannelUserState.ContainsKey(instance.InstanceId))
+            {
+                ChannelUserState.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, Dictionary<string, object>>());
+            }
+            if (!ChannelGroupUserState.ContainsKey(instance.InstanceId))
+            {
+                ChannelGroupUserState.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, Dictionary<string, object>>());
+            }
+            if (!ChannelLocalUserState.ContainsKey(instance.InstanceId))
+            {
+                ChannelLocalUserState.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, Dictionary<string, object>>());
+            }
+            if (!ChannelGroupLocalUserState.ContainsKey(instance.InstanceId))
+            {
+                ChannelGroupLocalUserState.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, Dictionary<string, object>>());
+            }
         }
 
         public SetStateOperation Channels(string[] channels)
@@ -599,40 +630,6 @@ namespace PubnubApi.EndPoint
         private string SetLocalUserState(string channel, string channelGroup, string userStateKey, string userStateValue)
         {
             return AddOrUpdateOrDeleteLocalUserState(channel, channelGroup, userStateKey, userStateValue);
-        }
-
-        internal void CurrentPubnubInstance(Pubnub instance)
-        {
-            PubnubInstance = instance;
-
-            if (!ChannelRequest.ContainsKey(instance.InstanceId))
-            {
-                ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
-            }
-            if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
-            {
-                ChannelInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
-            }
-            if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId))
-            {
-                ChannelGroupInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
-            }
-            if (!ChannelUserState.ContainsKey(instance.InstanceId))
-            {
-                ChannelUserState.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, Dictionary<string, object>>());
-            }
-            if (!ChannelGroupUserState.ContainsKey(instance.InstanceId))
-            {
-                ChannelGroupUserState.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, Dictionary<string, object>>());
-            }
-            if (!ChannelLocalUserState.ContainsKey(instance.InstanceId))
-            {
-                ChannelLocalUserState.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, Dictionary<string, object>>());
-            }
-            if (!ChannelGroupLocalUserState.ContainsKey(instance.InstanceId))
-            {
-                ChannelGroupLocalUserState.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, Dictionary<string, object>>());
-            }
         }
     }
 }

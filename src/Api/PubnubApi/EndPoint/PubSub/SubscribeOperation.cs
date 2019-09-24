@@ -91,12 +91,12 @@ namespace PubnubApi.EndPoint
                 List<string> presenceChannelGroupNames = (this.subscribeChannelGroupNames != null && this.subscribeChannelGroupNames.Count > 0 && !string.IsNullOrEmpty(this.subscribeChannelGroupNames[0])) 
                                                 ? this.subscribeChannelGroupNames.Select(c => string.Format("{0}-pnpres", c)).ToList() : new List<string>();
 
-                if (presenceChannelNames.Count > 0)
+                if (this.subscribeChannelNames != null && presenceChannelNames.Count > 0)
                 {
                     this.subscribeChannelNames.AddRange(presenceChannelNames);
                 }
 
-                if (presenceChannelGroupNames.Count > 0)
+                if (this.subscribeChannelGroupNames != null && presenceChannelGroupNames.Count > 0)
                 {
                     this.subscribeChannelGroupNames.AddRange(presenceChannelGroupNames);
                 }

@@ -16,7 +16,7 @@ namespace PubnubApi.EndPoint
         private static IPubnubUnitTest unit;
         private static IPubnubLog pubnubLog;
         private static EndPoint.TelemetryManager pubnubTelemetryMgr;
-        private static EndPoint.TokenManager pubnubTokenMgr;
+        private readonly EndPoint.TokenManager pubnubTokenMgr;
 
         private static Timer SubscribeHeartbeatCheckTimer;
         private Timer multiplexExceptionTimer;
@@ -29,7 +29,7 @@ namespace PubnubApi.EndPoint
             unit = pubnubUnit;
             pubnubLog = log;
             pubnubTelemetryMgr = telemetryManager;
-            pubnubTokenMgr = tokenManager;
+            this.pubnubTokenMgr = tokenManager;
         }
 
 

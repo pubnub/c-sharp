@@ -675,7 +675,7 @@ namespace PubnubApi
             PNOperationType currentType = PNOperationType.PNSetStateOperation;
             string internalChannelsCommaDelimited;
 
-            if (string.IsNullOrEmpty(channelsCommaDelimited) && channelsCommaDelimited.Trim().Length <= 0)
+            if (string.IsNullOrEmpty(channelsCommaDelimited) || channelsCommaDelimited.Trim().Length <= 0)
             {
                 internalChannelsCommaDelimited = ",";
             }

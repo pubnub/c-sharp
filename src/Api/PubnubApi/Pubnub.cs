@@ -77,7 +77,6 @@ namespace PubnubApi
         public EndPoint.DeleteMessageOperation DeleteMessages()
         {
             EndPoint.DeleteMessageOperation deleteMessageOperaton = new EndPoint.DeleteMessageOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
-            deleteMessageOperaton.CurrentPubnubInstance(this);
             return deleteMessageOperaton;
         }
 
@@ -132,7 +131,6 @@ namespace PubnubApi
         public EndPoint.SetStateOperation SetPresenceState()
 		{
             EndPoint.SetStateOperation setStateOperation = new EndPoint.SetStateOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
-            setStateOperation.CurrentPubnubInstance(this);
             return setStateOperation;
         }
 
@@ -153,7 +151,6 @@ namespace PubnubApi
 		public EndPoint.RemovePushChannelOperation RemovePushNotificationsFromChannels()
 		{
             EndPoint.RemovePushChannelOperation removePushChannelOperation = new EndPoint.RemovePushChannelOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
-            removePushChannelOperation.CurrentPubnubInstance(this);
             return removePushChannelOperation;
         }
 
