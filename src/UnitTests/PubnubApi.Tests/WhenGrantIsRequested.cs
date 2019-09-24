@@ -103,7 +103,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            if (PubnubCommon.PAMEnabled)
+            if (PubnubCommon.PAMServerSideGrant)
             {
                 grantManualEvent = new ManualResetEvent(false);
                 pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(false).TTL(5).Execute(new GrantResult());
@@ -161,7 +161,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            if (PubnubCommon.PAMEnabled)
+            if (PubnubCommon.PAMServerSideGrant)
             {
                 grantManualEvent = new ManualResetEvent(false);
                 pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(false).Manage(false).TTL(5).Execute(new GrantResult());
@@ -220,7 +220,7 @@ namespace PubNubMessaging.Tests
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
 
-            if (PubnubCommon.PAMEnabled)
+            if (PubnubCommon.PAMServerSideGrant)
             {
                 grantManualEvent = new ManualResetEvent(false);
                 pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(false).Write(true).Manage(false).TTL(5).Execute(new GrantResult());
@@ -285,7 +285,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            if (PubnubCommon.PAMEnabled)
+            if (PubnubCommon.PAMServerSideGrant)
             {
                 grantManualEvent = new ManualResetEvent(false);
                 pubnub.Grant().AuthKeys(new [] { authKey }).Channels(channelBuilder).Read(true).Write(true).Manage(false).TTL(5).Execute(new GrantResult());
@@ -352,7 +352,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            if (PubnubCommon.PAMEnabled)
+            if (PubnubCommon.PAMServerSideGrant)
             {
                 grantManualEvent = new ManualResetEvent(false);
                 pubnub.Grant().Channels(channelBuilder).AuthKeys(authKeyBuilder).Read(true).Write(true).Manage(false).TTL(5).Execute(new GrantResult());
@@ -428,7 +428,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expectedRevoke)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            if (PubnubCommon.PAMEnabled)
+            if (PubnubCommon.PAMServerSideGrant)
             {
                 grantManualEvent = new ManualResetEvent(false);
                 pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(false).TTL(5).Execute(new GrantResult());
@@ -497,7 +497,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            if (PubnubCommon.PAMEnabled)
+            if (PubnubCommon.PAMServerSideGrant)
             {
                 grantManualEvent = new ManualResetEvent(false);
                 pubnub.Grant().ChannelGroups(new [] { channelGroup }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(5).Execute(new GrantResult());
@@ -555,7 +555,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            if (PubnubCommon.PAMEnabled)
+            if (PubnubCommon.PAMServerSideGrant)
             {
                 grantManualEvent = new ManualResetEvent(false);
                 pubnub.Grant().ChannelGroups(new [] { channelGroup }).AuthKeys(new [] { authKey }).Read(true).Write(false).Manage(false).TTL(5).Execute(new GrantResult());
@@ -669,17 +669,37 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            if (PubnubCommon.PAMEnabled)
+            if (PubnubCommon.PAMServerSideGrant)
             {
                 
                 grantManualEvent = new ManualResetEvent(false);
 
                 pubnub.GrantToken()
                             .Users(new Dictionary<string, PNResourcePermission>() {
-                                { "myuser1", new PNResourcePermission() { Read = true, Write = true, Create = true } } })
+                                { "pandu_userid0", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
+                                { "pandu_userid1", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
+                                { "pandu-ut-uid", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
+                                { "pandu-ut-uid1", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
+                                { "pandu-ut-uid2", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } } })
                             .Spaces(new Dictionary<string, PNResourcePermission>() {
-                                { "myspace1", new PNResourcePermission() { Read = true, Write = true, Delete = true } } })
-                            .TTL(100)
+                                { "pandu_spaceid0", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
+                                { "pandu_spaceid1", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
+                                { "pandu-ut-sid", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
+                                { "pandu-ut-sid1", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
+                                { "pandu-ut-sid2", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } } })
+                            .Users(new Dictionary<string, PNResourcePermission>() {
+                                { "^emp-gen-*", new PNResourcePermission() { Read = true, Write = true } },
+                                { "^emp-mgr-*", new PNResourcePermission() { Read = true, Write = true, Create = true, Delete = true } } }, true)
+                            .Spaces(new Dictionary<string, PNResourcePermission>() {
+                                { "^public-*", new PNResourcePermission() { Read = true } },
+                                { "^private-*", new PNResourcePermission() { Read = true, Write = true, Create = true, Delete = true } } }, true)
+
+                            //.Users(new Dictionary<string, PNResourcePermission>() {
+                            //    { "myuser1", new PNResourcePermission() { Read = true, Write = true, Create = true } } })
+                            //.Spaces(new Dictionary<string, PNResourcePermission>() {
+                            //    { "myspace1", new PNResourcePermission() { Read = true, Write = true, Delete = true } } })
+                            .TTL(30*24*60)
+                            .AuthKey("myauth")
                     //.QueryParam(new System.Collections.Generic.Dictionary<string, object>() { { "PoundsSterling", "£13.37" } })
                     //.Meta(new System.Collections.Generic.Dictionary<string, object>() { { "user-id", "jay@example.com" }, { "contains-unicode", "The 💩 test." } })
                     .Execute(new PNAccessManagerTokenResultExt((result, status)=> 
@@ -689,42 +709,8 @@ namespace PubNubMessaging.Tests
                             try
                             {
                                 string token = result.Token;
-                                token = token.Replace('_', '/').Replace('-', '+').TrimEnd(new char[] { '=' });//.PadRight(4 * ((token.Length + 3) / 4), '=');
-                                byte[] tokenByteArray = Convert.FromBase64String(token);
-                                System.IO.MemoryStream stream = new System.IO.MemoryStream(tokenByteArray);
-
-                                object cborItemListObj = stream.DecodeAllCBORItems();
-                                if (cborItemListObj != null)
-                                {
-                                    System.Diagnostics.Debug.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(cborItemListObj));
-
-                                    List<object> cborItemList = cborItemListObj as List<object>;
-                                    if (cborItemList != null && cborItemList.Count > 0)
-                                    {
-                                        object tokenItem = cborItemList[0];
-                                        System.Diagnostics.Debug.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(tokenItem));
-                                    }
-                                }
-
-                                /* ONE */
-                                //var dahomeyRawcborData = Dahomey.Cbor.Cbor.DeserializeAsync<Dahomey.Cbor.ObjectModel.CborObject>(stream,Dahomey.Cbor.CborOptions.Default).Result;
-                                //if (dahomeyRawcborData != null && dahomeyRawcborData.Count > 0)
-                                //{
-                                //    foreach(Dahomey.Cbor.ObjectModel.CborValue val in dahomeyRawcborData.Keys)
-                                //    {
-                                //        uint num = uint.Parse(val.ToString().Replace("h'", "").Replace("'",""), System.Globalization.NumberStyles.AllowHexSpecifier);
-                                //        byte[] tempArray = BitConverter.GetBytes(num);
-                                //        string test = BitConverter.ToString(tempArray);
-                                //        System.Diagnostics.Debug.WriteLine("test = " + test);
-                                //    }
-                                //}
-                                //string dahomeyByteStringKeyData =  dahomeyRawcborData.ToString();
-                                //System.Diagnostics.Debug.WriteLine("dahomeyRawcborData = " + dahomeyByteStringKeyData);
-
-                                //PeterO.Cbor.CBORObject peterCborObj = PeterO.Cbor.CBORObject.DecodeFromBytes(tokenByteArray, PeterO.Cbor.CBOREncodeOptions.Default);
-                                //string peteroByteStringKeyData = peterCborObj.ToString();
-                                //System.Diagnostics.Debug.WriteLine("peterCborObj = " + peteroByteStringKeyData);
-
+                                PNGrantToken grantObject = pubnub.ParseToken(token);
+                                System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(grantObject));
                             }
                             catch (Exception ex)
                             {
@@ -742,6 +728,7 @@ namespace PubNubMessaging.Tests
                 Thread.Sleep(1000);
 
                 grantManualEvent.WaitOne();
+                Thread.Sleep(2000);
 
                 pubnub.Destroy();
                 pubnub.PubnubUnitTest = null;

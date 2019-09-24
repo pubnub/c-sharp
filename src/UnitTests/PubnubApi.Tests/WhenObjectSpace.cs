@@ -15,6 +15,8 @@ namespace PubNubMessaging.Tests
         private static int manualResetEventWaitTimeout = 310 * 1000;
         private static Pubnub pubnub;
         private static Server server;
+        private static string authKey = "myauth";
+        private static string authToken = "";
 
         [TestFixtureSetUp]
         public static void Init()
@@ -25,16 +27,10 @@ namespace PubNubMessaging.Tests
             MockServer.LoggingMethod.MockServerLog = unitLog;
             server.Start();
 
-            if (!PubnubCommon.PAMEnabled) { return; }
-
-            if (PubnubCommon.PAMEnabled && string.IsNullOrEmpty(PubnubCommon.SecretKey))
-            {
-                return;
-            }
+            if (!PubnubCommon.PAMServerSideGrant) { return; }
 
             bool receivedGrantMessage = false;
-            string channel = "hello_my_channel";
-            string authKey = "myAuth";
+            string spaceId = "pandu-ut-sid";
 
             PNConfiguration config = new PNConfiguration
             {
@@ -48,27 +44,32 @@ namespace PubNubMessaging.Tests
             server.RunOnHttps(false);
 
             pubnub = createPubNubInstance(config);
+            PNResourcePermission perm = new PNResourcePermission();
+            perm.Read = true;
+            perm.Write = true;
+            perm.Manage = true;
+            perm.Delete = true;
+            perm.Create = true;
 
             ManualResetEvent grantManualEvent = new ManualResetEvent(false);
-            pubnub.Grant().Channels(new[] { channel }).AuthKeys(new[] { authKey }).Read(true).Write(true).Manage(true).TTL(20)
-                .Execute(new PNAccessManagerGrantResultExt(
+            pubnub.GrantToken()
+                .Spaces(new Dictionary<string, PNResourcePermission>() { { spaceId, perm } })
+                .AuthKey(authKey)
+                .TTL(20)
+                .Execute(new PNAccessManagerTokenResultExt(
                                 (r, s) =>
                                 {
                                     try
                                     {
                                         Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
-                                        if (r != null)
+                                        if (r != null && !string.IsNullOrEmpty(r.Token))
                                         {
-                                            Debug.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
-                                            if (r.Channels != null && r.Channels.Count > 0)
-                                            {
-                                                var read = r.Channels[channel][authKey].ReadEnabled;
-                                                var write = r.Channels[channel][authKey].WriteEnabled;
-                                                if (read && write) { receivedGrantMessage = true; }
-                                            }
+                                            Debug.WriteLine("PNAccessManagerTokenResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                            authToken = r.Token;
+                                            receivedGrantMessage = true;
                                         }
                                     }
-                                    catch { /* ignore */  }
+                                    catch { }
                                     finally
                                     {
                                         grantManualEvent.Set();
@@ -82,7 +83,7 @@ namespace PubNubMessaging.Tests
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Assert.IsTrue(receivedGrantMessage, "WhenAMessageIsPublished Grant access failed.");
+            Assert.IsTrue(receivedGrantMessage, "WhenObjectSpace Grant access failed.");
         }
 
         [TestFixtureTearDown]
@@ -113,12 +114,21 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = false
             };
-            if (PubnubCommon.PAMEnabled)
+            if (PubnubCommon.PAMServerSideRun)
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
             server.RunOnHttps(false);
             pubnub = createPubNubInstance(config);
+            if (!PubnubCommon.PAMServerSideRun && !string.IsNullOrEmpty(authToken))
+            {
+                pubnub.ClearTokens();
+                pubnub.SetToken(authToken);
+            }
             ManualResetEvent manualEvent = new ManualResetEvent(false);
 
             manualResetEventWaitTimeout = 310 * 1000;
@@ -273,14 +283,24 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Uuid = "mytestuuid",
-                Secure = false
+                Secure = false,
+                AuthKey = "myauth"
             };
-            if (PubnubCommon.PAMEnabled)
+            if (PubnubCommon.PAMServerSideRun)
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
             server.RunOnHttps(false);
             pubnub = createPubNubInstance(config);
+            if (!PubnubCommon.PAMServerSideRun && !string.IsNullOrEmpty(authToken))
+            {
+                pubnub.ClearTokens();
+                pubnub.SetToken(authToken);
+            }
             pubnub.AddListener(eventListener);
 
             ManualResetEvent manualEvent = new ManualResetEvent(false);
@@ -345,6 +365,8 @@ namespace PubNubMessaging.Tests
                     delegate (PNDeleteSpaceResult result, PNStatus status) { }));
                 manualEvent.WaitOne(2000);
             }
+
+            Thread.Sleep(2000);
 
             pubnub.Unsubscribe<string>().Channels(new string[] { spaceId }).Execute();
             pubnub.RemoveListener(eventListener);

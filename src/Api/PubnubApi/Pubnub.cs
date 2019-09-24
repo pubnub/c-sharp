@@ -19,7 +19,7 @@ namespace PubnubApi
 
         private readonly string instanceId;
 
-        private static string sdkVersion = "PubNubCSharp4.0.34.0";
+        private static string sdkVersion = string.Format("{0}CSharp4.1.0.0", PNPlatform.Get());
 
         private object savedSubscribeOperation;
         private readonly string savedSdkVerion;
@@ -398,6 +398,7 @@ namespace PubnubApi
                 tokenManager.SetToken(token);
             }
         }
+
         public void SetTokens(string[] tokens)
         {
             if (tokenManager != null)
@@ -408,12 +409,23 @@ namespace PubnubApi
                 }
             }
         }
+
         public List<string> GetTokens()
         {
             List<string> result = null;
             if (tokenManager != null)
             {
                 result = tokenManager.GetAllTokens();
+            }
+            return result;
+        }
+
+        internal string GetToken(string resourceType, string resourceId)
+        {
+            string result = "";
+            if (tokenManager != null)
+            {
+                result = tokenManager.GetToken(resourceType, resourceId);
             }
             return result;
         }
@@ -598,7 +610,7 @@ namespace PubnubApi
                 telemetryManager = new EndPoint.TelemetryManager(pubnubConfig, pubnubLog);
             }
             CheckRequiredConfigValues();
-            if (config != null && string.IsNullOrEmpty(config.SecretKey) && config.StoreTokensOnGrant)
+            if (config != null && string.IsNullOrEmpty(config.SecretKey) && config.EnableTokenManager)
             {
                 tokenManager = new EndPoint.TokenManager(pubnubConfig, jsonPluggableLibrary, pubnubLog);
             }

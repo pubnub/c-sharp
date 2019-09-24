@@ -18,6 +18,7 @@ namespace PubnubApi.EndPoint
         private readonly IPubnubLog pubnubLog;
         private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
         private readonly EndPoint.TokenManager pubnubTokenMgr;
+        private readonly Pubnub currentPubnubInstance;
 
         private Dictionary<string, PNResourcePermission> pubnubChannelNames = new Dictionary<string, PNResourcePermission>();
         private Dictionary<string, PNResourcePermission> pubnubChannelGroupNames = new Dictionary<string, PNResourcePermission>();
@@ -26,12 +27,13 @@ namespace PubnubApi.EndPoint
 
         private Dictionary<string, PNResourcePermission> pubnubChannelNamesPattern = new Dictionary<string, PNResourcePermission>();
         private Dictionary<string, PNResourcePermission> pubnubChannelGroupNamesPattern = new Dictionary<string, PNResourcePermission>();
-        private Dictionary<string, PNResourcePermission> pubnubUsersPattern = new Dictionary<string, PNResourcePermission>();
-        private Dictionary<string, PNResourcePermission> pubnubSpacesPattern = new Dictionary<string, PNResourcePermission>();
+        private Dictionary<string, PNResourcePermission> pubnubUsersPattern = new Dictionary<string, PNResourcePermission>() { {"^$", new PNResourcePermission { Read=true } } };
+        private Dictionary<string, PNResourcePermission> pubnubSpacesPattern = new Dictionary<string, PNResourcePermission>() { { "^$", new PNResourcePermission { Read = true } } };
         private long grantTTL = -1;
         private PNCallback<PNAccessManagerTokenResult> savedCallbackGrantToken;
         private Dictionary<string, object> queryParam;
         private Dictionary<string, object> grantMeta;
+        private string pamv2AuthenticationKey;
 
         public GrantTokenOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
         {
@@ -41,6 +43,7 @@ namespace PubnubApi.EndPoint
             pubnubLog = log;
             pubnubTelemetryMgr = telemetryManager;
             pubnubTokenMgr = tokenManager;
+            currentPubnubInstance = instance;
         }
 
         public GrantTokenOperation Users(Dictionary<string, PNResourcePermission> userPermissions)
@@ -59,6 +62,10 @@ namespace PubnubApi.EndPoint
                 if (pattern)
                 {
                     this.pubnubUsersPattern = userPermissions;
+                    if (!this.pubnubUsersPattern.ContainsKey("^$"))
+                    {
+                        this.pubnubUsersPattern.Add("^$", new PNResourcePermission { Read = true });
+                    }
                 }
                 else
                 {
@@ -84,6 +91,10 @@ namespace PubnubApi.EndPoint
                 if (pattern)
                 {
                     this.pubnubSpacesPattern = spacePermissions;
+                    if (!this.pubnubSpacesPattern.ContainsKey("^$"))
+                    {
+                        this.pubnubSpacesPattern.Add("^$", new PNResourcePermission { Read = true });
+                    }
                 }
                 else
                 {
@@ -104,6 +115,13 @@ namespace PubnubApi.EndPoint
             this.grantMeta = metaObject;
             return this;
         }
+
+        public GrantTokenOperation AuthKey(string pamv2AuthKey)
+        {
+            this.pamv2AuthenticationKey = pamv2AuthKey;
+            return this;
+        }
+
 
         public GrantTokenOperation QueryParam(Dictionary<string, object> customQueryParam)
         {
@@ -294,6 +312,33 @@ namespace PubnubApi.EndPoint
             {
                 List<object> result = ProcessJsonResponse<PNAccessManagerTokenResult>(requestState, json);
                 ProcessResponseCallbacks(result, requestState);
+                if (result != null && result.Count > 0)
+                {
+                    Dictionary<string, object> dicResult = jsonLibrary.ConvertToDictionaryObject(result[0]);
+                    if (dicResult != null && dicResult.Count > 0 && dicResult.ContainsKey("status") && dicResult["status"].ToString() == "200")
+                    {
+
+                        TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
+                        EndPoint.GrantOperation pamv2GrantOperation = new GrantOperation(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, currentPubnubInstance);
+                        pamv2GrantOperation
+                            .Channels(usersPermission.Keys.Concat(spacesPermission.Keys).ToArray())
+                            .Read(true)
+                            .TTL(ttl)
+                            .AuthKeys(new string[] { this.pamv2AuthenticationKey })
+                            .Execute(new PNAccessManagerGrantResultExt((pamv2Result, pamv2Status) => 
+                            {
+                                if (pamv2Result != null && !pamv2Status.Error)
+                                {
+                                    tcs.SetResult(true);
+                                }
+                                else
+                                {
+                                    tcs.SetResult(false);
+                                }
+                            }));
+                        tcs.Task.Wait(config.NonSubscribeRequestTimeout * 1000);
+                    }
+                }
             }
         }
 

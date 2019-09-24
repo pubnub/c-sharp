@@ -19,7 +19,7 @@ namespace PubNubMessaging.Tests
         {
             bool receivedAuditMessage = false;
 
-            if (!PubnubCommon.PAMEnabled)
+            if (!PubnubCommon.PAMServerSideGrant)
             {
                 Assert.Ignore("PAM not enabled; CleanupGrant -> AtUserLevel.");
                 return;
@@ -114,7 +114,7 @@ namespace PubNubMessaging.Tests
         {
             bool receivedAuditMessage = false;
 
-            if (!PubnubCommon.PAMEnabled)
+            if (!PubnubCommon.PAMServerSideGrant)
             {
                 Assert.Ignore("PAM not enabled; CleanupGrant -> AtChannelLevel.");
                 return;

@@ -20,7 +20,7 @@ namespace PubNubMessaging.Tests
         private static string currentUnitTestCase = "";
         private static string channelGroupName = "hello_my_group";
         private static string channelName = "hello_my_channel";
-        private static string authKey = "myAuth";
+        private static string authKey = "myauth";
 
         private static Pubnub pubnub;
         private static Server server;
@@ -34,7 +34,7 @@ namespace PubNubMessaging.Tests
             MockServer.LoggingMethod.MockServerLog = unitLog;
             server.Start();
 
-            if (!PubnubCommon.PAMEnabled)
+            if (!PubnubCommon.PAMServerSideGrant)
             {
                 return;
             }
@@ -101,10 +101,16 @@ namespace PubNubMessaging.Tests
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                SecretKey = PubnubCommon.SecretKey,
                 Uuid = "mytestuuid",
             };
-
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
             pubnub = createPubNubInstance(config);
 
             string expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}";
@@ -148,10 +154,16 @@ namespace PubNubMessaging.Tests
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                SecretKey = PubnubCommon.SecretKey,
                 Uuid = "mytestuuid",
             };
-
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
             pubnub = createPubNubInstance(config);
 
             string expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}";
@@ -196,10 +208,16 @@ namespace PubNubMessaging.Tests
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                SecretKey = PubnubCommon.SecretKey,
                 Uuid = "mytestuuid",
             };
-
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
             pubnub = createPubNubInstance(config);
 
             string expected = "{\"status\": 200, \"payload\": {\"channels\": [\"" + channelName + "\"], \"group\": \"" + channelGroupName + "\"}, \"service\": \"channel-registry\", \"error\": false}";
@@ -233,7 +251,10 @@ namespace PubNubMessaging.Tests
         public static void ThenGetAllChannelGroupShouldReturnSuccess()
         {
             server.ClearRequests();
-
+            if (!PubnubCommon.PAMServerSideRun)
+            {
+                Assert.Ignore("Ignored due to requied secret key to get all CGs");
+            }
             currentUnitTestCase = "ThenGetAllChannelGroupShouldReturnSuccess";
 
             receivedChannelGroupMessage = false;
@@ -242,10 +263,16 @@ namespace PubNubMessaging.Tests
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                SecretKey = PubnubCommon.SecretKey,
                 Uuid = "mytestuuid",
             };
-
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
             pubnub = createPubNubInstance(config);
 
             string expected = "{\"status\": 200, \"payload\": {\"namespace\": \"\", \"groups\": [\"" + channelGroupName + "\", \"hello_my_group1\"]}, \"service\": \"channel-registry\", \"error\": false}";

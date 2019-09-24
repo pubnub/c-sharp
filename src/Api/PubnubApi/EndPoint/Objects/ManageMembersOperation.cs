@@ -237,6 +237,10 @@ namespace PubnubApi.EndPoint
             {
                 ret = "custom";
             }
+            else if (enumValue.ToLowerInvariant() == "user")
+            {
+                ret = "user";
+            }
             else if (enumValue.ToLowerInvariant() == "space")
             {
                 ret = "space";
@@ -244,6 +248,10 @@ namespace PubnubApi.EndPoint
             else if (enumValue.ToLowerInvariant() == "space_custom")
             {
                 ret = "space.custom";
+            }
+            else if (enumValue.ToLowerInvariant() == "user_custom")
+            {
+                ret = "user.custom";
             }
             return ret;
         }

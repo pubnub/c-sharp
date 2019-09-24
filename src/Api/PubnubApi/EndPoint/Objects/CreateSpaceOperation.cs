@@ -156,7 +156,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildCreateSpaceRequest("POST", postMessage, spaceCustom, externalQueryParam);
+            Uri request = urlBuilder.BuildCreateSpaceRequest("POST", postMessage, spaceId, spaceCustom, externalQueryParam);
 
             string json = UrlProcessRequest<PNCreateSpaceResult>(request, requestState, false, postMessage);
 

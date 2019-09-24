@@ -14,7 +14,7 @@
 
   <PropertyGroup>
     <PackageId>Pubnub</PackageId>
-    <PackageVersion>4.0.34.0</PackageVersion>
+    <PackageVersion>4.1.0.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -22,8 +22,11 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>Modified Signal listener message type to PNSignalResult.
-Added ObjectsAPI feature.</PackageReleaseNotes>
+    <PackageReleaseNotes>Fix for MessageCounts when multiple channels are used.
+Fix for PAM Signature when case-sensitive param keys are provided.
+Refactored all calls that use PAM signature to use  v2 format signature.
+Implemented PAMv3 to all Objects.
+New feature Token Management System to all Objects.</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
@@ -68,7 +71,6 @@ Added ObjectsAPI feature.</PackageReleaseNotes>
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <Reference Include="System" />
-    <Reference Include="System.Core" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net40'">
@@ -80,7 +82,6 @@ Added ObjectsAPI feature.</PackageReleaseNotes>
     </PackageReference>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Numerics" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net45'">
@@ -89,7 +90,6 @@ Added ObjectsAPI feature.</PackageReleaseNotes>
     </PackageReference>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Numerics" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
@@ -98,7 +98,6 @@ Added ObjectsAPI feature.</PackageReleaseNotes>
     </PackageReference>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Numerics" />
   </ItemGroup>
 
 </Project>

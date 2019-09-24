@@ -43,7 +43,7 @@ namespace PubnubApi
                                     }
                                     if (getMbrItemDataDic.ContainsKey("user"))
                                     {
-                                        Dictionary<string, object> userDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(getMbrItemDataDic["space"]);
+                                        Dictionary<string, object> userDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(getMbrItemDataDic["user"]);
                                         if (userDic != null && userDic.Count > 0)
                                         {
                                             var userResult = new PNUserResult

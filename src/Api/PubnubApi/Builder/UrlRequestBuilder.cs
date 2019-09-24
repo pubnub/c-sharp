@@ -389,7 +389,7 @@ namespace PubnubApi
             url.Add("message-counts");
             if (!string.IsNullOrEmpty(channel))
             {
-                url.Add(UriUtil.EncodeUriComponent(false, channel, currentType, false, false, false));
+                url.Add(UriUtil.EncodeUriComponent(false, channel, currentType, true, false, false));
             }
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
@@ -568,7 +568,6 @@ namespace PubnubApi
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
                         requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
-                        //requestQueryStringParams.Add(kvp.Key, kvp.Value.ToString());
                     }
                 }
             }
@@ -1267,7 +1266,7 @@ namespace PubnubApi
             return BuildRestApiRequest(url, currentType, queryParams);
         }
 
-        Uri IUrlRequestBuilder.BuildCreateSpaceRequest(string requestMethod, string requestBody, Dictionary<string, object> spaceCustom, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildCreateSpaceRequest(string requestMethod, string requestBody, string spaceId, Dictionary<string, object> spaceCustom, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PNCreateSpaceOperation;
 
@@ -1292,7 +1291,7 @@ namespace PubnubApi
                     }
                 }
             }
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
+            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true, "space", spaceId, false);
             string queryParams = string.Format("?{0}", queryString);
 
             return BuildRestApiRequest(url, currentType, queryParams);
@@ -1324,7 +1323,7 @@ namespace PubnubApi
                     }
                 }
             }
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
+            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true, "space", spaceId, false);
             string queryParams = string.Format("?{0}", queryString);
 
             return BuildRestApiRequest(url, currentType, queryParams);
@@ -1353,7 +1352,7 @@ namespace PubnubApi
                 }
             }
 
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
+            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true, "space", spaceId, false);
             string queryParams = string.Format("?{0}", queryString);
 
             return BuildRestApiRequest(url, currentType, queryParams);
@@ -1401,7 +1400,7 @@ namespace PubnubApi
                     }
                 }
             }
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
+            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true, "space","", true);
             string queryParams = string.Format("?{0}", queryString);
 
             return BuildRestApiRequest(url, currentType, queryParams);
@@ -1434,7 +1433,7 @@ namespace PubnubApi
                     }
                 }
             }
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
+            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true, "space", spaceId, false);
             string queryParams = string.Format("?{0}", queryString);
 
             return BuildRestApiRequest(url, currentType, queryParams);
@@ -1483,7 +1482,7 @@ namespace PubnubApi
                     }
                 }
             }
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
+            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true, "user", userId, false);
             string queryParams = string.Format("?{0}", queryString);
 
             return BuildRestApiRequest(url, currentType, queryParams);
@@ -1532,7 +1531,7 @@ namespace PubnubApi
                     }
                 }
             }
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
+            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true, "space", spaceId, false);
             string queryParams = string.Format("?{0}", queryString);
 
             return BuildRestApiRequest(url, currentType, queryParams);
@@ -1582,7 +1581,7 @@ namespace PubnubApi
                     }
                 }
             }
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
+            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true, "user", userId, false);
             string queryParams = string.Format("?{0}", queryString);
 
             return BuildRestApiRequest(url, currentType, queryParams);
@@ -1632,7 +1631,7 @@ namespace PubnubApi
                     }
                 }
             }
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
+            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true, "space", spaceId, false);
             string queryParams = string.Format("?{0}", queryString);
 
             return BuildRestApiRequest(url, currentType, queryParams);
@@ -1709,16 +1708,22 @@ namespace PubnubApi
                         || type == PNOperationType.PNGetMembersOperation || type == PNOperationType.PNGetMembershipsOperation
                         || type == PNOperationType.PNManageMembersOperation || type == PNOperationType.PNManageMembershipsOperation)
                     {
-                        string resourceToken = tokenMgr.GetToken(resourceType, resourceId);
-                        if (string.IsNullOrEmpty(resourceId) && checkResourcePattern)
+                        if (tokenMgr != null)
                         {
-                            resourceToken = tokenMgr.GetToken(resourceType, resourceId, checkResourcePattern);
+                            string resourceToken = "";
+                            if (string.IsNullOrEmpty(resourceId) && checkResourcePattern)
+                            {
+                                resourceToken = tokenMgr.GetToken(resourceType, resourceId, checkResourcePattern);
+                            }
+                            else
+                            {
+                                resourceToken = tokenMgr.GetToken(resourceType, resourceId);
+                            }
+                            if (!string.IsNullOrEmpty(resourceToken))
+                            {
+                                ret.Add("auth", UriUtil.EncodeUriComponent(false, resourceToken, type, false, false, false));
+                            }
                         }
-                        else
-                        {
-                            resourceToken = tokenMgr.GetToken(resourceType, resourceId);
-                        }
-                        ret.Add("auth", UriUtil.EncodeUriComponent(false, resourceToken, type, false, false, false));
                     }
                     else if (!string.IsNullOrEmpty(this.pubnubConfig.AuthKey))
                     {
@@ -1765,7 +1770,6 @@ namespace PubnubApi
 
             PubnubCrypto pubnubCrypto = new PubnubCrypto((opType != PNOperationType.PNSignalOperation) ? this.pubnubConfig.CipherKey : "", this.pubnubConfig, this.pubnubLog);
             signature = pubnubCrypto.PubnubAccessManagerSign(this.pubnubConfig.SecretKey, string_to_sign.ToString());
-            //signature = string.Format("v2.{0}", signature.TrimEnd(new char[] { '=' }));
             signature = string.Format("v2.{0}", signature.TrimEnd(new char[] { '=' }));
             if (this.pubnubLog != null && this.pubnubConfig != null)
             {
@@ -1799,7 +1803,6 @@ namespace PubnubApi
                 Dictionary<string, string> queryStringParams = new Dictionary<string, string>(commonQueryStringParams.Concat(internalQueryStringParamDic).GroupBy(item => item.Key).ToDictionary(item => item.Key, item => item.First().Value));
 
                 string queryToSign = string.Join("&", queryStringParams.OrderBy(kvp => kvp.Key, StringComparer.Ordinal).Select(kvp => string.Format("{0}={1}", kvp.Key, kvp.Value)).ToArray());
-                //string queryToSign = string.Join("&", queryStringParams.OrderBy(kvp => kvp.Key).Select(kvp => string.Format("{0}={1}", kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value, type, false, false, false))).ToArray());
 
                 if (this.pubnubConfig.SecretKey.Length > 0)
                 {

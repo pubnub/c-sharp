@@ -41,7 +41,7 @@ namespace PubNubMessaging.Tests
 
             currentUnitTestCase = "AtUserLevel";
 
-            if (!PubnubCommon.PAMEnabled)
+            if (!PubnubCommon.PAMServerSideGrant)
             {
                 Assert.Ignore("PAM not enabled; GenerateSampleGrant -> AtUserLevel.");
                 return;
@@ -103,7 +103,7 @@ namespace PubNubMessaging.Tests
 
             currentUnitTestCase = "AtChannelLevel";
 
-            if (!PubnubCommon.PAMEnabled)
+            if (!PubnubCommon.PAMServerSideGrant)
             {
                 Assert.Ignore("PAM not enabled; GenerateSampleGrant -> AtChannelLevel.");
                 return;

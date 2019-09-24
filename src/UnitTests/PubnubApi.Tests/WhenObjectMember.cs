@@ -15,6 +15,8 @@ namespace PubNubMessaging.Tests
         private static int manualResetEventWaitTimeout = 310 * 1000;
         private static Pubnub pubnub;
         private static Server server;
+        private static string authKey = "myauth";
+        private static string authToken = "";
 
         [TestFixtureSetUp]
         public static void Init()
@@ -25,16 +27,12 @@ namespace PubNubMessaging.Tests
             MockServer.LoggingMethod.MockServerLog = unitLog;
             server.Start();
 
-            if (!PubnubCommon.PAMEnabled) { return; }
-
-            if (PubnubCommon.PAMEnabled && string.IsNullOrEmpty(PubnubCommon.SecretKey))
-            {
-                return;
-            }
+            if (!PubnubCommon.PAMServerSideGrant) { return; }
 
             bool receivedGrantMessage = false;
-            string channel = "hello_my_channel";
-            string authKey = "myAuth";
+            string spaceId = "pandu-ut-sid";
+            string userId1 = "pandu-ut-uid1";
+            string userId2 = "pandu-ut-uid2";
 
             PNConfiguration config = new PNConfiguration
             {
@@ -48,27 +46,33 @@ namespace PubNubMessaging.Tests
             server.RunOnHttps(false);
 
             pubnub = createPubNubInstance(config);
+            PNResourcePermission perm = new PNResourcePermission();
+            perm.Read = true;
+            perm.Write = true;
+            perm.Manage = true;
+            perm.Delete = true;
+            perm.Create = true;
 
             ManualResetEvent grantManualEvent = new ManualResetEvent(false);
-            pubnub.Grant().Channels(new[] { channel }).AuthKeys(new[] { authKey }).Read(true).Write(true).Manage(true).TTL(20)
-                .Execute(new PNAccessManagerGrantResultExt(
+            pubnub.GrantToken()
+                .Users(new Dictionary<string, PNResourcePermission>() { { userId1, perm }, { userId2, perm } })
+                .Spaces(new Dictionary<string, PNResourcePermission>() { { spaceId, perm } })
+                .AuthKey(authKey)
+                .TTL(20)
+                .Execute(new PNAccessManagerTokenResultExt(
                                 (r, s) =>
                                 {
                                     try
                                     {
                                         Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
-                                        if (r != null)
+                                        if (r != null && !string.IsNullOrEmpty(r.Token))
                                         {
-                                            Debug.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
-                                            if (r.Channels != null && r.Channels.Count > 0)
-                                            {
-                                                var read = r.Channels[channel][authKey].ReadEnabled;
-                                                var write = r.Channels[channel][authKey].WriteEnabled;
-                                                if (read && write) { receivedGrantMessage = true; }
-                                            }
+                                            Debug.WriteLine("PNAccessManagerTokenResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                            authToken = r.Token;
+                                            receivedGrantMessage = true;
                                         }
                                     }
-                                    catch { /* ignore */  }
+                                    catch {  }
                                     finally
                                     {
                                         grantManualEvent.Set();
@@ -115,12 +119,22 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = false
             };
-            if (PubnubCommon.PAMEnabled)
+            if (PubnubCommon.PAMServerSideRun)
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+
             server.RunOnHttps(false);
             pubnub = createPubNubInstance(config);
+            if (!PubnubCommon.PAMServerSideRun && !string.IsNullOrEmpty(authToken))
+            {
+                pubnub.ClearTokens();
+                pubnub.SetToken(authToken);
+            }
             ManualResetEvent manualEvent = new ManualResetEvent(false);
 
             manualResetEventWaitTimeout = 310 * 1000;
@@ -235,7 +249,7 @@ namespace PubNubMessaging.Tests
                 manualEvent.WaitOne(manualResetEventWaitTimeout);
             }
 
-            if (receivedMessage)
+            if (receivedMessage && !string.IsNullOrEmpty(config.SecretKey))
             {
                 receivedMessage = false;
                 manualEvent = new ManualResetEvent(false);
@@ -374,14 +388,24 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Uuid = "mytestuuid",
-                Secure = false
+                Secure = false,
+                AuthKey = "myauth"
             };
-            if (PubnubCommon.PAMEnabled)
+            if (PubnubCommon.PAMServerSideRun)
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
             server.RunOnHttps(false);
             pubnub = createPubNubInstance(config);
+            if (!PubnubCommon.PAMServerSideRun && !string.IsNullOrEmpty(authToken))
+            {
+                pubnub.ClearTokens();
+                pubnub.SetToken(authToken);
+            }
             pubnub.AddListener(eventListener);
 
             ManualResetEvent manualEvent = new ManualResetEvent(false);
@@ -508,36 +532,61 @@ namespace PubNubMessaging.Tests
                 receivedMessage = false;
                 manualEvent = new ManualResetEvent(false);
                 #region "Members Update/Remove"
-                System.Diagnostics.Debug.WriteLine("pubnub.Members() UPDATE/REMOVE STARTED");
-                pubnub.ManageMembers().SpaceId(spaceId)
-                    .Update(new List<PNMember>()
-                            {
+                if (!string.IsNullOrEmpty(config.SecretKey))
+                {
+                    System.Diagnostics.Debug.WriteLine("pubnub.Members() UPDATE/REMOVE STARTED");
+                    pubnub.ManageMembers().SpaceId(spaceId)
+                        .Update(new List<PNMember>()
+                                {
                             new PNMember() { UserId = userId1, Custom = new Dictionary<string, object>(){ { "color", "green1" } } }
-                    })
-                    .Remove(new List<string>() { userId2 })
-                    .Execute(new PNManageMembersResultExt((r, s) =>
-                    {
-                        if (r != null && s.StatusCode == 200 && !s.Error)
+                        })
+                        .Remove(new List<string>() { userId2 })
+                        .Execute(new PNManageMembersResultExt((r, s) =>
                         {
-                            pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
-                            if (r.Members != null
-                            && r.Members.Find(x => x.UserId == userId1) != null)
+                            if (r != null && s.StatusCode == 200 && !s.Error)
                             {
+                                pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
+                                if (r.Members != null
+                                && r.Members.Find(x => x.UserId == userId1) != null)
+                                {
+                                    receivedMessage = true;
+                                }
+                            }
+                            manualEvent.Set();
+                        }));
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("pubnub.Members() REMOVE STARTED");
+                    pubnub.ManageMembers().SpaceId(spaceId)
+                        .Remove(new List<string>() { userId2 })
+                        .Execute(new PNManageMembersResultExt((r, s) =>
+                        {
+                            if (r != null && s.StatusCode == 200 && !s.Error)
+                            {
+                                pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
                                 receivedMessage = true;
                             }
-                        }
-                        manualEvent.Set();
-                    }));
+                            manualEvent.Set();
+                        }));
+                }
                 #endregion
                 manualEvent.WaitOne(manualResetEventWaitTimeout);
             }
 
             Thread.Sleep(2000);
 
-            pubnub.Unsubscribe<string>().Channels(new string[] { "pnuser-" + userId1, "pnuser-" + userId2, spaceId }).Execute();
+            pubnub.Unsubscribe<string>().Channels(new string[] { userId1, userId2, spaceId }).Execute();
             pubnub.RemoveListener(eventListener);
 
-            Assert.IsTrue(receivedDeleteEvent && receivedUpdateEvent && receivedCreateEvent, "Member events Failed");
+            if (!string.IsNullOrEmpty(config.SecretKey))
+            {
+                Assert.IsTrue(receivedDeleteEvent && receivedUpdateEvent && receivedCreateEvent, "Member events Failed");
+            }
+            else
+            {
+                Assert.IsTrue(receivedDeleteEvent && receivedCreateEvent, "Member events Failed");
+            }
 
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;

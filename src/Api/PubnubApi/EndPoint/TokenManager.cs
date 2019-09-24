@@ -4,6 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using PubnubApi.CBOR;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
+using System.Collections;
+using System.Reflection;
+using Newtonsoft.Json.Linq;
+
 
 namespace PubnubApi.EndPoint
 {
@@ -18,11 +25,103 @@ namespace PubnubApi.EndPoint
             set;
         } = new ConcurrentDictionary<TokenKey, string>();
 
+#if DEBUG && NET461
+        internal class TokenManagerConverter : JsonConverter
+        {
+            public override bool CanConvert(Type objectType)
+            {
+                return (typeof(IDictionary).IsAssignableFrom(objectType) ||
+                        TypeImplementsGenericInterface(objectType, typeof(IDictionary<,>)));
+            }
+
+            private static bool TypeImplementsGenericInterface(Type concreteType, Type interfaceType)
+            {
+                return concreteType.GetInterfaces()
+                       .Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == interfaceType);
+            }
+
+            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+            {
+                Type type = value.GetType();
+                IEnumerable keys = (IEnumerable)type.GetProperty("Keys").GetValue(value, null);
+                IEnumerable values = (IEnumerable)type.GetProperty("Values").GetValue(value, null);
+                IEnumerator valueEnumerator = values.GetEnumerator();
+
+                writer.WriteStartArray();
+                foreach (object key in keys)
+                {
+                    valueEnumerator.MoveNext();
+
+                    writer.WriteStartArray();
+                    serializer.Serialize(writer, key);
+                    serializer.Serialize(writer, valueEnumerator.Current);
+                    writer.WriteEndArray();
+                }
+                writer.WriteEndArray();
+            }
+
+            public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+            {
+                throw new NotImplementedException();
+            }
+        }
+#endif
+
         internal class TokenKey
         {
+            [JsonProperty("ResourceType ")]
             public string ResourceType { get; set; }
-            public int PatternFlag { get; set; }
+
+            [JsonProperty("ResourceId ")]
             public string ResourceId { get; set; }
+
+            [JsonProperty("PatternFlag ")]
+            public int PatternFlag { get; set; }
+
+            public override bool Equals(object obj)
+            {
+                TokenKey currentKey = obj as TokenKey;
+                if (currentKey == null)
+                {
+                    return false;
+                }
+                return currentKey.ResourceType == this.ResourceType && currentKey.ResourceId == this.ResourceId && currentKey.PatternFlag == this.PatternFlag;
+            }
+
+            public override int GetHashCode() => ResourceType.GetHashCode() ^ PatternFlag.GetHashCode() ^ ResourceId.GetHashCode();
+        }
+
+        internal class CborResPerm
+        {
+            public CborResPerm()
+            {
+                chan = new Dictionary<string, int>();
+                grp = new Dictionary<string, int>();
+                usr = new Dictionary<string, int>();
+                spc = new Dictionary<string, int>();
+            }
+            public Dictionary<string, int> chan { get; set; }
+            public Dictionary<string, int> grp { get; set; }
+            public Dictionary<string, int> usr { get; set; }
+            public Dictionary<string, int> spc { get; set; }
+        }
+
+        internal class CborToken
+        {
+            public CborToken()
+            {
+                res = new CborResPerm();
+                pat = new CborResPerm();
+                meta = new Dictionary<string, object>();
+                sig = "";
+            }
+            public int v { get; set; }
+            public long t { get; set; }
+            public int ttl { get; set; }
+            public CborResPerm res { get; set; }
+            public CborResPerm pat { get; set; }
+            public Dictionary<string, object> meta { get; set; }
+            public string sig { get; set; }
         }
 
         public TokenManager(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubLog log)
@@ -30,10 +129,6 @@ namespace PubnubApi.EndPoint
             this.pubnubConfig = config;
             this.pubnubLog = log;
             this.jsonLib = jsonPluggableLibrary;
-            if (config != null && config.StoreTokensOnGrant)
-            {
-                //StartTelemetryTimer();
-            }
         }
 
         public PNGrantToken ParseToken(string token)
@@ -331,6 +426,9 @@ namespace PubnubApi.EndPoint
                 }
                 #endregion
             }
+#if DEBUG && NET461
+            System.Diagnostics.Debug.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(dicToken, new TokenManagerConverter()));
+#endif
         }
 
         public string GetToken(string resourceType, string resourceId)
@@ -344,11 +442,7 @@ namespace PubnubApi.EndPoint
             }
             else
             {
-                key.PatternFlag = 1;
-                if (dicToken.ContainsKey(key))
-                {
-                    resultToken = dicToken[key];
-                }
+                resultToken = GetToken(resourceType, resourceId, true);
             }
 
             return resultToken;
@@ -358,14 +452,27 @@ namespace PubnubApi.EndPoint
         {
             string resultToken = "";
             int patterFlag = (pattern) ? 1 : 0;
-
-            List<string> tokenKeyPatternList = dicToken.Keys.Where(k => patterFlag == k.PatternFlag && resourceType == k.ResourceType && Regex.IsMatch(resourceId, k.ResourceId)).Select(k=> k.ResourceId).ToList();
-            string targetResourceId = (tokenKeyPatternList != null && tokenKeyPatternList.Count > 0) ? tokenKeyPatternList[0] : "";
-
-            TokenKey key = new TokenKey { ResourceType = resourceType, ResourceId = targetResourceId, PatternFlag = patterFlag };
-            if (dicToken.ContainsKey(key))
+            try
             {
-                resultToken = dicToken[key];
+                List<string> tokenKeyPatternList = dicToken.Keys.Where(k => patterFlag == k.PatternFlag && resourceType == k.ResourceType && Regex.IsMatch(resourceId, k.ResourceId)).Select(k => k.ResourceId).ToList();
+                string targetResourceId = (tokenKeyPatternList != null && tokenKeyPatternList.Count > 0) ? tokenKeyPatternList[0] : "";
+
+                TokenKey key = new TokenKey { ResourceType = resourceType, ResourceId = targetResourceId, PatternFlag = patterFlag };
+                if (dicToken.ContainsKey(key))
+                {
+                    resultToken = dicToken[key];
+                }
+            }
+            catch (Exception ex)
+            {
+                if (this.pubnubLog != null && this.pubnubConfig != null)
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, ex.ToString(), pubnubConfig.LogVerbosity);
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine(ex);
+                }
             }
 
             return resultToken;
@@ -405,6 +512,40 @@ namespace PubnubApi.EndPoint
             return rp;
         }
 
+        private int CalculateGrantBitMaskValue(bool read, bool write, bool manage, bool delete, bool create)
+        {
+            int result = 0;
+
+            if (read)
+            {
+                result = (int)GrantBitFlag.READ;
+            }
+            if (write)
+            {
+                result = result + (int)GrantBitFlag.WRITE;
+            }
+            if (manage)
+            {
+                result = result + (int)GrantBitFlag.MANAGE;
+            }
+            if (delete)
+            {
+                result = result + (int)GrantBitFlag.DELETE;
+            }
+            if (create)
+            {
+                result = result + (int)GrantBitFlag.CREATE;
+            }
+
+            return result;
+        }
+
+        internal void Destroy()
+        {
+            dicToken.Clear();
+            dicToken = null;
+        }
+
         #region IDisposable Support
         private bool disposedValue;
 
@@ -412,14 +553,7 @@ namespace PubnubApi.EndPoint
         {
             if (!disposedValue)
             {
-                //dicEndpointLatency.Clear();
-                //pubnubConfig = null;
-                //pubnubLog = null;
-                //if (telemetryTimer != null)
-                //{
-                //    telemetryTimer.Dispose();
-                //    telemetryTimer = null;
-                //}
+                dicToken.Clear();
 
                 disposedValue = true;
             }

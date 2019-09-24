@@ -279,9 +279,11 @@ namespace PubnubApiDemo
             //config.Uuid = "csharpuuid";
 
             pubnub = new Pubnub(config);
-            string tk = "p0F2AkF0Gl2BEIJDdHRsGGRDcmVzpERjaGFuoENncnCgQ3VzcqBDc3BjoENwYXSkRGNoYW6gQ2dycKBDdXNyomZeZW1wLSoDZl5tZ3ItKhgbQ3NwY6JpXnB1YmxpYy0qA2pecHJpdmF0ZS0qGBtEbWV0YaBDc2lnWCAsvzGmd2rcgtr9rcs4r2tqC87YSppSYqs9CKfaM5IRZA==";
+
+            string tk = "p0F2AkF0Gl2B57tDdHRsGGRDcmVzpERjaGFuoENncnCgQ3VzcqJtcGFuZHVfdXNlcmlkMBgfbXBhbmR1X3VzZXJpZDEYH0NzcGOibnBhbmR1X3NwYWNlaWQwGB9ucGFuZHVfc3BhY2VpZDEYH0NwYXSkRGNoYW6gQ2dycKBDdXNyo2ZeZW1wLSoDZl5tZ3ItKhgbYl4kAUNzcGOjaV5wdWJsaWMtKgNqXnByaXZhdGUtKhgbYl4kAURtZXRhoENzaWdYII0E3FdLGiiCdAXwATdzf5iKb84ThtdxGyOUm6V25VX8";
             pubnub.SetToken(tk);
             Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(pubnub.ParseToken(tk)));
+            
             //Add listener to receive published messages and presence events
             pubnub.AddListener(new SubscribeCallbackExt(
                 delegate (Pubnub pnObj, PNMessageResult<object> pubMsg) { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(pubMsg)); },
@@ -1659,6 +1661,7 @@ namespace PubnubApiDemo
                         }
 
                         List<PNMember> updMemberList = new List<PNMember>();
+                        //updMemberList.Add(new PNMember { UserId = "pandu_userid0", Custom = new Dictionary<string, object>() { {"foo","bar" } } });
 
                         List<string> remMemberList = new List<string>();
                         if (!string.IsNullOrEmpty(memberRemUserId))
@@ -1734,6 +1737,12 @@ namespace PubnubApiDemo
                         break;
                     case "54":
                         pubnub.GrantToken()
+                            .Users(new Dictionary<string, PNResourcePermission>() {
+                                { "pandu_userid0", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
+                                { "pandu_userid1", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } } })
+                            .Spaces(new Dictionary<string, PNResourcePermission>() {
+                                { "pandu_spaceid0", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
+                                { "pandu_spaceid1", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } } })
                             .Users(new Dictionary<string, PNResourcePermission>() {
                                 { "^emp-*", new PNResourcePermission() { Read = true, Write = true } },
                                 { "^mgr-*", new PNResourcePermission() { Read = true, Write = true, Create = true, Delete = true } } }, true)

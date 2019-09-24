@@ -71,7 +71,7 @@ namespace PubnubApi.Interface
 
         Uri BuildGetSingleUserRequest(string requestMethod, string requestBody, string userId, bool includeCustom, Dictionary<string, object> externalQueryParam);
 
-        Uri BuildCreateSpaceRequest(string requestMethod, string requestBody, Dictionary<string, object> spaceCustom, Dictionary<string, object> externalQueryParam);
+        Uri BuildCreateSpaceRequest(string requestMethod, string requestBody, string spaceId, Dictionary<string, object> spaceCustom, Dictionary<string, object> externalQueryParam);
 
         Uri BuildUpdateSpaceRequest(string requestMethod, string requestBody, string spaceId, Dictionary<string, object> spaceCustom, Dictionary<string, object> externalQueryParam);
 

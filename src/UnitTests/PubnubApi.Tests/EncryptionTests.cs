@@ -141,75 +141,6 @@ namespace PubNubMessaging.Tests
     [TestFixture]
     public class EncryptionTests
     {
-        private string HexToUnicodeString(string hexData)
-        {
-            string hexString = hexData.ToString().Replace("h'", "").Replace("'", "");
-            var sb = new StringBuilder();
-            for (var i = 0; i < hexString.Length; i += 2)
-            {
-                var hexChar = hexString.Substring(i, 2);
-                sb.Append((char)Convert.ToByte(hexChar, 16));
-            }
-            string unicodeChar = sb.ToString();
-            return unicodeChar;
-        }
-
-        private Dictionary<string, string> IterateCborObject(Dahomey.Cbor.ObjectModel.CborObject cborObj)
-        {
-            Dictionary<string, string> result = new Dictionary<string, string>();
-            foreach (Dahomey.Cbor.ObjectModel.CborValue key in cborObj.Keys)
-            {
-                System.Diagnostics.Debug.WriteLine(cborObj[key].Type.ToString() + " = " + cborObj[key].ToString());
-                if (cborObj[key].Type.ToString() == "Object")
-                {
-                    if (key.ToString().Contains("h'"))
-                    {
-                        string unicodeChar = HexToUnicodeString(key.ToString());
-                        if (!result.ContainsKey(key.ToString()))
-                        {
-                            result.Add(key.ToString(), string.Format("\"{0}\"",unicodeChar));
-                        }
-                    }
-
-                    Dahomey.Cbor.ObjectModel.CborObject currentObj = cborObj[key] as Dahomey.Cbor.ObjectModel.CborObject;
-                    if (currentObj != null && currentObj.Count > 0)
-                    {
-                        Dictionary<string, string> currentDic = IterateCborObject(currentObj);
-                        foreach (KeyValuePair<string, string> kvp in currentDic)
-                        {
-                            if (!result.ContainsKey(kvp.Key))
-                            {
-                                result.Add(kvp.Key, kvp.Value);
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    if (key.ToString().Contains("h'"))
-                    {
-                        string unicodeChar = HexToUnicodeString(key.ToString());
-                        if (!result.ContainsKey(key.ToString()))
-                        {
-                            result.Add(key.ToString(), string.Format("\"{0}\"",unicodeChar));
-                        }
-                    }
-                    else
-                    {
-                        System.Diagnostics.Debug.WriteLine(key.ToString());
-                    }
-
-                    if (cborObj[key].Type.ToString() == "ByteString")
-                    {
-                        string cborByteString = cborObj[key].ToString();
-                        string testing = HexToUnicodeString(cborByteString);
-                    }
-                }
-                //dahomeyByteStringKeyData = dahomeyByteStringKeyData.Replace(val.ToString(), unicodeChar1);
-            }
-            return result;
-        }
-
         [Test]
         public void ParseGrantTokenTest()
         {
@@ -225,6 +156,9 @@ namespace PubNubMessaging.Tests
                 };
                 Pubnub pubnub = new Pubnub(config);
                 PNGrantToken pnGrant = pubnub.ParseToken(token);
+
+                string cborFormat = pubnub.EncodeTokenToCBOR(pnGrant);
+
                 if (pnGrant != null)
                 {
                     actual = Newtonsoft.Json.JsonConvert.SerializeObject(pnGrant);
@@ -240,12 +174,45 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+        public void GetTokenByResourceTypeAndIdTest()
+        {
+            string expected = "p0F2AkF0Gl2BkWVDdHRsGGRDcmVzpERjaGFuoENncnCgQ3VzcqBDc3BjoENwYXSkRGNoYW6gQ2dycKBDdXNyo2ZeZW1wLSoDZl5tZ3ItKhgbYl4kAUNzcGOjaV5wdWJsaWMtKgNqXnByaXZhdGUtKhgbYl4kAURtZXRhoENzaWdYIBzbsFygBNyhETvsHwgDJm79KaCNk7nNwG8P0ra4UBoh";
+            string actual = "";
+            string token = "p0F2AkF0Gl2BkWVDdHRsGGRDcmVzpERjaGFuoENncnCgQ3VzcqBDc3BjoENwYXSkRGNoYW6gQ2dycKBDdXNyo2ZeZW1wLSoDZl5tZ3ItKhgbYl4kAUNzcGOjaV5wdWJsaWMtKgNqXnByaXZhdGUtKhgbYl4kAURtZXRhoENzaWdYIBzbsFygBNyhETvsHwgDJm79KaCNk7nNwG8P0ra4UBoh";
+            try
+            {
+                PNConfiguration config = new PNConfiguration
+                {
+                    SubscribeKey = PubnubCommon.SubscribeKey,
+                    PublishKey = PubnubCommon.PublishKey,
+                };
+                Pubnub pubnub = new Pubnub(config);
+                pubnub.SetToken(token);
+
+                actual = pubnub.GetToken("user", "emp-usr-1");
+                
+                //if (pnGrant != null)
+                //{
+                //    actual = Newtonsoft.Json.JsonConvert.SerializeObject(pnGrant);
+                //}
+                pubnub.ClearTokens();
+
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Exception = " + ex.ToString());
+            }
+            Assert.AreEqual(actual, expected);
+        }
+
+        [Test]
         public void NewCborParseTest()
         {
             string expected = "{\"v\":2,\"t\":1568264210,\"ttl\":100,\"res\":{\"chan\":{},\"grp\":{},\"usr\":{\"myuser1\":19},\"spc\":{\"myspace1\":11}},\"pat\":{\"chan\":{},\"grp\":{},\"usr\":{},\"spc\":{}},\"meta\":{},\"sig\":\"HtcG6s5fuao9T2bZCgWRQ3cmR27lnYT03yVs6c6H23o=\"}";
             string actual = "";
-            //string token = "p0F2AkF0Gl150BJDdHRsGGRDcmVzpERjaGFuoENncnCgQ3VzcqFnbXl1c2VyMRNDc3BjoWhteXNwYWNlMQtDcGF0pERjaGFuoENncnCgQ3VzcqBDc3BjoERtZXRhoENzaWdYIB7XBurOX7mqPU9m2QoFkUN3Jkdu5Z2E9N8lbOnOh9t6";
-            string token = "p0F2AkF0Gl2BEIJDdHRsGGRDcmVzpERjaGFuoENncnCgQ3VzcqBDc3BjoENwYXSkRGNoYW6gQ2dycKBDdXNyomZeZW1wLSoDZl5tZ3ItKhgbQ3NwY6JpXnB1YmxpYy0qA2pecHJpdmF0ZS0qGBtEbWV0YaBDc2lnWCAsvzGmd2rcgtr9rcs4r2tqC87YSppSYqs9CKfaM5IRZA==";
+            string token = "p0F2AkF0Gl150BJDdHRsGGRDcmVzpERjaGFuoENncnCgQ3VzcqFnbXl1c2VyMRNDc3BjoWhteXNwYWNlMQtDcGF0pERjaGFuoENncnCgQ3VzcqBDc3BjoERtZXRhoENzaWdYIB7XBurOX7mqPU9m2QoFkUN3Jkdu5Z2E9N8lbOnOh9t6";
+            //string token = "p0F2AkF0Gl2BEIJDdHRsGGRDcmVzpERjaGFuoENncnCgQ3VzcqBDc3BjoENwYXSkRGNoYW6gQ2dycKBDdXNyomZeZW1wLSoDZl5tZ3ItKhgbQ3NwY6JpXnB1YmxpYy0qA2pecHJpdmF0ZS0qGBtEbWV0YaBDc2lnWCAsvzGmd2rcgtr9rcs4r2tqC87YSppSYqs9CKfaM5IRZA==";
+            //string token = "p0F2AkF0Gl2B12pDdHRsA0NyZXOkRGNoYW6gQ2dycKBDdXNyoW50ZXN0dXNlcl8xODIyORgfQ3NwY6FvdGVzdHNwYWNlXzk4NjI4GB9DcGF0pERjaGFuoENncnCgQ3VzcqBDc3BjoERtZXRhoENzaWdYIPVDkcaEMDN6R7-98i84C5BXMn0NsXCmTV3EmWkMyz0y"; //Rajat
             try
             {
                 token = token.Replace('_', '/').Replace('-', '+');//.TrimEnd(new char[] { '=' });
@@ -271,66 +238,6 @@ namespace PubNubMessaging.Tests
             }
             Assert.AreEqual(actual, expected);
         }
-
-        [Test]
-        public void DahomeyCborParseTest()
-        {
-            string expected = "{\"v\":2,\"t\":1568264210,\"ttl\":100,\"res\":{\"chan\":{},\"grp\":{},\"usr\":{\"myuser1\":19},\"spc\":{\"myspace1\":11}},\"pat\":{\"chan\":{},\"grp\":{},\"usr\":{},\"spc\":{}},\"meta\":{},\"sig\":[30,-41,6,-22,-50,95,-71,-86,61,79,102,-39,10,5,-111,67,119,38,71,110,-27,-99,-124,-12,-33,37,108,-23,-50,-121,-37,122]}";
-            string actual = "";
-            string token = "p0F2AkF0Gl150BJDdHRsGGRDcmVzpERjaGFuoENncnCgQ3VzcqFnbXl1c2VyMRNDc3BjoWhteXNwYWNlMQtDcGF0pERjaGFuoENncnCgQ3VzcqBDc3BjoERtZXRhoENzaWdYIB7XBurOX7mqPU9m2QoFkUN3Jkdu5Z2E9N8lbOnOh9t6";
-            try
-            {
-                token = token.Replace('_', '/').Replace('-', '+').TrimEnd(new char[] { '=' });
-                byte[] tokenByteArray = Convert.FromBase64String(token);
-                System.IO.Stream stream = new System.IO.MemoryStream(tokenByteArray);
-
-                Dahomey.Cbor.CborOptions options = new Dahomey.Cbor.CborOptions() { IsIndented = false,  EnumFormat = Dahomey.Cbor.ValueFormat.WriteToString };
-                Dahomey.Cbor.ObjectModel.CborObject dahomeyRawcborData = Dahomey.Cbor.Cbor.DeserializeAsync<Dahomey.Cbor.ObjectModel.CborObject>(stream, options).Result;
-                string dahomeyByteStringKeyData = dahomeyRawcborData.ToString();
-                if (dahomeyRawcborData != null && dahomeyRawcborData.Count > 0)
-                {
-                    Dictionary<string, string> updates = IterateCborObject(dahomeyRawcborData);
-
-                    foreach(KeyValuePair<string, string> kvp in updates)
-                    {
-                        dahomeyByteStringKeyData = dahomeyByteStringKeyData.Replace(kvp.Key, kvp.Value);
-                    }
-                }
-                System.Diagnostics.Debug.WriteLine("dahomeyRawcborData = " + dahomeyByteStringKeyData);
-                actual = dahomeyByteStringKeyData;
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Exception = " + ex.ToString());
-            }
-            Assert.AreEqual(actual, expected);
-        }
-
-        [Test]
-        public void PeteroCborParseTest()
-        {
-            string expected = "{\"v\":2,\"t\":1568264210,\"ttl\":100,\"res\":{\"chan\":{},\"grp\":{},\"usr\":{\"myuser1\":19},\"spc\":{\"myspace1\":11}},\"pat\":{\"chan\":{},\"grp\":{},\"usr\":{},\"spc\":{}},\"meta\":{},\"sig\":[30,-41,6,-22,-50,95,-71,-86,61,79,102,-39,10,5,-111,67,119,38,71,110,-27,-99,-124,-12,-33,37,108,-23,-50,-121,-37,122]}";
-            string actual = "";
-            string token = "p0F2AkF0Gl150BJDdHRsGGRDcmVzpERjaGFuoENncnCgQ3VzcqFnbXl1c2VyMRNDc3BjoWhteXNwYWNlMQtDcGF0pERjaGFuoENncnCgQ3VzcqBDc3BjoERtZXRhoENzaWdYIB7XBurOX7mqPU9m2QoFkUN3Jkdu5Z2E9N8lbOnOh9t6";
-            try
-            {
-                token = token.Replace('_', '/').Replace('-', '+').TrimEnd(new char[] { '=' });
-                byte[] tokenByteArray = Convert.FromBase64String(token);
-                System.Diagnostics.Debug.WriteLine(string.Join("], [", tokenByteArray));
-                System.IO.Stream stream = new System.IO.MemoryStream(tokenByteArray);
-                PeterO.Cbor.CBORObject peterCborObj = PeterO.Cbor.CBORObject.Read(stream);
-                //PeterO.Cbor.CBORObject peterCborObj = PeterO.Cbor.CBORObject.DecodeFromBytes(tokenByteArray);
-                string peteroByteStringKeyData = peterCborObj.ToString();
-                System.Diagnostics.Debug.WriteLine("peterCborObj = " + peteroByteStringKeyData);
-                actual = peteroByteStringKeyData;
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Exception = " + ex.ToString());
-            }
-            Assert.AreEqual(actual, expected);
-        }
-
 
         /// <summary>
         /// Tests the null encryption.

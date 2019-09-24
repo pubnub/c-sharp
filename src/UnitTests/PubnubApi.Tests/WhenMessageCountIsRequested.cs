@@ -21,7 +21,7 @@ namespace PubNubMessaging.Tests
         private static string channelGroupName = "hello_my_group";
         private static string channelName1 = "hello_my_channel1";
         private static string channelName2 = "hello_my_channel2";
-        private static string authKey = "myAuth";
+        private static string authKey = "myauth";
 
         private static Pubnub pubnub;
         private static Server server;
@@ -35,12 +35,7 @@ namespace PubNubMessaging.Tests
             MockServer.LoggingMethod.MockServerLog = unitLog;
             server.Start();
 
-            if (!PubnubCommon.PAMEnabled) { return; }
-
-            if (PubnubCommon.PAMEnabled && !string.IsNullOrEmpty(PubnubCommon.SecretKey))
-            {
-                return;
-            }
+            if (!PubnubCommon.PAMServerSideGrant) { return; }
 
             receivedGrantMessage = false;
 
@@ -115,9 +110,13 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = true
             };
-            if (PubnubCommon.PAMEnabled)
+            if (PubnubCommon.PAMServerSideRun)
             {
                 config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
             }
 
             pubnub = createPubNubInstance(config);
@@ -175,9 +174,13 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = true
             };
-            if (PubnubCommon.PAMEnabled)
+            if (PubnubCommon.PAMServerSideRun)
             {
                 config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
             }
 
             pubnub = createPubNubInstance(config);
@@ -187,7 +190,7 @@ namespace PubNubMessaging.Tests
             server.AddRequest(new Request()
                     .WithMethod("GET")
                     .WithPath(string.Format("/v1/channel-registration/sub-key/{0}/channel-group/{1}", PubnubCommon.SubscribeKey, channelGroupName))
-                    .WithParameter("add", channelName1)
+                    .WithParameter("add", channelName2)
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")

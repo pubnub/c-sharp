@@ -66,7 +66,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            if (PubnubCommon.PAMEnabled)
+            if (PubnubCommon.PAMServerSideRun)
             {
                 auditManualEvent = new ManualResetEvent(false);
                 pubnub.Audit().Execute(new AuditResult());
@@ -122,7 +122,7 @@ namespace PubNubMessaging.Tests
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
 
-            if (PubnubCommon.PAMEnabled)
+            if (PubnubCommon.PAMServerSideRun)
             {
                 auditManualEvent = new ManualResetEvent(false);
                 pubnub.Audit().Channel(channel).Execute(new AuditResult());
@@ -175,7 +175,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            if (PubnubCommon.PAMEnabled)
+            if (PubnubCommon.PAMServerSideRun)
             {
                 auditManualEvent = new ManualResetEvent(false);
                 pubnub.Audit().ChannelGroup(channelgroup).Execute(new AuditResult());

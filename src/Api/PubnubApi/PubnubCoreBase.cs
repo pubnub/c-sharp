@@ -1798,6 +1798,14 @@ namespace PubnubApi
             }
         }
 
+        protected static void TerminateTokenManager()
+        {
+            if (pubnubTokenMgr != null)
+            {
+                pubnubTokenMgr.Destroy();
+            }
+        }
+
         protected static void TerminateDedupeManager()
         {
             if (pubnubSubscribeDuplicationManager != null)
@@ -1975,6 +1983,7 @@ namespace PubnubApi
             TerminatePresenceHeartbeatTimer();
             TerminateTelemetry();
             TerminateDedupeManager();
+            TerminateTokenManager();
 
             if (MultiChannelSubscribe.Count > 0 && MultiChannelSubscribe.ContainsKey(PubnubInstance.InstanceId))
             {
