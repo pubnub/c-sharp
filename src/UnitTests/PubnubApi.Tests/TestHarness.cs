@@ -18,7 +18,7 @@ namespace PubNubMessaging.Tests
                 unitTest.Timetoken = 1567581283;
                 unitTest.RequestId = "myRequestId";
                 unitTest.InternetAvailable = true;
-                unitTest.SdkVersion = "PubNub-Go/4.2.7";
+                unitTest.SdkVersion = "Csharp";
                 unitTest.IncludePnsdk = true;
                 unitTest.IncludeUuid = true;
 
@@ -28,8 +28,7 @@ namespace PubNubMessaging.Tests
             }
             else
             {
-                pnConfiguration.Origin = "ps.pndsn.com";// "ingress.bronze.aws-pdx-1.ps.pn";// "ps.pndsn.com";
-                //pnConfiguration.Secure = false;
+                pnConfiguration.Origin = "ps.pndsn.com";
                 pubnub = new Pubnub(pnConfiguration);
             }
             return pubnub;

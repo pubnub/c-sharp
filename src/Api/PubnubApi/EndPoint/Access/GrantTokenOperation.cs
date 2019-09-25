@@ -181,6 +181,11 @@ namespace PubnubApi.EndPoint
                 throw new MissingMemberException("Invalid secret key");
             }
 
+            if (this.grantTTL <= 0)
+            {
+                throw new MissingMemberException("Invalid TTL value");
+            }
+
             RequestState<PNAccessManagerTokenResult> requestState = new RequestState<PNAccessManagerTokenResult>();
             requestState.Channels = channelsPermission.Keys.ToArray();
             requestState.ChannelGroups = channelGroupsPermission.Keys.ToArray();

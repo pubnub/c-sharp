@@ -4,7 +4,7 @@ schema: 1
 scm: github.com/pubnub/c-sharp
 changelog: 
   - version: 4.1.0.0
-    date: September 24, 2019
+    date: September 26, 2019
     changes:
       - type: Improvement
         text: Fix for MessageCounts when multiple channels are used.

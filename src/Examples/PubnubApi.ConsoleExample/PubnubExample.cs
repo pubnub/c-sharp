@@ -22,6 +22,8 @@ namespace PubnubApiDemo
 
         static private string authKey { get; set; } = "";
 
+        static private string grantToken { get; set; } = "";
+
         public class PlatformPubnubLog : IPubnubLog
         {
             public PlatformPubnubLog()
@@ -71,7 +73,7 @@ namespace PubnubApiDemo
             Console.ForegroundColor = ConsoleColor.Blue;
             if (origin.Trim() == "")
             {
-                origin = "ingress.bronze.aws-pdx-1.ps.pn";// "balancer1b.bronze.aws-pdx-1.ps.pn";// "ingress.bronze.aws-pdx-1.ps.pn";// "ps.pndsn.com";
+                origin = "ps.pndsn.com";
                 Console.WriteLine("Default Origin selected");
             }
             else
@@ -124,7 +126,7 @@ namespace PubnubApiDemo
             else
             {
                 Console.WriteLine("Default demo subscribe key provided");
-                subscribeKey = "sub-c-d7da9e58-c997-11e9-a139-dab2c75acd6f";// "demo-36";
+                subscribeKey = "demo-36";
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -139,7 +141,7 @@ namespace PubnubApiDemo
             else
             {
                 Console.WriteLine("Default demo publish key provided");
-                publishKey = "pub-c-03f156ea-a2e3-4c35-a733-9535824be897";// "demo-36";
+                publishKey = "demo-36";
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -154,7 +156,7 @@ namespace PubnubApiDemo
             else
             {
                 Console.WriteLine("Default demo Secret key provided");
-                secretKey = "";// "sec-c-MmUxNTZjMmYtNzFkNS00ODkzLWE2YjctNmQ4YzE5NWNmZDA3";// "sec-c-NjM2YTczYmQtYWY2NS00NmRlLTgxYTktZWMyOTMzZGQ4OWY5";// "demo-36";
+                secretKey = "demo-36";
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -275,30 +277,15 @@ namespace PubnubApiDemo
             config.EnableTelemetry = false;
             config.IncludeRequestIdentifier = false;
             config.IncludeInstanceIdentifier = false;
-            config.StoreTokensOnGrant = true;
             //config.Uuid = "csharpuuid";
 
             pubnub = new Pubnub(config);
 
-            string tk = "p0F2AkF0Gl2B57tDdHRsGGRDcmVzpERjaGFuoENncnCgQ3VzcqJtcGFuZHVfdXNlcmlkMBgfbXBhbmR1X3VzZXJpZDEYH0NzcGOibnBhbmR1X3NwYWNlaWQwGB9ucGFuZHVfc3BhY2VpZDEYH0NwYXSkRGNoYW6gQ2dycKBDdXNyo2ZeZW1wLSoDZl5tZ3ItKhgbYl4kAUNzcGOjaV5wdWJsaWMtKgNqXnByaXZhdGUtKhgbYl4kAURtZXRhoENzaWdYII0E3FdLGiiCdAXwATdzf5iKb84ThtdxGyOUm6V25VX8";
-            pubnub.SetToken(tk);
-            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(pubnub.ParseToken(tk)));
-            
             //Add listener to receive published messages and presence events
             pubnub.AddListener(new SubscribeCallbackExt(
                 delegate (Pubnub pnObj, PNMessageResult<object> pubMsg) { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(pubMsg)); },
                 delegate (Pubnub pnObj, PNPresenceEventResult presenceEvnt) { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(presenceEvnt)); },
-                delegate (Pubnub pnObj, PNStatus pnStatus) { Console.WriteLine("{0} {1} {2}", pnStatus.Operation, pnStatus.Category, pnStatus.StatusCode); }
-                ));
-
-            //Add listener to receive signal messages
-            pubnub.AddListener(new SubscribeCallbackExt(
                 delegate (Pubnub pnObj, PNSignalResult<object> signalMsg) { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(signalMsg)); },
-                delegate (Pubnub pnObj, PNStatus pnStatus) { Console.WriteLine("{0} {1} {2}", pnStatus.Operation, pnStatus.Category, pnStatus.StatusCode); }
-                ));
-
-            //Add listener to receive ObjectAPI event messages
-            pubnub.AddListener(new SubscribeCallbackExt(
                 delegate (Pubnub pnObj, PNObjectApiEventResult objectApiEventObj)
                 {
                     if (objectApiEventObj.Type == "user") { /* got user related event. */ }
@@ -317,7 +304,7 @@ namespace PubnubApiDemo
             Console.WriteLine("");
             while (!exitFlag)
             {
-                if (currentUserChoice < 1 || (currentUserChoice > 54 && currentUserChoice != 99))
+                if (currentUserChoice < 1 || (currentUserChoice > 55 && currentUserChoice != 99))
                 {
                     StringBuilder menuOptionsStringBuilder = new StringBuilder();
                     menuOptionsStringBuilder.AppendLine("ENTER 1 FOR Subscribe channel/channelgroup");
@@ -365,6 +352,7 @@ namespace PubnubApiDemo
                     menuOptionsStringBuilder.AppendLine("Enter 52 FOR Get Memberships");
                     menuOptionsStringBuilder.AppendLine("Enter 53 FOR Get Members");
                     menuOptionsStringBuilder.AppendLine("Enter 54 FOR GrantToken");
+                    menuOptionsStringBuilder.AppendLine("Enter 55 FOR SetToken");
                     menuOptionsStringBuilder.AppendLine("ENTER 99 FOR EXIT OR QUIT");
                     Console.WriteLine(menuOptionsStringBuilder.ToString());
                     userinput = Console.ReadLine();
@@ -1736,28 +1724,89 @@ namespace PubnubApiDemo
                         }
                         break;
                     case "54":
+                        Console.WriteLine("Enter UserId for PAM Grant.");
+                        string grantUserId = Console.ReadLine();
+
+                        Console.WriteLine("Enter SpaceId for PAM Grant.");
+                        string grantSpaceId = Console.ReadLine();
+
+                        Console.WriteLine("Enter the auth_key for PAMv2 Grant (optional).");
+                        string grantAuth = Console.ReadLine();
+
+                        Console.WriteLine("Read Access? Enter Y for Yes (default), N for No.");
+                        string grantReadAccess = Console.ReadLine();
+                        bool grantRead = (grantReadAccess.ToLower() == "n") ? false : true;
+
+                        Console.WriteLine("Write Access? Enter Y for Yes (default), N for No.");
+                        string grantwriteAccess = Console.ReadLine();
+                        bool grantWrite = (grantwriteAccess.ToLower() == "n") ? false : true;
+
+                        Console.WriteLine("Delete Access? Enter Y for Yes (default), N for No.");
+                        string grantDeleteAccess = Console.ReadLine();
+                        bool grantDelete = (grantDeleteAccess.ToLower() == "n") ? false : true;
+
+                        Console.WriteLine("Create Access? Enter Y for Yes (default), N for No.");
+                        string grantCreateAccess = Console.ReadLine();
+                        bool grantCreate = (grantCreateAccess.ToLower() == "n") ? false : true;
+
+                        Console.WriteLine("Manage Access? Enter Y for Yes (default), N for No.");
+                        string grantManageAccess = Console.ReadLine();
+                        bool grantManage = (grantManageAccess.ToLower() == "n") ? false : true;
+
+                        Console.WriteLine("How many minutes do you want to allow Grant Access? Enter the number of minutes." + Environment.NewLine + "Default = 1440 minutes (24 hours). Press ENTER now to accept default value.");
+                        int grantTokenTTL;
+                        string grantTokenTimeLimit = Console.ReadLine();
+                        if (string.IsNullOrEmpty(grantTokenTimeLimit.Trim()))
+                        {
+                            grantTokenTTL = 1440;
+                        }
+                        else
+                        {
+                            Int32.TryParse(grantTokenTimeLimit, out grantTokenTTL);
+                            if (grantTokenTTL <= 0) grantTokenTTL = 1440;
+                        }
+
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        StringBuilder pamTokenGrantStringBuilder = new StringBuilder();
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("UserId = {0}", grantUserId));
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("SpaceId = {0}", grantSpaceId));
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("auth_key = {0}", grantAuth));
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("Read Access = {0}", grantRead.ToString()));
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("Write Access = {0}", grantWrite.ToString()));
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("Delete Access = {0}", grantDelete.ToString()));
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("Create Access = {0}", grantCreate.ToString()));
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("Manage Access = {0}", grantManage.ToString()));
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("TTL = {0}", grantTokenTTL.ToString()));
+                        Console.WriteLine(pamTokenGrantStringBuilder.ToString());
+                        Console.ResetColor();
+                        Console.WriteLine();
+
+                        Console.WriteLine("Running PamGrantToken()");
                         pubnub.GrantToken()
                             .Users(new Dictionary<string, PNResourcePermission>() {
-                                { "pandu_userid0", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
-                                { "pandu_userid1", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } } })
+                                { grantUserId, new PNResourcePermission() { Read = grantRead, Write = grantWrite, Manage= grantManage, Create = grantCreate, Delete=grantDelete } } })
                             .Spaces(new Dictionary<string, PNResourcePermission>() {
-                                { "pandu_spaceid0", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
-                                { "pandu_spaceid1", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } } })
-                            .Users(new Dictionary<string, PNResourcePermission>() {
-                                { "^emp-*", new PNResourcePermission() { Read = true, Write = true } },
-                                { "^mgr-*", new PNResourcePermission() { Read = true, Write = true, Create = true, Delete = true } } }, true)
-                            .Spaces(new Dictionary<string, PNResourcePermission>() {
-                                { "^public-*", new PNResourcePermission() { Read = true, Write = true } },
-                                { "^private-*", new PNResourcePermission() { Read = true, Write = true, Create = true, Delete = true } } }, true)
-                            .TTL(100)
+                                { grantSpaceId, new PNResourcePermission() { Read = grantRead, Write = grantWrite, Manage= grantManage, Create = grantCreate, Delete=grantDelete } } })
+                            .TTL(grantTokenTTL)
                             .Execute(new PNAccessManagerTokenResultExt((result, status) =>
                             {
                                 if (result != null)
                                 {
                                     Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
                                 }
+                                else
+                                {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                                }
                             }));
 
+                        break;
+                    case "55":
+                        Console.WriteLine("Enter PAMv3 token (ensure NO secret key in config)");
+                        grantToken = Console.ReadLine();
+                        pubnub.SetToken(grantToken);
+                        Console.WriteLine();
+                        Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(pubnub.ParseToken(grantToken)));
                         break;
                     default:
                         Console.ForegroundColor = ConsoleColor.Red;
