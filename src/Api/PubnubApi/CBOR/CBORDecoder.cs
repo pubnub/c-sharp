@@ -194,7 +194,7 @@ namespace PubnubApi.CBOR
                 }
                 else
                 {
-                    throw new Exception();
+                    throw new NotSupportedException("dataItem");
                 }
             }
             return dataItem;
@@ -208,8 +208,6 @@ namespace PubnubApi.CBOR
 
             while (b >> 5 == 6)
             {
-
-
                 ulong extraInfo = (ulong)b & 0x1f;
                 ulong tagNum = 0;
                 if (extraInfo >= 24 && extraInfo <= 27)

@@ -102,8 +102,8 @@ namespace PubnubApi.EndPoint
                 }
             }
 
-            string[] channelNames = this.subscribeChannelNames.ToArray();
-            string[] channelGroupNames = this.subscribeChannelGroupNames.ToArray();
+            string[] channelNames = this.subscribeChannelNames != null ? this.subscribeChannelNames.ToArray() : null;
+            string[] channelGroupNames = this.subscribeChannelGroupNames != null ? this.subscribeChannelGroupNames.ToArray() : null;
 
             Subscribe(channelNames, channelGroupNames, this.queryParam);
         }

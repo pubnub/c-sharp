@@ -634,7 +634,7 @@ namespace PubnubApi
             url.Add(pubnubConfig.SubscribeKey);
             url.Add("channel");
 
-            if (string.IsNullOrEmpty(channelsCommaDelimited) && channelsCommaDelimited.Trim().Length <= 0)
+            if (string.IsNullOrEmpty(channelsCommaDelimited) || channelsCommaDelimited.Trim().Length <= 0)
             {
                 url.Add(",");
             }

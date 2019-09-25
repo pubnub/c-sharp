@@ -938,7 +938,6 @@ namespace PubnubApi
         internal protected string UrlProcessRequest<T>(Uri requestUri, RequestState<T> pubnubRequestState, bool terminateCurrentSubRequest, string jsonPostOrPatchData)
         {
             string channel = "";
-            string channelGroup = "";
             PNConfiguration currentConfig;
             IPubnubLog currentLog;
 
@@ -958,19 +957,15 @@ namespace PubnubApi
                 if (pubnubRequestState != null)
                 {
                     channel = (pubnubRequestState.Channels != null && pubnubRequestState.Channels.Length > 0) ? string.Join(",", pubnubRequestState.Channels.OrderBy(x => x).ToArray()) : ",";
-                    if (pubnubRequestState.ChannelGroups != null)
-                    {
-                        channelGroup = string.Join(",", pubnubRequestState.ChannelGroups.OrderBy(x => x).ToArray());
-                    }
-                }
 
-                if (ChannelRequest.ContainsKey(PubnubInstance.InstanceId) && !channel.Equals(",", StringComparison.CurrentCultureIgnoreCase) && !ChannelRequest[PubnubInstance.InstanceId].ContainsKey(channel) && (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation || pubnubRequestState.ResponseType == PNOperationType.Presence))
-                {
-                    if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig) && pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog))
+                    if (ChannelRequest.ContainsKey(PubnubInstance.InstanceId) && !channel.Equals(",", StringComparison.CurrentCultureIgnoreCase) && !ChannelRequest[PubnubInstance.InstanceId].ContainsKey(channel) && (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation || pubnubRequestState.ResponseType == PNOperationType.Presence))
                     {
-                        LoggingMethod.WriteToLog(currentLog, string.Format("DateTime {0}, UrlProcessRequest ChannelRequest PubnubInstance.InstanceId Channel NOT matching", DateTime.Now.ToString(CultureInfo.InvariantCulture)), currentConfig.LogVerbosity);
+                        if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig) && pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog))
+                        {
+                            LoggingMethod.WriteToLog(currentLog, string.Format("DateTime {0}, UrlProcessRequest ChannelRequest PubnubInstance.InstanceId Channel NOT matching", DateTime.Now.ToString(CultureInfo.InvariantCulture)), currentConfig.LogVerbosity);
+                        }
+                        return "";
                     }
-                    return "";
                 }
 
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
@@ -996,7 +991,7 @@ namespace PubnubApi
                     LoggingMethod.WriteToLog(currentLog, string.Format("DateTime {0}, Request={1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), requestUri.ToString()), currentConfig.LogVerbosity);
                 }
 
-                if (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation)
+                if (pubnubRequestState != null && pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation)
                 {
                     SubscribeRequestTracker.AddOrUpdate(PubnubInstance.InstanceId, DateTime.Now, (key, oldState) => DateTime.Now);
                 }
