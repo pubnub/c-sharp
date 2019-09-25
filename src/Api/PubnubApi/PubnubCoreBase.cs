@@ -998,12 +998,12 @@ namespace PubnubApi
 
                 string jsonString = "";
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
-                if (pubnubRequestState.UsePostMethod)
+                if (pubnubRequestState != null && pubnubRequestState.UsePostMethod)
                 {
                     Task<string> jsonResponse = pubnubHttp.SendRequestAndGetJsonResponseWithPOST(requestUri, pubnubRequestState, null, jsonPostOrPatchData);
                     jsonString = jsonResponse.Result;
                 }
-                else if (pubnubRequestState.UsePatchMethod)
+                else if (pubnubRequestState != null && pubnubRequestState.UsePatchMethod)
                 {
                     Task<string> jsonResponse = pubnubHttp.SendRequestAndGetJsonResponseWithPATCH(requestUri, pubnubRequestState, null, jsonPostOrPatchData);
                     jsonString = jsonResponse.Result;
@@ -1014,12 +1014,12 @@ namespace PubnubApi
                     jsonString = jsonResponse.Result;
                 }
 #else
-                if (pubnubRequestState.UsePostMethod)
+                if (pubnubRequestState != null && pubnubRequestState.UsePostMethod)
                 {
                     Task<string> jsonResponse = pubnubHttp.SendRequestAndGetJsonResponseWithPOST(requestUri, pubnubRequestState, request, jsonPostOrPatchData);
                     jsonString = jsonResponse.Result;
                 }
-                else if (pubnubRequestState.UsePatchMethod)
+                else if (pubnubRequestState != null && pubnubRequestState.UsePatchMethod)
                 {
                     Task<string> jsonResponse = pubnubHttp.SendRequestAndGetJsonResponseWithPATCH(requestUri, pubnubRequestState, request, jsonPostOrPatchData);
                     jsonString = jsonResponse.Result;

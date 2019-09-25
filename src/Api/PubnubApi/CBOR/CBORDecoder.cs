@@ -158,7 +158,7 @@ namespace PubnubApi.CBOR
                     if (header.additionalInfo == 24)
                     {
                         // no simple value in range 32-255 has been defined
-                        throw new Exception();
+                        throw new NotSupportedException("header.additionalInfo value 24 not supported");
                     }
 
                     if (header.additionalInfo == 25)
@@ -263,7 +263,7 @@ namespace PubnubApi.CBOR
             }
             else if (b > 27 && b < 31)
             {
-                throw new Exception();
+                throw new NotSupportedException();
             }
             else if (b == 31)
             {
