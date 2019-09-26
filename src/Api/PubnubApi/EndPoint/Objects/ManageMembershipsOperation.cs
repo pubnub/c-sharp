@@ -10,13 +10,14 @@ using Newtonsoft.Json;
 
 namespace PubnubApi.EndPoint
 {
-    public class MembershipsOperation : PubnubCoreBase
+    public class ManageMembershipsOperation : PubnubCoreBase
     {
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
         private readonly IPubnubUnitTest unit;
         private readonly IPubnubLog pubnubLog;
         private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
+        private readonly EndPoint.TokenManager pubnubTokenMgr;
 
         private string usrId = "";
         private Dictionary<string, object> mbrshipCustom;
@@ -28,7 +29,7 @@ namespace PubnubApi.EndPoint
         private int limit = -1;
         private bool includeCount;
 
-        private PNCallback<PNMembershipsResult> savedCallback;
+        private PNCallback<PNManageMembershipsResult> savedCallback;
         private Dictionary<string, object> queryParam;
 
         private class PNDeleteMembership
@@ -37,13 +38,14 @@ namespace PubnubApi.EndPoint
             public string SpaceId { get; set; }
         }
 
-        public MembershipsOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, instance)
+        public ManageMembershipsOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
             pubnubLog = log;
             pubnubTelemetryMgr = telemetryManager;
+            pubnubTokenMgr = tokenManager;
 
             if (instance != null)
             {
@@ -62,31 +64,31 @@ namespace PubnubApi.EndPoint
             }
         }
 
-        public MembershipsOperation UserId(string id)
+        public ManageMembershipsOperation UserId(string id)
         {
             this.usrId = id;
             return this;
         }
 
-        public MembershipsOperation Add(List<PNMembership> membership)
+        public ManageMembershipsOperation Add(List<PNMembership> membership)
         {
             this.addMembership = membership;
             return this;
         }
 
-        public MembershipsOperation Update(List<PNMembership> membership)
+        public ManageMembershipsOperation Update(List<PNMembership> membership)
         {
             this.updMembership = membership;
             return this;
         }
 
-        public MembershipsOperation Remove(List<string> spaceIdList)
+        public ManageMembershipsOperation Remove(List<string> spaceIdList)
         {
             this.delMembership = spaceIdList;
             return this;
         }
 
-        public MembershipsOperation Include(PNMembershipField[] includeOptions)
+        public ManageMembershipsOperation Include(PNMembershipField[] includeOptions)
         {
             if (includeOptions != null)
             {
@@ -96,37 +98,37 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
-        public MembershipsOperation Page(PNPage bookmarkPage)
+        public ManageMembershipsOperation Page(PNPage bookmarkPage)
         {
             this.page = bookmarkPage;
             return this;
         }
 
-        public MembershipsOperation Limit(int numberOfObjects)
+        public ManageMembershipsOperation Limit(int numberOfObjects)
         {
             this.limit = numberOfObjects;
             return this;
         }
 
-        public MembershipsOperation IncludeCount(bool includeTotalCount)
+        public ManageMembershipsOperation IncludeCount(bool includeTotalCount)
         {
             this.includeCount = includeTotalCount;
             return this;
         }
 
-        public MembershipsOperation CustomObject(Dictionary<string, object> membershipCustomObject)
+        public ManageMembershipsOperation CustomObject(Dictionary<string, object> membershipCustomObject)
         {
             this.mbrshipCustom = membershipCustomObject;
             return this;
         }
 
-        public MembershipsOperation QueryParam(Dictionary<string, object> customQueryParam)
+        public ManageMembershipsOperation QueryParam(Dictionary<string, object> customQueryParam)
         {
             this.queryParam = customQueryParam;
             return this;
         }
 
-        public void Execute(PNCallback<PNMembershipsResult> callback)
+        public void Execute(PNCallback<PNManageMembershipsResult> callback)
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
@@ -160,7 +162,7 @@ namespace PubnubApi.EndPoint
 #endif
         }
 
-        private void UpdateSpaceMembershipWithUser(string userId, List<PNMembership> addMembership, List<PNMembership> updateMembership, List<string> removeMembership, Dictionary<string, object> custom, PNPage page, int limit, bool includeCount, string includeOptions, Dictionary<string, object> externalQueryParam, PNCallback<PNMembershipsResult> callback)
+        private void UpdateSpaceMembershipWithUser(string userId, List<PNMembership> addMembership, List<PNMembership> updateMembership, List<string> removeMembership, Dictionary<string, object> custom, PNPage page, int limit, bool includeCount, string includeOptions, Dictionary<string, object> externalQueryParam, PNCallback<PNManageMembershipsResult> callback)
         {
             if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(userId.Trim()))
             {
@@ -181,17 +183,11 @@ namespace PubnubApi.EndPoint
             if (page == null) { internalPage = new PNPage(); }
             else { internalPage = page; }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildUpdateSpaceMembershipsWithUserRequest(userId, internalPage.Next, internalPage.Prev, limit, includeCount, includeOptions, externalQueryParam);
-
-            RequestState<PNMembershipsResult> requestState = new RequestState<PNMembershipsResult>();
-            requestState.ResponseType = PNOperationType.PNMembershipsOperation;
+            RequestState<PNManageMembershipsResult> requestState = new RequestState<PNManageMembershipsResult>();
+            requestState.ResponseType = PNOperationType.PNManageMembershipsOperation;
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;
-
-            string json = "";
 
             requestState.UsePatchMethod = true;
             Dictionary<string, object> messageEnvelope = new Dictionary<string, object>();
@@ -220,11 +216,16 @@ namespace PubnubApi.EndPoint
                 messageEnvelope.Add("custom", custom);
             }
             string patchMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
-            json = UrlProcessRequest<PNMembershipsResult>(request, requestState, false, patchMessage);
+
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            Uri request = urlBuilder.BuildUpdateSpaceMembershipsWithUserRequest("PATCH", patchMessage, userId, internalPage.Next, internalPage.Prev, limit, includeCount, includeOptions, externalQueryParam);
+
+            string json = UrlProcessRequest<PNManageMembershipsResult>(request, requestState, false, patchMessage);
 
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = ProcessJsonResponse<PNMembershipsResult>(requestState, json);
+                List<object> result = ProcessJsonResponse<PNManageMembershipsResult>(requestState, json);
                 ProcessResponseCallbacks(result, requestState);
             }
         }
@@ -236,6 +237,10 @@ namespace PubnubApi.EndPoint
             {
                 ret = "custom";
             }
+            else if (enumValue.ToLowerInvariant() == "user")
+            {
+                ret = "user";
+            }
             else if (enumValue.ToLowerInvariant() == "space")
             {
                 ret = "space";
@@ -243,6 +248,10 @@ namespace PubnubApi.EndPoint
             else if (enumValue.ToLowerInvariant() == "space_custom")
             {
                 ret = "space.custom";
+            }
+            else if (enumValue.ToLowerInvariant() == "user_custom")
+            {
+                ret = "user.custom";
             }
             return ret;
         }

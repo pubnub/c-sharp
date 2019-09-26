@@ -48,6 +48,7 @@ namespace PubnubApi
         private static IPubnubUnitTest unitTest;
         private static ConcurrentDictionary<string, IPubnubLog> pubnubLog { get; } = new ConcurrentDictionary<string, IPubnubLog>();
         private static EndPoint.TelemetryManager pubnubTelemetryMgr;
+        private readonly EndPoint.TokenManager pubnubTokenMgr;
         private static EndPoint.DuplicationManager pubnubSubscribeDuplicationManager { get; set; }
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
         private static HttpClient httpClientSubscribe { get; set; }
@@ -148,12 +149,13 @@ namespace PubnubApi
             set;
         } = new ConcurrentDictionary<string, DateTime>();
 
-        protected PubnubCoreBase(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, Pubnub instance)
+        protected PubnubCoreBase(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance)
         {
             if (pubnubConfiguation == null)
             {
                 throw new ArgumentException("PNConfiguration missing");
             }
+            this.pubnubTokenMgr = tokenManager;
             if (jsonPluggableLibrary == null)
             {
                 InternalConstructor(pubnubConfiguation, new NewtonsoftJsonDotNet(pubnubConfiguation,log), pubnubUnitTest, log, telemetryManager, instance);
@@ -792,6 +794,7 @@ namespace PubnubApi
                     case PNOperationType.PNMessageCountsOperation:
                     case PNOperationType.PNHereNowOperation:
                     case PNOperationType.PNWhereNowOperation:
+                    case PNOperationType.PNAccessManagerGrantToken:
                     case PNOperationType.PNAccessManagerGrant:
                     case PNOperationType.PNAccessManagerAudit:
                     case PNOperationType.RevokeAccess:
@@ -819,8 +822,8 @@ namespace PubnubApi
                     case PNOperationType.PNDeleteSpaceOperation:
                     case PNOperationType.PNGetSpacesOperation:
                     case PNOperationType.PNGetSpaceOperation:
-                    case PNOperationType.PNMembershipsOperation:
-                    case PNOperationType.PNMembersOperation:
+                    case PNOperationType.PNManageMembershipsOperation:
+                    case PNOperationType.PNManageMembersOperation:
                     case PNOperationType.PNGetMembershipsOperation:
                     case PNOperationType.PNGetMembersOperation:
                         if (result != null && result.Count > 0)
@@ -935,7 +938,6 @@ namespace PubnubApi
         internal protected string UrlProcessRequest<T>(Uri requestUri, RequestState<T> pubnubRequestState, bool terminateCurrentSubRequest, string jsonPostOrPatchData)
         {
             string channel = "";
-            string channelGroup = "";
             PNConfiguration currentConfig;
             IPubnubLog currentLog;
 
@@ -955,19 +957,15 @@ namespace PubnubApi
                 if (pubnubRequestState != null)
                 {
                     channel = (pubnubRequestState.Channels != null && pubnubRequestState.Channels.Length > 0) ? string.Join(",", pubnubRequestState.Channels.OrderBy(x => x).ToArray()) : ",";
-                    if (pubnubRequestState.ChannelGroups != null)
-                    {
-                        channelGroup = string.Join(",", pubnubRequestState.ChannelGroups.OrderBy(x => x).ToArray());
-                    }
-                }
 
-                if (ChannelRequest.ContainsKey(PubnubInstance.InstanceId) && !channel.Equals(",", StringComparison.CurrentCultureIgnoreCase) && !ChannelRequest[PubnubInstance.InstanceId].ContainsKey(channel) && (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation || pubnubRequestState.ResponseType == PNOperationType.Presence))
-                {
-                    if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig) && pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog))
+                    if (ChannelRequest.ContainsKey(PubnubInstance.InstanceId) && !channel.Equals(",", StringComparison.CurrentCultureIgnoreCase) && !ChannelRequest[PubnubInstance.InstanceId].ContainsKey(channel) && (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation || pubnubRequestState.ResponseType == PNOperationType.Presence))
                     {
-                        LoggingMethod.WriteToLog(currentLog, string.Format("DateTime {0}, UrlProcessRequest ChannelRequest PubnubInstance.InstanceId Channel NOT matching", DateTime.Now.ToString(CultureInfo.InvariantCulture)), currentConfig.LogVerbosity);
+                        if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig) && pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog))
+                        {
+                            LoggingMethod.WriteToLog(currentLog, string.Format("DateTime {0}, UrlProcessRequest ChannelRequest PubnubInstance.InstanceId Channel NOT matching", DateTime.Now.ToString(CultureInfo.InvariantCulture)), currentConfig.LogVerbosity);
+                        }
+                        return "";
                     }
-                    return "";
                 }
 
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
@@ -993,19 +991,19 @@ namespace PubnubApi
                     LoggingMethod.WriteToLog(currentLog, string.Format("DateTime {0}, Request={1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), requestUri.ToString()), currentConfig.LogVerbosity);
                 }
 
-                if (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation)
+                if (pubnubRequestState != null && pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation)
                 {
                     SubscribeRequestTracker.AddOrUpdate(PubnubInstance.InstanceId, DateTime.Now, (key, oldState) => DateTime.Now);
                 }
 
                 string jsonString = "";
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
-                if (pubnubRequestState.UsePostMethod)
+                if (pubnubRequestState != null && pubnubRequestState.UsePostMethod)
                 {
                     Task<string> jsonResponse = pubnubHttp.SendRequestAndGetJsonResponseWithPOST(requestUri, pubnubRequestState, null, jsonPostOrPatchData);
                     jsonString = jsonResponse.Result;
                 }
-                else if (pubnubRequestState.UsePatchMethod)
+                else if (pubnubRequestState != null && pubnubRequestState.UsePatchMethod)
                 {
                     Task<string> jsonResponse = pubnubHttp.SendRequestAndGetJsonResponseWithPATCH(requestUri, pubnubRequestState, null, jsonPostOrPatchData);
                     jsonString = jsonResponse.Result;
@@ -1016,12 +1014,12 @@ namespace PubnubApi
                     jsonString = jsonResponse.Result;
                 }
 #else
-                if (pubnubRequestState.UsePostMethod)
+                if (pubnubRequestState != null && pubnubRequestState.UsePostMethod)
                 {
                     Task<string> jsonResponse = pubnubHttp.SendRequestAndGetJsonResponseWithPOST(requestUri, pubnubRequestState, request, jsonPostOrPatchData);
                     jsonString = jsonResponse.Result;
                 }
-                else if (pubnubRequestState.UsePatchMethod)
+                else if (pubnubRequestState != null && pubnubRequestState.UsePatchMethod)
                 {
                     Task<string> jsonResponse = pubnubHttp.SendRequestAndGetJsonResponseWithPATCH(requestUri, pubnubRequestState, request, jsonPostOrPatchData);
                     jsonString = jsonResponse.Result;
@@ -1321,6 +1319,7 @@ namespace PubnubApi
                                 result.Add(whereNowDictionary);
                                 result.Add(multiChannel);
                                 break;
+                            case PNOperationType.PNAccessManagerGrantToken:
                             case PNOperationType.PNAccessManagerGrant:
                             case PNOperationType.PNAccessManagerAudit:
                             case PNOperationType.RevokeAccess:
@@ -1790,6 +1789,14 @@ namespace PubnubApi
             }
         }
 
+        protected void TerminateTokenManager()
+        {
+            if (pubnubTokenMgr != null)
+            {
+                pubnubTokenMgr.Destroy();
+            }
+        }
+
         protected static void TerminateDedupeManager()
         {
             if (pubnubSubscribeDuplicationManager != null)
@@ -1967,6 +1974,7 @@ namespace PubnubApi
             TerminatePresenceHeartbeatTimer();
             TerminateTelemetry();
             TerminateDedupeManager();
+            TerminateTokenManager();
 
             if (MultiChannelSubscribe.Count > 0 && MultiChannelSubscribe.ContainsKey(PubnubInstance.InstanceId))
             {

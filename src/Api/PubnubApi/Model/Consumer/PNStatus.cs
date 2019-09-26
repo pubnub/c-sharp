@@ -57,6 +57,16 @@ namespace PubnubApi
                             }
                         }
                         break;
+                    case PNOperationType.PNAccessManagerGrantToken:
+                        if (savedEndpointOperation is GrantTokenOperation)
+                        {
+                            GrantTokenOperation endpoint = savedEndpointOperation as GrantTokenOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
                     case PNOperationType.PNAccessManagerGrant:
                         if (savedEndpointOperation is GrantOperation)
                         {
@@ -231,6 +241,146 @@ namespace PubnubApi
                         if (savedEndpointOperation is TimeOperation)
                         {
                             TimeOperation endpoint = savedEndpointOperation as TimeOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
+                    case PNOperationType.PNCreateUserOperation:
+                        if (savedEndpointOperation is CreateUserOperation)
+                        {
+                            CreateUserOperation endpoint = savedEndpointOperation as CreateUserOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
+                    case PNOperationType.PNCreateSpaceOperation:
+                        if (savedEndpointOperation is CreateSpaceOperation)
+                        {
+                            CreateSpaceOperation endpoint = savedEndpointOperation as CreateSpaceOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
+                    case PNOperationType.PNUpdateUserOperation:
+                        if (savedEndpointOperation is UpdateUserOperation)
+                        {
+                            UpdateUserOperation endpoint = savedEndpointOperation as UpdateUserOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
+                    case PNOperationType.PNUpdateSpaceOperation:
+                        if (savedEndpointOperation is UpdateSpaceOperation)
+                        {
+                            UpdateSpaceOperation endpoint = savedEndpointOperation as UpdateSpaceOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
+                    case PNOperationType.PNDeleteUserOperation:
+                        if (savedEndpointOperation is DeleteUserOperation)
+                        {
+                            DeleteUserOperation endpoint = savedEndpointOperation as DeleteUserOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
+                    case PNOperationType.PNDeleteSpaceOperation:
+                        if (savedEndpointOperation is DeleteSpaceOperation)
+                        {
+                            DeleteSpaceOperation endpoint = savedEndpointOperation as DeleteSpaceOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
+                    case PNOperationType.PNGetUserOperation:
+                        if (savedEndpointOperation is GetUserOperation)
+                        {
+                            GetUserOperation endpoint = savedEndpointOperation as GetUserOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
+                    case PNOperationType.PNGetSpaceOperation:
+                        if (savedEndpointOperation is GetSpaceOperation)
+                        {
+                            GetSpaceOperation endpoint = savedEndpointOperation as GetSpaceOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
+                    case PNOperationType.PNGetUsersOperation:
+                        if (savedEndpointOperation is GetUsersOperation)
+                        {
+                            GetUsersOperation endpoint = savedEndpointOperation as GetUsersOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
+                    case PNOperationType.PNGetSpacesOperation:
+                        if (savedEndpointOperation is GetSpacesOperation)
+                        {
+                            GetSpacesOperation endpoint = savedEndpointOperation as GetSpacesOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
+                    case PNOperationType.PNManageMembershipsOperation:
+                        if (savedEndpointOperation is ManageMembershipsOperation)
+                        {
+                            ManageMembershipsOperation endpoint = savedEndpointOperation as ManageMembershipsOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
+                    case PNOperationType.PNManageMembersOperation:
+                        if (savedEndpointOperation is ManageMembersOperation)
+                        {
+                            ManageMembersOperation endpoint = savedEndpointOperation as ManageMembersOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
+                    case PNOperationType.PNGetMembershipsOperation:
+                        if (savedEndpointOperation is GetMembershipsOperation)
+                        {
+                            GetMembershipsOperation endpoint = savedEndpointOperation as GetMembershipsOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
+                    case PNOperationType.PNGetMembersOperation:
+                        if (savedEndpointOperation is GetMembersOperation)
+                        {
+                            GetMembersOperation endpoint = savedEndpointOperation as GetMembersOperation;
                             if (endpoint != null)
                             {
                                 endpoint.Retry();

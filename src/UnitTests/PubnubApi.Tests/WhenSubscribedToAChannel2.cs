@@ -23,7 +23,7 @@ namespace PubNubMessaging.Tests
         static int manualResetEventWaitTimeout = 310 * 1000;
         private static string channel = "hello_my_channel";
         private static string[] channelsGrant = { "hello_my_channel", "hello_my_channel1", "hello_my_channel2" };
-        private static string authKey = "myAuth";
+        private static string authKey = "myauth";
         private static string currentTestCase = "";
 
         private static Pubnub pubnub;
@@ -47,7 +47,7 @@ namespace PubNubMessaging.Tests
             MockServer.LoggingMethod.MockServerLog = unitLog;
             server.Start();
 
-            if (!PubnubCommon.PAMEnabled)
+            if (!PubnubCommon.PAMServerSideGrant)
             {
                 return;
             }
@@ -118,20 +118,31 @@ namespace PubNubMessaging.Tests
         private static void CommonSubscribeShouldReturnReceivedMessageBasedOnParams(string secretKey, string cipherKey, bool ssl)
         {
             receivedMessage = false;
+            if (PubnubCommon.PAMServerSideRun && string.IsNullOrEmpty(secretKey))
+            {
+                Assert.Ignore("Ignored for Server side run");
+            }
 
             PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                SecretKey = secretKey,
                 CipherKey = cipherKey,
                 Uuid = "mytestuuid",
-                AuthKey = authKey,
                 Secure = ssl,
                 LogVerbosity = PNLogVerbosity.BODY,
                 PubnubLog = new TestLog(),
                 NonSubscribeRequestTimeout = 120
             };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = secretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+
             server.RunOnHttps(ssl);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
@@ -305,20 +316,31 @@ namespace PubNubMessaging.Tests
         private static void CommonSubscribeShouldReturnEmojiMessageBasedOnParams(string secretKey, string cipherKey, bool ssl)
         {
             receivedMessage = false;
+            if (PubnubCommon.PAMServerSideRun && string.IsNullOrEmpty(secretKey))
+            {
+                Assert.Ignore("Ignored for Server side run");
+            }
 
             PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                SecretKey = secretKey,
                 CipherKey = cipherKey,
                 Uuid = "mytestuuid",
-                AuthKey = authKey,
                 Secure = ssl,
                 LogVerbosity = PNLogVerbosity.BODY,
                 PubnubLog = new TestLog(),
                 NonSubscribeRequestTimeout = 120
             };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = secretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+
             server.RunOnHttps(ssl);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();

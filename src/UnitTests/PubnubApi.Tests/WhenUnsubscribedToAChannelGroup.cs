@@ -12,7 +12,7 @@ namespace PubNubMessaging.Tests
     public class WhenUnsubscribedToAChannelGroup : TestHarness
     {
         private static string channelGroupName = "hello_my_group";
-        private static string authKey = "myAuth";
+        private static string authKey = "myauth";
         private static Pubnub pubnub;
         private static Server server;
 
@@ -25,7 +25,7 @@ namespace PubNubMessaging.Tests
             MockServer.LoggingMethod.MockServerLog = unitLog;
             server.Start();
 
-            if (!PubnubCommon.PAMEnabled) { return; }
+            if (!PubnubCommon.PAMServerSideGrant) { return; }
 
             bool receivedGrantMessage = false;
 
@@ -124,10 +124,17 @@ namespace PubNubMessaging.Tests
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                AuthKey = authKey,
                 Uuid = "mytestuuid",
                 Secure = false
             };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
             server.RunOnHttps(false);
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);

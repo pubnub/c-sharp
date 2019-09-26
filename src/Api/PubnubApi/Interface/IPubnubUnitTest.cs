@@ -31,5 +31,17 @@ namespace PubnubApi
             get;
             set;
         }
+
+        bool IncludePnsdk
+        {
+            get;
+            set;
+        }
+
+        bool IncludeUuid
+        {
+            get;
+            set;
+        }
     }
 }

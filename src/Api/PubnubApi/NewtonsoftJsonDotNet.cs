@@ -589,6 +589,13 @@ namespace PubnubApi
                 ret = (T)Convert.ChangeType(ack, typeof(PNAccessManagerGrantResult), CultureInfo.InvariantCulture);
 #endregion
             }
+            else if (typeof(T) == typeof(PNAccessManagerTokenResult))
+            {
+                #region "PNAccessManagerTokenResult"
+                PNAccessManagerTokenResult result = PNGrantTokenJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNAccessManagerTokenResult), CultureInfo.InvariantCulture);
+                #endregion
+            }
             else if (typeof(T) == typeof(PNAccessManagerAuditResult))
             {
 #region "PNAccessManagerAuditResult"
@@ -1384,18 +1391,18 @@ namespace PubnubApi
                 ret = (T)Convert.ChangeType(result, typeof(PNGetSpaceResult), CultureInfo.InvariantCulture);
                 #endregion
             }
-            else if (typeof(T) == typeof(PNMembershipsResult))
+            else if (typeof(T) == typeof(PNManageMembershipsResult))
             {
                 #region "PNMembershipsResult"
-                PNMembershipsResult result = PNMembershipsJsonDataParse.GetObject(listObject);
-                ret = (T)Convert.ChangeType(result, typeof(PNMembershipsResult), CultureInfo.InvariantCulture);
+                PNManageMembershipsResult result = PNMembershipsJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNManageMembershipsResult), CultureInfo.InvariantCulture);
                 #endregion
             }
-            else if (typeof(T) == typeof(PNMembersResult))
+            else if (typeof(T) == typeof(PNManageMembersResult))
             {
                 #region "PNMembersResult"
-                PNMembersResult result = PNMembersJsonDataParse.GetObject(listObject);
-                ret = (T)Convert.ChangeType(result, typeof(PNMembersResult), CultureInfo.InvariantCulture);
+                PNManageMembersResult result = PNManageMembersJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNManageMembersResult), CultureInfo.InvariantCulture);
                 #endregion
             }
             else if (typeof(T) == typeof(PNGetMembershipsResult))

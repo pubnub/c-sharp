@@ -5,11 +5,11 @@ using System.Text;
 
 namespace PubnubApi
 {
-    internal static class PNMembersJsonDataParse
+    internal static class PNManageMembersJsonDataParse
     {
-        internal static PNMembersResult GetObject(List<object> listObject)
+        internal static PNManageMembersResult GetObject(List<object> listObject)
         {
-            PNMembersResult result = null;
+            PNManageMembersResult result = null;
             for (int listIndex = 0; listIndex < listObject.Count; listIndex++)
             {
                 Dictionary<string, object> dicObj = JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[listIndex]);
@@ -17,11 +17,11 @@ namespace PubnubApi
                 {
                     if (result == null)
                     {
-                        result = new PNMembersResult();
+                        result = new PNManageMembersResult();
                     }
                     if (dicObj.ContainsKey("data") && dicObj["data"] != null)
                     {
-                        result.Members = new List<PNMembersItemResult>();
+                        result.Members = new List<PNManageMembersItemResult>();
 
                         object[] userArray = JsonDataParseInternalUtil.ConvertToObjectArray(dicObj["data"]);
                         if (userArray != null && userArray.Length > 0)
@@ -31,7 +31,7 @@ namespace PubnubApi
                                 Dictionary<string, object> getMbrItemDataDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(userArray[index]);
                                 if (getMbrItemDataDic != null && getMbrItemDataDic.Count > 0)
                                 {
-                                    var mbrItem = new PNMembersItemResult
+                                    var mbrItem = new PNManageMembersItemResult
                                     {
                                         UserId = (getMbrItemDataDic.ContainsKey("id") && getMbrItemDataDic["id"] != null) ? getMbrItemDataDic["id"].ToString() : "",
                                         Created = (getMbrItemDataDic.ContainsKey("created") && getMbrItemDataDic["created"] != null) ? getMbrItemDataDic["created"].ToString() : "",
@@ -43,7 +43,7 @@ namespace PubnubApi
                                     }
                                     if (getMbrItemDataDic.ContainsKey("user"))
                                     {
-                                        Dictionary<string, object> userDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(getMbrItemDataDic["space"]);
+                                        Dictionary<string, object> userDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(getMbrItemDataDic["user"]);
                                         if (userDic != null && userDic.Count > 0)
                                         {
                                             var userResult = new PNUserResult

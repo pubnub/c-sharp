@@ -112,6 +112,7 @@ src/Examples/PubnubApiPCL.XamariniMacExample/obj/*
 /src/UnitTests/PubnubApiPCL.Silverlight50.Tests/*.user
 
 /src/*.userprefs
+/src/.vs/*
 
 /monotouch/packages/*
 /monotouch/PubnubMessagingExample/bin/*

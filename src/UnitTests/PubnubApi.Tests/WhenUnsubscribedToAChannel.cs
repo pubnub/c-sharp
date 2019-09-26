@@ -19,7 +19,7 @@ namespace PubNubMessaging.Tests
 
         private static int manualResetEventWaitTimeout = 310 * 1000;
         private static string channel = "hello_my_channel";
-        private static string authKey = "myAuth";
+        private static string authKey = "myauth";
         private static string currentTestCase = "";
 
         private static Pubnub pubnub;
@@ -36,7 +36,7 @@ namespace PubNubMessaging.Tests
             MockServer.LoggingMethod.MockServerLog = unitLog;
             server.Start();
 
-            if (!PubnubCommon.PAMEnabled) { return; }
+            if (!PubnubCommon.PAMServerSideGrant) { return; }
 
             receivedGrantMessage = false;
 
@@ -102,10 +102,17 @@ namespace PubNubMessaging.Tests
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                AuthKey = authKey,
                 Uuid = "mytestuuid",
                 Secure = false
             };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
             server.RunOnHttps(false);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();

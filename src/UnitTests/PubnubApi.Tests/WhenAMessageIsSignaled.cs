@@ -17,6 +17,7 @@ namespace PubNubMessaging.Tests
         private static int manualResetEventWaitTimeout = 310 * 1000;
         private static Pubnub pubnub;
         private static Server server;
+        private static string authKey = "myauth";
 
         [TestFixtureSetUp]
         public static void Init()
@@ -27,16 +28,10 @@ namespace PubNubMessaging.Tests
             MockServer.LoggingMethod.MockServerLog = unitLog;
             server.Start();
 
-            if (!PubnubCommon.PAMEnabled) { return; }
-
-            if (PubnubCommon.PAMEnabled && string.IsNullOrEmpty(PubnubCommon.SecretKey))
-            {
-                return;
-            }
+            if (!PubnubCommon.PAMServerSideGrant) { return; }
 
             bool receivedGrantMessage = false;
             string channel = "hello_my_channel";
-            string authKey = "myAuth";
 
             PNConfiguration config = new PNConfiguration
             {
@@ -138,9 +133,13 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = false
             };
-            if (PubnubCommon.PAMEnabled)
+            if (PubnubCommon.PAMServerSideRun)
             {
                 config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
             }
             server.RunOnHttps(false);
             pubnub = createPubNubInstance(config);
@@ -200,10 +199,18 @@ namespace PubNubMessaging.Tests
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                SecretKey = PubnubCommon.SecretKey,
                 Uuid = "mytestuuid",
                 Secure = false
             };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+
             server.RunOnHttps(config.Secure);
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
@@ -299,11 +306,19 @@ namespace PubNubMessaging.Tests
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                SecretKey = PubnubCommon.SecretKey,
                 CipherKey = "testcipherkey",
                 Uuid = "mytestuuid",
                 Secure = false
             };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+
             server.RunOnHttps(config.Secure);
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);

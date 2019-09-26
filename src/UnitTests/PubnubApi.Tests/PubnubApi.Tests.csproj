@@ -51,7 +51,6 @@
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="nunit.framework, Version=2.6.1.12217, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <HintPath>..\..\packages\NUnit.2.6.1\lib\nunit.framework.dll</HintPath>
@@ -69,6 +68,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Net" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -95,6 +95,42 @@
     <Compile Include="..\..\Api\PubnubApi\Callbacks\SubscribeCallback.cs">
       <Link>LinkedSourceCode\Callbacks\SubscribeCallback.cs</Link>
     </Compile>
+    <Compile Include="..\..\Api\PubnubApi\CBOR\CBORDecoder.cs">
+      <Link>LinkedSourceCode\CBOR\CBORDecoder.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\CBOR\CBORDecoderExtensions.cs">
+      <Link>LinkedSourceCode\CBOR\CBORDecoderExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\CBOR\ItemHeader.cs">
+      <Link>LinkedSourceCode\CBOR\ItemHeader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\CBOR\ItemTag.cs">
+      <Link>LinkedSourceCode\CBOR\ItemTag.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\CBOR\MajorType.cs">
+      <Link>LinkedSourceCode\CBOR\MajorType.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\CBOR\Tags\Base64Tag.cs">
+      <Link>LinkedSourceCode\CBOR\Tags\Base64Tag.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\CBOR\Tags\BigIntegerTag.cs">
+      <Link>LinkedSourceCode\CBOR\Tags\BigIntegerTag.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\CBOR\Tags\CBORItemTag.cs">
+      <Link>LinkedSourceCode\CBOR\Tags\CBORItemTag.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\CBOR\Tags\TagRegistry.cs">
+      <Link>LinkedSourceCode\CBOR\Tags\TagRegistry.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\CBOR\Tags\UnknownTag.cs">
+      <Link>LinkedSourceCode\CBOR\Tags\UnknownTag.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\CBOR\Tags\UriTag.cs">
+      <Link>LinkedSourceCode\CBOR\Tags\UriTag.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\CBOR\UndefinedValue.cs">
+      <Link>LinkedSourceCode\CBOR\UndefinedValue.cs</Link>
+    </Compile>
     <Compile Include="..\..\Api\PubnubApi\ClientNetworkStatus.cs">
       <Link>LinkedSourceCode\ClientNetworkStatus.cs</Link>
     </Compile>
@@ -106,6 +142,9 @@
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\EndPoint\Access\GrantOperation.cs">
       <Link>LinkedSourceCode\EndPoint\Access\GrantOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\EndPoint\Access\GrantTokenOperation.cs">
+      <Link>LinkedSourceCode\EndPoint\Access\GrantTokenOperation.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\EndPoint\ChannelGroup\AddChannelsToChannelGroupOperation.cs">
       <Link>LinkedSourceCode\EndPoint\ChannelGroup\AddChannelsToChannelGroupOperation.cs</Link>
@@ -161,11 +200,11 @@
     <Compile Include="..\..\Api\PubnubApi\EndPoint\Objects\GetUsersOperation.cs">
       <Link>LinkedSourceCode\EndPoint\Objects\GetUsersOperation.cs</Link>
     </Compile>
-    <Compile Include="..\..\Api\PubnubApi\EndPoint\Objects\MembershipsOperation.cs">
-      <Link>LinkedSourceCode\EndPoint\Objects\MembershipsOperation.cs</Link>
+    <Compile Include="..\..\Api\PubnubApi\EndPoint\Objects\ManageMembershipsOperation.cs">
+      <Link>LinkedSourceCode\EndPoint\Objects\ManageMembershipsOperation.cs</Link>
     </Compile>
-    <Compile Include="..\..\Api\PubnubApi\EndPoint\Objects\MembersOperation.cs">
-      <Link>LinkedSourceCode\EndPoint\Objects\MembersOperation.cs</Link>
+    <Compile Include="..\..\Api\PubnubApi\EndPoint\Objects\ManageMembersOperation.cs">
+      <Link>LinkedSourceCode\EndPoint\Objects\ManageMembersOperation.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\EndPoint\Objects\UpdateSpaceOperation.cs">
       <Link>LinkedSourceCode\EndPoint\Objects\UpdateSpaceOperation.cs</Link>
@@ -232,6 +271,12 @@
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\EndPoint\TimeOperation.cs">
       <Link>LinkedSourceCode\EndPoint\TimeOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\EndPoint\TokenManager.cs">
+      <Link>LinkedSourceCode\EndPoint\TokenManager.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Enum\GrantBitFlag.cs">
+      <Link>LinkedSourceCode\Enum\GrantBitFlag.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\Enum\PNHeartbeatNotificationOption.cs">
       <Link>LinkedSourceCode\Enum\PNHeartbeatNotificationOption.cs</Link>
@@ -320,11 +365,14 @@
     <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNGetUsersJsonDataParse.cs">
       <Link>LinkedSourceCode\JsonDataParse\PNGetUsersJsonDataParse.cs</Link>
     </Compile>
-    <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNMembershipsJsonDataParse.cs">
-      <Link>LinkedSourceCode\JsonDataParse\PNMembershipsJsonDataParse.cs</Link>
+    <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNGrantTokenJsonDataParse.cs">
+      <Link>LinkedSourceCode\JsonDataParse\PNGrantTokenJsonDataParse.cs</Link>
     </Compile>
-    <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNMembersJsonDataParse.cs">
-      <Link>LinkedSourceCode\JsonDataParse\PNMembersJsonDataParse.cs</Link>
+    <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNManageMembershipsJsonDataParse.cs">
+      <Link>LinkedSourceCode\JsonDataParse\PNManageMembershipsJsonDataParse.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNManageMembersJsonDataParse.cs">
+      <Link>LinkedSourceCode\JsonDataParse\PNManageMembersJsonDataParse.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNObjectApiEventJsonDataParse.cs">
       <Link>LinkedSourceCode\JsonDataParse\PNObjectApiEventJsonDataParse.cs</Link>
@@ -352,6 +400,15 @@
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\AccessManager\PNAccessManagerKeysData.cs">
       <Link>LinkedSourceCode\Model\Consumer\AccessManager\PNAccessManagerKeysData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\AccessManager\PNAccessManagerTokenResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\AccessManager\PNAccessManagerTokenResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\AccessManager\PNGrantToken.cs">
+      <Link>LinkedSourceCode\Model\Consumer\AccessManager\PNGrantToken.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\AccessManager\PNResourcePermission.cs">
+      <Link>LinkedSourceCode\Model\Consumer\AccessManager\PNResourcePermission.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\ChannelGroup\PNChannelGroupsAddChannelResult.cs">
       <Link>LinkedSourceCode\Model\Consumer\ChannelGroup\PNChannelGroupsAddChannelResult.cs</Link>
@@ -392,8 +449,14 @@
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNDeleteUserResult.cs">
       <Link>LinkedSourceCode\Model\Consumer\Objects\PNDeleteUserResult.cs</Link>
     </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNGetMembershipsItemResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Objects\PNGetMembershipsItemResult.cs</Link>
+    </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNGetMembershipsResult.cs">
       <Link>LinkedSourceCode\Model\Consumer\Objects\PNGetMembershipsResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNGetMembersItemResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Objects\PNGetMembersItemResult.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNGetMembersResult.cs">
       <Link>LinkedSourceCode\Model\Consumer\Objects\PNGetMembersResult.cs</Link>
@@ -410,23 +473,23 @@
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNGetUsersResult.cs">
       <Link>LinkedSourceCode\Model\Consumer\Objects\PNGetUsersResult.cs</Link>
     </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNManageMembershipsItemResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Objects\PNManageMembershipsItemResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNManageMembershipsResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Objects\PNManageMembershipsResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNManageMembersItemResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Objects\PNManageMembersItemResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNManageMembersResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Objects\PNManageMembersResult.cs</Link>
+    </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNMember.cs">
       <Link>LinkedSourceCode\Model\Consumer\Objects\PNMember.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNMembership.cs">
       <Link>LinkedSourceCode\Model\Consumer\Objects\PNMembership.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNMembershipsItemResult.cs">
-      <Link>LinkedSourceCode\Model\Consumer\Objects\PNMembershipsItemResult.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNMembershipsResult.cs">
-      <Link>LinkedSourceCode\Model\Consumer\Objects\PNMembershipsResult.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNMembersItemResult.cs">
-      <Link>LinkedSourceCode\Model\Consumer\Objects\PNMembersItemResult.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNMembersResult.cs">
-      <Link>LinkedSourceCode\Model\Consumer\Objects\PNMembersResult.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Objects\PNPage.cs">
       <Link>LinkedSourceCode\Model\Consumer\Objects\PNPage.cs</Link>
@@ -503,6 +566,9 @@
     <Compile Include="..\..\Api\PubnubApi\Model\Derived\AccessManager\PNAccessManagerGrantResultExt.cs">
       <Link>LinkedSourceCode\Model\Derived\AccessManager\PNAccessManagerGrantResultExt.cs</Link>
     </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\AccessManager\PNAccessManagerTokenResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\AccessManager\PNAccessManagerTokenResultExt.cs</Link>
+    </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Derived\ChannelGroup\PNChannelGroupsAddChannelResultExt.cs">
       <Link>LinkedSourceCode\Model\Derived\ChannelGroup\PNChannelGroupsAddChannelResultExt.cs</Link>
     </Compile>
@@ -557,11 +623,11 @@
     <Compile Include="..\..\Api\PubnubApi\Model\Derived\Objects\PNGetUsersResultExt.cs">
       <Link>LinkedSourceCode\Model\Derived\Objects\PNGetUsersResultExt.cs</Link>
     </Compile>
-    <Compile Include="..\..\Api\PubnubApi\Model\Derived\Objects\PNMembershipsResultExt.cs">
-      <Link>LinkedSourceCode\Model\Derived\Objects\PNMembershipsResultExt.cs</Link>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\Objects\PNManageMembershipsResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\Objects\PNManageMembershipsResultExt.cs</Link>
     </Compile>
-    <Compile Include="..\..\Api\PubnubApi\Model\Derived\Objects\PNMembersResultExt.cs">
-      <Link>LinkedSourceCode\Model\Derived\Objects\PNMembersResultExt.cs</Link>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\Objects\PNManageMembersResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\Objects\PNManageMembersResultExt.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Derived\Objects\PNUpdateSpaceResultExt.cs">
       <Link>LinkedSourceCode\Model\Derived\Objects\PNUpdateSpaceResultExt.cs</Link>
@@ -719,6 +785,7 @@
     <Compile Include="WhenObjectUser.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

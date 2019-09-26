@@ -17,6 +17,8 @@ namespace PubNubMessaging.Tests
         private string requestId;
         private bool internetAvailable;
         private string sdkVersion;
+        private bool includePnsdk;
+        private bool includeUuid;
 
         long IPubnubUnitTest.Timetoken
         {
@@ -66,6 +68,32 @@ namespace PubNubMessaging.Tests
             set
             {
                 sdkVersion = value;
+            }
+        }
+
+        bool IPubnubUnitTest.IncludePnsdk
+        {
+            get
+            {
+                return includePnsdk;
+            }
+
+            set
+            {
+                includePnsdk = value;
+            }
+        }
+
+        bool IPubnubUnitTest.IncludeUuid
+        {
+            get
+            {
+                return includeUuid;
+            }
+
+            set
+            {
+                includeUuid = value;
             }
         }
     }

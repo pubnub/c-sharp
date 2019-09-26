@@ -23,7 +23,7 @@ namespace PubNubMessaging.Tests
         private static ManualResetEvent publishManualEvent = new ManualResetEvent(false);
 
         private static string channel = "hello_my_channel";
-        private static string authKey = "myAuth";
+        private static string authKey = "myauth";
         private static long publishTimetoken = 0;
         private static string currentTestCase = "";
         private static int manualResetEventWaitTimeout = 310 * 1000;
@@ -42,7 +42,7 @@ namespace PubNubMessaging.Tests
             MockServer.LoggingMethod.MockServerLog = unitLog;
             server.Start();
 
-            if (!PubnubCommon.PAMEnabled)
+            if (!PubnubCommon.PAMServerSideGrant)
             {
                 return;
             }
@@ -116,12 +116,16 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = false
             };
-            server.RunOnHttps(false);
-            if (PubnubCommon.PAMEnabled)
+            if (PubnubCommon.PAMServerSideRun)
             {
-                config.AuthKey = "myAuth";
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
             }
 
+            server.RunOnHttps(false);
             pubnub = createPubNubInstance(config);
 
             MpnsToastNotification toast = new MpnsToastNotification();
@@ -169,12 +173,16 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = false
             };
-            server.RunOnHttps(false);
-            if (PubnubCommon.PAMEnabled)
+            if (PubnubCommon.PAMServerSideRun)
             {
-                config.AuthKey = "myAuth";
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
             }
 
+            server.RunOnHttps(false);
             pubnub = createPubNubInstance(config);
 
             MpnsFlipTileNotification tile = new MpnsFlipTileNotification();
@@ -227,12 +235,16 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = false
             };
-            server.RunOnHttps(false);
-            if (PubnubCommon.PAMEnabled)
+            if (PubnubCommon.PAMServerSideRun)
             {
-                config.AuthKey = "myAuth";
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
             }
 
+            server.RunOnHttps(false);
             pubnub = createPubNubInstance(config);
 
             string channel = "hello_my_channel";
@@ -285,11 +297,16 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = false
             };
-            server.RunOnHttps(false);
-            if (PubnubCommon.PAMEnabled)
+            if (PubnubCommon.PAMServerSideRun)
             {
-                config.AuthKey = "myAuth";
+                config.SecretKey = PubnubCommon.SecretKey;
             }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+
+            server.RunOnHttps(false);
 
             pubnub = createPubNubInstance(config);
 
@@ -347,6 +364,15 @@ namespace PubNubMessaging.Tests
                 Uuid = "mytestuuid",
                 Secure = false
             };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+
             server.RunOnHttps(false);
 
             pubnub = createPubNubInstance(config);

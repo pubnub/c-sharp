@@ -19,7 +19,7 @@ namespace PubNubMessaging.Tests
         {
             bool receivedAuditMessage = false;
 
-            if (!PubnubCommon.PAMEnabled)
+            if (!PubnubCommon.PAMServerSideGrant)
             {
                 Assert.Ignore("PAM not enabled; CleanupGrant -> AtUserLevel.");
                 return;
@@ -33,6 +33,7 @@ namespace PubNubMessaging.Tests
                     PublishKey = PubnubCommon.PublishKey,
                     SubscribeKey = PubnubCommon.SubscribeKey,
                     SecretKey = PubnubCommon.SecretKey,
+                    Secure = false,
                     Uuid = "mytestuuid"
                 };
 
@@ -113,7 +114,7 @@ namespace PubNubMessaging.Tests
         {
             bool receivedAuditMessage = false;
 
-            if (!PubnubCommon.PAMEnabled)
+            if (!PubnubCommon.PAMServerSideGrant)
             {
                 Assert.Ignore("PAM not enabled; CleanupGrant -> AtChannelLevel.");
                 return;
@@ -128,6 +129,7 @@ namespace PubNubMessaging.Tests
                     PublishKey = PubnubCommon.PublishKey,
                     SubscribeKey = PubnubCommon.SubscribeKey,
                     SecretKey = PubnubCommon.SecretKey,
+                    Secure = false,
                     Uuid = "mytestuuid"
                 };
 

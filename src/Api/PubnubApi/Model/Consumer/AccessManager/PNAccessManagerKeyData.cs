@@ -12,5 +12,7 @@ namespace PubnubApi
         public bool ManageEnabled { get; set; }
 
         public bool DeleteEnabled { get; set; }
+
+        public bool CreateEnabled { get; set; }
     }
 }

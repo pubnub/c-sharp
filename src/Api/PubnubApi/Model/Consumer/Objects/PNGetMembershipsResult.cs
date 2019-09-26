@@ -5,7 +5,10 @@ using System.Text;
 
 namespace PubnubApi
 {
-    public class PNGetMembershipsResult: PNMembershipsResult
+    public class PNGetMembershipsResult
     {
+        public List<PNGetMembershipsItemResult> Memberships { get; set; }
+        public int TotalCount { get; set; }
+        public PNPage Page { get; set; }
     }
 }

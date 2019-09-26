@@ -23,7 +23,6 @@ namespace PubnubApi.EndPoint
 
         private string GetSubscribeMessageHashKey(SubscribeMessage message)
         {
-            
             return dedupHasher.GetHashRaw(jsonLib.SerializeToJsonString(message));
         }
 

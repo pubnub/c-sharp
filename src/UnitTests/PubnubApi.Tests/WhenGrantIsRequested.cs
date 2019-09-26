@@ -6,9 +6,28 @@ using MockServer;
 using System.Text;
 using System.Linq;
 using System.Diagnostics;
+using System.Collections.Generic;
+using PubnubApi.CBOR;
 
 namespace PubNubMessaging.Tests
 {
+    public class PNRes
+    {
+        public Dictionary<string, object> usr { get; set; }
+        public Dictionary<string, object> chan { get; set; }
+        public Dictionary<string, object> spc { get; set; }
+        public Dictionary<string, object> grp { get; set; }
+    }
+    public class PNCbor
+    {
+        public int v { get; set; }
+        public long t { get; set; }
+        public int ttl { get; set; }
+        public PNRes res { get; set; }
+        public PNRes pat { get; set; }
+        public byte[] sig { get; set; }
+        public Dictionary<string, object> meta { get; set; }
+    }
     [TestFixture]
     public class WhenGrantIsRequested : TestHarness
     {
@@ -84,7 +103,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            if (PubnubCommon.PAMEnabled)
+            if (PubnubCommon.PAMServerSideGrant)
             {
                 grantManualEvent = new ManualResetEvent(false);
                 pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(false).TTL(5).Execute(new GrantResult());
@@ -142,7 +161,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            if (PubnubCommon.PAMEnabled)
+            if (PubnubCommon.PAMServerSideGrant)
             {
                 grantManualEvent = new ManualResetEvent(false);
                 pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(false).Manage(false).TTL(5).Execute(new GrantResult());
@@ -201,7 +220,7 @@ namespace PubNubMessaging.Tests
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
 
-            if (PubnubCommon.PAMEnabled)
+            if (PubnubCommon.PAMServerSideGrant)
             {
                 grantManualEvent = new ManualResetEvent(false);
                 pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(false).Write(true).Manage(false).TTL(5).Execute(new GrantResult());
@@ -266,7 +285,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            if (PubnubCommon.PAMEnabled)
+            if (PubnubCommon.PAMServerSideGrant)
             {
                 grantManualEvent = new ManualResetEvent(false);
                 pubnub.Grant().AuthKeys(new [] { authKey }).Channels(channelBuilder).Read(true).Write(true).Manage(false).TTL(5).Execute(new GrantResult());
@@ -333,7 +352,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            if (PubnubCommon.PAMEnabled)
+            if (PubnubCommon.PAMServerSideGrant)
             {
                 grantManualEvent = new ManualResetEvent(false);
                 pubnub.Grant().Channels(channelBuilder).AuthKeys(authKeyBuilder).Read(true).Write(true).Manage(false).TTL(5).Execute(new GrantResult());
@@ -409,7 +428,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expectedRevoke)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            if (PubnubCommon.PAMEnabled)
+            if (PubnubCommon.PAMServerSideGrant)
             {
                 grantManualEvent = new ManualResetEvent(false);
                 pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(false).TTL(5).Execute(new GrantResult());
@@ -478,7 +497,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            if (PubnubCommon.PAMEnabled)
+            if (PubnubCommon.PAMServerSideGrant)
             {
                 grantManualEvent = new ManualResetEvent(false);
                 pubnub.Grant().ChannelGroups(new [] { channelGroup }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(5).Execute(new GrantResult());
@@ -536,7 +555,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            if (PubnubCommon.PAMEnabled)
+            if (PubnubCommon.PAMServerSideGrant)
             {
                 grantManualEvent = new ManualResetEvent(false);
                 pubnub.Grant().ChannelGroups(new [] { channelGroup }).AuthKeys(new [] { authKey }).Read(true).Write(false).Manage(false).TTL(5).Execute(new GrantResult());
@@ -552,6 +571,174 @@ namespace PubNubMessaging.Tests
             else
             {
                 Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelGroupLevelWithReadShouldReturnSuccess.");
+            }
+        }
+
+        public static byte[] HexStringToByteArray(string hex)
+        {
+            return Enumerable.Range(0, hex.Length)
+                             .Where(x => x % 2 == 0)
+                             .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
+                             .ToArray();
+        }
+
+        [Test]
+        public static void ThenPAMv3ChannelShouldReturnTokenSuccess()
+        {
+            server.ClearRequests();
+
+            currentUnitTestCase = "ThenPAMv3ChannelShouldReturnSuccess";
+
+            receivedGrantMessage = false;
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Secure = false,
+                EnableTelemetry = false,
+                IncludeInstanceIdentifier = false,
+                IncludeRequestIdentifier = true,
+                Uuid = "csharpuuid"
+            };
+
+            pubnub = createPubNubInstance(config);
+
+            server.RunOnHttps(config.Secure);
+            string expected = "";
+
+            List<string> channelList = new List<string>();
+            List<string> channelGroupList = new List<string>();
+            List<string> authList = new List<string>();
+
+            List<string> userList = new List<string>();
+            List<string> spaceList = new List<string>();
+
+            Dictionary<string, int> chBitmaskPermDic = new Dictionary<string, int>();
+            for (int chIndex = 0; chIndex < channelList.Count; chIndex++)
+            {
+                if (!chBitmaskPermDic.ContainsKey(channelList[chIndex]))
+                {
+                    chBitmaskPermDic.Add(channelList[chIndex], 3);
+                }
+            }
+
+            Dictionary<string, int> cgBitmaskPermDic = new Dictionary<string, int>();
+
+            Dictionary<string, int> userBitmaskPermDic = new Dictionary<string, int>();
+
+            Dictionary<string, int> spaceBitmaskPermDic = new Dictionary<string, int>();
+
+            Dictionary<string, object> resourcesDic = new Dictionary<string, object>();
+            resourcesDic.Add("channels", chBitmaskPermDic);
+            resourcesDic.Add("groups", cgBitmaskPermDic);
+            resourcesDic.Add("users", userBitmaskPermDic);
+            resourcesDic.Add("spaces", spaceBitmaskPermDic);
+
+
+            Dictionary<string, int> dummyBitmaskPermDic = new Dictionary<string, int>();
+
+            Dictionary<string, object> patternsDic = new Dictionary<string, object>();
+            patternsDic.Add("channels", dummyBitmaskPermDic);
+            patternsDic.Add("groups", dummyBitmaskPermDic);
+            patternsDic.Add("users", dummyBitmaskPermDic);
+            patternsDic.Add("spaces", dummyBitmaskPermDic);
+
+            Dictionary<string, object> meta = new Dictionary<string, object>();
+            meta.Add("user-id", "jay@example.com");
+            meta.Add("contains-unicode", "The 💩 test.");
+
+            Dictionary<string, object> permissionDic = new Dictionary<string, object>();
+            permissionDic.Add("resources", resourcesDic);
+            permissionDic.Add("patterns", patternsDic);
+            permissionDic.Add("meta", meta);
+
+            Dictionary<string, object> messageEnvelope = new Dictionary<string, object>();
+            messageEnvelope.Add("ttl", 1440);
+            messageEnvelope.Add("permissions", permissionDic);
+            string postMessage = Newtonsoft.Json.JsonConvert.SerializeObject(messageEnvelope);
+
+            server.AddRequest(new Request()
+                    .WithMethod("POST")
+                    .WithPath(string.Format("/v3/pam/{0}/grant", PubnubCommon.SubscribeKey))
+                    .WithContent(postMessage)
+                    .WithParameter("PoundsSterling", "£13.37")
+                    .WithParameter("timestamp", "123456789")
+                    .WithParameter("signature", "v2.k80LsDMD-sImA8rCBj-ntRKhZ8mSjHY8Ivngt9W3Yc4")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            if (PubnubCommon.PAMServerSideGrant)
+            {
+                
+                grantManualEvent = new ManualResetEvent(false);
+
+                pubnub.GrantToken()
+                            .Users(new Dictionary<string, PNResourcePermission>() {
+                                { "pandu_userid0", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
+                                { "pandu_userid1", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
+                                { "pandu-ut-uid", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
+                                { "pandu-ut-uid1", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
+                                { "pandu-ut-uid2", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } } })
+                            .Spaces(new Dictionary<string, PNResourcePermission>() {
+                                { "pandu_spaceid0", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
+                                { "pandu_spaceid1", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
+                                { "pandu-ut-sid", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
+                                { "pandu-ut-sid1", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
+                                { "pandu-ut-sid2", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } } })
+                            .Users(new Dictionary<string, PNResourcePermission>() {
+                                { "^emp-gen-*", new PNResourcePermission() { Read = true, Write = true } },
+                                { "^emp-mgr-*", new PNResourcePermission() { Read = true, Write = true, Create = true, Delete = true } } }, true)
+                            .Spaces(new Dictionary<string, PNResourcePermission>() {
+                                { "^public-*", new PNResourcePermission() { Read = true } },
+                                { "^private-*", new PNResourcePermission() { Read = true, Write = true, Create = true, Delete = true } } }, true)
+
+                            //.Users(new Dictionary<string, PNResourcePermission>() {
+                            //    { "myuser1", new PNResourcePermission() { Read = true, Write = true, Create = true } } })
+                            //.Spaces(new Dictionary<string, PNResourcePermission>() {
+                            //    { "myspace1", new PNResourcePermission() { Read = true, Write = true, Delete = true } } })
+                            .TTL(30*24*60)
+                            .AuthKey("myauth")
+                    //.QueryParam(new System.Collections.Generic.Dictionary<string, object>() { { "PoundsSterling", "£13.37" } })
+                    //.Meta(new System.Collections.Generic.Dictionary<string, object>() { { "user-id", "jay@example.com" }, { "contains-unicode", "The 💩 test." } })
+                    .Execute(new PNAccessManagerTokenResultExt((result, status)=> 
+                    {
+                        if (result != null)
+                        {
+                            try
+                            {
+                                string token = result.Token;
+                                PNGrantToken grantObject = pubnub.ParseToken(token);
+                                System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(grantObject));
+                            }
+                            catch (Exception ex)
+                            {
+                                System.Diagnostics.Debug.WriteLine(ex.ToString());
+                            }
+                            receivedGrantMessage = true;
+                        }
+                        else
+                        {
+                            System.Diagnostics.Debug.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(status));
+                        }
+                        grantManualEvent.Set();
+                    }));
+
+                Thread.Sleep(1000);
+
+                grantManualEvent.WaitOne();
+                Thread.Sleep(2000);
+
+                pubnub.Destroy();
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
+                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenPAMv3ChannelShouldReturnSuccess failed.");
+
+            }
+            else
+            {
+                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenPAMv3ChannelShouldReturnSuccess.");
             }
         }
 

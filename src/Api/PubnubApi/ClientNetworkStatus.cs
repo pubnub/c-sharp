@@ -198,8 +198,6 @@ namespace PubnubApi
             Action<bool> internalCallback = null;
             PNCallback<T> pubnubCallback = null;
             PNOperationType type = PNOperationType.None;
-            string[] channels = null;
-            string[] channelGroups = null;
 
             var t = new TaskCompletionSource<bool>();
 
@@ -209,12 +207,10 @@ namespace PubnubApi
                 internalCallback = state.InternalCallback;
                 type = state.ResponseType;
                 pubnubCallback = state.PubnubCallbacck;
-                channels = state.Channels;
-                channelGroups = state.ChannelGroups;
             }
 
-            PubnubApi.Interface.IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(pubnubConfig, jsonLib, unit, pubnubLog, null);
-            Uri requestUri = urlBuilder.BuildTimeRequest(null);
+            PubnubApi.Interface.IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(pubnubConfig, jsonLib, unit, pubnubLog, null, null);
+            Uri requestUri = urlBuilder.BuildTimeRequest("GET", "", null);
             try
             {
                 bool gotTimeResp = false;

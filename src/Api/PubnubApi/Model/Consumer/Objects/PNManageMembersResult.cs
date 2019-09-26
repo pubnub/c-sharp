@@ -5,9 +5,9 @@ using System.Text;
 
 namespace PubnubApi
 {
-    public class PNMembersResult
+    public class PNManageMembersResult
     {
-        public List<PNMembersItemResult> Members { get; set; }
+        public List<PNManageMembersItemResult> Members { get; set; }
         public int TotalCount { get; set; }
         public PNPage Page { get; set; }
     }

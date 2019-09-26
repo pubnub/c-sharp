@@ -6,6 +6,7 @@ using PubnubApi.Interface;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Net;
+using System.Globalization;
 
 namespace PubnubApi.EndPoint
 {
@@ -28,7 +29,7 @@ namespace PubnubApi.EndPoint
         private PNCallback<PNAccessManagerGrantResult> savedCallback;
         private Dictionary<string, object> queryParam;
 
-        public GrantOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, instance)
+        public GrantOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, null, instance)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
@@ -99,6 +100,10 @@ namespace PubnubApi.EndPoint
 
         public void Execute(PNCallback<PNAccessManagerGrantResult> callback)
         {
+            if (config != null && pubnubLog != null)
+            {
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, WARNING: Grant() signature has changed! This specific call will be making a request to PAMv2. Please update your code if this is not the intended action.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+            }
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
@@ -164,9 +169,9 @@ namespace PubnubApi.EndPoint
             string channelGroupsCommaDelimited = string.Join(",", channelGroupList.ToArray().OrderBy(x => x).ToArray());
             string authKeysCommaDelimited = string.Join(",", authList.ToArray().OrderBy(x => x).ToArray());
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, null);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildGrantAccessRequest(channelsCommaDelimited, channelGroupsCommaDelimited, authKeysCommaDelimited, read, write, delete, manage, ttl, externalQueryParam);
+            Uri request = urlBuilder.BuildGrantV2AccessRequest("GET", "", channelsCommaDelimited, channelGroupsCommaDelimited, authKeysCommaDelimited, read, write, delete, manage, ttl, externalQueryParam);
 
             RequestState<PNAccessManagerGrantResult> requestState = new RequestState<PNAccessManagerGrantResult>();
             requestState.Channels = channels;

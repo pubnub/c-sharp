@@ -2,8 +2,10 @@
 {
     public static class PubnubCommon
     {
-		public static readonly bool PAMEnabled = true;
-		public static readonly bool EnableStubTest = false;
+		public static readonly bool PAMServerSideGrant = true;
+        public static readonly bool PAMServerSideRun = false;
+        public static readonly bool SuppressAuthKey = PAMServerSideRun;
+        public static readonly bool EnableStubTest = false;
 
         //USE demo-36 keys for unit tests
         public static readonly string PublishKey = "demo-36";

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace PubnubApi
 {
-    public class PNMembersItemResult
+    public class PNManageMembersItemResult
     {
         public string UserId { get; set; }
         public Dictionary<string, object> Custom { get; set; }

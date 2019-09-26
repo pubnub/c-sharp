@@ -22,6 +22,8 @@ namespace PubnubApiDemo
 
         static private string authKey { get; set; } = "";
 
+        static private string grantToken { get; set; } = "";
+
         public class PlatformPubnubLog : IPubnubLog
         {
             public PlatformPubnubLog()
@@ -272,25 +274,19 @@ namespace PubnubApiDemo
             config.ReconnectionPolicy = PNReconnectionPolicy.LINEAR;
             //config.UseClassicHttpWebRequest = true;
             //config.FilterExpression = "uuid == '" + config.Uuid +  "'";
-            //config.EnableTelemetry = false;
+            config.EnableTelemetry = false;
+            config.IncludeRequestIdentifier = false;
+            config.IncludeInstanceIdentifier = false;
+            //config.Uuid = "csharpuuid";
 
             pubnub = new Pubnub(config);
+
             //Add listener to receive published messages and presence events
             pubnub.AddListener(new SubscribeCallbackExt(
                 delegate (Pubnub pnObj, PNMessageResult<object> pubMsg) { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(pubMsg)); },
                 delegate (Pubnub pnObj, PNPresenceEventResult presenceEvnt) { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(presenceEvnt)); },
-                delegate (Pubnub pnObj, PNStatus pnStatus) { Console.WriteLine("{0} {1} {2}", pnStatus.Operation, pnStatus.Category, pnStatus.StatusCode); }
-                ));
-
-            //Add listener to receive signal messages
-            pubnub.AddListener(new SubscribeCallbackExt(
                 delegate (Pubnub pnObj, PNSignalResult<object> signalMsg) { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(signalMsg)); },
-                delegate (Pubnub pnObj, PNStatus pnStatus) { Console.WriteLine("{0} {1} {2}", pnStatus.Operation, pnStatus.Category, pnStatus.StatusCode); }
-                ));
-
-            //Add listener to receive ObjectAPI event messages
-            pubnub.AddListener(new SubscribeCallbackExt(
-                delegate (Pubnub pnObj, PNObjectApiEventResult objectApiEventObj) 
+                delegate (Pubnub pnObj, PNObjectApiEventResult objectApiEventObj)
                 {
                     if (objectApiEventObj.Type == "user") { /* got user related event. */ }
                     else if (objectApiEventObj.Type == "space") { /* got space related event. */ }
@@ -308,7 +304,7 @@ namespace PubnubApiDemo
             Console.WriteLine("");
             while (!exitFlag)
             {
-                if (currentUserChoice < 1 || (currentUserChoice > 53 && currentUserChoice != 99))
+                if (currentUserChoice < 1 || (currentUserChoice > 55 && currentUserChoice != 99))
                 {
                     StringBuilder menuOptionsStringBuilder = new StringBuilder();
                     menuOptionsStringBuilder.AppendLine("ENTER 1 FOR Subscribe channel/channelgroup");
@@ -355,6 +351,8 @@ namespace PubnubApiDemo
                     menuOptionsStringBuilder.AppendLine("Enter 51 FOR Add/Update/Remove Members");
                     menuOptionsStringBuilder.AppendLine("Enter 52 FOR Get Memberships");
                     menuOptionsStringBuilder.AppendLine("Enter 53 FOR Get Members");
+                    menuOptionsStringBuilder.AppendLine("Enter 54 FOR GrantToken");
+                    menuOptionsStringBuilder.AppendLine("Enter 55 FOR SetToken");
                     menuOptionsStringBuilder.AppendLine("ENTER 99 FOR EXIT OR QUIT");
                     Console.WriteLine(menuOptionsStringBuilder.ToString());
                     userinput = Console.ReadLine();
@@ -368,7 +366,7 @@ namespace PubnubApiDemo
                     case "1":
                         Console.WriteLine("Enter CHANNEL name for subscribe. Use comma to enter multiple channels." + Environment.NewLine + "NOTE: If you want to consider only Channel Group(s), just hit ENTER");
                         channel = Console.ReadLine();
-                        channel = channel + ",pnuser-pandu-id-test,pandu-space-id,pnuser-pandu-my-id0";
+                        //channel = channel + ",pnuser-pandu-id-test,pandu-space-id,pnuser-pandu-my-id0";
 
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Channel = {0}", channel));
@@ -396,7 +394,7 @@ namespace PubnubApiDemo
                             Console.WriteLine("Running subscribe()");
 
                             pubnub.Subscribe<object>()
-                                .WithPresence()
+                                //.WithPresence()
                                 .Channels(channel.Split(','))
                                 .ChannelGroups(channelGroup.Split(','))
                                 .Execute();
@@ -1420,7 +1418,8 @@ namespace PubnubApiDemo
                             pubnub.CreateUser()
                                     .Id(createUserId)
                                     .Name(createUserName)
-                                    .Execute(new PNCreateUserResultExt((r, s) => {
+                                    .Execute(new PNCreateUserResultExt((r, s) =>
+                                    {
                                         if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
                                         else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
                                     }
@@ -1436,7 +1435,8 @@ namespace PubnubApiDemo
                             pubnub.GetUser()
                                 .UserId(singleUserId)
                                 .IncludeCustom(true)
-                                .Execute(new PNGetUserResultExt((r, s) => {
+                                .Execute(new PNGetUserResultExt((r, s) =>
+                                {
                                     if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
                                     else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
                                 }
@@ -1448,7 +1448,8 @@ namespace PubnubApiDemo
                                 .IncludeCount(true)
                                 .IncludeCustom(true)
                                 .Page(new PNPage() { Next = "", Prev = "" })
-                                .Execute(new PNGetUsersResultExt((r, s) => {
+                                .Execute(new PNGetUsersResultExt((r, s) =>
+                                {
                                     if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
                                     else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
                                 }
@@ -1462,7 +1463,8 @@ namespace PubnubApiDemo
                         {
                             pubnub.DeleteUser()
                                 .Id(deleteUserId)
-                                .Execute(new PNDeleteUserResultExt((r, s) => {
+                                .Execute(new PNDeleteUserResultExt((r, s) =>
+                                {
                                     if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
                                     else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
                                 }
@@ -1488,7 +1490,8 @@ namespace PubnubApiDemo
                             pubnub.UpdateUser()
                                 .Id(updUserId)
                                 .Name(updUserName)
-                                .Execute(new PNUpdateUserResultExt((r, s) => {
+                                .Execute(new PNUpdateUserResultExt((r, s) =>
+                                {
                                     if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
                                     else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
                                 }
@@ -1527,7 +1530,8 @@ namespace PubnubApiDemo
                             pubnub.GetSpace()
                                 .SpaceId(singleSpaceId)
                                 .IncludeCustom(true)
-                                .Execute(new PNGetSpaceResultExt((r, s) => {
+                                .Execute(new PNGetSpaceResultExt((r, s) =>
+                                {
                                     if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
                                     else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
                                 }
@@ -1540,7 +1544,8 @@ namespace PubnubApiDemo
                                 .IncludeCustom(true)
                                 //.Limit(2)
                                 .Page(new PNPage() { Next = "", Prev = "" })
-                                .Execute(new PNGetSpacesResultExt((r, s) => {
+                                .Execute(new PNGetSpacesResultExt((r, s) =>
+                                {
                                     if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
                                     else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
                                 }
@@ -1554,7 +1559,8 @@ namespace PubnubApiDemo
                         {
                             pubnub.DeleteSpace()
                                 .Id(deleteSpaceId)
-                                .Execute(new PNDeleteSpaceResultExt((r, s) => {
+                                .Execute(new PNDeleteSpaceResultExt((r, s) =>
+                                {
                                     if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
                                     else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
                                 }
@@ -1583,7 +1589,8 @@ namespace PubnubApiDemo
                                 .Id(updSpaceId)
                                 .Name(updSpaceName)
                                 .Description(updSpaceDesc)
-                                .Execute(new PNUpdateSpaceResultExt((r, s) => {
+                                .Execute(new PNUpdateSpaceResultExt((r, s) =>
+                                {
                                     if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
                                     else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
                                 }
@@ -1612,7 +1619,7 @@ namespace PubnubApiDemo
                             removeList.Add(memshipRemSpaceId);
                         }
 
-                        pubnub.Memberships()
+                        pubnub.ManageMemberships()
                             .UserId(memshipUserId)
                             .Add(addList)
                             .Update(updateList)
@@ -1620,7 +1627,8 @@ namespace PubnubApiDemo
                             .Include(new PNMembershipField[] { PNMembershipField.CUSTOM, PNMembershipField.SPACE, PNMembershipField.SPACE_CUSTOM })
                             .IncludeCount(true)
                             .Page(new PNPage() { Next = "", Prev = "" })
-                            .Execute(new PNMembershipsResultExt((r, s) => {
+                            .Execute(new PNManageMembershipsResultExt((r, s) =>
+                            {
                                 if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
                                 else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
                             }
@@ -1641,6 +1649,7 @@ namespace PubnubApiDemo
                         }
 
                         List<PNMember> updMemberList = new List<PNMember>();
+                        //updMemberList.Add(new PNMember { UserId = "pandu_userid0", Custom = new Dictionary<string, object>() { {"foo","bar" } } });
 
                         List<string> remMemberList = new List<string>();
                         if (!string.IsNullOrEmpty(memberRemUserId))
@@ -1654,7 +1663,7 @@ namespace PubnubApiDemo
                         }
                         else
                         {
-                            pubnub.Members()
+                            pubnub.ManageMembers()
                                 .SpaceId(memberSpaceId)
                                 .Add(addMemberList)
                                 .Update(updMemberList)
@@ -1662,7 +1671,8 @@ namespace PubnubApiDemo
                                 .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.USER, PNMemberField.USER_CUSTOM })
                                 .IncludeCount(true)
                                 .Page(new PNPage() { Next = "", Prev = "" })
-                                .Execute(new PNMembersResultExt((r, s) => {
+                                .Execute(new PNManageMembersResultExt((r, s) =>
+                                {
                                     if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
                                     else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
                                 }
@@ -1679,7 +1689,8 @@ namespace PubnubApiDemo
                                 .Include(new PNMembershipField[] { PNMembershipField.CUSTOM, PNMembershipField.SPACE, PNMembershipField.SPACE_CUSTOM })
                                 .IncludeCount(true)
                                 .Page(new PNPage() { Next = "", Prev = "" })
-                                .Execute(new PNGetMembershipsResultExt((r, s) => {
+                                .Execute(new PNGetMembershipsResultExt((r, s) =>
+                                {
                                     if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
                                     else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
                                 }
@@ -1700,7 +1711,8 @@ namespace PubnubApiDemo
                                 .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.USER, PNMemberField.USER_CUSTOM })
                                 .IncludeCount(true)
                                 .Page(new PNPage() { Next = "", Prev = "" })
-                                .Execute(new PNGetMembersResultExt((r, s) => {
+                                .Execute(new PNGetMembersResultExt((r, s) =>
+                                {
                                     if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
                                     else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
                                 }
@@ -1710,6 +1722,91 @@ namespace PubnubApiDemo
                         {
                             Console.WriteLine("Invalid SpaceId!!!");
                         }
+                        break;
+                    case "54":
+                        Console.WriteLine("Enter UserId for PAM Grant.");
+                        string grantUserId = Console.ReadLine();
+
+                        Console.WriteLine("Enter SpaceId for PAM Grant.");
+                        string grantSpaceId = Console.ReadLine();
+
+                        Console.WriteLine("Enter the auth_key for PAMv2 Grant (optional).");
+                        string grantAuth = Console.ReadLine();
+
+                        Console.WriteLine("Read Access? Enter Y for Yes (default), N for No.");
+                        string grantReadAccess = Console.ReadLine();
+                        bool grantRead = (grantReadAccess.ToLower() == "n") ? false : true;
+
+                        Console.WriteLine("Write Access? Enter Y for Yes (default), N for No.");
+                        string grantwriteAccess = Console.ReadLine();
+                        bool grantWrite = (grantwriteAccess.ToLower() == "n") ? false : true;
+
+                        Console.WriteLine("Delete Access? Enter Y for Yes (default), N for No.");
+                        string grantDeleteAccess = Console.ReadLine();
+                        bool grantDelete = (grantDeleteAccess.ToLower() == "n") ? false : true;
+
+                        Console.WriteLine("Create Access? Enter Y for Yes (default), N for No.");
+                        string grantCreateAccess = Console.ReadLine();
+                        bool grantCreate = (grantCreateAccess.ToLower() == "n") ? false : true;
+
+                        Console.WriteLine("Manage Access? Enter Y for Yes (default), N for No.");
+                        string grantManageAccess = Console.ReadLine();
+                        bool grantManage = (grantManageAccess.ToLower() == "n") ? false : true;
+
+                        Console.WriteLine("How many minutes do you want to allow Grant Access? Enter the number of minutes." + Environment.NewLine + "Default = 1440 minutes (24 hours). Press ENTER now to accept default value.");
+                        int grantTokenTTL;
+                        string grantTokenTimeLimit = Console.ReadLine();
+                        if (string.IsNullOrEmpty(grantTokenTimeLimit.Trim()))
+                        {
+                            grantTokenTTL = 1440;
+                        }
+                        else
+                        {
+                            Int32.TryParse(grantTokenTimeLimit, out grantTokenTTL);
+                            if (grantTokenTTL <= 0) grantTokenTTL = 1440;
+                        }
+
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        StringBuilder pamTokenGrantStringBuilder = new StringBuilder();
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("UserId = {0}", grantUserId));
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("SpaceId = {0}", grantSpaceId));
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("auth_key = {0}", grantAuth));
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("Read Access = {0}", grantRead.ToString()));
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("Write Access = {0}", grantWrite.ToString()));
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("Delete Access = {0}", grantDelete.ToString()));
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("Create Access = {0}", grantCreate.ToString()));
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("Manage Access = {0}", grantManage.ToString()));
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("TTL = {0}", grantTokenTTL.ToString()));
+                        Console.WriteLine(pamTokenGrantStringBuilder.ToString());
+                        Console.ResetColor();
+                        Console.WriteLine();
+
+                        Console.WriteLine("Running PamGrantToken()");
+                        pubnub.GrantToken()
+                            .Users(new Dictionary<string, PNResourcePermission>() {
+                                { grantUserId, new PNResourcePermission() { Read = grantRead, Write = grantWrite, Manage= grantManage, Create = grantCreate, Delete=grantDelete } } })
+                            .Spaces(new Dictionary<string, PNResourcePermission>() {
+                                { grantSpaceId, new PNResourcePermission() { Read = grantRead, Write = grantWrite, Manage= grantManage, Create = grantCreate, Delete=grantDelete } } })
+                            .TTL(grantTokenTTL)
+                            .Execute(new PNAccessManagerTokenResultExt((result, status) =>
+                            {
+                                if (result != null)
+                                {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                                }
+                                else
+                                {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                                }
+                            }));
+
+                        break;
+                    case "55":
+                        Console.WriteLine("Enter PAMv3 token (ensure NO secret key in config)");
+                        grantToken = Console.ReadLine();
+                        pubnub.SetToken(grantToken);
+                        Console.WriteLine();
+                        Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(pubnub.ParseToken(grantToken)));
                         break;
                     default:
                         Console.ForegroundColor = ConsoleColor.Red;

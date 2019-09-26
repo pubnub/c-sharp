@@ -43,6 +43,24 @@ namespace PubnubApi
 
         }
 
+        public SubscribeCallbackExt(Action<Pubnub, PNMessageResult<object>> messageCallback, Action<Pubnub, PNPresenceEventResult> presenceCallback, Action<Pubnub, PNSignalResult<object>> signalCallback, Action<Pubnub, PNStatus> statusCallback)
+        {
+            this.subscribeAction = messageCallback;
+            this.presenceAction = presenceCallback;
+            this.statusAction = statusCallback;
+            this.signalAction = signalCallback;
+            this.objectApiAction = null;
+        }
+
+        public SubscribeCallbackExt(Action<Pubnub, PNMessageResult<object>> messageCallback, Action<Pubnub, PNPresenceEventResult> presenceCallback, Action<Pubnub, PNSignalResult<object>> signalCallback, Action<Pubnub, PNObjectApiEventResult> objectApiCallback, Action<Pubnub, PNStatus> statusCallback)
+        {
+            this.subscribeAction = messageCallback;
+            this.presenceAction = presenceCallback;
+            this.statusAction = statusCallback;
+            this.signalAction = signalCallback;
+            this.objectApiAction = objectApiCallback;
+        }
+
         public override void Message<T>(Pubnub pubnub, PNMessageResult<T> message)
         {
             PNMessageResult<object> message1 = new PNMessageResult<object>();

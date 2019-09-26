@@ -34,8 +34,8 @@ namespace PubnubApi
         PNGetSpacesOperation,
         PNGetSpaceOperation,
 
-        PNMembershipsOperation,
-        PNMembersOperation,
+        PNManageMembershipsOperation,
+        PNManageMembersOperation,
         PNGetMembershipsOperation,
         PNGetMembersOperation,
 
@@ -58,6 +58,7 @@ namespace PubnubApi
         PNHereNowOperation,
         PNGetStateOperation,
         PNAccessManagerAudit,
+        PNAccessManagerGrantToken,
         PNAccessManagerGrant
     }
 }

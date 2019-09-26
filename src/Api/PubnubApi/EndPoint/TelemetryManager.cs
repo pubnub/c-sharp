@@ -91,6 +91,9 @@ namespace PubnubApi.EndPoint
                 case PNOperationType.PushUnregister:
                     endpoint = "l_push";
                     break;
+                case PNOperationType.PNAccessManagerGrantToken:
+                    endpoint = "l_pamv3";
+                    break;
                 case PNOperationType.PNAccessManagerAudit:
                 case PNOperationType.PNAccessManagerGrant:
                     endpoint = "l_pam";
@@ -109,6 +112,15 @@ namespace PubnubApi.EndPoint
                 case PNOperationType.PNDeleteUserOperation:
                 case PNOperationType.PNGetUsersOperation:
                 case PNOperationType.PNGetUserOperation:
+                case PNOperationType.PNCreateSpaceOperation:
+                case PNOperationType.PNUpdateSpaceOperation:
+                case PNOperationType.PNDeleteSpaceOperation:
+                case PNOperationType.PNGetSpacesOperation:
+                case PNOperationType.PNGetSpaceOperation:
+                case PNOperationType.PNGetMembershipsOperation:
+                case PNOperationType.PNManageMembershipsOperation:
+                case PNOperationType.PNGetMembersOperation:
+                case PNOperationType.PNManageMembersOperation:
                     endpoint = "l_obj";
                     break;
                 default:

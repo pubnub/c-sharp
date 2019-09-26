@@ -40,5 +40,40 @@ namespace PubnubApi
                         LoggingMethod.WriteToLog(log, string.Format("DateTime {0} PLATFORM = UNKNOWN", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
 #endif
         }
+
+        public static string Get()
+        {
+            string result = "";
+#if NETSTANDARD10
+                        result = "NETSTD10";
+#elif NETSTANDARD11
+                        result = "NETSTD11";
+#elif NETSTANDARD12
+                        result = "NETSTD12";
+#elif NETSTANDARD13
+                        result = "NETSTD13";
+#elif NETSTANDARD14
+                        result = "NETSTD14";
+#elif NETSTANDARD20
+                        result = "NETSTD20";
+#elif UAP
+                        result = "UAP";
+#elif NETFX_CORE
+                        result = "NETFX_CORE";
+#elif WINDOWS_UWP
+                        result = "WINDOWS_UWP";
+#elif NET35
+                        result = "NET35";
+#elif NET40
+                        result = "NET40";
+#elif NET45
+                        result = "NET45";
+#elif NET461
+                        result = "NET461";
+#else
+                        result = "UNKNOWN";
+#endif
+            return result;
+        }
     }
 }

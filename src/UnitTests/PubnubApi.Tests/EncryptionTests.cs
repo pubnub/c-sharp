@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Globalization;
 using Newtonsoft.Json;
 using System.Diagnostics;
+using PubnubApi.CBOR;
 
 namespace PubNubMessaging.Tests
 {
@@ -140,6 +141,102 @@ namespace PubNubMessaging.Tests
     [TestFixture]
     public class EncryptionTests
     {
+        [Test]
+        public void ParseGrantTokenTest()
+        {
+            string expected = "{\"Version\":2,\"Timestamp\":1568739458,\"TTL\":100,\"Channels\":{},\"ChannelGroups\":{},\"Users\":{},\"Spaces\":{},\"ChannelPatterns\":{},\"GroupPatterns\":{},\"UserPatterns\":{\"^emp-*\":{\"Read\":true,\"Write\":true,\"Manage\":false,\"Delete\":false,\"Create\":false},\"^mgr-*\":{\"Read\":true,\"Write\":true,\"Manage\":false,\"Delete\":true,\"Create\":true}},\"SpacePatterns\":{\"^public-*\":{\"Read\":true,\"Write\":true,\"Manage\":false,\"Delete\":false,\"Create\":false},\"^private-*\":{\"Read\":true,\"Write\":true,\"Manage\":false,\"Delete\":true,\"Create\":true}},\"Meta\":{},\"Signature\":\"LL8xpndq3ILa/a3LOK9ragvO2EqaUmKrPQin2jOSEWQ=\"}";
+            string actual = "";
+            string token = "p0F2AkF0Gl2BEIJDdHRsGGRDcmVzpERjaGFuoENncnCgQ3VzcqBDc3BjoENwYXSkRGNoYW6gQ2dycKBDdXNyomZeZW1wLSoDZl5tZ3ItKhgbQ3NwY6JpXnB1YmxpYy0qA2pecHJpdmF0ZS0qGBtEbWV0YaBDc2lnWCAsvzGmd2rcgtr9rcs4r2tqC87YSppSYqs9CKfaM5IRZA==";
+            try
+            {
+                PNConfiguration config = new PNConfiguration
+                {
+                    SubscribeKey = PubnubCommon.SubscribeKey,
+                    PublishKey = PubnubCommon.PublishKey,
+                };
+                Pubnub pubnub = new Pubnub(config);
+                PNGrantToken pnGrant = pubnub.ParseToken(token);
+
+                if (pnGrant != null)
+                {
+                    actual = Newtonsoft.Json.JsonConvert.SerializeObject(pnGrant);
+                }
+                pubnub.ClearTokens();
+
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Exception = " + ex.ToString());
+            }
+            Assert.AreEqual(actual, expected);
+        }
+
+        [Test]
+        public void GetTokenByResourceTypeAndIdTest()
+        {
+            string expected = "p0F2AkF0Gl2BkWVDdHRsGGRDcmVzpERjaGFuoENncnCgQ3VzcqBDc3BjoENwYXSkRGNoYW6gQ2dycKBDdXNyo2ZeZW1wLSoDZl5tZ3ItKhgbYl4kAUNzcGOjaV5wdWJsaWMtKgNqXnByaXZhdGUtKhgbYl4kAURtZXRhoENzaWdYIBzbsFygBNyhETvsHwgDJm79KaCNk7nNwG8P0ra4UBoh";
+            string actual = "";
+            string token = "p0F2AkF0Gl2BkWVDdHRsGGRDcmVzpERjaGFuoENncnCgQ3VzcqBDc3BjoENwYXSkRGNoYW6gQ2dycKBDdXNyo2ZeZW1wLSoDZl5tZ3ItKhgbYl4kAUNzcGOjaV5wdWJsaWMtKgNqXnByaXZhdGUtKhgbYl4kAURtZXRhoENzaWdYIBzbsFygBNyhETvsHwgDJm79KaCNk7nNwG8P0ra4UBoh";
+            try
+            {
+                PNConfiguration config = new PNConfiguration
+                {
+                    SubscribeKey = PubnubCommon.SubscribeKey,
+                    PublishKey = PubnubCommon.PublishKey,
+                };
+                Pubnub pubnub = new Pubnub(config);
+                pubnub.SetToken(token);
+
+                actual = pubnub.GetToken("user", "emp-usr-1");
+                
+                //if (pnGrant != null)
+                //{
+                //    actual = Newtonsoft.Json.JsonConvert.SerializeObject(pnGrant);
+                //}
+                pubnub.ClearTokens();
+
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Exception = " + ex.ToString());
+            }
+            Assert.AreEqual(actual, expected);
+        }
+
+        [Test]
+        public void NewCborParseTest()
+        {
+            string expected = "{\"v\":2,\"t\":1568264210,\"ttl\":100,\"res\":{\"chan\":{},\"grp\":{},\"usr\":{\"myuser1\":19},\"spc\":{\"myspace1\":11}},\"pat\":{\"chan\":{},\"grp\":{},\"usr\":{},\"spc\":{}},\"meta\":{},\"sig\":\"HtcG6s5fuao9T2bZCgWRQ3cmR27lnYT03yVs6c6H23o=\"}";
+            string actual = "";
+            string token = "p0F2AkF0Gl150BJDdHRsGGRDcmVzpERjaGFuoENncnCgQ3VzcqFnbXl1c2VyMRNDc3BjoWhteXNwYWNlMQtDcGF0pERjaGFuoENncnCgQ3VzcqBDc3BjoERtZXRhoENzaWdYIB7XBurOX7mqPU9m2QoFkUN3Jkdu5Z2E9N8lbOnOh9t6";
+            //string token = "p0F2AkF0Gl2BEIJDdHRsGGRDcmVzpERjaGFuoENncnCgQ3VzcqBDc3BjoENwYXSkRGNoYW6gQ2dycKBDdXNyomZeZW1wLSoDZl5tZ3ItKhgbQ3NwY6JpXnB1YmxpYy0qA2pecHJpdmF0ZS0qGBtEbWV0YaBDc2lnWCAsvzGmd2rcgtr9rcs4r2tqC87YSppSYqs9CKfaM5IRZA==";
+            //string token = "p0F2AkF0Gl2B12pDdHRsA0NyZXOkRGNoYW6gQ2dycKBDdXNyoW50ZXN0dXNlcl8xODIyORgfQ3NwY6FvdGVzdHNwYWNlXzk4NjI4GB9DcGF0pERjaGFuoENncnCgQ3VzcqBDc3BjoERtZXRhoENzaWdYIPVDkcaEMDN6R7-98i84C5BXMn0NsXCmTV3EmWkMyz0y"; //Rajat
+            try
+            {
+                token = token.Replace('_', '/').Replace('-', '+');//.TrimEnd(new char[] { '=' });
+                byte[] tokenByteArray = Convert.FromBase64String(token);
+                System.IO.MemoryStream ms = new System.IO.MemoryStream(tokenByteArray);
+
+                object cborItemListObj = ms.DecodeAllCBORItems();
+                if (cborItemListObj != null)
+                {
+                    System.Diagnostics.Debug.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(cborItemListObj));
+
+                    List<object> cborItemList = cborItemListObj as List<object>;
+                    if (cborItemList != null && cborItemList.Count > 0)
+                    {
+                        object tokenItem = cborItemList[0];
+                        actual = Newtonsoft.Json.JsonConvert.SerializeObject(tokenItem);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Exception = " + ex.ToString());
+            }
+            Assert.AreEqual(actual, expected);
+        }
+
         /// <summary>
         /// Tests the null encryption.
         /// The input is serialized
@@ -585,9 +682,25 @@ namespace PubNubMessaging.Tests
             string message = "Pubnub Messaging 1";
 
             string signature = crypto.PubnubAccessManagerSign(secretKey, message);
+            System.Diagnostics.Debug.WriteLine("TestPAMSignature = " + signature);
 
             Assert.AreEqual("mIoxTVM2WAM5j-M2vlp9bVblDLoZQI5XIoYyQ48U0as=", signature);
         }
+
+        [Test]
+        public void TestPAMv3Signature()
+        {
+            PubnubCrypto crypto = new PubnubCrypto("");
+            string secretKey = "wMfbo9G0xVUG8yfTfYw5qIdfJkTd7A";
+            string message = "POST\ndemo\n/v3/pam/demo/grant\nPoundsSterling=%C2%A313.37&timestamp=123456789\n{\n  \"ttl\": 1440,\n  \"permissions\": {\n    \"resources\" : {\n      \"channels\": {\n        \"inbox-jay\": 3\n      },\n      \"groups\": {},\n      \"users\": {},\n      \"spaces\": {}\n    },\n    \"patterns\" : {\n      \"channels\": {},\n      \"groups\": {},\n      \"users\": {},\n      \"spaces\": {}\n    },\n    \"meta\": {\n      \"user-id\": \"jay@example.com\",\n      \"contains-unicode\": \"The 💩 test.\"\n    }\n  }\n}";
+
+            string signature = crypto.PubnubAccessManagerSign(secretKey, message);
+            signature = string.Format("v2.{0}", signature.TrimEnd(new char[] { '=' }));
+            System.Diagnostics.Debug.WriteLine("TestPAMv3Signature = " + signature);
+
+            Assert.AreEqual("v2.k80LsDMD-sImA8rCBj-ntRKhZ8mSjHY8Ivngt9W3Yc4", signature);
+        }
+
 
         public static string EncodeNonAsciiCharacters(string value)
         {

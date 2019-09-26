@@ -19,7 +19,7 @@ namespace PubNubMessaging.Tests
 
         private static int manualResetEventWaitTimeout = 310 * 1000;
         private static string channel = "hello_my_channel";
-        private static string authKey = "myAuth";
+        private static string authKey = "myauth";
         private static string currentTestCase = "";
 
         private static Pubnub pubnub;
@@ -35,7 +35,7 @@ namespace PubNubMessaging.Tests
             MockServer.LoggingMethod.MockServerLog = unitLog;
             server.Start();
 
-            if (!PubnubCommon.PAMEnabled) { return; }
+            if (!PubnubCommon.PAMServerSideGrant) { return; }
 
             receivedGrantMessage = false;
 
@@ -73,7 +73,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Execute(new UTGrantResult());
+            pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).Delete(true).TTL(20).Execute(new UTGrantResult());
 
             Thread.Sleep(1000);
 
@@ -104,11 +104,17 @@ namespace PubNubMessaging.Tests
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                SecretKey = PubnubCommon.SecretKey,
                 Uuid = "mytestuuid",
                 Secure = false
             };
-
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
             pubnub = createPubNubInstance(config);
 
             string expected = "{\"status\": 200, \"error\": false, \"error_message\": \"\"}";
