@@ -347,7 +347,7 @@ namespace PubnubApi.WinFormExample
                     .Write(accessManager.AccessWrite)
                     .Manage(accessManager.AccessManage)
                     .TTL(accessManager.TTL)
-                    .Async(new PNAccessManagerGrantResultExt(
+                    .Execute(new PNAccessManagerGrantResultExt(
                         (r, s) =>
                         {
                             Invoke(new Action(() => {
@@ -382,7 +382,7 @@ namespace PubnubApi.WinFormExample
                     .Write(accessManager.AccessWrite)
                     .Manage(accessManager.AccessManage)
                     .TTL(accessManager.TTL)
-                    .Async(new PNAccessManagerGrantResultExt(
+                    .Execute(new PNAccessManagerGrantResultExt(
                         (r, s) =>
                         {
                             Invoke(new Action(() => {
@@ -464,7 +464,7 @@ namespace PubnubApi.WinFormExample
                         pubnub[0].AddChannelsToChannelGroup()
                             .ChannelGroup(channelGroup)
                             .Channels(cg.ChannelName.Split(','))
-                            .Async(new PNChannelGroupsAddChannelResultExt(
+                            .Execute(new PNChannelGroupsAddChannelResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -482,7 +482,7 @@ namespace PubnubApi.WinFormExample
                     case "listchannel":
                         pubnub[0].ListChannelsForChannelGroup()
                             .ChannelGroup(channelGroup)
-                            .Async(new PNChannelGroupsAllChannelsResultExt(
+                            .Execute(new PNChannelGroupsAllChannelsResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -501,7 +501,7 @@ namespace PubnubApi.WinFormExample
                         pubnub[0].RemoveChannelsFromChannelGroup()
                             .ChannelGroup(channelGroup)
                             .Channels(cg.ChannelName.Split(','))
-                            .Async(new PNChannelGroupsRemoveChannelResultExt(
+                            .Execute(new PNChannelGroupsRemoveChannelResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -964,11 +964,593 @@ namespace PubnubApi.WinFormExample
                 .Channel(txtChannels2.Text)
                 .Message(txtMessage2.Text)
                 .UsePOST(false)
-                .Async(new PNPublishResultExt((r, s) => {
+                .Execute(new PNPublishResultExt((r, s) => {
                     Invoke(new Action(() => {
                         lvResults2.Items.Add(r.Timetoken.ToString());
                     }));
                 }));
+        }
+
+        private void btnGrantToken1_Click(object sender, EventArgs e)
+        {
+            frmTokenAccessManager accessManager = new frmTokenAccessManager();
+            accessManager.ChannelName = txtChannels1.Text;
+            accessManager.ChannelGroup = txtChannelGroup1.Text;
+            DialogResult result = accessManager.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                PNResourcePermission perm = new PNResourcePermission
+                {
+                    Read = accessManager.AccessRead,
+                    Write = accessManager.AccessWrite,
+                    Manage = accessManager.AccessManage,
+                    Delete = accessManager.AccessDelete,
+                    Create = accessManager.AccessCreate
+                };
+                pubnub[0].GrantToken()
+                    .Users(new Dictionary<string, PNResourcePermission>() { { accessManager.UserId, perm } })
+                    .Spaces(new Dictionary<string, PNResourcePermission>() { { accessManager.SpaceId, perm } })
+                    .AuthKey(accessManager.AuthKey)
+                    .TTL(accessManager.TTL)
+                    .Execute(new PNAccessManagerTokenResultExt(
+                        (r, s) =>
+                        {
+                            Invoke(new Action(() => {
+                                if (r != null)
+                                {
+                                    lvResults1.Items.Add(pubnub[0].JsonPluggableLibrary.SerializeToJsonString(r));
+                                }
+                                else if (s != null)
+                                {
+                                    lvResults1.Items.Add(pubnub[0].JsonPluggableLibrary.SerializeToJsonString(s));
+                                }
+
+                            }));
+
+                        })
+                        );
+            }
+        }
+
+        private void btnGrantToken2_Click(object sender, EventArgs e)
+        {
+            frmTokenAccessManager accessManager = new frmTokenAccessManager();
+            accessManager.ChannelName = txtChannels2.Text;
+            accessManager.ChannelGroup = txtChannelGroup2.Text;
+            DialogResult result = accessManager.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                PNResourcePermission perm = new PNResourcePermission
+                {
+                    Read = accessManager.AccessRead,
+                    Write = accessManager.AccessWrite,
+                    Manage = accessManager.AccessManage,
+                    Delete = accessManager.AccessDelete,
+                    Create = accessManager.AccessCreate
+                };
+                pubnub[1].GrantToken()
+                    .Users(new Dictionary<string, PNResourcePermission>() { { accessManager.UserId, perm } })
+                    .Spaces(new Dictionary<string, PNResourcePermission>() { { accessManager.SpaceId, perm } })
+                    .AuthKey(accessManager.AuthKey)
+                    .TTL(accessManager.TTL)
+                    .Execute(new PNAccessManagerTokenResultExt(
+                        (r, s) =>
+                        {
+                            Invoke(new Action(() => {
+                                if (r != null)
+                                {
+                                    lvResults2.Items.Add(pubnub[1].JsonPluggableLibrary.SerializeToJsonString(r));
+                                }
+                                else if (s != null)
+                                {
+                                    lvResults2.Items.Add(pubnub[1].JsonPluggableLibrary.SerializeToJsonString(s));
+                                }
+
+                            }));
+
+                        })
+                        );
+            }
+        }
+
+        private void lvResults1_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
+        {
+            Clipboard.Clear();
+            Clipboard.SetText(e.Item.Text);
+        }
+
+        private void lvResults2_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
+        {
+            Clipboard.Clear();
+            Clipboard.SetText(e.Item.Text);
+        }
+
+        private void btnObjects1_Click(object sender, EventArgs e)
+        {
+            frmObjects obj = new frmObjects();
+            DialogResult result = obj.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                switch (obj.ObjectsRequestType.ToLower())
+                {
+                    case "createuser":
+                        pubnub[0].CreateUser()
+                            .Id(obj.UserId)
+                            .Name(obj.UserName)
+                            .Execute(new PNCreateUserResultExt(
+                                (r, s) => {
+                                    Invoke(new Action(() => {
+                                        if (r != null)
+                                        {
+                                            lvResults1.Items.Add(pubnub[0].JsonPluggableLibrary.SerializeToJsonString(r));
+                                        }
+                                        else if (s != null)
+                                        {
+                                            lvResults1.Items.Add(pubnub[0].JsonPluggableLibrary.SerializeToJsonString(s));
+                                        }
+
+                                    }));
+                                }));
+                        break;
+                    case "updateuser":
+                        pubnub[0].UpdateUser()
+                            .Id(obj.UserId)
+                            .Name(obj.UserName)
+                            .Execute(new PNUpdateUserResultExt(
+                                (r, s) => {
+                                    Invoke(new Action(() => {
+                                        if (r != null)
+                                        {
+                                            lvResults1.Items.Add(pubnub[0].JsonPluggableLibrary.SerializeToJsonString(r));
+                                        }
+                                        else if (s != null)
+                                        {
+                                            lvResults1.Items.Add(pubnub[0].JsonPluggableLibrary.SerializeToJsonString(s));
+                                        }
+
+                                    }));
+                                }));
+                        break;
+                    case "deleteuser":
+                        pubnub[0].DeleteUser()
+                            .Id(obj.UserId)
+                            .Execute(new PNDeleteUserResultExt(
+                                (r, s) => {
+                                    Invoke(new Action(() => {
+                                        if (r != null)
+                                        {
+                                            lvResults1.Items.Add(pubnub[0].JsonPluggableLibrary.SerializeToJsonString(r));
+                                        }
+                                        else if (s != null)
+                                        {
+                                            lvResults1.Items.Add(pubnub[0].JsonPluggableLibrary.SerializeToJsonString(s));
+                                        }
+
+                                    }));
+                                }));
+                        break;
+                    case "getuser":
+                        pubnub[0].GetUser()
+                            .UserId(obj.UserId)
+                            .Execute(new PNGetUserResultExt(
+                                (r, s) => {
+                                    Invoke(new Action(() => {
+                                        if (r != null)
+                                        {
+                                            lvResults1.Items.Add(pubnub[0].JsonPluggableLibrary.SerializeToJsonString(r));
+                                        }
+                                        else if (s != null)
+                                        {
+                                            lvResults1.Items.Add(pubnub[0].JsonPluggableLibrary.SerializeToJsonString(s));
+                                        }
+
+                                    }));
+                                }));
+                        break;
+                    case "createspace":
+                        pubnub[0].CreateSpace()
+                            .Id(obj.SpaceId)
+                            .Name(obj.SpaceName)
+                            .Execute(new PNCreateSpaceResultExt(
+                                (r, s) => {
+                                    Invoke(new Action(() => {
+                                        if (r != null)
+                                        {
+                                            lvResults1.Items.Add(pubnub[0].JsonPluggableLibrary.SerializeToJsonString(r));
+                                        }
+                                        else if (s != null)
+                                        {
+                                            lvResults1.Items.Add(pubnub[0].JsonPluggableLibrary.SerializeToJsonString(s));
+                                        }
+
+                                    }));
+                                }));
+                        break;
+                    case "updatespace":
+                        pubnub[0].UpdateSpace()
+                            .Id(obj.SpaceId)
+                            .Name(obj.SpaceName)
+                            .Execute(new PNUpdateSpaceResultExt(
+                                (r, s) => {
+                                    Invoke(new Action(() => {
+                                        if (r != null)
+                                        {
+                                            lvResults1.Items.Add(pubnub[0].JsonPluggableLibrary.SerializeToJsonString(r));
+                                        }
+                                        else if (s != null)
+                                        {
+                                            lvResults1.Items.Add(pubnub[0].JsonPluggableLibrary.SerializeToJsonString(s));
+                                        }
+
+                                    }));
+                                }));
+                        break;
+                    case "deletespace":
+                        pubnub[0].DeleteSpace()
+                            .Id(obj.SpaceId)
+                            .Execute(new PNDeleteSpaceResultExt(
+                                (r, s) => {
+                                    Invoke(new Action(() => {
+                                        if (r != null)
+                                        {
+                                            lvResults1.Items.Add(pubnub[0].JsonPluggableLibrary.SerializeToJsonString(r));
+                                        }
+                                        else if (s != null)
+                                        {
+                                            lvResults1.Items.Add(pubnub[0].JsonPluggableLibrary.SerializeToJsonString(s));
+                                        }
+
+                                    }));
+                                }));
+                        break;
+                    case "getspace":
+                        pubnub[0].GetSpace()
+                            .SpaceId(obj.SpaceId)
+                            .Execute(new PNGetSpaceResultExt(
+                                (r, s) => {
+                                    Invoke(new Action(() => {
+                                        if (r != null)
+                                        {
+                                            lvResults1.Items.Add(pubnub[0].JsonPluggableLibrary.SerializeToJsonString(r));
+                                        }
+                                        else if (s != null)
+                                        {
+                                            lvResults1.Items.Add(pubnub[0].JsonPluggableLibrary.SerializeToJsonString(s));
+                                        }
+
+                                    }));
+                                }));
+                        break;
+                    case "memberadd":
+                        pubnub[0].ManageMembers()
+                            .SpaceId(obj.SpaceId)
+                            .Add(new List<PNMember>() { new PNMember { UserId = obj.UserId } })
+                            .Execute(new PNManageMembersResultExt(
+                                (r, s) => {
+                                    Invoke(new Action(() => {
+                                        if (r != null)
+                                        {
+                                            lvResults1.Items.Add(pubnub[0].JsonPluggableLibrary.SerializeToJsonString(r));
+                                        }
+                                        else if (s != null)
+                                        {
+                                            lvResults1.Items.Add(pubnub[0].JsonPluggableLibrary.SerializeToJsonString(s));
+                                        }
+
+                                    }));
+                                }));
+                        break;
+                    case "memberremove":
+                        pubnub[0].ManageMembers()
+                            .SpaceId(obj.SpaceId)
+                            .Remove(new List<string>() { obj.UserId })
+                            .Execute(new PNManageMembersResultExt(
+                                (r, s) => {
+                                    Invoke(new Action(() => {
+                                        if (r != null)
+                                        {
+                                            lvResults1.Items.Add(pubnub[0].JsonPluggableLibrary.SerializeToJsonString(r));
+                                        }
+                                        else if (s != null)
+                                        {
+                                            lvResults1.Items.Add(pubnub[0].JsonPluggableLibrary.SerializeToJsonString(s));
+                                        }
+
+                                    }));
+                                }));
+                        break;
+                    case "membershipadd":
+                        pubnub[0].ManageMemberships()
+                            .UserId(obj.UserId)
+                            .Add(new List<PNMembership>() { new PNMembership { SpaceId = obj.SpaceId } })
+                            .Execute(new PNManageMembershipsResultExt(
+                                (r, s) => {
+                                    Invoke(new Action(() => {
+                                        if (r != null)
+                                        {
+                                            lvResults1.Items.Add(pubnub[0].JsonPluggableLibrary.SerializeToJsonString(r));
+                                        }
+                                        else if (s != null)
+                                        {
+                                            lvResults1.Items.Add(pubnub[0].JsonPluggableLibrary.SerializeToJsonString(s));
+                                        }
+
+                                    }));
+                                }));
+                        break;
+                    case "membershipremove":
+                        pubnub[0].ManageMemberships()
+                            .UserId(obj.UserId)
+                            .Remove(new List<string>() { obj.SpaceId })
+                            .Execute(new PNManageMembershipsResultExt(
+                                (r, s) => {
+                                    Invoke(new Action(() => {
+                                        if (r != null)
+                                        {
+                                            lvResults1.Items.Add(pubnub[0].JsonPluggableLibrary.SerializeToJsonString(r));
+                                        }
+                                        else if (s != null)
+                                        {
+                                            lvResults1.Items.Add(pubnub[0].JsonPluggableLibrary.SerializeToJsonString(s));
+                                        }
+
+                                    }));
+                                }));
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        private void btnObjects2_Click(object sender, EventArgs e)
+        {
+            frmObjects obj = new frmObjects();
+            DialogResult result = obj.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                switch (obj.ObjectsRequestType.ToLower())
+                {
+                    case "createuser":
+                        pubnub[1].CreateUser()
+                            .Id(obj.UserId)
+                            .Name(obj.UserName)
+                            .Execute(new PNCreateUserResultExt(
+                                (r, s) => {
+                                    Invoke(new Action(() => {
+                                        if (r != null)
+                                        {
+                                            lvResults2.Items.Add(pubnub[1].JsonPluggableLibrary.SerializeToJsonString(r));
+                                        }
+                                        else if (s != null)
+                                        {
+                                            lvResults2.Items.Add(pubnub[1].JsonPluggableLibrary.SerializeToJsonString(s));
+                                        }
+
+                                    }));
+                                }));
+                        break;
+                    case "updateuser":
+                        pubnub[1].UpdateUser()
+                            .Id(obj.UserId)
+                            .Name(obj.UserName)
+                            .Execute(new PNUpdateUserResultExt(
+                                (r, s) => {
+                                    Invoke(new Action(() => {
+                                        if (r != null)
+                                        {
+                                            lvResults2.Items.Add(pubnub[1].JsonPluggableLibrary.SerializeToJsonString(r));
+                                        }
+                                        else if (s != null)
+                                        {
+                                            lvResults2.Items.Add(pubnub[1].JsonPluggableLibrary.SerializeToJsonString(s));
+                                        }
+
+                                    }));
+                                }));
+                        break;
+                    case "deleteuser":
+                        pubnub[1].DeleteUser()
+                            .Id(obj.UserId)
+                            .Execute(new PNDeleteUserResultExt(
+                                (r, s) => {
+                                    Invoke(new Action(() => {
+                                        if (r != null)
+                                        {
+                                            lvResults2.Items.Add(pubnub[1].JsonPluggableLibrary.SerializeToJsonString(r));
+                                        }
+                                        else if (s != null)
+                                        {
+                                            lvResults2.Items.Add(pubnub[1].JsonPluggableLibrary.SerializeToJsonString(s));
+                                        }
+
+                                    }));
+                                }));
+                        break;
+                    case "getuser":
+                        pubnub[1].GetUser()
+                            .UserId(obj.UserId)
+                            .Execute(new PNGetUserResultExt(
+                                (r, s) => {
+                                    Invoke(new Action(() => {
+                                        if (r != null)
+                                        {
+                                            lvResults2.Items.Add(pubnub[1].JsonPluggableLibrary.SerializeToJsonString(r));
+                                        }
+                                        else if (s != null)
+                                        {
+                                            lvResults2.Items.Add(pubnub[1].JsonPluggableLibrary.SerializeToJsonString(s));
+                                        }
+
+                                    }));
+                                }));
+                        break;
+                    case "createspace":
+                        pubnub[1].CreateSpace()
+                            .Id(obj.SpaceId)
+                            .Name(obj.SpaceName)
+                            .Execute(new PNCreateSpaceResultExt(
+                                (r, s) => {
+                                    Invoke(new Action(() => {
+                                        if (r != null)
+                                        {
+                                            lvResults2.Items.Add(pubnub[1].JsonPluggableLibrary.SerializeToJsonString(r));
+                                        }
+                                        else if (s != null)
+                                        {
+                                            lvResults2.Items.Add(pubnub[1].JsonPluggableLibrary.SerializeToJsonString(s));
+                                        }
+
+                                    }));
+                                }));
+                        break;
+                    case "updatespace":
+                        pubnub[1].UpdateSpace()
+                            .Id(obj.SpaceId)
+                            .Name(obj.SpaceName)
+                            .Execute(new PNUpdateSpaceResultExt(
+                                (r, s) => {
+                                    Invoke(new Action(() => {
+                                        if (r != null)
+                                        {
+                                            lvResults2.Items.Add(pubnub[1].JsonPluggableLibrary.SerializeToJsonString(r));
+                                        }
+                                        else if (s != null)
+                                        {
+                                            lvResults2.Items.Add(pubnub[1].JsonPluggableLibrary.SerializeToJsonString(s));
+                                        }
+
+                                    }));
+                                }));
+                        break;
+                    case "deletespace":
+                        pubnub[1].DeleteSpace()
+                            .Id(obj.SpaceId)
+                            .Execute(new PNDeleteSpaceResultExt(
+                                (r, s) => {
+                                    Invoke(new Action(() => {
+                                        if (r != null)
+                                        {
+                                            lvResults2.Items.Add(pubnub[1].JsonPluggableLibrary.SerializeToJsonString(r));
+                                        }
+                                        else if (s != null)
+                                        {
+                                            lvResults2.Items.Add(pubnub[1].JsonPluggableLibrary.SerializeToJsonString(s));
+                                        }
+
+                                    }));
+                                }));
+                        break;
+                    case "getspace":
+                        pubnub[1].GetSpace()
+                            .SpaceId(obj.SpaceId)
+                            .Execute(new PNGetSpaceResultExt(
+                                (r, s) => {
+                                    Invoke(new Action(() => {
+                                        if (r != null)
+                                        {
+                                            lvResults2.Items.Add(pubnub[1].JsonPluggableLibrary.SerializeToJsonString(r));
+                                        }
+                                        else if (s != null)
+                                        {
+                                            lvResults2.Items.Add(pubnub[1].JsonPluggableLibrary.SerializeToJsonString(s));
+                                        }
+
+                                    }));
+                                }));
+                        break;
+                    case "memberadd":
+                        pubnub[1].ManageMembers()
+                            .SpaceId(obj.SpaceId)
+                            .Add(new List<PNMember>() { new PNMember { UserId = obj.UserId } })
+                            .Execute(new PNManageMembersResultExt(
+                                (r, s) => {
+                                    Invoke(new Action(() => {
+                                        if (r != null)
+                                        {
+                                            lvResults2.Items.Add(pubnub[1].JsonPluggableLibrary.SerializeToJsonString(r));
+                                        }
+                                        else if (s != null)
+                                        {
+                                            lvResults2.Items.Add(pubnub[1].JsonPluggableLibrary.SerializeToJsonString(s));
+                                        }
+
+                                    }));
+                                }));
+                        break;
+                    case "memberremove":
+                        pubnub[1].ManageMembers()
+                            .SpaceId(obj.SpaceId)
+                            .Remove(new List<string>() { obj.UserId })
+                            .Execute(new PNManageMembersResultExt(
+                                (r, s) => {
+                                    Invoke(new Action(() => {
+                                        if (r != null)
+                                        {
+                                            lvResults2.Items.Add(pubnub[1].JsonPluggableLibrary.SerializeToJsonString(r));
+                                        }
+                                        else if (s != null)
+                                        {
+                                            lvResults2.Items.Add(pubnub[1].JsonPluggableLibrary.SerializeToJsonString(s));
+                                        }
+
+                                    }));
+                                }));
+                        break;
+                    case "membershipadd":
+                        pubnub[1].ManageMemberships()
+                            .UserId(obj.UserId)
+                            .Add(new List<PNMembership>() { new PNMembership { SpaceId = obj.SpaceId } })
+                            .Execute(new PNManageMembershipsResultExt(
+                                (r, s) => {
+                                    Invoke(new Action(() => {
+                                        if (r != null)
+                                        {
+                                            lvResults2.Items.Add(pubnub[1].JsonPluggableLibrary.SerializeToJsonString(r));
+                                        }
+                                        else if (s != null)
+                                        {
+                                            lvResults2.Items.Add(pubnub[1].JsonPluggableLibrary.SerializeToJsonString(s));
+                                        }
+
+                                    }));
+                                }));
+                        break;
+                    case "membershipremove":
+                        pubnub[1].ManageMemberships()
+                            .UserId(obj.UserId)
+                            .Remove(new List<string>() { obj.SpaceId })
+                            .Execute(new PNManageMembershipsResultExt(
+                                (r, s) => {
+                                    Invoke(new Action(() => {
+                                        if (r != null)
+                                        {
+                                            lvResults2.Items.Add(pubnub[1].JsonPluggableLibrary.SerializeToJsonString(r));
+                                        }
+                                        else if (s != null)
+                                        {
+                                            lvResults2.Items.Add(pubnub[1].JsonPluggableLibrary.SerializeToJsonString(s));
+                                        }
+
+                                    }));
+                                }));
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        private void btnSetToken1_Click(object sender, EventArgs e)
+        {
+            pubnub[0].SetToken(txtToken1.Text);
+            lvResults1.Items.Add(pubnub[0].JsonPluggableLibrary.SerializeToJsonString(pubnub[0].ParseToken(txtToken1.Text)));
+        }
+
+        private void btnSetToken2_Click(object sender, EventArgs e)
+        {
+            pubnub[1].SetToken(txtToken2.Text);
+            lvResults2.Items.Add(pubnub[1].JsonPluggableLibrary.SerializeToJsonString(pubnub[1].ParseToken(txtToken2.Text)));
         }
     }
 }
