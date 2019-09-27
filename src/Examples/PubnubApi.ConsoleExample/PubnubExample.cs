@@ -576,6 +576,7 @@ namespace PubnubApiDemo
                             .Reverse(false)
                             .Count(100)
                             .IncludeTimetoken(true)
+                            .WithMeta(true)
                             .Execute(new PNHistoryResultExt(
                                 (r, s) =>
                                 {

@@ -325,7 +325,7 @@ namespace PubnubApi
             return BuildRestApiRequest(url, currentType, queryParams);
         }
 
-        Uri IUrlRequestBuilder.BuildHistoryRequest(string requestMethod, string requestBody, string channel, long start, long end, int count, bool reverse, bool includeToken, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildHistoryRequest(string requestMethod, string requestBody, string channel, long start, long end, int count, bool reverse, bool includeToken, bool includeMeta, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PNHistoryOperation;
 
@@ -357,6 +357,11 @@ namespace PubnubApi
             if (includeToken)
             {
                 requestQueryStringParams.Add("include_token", "true");
+            }
+
+            if (includeMeta)
+            {
+                requestQueryStringParams.Add("include_meta", "true");
             }
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)

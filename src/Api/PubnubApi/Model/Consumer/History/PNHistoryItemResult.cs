@@ -9,5 +9,6 @@ namespace PubnubApi
     {
         public long Timetoken { get; set; }
         public object Entry { get; set; }
+        public object Meta { get; set; }
     }
 }
