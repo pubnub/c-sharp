@@ -27,6 +27,8 @@ namespace PubnubApi.Interface
 
         Uri BuildHistoryRequest(string requestMethod, string requestBody, string channel, long start, long end, int count, bool reverse, bool includeToken, bool includeMeta, Dictionary<string, object> externalQueryParam);
 
+        Uri BuildFetchRequest(string requestMethod, string requestBody, string[] channels, long start, long end, int count, bool reverse, bool includeMeta, Dictionary<string, object> externalQueryParam);
+
         Uri BuildDeleteMessageRequest(string requestMethod, string requestBody, string channel, long start, long end, Dictionary<string, object> externalQueryParam);
 
         Uri BuildWhereNowRequest(string requestMethod, string requestBody, string uuid, Dictionary<string, object> externalQueryParam);

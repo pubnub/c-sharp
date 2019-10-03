@@ -103,7 +103,7 @@ namespace PubnubApi
             }
 
             encodedUri = o.ToString();
-            if (type == PNOperationType.PNHereNowOperation || type == PNOperationType.PNHistoryOperation || type == PNOperationType.Leave || type == PNOperationType.PNHeartbeatOperation || type == PNOperationType.PushRegister || type == PNOperationType.PushRemove || type == PNOperationType.PushGet || type == PNOperationType.PushUnregister)
+            if (type == PNOperationType.PNHereNowOperation || type == PNOperationType.PNHistoryOperation || type == PNOperationType.PNFetchHistoryOperation || type == PNOperationType.Leave || type == PNOperationType.PNHeartbeatOperation || type == PNOperationType.PushRegister || type == PNOperationType.PushRemove || type == PNOperationType.PushGet || type == PNOperationType.PushUnregister)
             {
                 if (!ignorePercent2fEncode)
                 {

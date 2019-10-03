@@ -74,6 +74,12 @@ namespace PubnubApi
             return historyOperaton;
         }
 
+        public EndPoint.FetchHistoryOperation FetchHistory()
+        {
+            EndPoint.FetchHistoryOperation historyOperaton = new EndPoint.FetchHistoryOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
+            return historyOperaton;
+        }
+
         public EndPoint.DeleteMessageOperation DeleteMessages()
         {
             EndPoint.DeleteMessageOperation deleteMessageOperaton = new EndPoint.DeleteMessageOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);

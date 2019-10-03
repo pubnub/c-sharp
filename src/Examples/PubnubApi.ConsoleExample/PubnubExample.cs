@@ -331,6 +331,7 @@ namespace PubnubApiDemo
                     menuOptionsStringBuilder.AppendLine("Enter 22 FOR GetSubscribeChannelGroups");
                     menuOptionsStringBuilder.AppendLine("Enter 23 FOR DeleteMessages");
                     menuOptionsStringBuilder.AppendLine("Enter 24 FOR MessagesCount");
+                    menuOptionsStringBuilder.AppendLine("Enter 25 FOR Fetch Messages");
                     menuOptionsStringBuilder.AppendLine("Enter 31 FOR Push - Register Device");
                     menuOptionsStringBuilder.AppendLine("Enter 32 FOR Push - Remove Channel");
                     menuOptionsStringBuilder.AppendLine("Enter 33 FOR Push - Get Current Channels");
@@ -576,7 +577,7 @@ namespace PubnubApiDemo
                             .Reverse(false)
                             .Count(100)
                             .IncludeTimetoken(true)
-                            .WithMeta(true)
+                            .IncludeMeta(true)
                             .Execute(new PNHistoryResultExt(
                                 (r, s) =>
                                 {
@@ -1175,6 +1176,27 @@ namespace PubnubApiDemo
                                     {
                                         Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     }
+                                }));
+                        break;
+                    case "25":
+                        Console.WriteLine("Enter CHANNEL name(s) for Fetch History");
+                        channel = Console.ReadLine();
+
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Channel(s) = {0}", channel));
+                        Console.ResetColor();
+                        Console.WriteLine();
+
+                        Console.WriteLine("Running FetchHistory()");
+                        pubnub.FetchHistory()
+                            .Channels(channel.Split(','))
+                            .Reverse(false)
+                            .MaximumPerChannel(25)
+                            .IncludeMeta(true)
+                            .Execute(new PNFetchHistoryResultExt(
+                                (r, s) =>
+                                {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                 }));
                         break;
                     case "31":

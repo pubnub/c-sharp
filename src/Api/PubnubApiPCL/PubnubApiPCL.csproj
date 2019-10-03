@@ -22,7 +22,8 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>Added WithMeta option to History</PackageReleaseNotes>
+    <PackageReleaseNotes>Added IncludeMeta option to History
+Added new feature FetchHistory</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
@@ -105,11 +106,6 @@
     <Compile Include="..\PubnubApi\EndPoint\ChannelGroup\RemoveChannelsFromChannelGroupOperation.cs">
       <Link>EndPoint\ChannelGroup\RemoveChannelsFromChannelGroupOperation.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\EndPoint\DeleteMessageOperation.cs" Link="EndPoint\DeleteMessageOperation.cs" />
-    <Compile Include="..\PubnubApi\EndPoint\HistoryOperation.cs">
-      <Link>EndPoint\HistoryOperation.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\EndPoint\MessageCountsOperation.cs" Link="EndPoint\MessageCountsOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\Objects\CreateSpaceOperation.cs" Link="EndPoint\Objects\CreateSpaceOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\Objects\CreateUserOperation.cs" Link="EndPoint\Objects\CreateUserOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\Objects\DeleteSpaceOperation.cs" Link="EndPoint\Objects\DeleteSpaceOperation.cs" />
@@ -172,6 +168,10 @@
     <Compile Include="..\PubnubApi\EndPoint\Push\RemovePushChannelOperation.cs">
       <Link>EndPoint\Push\RemovePushChannelOperation.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\StoragePlayback\DeleteMessageOperation.cs" Link="EndPoint\StoragePlayback\DeleteMessageOperation.cs" />
+    <Compile Include="..\PubnubApi\EndPoint\StoragePlayback\FetchHistoryOperation.cs" Link="EndPoint\StoragePlayback\FetchHistoryOperation.cs" />
+    <Compile Include="..\PubnubApi\EndPoint\StoragePlayback\HistoryOperation.cs" Link="EndPoint\StoragePlayback\HistoryOperation.cs" />
+    <Compile Include="..\PubnubApi\EndPoint\StoragePlayback\MessageCountsOperation.cs" Link="EndPoint\StoragePlayback\MessageCountsOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\TelemetryManager.cs" Link="EndPoint\TelemetryManager.cs" />
     <Compile Include="..\PubnubApi\EndPoint\TimeOperation.cs">
       <Link>EndPoint\TimeOperation.cs</Link>
@@ -237,6 +237,7 @@
     <Compile Include="..\PubnubApi\JsonDataParse\JsonDataParseInternalUtil.cs" Link="JsonDataParse\JsonDataParseInternalUtil.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNCreateSpaceJsonDataParse.cs" Link="JsonDataParse\PNCreateSpaceJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNCreateUserJsonDataParse.cs" Link="JsonDataParse\PNCreateUserJsonDataParse.cs" />
+    <Compile Include="..\PubnubApi\JsonDataParse\PNFetchHistoryJsonDataParse.cs" Link="JsonDataParse\PNFetchHistoryJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNGetMembershipsJsonDataParse.cs" Link="JsonDataParse\PNGetMembershipsJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNGetMembersJsonDataParse.cs" Link="JsonDataParse\PNGetMembersJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNGetSpaceJsonDataParse.cs" Link="JsonDataParse\PNGetSpaceJsonDataParse.cs" />
@@ -244,6 +245,7 @@
     <Compile Include="..\PubnubApi\JsonDataParse\PNGetUserJsonDataParse.cs" Link="JsonDataParse\PNGetUserJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNGetUsersJsonDataParse.cs" Link="JsonDataParse\PNGetUsersJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNGrantTokenJsonDataParse.cs" Link="JsonDataParse\PNGrantTokenJsonDataParse.cs" />
+    <Compile Include="..\PubnubApi\JsonDataParse\PNHistoryJsonDataParse.cs" Link="JsonDataParse\PNHistoryJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNManageMembershipsJsonDataParse.cs" Link="JsonDataParse\PNManageMembershipsJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNManageMembersJsonDataParse.cs" Link="JsonDataParse\PNManageMembersJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNObjectApiEventJsonDataParse.cs" Link="JsonDataParse\PNObjectApiEventJsonDataParse.cs" />
@@ -286,6 +288,7 @@
       <Link>Model\Consumer\ChannelGroup\PNChannelGroupsRemoveChannelResult.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\Model\Consumer\DeleteMessage\PNDeleteMessageResult.cs" Link="Model\Consumer\DeleteMessage\PNDeleteMessageResult.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\History\PNFetchHistoryResult.cs" Link="Model\Consumer\History\PNFetchHistoryResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\History\PNHistoryItemResult.cs">
       <Link>Model\Consumer\History\PNHistoryItemResult.cs</Link>
     </Compile>
@@ -389,6 +392,7 @@
       <Link>Model\Derived\ChannelGroup\PNChannelGroupsRemoveChannelResultExt.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\Model\Derived\DeleteMessage\PNDeleteMessageResultExt.cs" Link="Model\Derived\DeleteMessage\PNDeleteMessageResultExt.cs" />
+    <Compile Include="..\PubnubApi\Model\Derived\History\PNFetchHistoryResultExt.cs" Link="Model\Derived\History\PNFetchHistoryResultExt.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\History\PNHistoryResultExt.cs">
       <Link>Model\Derived\History\PNHistoryResultExt.cs</Link>
     </Compile>
@@ -713,6 +717,7 @@
     <Folder Include="CBOR\Tags\" />
     <Folder Include="EndPoint\Access\" />
     <Folder Include="EndPoint\ChannelGroup\" />
+    <Folder Include="EndPoint\StoragePlayback\" />
     <Folder Include="EndPoint\Objects\" />
     <Folder Include="EndPoint\Push\" />
     <Folder Include="EndPoint\PubSub\" />

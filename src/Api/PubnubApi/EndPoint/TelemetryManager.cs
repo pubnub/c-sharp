@@ -66,6 +66,7 @@ namespace PubnubApi.EndPoint
                     endpoint = "l_pub";
                     break;
                 case PNOperationType.PNHistoryOperation:
+                case PNOperationType.PNFetchHistoryOperation:
                 case PNOperationType.PNFireOperation:
                 case PNOperationType.PNDeleteMessageOperation:
                     endpoint = "l_hist";

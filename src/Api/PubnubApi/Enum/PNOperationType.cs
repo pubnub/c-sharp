@@ -10,6 +10,7 @@ namespace PubnubApi
         PNFireOperation,
         PNSignalOperation,
         PNHistoryOperation,
+        PNFetchHistoryOperation,
         PNDeleteMessageOperation,
         PNMessageCountsOperation,
         PNWhereNowOperation,

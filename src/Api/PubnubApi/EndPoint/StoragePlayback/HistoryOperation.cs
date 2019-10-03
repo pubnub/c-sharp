@@ -57,9 +57,9 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
-        public HistoryOperation WithMeta(bool includeMeta)
+        public HistoryOperation IncludeMeta(bool withMeta)
         {
-            this.withMetaOption = includeMeta;
+            this.withMetaOption = withMeta;
             return this;
         }
 
@@ -150,10 +150,10 @@ namespace PubnubApi.EndPoint
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;
 
-            string json = UrlProcessRequest< PNHistoryResult>(request, requestState, false);
+            string json = UrlProcessRequest(request, requestState, false);
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = ProcessJsonResponse<PNHistoryResult>(requestState, json);
+                List<object> result = ProcessJsonResponse(requestState, json);
                 ProcessResponseCallbacks(result, requestState);
             }
         }

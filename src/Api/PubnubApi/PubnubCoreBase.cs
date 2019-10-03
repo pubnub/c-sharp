@@ -790,6 +790,7 @@ namespace PubnubApi
                     case PNOperationType.PNFireOperation:
                     case PNOperationType.PNSignalOperation:
                     case PNOperationType.PNHistoryOperation:
+                    case PNOperationType.PNFetchHistoryOperation:
                     case PNOperationType.PNDeleteMessageOperation:
                     case PNOperationType.PNMessageCountsOperation:
                     case PNOperationType.PNHereNowOperation:
@@ -1295,9 +1296,26 @@ namespace PubnubApi
                             case PNOperationType.PNTimeOperation:
                                 break;
                             case PNOperationType.PNHistoryOperation:
+                            case PNOperationType.PNFetchHistoryOperation:
                                 if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig) && pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog))
                                 {
-                                    result = SecureMessage.Instance(currentConfig, jsonLib, currentLog).DecodeDecryptLoop(result, channels, channelGroups, callback);
+                                    if (type == PNOperationType.PNFetchHistoryOperation)
+                                    {
+                                        Dictionary<string, object> messageContainer = (result.Count >= 4) ? jsonLib.ConvertToDictionaryObject(result[3]) : null;
+                                        if (messageContainer != null && messageContainer.Count > 0 && messageContainer.ContainsKey("channels"))
+                                        {
+                                            object channelMessageContainer = messageContainer["channels"];
+                                            Dictionary<string, object> channelDic = jsonLib.ConvertToDictionaryObject(channelMessageContainer);
+                                            if (channelDic != null && channelDic.Count > 0)
+                                            {
+                                                result = SecureMessage.Instance(currentConfig, jsonLib, currentLog).FetchHistoryDecodeDecryptLoop(type, channelDic, channels, channelGroups, callback);
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        result = SecureMessage.Instance(currentConfig, jsonLib, currentLog).HistoryDecodeDecryptLoop(type, result, channels, channelGroups, callback);
+                                    }
                                 }
                                 result.Add(multiChannel);
                                 break;

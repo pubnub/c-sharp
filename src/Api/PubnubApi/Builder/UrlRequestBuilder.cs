@@ -381,6 +381,59 @@ namespace PubnubApi
             return BuildRestApiRequest(url, currentType, queryParams);
         }
 
+        Uri IUrlRequestBuilder.BuildFetchRequest(string requestMethod, string requestBody, string[] channels, long start, long end, int count, bool reverse, bool includeMeta, Dictionary<string, object> externalQueryParam)
+        {
+            string channel = (channels != null && channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : "";
+
+            PNOperationType currentType = PNOperationType.PNFetchHistoryOperation;
+
+            List<string> url = new List<string>();
+            url.Add("v3");
+            url.Add("history");
+            url.Add("sub-key");
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("channel");
+            url.Add(channel);
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+
+            requestQueryStringParams.Add("max", (count <= -1) ? "100" : count.ToString());
+
+            if (reverse)
+            {
+                requestQueryStringParams.Add("reverse", "true");
+            }
+            if (start != -1)
+            {
+                requestQueryStringParams.Add("start", start.ToString(CultureInfo.InvariantCulture));
+            }
+            if (end != -1)
+            {
+                requestQueryStringParams.Add("end", end.ToString(CultureInfo.InvariantCulture));
+            }
+
+            if (includeMeta)
+            {
+                requestQueryStringParams.Add("include_meta", "true");
+            }
+
+            if (externalQueryParam != null && externalQueryParam.Count > 0)
+            {
+                foreach (KeyValuePair<string, object> kvp in externalQueryParam)
+                {
+                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    {
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                    }
+                }
+            }
+
+            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest(url, currentType, queryParams);
+        }
+
         Uri IUrlRequestBuilder.BuildMessageCountsRequest(string requestMethod, string requestBody, string[] channels, long[] timetokens, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PNMessageCountsOperation;

@@ -227,6 +227,16 @@ namespace PubnubApi
                             }
                         }
                         break;
+                    case PNOperationType.PNFetchHistoryOperation:
+                        if (savedEndpointOperation is FetchHistoryOperation)
+                        {
+                            FetchHistoryOperation endpoint = savedEndpointOperation as FetchHistoryOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
                     case PNOperationType.PNMessageCountsOperation:
                         if (savedEndpointOperation is MessageCountsOperation)
                         {

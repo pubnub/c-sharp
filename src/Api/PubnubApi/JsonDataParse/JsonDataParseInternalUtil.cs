@@ -50,6 +50,29 @@ namespace PubnubApi
                             ret.Add(propName, ConvertJTokenToObject(jsonProp.Value));
                         }
                     }
+                    else if (localContainer.GetType().ToString() == "System.Collections.Generic.List`1[System.Object]")
+                    {
+                        List<object> localList = localContainer as List<object>;
+                        if (localList != null)
+                        {
+                            if (localList.Count > 0 && localList[0].GetType() == typeof(KeyValuePair<string, object>))
+                            {
+                                ret = new Dictionary<string, object>();
+                                foreach (object item in localList)
+                                {
+                                    if (item is KeyValuePair<string, object> kvpItem)
+                                    {
+                                        ret.Add(kvpItem.Key, kvpItem.Value);
+                                    }
+                                    else
+                                    {
+                                        ret = null;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
             catch { /* ignore */ }
