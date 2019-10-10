@@ -166,13 +166,13 @@ namespace PubnubApi.EndPoint
             {
                 ret = "custom";
             }
-            else if (enumValue.ToLowerInvariant() == "space")
+            else if (enumValue.ToLowerInvariant() == "user")
             {
-                ret = "space";
+                ret = "user";
             }
-            else if (enumValue.ToLowerInvariant() == "space_custom")
+            else if (enumValue.ToLowerInvariant() == "user_custom")
             {
-                ret = "space.custom";
+                ret = "user.custom";
             }
             return ret;
         }

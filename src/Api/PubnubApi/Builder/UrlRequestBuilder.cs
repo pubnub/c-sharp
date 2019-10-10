@@ -381,7 +381,7 @@ namespace PubnubApi
             return BuildRestApiRequest(url, currentType, queryParams);
         }
 
-        Uri IUrlRequestBuilder.BuildFetchRequest(string requestMethod, string requestBody, string[] channels, long start, long end, int count, bool reverse, bool includeMeta, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildFetchRequest(string requestMethod, string requestBody, string[] channels, long start, long end, int count, bool reverse, bool includeMeta, bool includeMessageActions, Dictionary<string, object> externalQueryParam)
         {
             string channel = (channels != null && channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : "";
 
@@ -389,7 +389,7 @@ namespace PubnubApi
 
             List<string> url = new List<string>();
             url.Add("v3");
-            url.Add("history");
+            url.Add(includeMessageActions ? "history-with-actions" : "history");
             url.Add("sub-key");
             url.Add(pubnubConfig.SubscribeKey);
             url.Add("channel");
@@ -1528,7 +1528,7 @@ namespace PubnubApi
             }
             if (!string.IsNullOrEmpty(includeOptions))
             {
-                requestQueryStringParams.Add("include", UriUtil.EncodeUriComponent(false, includeOptions, currentType, true, false, false));
+                requestQueryStringParams.Add("include", UriUtil.EncodeUriComponent(false, includeOptions, currentType, false, false, false));
             }
             if (externalQueryParam != null && externalQueryParam.Count > 0)
             {
@@ -1577,7 +1577,7 @@ namespace PubnubApi
             }
             if (!string.IsNullOrEmpty(includeOptions))
             {
-                requestQueryStringParams.Add("include", UriUtil.EncodeUriComponent(false, includeOptions, currentType, true, false, false));
+                requestQueryStringParams.Add("include", UriUtil.EncodeUriComponent(false, includeOptions, currentType, false, false, false));
             }
             if (externalQueryParam != null && externalQueryParam.Count > 0)
             {
@@ -1626,7 +1626,7 @@ namespace PubnubApi
             }
             if (!string.IsNullOrEmpty(includeOptions))
             {
-                requestQueryStringParams.Add("include", UriUtil.EncodeUriComponent(false, includeOptions, currentType, true, false, false));
+                requestQueryStringParams.Add("include", UriUtil.EncodeUriComponent(false, includeOptions, currentType, false, false, false));
             }
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
@@ -1676,7 +1676,7 @@ namespace PubnubApi
             }
             if (!string.IsNullOrEmpty(includeOptions))
             {
-                requestQueryStringParams.Add("include", UriUtil.EncodeUriComponent(false, includeOptions, currentType, true, false, false));
+                requestQueryStringParams.Add("include", UriUtil.EncodeUriComponent(false, includeOptions, currentType, false, false, false));
             }
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
@@ -1690,6 +1690,117 @@ namespace PubnubApi
                 }
             }
             string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true, "space", spaceId, false);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest(url, currentType, queryParams);
+        }
+
+        Uri IUrlRequestBuilder.BuildAddMessageActionRequest(string requestMethod, string requestBody, string channel, long messageTimetoken, Dictionary<string, object> externalQueryParam)
+        {
+            PNOperationType currentType = PNOperationType.PNAddMessageActionOperation;
+
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("message-actions");
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("channel");
+            url.Add(channel);
+            url.Add("message");
+            url.Add(messageTimetoken.ToString());
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+
+            if (externalQueryParam != null && externalQueryParam.Count > 0)
+            {
+                foreach (KeyValuePair<string, object> kvp in externalQueryParam)
+                {
+                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    {
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                    }
+                }
+            }
+
+            bool allowPAMv3Sign = (requestMethod.ToUpperInvariant() == "POST") ? false : true;
+            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, allowPAMv3Sign);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest(url, currentType, queryParams);
+        }
+
+        Uri IUrlRequestBuilder.BuildRemoveMessageActionRequest(string requestMethod, string requestBody, string channel, long messageTimetoken, long actionTimetoken, Dictionary<string, object> externalQueryParam)
+        {
+            PNOperationType currentType = PNOperationType.PNRemoveMessageActionOperation;
+
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("message-actions");
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("channel");
+            url.Add(channel);
+            url.Add("message");
+            url.Add(messageTimetoken.ToString());
+            url.Add("action");
+            url.Add(actionTimetoken.ToString());
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+
+            if (externalQueryParam != null && externalQueryParam.Count > 0)
+            {
+                foreach (KeyValuePair<string, object> kvp in externalQueryParam)
+                {
+                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    {
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                    }
+                }
+            }
+
+            bool allowPAMv3Sign = (requestMethod.ToUpperInvariant() == "POST") ? false : true;
+            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, allowPAMv3Sign);
+            string queryParams = string.Format("?{0}", queryString);
+
+            return BuildRestApiRequest(url, currentType, queryParams);
+        }
+
+        Uri IUrlRequestBuilder.BuildGetMessageActionsRequest(string requestMethod, string requestBody, string channel, long start, long end, int limit, Dictionary<string, object> externalQueryParam)
+        {
+            PNOperationType currentType = PNOperationType.PNGetMessageActionsOperation;
+
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("message-actions");
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("channel");
+            url.Add(channel);
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+            if (start >= 0)
+            {
+                requestQueryStringParams.Add("start", start.ToString(CultureInfo.InvariantCulture));
+            }
+            if (end >= 0)
+            {
+                requestQueryStringParams.Add("end", end.ToString(CultureInfo.InvariantCulture));
+            }
+            if (limit >= 0)
+            {
+                requestQueryStringParams.Add("limit", limit.ToString(CultureInfo.InvariantCulture));
+            }
+
+            if (externalQueryParam != null && externalQueryParam.Count > 0)
+            {
+                foreach (KeyValuePair<string, object> kvp in externalQueryParam)
+                {
+                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    {
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                    }
+                }
+            }
+
+            bool allowPAMv3Sign = (requestMethod.ToUpperInvariant() == "POST") ? false : true;
+            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, allowPAMv3Sign);
             string queryParams = string.Format("?{0}", queryString);
 
             return BuildRestApiRequest(url, currentType, queryParams);
@@ -1841,10 +1952,12 @@ namespace PubnubApi
             }
             return signature;
         }
+
         private string BuildQueryString(string requestMethod, string requestBody, PNOperationType type, List<string> urlComponentList, Dictionary<string, string> queryStringParamDic, bool isPamV3Sign)
         {
             return BuildQueryString(requestMethod, requestBody, type, urlComponentList, queryStringParamDic, isPamV3Sign, "", "", false);
         }
+
         private string BuildQueryString(string requestMethod, string requestBody, PNOperationType type, List<string> urlComponentList, Dictionary<string, string> queryStringParamDic, bool isPamV3Sign, string resourceType, string resourceId, bool checkResourcePattern)
         {
             string queryString = "";

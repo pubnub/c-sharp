@@ -1381,6 +1381,34 @@ namespace PubnubApi
                 ret = (T)Convert.ChangeType(result, typeof(PNObjectApiEventResult), CultureInfo.InvariantCulture);
                 #endregion
             }
+            else if (typeof(T) == typeof(PNMessageActionEventResult))
+            {
+                #region "PNMessageActionEventResult"
+                PNMessageActionEventResult result = PNMessageActionEventJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNMessageActionEventResult), CultureInfo.InvariantCulture);
+                #endregion
+            }
+            else if (typeof(T) == typeof(PNAddMessageActionResult))
+            {
+                #region "PNAddMessageActionResult"
+                PNAddMessageActionResult result = PNAddMessageActionJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNAddMessageActionResult), CultureInfo.InvariantCulture);
+                #endregion
+            }
+            else if (typeof(T) == typeof(PNRemoveMessageActionResult))
+            {
+                #region "PNRemoveMessageActionResult"
+                PNRemoveMessageActionResult result = PNRemoveMessageActionJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNRemoveMessageActionResult), CultureInfo.InvariantCulture);
+                #endregion
+            }
+            else if (typeof(T) == typeof(PNGetMessageActionsResult))
+            {
+                #region "PNGetMessageActionsResult"
+                PNGetMessageActionsResult result = PNGetMessageActionsJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNGetMessageActionsResult), CultureInfo.InvariantCulture);
+                #endregion
+            }
             else
             {
                 System.Diagnostics.Debug.WriteLine("DeserializeToObject<T>(list) => NO MATCH");

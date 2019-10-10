@@ -40,6 +40,10 @@ namespace PubnubApi
         PNGetMembershipsOperation,
         PNGetMembersOperation,
 
+        PNAddMessageActionOperation,
+        PNRemoveMessageActionOperation,
+        PNGetMessageActionsOperation,
+
         Presence,
         Leave,
         PresenceUnsubscribe,

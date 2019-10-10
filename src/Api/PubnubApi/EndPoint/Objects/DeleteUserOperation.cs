@@ -125,11 +125,11 @@ namespace PubnubApi.EndPoint
 
             string json = "";
 
-            json = UrlProcessRequest<PNDeleteUserResult>(request, requestState, false);
+            json = UrlProcessRequest(request, requestState, false);
 
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = ProcessJsonResponse<PNDeleteUserResult>(requestState, json);
+                List<object> result = ProcessJsonResponse(requestState, json);
                 ProcessResponseCallbacks(result, requestState);
             }
         }

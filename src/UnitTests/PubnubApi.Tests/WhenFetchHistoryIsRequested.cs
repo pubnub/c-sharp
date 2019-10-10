@@ -407,6 +407,75 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+        public static void FetchHistoryWithMessageActionsReturnsRecords()
+        {
+            server.ClearRequests();
+
+            bool receivedMessage = false;
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+
+            server.RunOnHttps(false);
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.AuthKey = "myAuth";
+            }
+
+            pubnub = createPubNubInstance(config);
+
+            string channel = "hello_my_channel";
+            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+
+            string expected = "[[\"Pubnub Messaging API 1\",\"Pubnub Messaging API 2\",\"Pubnub Messaging API 3\",\"Pubnub Messaging API 4\",\"Pubnub Messaging API 5\",\"Pubnub Messaging API 6\",\"Pubnub Messaging API 7\",\"Pubnub Messaging API 8\",\"Pubnub Messaging API 9\",\"Pubnub Messaging API 10\"],14715432709547189,14715432709547189]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/history-with-actions/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                    .WithParameter("count", "10")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            ManualResetEvent historyManualEvent = new ManualResetEvent(false);
+            pubnub.FetchHistory().Channels(new string[] { channel })
+                .MaximumPerChannel(46)
+                .IncludeMeta(false)
+                .IncludeMessageActions(true)
+                .Start(15700167273495784)
+                .Execute(new PNFetchHistoryResultExt((r, s) =>
+                {
+                    if (r != null && s.StatusCode == 200 && !s.Error && r.Messages != null && r.Messages.ContainsKey(channel) && r.Messages[channel].Count >= 10)
+                    {
+                        System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                        receivedMessage = true;
+                    }
+                    historyManualEvent.Set();
+                }));
+            historyManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+            Assert.IsTrue(receivedMessage, "Fetch History Failed");
+        }
+
+        [Test]
         public static void FetchHistoryCount10ReverseTrueReturnsRecords()
         {
             server.ClearRequests();

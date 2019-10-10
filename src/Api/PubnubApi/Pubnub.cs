@@ -257,6 +257,25 @@ namespace PubnubApi
             EndPoint.GetMembersOperation getMembersOperation = new EndPoint.GetMembersOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
             return getMembersOperation;
         }
+
+        public EndPoint.AddMessageActionOperation AddMessageAction()
+        {
+            EndPoint.AddMessageActionOperation addMessageActionOperation = new EndPoint.AddMessageActionOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
+            return addMessageActionOperation;
+        }
+
+        public EndPoint.RemoveMessageActionOperation RemoveMessageAction()
+        {
+            EndPoint.RemoveMessageActionOperation removeMessageActionOperation = new EndPoint.RemoveMessageActionOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
+            return removeMessageActionOperation;
+        }
+
+        public EndPoint.GetMessageActionsOperation GetMessageActions()
+        {
+            EndPoint.GetMessageActionsOperation getMessageActionsOperation = new EndPoint.GetMessageActionsOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
+            return getMessageActionsOperation;
+        }
+
         #endregion
 
         #region "PubNub API Channel Group Methods"

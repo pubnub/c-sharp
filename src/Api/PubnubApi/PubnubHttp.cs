@@ -432,7 +432,8 @@ namespace PubnubApi
             {
                 request.Method = (pubnubRequestState != null && (pubnubRequestState.ResponseType == PNOperationType.PNDeleteMessageOperation 
                                                                 || pubnubRequestState.ResponseType == PNOperationType.PNDeleteUserOperation
-                                                                || pubnubRequestState.ResponseType == PNOperationType.PNDeleteSpaceOperation)) ? "DELETE" : "GET";
+                                                                || pubnubRequestState.ResponseType == PNOperationType.PNDeleteSpaceOperation
+                                                                || pubnubRequestState.ResponseType == PNOperationType.PNRemoveMessageActionOperation)) ? "DELETE" : "GET";
                 new Timer(OnPubnubWebRequestTimeout<T>, pubnubRequestState, GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType) * 1000, Timeout.Infinite);
                 System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
                 stopWatch.Start();
@@ -692,7 +693,10 @@ namespace PubnubApi
             var taskComplete = new TaskCompletionSource<string>();
             try
             {
-                request.Method = (pubnubRequestState != null && (pubnubRequestState.ResponseType == PNOperationType.PNDeleteMessageOperation || pubnubRequestState.ResponseType == PNOperationType.PNDeleteUserOperation)) ? "DELETE" : "GET";
+                request.Method = (pubnubRequestState != null && (pubnubRequestState.ResponseType == PNOperationType.PNDeleteMessageOperation 
+                    || pubnubRequestState.ResponseType == PNOperationType.PNDeleteUserOperation
+                    || pubnubRequestState.ResponseType == PNOperationType.PNDeleteSpaceOperation
+                    || pubnubRequestState.ResponseType == PNOperationType.PNRemoveMessageActionOperation)) ? "DELETE" : "GET";
                 System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Before BeginGetResponse", DateTime.Now.ToString(CultureInfo.InvariantCulture)));
                 System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
                 stopWatch.Start();

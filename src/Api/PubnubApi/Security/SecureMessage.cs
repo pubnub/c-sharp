@@ -163,11 +163,6 @@ namespace PubnubApi
                     }
                     dicMessage.Add(kvp.Key, decryptList);
                 }
-                //else
-                //{
-                //    List<object> currentMessageList = HistoryDecodeDecryptLoop(type, currentVal, channels, channelGroups, errorCallback);
-                //    dicMessage.Add(kvp.Key, currentMessageList);
-                //}
             }
             if (dicMessage.Count > 0)
             {

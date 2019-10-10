@@ -238,6 +238,11 @@ namespace PubNubMessaging.Tests
                 throw new NotImplementedException();
             }
 
+            public override void MessageAction(Pubnub pubnub, PNMessageActionEventResult messageAction)
+            {
+                throw new NotImplementedException();
+            }
+
             public override void Status(Pubnub pubnub, PNStatus status)
             {
                 Debug.WriteLine("SubscribeCallback: PNStatus: " + status.StatusCode.ToString());

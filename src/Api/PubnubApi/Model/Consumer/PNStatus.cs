@@ -397,6 +397,26 @@ namespace PubnubApi
                             }
                         }
                         break;
+                    case PNOperationType.PNAddMessageActionOperation:
+                        if (savedEndpointOperation is AddMessageActionOperation)
+                        {
+                            AddMessageActionOperation endpoint = savedEndpointOperation as AddMessageActionOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
+                    case PNOperationType.PNRemoveMessageActionOperation:
+                        if (savedEndpointOperation is RemoveMessageActionOperation)
+                        {
+                            RemoveMessageActionOperation endpoint = savedEndpointOperation as RemoveMessageActionOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
                     default:
                         break;
                 }

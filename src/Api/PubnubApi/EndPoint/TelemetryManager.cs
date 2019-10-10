@@ -124,6 +124,11 @@ namespace PubnubApi.EndPoint
                 case PNOperationType.PNManageMembersOperation:
                     endpoint = "l_obj";
                     break;
+                case PNOperationType.PNAddMessageActionOperation:
+                case PNOperationType.PNRemoveMessageActionOperation:
+                case PNOperationType.PNGetMessageActionsOperation:
+                    endpoint = "l_msga";
+                    break;
                 default:
                     endpoint = "";
                     break;
