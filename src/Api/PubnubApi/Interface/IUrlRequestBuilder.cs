@@ -93,7 +93,7 @@ namespace PubnubApi.Interface
 
         Uri BuildAddMessageActionRequest(string requestMethod, string requestBody, string channel, long messageTimetoken, Dictionary<string, object> externalQueryParam);
 
-        Uri BuildRemoveMessageActionRequest(string requestMethod, string requestBody, string channel, long messageTimetoken, long actionTimetoken, Dictionary<string, object> externalQueryParam);
+        Uri BuildRemoveMessageActionRequest(string requestMethod, string requestBody, string channel, long messageTimetoken, long actionTimetoken, string messageActionUuid, Dictionary<string, object> externalQueryParam);
 
         Uri BuildGetMessageActionsRequest(string requestMethod, string requestBody, string channel, long start, long end, int limit, Dictionary<string, object> externalQueryParam);
     }

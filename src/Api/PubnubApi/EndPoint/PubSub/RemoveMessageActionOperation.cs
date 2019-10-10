@@ -21,6 +21,7 @@ namespace PubnubApi.EndPoint
         private string msgActionChannelName = "";
         private long messageTimetoken;
         private long actionTimetoken;
+        private string msgActionUuid;
         private PNCallback<PNRemoveMessageActionResult> savedCallback;
         private Dictionary<string, object> queryParam;
 
@@ -77,6 +78,12 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
+        public RemoveMessageActionOperation Uuid(string messageActionUuid)
+        {
+            msgActionUuid = messageActionUuid;
+            return this;
+        }
+
         public RemoveMessageActionOperation QueryParam(Dictionary<string, object> customQueryParam)
         {
             queryParam = customQueryParam;
@@ -99,13 +106,13 @@ namespace PubnubApi.EndPoint
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
-                RemoveMessageAction(this.msgActionChannelName, this.messageTimetoken, this.actionTimetoken, this.queryParam, callback);
+                RemoveMessageAction(this.msgActionChannelName, this.messageTimetoken, this.actionTimetoken, this.msgActionUuid, this.queryParam, callback);
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
             new Thread(() =>
             {
                 this.savedCallback = callback;
-                RemoveMessageAction(this.msgActionChannelName, this.messageTimetoken, this.actionTimetoken, this.queryParam, callback);
+                RemoveMessageAction(this.msgActionChannelName, this.messageTimetoken, this.actionTimetoken, this.msgActionUuid, this.queryParam, callback);
             })
             { IsBackground = true }.Start();
 #endif
@@ -116,18 +123,18 @@ namespace PubnubApi.EndPoint
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
-                RemoveMessageAction(this.msgActionChannelName, this.messageTimetoken, this.actionTimetoken, this.queryParam, savedCallback);
+                RemoveMessageAction(this.msgActionChannelName, this.messageTimetoken, this.actionTimetoken, this.msgActionUuid, this.queryParam, savedCallback);
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
             new Thread(() =>
             {
-                RemoveMessageAction(this.msgActionChannelName, this.messageTimetoken, this.actionTimetoken, this.queryParam, savedCallback);
+                RemoveMessageAction(this.msgActionChannelName, this.messageTimetoken, this.actionTimetoken, this.msgActionUuid, this.queryParam, savedCallback);
             })
             { IsBackground = true }.Start();
 #endif
         }
 
-        private void RemoveMessageAction(string channel, long messageTimetoken, long actionTimetoken, Dictionary<string, object> externalQueryParam, PNCallback<PNRemoveMessageActionResult> callback)
+        private void RemoveMessageAction(string channel, long messageTimetoken, long actionTimetoken, string messageActionUuid, Dictionary<string, object> externalQueryParam, PNCallback<PNRemoveMessageActionResult> callback)
         {
             if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()))
             {
@@ -154,7 +161,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildRemoveMessageActionRequest("DELETE", "", channel, messageTimetoken, actionTimetoken, externalQueryParam);
+            Uri request = urlBuilder.BuildRemoveMessageActionRequest("DELETE", "", channel, messageTimetoken, actionTimetoken, messageActionUuid, externalQueryParam);
 
             RequestState<PNRemoveMessageActionResult> requestState = new RequestState<PNRemoveMessageActionResult>();
             requestState.Channels = new[] { channel };

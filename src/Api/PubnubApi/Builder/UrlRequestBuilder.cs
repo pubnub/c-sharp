@@ -1728,7 +1728,7 @@ namespace PubnubApi
             return BuildRestApiRequest(url, currentType, queryParams);
         }
 
-        Uri IUrlRequestBuilder.BuildRemoveMessageActionRequest(string requestMethod, string requestBody, string channel, long messageTimetoken, long actionTimetoken, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildRemoveMessageActionRequest(string requestMethod, string requestBody, string channel, long messageTimetoken, long actionTimetoken, string messageActionUuid, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PNRemoveMessageActionOperation;
 
@@ -1744,6 +1744,10 @@ namespace PubnubApi
             url.Add(actionTimetoken.ToString());
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+            if (messageActionUuid != null)
+            {
+                requestQueryStringParams.Add("uuid", UriUtil.EncodeUriComponent(false, messageActionUuid, currentType, false, false, false));
+            }
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
             {
@@ -1806,7 +1810,7 @@ namespace PubnubApi
             return BuildRestApiRequest(url, currentType, queryParams);
         }
 
-        private Dictionary<string, string> GenerateCommonQueryParams(PNOperationType type, string resourceType, string resourceId, bool checkResourcePattern)
+        private Dictionary<string, string> GenerateCommonQueryParams(PNOperationType type, string resourceType, string resourceId, bool checkResourcePattern, string uuid)
         {
             long timeStamp = TranslateUtcDateTimeToSeconds(DateTime.UtcNow);
             string requestid = Guid.NewGuid().ToString();
@@ -1832,7 +1836,7 @@ namespace PubnubApi
             }
             else
             {
-                ret.Add("uuid", UriUtil.EncodeUriComponent(false, this.pubnubConfig.Uuid, PNOperationType.PNSubscribeOperation, false, false, true));
+                ret.Add("uuid", UriUtil.EncodeUriComponent(false, uuid != null ? uuid : this.pubnubConfig.Uuid, PNOperationType.PNSubscribeOperation, false, false, true));
                 ret.Add("pnsdk", UriUtil.EncodeUriComponent(false, Pubnub.Version, PNOperationType.PNSubscribeOperation, false, false, true));
             }
 
@@ -1970,7 +1974,9 @@ namespace PubnubApi
                     internalQueryStringParamDic = queryStringParamDic;
                 }
 
-                Dictionary<string, string> commonQueryStringParams = GenerateCommonQueryParams(type, resourceType, resourceId, checkResourcePattern);
+                string qsUuid = internalQueryStringParamDic.ContainsKey("uuid") ? internalQueryStringParamDic["uuid"] : null;
+                
+                Dictionary<string, string> commonQueryStringParams = GenerateCommonQueryParams(type, resourceType, resourceId, checkResourcePattern, qsUuid);
                 Dictionary<string, string> queryStringParams = new Dictionary<string, string>(commonQueryStringParams.Concat(internalQueryStringParamDic).GroupBy(item => item.Key).ToDictionary(item => item.Key, item => item.First().Value));
 
                 string queryToSign = string.Join("&", queryStringParams.OrderBy(kvp => kvp.Key, StringComparer.Ordinal).Select(kvp => string.Format("{0}={1}", kvp.Key, kvp.Value)).ToArray());

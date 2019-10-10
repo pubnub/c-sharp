@@ -137,7 +137,7 @@ namespace PubNubMessaging.Tests
 
             string channel = "hello_my_channel";
             manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
-            long currentMessageTimetoken = 15705420756473539;// new Random().Next(Int32.MaxValue);
+            long currentMessageTimetoken = new Random().Next(Int32.MaxValue);
             long currentActionTimetoken = 0;
 
             ManualResetEvent me = new ManualResetEvent(false);
