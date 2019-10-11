@@ -430,10 +430,6 @@ namespace PubNubMessaging.Tests
             }
 
             server.RunOnHttps(false);
-            if (PubnubCommon.PAMServerSideRun)
-            {
-                config.AuthKey = "myAuth";
-            }
 
             pubnub = createPubNubInstance(config);
 
@@ -454,10 +450,8 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent historyManualEvent = new ManualResetEvent(false);
             pubnub.FetchHistory().Channels(new string[] { channel })
-                .MaximumPerChannel(46)
                 .IncludeMeta(false)
                 .IncludeMessageActions(true)
-                .Start(15700167273495784)
                 .Execute(new PNFetchHistoryResultExt((r, s) =>
                 {
                     if (r != null && s.StatusCode == 200 && !s.Error && r.Messages != null && r.Messages.ContainsKey(channel) && r.Messages[channel].Count >= 10)

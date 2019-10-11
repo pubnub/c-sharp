@@ -128,10 +128,6 @@ namespace PubNubMessaging.Tests
             }
 
             server.RunOnHttps(false);
-            if (PubnubCommon.PAMServerSideRun)
-            {
-                config.AuthKey = "myauth";
-            }
 
             pubnub = createPubNubInstance(config);
 
@@ -139,6 +135,7 @@ namespace PubNubMessaging.Tests
             manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
             long currentMessageTimetoken = new Random().Next(Int32.MaxValue);
             long currentActionTimetoken = 0;
+            string currentUUID = "";
 
             ManualResetEvent me = new ManualResetEvent(false);
             System.Diagnostics.Debug.WriteLine("GetMessageActions STARTED");
@@ -154,6 +151,7 @@ namespace PubNubMessaging.Tests
                         {
                             PNMessageActionItem actionItem = r.MessageActions.Find(x => x.MessageTimetoken == currentMessageTimetoken);
                             currentActionTimetoken = actionItem.ActionTimetoken;
+                            currentUUID = actionItem.Uuid;
                         }
                     }
                     me.Set();
@@ -167,8 +165,9 @@ namespace PubNubMessaging.Tests
 
                 pubnub.RemoveMessageAction()
                 .Channel(channel)
-                .MessageTimetoken(0)
-                .ActionTimetoken(0)
+                .MessageTimetoken(currentMessageTimetoken)
+                .ActionTimetoken(currentActionTimetoken)
+                .Uuid(currentUUID)
                 .Execute(new PNRemoveMessageActionResultExt((r, s) =>
                 {
                     if (r != null && s.StatusCode == 200 && !s.Error)
@@ -211,6 +210,11 @@ namespace PubNubMessaging.Tests
             server.ClearRequests();
 
             bool receivedMessage = false;
+            if (!PubnubCommon.PAMServerSideRun)
+            {
+                Assert.Ignore("RemoveMessageActionReturnsSuccess needs Secret Key");
+                return;
+            }
 
             PNConfiguration config = new PNConfiguration
             {
@@ -239,6 +243,7 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             long currentMessageTimetoken = 0;
             long currentActionTimetoken = 0;
+            string currentUUID = "";
             manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
 
             System.Diagnostics.Debug.WriteLine("GetMessageActions 1 STARTED");
@@ -257,6 +262,7 @@ namespace PubNubMessaging.Tests
                             PNMessageActionItem actionItem = r.MessageActions[0];
                             currentMessageTimetoken = actionItem.MessageTimetoken;
                             currentActionTimetoken = actionItem.ActionTimetoken;
+                            currentUUID = actionItem.Uuid;
                         }
                     }
                     me.Set();
@@ -269,6 +275,7 @@ namespace PubNubMessaging.Tests
                 .Channel(channel)
                 .MessageTimetoken(currentMessageTimetoken)
                 .ActionTimetoken(currentActionTimetoken)
+                .Uuid(currentUUID)
                 .Execute(new PNRemoveMessageActionResultExt((r, s) =>
                 {
                     if (r != null && s.StatusCode == 200 && !s.Error)
@@ -345,6 +352,11 @@ namespace PubNubMessaging.Tests
         public static void AddRemoveMessageActionReturnEventInfo()
         {
             server.ClearRequests();
+            if (!PubnubCommon.PAMServerSideRun)
+            {
+                Assert.Ignore("AddRemoveMessageActionReturnEventInfo needs Secret Key");
+                return;
+            }
 
             bool receivedMessage = false;
             bool receivedAddEvent = false;
@@ -386,10 +398,6 @@ namespace PubNubMessaging.Tests
             }
 
             server.RunOnHttps(false);
-            if (PubnubCommon.PAMServerSideRun)
-            {
-                config.AuthKey = "myauth";
-            }
 
             pubnub = createPubNubInstance(config);
             pubnub.AddListener(eventListener);
@@ -398,6 +406,7 @@ namespace PubNubMessaging.Tests
             manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
             long currentMessageTimetoken = new Random().Next(Int32.MaxValue);
             long currentActionTimetoken = 0;
+            string currentUUID = "";
 
             ManualResetEvent me = new ManualResetEvent(false);
             pubnub.Subscribe<string>().Channels(new string[] { channel }).Execute();
@@ -417,11 +426,13 @@ namespace PubNubMessaging.Tests
                         {
                             PNMessageActionItem actionItem = r.MessageActions.Find(x => x.MessageTimetoken == currentMessageTimetoken);
                             currentActionTimetoken = actionItem.ActionTimetoken;
+                            currentUUID = actionItem.Uuid;
                         }
                     }
                     me.Set();
                 }));
             me.WaitOne(manualResetEventWaitTimeout);
+            Thread.Sleep(2000);
 
             if (currentMessageTimetoken > 0 && currentActionTimetoken > 0)
             {
@@ -430,8 +441,9 @@ namespace PubNubMessaging.Tests
 
                 pubnub.RemoveMessageAction()
                 .Channel(channel)
-                .MessageTimetoken(0)
-                .ActionTimetoken(0)
+                .MessageTimetoken(currentMessageTimetoken)
+                .ActionTimetoken(currentActionTimetoken)
+                .Uuid(currentUUID)
                 .Execute(new PNRemoveMessageActionResultExt((r, s) =>
                 {
                     if (r != null && s.StatusCode == 200 && !s.Error)
@@ -458,10 +470,12 @@ namespace PubNubMessaging.Tests
                         System.Diagnostics.Debug.WriteLine("AddMessageAction = " + pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                         receivedMessage = true;
                         currentActionTimetoken = r.ActionTimetoken;
+                        currentUUID = r.Uuid;
                     }
                     me.Set();
                 }));
             me.WaitOne(manualResetEventWaitTimeout);
+            Thread.Sleep(2000);
 
             if (receivedMessage && currentActionTimetoken > 0 && currentMessageTimetoken > 0 && !receivedRemoveEvent)
             {
@@ -472,6 +486,7 @@ namespace PubNubMessaging.Tests
                 .Channel(channel)
                 .MessageTimetoken(currentMessageTimetoken)
                 .ActionTimetoken(currentActionTimetoken)
+                .Uuid(currentUUID)
                 .Execute(new PNRemoveMessageActionResultExt((r, s) =>
                 {
                     if (r != null && s.StatusCode == 200 && !s.Error)
@@ -490,12 +505,10 @@ namespace PubNubMessaging.Tests
             pubnub.Unsubscribe<string>().Channels(new string[] { channel }).Execute();
             pubnub.RemoveListener(eventListener);
 
-            Assert.IsTrue(receivedAddEvent && receivedRemoveEvent, "Message Action events Failed");
-
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Assert.IsTrue(receivedMessage, "AddMessageActionReturnsSuccess Failed");
+            Assert.IsTrue(receivedAddEvent && receivedRemoveEvent, "Message Action events Failed");
         }
 
     }

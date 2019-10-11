@@ -174,7 +174,7 @@ namespace PubnubApi.WinFormExample
                 .Message(txtMessage1.Text)
                 .ShouldStore(true)
                 .UsePOST(false)
-                .Async(new PNPublishResultExt((r, s) => {
+                .Execute(new PNPublishResultExt((r, s) => {
                     Invoke(new Action(() => {
                         if (r != null)
                         {
@@ -196,7 +196,7 @@ namespace PubnubApi.WinFormExample
                 .Message(txtMessage2.Text)
                 .ShouldStore(true)
                 .UsePOST(false)
-                .Async(new PNPublishResultExt((r, s) => {
+                .Execute(new PNPublishResultExt((r, s) => {
                     Invoke(new Action(() => {
                         if (r != null)
                         {
@@ -236,7 +236,7 @@ namespace PubnubApi.WinFormExample
                 .Channels(new string[] { txtChannels1.Text })
                 .IncludeState(true)
                 .IncludeUUIDs(true)
-                .Async(new PNHereNowResultEx((r, s) => {
+                .Execute(new PNHereNowResultEx((r, s) => {
                     Invoke(new Action(() => {
                         lvResults1.Items.Add(pubnub[0].JsonPluggableLibrary.SerializeToJsonString(r));
                     }));
@@ -248,7 +248,7 @@ namespace PubnubApi.WinFormExample
             pubnub[0].HereNow()
                 .IncludeState(true)
                 .IncludeUUIDs(true)
-                .Async(new PNHereNowResultEx((r, s) => {
+                .Execute(new PNHereNowResultEx((r, s) => {
                     Invoke(new Action(() => {
                         lvResults1.Items.Add(pubnub[0].JsonPluggableLibrary.SerializeToJsonString(r));
                     }));
@@ -261,7 +261,7 @@ namespace PubnubApi.WinFormExample
                 .Channels(new string[] { txtChannels2.Text })
                 .IncludeState(true)
                 .IncludeUUIDs(true)
-                .Async(new PNHereNowResultEx((r, s) => {
+                .Execute(new PNHereNowResultEx((r, s) => {
                     Invoke(new Action(() => {
                         lvResults2.Items.Add(pubnub[1].JsonPluggableLibrary.SerializeToJsonString(r));
                     }));
@@ -273,7 +273,7 @@ namespace PubnubApi.WinFormExample
             pubnub[1].HereNow()
                 .IncludeState(true)
                 .IncludeUUIDs(true)
-                .Async(new PNHereNowResultEx((r, s) => {
+                .Execute(new PNHereNowResultEx((r, s) => {
                     Invoke(new Action(() => {
                         lvResults2.Items.Add(pubnub[1].JsonPluggableLibrary.SerializeToJsonString(r));
                     }));
@@ -283,7 +283,7 @@ namespace PubnubApi.WinFormExample
         private void btnTime1_Click(object sender, EventArgs e)
         {
             pubnub[0].Time()
-                .Async(new PNTimeResultExt((r, s) => {
+                .Execute(new PNTimeResultExt((r, s) => {
                     Invoke(new Action(() => {
                         lvResults1.Items.Add(pubnub[0].JsonPluggableLibrary.SerializeToJsonString(r));
                     }));
@@ -293,7 +293,7 @@ namespace PubnubApi.WinFormExample
         private void btnTime2_Click(object sender, EventArgs e)
         {
             pubnub[1].Time()
-                .Async(new PNTimeResultExt((r, s) => {
+                .Execute(new PNTimeResultExt((r, s) => {
                     Invoke(new Action(() => {
                         lvResults2.Items.Add(pubnub[1].JsonPluggableLibrary.SerializeToJsonString(r));
                     }));
@@ -304,7 +304,7 @@ namespace PubnubApi.WinFormExample
         {
             pubnub[0].WhereNow()
                 .Uuid( config1.Uuid )
-                .Async(new PNWhereNowResultExt((r, s) => {
+                .Execute(new PNWhereNowResultExt((r, s) => {
                     Invoke(new Action(() => {
                         lvResults1.Items.Add(pubnub[0].JsonPluggableLibrary.SerializeToJsonString(r));
                     }));
@@ -315,7 +315,7 @@ namespace PubnubApi.WinFormExample
         {
             pubnub[1].WhereNow()
                 .Uuid(config2.Uuid)
-                .Async(new PNWhereNowResultExt((r, s) => {
+                .Execute(new PNWhereNowResultExt((r, s) => {
                     Invoke(new Action(() => {
                         lvResults2.Items.Add(pubnub[1].JsonPluggableLibrary.SerializeToJsonString(r));
                     }));
@@ -536,7 +536,7 @@ namespace PubnubApi.WinFormExample
                         pubnub[1].AddChannelsToChannelGroup()
                             .ChannelGroup(channelGroup)
                             .Channels(cg.ChannelName.Split(','))
-                            .Async(new PNChannelGroupsAddChannelResultExt(
+                            .Execute(new PNChannelGroupsAddChannelResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -554,7 +554,7 @@ namespace PubnubApi.WinFormExample
                     case "listchannel":
                         pubnub[1].ListChannelsForChannelGroup()
                             .ChannelGroup(channelGroup)
-                            .Async(new PNChannelGroupsAllChannelsResultExt(
+                            .Execute(new PNChannelGroupsAllChannelsResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -573,7 +573,7 @@ namespace PubnubApi.WinFormExample
                         pubnub[1].RemoveChannelsFromChannelGroup()
                             .ChannelGroup(channelGroup)
                             .Channels(cg.ChannelName.Split(','))
-                            .Async(new PNChannelGroupsRemoveChannelResultExt(
+                            .Execute(new PNChannelGroupsRemoveChannelResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -613,7 +613,7 @@ namespace PubnubApi.WinFormExample
                             .Channels(userStateChannel.Split(','))
                             .ChannelGroups(userStateChannelGroup.Split(','))
                             .State(userState.StateKV)
-                            .Async(new PNSetStateResultExt(
+                            .Execute(new PNSetStateResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -633,7 +633,7 @@ namespace PubnubApi.WinFormExample
                             .Channels(userStateChannel.Split(','))
                             .ChannelGroups(userStateChannelGroup.Split(','))
                             .Uuid(userState.UUID)
-                            .Async(new PNGetStateResultExt(
+                            .Execute(new PNGetStateResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -673,7 +673,7 @@ namespace PubnubApi.WinFormExample
                             .Channels(userStateChannel.Split(','))
                             .ChannelGroups(userStateChannelGroup.Split(','))
                             .State(userState.StateKV)
-                            .Async(new PNSetStateResultExt(
+                            .Execute(new PNSetStateResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -693,7 +693,7 @@ namespace PubnubApi.WinFormExample
                             .Channels(userStateChannel.Split(','))
                             .ChannelGroups(userStateChannelGroup.Split(','))
                             .Uuid(userState.UUID)
-                            .Async(new PNGetStateResultExt(
+                            .Execute(new PNGetStateResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -727,7 +727,7 @@ namespace PubnubApi.WinFormExample
                             .Reverse(hist.Reverse)
                             .Count(hist.Count)
                             .IncludeTimetoken(hist.IncludeTimetoken)
-                            .Async(new PNHistoryResultExt(
+                            .Execute(new PNHistoryResultExt(
                                 (r, s) =>
                                 {
                                     Invoke(new Action(() => {
@@ -757,7 +757,7 @@ namespace PubnubApi.WinFormExample
                             .Reverse(hist.Reverse)
                             .Count(hist.Count)
                             .IncludeTimetoken(hist.IncludeTimetoken)
-                            .Async(new PNHistoryResultExt(
+                            .Execute(new PNHistoryResultExt(
                                 (r, s) =>
                                 {
                                     Invoke(new Action(() => {
@@ -800,7 +800,7 @@ namespace PubnubApi.WinFormExample
                         pubnub[0].AddPushNotificationsOnChannels().Channels(pushForm.ChannelName.Split(','))
                                                     .PushType(pushType)
                                                     .DeviceId(pushForm.DeviceId)
-                                                    .Async(new PNPushAddChannelResultExt(
+                                                    .Execute(new PNPushAddChannelResultExt(
                                                         (r, s) => {
                                                             Invoke(new Action(() => {
                                                                 if (r != null)
@@ -819,7 +819,7 @@ namespace PubnubApi.WinFormExample
                         pubnub[0].AuditPushChannelProvisions()
                             .PushType(pushType)
                             .DeviceId(pushForm.DeviceId)
-                            .Async(new PNPushListProvisionsResultExt(
+                            .Execute(new PNPushListProvisionsResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -839,7 +839,7 @@ namespace PubnubApi.WinFormExample
                             .Channels(pushForm.ChannelName.Split(','))
                             .PushType(pushType)
                             .DeviceId(pushForm.DeviceId)
-                            .Async(new PNPushRemoveChannelResultExt(
+                            .Execute(new PNPushRemoveChannelResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -885,7 +885,7 @@ namespace PubnubApi.WinFormExample
                         pubnub[1].AddPushNotificationsOnChannels().Channels(pushForm.ChannelName.Split(','))
                                                     .PushType(pushType)
                                                     .DeviceId(pushForm.DeviceId)
-                                                    .Async(new PNPushAddChannelResultExt(
+                                                    .Execute(new PNPushAddChannelResultExt(
                                                         (r, s) => {
                                                             Invoke(new Action(() => {
                                                                 if (r != null)
@@ -904,7 +904,7 @@ namespace PubnubApi.WinFormExample
                         pubnub[1].AuditPushChannelProvisions()
                             .PushType(pushType)
                             .DeviceId(pushForm.DeviceId)
-                            .Async(new PNPushListProvisionsResultExt(
+                            .Execute(new PNPushListProvisionsResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -924,7 +924,7 @@ namespace PubnubApi.WinFormExample
                             .Channels(pushForm.ChannelName.Split(','))
                             .PushType(pushType)
                             .DeviceId(pushForm.DeviceId)
-                            .Async(new PNPushRemoveChannelResultExt(
+                            .Execute(new PNPushRemoveChannelResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -951,7 +951,7 @@ namespace PubnubApi.WinFormExample
                 .Channel(txtChannels1.Text)
                 .Message(txtMessage1.Text)
                 .UsePOST(false)
-                .Async(new PNPublishResultExt((r, s) => {
+                .Execute(new PNPublishResultExt((r, s) => {
                     Invoke(new Action(() => {
                         lvResults1.Items.Add(r.Timetoken.ToString());
                     }));

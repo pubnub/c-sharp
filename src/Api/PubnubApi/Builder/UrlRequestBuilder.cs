@@ -1721,8 +1721,7 @@ namespace PubnubApi
                 }
             }
 
-            bool allowPAMv3Sign = (requestMethod.ToUpperInvariant() == "POST") ? false : true;
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, allowPAMv3Sign);
+            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
             string queryParams = string.Format("?{0}", queryString);
 
             return BuildRestApiRequest(url, currentType, queryParams);
@@ -1760,8 +1759,7 @@ namespace PubnubApi
                 }
             }
 
-            bool allowPAMv3Sign = (requestMethod.ToUpperInvariant() == "POST") ? false : true;
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, allowPAMv3Sign);
+            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
             string queryParams = string.Format("?{0}", queryString);
 
             return BuildRestApiRequest(url, currentType, queryParams);
@@ -1803,8 +1801,7 @@ namespace PubnubApi
                 }
             }
 
-            bool allowPAMv3Sign = (requestMethod.ToUpperInvariant() == "POST") ? false : true;
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, allowPAMv3Sign);
+            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
             string queryParams = string.Format("?{0}", queryString);
 
             return BuildRestApiRequest(url, currentType, queryParams);
