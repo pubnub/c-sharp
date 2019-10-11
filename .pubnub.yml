@@ -4,7 +4,7 @@ schema: 1
 scm: github.com/pubnub/c-sharp
 changelog: 
   - version: 4.2.0.0
-    date: October 16, 2019
+    date: October 15, 2019
     changes:
       - type: Improvement
         text: Added IncludeMeta option to History.
