@@ -70,7 +70,6 @@ namespace PubnubApi
         public EndPoint.HistoryOperation History()
 		{
             EndPoint.HistoryOperation historyOperaton = new EndPoint.HistoryOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
-            historyOperaton.CurrentPubnubInstance(this);
             return historyOperaton;
         }
 

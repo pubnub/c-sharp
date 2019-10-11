@@ -37,53 +37,69 @@ namespace PubnubApi.EndPoint
             pubnubLog = log;
             pubnubTelemetryMgr = telemetryManager;
             pubnubTokenMgr = tokenManager;
+
+            PubnubInstance = instance;
+
+            if (!ChannelRequest.ContainsKey(instance.InstanceId))
+            {
+                ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
+            }
+            if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
+            {
+                ChannelInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+            }
+            if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId))
+            {
+                ChannelGroupInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+            }
+
         }
 
         public HistoryOperation Channel(string channel)
         {
-            this.channelName = channel;
+            channelName = channel;
             return this;
         }
 
         public HistoryOperation Reverse(bool reverse)
         {
-            this.reverseOption = reverse;
+            reverseOption = reverse;
             return this;
         }
 
         public HistoryOperation IncludeTimetoken(bool includeTimetoken)
         {
-            this.includeTimetokenOption = includeTimetoken;
+            includeTimetokenOption = includeTimetoken;
             return this;
         }
 
         public HistoryOperation IncludeMeta(bool withMeta)
         {
-            this.withMetaOption = withMeta;
+            withMetaOption = withMeta;
             return this;
         }
 
         public HistoryOperation Start(long start)
         {
-            this.startTimetoken = start;
+            startTimetoken = start;
             return this;
         }
 
         public HistoryOperation End(long end)
         {
-            this.endTimetoken = end;
+            endTimetoken = end;
             return this;
         }
 
         public HistoryOperation Count(int count)
         {
-            this.historyCount = count;
+            historyCount = count;
             return this;
         }
 
         public HistoryOperation QueryParam(Dictionary<string, object> customQueryParam)
         {
-            this.queryParam = customQueryParam;
+            queryParam = customQueryParam;
             return this;
         }
 
@@ -155,24 +171,6 @@ namespace PubnubApi.EndPoint
             {
                 List<object> result = ProcessJsonResponse(requestState, json);
                 ProcessResponseCallbacks(result, requestState);
-            }
-        }
-
-        internal void CurrentPubnubInstance(Pubnub instance)
-        {
-            PubnubInstance = instance;
-
-            if (!ChannelRequest.ContainsKey(instance.InstanceId))
-            {
-                ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
-            }
-            if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
-            {
-                ChannelInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
-            }
-            if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId))
-            {
-                ChannelGroupInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
             }
         }
     }

@@ -115,50 +115,53 @@ namespace PubnubApi
                 {
                     object[] currentValArray = jsonLib.ConvertToObjectArray(currentVal);
                     List<object> decryptList = (currentValArray != null && currentValArray.Length > 0) ? new List<object>() : null;
-                    foreach (object currentObj in currentValArray)
+                    if (currentValArray != null && decryptList != null)
                     {
-                        Dictionary<string, object> dicValue = jsonLib.ConvertToDictionaryObject(currentObj);
-                        if (dicValue != null && dicValue.Count > 0 && dicValue.ContainsKey("message"))
+                        foreach (object currentObj in currentValArray)
                         {
-                            Dictionary<string, object> dicDecrypt = new Dictionary<string, object>();
-                            foreach (KeyValuePair<string, object> kvpValue in dicValue)
+                            Dictionary<string, object> dicValue = jsonLib.ConvertToDictionaryObject(currentObj);
+                            if (dicValue != null && dicValue.Count > 0 && dicValue.ContainsKey("message"))
                             {
-                                if (kvpValue.Key == "message" && config.CipherKey.Length > 0)
+                                Dictionary<string, object> dicDecrypt = new Dictionary<string, object>();
+                                foreach (KeyValuePair<string, object> kvpValue in dicValue)
                                 {
-                                    PubnubCrypto aes = new PubnubCrypto(config.CipherKey, config, pubnubLog);
-                                    string decryptMessage = "";
-                                    try
+                                    if (kvpValue.Key == "message" && config.CipherKey.Length > 0)
                                     {
-                                        decryptMessage = aes.Decrypt(kvpValue.Value.ToString());
+                                        PubnubCrypto aes = new PubnubCrypto(config.CipherKey, config, pubnubLog);
+                                        string decryptMessage = "";
+                                        try
+                                        {
+                                            decryptMessage = aes.Decrypt(kvpValue.Value.ToString());
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            #region "Exception"
+                                            decryptMessage = "**DECRYPT ERROR**";
+
+                                            PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(ex);
+                                            PNStatus status = new StatusBuilder(config, jsonLib).CreateStatusResponse<T>(type, category, null, (int)HttpStatusCode.NotFound, new PNException(ex));
+                                            if (channels != null && channels.Length > 0)
+                                            {
+                                                status.AffectedChannels.AddRange(channels);
+                                            }
+                                            if (channelGroups != null && channelGroups.Length > 0)
+                                            {
+                                                status.AffectedChannelGroups.AddRange(channelGroups);
+                                            }
+
+                                            errorCallback.OnResponse(default(T), status);
+                                            #endregion
+                                        }
+                                        object decodeMessage = (decryptMessage == "**DECRYPT ERROR**") ? decryptMessage : jsonLib.DeserializeToObject(decryptMessage);
+                                        dicDecrypt.Add(kvpValue.Key, decodeMessage);
                                     }
-                                    catch (Exception ex)
+                                    else
                                     {
-                                        #region "Exception"
-                                        decryptMessage = "**DECRYPT ERROR**";
-
-                                        PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(ex);
-                                        PNStatus status = new StatusBuilder(config, jsonLib).CreateStatusResponse<T>(type, category, null, (int)HttpStatusCode.NotFound, new PNException(ex));
-                                        if (channels != null && channels.Length > 0)
-                                        {
-                                            status.AffectedChannels.AddRange(channels);
-                                        }
-                                        if (channelGroups != null && channelGroups.Length > 0)
-                                        {
-                                            status.AffectedChannelGroups.AddRange(channelGroups);
-                                        }
-
-                                        errorCallback.OnResponse(default(T), status);
-                                        #endregion
+                                        dicDecrypt.Add(kvpValue.Key, kvpValue.Value);
                                     }
-                                    object decodeMessage = (decryptMessage == "**DECRYPT ERROR**") ? decryptMessage : jsonLib.DeserializeToObject(decryptMessage);
-                                    dicDecrypt.Add(kvpValue.Key, decodeMessage);
                                 }
-                                else
-                                {
-                                    dicDecrypt.Add(kvpValue.Key, kvpValue.Value);
-                                }
+                                decryptList.Add(dicDecrypt);
                             }
-                            decryptList.Add(dicDecrypt);
                         }
                     }
                     dicMessage.Add(kvp.Key, decryptList);

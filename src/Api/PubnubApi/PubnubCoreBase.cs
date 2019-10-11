@@ -1313,7 +1313,6 @@ namespace PubnubApi
                                 {
                                     if (type == PNOperationType.PNFetchHistoryOperation)
                                     {
-                                        List<object> fetchResult = new List<object>();
                                         for (int index=0; index < result.Count; index++)
                                         {
                                             Dictionary<string, object> messageContainer = jsonLib.ConvertToDictionaryObject(result[index]);
@@ -1332,15 +1331,6 @@ namespace PubnubApi
                                                 {
                                                     result[index] = messageContainer;
                                                 }
-                                                //if (messageContainer.ContainsKey("more"))
-                                                //{
-                                                //    object moreContainer = messageContainer["more"];
-                                                //    Dictionary<string, object> moreDic = jsonLib.ConvertToDictionaryObject(moreContainer);
-                                                //    if (moreDic != null && moreDic.Count > 0)
-                                                //    {
-                                                //        //result[index] = SecureMessage.Instance(currentConfig, jsonLib, currentLog).FetchHistoryDecodeDecryptLoop(type, channelDic, channels, channelGroups, callback);
-                                                //    }
-                                                //}
                                             }
                                         }
                                     }

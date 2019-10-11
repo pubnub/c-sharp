@@ -174,20 +174,6 @@ namespace PubnubApi.EndPoint
             CleanUp();
         }
 
-        private string JsonEncodePublishMsg(object originalMessage)
-        {
-            string message = jsonLibrary.SerializeToJsonString(originalMessage);
-
-            if (config.CipherKey.Length > 0)
-            {
-                PubnubCrypto aes = new PubnubCrypto(config.CipherKey, config, pubnubLog);
-                string encryptMessage = aes.Encrypt(message);
-                message = jsonLibrary.SerializeToJsonString(encryptMessage);
-            }
-
-            return message;
-        }
-
         private void CleanUp()
         {
             this.savedCallback = null;
