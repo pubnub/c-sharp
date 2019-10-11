@@ -103,17 +103,37 @@ namespace PubnubApi
             }
 
             encodedUri = o.ToString();
-            if (type == PNOperationType.PNHereNowOperation || type == PNOperationType.PNHistoryOperation || type == PNOperationType.PNFetchHistoryOperation || type == PNOperationType.Leave || type == PNOperationType.PNHeartbeatOperation || type == PNOperationType.PushRegister || type == PNOperationType.PushRemove || type == PNOperationType.PushGet || type == PNOperationType.PushUnregister)
+            if (IsOperationTypeForPercent2fEncode(type) && !ignorePercent2fEncode)
             {
-                if (!ignorePercent2fEncode)
-                {
-                    encodedUri = encodedUri.Replace("%2F", "%252F");
-                }
+                encodedUri = encodedUri.Replace("%2F", "%252F");
             }
 
             return encodedUri;
         }
 
+        private static bool IsOperationTypeForPercent2fEncode(PNOperationType type)
+        {
+            bool ret;
+            switch (type)
+            {
+                case PNOperationType.PNHereNowOperation:
+                case PNOperationType.PNHistoryOperation:
+                case PNOperationType.PNFetchHistoryOperation:
+                case PNOperationType.Leave:
+                case PNOperationType.PNHeartbeatOperation:
+                case PNOperationType.PushRegister:
+                case PNOperationType.PushRemove:
+                case PNOperationType.PushGet:
+                case PNOperationType.PushUnregister:
+                    ret = true;
+                    break;
+                default:
+                    ret = false;
+                    break;
+            }
+
+            return ret;
+        }
         private static bool IsUnsafeToEncode(char ch, bool ignoreComma, bool ignoreColon)
         {
             if (ignoreComma && ignoreColon)

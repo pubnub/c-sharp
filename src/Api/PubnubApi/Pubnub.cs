@@ -19,7 +19,7 @@ namespace PubnubApi
 
         private readonly string instanceId;
 
-        private static string sdkVersion = string.Format("{0}CSharp4.1.1.0", PNPlatform.Get());
+        private static string sdkVersion = string.Format("{0}CSharp4.2.0.0", PNPlatform.Get());
 
         private object savedSubscribeOperation;
         private readonly string savedSdkVerion;
