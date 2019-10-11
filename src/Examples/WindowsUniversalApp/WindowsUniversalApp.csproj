@@ -213,7 +213,7 @@
       <Version>5.2.3</Version>
     </PackageReference>
     <PackageReference Include="PubnubUWP">
-      <Version>4.1.1</Version>
+      <Version>4.2.0</Version>
     </PackageReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
