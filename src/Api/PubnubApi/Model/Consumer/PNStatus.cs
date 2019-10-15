@@ -227,6 +227,16 @@ namespace PubnubApi
                             }
                         }
                         break;
+                    case PNOperationType.PNFetchHistoryOperation:
+                        if (savedEndpointOperation is FetchHistoryOperation)
+                        {
+                            FetchHistoryOperation endpoint = savedEndpointOperation as FetchHistoryOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
                     case PNOperationType.PNMessageCountsOperation:
                         if (savedEndpointOperation is MessageCountsOperation)
                         {
@@ -381,6 +391,26 @@ namespace PubnubApi
                         if (savedEndpointOperation is GetMembersOperation)
                         {
                             GetMembersOperation endpoint = savedEndpointOperation as GetMembersOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
+                    case PNOperationType.PNAddMessageActionOperation:
+                        if (savedEndpointOperation is AddMessageActionOperation)
+                        {
+                            AddMessageActionOperation endpoint = savedEndpointOperation as AddMessageActionOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
+                    case PNOperationType.PNRemoveMessageActionOperation:
+                        if (savedEndpointOperation is RemoveMessageActionOperation)
+                        {
+                            RemoveMessageActionOperation endpoint = savedEndpointOperation as RemoveMessageActionOperation;
                             if (endpoint != null)
                             {
                                 endpoint.Retry();

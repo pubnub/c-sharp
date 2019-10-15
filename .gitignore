@@ -57,6 +57,7 @@ src/.vs/Pubnub/v15/sqlite3/storage.ide
 /src/Examples/PubnubApi.WinFormExample/obj/Release/*
 /src/Examples/PubnubApi.WinFormExample/*.user
 /src/Examples/PubnubApi.WinFormExample/packages/*
+/src/Examples/PubnubApi.WinFormExample/.vs/*
 
 /src/Examples/PubnubApiPCL.ConsoleExample/bin/Debug/*
 /src/Examples/PubnubApiPCL.ConsoleExample/obj/Debug/*
@@ -67,6 +68,7 @@ src/.vs/Pubnub/v15/sqlite3/storage.ide
 /src/Examples/WindowsUniversalApp/bin/*
 /src/Examples/WindowsUniversalApp/obj/*
 /src/Examples/WindowsUniversalApp/*.user
+src/Examples/WindowsUniversalApp/.vs/*
 
 /src/Examples/PubnubApiPCL.Windows10UWPExample/bin/*
 /src/Examples/PubnubApiPCL.Windows10UWPExample/obj/*

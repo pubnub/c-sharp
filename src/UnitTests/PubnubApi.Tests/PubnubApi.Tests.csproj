@@ -161,15 +161,6 @@
     <Compile Include="..\..\Api\PubnubApi\EndPoint\ChannelGroup\RemoveChannelsFromChannelGroupOperation.cs">
       <Link>LinkedSourceCode\EndPoint\ChannelGroup\RemoveChannelsFromChannelGroupOperation.cs</Link>
     </Compile>
-    <Compile Include="..\..\Api\PubnubApi\EndPoint\DeleteMessageOperation.cs">
-      <Link>LinkedSourceCode\EndPoint\DeleteMessageOperation.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Api\PubnubApi\EndPoint\HistoryOperation.cs">
-      <Link>LinkedSourceCode\EndPoint\HistoryOperation.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Api\PubnubApi\EndPoint\MessageCountsOperation.cs">
-      <Link>LinkedSourceCode\EndPoint\MessageCountsOperation.cs</Link>
-    </Compile>
     <Compile Include="..\..\Api\PubnubApi\EndPoint\Objects\CreateSpaceOperation.cs">
       <Link>LinkedSourceCode\EndPoint\Objects\CreateSpaceOperation.cs</Link>
     </Compile>
@@ -227,17 +218,26 @@
     <Compile Include="..\..\Api\PubnubApi\EndPoint\Presence\WhereNowOperation.cs">
       <Link>LinkedSourceCode\EndPoint\Presence\WhereNowOperation.cs</Link>
     </Compile>
+    <Compile Include="..\..\Api\PubnubApi\EndPoint\PubSub\AddMessageActionOperation.cs">
+      <Link>LinkedSourceCode\EndPoint\PubSub\AddMessageActionOperation.cs</Link>
+    </Compile>
     <Compile Include="..\..\Api\PubnubApi\EndPoint\PubSub\DuplicationManager.cs">
       <Link>LinkedSourceCode\EndPoint\PubSub\DuplicationManager.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\EndPoint\PubSub\FireOperation.cs">
       <Link>LinkedSourceCode\EndPoint\PubSub\FireOperation.cs</Link>
     </Compile>
+    <Compile Include="..\..\Api\PubnubApi\EndPoint\PubSub\GetMessageActionsOperation.cs">
+      <Link>LinkedSourceCode\EndPoint\PubSub\GetMessageActionsOperation.cs</Link>
+    </Compile>
     <Compile Include="..\..\Api\PubnubApi\EndPoint\PubSub\ListenerManager.cs">
       <Link>LinkedSourceCode\EndPoint\PubSub\ListenerManager.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\EndPoint\PubSub\PublishOperation.cs">
       <Link>LinkedSourceCode\EndPoint\PubSub\PublishOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\EndPoint\PubSub\RemoveMessageActionOperation.cs">
+      <Link>LinkedSourceCode\EndPoint\PubSub\RemoveMessageActionOperation.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\EndPoint\PubSub\SignalOperation.cs">
       <Link>LinkedSourceCode\EndPoint\PubSub\SignalOperation.cs</Link>
@@ -265,6 +265,18 @@
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\EndPoint\Push\RemovePushChannelOperation.cs">
       <Link>LinkedSourceCode\EndPoint\Push\RemovePushChannelOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\EndPoint\StoragePlayback\DeleteMessageOperation.cs">
+      <Link>LinkedSourceCode\EndPoint\StoragePlayback\DeleteMessageOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\EndPoint\StoragePlayback\FetchHistoryOperation.cs">
+      <Link>LinkedSourceCode\EndPoint\StoragePlayback\FetchHistoryOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\EndPoint\StoragePlayback\HistoryOperation.cs">
+      <Link>LinkedSourceCode\EndPoint\StoragePlayback\HistoryOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\EndPoint\StoragePlayback\MessageCountsOperation.cs">
+      <Link>LinkedSourceCode\EndPoint\StoragePlayback\MessageCountsOperation.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\EndPoint\TelemetryManager.cs">
       <Link>LinkedSourceCode\EndPoint\TelemetryManager.cs</Link>
@@ -341,17 +353,26 @@
     <Compile Include="..\..\Api\PubnubApi\JsonDataParse\JsonDataParseInternalUtil.cs">
       <Link>LinkedSourceCode\JsonDataParse\JsonDataParseInternalUtil.cs</Link>
     </Compile>
+    <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNAddMessageActionJsonDataParse.cs">
+      <Link>LinkedSourceCode\JsonDataParse\PNAddMessageActionJsonDataParse.cs</Link>
+    </Compile>
     <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNCreateSpaceJsonDataParse.cs">
       <Link>LinkedSourceCode\JsonDataParse\PNCreateSpaceJsonDataParse.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNCreateUserJsonDataParse.cs">
       <Link>LinkedSourceCode\JsonDataParse\PNCreateUserJsonDataParse.cs</Link>
     </Compile>
+    <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNFetchHistoryJsonDataParse.cs">
+      <Link>LinkedSourceCode\JsonDataParse\PNFetchHistoryJsonDataParse.cs</Link>
+    </Compile>
     <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNGetMembershipsJsonDataParse.cs">
       <Link>LinkedSourceCode\JsonDataParse\PNGetMembershipsJsonDataParse.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNGetMembersJsonDataParse.cs">
       <Link>LinkedSourceCode\JsonDataParse\PNGetMembersJsonDataParse.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNGetMessageActionsJsonDataParse.cs">
+      <Link>LinkedSourceCode\JsonDataParse\PNGetMessageActionsJsonDataParse.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNGetSpaceJsonDataParse.cs">
       <Link>LinkedSourceCode\JsonDataParse\PNGetSpaceJsonDataParse.cs</Link>
@@ -368,14 +389,23 @@
     <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNGrantTokenJsonDataParse.cs">
       <Link>LinkedSourceCode\JsonDataParse\PNGrantTokenJsonDataParse.cs</Link>
     </Compile>
+    <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNHistoryJsonDataParse.cs">
+      <Link>LinkedSourceCode\JsonDataParse\PNHistoryJsonDataParse.cs</Link>
+    </Compile>
     <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNManageMembershipsJsonDataParse.cs">
       <Link>LinkedSourceCode\JsonDataParse\PNManageMembershipsJsonDataParse.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNManageMembersJsonDataParse.cs">
       <Link>LinkedSourceCode\JsonDataParse\PNManageMembersJsonDataParse.cs</Link>
     </Compile>
+    <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNMessageActionEventJsonDataParse.cs">
+      <Link>LinkedSourceCode\JsonDataParse\PNMessageActionEventJsonDataParse.cs</Link>
+    </Compile>
     <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNObjectApiEventJsonDataParse.cs">
       <Link>LinkedSourceCode\JsonDataParse\PNObjectApiEventJsonDataParse.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNRemoveMessageActionJsonDataParse.cs">
+      <Link>LinkedSourceCode\JsonDataParse\PNRemoveMessageActionJsonDataParse.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\JsonDataParse\PNUpdateSpaceJsonDataParse.cs">
       <Link>LinkedSourceCode\JsonDataParse\PNUpdateSpaceJsonDataParse.cs</Link>
@@ -427,6 +457,9 @@
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\DeleteMessage\PNDeleteMessageResult.cs">
       <Link>LinkedSourceCode\Model\Consumer\DeleteMessage\PNDeleteMessageResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\History\PNFetchHistoryResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\History\PNFetchHistoryResult.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\History\PNHistoryItemResult.cs">
       <Link>LinkedSourceCode\Model\Consumer\History\PNHistoryItemResult.cs</Link>
@@ -533,6 +566,21 @@
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Presence\PNWhereNowResult.cs">
       <Link>LinkedSourceCode\Model\Consumer\Presence\PNWhereNowResult.cs</Link>
     </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Pubsub\PNAddMessageActionResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Pubsub\PNAddMessageActionResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Pubsub\PNGetMessageActionsResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Pubsub\PNGetMessageActionsResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Pubsub\PNMessageAction.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Pubsub\PNMessageAction.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Pubsub\PNMessageActionEventResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Pubsub\PNMessageActionEventResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Pubsub\PNMessageActionItem.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Pubsub\PNMessageActionItem.cs</Link>
+    </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Pubsub\PNMessageResult.cs">
       <Link>LinkedSourceCode\Model\Consumer\Pubsub\PNMessageResult.cs</Link>
     </Compile>
@@ -544,6 +592,9 @@
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Pubsub\PNPublishResult.cs">
       <Link>LinkedSourceCode\Model\Consumer\Pubsub\PNPublishResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Pubsub\PNRemoveMessageActionResult.cs">
+      <Link>LinkedSourceCode\Model\Consumer\Pubsub\PNRemoveMessageActionResult.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Consumer\Pubsub\PNSignalResult.cs">
       <Link>LinkedSourceCode\Model\Consumer\Pubsub\PNSignalResult.cs</Link>
@@ -586,6 +637,9 @@
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Derived\DeleteMessage\PNDeleteMessageResultExt.cs">
       <Link>LinkedSourceCode\Model\Derived\DeleteMessage\PNDeleteMessageResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\History\PNFetchHistoryResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\History\PNFetchHistoryResultExt.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Derived\History\PNHistoryResultExt.cs">
       <Link>LinkedSourceCode\Model\Derived\History\PNHistoryResultExt.cs</Link>
@@ -650,8 +704,17 @@
     <Compile Include="..\..\Api\PubnubApi\Model\Derived\Presence\PNWhereNowResultExt.cs">
       <Link>LinkedSourceCode\Model\Derived\Presence\PNWhereNowResultExt.cs</Link>
     </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\Pubsub\PNAddMessageActionResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\Pubsub\PNAddMessageActionResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\Pubsub\PNGetMessageActionsResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\Pubsub\PNGetMessageActionsResultExt.cs</Link>
+    </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Derived\Pubsub\PNPublishResultExt.cs">
       <Link>LinkedSourceCode\Model\Derived\Pubsub\PNPublishResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Model\Derived\Pubsub\PNRemoveMessageActionResultExt.cs">
+      <Link>LinkedSourceCode\Model\Derived\Pubsub\PNRemoveMessageActionResultExt.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\Model\Derived\Pubsub\SubscribeCallbackExt.cs">
       <Link>LinkedSourceCode\Model\Derived\Pubsub\SubscribeCallbackExt.cs</Link>
@@ -766,9 +829,11 @@
     <Compile Include="WhenAuditIsRequested.cs" />
     <Compile Include="WhenChannelGroupIsRequested.cs" />
     <Compile Include="WhenDetailedHistoryIsRequested.cs" />
+    <Compile Include="WhenFetchHistoryIsRequested.cs" />
     <Compile Include="WhenGetRequestServerTimeMultiInstance.cs" />
     <Compile Include="WhenGetRequestServerTime.cs" />
     <Compile Include="WhenGrantIsRequested.cs" />
+    <Compile Include="WhenMessageAction.cs" />
     <Compile Include="WhenMessageCountIsRequested.cs" />
     <Compile Include="WhenMessageDeletedFromChannel.cs" />
     <Compile Include="WhenObjectMember.cs" />

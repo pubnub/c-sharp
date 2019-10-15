@@ -76,6 +76,16 @@
             this.txtPush2 = new System.Windows.Forms.Button();
             this.btnFire1 = new System.Windows.Forms.Button();
             this.btnFire2 = new System.Windows.Forms.Button();
+            this.btnGrantToken1 = new System.Windows.Forms.Button();
+            this.btnGrantToken2 = new System.Windows.Forms.Button();
+            this.btnObjects1 = new System.Windows.Forms.Button();
+            this.btnObjects2 = new System.Windows.Forms.Button();
+            this.txtToken1 = new System.Windows.Forms.TextBox();
+            this.label9 = new System.Windows.Forms.Label();
+            this.label10 = new System.Windows.Forms.Label();
+            this.txtToken2 = new System.Windows.Forms.TextBox();
+            this.btnSetToken1 = new System.Windows.Forms.Button();
+            this.btnSetToken2 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -90,7 +100,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(658, -2);
+            this.label2.Location = new System.Drawing.Point(520, -4);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(57, 13);
             this.label2.TabIndex = 1;
@@ -99,7 +109,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(599, 100);
+            this.label3.Location = new System.Drawing.Point(520, 100);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(84, 13);
             this.label3.TabIndex = 2;
@@ -116,7 +126,7 @@
             // 
             // txtMessage2
             // 
-            this.txtMessage2.Location = new System.Drawing.Point(689, 97);
+            this.txtMessage2.Location = new System.Drawing.Point(610, 97);
             this.txtMessage2.Name = "txtMessage2";
             this.txtMessage2.Size = new System.Drawing.Size(319, 20);
             this.txtMessage2.TabIndex = 4;
@@ -150,19 +160,25 @@
             // 
             // lvResults1
             // 
+            this.lvResults1.FullRowSelect = true;
+            this.lvResults1.HideSelection = false;
             this.lvResults1.Location = new System.Drawing.Point(3, 226);
             this.lvResults1.Name = "lvResults1";
             this.lvResults1.Size = new System.Drawing.Size(490, 239);
             this.lvResults1.TabIndex = 8;
             this.lvResults1.UseCompatibleStateImageBehavior = false;
+            this.lvResults1.ItemSelectionChanged += new System.Windows.Forms.ListViewItemSelectionChangedEventHandler(this.lvResults1_ItemSelectionChanged);
             // 
             // lvResults2
             // 
+            this.lvResults2.FullRowSelect = true;
+            this.lvResults2.HideSelection = false;
             this.lvResults2.Location = new System.Drawing.Point(512, 226);
             this.lvResults2.Name = "lvResults2";
             this.lvResults2.Size = new System.Drawing.Size(490, 239);
             this.lvResults2.TabIndex = 9;
             this.lvResults2.UseCompatibleStateImageBehavior = false;
+            this.lvResults2.ItemSelectionChanged += new System.Windows.Forms.ListViewItemSelectionChangedEventHandler(this.lvResults2_ItemSelectionChanged);
             // 
             // txtChannels1
             // 
@@ -173,7 +189,7 @@
             // 
             // txtChannels2
             // 
-            this.txtChannels2.Location = new System.Drawing.Point(689, 43);
+            this.txtChannels2.Location = new System.Drawing.Point(610, 43);
             this.txtChannels2.Name = "txtChannels2";
             this.txtChannels2.Size = new System.Drawing.Size(319, 20);
             this.txtChannels2.TabIndex = 12;
@@ -190,7 +206,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(599, 46);
+            this.label6.Location = new System.Drawing.Point(520, 46);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(51, 13);
             this.label6.TabIndex = 10;
@@ -205,7 +221,7 @@
             // 
             // txtChannelGroup2
             // 
-            this.txtChannelGroup2.Location = new System.Drawing.Point(689, 68);
+            this.txtChannelGroup2.Location = new System.Drawing.Point(610, 68);
             this.txtChannelGroup2.Name = "txtChannelGroup2";
             this.txtChannelGroup2.Size = new System.Drawing.Size(319, 20);
             this.txtChannelGroup2.TabIndex = 16;
@@ -213,7 +229,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(599, 71);
+            this.label8.Location = new System.Drawing.Point(520, 71);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(80, 13);
             this.label8.TabIndex = 14;
@@ -394,7 +410,7 @@
             this.btnPAM1.Name = "btnPAM1";
             this.btnPAM1.Size = new System.Drawing.Size(75, 23);
             this.btnPAM1.TabIndex = 41;
-            this.btnPAM1.Text = "PAM";
+            this.btnPAM1.Text = "Grant";
             this.btnPAM1.UseVisualStyleBackColor = true;
             this.btnPAM1.Click += new System.EventHandler(this.btnPAM1_Click);
             // 
@@ -404,13 +420,13 @@
             this.btnPAM2.Name = "btnPAM2";
             this.btnPAM2.Size = new System.Drawing.Size(75, 23);
             this.btnPAM2.TabIndex = 42;
-            this.btnPAM2.Text = "PAM";
+            this.btnPAM2.Text = "Grant";
             this.btnPAM2.UseVisualStyleBackColor = true;
             this.btnPAM2.Click += new System.EventHandler(this.btnPAM2_Click);
             // 
             // btnPnConfig1
             // 
-            this.btnPnConfig1.Location = new System.Drawing.Point(96, 14);
+            this.btnPnConfig1.Location = new System.Drawing.Point(9, 12);
             this.btnPnConfig1.Name = "btnPnConfig1";
             this.btnPnConfig1.Size = new System.Drawing.Size(75, 23);
             this.btnPnConfig1.TabIndex = 43;
@@ -420,7 +436,7 @@
             // 
             // btnPnConfig2
             // 
-            this.btnPnConfig2.Location = new System.Drawing.Point(691, 14);
+            this.btnPnConfig2.Location = new System.Drawing.Point(523, 12);
             this.btnPnConfig2.Name = "btnPnConfig2";
             this.btnPnConfig2.Size = new System.Drawing.Size(75, 23);
             this.btnPnConfig2.TabIndex = 44;
@@ -528,11 +544,113 @@
             this.btnFire2.UseVisualStyleBackColor = true;
             this.btnFire2.Click += new System.EventHandler(this.btnFire2_Click);
             // 
+            // btnGrantToken1
+            // 
+            this.btnGrantToken1.Location = new System.Drawing.Point(170, 190);
+            this.btnGrantToken1.Name = "btnGrantToken1";
+            this.btnGrantToken1.Size = new System.Drawing.Size(75, 23);
+            this.btnGrantToken1.TabIndex = 55;
+            this.btnGrantToken1.Text = "GrantToken";
+            this.btnGrantToken1.UseVisualStyleBackColor = true;
+            this.btnGrantToken1.Click += new System.EventHandler(this.btnGrantToken1_Click);
+            // 
+            // btnGrantToken2
+            // 
+            this.btnGrantToken2.Location = new System.Drawing.Point(684, 187);
+            this.btnGrantToken2.Name = "btnGrantToken2";
+            this.btnGrantToken2.Size = new System.Drawing.Size(75, 23);
+            this.btnGrantToken2.TabIndex = 56;
+            this.btnGrantToken2.Text = "GrantToken";
+            this.btnGrantToken2.UseVisualStyleBackColor = true;
+            this.btnGrantToken2.Click += new System.EventHandler(this.btnGrantToken2_Click);
+            // 
+            // btnObjects1
+            // 
+            this.btnObjects1.Location = new System.Drawing.Point(251, 190);
+            this.btnObjects1.Name = "btnObjects1";
+            this.btnObjects1.Size = new System.Drawing.Size(75, 23);
+            this.btnObjects1.TabIndex = 57;
+            this.btnObjects1.Text = "Objects";
+            this.btnObjects1.UseVisualStyleBackColor = true;
+            this.btnObjects1.Click += new System.EventHandler(this.btnObjects1_Click);
+            // 
+            // btnObjects2
+            // 
+            this.btnObjects2.Location = new System.Drawing.Point(765, 188);
+            this.btnObjects2.Name = "btnObjects2";
+            this.btnObjects2.Size = new System.Drawing.Size(75, 23);
+            this.btnObjects2.TabIndex = 58;
+            this.btnObjects2.Text = "Objects";
+            this.btnObjects2.UseVisualStyleBackColor = true;
+            this.btnObjects2.Click += new System.EventHandler(this.btnObjects2_Click);
+            // 
+            // txtToken1
+            // 
+            this.txtToken1.Location = new System.Drawing.Point(138, 15);
+            this.txtToken1.Name = "txtToken1";
+            this.txtToken1.Size = new System.Drawing.Size(351, 20);
+            this.txtToken1.TabIndex = 59;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(91, 18);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(41, 13);
+            this.label9.TabIndex = 60;
+            this.label9.Text = "Token:";
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(608, 18);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(41, 13);
+            this.label10.TabIndex = 62;
+            this.label10.Text = "Token:";
+            // 
+            // txtToken2
+            // 
+            this.txtToken2.Location = new System.Drawing.Point(655, 15);
+            this.txtToken2.Name = "txtToken2";
+            this.txtToken2.Size = new System.Drawing.Size(351, 20);
+            this.txtToken2.TabIndex = 61;
+            // 
+            // btnSetToken1
+            // 
+            this.btnSetToken1.Location = new System.Drawing.Point(333, 188);
+            this.btnSetToken1.Name = "btnSetToken1";
+            this.btnSetToken1.Size = new System.Drawing.Size(75, 23);
+            this.btnSetToken1.TabIndex = 63;
+            this.btnSetToken1.Text = "Set Token";
+            this.btnSetToken1.UseVisualStyleBackColor = true;
+            this.btnSetToken1.Click += new System.EventHandler(this.btnSetToken1_Click);
+            // 
+            // btnSetToken2
+            // 
+            this.btnSetToken2.Location = new System.Drawing.Point(846, 189);
+            this.btnSetToken2.Name = "btnSetToken2";
+            this.btnSetToken2.Size = new System.Drawing.Size(75, 23);
+            this.btnSetToken2.TabIndex = 64;
+            this.btnSetToken2.Text = "Set Token";
+            this.btnSetToken2.UseVisualStyleBackColor = true;
+            this.btnSetToken2.Click += new System.EventHandler(this.btnSetToken2_Click);
+            // 
             // PubnubDemoForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1022, 503);
+            this.Controls.Add(this.btnSetToken2);
+            this.Controls.Add(this.btnSetToken1);
+            this.Controls.Add(this.label10);
+            this.Controls.Add(this.txtToken2);
+            this.Controls.Add(this.label9);
+            this.Controls.Add(this.txtToken1);
+            this.Controls.Add(this.btnObjects2);
+            this.Controls.Add(this.btnObjects1);
+            this.Controls.Add(this.btnGrantToken2);
+            this.Controls.Add(this.btnGrantToken1);
             this.Controls.Add(this.btnFire2);
             this.Controls.Add(this.btnFire1);
             this.Controls.Add(this.txtPush2);
@@ -639,5 +757,15 @@
         private System.Windows.Forms.Button txtPush2;
         private System.Windows.Forms.Button btnFire1;
         private System.Windows.Forms.Button btnFire2;
+        private System.Windows.Forms.Button btnGrantToken1;
+        private System.Windows.Forms.Button btnGrantToken2;
+        private System.Windows.Forms.Button btnObjects1;
+        private System.Windows.Forms.Button btnObjects2;
+        private System.Windows.Forms.TextBox txtToken1;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.TextBox txtToken2;
+        private System.Windows.Forms.Button btnSetToken1;
+        private System.Windows.Forms.Button btnSetToken2;
     }
 }

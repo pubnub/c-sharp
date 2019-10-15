@@ -231,6 +231,9 @@ namespace PubNubMessaging.Tests
                             new PNMember() { UserId = userId1 },
                             new PNMember() { UserId = userId2 }
                     })
+                    .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.USER, PNMemberField.USER_CUSTOM })
+                    .IncludeCount(true)
+                    .Page(new PNPage() { Next = "", Prev = "" })
                     .Execute(new PNManageMembersResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
@@ -261,6 +264,9 @@ namespace PubNubMessaging.Tests
                             new PNMember() { UserId = userId1, Custom = new Dictionary<string, object>(){ { "color", "green1" } } },
                             new PNMember() { UserId = userId2, Custom = new Dictionary<string, object>(){ { "color", "green2" } } }
                     })
+                    .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.USER, PNMemberField.USER_CUSTOM })
+                    .IncludeCount(true)
+                    .Page(new PNPage() { Next = "", Prev = "" })
                     .Execute(new PNManageMembersResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
@@ -287,6 +293,9 @@ namespace PubNubMessaging.Tests
                 System.Diagnostics.Debug.WriteLine("pubnub.Members() REMOVE STARTED");
                 pubnub.ManageMembers().SpaceId(spaceId)
                     .Remove(new List<string>() { userId2 })
+                    .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.USER, PNMemberField.USER_CUSTOM })
+                    .IncludeCount(true)
+                    .Page(new PNPage() { Next = "", Prev = "" })
                     .Execute(new PNManageMembersResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)

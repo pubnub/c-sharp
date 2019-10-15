@@ -750,6 +750,15 @@ namespace PubnubApi
                                             Announce(objectApiEvent);
                                         }
                                     }
+                                    else if (currentMessage.MessageType == 3)
+                                    {
+                                        ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
+                                        PNMessageActionEventResult msgActionEventEvent = responseBuilder.JsonToObject<PNMessageActionEventResult>(payloadContainer, true);
+                                        if (msgActionEventEvent != null)
+                                        {
+                                            Announce(msgActionEventEvent);
+                                        }
+                                    }
                                     else if (currentMessageChannel.Contains("-pnpres"))
                                     {
                                         ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
@@ -790,6 +799,7 @@ namespace PubnubApi
                     case PNOperationType.PNFireOperation:
                     case PNOperationType.PNSignalOperation:
                     case PNOperationType.PNHistoryOperation:
+                    case PNOperationType.PNFetchHistoryOperation:
                     case PNOperationType.PNDeleteMessageOperation:
                     case PNOperationType.PNMessageCountsOperation:
                     case PNOperationType.PNHereNowOperation:
@@ -826,6 +836,9 @@ namespace PubnubApi
                     case PNOperationType.PNManageMembersOperation:
                     case PNOperationType.PNGetMembershipsOperation:
                     case PNOperationType.PNGetMembersOperation:
+                    case PNOperationType.PNAddMessageActionOperation:
+                    case PNOperationType.PNRemoveMessageActionOperation:
+                    case PNOperationType.PNGetMessageActionsOperation:
                         if (result != null && result.Count > 0)
                         {
                             ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
@@ -1295,9 +1308,36 @@ namespace PubnubApi
                             case PNOperationType.PNTimeOperation:
                                 break;
                             case PNOperationType.PNHistoryOperation:
+                            case PNOperationType.PNFetchHistoryOperation:
                                 if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig) && pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog))
                                 {
-                                    result = SecureMessage.Instance(currentConfig, jsonLib, currentLog).DecodeDecryptLoop(result, channels, channelGroups, callback);
+                                    if (type == PNOperationType.PNFetchHistoryOperation)
+                                    {
+                                        for (int index=0; index < result.Count; index++)
+                                        {
+                                            Dictionary<string, object> messageContainer = jsonLib.ConvertToDictionaryObject(result[index]);
+                                            if (messageContainer != null && messageContainer.Count > 0)
+                                            {
+                                                if (messageContainer.ContainsKey("channels"))
+                                                {
+                                                    object channelMessageContainer = messageContainer["channels"];
+                                                    Dictionary<string, object> channelDic = jsonLib.ConvertToDictionaryObject(channelMessageContainer);
+                                                    if (channelDic != null && channelDic.Count > 0)
+                                                    {
+                                                        result[index] = SecureMessage.Instance(currentConfig, jsonLib, currentLog).FetchHistoryDecodeDecryptLoop(type, channelDic, channels, channelGroups, callback);
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    result[index] = messageContainer;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        result = SecureMessage.Instance(currentConfig, jsonLib, currentLog).HistoryDecodeDecryptLoop(type, result, channels, channelGroups, callback);
+                                    }
                                 }
                                 result.Add(multiChannel);
                                 break;
@@ -1356,6 +1396,9 @@ namespace PubnubApi
                             case PNOperationType.PNUpdateUserOperation:
                             case PNOperationType.PNCreateSpaceOperation:
                             case PNOperationType.PNUpdateSpaceOperation:
+                            case PNOperationType.PNAddMessageActionOperation:
+                            case PNOperationType.PNRemoveMessageActionOperation:
+                            case PNOperationType.PNGetMessageActionsOperation:
                                 result.Add(multiChannel);
                                 break;
                             case PNOperationType.PNAddChannelsToGroupOperation:
@@ -2145,8 +2188,18 @@ namespace PubnubApi
                     callbackList[listenerIndex].ObjectEvent(PubnubInstance, objectApiEvent);
                 }
             }
-
         }
 
+        internal void Announce(PNMessageActionEventResult messageActionEvent)
+        {
+            if (PubnubInstance != null && SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
+            {
+                List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
+                for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
+                {
+                    callbackList[listenerIndex].MessageAction(PubnubInstance, messageActionEvent);
+                }
+            }
+        }
     }
 }

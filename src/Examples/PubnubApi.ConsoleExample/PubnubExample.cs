@@ -304,7 +304,7 @@ namespace PubnubApiDemo
             Console.WriteLine("");
             while (!exitFlag)
             {
-                if (currentUserChoice < 1 || (currentUserChoice > 55 && currentUserChoice != 99))
+                if (currentUserChoice < 1 || (currentUserChoice > 58 && currentUserChoice != 99))
                 {
                     StringBuilder menuOptionsStringBuilder = new StringBuilder();
                     menuOptionsStringBuilder.AppendLine("ENTER 1 FOR Subscribe channel/channelgroup");
@@ -331,6 +331,7 @@ namespace PubnubApiDemo
                     menuOptionsStringBuilder.AppendLine("Enter 22 FOR GetSubscribeChannelGroups");
                     menuOptionsStringBuilder.AppendLine("Enter 23 FOR DeleteMessages");
                     menuOptionsStringBuilder.AppendLine("Enter 24 FOR MessagesCount");
+                    menuOptionsStringBuilder.AppendLine("Enter 25 FOR Fetch Messages");
                     menuOptionsStringBuilder.AppendLine("Enter 31 FOR Push - Register Device");
                     menuOptionsStringBuilder.AppendLine("Enter 32 FOR Push - Remove Channel");
                     menuOptionsStringBuilder.AppendLine("Enter 33 FOR Push - Get Current Channels");
@@ -353,6 +354,9 @@ namespace PubnubApiDemo
                     menuOptionsStringBuilder.AppendLine("Enter 53 FOR Get Members");
                     menuOptionsStringBuilder.AppendLine("Enter 54 FOR GrantToken");
                     menuOptionsStringBuilder.AppendLine("Enter 55 FOR SetToken");
+                    menuOptionsStringBuilder.AppendLine("Enter 56 FOR Add MessageAction");
+                    menuOptionsStringBuilder.AppendLine("Enter 57 FOR Remove MessageAction");
+                    menuOptionsStringBuilder.AppendLine("Enter 58 FOR Get MessageActions");
                     menuOptionsStringBuilder.AppendLine("ENTER 99 FOR EXIT OR QUIT");
                     Console.WriteLine(menuOptionsStringBuilder.ToString());
                     userinput = Console.ReadLine();
@@ -576,6 +580,7 @@ namespace PubnubApiDemo
                             .Reverse(false)
                             .Count(100)
                             .IncludeTimetoken(true)
+                            .IncludeMeta(true)
                             .Execute(new PNHistoryResultExt(
                                 (r, s) =>
                                 {
@@ -1174,6 +1179,27 @@ namespace PubnubApiDemo
                                     {
                                         Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     }
+                                }));
+                        break;
+                    case "25":
+                        Console.WriteLine("Enter CHANNEL name(s) for Fetch History");
+                        channel = Console.ReadLine();
+
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine(string.Format("Channel(s) = {0}", channel));
+                        Console.ResetColor();
+                        Console.WriteLine();
+
+                        Console.WriteLine("Running FetchHistory()");
+                        pubnub.FetchHistory()
+                            .Channels(channel.Split(','))
+                            .Reverse(false)
+                            .MaximumPerChannel(25)
+                            .IncludeMeta(true)
+                            .Execute(new PNFetchHistoryResultExt(
+                                (r, s) =>
+                                {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                 }));
                         break;
                     case "31":
@@ -1807,6 +1833,83 @@ namespace PubnubApiDemo
                         pubnub.SetToken(grantToken);
                         Console.WriteLine();
                         Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(pubnub.ParseToken(grantToken)));
+                        break;
+                    case "56":
+                        Console.WriteLine("Enter Channel Name to Add Message Actions");
+                        string addMsgActionChannelName = Console.ReadLine();
+                        Console.WriteLine("Enter MessageTimetoken");
+                        string addMsgActionMsgTT = Console.ReadLine();
+                        Console.WriteLine("Enter Message Action Type");
+                        string addMsgActionType = Console.ReadLine();
+                        Console.WriteLine("Enter Message Action Value");
+                        string addMsgActionValue = Console.ReadLine();
+                        long addMsgActionMsgTimetoken;
+                        Int64.TryParse(addMsgActionMsgTT.ToString(), out addMsgActionMsgTimetoken);
+                        
+                        pubnub.AddMessageAction()
+                            .Channel(addMsgActionChannelName)
+                            .MessageTimetoken(addMsgActionMsgTimetoken)
+                            .Action(new PNMessageAction { Type = addMsgActionType, Value = addMsgActionValue })
+                            .Execute(new PNAddMessageActionResultExt((result, status) => 
+                            {
+                                if (result != null)
+                                {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                                }
+                                else
+                                {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                                }
+                            }));
+                        break;
+                    case "57":
+                        Console.WriteLine("Enter Channel Name to Remove Message Actions");
+                        string rmMsgActionChannelName = Console.ReadLine();
+                        Console.WriteLine("Enter MessageTimetoken");
+                        string rmMsgActionMsgTT = Console.ReadLine();
+                        Console.WriteLine("Enter ActionTimetoken");
+                        string rmMsgActionActTT = Console.ReadLine();
+                        Console.WriteLine("Enter UUID");
+                        string rmMsgActionUuid = Console.ReadLine();
+                        long rmMsgActionMsgTimetoken;
+                        Int64.TryParse(rmMsgActionMsgTT.ToString(), out rmMsgActionMsgTimetoken);
+                        long rmMsgActionMsgActionTimetoken;
+                        Int64.TryParse(rmMsgActionActTT.ToString(), out rmMsgActionMsgActionTimetoken);
+
+                        pubnub.RemoveMessageAction()
+                            .Channel(rmMsgActionChannelName)
+                            .MessageTimetoken(rmMsgActionMsgTimetoken)
+                            .ActionTimetoken(rmMsgActionMsgActionTimetoken)
+                            .Uuid(rmMsgActionUuid)
+                            .Execute(new PNRemoveMessageActionResultExt((result, status) =>
+                            {
+                                if (result != null)
+                                {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                                }
+                                else
+                                {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                                }
+                            }));
+                        break;
+                    case "58":
+                        Console.WriteLine("Enter Channel Name to Get Message Actions");
+                        string getMsgActionChannelName = Console.ReadLine();
+
+                        pubnub.GetMessageActions()
+                            .Channel(getMsgActionChannelName)
+                            .Execute(new PNGetMessageActionsResultExt((result, status) =>
+                            {
+                                if (result != null)
+                                {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                                }
+                                else
+                                {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                                }
+                            }));
                         break;
                     default:
                         Console.ForegroundColor = ConsoleColor.Red;

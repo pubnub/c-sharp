@@ -20,6 +20,7 @@ namespace PubnubApi.EndPoint
 
         private bool reverseOption;
         private bool includeTimetokenOption;
+        private bool withMetaOption;
         private long startTimetoken = -1;
         private long endTimetoken = -1;
         private int historyCount = -1;
@@ -36,47 +37,69 @@ namespace PubnubApi.EndPoint
             pubnubLog = log;
             pubnubTelemetryMgr = telemetryManager;
             pubnubTokenMgr = tokenManager;
+
+            PubnubInstance = instance;
+
+            if (!ChannelRequest.ContainsKey(instance.InstanceId))
+            {
+                ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
+            }
+            if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
+            {
+                ChannelInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+            }
+            if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId))
+            {
+                ChannelGroupInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+            }
+
         }
 
         public HistoryOperation Channel(string channel)
         {
-            this.channelName = channel;
+            channelName = channel;
             return this;
         }
 
         public HistoryOperation Reverse(bool reverse)
         {
-            this.reverseOption = reverse;
+            reverseOption = reverse;
             return this;
         }
 
         public HistoryOperation IncludeTimetoken(bool includeTimetoken)
         {
-            this.includeTimetokenOption = includeTimetoken;
+            includeTimetokenOption = includeTimetoken;
+            return this;
+        }
+
+        public HistoryOperation IncludeMeta(bool withMeta)
+        {
+            withMetaOption = withMeta;
             return this;
         }
 
         public HistoryOperation Start(long start)
         {
-            this.startTimetoken = start;
+            startTimetoken = start;
             return this;
         }
 
         public HistoryOperation End(long end)
         {
-            this.endTimetoken = end;
+            endTimetoken = end;
             return this;
         }
 
         public HistoryOperation Count(int count)
         {
-            this.historyCount = count;
+            historyCount = count;
             return this;
         }
 
         public HistoryOperation QueryParam(Dictionary<string, object> customQueryParam)
         {
-            this.queryParam = customQueryParam;
+            queryParam = customQueryParam;
             return this;
         }
 
@@ -97,13 +120,13 @@ namespace PubnubApi.EndPoint
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
-                History(this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, this.queryParam, callback);
+                History(this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, this.withMetaOption, this.queryParam, callback);
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
             new Thread(() =>
             {
                 this.savedCallback = callback;
-                History(this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, this.queryParam, callback);
+                History(this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, this.withMetaOption, this.queryParam, callback);
             })
             { IsBackground = true }.Start();
 #endif
@@ -114,18 +137,18 @@ namespace PubnubApi.EndPoint
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
-                History(this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, this.queryParam, savedCallback);
+                History(this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, this.withMetaOption, this.queryParam, savedCallback);
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
             new Thread(() =>
             {
-                History(this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, this.queryParam, savedCallback);
+                History(this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, this.withMetaOption, this.queryParam, savedCallback);
             })
             { IsBackground = true }.Start();
 #endif
         }
 
-        internal void History(string channel, long start, long end, int count, bool reverse, bool includeToken, Dictionary<string, object> externalQueryParam, PNCallback<PNHistoryResult> callback)
+        internal void History(string channel, long start, long end, int count, bool reverse, bool includeToken, bool includeMeta, Dictionary<string, object> externalQueryParam, PNCallback<PNHistoryResult> callback)
         {
             if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()))
             {
@@ -134,7 +157,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildHistoryRequest("GET", "", channel, start, end, count, reverse, includeToken, externalQueryParam);
+            Uri request = urlBuilder.BuildHistoryRequest("GET", "", channel, start, end, count, reverse, includeToken, includeMeta, externalQueryParam);
 
             RequestState<PNHistoryResult> requestState = new RequestState<PNHistoryResult>();
             requestState.Channels = new [] { channel };
@@ -143,29 +166,11 @@ namespace PubnubApi.EndPoint
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;
 
-            string json = UrlProcessRequest< PNHistoryResult>(request, requestState, false);
+            string json = UrlProcessRequest(request, requestState, false);
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = ProcessJsonResponse<PNHistoryResult>(requestState, json);
+                List<object> result = ProcessJsonResponse(requestState, json);
                 ProcessResponseCallbacks(result, requestState);
-            }
-        }
-
-        internal void CurrentPubnubInstance(Pubnub instance)
-        {
-            PubnubInstance = instance;
-
-            if (!ChannelRequest.ContainsKey(instance.InstanceId))
-            {
-                ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
-            }
-            if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
-            {
-                ChannelInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
-            }
-            if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId))
-            {
-                ChannelGroupInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
             }
         }
     }

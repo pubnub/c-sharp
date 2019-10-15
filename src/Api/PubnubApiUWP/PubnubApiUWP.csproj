@@ -15,7 +15,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubUWP</PackageId>
-    <PackageVersion>4.1.0.0</PackageVersion>
+    <PackageVersion>4.2.0.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -23,11 +23,10 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>Fix for MessageCounts when multiple channels are used.
-Fix for PAM Signature when case-sensitive param keys are provided.
-Refactored all calls that use PAM signature to use  v2 format signature.
-Implemented PAMv3 to all Objects.
-New feature Token Management System to all Objects.</PackageReleaseNotes>
+    <PackageReleaseNotes>Added IncludeMeta option to History.
+Added new feature FetchHistory.
+Added support for Message Actions.
+Fix for ManageMembers and ManageMemberships when multiple include fields are provided.</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
@@ -215,11 +214,6 @@ New feature Token Management System to all Objects.</PackageReleaseNotes>
     <Compile Include="..\PubnubApi\EndPoint\ChannelGroup\RemoveChannelsFromChannelGroupOperation.cs">
       <Link>EndPoint\ChannelGroup\RemoveChannelsFromChannelGroupOperation.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\EndPoint\DeleteMessageOperation.cs" Link="EndPoint\DeleteMessageOperation.cs" />
-    <Compile Include="..\PubnubApi\EndPoint\HistoryOperation.cs">
-      <Link>EndPoint\HistoryOperation.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\EndPoint\MessageCountsOperation.cs" Link="EndPoint\MessageCountsOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\Objects\CreateSpaceOperation.cs" Link="EndPoint\Objects\CreateSpaceOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\Objects\CreateUserOperation.cs" Link="EndPoint\Objects\CreateUserOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\Objects\DeleteSpaceOperation.cs" Link="EndPoint\Objects\DeleteSpaceOperation.cs" />
@@ -249,16 +243,19 @@ New feature Token Management System to all Objects.</PackageReleaseNotes>
     <Compile Include="..\PubnubApi\EndPoint\Presence\WhereNowOperation.cs">
       <Link>EndPoint\Presence\WhereNowOperation.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\PubSub\AddMessageActionOperation.cs" Link="EndPoint\PubSub\AddMessageActionOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\PubSub\DuplicationManager.cs" Link="EndPoint\PubSub\DuplicationManager.cs" />
     <Compile Include="..\PubnubApi\EndPoint\PubSub\FireOperation.cs">
       <Link>EndPoint\PubSub\FireOperation.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\PubSub\GetMessageActionsOperation.cs" Link="EndPoint\PubSub\GetMessageActionsOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\PubSub\ListenerManager.cs">
       <Link>EndPoint\PubSub\ListenerManager.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\EndPoint\PubSub\PublishOperation.cs">
       <Link>EndPoint\PubSub\PublishOperation.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\PubSub\RemoveMessageActionOperation.cs" Link="EndPoint\PubSub\RemoveMessageActionOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\PubSub\SignalOperation.cs" Link="EndPoint\PubSub\SignalOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\PubSub\SubscribeManager.cs">
       <Link>EndPoint\PubSub\SubscribeManager.cs</Link>
@@ -282,6 +279,10 @@ New feature Token Management System to all Objects.</PackageReleaseNotes>
     <Compile Include="..\PubnubApi\EndPoint\Push\RemovePushChannelOperation.cs">
       <Link>EndPoint\Push\RemovePushChannelOperation.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\StoragePlayback\DeleteMessageOperation.cs" Link="EndPoint\StoragePlayback\DeleteMessageOperation.cs" />
+    <Compile Include="..\PubnubApi\EndPoint\StoragePlayback\FetchHistoryOperation.cs" Link="EndPoint\StoragePlayback\FetchHistoryOperation.cs" />
+    <Compile Include="..\PubnubApi\EndPoint\StoragePlayback\HistoryOperation.cs" Link="EndPoint\StoragePlayback\HistoryOperation.cs" />
+    <Compile Include="..\PubnubApi\EndPoint\StoragePlayback\MessageCountsOperation.cs" Link="EndPoint\StoragePlayback\MessageCountsOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\TelemetryManager.cs" Link="EndPoint\TelemetryManager.cs" />
     <Compile Include="..\PubnubApi\EndPoint\TimeOperation.cs">
       <Link>EndPoint\TimeOperation.cs</Link>
@@ -345,18 +346,24 @@ New feature Token Management System to all Objects.</PackageReleaseNotes>
       <Link>Interface\IUrlRequestBuilder.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\JsonDataParse\JsonDataParseInternalUtil.cs" Link="JsonDataParse\JsonDataParseInternalUtil.cs" />
+    <Compile Include="..\PubnubApi\JsonDataParse\PNAddMessageActionJsonDataParse.cs" Link="JsonDataParse\PNAddMessageActionJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNCreateSpaceJsonDataParse.cs" Link="JsonDataParse\PNCreateSpaceJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNCreateUserJsonDataParse.cs" Link="JsonDataParse\PNCreateUserJsonDataParse.cs" />
+    <Compile Include="..\PubnubApi\JsonDataParse\PNFetchHistoryJsonDataParse.cs" Link="JsonDataParse\PNFetchHistoryJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNGetMembershipsJsonDataParse.cs" Link="JsonDataParse\PNGetMembershipsJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNGetMembersJsonDataParse.cs" Link="JsonDataParse\PNGetMembersJsonDataParse.cs" />
+    <Compile Include="..\PubnubApi\JsonDataParse\PNGetMessageActionsJsonDataParse.cs" Link="JsonDataParse\PNGetMessageActionsJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNGetSpaceJsonDataParse.cs" Link="JsonDataParse\PNGetSpaceJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNGetSpacesJsonDataParse.cs" Link="JsonDataParse\PNGetSpacesJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNGetUserJsonDataParse.cs" Link="JsonDataParse\PNGetUserJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNGetUsersJsonDataParse.cs" Link="JsonDataParse\PNGetUsersJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNGrantTokenJsonDataParse.cs" Link="JsonDataParse\PNGrantTokenJsonDataParse.cs" />
+    <Compile Include="..\PubnubApi\JsonDataParse\PNHistoryJsonDataParse.cs" Link="JsonDataParse\PNHistoryJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNManageMembershipsJsonDataParse.cs" Link="JsonDataParse\PNManageMembershipsJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNManageMembersJsonDataParse.cs" Link="JsonDataParse\PNManageMembersJsonDataParse.cs" />
+    <Compile Include="..\PubnubApi\JsonDataParse\PNMessageActionEventJsonDataParse.cs" Link="JsonDataParse\PNMessageActionEventJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNObjectApiEventJsonDataParse.cs" Link="JsonDataParse\PNObjectApiEventJsonDataParse.cs" />
+    <Compile Include="..\PubnubApi\JsonDataParse\PNRemoveMessageActionJsonDataParse.cs" Link="JsonDataParse\PNRemoveMessageActionJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNUpdateSpaceJsonDataParse.cs" Link="JsonDataParse\PNUpdateSpaceJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNUpdateUserJsonDataParse.cs" Link="JsonDataParse\PNUpdateUserJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\Log\LoggingMethod.cs">
@@ -396,6 +403,7 @@ New feature Token Management System to all Objects.</PackageReleaseNotes>
       <Link>Model\Consumer\ChannelGroup\PNChannelGroupsRemoveChannelResult.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\Model\Consumer\DeleteMessage\PNDeleteMessageResult.cs" Link="Model\Consumer\DeleteMessage\PNDeleteMessageResult.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\History\PNFetchHistoryResult.cs" Link="Model\Consumer\History\PNFetchHistoryResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\History\PNHistoryItemResult.cs">
       <Link>Model\Consumer\History\PNHistoryItemResult.cs</Link>
     </Compile>
@@ -453,6 +461,11 @@ New feature Token Management System to all Objects.</PackageReleaseNotes>
     <Compile Include="..\PubnubApi\Model\Consumer\Presence\PNWhereNowResult.cs">
       <Link>Model\Consumer\Presence\PNWhereNowResult.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\Pubsub\PNAddMessageActionResult.cs" Link="Model\Consumer\Pubsub\PNAddMessageActionResult.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\Pubsub\PNGetMessageActionsResult.cs" Link="Model\Consumer\Pubsub\PNGetMessageActionsResult.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\Pubsub\PNMessageAction.cs" Link="Model\Consumer\Pubsub\PNMessageAction.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\Pubsub\PNMessageActionEventResult.cs" Link="Model\Consumer\Pubsub\PNMessageActionEventResult.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\Pubsub\PNMessageActionItem.cs" Link="Model\Consumer\Pubsub\PNMessageActionItem.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Pubsub\PNMessageResult.cs">
       <Link>Model\Consumer\Pubsub\PNMessageResult.cs</Link>
     </Compile>
@@ -463,6 +476,7 @@ New feature Token Management System to all Objects.</PackageReleaseNotes>
     <Compile Include="..\PubnubApi\Model\Consumer\Pubsub\PNPublishResult.cs">
       <Link>Model\Consumer\Pubsub\PNPublishResult.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\Pubsub\PNRemoveMessageActionResult.cs" Link="Model\Consumer\Pubsub\PNRemoveMessageActionResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Pubsub\PNSignalResult.cs" Link="Model\Consumer\Pubsub\PNSignalResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Push\PNPushAddChannelResult.cs">
       <Link>Model\Consumer\Push\PNPushAddChannelResult.cs</Link>
@@ -499,6 +513,7 @@ New feature Token Management System to all Objects.</PackageReleaseNotes>
       <Link>Model\Derived\ChannelGroup\PNChannelGroupsRemoveChannelResultExt.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\Model\Derived\DeleteMessage\PNDeleteMessageResultExt.cs" Link="Model\Derived\DeleteMessage\PNDeleteMessageResultExt.cs" />
+    <Compile Include="..\PubnubApi\Model\Derived\History\PNFetchHistoryResultExt.cs" Link="Model\Derived\History\PNFetchHistoryResultExt.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\History\PNHistoryResultExt.cs">
       <Link>Model\Derived\History\PNHistoryResultExt.cs</Link>
     </Compile>
@@ -532,9 +547,12 @@ New feature Token Management System to all Objects.</PackageReleaseNotes>
     <Compile Include="..\PubnubApi\Model\Derived\Presence\PNWhereNowResultExt.cs">
       <Link>Model\Derived\Presence\PNWhereNowResultExt.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\Pubsub\PNAddMessageActionResultExt.cs" Link="Model\Derived\Pubsub\PNAddMessageActionResultExt.cs" />
+    <Compile Include="..\PubnubApi\Model\Derived\Pubsub\PNGetMessageActionsResultExt.cs" Link="Model\Derived\Pubsub\PNGetMessageActionsResultExt.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\Pubsub\PNPublishResultExt.cs">
       <Link>Model\Derived\Pubsub\PNPublishResultExt.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\Pubsub\PNRemoveMessageActionResultExt.cs" Link="Model\Derived\Pubsub\PNRemoveMessageActionResultExt.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\Pubsub\SubscribeCallbackExt.cs">
       <Link>Model\Derived\Pubsub\SubscribeCallbackExt.cs</Link>
     </Compile>
@@ -646,6 +664,7 @@ New feature Token Management System to all Objects.</PackageReleaseNotes>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="CBOR\Tags\" />
+    <Folder Include="EndPoint\StoragePlayback\" />
     <Folder Include="EndPoint\Objects\" />
     <Folder Include="Model\Consumer\DeleteMessage\" />
     <Folder Include="Model\Consumer\Objects\" />

@@ -51,7 +51,7 @@ namespace PubnubApi.EndPoint
 
         public SignalOperation Message(object message)
         {
-            this.msg = message;
+            msg = message;
             return this;
         }
 
@@ -63,7 +63,7 @@ namespace PubnubApi.EndPoint
 
         public SignalOperation QueryParam(Dictionary<string, object> customQueryParam)
         {
-            this.queryParam = customQueryParam;
+            queryParam = customQueryParam;
             return this;
         }
 

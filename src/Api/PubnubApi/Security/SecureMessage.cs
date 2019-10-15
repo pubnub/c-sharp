@@ -22,13 +22,14 @@ namespace PubnubApi
             return secureMessage;
         }
 
-        public List<object> DecodeDecryptLoop<T>(List<object> message, string[] channels, string[] channelGroups, PNCallback<T> errorCallback)
+        public List<object> HistoryDecodeDecryptLoop<T>(PNOperationType type, List<object> messageList, string[] channels, string[] channelGroups, PNCallback<T> errorCallback)
         {
             List<object> returnMessage = new List<object>();
+
             if (config.CipherKey.Length > 0)
             {
                 PubnubCrypto aes = new PubnubCrypto(config.CipherKey, config, pubnubLog);
-                object[] myObjectArray = (from item in message
+                object[] myObjectArray = (from item in messageList
                                      select item as object).ToArray();
                 object[] enumerable = myObjectArray[0] as object[];
                 if (enumerable != null)
@@ -56,7 +57,7 @@ namespace PubnubApi
                             decryptMessage = "**DECRYPT ERROR**";
 
                             PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(ex);
-                            PNStatus status = new StatusBuilder(config, jsonLib).CreateStatusResponse<T>(PNOperationType.PNHistoryOperation, category, null, (int)HttpStatusCode.NotFound, new PNException(ex));
+                            PNStatus status = new StatusBuilder(config, jsonLib).CreateStatusResponse<T>(type, category, null, (int)HttpStatusCode.NotFound, new PNException(ex));
                             if (channels != null && channels.Length > 0)
                             {
                                 status.AffectedChannels.AddRange(channels);
@@ -82,7 +83,7 @@ namespace PubnubApi
             }
             else
             {
-                var myObjectArray = (from item in message
+                var myObjectArray = (from item in messageList
                                      select item as object).ToArray();
                 IEnumerable enumerable = myObjectArray[0] as IEnumerable;
                 if (enumerable != null)
@@ -102,5 +103,75 @@ namespace PubnubApi
             }
         }
 
+        public List<object> FetchHistoryDecodeDecryptLoop<T>(PNOperationType type, Dictionary<string, object> messageContainer, string[] channels, string[] channelGroups, PNCallback<T> errorCallback)
+        {
+            List<object> returnMessage = new List<object>();
+
+            Dictionary<string, List<object>> dicMessage = new Dictionary<string, List<object>>();
+            foreach (KeyValuePair<string, object> kvp in messageContainer)
+            {
+                List<object> currentVal = kvp.Value as List<object>;
+                if (currentVal != null)
+                {
+                    object[] currentValArray = jsonLib.ConvertToObjectArray(currentVal);
+                    List<object> decryptList = (currentValArray != null && currentValArray.Length > 0) ? new List<object>() : null;
+                    if (currentValArray != null && decryptList != null)
+                    {
+                        foreach (object currentObj in currentValArray)
+                        {
+                            Dictionary<string, object> dicValue = jsonLib.ConvertToDictionaryObject(currentObj);
+                            if (dicValue != null && dicValue.Count > 0 && dicValue.ContainsKey("message"))
+                            {
+                                Dictionary<string, object> dicDecrypt = new Dictionary<string, object>();
+                                foreach (KeyValuePair<string, object> kvpValue in dicValue)
+                                {
+                                    if (kvpValue.Key == "message" && config.CipherKey.Length > 0)
+                                    {
+                                        PubnubCrypto aes = new PubnubCrypto(config.CipherKey, config, pubnubLog);
+                                        string decryptMessage = "";
+                                        try
+                                        {
+                                            decryptMessage = aes.Decrypt(kvpValue.Value.ToString());
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            #region "Exception"
+                                            decryptMessage = "**DECRYPT ERROR**";
+
+                                            PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(ex);
+                                            PNStatus status = new StatusBuilder(config, jsonLib).CreateStatusResponse<T>(type, category, null, (int)HttpStatusCode.NotFound, new PNException(ex));
+                                            if (channels != null && channels.Length > 0)
+                                            {
+                                                status.AffectedChannels.AddRange(channels);
+                                            }
+                                            if (channelGroups != null && channelGroups.Length > 0)
+                                            {
+                                                status.AffectedChannelGroups.AddRange(channelGroups);
+                                            }
+
+                                            errorCallback.OnResponse(default(T), status);
+                                            #endregion
+                                        }
+                                        object decodeMessage = (decryptMessage == "**DECRYPT ERROR**") ? decryptMessage : jsonLib.DeserializeToObject(decryptMessage);
+                                        dicDecrypt.Add(kvpValue.Key, decodeMessage);
+                                    }
+                                    else
+                                    {
+                                        dicDecrypt.Add(kvpValue.Key, kvpValue.Value);
+                                    }
+                                }
+                                decryptList.Add(dicDecrypt);
+                            }
+                        }
+                    }
+                    dicMessage.Add(kvp.Key, decryptList);
+                }
+            }
+            if (dicMessage.Count > 0)
+            {
+                returnMessage.Add(dicMessage);
+            }
+            return returnMessage;
+        }
     }
 }

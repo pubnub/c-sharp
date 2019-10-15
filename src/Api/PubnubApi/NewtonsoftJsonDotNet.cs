@@ -782,60 +782,15 @@ namespace PubnubApi
             else if (typeof(T) == typeof(PNHistoryResult))
             {
 #region "PNHistoryResult"
-                PNHistoryResult ack = new PNHistoryResult();
-                long historyStartTime;
-                long historyEndTime;
-                if (Int64.TryParse(listObject[1].ToString(), out historyStartTime))
-                {
-                    ack.StartTimeToken = historyStartTime;
-                }
-                if (Int64.TryParse(listObject[2].ToString(), out historyEndTime))
-                {
-                    ack.EndTimeToken = historyEndTime;
-                }
-                List<object> messagesContainer = listObject[0] as List<object>;
-                if (messagesContainer == null)
-                {
-                    object[] messagesCollection = listObject[0] as object[];
-                    if (messagesCollection != null && messagesCollection.Length > 0)
-                    {
-                        messagesContainer = messagesCollection.ToList();
-                    }
-                }
-                if (messagesContainer != null)
-                {
-                    ack.Messages = new List<PNHistoryItemResult>();
-                    foreach(var message in messagesContainer)
-                    {
-                        PNHistoryItemResult result = new PNHistoryItemResult();
-                        Dictionary<string, object> dicMessageTimetoken = ConvertToDictionaryObject(message);
-                        if (dicMessageTimetoken != null)
-                        {
-                            if (dicMessageTimetoken.ContainsKey("message") && dicMessageTimetoken.ContainsKey("timetoken"))
-                            {
-                                result.Entry = dicMessageTimetoken["message"];
-
-                                long messageTimetoken;
-                                if (Int64.TryParse(dicMessageTimetoken["timetoken"].ToString(), out messageTimetoken))
-                                {
-                                    result.Timetoken = messageTimetoken;
-                                }
-                            }
-                            else
-                            {
-                                result.Entry = dicMessageTimetoken;
-                            }
-                        }
-                        else
-                        {
-                            result.Entry = message;
-                        }
-
-                        ack.Messages.Add(result);
-                    }
-                }
-
-                ret = (T)Convert.ChangeType(ack, typeof(PNHistoryResult), CultureInfo.InvariantCulture);
+                PNHistoryResult result = PNHistoryJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNHistoryResult), CultureInfo.InvariantCulture);
+#endregion
+            }
+            else if (typeof(T) == typeof(PNFetchHistoryResult))
+            {
+#region "PNFetchHistoryResult"
+                PNFetchHistoryResult result = PNFetchHistoryJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNFetchHistoryResult), CultureInfo.InvariantCulture);
 #endregion
             }
             else if (typeof(T) == typeof(PNDeleteMessageResult))
@@ -1426,6 +1381,34 @@ namespace PubnubApi
                 ret = (T)Convert.ChangeType(result, typeof(PNObjectApiEventResult), CultureInfo.InvariantCulture);
                 #endregion
             }
+            else if (typeof(T) == typeof(PNMessageActionEventResult))
+            {
+                #region "PNMessageActionEventResult"
+                PNMessageActionEventResult result = PNMessageActionEventJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNMessageActionEventResult), CultureInfo.InvariantCulture);
+                #endregion
+            }
+            else if (typeof(T) == typeof(PNAddMessageActionResult))
+            {
+                #region "PNAddMessageActionResult"
+                PNAddMessageActionResult result = PNAddMessageActionJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNAddMessageActionResult), CultureInfo.InvariantCulture);
+                #endregion
+            }
+            else if (typeof(T) == typeof(PNRemoveMessageActionResult))
+            {
+                #region "PNRemoveMessageActionResult"
+                PNRemoveMessageActionResult result = PNRemoveMessageActionJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNRemoveMessageActionResult), CultureInfo.InvariantCulture);
+                #endregion
+            }
+            else if (typeof(T) == typeof(PNGetMessageActionsResult))
+            {
+                #region "PNGetMessageActionsResult"
+                PNGetMessageActionsResult result = PNGetMessageActionsJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNGetMessageActionsResult), CultureInfo.InvariantCulture);
+                #endregion
+            }
             else
             {
                 System.Diagnostics.Debug.WriteLine("DeserializeToObject<T>(list) => NO MATCH");
@@ -1491,6 +1474,47 @@ namespace PubnubApi
                         {
                             string propName = jsonProp.Name;
                             ret.Add(propName, ConvertJTokenToObject(jsonProp.Value));
+                        }
+                    }
+                    else if (localContainer.GetType().ToString() == "System.Collections.Generic.List`1[System.Object]")
+                    {
+                        List<object> localList = localContainer as List<object>;
+                        if (localList != null)
+                        {
+                            if (localList.Count > 0 && localList[0].GetType() == typeof(KeyValuePair<string, object>))
+                            {
+                                ret = new Dictionary<string, object>();
+                                foreach (object item in localList)
+                                {
+                                    if (item is KeyValuePair<string, object> kvpItem)
+                                    {
+                                        ret.Add(kvpItem.Key, kvpItem.Value);
+                                    }
+                                    else
+                                    {
+                                        ret = null;
+                                        break;
+                                    }
+                                }
+                            }
+                            else if (localList.Count == 1 && localList[0].GetType() == typeof(Dictionary<string, object>))
+                            {
+                                ret = new Dictionary<string, object>();
+
+                                Dictionary<string, object> localDic = localList[0] as Dictionary<string, object>;
+                                foreach (object item in localDic)
+                                {
+                                    if (item is KeyValuePair<string, object> kvpItem)
+                                    {
+                                        ret.Add(kvpItem.Key, kvpItem.Value);
+                                    }
+                                    else
+                                    {
+                                        ret = null;
+                                        break;
+                                    }
+                                }
+                            }
                         }
                     }
                 }

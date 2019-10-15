@@ -66,6 +66,7 @@ namespace PubnubApi.EndPoint
                     endpoint = "l_pub";
                     break;
                 case PNOperationType.PNHistoryOperation:
+                case PNOperationType.PNFetchHistoryOperation:
                 case PNOperationType.PNFireOperation:
                 case PNOperationType.PNDeleteMessageOperation:
                     endpoint = "l_hist";
@@ -122,6 +123,11 @@ namespace PubnubApi.EndPoint
                 case PNOperationType.PNGetMembersOperation:
                 case PNOperationType.PNManageMembersOperation:
                     endpoint = "l_obj";
+                    break;
+                case PNOperationType.PNAddMessageActionOperation:
+                case PNOperationType.PNRemoveMessageActionOperation:
+                case PNOperationType.PNGetMessageActionsOperation:
+                    endpoint = "l_msga";
                     break;
                 default:
                     endpoint = "";

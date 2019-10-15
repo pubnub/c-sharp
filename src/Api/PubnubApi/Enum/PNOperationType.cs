@@ -10,6 +10,7 @@ namespace PubnubApi
         PNFireOperation,
         PNSignalOperation,
         PNHistoryOperation,
+        PNFetchHistoryOperation,
         PNDeleteMessageOperation,
         PNMessageCountsOperation,
         PNWhereNowOperation,
@@ -38,6 +39,10 @@ namespace PubnubApi
         PNManageMembersOperation,
         PNGetMembershipsOperation,
         PNGetMembersOperation,
+
+        PNAddMessageActionOperation,
+        PNRemoveMessageActionOperation,
+        PNGetMessageActionsOperation,
 
         Presence,
         Leave,

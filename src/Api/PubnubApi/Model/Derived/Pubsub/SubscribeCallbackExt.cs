@@ -14,51 +14,84 @@ namespace PubnubApi
         readonly Action<Pubnub, PNSignalResult<object>> signalAction;
         readonly Action<Pubnub, PNStatus> statusAction;
         readonly Action<Pubnub, PNObjectApiEventResult> objectApiAction;
+        readonly Action<Pubnub, PNMessageActionEventResult> messageAction;
 
         public SubscribeCallbackExt(Action<Pubnub, PNMessageResult<object>> messageCallback, Action<Pubnub, PNPresenceEventResult> presenceCallback, Action<Pubnub, PNStatus> statusCallback)
         {
-            this.subscribeAction = messageCallback;
-            this.presenceAction = presenceCallback;
-            this.statusAction = statusCallback;
-            this.signalAction = null;
-            this.objectApiAction = null;
+            subscribeAction = messageCallback;
+            presenceAction = presenceCallback;
+            statusAction = statusCallback;
+            signalAction = null;
+            objectApiAction = null;
         }
 
         public SubscribeCallbackExt(Action<Pubnub, PNSignalResult<object>> signalCallback, Action<Pubnub, PNStatus> statusCallback)
         {
-            this.subscribeAction = null;
-            this.presenceAction = null;
-            this.statusAction = statusCallback;
-            this.signalAction = signalCallback;
-            this.objectApiAction = null;
+            subscribeAction = null;
+            presenceAction = null;
+            statusAction = statusCallback;
+            signalAction = signalCallback;
+            objectApiAction = null;
         }
 
         public SubscribeCallbackExt(Action<Pubnub, PNObjectApiEventResult> objectApiCallback, Action<Pubnub, PNStatus> statusCallback)
         {
-            this.subscribeAction = null;
-            this.presenceAction = null;
-            this.signalAction = null;
-            this.statusAction = statusCallback;
-            this.objectApiAction = objectApiCallback;
+            subscribeAction = null;
+            presenceAction = null;
+            signalAction = null;
+            statusAction = statusCallback;
+            objectApiAction = objectApiCallback;
 
         }
 
-        public SubscribeCallbackExt(Action<Pubnub, PNMessageResult<object>> messageCallback, Action<Pubnub, PNPresenceEventResult> presenceCallback, Action<Pubnub, PNSignalResult<object>> signalCallback, Action<Pubnub, PNStatus> statusCallback)
+        public SubscribeCallbackExt(Action<Pubnub, PNMessageActionEventResult> messageActionCallback, Action<Pubnub, PNStatus> statusCallback)
         {
-            this.subscribeAction = messageCallback;
-            this.presenceAction = presenceCallback;
-            this.statusAction = statusCallback;
-            this.signalAction = signalCallback;
-            this.objectApiAction = null;
+            subscribeAction = null;
+            presenceAction = null;
+            signalAction = null;
+            statusAction = null;
+            objectApiAction = null;
+            messageAction = messageActionCallback;
         }
 
-        public SubscribeCallbackExt(Action<Pubnub, PNMessageResult<object>> messageCallback, Action<Pubnub, PNPresenceEventResult> presenceCallback, Action<Pubnub, PNSignalResult<object>> signalCallback, Action<Pubnub, PNObjectApiEventResult> objectApiCallback, Action<Pubnub, PNStatus> statusCallback)
+        public SubscribeCallbackExt(Action<Pubnub, PNMessageResult<object>> messageCallback, 
+            Action<Pubnub, PNPresenceEventResult> presenceCallback, 
+            Action<Pubnub, PNSignalResult<object>> signalCallback, 
+            Action<Pubnub, PNStatus> statusCallback)
         {
-            this.subscribeAction = messageCallback;
-            this.presenceAction = presenceCallback;
-            this.statusAction = statusCallback;
-            this.signalAction = signalCallback;
-            this.objectApiAction = objectApiCallback;
+            subscribeAction = messageCallback;
+            presenceAction = presenceCallback;
+            statusAction = statusCallback;
+            signalAction = signalCallback;
+            objectApiAction = null;
+        }
+
+        public SubscribeCallbackExt(Action<Pubnub, PNMessageResult<object>> messageCallback, 
+            Action<Pubnub, PNPresenceEventResult> presenceCallback, 
+            Action<Pubnub, PNSignalResult<object>> signalCallback, 
+            Action<Pubnub, PNObjectApiEventResult> objectApiCallback, 
+            Action<Pubnub, PNStatus> statusCallback)
+        {
+            subscribeAction = messageCallback;
+            presenceAction = presenceCallback;
+            statusAction = statusCallback;
+            signalAction = signalCallback;
+            objectApiAction = objectApiCallback;
+        }
+
+        public SubscribeCallbackExt(Action<Pubnub, PNMessageResult<object>> messageCallback, 
+            Action<Pubnub, PNPresenceEventResult> presenceCallback, 
+            Action<Pubnub, PNSignalResult<object>> signalCallback, 
+            Action<Pubnub, PNObjectApiEventResult> objectApiCallback, 
+            Action<Pubnub, PNMessageActionEventResult> messageActionCallback, 
+            Action<Pubnub, PNStatus> statusCallback)
+        {
+            subscribeAction = messageCallback;
+            presenceAction = presenceCallback;
+            statusAction = statusCallback;
+            signalAction = signalCallback;
+            objectApiAction = objectApiCallback;
+            messageAction = messageActionCallback;
         }
 
         public override void Message<T>(Pubnub pubnub, PNMessageResult<T> message)
@@ -100,6 +133,11 @@ namespace PubnubApi
         public override void ObjectEvent(Pubnub pubnub, PNObjectApiEventResult objectEvent)
         {
             objectApiAction?.Invoke(pubnub, objectEvent);
+        }
+
+        public override void MessageAction(Pubnub pubnub, PNMessageActionEventResult messageActionEvent)
+        {
+            messageAction?.Invoke(pubnub, messageActionEvent);
         }
     }
 }

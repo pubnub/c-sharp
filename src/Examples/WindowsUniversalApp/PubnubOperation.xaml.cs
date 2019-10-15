@@ -77,7 +77,7 @@ namespace WindowsUniversalApp
                 config.PresenceTimeout = data.presenceHeartbeat;
                 config.SubscribeTimeout = data.subscribeTimeout;
                 config.NonSubscribeRequestTimeout = data.nonSubscribeTimeout;
-                config.UseClassicHttpWebRequest = true;
+                //config.UseClassicHttpWebRequest = true;
 
                 config.PubnubLog = new PlatformPubnubLog();
                 config.LogVerbosity = PNLogVerbosity.BODY;
@@ -101,7 +101,7 @@ namespace WindowsUniversalApp
 
         private void btnTime_Click(object sender, RoutedEventArgs e)
         {
-            pubnub.Time().Async(new PNTimeResultExt(
+            pubnub.Time().Execute(new PNTimeResultExt(
                 async (r, s) =>
                 {
                     if (r != null)
@@ -184,7 +184,7 @@ namespace WindowsUniversalApp
                                 .Channel(channel)
                                 .Message(intData)
                                 .ShouldStore(storeInHistory)
-                                .Async(new PNPublishResultExt(
+                                .Execute(new PNPublishResultExt(
                                     async (r, s) =>
                                     {
                                         if (r != null)
@@ -199,7 +199,7 @@ namespace WindowsUniversalApp
                                 .Channel(channel)
                                 .Message(doubleData)
                                 .ShouldStore(storeInHistory)
-                                .Async(new PNPublishResultExt(
+                                .Execute(new PNPublishResultExt(
                                     async (r, s) =>
                                     {
                                         if (r != null)
@@ -214,7 +214,7 @@ namespace WindowsUniversalApp
                                 .Channel(channel)
                                 .Message(publishMsg)
                                 .ShouldStore(storeInHistory)
-                                .Async(new PNPublishResultExt(
+                                .Execute(new PNPublishResultExt(
                                     async (r, s) =>
                                     {
                                         if (r != null)
@@ -240,7 +240,7 @@ namespace WindowsUniversalApp
             pubnub.History()
                 .Channel(channel)
                 .Count(100)
-                .Async(new PNHistoryResultExt(
+                .Execute(new PNHistoryResultExt(
                     async (r, s) =>
                     {
                         if (r != null)
@@ -290,7 +290,7 @@ namespace WindowsUniversalApp
                     pubnub.HereNow()
                     .IncludeUUIDs(showUUID)
                     .IncludeState(includeState)
-                    .Async(new PNHereNowResultEx(
+                    .Execute(new PNHereNowResultEx(
                         async (r, s) =>
                         {
                             if (r != null)
@@ -348,7 +348,7 @@ namespace WindowsUniversalApp
                     .Channels(new[] { channel })
                     .IncludeUUIDs(showUUID)
                     .IncludeState(includeState)
-                    .Async(new PNHereNowResultEx(
+                    .Execute(new PNHereNowResultEx(
                         async (r, s) =>
                         {
                             if (r != null)
@@ -427,7 +427,7 @@ namespace WindowsUniversalApp
                         .Read(true)
                         .Write(true)
                         .TTL(ttlInMinutes)
-                        .Async(new PNAccessManagerGrantResultExt(async (r, s) =>
+                        .Execute(new PNAccessManagerGrantResultExt(async (r, s) =>
                         {
                             if (r != null)
                             {
@@ -443,7 +443,7 @@ namespace WindowsUniversalApp
                         pubnub.Audit()
                         .Channel(pamUserChannelName)
                         .AuthKeys(new[] { pamAuthKey })
-                        .Async(new PNAccessManagerAuditResultExt(
+                        .Execute(new PNAccessManagerAuditResultExt(
                             async (r, s) =>
                             {
                                 if (r != null)
@@ -464,7 +464,7 @@ namespace WindowsUniversalApp
                              .AuthKeys(new[] { pamAuthKey })
                              .Read(false)
                              .Write(false)
-                             .Async(new PNAccessManagerGrantResultExt(async (r, s) =>
+                             .Execute(new PNAccessManagerGrantResultExt(async (r, s) =>
                              {
                                  if (r != null)
                                  {
@@ -544,7 +544,7 @@ namespace WindowsUniversalApp
                             .Read(true)
                             .Write(true)
                             .TTL(ttlInMinutes)
-                            .Async(new PNAccessManagerGrantResultExt(async (r, s) =>
+                            .Execute(new PNAccessManagerGrantResultExt(async (r, s) =>
                             {
                                 if (r != null)
                                 {
@@ -560,7 +560,7 @@ namespace WindowsUniversalApp
                             pubnub.Audit()
                             .ChannelGroup(pamUserChannelGroup)
                             .AuthKeys(new[] { pamAuthKey })
-                            .Async(new PNAccessManagerAuditResultExt(
+                            .Execute(new PNAccessManagerAuditResultExt(
                                 async (r, s) =>
                                 {
                                     if (r != null)
@@ -580,7 +580,7 @@ namespace WindowsUniversalApp
                             .Read(false)
                             .Write(false)
                             .TTL(ttlInMinutes)
-                            .Async(new PNAccessManagerGrantResultExt(async (r, s) =>
+                            .Execute(new PNAccessManagerGrantResultExt(async (r, s) =>
                             {
                                 if (r != null)
                                 {
@@ -660,7 +660,7 @@ namespace WindowsUniversalApp
                             .Channels(new[] { channel })
                             .ChannelGroups(new[] { channelGroup })
                             .State(dicInt)
-                            .Async(new PNSetStateResultExt(
+                            .Execute(new PNSetStateResultExt(
                                 async (r, s) =>
                                 {
                                     await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
@@ -675,7 +675,7 @@ namespace WindowsUniversalApp
                             .Channels(new[] { channel })
                             .ChannelGroups(new[] { channelGroup })
                             .State(dicDouble)
-                            .Async(new PNSetStateResultExt(
+                            .Execute(new PNSetStateResultExt(
                                 async (r, s) =>
                                 {
                                     await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
@@ -690,7 +690,7 @@ namespace WindowsUniversalApp
                             .Channels(new[] { channel })
                             .ChannelGroups(new[] { channelGroup })
                             .State(dicObj)
-                            .Async(new PNSetStateResultExt(
+                            .Execute(new PNSetStateResultExt(
                                 async (r, s) =>
                                 {
                                     await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
@@ -709,7 +709,7 @@ namespace WindowsUniversalApp
                             .Channels(new[] { channel })
                             .ChannelGroups(new[] { channelGroup })
                             .Uuid(userStateUUID)
-                            .Async(new PNGetStateResultExt(
+                            .Execute(new PNGetStateResultExt(
                                 async (r, s) =>
                                 {
                                     await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
@@ -767,7 +767,7 @@ namespace WindowsUniversalApp
 
                         pubnub.WhereNow()
                         .Uuid(whereNowUUID)
-                        .Async(new PNWhereNowResultExt(async (r, s) =>
+                        .Execute(new PNWhereNowResultExt(async (r, s) =>
                         {
                             await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
                         }));
@@ -894,7 +894,7 @@ namespace WindowsUniversalApp
                             await DisplayMessageInTextBox("Running GetChannelsForChannelGroup:").ConfigureAwait(false);
                             pubnub.ListChannelsForChannelGroup()
                             .ChannelGroup(userChannelGroup)
-                            .Async(new PNChannelGroupsAllChannelsResultExt(async (r, s) =>
+                            .Execute(new PNChannelGroupsAllChannelsResultExt(async (r, s) =>
                             {
                                 await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
                             }));
@@ -907,7 +907,7 @@ namespace WindowsUniversalApp
                             pubnub.AddChannelsToChannelGroup()
                             .Channels(new[] { userChannelName })
                             .ChannelGroup(userChannelGroup)
-                            .Async(new PNChannelGroupsAddChannelResultExt(async (r, s) =>
+                            .Execute(new PNChannelGroupsAddChannelResultExt(async (r, s) =>
                             {
                                 await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
                             }));
@@ -920,7 +920,7 @@ namespace WindowsUniversalApp
                             pubnub.RemoveChannelsFromChannelGroup()
                             .Channels(new[] { userChannelName })
                             .ChannelGroup(userChannelGroup)
-                            .Async(new PNChannelGroupsRemoveChannelResultExt(async (r, s) =>
+                            .Execute(new PNChannelGroupsRemoveChannelResultExt(async (r, s) =>
                             {
                                 await DisplayMessageInTextBox(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)).ConfigureAwait(false);
                             }));
@@ -1033,6 +1033,30 @@ namespace WindowsUniversalApp
             if (presence != null)
             {
                 this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(presence));
+            }
+        }
+
+        public override void Signal<T>(Pubnub pubnub, PNSignalResult<T> signal)
+        {
+            if (signal != null)
+            {
+                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(signal));
+            }
+        }
+
+        public override void ObjectEvent(Pubnub pubnub, PNObjectApiEventResult objectEvent)
+        {
+            if (objectEvent != null)
+            {
+                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(objectEvent));
+            }
+        }
+
+        public override void MessageAction(Pubnub pubnub, PNMessageActionEventResult messageAction)
+        {
+            if (messageAction != null)
+            {
+                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(messageAction));
             }
         }
 

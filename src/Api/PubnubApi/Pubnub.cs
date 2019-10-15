@@ -19,7 +19,7 @@ namespace PubnubApi
 
         private readonly string instanceId;
 
-        private static string sdkVersion = string.Format("{0}CSharp4.1.0.0", PNPlatform.Get());
+        private static string sdkVersion = string.Format("{0}CSharp4.2.0.0", PNPlatform.Get());
 
         private object savedSubscribeOperation;
         private readonly string savedSdkVerion;
@@ -70,7 +70,12 @@ namespace PubnubApi
         public EndPoint.HistoryOperation History()
 		{
             EndPoint.HistoryOperation historyOperaton = new EndPoint.HistoryOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
-            historyOperaton.CurrentPubnubInstance(this);
+            return historyOperaton;
+        }
+
+        public EndPoint.FetchHistoryOperation FetchHistory()
+        {
+            EndPoint.FetchHistoryOperation historyOperaton = new EndPoint.FetchHistoryOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
             return historyOperaton;
         }
 
@@ -251,6 +256,25 @@ namespace PubnubApi
             EndPoint.GetMembersOperation getMembersOperation = new EndPoint.GetMembersOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
             return getMembersOperation;
         }
+
+        public EndPoint.AddMessageActionOperation AddMessageAction()
+        {
+            EndPoint.AddMessageActionOperation addMessageActionOperation = new EndPoint.AddMessageActionOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
+            return addMessageActionOperation;
+        }
+
+        public EndPoint.RemoveMessageActionOperation RemoveMessageAction()
+        {
+            EndPoint.RemoveMessageActionOperation removeMessageActionOperation = new EndPoint.RemoveMessageActionOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
+            return removeMessageActionOperation;
+        }
+
+        public EndPoint.GetMessageActionsOperation GetMessageActions()
+        {
+            EndPoint.GetMessageActionsOperation getMessageActionsOperation = new EndPoint.GetMessageActionsOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
+            return getMessageActionsOperation;
+        }
+
         #endregion
 
         #region "PubNub API Channel Group Methods"
