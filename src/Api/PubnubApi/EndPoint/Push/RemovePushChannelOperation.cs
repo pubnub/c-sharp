@@ -20,6 +20,8 @@ namespace PubnubApi.EndPoint
         private PNPushType pubnubPushType;
         private string[] channelNames;
         private string deviceTokenId = "";
+        private PushEnvironment pushEnvironment = PushEnvironment.Development;
+        private string deviceTopic = "";
         private PNCallback<PNPushRemoveChannelResult> savedCallback;
         private Dictionary<string, object> queryParam;
 
@@ -66,6 +68,28 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
+        /// <summary>
+        /// Applies to APNS2 Only. Default = Development
+        /// </summary>
+        /// <param name="environment"></param>
+        /// <returns></returns>
+        public RemovePushChannelOperation Environment(PushEnvironment environment)
+        {
+            this.pushEnvironment = environment;
+            return this;
+        }
+
+        /// <summary>
+        /// Applies to APNS2 Only
+        /// </summary>
+        /// <param name="deviceTopic"></param>
+        /// <returns></returns>
+        public RemovePushChannelOperation Topic(string deviceTopic)
+        {
+            this.deviceTopic = deviceTopic;
+            return this;
+        }
+
         public RemovePushChannelOperation QueryParam(Dictionary<string, object> customQueryParam)
         {
             this.queryParam = customQueryParam;
@@ -84,13 +108,13 @@ namespace PubnubApi.EndPoint
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
-                RemoveChannelForDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, this.queryParam, callback);
+                RemoveChannelForDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, this.pushEnvironment, this.deviceTopic, this.queryParam, callback);
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
             new Thread(() =>
             {
                 this.savedCallback = callback;
-                RemoveChannelForDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, this.queryParam, callback);
+                RemoveChannelForDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, this.pushEnvironment, this.deviceTopic, this.queryParam, callback);
             })
             { IsBackground = true }.Start();
 #endif
@@ -101,18 +125,18 @@ namespace PubnubApi.EndPoint
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
-                RemoveChannelForDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, this.queryParam, savedCallback);
+                RemoveChannelForDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, this.pushEnvironment, this.deviceTopic, this.queryParam, savedCallback);
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
             new Thread(() =>
             {
-                RemoveChannelForDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, this.queryParam, savedCallback);
+                RemoveChannelForDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, this.pushEnvironment, this.deviceTopic, this.queryParam, savedCallback);
             })
             { IsBackground = true }.Start();
 #endif
         }
 
-        internal void RemoveChannelForDevice(string[] channels, PNPushType pushType, string pushToken, Dictionary<string, object> externalQueryParam, PNCallback<PNPushRemoveChannelResult> callback)
+        internal void RemoveChannelForDevice(string[] channels, PNPushType pushType, string pushToken, PushEnvironment environment, string deviceTopic, Dictionary<string, object> externalQueryParam, PNCallback<PNPushRemoveChannelResult> callback)
         {
             if (channels == null || channels.Length == 0 || channels[0] == null || channels[0].Trim().Length == 0)
             {
@@ -124,11 +148,16 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing deviceId");
             }
 
+            if (pushType == PNPushType.APNS2 && string.IsNullOrEmpty(deviceTopic))
+            {
+                throw new ArgumentException("Missing Topic");
+            }
+
             string channel = string.Join(",", channels.OrderBy(x => x).ToArray());
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildRemoveChannelPushRequest("GET", "", channel, pushType, pushToken, externalQueryParam);
+            Uri request = urlBuilder.BuildRemoveChannelPushRequest("GET", "", channel, pushType, pushToken, environment, deviceTopic, externalQueryParam);
 
             RequestState<PNPushRemoveChannelResult> requestState = new RequestState<PNPushRemoveChannelResult>();
             requestState.Channels = new [] { channel };

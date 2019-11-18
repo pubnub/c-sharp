@@ -977,21 +977,40 @@ namespace PubnubApi
             return BuildRestApiRequest(url, currentType, queryParams);
         }
 
-        Uri IUrlRequestBuilder.BuildRegisterDevicePushRequest(string requestMethod, string requestBody, string channel, PNPushType pushType, string pushToken, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildRegisterDevicePushRequest(string requestMethod, string requestBody, string channel, PNPushType pushType, string pushToken, PushEnvironment environment, string deviceTopic, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PushRegister;
 
             List<string> url = new List<string>();
-            url.Add("v1");
-            url.Add("push");
-            url.Add("sub-key");
-            url.Add(pubnubConfig.SubscribeKey);
-            url.Add("devices");
-            url.Add(pushToken);
+            if (pushType == PNPushType.APNS2)
+            {
+                url.Add("v2");
+                url.Add("push");
+                url.Add("sub-key");
+                url.Add(pubnubConfig.SubscribeKey);
+                url.Add("devices-apns2");
+                url.Add(pushToken);
+            }
+            else
+            {
+                url.Add("v1");
+                url.Add("push");
+                url.Add("sub-key");
+                url.Add(pubnubConfig.SubscribeKey);
+                url.Add("devices");
+                url.Add(pushToken);
+            }
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
-
-            requestQueryStringParams.Add("type", pushType.ToString().ToLower());
+            if (pushType == PNPushType.APNS2)
+            {
+                requestQueryStringParams.Add("environment", environment.ToString().ToLower());
+                requestQueryStringParams.Add("topic", UriUtil.EncodeUriComponent(false, deviceTopic, currentType, false, false, false));
+            }
+            else
+            {
+                requestQueryStringParams.Add("type", pushType.ToString().ToLower());
+            }
             requestQueryStringParams.Add("add", UriUtil.EncodeUriComponent(false, channel, currentType, true, false, false));
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
@@ -1011,22 +1030,42 @@ namespace PubnubApi
             return BuildRestApiRequest(url, currentType, queryParams);
         }
 
-        Uri IUrlRequestBuilder.BuildUnregisterDevicePushRequest(string requestMethod, string requestBody, PNPushType pushType, string pushToken, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildUnregisterDevicePushRequest(string requestMethod, string requestBody, PNPushType pushType, string pushToken, PushEnvironment environment, string deviceTopic, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PushUnregister;
 
             List<string> url = new List<string>();
-            url.Add("v1");
-            url.Add("push");
-            url.Add("sub-key");
-            url.Add(pubnubConfig.SubscribeKey);
-            url.Add("devices");
-            url.Add(pushToken);
-            url.Add("remove");
+            if (pushType == PNPushType.APNS2)
+            {
+                url.Add("v2");
+                url.Add("push");
+                url.Add("sub-key");
+                url.Add(pubnubConfig.SubscribeKey);
+                url.Add("devices-apns2");
+                url.Add(pushToken);
+                url.Add("remove");
+            }
+            else
+            {
+                url.Add("v1");
+                url.Add("push");
+                url.Add("sub-key");
+                url.Add(pubnubConfig.SubscribeKey);
+                url.Add("devices");
+                url.Add(pushToken);
+                url.Add("remove");
+            }
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
-
-            requestQueryStringParams.Add("type", pushType.ToString().ToLower());
+            if (pushType == PNPushType.APNS2)
+            {
+                requestQueryStringParams.Add("environment", environment.ToString().ToLower());
+                requestQueryStringParams.Add("topic", UriUtil.EncodeUriComponent(false, deviceTopic, currentType, false, false, false));
+            }
+            else
+            {
+                requestQueryStringParams.Add("type", pushType.ToString().ToLower());
+            }
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
             {
@@ -1045,21 +1084,40 @@ namespace PubnubApi
             return BuildRestApiRequest(url, currentType, queryParams);
         }
 
-        Uri IUrlRequestBuilder.BuildRemoveChannelPushRequest(string requestMethod, string requestBody, string channel, PNPushType pushType, string pushToken, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildRemoveChannelPushRequest(string requestMethod, string requestBody, string channel, PNPushType pushType, string pushToken, PushEnvironment environment, string deviceTopic, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PushRemove;
 
             List<string> url = new List<string>();
-            url.Add("v1");
-            url.Add("push");
-            url.Add("sub-key");
-            url.Add(pubnubConfig.SubscribeKey);
-            url.Add("devices");
-            url.Add(pushToken);
+            if (pushType == PNPushType.APNS2)
+            {
+                url.Add("v2");
+                url.Add("push");
+                url.Add("sub-key");
+                url.Add(pubnubConfig.SubscribeKey);
+                url.Add("devices-apns2");
+                url.Add(pushToken);
+            }
+            else
+            {
+                url.Add("v1");
+                url.Add("push");
+                url.Add("sub-key");
+                url.Add(pubnubConfig.SubscribeKey);
+                url.Add("devices");
+                url.Add(pushToken);
+            }
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
-
-            requestQueryStringParams.Add("type", pushType.ToString().ToLower());
+            if (pushType == PNPushType.APNS2)
+            {
+                requestQueryStringParams.Add("environment", environment.ToString().ToLower());
+                requestQueryStringParams.Add("topic", UriUtil.EncodeUriComponent(false, deviceTopic, currentType, false, false, false));
+            }
+            else
+            {
+                requestQueryStringParams.Add("type", pushType.ToString().ToLower());
+            }
             requestQueryStringParams.Add("remove", UriUtil.EncodeUriComponent(false, channel, currentType, true, false, false));
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
@@ -1079,21 +1137,41 @@ namespace PubnubApi
             return BuildRestApiRequest(url, currentType, queryParams);
         }
 
-        Uri IUrlRequestBuilder.BuildGetChannelsPushRequest(string requestMethod, string requestBody, PNPushType pushType, string pushToken, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildGetChannelsPushRequest(string requestMethod, string requestBody, PNPushType pushType, string pushToken, PushEnvironment environment, string deviceTopic, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PushGet;
 
             List<string> url = new List<string>();
-            url.Add("v1");
-            url.Add("push");
-            url.Add("sub-key");
-            url.Add(pubnubConfig.SubscribeKey);
-            url.Add("devices");
-            url.Add(pushToken);
+            if (pushType == PNPushType.APNS2)
+            {
+                url.Add("v2");
+                url.Add("push");
+                url.Add("sub-key");
+                url.Add(pubnubConfig.SubscribeKey);
+                url.Add("devices-apns2");
+                url.Add(pushToken);
+            }
+            else
+            {
+                url.Add("v1");
+                url.Add("push");
+                url.Add("sub-key");
+                url.Add(pubnubConfig.SubscribeKey);
+                url.Add("devices");
+                url.Add(pushToken);
+            }
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
 
-            requestQueryStringParams.Add("type", pushType.ToString().ToLower());
+            if (pushType == PNPushType.APNS2)
+            {
+                requestQueryStringParams.Add("environment", environment.ToString().ToLower());
+                requestQueryStringParams.Add("topic", UriUtil.EncodeUriComponent(false, deviceTopic, currentType, false, false, false));
+            }
+            else
+            {
+                requestQueryStringParams.Add("type", pushType.ToString().ToLower());
+            }
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
             {

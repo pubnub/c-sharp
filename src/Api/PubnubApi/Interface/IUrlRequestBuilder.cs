@@ -51,13 +51,13 @@ namespace PubnubApi.Interface
 
         Uri BuildGetAllChannelGroupRequest(string requestMethod, string requestBody, Dictionary<string, object> externalQueryParam);
 
-        Uri BuildRegisterDevicePushRequest(string requestMethod, string requestBody, string channel, PNPushType pushType, string pushToken, Dictionary<string, object> externalQueryParam);
+        Uri BuildRegisterDevicePushRequest(string requestMethod, string requestBody, string channel, PNPushType pushType, string pushToken, PushEnvironment environment, string deviceTopic, Dictionary<string, object> externalQueryParam);
 
-        Uri BuildUnregisterDevicePushRequest(string requestMethod, string requestBody, PNPushType pushType, string pushToken, Dictionary<string, object> externalQueryParam);
+        Uri BuildUnregisterDevicePushRequest(string requestMethod, string requestBody, PNPushType pushType, string pushToken, PushEnvironment environment, string deviceTopic, Dictionary<string, object> externalQueryParam);
 
-        Uri BuildRemoveChannelPushRequest(string requestMethod, string requestBody, string channel, PNPushType pushType, string pushToken, Dictionary<string, object> externalQueryParam);
+        Uri BuildRemoveChannelPushRequest(string requestMethod, string requestBody, string channel, PNPushType pushType, string pushToken, PushEnvironment environment, string deviceTopic, Dictionary<string, object> externalQueryParam);
 
-        Uri BuildGetChannelsPushRequest(string requestMethod, string requestBody, PNPushType pushType, string pushToken, Dictionary<string, object> externalQueryParam);
+        Uri BuildGetChannelsPushRequest(string requestMethod, string requestBody, PNPushType pushType, string pushToken, PushEnvironment environment, string deviceTopic, Dictionary<string, object> externalQueryParam);
 
         Uri BuildPresenceHeartbeatRequest(string requestMethod, string requestBody, string[] channels, string[] channelGroups, string jsonUserState);
 

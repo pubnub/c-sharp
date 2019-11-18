@@ -320,6 +320,9 @@
     <Compile Include="..\..\Api\PubnubApi\Enum\PubnubMessageSource.cs">
       <Link>LinkedSourceCode\Enum\PubnubMessageSource.cs</Link>
     </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Enum\PushEnvironment.cs">
+      <Link>LinkedSourceCode\Enum\PushEnvironment.cs</Link>
+    </Compile>
     <Compile Include="..\..\Api\PubnubApi\Enum\PushTypeService.cs">
       <Link>LinkedSourceCode\Enum\PushTypeService.cs</Link>
     </Compile>
