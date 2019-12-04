@@ -1465,5 +1465,64 @@ namespace PubNubMessaging.Tests
             pubnub = null;
             Assert.IsTrue(receivedPublishMessage, "FAILED - IfSecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess");
         }
+
+        [Test]
+        public static void IfMobilePayloadThenPublishReturnSuccess()
+        {
+            Apns2Data apns2Data = new Apns2Data
+            {
+                collapseId = "sample collapse id",
+                expiration = "xyzexpiration",
+                targets = new List<PushTarget>()
+                                                        {
+                                                            new PushTarget()
+                                                            {
+                                                                environment= PubnubApi.Environment.Development,
+                                                                exclude_devices = new List<string>(){ "excl_d1", "excl_d2" },
+                                                                topic = "sample dev topic"
+                                                            },
+                                                            new PushTarget()
+                                                            {
+                                                                environment= PubnubApi.Environment.Production,
+                                                                exclude_devices = new List<string>(){ "excl_d3", "excl_d4" },
+                                                                topic = "sample prod topic"
+                                                            }
+                                                        }
+            };
+
+            Dictionary<PNPushType, Dictionary<string, object>> pushTypeCustomData = new Dictionary<PNPushType, Dictionary<string, object>>();
+            pushTypeCustomData.Add(PNPushType.APNS2, new Dictionary<string, object>
+                                {
+                                    {"teams", new string[] { "49ers", "raiders" } },
+                                    {"score", new int[] { 7, 0 } }
+                                });
+            pushTypeCustomData.Add(PNPushType.FCM, new Dictionary<string, object>
+                                {
+                                    {"teams", new string[] { "49ers", "raiders" } },
+                                    {"score", new int[] { 7, 0 } },
+                                    {"lastplay", "5yd run up the middle" }
+                                });
+            pushTypeCustomData.Add(PNPushType.MPNS, new Dictionary<string, object> 
+                                {
+                                    {"type", "flip" },
+                                    {"back_title", "Back Tile" },
+                                    {"back_content", "Back message" }
+                                });
+
+            Dictionary<string, object> payload =
+                new MobilePushHelper()
+                .PushTypeSupport(new PNPushType[] { PNPushType.APNS2, PNPushType.FCM, PNPushType.MPNS })
+                .Title("Game update 49ers touchdown")
+                .Badge(2)
+                .Apns2Data(new List<Apns2Data>() { apns2Data })
+                .Custom(pushTypeCustomData)
+                .GetPayload();
+
+            
+            pubnub = new Pubnub(null);
+            System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(payload));
+
+            Assert.IsTrue(payload != null, "FAILED - IfMobilePayloadThenPublishReturnSuccess");
+        }
     }
 }

@@ -69,6 +69,7 @@
     </Reference>
     <Reference Include="System.Net" />
     <Reference Include="System.Numerics" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -328,6 +329,9 @@
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\Enum\ResponseType.cs">
       <Link>LinkedSourceCode\Enum\ResponseType.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Api\PubnubApi\Helper\MobilePushHelper.cs">
+      <Link>LinkedSourceCode\Helper\MobilePushHelper.cs</Link>
     </Compile>
     <Compile Include="..\..\Api\PubnubApi\HttpUtility\HttpUtility.cs">
       <Link>LinkedSourceCode\HttpUtility\HttpUtility.cs</Link>
