@@ -172,20 +172,7 @@ namespace PubnubApi
 
         private List<Apns2Data> BuildApns2Data()
         {
-            //List<Apns2Data> ret = new List<Apns2Data>();
-            //if (pushApns2Data != null && pushApns2Data.Count > 0)
-            //{
-            //   foreach(Apns2Data currentData in pushApns2Data)
-            //    {
-            //        if (pushApns2Data != null && pushApns2Data.targets != null && pushApns2Data.targets.Count > 0)
-            //        {
-            //            ret
-            //            Apns2Data apns2Dic = BuildApns2Data();
-            //            //pnApns.Add("pn_push", apns2Dic);
-            //        }
-            //    }
-            //}
-            
+            //Placeholder to add any APNS2 specific
             return pushApns2Data;
         }
 
