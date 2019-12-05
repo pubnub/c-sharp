@@ -10,6 +10,7 @@
     <AssemblyTitle>PubNub C# .NET - Web Data Push API</AssemblyTitle>
     <AssemblyName>PubnubPCL</AssemblyName>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+    <NoWarn>CS0169</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>
