@@ -43,6 +43,7 @@ namespace PubnubApi
 #endif
         }
 
+#if UNITY && NETSTANDARD20
         private static void PrintUnity(PNConfiguration config, IPubnubLog log)
         {
 #if UNITY_IOS || UNITY_IPHONE
@@ -63,7 +64,7 @@ namespace PubnubApi
             LoggingMethod.WriteToLog(log, string.Format("DateTime {0} PLATFORM = UNITY", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
 #endif
         }
-
+#endif
         public static string Get()
         {
             string result = "";
@@ -101,6 +102,7 @@ namespace PubnubApi
             return result;
         }
 
+#if UNITY && NETSTANDARD20
         private static string GetUnity()
         {
             string result = "";
@@ -123,5 +125,6 @@ namespace PubnubApi
 #endif
             return result;
         }
+#endif
     }
 }
