@@ -17,24 +17,25 @@ namespace PubnubApi
         //Got an exception when using JSON serialisation for [],
         //IL2CPP needs to know about the array type at compile time.
         //So please define private static filed like this:
-        private static System.String[][] _unused { get; set; }
-        private static System.Int32[][] _unused2 { get; set; }
-        private static System.Int64[][] _unused3 { get; set; }
-        private static System.Int16[][] _unused4 { get; set; }
-        private static System.UInt16[][] _unused5 { get; set; }
-        private static System.UInt64[][] _unused6 { get; set; }
-        private static System.UInt32[][] _unused7 { get; set; }
-        private static System.Decimal[][] _unused8 { get; set; }
-        private static System.Double[][] _unused9 { get; set; }
-        private static System.Boolean[][] _unused91 { get; set; }
-        private static System.Object[][] _unused92 { get; set; }
+        private static System.String[][] _unused;
+        private static System.Int32[][] _unused2;
+        private static System.Int64[][] _unused3;
+        private static System.Int16[][] _unused4;
+        private static System.UInt16[][] _unused5;
+        private static System.UInt64[][] _unused6;
+        private static System.UInt32[][] _unused7;
+        private static System.Decimal[][] _unused8;
+        private static System.Double[][] _unused9;
+        private static System.Boolean[][] _unused91;
+        private static System.Object[][] _unused92;
 
-        private static long[][] _unused10 { get; set; }
-        private static int[][] _unused11 { get; set; }
-        private static float[][] _unused12 { get; set; }
-        private static decimal[][] _unused13 { get; set; }
-        private static uint[][] _unused14 { get; set; }
-        private static ulong[][] _unused15 { get; set; }
+        private static long[][] _unused10;
+        private static int[][] _unused11;
+        private static float[][] _unused12;
+        private static decimal[][] _unused13;
+        private static uint[][] _unused14;
+        private static ulong[][] _unused15;
+
         #endregion
 
         public NewtonsoftJsonDotNet(PNConfiguration pubnubConfig, IPubnubLog log)
