@@ -558,6 +558,10 @@ Added helper class o build mobile push payload.</PackageReleaseNotes>
     <DefineConstants>$(DefineConstants);NETSTANDARD20</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard1.0|AnyCPU'">
+    <NoWarn>1701;1702;CS0169;</NoWarn>
+  </PropertyGroup>
+
   <ItemGroup>
     <None Include="..\PubnubApi\LICENSE.txt" Link="LICENSE.txt" Pack="true" PackagePath="" />
   </ItemGroup>
