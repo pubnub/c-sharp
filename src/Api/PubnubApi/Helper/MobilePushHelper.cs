@@ -139,7 +139,7 @@ namespace PubnubApi
 
                 apsData.Add("alert", alertDic);
             }
-            else if (pushTitle != null && pushBody == null)
+            else if (pushTitle != null)
             {
                 apsData.Add("alert", pushTitle);
             }
@@ -197,7 +197,6 @@ namespace PubnubApi
         private Dictionary<string, object> BuildFcmPayload(PNPushType pushType)
         {
             Dictionary<string, object> retFcmPayload = new Dictionary<string, object>();
-            Dictionary<string, object> fcmPayload = new Dictionary<string, object>();
 
             Dictionary<string, object> fcmData = new Dictionary<string, object>();
             
@@ -207,9 +206,8 @@ namespace PubnubApi
             }
 
 
-            //
-
             Dictionary<string, object> customData = BuildCustomData(pushType);
+            Dictionary<string, object> fcmPayload;
             if (customData != null)
             {
                 fcmPayload = new Dictionary<string, object>(fcmData.Concat(customData).GroupBy(item => item.Key).ToDictionary(item => item.Key, item => item.First().Value));
@@ -226,8 +224,7 @@ namespace PubnubApi
 
         private Dictionary<string, object> BuildMpnsPayload(PNPushType pushType)
         {
-            Dictionary<string, object> retMpnsPayload = new Dictionary<string, object>();
-            Dictionary<string, object> mpnsPayload = new Dictionary<string, object>();
+            Dictionary<string, object> retMpnsPayload;
 
             Dictionary<string, object> mpnsData = new Dictionary<string, object>();
 
@@ -241,20 +238,15 @@ namespace PubnubApi
                 mpnsData.Add("count", pushBadge);
             }
 
-
-            //
-
             Dictionary<string, object> customData = BuildCustomData(pushType);
             if (customData != null)
             {
-                mpnsPayload = new Dictionary<string, object>(mpnsData.Concat(customData).GroupBy(item => item.Key).ToDictionary(item => item.Key, item => item.First().Value));
+                retMpnsPayload = new Dictionary<string, object>(mpnsData.Concat(customData).GroupBy(item => item.Key).ToDictionary(item => item.Key, item => item.First().Value));
             }
             else
             {
-                mpnsPayload = mpnsData;
+                retMpnsPayload = mpnsData;
             }
-
-            retMpnsPayload = mpnsPayload;
 
             return retMpnsPayload;
         }
