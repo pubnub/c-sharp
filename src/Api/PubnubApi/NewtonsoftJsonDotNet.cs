@@ -17,7 +17,7 @@ namespace PubnubApi
         //Got an exception when using JSON serialisation for [],
         //IL2CPP needs to know about the array type at compile time.
         //So please define private static filed like this:
-#pragma warning disable CS0169, IDE0051, 1144
+#pragma warning disable
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Sonar Code Smell", "S1144:Unused private types or members should be removed")]
         private static readonly System.String[][] _unused;
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Sonar Code Smell", "S1144:Unused private types or members should be removed")]
@@ -53,7 +53,7 @@ namespace PubnubApi
         private static readonly uint[][] _unused14;
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Sonar Code Smell", "S1144:Unused private types or members should be removed")]
         private static readonly ulong[][] _unused15;
-#pragma warning restore CS0169, IDE0051, 1144
+#pragma warning restore
 
         #endregion
 
