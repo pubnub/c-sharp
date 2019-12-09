@@ -323,6 +323,7 @@ namespace MockServer
                         }
                         catch (Exception eHttp)
                         {
+                            System.Diagnostics.Debug.WriteLine(eHttp.ToString());
                             LoggingMethod.WriteToLog(String.Format("Path not found: {0}", strData), LoggingMethod.LevelError);
                             string statusNotFound = "HTTP/1.1 404 Not Found\r\n";
                             statusNotFound = "HTTP/1.1 404 Not Found\r\n";

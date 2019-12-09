@@ -1,5 +1,4 @@
 ﻿using System;
-using System;
 using NUnit.Framework;
 using System.Threading;
 using PubnubApi;
