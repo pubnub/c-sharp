@@ -12,7 +12,6 @@ namespace PubnubApi
 
             string encodedUri = "";
             bool prevSurroagePair = false;
-            bool tildeCharPresent = s.Contains("~");
             StringBuilder o = new StringBuilder();
             for (int index = 0; index < s.Length; index++)
             {
@@ -74,19 +73,14 @@ namespace PubnubApi
 
                         prevSurroagePair = true;
                     }
-                    else if (forPamSign && IsUnsafeToEscapeForPamSign(ch) && tildeCharPresent)
+                    else if (forPamSign && IsUnsafeToEscapeForPamSign(ch))
                     {
-                        if (ch.ToString() == "~") {
-                            System.Diagnostics.Debug.WriteLine(ch.ToString() + "is true for IsUnsafeToEscapeForPamSign");
-                        }
-                        o.Append(ch);
+                        byte[] strBytes = Encoding.UTF8.GetBytes(ch.ToString());
+                        string encodeChar = Encoding.UTF8.GetString(strBytes, 0, strBytes.Length);
+                        o.Append(encodeChar);
                     }
                     else
                     {
-                        if (ch.ToString() == "~")
-                        {
-                            System.Diagnostics.Debug.WriteLine(ch.ToString() + " is EscapeDataString");
-                        }
                         string escapeChar = System.Uri.EscapeDataString(ch.ToString());
 #if NET35 || NET40
                         if (escapeChar == ch.ToString() && IsUnsafeToEncode(ch, ignoreComma, ignoreColon))
