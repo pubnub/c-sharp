@@ -17,7 +17,7 @@ namespace PubnubApi
         //Got an exception when using JSON serialisation for [],
         //IL2CPP needs to know about the array type at compile time.
         //So please define private static filed like this:
-#pragma warning disable CS0169, IDE0051
+#pragma warning disable CS0169, IDE0051, 1144
         private static readonly System.String[][] _unused;
         private static readonly System.Int32[][] _unused2;
         private static readonly System.Int64[][] _unused3;
@@ -36,7 +36,7 @@ namespace PubnubApi
         private static readonly decimal[][] _unused13;
         private static readonly uint[][] _unused14;
         private static readonly ulong[][] _unused15;
-#pragma warning restore CS0169, IDE0051
+#pragma warning restore CS0169, IDE0051, 1144
 
         #endregion
 
