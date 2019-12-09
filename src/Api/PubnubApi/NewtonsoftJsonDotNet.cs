@@ -18,23 +18,40 @@ namespace PubnubApi
         //IL2CPP needs to know about the array type at compile time.
         //So please define private static filed like this:
 #pragma warning disable CS0169, IDE0051, 1144
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Sonar Code Smell", "S1144:Unused private types or members should be removed")]
         private static readonly System.String[][] _unused;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Sonar Code Smell", "S1144:Unused private types or members should be removed")]
         private static readonly System.Int32[][] _unused2;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Sonar Code Smell", "S1144:Unused private types or members should be removed")]
         private static readonly System.Int64[][] _unused3;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Sonar Code Smell", "S1144:Unused private types or members should be removed")]
         private static readonly System.Int16[][] _unused4;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Sonar Code Smell", "S1144:Unused private types or members should be removed")]
         private static readonly System.UInt16[][] _unused5;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Sonar Code Smell", "S1144:Unused private types or members should be removed")]
         private static readonly System.UInt64[][] _unused6;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Sonar Code Smell", "S1144:Unused private types or members should be removed")]
         private static readonly System.UInt32[][] _unused7;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Sonar Code Smell", "S1144:Unused private types or members should be removed")]
         private static readonly System.Decimal[][] _unused8;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Sonar Code Smell", "S1144:Unused private types or members should be removed")]
         private static readonly System.Double[][] _unused9;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Sonar Code Smell", "S1144:Unused private types or members should be removed")]
         private static readonly System.Boolean[][] _unused91;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Sonar Code Smell", "S1144:Unused private types or members should be removed")]
         private static readonly System.Object[][] _unused92;
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Sonar Code Smell", "S1144:Unused private types or members should be removed")]
         private static readonly long[][] _unused10;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Sonar Code Smell", "S1144:Unused private types or members should be removed")]
         private static readonly int[][] _unused11;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Sonar Code Smell", "S1144:Unused private types or members should be removed")]
         private static readonly float[][] _unused12;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Sonar Code Smell", "S1144:Unused private types or members should be removed")]
         private static readonly decimal[][] _unused13;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Sonar Code Smell", "S1144:Unused private types or members should be removed")]
         private static readonly uint[][] _unused14;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Sonar Code Smell", "S1144:Unused private types or members should be removed")]
         private static readonly ulong[][] _unused15;
 #pragma warning restore CS0169, IDE0051, 1144
 
