@@ -2065,11 +2065,10 @@ namespace PubnubApi
 
             if (this.pubnubConfig.SecretKey.Length > 0)
             {
-                //HttpUtility.ParseQueryString()
                 StringBuilder partialUrl = new StringBuilder();
                 partialUrl.Append(requestUri.AbsolutePath);
 
-                string signature = "";
+                string signature;
                 if (isPamV3Sign)
                 {
                     signature = GeneratePAMv3Signature(requestMethod, requestBody, queryString, partialUrl.ToString(), type);
@@ -2078,16 +2077,13 @@ namespace PubnubApi
                 {
                     signature = GeneratePAMv2Signature(queryString, partialUrl.ToString(), type);
                 }
-                queryString = string.Format("{0}&signature={1}", queryString, signature);
+                string queryStringWithSignature = string.Format("{0}&signature={1}", queryString, signature);
                 UriBuilder uriBuilder = new UriBuilder(requestUri);
-                uriBuilder.Query = queryString;
+                uriBuilder.Query = queryStringWithSignature;
 
                 requestUri = uriBuilder.Uri;
             }
-            else
-            {
-                //queryString = queryToSign;
-            }
+
             return requestUri;
         }
 
