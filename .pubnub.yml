@@ -4,7 +4,7 @@ schema: 1
 scm: github.com/pubnub/c-sharp
 changelog: 
   - version: 4.3.0.0
-    date: December 10, 2019
+    date: December 12, 2019
     changes:
       - type: Improvement
         text: Added APNS2 support for mobile push.
