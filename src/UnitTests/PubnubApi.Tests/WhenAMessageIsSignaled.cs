@@ -2,9 +2,7 @@
 using NUnit.Framework;
 using System.Threading;
 using PubnubApi;
-using System.Collections.Generic;
 using MockServer;
-using PubnubApi.Tests;
 using System.Diagnostics;
 
 namespace PubNubMessaging.Tests
@@ -230,7 +228,7 @@ namespace PubNubMessaging.Tests
                     }
                 },
                 (o, s) => {
-                    Debug.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    Debug.WriteLine(string.Format("{0} {1} {2}", s.Operation, s.Category, s.StatusCode));
                     if (s.StatusCode != 200 || s.Error)
                     {
                         receivedErrorMessage = true;
@@ -338,7 +336,7 @@ namespace PubNubMessaging.Tests
                     }
                 },
                 delegate(Pubnub o, PNStatus s) {
-                    Debug.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    Debug.WriteLine(string.Format("{0} {1} {2}", s.Operation, s.Category, s.StatusCode));
                     if (s.StatusCode != 200 || s.Error)
                     {
                         receivedErrorMessage = true;

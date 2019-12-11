@@ -1158,7 +1158,164 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public static void IfSecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess()
+        public static void IfSample1SecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess()
+        {
+            string message = " !~`@#$%^&*()+=[]\\{}|;':\",/<>?-_.aA1©®€™₹😜🎉";
+            bool receivedPublishMessage = SampleXSecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess(message);
+            Assert.IsTrue(receivedPublishMessage, "FAILED - IfSample1SecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess");
+        }
+
+        [Test]
+        public static void IfSample2SecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess()
+        {
+            string message = " !~";
+            bool receivedPublishMessage = SampleXSecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess(message);
+            Assert.IsTrue(receivedPublishMessage, "FAILED - IfSample2SecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess");
+        }
+
+        [Test]
+        public static void IfSample3SecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess()
+        {
+            string message = "{a:\"!\"}";
+            bool receivedPublishMessage = SampleXSecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess(message);
+            Assert.IsTrue(receivedPublishMessage, "FAILED - IfSample3SecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess");
+        }
+
+
+        [Test]
+        public static void IfSample4SecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess()
+        {
+            string message = "{a:6}";
+            bool receivedPublishMessage = SampleXSecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess(message);
+            Assert.IsTrue(receivedPublishMessage, "FAILED - IfSample4SecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess");
+        }
+
+        [Test]
+        public static void IfSample5SecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess()
+        {
+            string message = "!";
+            bool receivedPublishMessage = SampleXSecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess(message);
+            Assert.IsTrue(receivedPublishMessage, "FAILED - IfSample5SecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess");
+        }
+
+        [Test]
+        public static void IfSample6SecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess()
+        {
+            string message = "~";
+            bool receivedPublishMessage = SampleXSecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess(message);
+            Assert.IsTrue(receivedPublishMessage, "FAILED - IfSample6SecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess");
+        }
+
+        [Test]
+        public static void IfSample7SecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess()
+        {
+            string message = "Its me (Pandu)";
+            bool receivedPublishMessage = SampleXSecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess(message);
+            Assert.IsTrue(receivedPublishMessage, "FAILED - IfSample7SecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess");
+        }
+
+        [Test]
+        public static void IfSample8SecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess()
+        {
+            string message = "Its me (Pandu) Ok ç!~:)@";
+            bool receivedPublishMessage = SampleXSecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess(message);
+            Assert.IsTrue(receivedPublishMessage, "FAILED - IfSample8SecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess");
+        }
+
+        [Test]
+        public static void IfSample9SecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess()
+        {
+            object message = new
+            {
+                id = "c670e9a9-fe5b-436c-8c0e-785a9201a5ef",
+                senderId = "yigit@armut.com",
+                quoteId = 2208445,
+                shouldImport = false,
+                type = "TEXT",
+                text = @"
+            Merhabalar :)
+
+            Kare ya da çember arka fon tercihinize göre kullanılabilir.
+
+            Jardinyer Takım
+            Şamdanlar ve mumlar
+            Çember ya da Kare arka fon
+            Çiçekli vazo
+            Lokumluklar
+            Kolonyalık
+            Led ışıklar
+            Led mumlar
+            Maket pasta
+            Damat fincanı
+            Yüzük tepsisi
+            Kıyafet renginize göre hafif süsleme.
+
+
+
+            Nakliye Kurulum dahildir.
+            Kırılan ya da eksilen malzeme size aittir, ödemesi alınır.
+
+            Çiçek karışık renk ya da beyaz seçilebilir. Ya da mor seçilebilir
+
+
+
+
+
+
+            "
+            };
+            bool receivedPublishMessage = SampleXSecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess(message);
+            Assert.IsTrue(receivedPublishMessage, "FAILED - IfSample9SecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess");
+        }
+
+        [Test]
+        public static void IfSample10SecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess()
+        {
+            object message = new
+            {
+                id = "c670e9a9-fe5b-436c-8c0e-785a9201a5ef",
+                senderId = "yigit@armut.com",
+                quoteId = 2208445,
+                shouldImport = false,
+                type = "TEXT Its me (Pandu) Ok ç!~:)@",
+                text = @"
+            Merhabalar :)
+
+            Kare ya da çember arka fon tercihinize göre kullanılabilir.
+
+            Jardinyer Takım
+            Şamdanlar ve mumlar
+            Çember ya da Kare arka fon
+            Çiçekli vazo
+            Lokumluklar
+            Kolonyalık
+            Led ışıklar
+            Led mumlar
+            Maket pasta
+            Damat fincanı
+            Yüzük tepsisi
+            Kıyafet renginize göre hafif süsleme.
+
+
+
+            Nakliye Kurulum dahildir.
+            Kırılan ya da eksilen malzeme size aittir, ödemesi alınır.
+
+            Çiçek karışık renk ya da beyaz seçilebilir. Ya da mor seçilebilir
+
+
+
+
+
+
+            "
+            };
+            bool receivedPublishMessage = SampleXSecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess(message);
+            Assert.IsTrue(receivedPublishMessage, "FAILED - IfSample10SecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess");
+        }
+
+
+        private static bool SampleXSecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess(object message)
         {
             server.ClearRequests();
             if (!PubnubCommon.PAMServerSideRun)
@@ -1170,13 +1327,6 @@ namespace PubNubMessaging.Tests
 
             //string channel = "hello_my_channel ~!@#$%^&()+=[]{}|;\"<>?-_.aA1©®€™₹😜🎉";
             string channel = "hello_my_channel";
-            //string message = " !~`@#$%^&*()+=[]\\{}|;':\",/<>?-_.aA1©®€™₹😜🎉";
-            //string message = " !~";
-            //string message = "{a:\"!\"}";
-            //string message = "{a:6}";
-            string message = "!";
-            //var message = new { a="!" };
-            //":";
 
             PNConfiguration config = new PNConfiguration
             {
@@ -1224,7 +1374,8 @@ namespace PubNubMessaging.Tests
                             publishTimetoken = r.Timetoken;
                             receivedPublishMessage = true;
                         }
-                        else {
+                        else
+                        {
                             //System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(s.ErrorData));
                         }
                         publishManualEvent.Set();
@@ -1234,7 +1385,8 @@ namespace PubNubMessaging.Tests
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Assert.IsTrue(receivedPublishMessage, "FAILED - IfSecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess");
+
+            return receivedPublishMessage;
         }
 
         [Test]

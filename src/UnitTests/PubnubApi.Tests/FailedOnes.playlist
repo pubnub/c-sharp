@@ -1,0 +1,1 @@
+<Playlist Version="1.0"><Add Test="PubNubMessaging.Tests.WhenAMessageIsPublished.IfSecretKeyWithoutAuthThenGetMessageWithSpecialCharsReturnSuccess" /><Add Test="PubNubMessaging.Tests.WhenAMessageIsPublished.ThenUnencryptObjectPublishShouldReturnSuccessCodeAndInfo" /></Playlist>

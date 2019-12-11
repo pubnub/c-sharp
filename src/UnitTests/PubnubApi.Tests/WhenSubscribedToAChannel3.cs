@@ -818,9 +818,9 @@ namespace PubNubMessaging.Tests
             {
                 if (disposing)
                 {
-                    subscribeManualEvent.Dispose();
-                    publishManualEvent.Dispose();
-                    grantManualEvent.Dispose();
+                    subscribeManualEvent.Close();
+                    publishManualEvent.Close();
+                    grantManualEvent.Close();
                 }
 
                 disposedValue = true;

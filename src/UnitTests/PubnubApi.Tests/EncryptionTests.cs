@@ -187,7 +187,9 @@ namespace PubNubMessaging.Tests
                 Pubnub pubnub = new Pubnub(config);
                 pubnub.SetToken(token);
 
-                actual = pubnub.GetToken("user", "emp-usr-1");
+                List<string> tokensList = pubnub.GetTokens();
+
+                actual = tokensList[0];
                 
                 //if (pnGrant != null)
                 //{
