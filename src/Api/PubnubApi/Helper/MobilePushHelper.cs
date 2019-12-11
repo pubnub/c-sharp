@@ -104,7 +104,7 @@ namespace PubnubApi
                     
                     ret.Add("pn_apns", pnApns);
                 }
-                else if (pushType == PNPushType.FCM)
+                else if (pushType == PNPushType.FCM || pushType == PNPushType.GCM)
                 {
                     Dictionary<string, object> pnFcm = BuildFcmPayload(pushType);
                     if (pnFcm != null)
