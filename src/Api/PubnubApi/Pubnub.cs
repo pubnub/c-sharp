@@ -19,7 +19,7 @@ namespace PubnubApi
 
         private readonly string instanceId;
 
-        private static string sdkVersion = string.Format("{0}CSharp4.2.0.0", PNPlatform.Get());
+        private static string sdkVersion = string.Format("{0}CSharp4.3.0.0", PNPlatform.Get());
 
         private object savedSubscribeOperation;
         private readonly string savedSdkVerion;
@@ -149,7 +149,6 @@ namespace PubnubApi
 		public EndPoint.AddPushChannelOperation AddPushNotificationsOnChannels()
 		{
             EndPoint.AddPushChannelOperation addPushChannelOperation = new EndPoint.AddPushChannelOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
-            addPushChannelOperation.CurrentPubnubInstance(this);
             return addPushChannelOperation;
         }
 

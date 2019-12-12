@@ -29,7 +29,7 @@ namespace MockServer
         {
             if (server == null)
             {
-                server = new MockServer.Server(new Uri("https://localhost:9191"));
+                server = new MockServer.Server(new Uri("http://localhost:9191"));
             }
 
             return server;
@@ -47,8 +47,10 @@ namespace MockServer
             {
                 secure = true;
             }
-
-            certificate = new X509Certificate2(Resource.localhostPFX, "pubnub");
+            if (secure)
+            {
+                certificate = new X509Certificate2(Resource.localhostPFX, "pubnub");
+            }
         }
 
         /// <summary>
@@ -323,6 +325,7 @@ namespace MockServer
                         }
                         catch (Exception eHttp)
                         {
+                            System.Diagnostics.Debug.WriteLine(eHttp.ToString());
                             LoggingMethod.WriteToLog(String.Format("Path not found: {0}", strData), LoggingMethod.LevelError);
                             string statusNotFound = "HTTP/1.1 404 Not Found\r\n";
                             statusNotFound = "HTTP/1.1 404 Not Found\r\n";

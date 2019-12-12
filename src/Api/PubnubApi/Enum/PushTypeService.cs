@@ -4,7 +4,9 @@ namespace PubnubApi
     public enum PNPushType
     {
         GCM,
+        FCM,
         APNS,
-        MPNS, //MicrosoftPushNotificationService
+        MPNS, //MicrosoftPushNotificationService,
+        APNS2
     }
 }

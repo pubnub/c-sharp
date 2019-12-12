@@ -482,7 +482,7 @@ namespace PubNubMessaging.Tests
                     subscribeManualEvent.Set();
                 },
                 (o, s) => {
-                    Debug.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    Debug.WriteLine(string.Format("{0} {1} {2}", s.Operation, s.Category, s.StatusCode));
                     if (s.StatusCode != 200 || s.Error)
                     {
                         receivedErrorMessage = true;
@@ -697,7 +697,7 @@ namespace PubNubMessaging.Tests
                     subscribeManualEvent.Set();
                 },
                 (o, s) => {
-                    Debug.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    Debug.WriteLine(string.Format("{0} {1} {2}", s.Operation, s.Category, s.StatusCode));
                     if (s.StatusCode != 200 || s.Error)
                     {
                         receivedErrorMessage = true;
@@ -887,7 +887,7 @@ namespace PubNubMessaging.Tests
                     subscribeManualEvent.Set();
                 },
                 (o, s) => {
-                    Debug.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    Debug.WriteLine(string.Format("{0} {1} {2}", s.Operation, s.Category, s.StatusCode));
                     if (s.StatusCode != 200 || s.Error)
                     {
                         if (s.ErrorData != null) { Debug.WriteLine(s.ErrorData.Information); }
@@ -1126,7 +1126,7 @@ namespace PubNubMessaging.Tests
                     subscribeManualEvent.Set();
                 },
                 (o, s) => {
-                    Debug.WriteLine("{0} {1} {2}", s.Operation, s.Category, s.StatusCode);
+                    Debug.WriteLine(string.Format("{0} {1} {2}", s.Operation, s.Category, s.StatusCode));
                     if (s.StatusCode != 200 || s.Error)
                     {
                         receivedErrorMessage = true;

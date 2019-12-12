@@ -15,7 +15,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubUWP</PackageId>
-    <PackageVersion>4.2.0.0</PackageVersion>
+    <PackageVersion>4.3.0.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -23,10 +23,9 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>Added IncludeMeta option to History.
-Added new feature FetchHistory.
-Added support for Message Actions.
-Fix for ManageMembers and ManageMemberships when multiple include fields are provided.</PackageReleaseNotes>
+    <PackageReleaseNotes>Added APNS2 support for mobile push.
+Added helper class o build mobile push payload.
+Refactored code for PAM Signature.</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
@@ -76,6 +75,7 @@ Fix for ManageMembers and ManageMemberships when multiple include fields are pro
     <DefineConstants>DEBUG;TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <NoWarn>1701;1702;</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -85,6 +85,7 @@ Fix for ManageMembers and ManageMemberships when multiple include fields are pro
     <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <NoWarn>1701;1702;</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <PlatformTarget>x86</PlatformTarget>
@@ -315,12 +316,14 @@ Fix for ManageMembers and ManageMemberships when multiple include fields are pro
     <Compile Include="..\PubnubApi\Enum\PubnubMessageSource.cs">
       <Link>Enum\PubnubMessageSource.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Enum\PushEnvironment.cs" Link="Enum\PushEnvironment.cs" />
     <Compile Include="..\PubnubApi\Enum\PushTypeService.cs">
       <Link>Enum\PushTypeService.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\Enum\ResponseType.cs">
       <Link>Enum\ResponseType.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Helper\MobilePushHelper.cs" Link="Helper\MobilePushHelper.cs" />
     <Compile Include="..\PubnubApi\HttpUtility\HttpUtility.cs">
       <Link>HttpUtility\HttpUtility.cs</Link>
     </Compile>
@@ -671,6 +674,7 @@ Fix for ManageMembers and ManageMemberships when multiple include fields are pro
     <Folder Include="Model\Derived\DeleteMessage\" />
     <Folder Include="Model\Derived\Objects\" />
     <Folder Include="JsonDataParse\" />
+    <Folder Include="Helper\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

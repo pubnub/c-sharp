@@ -30,7 +30,7 @@ namespace PubnubApiDemo
             {
                 // Get folder path may vary based on environment
                 string folder = System.IO.Directory.GetCurrentDirectory(); //For console
-                //string folder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments); // For iOS
+                //string folder = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments); // For iOS
                 System.Diagnostics.Debug.WriteLine(folder);
                 string logFilePath = System.IO.Path.Combine(folder, "pubnubmessaging.log");
                 Trace.Listeners.Add(new TextWriterTraceListener(logFilePath));
@@ -47,7 +47,7 @@ namespace PubnubApiDemo
         static void UnhandledExceptionTrapper(object sender, UnhandledExceptionEventArgs e)
         {
             Console.WriteLine("Unhandled exception occured inside Pubnub C# API. Exiting the application. Please try again.");
-            Environment.Exit(1);
+            System.Environment.Exit(1);
         }
 
         static public void Main()
@@ -102,7 +102,7 @@ namespace PubnubApiDemo
             Console.ResetColor();
             Console.WriteLine();
 
-            Console.WriteLine("ENTER cipher key for encryption feature." + Environment.NewLine + "If you don't want to avail at this time, press ENTER.");
+            Console.WriteLine("ENTER cipher key for encryption feature." + System.Environment.NewLine + "If you don't want to avail at this time, press ENTER.");
             string cipherKey = Console.ReadLine();
             Console.ForegroundColor = ConsoleColor.Blue;
             if (cipherKey.Trim().Length > 0)
@@ -116,7 +116,7 @@ namespace PubnubApiDemo
             Console.ResetColor();
             Console.WriteLine();
 
-            Console.WriteLine("ENTER subscribe key." + Environment.NewLine + "If you want to accept default demo subscribe key, press ENTER.");
+            Console.WriteLine("ENTER subscribe key." + System.Environment.NewLine + "If you want to accept default demo subscribe key, press ENTER.");
             string subscribeKey = Console.ReadLine();
             Console.ForegroundColor = ConsoleColor.Blue;
             if (subscribeKey.Trim().Length > 0)
@@ -131,7 +131,7 @@ namespace PubnubApiDemo
             Console.ResetColor();
             Console.WriteLine();
 
-            Console.WriteLine("ENTER publish key." + Environment.NewLine + "If you want to accept default demo publish key, press ENTER.");
+            Console.WriteLine("ENTER publish key." + System.Environment.NewLine + "If you want to accept default demo publish key, press ENTER.");
             string publishKey = Console.ReadLine();
             Console.ForegroundColor = ConsoleColor.Blue;
             if (publishKey.Trim().Length > 0)
@@ -146,7 +146,7 @@ namespace PubnubApiDemo
             Console.ResetColor();
             Console.WriteLine();
 
-            Console.WriteLine("ENTER secret key." + Environment.NewLine + "If you don't want to avail at this time, press ENTER.");
+            Console.WriteLine("ENTER secret key." + System.Environment.NewLine + "If you don't want to avail at this time, press ENTER.");
             string secretKey = Console.ReadLine();
             Console.ForegroundColor = ConsoleColor.Blue;
             if (secretKey.Trim().Length > 0)
@@ -196,7 +196,7 @@ namespace PubnubApiDemo
             Console.ResetColor();
             Console.WriteLine();
 
-            Console.WriteLine("Enable Internal Logging? Enter Y for Yes, Else N for No." + Environment.NewLine + "Default = Y  ");
+            Console.WriteLine("Enable Internal Logging? Enter Y for Yes, Else N for No." + System.Environment.NewLine + "Default = Y  ");
             string enableLoggingString = Console.ReadLine();
             Console.ForegroundColor = ConsoleColor.Blue;
             if (enableLoggingString.Trim().ToLowerInvariant() == "n")
@@ -368,7 +368,7 @@ namespace PubnubApiDemo
                         pubnub.Destroy();
                         break;
                     case "1":
-                        Console.WriteLine("Enter CHANNEL name for subscribe. Use comma to enter multiple channels." + Environment.NewLine + "NOTE: If you want to consider only Channel Group(s), just hit ENTER");
+                        Console.WriteLine("Enter CHANNEL name for subscribe. Use comma to enter multiple channels." + System.Environment.NewLine + "NOTE: If you want to consider only Channel Group(s), just hit ENTER");
                         channel = Console.ReadLine();
                         //channel = channel + ",pnuser-pandu-id-test,pandu-space-id,pnuser-pandu-my-id0";
 
@@ -599,7 +599,7 @@ namespace PubnubApiDemo
                         Console.ResetColor();
                         Console.WriteLine();
 
-                        Console.WriteLine("Enter channel group name" + Environment.NewLine + "NOTE: If you want to consider only Channel, just hit ENTER");
+                        Console.WriteLine("Enter channel group name" + System.Environment.NewLine + "NOTE: If you want to consider only Channel, just hit ENTER");
                         channelGroup = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("ChannelGroup = {0}", channelGroup));
@@ -639,7 +639,7 @@ namespace PubnubApiDemo
                                 }));
                         break;
                     case "5":
-                        Console.WriteLine("Enter CHANNEL name for Unsubscribe. Use comma to enter multiple channels." + Environment.NewLine + "NOTE: If you want to consider only Channel Group, just hit ENTER");
+                        Console.WriteLine("Enter CHANNEL name for Unsubscribe. Use comma to enter multiple channels." + System.Environment.NewLine + "NOTE: If you want to consider only Channel Group, just hit ENTER");
                         channel = Console.ReadLine();
 
                         Console.ForegroundColor = ConsoleColor.Blue;
@@ -647,7 +647,7 @@ namespace PubnubApiDemo
                         Console.ResetColor();
                         Console.WriteLine();
 
-                        Console.WriteLine("Enter channel group name" + Environment.NewLine + "NOTE: If you want to consider only Channel, just hit ENTER");
+                        Console.WriteLine("Enter channel group name" + System.Environment.NewLine + "NOTE: If you want to consider only Channel, just hit ENTER");
                         channelGroup = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("ChannelGroup = {0}", channelGroup));
@@ -707,7 +707,7 @@ namespace PubnubApiDemo
                         string[] channelList = channel.Split(',');
                         string[] channelGroupList = channelGroup.Split(',');
 
-                        Console.WriteLine("Enter the auth_key for PAM Grant (optional)" + Environment.NewLine + "Press Enter Key if there is no auth_key at this time.");
+                        Console.WriteLine("Enter the auth_key for PAM Grant (optional)" + System.Environment.NewLine + "Press Enter Key if there is no auth_key at this time.");
                         string authGrant = Console.ReadLine();
                         string[] authKeyList = authGrant.Split(',');
 
@@ -738,7 +738,7 @@ namespace PubnubApiDemo
                             string manageAccess = Console.ReadLine();
                             manage = (manageAccess.ToLower() == "n") ? false : true;
                         }
-                        Console.WriteLine("How many minutes do you want to allow Grant Access? Enter the number of minutes." + Environment.NewLine + "Default = 1440 minutes (24 hours). Press ENTER now to accept default value.");
+                        Console.WriteLine("How many minutes do you want to allow Grant Access? Enter the number of minutes." + System.Environment.NewLine + "Default = 1440 minutes (24 hours). Press ENTER now to accept default value.");
                         int grantTimeLimitInMinutes;
                         string grantTimeLimit = Console.ReadLine();
                         if (string.IsNullOrEmpty(grantTimeLimit.Trim()))
@@ -797,7 +797,7 @@ namespace PubnubApiDemo
                                 );
                         break;
                     case "9":
-                        Console.WriteLine("Enter CHANNEL name for PAM Audit" + Environment.NewLine + "To enter CHANNEL GROUP name, just hit ENTER");
+                        Console.WriteLine("Enter CHANNEL name for PAM Audit" + System.Environment.NewLine + "To enter CHANNEL GROUP name, just hit ENTER");
                         channel = Console.ReadLine();
 
                         if (channel.Trim().Length <= 0)
@@ -827,7 +827,7 @@ namespace PubnubApiDemo
                         Console.ResetColor();
                         Console.WriteLine();
 
-                        Console.WriteLine("Enter the auth_key for PAM Audit (optional)" + Environment.NewLine + "Press Enter Key if there is no auth_key at this time.");
+                        Console.WriteLine("Enter the auth_key for PAM Audit (optional)" + System.Environment.NewLine + "Press Enter Key if there is no auth_key at this time.");
                         string authAudit = Console.ReadLine();
                         string[] authKeyListAudit = authAudit.Split(',');
 
@@ -888,7 +888,7 @@ namespace PubnubApiDemo
                         string[] channelList2 = channel.Split(',');
                         string[] channelGroupList2 = channelGroup.Split(',');
 
-                        Console.WriteLine("Enter the auth_key for PAM Revoke (optional)" + Environment.NewLine + "Press Enter Key if there is no auth_key at this time.");
+                        Console.WriteLine("Enter the auth_key for PAM Revoke (optional)" + System.Environment.NewLine + "Press Enter Key if there is no auth_key at this time.");
                         string authRevoke = Console.ReadLine();
                         string[] authKeyList2 = authRevoke.Split(',');
 
@@ -934,19 +934,19 @@ namespace PubnubApiDemo
                         Console.ResetColor();
                         break;
                     case "13":
-                        Console.WriteLine("Enter channel name" + Environment.NewLine + "NOTE: If you want to consider only Channel Group, just hit ENTER");
+                        Console.WriteLine("Enter channel name" + System.Environment.NewLine + "NOTE: If you want to consider only Channel Group, just hit ENTER");
                         string userStateChannel = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Channel = {0}", userStateChannel));
                         Console.ResetColor();
 
-                        Console.WriteLine("Enter channel group name" + Environment.NewLine + "NOTE: If you want to consider only Channel, just hit ENTER");
+                        Console.WriteLine("Enter channel group name" + System.Environment.NewLine + "NOTE: If you want to consider only Channel, just hit ENTER");
                         string userStateChannelGroup = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("ChannelGroup = {0}", userStateChannelGroup));
                         Console.ResetColor();
 
-                        Console.WriteLine("User State will be accepted as dictionary key:value pair" + Environment.NewLine + "Enter key. ");
+                        Console.WriteLine("User State will be accepted as dictionary key:value pair" + System.Environment.NewLine + "Enter key. ");
                         string keyUserState = Console.ReadLine();
                         if (string.IsNullOrEmpty(keyUserState.Trim()))
                         {
@@ -983,13 +983,13 @@ namespace PubnubApiDemo
 
                         break;
                     case "14":
-                        Console.WriteLine("Enter channel name" + Environment.NewLine + "NOTE: If you want to consider only Channel Group, just hit ENTER");
+                        Console.WriteLine("Enter channel name" + System.Environment.NewLine + "NOTE: If you want to consider only Channel Group, just hit ENTER");
                         string deleteChannelUserState = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Channel = {0}", deleteChannelUserState));
                         Console.ResetColor();
 
-                        Console.WriteLine("Enter channel group name" + Environment.NewLine + "NOTE: If you want to consider only Channel, just hit ENTER");
+                        Console.WriteLine("Enter channel group name" + System.Environment.NewLine + "NOTE: If you want to consider only Channel, just hit ENTER");
                         string deleteChannelGroupUserState = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("ChannelGroup = {0}", deleteChannelGroupUserState));
@@ -1010,13 +1010,13 @@ namespace PubnubApiDemo
 
                         break;
                     case "15":
-                        Console.WriteLine("Enter channel name" + Environment.NewLine + "NOTE: If you want to consider only Channel Group, just hit ENTER");
+                        Console.WriteLine("Enter channel name" + System.Environment.NewLine + "NOTE: If you want to consider only Channel Group, just hit ENTER");
                         string getUserStateChannel2 = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Channel = {0}", getUserStateChannel2));
                         Console.ResetColor();
 
-                        Console.WriteLine("Enter channel group name" + Environment.NewLine + "NOTE: If you want to consider only Channel, just hit ENTER");
+                        Console.WriteLine("Enter channel group name" + System.Environment.NewLine + "NOTE: If you want to consider only Channel, just hit ENTER");
                         string getUserStateChannelGroup2 = Console.ReadLine();
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("ChannelGroup = {0}", getUserStateChannelGroup2));
@@ -1779,7 +1779,7 @@ namespace PubnubApiDemo
                         string grantManageAccess = Console.ReadLine();
                         bool grantManage = (grantManageAccess.ToLower() == "n") ? false : true;
 
-                        Console.WriteLine("How many minutes do you want to allow Grant Access? Enter the number of minutes." + Environment.NewLine + "Default = 1440 minutes (24 hours). Press ENTER now to accept default value.");
+                        Console.WriteLine("How many minutes do you want to allow Grant Access? Enter the number of minutes." + System.Environment.NewLine + "Default = 1440 minutes (24 hours). Press ENTER now to accept default value.");
                         int grantTokenTTL;
                         string grantTokenTimeLimit = Console.ReadLine();
                         if (string.IsNullOrEmpty(grantTokenTimeLimit.Trim()))

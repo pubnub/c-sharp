@@ -57,15 +57,14 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
 
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildMultiChannelSubscribeRequest(string requestMethod, string requestBody, string[] channels, string[] channelGroups, long timetoken, string channelsJsonState, Dictionary<string, string> initialSubscribeUrlParams, Dictionary<string, object> externalQueryParam)
@@ -90,7 +89,7 @@ namespace PubnubApi
 
             if (!requestQueryStringParams.ContainsKey("filter-expr") && !string.IsNullOrEmpty(pubnubConfig.FilterExpression))
             {
-                requestQueryStringParams.Add("filter-expr", UriUtil.EncodeUriComponent(false, pubnubConfig.FilterExpression, currentType, false, false, false));
+                requestQueryStringParams.Add("filter-expr", UriUtil.EncodeUriComponent(pubnubConfig.FilterExpression, currentType, false, false, false));
             }
 
             if (!requestQueryStringParams.ContainsKey("tt"))
@@ -105,12 +104,12 @@ namespace PubnubApi
 
             if (channelGroups != null && channelGroups.Length > 0 && channelGroups[0] != "")
             {
-                requestQueryStringParams.Add("channel-group", UriUtil.EncodeUriComponent(false, string.Join(",", channelGroups.OrderBy(x => x).ToArray()), currentType, false, false, false));
+                requestQueryStringParams.Add("channel-group", UriUtil.EncodeUriComponent(string.Join(",", channelGroups.OrderBy(x => x).ToArray()), currentType, false, false, false));
             }
 
             if (channelsJsonState != "{}" && channelsJsonState != "")
             {
-                requestQueryStringParams.Add("state", UriUtil.EncodeUriComponent(false, channelsJsonState, currentType, false, false, false));
+                requestQueryStringParams.Add("state", UriUtil.EncodeUriComponent(channelsJsonState, currentType, false, false, false));
             }
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
@@ -119,14 +118,13 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildMultiChannelLeaveRequest(string requestMethod, string requestBody, string[] channels, string[] channelGroups, string jsonUserState, Dictionary<string, object> externalQueryParam)
@@ -153,12 +151,12 @@ namespace PubnubApi
             string channelsJsonState = jsonUserState;
             if (channelsJsonState != "{}" && channelsJsonState != "")
             {
-                requestQueryStringParams.Add("state", UriUtil.EncodeUriComponent(false, channelsJsonState, currentType, false, false, false));
+                requestQueryStringParams.Add("state", UriUtil.EncodeUriComponent(channelsJsonState, currentType, false, false, false));
             }
 
             if (channelGroups != null && channelGroups.Length > 0)
             {
-                requestQueryStringParams.Add("channel-group", UriUtil.EncodeUriComponent(false, string.Join(",", channelGroups.OrderBy(x => x).ToArray()),currentType, false, false, false));
+                requestQueryStringParams.Add("channel-group", UriUtil.EncodeUriComponent(string.Join(",", channelGroups.OrderBy(x => x).ToArray()),currentType, false, false, false));
             }
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
@@ -167,15 +165,14 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
 
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildPublishRequest(string requestMethod, string requestBody, string channel, object originalMessage, bool storeInHistory, int ttl, Dictionary<string, object> userMetaData, Dictionary<string, string> additionalUrlParams, Dictionary<string, object> externalQueryParam)
@@ -206,7 +203,7 @@ namespace PubnubApi
             if (userMetaData != null)
             {
                 string jsonMetaData = jsonLib.SerializeToJsonString(userMetaData);
-                requestQueryStringParams.Add("meta", UriUtil.EncodeUriComponent(false, jsonMetaData, currentType, false, false, false));
+                requestQueryStringParams.Add("meta", UriUtil.EncodeUriComponent(jsonMetaData, currentType, false, false, false));
             }
 
             if (storeInHistory && ttl >= 0)
@@ -225,16 +222,15 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
 
             bool allowPAMv3Sign = (requestMethod.ToUpperInvariant() == "POST") ? false : true;
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, allowPAMv3Sign);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, allowPAMv3Sign);
         }
 
         Uri IUrlRequestBuilder.BuildSignalRequest(string requestMethod, string requestBody, string channel, object originalMessage, Dictionary<string, object> userMetaData, Dictionary<string, object> externalQueryParam)
@@ -258,7 +254,7 @@ namespace PubnubApi
             if (userMetaData != null)
             {
                 string jsonMetaData = jsonLib.SerializeToJsonString(userMetaData);
-                requestQueryStringParams.Add("meta", UriUtil.EncodeUriComponent(false, jsonMetaData, currentType, false, false, false));
+                requestQueryStringParams.Add("meta", UriUtil.EncodeUriComponent(jsonMetaData, currentType, false, false, false));
             }
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
@@ -267,15 +263,14 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
 
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildHereNowRequest(string requestMethod, string requestBody, string[] channels, string[] channelGroups, bool showUUIDList, bool includeUserState, Dictionary<string, object> externalQueryParam)
@@ -302,7 +297,7 @@ namespace PubnubApi
             string commaDelimitedchannelGroup = (channelGroups != null) ? string.Join(",", channelGroups.OrderBy(x => x).ToArray()) : "";
             if (!string.IsNullOrEmpty(commaDelimitedchannelGroup) && commaDelimitedchannelGroup.Trim().Length > 0)
             {
-                requestQueryStringParams.Add("channel-group", UriUtil.EncodeUriComponent(false, commaDelimitedchannelGroup, currentType, false, false, false));
+                requestQueryStringParams.Add("channel-group", UriUtil.EncodeUriComponent(commaDelimitedchannelGroup, currentType, false, false, false));
             }
 
             requestQueryStringParams.Add("disable_uuids", disableUUID.ToString());
@@ -314,15 +309,14 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
 
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildHistoryRequest(string requestMethod, string requestBody, string channel, long start, long end, int count, bool reverse, bool includeToken, bool includeMeta, Dictionary<string, object> externalQueryParam)
@@ -370,15 +364,14 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
 
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildFetchRequest(string requestMethod, string requestBody, string[] channels, long start, long end, int count, bool reverse, bool includeMeta, bool includeMessageActions, Dictionary<string, object> externalQueryParam)
@@ -423,15 +416,14 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
 
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildMessageCountsRequest(string requestMethod, string requestBody, string[] channels, long[] timetokens, Dictionary<string, object> externalQueryParam)
@@ -447,7 +439,7 @@ namespace PubnubApi
             url.Add("message-counts");
             if (!string.IsNullOrEmpty(channel))
             {
-                url.Add(UriUtil.EncodeUriComponent(false, channel, currentType, true, false, false));
+                url.Add(UriUtil.EncodeUriComponent(channel, currentType, true, false, false));
             }
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
@@ -461,7 +453,7 @@ namespace PubnubApi
                 }
                 else
                 {
-                    requestQueryStringParams.Add("channelsTimetoken", UriUtil.EncodeUriComponent(false, tt, currentType, false, false, false));
+                    requestQueryStringParams.Add("channelsTimetoken", UriUtil.EncodeUriComponent(tt, currentType, false, false, false));
                 }
             }
 
@@ -471,15 +463,14 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
 
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildDeleteMessageRequest(string requestMethod, string requestBody, string channel, long start, long end, Dictionary<string, object> externalQueryParam)
@@ -511,15 +502,14 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
 
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildWhereNowRequest(string requestMethod, string requestBody, string uuid, Dictionary<string, object> externalQueryParam)
@@ -541,15 +531,14 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
 
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildGrantV2AccessRequest(string requestMethod, string requestBody, string channelsCommaDelimited, string channelGroupsCommaDelimited, string authKeysCommaDelimited, bool read, bool write, bool delete, bool manage, long ttl, Dictionary<string, object> externalQueryParam)
@@ -567,17 +556,17 @@ namespace PubnubApi
 
             if (!string.IsNullOrEmpty(authKeysCommaDelimited))
             {
-                requestQueryStringParams.Add("auth", UriUtil.EncodeUriComponent(false, authKeysCommaDelimited, currentType, false, false, false));
+                requestQueryStringParams.Add("auth", UriUtil.EncodeUriComponent(authKeysCommaDelimited, currentType, false, false, false));
             }
 
             if (!string.IsNullOrEmpty(channelsCommaDelimited))
             {
-                requestQueryStringParams.Add("channel", UriUtil.EncodeUriComponent(false, channelsCommaDelimited, currentType, false, false, false));
+                requestQueryStringParams.Add("channel", UriUtil.EncodeUriComponent(channelsCommaDelimited, currentType, false, false, false));
             }
 
             if (!string.IsNullOrEmpty(channelGroupsCommaDelimited))
             {
-                requestQueryStringParams.Add("channel-group", UriUtil.EncodeUriComponent(false, channelGroupsCommaDelimited, currentType, false, false, false));
+                requestQueryStringParams.Add("channel-group", UriUtil.EncodeUriComponent(channelGroupsCommaDelimited, currentType, false, false, false));
             }
 
             if (ttl > -1)
@@ -596,15 +585,14 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
 
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildGrantV3AccessRequest(string requestMethod, string requestBody, Dictionary<string, object> externalQueryParam)
@@ -625,15 +613,14 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
 
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildAuditAccessRequest(string requestMethod, string requestBody, string channel, string channelGroup, string authKeysCommaDelimited, Dictionary<string, object> externalQueryParam)
@@ -651,17 +638,17 @@ namespace PubnubApi
 
             if (!string.IsNullOrEmpty(authKeysCommaDelimited))
             {
-                requestQueryStringParams.Add("auth", UriUtil.EncodeUriComponent(false, authKeysCommaDelimited, currentType, false, false, false));
+                requestQueryStringParams.Add("auth", UriUtil.EncodeUriComponent(authKeysCommaDelimited, currentType, false, false, false));
             }
 
             if (!string.IsNullOrEmpty(channel))
             {
-                requestQueryStringParams.Add("channel", UriUtil.EncodeUriComponent(false, channel, currentType, false, false, false));
+                requestQueryStringParams.Add("channel", UriUtil.EncodeUriComponent(channel, currentType, false, false, false));
             }
 
             if (!string.IsNullOrEmpty(channelGroup))
             {
-                requestQueryStringParams.Add("channel-group", UriUtil.EncodeUriComponent(false, channelGroup, currentType, false, false, false));
+                requestQueryStringParams.Add("channel-group", UriUtil.EncodeUriComponent(channelGroup, currentType, false, false, false));
             }
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
@@ -670,15 +657,14 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
 
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildGetUserStateRequest(string requestMethod, string requestBody, string channelsCommaDelimited, string channelGroupsCommaDelimited, string uuid, Dictionary<string, object> externalQueryParam)
@@ -708,7 +694,7 @@ namespace PubnubApi
 
             if (!string.IsNullOrEmpty(channelGroupsCommaDelimited) && channelGroupsCommaDelimited.Trim().Length > 0)
             {
-                requestQueryStringParams.Add("channel-group", UriUtil.EncodeUriComponent(false, channelGroupsCommaDelimited, currentType, false, false, false));
+                requestQueryStringParams.Add("channel-group", UriUtil.EncodeUriComponent(channelGroupsCommaDelimited, currentType, false, false, false));
             }
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
@@ -717,15 +703,14 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
 
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildSetUserStateRequest(string requestMethod, string requestBody, string channelsCommaDelimited, string channelGroupsCommaDelimited, string uuid, string jsonUserState, Dictionary<string, object> externalQueryParam)
@@ -757,12 +742,12 @@ namespace PubnubApi
 
             if (!string.IsNullOrEmpty(channelGroupsCommaDelimited) && channelGroupsCommaDelimited.Trim().Length > 0)
             {
-                requestQueryStringParams.Add("state", UriUtil.EncodeUriComponent(false, jsonUserState, currentType, false, false, false));
-                requestQueryStringParams.Add("channel-group", UriUtil.EncodeUriComponent(false, channelGroupsCommaDelimited, currentType, false, false, false));
+                requestQueryStringParams.Add("state", UriUtil.EncodeUriComponent(jsonUserState, currentType, false, false, false));
+                requestQueryStringParams.Add("channel-group", UriUtil.EncodeUriComponent(channelGroupsCommaDelimited, currentType, false, false, false));
             }
             else
             {
-                requestQueryStringParams.Add("state", UriUtil.EncodeUriComponent(false, jsonUserState, currentType, false, false, false));
+                requestQueryStringParams.Add("state", UriUtil.EncodeUriComponent(jsonUserState, currentType, false, false, false));
             }
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
@@ -771,15 +756,14 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
 
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildAddChannelsToChannelGroupRequest(string requestMethod, string requestBody, string channelsCommaDelimited, string nameSpace, string groupName, Dictionary<string, object> externalQueryParam)
@@ -801,7 +785,7 @@ namespace PubnubApi
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
 
-            requestQueryStringParams.Add("add", UriUtil.EncodeUriComponent(false, channelsCommaDelimited, currentType,false, false, false));
+            requestQueryStringParams.Add("add", UriUtil.EncodeUriComponent(channelsCommaDelimited, currentType,false, false, false));
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
             {
@@ -809,15 +793,14 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
 
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildRemoveChannelsFromChannelGroupRequest(string requestMethod, string requestBody, string channelsCommaDelimited, string nameSpace, string groupName, Dictionary<string, object> externalQueryParam)
@@ -869,7 +852,7 @@ namespace PubnubApi
 
             if (channelAvaiable)
             {
-                requestQueryStringParams.Add("remove", UriUtil.EncodeUriComponent(false, channelsCommaDelimited, currentType, false, false, false));
+                requestQueryStringParams.Add("remove", UriUtil.EncodeUriComponent(channelsCommaDelimited, currentType, false, false, false));
             }
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
@@ -878,15 +861,14 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
 
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildGetChannelsForChannelGroupRequest(string requestMethod, string requestBody, string nameSpace, string groupName, bool limitToChannelGroupScopeOnly, Dictionary<string, object> externalQueryParam)
@@ -937,15 +919,14 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
 
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildGetAllChannelGroupRequest(string requestMethod, string requestBody, Dictionary<string, object> externalQueryParam)
@@ -966,33 +947,51 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
 
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
-        Uri IUrlRequestBuilder.BuildRegisterDevicePushRequest(string requestMethod, string requestBody, string channel, PNPushType pushType, string pushToken, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildRegisterDevicePushRequest(string requestMethod, string requestBody, string channel, PNPushType pushType, string pushToken, PushEnvironment environment, string deviceTopic, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PushRegister;
 
             List<string> url = new List<string>();
-            url.Add("v1");
-            url.Add("push");
-            url.Add("sub-key");
-            url.Add(pubnubConfig.SubscribeKey);
-            url.Add("devices");
-            url.Add(pushToken);
+            if (pushType == PNPushType.APNS2)
+            {
+                url.Add("v2");
+                url.Add("push");
+                url.Add("sub-key");
+                url.Add(pubnubConfig.SubscribeKey);
+                url.Add("devices-apns2");
+                url.Add(pushToken);
+            }
+            else
+            {
+                url.Add("v1");
+                url.Add("push");
+                url.Add("sub-key");
+                url.Add(pubnubConfig.SubscribeKey);
+                url.Add("devices");
+                url.Add(pushToken);
+            }
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
-
-            requestQueryStringParams.Add("type", pushType.ToString().ToLower());
-            requestQueryStringParams.Add("add", UriUtil.EncodeUriComponent(false, channel, currentType, true, false, false));
+            if (pushType == PNPushType.APNS2)
+            {
+                requestQueryStringParams.Add("environment", environment.ToString().ToLower());
+                requestQueryStringParams.Add("topic", UriUtil.EncodeUriComponent(deviceTopic, currentType, false, false, false));
+            }
+            else
+            {
+                requestQueryStringParams.Add("type", pushType.ToString().ToLower());
+            }
+            requestQueryStringParams.Add("add", UriUtil.EncodeUriComponent(channel, currentType, true, false, false));
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
             {
@@ -1000,33 +999,52 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
 
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
-        Uri IUrlRequestBuilder.BuildUnregisterDevicePushRequest(string requestMethod, string requestBody, PNPushType pushType, string pushToken, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildUnregisterDevicePushRequest(string requestMethod, string requestBody, PNPushType pushType, string pushToken, PushEnvironment environment, string deviceTopic, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PushUnregister;
 
             List<string> url = new List<string>();
-            url.Add("v1");
-            url.Add("push");
-            url.Add("sub-key");
-            url.Add(pubnubConfig.SubscribeKey);
-            url.Add("devices");
-            url.Add(pushToken);
-            url.Add("remove");
+            if (pushType == PNPushType.APNS2)
+            {
+                url.Add("v2");
+                url.Add("push");
+                url.Add("sub-key");
+                url.Add(pubnubConfig.SubscribeKey);
+                url.Add("devices-apns2");
+                url.Add(pushToken);
+                url.Add("remove");
+            }
+            else
+            {
+                url.Add("v1");
+                url.Add("push");
+                url.Add("sub-key");
+                url.Add(pubnubConfig.SubscribeKey);
+                url.Add("devices");
+                url.Add(pushToken);
+                url.Add("remove");
+            }
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
-
-            requestQueryStringParams.Add("type", pushType.ToString().ToLower());
+            if (pushType == PNPushType.APNS2)
+            {
+                requestQueryStringParams.Add("environment", environment.ToString().ToLower());
+                requestQueryStringParams.Add("topic", UriUtil.EncodeUriComponent(deviceTopic, currentType, false, false, false));
+            }
+            else
+            {
+                requestQueryStringParams.Add("type", pushType.ToString().ToLower());
+            }
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
             {
@@ -1034,33 +1052,51 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
 
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
-        Uri IUrlRequestBuilder.BuildRemoveChannelPushRequest(string requestMethod, string requestBody, string channel, PNPushType pushType, string pushToken, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildRemoveChannelPushRequest(string requestMethod, string requestBody, string channel, PNPushType pushType, string pushToken, PushEnvironment environment, string deviceTopic, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PushRemove;
 
             List<string> url = new List<string>();
-            url.Add("v1");
-            url.Add("push");
-            url.Add("sub-key");
-            url.Add(pubnubConfig.SubscribeKey);
-            url.Add("devices");
-            url.Add(pushToken);
+            if (pushType == PNPushType.APNS2)
+            {
+                url.Add("v2");
+                url.Add("push");
+                url.Add("sub-key");
+                url.Add(pubnubConfig.SubscribeKey);
+                url.Add("devices-apns2");
+                url.Add(pushToken);
+            }
+            else
+            {
+                url.Add("v1");
+                url.Add("push");
+                url.Add("sub-key");
+                url.Add(pubnubConfig.SubscribeKey);
+                url.Add("devices");
+                url.Add(pushToken);
+            }
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
-
-            requestQueryStringParams.Add("type", pushType.ToString().ToLower());
-            requestQueryStringParams.Add("remove", UriUtil.EncodeUriComponent(false, channel, currentType, true, false, false));
+            if (pushType == PNPushType.APNS2)
+            {
+                requestQueryStringParams.Add("environment", environment.ToString().ToLower());
+                requestQueryStringParams.Add("topic", UriUtil.EncodeUriComponent(deviceTopic, currentType, false, false, false));
+            }
+            else
+            {
+                requestQueryStringParams.Add("type", pushType.ToString().ToLower());
+            }
+            requestQueryStringParams.Add("remove", UriUtil.EncodeUriComponent(channel, currentType, true, false, false));
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
             {
@@ -1068,32 +1104,51 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
 
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
-        Uri IUrlRequestBuilder.BuildGetChannelsPushRequest(string requestMethod, string requestBody, PNPushType pushType, string pushToken, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildGetChannelsPushRequest(string requestMethod, string requestBody, PNPushType pushType, string pushToken, PushEnvironment environment, string deviceTopic, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PushGet;
 
             List<string> url = new List<string>();
-            url.Add("v1");
-            url.Add("push");
-            url.Add("sub-key");
-            url.Add(pubnubConfig.SubscribeKey);
-            url.Add("devices");
-            url.Add(pushToken);
+            if (pushType == PNPushType.APNS2)
+            {
+                url.Add("v2");
+                url.Add("push");
+                url.Add("sub-key");
+                url.Add(pubnubConfig.SubscribeKey);
+                url.Add("devices-apns2");
+                url.Add(pushToken);
+            }
+            else
+            {
+                url.Add("v1");
+                url.Add("push");
+                url.Add("sub-key");
+                url.Add(pubnubConfig.SubscribeKey);
+                url.Add("devices");
+                url.Add(pushToken);
+            }
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
 
-            requestQueryStringParams.Add("type", pushType.ToString().ToLower());
+            if (pushType == PNPushType.APNS2)
+            {
+                requestQueryStringParams.Add("environment", environment.ToString().ToLower());
+                requestQueryStringParams.Add("topic", UriUtil.EncodeUriComponent(deviceTopic, currentType, false, false, false));
+            }
+            else
+            {
+                requestQueryStringParams.Add("type", pushType.ToString().ToLower());
+            }
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
             {
@@ -1101,15 +1156,14 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
 
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildPresenceHeartbeatRequest(string requestMethod, string requestBody, string[] channels, string[] channelGroups, string jsonUserState)
@@ -1132,12 +1186,12 @@ namespace PubnubApi
             string channelsJsonState = jsonUserState;
             if (channelsJsonState != "{}" && channelsJsonState != "")
             {
-                requestQueryStringParams.Add("state", UriUtil.EncodeUriComponent(false, channelsJsonState, currentType, false, false, false));
+                requestQueryStringParams.Add("state", UriUtil.EncodeUriComponent(channelsJsonState, currentType, false, false, false));
             }
 
             if (channelGroups != null && channelGroups.Length > 0)
             {
-                requestQueryStringParams.Add("channel-group", UriUtil.EncodeUriComponent(false, string.Join(",", channelGroups.OrderBy(x => x).ToArray()), currentType, false, false, false));
+                requestQueryStringParams.Add("channel-group", UriUtil.EncodeUriComponent(string.Join(",", channelGroups.OrderBy(x => x).ToArray()), currentType, false, false, false));
             }
 
             if (pubnubConfig.PresenceTimeout != 0)
@@ -1145,10 +1199,9 @@ namespace PubnubApi
                 requestQueryStringParams.Add("heartbeat", pubnubConfig.PresenceTimeout.ToString());
             }
 
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildCreateUserRequest(string requestMethod, string requestBody, string userId, Dictionary<string, object> userCustom, Dictionary<string, object> externalQueryParam)
@@ -1172,14 +1225,13 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true, "user", userId, false);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams, "user", userId, false);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildUpdateUserRequest(string requestMethod, string requestBody, string userId, Dictionary<string, object> userCustom, Dictionary<string, object> externalQueryParam)
@@ -1204,14 +1256,13 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true, "user", userId, false);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams, "user", userId, false);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildDeleteUserRequest(string requestMethod, string requestBody, string userId, Dictionary<string, object> externalQueryParam)
@@ -1232,15 +1283,14 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
 
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true, "user", userId, false);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams, "user", userId, false);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildGetAllUsersRequest(string requestMethod, string requestBody, string start, string end, int limit, bool includeCount, bool includeCustom, Dictionary<string, object> externalQueryParam)
@@ -1256,11 +1306,11 @@ namespace PubnubApi
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
             if (!string.IsNullOrEmpty(start))
             {
-                requestQueryStringParams.Add("start", UriUtil.EncodeUriComponent(false, start, currentType, false, false, false));
+                requestQueryStringParams.Add("start", UriUtil.EncodeUriComponent(start, currentType, false, false, false));
             }
             if (!string.IsNullOrEmpty(end))
             {
-                requestQueryStringParams.Add("end", UriUtil.EncodeUriComponent(false, end, currentType, false, false, false));
+                requestQueryStringParams.Add("end", UriUtil.EncodeUriComponent(end, currentType, false, false, false));
             }
             if (limit >= 0)
             {
@@ -1281,14 +1331,13 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true, "user", "", true);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams, "user", "", true);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildGetSingleUserRequest(string requestMethod, string requestBody, string userId, bool includeCustom, Dictionary<string, object> externalQueryParam)
@@ -1314,14 +1363,13 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true, "user", userId, false);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams, "user", userId, false);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildCreateSpaceRequest(string requestMethod, string requestBody, string spaceId, Dictionary<string, object> spaceCustom, Dictionary<string, object> externalQueryParam)
@@ -1345,14 +1393,13 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true, "space", spaceId, false);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams, "space", spaceId, false);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildUpdateSpaceRequest(string requestMethod, string requestBody, string spaceId, Dictionary<string, object> spaceCustom, Dictionary<string, object> externalQueryParam)
@@ -1377,14 +1424,13 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true, "space", spaceId, false);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams, "space", spaceId, false);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildDeleteSpaceRequest(string requestMethod, string requestBody, string spaceId, Dictionary<string, object> externalQueryParam)
@@ -1405,15 +1451,14 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
 
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true, "space", spaceId, false);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams, "space", spaceId, false);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildGetAllSpacesRequest(string requestMethod, string requestBody, string start, string end, int limit, bool includeCount, bool includeCustom, Dictionary<string, object> externalQueryParam)
@@ -1429,11 +1474,11 @@ namespace PubnubApi
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
             if (!string.IsNullOrEmpty(start))
             {
-                requestQueryStringParams.Add("start", UriUtil.EncodeUriComponent(false, start, currentType, false, false, false));
+                requestQueryStringParams.Add("start", UriUtil.EncodeUriComponent(start, currentType, false, false, false));
             }
             if (!string.IsNullOrEmpty(end))
             {
-                requestQueryStringParams.Add("end", UriUtil.EncodeUriComponent(false, end, currentType, false, false, false));
+                requestQueryStringParams.Add("end", UriUtil.EncodeUriComponent(end, currentType, false, false, false));
             }
             if (limit >= 0)
             {
@@ -1454,14 +1499,13 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true, "space","", true);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams, "space","", true);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildGetSingleSpaceRequest(string requestMethod, string requestBody, string spaceId, bool includeCustom, Dictionary<string, object> externalQueryParam)
@@ -1487,14 +1531,13 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true, "space", spaceId, false);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams, "space", spaceId, false);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildUpdateSpaceMembershipsWithUserRequest(string requestMethod, string requestBody, string userId, string start, string end, int limit, bool includeCount, string includeOptions, Dictionary<string, object> externalQueryParam)
@@ -1512,11 +1555,11 @@ namespace PubnubApi
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
             if (!string.IsNullOrEmpty(start))
             {
-                requestQueryStringParams.Add("start", UriUtil.EncodeUriComponent(false, start, currentType, false, false, false));
+                requestQueryStringParams.Add("start", UriUtil.EncodeUriComponent(start, currentType, false, false, false));
             }
             if (!string.IsNullOrEmpty(end))
             {
-                requestQueryStringParams.Add("end", UriUtil.EncodeUriComponent(false, end, currentType, false, false, false));
+                requestQueryStringParams.Add("end", UriUtil.EncodeUriComponent(end, currentType, false, false, false));
             }
             if (limit >= 0)
             {
@@ -1528,7 +1571,7 @@ namespace PubnubApi
             }
             if (!string.IsNullOrEmpty(includeOptions))
             {
-                requestQueryStringParams.Add("include", UriUtil.EncodeUriComponent(false, includeOptions, currentType, false, false, false));
+                requestQueryStringParams.Add("include", UriUtil.EncodeUriComponent(includeOptions, currentType, false, false, false));
             }
             if (externalQueryParam != null && externalQueryParam.Count > 0)
             {
@@ -1536,14 +1579,13 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true, "user", userId, false);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams, "user", userId, false);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildMembersAddUpdateRemoveRequest(string requestMethod, string requestBody, string spaceId, string start, string end, int limit, bool includeCount, string includeOptions, Dictionary<string, object> externalQueryParam)
@@ -1561,11 +1603,11 @@ namespace PubnubApi
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
             if (!string.IsNullOrEmpty(start))
             {
-                requestQueryStringParams.Add("start", UriUtil.EncodeUriComponent(false, start, currentType, false, false, false));
+                requestQueryStringParams.Add("start", UriUtil.EncodeUriComponent(start, currentType, false, false, false));
             }
             if (!string.IsNullOrEmpty(end))
             {
-                requestQueryStringParams.Add("end", UriUtil.EncodeUriComponent(false, end, currentType, false, false, false));
+                requestQueryStringParams.Add("end", UriUtil.EncodeUriComponent(end, currentType, false, false, false));
             }
             if (limit >= 0)
             {
@@ -1577,7 +1619,7 @@ namespace PubnubApi
             }
             if (!string.IsNullOrEmpty(includeOptions))
             {
-                requestQueryStringParams.Add("include", UriUtil.EncodeUriComponent(false, includeOptions, currentType, false, false, false));
+                requestQueryStringParams.Add("include", UriUtil.EncodeUriComponent(includeOptions, currentType, false, false, false));
             }
             if (externalQueryParam != null && externalQueryParam.Count > 0)
             {
@@ -1585,14 +1627,13 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true, "space", spaceId, false);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams, "space", spaceId, false);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildGetAllMembershipsRequest(string requestMethod, string requestBody, string userId, string start, string end, int limit, bool includeCount, string includeOptions, Dictionary<string, object> externalQueryParam)
@@ -1610,11 +1651,11 @@ namespace PubnubApi
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
             if (!string.IsNullOrEmpty(start))
             {
-                requestQueryStringParams.Add("start", UriUtil.EncodeUriComponent(false, start, currentType, false, false, false));
+                requestQueryStringParams.Add("start", UriUtil.EncodeUriComponent(start, currentType, false, false, false));
             }
             if (!string.IsNullOrEmpty(end))
             {
-                requestQueryStringParams.Add("end", UriUtil.EncodeUriComponent(false, end, currentType, false, false, false));
+                requestQueryStringParams.Add("end", UriUtil.EncodeUriComponent(end, currentType, false, false, false));
             }
             if (limit >= 0)
             {
@@ -1626,7 +1667,7 @@ namespace PubnubApi
             }
             if (!string.IsNullOrEmpty(includeOptions))
             {
-                requestQueryStringParams.Add("include", UriUtil.EncodeUriComponent(false, includeOptions, currentType, false, false, false));
+                requestQueryStringParams.Add("include", UriUtil.EncodeUriComponent(includeOptions, currentType, false, false, false));
             }
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
@@ -1635,14 +1676,13 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true, "user", userId, false);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams, "user", userId, false);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildGetAllMembersRequest(string requestMethod, string requestBody, string spaceId, string start, string end, int limit, bool includeCount, string includeOptions, Dictionary<string, object> externalQueryParam)
@@ -1660,11 +1700,11 @@ namespace PubnubApi
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
             if (!string.IsNullOrEmpty(start))
             {
-                requestQueryStringParams.Add("start", UriUtil.EncodeUriComponent(false, start, currentType, false, false, false));
+                requestQueryStringParams.Add("start", UriUtil.EncodeUriComponent(start, currentType, false, false, false));
             }
             if (!string.IsNullOrEmpty(end))
             {
-                requestQueryStringParams.Add("end", UriUtil.EncodeUriComponent(false, end, currentType, false, false, false));
+                requestQueryStringParams.Add("end", UriUtil.EncodeUriComponent(end, currentType, false, false, false));
             }
             if (limit >= 0)
             {
@@ -1676,7 +1716,7 @@ namespace PubnubApi
             }
             if (!string.IsNullOrEmpty(includeOptions))
             {
-                requestQueryStringParams.Add("include", UriUtil.EncodeUriComponent(false, includeOptions, currentType, false, false, false));
+                requestQueryStringParams.Add("include", UriUtil.EncodeUriComponent(includeOptions, currentType, false, false, false));
             }
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
@@ -1685,14 +1725,13 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true, "space", spaceId, false);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams, "space", spaceId, false);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildAddMessageActionRequest(string requestMethod, string requestBody, string channel, long messageTimetoken, Dictionary<string, object> externalQueryParam)
@@ -1716,15 +1755,14 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
 
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildRemoveMessageActionRequest(string requestMethod, string requestBody, string channel, long messageTimetoken, long actionTimetoken, string messageActionUuid, Dictionary<string, object> externalQueryParam)
@@ -1745,7 +1783,7 @@ namespace PubnubApi
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
             if (messageActionUuid != null)
             {
-                requestQueryStringParams.Add("uuid", UriUtil.EncodeUriComponent(false, messageActionUuid, currentType, false, false, false));
+                requestQueryStringParams.Add("uuid", UriUtil.EncodeUriComponent(messageActionUuid, currentType, false, false, false));
             }
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
@@ -1754,15 +1792,14 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
 
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         Uri IUrlRequestBuilder.BuildGetMessageActionsRequest(string requestMethod, string requestBody, string channel, long start, long end, int limit, Dictionary<string, object> externalQueryParam)
@@ -1796,15 +1833,14 @@ namespace PubnubApi
                 {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
                     {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(false, kvp.Value.ToString(), currentType, false, false, false));
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
                     }
                 }
             }
 
-            string queryString = BuildQueryString(requestMethod, requestBody, currentType, url, requestQueryStringParams, true);
-            string queryParams = string.Format("?{0}", queryString);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
-            return BuildRestApiRequest(url, currentType, queryParams);
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
         private Dictionary<string, string> GenerateCommonQueryParams(PNOperationType type, string resourceType, string resourceId, bool checkResourcePattern, string uuid)
@@ -1823,18 +1859,18 @@ namespace PubnubApi
             {
                 if (pubnubUnitTest.IncludeUuid)
                 {
-                    ret.Add("uuid", UriUtil.EncodeUriComponent(false, this.pubnubConfig.Uuid, PNOperationType.PNSubscribeOperation, false, false, true));
+                    ret.Add("uuid", UriUtil.EncodeUriComponent(this.pubnubConfig.Uuid, PNOperationType.PNSubscribeOperation, false, false, true));
                 }
 
                 if (pubnubUnitTest.IncludePnsdk)
                 {
-                    ret.Add("pnsdk", UriUtil.EncodeUriComponent(false, Pubnub.Version, PNOperationType.PNSubscribeOperation, false, false, true));
+                    ret.Add("pnsdk", UriUtil.EncodeUriComponent(Pubnub.Version, PNOperationType.PNSubscribeOperation, false, false, true));
                 }
             }
             else
             {
-                ret.Add("uuid", UriUtil.EncodeUriComponent(false, uuid != null ? uuid : this.pubnubConfig.Uuid, PNOperationType.PNSubscribeOperation, false, false, true));
-                ret.Add("pnsdk", UriUtil.EncodeUriComponent(false, Pubnub.Version, PNOperationType.PNSubscribeOperation, false, false, true));
+                ret.Add("uuid", UriUtil.EncodeUriComponent(uuid != null ? uuid : this.pubnubConfig.Uuid, PNOperationType.PNSubscribeOperation, false, false, true));
+                ret.Add("pnsdk", UriUtil.EncodeUriComponent(Pubnub.Version, PNOperationType.PNSubscribeOperation, false, false, true));
             }
 
             if (pubnubConfig != null)
@@ -1891,13 +1927,13 @@ namespace PubnubApi
                             }
                             if (!string.IsNullOrEmpty(resourceToken))
                             {
-                                ret.Add("auth", UriUtil.EncodeUriComponent(false, resourceToken, type, false, false, false));
+                                ret.Add("auth", UriUtil.EncodeUriComponent(resourceToken, type, false, false, false));
                             }
                         }
                     }
                     else if (!string.IsNullOrEmpty(this.pubnubConfig.AuthKey))
                     {
-                        ret.Add("auth", UriUtil.EncodeUriComponent(false, this.pubnubConfig.AuthKey, type, false, false, false));
+                        ret.Add("auth", UriUtil.EncodeUriComponent(this.pubnubConfig.AuthKey, type, false, false, false));
                     }
                 }
             }
@@ -1954,12 +1990,12 @@ namespace PubnubApi
             return signature;
         }
 
-        private string BuildQueryString(string requestMethod, string requestBody, PNOperationType type, List<string> urlComponentList, Dictionary<string, string> queryStringParamDic, bool isPamV3Sign)
+        private string BuildQueryString(PNOperationType type, Dictionary<string, string> queryStringParamDic)
         {
-            return BuildQueryString(requestMethod, requestBody, type, urlComponentList, queryStringParamDic, isPamV3Sign, "", "", false);
+            return BuildQueryString(type, queryStringParamDic, "", "", false);
         }
 
-        private string BuildQueryString(string requestMethod, string requestBody, PNOperationType type, List<string> urlComponentList, Dictionary<string, string> queryStringParamDic, bool isPamV3Sign, string resourceType, string resourceId, bool checkResourcePattern)
+        private string BuildQueryString(PNOperationType type, Dictionary<string, string> queryStringParamDic, string resourceType, string resourceId, bool checkResourcePattern)
         {
             string queryString = "";
 
@@ -1976,39 +2012,8 @@ namespace PubnubApi
                 Dictionary<string, string> commonQueryStringParams = GenerateCommonQueryParams(type, resourceType, resourceId, checkResourcePattern, qsUuid);
                 Dictionary<string, string> queryStringParams = new Dictionary<string, string>(commonQueryStringParams.Concat(internalQueryStringParamDic).GroupBy(item => item.Key).ToDictionary(item => item.Key, item => item.First().Value));
 
-                string queryToSign = string.Join("&", queryStringParams.OrderBy(kvp => kvp.Key, StringComparer.Ordinal).Select(kvp => string.Format("{0}={1}", kvp.Key, kvp.Value)).ToArray());
+                queryString = string.Join("&", queryStringParams.OrderBy(kvp => kvp.Key, StringComparer.Ordinal).Select(kvp => string.Format("{0}={1}", kvp.Key, kvp.Value)).ToArray());
 
-                if (this.pubnubConfig.SecretKey.Length > 0)
-                {
-                    StringBuilder partialUrl = new StringBuilder();
-                    for (int componentIndex = 0; componentIndex < urlComponentList.Count; componentIndex++)
-                    {
-                        partialUrl.Append("/");
-                        if (type == PNOperationType.PNPublishOperation && componentIndex == urlComponentList.Count - 1)
-                        {
-                            partialUrl.Append(UriUtil.EncodeUriComponent(true, urlComponentList[componentIndex], type, false, true, false));
-                        }
-                        else
-                        {
-                            partialUrl.Append(UriUtil.EncodeUriComponent(true, urlComponentList[componentIndex], type, true, false, false));
-                        }
-                    }
-
-                    string signature = "";
-                    if (isPamV3Sign)
-                    {
-                        signature = GeneratePAMv3Signature(requestMethod, requestBody, queryToSign, partialUrl.ToString(), type);
-                    }
-                    else
-                    {
-                        signature = GeneratePAMv2Signature(queryToSign, partialUrl.ToString(), type);
-                    }
-                    queryString = string.Format("{0}&signature={1}", queryToSign, signature);
-                }
-                else
-                {
-                    queryString = queryToSign;
-                }
             }
             catch (Exception ex)
             {
@@ -2018,7 +2023,7 @@ namespace PubnubApi
             return queryString;
         }
 
-        private Uri BuildRestApiRequest(List<string> urlComponents, PNOperationType type, string queryString)
+        private Uri BuildRestApiRequest(string requestMethod, string requestBody, List<string> urlComponents, PNOperationType type, string queryString, bool isPamV3Sign)
         {   
             StringBuilder url = new StringBuilder();
 
@@ -2039,14 +2044,15 @@ namespace PubnubApi
 
                 if (type == PNOperationType.PNPublishOperation && componentIndex == urlComponents.Count - 1)
                 {
-                    url.Append(UriUtil.EncodeUriComponent(false, urlComponents[componentIndex], type, false, true, false));
+                    url.Append(UriUtil.EncodeUriComponent(urlComponents[componentIndex], type, false, true, false));
                 }
                 else
                 {
-                    url.Append(UriUtil.EncodeUriComponent(false, urlComponents[componentIndex], type, true, false, false));
+                    url.Append(UriUtil.EncodeUriComponent(urlComponents[componentIndex], type, true, false, false));
                 }
             }
 
+            url.Append("?");
             url.Append(queryString);
             System.Diagnostics.Debug.WriteLine("sb = " + url);
             Uri requestUri = new Uri(url.ToString());
@@ -2056,6 +2062,28 @@ namespace PubnubApi
                 ForceCanonicalPathAndQuery(requestUri);
             }
             System.Diagnostics.Debug.WriteLine("Uri = " + requestUri.ToString());
+
+            if (this.pubnubConfig.SecretKey.Length > 0)
+            {
+                StringBuilder partialUrl = new StringBuilder();
+                partialUrl.Append(requestUri.AbsolutePath);
+
+                string signature;
+                if (isPamV3Sign)
+                {
+                    signature = GeneratePAMv3Signature(requestMethod, requestBody, queryString, partialUrl.ToString(), type);
+                }
+                else
+                {
+                    signature = GeneratePAMv2Signature(queryString, partialUrl.ToString(), type);
+                }
+                string queryStringWithSignature = string.Format("{0}&signature={1}", queryString, signature);
+                UriBuilder uriBuilder = new UriBuilder(requestUri);
+                uriBuilder.Query = queryStringWithSignature;
+
+                requestUri = uriBuilder.Uri;
+            }
+
             return requestUri;
         }
 

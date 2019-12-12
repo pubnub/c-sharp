@@ -52,7 +52,7 @@ namespace PubNubMessaging.Tests
                                 if (!String.IsNullOrEmpty(r.Channel))
                                 {
                                     var channels = r.Channel.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                                    Debug.WriteLine("CleanupGrant / AtUserLevel / UserCallbackForCleanUpAccess - Channel Count = {0}", channels.Length);
+                                    Debug.WriteLine("CleanupGrant / AtUserLevel / UserCallbackForCleanUpAccess - Channel Count = {0}", channels.Length.ToString());
                                     foreach (string channelName in channels)
                                     {
                                         if (r.AuthKeys != null)
@@ -149,7 +149,7 @@ namespace PubNubMessaging.Tests
                                 if (!String.IsNullOrEmpty(r.Channel))
                                 {
                                     var channels = r.Channel.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                                    Debug.WriteLine("CleanupGrant / AtUserLevel / UserCallbackForCleanUpAccess - Channel Count = {0}", channels.Length);
+                                    Debug.WriteLine("CleanupGrant / AtUserLevel / UserCallbackForCleanUpAccess - Channel Count = {0}", channels.Length.ToString());
                                     foreach (string channelName in channels)
                                     {
                                         if (r.AuthKeys != null)

@@ -2,9 +2,7 @@
 using NUnit.Framework;
 using System.Threading;
 using PubnubApi;
-using System.Collections.Generic;
 using MockServer;
-using PubnubApi.Tests;
 using System.Diagnostics;
 
 namespace PubNubMessaging.Tests

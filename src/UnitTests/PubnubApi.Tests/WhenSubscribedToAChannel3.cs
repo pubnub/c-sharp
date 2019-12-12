@@ -1,5 +1,4 @@
 ﻿using System;
-using System;
 using NUnit.Framework;
 using System.Threading;
 using PubnubApi;
@@ -819,9 +818,9 @@ namespace PubNubMessaging.Tests
             {
                 if (disposing)
                 {
-                    subscribeManualEvent.Dispose();
-                    publishManualEvent.Dispose();
-                    grantManualEvent.Dispose();
+                    subscribeManualEvent.Close();
+                    publishManualEvent.Close();
+                    grantManualEvent.Close();
                 }
 
                 disposedValue = true;

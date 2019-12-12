@@ -20,7 +20,9 @@ namespace PubnubApi
                         LoggingMethod.WriteToLog(log, string.Format("DateTime {0} PLATFORM = NETSTANDARD13", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
 #elif NETSTANDARD14
                         LoggingMethod.WriteToLog(log, string.Format("DateTime {0} PLATFORM = NETSTANDARD14", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
-#elif NETSTANDARD20
+#elif UNITY && NETSTANDARD20
+                        PrintUnity(config, log);
+#elif !UNITY && NETSTANDARD20
                         LoggingMethod.WriteToLog(log, string.Format("DateTime {0} PLATFORM = NETSTANDARD20", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
 #elif UAP
                         LoggingMethod.WriteToLog(log, string.Format("DateTime {0} PLATFORM = UAP", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
@@ -37,10 +39,32 @@ namespace PubnubApi
 #elif NET461
             LoggingMethod.WriteToLog(log, string.Format("DateTime {0} PLATFORM = NET461", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
 #else
-                        LoggingMethod.WriteToLog(log, string.Format("DateTime {0} PLATFORM = UNKNOWN", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+            LoggingMethod.WriteToLog(log, string.Format("DateTime {0} PLATFORM = UNKNOWN", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
 #endif
         }
 
+#if UNITY && NETSTANDARD20
+        private static void PrintUnity(PNConfiguration config, IPubnubLog log)
+        {
+#if UNITY_IOS || UNITY_IPHONE
+                        LoggingMethod.WriteToLog(log, string.Format("DateTime {0} PLATFORM = UNITY_IOS", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+#elif UNITY_STANDALONE_WIN
+                        LoggingMethod.WriteToLog(log, string.Format("DateTime {0} PLATFORM = UNITY_STANDALONE_WIN", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+#elif UNITY_STANDALONE_OSX
+                        LoggingMethod.WriteToLog(log, string.Format("DateTime {0} PLATFORM = UNITY_STANDALONE_OSX", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+#elif UNITY_ANDROID
+                        LoggingMethod.WriteToLog(log, string.Format("DateTime {0} PLATFORM = UNITY_ANDROID", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+#elif UNITY_STANDALONE_LINUX
+                        LoggingMethod.WriteToLog(log, string.Format("DateTime {0} PLATFORM = UNITY_STANDALONE_LINUX", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+#elif UNITY_WEBPLAYER
+                        LoggingMethod.WriteToLog(log, string.Format("DateTime {0} PLATFORM = UNITY_WEBPLAYER", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+#elif UNITY_WEBGL
+                        LoggingMethod.WriteToLog(log, string.Format("DateTime {0} PLATFORM = UNITY_WEBGL", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+#else
+            LoggingMethod.WriteToLog(log, string.Format("DateTime {0} PLATFORM = UNITY", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+#endif
+        }
+#endif
         public static string Get()
         {
             string result = "";
@@ -54,7 +78,9 @@ namespace PubnubApi
                         result = "NETSTD13";
 #elif NETSTANDARD14
                         result = "NETSTD14";
-#elif NETSTANDARD20
+#elif UNITY && NETSTANDARD20
+                        result = GetUnity();
+#elif !UNITY && NETSTANDARD20
                         result = "NETSTD20";
 #elif UAP
                         result = "UAP";
@@ -75,5 +101,30 @@ namespace PubnubApi
 #endif
             return result;
         }
+
+#if UNITY && NETSTANDARD20
+        private static string GetUnity()
+        {
+            string result = "";
+#if UNITY_IOS || UNITY_IPHONE
+                        result = "UNITY_IOS";
+#elif UNITY_STANDALONE_WIN
+                        result = "UNITY_STDALONE_WIN";
+#elif UNITY_STANDALONE_OSX
+                        result = "UNITY_STDALONE_OSX";
+#elif UNITY_ANDROID
+                        result = "UNITY_DROID";
+#elif UNITY_STANDALONE_LINUX
+                        result = "UNITY_STDALONE_LINUX";
+#elif UNITY_WEBPLAYER
+                        result = "UNITY_WEBPLAYER";
+#elif UNITY_WEBGL
+                        result = "UNITY_WEBGL";
+#else
+            result = "UNITY";
+#endif
+            return result;
+        }
+#endif
     }
 }

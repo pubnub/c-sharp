@@ -1,21 +1,17 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Globalization;
-using System.Linq;
 using System.Text;
 
 namespace PubnubApi
 {
     public class UriUtil
     {
-        public static string EncodeUriComponent(bool forPamSign, string s, PNOperationType type, bool ignoreComma, bool ignoreColon, bool ignorePercent2fEncode)
+        public static string EncodeUriComponent(string s, PNOperationType type, bool ignoreComma, bool ignoreColon, bool ignorePercent2fEncode)
         {
             if (s == null) { return string.Empty; }
 
             string encodedUri = "";
             bool prevSurroagePair = false;
-            bool tildeCharPresent = s.Contains("~");
             StringBuilder o = new StringBuilder();
             for (int index = 0; index < s.Length; index++)
             {
@@ -26,7 +22,7 @@ namespace PubnubApi
                     continue;
                 }
 
-                if (!forPamSign && IsUnsafeToEncode(ch, ignoreComma, ignoreColon))
+                if (IsUnsafeToEncode(ch, ignoreComma, ignoreColon))
                 {
                     o.Append('%');
                     o.Append(ToHex(ch / 16));
@@ -77,19 +73,8 @@ namespace PubnubApi
 
                         prevSurroagePair = true;
                     }
-                    else if (forPamSign && IsUnsafeToEscapeForPamSign(ch) && tildeCharPresent)
-                    {
-                        if (ch.ToString() == "~") {
-                            System.Diagnostics.Debug.WriteLine(ch.ToString() + "is true for IsUnsafeToEscapeForPamSign");
-                        }
-                        o.Append(ch);
-                    }
                     else
                     {
-                        if (ch.ToString() == "~")
-                        {
-                            System.Diagnostics.Debug.WriteLine(ch.ToString() + " is EscapeDataString");
-                        }
                         string escapeChar = System.Uri.EscapeDataString(ch.ToString());
 #if NET35 || NET40
                         if (escapeChar == ch.ToString() && IsUnsafeToEncode(ch, ignoreComma, ignoreColon))
@@ -156,7 +141,11 @@ namespace PubnubApi
 
         private static bool IsUnsafeToEscapeForPamSign(char ch)
         {
+#if NET35 || NET40
+            return "*()':!~".ToLowerInvariant().IndexOf(ch) >= 0;
+#else
             return "*()':!".ToLowerInvariant().IndexOf(ch) >= 0;
+#endif
         }
 
         private static char ToHex(int ch)
