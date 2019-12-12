@@ -9,7 +9,9 @@ changelog:
       - type: Improvement
         text: Added APNS2 support for mobile push.
       - type: Improvement
-        text: Added helper class o build mobile push payload.
+        text: Added helper class to build mobile push payload.
+      - type: Improvement
+        text: Refactored code for PAM Signature.
   - version: 4.2.0.0
     date: October 15, 2019
     changes:
