@@ -1,0 +1,8 @@
+---
+exclude_paths:
+  - '**/Examples/**'
+  - '**/Editor/**'
+  - '**/PlayModeTests/**' 
+  - '**/netstandard2.0/**'
+  - '**/Plugins/**'
+  
