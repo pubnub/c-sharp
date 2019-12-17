@@ -5,4 +5,5 @@ exclude_paths:
   - '**/PlayModeTests/**' 
   - '**/netstandard2.0/**'
   - '**/Plugins/**'
+  - '**/Scripts/PubnubExample.*'
   
