@@ -81,7 +81,7 @@ namespace PubnubApi
             return ret;
         }
 
-        object IJsonPluggableLibrary.BuildJsonObject(string jsonString)
+        public object BuildJsonObject(string jsonString)
         {
             object ret = null;
 
@@ -95,7 +95,7 @@ namespace PubnubApi
             return ret;
         }
 
-        bool IJsonPluggableLibrary.IsDictionaryCompatible(string jsonString, PNOperationType operationType)
+        public bool IsDictionaryCompatible(string jsonString, PNOperationType operationType)
         {
             bool ret = false;
             if (IsValidJson(jsonString, operationType))
@@ -130,7 +130,7 @@ namespace PubnubApi
             return ret;
         }
 
-        string IJsonPluggableLibrary.SerializeToJsonString(object objectToSerialize)
+        public string SerializeToJsonString(object objectToSerialize)
         {
             return JsonConvert.SerializeObject(objectToSerialize);
         }
@@ -140,19 +140,19 @@ namespace PubnubApi
         /// </summary>
         /// <param name="objectToSerialize"></param>
         /// <returns></returns>
-        string IJsonPluggableLibrary.SerializeDictionaryOfTokenKey(Dictionary<PNTokenKey, string> objectToSerialize)
+        public string SerializeDictionaryOfTokenKey(Dictionary<PNTokenKey, string> objectToSerialize)
         {
             return JsonConvert.SerializeObject(objectToSerialize, new EndPoint.TokenManager.TokenManagerConverter());
         }
 
-        List<object> IJsonPluggableLibrary.DeserializeToListOfObject(string jsonString)
+        public List<object> DeserializeToListOfObject(string jsonString)
         {
             List<object> result = JsonConvert.DeserializeObject<List<object>>(jsonString);
 
             return result;
         }
 
-        object IJsonPluggableLibrary.DeserializeToObject(string jsonString)
+        public object DeserializeToObject(string jsonString)
         {
             object result = JsonConvert.DeserializeObject<object>(jsonString, new JsonSerializerSettings { DateParseHandling = DateParseHandling.None });
             if (result.GetType().ToString() == "Newtonsoft.Json.Linq.JArray")
@@ -175,7 +175,7 @@ namespace PubnubApi
             return result;
         }
 
-        void IJsonPluggableLibrary.PopulateObject(string value, object target)
+        public void PopulateObject(string value, object target)
         {
             JsonConvert.PopulateObject(value, target);
         }
@@ -1458,7 +1458,7 @@ namespace PubnubApi
             return ret;
         }
 
-        Dictionary<string, object> IJsonPluggableLibrary.DeserializeToDictionaryOfObject(string jsonString)
+        public Dictionary<string, object> DeserializeToDictionaryOfObject(string jsonString)
         {
             try
             {
