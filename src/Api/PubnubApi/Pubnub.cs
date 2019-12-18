@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Threading;
 using PubnubApi;
+using System.Reflection;
 
 namespace PubnubApi
 {
@@ -16,13 +17,20 @@ namespace PubnubApi
         private EndPoint.ListenerManager listenerManager;
         private readonly EndPoint.TelemetryManager telemetryManager;
         private readonly EndPoint.TokenManager tokenManager;
-
-        private readonly string instanceId;
-
-        private static string sdkVersion = string.Format("{0}CSharp4.3.0.0", PNPlatform.Get());
-
         private object savedSubscribeOperation;
         private readonly string savedSdkVerion;
+
+        static Pubnub() 
+        {
+#if NET35 || NET40
+            var assemblyVersion = typeof(Pubnub).Assembly.GetName().Version;
+#else
+            var assembly = typeof(Pubnub).GetTypeInfo().Assembly;
+            var assemblyName = new AssemblyName(assembly.FullName);
+            string assemblyVersion = assemblyName.Version.ToString();
+#endif
+            Version = string.Format("{0}CSharp{1}", PNPlatform.Get(), assemblyVersion);
+        }
 
         #region "PubNub API Channel Methods"
 
@@ -274,9 +282,9 @@ namespace PubnubApi
             return getMessageActionsOperation;
         }
 
-        #endregion
+#endregion
 
-        #region "PubNub API Channel Group Methods"
+#region "PubNub API Channel Group Methods"
 
         public EndPoint.AddChannelsToChannelGroupOperation AddChannelsToChannelGroup()
 		{
@@ -331,9 +339,9 @@ namespace PubnubApi
             }
             return ret;
         }
-        #endregion
+#endregion
 
-        #region "PubNub API Other Methods"
+#region "PubNub API Other Methods"
         public void TerminateCurrentSubscriberRequest()
 		{
             EndPoint.OtherOperation endpoint = new EndPoint.OtherOperation(pubnubConfig, jsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, this);
@@ -429,9 +437,9 @@ namespace PubnubApi
             }
         }
 
-        public List<string> GetTokens()
+        public Dictionary<PNTokenKey, string> GetTokens()
         {
-            List<string> result = null;
+            Dictionary<PNTokenKey, string> result = null;
             if (tokenManager != null)
             {
                 result = tokenManager.GetAllTokens();
@@ -439,12 +447,22 @@ namespace PubnubApi
             return result;
         }
 
-        internal string GetToken(string resourceType, string resourceId)
+        public string GetToken(string resourceType, string resourceId)
         {
             string result = "";
             if (tokenManager != null)
             {
                 result = tokenManager.GetToken(resourceType, resourceId);
+            }
+            return result;
+        }
+
+        public Dictionary<PNTokenKey, string> GetTokensByResource(string resourceType)
+        {
+            Dictionary<PNTokenKey, string> result = null;
+            if (tokenManager != null)
+            {
+                result = tokenManager.GetTokensByResource(resourceType);
             }
             return result;
         }
@@ -553,9 +571,9 @@ namespace PubnubApi
             return pc.Encrypt(inputString);
         }
 
-        #endregion
+#endregion
 
-        #region "Properties"
+#region "Properties"
         public IPubnubUnitTest PubnubUnitTest
         {
             get
@@ -567,11 +585,11 @@ namespace PubnubApi
                 pubnubUnitTest = value;
                 if (pubnubUnitTest != null)
                 {
-                    sdkVersion = pubnubUnitTest.SdkVersion;
+                    Version = pubnubUnitTest.SdkVersion;
                 }
                 else
                 {
-                    sdkVersion = savedSdkVerion;
+                    Version = savedSdkVerion;
                 }
             }
         }
@@ -592,23 +610,11 @@ namespace PubnubApi
 			}
 		}
 
-        public static string Version
-        {
-            get
-            {
-                return sdkVersion;
-            }
-        }
+        public static string Version { get; private set; }
 
 
 
-        public string InstanceId
-        {
-            get
-            {
-                return instanceId;
-            }
-        }
+        public string InstanceId { get; private set; }
 
         #endregion
 
@@ -616,8 +622,8 @@ namespace PubnubApi
 
         public Pubnub(PNConfiguration config)
         {
-            savedSdkVerion = sdkVersion;
-            instanceId = Guid.NewGuid().ToString();
+            savedSdkVerion = Version;
+            InstanceId = Guid.NewGuid().ToString();
             pubnubConfig = config;
             if (config != null)
             {
@@ -673,6 +679,6 @@ namespace PubnubApi
             }
         }
 
-		#endregion
+#endregion
 	}
 }

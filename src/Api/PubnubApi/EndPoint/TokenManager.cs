@@ -4,13 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using PubnubApi.CBOR;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
 using System.Collections;
 using System.Reflection;
-using Newtonsoft.Json.Linq;
-
+#if DEBUG && NET461
+#endif
+using Newtonsoft.Json;
 
 namespace PubnubApi.EndPoint
 {
@@ -20,13 +18,12 @@ namespace PubnubApi.EndPoint
         private readonly IJsonPluggableLibrary jsonLib;
         private readonly IPubnubLog pubnubLog;
         private readonly string pubnubInstanceId;
-        private static ConcurrentDictionary<string, ConcurrentDictionary<TokenKey, string>> dicToken
+        private static ConcurrentDictionary<string, ConcurrentDictionary<PNTokenKey, string>> dicToken
         {
             get;
             set;
-        } = new ConcurrentDictionary<string, ConcurrentDictionary<TokenKey, string>>();
+        } = new ConcurrentDictionary<string, ConcurrentDictionary<PNTokenKey, string>>();
 
-#if DEBUG && NET461
         internal class TokenManagerConverter : JsonConverter
         {
             public override bool CanConvert(Type objectType)
@@ -37,8 +34,13 @@ namespace PubnubApi.EndPoint
 
             private static bool TypeImplementsGenericInterface(Type concreteType, Type interfaceType)
             {
+#if NET35 || NET40
                 return concreteType.GetInterfaces()
                        .Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == interfaceType);
+#else
+                return concreteType.GetInterfaces()
+                       .Any(i => i.GetTypeInfo().IsGenericType && i.GetGenericTypeDefinition() == interfaceType);
+#endif
             }
 
             public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
@@ -66,31 +68,6 @@ namespace PubnubApi.EndPoint
                 throw new NotImplementedException();
             }
         }
-#endif
-
-        internal class TokenKey
-        {
-            [JsonProperty("ResourceType ")]
-            public string ResourceType { get; set; }
-
-            [JsonProperty("ResourceId ")]
-            public string ResourceId { get; set; }
-
-            [JsonProperty("PatternFlag ")]
-            public int PatternFlag { get; set; }
-
-            public override bool Equals(object obj)
-            {
-                TokenKey currentKey = obj as TokenKey;
-                if (currentKey == null)
-                {
-                    return false;
-                }
-                return currentKey.ResourceType == this.ResourceType && currentKey.ResourceId == this.ResourceId && currentKey.PatternFlag == this.PatternFlag;
-            }
-
-            public override int GetHashCode() => ResourceType.GetHashCode() ^ PatternFlag.GetHashCode() ^ ResourceId.GetHashCode();
-        }
 
         public TokenManager(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubLog log, string instanceId)
         {
@@ -100,7 +77,7 @@ namespace PubnubApi.EndPoint
             this.pubnubInstanceId = instanceId;
             if (!dicToken.ContainsKey(instanceId))
             {
-                dicToken.GetOrAdd(instanceId, new ConcurrentDictionary<TokenKey, string>());
+                dicToken.GetOrAdd(instanceId, new ConcurrentDictionary<PNTokenKey, string>());
             }
             
         }
@@ -331,12 +308,12 @@ namespace PubnubApi.EndPoint
             PNGrantToken tokenObj = ParseToken(token);
             if (tokenObj != null)
             {
-                #region "Non-Pattern Resources"
+#region "Non-Pattern Resources"
                 if (tokenObj.Channels != null && tokenObj.Channels.Count > 0)
                 {
                     foreach(KeyValuePair<string, PNResourcePermission> kvp in tokenObj.Channels)
                     {
-                        TokenKey key = new TokenKey { ResourceType = "channel", ResourceId = kvp.Key, PatternFlag = 0 };
+                        PNTokenKey key = new PNTokenKey { ResourceType = "channel", ResourceId = kvp.Key, PatternFlag = 0 };
                         dicToken[pubnubInstanceId].AddOrUpdate(key, token, (oldVal, newVal) => token);
                     }
                 }
@@ -344,7 +321,7 @@ namespace PubnubApi.EndPoint
                 {
                     foreach (KeyValuePair<string, PNResourcePermission> kvp in tokenObj.ChannelGroups)
                     {
-                        TokenKey key = new TokenKey { ResourceType = "group", ResourceId = kvp.Key, PatternFlag = 0 };
+                        PNTokenKey key = new PNTokenKey { ResourceType = "group", ResourceId = kvp.Key, PatternFlag = 0 };
                         dicToken[pubnubInstanceId].AddOrUpdate(key, token, (oldVal, newVal) => token);
                     }
                 }
@@ -352,7 +329,7 @@ namespace PubnubApi.EndPoint
                 {
                     foreach (KeyValuePair<string, PNResourcePermission> kvp in tokenObj.Users)
                     {
-                        TokenKey key = new TokenKey { ResourceType = "user", ResourceId = kvp.Key, PatternFlag = 0 };
+                        PNTokenKey key = new PNTokenKey { ResourceType = "user", ResourceId = kvp.Key, PatternFlag = 0 };
                         dicToken[pubnubInstanceId].AddOrUpdate(key, token, (oldVal, newVal) => token);
                     }
                 }
@@ -360,17 +337,17 @@ namespace PubnubApi.EndPoint
                 {
                     foreach (KeyValuePair<string, PNResourcePermission> kvp in tokenObj.Spaces)
                     {
-                        TokenKey key = new TokenKey { ResourceType = "space", ResourceId = kvp.Key, PatternFlag = 0 };
+                        PNTokenKey key = new PNTokenKey { ResourceType = "space", ResourceId = kvp.Key, PatternFlag = 0 };
                         dicToken[pubnubInstanceId].AddOrUpdate(key, token, (oldVal, newVal) => token);
                     }
                 }
-                #endregion
-                #region "Pattern Resources"
+#endregion
+#region "Pattern Resources"
                 if (tokenObj.ChannelPatterns != null && tokenObj.ChannelPatterns.Count > 0)
                 {
                     foreach (KeyValuePair<string, PNResourcePermission> kvp in tokenObj.ChannelPatterns)
                     {
-                        TokenKey key = new TokenKey { ResourceType = "channel", ResourceId = kvp.Key, PatternFlag = 1 };
+                        PNTokenKey key = new PNTokenKey { ResourceType = "channel", ResourceId = kvp.Key, PatternFlag = 1 };
                         dicToken[pubnubInstanceId].AddOrUpdate(key, token, (oldVal, newVal) => token);
                     }
                 }
@@ -378,7 +355,7 @@ namespace PubnubApi.EndPoint
                 {
                     foreach (KeyValuePair<string, PNResourcePermission> kvp in tokenObj.GroupPatterns)
                     {
-                        TokenKey key = new TokenKey { ResourceType = "group", ResourceId = kvp.Key, PatternFlag = 1 };
+                        PNTokenKey key = new PNTokenKey { ResourceType = "group", ResourceId = kvp.Key, PatternFlag = 1 };
                         dicToken[pubnubInstanceId].AddOrUpdate(key, token, (oldVal, newVal) => token);
                     }
                 }
@@ -386,7 +363,7 @@ namespace PubnubApi.EndPoint
                 {
                     foreach (KeyValuePair<string, PNResourcePermission> kvp in tokenObj.UserPatterns)
                     {
-                        TokenKey key = new TokenKey { ResourceType = "user", ResourceId = kvp.Key, PatternFlag = 1 };
+                        PNTokenKey key = new PNTokenKey { ResourceType = "user", ResourceId = kvp.Key, PatternFlag = 1 };
                         dicToken[pubnubInstanceId].AddOrUpdate(key, token, (oldVal, newVal) => token);
                     }
                 }
@@ -394,13 +371,13 @@ namespace PubnubApi.EndPoint
                 {
                     foreach (KeyValuePair<string, PNResourcePermission> kvp in tokenObj.SpacePatterns)
                     {
-                        TokenKey key = new TokenKey { ResourceType = "space", ResourceId = kvp.Key, PatternFlag = 1 };
+                        PNTokenKey key = new PNTokenKey { ResourceType = "space", ResourceId = kvp.Key, PatternFlag = 1 };
                         dicToken[pubnubInstanceId].AddOrUpdate(key, token, (oldVal, newVal) => token);
                     }
                 }
-                #endregion
+#endregion
             }
-#if DEBUG && NET461
+#if DEBUG
             System.Diagnostics.Debug.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(dicToken, new TokenManagerConverter()));
 #endif
         }
@@ -409,7 +386,7 @@ namespace PubnubApi.EndPoint
         {
             string resultToken = "";
 
-            TokenKey key = new TokenKey { ResourceType = resourceType, ResourceId = resourceId, PatternFlag = 0 };
+            PNTokenKey key = new PNTokenKey { ResourceType = resourceType, ResourceId = resourceId, PatternFlag = 0 };
             if (!string.IsNullOrEmpty(pubnubInstanceId) && dicToken[pubnubInstanceId].ContainsKey(key))
             {
                 resultToken = dicToken[pubnubInstanceId][key];
@@ -431,7 +408,7 @@ namespace PubnubApi.EndPoint
                 List<string> tokenKeyPatternList = dicToken[pubnubInstanceId].Keys.Where(k => patterFlag == k.PatternFlag && resourceType == k.ResourceType && Regex.IsMatch(resourceId, k.ResourceId)).Select(k => k.ResourceId).ToList();
                 string targetResourceId = (tokenKeyPatternList != null && tokenKeyPatternList.Count > 0) ? tokenKeyPatternList[0] : "";
 
-                TokenKey key = new TokenKey { ResourceType = resourceType, ResourceId = targetResourceId, PatternFlag = patterFlag };
+                PNTokenKey key = new PNTokenKey { ResourceType = resourceType, ResourceId = targetResourceId, PatternFlag = patterFlag };
                 if (!string.IsNullOrEmpty(pubnubInstanceId) && dicToken[pubnubInstanceId].ContainsKey(key))
                 {
                     resultToken = dicToken[pubnubInstanceId][key];
@@ -452,13 +429,26 @@ namespace PubnubApi.EndPoint
             return resultToken;
         }
 
-        public List<string> GetAllTokens()
+        public Dictionary<PNTokenKey,string> GetAllTokens()
         {
-            List<string> tokenList = null;
+            Dictionary<PNTokenKey, string> tokenList = null;
 
             if (!string.IsNullOrEmpty(pubnubInstanceId) && dicToken != null && dicToken.ContainsKey(pubnubInstanceId))
             {
-                tokenList = dicToken[pubnubInstanceId].Values.Distinct().ToList();
+                ConcurrentDictionary<PNTokenKey, string> currentInstanceTokens = dicToken[pubnubInstanceId];
+                tokenList = new Dictionary<PNTokenKey, string>(currentInstanceTokens);
+            }
+
+            return tokenList;
+        }
+
+        public Dictionary<PNTokenKey, string> GetTokensByResource(string resourceType)
+        {
+            Dictionary<PNTokenKey, string> tokenList = null;
+
+            if (!string.IsNullOrEmpty(pubnubInstanceId) && dicToken != null && dicToken.ContainsKey(pubnubInstanceId))
+            {
+                tokenList = dicToken[pubnubInstanceId].Where(tk=> tk.Key.ResourceType == resourceType).ToDictionary(kvp=> kvp.Key, kvp=> kvp.Value);
             }
 
             return tokenList;
@@ -496,7 +486,7 @@ namespace PubnubApi.EndPoint
             
         }
 
-        #region IDisposable Support
+#region IDisposable Support
         private bool disposedValue;
 
         protected virtual void DisposeInternal(bool disposing)
@@ -517,7 +507,7 @@ namespace PubnubApi.EndPoint
         {
             DisposeInternal(true);
         }
-        #endregion
+#endregion
 
     }
 }

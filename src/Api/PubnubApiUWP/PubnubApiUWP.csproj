@@ -15,7 +15,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubUWP</PackageId>
-    <PackageVersion>4.3.0.0</PackageVersion>
+    <PackageVersion>4.4.0.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -446,6 +446,7 @@ Refactored code for PAM Signature.</PackageReleaseNotes>
     <Compile Include="..\PubnubApi\Model\Consumer\PNTimeResult.cs">
       <Link>Model\Consumer\PNTimeResult.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\PNTokenKey.cs" Link="Model\Consumer\PNTokenKey.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Presence\PNGetStateResult.cs">
       <Link>Model\Consumer\Presence\PNGetStateResult.cs</Link>
     </Compile>
@@ -601,6 +602,7 @@ Refactored code for PAM Signature.</PackageReleaseNotes>
     <Compile Include="..\PubnubApi\PNConfiguration.cs">
       <Link>PNConfiguration.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Properties\AssemblyInfo.cs" Link="Properties\AssemblyInfo.cs" />
     <Compile Include="..\PubnubApi\Proxy\PubnubProxy.cs">
       <Link>Proxy\PubnubProxy.cs</Link>
     </Compile>
@@ -644,7 +646,6 @@ Refactored code for PAM Signature.</PackageReleaseNotes>
     <Compile Include="..\PubnubApi\Timer.cs">
       <Link>Timer.cs</Link>
     </Compile>
-    <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="..\PubnubApi\LICENSE.txt" Link="LICENSE.txt" Pack="true" PackagePath="" />
     <EmbeddedResource Include="Properties\PubnubApiUWP.rd.xml" />
   </ItemGroup>

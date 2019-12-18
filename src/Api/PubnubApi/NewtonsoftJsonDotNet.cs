@@ -135,6 +135,16 @@ namespace PubnubApi
             return JsonConvert.SerializeObject(objectToSerialize);
         }
 
+        /// <summary>
+        /// Use this to serialize Dictionary<PNTokenKey, string>
+        /// </summary>
+        /// <param name="objectToSerialize"></param>
+        /// <returns></returns>
+        public string SerializeDictionaryOfTokenKey(Dictionary<PNTokenKey, string> objectToSerialize)
+        {
+            return JsonConvert.SerializeObject(objectToSerialize, new EndPoint.TokenManager.TokenManagerConverter());
+        }
+
         public List<object> DeserializeToListOfObject(string jsonString)
         {
             List<object> result = JsonConvert.DeserializeObject<List<object>>(jsonString);
