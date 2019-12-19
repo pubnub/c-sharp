@@ -24,7 +24,7 @@ namespace PubnubApi.EndPoint
             set;
         } = new ConcurrentDictionary<string, ConcurrentDictionary<PNTokenKey, string>>();
 
-        internal class TokenManagerConverter : JsonConverter //NOSONAR
+        internal class TokenManagerConverter : JsonConverter // NOSONAR
         {
             public override bool CanConvert(Type objectType)
             {
