@@ -41,6 +41,7 @@ src/.vs/Pubnub/v15/sqlite3/storage.ide
 /src/PubnubUnity/Logs/*
 /src/PubnubUnity/Assets/netstandard2.0/*.pdb
 /src/PubnubUnity/Assets/netstandard2.0/*.pdb.meta
+/src/PubnubUnity/Assets/netstandard2.0/*.dll
 /src/PubnubUnity/ProjectSettings/*
 /src/PubnubUnity/ProjectSettings/*.*
 

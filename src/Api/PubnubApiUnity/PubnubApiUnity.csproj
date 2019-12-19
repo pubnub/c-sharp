@@ -200,6 +200,7 @@
     <Compile Include="..\PubnubApi\Model\Consumer\PNErrorData.cs" Link="Model\Consumer\PNErrorData.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\PNStatus.cs" Link="Model\Consumer\PNStatus.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\PNTimeResult.cs" Link="Model\Consumer\PNTimeResult.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\PNTokenKey.cs" Link="Model\Consumer\PNTokenKey.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Presence\PNGetStateResult.cs" Link="Model\Consumer\Presence\PNGetStateResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Presence\PNHereNowChannelData.cs" Link="Model\Consumer\Presence\PNHereNowChannelData.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Presence\PNHereNowOccupantData.cs" Link="Model\Consumer\Presence\PNHereNowOccupantData.cs" />
