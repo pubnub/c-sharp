@@ -95,7 +95,6 @@ namespace PubnubApi
 
             return encodedUri;
         }
-
         private static bool IsOperationTypeForPercent2fEncode(PNOperationType type)
         {
             bool ret;
@@ -138,16 +137,6 @@ namespace PubnubApi
                 return " ~`!@#$%^&*()+=[]\\{}|;':\",/<>?".IndexOf(ch) >= 0;
             }
         }
-
-        private static bool IsUnsafeToEscapeForPamSign(char ch)
-        {
-#if NET35 || NET40
-            return "*()':!~".ToLowerInvariant().IndexOf(ch) >= 0;
-#else
-            return "*()':!".ToLowerInvariant().IndexOf(ch) >= 0;
-#endif
-        }
-
         private static char ToHex(int ch)
         {
             return (char)(ch < 10 ? '0' + ch : 'A' + ch - 10);
@@ -207,7 +196,5 @@ namespace PubnubApi
             // Not a high-surrogate or low-surrogate. Genereate the UTF32 value for the BMP characters.
             return (int)s[index];
         }
-
-
     }
 }

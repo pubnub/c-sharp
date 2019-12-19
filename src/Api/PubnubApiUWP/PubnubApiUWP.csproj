@@ -15,7 +15,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubUWP</PackageId>
-    <PackageVersion>4.3.0.0</PackageVersion>
+    <PackageVersion>4.4.0.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -23,9 +23,8 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>Added APNS2 support for mobile push.
-Added helper class o build mobile push payload.
-Refactored code for PAM Signature.</PackageReleaseNotes>
+    <PackageReleaseNotes>Refactored code related to TMS GetToken and GetTokens.
+Refactored code to retrieve assembly version.</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
@@ -446,6 +445,7 @@ Refactored code for PAM Signature.</PackageReleaseNotes>
     <Compile Include="..\PubnubApi\Model\Consumer\PNTimeResult.cs">
       <Link>Model\Consumer\PNTimeResult.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\PNTokenKey.cs" Link="Model\Consumer\PNTokenKey.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Presence\PNGetStateResult.cs">
       <Link>Model\Consumer\Presence\PNGetStateResult.cs</Link>
     </Compile>
@@ -601,6 +601,7 @@ Refactored code for PAM Signature.</PackageReleaseNotes>
     <Compile Include="..\PubnubApi\PNConfiguration.cs">
       <Link>PNConfiguration.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Properties\AssemblyInfo.cs" Link="Properties\AssemblyInfo.cs" />
     <Compile Include="..\PubnubApi\Proxy\PubnubProxy.cs">
       <Link>Proxy\PubnubProxy.cs</Link>
     </Compile>
@@ -644,7 +645,6 @@ Refactored code for PAM Signature.</PackageReleaseNotes>
     <Compile Include="..\PubnubApi\Timer.cs">
       <Link>Timer.cs</Link>
     </Compile>
-    <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="..\PubnubApi\LICENSE.txt" Link="LICENSE.txt" Pack="true" PackagePath="" />
     <EmbeddedResource Include="Properties\PubnubApiUWP.rd.xml" />
   </ItemGroup>
@@ -653,7 +653,7 @@ Refactored code for PAM Signature.</PackageReleaseNotes>
   </ItemGroup>-->
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
-      <Version>5.2.3</Version>
+      <Version>5.2.4</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>9.0.1</Version>

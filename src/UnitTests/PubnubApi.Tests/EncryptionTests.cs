@@ -187,14 +187,82 @@ namespace PubNubMessaging.Tests
                 Pubnub pubnub = new Pubnub(config);
                 pubnub.SetToken(token);
 
-                List<string> tokensList = pubnub.GetTokens();
+                actual = pubnub.GetToken("space", "public");
 
-                actual = tokensList[0];
-                
-                //if (pnGrant != null)
-                //{
-                //    actual = Newtonsoft.Json.JsonConvert.SerializeObject(pnGrant);
-                //}
+                pubnub.ClearTokens();
+
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Exception = " + ex.ToString());
+            }
+            Assert.AreEqual(actual, expected);
+        }
+
+        [Test]
+        public void GetTokenByResourceTypeTest()
+        {
+            string expected = "p0F2AkF0Gl2BkWVDdHRsGGRDcmVzpERjaGFuoENncnCgQ3VzcqBDc3BjoENwYXSkRGNoYW6gQ2dycKBDdXNyo2ZeZW1wLSoDZl5tZ3ItKhgbYl4kAUNzcGOjaV5wdWJsaWMtKgNqXnByaXZhdGUtKhgbYl4kAURtZXRhoENzaWdYIBzbsFygBNyhETvsHwgDJm79KaCNk7nNwG8P0ra4UBoh";
+            string actual = "";
+            string token = "p0F2AkF0Gl2BkWVDdHRsGGRDcmVzpERjaGFuoENncnCgQ3VzcqBDc3BjoENwYXSkRGNoYW6gQ2dycKBDdXNyo2ZeZW1wLSoDZl5tZ3ItKhgbYl4kAUNzcGOjaV5wdWJsaWMtKgNqXnByaXZhdGUtKhgbYl4kAURtZXRhoENzaWdYIBzbsFygBNyhETvsHwgDJm79KaCNk7nNwG8P0ra4UBoh";
+            try
+            {
+                PNConfiguration config = new PNConfiguration
+                {
+                    SubscribeKey = PubnubCommon.SubscribeKey,
+                    PublishKey = PubnubCommon.PublishKey,
+                };
+                Pubnub pubnub = new Pubnub(config);
+                pubnub.SetToken(token);
+
+                Dictionary<PNTokenKey, string> tokensList = pubnub.GetTokensByResource("user");
+                if (tokensList != null && tokensList.Count > 0)
+                {
+                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeDictionaryOfTokenKey(tokensList));
+                    foreach (KeyValuePair<PNTokenKey, string> kvp in tokensList)
+                    {
+                        actual = kvp.Value;
+                        break;
+                    }
+                }
+
+                pubnub.ClearTokens();
+
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Exception = " + ex.ToString());
+            }
+            Assert.AreEqual(actual, expected);
+        }
+
+        [Test]
+        public void GetAllTokensTest()
+        {
+            string expected = "p0F2AkF0Gl2BkWVDdHRsGGRDcmVzpERjaGFuoENncnCgQ3VzcqBDc3BjoENwYXSkRGNoYW6gQ2dycKBDdXNyo2ZeZW1wLSoDZl5tZ3ItKhgbYl4kAUNzcGOjaV5wdWJsaWMtKgNqXnByaXZhdGUtKhgbYl4kAURtZXRhoENzaWdYIBzbsFygBNyhETvsHwgDJm79KaCNk7nNwG8P0ra4UBoh";
+            string actual = "";
+            string token = "p0F2AkF0Gl2BkWVDdHRsGGRDcmVzpERjaGFuoENncnCgQ3VzcqBDc3BjoENwYXSkRGNoYW6gQ2dycKBDdXNyo2ZeZW1wLSoDZl5tZ3ItKhgbYl4kAUNzcGOjaV5wdWJsaWMtKgNqXnByaXZhdGUtKhgbYl4kAURtZXRhoENzaWdYIBzbsFygBNyhETvsHwgDJm79KaCNk7nNwG8P0ra4UBoh";
+            try
+            {
+                PNConfiguration config = new PNConfiguration
+                {
+                    SubscribeKey = PubnubCommon.SubscribeKey,
+                    PublishKey = PubnubCommon.PublishKey,
+                };
+                Pubnub pubnub = new Pubnub(config);
+                pubnub.SetToken(token);
+
+                Dictionary<PNTokenKey, string> tokensDic = pubnub.GetTokens();
+                if (tokensDic != null && tokensDic.Count > 0)
+                {
+                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeDictionaryOfTokenKey(tokensDic));
+                    foreach (KeyValuePair<PNTokenKey, string> kvp in tokensDic)
+                    {
+                        actual = kvp.Value;
+                        break;
+                    }
+                }
+
                 pubnub.ClearTokens();
 
             }
