@@ -1,6 +1,7 @@
 ---
 exclude_paths:
   - '**/Examples/**'
+  - '**/UnitTests/**'
   - '**/Editor/**'
   - '**/PlayModeTests/**' 
   - '**/netstandard2.0/**'
