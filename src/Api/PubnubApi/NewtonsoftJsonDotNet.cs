@@ -135,6 +135,7 @@ namespace PubnubApi
             return JsonConvert.SerializeObject(objectToSerialize);
         }
 
+#pragma warning disable S2325
         /// <summary>
         /// Use this to serialize Dictionary<PNTokenKey, string>
         /// </summary>
@@ -144,6 +145,7 @@ namespace PubnubApi
         {
             return JsonConvert.SerializeObject(objectToSerialize, new EndPoint.TokenManager.TokenManagerConverter());
         }
+#pragma warning restore S2325
 
         public List<object> DeserializeToListOfObject(string jsonString)
         {
