@@ -140,7 +140,7 @@ namespace PubnubApi
         /// </summary>
         /// <param name="objectToSerialize"></param>
         /// <returns></returns>
-        public string SerializeDictionaryOfTokenKey(Dictionary<PNTokenKey, string> objectToSerialize)
+        public string SerializeDictionaryOfTokenKey(Dictionary<PNTokenKey, string> objectToSerialize) //NOSONAR
         {
             return JsonConvert.SerializeObject(objectToSerialize, new EndPoint.TokenManager.TokenManagerConverter());
         }
