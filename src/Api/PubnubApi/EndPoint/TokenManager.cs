@@ -24,6 +24,7 @@ namespace PubnubApi.EndPoint
             set;
         } = new ConcurrentDictionary<string, ConcurrentDictionary<PNTokenKey, string>>();
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Codacy.Sonar", "S1144:Unused private types or members should be removed")]
         internal class TokenManagerConverter : JsonConverter // NOSONAR
         {
             public override bool CanConvert(Type objectType)
