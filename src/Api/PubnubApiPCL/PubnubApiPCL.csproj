@@ -14,7 +14,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubPCL</PackageId>
-    <PackageVersion>4.3.0.0</PackageVersion>
+    <PackageVersion>4.4.0.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -22,9 +22,8 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>Added APNS2 support for mobile push.
-Added helper class o build mobile push payload.
-Refactored code for PAM Signature.</PackageReleaseNotes>
+    <PackageReleaseNotes>Refactored code related to TMS GetToken and GetTokens.
+Refactored code to retrieve assembly version.</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
@@ -338,6 +337,7 @@ Refactored code for PAM Signature.</PackageReleaseNotes>
     <Compile Include="..\PubnubApi\Model\Consumer\PNTimeResult.cs">
       <Link>Model\Consumer\PNTimeResult.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\PNTokenKey.cs" Link="Model\Consumer\PNTokenKey.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Presence\PNGetStateResult.cs">
       <Link>Model\Consumer\Presence\PNGetStateResult.cs</Link>
     </Compile>
@@ -493,6 +493,7 @@ Refactored code for PAM Signature.</PackageReleaseNotes>
     <Compile Include="..\PubnubApi\PNConfiguration.cs">
       <Link>PNConfiguration.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Properties\AssemblyInfo.cs" Link="Properties\AssemblyInfo.cs" />
     <Compile Include="..\PubnubApi\Proxy\PubnubProxy.cs">
       <Link>Proxy\PubnubProxy.cs</Link>
     </Compile>
@@ -536,7 +537,6 @@ Refactored code for PAM Signature.</PackageReleaseNotes>
     <Compile Include="..\PubnubApi\Timer.cs">
       <Link>Timer.cs</Link>
     </Compile>
-    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
@@ -592,7 +592,13 @@ Refactored code for PAM Signature.</PackageReleaseNotes>
     <PackageReference Include="System.Net.Requests" Version="4.0.11">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="System.Reflection" Version="4.3.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="System.Reflection.Primitives" Version="4.3.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.3.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="System.Linq.Queryable" Version="4.0.1">
@@ -614,6 +620,12 @@ Refactored code for PAM Signature.</PackageReleaseNotes>
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="System.Net.Requests" Version="4.0.11">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Reflection" Version="4.3.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.3.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
   </ItemGroup>
@@ -771,6 +783,7 @@ Refactored code for PAM Signature.</PackageReleaseNotes>
     <Folder Include="Model\Derived\Presence\" />
     <Folder Include="Model\Server\" />
     <Folder Include="Helper\" />
+    <Folder Include="Properties\" />
     <Folder Include="Push\Mpns\" />
     <Folder Include="Security\" />
     <Folder Include="Proxy\" />

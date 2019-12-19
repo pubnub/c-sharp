@@ -10,6 +10,8 @@ namespace PubnubApi
 
         string SerializeToJsonString(object objectToSerialize);
 
+        string SerializeDictionaryOfTokenKey(Dictionary<PNTokenKey, string> objectToSerialize);
+
         List<object> DeserializeToListOfObject(string jsonString);
 
         object DeserializeToObject(string jsonString);
@@ -25,5 +27,6 @@ namespace PubnubApi
         object[] ConvertToObjectArray(object localContainer);
 
         void PopulateObject(string value, object target);
+
     }
 }
