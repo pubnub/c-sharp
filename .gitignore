@@ -9,6 +9,13 @@ src/.vs/Pubnub/v15/sqlite3/storage.ide
 /src/UnitTests/MockServerPubnubApi/*.user
 /src/UnitTests/MockServerPubnubApi/obj/*
 
+/src/UnitTests/MockServerPubnubApiPCL/bin/Debug/*
+/src/UnitTests/MockServerPubnubApiPCL/obj/Debug/*
+/src/UnitTests/MockServerPubnubApiPCL/bin/Release/*
+/src/UnitTests/MockServerPubnubApiPCL/obj/Release/*
+/src/UnitTests/MockServerPubnubApiPCL/*.user
+/src/UnitTests/MockServerPubnubApiPCL/obj/*
+
 /src/Api/PubnubApiPCL/bin/*
 /src/Api/PubnubApiPCL/obj/Debug/*
 /src/Api/PubnubApiPCL/obj/Release/*
@@ -43,12 +50,12 @@ src/.vs/Pubnub/v15/sqlite3/storage.ide
 /src/UnitTests/PubnubApi.Tests/*.user
 /src/UnitTests/PubnubApi.Tests/obj/*
 
-
 /src/UnitTests/PubnubApiPCL.Tests/bin/Debug/*
 /src/UnitTests/PubnubApiPCL.Tests/obj/Debug/*
 /src/UnitTests/PubnubApiPCL.Tests/bin/Release/*
 /src/UnitTests/PubnubApiPCL.Tests/obj/Release/*
 /src/UnitTests/PubnubApiPCL.Tests/*.user
+/src/UnitTests/PubnubApiPCL.Tests/obj/*
 
 /src/Examples/PubnubApi.ASPNETWebFormExample/bin/*
 /src/Examples/PubnubApi.ASPNETWebFormExample/obj/*

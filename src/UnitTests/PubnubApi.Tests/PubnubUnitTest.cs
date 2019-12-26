@@ -1,100 +1,43 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using PubnubApi;
-using System.IO;
-using System.Net;
-
+﻿using PubnubApi;
 
 namespace PubNubMessaging.Tests
 {
     public class PubnubUnitTest : IPubnubUnitTest
     {
-        private long pubnubTimetoken;
-        private string requestId;
-        private bool internetAvailable;
-        private string sdkVersion;
-        private bool includePnsdk;
-        private bool includeUuid;
-
         long IPubnubUnitTest.Timetoken
         {
-            get
-            {
-                return pubnubTimetoken;
-            }
-
-            set
-            {
-                pubnubTimetoken = value;
-            }
+            get;
+            set;
         }
 
         string IPubnubUnitTest.RequestId
         {
-            get
-            {
-                return requestId;
-            }
-            set
-            {
-                requestId = value;
-            }
+            get;
+            set;
         }
 
         bool IPubnubUnitTest.InternetAvailable
         {
-            get
-            {
-                return internetAvailable;
-            }
-
-            set
-            {
-                internetAvailable = value;
-            }
+            get;
+            set;
         }
 
         string IPubnubUnitTest.SdkVersion
         {
-            get
-            {
-                return sdkVersion;
-            }
-
-            set
-            {
-                sdkVersion = value;
-            }
+            get;
+            set;
         }
 
         bool IPubnubUnitTest.IncludePnsdk
         {
-            get
-            {
-                return includePnsdk;
-            }
-
-            set
-            {
-                includePnsdk = value;
-            }
+            get;
+            set;
         }
 
         bool IPubnubUnitTest.IncludeUuid
         {
-            get
-            {
-                return includeUuid;
-            }
-
-            set
-            {
-                includeUuid = value;
-            }
+            get;
+            set;
         }
     }
 }

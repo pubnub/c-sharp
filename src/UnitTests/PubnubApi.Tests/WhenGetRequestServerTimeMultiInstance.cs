@@ -16,7 +16,7 @@ namespace PubNubMessaging.Tests
 
         private static Server server;
 
-        [TestFixtureSetUp]
+        [SetUp]
         public static void Init()
         {
             UnitTestLog unitLog = new Tests.UnitTestLog();
@@ -26,7 +26,7 @@ namespace PubNubMessaging.Tests
             server.Start();
         }
 
-        [TestFixtureTearDown]
+        [TearDown]
         public void Exit()
         {
             server.Stop();

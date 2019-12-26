@@ -4,8 +4,12 @@ using System.Threading;
 using PubnubApi;
 using System.Collections.Generic;
 using MockServer;
-using PubnubApi.Tests;
 using System.Diagnostics;
+#if NETSTANDARD20
+using PubnubApiPCL.Tests;
+#else
+using PubnubApi.Tests;
+#endif
 
 namespace PubNubMessaging.Tests
 {
@@ -21,7 +25,7 @@ namespace PubNubMessaging.Tests
         private static Server server;
         private static string authKey = "myauth";
 
-        [TestFixtureSetUp]
+        [SetUp]
         public static void Init()
         {
             UnitTestLog unitLog = new Tests.UnitTestLog();
@@ -103,14 +107,13 @@ namespace PubNubMessaging.Tests
             Assert.IsTrue(receivedGrantMessage, "WhenAMessageIsPublished Grant access failed.");
         }
 
-        [TestFixtureTearDown]
+        [TearDown]
         public static void Exit()
         {
             server.Stop();
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
         public static void ThenNullMessageShouldReturnException()
         {
             server.ClearRequests();
@@ -147,10 +150,13 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Publish()
-                    .Channel(channel)
-                    .Message(message)
-                    .Execute(new PNPublishResultExt((r, s) => { }));
+            Assert.Throws<ArgumentException>(() =>
+            {
+                pubnub.Publish()
+                        .Channel(channel)
+                        .Message(message)
+                        .Execute(new PNPublishResultExt((r, s) => { }));
+            });
 
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
@@ -1014,7 +1020,6 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        [ExpectedException(typeof(MissingMemberException))]
         public static void ThenPublishKeyShouldNotBeEmpty()
         {
             PNConfiguration config = new PNConfiguration
@@ -1028,8 +1033,12 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             string message = "Pubnub API Usage Example";
 
-            pubnub.Publish().Channel(channel).Message(message)
-                    .Execute(new PNPublishResultExt((r, s) => { }));
+            Assert.Throws<MissingMemberException>(() =>
+            {
+                pubnub.Publish().Channel(channel).Message(message)
+                        .Execute(new PNPublishResultExt((r, s) => { }));
+
+            });
             pubnub = null;
 
         }

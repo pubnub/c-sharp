@@ -19,7 +19,7 @@ namespace PubNubMessaging.Tests
         private static Server server;
         private static string authKey = "myauth";
 
-        [TestFixtureSetUp]
+        [SetUp]
         public static void Init()
         {
             UnitTestLog unitLog = new Tests.UnitTestLog();
@@ -100,7 +100,7 @@ namespace PubNubMessaging.Tests
             Assert.IsTrue(receivedGrantMessage, "WhenDetailedHistoryIsRequested Grant access failed.");
         }
 
-        [TestFixtureTearDown]
+        [TearDown]
         public static void Exit()
         {
             server.Stop();
@@ -671,7 +671,6 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        [ExpectedException(typeof(MissingMemberException))]
         public static void FetchHistoryWithNullKeysReturnsError()
         {
             server.ClearRequests();
@@ -694,22 +693,23 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
 
-            ManualResetEvent historyManualEvent = new ManualResetEvent(false);
-            pubnub.FetchHistory().Channels(new string[] {channel })
-                .MaximumPerChannel(10)
-                .Reverse(true)
-                .IncludeMeta(false)
-                .Execute(new PNFetchHistoryResultExt((r, s) => {
-                    receivedMessage = r == null || s.StatusCode != 200 || s.Error;
-                    historyManualEvent.Set();
-                }));
-            historyManualEvent.WaitOne(manualResetEventWaitTimeout);
+            Assert.Throws<MissingMemberException>(() =>
+            {
+                ManualResetEvent historyManualEvent = new ManualResetEvent(false);
+                pubnub.FetchHistory().Channels(new string[] { channel })
+                    .MaximumPerChannel(10)
+                    .Reverse(true)
+                    .IncludeMeta(false)
+                    .Execute(new PNFetchHistoryResultExt((r, s) => {
+                        receivedMessage = r == null || s.StatusCode != 200 || s.Error;
+                        historyManualEvent.Set();
+                    }));
+                historyManualEvent.WaitOne(manualResetEventWaitTimeout);
+            });
 
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-
-            Assert.IsTrue(receivedMessage, "Fetch History With Null Keys Failed");
         }
 
         [Test]

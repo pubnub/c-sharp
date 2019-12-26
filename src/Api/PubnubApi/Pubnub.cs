@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Globalization;
-using System.Threading;
-using PubnubApi;
 using System.Reflection;
 
 namespace PubnubApi
 {
-	public class Pubnub
+    public class Pubnub
 	{
         private PNConfiguration pubnubConfig;
         private IJsonPluggableLibrary jsonPluggableLibrary;
@@ -492,7 +489,7 @@ namespace PubnubApi
         public bool Reconnect<T>(bool resetSubscribeTimetoken)
         {
             bool ret = false;
-            if (savedSubscribeOperation != null && savedSubscribeOperation is EndPoint.SubscribeOperation<T>)
+            if (savedSubscribeOperation is EndPoint.SubscribeOperation<T>)
             {
                 EndPoint.SubscribeOperation<T> subscibeOperationInstance = savedSubscribeOperation as EndPoint.SubscribeOperation<T>;
                 if (subscibeOperationInstance != null)
@@ -506,7 +503,7 @@ namespace PubnubApi
         public bool Disconnect<T>()
         {
             bool ret = false;
-            if (savedSubscribeOperation != null && savedSubscribeOperation is EndPoint.SubscribeOperation<T>)
+            if (savedSubscribeOperation is EndPoint.SubscribeOperation<T>)
             {
                 EndPoint.SubscribeOperation<T> subscibeOperationInstance = savedSubscribeOperation as EndPoint.SubscribeOperation<T>;
                 if (subscibeOperationInstance != null)

@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Reflection;
 using PubnubApi.Interface;
 using System.Globalization;
+#if !NETSTANDARD10 && !NETSTANDARD11 && !NETSTANDARD12 && !WP81
+using System.Reflection;
+#endif
 
 namespace PubnubApi
 {
@@ -227,7 +229,7 @@ namespace PubnubApi
                 }
             }
 
-            bool allowPAMv3Sign = (requestMethod.ToUpperInvariant() == "POST") ? false : true;
+            bool allowPAMv3Sign = requestMethod.ToUpperInvariant() != "POST";
             string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
             return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, allowPAMv3Sign);

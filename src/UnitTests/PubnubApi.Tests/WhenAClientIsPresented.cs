@@ -28,7 +28,7 @@ namespace PubNubMessaging.Tests
             }
         }
 
-        [TestFixtureSetUp]
+        [SetUp]
         public static void Init()
         {
             UnitTestLog unitLog = new Tests.UnitTestLog();
@@ -98,7 +98,7 @@ namespace PubNubMessaging.Tests
             Assert.IsTrue(receivedGrantMessage, "WhenAClientIsPresent Grant access failed.");
         }
 
-        [TestFixtureTearDown]
+        [TearDown]
         public static void Exit()
         {
             server.Stop();
@@ -107,7 +107,7 @@ namespace PubNubMessaging.Tests
 #if (USE_JSONFX)
         [Test]
 #else
-        [Ignore]
+        [Ignore("Ignore this for non-JsonFX")]
 #endif
         public void UsingJsonFx()
         {
