@@ -277,7 +277,6 @@ namespace PubnubApiDemo
             config.EnableTelemetry = false;
             config.IncludeRequestIdentifier = false;
             config.IncludeInstanceIdentifier = false;
-            //config.Uuid = "csharpuuid";
 
             pubnub = new Pubnub(config);
 
@@ -370,7 +369,6 @@ namespace PubnubApiDemo
                     case "1":
                         Console.WriteLine("Enter CHANNEL name for subscribe. Use comma to enter multiple channels." + System.Environment.NewLine + "NOTE: If you want to consider only Channel Group(s), just hit ENTER");
                         channel = Console.ReadLine();
-                        //channel = channel + ",pnuser-pandu-id-test,pandu-space-id,pnuser-pandu-my-id0";
 
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine(string.Format("Channel = {0}", channel));
@@ -398,7 +396,7 @@ namespace PubnubApiDemo
                             Console.WriteLine("Running subscribe()");
 
                             pubnub.Subscribe<object>()
-                                //.WithPresence()
+                                .WithPresence()
                                 .Channels(channel.Split(','))
                                 .ChannelGroups(channelGroup.Split(','))
                                 .Execute();
@@ -1473,6 +1471,7 @@ namespace PubnubApiDemo
                             pubnub.GetUsers()
                                 .IncludeCount(true)
                                 .IncludeCustom(true)
+                                .Filter("name=='newnamemodified'")
                                 .Page(new PNPage() { Next = "", Prev = "" })
                                 .Execute(new PNGetUsersResultExt((r, s) =>
                                 {
@@ -1761,19 +1760,19 @@ namespace PubnubApiDemo
 
                         Console.WriteLine("Read Access? Enter Y for Yes (default), N for No.");
                         string grantReadAccess = Console.ReadLine();
-                        bool grantRead = (grantReadAccess.ToLower() == "n") ? false : true;
+                        bool grantRead = !(grantReadAccess.ToLower() == "n");
 
                         Console.WriteLine("Write Access? Enter Y for Yes (default), N for No.");
                         string grantwriteAccess = Console.ReadLine();
-                        bool grantWrite = (grantwriteAccess.ToLower() == "n") ? false : true;
+                        bool grantWrite = !(grantwriteAccess.ToLower() == "n");
 
                         Console.WriteLine("Delete Access? Enter Y for Yes (default), N for No.");
                         string grantDeleteAccess = Console.ReadLine();
-                        bool grantDelete = (grantDeleteAccess.ToLower() == "n") ? false : true;
+                        bool grantDelete = !(grantDeleteAccess.ToLower() == "n");
 
                         Console.WriteLine("Create Access? Enter Y for Yes (default), N for No.");
                         string grantCreateAccess = Console.ReadLine();
-                        bool grantCreate = (grantCreateAccess.ToLower() == "n") ? false : true;
+                        bool grantCreate = !(grantCreateAccess.ToLower() == "n");
 
                         Console.WriteLine("Manage Access? Enter Y for Yes (default), N for No.");
                         string grantManageAccess = Console.ReadLine();
