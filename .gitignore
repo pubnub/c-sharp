@@ -49,6 +49,7 @@ src/.vs/Pubnub/v15/sqlite3/storage.ide
 /src/UnitTests/PubnubApi.Tests/obj/Release/*
 /src/UnitTests/PubnubApi.Tests/*.user
 /src/UnitTests/PubnubApi.Tests/obj/*
+/src/UnitTests/PubnubApi.Tests/TestResults/*
 
 /src/UnitTests/PubnubApiPCL.Tests/bin/Debug/*
 /src/UnitTests/PubnubApiPCL.Tests/obj/Debug/*
@@ -56,6 +57,7 @@ src/.vs/Pubnub/v15/sqlite3/storage.ide
 /src/UnitTests/PubnubApiPCL.Tests/obj/Release/*
 /src/UnitTests/PubnubApiPCL.Tests/*.user
 /src/UnitTests/PubnubApiPCL.Tests/obj/*
+/src/UnitTests/PubnubApiPCL.Tests/TestResults/*
 
 /src/Examples/PubnubApi.ASPNETWebFormExample/bin/*
 /src/Examples/PubnubApi.ASPNETWebFormExample/obj/*
