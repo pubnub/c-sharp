@@ -52,6 +52,11 @@ namespace PubnubApiDemo
 
         static public void Main()
         {
+            string EnvPublishKey = System.Environment.GetEnvironmentVariable("PN_PUB_KEY", EnvironmentVariableTarget.Machine);
+            string EnvSubscribeKey = System.Environment.GetEnvironmentVariable("PN_SUB_KEY", EnvironmentVariableTarget.Machine);
+            string EnvSecretKey = System.Environment.GetEnvironmentVariable("PN_SEC_KEY", EnvironmentVariableTarget.Machine);
+
+
             PNConfiguration config = new PNConfiguration();
             AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionTrapper;
 
@@ -126,7 +131,7 @@ namespace PubnubApiDemo
             else
             {
                 Console.WriteLine("Default demo subscribe key provided");
-                subscribeKey = "demo-36";
+                subscribeKey = string.IsNullOrEmpty(EnvSubscribeKey) ? "demo-36" : EnvSubscribeKey;
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -141,7 +146,7 @@ namespace PubnubApiDemo
             else
             {
                 Console.WriteLine("Default demo publish key provided");
-                publishKey = "demo-36";
+                publishKey = string.IsNullOrEmpty(EnvPublishKey) ? "demo-36" : EnvPublishKey;
             }
             Console.ResetColor();
             Console.WriteLine();
@@ -156,7 +161,7 @@ namespace PubnubApiDemo
             else
             {
                 Console.WriteLine("Default demo Secret key provided");
-                secretKey = "demo-36";
+                secretKey = string.IsNullOrEmpty(EnvSecretKey) ? "demo-36" : EnvSecretKey;
             }
             Console.ResetColor();
             Console.WriteLine();
