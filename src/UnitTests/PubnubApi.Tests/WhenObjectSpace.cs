@@ -16,7 +16,7 @@ namespace PubNubMessaging.Tests
         private static string authKey = "myauth";
         private static string authToken = "";
 
-        [TestFixtureSetUp]
+        [SetUp]
         public static void Init()
         {
             UnitTestLog unitLog = new Tests.UnitTestLog();
@@ -84,7 +84,7 @@ namespace PubNubMessaging.Tests
             Assert.IsTrue(receivedGrantMessage, "WhenObjectSpace Grant access failed.");
         }
 
-        [TestFixtureTearDown]
+        [TearDown]
         public static void Exit()
         {
             server.Stop();

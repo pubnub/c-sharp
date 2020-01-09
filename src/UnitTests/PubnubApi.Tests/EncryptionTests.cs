@@ -8,6 +8,7 @@ using System.Globalization;
 using Newtonsoft.Json;
 using System.Diagnostics;
 using PubnubApi.CBOR;
+using System.Linq;
 
 namespace PubNubMessaging.Tests
 {
@@ -168,7 +169,7 @@ namespace PubNubMessaging.Tests
             {
                 System.Diagnostics.Debug.WriteLine("Exception = " + ex.ToString());
             }
-            Assert.AreEqual(actual, expected);
+            Assert.AreEqual(expected, actual);
         }
 
         [Test]
@@ -196,7 +197,7 @@ namespace PubNubMessaging.Tests
             {
                 System.Diagnostics.Debug.WriteLine("Exception = " + ex.ToString());
             }
-            Assert.AreEqual(actual, expected);
+            Assert.AreEqual(expected, actual);
         }
 
         [Test]
@@ -219,11 +220,8 @@ namespace PubNubMessaging.Tests
                 if (tokensList != null && tokensList.Count > 0)
                 {
                     Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeDictionaryOfTokenKey(tokensList));
-                    foreach (KeyValuePair<PNTokenKey, string> kvp in tokensList)
-                    {
-                        actual = kvp.Value;
-                        break;
-                    }
+                    KeyValuePair<PNTokenKey, string> firstItem = tokensList.FirstOrDefault();
+                    actual = firstItem.Value;
                 }
 
                 pubnub.ClearTokens();
@@ -233,7 +231,7 @@ namespace PubNubMessaging.Tests
             {
                 System.Diagnostics.Debug.WriteLine("Exception = " + ex.ToString());
             }
-            Assert.AreEqual(actual, expected);
+            Assert.AreEqual(expected, actual);
         }
 
         [Test]
@@ -256,11 +254,8 @@ namespace PubNubMessaging.Tests
                 if (tokensDic != null && tokensDic.Count > 0)
                 {
                     Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeDictionaryOfTokenKey(tokensDic));
-                    foreach (KeyValuePair<PNTokenKey, string> kvp in tokensDic)
-                    {
-                        actual = kvp.Value;
-                        break;
-                    }
+                    KeyValuePair<PNTokenKey, string> firstItem = tokensDic.FirstOrDefault();
+                    actual = firstItem.Value;
                 }
 
                 pubnub.ClearTokens();
@@ -270,7 +265,7 @@ namespace PubNubMessaging.Tests
             {
                 System.Diagnostics.Debug.WriteLine("Exception = " + ex.ToString());
             }
-            Assert.AreEqual(actual, expected);
+            Assert.AreEqual(expected, actual);
         }
 
         [Test]
@@ -279,11 +274,10 @@ namespace PubNubMessaging.Tests
             string expected = "{\"v\":2,\"t\":1568264210,\"ttl\":100,\"res\":{\"chan\":{},\"grp\":{},\"usr\":{\"myuser1\":19},\"spc\":{\"myspace1\":11}},\"pat\":{\"chan\":{},\"grp\":{},\"usr\":{},\"spc\":{}},\"meta\":{},\"sig\":\"HtcG6s5fuao9T2bZCgWRQ3cmR27lnYT03yVs6c6H23o=\"}";
             string actual = "";
             string token = "p0F2AkF0Gl150BJDdHRsGGRDcmVzpERjaGFuoENncnCgQ3VzcqFnbXl1c2VyMRNDc3BjoWhteXNwYWNlMQtDcGF0pERjaGFuoENncnCgQ3VzcqBDc3BjoERtZXRhoENzaWdYIB7XBurOX7mqPU9m2QoFkUN3Jkdu5Z2E9N8lbOnOh9t6";
-            //string token = "p0F2AkF0Gl2BEIJDdHRsGGRDcmVzpERjaGFuoENncnCgQ3VzcqBDc3BjoENwYXSkRGNoYW6gQ2dycKBDdXNyomZeZW1wLSoDZl5tZ3ItKhgbQ3NwY6JpXnB1YmxpYy0qA2pecHJpdmF0ZS0qGBtEbWV0YaBDc2lnWCAsvzGmd2rcgtr9rcs4r2tqC87YSppSYqs9CKfaM5IRZA==";
             //string token = "p0F2AkF0Gl2B12pDdHRsA0NyZXOkRGNoYW6gQ2dycKBDdXNyoW50ZXN0dXNlcl8xODIyORgfQ3NwY6FvdGVzdHNwYWNlXzk4NjI4GB9DcGF0pERjaGFuoENncnCgQ3VzcqBDc3BjoERtZXRhoENzaWdYIPVDkcaEMDN6R7-98i84C5BXMn0NsXCmTV3EmWkMyz0y"; //Rajat
             try
             {
-                token = token.Replace('_', '/').Replace('-', '+');//.TrimEnd(new char[] { '=' });
+                token = token.Replace('_', '/').Replace('-', '+');
                 byte[] tokenByteArray = Convert.FromBase64String(token);
                 System.IO.MemoryStream ms = new System.IO.MemoryStream(tokenByteArray);
 
@@ -304,7 +298,7 @@ namespace PubNubMessaging.Tests
             {
                 System.Diagnostics.Debug.WriteLine("Exception = " + ex.ToString());
             }
-            Assert.AreEqual(actual, expected);
+            Assert.AreEqual(expected, actual);
         }
 
         /// <summary>
@@ -312,15 +306,16 @@ namespace PubNubMessaging.Tests
         /// The input is serialized
         /// </summary>
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void TestNullEncryption()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
             ////serialized string
             string message = null;
-
-            ////encrypt
-            string encryptedMessage = pc.Encrypt(message);
+            Assert.Throws<ArgumentNullException>(() => 
+            {
+                ////encrypt
+                pc.Encrypt(message);
+            });
         }
 
         /// <summary>
@@ -328,16 +323,16 @@ namespace PubNubMessaging.Tests
         /// Assumes that the input message is  deserialized  
         /// </summary>        
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void TestNullDecryption()
         {
             PubnubCrypto pc = new PubnubCrypto("enigma");
             ////deserialized string
             string message = null;
-            ////decrypt
-            string decryptedMessage = pc.Decrypt(message);
-
-            Assert.AreEqual("", decryptedMessage);
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                ////decrypt
+                pc.Decrypt(message);
+            });
         }
 
         /// <summary>

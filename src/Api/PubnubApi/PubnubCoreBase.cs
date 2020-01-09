@@ -4,20 +4,14 @@
 #define TRACE
 #endif
 using System;
-using System.IO;
 using System.Text;
 using System.Net;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Reflection;
 using System.Threading;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using System.Text.RegularExpressions;
-using PubnubApi.Interface;
 using System.Threading.Tasks;
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
 using System.Net.Http;
@@ -542,7 +536,7 @@ namespace PubnubApi
                         IEnumerable<string> newChannelGroups = from channelGroup in MultiChannelGroupSubscribe[PubnubInstance.InstanceId]
                                                                where channelGroup.Value == 0
                                                                select channelGroup.Key;
-                        if ((newChannels != null && newChannels.Count() > 0) || (newChannelGroups != null && newChannelGroups.Count() > 0))
+                        if ((newChannels != null && newChannels.Any()) || (newChannelGroups != null && newChannelGroups.Any()))
                         {
                             ret = true;
                         }
@@ -572,7 +566,7 @@ namespace PubnubApi
                 IEnumerable<string> newChannels = from channel in MultiChannelSubscribe[PubnubInstance.InstanceId]
                                                   where channel.Value == 0
                                                   select channel.Key;
-                if (newChannels != null && newChannels.Count() > 0)
+                if (newChannels != null && newChannels.Any())
                 {
                     status.AffectedChannels = newChannels.ToList();
                 }
@@ -584,7 +578,7 @@ namespace PubnubApi
                                                        where channelGroup.Value == 0
                                                        select channelGroup.Key;
 
-                if (newChannelGroups != null && newChannelGroups.Count() > 0)
+                if (newChannelGroups != null && newChannelGroups.Any())
                 {
                     status.AffectedChannelGroups = newChannelGroups.ToList();
                 }
@@ -626,20 +620,10 @@ namespace PubnubApi
                                 SubscribeMessage currentMessage = messageList[messageIndex];
                                 if (currentMessage != null)
                                 {
-                                    if (currentConfig != null && currentLog != null)
+                                    if (currentConfig != null && currentLog != null && currentConfig.DedupOnSubscribe && IsTargetForDedup(currentMessage))
                                     {
-                                        LoggingMethod.WriteToLog(currentLog, string.Format("DateTime: {0}, ResponseToUserCallback - messageIndex={1}; currentMessage = {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), messageIndex, jsonLib.SerializeToJsonString(currentMessage)), currentConfig.LogVerbosity);
-                                    }
-                                    if (currentConfig.DedupOnSubscribe)
-                                    {
-                                        if (IsTargetForDedup(currentMessage))
-                                        {
-                                            if (currentConfig != null && currentLog != null)
-                                            {
-                                                LoggingMethod.WriteToLog(currentLog, string.Format("DateTime: {0}, ResponseToUserCallback - messageList for loop - messageIndex = {1} => IsTargetForDedup", DateTime.Now.ToString(CultureInfo.InvariantCulture), messageIndex), currentConfig.LogVerbosity);
-                                            }
-                                            continue;
-                                        }
+                                        LoggingMethod.WriteToLog(currentLog, string.Format("DateTime: {0}, ResponseToUserCallback - messageList for loop - messageIndex = {1} => IsTargetForDedup", DateTime.Now.ToString(CultureInfo.InvariantCulture), messageIndex), currentConfig.LogVerbosity);
+                                        continue;
                                     }
 
                                     string currentMessageChannel = currentMessage.Channel;
@@ -874,7 +858,7 @@ namespace PubnubApi
                                     else
                                     {
                                         ex = new PNException(userResult.Message);
-                                        status = statusBuilder.CreateStatusResponse(type, PNStatusCategory.PNAcknowledgmentCategory, asyncRequestState, userResult.Status, null);
+                                        status = statusBuilder.CreateStatusResponse(type, PNStatusCategory.PNAcknowledgmentCategory, asyncRequestState, userResult.Status, ex);
                                     }
 
                                     Announce(status);
@@ -1141,39 +1125,28 @@ namespace PubnubApi
                 {
                     string errorMessageJson = deserializeStatus["error"].ToString();
                     Dictionary<string, object> errorDic = jsonLib.DeserializeToDictionaryOfObject(errorMessageJson);
-                    if (errorDic != null && errorDic.Count > 0)
+                    if (errorDic != null && errorDic.Count > 0 && errorDic.ContainsKey("message")
+                        && statusCode != 200 && pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig))
                     {
-                        if (errorDic.ContainsKey("message"))
-                        {
-                            string statusMessage = errorDic["message"].ToString();
-                            if (statusCode != 200)
-                            {
-                                PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, statusMessage);
-                                if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig))
-                                {
-                                    status = new StatusBuilder(currentConfig, jsonLib).CreateStatusResponse<T>(type, category, asyncRequestState, statusCode, new PNException(jsonString));
-                                }
-                            }
-                        }
+                        string statusMessage = errorDic["message"].ToString();
+                        PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, statusMessage);
+                        status = new StatusBuilder(currentConfig, jsonLib).CreateStatusResponse<T>(type, category, asyncRequestState, statusCode, new PNException(jsonString));
                     }
                 }
                 else if (deserializeStatus.Count >= 1 && deserializeStatus.ContainsKey("status") && string.Equals(deserializeStatus["status"].ToString(), "error", StringComparison.CurrentCultureIgnoreCase) && deserializeStatus.ContainsKey("error"))
                 {
                     string errorMessageJson = deserializeStatus["error"].ToString();
                     Dictionary<string, object> errorDic = jsonLib.DeserializeToDictionaryOfObject(errorMessageJson);
-                    if (errorDic != null && errorDic.Count > 0)
+                    if (errorDic != null && errorDic.Count > 0 && errorDic.ContainsKey("code") && errorDic.ContainsKey("message"))
                     {
-                        if (errorDic.ContainsKey("code") && errorDic.ContainsKey("message"))
+                        statusCode = PNStatusCodeHelper.GetHttpStatusCode(errorDic["code"].ToString());
+                        string statusMessage = errorDic["message"].ToString();
+                        if (statusCode != 200)
                         {
-                            statusCode = PNStatusCodeHelper.GetHttpStatusCode(errorDic["code"].ToString());
-                            string statusMessage = errorDic["message"].ToString();
-                            if (statusCode != 200)
+                            PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, statusMessage);
+                            if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig))
                             {
-                                PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, statusMessage);
-                                if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig))
-                                {
-                                    status = new StatusBuilder(currentConfig, jsonLib).CreateStatusResponse<T>(type, category, asyncRequestState, statusCode, new PNException(jsonString));
-                                }
+                                status = new StatusBuilder(currentConfig, jsonLib).CreateStatusResponse<T>(type, category, asyncRequestState, statusCode, new PNException(jsonString));
                             }
                         }
                     }
@@ -1227,202 +1200,199 @@ namespace PubnubApi
 
                 if (!string.IsNullOrEmpty(jsonString))
                 {
-                    if (!string.IsNullOrEmpty(jsonString))
+                    object deserializedResult = jsonLib.DeserializeToObject(jsonString);
+                    List<object> result1 = ((IEnumerable)deserializedResult).Cast<object>().ToList();
+
+                    if (result1 != null && result1.Count > 0)
                     {
-                        object deserializedResult = jsonLib.DeserializeToObject(jsonString);
-                        List<object> result1 = ((IEnumerable)deserializedResult).Cast<object>().ToList();
+                        result = result1;
+                    }
 
-                        if (result1 != null && result1.Count > 0)
-                        {
-                            result = result1;
-                        }
+                    switch (type)
+                    {
+                        case PNOperationType.PNSubscribeOperation:
+                        case PNOperationType.Presence:
+                            if (result.Count == 3 && result[0] is object[] && (result[0] as object[]).Length == 0 && result[2].ToString() == "")
+                            {
+                                result.RemoveAt(2);
+                            }
+                            if (result.Count == 4 && result[0] is object[] && (result[0] as object[]).Length == 0 && result[2].ToString() == "" && result[3].ToString() == "")
+                            {
+                                result.RemoveRange(2, 2);
+                            }
+                            result.Add(multiChannelGroup);
+                            result.Add(multiChannel);
 
-                        switch (type)
-                        {
-                            case PNOperationType.PNSubscribeOperation:
-                            case PNOperationType.Presence:
-                                if (result.Count == 3 && result[0] is object[] && (result[0] as object[]).Length == 0 && result[2].ToString() == "")
+                            long receivedTimetoken = GetTimetokenFromMultiplexResult(result);
+
+                            long minimumTimetoken1 = (MultiChannelSubscribe[PubnubInstance.InstanceId].Count > 0) ? MultiChannelSubscribe[PubnubInstance.InstanceId].Min(token => token.Value) : 0;
+                            long minimumTimetoken2 = (MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Count > 0) ? MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Min(token => token.Value) : 0;
+                            long minimumTimetoken = Math.Max(minimumTimetoken1, minimumTimetoken2);
+
+                            long maximumTimetoken1 = (MultiChannelSubscribe[PubnubInstance.InstanceId].Count > 0) ? MultiChannelSubscribe[PubnubInstance.InstanceId].Max(token => token.Value) : 0;
+                            long maximumTimetoken2 = (MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Count > 0) ? MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Max(token => token.Value) : 0;
+                            long maximumTimetoken = Math.Max(maximumTimetoken1, maximumTimetoken2);
+
+                            if (minimumTimetoken == 0 || lastTimetoken == 0)
+                            {
+                                if (maximumTimetoken == 0)
                                 {
-                                    result.RemoveAt(2);
+                                    LastSubscribeTimetoken[PubnubInstance.InstanceId] = receivedTimetoken;
                                 }
-                                if (result.Count == 4 && result[0] is object[] && (result[0] as object[]).Length == 0 && result[2].ToString() == "" && result[3].ToString() == "")
+                                else
                                 {
-                                    result.RemoveRange(2, 2);
-                                }
-                                result.Add(multiChannelGroup);
-                                result.Add(multiChannel);
-
-                                long receivedTimetoken = GetTimetokenFromMultiplexResult(result);
-
-                                long minimumTimetoken1 = (MultiChannelSubscribe[PubnubInstance.InstanceId].Count > 0) ? MultiChannelSubscribe[PubnubInstance.InstanceId].Min(token => token.Value) : 0;
-                                long minimumTimetoken2 = (MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Count > 0) ? MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Min(token => token.Value) : 0;
-                                long minimumTimetoken = Math.Max(minimumTimetoken1, minimumTimetoken2);
-
-                                long maximumTimetoken1 = (MultiChannelSubscribe[PubnubInstance.InstanceId].Count > 0) ? MultiChannelSubscribe[PubnubInstance.InstanceId].Max(token => token.Value) : 0;
-                                long maximumTimetoken2 = (MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Count > 0) ? MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Max(token => token.Value) : 0;
-                                long maximumTimetoken = Math.Max(maximumTimetoken1, maximumTimetoken2);
-
-                                if (minimumTimetoken == 0 || lastTimetoken == 0)
-                                {
-                                    if (maximumTimetoken == 0)
+                                    if (!enableResumeOnReconnect)
                                     {
                                         LastSubscribeTimetoken[PubnubInstance.InstanceId] = receivedTimetoken;
                                     }
                                     else
                                     {
-                                        if (!enableResumeOnReconnect)
+                                        //do nothing. keep last subscribe token
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (reconnect)
+                                {
+                                    if (enableResumeOnReconnect)
+                                    {
+                                        //do nothing. keep last subscribe token
+                                    }
+                                    else
+                                    {
+                                        LastSubscribeTimetoken[PubnubInstance.InstanceId] = receivedTimetoken;
+                                    }
+                                }
+                                else
+                                {
+                                    LastSubscribeTimetoken[PubnubInstance.InstanceId] = receivedTimetoken;
+                                }
+                            }
+                            break;
+                        case PNOperationType.PNHeartbeatOperation:
+                            Dictionary<string, object> heartbeatadictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
+                            result = new List<object>();
+                            result.Add(heartbeatadictionary);
+                            result.Add(multiChannel);
+                            break;
+                        case PNOperationType.PNTimeOperation:
+                            break;
+                        case PNOperationType.PNHistoryOperation:
+                        case PNOperationType.PNFetchHistoryOperation:
+                            if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig) && pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog))
+                            {
+                                if (type == PNOperationType.PNFetchHistoryOperation)
+                                {
+                                    for (int index = 0; index < result.Count; index++)
+                                    {
+                                        Dictionary<string, object> messageContainer = jsonLib.ConvertToDictionaryObject(result[index]);
+                                        if (messageContainer != null && messageContainer.Count > 0)
                                         {
-                                            LastSubscribeTimetoken[PubnubInstance.InstanceId] = receivedTimetoken;
-                                        }
-                                        else
-                                        {
-                                            //do nothing. keep last subscribe token
+                                            if (messageContainer.ContainsKey("channels"))
+                                            {
+                                                object channelMessageContainer = messageContainer["channels"];
+                                                Dictionary<string, object> channelDic = jsonLib.ConvertToDictionaryObject(channelMessageContainer);
+                                                if (channelDic != null && channelDic.Count > 0)
+                                                {
+                                                    result[index] = SecureMessage.Instance(currentConfig, jsonLib, currentLog).FetchHistoryDecodeDecryptLoop(type, channelDic, channels, channelGroups, callback);
+                                                }
+                                            }
+                                            else
+                                            {
+                                                result[index] = messageContainer;
+                                            }
                                         }
                                     }
                                 }
                                 else
                                 {
-                                    if (reconnect)
-                                    {
-                                        if (enableResumeOnReconnect)
-                                        {
-                                            //do nothing. keep last subscribe token
-                                        }
-                                        else
-                                        {
-                                            LastSubscribeTimetoken[PubnubInstance.InstanceId] = receivedTimetoken;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        LastSubscribeTimetoken[PubnubInstance.InstanceId] = receivedTimetoken;
-                                    }
+                                    result = SecureMessage.Instance(currentConfig, jsonLib, currentLog).HistoryDecodeDecryptLoop(type, result, channels, channelGroups, callback);
                                 }
-                                break;
-                            case PNOperationType.PNHeartbeatOperation:
-                                Dictionary<string, object> heartbeatadictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
-                                result = new List<object>();
-                                result.Add(heartbeatadictionary);
-                                result.Add(multiChannel);
-                                break;
-                            case PNOperationType.PNTimeOperation:
-                                break;
-                            case PNOperationType.PNHistoryOperation:
-                            case PNOperationType.PNFetchHistoryOperation:
-                                if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig) && pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog))
-                                {
-                                    if (type == PNOperationType.PNFetchHistoryOperation)
-                                    {
-                                        for (int index=0; index < result.Count; index++)
-                                        {
-                                            Dictionary<string, object> messageContainer = jsonLib.ConvertToDictionaryObject(result[index]);
-                                            if (messageContainer != null && messageContainer.Count > 0)
-                                            {
-                                                if (messageContainer.ContainsKey("channels"))
-                                                {
-                                                    object channelMessageContainer = messageContainer["channels"];
-                                                    Dictionary<string, object> channelDic = jsonLib.ConvertToDictionaryObject(channelMessageContainer);
-                                                    if (channelDic != null && channelDic.Count > 0)
-                                                    {
-                                                        result[index] = SecureMessage.Instance(currentConfig, jsonLib, currentLog).FetchHistoryDecodeDecryptLoop(type, channelDic, channels, channelGroups, callback);
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    result[index] = messageContainer;
-                                                }
-                                            }
-                                        }
-                                    }
-                                    else
-                                    {
-                                        result = SecureMessage.Instance(currentConfig, jsonLib, currentLog).HistoryDecodeDecryptLoop(type, result, channels, channelGroups, callback);
-                                    }
-                                }
-                                result.Add(multiChannel);
-                                break;
-                            case PNOperationType.PNMessageCountsOperation:
-                                Dictionary<string, object> msgCountDictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
-                                result = new List<object>();
-                                result.Add(msgCountDictionary);
-                                result.Add(multiChannel);
-                                break;
-                            case PNOperationType.PNHereNowOperation:
-                                Dictionary<string, object> dictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
-                                result = new List<object>();
-                                result.Add(dictionary);
-                                result.Add(multiChannel);
-                                break;
-                            case PNOperationType.PNWhereNowOperation:
-                                Dictionary<string, object> whereNowDictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
-                                result = new List<object>();
-                                result.Add(whereNowDictionary);
-                                result.Add(multiChannel);
-                                break;
-                            case PNOperationType.PNAccessManagerGrantToken:
-                            case PNOperationType.PNAccessManagerGrant:
-                            case PNOperationType.PNAccessManagerAudit:
-                            case PNOperationType.RevokeAccess:
-                                Dictionary<string, object> grantDictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
-                                result = new List<object>();
-                                result.Add(grantDictionary);
-                                result.Add(multiChannel);
-                                break;
-                            case PNOperationType.ChannelGroupGrantAccess:
-                            case PNOperationType.ChannelGroupAuditAccess:
-                            case PNOperationType.ChannelGroupRevokeAccess:
-                                Dictionary<string, object> channelGroupPAMDictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
-                                result = new List<object>();
-                                result.Add(channelGroupPAMDictionary);
+                            }
+                            result.Add(multiChannel);
+                            break;
+                        case PNOperationType.PNMessageCountsOperation:
+                            Dictionary<string, object> msgCountDictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
+                            result = new List<object>();
+                            result.Add(msgCountDictionary);
+                            result.Add(multiChannel);
+                            break;
+                        case PNOperationType.PNHereNowOperation:
+                            Dictionary<string, object> dictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
+                            result = new List<object>();
+                            result.Add(dictionary);
+                            result.Add(multiChannel);
+                            break;
+                        case PNOperationType.PNWhereNowOperation:
+                            Dictionary<string, object> whereNowDictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
+                            result = new List<object>();
+                            result.Add(whereNowDictionary);
+                            result.Add(multiChannel);
+                            break;
+                        case PNOperationType.PNAccessManagerGrantToken:
+                        case PNOperationType.PNAccessManagerGrant:
+                        case PNOperationType.PNAccessManagerAudit:
+                        case PNOperationType.RevokeAccess:
+                            Dictionary<string, object> grantDictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
+                            result = new List<object>();
+                            result.Add(grantDictionary);
+                            result.Add(multiChannel);
+                            break;
+                        case PNOperationType.ChannelGroupGrantAccess:
+                        case PNOperationType.ChannelGroupAuditAccess:
+                        case PNOperationType.ChannelGroupRevokeAccess:
+                            Dictionary<string, object> channelGroupPAMDictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
+                            result = new List<object>();
+                            result.Add(channelGroupPAMDictionary);
+                            result.Add(multiChannelGroup);
+                            break;
+                        case PNOperationType.PNGetStateOperation:
+                        case PNOperationType.PNSetStateOperation:
+                            Dictionary<string, object> userStateDictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
+                            result = new List<object>();
+                            result.Add(userStateDictionary);
+                            result.Add(multiChannelGroup);
+                            result.Add(multiChannel);
+                            break;
+                        case PNOperationType.PNPublishOperation:
+                        case PNOperationType.PNFireOperation:
+                        case PNOperationType.PNSignalOperation:
+                        case PNOperationType.PushRegister:
+                        case PNOperationType.PushRemove:
+                        case PNOperationType.PushGet:
+                        case PNOperationType.PushUnregister:
+                        case PNOperationType.Leave:
+                        case PNOperationType.PNCreateUserOperation:
+                        case PNOperationType.PNUpdateUserOperation:
+                        case PNOperationType.PNCreateSpaceOperation:
+                        case PNOperationType.PNUpdateSpaceOperation:
+                        case PNOperationType.PNAddMessageActionOperation:
+                        case PNOperationType.PNRemoveMessageActionOperation:
+                        case PNOperationType.PNGetMessageActionsOperation:
+                            result.Add(multiChannel);
+                            break;
+                        case PNOperationType.PNAddChannelsToGroupOperation:
+                        case PNOperationType.PNRemoveChannelsFromGroupOperation:
+                        case PNOperationType.PNRemoveGroupOperation:
+                        case PNOperationType.ChannelGroupGet:
+                        case PNOperationType.ChannelGroupAllGet:
+                            Dictionary<string, object> channelGroupDictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
+                            result = new List<object>();
+                            result.Add(channelGroupDictionary);
+                            if (multiChannelGroup != "")
+                            {
                                 result.Add(multiChannelGroup);
-                                break;
-                            case PNOperationType.PNGetStateOperation:
-                            case PNOperationType.PNSetStateOperation:
-                                Dictionary<string, object> userStateDictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
-                                result = new List<object>();
-                                result.Add(userStateDictionary);
-                                result.Add(multiChannelGroup);
+                            }
+                            if (multiChannel != "")
+                            {
                                 result.Add(multiChannel);
-                                break;
-                            case PNOperationType.PNPublishOperation:
-                            case PNOperationType.PNFireOperation:
-                            case PNOperationType.PNSignalOperation:
-                            case PNOperationType.PushRegister:
-                            case PNOperationType.PushRemove:
-                            case PNOperationType.PushGet:
-                            case PNOperationType.PushUnregister:
-                            case PNOperationType.Leave:
-                            case PNOperationType.PNCreateUserOperation:
-                            case PNOperationType.PNUpdateUserOperation:
-                            case PNOperationType.PNCreateSpaceOperation:
-                            case PNOperationType.PNUpdateSpaceOperation:
-                            case PNOperationType.PNAddMessageActionOperation:
-                            case PNOperationType.PNRemoveMessageActionOperation:
-                            case PNOperationType.PNGetMessageActionsOperation:
-                                result.Add(multiChannel);
-                                break;
-                            case PNOperationType.PNAddChannelsToGroupOperation:
-                            case PNOperationType.PNRemoveChannelsFromGroupOperation:
-                            case PNOperationType.PNRemoveGroupOperation:
-                            case PNOperationType.ChannelGroupGet:
-                            case PNOperationType.ChannelGroupAllGet:
-                                Dictionary<string, object> channelGroupDictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
-                                result = new List<object>();
-                                result.Add(channelGroupDictionary);
-                                if (multiChannelGroup != "")
-                                {
-                                    result.Add(multiChannelGroup);
-                                }
-                                if (multiChannel != "")
-                                {
-                                    result.Add(multiChannel);
-                                }
-                                break;
-                            default:
-                                break;
-                        }
-                        //switch stmt end
+                            }
+                            break;
+                        default:
+                            break;
                     }
+                    //switch stmt end
                 }
             }
             catch { /* ignore */ }
@@ -1433,12 +1403,9 @@ namespace PubnubApi
         protected void ProcessResponseCallbacks<T>(List<object> result, RequestState<T> asyncRequestState)
         {
             bool callbackAvailable = false;
-            if (result != null && result.Count >= 1)
+            if (result != null && result.Count >= 1 && asyncRequestState.PubnubCallback != null || SubscribeCallbackListenerList.Count >= 1)
             {
-                if (asyncRequestState.PubnubCallback != null || SubscribeCallbackListenerList.Count >= 1)
-                {
-                    callbackAvailable = true;
-                }
+                callbackAvailable = true;
             }
             if (callbackAvailable)
             {
@@ -2056,6 +2023,7 @@ namespace PubnubApi
 
         internal static void RemoveHttpClients()
         {
+            //Conditionalmethod logic
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
             if (httpClientNetworkStatus != null)
             {
@@ -2093,26 +2061,20 @@ namespace PubnubApi
             if (channels != null)
             {
                 string multiChannel = (channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : ",";
-                if (ChannelRequest.ContainsKey(PubnubInstance.InstanceId))
+                HttpWebRequest request;
+                if (ChannelRequest[PubnubInstance.InstanceId].ContainsKey(multiChannel) && ChannelRequest[PubnubInstance.InstanceId].TryGetValue(multiChannel, out request) && request != null)
                 {
-                    HttpWebRequest request;
-                    if (ChannelRequest[PubnubInstance.InstanceId].ContainsKey(multiChannel) && ChannelRequest[PubnubInstance.InstanceId].TryGetValue(multiChannel, out request) && request != null)
+                    PNConfiguration currentConfig;
+                    IPubnubLog currentLog;
+                    if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig) && pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog))
                     {
-                        if (request != null)
-                        {
-                            PNConfiguration currentConfig;
-                            IPubnubLog currentLog;
-                            if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig) && pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog))
-                            {
-                                LoggingMethod.WriteToLog(currentLog, string.Format("DateTime {0} TerminateCurrentSubsciberRequest {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), request.RequestUri.ToString()), currentConfig.LogVerbosity);
-                            }
-                            try
-                            {
-                                request.Abort();
-                            }
-                            catch { /* ignore */ }
-                        }
+                        LoggingMethod.WriteToLog(currentLog, string.Format("DateTime {0} TerminateCurrentSubsciberRequest {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), request.RequestUri.ToString()), currentConfig.LogVerbosity);
                     }
+                    try
+                    {
+                        request.Abort();
+                    }
+                    catch { /* ignore */ }
                 }
             }
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10

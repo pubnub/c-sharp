@@ -18,7 +18,7 @@ namespace PubNubMessaging.Tests
         private static Server server;
         private static int manualResetEventWaitTimeout = 20 * 1000;
 
-        [TestFixtureSetUp]
+        [SetUp]
         public static void Init()
         {
             UnitTestLog unitLog = new Tests.UnitTestLog();
@@ -28,7 +28,7 @@ namespace PubNubMessaging.Tests
             server.Start();
         }
 
-        [TestFixtureTearDown]
+        [TearDown]
         public static void Exit()
         {
             server.Stop();

@@ -16,7 +16,7 @@ namespace PubNubMessaging.Tests
         private static string authKey = "myauth";
         private static string authToken = "";
 
-        [TestFixtureSetUp]
+        [SetUp]
         public static void Init()
         {
             UnitTestLog unitLog = new Tests.UnitTestLog();
@@ -70,7 +70,6 @@ namespace PubNubMessaging.Tests
                                             receivedGrantMessage = true;
                                         }
                                     }
-                                    catch { }
                                     finally
                                     {
                                         grantManualEvent.Set();
@@ -87,7 +86,7 @@ namespace PubNubMessaging.Tests
             Assert.IsTrue(receivedGrantMessage, "WhenAMessageIsPublished Grant access failed.");
         }
 
-        [TestFixtureTearDown]
+        [TearDown]
         public static void Exit()
         {
             server.Stop();

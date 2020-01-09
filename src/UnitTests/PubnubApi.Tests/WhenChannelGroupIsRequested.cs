@@ -25,7 +25,7 @@ namespace PubNubMessaging.Tests
         private static Pubnub pubnub;
         private static Server server;
 
-        [TestFixtureSetUp]
+        [SetUp]
         public static void Init()
         {
             UnitTestLog unitLog = new Tests.UnitTestLog();
@@ -83,7 +83,7 @@ namespace PubNubMessaging.Tests
             Assert.IsTrue(receivedGrantMessage, "WhenChannelGroupIsRequested Grant access failed.");
         }
 
-        [TestFixtureTearDown]
+        [TearDown]
         public static void Exit()
         {
             server.Stop();

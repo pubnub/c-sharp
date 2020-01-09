@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using PubnubApi.Interface;
-using System.Threading.Tasks;
 using System.Threading;
 using System.Net;
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+using System.Threading.Tasks;
+#endif
 
 namespace PubnubApi.EndPoint
 {
@@ -22,6 +23,7 @@ namespace PubnubApi.EndPoint
         private int limit = -1;
         private bool includeCount;
         private string commandDelimitedIncludeOptions = "";
+        private string membershipsFilter;
         private PNPage page;
 
         private PNCallback<PNGetMembershipsResult> savedCallback;
@@ -87,6 +89,12 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
+        public GetMembershipsOperation Filter(string filterExpression)
+        {
+            this.membershipsFilter = filterExpression;
+            return this;
+        }
+
         public GetMembershipsOperation QueryParam(Dictionary<string, object> customQueryParam)
         {
             this.queryParam = customQueryParam;
@@ -99,13 +107,13 @@ namespace PubnubApi.EndPoint
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
-                GetMembershipsList(this.usrId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.queryParam, savedCallback);
+                GetMembershipsList(this.usrId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membershipsFilter, this.queryParam, savedCallback);
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
             new Thread(() =>
             {
                 this.savedCallback = callback;
-                GetMembershipsList(this.usrId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.queryParam, savedCallback);
+                GetMembershipsList(this.usrId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membershipsFilter, this.queryParam, savedCallback);
             })
             { IsBackground = true }.Start();
 #endif
@@ -116,18 +124,18 @@ namespace PubnubApi.EndPoint
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
-                GetMembershipsList(this.usrId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.queryParam, savedCallback);
+                GetMembershipsList(this.usrId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membershipsFilter, this.queryParam, savedCallback);
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
             new Thread(() =>
             {
-                GetMembershipsList(this.usrId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.queryParam, savedCallback);
+                GetMembershipsList(this.usrId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membershipsFilter, this.queryParam, savedCallback);
             })
             { IsBackground = true }.Start();
 #endif
         }
 
-        private void GetMembershipsList(string userId, PNPage page, int limit, bool includeCount, string includeOptions, Dictionary<string, object> externalQueryParam, PNCallback<PNGetMembershipsResult> callback)
+        private void GetMembershipsList(string userId, PNPage page, int limit, bool includeCount, string includeOptions, string filter, Dictionary<string, object> externalQueryParam, PNCallback<PNGetMembershipsResult> callback)
         {
             if (callback == null)
             {
@@ -139,7 +147,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildGetAllMembershipsRequest("GET", "", userId, internalPage.Next, internalPage.Prev, limit, includeCount, includeOptions, externalQueryParam);
+            Uri request = urlBuilder.BuildGetAllMembershipsRequest("GET", "", userId, internalPage.Next, internalPage.Prev, limit, includeCount, includeOptions, filter, externalQueryParam);
 
             RequestState<PNGetMembershipsResult> requestState = new RequestState<PNGetMembershipsResult>();
             requestState.ResponseType = PNOperationType.PNGetMembershipsOperation;

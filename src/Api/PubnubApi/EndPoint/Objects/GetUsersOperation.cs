@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using PubnubApi.Interface;
-using System.Threading.Tasks;
 using System.Threading;
 using System.Net;
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+using System.Threading.Tasks;
+#endif
 
 namespace PubnubApi.EndPoint
 {
@@ -21,6 +21,7 @@ namespace PubnubApi.EndPoint
         private int limit = -1;
         private bool includeCount;
         private bool includeCustom;
+        private string usersFilter;
         private PNPage page;
 
         private PNCallback<PNGetUsersResult> savedCallback;
@@ -76,6 +77,12 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
+        public GetUsersOperation Filter(string filterExpression)
+        {
+            this.usersFilter = filterExpression;
+            return this;
+        }
+
         public GetUsersOperation QueryParam(Dictionary<string, object> customQueryParam)
         {
             this.queryParam = customQueryParam;
@@ -88,13 +95,13 @@ namespace PubnubApi.EndPoint
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
-                GetUserList(this.page, this.limit, this.includeCount, this.includeCustom, this.queryParam, savedCallback);
+                GetUserList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.queryParam, savedCallback);
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
             new Thread(() =>
             {
                 this.savedCallback = callback;
-                GetUserList(this.page, this.limit, this.includeCount, this.includeCustom, this.queryParam, savedCallback);
+                GetUserList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.queryParam, savedCallback);
             })
             { IsBackground = true }.Start();
 #endif
@@ -105,18 +112,18 @@ namespace PubnubApi.EndPoint
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
-                GetUserList(this.page, this.limit, this.includeCount, this.includeCustom, this.queryParam, savedCallback);
+                GetUserList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.queryParam, savedCallback);
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
             new Thread(() =>
             {
-                GetUserList(this.page, this.limit, this.includeCount, this.includeCustom, this.queryParam, savedCallback);
+                GetUserList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.queryParam, savedCallback);
             })
             { IsBackground = true }.Start();
 #endif
         }
 
-        private void GetUserList(PNPage page, int limit, bool includeCount, bool includeCustom, Dictionary<string, object> externalQueryParam, PNCallback<PNGetUsersResult> callback)
+        private void GetUserList(PNPage page, int limit, bool includeCount, bool includeCustom, string filter, Dictionary<string, object> externalQueryParam, PNCallback<PNGetUsersResult> callback)
         {
             if (callback == null)
             {
@@ -128,7 +135,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildGetAllUsersRequest("GET", "", internalPage.Next, internalPage.Prev, limit, includeCount, includeCustom, externalQueryParam);
+            Uri request = urlBuilder.BuildGetAllUsersRequest("GET", "", internalPage.Next, internalPage.Prev, limit, includeCount, includeCustom, filter, externalQueryParam);
 
             RequestState<PNGetUsersResult> requestState = new RequestState<PNGetUsersResult>();
             requestState.ResponseType = PNOperationType.PNGetUsersOperation;

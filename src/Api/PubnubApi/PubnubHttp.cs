@@ -164,7 +164,7 @@ namespace PubnubApi
                 {
                     response = await httpClientSubscribe.GetAsync(requestUri, cts.Token).ConfigureAwait(false);
                 }
-                else if (pubnubRequestState.ResponseType == PNOperationType.PNDeleteMessageOperation || pubnubRequestState.ResponseType == PNOperationType.PNDeleteUserOperation)
+                else if (string.Compare(FindHttpGetOrDeleteMethod(pubnubRequestState), "DELETE", StringComparison.CurrentCultureIgnoreCase) == 0)
                 {
                     response = await httpClientNonsubscribe.DeleteAsync(requestUri, cts.Token).ConfigureAwait(false);
                 }
@@ -252,6 +252,7 @@ namespace PubnubApi
                 System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
                 stopWatch.Start();
                 StringContent jsonPostString = new StringContent(postData, Encoding.UTF8);
+                jsonPostString.Headers.ContentType = new MediaTypeHeaderValue("application/json");
                 if (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation)
                 {
                     response = await httpClientSubscribe.PostAsync(requestUri, jsonPostString, cts.Token).ConfigureAwait(false);
@@ -342,6 +343,7 @@ namespace PubnubApi
                 stopWatch.Start();
                 HttpMethod httpMethod = new HttpMethod("PATCH");
                 StringContent jsonPatchString = new StringContent(patchData, Encoding.UTF8);
+                jsonPatchString.Headers.ContentType = new MediaTypeHeaderValue("application/json");
                 HttpRequestMessage requestMsg = new HttpRequestMessage(httpMethod, requestUri)
                 {
                     Content = jsonPatchString
@@ -430,10 +432,7 @@ namespace PubnubApi
             LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Inside SendRequestAndGetJsonResponseTaskFactory", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
             try
             {
-                request.Method = (pubnubRequestState != null && (pubnubRequestState.ResponseType == PNOperationType.PNDeleteMessageOperation 
-                                                                || pubnubRequestState.ResponseType == PNOperationType.PNDeleteUserOperation
-                                                                || pubnubRequestState.ResponseType == PNOperationType.PNDeleteSpaceOperation
-                                                                || pubnubRequestState.ResponseType == PNOperationType.PNRemoveMessageActionOperation)) ? "DELETE" : "GET";
+                request.Method = FindHttpGetOrDeleteMethod(pubnubRequestState);
                 new Timer(OnPubnubWebRequestTimeout<T>, pubnubRequestState, GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType) * 1000, Timeout.Infinite);
                 System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
                 stopWatch.Start();
@@ -1067,6 +1066,13 @@ namespace PubnubApi
             return timeout;
         }
 
+        private static string FindHttpGetOrDeleteMethod<T>(RequestState<T> pubnubRequestState)
+        {
+            return (pubnubRequestState != null && (pubnubRequestState.ResponseType == PNOperationType.PNDeleteMessageOperation
+                                                || pubnubRequestState.ResponseType == PNOperationType.PNDeleteUserOperation
+                                                || pubnubRequestState.ResponseType == PNOperationType.PNDeleteSpaceOperation
+                                                || pubnubRequestState.ResponseType == PNOperationType.PNRemoveMessageActionOperation)) ? "DELETE" : "GET";
 
+        }
     }
 }

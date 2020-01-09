@@ -3,11 +3,9 @@ using NUnit.Framework;
 using System.Threading;
 using PubnubApi;
 using MockServer;
-using System.Text;
 using System.Linq;
 using System.Diagnostics;
 using System.Collections.Generic;
-using PubnubApi.CBOR;
 
 namespace PubNubMessaging.Tests
 {
@@ -48,7 +46,7 @@ namespace PubNubMessaging.Tests
 
         private static Server server;
 
-        [TestFixtureSetUp]
+        [SetUp]
         public static void Init()
         {
             UnitTestLog unitLog = new Tests.UnitTestLog();
@@ -58,7 +56,7 @@ namespace PubNubMessaging.Tests
             server.Start();
         }
 
-        [TestFixtureTearDown]
+        [TearDown]
         public static void Exit()
         {
             server.Stop();
@@ -608,21 +606,7 @@ namespace PubNubMessaging.Tests
             server.RunOnHttps(config.Secure);
             string expected = "";
 
-            List<string> channelList = new List<string>();
-            List<string> channelGroupList = new List<string>();
-            List<string> authList = new List<string>();
-
-            List<string> userList = new List<string>();
-            List<string> spaceList = new List<string>();
-
             Dictionary<string, int> chBitmaskPermDic = new Dictionary<string, int>();
-            for (int chIndex = 0; chIndex < channelList.Count; chIndex++)
-            {
-                if (!chBitmaskPermDic.ContainsKey(channelList[chIndex]))
-                {
-                    chBitmaskPermDic.Add(channelList[chIndex], 3);
-                }
-            }
 
             Dictionary<string, int> cgBitmaskPermDic = new Dictionary<string, int>();
 
@@ -694,14 +678,8 @@ namespace PubNubMessaging.Tests
                                 { "^public-*", new PNResourcePermission() { Read = true } },
                                 { "^private-*", new PNResourcePermission() { Read = true, Write = true, Create = true, Delete = true } } }, true)
 
-                            //.Users(new Dictionary<string, PNResourcePermission>() {
-                            //    { "myuser1", new PNResourcePermission() { Read = true, Write = true, Create = true } } })
-                            //.Spaces(new Dictionary<string, PNResourcePermission>() {
-                            //    { "myspace1", new PNResourcePermission() { Read = true, Write = true, Delete = true } } })
                             .TTL(30*24*60)
                             .AuthKey("myauth")
-                    //.QueryParam(new System.Collections.Generic.Dictionary<string, object>() { { "PoundsSterling", "£13.37" } })
-                    //.Meta(new System.Collections.Generic.Dictionary<string, object>() { { "user-id", "jay@example.com" }, { "contains-unicode", "The 💩 test." } })
                     .Execute(new PNAccessManagerTokenResultExt((result, status)=> 
                     {
                         if (result != null)
@@ -799,12 +777,9 @@ namespace PubNubMessaging.Tests
                                 }
                             case "ThenMultipleAuthGrantShouldReturnSuccess":
                                 {
-                                    if (result.Channels.Count == multipleAuthGrantCount)
+                                    if (result.Channels.Count == multipleAuthGrantCount && result.Channels.ToList()[0].Value.Count == multipleAuthGrantCount)
                                     {
-                                        if (result.Channels.ToList()[0].Value.Count == multipleAuthGrantCount)
-                                        {
-                                            receivedGrantMessage = true;
-                                        }
+                                        receivedGrantMessage = true;
                                     }
                                     break;
                                 }
@@ -832,9 +807,6 @@ namespace PubNubMessaging.Tests
                                 }
                         }
                     }
-                }
-                catch
-                {
                 }
                 finally
                 {
@@ -900,20 +872,14 @@ namespace PubNubMessaging.Tests
                                 }
                             case "ThenMultipleAuthGrantShouldReturnSuccess":
                                 {
-                                    if (result.Channels.Count == multipleAuthGrantCount)
+                                    if (result.Channels.Count == multipleAuthGrantCount && result.Channels.ToList()[0].Value.Count == multipleAuthGrantCount)
                                     {
-                                        if (result.Channels.ToList()[0].Value.Count == multipleAuthGrantCount)
-                                        {
-                                            receivedGrantMessage = true;
-                                        }
+                                        receivedGrantMessage = true;
                                     }
                                     break;
                                 }
                         }
                     }
-                }
-                catch
-                {
                 }
                 finally
                 {
