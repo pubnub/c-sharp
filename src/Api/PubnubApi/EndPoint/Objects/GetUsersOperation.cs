@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using PubnubApi.Interface;
 using System.Threading;
 using System.Net;
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+//#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
 using System.Threading.Tasks;
-#endif
+//#endif
 
 namespace PubnubApi.EndPoint
 {
@@ -107,6 +107,16 @@ namespace PubnubApi.EndPoint
 #endif
         }
 
+        public async Task<PNResult<PNGetUsersResult>> ExecuteAsync()
+        {
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+            return await GetUserList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.queryParam);
+#else
+            return await GetUserList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.queryParam);
+#endif
+        }
+
+
         internal void Retry()
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
@@ -143,17 +153,51 @@ namespace PubnubApi.EndPoint
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;
 
-            string json = "";
-
             requestState.UsePostMethod = false;
-            json = UrlProcessRequest<PNGetUsersResult>(request, requestState, false);
-
-            if (!string.IsNullOrEmpty(json))
+            UrlProcessRequest(request, requestState, false).ContinueWith(r =>
             {
-                List<object> result = ProcessJsonResponse<PNGetUsersResult>(requestState, json);
-                ProcessResponseCallbacks(result, requestState);
-            }
+                string json = r.Result.Item1;
+                if (!string.IsNullOrEmpty(json))
+                {
+                    List<object> result = ProcessJsonResponse(requestState, json);
+                    ProcessResponseCallbacks(result, requestState);
+                }
+            }, TaskContinuationOptions.ExecuteSynchronously).Wait();
         }
 
+        private async Task<PNResult<PNGetUsersResult>> GetUserList(PNPage page, int limit, bool includeCount, bool includeCustom, string filter, Dictionary<string, object> externalQueryParam)
+        {
+            PNResult<PNGetUsersResult> ret = new PNResult<PNGetUsersResult>();
+
+            PNPage internalPage;
+            if (page == null) { internalPage = new PNPage(); }
+            else { internalPage = page; }
+
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            Uri request = urlBuilder.BuildGetAllUsersRequest("GET", "", internalPage.Next, internalPage.Prev, limit, includeCount, includeCustom, filter, externalQueryParam);
+
+            RequestState<PNGetUsersResult> requestState = new RequestState<PNGetUsersResult>();
+            requestState.ResponseType = PNOperationType.PNGetUsersOperation;
+            requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
+
+            requestState.UsePostMethod = false;
+            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false);
+            ret.Status = JsonAndStatusTuple.Item2;
+            string json = JsonAndStatusTuple.Item1;
+            if (!string.IsNullOrEmpty(json))
+            {
+                List<object> resultList = ProcessJsonResponse(requestState, json);
+                ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+                PNGetUsersResult responseResult = responseBuilder.JsonToObject<PNGetUsersResult>(resultList, true);
+                if (responseResult != null)
+                {
+                    ret.Result = responseResult;
+                }
+            }
+
+            return ret;
+        }
     }
 }

@@ -134,35 +134,37 @@ namespace PubnubApi.EndPoint
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;
 
-            string json = UrlProcessRequest<PNPublishResult>(request, requestState, false);
-
-            if (!string.IsNullOrEmpty(json))
+            UrlProcessRequest(request, requestState, false).ContinueWith(r =>
             {
-                List<object> result = ProcessJsonResponse<PNPublishResult>(requestState, json);
-
-                if (result != null && result.Count >= 3)
+                string json = r.Result.Item1;
+                if (!string.IsNullOrEmpty(json))
                 {
-                    int signalStatus;
-                    Int32.TryParse(result[0].ToString(), out signalStatus);
-                    if (signalStatus == 1)
+                    List<object> result = ProcessJsonResponse(requestState, json);
+
+                    if (result != null && result.Count >= 3)
                     {
-                        ProcessResponseCallbacks(result, requestState);
+                        int signalStatus;
+                        Int32.TryParse(result[0].ToString(), out signalStatus);
+                        if (signalStatus == 1)
+                        {
+                            ProcessResponseCallbacks(result, requestState);
+                        }
+                        else
+                        {
+                            PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(400, result[1].ToString());
+                            PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<PNPublishResult>(PNOperationType.PNSignalOperation, category, requestState, 400, new PNException(json));
+                            if (requestState.PubnubCallback != null)
+                            {
+                                requestState.PubnubCallback.OnResponse(default, status);
+                            }
+                        }
                     }
                     else
                     {
-                        PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(400, result[1].ToString());
-                        PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<PNPublishResult>(PNOperationType.PNSignalOperation, category, requestState, 400, new PNException(json));
-                        if (requestState.PubnubCallback != null)
-                        {
-                            requestState.PubnubCallback.OnResponse(default(PNPublishResult), status);
-                        }
+                        ProcessResponseCallbacks(result, requestState);
                     }
                 }
-                else
-                {
-                    ProcessResponseCallbacks(result, requestState);
-                }
-            }
+            }, TaskContinuationOptions.ExecuteSynchronously).Wait();
         }
     }
 }

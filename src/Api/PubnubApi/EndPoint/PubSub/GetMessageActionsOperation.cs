@@ -160,16 +160,18 @@ namespace PubnubApi.EndPoint
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;
 
-            string json = UrlProcessRequest(request, requestState, false);
-
-            if (!string.IsNullOrEmpty(json))
+            UrlProcessRequest(request, requestState, false).ContinueWith(r =>
             {
-                List<object> result = ProcessJsonResponse(requestState, json);
+                string json = r.Result.Item1;
+                if (!string.IsNullOrEmpty(json))
+                {
+                    List<object> result = ProcessJsonResponse(requestState, json);
 
-                ProcessResponseCallbacks(result, requestState);
-            }
+                    ProcessResponseCallbacks(result, requestState);
+                }
 
-            CleanUp();
+                CleanUp();
+            }, TaskContinuationOptions.ExecuteSynchronously).Wait();
         }
 
         private void CleanUp()

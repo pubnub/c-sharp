@@ -100,6 +100,16 @@ namespace PubnubApi.EndPoint
 #endif
         }
 
+        public async Task<PNResult<PNCreateSpaceResult>> ExecuteAsync()
+        {
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+            return await CreateSpace(this.spcId, this.spcName, this.spcDesc, this.spcCustom, this.queryParam);
+#else
+            return await CreateSpace(this.spcId, this.spcName, this.spcDesc, this.spcCustom, this.queryParam);
+#endif
+        }
+
+
         internal void Retry()
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
@@ -158,13 +168,68 @@ namespace PubnubApi.EndPoint
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
             Uri request = urlBuilder.BuildCreateSpaceRequest("POST", postMessage, spaceId, spaceCustom, externalQueryParam);
 
-            string json = UrlProcessRequest<PNCreateSpaceResult>(request, requestState, false, postMessage);
+            UrlProcessRequest(request, requestState, false, postMessage).ContinueWith(r =>
+            {
+                string json = r.Result.Item1;
+                if (!string.IsNullOrEmpty(json))
+                {
+                    List<object> result = ProcessJsonResponse(requestState, json);
+                    ProcessResponseCallbacks(result, requestState);
+                }
+            }, TaskContinuationOptions.ExecuteSynchronously).Wait();
+        }
 
+        private async Task<PNResult<PNCreateSpaceResult>> CreateSpace(string spaceId, string spaceName, string spaceDescription, Dictionary<string, object> spaceCustom, Dictionary<string, object> externalQueryParam)
+        {
+            if (string.IsNullOrEmpty(spaceId) || string.IsNullOrEmpty(spaceId.Trim()) || spaceName == null)
+            {
+                throw new ArgumentException("Missing Id or Name");
+            }
+
+            if (string.IsNullOrEmpty(config.SubscribeKey) || string.IsNullOrEmpty(config.SubscribeKey.Trim()) || config.SubscribeKey.Length <= 0)
+            {
+                throw new MissingMemberException("Invalid subscribe key");
+            }
+            PNResult<PNCreateSpaceResult> ret = new PNResult<PNCreateSpaceResult>();
+
+            RequestState<PNCreateSpaceResult> requestState = new RequestState<PNCreateSpaceResult>();
+            requestState.ResponseType = PNOperationType.PNCreateSpaceOperation;
+            requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
+
+            requestState.UsePostMethod = true;
+            Dictionary<string, object> messageEnvelope = new Dictionary<string, object>();
+            messageEnvelope.Add("id", spaceId);
+            messageEnvelope.Add("name", spaceName);
+            if (spaceDescription != null)
+            {
+                messageEnvelope.Add("description", spaceDescription);
+            }
+            if (spaceCustom != null)
+            {
+                messageEnvelope.Add("custom", spaceCustom);
+            }
+            string postMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
+
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            Uri request = urlBuilder.BuildCreateSpaceRequest("POST", postMessage, spaceId, spaceCustom, externalQueryParam);
+
+            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false, postMessage);
+            ret.Status = JsonAndStatusTuple.Item2;
+            string json = JsonAndStatusTuple.Item1;
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = ProcessJsonResponse<PNCreateSpaceResult>(requestState, json);
-                ProcessResponseCallbacks(result, requestState);
+                List<object> resultList = ProcessJsonResponse(requestState, json);
+                ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+                PNCreateSpaceResult responseResult = responseBuilder.JsonToObject<PNCreateSpaceResult>(resultList, true);
+                if (responseResult != null)
+                {
+                    ret.Result = responseResult;
+                }
             }
+
+            return ret;
         }
 
     }

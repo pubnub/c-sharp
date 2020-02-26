@@ -13,7 +13,7 @@
 
   <PropertyGroup>
     <PackageId>Pubnub</PackageId>
-    <PackageVersion>4.5.0.0</PackageVersion>
+    <PackageVersion>4.6.0.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -73,6 +73,9 @@ Added filter support for Objects API.</PackageReleaseNotes>
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <Reference Include="System" />
+    <!--<PackageReference Include="NetLegacySupport.Tuple" Version="1.1.1">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>-->
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net40'">
@@ -84,6 +87,9 @@ Added filter support for Objects API.</PackageReleaseNotes>
     </PackageReference>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
+    <!--<PackageReference Include="NetLegacySupport.Tuple" Version="1.1.1">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>-->
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net45'">
@@ -92,6 +98,9 @@ Added filter support for Objects API.</PackageReleaseNotes>
     </PackageReference>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
+    <PackageReference Include="System.ValueTuple" Version="4.4.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
@@ -100,6 +109,9 @@ Added filter support for Objects API.</PackageReleaseNotes>
     </PackageReference>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
+    <PackageReference Include="System.ValueTuple" Version="4.4.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
 
 </Project>

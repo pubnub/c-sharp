@@ -79,6 +79,16 @@ namespace PubnubApi.EndPoint
 #endif
         }
 
+
+        public async Task<PNResult<PNDeleteUserResult>> ExecuteAsync()
+        {
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+            return await DeleteUser(this.usrId, this.queryParam);
+#else
+            return await DeleteUser(this.usrId, this.queryParam);
+#endif
+        }
+
         internal void Retry()
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
@@ -123,15 +133,58 @@ namespace PubnubApi.EndPoint
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;
 
-            string json = "";
+            UrlProcessRequest(request, requestState, false).ContinueWith(r =>
+            {
+                string json = r.Result.Item1;
+                if (!string.IsNullOrEmpty(json))
+                {
+                    List<object> result = ProcessJsonResponse(requestState, json);
+                    ProcessResponseCallbacks(result, requestState);
+                }
+            }, TaskContinuationOptions.ExecuteSynchronously).Wait();
 
-            json = UrlProcessRequest(request, requestState, false);
+        }
 
+
+        private async Task<PNResult<PNDeleteUserResult>> DeleteUser(string userId, Dictionary<string, object> externalQueryParam)
+        {
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(userId.Trim()))
+            {
+                throw new ArgumentException("Missing Id");
+            }
+
+            if (string.IsNullOrEmpty(config.SubscribeKey) || string.IsNullOrEmpty(config.SubscribeKey.Trim()) || config.SubscribeKey.Length <= 0)
+            {
+                throw new MissingMemberException("Invalid Subscribe key");
+            }
+
+            PNResult<PNDeleteUserResult> ret = new PNResult<PNDeleteUserResult>();
+
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            Uri request = urlBuilder.BuildDeleteUserRequest("DELETE", "", userId, externalQueryParam);
+
+            RequestState<PNDeleteUserResult> requestState = new RequestState<PNDeleteUserResult>();
+            requestState.ResponseType = PNOperationType.PNDeleteUserOperation;
+            requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
+
+            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false);
+            ret.Status = JsonAndStatusTuple.Item2;
+            string json = JsonAndStatusTuple.Item1;
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = ProcessJsonResponse(requestState, json);
-                ProcessResponseCallbacks(result, requestState);
+                List<object> resultList = ProcessJsonResponse(requestState, json);
+                ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+                PNDeleteUserResult responseResult = responseBuilder.JsonToObject<PNDeleteUserResult>(resultList, true);
+                if (responseResult != null)
+                {
+                    ret.Result = responseResult;
+                }
             }
+
+            return ret;
+
         }
     }
 }

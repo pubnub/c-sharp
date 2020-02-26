@@ -461,12 +461,15 @@ namespace PubnubApi.EndPoint
             requestState.EndPointOperation = this;
 
             //Set TerminateSubRequest to true to bounce the long-polling subscribe requests to update user state
-            string json = UrlProcessRequest<PNSetStateResult>(request, requestState, true);
-            if (!string.IsNullOrEmpty(json))
+            UrlProcessRequest(request, requestState, false).ContinueWith(r =>
             {
-                List<object> result = ProcessJsonResponse<PNSetStateResult>(requestState, json);
-                ProcessResponseCallbacks(result, requestState);
-            }
+                string json = r.Result.Item1;
+                if (!string.IsNullOrEmpty(json))
+                {
+                    List<object> result = ProcessJsonResponse(requestState, json);
+                    ProcessResponseCallbacks(result, requestState);
+                }
+            }, TaskContinuationOptions.ExecuteSynchronously).Wait();
         }
 
         private string AddOrUpdateOrDeleteLocalUserState(string channel, string channelGroup, string userStateKey, object userStateValue)
