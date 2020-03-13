@@ -158,7 +158,6 @@ namespace PubnubApi.EndPoint
 #endif
         }
 
-
         public async Task<PNResult<PNAccessManagerTokenResult>> ExecuteAsync()
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12

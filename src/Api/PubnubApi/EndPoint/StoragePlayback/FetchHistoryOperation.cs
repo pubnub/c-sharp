@@ -136,6 +136,30 @@ namespace PubnubApi.EndPoint
 #endif
         }
 
+        public async Task<PNResult<PNFetchHistoryResult>> ExecuteAsync()
+        {
+            if (string.IsNullOrEmpty(config.SubscribeKey) || config.SubscribeKey.Trim().Length == 0)
+            {
+                throw new MissingMemberException("Invalid Subscribe Key");
+            }
+
+            if (this.channelNames == null || this.channelNames.Length == 0 || string.IsNullOrEmpty(this.channelNames[0]))
+            {
+                throw new MissingMemberException("Missing channel name(s)");
+            }
+
+            if (this.withMessageActionsOption && this.channelNames != null && this.channelNames.Length > 1)
+            {
+                throw new NotSupportedException("Only one channel can be used along with MessageActions");
+            }
+
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+            return await History(this.channelNames, this.startTimetoken, this.endTimetoken, this.perChannelCount, this.reverseOption, this.withMetaOption, this.withMessageActionsOption, this.queryParam);
+#else
+            return await History(this.channelNames, this.startTimetoken, this.endTimetoken, this.perChannelCount, this.reverseOption, this.withMetaOption, this.withMessageActionsOption, this.queryParam);
+#endif
+        }
+
         internal void Retry()
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
@@ -180,6 +204,42 @@ namespace PubnubApi.EndPoint
                     ProcessResponseCallbacks(result, requestState);
                 }
             }, TaskContinuationOptions.ExecuteSynchronously).Wait();
+        }
+
+        internal async Task<PNResult<PNFetchHistoryResult>> History(string[] channels, long start, long end, int count, bool reverse, bool includeMeta, bool includeMsgActions, Dictionary<string, object> externalQueryParam)
+        {
+            if (channels == null || channels.Length == 0 || string.IsNullOrEmpty(channels[0]) || string.IsNullOrEmpty(channels[0].Trim()))
+            {
+                throw new ArgumentException("Missing Channel(s)");
+            }
+            PNResult<PNFetchHistoryResult> ret = new PNResult<PNFetchHistoryResult>();
+            string channel = string.Join(",", channels);
+
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            Uri request = urlBuilder.BuildFetchRequest("GET", "", channels, start, end, count, reverse, includeMeta, includeMsgActions, externalQueryParam);
+
+            RequestState<PNFetchHistoryResult> requestState = new RequestState<PNFetchHistoryResult>();
+            requestState.Channels = new[] { channel };
+            requestState.ResponseType = PNOperationType.PNFetchHistoryOperation;
+            requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
+
+            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false);
+            ret.Status = JsonAndStatusTuple.Item2;
+            string json = JsonAndStatusTuple.Item1;
+            if (!string.IsNullOrEmpty(json))
+            {
+                List<object> resultList = ProcessJsonResponse(requestState, json);
+                ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+                PNFetchHistoryResult responseResult = responseBuilder.JsonToObject<PNFetchHistoryResult>(resultList, true);
+                if (responseResult != null)
+                {
+                    ret.Result = responseResult;
+                }
+            }
+
+            return ret;
         }
     }
 

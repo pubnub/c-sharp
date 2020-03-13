@@ -86,7 +86,7 @@ namespace PubnubApi.EndPoint
 #endif
         }
 
-        public async Task<PNResult<PNGetUserResult>> ExecuteSync()
+        public async Task<PNResult<PNGetUserResult>> ExecuteAsync()
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             return await GetSingleUser(this.usrId, this.includeCustom, this.queryParam);

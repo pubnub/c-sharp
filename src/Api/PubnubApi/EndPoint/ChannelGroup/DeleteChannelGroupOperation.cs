@@ -66,6 +66,15 @@ namespace PubnubApi.EndPoint
 #endif
         }
 
+        public async Task<PNResult<PNChannelGroupsDeleteGroupResult>> ExecuteAsync()
+        {
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+            return await DeleteChannelGroup(this.channelGroupName, this.queryParam);
+#else
+            return await DeleteChannelGroup(this.channelGroupName, this.queryParam);
+#endif
+        }
+
         internal void Retry()
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
@@ -111,6 +120,43 @@ namespace PubnubApi.EndPoint
                     ProcessResponseCallbacks(result, requestState);
                 }
             }, TaskContinuationOptions.ExecuteSynchronously).Wait();
+        }
+
+        internal async Task<PNResult<PNChannelGroupsDeleteGroupResult>> DeleteChannelGroup(string groupName, Dictionary<string, object> externalQueryParam)
+        {
+            if (string.IsNullOrEmpty(groupName) || groupName.Trim().Length == 0)
+            {
+                throw new ArgumentException("Missing groupName");
+            }
+            PNResult<PNChannelGroupsDeleteGroupResult> ret = new PNResult<PNChannelGroupsDeleteGroupResult>();
+
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+
+            Uri request = urlBuilder.BuildRemoveChannelsFromChannelGroupRequest("GET", "", null, "", groupName, externalQueryParam);
+
+            RequestState<PNChannelGroupsDeleteGroupResult> requestState = new RequestState<PNChannelGroupsDeleteGroupResult>();
+            requestState.ResponseType = PNOperationType.PNRemoveGroupOperation;
+            requestState.Channels = new string[] { };
+            requestState.ChannelGroups = new[] { groupName };
+            requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
+
+            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false);
+            ret.Status = JsonAndStatusTuple.Item2;
+            string json = JsonAndStatusTuple.Item1;
+            if (!string.IsNullOrEmpty(json))
+            {
+                List<object> resultList = ProcessJsonResponse(requestState, json);
+                ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+                PNChannelGroupsDeleteGroupResult responseResult = responseBuilder.JsonToObject<PNChannelGroupsDeleteGroupResult>(resultList, true);
+                if (responseResult != null)
+                {
+                    ret.Result = responseResult;
+                }
+            }
+
+            return ret;
         }
 
         internal void CurrentPubnubInstance(Pubnub instance)

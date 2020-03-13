@@ -81,6 +81,20 @@ namespace PubnubApi.EndPoint
 #endif
         }
 
+        public async Task<PNResult<PNMessageCountResult>> ExecuteAsync()
+        {
+            if (string.IsNullOrEmpty(config.SubscribeKey) || config.SubscribeKey.Trim().Length == 0)
+            {
+                throw new MissingMemberException("Invalid Subscribe Key");
+            }
+
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+            return await MessageCounts(this.channelNames, this.msgCountArrayTimetoken, this.queryParam);
+#else
+            return await MessageCounts(this.channelNames, this.msgCountArrayTimetoken, this.queryParam);
+#endif
+        }
+
         internal void Retry()
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
@@ -124,6 +138,41 @@ namespace PubnubApi.EndPoint
                     ProcessResponseCallbacks(result, requestState);
                 }
             }, TaskContinuationOptions.ExecuteSynchronously).Wait();
+        }
+
+        internal async Task<PNResult<PNMessageCountResult>> MessageCounts(string[] channels, long[] timetokens, Dictionary<string, object> externalQueryParam)
+        {
+            if (channels == null || channels.Length == 0)
+            {
+                throw new ArgumentException("Missing Channel");
+            }
+            PNResult<PNMessageCountResult> ret = new PNResult<PNMessageCountResult>();
+
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            Uri request = urlBuilder.BuildMessageCountsRequest("GET", "", channels, timetokens, externalQueryParam);
+
+            RequestState<PNMessageCountResult> requestState = new RequestState<PNMessageCountResult>();
+            requestState.Channels = channels;
+            requestState.ResponseType = PNOperationType.PNMessageCountsOperation;
+            requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
+
+            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false);
+            ret.Status = JsonAndStatusTuple.Item2;
+            string json = JsonAndStatusTuple.Item1;
+            if (!string.IsNullOrEmpty(json))
+            {
+                List<object> resultList = ProcessJsonResponse(requestState, json);
+                ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+                PNMessageCountResult responseResult = responseBuilder.JsonToObject<PNMessageCountResult>(resultList, true);
+                if (responseResult != null)
+                {
+                    ret.Result = responseResult;
+                }
+            }
+
+            return ret;
         }
 
         internal void CurrentPubnubInstance(Pubnub instance)

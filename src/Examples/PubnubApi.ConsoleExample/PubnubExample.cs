@@ -501,72 +501,74 @@ namespace PubnubApiDemo
                         //phoneList.Add(new Phone() { Number = "111-222-2222", PhoneType = PhoneType.Mobile, Extenion = "11" });
                         //userCreated.User = new User { Id = 11, Name = "Doe", Addressee = new Addressee { Id = Guid.NewGuid(), Street = "My Street" }, Phones = phoneList };
 
-                        //pubnub.Publish()
-                        //    .Channel(channel)
-                        //    .Message(userCreated)
-                        //    .Meta(meta)
-                        //    .ShouldStore(store).UsePOST(usePost)
-                        //    .Execute(new PNPublishResultExt((r, s) => { Console.WriteLine(r.Timetoken); }));
+                        CustomMessage myCustomMsg = new CustomMessage { Text = "FC Bayern M\xFCnchen II (w)", Id = 1 };
+                        pubnub.Publish()
+                            .Channel(channel)
+                            .Message(myCustomMsg)
+                            .Meta(meta)
+                            .ShouldStore(store).UsePOST(usePost)
+                            .Execute(new PNPublishResultExt((r, s) => { Console.WriteLine(r.Timetoken); }));
+                        //pubnub.Publish().Message()
 
 
-                        double doubleData;
-                        int intData;
-                        if (int.TryParse(publishMsg, out intData)) //capture numeric data
-                        {
-                            pubnub.Publish().Channel(channel).Message(intData).Meta(meta).ShouldStore(store).UsePOST(usePost)
-                                .Execute(new PNPublishResultExt((r, s) => { if (s.Error) { Console.WriteLine(s.ErrorData.Information); } else { Console.WriteLine(r.Timetoken); } }));
-                        }
-                        else if (double.TryParse(publishMsg, out doubleData)) //capture numeric data
-                        {
-                            pubnub.Publish().Channel(channel).Message(doubleData).Meta(meta).ShouldStore(store).UsePOST(usePost)
-                                .Execute(new PNPublishResultExt((r, s) => { if (s.Error) { Console.WriteLine(s.ErrorData.Information); } else { Console.WriteLine(r.Timetoken); } }));
-                        }
-                        else
-                        {
-                            //check whether any numeric is sent in double quotes
-                            if (publishMsg.IndexOf("\"") == 0 && publishMsg.LastIndexOf("\"") == publishMsg.Length - 1)
-                            {
-                                string strMsg = publishMsg.Substring(1, publishMsg.Length - 2);
-                                if (int.TryParse(strMsg, out intData))
-                                {
-                                    pubnub.Publish().Channel(channel).Message(strMsg).Meta(meta).ShouldStore(store).UsePOST(usePost)
-                                        .Execute(new PNPublishResultExt((r, s) => { if (s.Error) { Console.WriteLine(s.ErrorData.Information); } else { Console.WriteLine(r.Timetoken); } }));
-                                }
-                                else if (double.TryParse(strMsg, out doubleData))
-                                {
-                                    pubnub.Publish().Channel(channel).Message(strMsg).Meta(meta).ShouldStore(store).UsePOST(usePost)
-                                        .Execute(new PNPublishResultExt((r, s) => { if (s.Error) { Console.WriteLine(s.ErrorData.Information); } else { Console.WriteLine(r.Timetoken); } }));
-                                }
-                                else
-                                {
-                                    pubnub.Publish().Channel(channel).Message(publishMsg).Meta(meta).ShouldStore(store).UsePOST(usePost)
-                                        .Execute(new PNPublishResultExt((r, s) => { if (s.Error) { Console.WriteLine(s.ErrorData.Information); } else { Console.WriteLine(r.Timetoken); } }));
-                                }
-                            }
-                            else
-                            {
-                                if (useSync)
-                                {
-                                    PNPublishResult pubRes = pubnub.Publish()
-                                        .Channel(channel)
-                                        .Message(publishMsg)
-                                        .Meta(meta)
-                                        .ShouldStore(store)
-                                        .UsePOST(usePost).Sync();
-                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(pubRes));
-                                }
-                                else
-                                {
-                                    pubnub.Publish()
-                                        .Channel(channel)
-                                        .Message(publishMsg)
-                                        .Meta(meta)
-                                        .ShouldStore(store)
-                                        .UsePOST(usePost)
-                                        .Execute(new PNPublishResultExt((r, s) => { if (s.Error) { Console.WriteLine(s.ErrorData.Information); } else { Console.WriteLine(r.Timetoken); } }));
-                                }
-                            }
-                        }
+                        //double doubleData;
+                        //int intData;
+                        //if (int.TryParse(publishMsg, out intData)) //capture numeric data
+                        //{
+                        //    pubnub.Publish().Channel(channel).Message(intData).Meta(meta).ShouldStore(store).UsePOST(usePost)
+                        //        .Execute(new PNPublishResultExt((r, s) => { if (s.Error) { Console.WriteLine(s.ErrorData.Information); } else { Console.WriteLine(r.Timetoken); } }));
+                        //}
+                        //else if (double.TryParse(publishMsg, out doubleData)) //capture numeric data
+                        //{
+                        //    pubnub.Publish().Channel(channel).Message(doubleData).Meta(meta).ShouldStore(store).UsePOST(usePost)
+                        //        .Execute(new PNPublishResultExt((r, s) => { if (s.Error) { Console.WriteLine(s.ErrorData.Information); } else { Console.WriteLine(r.Timetoken); } }));
+                        //}
+                        //else
+                        //{
+                        //    //check whether any numeric is sent in double quotes
+                        //    if (publishMsg.IndexOf("\"") == 0 && publishMsg.LastIndexOf("\"") == publishMsg.Length - 1)
+                        //    {
+                        //        string strMsg = publishMsg.Substring(1, publishMsg.Length - 2);
+                        //        if (int.TryParse(strMsg, out intData))
+                        //        {
+                        //            pubnub.Publish().Channel(channel).Message(strMsg).Meta(meta).ShouldStore(store).UsePOST(usePost)
+                        //                .Execute(new PNPublishResultExt((r, s) => { if (s.Error) { Console.WriteLine(s.ErrorData.Information); } else { Console.WriteLine(r.Timetoken); } }));
+                        //        }
+                        //        else if (double.TryParse(strMsg, out doubleData))
+                        //        {
+                        //            pubnub.Publish().Channel(channel).Message(strMsg).Meta(meta).ShouldStore(store).UsePOST(usePost)
+                        //                .Execute(new PNPublishResultExt((r, s) => { if (s.Error) { Console.WriteLine(s.ErrorData.Information); } else { Console.WriteLine(r.Timetoken); } }));
+                        //        }
+                        //        else
+                        //        {
+                        //            pubnub.Publish().Channel(channel).Message(publishMsg).Meta(meta).ShouldStore(store).UsePOST(usePost)
+                        //                .Execute(new PNPublishResultExt((r, s) => { if (s.Error) { Console.WriteLine(s.ErrorData.Information); } else { Console.WriteLine(r.Timetoken); } }));
+                        //        }
+                        //    }
+                        //    else
+                        //    {
+                        //        if (useSync)
+                        //        {
+                        //            PNPublishResult pubRes = pubnub.Publish()
+                        //                .Channel(channel)
+                        //                .Message(publishMsg)
+                        //                .Meta(meta)
+                        //                .ShouldStore(store)
+                        //                .UsePOST(usePost).Sync();
+                        //            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(pubRes));
+                        //        }
+                        //        else
+                        //        {
+                        //            pubnub.Publish()
+                        //                .Channel(channel)
+                        //                .Message(publishMsg)
+                        //                .Meta(meta)
+                        //                .ShouldStore(store)
+                        //                .UsePOST(usePost)
+                        //                .Execute(new PNPublishResultExt((r, s) => { if (s.Error) { Console.WriteLine(s.ErrorData.Information); } else { Console.WriteLine(r.Timetoken); } }));
+                        //        }
+                        //    }
+                        //}
                         break;
                     case "3":
                         Console.WriteLine("Enter CHANNEL name for History");
@@ -2065,6 +2067,12 @@ namespace PubnubApiDemo
 
         [JsonConverter(typeof(StringEnumConverter))]
         public PhoneType PhoneType { get; set; }
+    }
+
+    public class CustomMessage
+    {
+        public string Text { get; set; }
+        public int Id { get; set; }
     }
 
     public enum PhoneType

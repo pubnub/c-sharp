@@ -67,6 +67,15 @@ namespace PubnubApi.EndPoint
 #endif
         }
 
+        public async Task<PNResult<PNChannelGroupsAllChannelsResult>> ExecuteAsync()
+        {
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+            return await GetChannelsForChannelGroup(this.channelGroupName, this.queryParam);
+#else
+            return await GetChannelsForChannelGroup(this.channelGroupName, this.queryParam);
+#endif
+        }
+
         internal void Retry()
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
@@ -111,6 +120,42 @@ namespace PubnubApi.EndPoint
                     ProcessResponseCallbacks(result, requestState);
                 }
             }, TaskContinuationOptions.ExecuteSynchronously).Wait();
+        }
+
+        internal async Task<PNResult<PNChannelGroupsAllChannelsResult>> GetChannelsForChannelGroup(string groupName, Dictionary<string, object> externalQueryParam)
+        {
+            if (string.IsNullOrEmpty(groupName) || groupName.Trim().Length == 0)
+            {
+                throw new ArgumentException("Missing groupName");
+            }
+            PNResult<PNChannelGroupsAllChannelsResult> ret = new PNResult<PNChannelGroupsAllChannelsResult>();
+
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+
+            Uri request = urlBuilder.BuildGetChannelsForChannelGroupRequest("GET", "", null, groupName, false, externalQueryParam);
+
+            RequestState<PNChannelGroupsAllChannelsResult> requestState = new RequestState<PNChannelGroupsAllChannelsResult>();
+            requestState.ResponseType = PNOperationType.ChannelGroupGet;
+            requestState.ChannelGroups = new[] { groupName };
+            requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
+
+            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false);
+            ret.Status = JsonAndStatusTuple.Item2;
+            string json = JsonAndStatusTuple.Item1;
+            if (!string.IsNullOrEmpty(json))
+            {
+                List<object> resultList = ProcessJsonResponse(requestState, json);
+                ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+                PNChannelGroupsAllChannelsResult responseResult = responseBuilder.JsonToObject<PNChannelGroupsAllChannelsResult>(resultList, true);
+                if (responseResult != null)
+                {
+                    ret.Result = responseResult;
+                }
+            }
+
+            return ret;
         }
 
         internal void CurrentPubnubInstance(Pubnub instance)

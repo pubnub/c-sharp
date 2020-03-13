@@ -10,7 +10,7 @@ namespace PubnubApi
         internal static PNGetSpaceResult GetObject(List<object> listObject)
         {
             PNGetSpaceResult result = null;
-            Dictionary<string, object> getSpaceDicObj = (listObject.Count >= 2) ? JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[1]) : null;
+            Dictionary<string, object> getSpaceDicObj = (listObject != null && listObject.Count >= 2) ? JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[1]) : null;
             if (getSpaceDicObj != null && getSpaceDicObj.ContainsKey("data"))
             {
                 result = new PNGetSpaceResult();
