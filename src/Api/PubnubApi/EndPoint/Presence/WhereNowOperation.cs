@@ -71,9 +71,9 @@ namespace PubnubApi.EndPoint
         public async Task<PNResult<PNWhereNowResult>> ExecuteAsync()
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
-            return await WhereNow(this.whereNowUUID, this.queryParam);
+            return await WhereNow(this.whereNowUUID, this.queryParam).ConfigureAwait(false);
 #else
-            return await WhereNow(this.whereNowUUID, this.queryParam);
+            return await WhereNow(this.whereNowUUID, this.queryParam).ConfigureAwait(false);
 #endif
         }
 

@@ -89,9 +89,9 @@ namespace PubnubApi.EndPoint
         public async Task<PNResult<PNGetSpaceResult>> ExecuteAsync()
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
-            return await GetSingleSpace(this.spcId, this.includeCustom, this.queryParam);
+            return await GetSingleSpace(this.spcId, this.includeCustom, this.queryParam).ConfigureAwait(false);
 #else
-            return await GetSingleSpace(this.spcId, this.includeCustom, this.queryParam);
+            return await GetSingleSpace(this.spcId, this.includeCustom, this.queryParam).ConfigureAwait(false);
 #endif
         }
 

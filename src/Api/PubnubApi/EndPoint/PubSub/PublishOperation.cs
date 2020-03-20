@@ -141,10 +141,10 @@ namespace PubnubApi.EndPoint
 
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             syncRequest = false;
-            return await Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, this.queryParam);
+            return await Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, this.queryParam).ConfigureAwait(false);
 #else
             syncRequest = false;
-            return await Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, this.queryParam);
+            return await Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, this.queryParam).ConfigureAwait(false);
 #endif
         }
 

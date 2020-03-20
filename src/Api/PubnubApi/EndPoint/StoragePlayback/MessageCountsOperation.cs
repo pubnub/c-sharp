@@ -89,9 +89,9 @@ namespace PubnubApi.EndPoint
             }
 
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
-            return await MessageCounts(this.channelNames, this.msgCountArrayTimetoken, this.queryParam);
+            return await MessageCounts(this.channelNames, this.msgCountArrayTimetoken, this.queryParam).ConfigureAwait(false);
 #else
-            return await MessageCounts(this.channelNames, this.msgCountArrayTimetoken, this.queryParam);
+            return await MessageCounts(this.channelNames, this.msgCountArrayTimetoken, this.queryParam).ConfigureAwait(false);
 #endif
         }
 

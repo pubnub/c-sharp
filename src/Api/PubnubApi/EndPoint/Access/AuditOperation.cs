@@ -84,9 +84,9 @@ namespace PubnubApi.EndPoint
         public async Task<PNResult<PNAccessManagerAuditResult>> ExecuteAsync()
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
-            return await AuditAccess(this.channelName, this.channelGroupName, this.authenticationKeys, this.queryParam);
+            return await AuditAccess(this.channelName, this.channelGroupName, this.authenticationKeys, this.queryParam).ConfigureAwait(false);
 #else
-            return await AuditAccess(this.channelName, this.channelGroupName, this.authenticationKeys, this.queryParam);
+            return await AuditAccess(this.channelName, this.channelGroupName, this.authenticationKeys, this.queryParam).ConfigureAwait(false);
 #endif
         }
 
@@ -171,7 +171,6 @@ namespace PubnubApi.EndPoint
                 requestState.ChannelGroups = new[] { channelGroup };
             }
             requestState.ResponseType = PNOperationType.PNAccessManagerAudit;
-            //requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;
 

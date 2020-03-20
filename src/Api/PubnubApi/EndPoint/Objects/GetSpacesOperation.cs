@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using PubnubApi.Interface;
 using System.Threading;
 using System.Net;
-//#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
 using System.Threading.Tasks;
-//#endif
 
 namespace PubnubApi.EndPoint
 {
@@ -110,9 +108,9 @@ namespace PubnubApi.EndPoint
         public async Task<PNResult<PNGetSpacesResult>> ExecuteAsync()
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
-            return await GetSpaceList(this.page, this.limit, this.includeCount, this.includeCustom, this.spacesFilter, this.queryParam);
+            return await GetSpaceList(this.page, this.limit, this.includeCount, this.includeCustom, this.spacesFilter, this.queryParam).ConfigureAwait(false);
 #else
-            return await GetSpaceList(this.page, this.limit, this.includeCount, this.includeCustom, this.spacesFilter, this.queryParam);
+            return await GetSpaceList(this.page, this.limit, this.includeCount, this.includeCustom, this.spacesFilter, this.queryParam).ConfigureAwait(false);
 #endif
         }
 

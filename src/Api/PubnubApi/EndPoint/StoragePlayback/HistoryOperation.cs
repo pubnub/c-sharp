@@ -140,9 +140,9 @@ namespace PubnubApi.EndPoint
             }
 
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
-            return await History(this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, this.withMetaOption, this.queryParam);
+            return await History(this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, this.withMetaOption, this.queryParam).ConfigureAwait(false);
 #else
-            return await History(this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, this.withMetaOption, this.queryParam);
+            return await History(this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, this.withMetaOption, this.queryParam).ConfigureAwait(false);
 #endif
         }
 

@@ -149,9 +149,9 @@ namespace PubnubApi.EndPoint
         public async Task<PNResult<PNManageMembershipsResult>> ExecuteAsync()
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
-            return await UpdateSpaceMembershipWithUser(this.usrId, this.addMembership, this.updMembership, this.delMembership, this.mbrshipCustom, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.queryParam);
+            return await UpdateSpaceMembershipWithUser(this.usrId, this.addMembership, this.updMembership, this.delMembership, this.mbrshipCustom, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.queryParam).ConfigureAwait(false);
 #else
-            return await UpdateSpaceMembershipWithUser(this.usrId, this.addMembership, this.updMembership, this.delMembership, this.mbrshipCustom, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.queryParam);
+            return await UpdateSpaceMembershipWithUser(this.usrId, this.addMembership, this.updMembership, this.delMembership, this.mbrshipCustom, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.queryParam).ConfigureAwait(false);
 #endif
         }
 

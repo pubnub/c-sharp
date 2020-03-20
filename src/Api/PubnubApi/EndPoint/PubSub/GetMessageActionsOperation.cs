@@ -116,9 +116,9 @@ namespace PubnubApi.EndPoint
             }
 
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
-            return await GetMessageActions(this.messageActionChannelName, this.startTT, this.endTT, this.limitRecords, this.queryParam);
+            return await GetMessageActions(this.messageActionChannelName, this.startTT, this.endTT, this.limitRecords, this.queryParam).ConfigureAwait(false);
 #else
-            return await GetMessageActions(this.messageActionChannelName, this.startTT, this.endTT, this.limitRecords, this.queryParam);
+            return await GetMessageActions(this.messageActionChannelName, this.startTT, this.endTT, this.limitRecords, this.queryParam).ConfigureAwait(false);
 #endif
         }
 

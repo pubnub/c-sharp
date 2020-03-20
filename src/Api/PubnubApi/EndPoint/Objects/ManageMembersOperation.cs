@@ -149,9 +149,9 @@ namespace PubnubApi.EndPoint
         public async Task<PNResult<PNManageMembersResult>> ExecuteAsync()
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
-            return await ProcessMembersOperationRequest(this.spcId, this.addMember, this.updMember, this.delMember, this.mbrCustom, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.queryParam);
+            return await ProcessMembersOperationRequest(this.spcId, this.addMember, this.updMember, this.delMember, this.mbrCustom, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.queryParam).ConfigureAwait(false);
 #else
-            return await ProcessMembersOperationRequest(this.spcId, this.addMember, this.updMember, this.delMember, this.mbrCustom, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.queryParam);
+            return await ProcessMembersOperationRequest(this.spcId, this.addMember, this.updMember, this.delMember, this.mbrCustom, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.queryParam).ConfigureAwait(false);
 #endif
         }
 

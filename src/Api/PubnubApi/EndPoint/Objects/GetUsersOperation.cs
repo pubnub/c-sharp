@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using PubnubApi.Interface;
 using System.Threading;
 using System.Net;
-//#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
 using System.Threading.Tasks;
-//#endif
 
 namespace PubnubApi.EndPoint
 {
@@ -110,9 +108,9 @@ namespace PubnubApi.EndPoint
         public async Task<PNResult<PNGetUsersResult>> ExecuteAsync()
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
-            return await GetUserList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.queryParam);
+            return await GetUserList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.queryParam).ConfigureAwait(false);
 #else
-            return await GetUserList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.queryParam);
+            return await GetUserList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.queryParam).ConfigureAwait(false);
 #endif
         }
 

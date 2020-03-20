@@ -97,10 +97,10 @@ namespace PubnubApi.EndPoint
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             syncRequest = false;
-            return await Fire(this.channelName, this.msg, false, this.ttl, this.userMetadata, this.queryParam);
+            return await Fire(this.channelName, this.msg, false, this.ttl, this.userMetadata, this.queryParam).ConfigureAwait(false);
 #else
             syncRequest = false;
-            return await Fire(this.channelName, this.msg, false, this.ttl, this.userMetadata, this.queryParam);
+            return await Fire(this.channelName, this.msg, false, this.ttl, this.userMetadata, this.queryParam).ConfigureAwait(false);
 #endif
         }
 

@@ -126,10 +126,10 @@ namespace PubnubApi.EndPoint
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             string serializedState = jsonLibrary.SerializeToJsonString(this.userState);
-            return await SetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, serializedState, this.queryParam);
+            return await SetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, serializedState, this.queryParam).ConfigureAwait(false);
 #else
             string serializedState = jsonLibrary.SerializeToJsonString(this.userState);
-            return await SetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, serializedState, this.queryParam);
+            return await SetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, serializedState, this.queryParam).ConfigureAwait(false);
 #endif
         }
 
@@ -331,7 +331,7 @@ namespace PubnubApi.EndPoint
                 }
             }
 
-            return await SharedSetUserState(filteredChannels, filteredChannelGroups, uuid, jsonUserState, jsonUserState, externalQueryParam);
+            return await SharedSetUserState(filteredChannels, filteredChannelGroups, uuid, jsonUserState, jsonUserState, externalQueryParam).ConfigureAwait(false);
         }
 
         private void SharedSetUserState(string[] channels, string[] channelGroups, string uuid, string jsonChannelUserState, string jsonChannelGroupUserState, Dictionary<string, object> externalQueryParam, PNCallback<PNSetStateResult> callback)

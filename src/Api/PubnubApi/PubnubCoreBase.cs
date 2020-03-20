@@ -929,7 +929,7 @@ namespace PubnubApi
 #region "Build, process and send request"
         internal protected async Task<Tuple<string, PNStatus>> UrlProcessRequest<T>(Uri requestUri, RequestState<T> pubnubRequestState, bool terminateCurrentSubRequest)
         {
-            return await UrlProcessRequest(requestUri, pubnubRequestState, terminateCurrentSubRequest, "");
+            return await UrlProcessRequest(requestUri, pubnubRequestState, terminateCurrentSubRequest, "").ConfigureAwait(false);
         }
 
         internal protected async Task<Tuple<string, PNStatus>> UrlProcessRequest<T>(Uri requestUri, RequestState<T> pubnubRequestState, bool terminateCurrentSubRequest, string jsonPostOrPatchData)
@@ -1035,8 +1035,16 @@ namespace PubnubApi
                 {
                     LoggingMethod.WriteToLog(currentLog, string.Format("DateTime {0}, JSON= {1} for request={2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), jsonString, requestUri), currentConfig.LogVerbosity);
                 }
-                PNStatus status = new StatusBuilder(currentConfig, jsonLib).CreateStatusResponse(pubnubRequestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, pubnubRequestState, (int)HttpStatusCode.OK, null);
-                return new Tuple<string, PNStatus>(jsonString, status);
+
+                if (pubnubRequestState != null)
+                {
+                    PNStatus status = new StatusBuilder(currentConfig, jsonLib).CreateStatusResponse(pubnubRequestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, pubnubRequestState, (int)HttpStatusCode.OK, null);
+                    return new Tuple<string, PNStatus>(jsonString, status);
+                }
+                else
+                {
+                    return new Tuple<string, PNStatus>(jsonString, null);
+                }
             }
             catch (Exception ex)
             {

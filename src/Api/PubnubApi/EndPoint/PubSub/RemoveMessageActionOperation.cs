@@ -126,9 +126,9 @@ namespace PubnubApi.EndPoint
             }
 
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
-            return await RemoveMessageAction(this.msgActionChannelName, this.messageTimetoken, this.actionTimetoken, this.msgActionUuid, this.queryParam);
+            return await RemoveMessageAction(this.msgActionChannelName, this.messageTimetoken, this.actionTimetoken, this.msgActionUuid, this.queryParam).ConfigureAwait(false);
 #else
-            return await RemoveMessageAction(this.msgActionChannelName, this.messageTimetoken, this.actionTimetoken, this.msgActionUuid, this.queryParam);
+            return await RemoveMessageAction(this.msgActionChannelName, this.messageTimetoken, this.actionTimetoken, this.msgActionUuid, this.queryParam).ConfigureAwait(false);
 #endif
         }
 

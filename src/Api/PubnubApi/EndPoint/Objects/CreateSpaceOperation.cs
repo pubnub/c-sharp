@@ -103,9 +103,9 @@ namespace PubnubApi.EndPoint
         public async Task<PNResult<PNCreateSpaceResult>> ExecuteAsync()
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
-            return await CreateSpace(this.spcId, this.spcName, this.spcDesc, this.spcCustom, this.queryParam);
+            return await CreateSpace(this.spcId, this.spcName, this.spcDesc, this.spcCustom, this.queryParam).ConfigureAwait(false);
 #else
-            return await CreateSpace(this.spcId, this.spcName, this.spcDesc, this.spcCustom, this.queryParam);
+            return await CreateSpace(this.spcId, this.spcName, this.spcDesc, this.spcCustom, this.queryParam).ConfigureAwait(false);
 #endif
         }
 

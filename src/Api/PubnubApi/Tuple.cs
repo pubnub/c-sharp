@@ -1,7 +1,6 @@
-﻿namespace System
-{
-#if NET35 || NET40
-    //THIS IS ADDED TO SUPPORT .NET 3.5 and .NET 4.0 BASED SDKs. IF THIS DOES NOT WORK, NEED TO REVIEW NetLegacySupport.Tuple NUGET PACKAGE, TO SEE IF IT CAN WORK
+﻿#if NET35 || NET40
+namespace System
+{    //THIS IS ADDED TO SUPPORT .NET 3.5 and .NET 4.0 BASED SDKs. IF THIS DOES NOT WORK, NEED TO REVIEW NetLegacySupport.Tuple NUGET PACKAGE, TO SEE IF IT CAN WORK
     public class Tuple<T1>
     {
         public Tuple(T1 item1)
@@ -49,6 +48,5 @@
             return new Tuple<T1, T2, T3>(item1, item2, item3);
         }
     }
-
-#endif
 }
+#endif

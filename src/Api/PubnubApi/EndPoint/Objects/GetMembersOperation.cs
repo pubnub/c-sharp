@@ -4,9 +4,7 @@ using System.Linq;
 using PubnubApi.Interface;
 using System.Threading;
 using System.Net;
-//#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
 using System.Threading.Tasks;
-//#endif
 
 namespace PubnubApi.EndPoint
 {
@@ -122,9 +120,9 @@ namespace PubnubApi.EndPoint
         public async Task<PNResult<PNGetMembersResult>> ExecuteAsync()
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
-            return await GetMembersList(this.spcId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membersFilter, this.queryParam);
+            return await GetMembersList(this.spcId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membersFilter, this.queryParam).ConfigureAwait(false);
 #else
-            return await GetMembersList(this.spcId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membersFilter, this.queryParam);
+            return await GetMembersList(this.spcId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membersFilter, this.queryParam).ConfigureAwait(false);
 #endif
         }
 
