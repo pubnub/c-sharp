@@ -87,7 +87,7 @@ namespace PubnubApi
                         }
                     }
 
-                    PNErrorData errorData = new PNErrorData(jsonLibrary.SerializeToJsonString(targetException.Message), targetException);
+                    PNErrorData errorData = new PNErrorData(string.IsNullOrEmpty(targetException.Message) ? "" : targetException.Message, targetException);
                     status.ErrorData = errorData;
                 }
             }

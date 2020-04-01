@@ -21,6 +21,7 @@ namespace PubnubApi.EndPoint
         private bool includeCustom;
         private string usersFilter;
         private PNPage page;
+        private List<string> sortField;
 
         private PNCallback<PNGetUsersResult> savedCallback;
         private Dictionary<string, object> queryParam;
@@ -81,6 +82,12 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
+        public GetUsersOperation Sort(List<string> sortByField)
+        {
+            this.sortField = sortByField;
+            return this;
+        }
+
         public GetUsersOperation QueryParam(Dictionary<string, object> customQueryParam)
         {
             this.queryParam = customQueryParam;
@@ -93,13 +100,13 @@ namespace PubnubApi.EndPoint
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
-                GetUserList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.queryParam, savedCallback);
+                GetUserList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.sortField, this.queryParam, savedCallback);
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
             new Thread(() =>
             {
                 this.savedCallback = callback;
-                GetUserList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.queryParam, savedCallback);
+                GetUserList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.sortField, this.queryParam, savedCallback);
             })
             { IsBackground = true }.Start();
 #endif
@@ -108,9 +115,9 @@ namespace PubnubApi.EndPoint
         public async Task<PNResult<PNGetUsersResult>> ExecuteAsync()
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
-            return await GetUserList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.queryParam).ConfigureAwait(false);
+            return await GetUserList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.sortField, this.queryParam).ConfigureAwait(false);
 #else
-            return await GetUserList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.queryParam).ConfigureAwait(false);
+            return await GetUserList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.sortField, this.queryParam).ConfigureAwait(false);
 #endif
         }
 
@@ -120,18 +127,18 @@ namespace PubnubApi.EndPoint
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
-                GetUserList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.queryParam, savedCallback);
+                GetUserList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.sortField, this.queryParam, savedCallback);
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
             new Thread(() =>
             {
-                GetUserList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.queryParam, savedCallback);
+                GetUserList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.sortField, this.queryParam, savedCallback);
             })
             { IsBackground = true }.Start();
 #endif
         }
 
-        private void GetUserList(PNPage page, int limit, bool includeCount, bool includeCustom, string filter, Dictionary<string, object> externalQueryParam, PNCallback<PNGetUsersResult> callback)
+        private void GetUserList(PNPage page, int limit, bool includeCount, bool includeCustom, string filter, List<string> sort, Dictionary<string, object> externalQueryParam, PNCallback<PNGetUsersResult> callback)
         {
             if (callback == null)
             {
@@ -143,7 +150,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildGetAllUsersRequest("GET", "", internalPage.Next, internalPage.Prev, limit, includeCount, includeCustom, filter, externalQueryParam);
+            Uri request = urlBuilder.BuildGetAllUsersRequest("GET", "", internalPage.Next, internalPage.Prev, limit, includeCount, includeCustom, filter, sort, externalQueryParam);
 
             RequestState<PNGetUsersResult> requestState = new RequestState<PNGetUsersResult>();
             requestState.ResponseType = PNOperationType.PNGetUsersOperation;
@@ -163,7 +170,7 @@ namespace PubnubApi.EndPoint
             }, TaskContinuationOptions.ExecuteSynchronously).Wait();
         }
 
-        private async Task<PNResult<PNGetUsersResult>> GetUserList(PNPage page, int limit, bool includeCount, bool includeCustom, string filter, Dictionary<string, object> externalQueryParam)
+        private async Task<PNResult<PNGetUsersResult>> GetUserList(PNPage page, int limit, bool includeCount, bool includeCustom, string filter, List<string> sort, Dictionary<string, object> externalQueryParam)
         {
             PNResult<PNGetUsersResult> ret = new PNResult<PNGetUsersResult>();
 
@@ -173,7 +180,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildGetAllUsersRequest("GET", "", internalPage.Next, internalPage.Prev, limit, includeCount, includeCustom, filter, externalQueryParam);
+            Uri request = urlBuilder.BuildGetAllUsersRequest("GET", "", internalPage.Next, internalPage.Prev, limit, includeCount, includeCustom, filter, sort, externalQueryParam);
 
             RequestState<PNGetUsersResult> requestState = new RequestState<PNGetUsersResult>();
             requestState.ResponseType = PNOperationType.PNGetUsersOperation;

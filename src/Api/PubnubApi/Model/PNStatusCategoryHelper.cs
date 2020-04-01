@@ -157,6 +157,10 @@ namespace PubnubApi
                     {
                         ret = PNStatusCategory.PNBadRequestCategory;
                     }
+                    else if (httpErrorCodeMessage.ToUpperInvariant().Contains("INVALID REQUEST INPUT"))
+                    {
+                        ret = PNStatusCategory.PNBadRequestCategory;
+                    }
                     break;
                 case 401:
                     ret = PNStatusCategory.PNAccessDeniedCategory;

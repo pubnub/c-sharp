@@ -23,6 +23,7 @@ namespace PubnubApi.EndPoint
         private string commandDelimitedIncludeOptions = "";
         private string membershipsFilter;
         private PNPage page;
+        private List<string> sortField;
 
         private PNCallback<PNGetMembershipsResult> savedCallback;
         private Dictionary<string, object> queryParam;
@@ -93,6 +94,12 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
+        public GetMembershipsOperation Sort(List<string> sortByField)
+        {
+            this.sortField = sortByField;
+            return this;
+        }
+
         public GetMembershipsOperation QueryParam(Dictionary<string, object> customQueryParam)
         {
             this.queryParam = customQueryParam;
@@ -105,13 +112,13 @@ namespace PubnubApi.EndPoint
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
-                GetMembershipsList(this.usrId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membershipsFilter, this.queryParam, savedCallback);
+                GetMembershipsList(this.usrId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membershipsFilter, this.sortField, this.queryParam, savedCallback);
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
             new Thread(() =>
             {
                 this.savedCallback = callback;
-                GetMembershipsList(this.usrId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membershipsFilter, this.queryParam, savedCallback);
+                GetMembershipsList(this.usrId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membershipsFilter, this.sortField, this.queryParam, savedCallback);
             })
             { IsBackground = true }.Start();
 #endif
@@ -120,9 +127,9 @@ namespace PubnubApi.EndPoint
         public async Task<PNResult<PNGetMembershipsResult>> ExecuteAsync()
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
-            return await GetMembershipsList(this.usrId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membershipsFilter, this.queryParam).ConfigureAwait(false);
+            return await GetMembershipsList(this.usrId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membershipsFilter, this.sortField, this.queryParam).ConfigureAwait(false);
 #else
-            return await GetMembershipsList(this.usrId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membershipsFilter, this.queryParam).ConfigureAwait(false);
+            return await GetMembershipsList(this.usrId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membershipsFilter, this.sortField, this.queryParam).ConfigureAwait(false);
 #endif
         }
 
@@ -131,18 +138,18 @@ namespace PubnubApi.EndPoint
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
-                GetMembershipsList(this.usrId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membershipsFilter, this.queryParam, savedCallback);
+                GetMembershipsList(this.usrId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membershipsFilter, this.sortField, this.queryParam, savedCallback);
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
             new Thread(() =>
             {
-                GetMembershipsList(this.usrId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membershipsFilter, this.queryParam, savedCallback);
+                GetMembershipsList(this.usrId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membershipsFilter, this.sortField, this.queryParam, savedCallback);
             })
             { IsBackground = true }.Start();
 #endif
         }
 
-        private void GetMembershipsList(string userId, PNPage page, int limit, bool includeCount, string includeOptions, string filter, Dictionary<string, object> externalQueryParam, PNCallback<PNGetMembershipsResult> callback)
+        private void GetMembershipsList(string userId, PNPage page, int limit, bool includeCount, string includeOptions, string filter, List<string> sort, Dictionary<string, object> externalQueryParam, PNCallback<PNGetMembershipsResult> callback)
         {
             if (callback == null)
             {
@@ -154,7 +161,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildGetAllMembershipsRequest("GET", "", userId, internalPage.Next, internalPage.Prev, limit, includeCount, includeOptions, filter, externalQueryParam);
+            Uri request = urlBuilder.BuildGetAllMembershipsRequest("GET", "", userId, internalPage.Next, internalPage.Prev, limit, includeCount, includeOptions, filter, sort, externalQueryParam);
 
             RequestState<PNGetMembershipsResult> requestState = new RequestState<PNGetMembershipsResult>();
             requestState.ResponseType = PNOperationType.PNGetMembershipsOperation;
@@ -175,7 +182,7 @@ namespace PubnubApi.EndPoint
 
         }
 
-        private async Task<PNResult<PNGetMembershipsResult>> GetMembershipsList(string userId, PNPage page, int limit, bool includeCount, string includeOptions, string filter, Dictionary<string, object> externalQueryParam)
+        private async Task<PNResult<PNGetMembershipsResult>> GetMembershipsList(string userId, PNPage page, int limit, bool includeCount, string includeOptions, string filter, List<string> sort, Dictionary<string, object> externalQueryParam)
         {
             PNResult<PNGetMembershipsResult> ret = new PNResult<PNGetMembershipsResult>();
 
@@ -185,7 +192,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildGetAllMembershipsRequest("GET", "", userId, internalPage.Next, internalPage.Prev, limit, includeCount, includeOptions, filter, externalQueryParam);
+            Uri request = urlBuilder.BuildGetAllMembershipsRequest("GET", "", userId, internalPage.Next, internalPage.Prev, limit, includeCount, includeOptions, filter, sort, externalQueryParam);
 
             RequestState<PNGetMembershipsResult> requestState = new RequestState<PNGetMembershipsResult>();
             requestState.ResponseType = PNOperationType.PNGetMembershipsOperation;

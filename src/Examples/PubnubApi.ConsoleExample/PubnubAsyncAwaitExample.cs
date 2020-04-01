@@ -1490,7 +1490,8 @@ namespace PubnubApiAsyncAwaitDemo
                             PNResult<PNGetUsersResult> respGetUsers = await pubnub.GetUsers()
                                 .IncludeCount(true)
                                 .IncludeCustom(true)
-                                .Filter("name=='newnamemodified'")
+                                //.Filter("name=='newnamemodified'")
+                                .Sort(new List<string>() { "name:desc", "created:asc"})
                                 .Page(new PNPage() { Next = "", Prev = "" })
                                 .ExecuteAsync();
 
@@ -1577,6 +1578,7 @@ namespace PubnubApiAsyncAwaitDemo
                                 .IncludeCount(true)
                                 .IncludeCustom(true)
                                 //.Limit(2)
+                                .Sort(new List<string>() { "name:asc" })
                                 .Page(new PNPage() { Next = "", Prev = "" })
                                 .ExecuteAsync();
 
@@ -1654,6 +1656,7 @@ namespace PubnubApiAsyncAwaitDemo
                             .Remove(removeList)
                             .Include(new PNMembershipField[] { PNMembershipField.CUSTOM, PNMembershipField.SPACE, PNMembershipField.SPACE_CUSTOM })
                             .IncludeCount(true)
+                            .Sort(new List<string>() { "space.name:asc" })
                             .Page(new PNPage() { Next = "", Prev = "" })
                             .ExecuteAsync();
 
@@ -1697,6 +1700,7 @@ namespace PubnubApiAsyncAwaitDemo
                                 .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.USER, PNMemberField.USER_CUSTOM })
                                 .IncludeCount(true)
                                 .Page(new PNPage() { Next = "", Prev = "" })
+                                .Sort(new List<string>() { "user.name:desc" })
                                 .ExecuteAsync();
 
                             if (respMngMmbers.Status.Error) { Console.WriteLine(respMngMmbers.Status.ErrorData.Information); }
@@ -1712,6 +1716,7 @@ namespace PubnubApiAsyncAwaitDemo
                                 .UserId(getMembershipsUserId)
                                 .Include(new PNMembershipField[] { PNMembershipField.CUSTOM, PNMembershipField.SPACE, PNMembershipField.SPACE_CUSTOM })
                                 .IncludeCount(true)
+                                .Sort(new List<string>() { "name:asc" })
                                 .Page(new PNPage() { Next = "", Prev = "" })
                                 .ExecuteAsync();
 
@@ -1732,6 +1737,7 @@ namespace PubnubApiAsyncAwaitDemo
                                 .SpaceId(getMembersSpaceId)
                                 .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.USER, PNMemberField.USER_CUSTOM })
                                 .IncludeCount(true)
+                                .Sort(new List<string>() { "user.name:asc" })
                                 .Page(new PNPage() { Next = "", Prev = "" })
                                 .ExecuteAsync();
 
@@ -1755,23 +1761,23 @@ namespace PubnubApiAsyncAwaitDemo
 
                         Console.WriteLine("Read Access? Enter Y for Yes (default), N for No.");
                         string grantReadAccess = Console.ReadLine();
-                        bool grantRead = !(grantReadAccess.ToLower() == "n");
+                        bool grantRead = grantReadAccess.ToLower() != "n";
 
                         Console.WriteLine("Write Access? Enter Y for Yes (default), N for No.");
                         string grantwriteAccess = Console.ReadLine();
-                        bool grantWrite = !(grantwriteAccess.ToLower() == "n");
+                        bool grantWrite = grantwriteAccess.ToLower() != "n";
 
                         Console.WriteLine("Delete Access? Enter Y for Yes (default), N for No.");
                         string grantDeleteAccess = Console.ReadLine();
-                        bool grantDelete = !(grantDeleteAccess.ToLower() == "n");
+                        bool grantDelete = grantDeleteAccess.ToLower() != "n";
 
                         Console.WriteLine("Create Access? Enter Y for Yes (default), N for No.");
                         string grantCreateAccess = Console.ReadLine();
-                        bool grantCreate = !(grantCreateAccess.ToLower() == "n");
+                        bool grantCreate = grantCreateAccess.ToLower() != "n";
 
                         Console.WriteLine("Manage Access? Enter Y for Yes (default), N for No.");
                         string grantManageAccess = Console.ReadLine();
-                        bool grantManage = (grantManageAccess.ToLower() == "n") ? false : true;
+                        bool grantManage = grantManageAccess.ToLower() != "n";
 
                         Console.WriteLine("How many minutes do you want to allow Grant Access? Enter the number of minutes." + System.Environment.NewLine + "Default = 1440 minutes (24 hours). Press ENTER now to accept default value.");
                         int grantTokenTTL;

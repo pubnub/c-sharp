@@ -1035,15 +1035,16 @@ namespace PubnubApi
                 {
                     LoggingMethod.WriteToLog(currentLog, string.Format("DateTime {0}, JSON= {1} for request={2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), jsonString, requestUri), currentConfig.LogVerbosity);
                 }
-
-                if (pubnubRequestState != null)
+                PNStatus errStatus = GetStatusIfError<T>(pubnubRequestState, jsonString);
+                if (errStatus == null && pubnubRequestState != null)
                 {
                     PNStatus status = new StatusBuilder(currentConfig, jsonLib).CreateStatusResponse(pubnubRequestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, pubnubRequestState, (int)HttpStatusCode.OK, null);
                     return new Tuple<string, PNStatus>(jsonString, status);
                 }
                 else
                 {
-                    return new Tuple<string, PNStatus>(jsonString, null);
+                    jsonString = "";
+                    return new Tuple<string, PNStatus>(jsonString, errStatus);
                 }
             }
             catch (Exception ex)
@@ -1104,18 +1105,42 @@ namespace PubnubApi
         internal protected List<object> ProcessJsonResponse<T>(RequestState<T> asyncRequestState, string jsonString)
         {
             List<object> result = new List<object>();
-            PNConfiguration currentConfig;
 
+            bool errorCallbackRaised = false;
+            PNStatus status = GetStatusIfError<T>(asyncRequestState, jsonString);
+            if (status != null)
+            {
+                errorCallbackRaised = true;
+                if (asyncRequestState != null && asyncRequestState.PubnubCallback != null)
+                {
+                    asyncRequestState.PubnubCallback.OnResponse(default(T), status);
+                }
+                else
+                {
+                    Announce(status);
+                }
+            }
+            if (!errorCallbackRaised && asyncRequestState != null)
+            {
+                result = WrapResultBasedOnResponseType<T>(asyncRequestState.ResponseType, jsonString, asyncRequestState.Channels, asyncRequestState.ChannelGroups, asyncRequestState.Reconnect, asyncRequestState.Timetoken, asyncRequestState.PubnubCallback);
+            }
+
+            return result;
+        }
+
+        private PNStatus GetStatusIfError<T>(RequestState<T> asyncRequestState, string jsonString)
+        {
+            PNStatus status = null;
+            if (string.IsNullOrEmpty(jsonString)) { return status;  }
+
+            PNConfiguration currentConfig;
             PNOperationType type = PNOperationType.None;
             if (asyncRequestState != null)
             {
                 type = asyncRequestState.ResponseType;
             }
-
-            bool errorCallbackRaised = false;
             if (jsonLib.IsDictionaryCompatible(jsonString, type))
             {
-                PNStatus status = null;
                 Dictionary<string, object> deserializeStatus = jsonLib.DeserializeToDictionaryOfObject(jsonString);
                 int statusCode = 0; //default. assuming all is ok 
                 if (deserializeStatus.Count >= 1 && deserializeStatus.ContainsKey("error") && string.Equals(deserializeStatus["error"].ToString(), "true", StringComparison.CurrentCultureIgnoreCase))
@@ -1170,27 +1195,10 @@ namespace PubnubApi
                     }
                 }
 
-                if (status != null)
-                {
-                    errorCallbackRaised = true;
-                    if (asyncRequestState != null && asyncRequestState.PubnubCallback != null)
-                    {
-                        asyncRequestState.PubnubCallback.OnResponse(default(T), status);
-                    }
-                    else
-                    {
-                        Announce(status);
-                    }
-                }
-            }
-            if (!errorCallbackRaised && asyncRequestState != null)
-            {
-                result = WrapResultBasedOnResponseType<T>(asyncRequestState.ResponseType, jsonString, asyncRequestState.Channels, asyncRequestState.ChannelGroups, asyncRequestState.Reconnect, asyncRequestState.Timetoken, asyncRequestState.PubnubCallback);
             }
 
-            return result;
+            return status;
         }
-
         protected List<object> WrapResultBasedOnResponseType<T>(PNOperationType type, string jsonString, string[] channels, string[] channelGroups, bool reconnect, long lastTimetoken, PNCallback<T> callback)
         {
             List<object> result = new List<object>();
