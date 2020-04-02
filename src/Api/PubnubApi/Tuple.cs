@@ -1,6 +1,7 @@
 ﻿#if NET35 || NET40
 namespace System
 {    //THIS IS ADDED TO SUPPORT .NET 3.5 and .NET 4.0 BASED SDKs. IF THIS DOES NOT WORK, NEED TO REVIEW NetLegacySupport.Tuple NUGET PACKAGE, TO SEE IF IT CAN WORK
+    // CS0436,0436 warnings were disabled in project file
     public class Tuple<T1>
     {
         public Tuple(T1 item1)
