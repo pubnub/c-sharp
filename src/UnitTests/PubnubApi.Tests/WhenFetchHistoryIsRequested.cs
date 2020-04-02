@@ -5,6 +5,7 @@ using PubnubApi;
 using System.Collections.Generic;
 using MockServer;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace PubNubMessaging.Tests
 {
@@ -340,6 +341,119 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+        public static async Task FetchHistoryWithAsyncShouldReturnDecryptMessage()
+        {
+            server.ClearRequests();
+
+            bool receivedMessage = false;
+            long publishTimetoken = 0;
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                CipherKey = "enigma",
+                Uuid = "mytestuuid",
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+
+            server.RunOnHttps(false);
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.AuthKey = "myAuth";
+            }
+
+            pubnub = createPubNubInstance(config);
+
+            string channel = "hello_my_channel";
+            string message = messageForPublish;
+
+            string expected = "[1,\"Sent\",\"14715322883933786\"]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/{3}", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel, "%22f42pIQcWZ9zbTbH8cyLwByD%2FGsviOE0vcREIEVPARR0%3D%22"))
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            PNResult<PNPublishResult> publishResult = await pubnub.Publish().Channel(channel).Message(message).ShouldStore(true)
+                .ExecuteAsync();
+            if (publishResult.Result != null && publishResult.Status.StatusCode == 200 && !publishResult.Status.Error)
+            {
+                publishTimetoken = publishResult.Result.Timetoken;
+                receivedMessage = true;
+            }
+
+            if (!receivedMessage)
+            {
+                Assert.IsTrue(receivedMessage, "Encrypted message Publish Failed");
+            }
+            else
+            {
+                receivedMessage = false;
+
+                Thread.Sleep(1000);
+
+                expected = "[[{\"message\":\"f42pIQcWZ9zbTbH8cyLwByD/GsviOE0vcREIEVPARR0=\",\"timetoken\":14715322883933786}],14834460344901569,14834460344901569]";
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                        .WithParameter("count", "1")
+                        .WithParameter("end", "14715322883933786")
+                        .WithParameter("include_token", "true")
+                        .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                        .WithParameter("requestid", "myRequestId")
+                        .WithParameter("start", "14715322883933785")
+                        .WithParameter("uuid", config.Uuid)
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+                PNResult<PNFetchHistoryResult> fetchHistResult = await pubnub.FetchHistory()
+                    .Channels(new string[] { channel })
+                    .Start(publishTimetoken - 1)
+                    .End(publishTimetoken)
+                    .MaximumPerChannel(1)
+                    .Reverse(false)
+                    .IncludeMeta(false)
+                    .ExecuteAsync();
+                if (fetchHistResult.Result != null && fetchHistResult.Status.StatusCode == 200 && !fetchHistResult.Status.Error 
+                    && fetchHistResult.Result.Messages != null && fetchHistResult.Result.Messages.ContainsKey(channel) 
+                    && fetchHistResult.Result.Messages[channel].Count > 0)
+                {
+                    foreach (KeyValuePair<string, List<PNHistoryItemResult>> channelItem in fetchHistResult.Result.Messages)
+                    {
+                        List<PNHistoryItemResult> itemList = channelItem.Value;
+                        foreach (PNHistoryItemResult item in itemList)
+                        {
+                            if (item.Entry != null && item.Entry.ToString() == messageForPublish && item.Timetoken == publishTimetoken)
+                            {
+                                receivedMessage = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                Assert.IsTrue(receivedMessage, "Encrypted message not showed up in history");
+            }
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
+
+
+        [Test]
         public static void FetchHistoryCount10ReturnsRecords()
         {
             server.ClearRequests();
@@ -407,6 +521,70 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+        public static async Task FetchHistoryWithAsyncCount10ReturnsRecords()
+        {
+            server.ClearRequests();
+
+            bool receivedMessage = false;
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+
+            server.RunOnHttps(false);
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.AuthKey = "myAuth";
+            }
+
+            pubnub = createPubNubInstance(config);
+
+            string channel = "hello_my_channel";
+            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+
+            string expected = "[[\"Pubnub Messaging API 1\",\"Pubnub Messaging API 2\",\"Pubnub Messaging API 3\",\"Pubnub Messaging API 4\",\"Pubnub Messaging API 5\",\"Pubnub Messaging API 6\",\"Pubnub Messaging API 7\",\"Pubnub Messaging API 8\",\"Pubnub Messaging API 9\",\"Pubnub Messaging API 10\"],14715432709547189,14715432709547189]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                    .WithParameter("count", "10")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            PNResult<PNFetchHistoryResult> fetchHistResult = await pubnub.FetchHistory().Channels(new string[] { channel })
+                .MaximumPerChannel(10)
+                .IncludeMeta(false)
+                .ExecuteAsync();
+            if (fetchHistResult.Result != null && fetchHistResult.Status.StatusCode == 200 && !fetchHistResult.Status.Error 
+                && fetchHistResult.Result.Messages != null && fetchHistResult.Result.Messages.ContainsKey(channel) 
+                && fetchHistResult.Result.Messages[channel].Count >= 10)
+            {
+                System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(fetchHistResult.Result));
+                receivedMessage = true;
+            }
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+            Assert.IsTrue(receivedMessage, "Fetch History Failed");
+        }
+
+        [Test]
         public static void FetchHistoryWithMessageActionsReturnsRecords()
         {
             server.ClearRequests();
@@ -462,6 +640,66 @@ namespace PubNubMessaging.Tests
                     historyManualEvent.Set();
                 }));
             historyManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+            Assert.IsTrue(receivedMessage, "Fetch History Failed");
+        }
+
+        [Test]
+        public static async Task FetchHistoryWithAsyncWithMessageActionsReturnsRecords()
+        {
+            server.ClearRequests();
+
+            bool receivedMessage = false;
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+
+            server.RunOnHttps(false);
+
+            pubnub = createPubNubInstance(config);
+
+            string channel = "hello_my_channel";
+            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+
+            string expected = "[[\"Pubnub Messaging API 1\",\"Pubnub Messaging API 2\",\"Pubnub Messaging API 3\",\"Pubnub Messaging API 4\",\"Pubnub Messaging API 5\",\"Pubnub Messaging API 6\",\"Pubnub Messaging API 7\",\"Pubnub Messaging API 8\",\"Pubnub Messaging API 9\",\"Pubnub Messaging API 10\"],14715432709547189,14715432709547189]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/history-with-actions/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                    .WithParameter("count", "10")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            PNResult<PNFetchHistoryResult> fetchHistResult = await pubnub.FetchHistory().Channels(new string[] { channel })
+                .IncludeMeta(false)
+                .IncludeMessageActions(true)
+                .ExecuteAsync();
+            if (fetchHistResult.Result != null && fetchHistResult.Status.StatusCode == 200 && !fetchHistResult.Status.Error 
+                && fetchHistResult.Result.Messages != null && fetchHistResult.Result.Messages.ContainsKey(channel) 
+                && fetchHistResult.Result.Messages[channel].Count >= 10)
+            {
+                System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(fetchHistResult.Result));
+                receivedMessage = true;
+            }
 
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
@@ -671,6 +909,127 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+        public static async Task FetchHistoryWithAsyncStartWithReverseTrue()
+        {
+            server.ClearRequests();
+
+            bool receivedMessage = false;
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+
+            server.RunOnHttps(false);
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.AuthKey = "myAuth";
+            }
+
+            pubnub = createPubNubInstance(config);
+
+            string channel = "hello_my_channel";
+
+            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 2000 : 310 * 1000;
+
+            long currentTimetoken = 0;
+
+            string expected = "[1356998400]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath("/time/0")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            PNResult<PNTimeResult> timeResult = await pubnub.Time().ExecuteAsync();
+            try
+            {
+                Debug.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(timeResult.Result));
+                currentTimetoken = (timeResult.Result != null && timeResult.Status.StatusCode == 200 && !timeResult.Status.Error) ? timeResult.Result.Timetoken : 0;
+            }
+            catch { /* ignore */ }
+
+            Thread.Sleep(2000);
+
+            for (int index = 0; index < 10; index++)
+            {
+                receivedMessage = false;
+                expected = "[1,\"Sent\",\"14715322883933786\"]";
+
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/{3}", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel, String.Format("%22DetailedHistoryStartTimeWithReverseTrue%20{0}%22", index)))
+                        .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                        .WithParameter("requestid", "myRequestId")
+                        .WithParameter("uuid", config.Uuid)
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+                PNResult<PNPublishResult> publishResult = await pubnub.Publish().Channel(channel)
+                    .Message(string.Format("DetailedHistoryStartTimeWithReverseTrue {0}", index))
+                    .ExecuteAsync();
+                if (publishResult.Result != null && publishResult.Status.StatusCode == 200 && !publishResult.Status.Error && publishResult.Result.Timetoken > 0)
+                {
+                    receivedMessage = true;
+                }
+
+                if (!receivedMessage)
+                {
+                    break;
+                }
+            }
+
+            if (receivedMessage)
+            {
+                Thread.Sleep(2000);
+
+                expected = "[[\"Pubnub Messaging API 1\",\"Pubnub Messaging API 2\",\"Pubnub Messaging API 3\",\"Pubnub Messaging API 4\",\"Pubnub Messaging API 5\",\"Pubnub Messaging API 6\",\"Pubnub Messaging API 7\",\"Pubnub Messaging API 8\",\"Pubnub Messaging API 9\",\"Pubnub Messaging API 10\"],14715432709547189,14715432709547189]";
+
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                        .WithParameter("count", "100")
+                        .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                        .WithParameter("requestid", "myRequestId")
+                        .WithParameter("start", "1356998400")
+                        .WithParameter("uuid", config.Uuid)
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+                PNResult<PNFetchHistoryResult> fetchHistResult = await pubnub.FetchHistory().Channels(new string[] { channel })
+                    .Start(currentTimetoken)
+                    .Reverse(false)
+                    .IncludeMeta(false)
+                    .ExecuteAsync();
+                if (fetchHistResult.Result != null && fetchHistResult.Status.StatusCode == 200 && !fetchHistResult.Status.Error && fetchHistResult.Result.Messages != null && fetchHistResult.Result.Messages.Count >= 10)
+                {
+                    receivedMessage = true;
+                }
+            }
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+            Assert.IsTrue(receivedMessage, "Async/Await Fetch History with Start and Reverse True Failed");
+        }
+
+
+        [Test]
         public static void FetchHistoryWithNullKeysReturnsError()
         {
             server.ClearRequests();
@@ -722,6 +1081,14 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+        public static async Task FetchHistoryWithAsyncShouldReturnUnencrypedSecretMessage()
+        {
+            server.ClearRequests();
+            bool receivedMessage = await CommonFetchHistoryWithAsyncShouldReturnUnencryptedMessageBasedOnParams(PubnubCommon.SecretKey, "", false);
+            Assert.IsTrue(receivedMessage, "FetchHistoryWithAsyncShouldReturnUnencrypedSecretMessage - Fetch History Result not expected");
+        }
+
+        [Test]
         public static void FetchHistoryShouldReturnUnencrypedMessage()
         {
             server.ClearRequests();
@@ -731,12 +1098,29 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+        public static async Task FetchHistoryWithAsyncShouldReturnUnencrypedMessage()
+        {
+            server.ClearRequests();
+            bool receivedMessage = await CommonFetchHistoryWithAsyncShouldReturnUnencryptedMessageBasedOnParams("", "", false);
+            Assert.IsTrue(receivedMessage, "FetchHistoryWithAsyncShouldReturnUnencrypedMessage - Fetch History Result not expected");
+        }
+
+
+        [Test]
         public static void FetchHistoryShouldReturnUnencrypedSecretSSLMessage()
         {
             server.ClearRequests();
             bool receivedMessage = false;
             CommonFetchHistoryShouldReturnUnencryptedMessageBasedOnParams(PubnubCommon.SecretKey, "", true, out receivedMessage);
             Assert.IsTrue(receivedMessage, "FetchHistoryShouldReturnUnencrypedSecretSSLMessage - Fetch History Result not expected");
+        }
+
+        [Test]
+        public static async Task FetchHistoryWithAsyncShouldReturnUnencrypedSecretSSLMessage()
+        {
+            server.ClearRequests();
+            bool receivedMessage = await CommonFetchHistoryWithAsyncShouldReturnUnencryptedMessageBasedOnParams(PubnubCommon.SecretKey, "", true);
+            Assert.IsTrue(receivedMessage, "FetchHistoryWithAsyncShouldReturnUnencrypedSecretSSLMessage - Fetch History Result not expected");
         }
 
         [Test]
@@ -749,6 +1133,14 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+        public static async Task FetchHistoryWithAsyncShouldReturnUnencrypedSSLMessage()
+        {
+            server.ClearRequests();
+            bool receivedMessage = await CommonFetchHistoryWithAsyncShouldReturnUnencryptedMessageBasedOnParams("", "", true);
+            Assert.IsTrue(receivedMessage, "FetchHistoryWithAsyncShouldReturnUnencrypedSSLMessage - Fetch History Result not expected");
+        }
+
+        [Test]
         public static void FetchHistoryShouldReturnEncrypedMessage()
         {
             server.ClearRequests();
@@ -758,11 +1150,28 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+        public static async Task FetchHistoryWithAsyncShouldReturnEncrypedMessage()
+        {
+            server.ClearRequests();
+            bool receivedMessage = await CommonFetchHistoryWithAsyncShouldReturnEncryptedMessageBasedOnParams("", "enigma", false);
+            Assert.IsTrue(receivedMessage, "FetchHistoryShouldReturnEncrypedMessage - Fetch History Result not expected");
+        }
+
+
+        [Test]
         public static void FetchHistoryShouldReturnEncrypedSecretMessage()
         {
             server.ClearRequests();
             bool receivedMessage = false;
             CommonFetchHistoryShouldReturnEncryptedMessageBasedOnParams(PubnubCommon.SecretKey, "enigma", false, out receivedMessage);
+            Assert.IsTrue(receivedMessage, "FetchHistoryShouldReturnEncrypedSecretMessage - Fetch History Result not expected");
+        }
+        
+        [Test]
+        public static async Task FetchHistoryWithAsyncShouldReturnEncrypedSecretMessage()
+        {
+            server.ClearRequests();
+            bool receivedMessage = await CommonFetchHistoryWithAsyncShouldReturnEncryptedMessageBasedOnParams(PubnubCommon.SecretKey, "enigma", false);
             Assert.IsTrue(receivedMessage, "FetchHistoryShouldReturnEncrypedSecretMessage - Fetch History Result not expected");
         }
 
@@ -776,11 +1185,28 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+        public static async Task FetchHistoryWithAsyncShouldReturnEncrypedSecretSSLMessage()
+        {
+            server.ClearRequests();
+            bool receivedMessage = await CommonFetchHistoryWithAsyncShouldReturnEncryptedMessageBasedOnParams(PubnubCommon.SecretKey, "enigma", true);
+            Assert.IsTrue(receivedMessage, "FetchHistoryShouldReturnEncrypedSecretSSLMessage - Fetch History Result not expected");
+        }
+
+
+        [Test]
         public static void FetchHistoryShouldReturnEncrypedSSLMessage()
         {
             server.ClearRequests();
             bool receivedMessage = false;
             CommonFetchHistoryShouldReturnEncryptedMessageBasedOnParams("", "enigma", true, out receivedMessage);
+            Assert.IsTrue(receivedMessage, "FetchHistoryShouldReturnEncrypedSSLMessage - Fetch History Result not expected");
+        }
+
+        [Test]
+        public static async Task FetchHistoryWithAsyncShouldReturnEncrypedSSLMessage()
+        {
+            server.ClearRequests();
+            bool receivedMessage = await CommonFetchHistoryWithAsyncShouldReturnEncryptedMessageBasedOnParams("", "enigma", true);
             Assert.IsTrue(receivedMessage, "FetchHistoryShouldReturnEncrypedSSLMessage - Fetch History Result not expected");
         }
 
@@ -1131,6 +1557,326 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = null;
             pubnub = null;
         }
+
+        private static async Task<bool> CommonFetchHistoryWithAsyncShouldReturnEncryptedMessageBasedOnParams(string secretKey, string cipherKey, bool ssl)
+        {
+            server.ClearRequests();
+            if (PubnubCommon.PAMServerSideRun && string.IsNullOrEmpty(secretKey))
+            {
+                Assert.Ignore("Ignored for Server side run");
+            }
+
+            bool receivedMessage = false;
+            int totalMessages = 10;
+            long starttime = 0;
+            long midtime = 0;
+            long endtime = 0;
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                CipherKey = cipherKey,
+                Uuid = "mytestuuid",
+                Secure = ssl
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = secretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+
+            server.RunOnHttps(ssl);
+
+            pubnub = createPubNubInstance(config);
+
+            string channel = "hello_my_channel";
+
+            long currentTimetoken = 0;
+
+            string expected = "[1356998400]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath("/time/0")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            PNResult<PNTimeResult> timeResult = await pubnub.Time().ExecuteAsync();
+            try
+            {
+                Debug.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(timeResult.Result));
+                currentTimetoken = (timeResult.Result != null && timeResult.Status.StatusCode == 200 && !timeResult.Status.Error) ? timeResult.Result.Timetoken : 0;
+            }
+            catch { /* ignore */ }
+
+            starttime = currentTimetoken;
+
+            System.Diagnostics.Debug.WriteLine(string.Format("Start Time = {0}", starttime));
+            List<string> firstPublishSet = new List<string>();
+
+            for (int index = 0; index < totalMessages / 2; index++)
+            {
+                object message = string.Format("Set1-{0}", index);
+                firstPublishSet.Add(string.Format("Set1-{0}", index));
+
+                manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 2000 : 310 * 1000;
+
+                expected = "[1,\"Sent\",\"14715322883933786\"]";
+
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/{3}", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel, index))
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+                PNResult<PNPublishResult> publishResult = await pubnub.Publish().Channel(channel).Message(message).ShouldStore(true)
+                    .ExecuteAsync();
+                if (publishResult.Result != null && publishResult.Status.StatusCode == 200 && !publishResult.Status.Error)
+                {
+                    receivedMessage = true;
+                }
+
+                System.Diagnostics.Debug.WriteLine(string.Format("Message #{0} publish {1}", index, (receivedMessage) ? "SUCCESS" : "FAILED"));
+            }
+            Thread.Sleep(2000);
+
+            currentTimetoken = 0;
+
+            expected = "[1356998400]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath("/time/0")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            timeResult = await pubnub.Time().ExecuteAsync();
+            try
+            {
+                Debug.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(timeResult.Result));
+                currentTimetoken = (timeResult.Result != null && timeResult.Status.StatusCode == 200 && !timeResult.Status.Error) ? timeResult.Result.Timetoken : 0;
+            }
+            catch { /* ignore */ }
+
+            midtime = currentTimetoken;
+
+            System.Diagnostics.Debug.WriteLine(string.Format("Mid Time = {0}", midtime));
+            List<string> secondPublishSet = new List<string>();
+            int arrayIndex = 0;
+
+            for (int index = totalMessages / 2; index < totalMessages; index++)
+            {
+                receivedMessage = false;
+
+                object message = string.Format("Set2-{0}", (double)index + 0.1D);
+                secondPublishSet.Add(string.Format("Set2-{0}", (double)index + 0.1D));
+                arrayIndex++;
+
+                //manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 2000 : 310 * 1000;
+
+                expected = "[1,\"Sent\",\"14715322883933786\"]";
+
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/{3}", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel, message))
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+                PNResult<PNPublishResult> publishResult = await pubnub.Publish().Channel(channel).Message(message).ShouldStore(true)
+                    .ExecuteAsync();
+                if (publishResult.Result != null && publishResult.Status.StatusCode == 200 && !publishResult.Status.Error)
+                {
+                    receivedMessage = true;
+                }
+
+                System.Diagnostics.Debug.WriteLine(string.Format("Message #{0} publish {1}", index, (receivedMessage) ? "SUCCESS" : "FAILED"));
+            }
+            Thread.Sleep(3000);
+            currentTimetoken = 0;
+
+            expected = "[1356998400]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath("/time/0")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            timeResult = await pubnub.Time().ExecuteAsync();
+            try
+            {
+                Debug.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(timeResult.Result));
+                currentTimetoken = (timeResult.Result != null && timeResult.Status.StatusCode == 200 && !timeResult.Status.Error) ? timeResult.Result.Timetoken : 0;
+            }
+            catch { /* ignore */ }
+
+            endtime = currentTimetoken;
+
+            System.Diagnostics.Debug.WriteLine(string.Format("End Time = {0}", endtime));
+
+            Thread.Sleep(1000);
+
+            System.Diagnostics.Debug.WriteLine("Detailed History with Start & End");
+
+            expected = "[[\"kvIeHmojsLyV1KMBo82DYQ==\",\"Ld0rZfbe4yN0Qj4V7o2BuQ==\",\"zNlnhYco9o6a646+Ox6ksg==\",\"mR8EEMx154BBHU3OOa+YjQ==\",\"v+viLoq0Gj2docUMAYyoYg==\"],14835539837820376,14835539843298232]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            List<object> historyMessageList = new List<object>();
+            PNResult<PNFetchHistoryResult> fetchHistResult = await pubnub.FetchHistory().Channels(new string[] { channel })
+                .Start(starttime)
+                .End(midtime)
+                .MaximumPerChannel(totalMessages / 2)
+                .Reverse(true)
+                .IncludeMeta(false)
+                .ExecuteAsync();
+            if (fetchHistResult.Result != null && fetchHistResult.Status.StatusCode == 200 && !fetchHistResult.Status.Error
+                && fetchHistResult.Result.Messages != null && fetchHistResult.Result.Messages.ContainsKey(channel)
+                && fetchHistResult.Result.Messages[channel].Count > 0)
+            {
+                System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(fetchHistResult.Result));
+                foreach (KeyValuePair<string, List<PNHistoryItemResult>> channelItem in fetchHistResult.Result.Messages)
+                {
+                    List<PNHistoryItemResult> itemList = channelItem.Value;
+                    foreach (PNHistoryItemResult item in itemList)
+                    {
+                        if (item.Entry != null)
+                        {
+                            historyMessageList.Add(item.Entry);
+                        }
+                    }
+                }
+            }
+
+            foreach (object item in historyMessageList)
+            {
+                if (!firstPublishSet.Contains(item.ToString()))
+                {
+                    receivedMessage = false;
+                    break;
+                }
+                receivedMessage = true;
+            }
+
+            if (!receivedMessage)
+            {
+                System.Diagnostics.Debug.WriteLine("firstPublishSet did not match");
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("firstPublishSet SUCCESS. All published messages received.");
+                System.Diagnostics.Debug.WriteLine("FetchHistory with start & reverse = true");
+
+                expected = "[[\"F2ZPfJnzuU34VKe24ds81A==\",\"2K/TO5WADvJRhvX7Zk0IpQ==\",\"oWOYyGxkWFJ1gpJxhcyzjA==\",\"LwEzvPCHdM8Yagg6oKknvg==\",\"/jjH/PT4NrK5HHjDT2KAlQ==\"],14835549524365492,14835549537755368]";
+
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+                historyMessageList = new List<object>();
+                fetchHistResult = await pubnub.FetchHistory().Channels(new string[] { channel })
+                    .Start(midtime)
+                    .End(endtime)
+                    .MaximumPerChannel(totalMessages / 2)
+                    .Reverse(true)
+                    .IncludeMeta(false)
+                    .ExecuteAsync();
+                if (fetchHistResult.Result != null && fetchHistResult.Status.StatusCode == 200 && !fetchHistResult.Status.Error
+                    && fetchHistResult.Result.Messages != null && fetchHistResult.Result.Messages.ContainsKey(channel)
+                    && fetchHistResult.Result.Messages[channel].Count > 0)
+                {
+                    System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(fetchHistResult.Result));
+                    foreach (KeyValuePair<string, List<PNHistoryItemResult>> channelItem in fetchHistResult.Result.Messages)
+                    {
+                        List<PNHistoryItemResult> itemList = channelItem.Value;
+                        foreach (PNHistoryItemResult item in itemList)
+                        {
+                            if (item.Entry != null)
+                            {
+                                historyMessageList.Add(item.Entry);
+                            }
+                        }
+                    }
+                }
+
+                foreach (object item in historyMessageList)
+                {
+                    if (!secondPublishSet.Contains(item.ToString()))
+                    {
+                        receivedMessage = false;
+                        break;
+                    }
+                    receivedMessage = true;
+                }
+
+                if (!receivedMessage)
+                {
+                    System.Diagnostics.Debug.WriteLine("secondPublishSet did not match");
+                }
+                else
+                {
+                    Debug.WriteLine("FetchHistory with start & reverse = false");
+                    expected = "[[\"kvIeHmojsLyV1KMBo82DYQ==\",\"Ld0rZfbe4yN0Qj4V7o2BuQ==\",\"zNlnhYco9o6a646+Ox6ksg==\",\"mR8EEMx154BBHU3OOa+YjQ==\",\"v+viLoq0Gj2docUMAYyoYg==\"],14835550731714499,14835550737165103]";
+
+                    server.AddRequest(new Request()
+                            .WithMethod("GET")
+                            .WithPath(String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                            .WithResponse(expected)
+                            .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+                    historyMessageList = new List<object>();
+                    fetchHistResult = await pubnub.FetchHistory().Channels(new string[] { channel })
+                        .Start(midtime - 1)
+                        .MaximumPerChannel(totalMessages / 2)
+                        .Reverse(false)
+                        .IncludeMeta(false)
+                        .ExecuteAsync();
+                    if (fetchHistResult.Result != null && fetchHistResult.Status.StatusCode == 200 && !fetchHistResult.Status.Error
+                        && fetchHistResult.Result.Messages != null && fetchHistResult.Result.Messages.ContainsKey(channel)
+                        && fetchHistResult.Result.Messages[channel].Count > 0)
+                    {
+                        foreach (KeyValuePair<string, List<PNHistoryItemResult>> channelItem in fetchHistResult.Result.Messages)
+                        {
+                            List<PNHistoryItemResult> itemList = channelItem.Value;
+                            foreach (PNHistoryItemResult item in itemList)
+                            {
+                                if (item.Entry != null)
+                                {
+                                    historyMessageList.Add(item.Entry);
+                                }
+                            }
+                        }
+                    }
+
+                    foreach (object item in historyMessageList)
+                    {
+                        if (!firstPublishSet.Contains(item.ToString()))
+                        {
+                            receivedMessage = false;
+                            break;
+                        }
+                        receivedMessage = true;
+                    }
+                }
+            }
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+
+            return receivedMessage;
+        }
+
 
         private static void CommonFetchHistoryShouldReturnUnencryptedMessageBasedOnParams(string secretKey, string cipherKey, bool ssl, out bool outReceivedMessage)
         {
@@ -1489,6 +2235,334 @@ namespace PubNubMessaging.Tests
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
+        }
+
+        private static async Task<bool> CommonFetchHistoryWithAsyncShouldReturnUnencryptedMessageBasedOnParams(string secretKey, string cipherKey, bool ssl)
+        {
+            bool receivedMessage = false;
+            int totalMessages = 10;
+            long starttime = 0;
+            long midtime = 0;
+            long endtime = 0;
+            if (PubnubCommon.PAMServerSideRun && string.IsNullOrEmpty(secretKey))
+            {
+                Assert.Ignore("Ignored for Server side run");
+            }
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                CipherKey = cipherKey,
+                Uuid = "mytestuuid",
+                Secure = ssl
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = secretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+
+            server.RunOnHttps(ssl);
+
+            pubnub = createPubNubInstance(config);
+
+            string channel = "hello_my_channel";
+
+            long currentTimetoken = 0;
+
+            string expected = "[1356998400]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath("/time/0")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            PNResult<PNTimeResult> timeResult = await pubnub.Time().ExecuteAsync();
+            try
+            {
+                Debug.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(timeResult.Result));
+                currentTimetoken = (timeResult.Result != null && timeResult.Status.StatusCode == 200 && !timeResult.Status.Error) ? timeResult.Result.Timetoken : 0;
+            }
+            catch { /* ignore */ }
+
+            starttime = currentTimetoken;
+
+            Debug.WriteLine(string.Format("Start Time = {0}", starttime));
+            List<int> firstPublishSet = new List<int>();
+
+            for (int index = 0; index < totalMessages / 2; index++)
+            {
+                receivedMessage = false;
+
+                object message = index;
+                firstPublishSet.Add(index);
+
+                manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 2000 : 310 * 1000;
+
+                expected = "[1,\"Sent\",\"14715322883933786\"]";
+
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/{3}", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel, index))
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+                PNResult<PNPublishResult> publishResult = await pubnub.Publish().Channel(channel).Message(message).ShouldStore(true).ExecuteAsync();
+                if (publishResult.Result != null && publishResult.Status.StatusCode == 200 && !publishResult.Status.Error)
+                {
+                    receivedMessage = true;
+                }
+
+                Debug.WriteLine(string.Format("Message #{0} publish {1}", index, (receivedMessage) ? "SUCCESS" : "FAILED"));
+            }
+
+            currentTimetoken = 0;
+
+            expected = "[1356998400]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath("/time/0")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            timeResult = await pubnub.Time().ExecuteAsync();
+            try
+            {
+                Debug.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(timeResult.Result));
+                currentTimetoken = (timeResult.Result != null && timeResult.Status.StatusCode == 200 && !timeResult.Status.Error) ? timeResult.Result.Timetoken : 0;
+            }
+            catch { /* ignore */ }
+
+            midtime = currentTimetoken;
+
+            Debug.WriteLine(string.Format("Mid Time = {0}", midtime));
+            List<double> secondPublishSet = new List<double>();
+            int arrayIndex = 0;
+
+            for (int index = totalMessages / 2; index < totalMessages; index++)
+            {
+                receivedMessage = false;
+
+                object message = (double)index + 0.1D;
+                secondPublishSet.Add((double)index + 0.1D);
+                arrayIndex++;
+
+                manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 2000 : 310 * 1000;
+
+                expected = "[1,\"Sent\",\"14715322883933786\"]";
+
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/{3}", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel, message))
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+                PNResult<PNPublishResult> publishResult = await pubnub.Publish().Channel(channel).Message(message).ShouldStore(true).ExecuteAsync();
+                if (publishResult.Result != null && publishResult.Status.StatusCode == 200 && !publishResult.Status.Error)
+                {
+                    receivedMessage = true;
+                }
+
+                Debug.WriteLine(string.Format("Message #{0} publish {1}", index, (receivedMessage) ? "SUCCESS" : "FAILED"));
+            }
+
+            currentTimetoken = 0;
+
+            expected = "[1356998400]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath("/time/0")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            timeResult = await pubnub.Time().ExecuteAsync();
+            try
+            {
+                Debug.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(timeResult.Result));
+                currentTimetoken = (timeResult.Result != null && timeResult.Status.StatusCode == 200 && !timeResult.Status.Error) ? timeResult.Result.Timetoken : 0;
+            }
+            catch { /* ignore */ }
+
+            endtime = currentTimetoken;
+
+            Debug.WriteLine(string.Format("End Time = {0}", endtime));
+
+            Thread.Sleep(1000);
+
+            Debug.WriteLine("Detailed History with Start & End");
+
+            expected = "[[0,1,2,3,4],14715432709547189,14715432709547189]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            List<object> historyMessageList;
+            PNResult<PNFetchHistoryResult> fetchHistResult = await pubnub.FetchHistory().Channels(new string[] { channel })
+                .Start(starttime)
+                .End(midtime)
+                .MaximumPerChannel(totalMessages / 2)
+                .Reverse(true)
+                .IncludeMeta(false)
+                .ExecuteAsync();
+            historyMessageList = new List<object>();
+            if (fetchHistResult.Result != null && fetchHistResult.Status.StatusCode == 200 && !fetchHistResult.Status.Error 
+                && fetchHistResult.Result.Messages != null && fetchHistResult.Result.Messages.ContainsKey(channel) 
+                && fetchHistResult.Result.Messages[channel].Count > 0)
+            {
+                foreach (KeyValuePair<string, List<PNHistoryItemResult>> channelItem in fetchHistResult.Result.Messages)
+                {
+                    List<PNHistoryItemResult> itemList = channelItem.Value;
+                    foreach (PNHistoryItemResult item in itemList)
+                    {
+                        if (item.Entry != null)
+                        {
+                            historyMessageList.Add(item.Entry);
+                        }
+                    }
+                }
+            }
+
+            foreach (object item in historyMessageList)
+            {
+                int num;
+                if (int.TryParse(item.ToString(), out num))
+                {
+                    if (!firstPublishSet.Contains(num))
+                    {
+                        receivedMessage = false;
+                        break;
+                    }
+                    receivedMessage = true;
+                }
+            }
+
+            if (!receivedMessage)
+            {
+                Debug.WriteLine("firstPublishSet did not match");
+            }
+            else
+            {
+                Debug.WriteLine("FetchHistory with start & reverse = true");
+
+
+                expected = "[[5.1,6.1,7.1,8.1,9.1],14715432709547189,14715432709547189]";
+
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+                fetchHistResult = await pubnub.FetchHistory().Channels(new string[] { channel })
+                    .Start(midtime - 1)
+                    .End(endtime)
+                    .MaximumPerChannel(totalMessages / 2)
+                    .Reverse(true)
+                    .IncludeMeta(false)
+                    .ExecuteAsync();
+                historyMessageList = new List<object>();
+                if (fetchHistResult.Result != null && fetchHistResult.Status.StatusCode == 200 && !fetchHistResult.Status.Error 
+                    && fetchHistResult.Result.Messages != null && fetchHistResult.Result.Messages.ContainsKey(channel) 
+                    && fetchHistResult.Result.Messages[channel].Count > 0)
+                {
+                    foreach (KeyValuePair<string, List<PNHistoryItemResult>> channelItem in fetchHistResult.Result.Messages)
+                    {
+                        List<PNHistoryItemResult> itemList = channelItem.Value;
+                        foreach (PNHistoryItemResult item in itemList)
+                        {
+                            if (item.Entry != null)
+                            {
+                                historyMessageList.Add(item.Entry);
+                            }
+                        }
+                    }
+                }
+
+                foreach (object item in historyMessageList)
+                {
+                    int num;
+                    if (int.TryParse(item.ToString(), out num))
+                    {
+                        if (!secondPublishSet.Contains(num))
+                        {
+                            receivedMessage = false;
+                            break;
+                        }
+                        receivedMessage = true;
+                    }
+                }
+
+                if (!receivedMessage)
+                {
+                    Debug.WriteLine("secondPublishSet did not match");
+                }
+                else
+                {
+                    Debug.WriteLine("DetailedHistory with start & reverse = false");
+                    expected = "[[5.1,6.1,7.1,8.1,9.1],14715432709547189,14715432709547189]";
+
+                    server.AddRequest(new Request()
+                            .WithMethod("GET")
+                            .WithPath(String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                            .WithResponse(expected)
+                            .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+                    fetchHistResult = await pubnub.FetchHistory().Channels(new string[] { channel })
+                        .Start(midtime - 1)
+                        .MaximumPerChannel(totalMessages / 2)
+                        .Reverse(false)
+                        .IncludeMeta(false)
+                        .ExecuteAsync();
+                    historyMessageList = new List<object>();
+                    if (fetchHistResult.Result != null && fetchHistResult.Status.StatusCode == 200 && !fetchHistResult.Status.Error 
+                        && fetchHistResult.Result.Messages != null && fetchHistResult.Result.Messages.ContainsKey(channel) 
+                        && fetchHistResult.Result.Messages[channel].Count > 0)
+                    {
+                        foreach (KeyValuePair<string, List<PNHistoryItemResult>> channelItem in fetchHistResult.Result.Messages)
+                        {
+                            List<PNHistoryItemResult> itemList = channelItem.Value;
+                            foreach (PNHistoryItemResult item in itemList)
+                            {
+                                if (item.Entry != null)
+                                {
+                                    historyMessageList.Add(item.Entry);
+                                }
+                            }
+                        }
+                    }
+
+                    foreach (object item in historyMessageList)
+                    {
+                        int num;
+                        if (int.TryParse(item.ToString(), out num))
+                        {
+                            if (!firstPublishSet.Contains(num))
+                            {
+                                receivedMessage = false;
+                                break;
+                            }
+                            receivedMessage = true;
+                        }
+                    }
+                }
+
+            }
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+
+            return receivedMessage;
         }
     }
 }

@@ -9,7 +9,7 @@ namespace PubnubApi
     {
         internal static PNGetMessageActionsResult GetObject(List<object> listObject)
         {
-            Dictionary<string, object> getMsgActionsDicObj = JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[1]);
+            Dictionary<string, object> getMsgActionsDicObj = (listObject != null && listObject.Count >= 2) ? JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[1]) : null;
             PNGetMessageActionsResult result = null;
             if (getMsgActionsDicObj != null && getMsgActionsDicObj.ContainsKey("data"))
             {

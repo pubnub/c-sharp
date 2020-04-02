@@ -4,6 +4,7 @@ using System.Threading;
 using PubnubApi;
 using MockServer;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace PubNubMessaging.Tests
 {
@@ -180,6 +181,72 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+        public static async Task ThenWithAsyncUnencryptSignalShouldReturnSuccessCodeAndInfo()
+        {
+            server.ClearRequests();
+
+            if (PubnubCommon.EnableStubTest)
+            {
+                Assert.Ignore("Ignored ThenWithAsyncUnencryptSignalShouldReturnSuccessCodeAndInfo");
+                return;
+            }
+
+            bool receivedSignalMessage = false;
+
+            string channel = "hello_my_channel";
+            string message = messageForUnencryptSignal;
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                CipherKey = "test",
+                Uuid = "mytestuuid",
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+            server.RunOnHttps(false);
+            pubnub = createPubNubInstance(config);
+
+            string expected = "[1,\"Sent\",\"14715278266153304\"]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("POST")
+                    .WithPath(String.Format("/v1/signal/{0}/{1}/{2}", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel))
+                    .WithContent("{\"message\":\"%22Pubnub%20Messaging%20API%201%22\"}")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            manualResetEventWaitTimeout = 310 * 1000;
+
+            PNResult<PNPublishResult> signalResult = await pubnub.Signal().Channel(channel).Message(message).ExecuteAsync();
+            if (signalResult.Result != null && signalResult.Status.StatusCode == 200 && !signalResult.Status.Error
+                && signalResult.Result.Timetoken > 0)
+            {
+                receivedSignalMessage = true;
+            }
+
+            if (!receivedSignalMessage)
+            {
+                Assert.IsTrue(receivedSignalMessage, "WithAsync Unencrypt Signal Failed");
+            }
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
+
+        [Test]
         public static void ThenUnencryptSignalListenerShouldGetMessagae()
         {
             server.ClearRequests();
@@ -283,6 +350,106 @@ namespace PubNubMessaging.Tests
                     internalReceivedMessage = false;
                 }
                 Assert.IsTrue(internalReceivedMessage, "WhenSubscribedToAChannel --> ThenUnencryptSignalListenerShouldGetMessagae Failed");
+            }
+        }
+
+        [Test]
+        public static async Task ThenWithAsyncUnencryptSignalListenerShouldGetMessagae()
+        {
+            server.ClearRequests();
+
+            bool internalReceivedMessage = false;
+            bool receivedErrorMessage = false;
+
+            if (PubnubCommon.EnableStubTest)
+            {
+                Assert.Ignore("Ignored ThenWithAsyncUnencryptSignalListenerShouldGetMessagae");
+                return;
+            }
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+
+            server.RunOnHttps(config.Secure);
+
+            ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
+
+            SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
+                (o, m) =>
+                {
+                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m));
+                    if (m != null)
+                    {
+                        Debug.WriteLine(string.Format("Signal SubscribeCallback: PNMessageResult: {0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(m.Message)));
+                        if (pubnub.JsonPluggableLibrary.SerializeToJsonString(messageForUnencryptSignal) == m.Message.ToString())
+                        {
+                            internalReceivedMessage = true;
+                        }
+                        subscribeManualEvent.Set();
+                    }
+                },
+                (o, s) => {
+                    Debug.WriteLine(string.Format("{0} {1} {2}", s.Operation, s.Category, s.StatusCode));
+                    if (s.StatusCode != 200 || s.Error)
+                    {
+                        receivedErrorMessage = true;
+                        if (s.ErrorData != null) { Debug.WriteLine(s.ErrorData.Information); }
+                        subscribeManualEvent.Set();
+                    }
+                    else if (s.StatusCode == 200 && s.Category == PNStatusCategory.PNConnectedCategory)
+                    {
+                        internalReceivedMessage = true;
+                        subscribeManualEvent.Set();
+                    }
+                });
+
+            pubnub = createPubNubInstance(config);
+            pubnub.AddListener(listenerSubCallack);
+
+            string channel = "hello_my_channel";
+            manualResetEventWaitTimeout = 310 * 1000;
+
+            pubnub.Subscribe<string>().Channels(new[] { channel }).Execute();
+            subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for connect
+            Thread.Sleep(1000);
+            if (!receivedErrorMessage)
+            {
+                subscribeManualEvent = new ManualResetEvent(false); //Reset to wait for message
+                internalReceivedMessage = false;
+                PNResult<PNPublishResult> signalResult = await pubnub.Signal().Channel(channel).Message(messageForUnencryptSignal).ExecuteAsync();
+                if (signalResult.Result != null && signalResult.Status.StatusCode == 200 && !signalResult.Status.Error)
+                {
+                    internalReceivedMessage = true;
+                }
+
+                subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+                pubnub.Unsubscribe<string>().Channels(new[] { channel }).Execute();
+
+                Thread.Sleep(1000);
+
+                pubnub.RemoveListener(listenerSubCallack);
+                pubnub.Destroy();
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
+                if (receivedErrorMessage)
+                {
+                    internalReceivedMessage = false;
+                }
+                Assert.IsTrue(internalReceivedMessage, "WhenSubscribedToAChannel --> ThenWithAsyncUnencryptSignalListenerShouldGetMessagae Failed");
             }
         }
 
@@ -394,5 +561,103 @@ namespace PubNubMessaging.Tests
             }
         }
 
+        [Test]
+        public static async Task ThenWithAsyncIgnoreCipherKeyUnencryptSignalListenerShouldGetMessagae()
+        {
+            server.ClearRequests();
+
+            bool internalReceivedMessage = false;
+            bool receivedErrorMessage = false;
+
+            if (PubnubCommon.EnableStubTest)
+            {
+                Assert.Ignore("Ignored ThenWithAsyncIgnoreCipherKeyUnencryptSignalListenerShouldGetMessagae");
+                return;
+            }
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                CipherKey = "testcipherkey",
+                Uuid = "mytestuuid",
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+
+            server.RunOnHttps(config.Secure);
+
+            ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
+
+            SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
+                delegate (Pubnub o, PNSignalResult<object> m)
+                {
+                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m));
+                    if (m != null)
+                    {
+                        Debug.WriteLine(string.Format("Signal SubscribeCallback: PNMessageResult: {0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(m.Message)));
+                        if (pubnub.JsonPluggableLibrary.SerializeToJsonString(messageForUnencryptSignal) == m.Message.ToString())
+                        {
+                            internalReceivedMessage = true;
+                        }
+                        subscribeManualEvent.Set();
+                    }
+                },
+                delegate (Pubnub o, PNStatus s) {
+                    Debug.WriteLine(string.Format("{0} {1} {2}", s.Operation, s.Category, s.StatusCode));
+                    if (s.StatusCode != 200 || s.Error)
+                    {
+                        receivedErrorMessage = true;
+                        if (s.ErrorData != null) { Debug.WriteLine(s.ErrorData.Information); }
+                        subscribeManualEvent.Set();
+                    }
+                    else if (s.StatusCode == 200 && s.Category == PNStatusCategory.PNConnectedCategory)
+                    {
+                        internalReceivedMessage = true;
+                        subscribeManualEvent.Set();
+                    }
+                });
+
+            pubnub = createPubNubInstance(config);
+            pubnub.AddListener(listenerSubCallack);
+
+            string channel = "hello_my_channel";
+            manualResetEventWaitTimeout = 310 * 1000;
+
+            pubnub.Subscribe<string>().Channels(new[] { channel }).Execute();
+            subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for connect
+            Thread.Sleep(1000);
+            if (!receivedErrorMessage)
+            {
+                subscribeManualEvent = new ManualResetEvent(false); //Reset to wait for message
+                internalReceivedMessage = false;
+                PNResult<PNPublishResult> signalResult = await pubnub.Signal().Channel(channel).Message(messageForUnencryptSignal).ExecuteAsync();
+                if (signalResult.Result != null && signalResult.Status.StatusCode == 200 && !signalResult.Status.Error)
+                {
+                    internalReceivedMessage = true;
+                }
+
+                pubnub.Unsubscribe<string>().Channels(new[] { channel }).Execute();
+
+                Thread.Sleep(1000);
+
+                pubnub.RemoveListener(listenerSubCallack);
+                pubnub.Destroy();
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
+                if (receivedErrorMessage)
+                {
+                    internalReceivedMessage = false;
+                }
+                Assert.IsTrue(internalReceivedMessage, "WhenSubscribedToAChannel --> ThenWithAsyncIgnoreCipherKeyUnencryptSignalListenerShouldGetMessagae Failed");
+            }
+        }
     }
 }

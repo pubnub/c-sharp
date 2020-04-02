@@ -10,7 +10,7 @@ namespace PubnubApi
         internal static PNUpdateSpaceResult GetObject(List<object> listObject)
         {
             PNUpdateSpaceResult result = null;
-            Dictionary<string, object> updateSpaceDicObj = JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[1]);
+            Dictionary<string, object> updateSpaceDicObj = (listObject.Count >= 2) ? JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[1]) : null;
             if (updateSpaceDicObj != null && updateSpaceDicObj.ContainsKey("data"))
             {
                 result = new PNUpdateSpaceResult();

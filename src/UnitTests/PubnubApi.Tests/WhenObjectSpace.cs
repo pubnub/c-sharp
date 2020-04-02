@@ -4,6 +4,7 @@ using PubnubApi;
 using System.Collections.Generic;
 using MockServer;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace PubNubMessaging.Tests
 {
@@ -237,6 +238,126 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+        public static async Task ThenWithAsyncSpaceCRUDShouldReturnSuccessCodeAndInfo()
+        {
+            server.ClearRequests();
+
+            if (PubnubCommon.EnableStubTest)
+            {
+                Assert.Ignore("Ignored ThenSpaceCRUDShouldReturnSuccessCodeAndInfo");
+                return;
+            }
+
+            bool receivedMessage = false;
+
+            string spaceId = "pandu-ut-sid";
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+            server.RunOnHttps(false);
+            pubnub = createPubNubInstance(config);
+            if (!PubnubCommon.PAMServerSideRun && !string.IsNullOrEmpty(authToken))
+            {
+                pubnub.ClearTokens();
+                pubnub.SetToken(authToken);
+            }
+
+            System.Diagnostics.Debug.WriteLine("pubnub.DeleteSpace() STARTED");
+            await pubnub.DeleteSpace().Id(spaceId).ExecuteAsync();
+
+            #region "CreateSpace"
+            System.Diagnostics.Debug.WriteLine("pubnub.CreateSpace() STARTED");
+            PNResult<PNCreateSpaceResult> createSpaceResult = await pubnub.CreateSpace().Id(spaceId).Name("pandu-ut-spname").ExecuteAsync();
+            if (createSpaceResult.Result != null && createSpaceResult.Status.StatusCode == 200 && !createSpaceResult.Status.Error)
+            {
+                pubnub.JsonPluggableLibrary.SerializeToJsonString(createSpaceResult.Result);
+                if (spaceId == createSpaceResult.Result.Id)
+                {
+                    receivedMessage = true;
+                }
+            }
+            #endregion
+
+            if (receivedMessage)
+            {
+                receivedMessage = false;
+                #region "UpdateSpace"
+                System.Diagnostics.Debug.WriteLine("pubnub.UpdateSpace() STARTED");
+                PNResult<PNUpdateSpaceResult> updateSpaceResult = await pubnub.UpdateSpace().Id(spaceId).Name("pandu-ut-spname-upd")
+                    .Description("pandu-ut-spdesc")
+                    .CustomObject(new Dictionary<string, object>() { { "color", "red" } })
+                        .ExecuteAsync();
+                if (updateSpaceResult.Result != null && updateSpaceResult.Status.StatusCode == 200 && !updateSpaceResult.Status.Error)
+                {
+                    pubnub.JsonPluggableLibrary.SerializeToJsonString(updateSpaceResult.Result);
+                    if (spaceId == updateSpaceResult.Result.Id)
+                    {
+                        receivedMessage = true;
+                    }
+                }
+                #endregion
+            }
+
+            if (receivedMessage)
+            {
+                receivedMessage = false;
+                #region "GetSpace"
+                System.Diagnostics.Debug.WriteLine("pubnub.GetSpace() STARTED");
+                PNResult<PNGetSpaceResult> getSpaceResult = await pubnub.GetSpace().SpaceId(spaceId).IncludeCustom(true)
+                    .ExecuteAsync();
+                if (getSpaceResult.Result != null && getSpaceResult.Status.StatusCode == 200 && !getSpaceResult.Status.Error)
+                {
+                    pubnub.JsonPluggableLibrary.SerializeToJsonString(getSpaceResult.Result);
+                    if (spaceId == getSpaceResult.Result.Id)
+                    {
+                        receivedMessage = true;
+                    }
+                }
+                #endregion
+            }
+
+            if (receivedMessage)
+            {
+                receivedMessage = false;
+                #region "GetSpaces"
+                System.Diagnostics.Debug.WriteLine("pubnub.GetSpaces() STARTED");
+                PNResult<PNGetSpacesResult> getSpacesResult = await pubnub.GetSpaces().IncludeCount(true).ExecuteAsync();
+                if (getSpacesResult.Result != null && getSpacesResult.Status.StatusCode == 200 && !getSpacesResult.Status.Error)
+                {
+                    pubnub.JsonPluggableLibrary.SerializeToJsonString(getSpacesResult.Result);
+                    List<PNSpaceResult> spaceList = getSpacesResult.Result.Spaces;
+                    if (spaceList != null && spaceList.Count > 0 && spaceList.Find(x => x.Id == spaceId) != null)
+                    {
+                        receivedMessage = true;
+                    }
+                }
+                #endregion
+            }
+
+            if (!receivedMessage)
+            {
+                Assert.IsTrue(receivedMessage, "CreateUser/UpdateUser/DeleteUser Failed");
+            }
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
+
+        [Test]
         public static void ThenSpaceUpdateDeleteShouldReturnEventInfo()
         {
             server.ClearRequests();
@@ -362,6 +483,130 @@ namespace PubNubMessaging.Tests
                 pubnub.DeleteSpace().Id(spaceId).Execute(new PNDeleteSpaceResultExt(
                     delegate (PNDeleteSpaceResult result, PNStatus status) { }));
                 manualEvent.WaitOne(2000);
+            }
+
+            Thread.Sleep(2000);
+
+            pubnub.Unsubscribe<string>().Channels(new string[] { spaceId }).Execute();
+            pubnub.RemoveListener(eventListener);
+
+            Assert.IsTrue(receivedDeleteEvent && receivedUpdateEvent, "Space events Failed");
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+
+        }
+
+        [Test]
+        public static async Task ThenWithAsyncSpaceUpdateDeleteShouldReturnEventInfo()
+        {
+            server.ClearRequests();
+
+            if (PubnubCommon.EnableStubTest)
+            {
+                Assert.Ignore("Ignored ThenSpaceUpdateDeleteShouldReturnEventInfo");
+                return;
+            }
+
+            bool receivedMessage = false;
+            bool receivedDeleteEvent = false;
+            bool receivedUpdateEvent = false;
+
+            string spaceId = "pandu-ut-sid";
+            manualResetEventWaitTimeout = 310 * 1000;
+
+            SubscribeCallbackExt eventListener = new SubscribeCallbackExt(
+                delegate (Pubnub pnObj, PNObjectApiEventResult eventResult)
+                {
+                    System.Diagnostics.Debug.WriteLine("EVENT:" + pubnub.JsonPluggableLibrary.SerializeToJsonString(eventResult));
+                    if (eventResult.Type.ToLowerInvariant() == "space")
+                    {
+                        if (eventResult.Event.ToLowerInvariant() == "update")
+                        {
+                            receivedUpdateEvent = true;
+                        }
+                        else if (eventResult.Event.ToLowerInvariant() == "delete")
+                        {
+                            receivedDeleteEvent = true;
+                        }
+                    }
+                },
+                delegate (Pubnub pnObj, PNStatus status)
+                {
+
+                }
+                );
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+                Secure = false,
+                AuthKey = "myauth"
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+            server.RunOnHttps(false);
+            pubnub = createPubNubInstance(config);
+            if (!PubnubCommon.PAMServerSideRun && !string.IsNullOrEmpty(authToken))
+            {
+                pubnub.ClearTokens();
+                pubnub.SetToken(authToken);
+            }
+            pubnub.AddListener(eventListener);
+
+            ManualResetEvent manualEvent = new ManualResetEvent(false);
+            pubnub.Subscribe<string>().Channels(new string[] { spaceId }).Execute();
+            manualEvent.WaitOne(2000);
+
+            System.Diagnostics.Debug.WriteLine("pubnub.DeleteSpace() STARTED");
+            await pubnub.DeleteSpace().Id(spaceId).ExecuteAsync();
+
+            #region "CreateSpace"
+            System.Diagnostics.Debug.WriteLine("pubnub.CreateSpace() STARTED");
+            PNResult<PNCreateSpaceResult> createSpaceResult = await pubnub.CreateSpace().Id(spaceId).Name("pandu-ut-spname").ExecuteAsync();
+            if (createSpaceResult.Result != null && createSpaceResult.Status.StatusCode == 200 && !createSpaceResult.Status.Error)
+            {
+                pubnub.JsonPluggableLibrary.SerializeToJsonString(createSpaceResult.Result);
+                if (spaceId == createSpaceResult.Result.Id)
+                {
+                    receivedMessage = true;
+                }
+            }
+            #endregion
+
+            if (receivedMessage)
+            {
+                receivedMessage = false;
+                #region "UpdateSpace"
+                System.Diagnostics.Debug.WriteLine("pubnub.UpdateSpace() STARTED");
+                PNResult<PNUpdateSpaceResult> updateSpaceResult = await pubnub.UpdateSpace().Id(spaceId).Name("pandu-ut-spname-upd")
+                    .Description("pandu-ut-spdesc")
+                    .CustomObject(new Dictionary<string, object>() { { "color", "red" } })
+                        .ExecuteAsync();
+                if (updateSpaceResult.Result != null && updateSpaceResult.Status.StatusCode == 200 && !updateSpaceResult.Status.Error)
+                {
+                    pubnub.JsonPluggableLibrary.SerializeToJsonString(updateSpaceResult.Result);
+                    if (spaceId == updateSpaceResult.Result.Id)
+                    {
+                        receivedMessage = true;
+                    }
+                }
+                #endregion
+            }
+
+            if (!receivedDeleteEvent)
+            {
+                System.Diagnostics.Debug.WriteLine("pubnub.DeleteSpace() 2 STARTED");
+                await pubnub.DeleteSpace().Id(spaceId).ExecuteAsync();
             }
 
             Thread.Sleep(2000);

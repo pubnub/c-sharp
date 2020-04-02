@@ -9,6 +9,7 @@ using System.Collections;
 using PubnubApi;
 using MockServer;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace PubNubMessaging.Tests
 {
@@ -449,6 +450,57 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+        public static async Task ThenWithAsyncAuditPushChannelProvisionsShouldReturnSuccess()
+        {
+            server.ClearRequests();
+
+            receivedMessage = false;
+            currentTestCase = "ThenWithAsyncAuditPushChannelProvisionsShouldReturnSuccess";
+
+            if (PubnubCommon.EnableStubTest)
+            {
+                Assert.Ignore("Cannot run static unit test on AuditPushChannelProvisions");
+                return;
+            }
+
+            PNConfiguration config = new PNConfiguration
+            {
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.PublishKey = PubnubCommon.PublishKey;
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+
+            server.RunOnHttps(false);
+
+            pubnub = createPubNubInstance(config);
+
+            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+
+            mrePush = new ManualResetEvent(false);
+
+            PNResult<PNPushListProvisionsResult> resp = await pubnub.AuditPushChannelProvisions().DeviceId("4e71acc275a8eeb400654d923724c073956661455697c92ca6c5438f2c19aa7b").PushType(PNPushType.APNS)
+                .ExecuteAsync();
+            if (resp.Result != null)
+            {
+                receivedMessage = true;
+            }
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+            Assert.IsTrue(receivedMessage, "With Async AuditPushChannelProvisions Failed");
+        }
+
+        [Test]
         public static void ThenAPNS2AddDeviceToPushChannelShouldReturnSuccess()
         {
             server.ClearRequests();
@@ -507,6 +559,63 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedMessage, "ThenAPNS2AddDeviceToPushChannelShouldReturnSuccess Failed");
+        }
+
+        [Test]
+        public static async Task ThenWithAsyncAPNS2AddDeviceToPushChannelShouldReturnSuccess()
+        {
+            server.ClearRequests();
+
+            receivedMessage = false;
+            currentTestCase = "ThenWithAsyncAPNS2AddDeviceToPushChannelShouldReturnSuccess";
+
+            if (PubnubCommon.EnableStubTest)
+            {
+                Assert.Ignore("Cannot run static unit test on AddPushNotificationsOnChannels");
+                return;
+            }
+
+            PNConfiguration config = new PNConfiguration
+            {
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.PublishKey = PubnubCommon.PublishKey;
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+
+            server.RunOnHttps(false);
+
+            pubnub = createPubNubInstance(config);
+
+            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+
+            mrePush = new ManualResetEvent(false);
+
+            PNResult<PNPushAddChannelResult> resp = await pubnub.AddPushNotificationsOnChannels()
+                .Channels(new string[] { channel })
+                .DeviceId("4e71acc275a8eeb400654d923724c073956661455697c92ca6c5438f2c19aa7b")
+                .PushType(PNPushType.APNS2)
+                .Environment(PushEnvironment.Development)
+                .Topic("My Sample Topic")
+                .ExecuteAsync();
+            if (resp.Result != null)
+            {
+                System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(resp.Result));
+                receivedMessage = true;
+            }
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+            Assert.IsTrue(receivedMessage, "ThenWithAsyncAPNS2AddDeviceToPushChannelShouldReturnSuccess Failed");
         }
 
         [Test]
@@ -571,6 +680,63 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+        public static async Task ThenWithAsyncAPNS2RemovePushChannelFromDeviceShouldReturnSuccess()
+        {
+            server.ClearRequests();
+
+            receivedMessage = false;
+            currentTestCase = "ThenWithAsyncAPNS2RemovePushChannelFromDeviceShouldReturnSuccess";
+
+            if (PubnubCommon.EnableStubTest)
+            {
+                Assert.Ignore("Cannot run static unit test on RemovePushNotificationsFromChannels");
+                return;
+            }
+
+            PNConfiguration config = new PNConfiguration
+            {
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.PublishKey = PubnubCommon.PublishKey;
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+
+            server.RunOnHttps(false);
+
+            pubnub = createPubNubInstance(config);
+
+            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+
+            mrePush = new ManualResetEvent(false);
+
+            PNResult<PNPushRemoveChannelResult> resp = await pubnub.RemovePushNotificationsFromChannels()
+                .Channels(new string[] { channel })
+                .DeviceId("4e71acc275a8eeb400654d923724c073956661455697c92ca6c5438f2c19aa7b")
+                .PushType(PNPushType.APNS2)
+                .Environment(PushEnvironment.Development)
+                .Topic("My Sample Topic")
+                .ExecuteAsync();
+            if (resp.Result != null)
+            {
+                System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(resp.Result));
+                receivedMessage = true;
+            }
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+            Assert.IsTrue(receivedMessage, "ThenWithAsyncAPNS2RemovePushChannelFromDeviceShouldReturnSuccess Failed");
+        }
+
+        [Test]
         public static void ThenAPNS2ListPushChannelsFromDeviceShouldReturnSuccess()
         {
             server.ClearRequests();
@@ -623,6 +789,58 @@ namespace PubNubMessaging.Tests
                     mrePush.Set();
                 }));
             mrePush.WaitOne(manualResetEventWaitTimeout);
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+            Assert.IsTrue(receivedMessage, "ThenAPNS2ListPushChannelsFromDeviceShouldReturnSuccess Failed");
+        }
+
+        [Test]
+        public static async Task ThenWithAsyncAPNS2ListPushChannelsFromDeviceShouldReturnSuccess()
+        {
+            server.ClearRequests();
+
+            receivedMessage = false;
+            currentTestCase = "ThenWithAsyncAPNS2ListPushChannelsFromDeviceShouldReturnSuccess";
+
+            if (PubnubCommon.EnableStubTest)
+            {
+                Assert.Ignore("Cannot run static unit test on AuditPushChannelProvisions");
+                return;
+            }
+
+            PNConfiguration config = new PNConfiguration
+            {
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.PublishKey = PubnubCommon.PublishKey;
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+
+            server.RunOnHttps(false);
+
+            pubnub = createPubNubInstance(config);
+
+            PNResult<PNPushListProvisionsResult> resp = await pubnub.AuditPushChannelProvisions()
+                .DeviceId("4e71acc275a8eeb400654d923724c073956661455697c92ca6c5438f2c19aa7b")
+                .PushType(PNPushType.APNS2)
+                .Environment(PushEnvironment.Development)
+                .Topic("My Sample Topic")
+                .ExecuteAsync();
+            if (resp.Result != null)
+            {
+                System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(resp.Result));
+                receivedMessage = true;
+            }
 
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
@@ -690,37 +908,58 @@ namespace PubNubMessaging.Tests
             Assert.IsTrue(receivedMessage, "ThenAPNS2RemoveDeviceFromPushShouldReturnSuccess Failed");
         }
 
-        private class UTGrantResult : PNCallback<PNAccessManagerGrantResult>
+        [Test]
+        public static async Task ThenWithAsyncAPNS2RemoveDeviceFromPushShouldReturnSuccess()
         {
-            public override void OnResponse(PNAccessManagerGrantResult result, PNStatus status)
-            {
-                try
-                {
-                    Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+            server.ClearRequests();
 
-                    if (result != null)
-                    {
-                        Debug.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-                        if (result.Channels != null && result.Channels.Count > 0)
-                        {
-                            var read = result.Channels[channel][authKey].ReadEnabled;
-                            var write = result.Channels[channel][authKey].WriteEnabled;
-                            if (read && write)
-                            {
-                                receivedGrantMessage = true;
-                            }
-                        }
-                    }
-                }
-                catch
-                {
-                }
-                finally
-                {
-                    grantManualEvent.Set();
-                }
+            receivedMessage = false;
+            currentTestCase = "ThenAPNS2RemoveDeviceFromPushShouldReturnSuccess";
+
+            if (PubnubCommon.EnableStubTest)
+            {
+                Assert.Ignore("Cannot run static unit test on ThenWithAsyncAPNS2RemoveDeviceFromPushShouldReturnSuccess");
+                return;
             }
+
+            PNConfiguration config = new PNConfiguration
+            {
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.PublishKey = PubnubCommon.PublishKey;
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+
+            server.RunOnHttps(false);
+
+            pubnub = createPubNubInstance(config);
+
+            manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
+
+            PNResult<PNPushRemoveAllChannelsResult> resp = await pubnub.RemoveAllPushNotificationsFromDeviceWithPushToken()
+                .DeviceId("4e71acc275a8eeb400654d923724c073956661455697c92ca6c5438f2c19aa7b")
+                .PushType(PNPushType.APNS2)
+                .Environment(PushEnvironment.Development)
+                .Topic("My Sample Topic")
+                .ExecuteAsync();
+            if (resp.Result != null)
+            {
+                System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(resp.Result));
+                receivedMessage = true;
+            }
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+            Assert.IsTrue(receivedMessage, "ThenWithAsyncAPNS2RemoveDeviceFromPushShouldReturnSuccess Failed");
         }
-       
     }
 }

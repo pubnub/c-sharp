@@ -82,6 +82,15 @@ namespace PubnubApi.EndPoint
 #endif
         }
 
+        public async Task<PNResult<PNGetStateResult>> ExecuteAsync()
+        {
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+            return await GetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, this.queryParam).ConfigureAwait(false);
+#else
+            return await GetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, this.queryParam).ConfigureAwait(false);
+#endif
+        }
+
         internal void Retry()
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
@@ -129,12 +138,65 @@ namespace PubnubApi.EndPoint
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;
 
-            string json = UrlProcessRequest<PNGetStateResult>(request, requestState, false);
+            UrlProcessRequest(request, requestState, false).ContinueWith(r =>
+            {
+                string json = r.Result.Item1;
+                if (!string.IsNullOrEmpty(json))
+                {
+                    List<object> result = ProcessJsonResponse(requestState, json);
+                    ProcessResponseCallbacks(result, requestState);
+                }
+            }, TaskContinuationOptions.ExecuteSynchronously).Wait();
+        }
+
+        internal async Task<PNResult<PNGetStateResult>> GetUserState(string[] channels, string[] channelGroups, string uuid, Dictionary<string, object> externalQueryParam)
+        {
+            if ((channels == null && channelGroups == null)
+                           || (channels != null && channelGroups != null && channels.Length == 0 && channelGroups.Length == 0))
+            {
+                throw new ArgumentException("Either Channel Or Channel Group or Both should be provided");
+            }
+            PNResult<PNGetStateResult> ret = new PNResult<PNGetStateResult>();
+
+            string internalUuid;
+            if (string.IsNullOrEmpty(uuid) || uuid.Trim().Length == 0)
+            {
+                internalUuid = config.Uuid;
+            }
+            else
+            {
+                internalUuid = uuid;
+            }
+
+            string channelsCommaDelimited = (channels != null && channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : "";
+            string channelGroupsCommaDelimited = (channelGroups != null && channelGroups.Length > 0) ? string.Join(",", channelGroups.OrderBy(x => x).ToArray()) : "";
+
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            Uri request = urlBuilder.BuildGetUserStateRequest("GET", "", channelsCommaDelimited, channelGroupsCommaDelimited, internalUuid, externalQueryParam);
+
+            RequestState<PNGetStateResult> requestState = new RequestState<PNGetStateResult>();
+            requestState.Channels = channels;
+            requestState.ChannelGroups = channelGroups;
+            requestState.ResponseType = PNOperationType.PNGetStateOperation;
+            requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
+
+            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false);
+            ret.Status = JsonAndStatusTuple.Item2;
+            string json = JsonAndStatusTuple.Item1;
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = ProcessJsonResponse<PNGetStateResult>(requestState, json);
-                ProcessResponseCallbacks(result, requestState);
+                List<object> resultList = ProcessJsonResponse(requestState, json);
+                ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+                PNGetStateResult responseResult = responseBuilder.JsonToObject<PNGetStateResult>(resultList, true);
+                if (responseResult != null)
+                {
+                    ret.Result = responseResult;
+                }
             }
+
+            return ret;
         }
 
         internal void CurrentPubnubInstance(Pubnub instance)

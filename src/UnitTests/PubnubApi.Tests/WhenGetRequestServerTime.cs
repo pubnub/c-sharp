@@ -4,6 +4,7 @@ using System.Threading;
 using PubnubApi;
 using MockServer;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace PubNubMessaging.Tests
 {
@@ -35,7 +36,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public static void ThenItShouldReturnTimeStamp()
+        public static async Task ThenItShouldReturnTimeStamp()
         {
             server.ClearRequests();
 
@@ -65,9 +66,47 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Time().Execute(new TimeResult());
-                
+            pubnub.Time().Execute(new PNTimeResultExt((result, status)=> 
+            {
+                try
+                {
+                    Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+
+                    if (result != null)
+                    {
+                        Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+
+                        if (status.StatusCode == 200 && status.Error == false)
+                        {
+                            if (PubnubCommon.EnableStubTest)
+                            {
+                                if (expectedTime == result.Timetoken)
+                                {
+                                    timeReceived = true;
+                                }
+                            }
+                            else if (result.Timetoken > 0)
+                            {
+                                timeReceived = true;
+                            }
+                        }
+                    }
+                }
+                catch { /* ignone */ }
+                finally
+                {
+                    mreTime.Set();
+                }
+            }));
             mreTime.WaitOne(310 * 1000);
+
+            PNResult<PNTimeResult> timeResult = await pubnub.Time().ExecuteAsync();
+            if (timeResult.Result != null)
+            {
+                Debug.WriteLine(string.Format("ASYNC RESULT = {0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(timeResult.Result)));
+            }
+
+
 
             pubnub.Destroy();
             pubnub = null;

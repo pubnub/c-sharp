@@ -5,6 +5,7 @@ using PubnubApi;
 using System.Collections.Generic;
 using MockServer;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace PubNubMessaging.Tests
 {
@@ -93,11 +94,11 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public static void DeleteMessageShouldReturnSuccessMessage()
+        public static void ThenDeleteMessageShouldReturnSuccessMessage()
         {
             server.ClearRequests();
 
-            currentTestCase = "DeleteMessageShouldReturnSuccessMessage";
+            currentTestCase = "ThenDeleteMessageShouldReturnSuccessMessage";
             receivedMessage = false;
 
             PNConfiguration config = new PNConfiguration
@@ -139,9 +140,59 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = null;
             pubnub = null;
 
-            Assert.IsTrue(receivedMessage, "DeleteMessageShouldReturnSuccessMessage - DeleteMessages Result not expected");
+            Assert.IsTrue(receivedMessage, "ThenDeleteMessageShouldReturnSuccessMessage - DeleteMessages Result not expected");
         }
 
+        [Test]
+        public static async Task ThenWithAsyncDeleteMessageShouldReturnSuccessMessage()
+        {
+            server.ClearRequests();
+
+            currentTestCase = "ThenWithAsyncDeleteMessageShouldReturnSuccessMessage";
+            receivedMessage = false;
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+            pubnub = createPubNubInstance(config);
+
+            string expected = "{\"status\": 200, \"error\": false, \"error_message\": \"\"}";
+
+            server.AddRequest(new Request()
+                    .WithMethod("DELETE")
+                    .WithPath(string.Format("/v3/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("signature", "AQjIVGOI59CyaHrRG18XRZmqRjgWdzbbf9icO0Yzxo4=")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            PNResult<PNDeleteMessageResult> resp = await pubnub.DeleteMessages().Channel(channel).ExecuteAsync();
+            if (resp.Result != null && resp.Status.StatusCode == 200 && !resp.Status.Error)
+            {
+                receivedMessage = true;
+            }
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+
+            Assert.IsTrue(receivedMessage, "ThenWithAsyncDeleteMessageShouldReturnSuccessMessage - DeleteMessages Result not expected");
+        }
 
         private class UTGrantResult : PNCallback<PNAccessManagerGrantResult>
         {
