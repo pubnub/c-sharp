@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using MockServer;
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace PubNubMessaging.Tests
 {
@@ -25,7 +26,7 @@ namespace PubNubMessaging.Tests
         private static Pubnub pubnub;
         private static Server server;
 
-        [TestFixtureSetUp]
+        [SetUp]
         public static void Init()
         {
             UnitTestLog unitLog = new Tests.UnitTestLog();
@@ -83,7 +84,7 @@ namespace PubNubMessaging.Tests
             Assert.IsTrue(receivedGrantMessage, "WhenChannelGroupIsRequested Grant access failed.");
         }
 
-        [TestFixtureTearDown]
+        [TearDown]
         public static void Exit()
         {
             server.Stop();
@@ -142,6 +143,65 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+        public static async Task ThenWithAsyncAddChannelShouldReturnSuccess()
+        {
+            server.ClearRequests();
+
+            currentUnitTestCase = "ThenAddChannelShouldReturnSuccess";
+            receivedChannelGroupMessage = false;
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+            pubnub = createPubNubInstance(config);
+
+            string expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(string.Format("/v1/channel-registration/sub-key/{0}/channel-group/{1}", PubnubCommon.SubscribeKey, channelGroupName))
+                    .WithParameter("add", channelName)
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("signature", "yo21VoxIksrH3Iozeaz5Zw4BX18N3vU9PLa-zVxRXsU=")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            channelGroupManualEvent = new ManualResetEvent(false);
+
+            PNResult<PNChannelGroupsAddChannelResult> cgAddResult = await pubnub.AddChannelsToChannelGroup().Channels(new[] { channelName }).ChannelGroup(channelGroupName).ExecuteAsync();
+            Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(cgAddResult.Status));
+
+            if (cgAddResult.Result != null)
+            {
+                Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(cgAddResult.Result));
+                if (cgAddResult.Status.StatusCode == 200 && !cgAddResult.Status.Error)
+                {
+                    receivedChannelGroupMessage = true;
+                }
+            }
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+            Assert.IsTrue(receivedChannelGroupMessage, "WhenChannelGroupIsRequested -> ThenWithAsyncAddChannelShouldReturnSuccess failed.");
+
+        }
+
+        [Test]
         public static void ThenRemoveChannelShouldReturnSuccess()
         {
             server.ClearRequests();
@@ -192,6 +252,69 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedChannelGroupMessage, "WhenChannelGroupIsRequested -> ThenRemoveChannelShouldReturnSuccess failed.");
+
+        }
+
+        [Test]
+        public static async Task ThenWithAsyncRemoveChannelShouldReturnSuccess()
+        {
+            server.ClearRequests();
+
+            currentUnitTestCase = "ThenRemoveChannelShouldReturnSuccess";
+            string channelName = "hello_my_channel";
+            receivedChannelGroupMessage = false;
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+            pubnub = createPubNubInstance(config);
+
+            string expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(string.Format("/v1/channel-registration/sub-key/{0}/channel-group/{1}", PubnubCommon.SubscribeKey, channelGroupName))
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("remove", channelName)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("signature", "bTwraHYh6dEMi44y-WgHslZdKSltsMySX5cg0uHt9tE=")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            channelGroupManualEvent = new ManualResetEvent(false);
+
+            PNResult<PNChannelGroupsRemoveChannelResult> cgRemoveChannelResult = await pubnub.RemoveChannelsFromChannelGroup().Channels(new[] { channelName }).ChannelGroup(channelGroupName).ExecuteAsync();
+            Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(cgRemoveChannelResult.Status));
+
+            if (cgRemoveChannelResult.Result != null)
+            {
+                Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(cgRemoveChannelResult.Result));
+                if (cgRemoveChannelResult.Status.StatusCode == 200 && cgRemoveChannelResult.Result.Message.ToLower() == "ok" 
+                    && cgRemoveChannelResult.Result.Service == "channel-registry" && !cgRemoveChannelResult.Status.Error 
+                    && cgRemoveChannelResult.Result.ChannelGroup == channelGroupName)
+                {
+                    receivedChannelGroupMessage = true;
+                }
+            }
+
+            pubnub.Destroy();
+
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+            Assert.IsTrue(receivedChannelGroupMessage, "WhenChannelGroupIsRequested -> ThenWithAsyncRemoveChannelShouldReturnSuccess failed.");
 
         }
 
@@ -248,6 +371,66 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+        public static async Task ThenWithAsyncGetChannelListShouldReturnSuccess()
+        {
+            server.ClearRequests();
+
+            currentUnitTestCase = "ThenGetChannelListShouldReturnSuccess";
+
+            receivedChannelGroupMessage = false;
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+            pubnub = createPubNubInstance(config);
+
+            string expected = "{\"status\": 200, \"payload\": {\"channels\": [\"" + channelName + "\"], \"group\": \"" + channelGroupName + "\"}, \"service\": \"channel-registry\", \"error\": false}";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(string.Format("/v1/channel-registration/sub-key/{0}/channel-group/{1}", PubnubCommon.SubscribeKey, channelGroupName))
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("signature", "03YaQgvhwhQ9wMg3RLSYolTDzOpuuGoRzE5a7sEMLds=")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            channelGroupManualEvent = new ManualResetEvent(false);
+
+            PNResult<PNChannelGroupsAllChannelsResult> cgAllChannelsResult = await pubnub.ListChannelsForChannelGroup().ChannelGroup(channelGroupName).ExecuteAsync();
+            Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(cgAllChannelsResult.Status));
+
+            if (cgAllChannelsResult.Result != null)
+            {
+                Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(cgAllChannelsResult.Result));
+                if (cgAllChannelsResult.Status.StatusCode == 200 && !cgAllChannelsResult.Status.Error 
+                    && cgAllChannelsResult.Result.ChannelGroup == channelGroupName && cgAllChannelsResult.Result.Channels.Count > 0)
+                {
+                    receivedChannelGroupMessage = true;
+                }
+            }
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+            Assert.IsTrue(receivedChannelGroupMessage, "WhenChannelGroupIsRequested -> ThenWithAsyncGetChannelListShouldReturnSuccess failed.");
+
+        }
+
+        [Test]
         public static void ThenGetAllChannelGroupShouldReturnSuccess()
         {
             server.ClearRequests();
@@ -294,6 +477,68 @@ namespace PubNubMessaging.Tests
             Thread.Sleep(1000);
 
             channelGroupManualEvent.WaitOne();
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+            Assert.IsTrue(receivedChannelGroupMessage, "WhenChannelGroupIsRequested -> ThenGetChannelListShouldReturnSuccess failed.");
+
+        }
+
+        [Test]
+        public static async Task ThenWithAsyncGetAllChannelGroupShouldReturnSuccess()
+        {
+            server.ClearRequests();
+            if (!PubnubCommon.PAMServerSideRun)
+            {
+                Assert.Ignore("Ignored due to requied secret key to get all CGs");
+            }
+            currentUnitTestCase = "ThenGetAllChannelGroupShouldReturnSuccess";
+
+            receivedChannelGroupMessage = false;
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+            pubnub = createPubNubInstance(config);
+
+            string expected = "{\"status\": 200, \"payload\": {\"namespace\": \"\", \"groups\": [\"" + channelGroupName + "\", \"hello_my_group1\"]}, \"service\": \"channel-registry\", \"error\": false}";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(string.Format("/v1/channel-registration/sub-key/{0}/channel-group", PubnubCommon.SubscribeKey))
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("signature", "qnMQZkath89WEZaFGFmYaODIJqscq97l4TlvkVKHx_0=")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            channelGroupManualEvent = new ManualResetEvent(false);
+
+            PNResult<PNChannelGroupsListAllResult> cgListAllResult = await pubnub.ListChannelGroups().ExecuteAsync();
+            Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(cgListAllResult.Status));
+
+            if (cgListAllResult.Result != null)
+            {
+                Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(cgListAllResult.Result));
+                if (cgListAllResult.Status.StatusCode == 200 && !cgListAllResult.Status.Error)
+                {
+                    receivedChannelGroupMessage = true;
+                }
+            }
 
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;

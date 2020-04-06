@@ -1,0 +1,107 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <!--<Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />-->
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp3.1</TargetFrameworks>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5ACBD3DD-B120-4F8C-91EB-D4D8F83E9F2C}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <!--<RootNamespace>PubnubApi.Tests</RootNamespace>
+    <AssemblyName>PubnubApi.Tests</AssemblyName>-->
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
+    <DefineConstants>$(DefineConstants);NETSTANDARD10</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
+    <DefineConstants>$(DefineConstants);NETSTANDARD11</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
+    <DefineConstants>$(DefineConstants);NETSTANDARD13</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.4' ">
+    <DefineConstants>$(DefineConstants);NETSTANDARD14</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <DefineConstants>$(DefineConstants);NETSTANDARD20</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
+    <DefineConstants>$(DefineConstants);NETSTANDARD20</DefineConstants>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition=" '$(Configuration)|$(TargetFramework)|$(Platform)' == 'Debug|AnyCPU' ">
+
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(TargetFramework)|$(Platform)' == 'Release|AnyCPU' ">
+
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\PubnubApi.Tests\CleanupGrant.cs" Link="CleanupGrant.cs" />
+    <Compile Include="..\PubnubApi.Tests\EncryptionTests.cs" Link="EncryptionTests.cs" />
+    <Compile Include="..\PubnubApi.Tests\GenerateSampleGrant.cs" Link="GenerateSampleGrant.cs" />
+    <Compile Include="..\PubnubApi.Tests\PubnubCommon.cs" Link="PubnubCommon.cs" />
+    <Compile Include="..\PubnubApi.Tests\PubnubUnitTest.cs" Link="PubnubUnitTest.cs" />
+    <Compile Include="..\PubnubApi.Tests\TestHarness.cs" Link="TestHarness.cs" />
+    <Compile Include="..\PubnubApi.Tests\UnitTestLog.cs" Link="UnitTestLog.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenAClientIsPresented.cs" Link="WhenAClientIsPresented.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenAMessageIsPublished.cs" Link="WhenAMessageIsPublished.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenAMessageIsSignaled.cs" Link="WhenAMessageIsSignaled.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenAuditIsRequested.cs" Link="WhenAuditIsRequested.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenChannelGroupIsRequested.cs" Link="WhenChannelGroupIsRequested.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenDetailedHistoryIsRequested.cs" Link="WhenDetailedHistoryIsRequested.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenFetchHistoryIsRequested.cs" Link="WhenFetchHistoryIsRequested.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenGetRequestServerTime.cs" Link="WhenGetRequestServerTime.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenGetRequestServerTimeMultiInstance.cs" Link="WhenGetRequestServerTimeMultiInstance.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenGrantIsRequested.cs" Link="WhenGrantIsRequested.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenMessageAction.cs" Link="WhenMessageAction.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenMessageCountIsRequested.cs" Link="WhenMessageCountIsRequested.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenMessageDeletedFromChannel.cs" Link="WhenMessageDeletedFromChannel.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenObjectMember.cs" Link="WhenObjectMember.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenObjectMembership.cs" Link="WhenObjectMembership.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenObjectSpace.cs" Link="WhenObjectSpace.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenObjectUser.cs" Link="WhenObjectUser.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenPushIsRequested.cs" Link="WhenPushIsRequested.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenSubscribedToAChannel.cs" Link="WhenSubscribedToAChannel.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenSubscribedToAChannel2.cs" Link="WhenSubscribedToAChannel2.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenSubscribedToAChannel3.cs" Link="WhenSubscribedToAChannel3.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenSubscribedToAChannelGroup.cs" Link="WhenSubscribedToAChannelGroup.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenSubscribedToWildcardChannel.cs" Link="WhenSubscribedToWildcardChannel.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenUnsubscribedToAChannel.cs" Link="WhenUnsubscribedToAChannel.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenUnsubscribedToAChannelGroup.cs" Link="WhenUnsubscribedToAChannelGroup.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.1">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
+    <PackageReference Include="NUnit" Version="3.12.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Api\PubnubApiPCL\PubnubApiPCL.csproj" />
+    <ProjectReference Include="..\MockServerPubnubApiPCL\MockServerPubnubApiPCL.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Resource.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resource.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Resource.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+ </Project>

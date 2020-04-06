@@ -4,8 +4,13 @@ using System.Threading;
 using PubnubApi;
 using System.Collections.Generic;
 using MockServer;
-using PubnubApi.Tests;
 using System.Diagnostics;
+using System.Threading.Tasks;
+#if NETSTANDARD20
+using PubnubApiPCL.Tests;
+#else
+using PubnubApi.Tests;
+#endif
 
 namespace PubNubMessaging.Tests
 {
@@ -21,7 +26,7 @@ namespace PubNubMessaging.Tests
         private static Server server;
         private static string authKey = "myauth";
 
-        [TestFixtureSetUp]
+        [SetUp]
         public static void Init()
         {
             UnitTestLog unitLog = new Tests.UnitTestLog();
@@ -103,14 +108,13 @@ namespace PubNubMessaging.Tests
             Assert.IsTrue(receivedGrantMessage, "WhenAMessageIsPublished Grant access failed.");
         }
 
-        [TestFixtureTearDown]
+        [TearDown]
         public static void Exit()
         {
             server.Stop();
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
         public static void ThenNullMessageShouldReturnException()
         {
             server.ClearRequests();
@@ -147,10 +151,13 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Publish()
-                    .Channel(channel)
-                    .Message(message)
-                    .Execute(new PNPublishResultExt((r, s) => { }));
+            Assert.Throws<ArgumentException>(() =>
+            {
+                pubnub.Publish()
+                        .Channel(channel)
+                        .Message(message)
+                        .Execute(new PNPublishResultExt((r, s) => { }));
+            });
 
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
@@ -259,6 +266,160 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = null;
             pubnub = null;
         }
+
+        [Test]
+        public static async Task ThenWithAsyncUnencryptPublishGETShouldReturnSuccessCodeAndInfo()
+        {
+            server.ClearRequests();
+
+            bool receivedPublishMessage = false;
+
+            long publishTimetoken = 0;
+
+            string channel = "hello_my_channel";
+            string message = messageForUnencryptPublish;
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Secure = false,
+                Uuid = "mytestuuid"
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+            server.RunOnHttps(true);
+            pubnub = createPubNubInstance(config);
+
+            string expected = "[1,\"Sent\",\"14715278266153304\"]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/{3}", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel, "%22Pubnub%20Messaging%20API%201%22"))
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            PNResult<PNPublishResult> respPub = await pubnub.Publish().Channel(channel).Message(message).ExecuteAsync();
+            if (respPub.Result != null && respPub.Status.StatusCode == 200 && !respPub.Status.Error)
+            {
+                publishTimetoken = respPub.Result.Timetoken;
+                receivedPublishMessage = true;
+            }
+
+            if (!receivedPublishMessage)
+            {
+                Assert.IsTrue(receivedPublishMessage, "WithAsync Unencrypt Publish Failed");
+            }
+            else
+            {
+                receivedPublishMessage = false;
+
+                if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
+
+                expected = "[[\"Pubnub Messaging API 1\"],14715432709547189,14715432709547189]";
+
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                        .WithParameter("count", "100")
+                        .WithParameter("end", "14715278266153304")
+                        .WithParameter("include_token", "true")
+                        .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                        .WithParameter("requestid", "myRequestId")
+                        .WithParameter("uuid", config.Uuid)
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+                PNResult<PNHistoryResult> respHist = await pubnub.History().Channel(channel)
+                    .End(PubnubCommon.EnableStubTest ? 14715278266153304 : publishTimetoken)
+                    .Reverse(false)
+                    .IncludeTimetoken(true)
+                    .ExecuteAsync();
+                if (respHist.Result != null)
+                {
+                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(respHist.Result));
+                    receivedPublishMessage = true;
+                }
+
+                Assert.IsTrue(receivedPublishMessage, "WithAsync Unable to match the successful unencrypt Publish");
+            }
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
+
+        [Test]
+        public static void ThenUnencryptFireGETShouldReturnSuccessCodeAndInfo()
+        {
+            server.ClearRequests();
+
+            bool receivedPublishMessage = false;
+
+            long publishTimetoken = 0;
+
+            string channel = "hello_my_channel";
+            string message = messageForUnencryptPublish;
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Secure = false,
+                Uuid = "mytestuuid"
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+            server.RunOnHttps(true);
+            pubnub = createPubNubInstance(config);
+
+            string expected = "[1,\"Sent\",\"14715278266153304\"]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/{3}", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel, "%22Pubnub%20Messaging%20API%201%22"))
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            manualResetEventWaitTimeout = 310 * 1000;
+
+            ManualResetEvent publishManualEvent = new ManualResetEvent(false);
+            pubnub.Fire().Channel(channel).Message(message)
+                    .Execute(new PNPublishResultExt((r, s) =>
+                    {
+                        if (r != null && s.StatusCode == 200 && !s.Error)
+                        {
+                            publishTimetoken = r.Timetoken;
+                            receivedPublishMessage = true;
+                        }
+                        publishManualEvent.Set();
+                    }));
+            publishManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+
+            Assert.IsTrue(receivedPublishMessage, "Unencrypt Fire Failed");
+        }
+
 
         [Test]
         public static void ThenUnencryptPublishPOSTShouldReturnSuccessCodeAndInfo()
@@ -1014,7 +1175,6 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        [ExpectedException(typeof(MissingMemberException))]
         public static void ThenPublishKeyShouldNotBeEmpty()
         {
             PNConfiguration config = new PNConfiguration
@@ -1028,8 +1188,12 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             string message = "Pubnub API Usage Example";
 
-            pubnub.Publish().Channel(channel).Message(message)
-                    .Execute(new PNPublishResultExt((r, s) => { }));
+            Assert.Throws<MissingMemberException>(() =>
+            {
+                pubnub.Publish().Channel(channel).Message(message)
+                        .Execute(new PNPublishResultExt((r, s) => { }));
+
+            });
             pubnub = null;
 
         }

@@ -68,6 +68,15 @@ namespace PubnubApi.EndPoint
 #endif
         }
 
+        public async Task<PNResult<PNWhereNowResult>> ExecuteAsync()
+        {
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+            return await WhereNow(this.whereNowUUID, this.queryParam).ConfigureAwait(false);
+#else
+            return await WhereNow(this.whereNowUUID, this.queryParam).ConfigureAwait(false);
+#endif
+        }
+
         internal void Retry()
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
@@ -112,13 +121,62 @@ namespace PubnubApi.EndPoint
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;
 
-            string json = UrlProcessRequest<PNWhereNowResult>(request, requestState, false);
+            UrlProcessRequest(request, requestState, false).ContinueWith(r =>
+            {
+                string json = r.Result.Item1;
+                if (!string.IsNullOrEmpty(json))
+                {
+                    List<object> result = ProcessJsonResponse(requestState, json);
+                    ProcessResponseCallbacks(result, requestState);
+                }
+            }, TaskContinuationOptions.ExecuteSynchronously).Wait();
+        }
+
+        internal async Task<PNResult<PNWhereNowResult>> WhereNow(string uuid, Dictionary<string, object> externalQueryParam)
+        {
+            if (jsonLibrary == null)
+            {
+                throw new MissingMemberException("Missing Json Pluggable Library for Pubnub Instance");
+            }
+
+            PNResult<PNWhereNowResult> ret = new PNResult<PNWhereNowResult>();
+            string currentUuid = "";
+            if (string.IsNullOrEmpty(uuid))
+            {
+                currentUuid = config.Uuid;
+            }
+            else
+            {
+                currentUuid = uuid;
+            }
+
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            Uri request = urlBuilder.BuildWhereNowRequest("GET", "", currentUuid, externalQueryParam);
+
+            RequestState<PNWhereNowResult> requestState = new RequestState<PNWhereNowResult>();
+            requestState.Channels = new[] { currentUuid };
+            requestState.ResponseType = PNOperationType.PNWhereNowOperation;
+            requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
+
+            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false);
+            ret.Status = JsonAndStatusTuple.Item2;
+            string json = JsonAndStatusTuple.Item1;
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = ProcessJsonResponse<PNWhereNowResult>(requestState, json);
-                ProcessResponseCallbacks(result, requestState);
+                List<object> resultList = ProcessJsonResponse(requestState, json);
+                ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+                PNWhereNowResult responseResult = responseBuilder.JsonToObject<PNWhereNowResult>(resultList, true);
+                if (responseResult != null)
+                {
+                    ret.Result = responseResult;
+                }
             }
+
+            return ret;
         }
+
 
         internal void CurrentPubnubInstance(Pubnub instance)
         {

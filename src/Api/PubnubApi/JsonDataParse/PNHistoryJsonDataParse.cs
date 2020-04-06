@@ -10,14 +10,18 @@ namespace PubnubApi
         internal static PNHistoryResult GetObject(List<object> listObject)
         {
             PNHistoryResult ack = new PNHistoryResult();
+            if (listObject == null || listObject.Count == 0)
+            {
+                return ack;
+            }
 
             long historyStartTime;
             long historyEndTime;
-            if (Int64.TryParse(listObject[1].ToString(), out historyStartTime))
+            if (listObject.Count >= 2 && Int64.TryParse(listObject[1].ToString(), out historyStartTime))
             {
                 ack.StartTimeToken = historyStartTime;
             }
-            if (Int64.TryParse(listObject[2].ToString(), out historyEndTime))
+            if (listObject.Count >= 2 && Int64.TryParse(listObject[2].ToString(), out historyEndTime))
             {
                 ack.EndTimeToken = historyEndTime;
             }

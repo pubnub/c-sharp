@@ -85,6 +85,15 @@ namespace PubnubApi.EndPoint
 #endif
         }
 
+        public async Task<PNResult<PNPublishResult>> ExecuteAsync()
+        {
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+            return await Signal(this.channelName, this.msg, null, this.queryParam).ConfigureAwait(false);
+#else
+            return await Signal(this.channelName, this.msg, null, this.queryParam).ConfigureAwait(false);
+#endif
+        }
+
         internal void Retry()
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
@@ -134,35 +143,102 @@ namespace PubnubApi.EndPoint
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;
 
-            string json = UrlProcessRequest<PNPublishResult>(request, requestState, false);
-
-            if (!string.IsNullOrEmpty(json))
+            UrlProcessRequest(request, requestState, false).ContinueWith(r =>
             {
-                List<object> result = ProcessJsonResponse<PNPublishResult>(requestState, json);
-
-                if (result != null && result.Count >= 3)
+                string json = r.Result.Item1;
+                if (!string.IsNullOrEmpty(json))
                 {
-                    int signalStatus;
-                    Int32.TryParse(result[0].ToString(), out signalStatus);
-                    if (signalStatus == 1)
+                    List<object> result = ProcessJsonResponse(requestState, json);
+
+                    if (result != null && result.Count >= 3)
                     {
-                        ProcessResponseCallbacks(result, requestState);
+                        int signalStatus;
+                        Int32.TryParse(result[0].ToString(), out signalStatus);
+                        if (signalStatus == 1)
+                        {
+                            ProcessResponseCallbacks(result, requestState);
+                        }
+                        else
+                        {
+                            PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(400, result[1].ToString());
+                            PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<PNPublishResult>(PNOperationType.PNSignalOperation, category, requestState, 400, new PNException(json));
+                            if (requestState.PubnubCallback != null)
+                            {
+                                requestState.PubnubCallback.OnResponse(default, status);
+                            }
+                        }
                     }
                     else
                     {
-                        PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(400, result[1].ToString());
-                        PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<PNPublishResult>(PNOperationType.PNSignalOperation, category, requestState, 400, new PNException(json));
-                        if (requestState.PubnubCallback != null)
+                        ProcessResponseCallbacks(result, requestState);
+                    }
+                }
+            }, TaskContinuationOptions.ExecuteSynchronously).Wait();
+        }
+
+        private async Task<PNResult<PNPublishResult>> Signal(string channel, object message, Dictionary<string, object> metaData, Dictionary<string, object> externalQueryParam)
+        {
+            if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()) || message == null)
+            {
+                throw new ArgumentException("Missing Channel or Message");
+            }
+
+            if (string.IsNullOrEmpty(config.PublishKey) || string.IsNullOrEmpty(config.PublishKey.Trim()) || config.PublishKey.Length <= 0)
+            {
+                throw new MissingMemberException("Invalid publish key");
+            }
+
+            if (string.IsNullOrEmpty(config.SubscribeKey) || string.IsNullOrEmpty(config.SubscribeKey.Trim()) || config.SubscribeKey.Length <= 0)
+            {
+                throw new MissingMemberException("Invalid subscribe key");
+            }
+
+            PNResult<PNPublishResult> ret = new PNResult<PNPublishResult>();
+
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            Uri request = urlBuilder.BuildSignalRequest("GET", "", channel, message, metaData, externalQueryParam);
+
+            RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>();
+            requestState.Channels = new[] { channel };
+            requestState.ResponseType = PNOperationType.PNSignalOperation;
+            requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
+
+            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false);
+            ret.Status = JsonAndStatusTuple.Item2;
+            string json = JsonAndStatusTuple.Item1;
+            if (!string.IsNullOrEmpty(json))
+            {
+                List<object> result = ProcessJsonResponse<PNPublishResult>(requestState, json);
+                if (result != null && result.Count >= 3)
+                {
+                    int publishStatus;
+                    Int32.TryParse(result[0].ToString(), out publishStatus);
+                    if (publishStatus == 1)
+                    {
+                        List<object> resultList = ProcessJsonResponse(requestState, json);
+                        if (resultList != null && resultList.Count > 0)
                         {
-                            requestState.PubnubCallback.OnResponse(default(PNPublishResult), status);
+                            ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+                            PNPublishResult responseResult = responseBuilder.JsonToObject<PNPublishResult>(resultList, true);
+                            if (responseResult != null)
+                            {
+                                ret.Result = responseResult;
+                            }
+                        }
+                        else
+                        {
+                            PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(400, result[1].ToString());
+                            PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<PNPublishResult>(PNOperationType.PNSignalOperation, category, requestState, 400, new PNException(json));
+                            ret.Status = status;
+                            ret.Result = default;
                         }
                     }
                 }
-                else
-                {
-                    ProcessResponseCallbacks(result, requestState);
-                }
             }
+
+            return ret;
         }
     }
 }

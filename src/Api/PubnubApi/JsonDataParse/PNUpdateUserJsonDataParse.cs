@@ -9,7 +9,7 @@ namespace PubnubApi
     {
         internal static PNUpdateUserResult GetObject(List<object> listObject)
         {
-            Dictionary<string, object> updateUserDicObj = JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[1]);
+            Dictionary<string, object> updateUserDicObj = (listObject.Count >= 2) ? JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[1]) : null;
             PNUpdateUserResult result = null;
             if (updateUserDicObj != null && updateUserDicObj.ContainsKey("data"))
             {

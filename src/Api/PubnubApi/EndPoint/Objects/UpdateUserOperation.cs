@@ -113,6 +113,14 @@ namespace PubnubApi.EndPoint
             { IsBackground = true }.Start();
 #endif
         }
+        public async Task<PNResult<PNUpdateUserResult>> ExecuteAsync()
+        {
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+            return await UpdateUser(this.usrId, this.usrName, this.usrExternalId, this.usrProfileUrl, this.usrEmail, this.usrCustom, this.queryParam).ConfigureAwait(false);
+#else
+            return await UpdateUser(this.usrId, this.usrName, this.usrExternalId, this.usrProfileUrl, this.usrEmail, this.usrCustom, this.queryParam).ConfigureAwait(false);
+#endif
+        }
 
         internal void Retry()
         {
@@ -180,13 +188,76 @@ namespace PubnubApi.EndPoint
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
             Uri request = urlBuilder.BuildUpdateUserRequest("PATCH", patchMessage, userId, userCustom, externalQueryParam);
 
-            string json = UrlProcessRequest<PNUpdateUserResult>(request, requestState, false, patchMessage);
+            UrlProcessRequest(request, requestState, false, patchMessage).ContinueWith(r =>
+            {
+                string json = r.Result.Item1;
+                if (!string.IsNullOrEmpty(json))
+                {
+                    List<object> result = ProcessJsonResponse(requestState, json);
+                    ProcessResponseCallbacks(result, requestState);
+                }
+            }, TaskContinuationOptions.ExecuteSynchronously).Wait();
+        }
 
+        private async Task<PNResult<PNUpdateUserResult>> UpdateUser(string userId, string userName, string userExternalId, string userProfileUrl, string userEmail, Dictionary<string, object> userCustom, Dictionary<string, object> externalQueryParam)
+        {
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(userId.Trim()) || userName == null)
+            {
+                throw new ArgumentException("Missing Id or Name");
+            }
+
+            if (string.IsNullOrEmpty(config.SubscribeKey) || string.IsNullOrEmpty(config.SubscribeKey.Trim()) || config.SubscribeKey.Length <= 0)
+            {
+                throw new MissingMemberException("Invalid subscribe key");
+            }
+            PNResult<PNUpdateUserResult> ret = new PNResult<PNUpdateUserResult>();
+
+            RequestState<PNUpdateUserResult> requestState = new RequestState<PNUpdateUserResult>();
+            requestState.ResponseType = PNOperationType.PNUpdateUserOperation;
+            requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
+
+            requestState.UsePatchMethod = true;
+            Dictionary<string, object> messageEnvelope = new Dictionary<string, object>();
+            messageEnvelope.Add("id", userId);
+            messageEnvelope.Add("name", userName);
+            if (userExternalId != null)
+            {
+                messageEnvelope.Add("externalId", userExternalId);
+            }
+            if (userProfileUrl != null)
+            {
+                messageEnvelope.Add("profileUrl", userProfileUrl);
+            }
+            if (userEmail != null)
+            {
+                messageEnvelope.Add("email", userEmail);
+            }
+            if (userCustom != null)
+            {
+                messageEnvelope.Add("custom", userCustom);
+            }
+            string patchMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
+
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            Uri request = urlBuilder.BuildUpdateUserRequest("PATCH", patchMessage, userId, userCustom, externalQueryParam);
+
+            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false, patchMessage);
+            ret.Status = JsonAndStatusTuple.Item2;
+            string json = JsonAndStatusTuple.Item1;
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = ProcessJsonResponse<PNUpdateUserResult>(requestState, json);
-                ProcessResponseCallbacks(result, requestState);
+                List<object> resultList = ProcessJsonResponse(requestState, json);
+                ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+                PNUpdateUserResult responseResult = responseBuilder.JsonToObject<PNUpdateUserResult>(resultList, true);
+                if (responseResult != null)
+                {
+                    ret.Result = responseResult;
+                }
             }
+
+            return ret;
         }
     }
 }

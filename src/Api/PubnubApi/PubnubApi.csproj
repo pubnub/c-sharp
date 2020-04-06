@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <!--<TargetFrameworks>net35;net40;net45;net461</TargetFrameworks>-->
     <TargetFrameworks>net35;net40;net45;net461</TargetFrameworks>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>pubnub.snk</AssemblyOriginatorKeyFile>
@@ -14,7 +13,7 @@
 
   <PropertyGroup>
     <PackageId>Pubnub</PackageId>
-    <PackageVersion>4.4.0.0</PackageVersion>
+    <PackageVersion>4.6.0.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -22,12 +21,12 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>Refactored code related to TMS GetToken and GetTokens.
-Refactored code to retrieve assembly version.</PackageReleaseNotes>
+    <PackageReleaseNotes>Added async/await support for feature method calls.
+Added sort for Objects API.</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
-    <Copyright>PubNub 2012-2019</Copyright>
+    <Copyright>PubNub 2012-2020</Copyright>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
@@ -45,10 +44,16 @@ Refactored code to retrieve assembly version.</PackageReleaseNotes>
     <DefineConstants>$(DefineConstants);NET461</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net35|AnyCPU'">
-    <NoWarn>1701;1702;</NoWarn>
+    <NoWarn>1701;1702;0436;</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net35|AnyCPU'">
-    <NoWarn>1701;1702;</NoWarn>
+    <NoWarn>1701;1702;0436;</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net40|AnyCPU'">
+    <NoWarn>0436;</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net40|AnyCPU'">
+    <NoWarn>0436;</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <None Include="LICENSE.txt" Pack="true" PackagePath="" />
@@ -74,6 +79,9 @@ Refactored code to retrieve assembly version.</PackageReleaseNotes>
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <Reference Include="System" />
+    <!--<PackageReference Include="NetLegacySupport.Tuple" Version="1.1.1">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>-->
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net40'">
@@ -85,6 +93,9 @@ Refactored code to retrieve assembly version.</PackageReleaseNotes>
     </PackageReference>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
+    <!--<PackageReference Include="NetLegacySupport.Tuple" Version="1.1.1">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>-->
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net45'">
@@ -93,6 +104,9 @@ Refactored code to retrieve assembly version.</PackageReleaseNotes>
     </PackageReference>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
+    <PackageReference Include="System.ValueTuple" Version="4.4.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
@@ -101,6 +115,9 @@ Refactored code to retrieve assembly version.</PackageReleaseNotes>
     </PackageReference>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
+    <PackageReference Include="System.ValueTuple" Version="4.4.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
 
 </Project>

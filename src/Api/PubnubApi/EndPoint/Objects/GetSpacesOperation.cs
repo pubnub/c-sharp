@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using PubnubApi.Interface;
-using System.Threading.Tasks;
 using System.Threading;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace PubnubApi.EndPoint
 {
@@ -21,7 +19,9 @@ namespace PubnubApi.EndPoint
         private int limit = -1;
         private bool includeCount;
         private bool includeCustom;
+        private string spacesFilter;
         private PNPage page;
+        private List<string> sortField;
 
         private PNCallback<PNGetSpacesResult> savedCallback;
         private Dictionary<string, object> queryParam;
@@ -76,6 +76,18 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
+        public GetSpacesOperation Filter(string filterExpression)
+        {
+            this.spacesFilter = filterExpression;
+            return this;
+        }
+
+        public GetSpacesOperation Sort(List<string> sortByField)
+        {
+            this.sortField = sortByField;
+            return this;
+        }
+
         public GetSpacesOperation QueryParam(Dictionary<string, object> customQueryParam)
         {
             this.queryParam = customQueryParam;
@@ -88,15 +100,24 @@ namespace PubnubApi.EndPoint
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
-                GetSpaceList(this.page, this.limit, this.includeCount, this.includeCustom, this.queryParam, savedCallback);
+                GetSpaceList(this.page, this.limit, this.includeCount, this.includeCustom, this.spacesFilter, this.sortField, this.queryParam, savedCallback);
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
             new Thread(() =>
             {
                 this.savedCallback = callback;
-                GetSpaceList(this.page, this.limit, this.includeCount, this.includeCustom, this.queryParam, savedCallback);
+                GetSpaceList(this.page, this.limit, this.includeCount, this.includeCustom, this.spacesFilter, this.sortField, this.queryParam, savedCallback);
             })
             { IsBackground = true }.Start();
+#endif
+        }
+
+        public async Task<PNResult<PNGetSpacesResult>> ExecuteAsync()
+        {
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+            return await GetSpaceList(this.page, this.limit, this.includeCount, this.includeCustom, this.spacesFilter, this.sortField, this.queryParam).ConfigureAwait(false);
+#else
+            return await GetSpaceList(this.page, this.limit, this.includeCount, this.includeCustom, this.spacesFilter, this.sortField, this.queryParam).ConfigureAwait(false);
 #endif
         }
 
@@ -105,18 +126,18 @@ namespace PubnubApi.EndPoint
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
-                GetSpaceList(this.page, this.limit, this.includeCount, this.includeCustom, this.queryParam, savedCallback);
+                GetSpaceList(this.page, this.limit, this.includeCount, this.includeCustom, this.spacesFilter, this.sortField, this.queryParam, savedCallback);
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
             new Thread(() =>
             {
-                GetSpaceList(this.page, this.limit, this.includeCount, this.includeCustom, this.queryParam, savedCallback);
+                GetSpaceList(this.page, this.limit, this.includeCount, this.includeCustom, this.spacesFilter, this.sortField, this.queryParam, savedCallback);
             })
             { IsBackground = true }.Start();
 #endif
         }
 
-        private void GetSpaceList(PNPage page, int limit, bool includeCount, bool includeCustom, Dictionary<string, object> externalQueryParam, PNCallback<PNGetSpacesResult> callback)
+        private void GetSpaceList(PNPage page, int limit, bool includeCount, bool includeCustom, string filter, List<string> sort, Dictionary<string, object> externalQueryParam, PNCallback<PNGetSpacesResult> callback)
         {
             if (callback == null)
             {
@@ -128,7 +149,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildGetAllSpacesRequest("GET", "", internalPage.Next, internalPage.Prev, limit, includeCount, includeCustom, externalQueryParam);
+            Uri request = urlBuilder.BuildGetAllSpacesRequest("GET", "", internalPage.Next, internalPage.Prev, limit, includeCount, includeCustom, filter, sort, externalQueryParam);
 
             RequestState<PNGetSpacesResult> requestState = new RequestState<PNGetSpacesResult>();
             requestState.ResponseType = PNOperationType.PNGetSpacesOperation;
@@ -136,18 +157,52 @@ namespace PubnubApi.EndPoint
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;
 
-            string json = "";
-
             requestState.UsePostMethod = false;
-            json = UrlProcessRequest<PNGetSpacesResult>(request, requestState, false);
-
-            if (!string.IsNullOrEmpty(json))
+            UrlProcessRequest(request, requestState, false).ContinueWith(r =>
             {
-                List<object> result = ProcessJsonResponse<PNGetSpacesResult>(requestState, json);
-                ProcessResponseCallbacks(result, requestState);
-            }
+                string json = r.Result.Item1;
+                if (!string.IsNullOrEmpty(json))
+                {
+                    List<object> result = ProcessJsonResponse(requestState, json);
+                    ProcessResponseCallbacks(result, requestState);
+                }
+            }, TaskContinuationOptions.ExecuteSynchronously).Wait();
         }
 
+        private async Task<PNResult<PNGetSpacesResult>> GetSpaceList(PNPage page, int limit, bool includeCount, bool includeCustom, string filter, List<string> sort, Dictionary<string, object> externalQueryParam)
+        {
+            PNResult<PNGetSpacesResult> ret = new PNResult<PNGetSpacesResult>();
+
+            PNPage internalPage;
+            if (page == null) { internalPage = new PNPage(); }
+            else { internalPage = page; }
+
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            Uri request = urlBuilder.BuildGetAllSpacesRequest("GET", "", internalPage.Next, internalPage.Prev, limit, includeCount, includeCustom, filter, sort, externalQueryParam);
+
+            RequestState<PNGetSpacesResult> requestState = new RequestState<PNGetSpacesResult>();
+            requestState.ResponseType = PNOperationType.PNGetSpacesOperation;
+            requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
+
+            requestState.UsePostMethod = false;
+            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false);
+            ret.Status = JsonAndStatusTuple.Item2;
+            string json = JsonAndStatusTuple.Item1;
+            if (!string.IsNullOrEmpty(json))
+            {
+                List<object> resultList = ProcessJsonResponse(requestState, json);
+                ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+                PNGetSpacesResult responseResult = responseBuilder.JsonToObject<PNGetSpacesResult>(resultList, true);
+                if (responseResult != null)
+                {
+                    ret.Result = responseResult;
+                }
+            }
+
+            return ret;
+        }
     }
 
 }

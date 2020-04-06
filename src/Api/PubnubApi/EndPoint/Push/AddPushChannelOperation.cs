@@ -120,6 +120,15 @@ namespace PubnubApi.EndPoint
 #endif
         }
 
+        public async Task<PNResult<PNPushAddChannelResult>> ExecuteAsync()
+        {
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+            return await RegisterDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, this.pushEnvironment, this.deviceTopic, this.queryParam).ConfigureAwait(false);
+#else
+            return await RegisterDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, this.pushEnvironment, this.deviceTopic, this.queryParam).ConfigureAwait(false);
+#endif
+        }
+
         internal void Retry()
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
@@ -166,12 +175,62 @@ namespace PubnubApi.EndPoint
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;
 
-            string json = UrlProcessRequest<PNPushAddChannelResult>(request, requestState, false);
+            UrlProcessRequest(request, requestState, false).ContinueWith(r =>
+            {
+                string json = r.Result.Item1;
+                if (!string.IsNullOrEmpty(json))
+                {
+                    List<object> result = ProcessJsonResponse(requestState, json);
+                    ProcessResponseCallbacks(result, requestState);
+                }
+            }, TaskContinuationOptions.ExecuteSynchronously).Wait();
+        }
+
+        internal async Task<PNResult<PNPushAddChannelResult>> RegisterDevice(string[] channels, PNPushType pushType, string pushToken, PushEnvironment environment, string deviceTopic, Dictionary<string, object> externalQueryParam)
+        {
+            if (channels == null || channels.Length == 0 || channels[0] == null || channels[0].Trim().Length == 0)
+            {
+                throw new ArgumentException("Missing Channel");
+            }
+
+            if (pushToken == null)
+            {
+                throw new ArgumentException("Missing deviceId");
+            }
+
+            if (pushType == PNPushType.APNS2 && string.IsNullOrEmpty(deviceTopic))
+            {
+                throw new ArgumentException("Missing Topic");
+            }
+            PNResult<PNPushAddChannelResult> ret = new PNResult<PNPushAddChannelResult>();
+
+            string channel = string.Join(",", channels.OrderBy(x => x).ToArray());
+
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            Uri request = urlBuilder.BuildRegisterDevicePushRequest("GET", "", channel, pushType, pushToken, environment, deviceTopic, externalQueryParam);
+
+            RequestState<PNPushAddChannelResult> requestState = new RequestState<PNPushAddChannelResult>();
+            requestState.Channels = new[] { channel };
+            requestState.ResponseType = PNOperationType.PushRegister;
+            requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
+
+            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false);
+            ret.Status = JsonAndStatusTuple.Item2;
+            string json = JsonAndStatusTuple.Item1;
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = ProcessJsonResponse<PNPushAddChannelResult>(requestState, json);
-                ProcessResponseCallbacks(result, requestState);
+                List<object> resultList = ProcessJsonResponse(requestState, json);
+                ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+                PNPushAddChannelResult responseResult = responseBuilder.JsonToObject<PNPushAddChannelResult>(resultList, true);
+                if (responseResult != null)
+                {
+                    ret.Result = responseResult;
+                }
             }
+
+            return ret;
         }
     }
 }

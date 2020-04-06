@@ -88,15 +88,24 @@ namespace PubnubApi.EndPoint
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
-                CreateSpace(this.spcId, this.spcName, this.spcDesc, this.spcCustom, this.queryParam, callback);
+                UpdateSpace(this.spcId, this.spcName, this.spcDesc, this.spcCustom, this.queryParam, callback);
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
             new Thread(() =>
             {
                 this.savedCallback = callback;
-                CreateSpace(this.spcId, this.spcName, this.spcDesc, this.spcCustom, this.queryParam, callback);
+                UpdateSpace(this.spcId, this.spcName, this.spcDesc, this.spcCustom, this.queryParam, callback);
             })
             { IsBackground = true }.Start();
+#endif
+        }
+
+        public async Task<PNResult<PNUpdateSpaceResult>> ExecuteAsync()
+        {
+#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+            return await UpdateSpace(this.spcId, this.spcName, this.spcDesc, this.spcCustom, this.queryParam).ConfigureAwait(false);
+#else
+            return await UpdateSpace(this.spcId, this.spcName, this.spcDesc, this.spcCustom, this.queryParam).ConfigureAwait(false);
 #endif
         }
 
@@ -105,18 +114,18 @@ namespace PubnubApi.EndPoint
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
-                CreateSpace(this.spcId, this.spcName, this.spcDesc, this.spcCustom, this.queryParam, savedCallback);
+                UpdateSpace(this.spcId, this.spcName, this.spcDesc, this.spcCustom, this.queryParam, savedCallback);
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
             new Thread(() =>
             {
-                CreateSpace(this.spcId, this.spcName, this.spcDesc, this.spcCustom, this.queryParam, savedCallback);
+                UpdateSpace(this.spcId, this.spcName, this.spcDesc, this.spcCustom, this.queryParam, savedCallback);
             })
             { IsBackground = true }.Start();
 #endif
         }
 
-        private void CreateSpace(string spaceId, string spaceName, string spaceDescription, Dictionary<string, object> spaceCustom, Dictionary<string, object> externalQueryParam, PNCallback<PNUpdateSpaceResult> callback)
+        private void UpdateSpace(string spaceId, string spaceName, string spaceDescription, Dictionary<string, object> spaceCustom, Dictionary<string, object> externalQueryParam, PNCallback<PNUpdateSpaceResult> callback)
         {
             if (string.IsNullOrEmpty(spaceId) || string.IsNullOrEmpty(spaceId.Trim()) || spaceName == null)
             {
@@ -155,14 +164,65 @@ namespace PubnubApi.EndPoint
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
             Uri request = urlBuilder.BuildUpdateSpaceRequest("PATCH", patchMessage, spaceId, spaceCustom, externalQueryParam);
 
-            string json = UrlProcessRequest<PNUpdateSpaceResult>(request, requestState, false, patchMessage);
-
-            if (!string.IsNullOrEmpty(json))
+            UrlProcessRequest(request, requestState, false, patchMessage).ContinueWith(r =>
             {
-                List<object> result = ProcessJsonResponse<PNUpdateSpaceResult>(requestState, json);
-                ProcessResponseCallbacks(result, requestState);
-            }
+                string json = r.Result.Item1;
+                if (!string.IsNullOrEmpty(json))
+                {
+                    List<object> result = ProcessJsonResponse(requestState, json);
+                    ProcessResponseCallbacks(result, requestState);
+                }
+            }, TaskContinuationOptions.ExecuteSynchronously).Wait();
         }
 
+        private async Task<PNResult<PNUpdateSpaceResult>> UpdateSpace(string spaceId, string spaceName, string spaceDescription, Dictionary<string, object> spaceCustom, Dictionary<string, object> externalQueryParam)
+        {
+            if (string.IsNullOrEmpty(spaceId) || string.IsNullOrEmpty(spaceId.Trim()) || spaceName == null)
+            {
+                throw new ArgumentException("Missing Id or Name");
+            }
+
+            if (string.IsNullOrEmpty(config.SubscribeKey) || string.IsNullOrEmpty(config.SubscribeKey.Trim()) || config.SubscribeKey.Length <= 0)
+            {
+                throw new MissingMemberException("Invalid subscribe key");
+            }
+            PNResult<PNUpdateSpaceResult> ret = new PNResult<PNUpdateSpaceResult>();
+
+            RequestState<PNUpdateSpaceResult> requestState = new RequestState<PNUpdateSpaceResult>();
+            requestState.ResponseType = PNOperationType.PNUpdateSpaceOperation;
+            requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
+
+            requestState.UsePatchMethod = true;
+            Dictionary<string, object> messageEnvelope = new Dictionary<string, object>();
+            messageEnvelope.Add("id", spaceId);
+            messageEnvelope.Add("name", spaceName);
+            messageEnvelope.Add("description", spaceDescription);
+            if (spaceCustom != null)
+            {
+                messageEnvelope.Add("custom", spaceCustom);
+            }
+            string patchMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
+
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            Uri request = urlBuilder.BuildUpdateSpaceRequest("PATCH", patchMessage, spaceId, spaceCustom, externalQueryParam);
+
+            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false, patchMessage);
+            ret.Status = JsonAndStatusTuple.Item2;
+            string json = JsonAndStatusTuple.Item1;
+            if (!string.IsNullOrEmpty(json))
+            {
+                List<object> resultList = ProcessJsonResponse(requestState, json);
+                ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+                PNUpdateSpaceResult responseResult = responseBuilder.JsonToObject<PNUpdateSpaceResult>(resultList, true);
+                if (responseResult != null)
+                {
+                    ret.Result = responseResult;
+                }
+            }
+
+            return ret;
+        }
     }
 }

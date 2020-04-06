@@ -19,7 +19,7 @@ namespace PubNubMessaging.Tests
         private static Server server;
         private static string authKey = "myauth";
 
-        [TestFixtureSetUp]
+        [SetUp]
         public static void Init()
         {
             UnitTestLog unitLog = new Tests.UnitTestLog();
@@ -100,7 +100,7 @@ namespace PubNubMessaging.Tests
             Assert.IsTrue(receivedGrantMessage, "WhenDetailedHistoryIsRequested Grant access failed.");
         }
 
-        [TestFixtureTearDown]
+        [TearDown]
         public static void Exit()
         {
             server.Stop();
@@ -514,7 +514,7 @@ namespace PubNubMessaging.Tests
             pubnub.Time().Execute(new PNTimeResultExt((r,s)=> {
                 try{
                     Debug.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
-                    currentTimetoken = (r != null && s.StatusCode == 200 && s.Error == false) ? r.Timetoken : 0;
+                    currentTimetoken = (r != null && s.StatusCode == 200 && !s.Error) ? r.Timetoken : 0;
                 } catch { /* ignore */ }
                 finally { timeManualEvent.Set(); }
             }));
@@ -594,7 +594,6 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        [ExpectedException(typeof(MissingMemberException))]
         public static void DetailHistoryWithNullKeysReturnsError()
         {
             server.ClearRequests();
@@ -617,22 +616,24 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
 
-            ManualResetEvent historyManualEvent = new ManualResetEvent(false);
-            pubnub.History().Channel(channel)
-                .Count(10)
-                .Reverse(true)
-                .IncludeTimetoken(false)
-                .Execute(new PNHistoryResultExt((r, s) => {
-                    receivedMessage = r == null || s.StatusCode != 200 || s.Error;
-                    historyManualEvent.Set();
-                }));
-            historyManualEvent.WaitOne(manualResetEventWaitTimeout);
+            Assert.Throws<MissingMemberException>(() =>
+            {
+                ManualResetEvent historyManualEvent = new ManualResetEvent(false);
+                pubnub.History().Channel(channel)
+                    .Count(10)
+                    .Reverse(true)
+                    .IncludeTimetoken(false)
+                    .Execute(new PNHistoryResultExt((r, s) => {
+                        receivedMessage = r == null || s.StatusCode != 200 || s.Error;
+                        historyManualEvent.Set();
+                    }));
+                historyManualEvent.WaitOne(manualResetEventWaitTimeout);
+            }, "Detailed History With Null Keys Failed");
 
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
 
-            Assert.IsTrue(receivedMessage, "Detailed History With Null Keys Failed");
         }
 
         [Test]
@@ -759,7 +760,7 @@ namespace PubNubMessaging.Tests
                 try
                 {
                     Debug.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
-                    currentTimetoken = (r != null && s.StatusCode == 200 && s.Error == false) ? r.Timetoken : 0;
+                    currentTimetoken = (r != null && s.StatusCode == 200 && !s.Error) ? r.Timetoken : 0;
                 }
                 catch { /* ignore */ }
                 finally { timeManualEvent.Set(); }
@@ -817,7 +818,7 @@ namespace PubNubMessaging.Tests
                 try
                 {
                     Debug.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
-                    currentTimetoken = (r != null && s.StatusCode == 200 && s.Error == false) ? r.Timetoken : 0;
+                    currentTimetoken = (r != null && s.StatusCode == 200 && !s.Error) ? r.Timetoken : 0;
                 }
                 catch { /* ignore */ }
                 finally { timeManualEvent.Set(); }
@@ -879,7 +880,7 @@ namespace PubNubMessaging.Tests
                 try
                 {
                     Debug.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
-                    currentTimetoken = (r != null && s.StatusCode == 200 && s.Error == false) ? r.Timetoken : 0;
+                    currentTimetoken = (r != null && s.StatusCode == 200 && !s.Error) ? r.Timetoken : 0;
                 }
                 catch { /* ignore */ }
                 finally { timeManualEvent.Set(); }
@@ -1101,7 +1102,7 @@ namespace PubNubMessaging.Tests
                 try
                 {
                     Debug.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
-                    currentTimetoken = (r != null && s.StatusCode == 200 && s.Error == false) ? r.Timetoken : 0;
+                    currentTimetoken = (r != null && s.StatusCode == 200 && !s.Error) ? r.Timetoken : 0;
                 }
                 catch { /* ignore */ }
                 finally { timeManualEvent.Set(); }
@@ -1161,7 +1162,7 @@ namespace PubNubMessaging.Tests
                 try
                 {
                     Debug.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
-                    currentTimetoken = (r != null && s.StatusCode == 200 && s.Error == false) ? r.Timetoken : 0;
+                    currentTimetoken = (r != null && s.StatusCode == 200 && !s.Error) ? r.Timetoken : 0;
                 }
                 catch { /* ignore */ }
                 finally { timeManualEvent.Set(); }
@@ -1223,7 +1224,7 @@ namespace PubNubMessaging.Tests
                 try
                 {
                     Debug.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
-                    currentTimetoken = (r != null && s.StatusCode == 200 && s.Error == false) ? r.Timetoken : 0;
+                    currentTimetoken = (r != null && s.StatusCode == 200 && !s.Error) ? r.Timetoken : 0;
                 }
                 catch { /* ignore */ }
                 finally { timeManualEvent.Set(); }
