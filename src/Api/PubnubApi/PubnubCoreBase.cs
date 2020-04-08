@@ -997,28 +997,28 @@ namespace PubnubApi
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
                 if (pubnubRequestState != null && pubnubRequestState.UsePostMethod)
                 {
-                    jsonString = await pubnubHttp.SendRequestAndGetJsonResponseWithPOST(requestUri, pubnubRequestState, null, jsonPostOrPatchData);
+                    jsonString = await pubnubHttp.SendRequestAndGetJsonResponseWithPOST(requestUri, pubnubRequestState, null, jsonPostOrPatchData).ConfigureAwait(false);
                 }
                 else if (pubnubRequestState != null && pubnubRequestState.UsePatchMethod)
                 {
-                    jsonString = await pubnubHttp.SendRequestAndGetJsonResponseWithPATCH(requestUri, pubnubRequestState, null, jsonPostOrPatchData);
+                    jsonString = await pubnubHttp.SendRequestAndGetJsonResponseWithPATCH(requestUri, pubnubRequestState, null, jsonPostOrPatchData).ConfigureAwait(false);
                 }
                 else
                 {
-                    jsonString = await pubnubHttp.SendRequestAndGetJsonResponse(requestUri, pubnubRequestState, null);
+                    jsonString = await pubnubHttp.SendRequestAndGetJsonResponse(requestUri, pubnubRequestState, null).ConfigureAwait(false);
                 }
 #else
                 if (pubnubRequestState != null && pubnubRequestState.UsePostMethod)
                 {
-                    jsonString = await pubnubHttp.SendRequestAndGetJsonResponseWithPOST(requestUri, pubnubRequestState, request, jsonPostOrPatchData);
+                    jsonString = await pubnubHttp.SendRequestAndGetJsonResponseWithPOST(requestUri, pubnubRequestState, request, jsonPostOrPatchData).ConfigureAwait(false);
                 }
                 else if (pubnubRequestState != null && pubnubRequestState.UsePatchMethod)
                 {
-                    jsonString = await pubnubHttp.SendRequestAndGetJsonResponseWithPATCH(requestUri, pubnubRequestState, request, jsonPostOrPatchData);
+                    jsonString = await pubnubHttp.SendRequestAndGetJsonResponseWithPATCH(requestUri, pubnubRequestState, request, jsonPostOrPatchData).ConfigureAwait(false);
                 }
                 else
                 {
-                    jsonString = await pubnubHttp.SendRequestAndGetJsonResponse(requestUri, pubnubRequestState, request);
+                    jsonString = await pubnubHttp.SendRequestAndGetJsonResponse(requestUri, pubnubRequestState, request).ConfigureAwait(false);
                 }
 #endif
 
