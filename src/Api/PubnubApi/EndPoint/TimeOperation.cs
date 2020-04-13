@@ -123,7 +123,7 @@ namespace PubnubApi.EndPoint
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;
 
-            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest<PNTimeResult>(request, requestState, false).ConfigureAwait(false);
+            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false).ConfigureAwait(false);
             ret.Status = JsonAndStatusTuple.Item2;
             string json = JsonAndStatusTuple.Item1;
             if (!string.IsNullOrEmpty(json))

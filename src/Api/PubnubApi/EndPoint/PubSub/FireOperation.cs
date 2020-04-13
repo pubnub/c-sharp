@@ -268,11 +268,11 @@ namespace PubnubApi.EndPoint
                 Dictionary<string, object> messageEnvelope = new Dictionary<string, object>();
                 messageEnvelope.Add("message", message);
                 string postMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
-                JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false, postMessage);
+                JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false, postMessage).ConfigureAwait(false);
             }
             else
             {
-                JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false);
+                JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false).ConfigureAwait(false);
             }
 
             ret.Status = JsonAndStatusTuple.Item2;

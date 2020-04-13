@@ -29,7 +29,7 @@ namespace PubnubApi
         {
             cancellationToken.ThrowIfCancellationRequested();
             LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} PubnubHttpClientHandler {1} SendAsync ", DateTime.Now.ToString(CultureInfo.InvariantCulture), pubnubHandlerName), pubnubConfig.LogVerbosity);
-            return await base.SendAsync(request, cancellationToken);
+            return await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
         }
     }
 }
