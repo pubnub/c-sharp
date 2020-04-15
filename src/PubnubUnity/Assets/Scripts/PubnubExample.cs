@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using PubnubApi;
 using UnityEngine.UI;
+using System.Threading.Tasks;
 
 //Refer PubnubDemoScene
 public class PubnubExample : MonoBehaviour
 {
+    public static bool useAsyncAwait = true;
     private static Pubnub pubnub;
     private static Queue outputMsgQueue = new Queue(10);
     private static SubscribeCallbackExt subListener;
@@ -106,20 +108,38 @@ public class PubnubExample : MonoBehaviour
     public void handleTimeButtonClick()
     {
         Debug.Log("Running Time()");
-        pubnub.Time().Execute(new PNTimeResultExt((result, status) =>
+        if (useAsyncAwait)
         {
-            if (result != null)
+            PNResult<PNTimeResult> respTime = Task.Run(() => pubnub.Time().ExecuteAsync()).Result;
+            if (respTime.Result != null)
             {
-                string timeResponse = pubnub.JsonPluggableLibrary.SerializeToJsonString(result);
-                Debug.Log("Time Response = " + timeResponse);
-                DisplayText("Time Response = " + timeResponse);
+                string timeResponse = pubnub.JsonPluggableLibrary.SerializeToJsonString(respTime.Result);
+                Debug.Log("Async Time Response = " + timeResponse);
+                DisplayText("Async Time Response = " + timeResponse);
             }
             else
             {
-                Debug.Log("Time ERROR = " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-                DisplayText("Time ERROR = " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                Debug.Log("Async Time ERROR = " + pubnub.JsonPluggableLibrary.SerializeToJsonString(respTime.Status));
+                DisplayText("Async Time ERROR = " + pubnub.JsonPluggableLibrary.SerializeToJsonString(respTime.Status));
             }
-        }));
+        }
+        else
+        {
+            pubnub.Time().Execute(new PNTimeResultExt((result, status) =>
+            {
+                if (result != null)
+                {
+                    string timeResponse = pubnub.JsonPluggableLibrary.SerializeToJsonString(result);
+                    Debug.Log("Time Response = " + timeResponse);
+                    DisplayText("Time Response = " + timeResponse);
+                }
+                else
+                {
+                    Debug.Log("Time ERROR = " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                    DisplayText("Time ERROR = " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                }
+            }));
+        }
     }
 
     public void handleSubscribeButtonClick()
@@ -157,23 +177,44 @@ public class PubnubExample : MonoBehaviour
     {
         if (!string.IsNullOrEmpty(ChannelName.text) && !string.IsNullOrEmpty(PublishMessage.text))
         {
-            pubnub.Publish()
-            .Channel(ChannelName.text)
-            .Message(PublishMessage.text)
-            .Execute(new PNPublishResultExt((result, status) =>
+            if (useAsyncAwait)
             {
-                if (result != null)
+                PNResult<PNPublishResult> respPublish = Task.Run(()=>pubnub.Publish()
+                .Channel(ChannelName.text)
+                .Message(PublishMessage.text)
+                .ExecuteAsync()).Result;
+                if (respPublish.Result != null)
                 {
-                    string publishResponse = pubnub.JsonPluggableLibrary.SerializeToJsonString(result);
-                    Debug.Log("Publish Response = " + publishResponse);
-                    DisplayText("Publish Response = " + publishResponse);
+                    string publishResponse = pubnub.JsonPluggableLibrary.SerializeToJsonString(respPublish.Result);
+                    Debug.Log("Async Publish Response = " + publishResponse);
+                    DisplayText("Async Publish Response = " + publishResponse);
                 }
                 else
                 {
-                    Debug.Log("Publish ERROR = " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-                    DisplayText("Publish ERROR = " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                    Debug.Log("Async Publish ERROR = " + pubnub.JsonPluggableLibrary.SerializeToJsonString(respPublish.Status));
+                    DisplayText("Async Publish ERROR = " + pubnub.JsonPluggableLibrary.SerializeToJsonString(respPublish.Status));
                 }
-            }));
+            }
+            else
+            {
+                pubnub.Publish()
+                .Channel(ChannelName.text)
+                .Message(PublishMessage.text)
+                .Execute(new PNPublishResultExt((result, status) =>
+                {
+                    if (result != null)
+                    {
+                        string publishResponse = pubnub.JsonPluggableLibrary.SerializeToJsonString(result);
+                        Debug.Log("Publish Response = " + publishResponse);
+                        DisplayText("Publish Response = " + publishResponse);
+                    }
+                    else
+                    {
+                        Debug.Log("Publish ERROR = " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                        DisplayText("Publish ERROR = " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                    }
+                }));
+            }
         }
         else
         {
