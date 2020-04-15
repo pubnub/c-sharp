@@ -238,7 +238,11 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void ThenWithAsyncSpaceCRUDShouldReturnSuccessCodeAndInfo()
+#else
         public static async Task ThenWithAsyncSpaceCRUDShouldReturnSuccessCodeAndInfo()
+#endif        
         {
             server.ClearRequests();
 
@@ -276,11 +280,19 @@ namespace PubNubMessaging.Tests
             }
 
             System.Diagnostics.Debug.WriteLine("pubnub.DeleteSpace() STARTED");
+#if NET40
+            Task.Factory.StartNew(async () => await pubnub.DeleteSpace().Id(spaceId).ExecuteAsync());
+#else
             await pubnub.DeleteSpace().Id(spaceId).ExecuteAsync();
+#endif
 
             #region "CreateSpace"
             System.Diagnostics.Debug.WriteLine("pubnub.CreateSpace() STARTED");
+#if NET40
+            PNResult<PNCreateSpaceResult> createSpaceResult = Task.Factory.StartNew(async () => await pubnub.CreateSpace().Id(spaceId).Name("pandu-ut-spname").ExecuteAsync()).Result.Result;
+#else
             PNResult<PNCreateSpaceResult> createSpaceResult = await pubnub.CreateSpace().Id(spaceId).Name("pandu-ut-spname").ExecuteAsync();
+#endif
             if (createSpaceResult.Result != null && createSpaceResult.Status.StatusCode == 200 && !createSpaceResult.Status.Error)
             {
                 pubnub.JsonPluggableLibrary.SerializeToJsonString(createSpaceResult.Result);
@@ -296,10 +308,17 @@ namespace PubNubMessaging.Tests
                 receivedMessage = false;
                 #region "UpdateSpace"
                 System.Diagnostics.Debug.WriteLine("pubnub.UpdateSpace() STARTED");
+#if NET40
+                PNResult<PNUpdateSpaceResult> updateSpaceResult = Task.Factory.StartNew(async () => await pubnub.UpdateSpace().Id(spaceId).Name("pandu-ut-spname-upd")
+                    .Description("pandu-ut-spdesc")
+                    .CustomObject(new Dictionary<string, object>() { { "color", "red" } })
+                        .ExecuteAsync()).Result.Result;
+#else
                 PNResult<PNUpdateSpaceResult> updateSpaceResult = await pubnub.UpdateSpace().Id(spaceId).Name("pandu-ut-spname-upd")
                     .Description("pandu-ut-spdesc")
                     .CustomObject(new Dictionary<string, object>() { { "color", "red" } })
                         .ExecuteAsync();
+#endif
                 if (updateSpaceResult.Result != null && updateSpaceResult.Status.StatusCode == 200 && !updateSpaceResult.Status.Error)
                 {
                     pubnub.JsonPluggableLibrary.SerializeToJsonString(updateSpaceResult.Result);
@@ -316,8 +335,13 @@ namespace PubNubMessaging.Tests
                 receivedMessage = false;
                 #region "GetSpace"
                 System.Diagnostics.Debug.WriteLine("pubnub.GetSpace() STARTED");
+#if NET40
+                PNResult<PNGetSpaceResult> getSpaceResult = Task.Factory.StartNew(async () => await pubnub.GetSpace().SpaceId(spaceId).IncludeCustom(true)
+                    .ExecuteAsync()).Result.Result;
+#else
                 PNResult<PNGetSpaceResult> getSpaceResult = await pubnub.GetSpace().SpaceId(spaceId).IncludeCustom(true)
                     .ExecuteAsync();
+#endif
                 if (getSpaceResult.Result != null && getSpaceResult.Status.StatusCode == 200 && !getSpaceResult.Status.Error)
                 {
                     pubnub.JsonPluggableLibrary.SerializeToJsonString(getSpaceResult.Result);
@@ -334,7 +358,11 @@ namespace PubNubMessaging.Tests
                 receivedMessage = false;
                 #region "GetSpaces"
                 System.Diagnostics.Debug.WriteLine("pubnub.GetSpaces() STARTED");
+#if NET40
+                PNResult<PNGetSpacesResult> getSpacesResult = Task.Factory.StartNew(async () => await pubnub.GetSpaces().IncludeCount(true).ExecuteAsync()).Result.Result;
+#else
                 PNResult<PNGetSpacesResult> getSpacesResult = await pubnub.GetSpaces().IncludeCount(true).ExecuteAsync();
+#endif
                 if (getSpacesResult.Result != null && getSpacesResult.Status.StatusCode == 200 && !getSpacesResult.Status.Error)
                 {
                     pubnub.JsonPluggableLibrary.SerializeToJsonString(getSpacesResult.Result);
@@ -499,7 +527,11 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void ThenWithAsyncSpaceUpdateDeleteShouldReturnEventInfo()
+#else
         public static async Task ThenWithAsyncSpaceUpdateDeleteShouldReturnEventInfo()
+#endif        
         {
             server.ClearRequests();
 
@@ -568,11 +600,19 @@ namespace PubNubMessaging.Tests
             manualEvent.WaitOne(2000);
 
             System.Diagnostics.Debug.WriteLine("pubnub.DeleteSpace() STARTED");
+#if NET40
+            Task.Factory.StartNew(async () => await pubnub.DeleteSpace().Id(spaceId).ExecuteAsync());
+#else
             await pubnub.DeleteSpace().Id(spaceId).ExecuteAsync();
+#endif
 
             #region "CreateSpace"
             System.Diagnostics.Debug.WriteLine("pubnub.CreateSpace() STARTED");
+#if NET40
+            PNResult<PNCreateSpaceResult> createSpaceResult = Task.Factory.StartNew(async () => await pubnub.CreateSpace().Id(spaceId).Name("pandu-ut-spname").ExecuteAsync()).Result.Result;
+#else
             PNResult<PNCreateSpaceResult> createSpaceResult = await pubnub.CreateSpace().Id(spaceId).Name("pandu-ut-spname").ExecuteAsync();
+#endif
             if (createSpaceResult.Result != null && createSpaceResult.Status.StatusCode == 200 && !createSpaceResult.Status.Error)
             {
                 pubnub.JsonPluggableLibrary.SerializeToJsonString(createSpaceResult.Result);
@@ -588,10 +628,17 @@ namespace PubNubMessaging.Tests
                 receivedMessage = false;
                 #region "UpdateSpace"
                 System.Diagnostics.Debug.WriteLine("pubnub.UpdateSpace() STARTED");
+#if NET40
+                PNResult<PNUpdateSpaceResult> updateSpaceResult = Task.Factory.StartNew(async () => await pubnub.UpdateSpace().Id(spaceId).Name("pandu-ut-spname-upd")
+                    .Description("pandu-ut-spdesc")
+                    .CustomObject(new Dictionary<string, object>() { { "color", "red" } })
+                        .ExecuteAsync()).Result.Result;
+#else
                 PNResult<PNUpdateSpaceResult> updateSpaceResult = await pubnub.UpdateSpace().Id(spaceId).Name("pandu-ut-spname-upd")
                     .Description("pandu-ut-spdesc")
                     .CustomObject(new Dictionary<string, object>() { { "color", "red" } })
                         .ExecuteAsync();
+#endif
                 if (updateSpaceResult.Result != null && updateSpaceResult.Status.StatusCode == 200 && !updateSpaceResult.Status.Error)
                 {
                     pubnub.JsonPluggableLibrary.SerializeToJsonString(updateSpaceResult.Result);
@@ -606,7 +653,11 @@ namespace PubNubMessaging.Tests
             if (!receivedDeleteEvent)
             {
                 System.Diagnostics.Debug.WriteLine("pubnub.DeleteSpace() 2 STARTED");
+#if NET40
+                Task.Factory.StartNew(async () => await pubnub.DeleteSpace().Id(spaceId).ExecuteAsync());
+#else
                 await pubnub.DeleteSpace().Id(spaceId).ExecuteAsync();
+#endif
             }
 
             Thread.Sleep(2000);
