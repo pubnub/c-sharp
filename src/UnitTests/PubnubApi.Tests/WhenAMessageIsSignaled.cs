@@ -181,7 +181,11 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void ThenWithAsyncUnencryptSignalShouldReturnSuccessCodeAndInfo()
+#else
         public static async Task ThenWithAsyncUnencryptSignalShouldReturnSuccessCodeAndInfo()
+#endif
         {
             server.ClearRequests();
 
@@ -229,7 +233,11 @@ namespace PubNubMessaging.Tests
 
             manualResetEventWaitTimeout = 310 * 1000;
 
+#if NET40
+            PNResult<PNPublishResult> signalResult = Task.Factory.StartNew(async () => await pubnub.Signal().Channel(channel).Message(message).ExecuteAsync()).Result.Result;
+#else
             PNResult<PNPublishResult> signalResult = await pubnub.Signal().Channel(channel).Message(message).ExecuteAsync();
+#endif
             if (signalResult.Result != null && signalResult.Status.StatusCode == 200 && !signalResult.Status.Error
                 && signalResult.Result.Timetoken > 0)
             {
@@ -354,7 +362,11 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void ThenWithAsyncUnencryptSignalListenerShouldGetMessagae()
+#else
         public static async Task ThenWithAsyncUnencryptSignalListenerShouldGetMessagae()
+#endif
         {
             server.ClearRequests();
 
@@ -429,7 +441,11 @@ namespace PubNubMessaging.Tests
             {
                 subscribeManualEvent = new ManualResetEvent(false); //Reset to wait for message
                 internalReceivedMessage = false;
+#if NET40
+                PNResult<PNPublishResult> signalResult = Task.Factory.StartNew(async () => await pubnub.Signal().Channel(channel).Message(messageForUnencryptSignal).ExecuteAsync()).Result.Result;
+#else
                 PNResult<PNPublishResult> signalResult = await pubnub.Signal().Channel(channel).Message(messageForUnencryptSignal).ExecuteAsync();
+#endif
                 if (signalResult.Result != null && signalResult.Status.StatusCode == 200 && !signalResult.Status.Error)
                 {
                     internalReceivedMessage = true;
@@ -562,7 +578,11 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void ThenWithAsyncIgnoreCipherKeyUnencryptSignalListenerShouldGetMessagae()
+#else
         public static async Task ThenWithAsyncIgnoreCipherKeyUnencryptSignalListenerShouldGetMessagae()
+#endif
         {
             server.ClearRequests();
 
@@ -638,7 +658,11 @@ namespace PubNubMessaging.Tests
             {
                 subscribeManualEvent = new ManualResetEvent(false); //Reset to wait for message
                 internalReceivedMessage = false;
+#if NET40
+                PNResult<PNPublishResult> signalResult = Task.Factory.StartNew(async () => await pubnub.Signal().Channel(channel).Message(messageForUnencryptSignal).ExecuteAsync()).Result.Result;
+#else
                 PNResult<PNPublishResult> signalResult = await pubnub.Signal().Channel(channel).Message(messageForUnencryptSignal).ExecuteAsync();
+#endif
                 if (signalResult.Result != null && signalResult.Status.StatusCode == 200 && !signalResult.Status.Error)
                 {
                     internalReceivedMessage = true;

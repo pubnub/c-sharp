@@ -133,7 +133,16 @@ namespace PubNubMessaging.Tests
 
             manualResetEventWaitTimeout = 310 * 1000;
             deleteMessageManualEvent = new ManualResetEvent(false);
-            pubnub.DeleteMessages().Channel(channel).Execute(new UTDeleteMessagaeResult());
+            pubnub.DeleteMessages().Channel(channel).Execute(new PNDeleteMessageResultExt((result, status) => 
+            {
+                if (result != null && !status.Error)
+                {
+                    receivedMessage = true;
+                }
+                Debug.WriteLine("DeleteMessage Response: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                Debug.WriteLine("DeleteMessage PNStatus => Status = : " + status.StatusCode.ToString());
+                deleteMessageManualEvent.Set();
+            }));
             deleteMessageManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             pubnub.Destroy();
@@ -144,7 +153,11 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void ThenWithAsyncDeleteMessageShouldReturnSuccessMessage()
+#else
         public static async Task ThenWithAsyncDeleteMessageShouldReturnSuccessMessage()
+#endif
         {
             server.ClearRequests();
 
@@ -181,7 +194,11 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
+#if NET40
+            PNResult<PNDeleteMessageResult> resp = Task.Factory.StartNew(async () => await pubnub.DeleteMessages().Channel(channel).ExecuteAsync()).Result.Result;
+#else
             PNResult<PNDeleteMessageResult> resp = await pubnub.DeleteMessages().Channel(channel).ExecuteAsync();
+#endif
             if (resp.Result != null && resp.Status.StatusCode == 200 && !resp.Status.Error)
             {
                 receivedMessage = true;

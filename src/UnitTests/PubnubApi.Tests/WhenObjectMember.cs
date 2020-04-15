@@ -346,7 +346,11 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void ThenWithAsyncAddUpdateRemoveUserShouldReturnSuccessCodeAndInfo()
+#else
         public static async Task ThenWithAsyncAddUpdateRemoveUserShouldReturnSuccessCodeAndInfo()
+#endif
         {
             server.ClearRequests();
 
@@ -387,19 +391,34 @@ namespace PubNubMessaging.Tests
             }
 
             System.Diagnostics.Debug.WriteLine("pubnub.DeleteUser() 1 STARTED");
+#if NET40
+            Task.Factory.StartNew(async () => await pubnub.DeleteUser().Id(userId1).ExecuteAsync());
+#else
             await pubnub.DeleteUser().Id(userId1).ExecuteAsync();
+#endif
 
             System.Diagnostics.Debug.WriteLine("pubnub.DeleteUser() 2 STARTED");
+#if NET40
+            Task.Factory.StartNew(async () => await pubnub.DeleteUser().Id(userId2).ExecuteAsync());
+#else
             await pubnub.DeleteUser().Id(userId2).ExecuteAsync();
+#endif
 
             System.Diagnostics.Debug.WriteLine("pubnub.DeleteSpace() STARTED");
+#if NET40
+            Task.Factory.StartNew(async () => await pubnub.DeleteSpace().Id(spaceId).ExecuteAsync());
+#else
             await pubnub.DeleteSpace().Id(spaceId).ExecuteAsync();
+#endif
 
             receivedMessage = false;
             #region "CreateUser 1"
             System.Diagnostics.Debug.WriteLine("pubnub.CreateUser() 1 STARTED");
+#if NET40
+            PNResult<PNCreateUserResult> createUser1Result = Task.Factory.StartNew(async () => await pubnub.CreateUser().Id(userId1).Name("pandu-ut-un1").ExecuteAsync()).Result.Result;
+#else
             PNResult<PNCreateUserResult> createUser1Result = await pubnub.CreateUser().Id(userId1).Name("pandu-ut-un1").ExecuteAsync();
-
+#endif
             if (createUser1Result.Result != null && createUser1Result.Status.StatusCode == 200 && !createUser1Result.Status.Error)
             {
                 pubnub.JsonPluggableLibrary.SerializeToJsonString(createUser1Result.Result);
@@ -415,7 +434,11 @@ namespace PubNubMessaging.Tests
                 receivedMessage = false;
                 #region "CreateUser 2"
                 System.Diagnostics.Debug.WriteLine("pubnub.CreateUser() 2 STARTED");
+#if NET40
+                PNResult<PNCreateUserResult> createUser2Result = Task.Factory.StartNew(async () => await pubnub.CreateUser().Id(userId2).Name("pandu-ut-un2").ExecuteAsync()).Result.Result;
+#else
                 PNResult<PNCreateUserResult> createUser2Result = await pubnub.CreateUser().Id(userId2).Name("pandu-ut-un2").ExecuteAsync();
+#endif
                 if (createUser2Result.Result != null && createUser2Result.Status.StatusCode == 200 && !createUser2Result.Status.Error)
                 {
                     pubnub.JsonPluggableLibrary.SerializeToJsonString(createUser2Result.Result);
@@ -431,7 +454,11 @@ namespace PubNubMessaging.Tests
                 receivedMessage = false;
                 #region "CreateSpace"
                 System.Diagnostics.Debug.WriteLine("pubnub.CreateSpace() STARTED");
+#if NET40
+                PNResult<PNCreateSpaceResult> createSpaceResult = Task.Factory.StartNew(async () => await pubnub.CreateSpace().Id(spaceId).Name("pandu-ut-spname").ExecuteAsync()).Result.Result;
+#else
                 PNResult<PNCreateSpaceResult> createSpaceResult = await pubnub.CreateSpace().Id(spaceId).Name("pandu-ut-spname").ExecuteAsync();
+#endif
                 if (createSpaceResult.Result != null && createSpaceResult.Status.StatusCode == 200 && !createSpaceResult.Status.Error)
                 {
                     pubnub.JsonPluggableLibrary.SerializeToJsonString(createSpaceResult.Result);
@@ -448,6 +475,18 @@ namespace PubNubMessaging.Tests
                 receivedMessage = false;
                 #region "Members Add"
                 System.Diagnostics.Debug.WriteLine("pubnub.Members() ADD STARTED");
+#if NET40
+                PNResult<PNManageMembersResult> manageMemberResult = Task.Factory.StartNew(async () => await pubnub.ManageMembers().SpaceId(spaceId)
+                    .Add(new List<PNMember>()
+                            {
+                            new PNMember() { UserId = userId1 },
+                            new PNMember() { UserId = userId2 }
+                    })
+                    .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.USER, PNMemberField.USER_CUSTOM })
+                    .IncludeCount(true)
+                    .Page(new PNPage() { Next = "", Prev = "" })
+                    .ExecuteAsync()).Result.Result;
+#else
                 PNResult<PNManageMembersResult> manageMemberResult = await pubnub.ManageMembers().SpaceId(spaceId)
                     .Add(new List<PNMember>()
                             {
@@ -458,6 +497,7 @@ namespace PubNubMessaging.Tests
                     .IncludeCount(true)
                     .Page(new PNPage() { Next = "", Prev = "" })
                     .ExecuteAsync();
+#endif
                 if (manageMemberResult.Result != null && manageMemberResult.Status.StatusCode == 200 && !manageMemberResult.Status.Error)
                 {
                     pubnub.JsonPluggableLibrary.SerializeToJsonString(manageMemberResult.Result);
@@ -476,6 +516,18 @@ namespace PubNubMessaging.Tests
                 receivedMessage = false;
                 #region "Members Update"
                 System.Diagnostics.Debug.WriteLine("pubnub.Members() UPDATE STARTED");
+#if NET40
+                PNResult<PNManageMembersResult> manageMmbrUpdResult = Task.Factory.StartNew(async () => await pubnub.ManageMembers().SpaceId(spaceId)
+                    .Update(new List<PNMember>()
+                            {
+                            new PNMember() { UserId = userId1, Custom = new Dictionary<string, object>(){ { "color", "green1" } } },
+                            new PNMember() { UserId = userId2, Custom = new Dictionary<string, object>(){ { "color", "green2" } } }
+                    })
+                    .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.USER, PNMemberField.USER_CUSTOM })
+                    .IncludeCount(true)
+                    .Page(new PNPage() { Next = "", Prev = "" })
+                    .ExecuteAsync()).Result.Result;
+#else
                 PNResult<PNManageMembersResult> manageMmbrUpdResult = await pubnub.ManageMembers().SpaceId(spaceId)
                     .Update(new List<PNMember>()
                             {
@@ -486,6 +538,7 @@ namespace PubNubMessaging.Tests
                     .IncludeCount(true)
                     .Page(new PNPage() { Next = "", Prev = "" })
                     .ExecuteAsync();
+#endif
                 if (manageMmbrUpdResult.Result != null && manageMmbrUpdResult.Status.StatusCode == 200 && !manageMmbrUpdResult.Status.Error)
                 {
                     pubnub.JsonPluggableLibrary.SerializeToJsonString(manageMmbrUpdResult.Result);
@@ -504,12 +557,21 @@ namespace PubNubMessaging.Tests
                 receivedMessage = false;
                 #region "Members Remove"
                 System.Diagnostics.Debug.WriteLine("pubnub.Members() REMOVE STARTED");
+#if NET40
+                PNResult<PNManageMembersResult> manageMmbrDelResult = Task.Factory.StartNew(async () => await pubnub.ManageMembers().SpaceId(spaceId)
+                    .Remove(new List<string>() { userId2 })
+                    .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.USER, PNMemberField.USER_CUSTOM })
+                    .IncludeCount(true)
+                    .Page(new PNPage() { Next = "", Prev = "" })
+                    .ExecuteAsync()).Result.Result;
+#else
                 PNResult<PNManageMembersResult> manageMmbrDelResult = await pubnub.ManageMembers().SpaceId(spaceId)
                     .Remove(new List<string>() { userId2 })
                     .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.USER, PNMemberField.USER_CUSTOM })
                     .IncludeCount(true)
                     .Page(new PNPage() { Next = "", Prev = "" })
                     .ExecuteAsync();
+#endif
                 if (manageMmbrDelResult.Result != null && manageMmbrDelResult.Status.StatusCode == 200 && !manageMmbrDelResult.Status.Error)
                 {
                     pubnub.JsonPluggableLibrary.SerializeToJsonString(manageMmbrDelResult.Result);
@@ -526,8 +588,13 @@ namespace PubNubMessaging.Tests
                 receivedMessage = false;
                 #region "GetMembers"
                 System.Diagnostics.Debug.WriteLine("pubnub.GetMembers() STARTED");
+#if NET40
+                PNResult<PNGetMembersResult> getMbrsResult = Task.Factory.StartNew(async () => await pubnub.GetMembers().SpaceId(spaceId)
+                    .ExecuteAsync()).Result.Result;
+#else
                 PNResult<PNGetMembersResult> getMbrsResult = await pubnub.GetMembers().SpaceId(spaceId)
                     .ExecuteAsync();
+#endif
                 if (getMbrsResult.Result != null && getMbrsResult.Status.StatusCode == 200 && !getMbrsResult.Status.Error)
                 {
                     pubnub.JsonPluggableLibrary.SerializeToJsonString(getMbrsResult.Result);
@@ -808,7 +875,11 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void ThenWithAsyncMemberAddUpdateRemoveShouldReturnEventInfo()
+#else
         public static async Task ThenWithAsyncMemberAddUpdateRemoveShouldReturnEventInfo()
+#endif
         {
             server.ClearRequests();
 
@@ -883,18 +954,34 @@ namespace PubNubMessaging.Tests
             manualEvent.WaitOne(2000);
 
             System.Diagnostics.Debug.WriteLine("pubnub.DeleteUser() 1 STARTED");
+#if NET40
+            Task.Factory.StartNew(async () => await pubnub.DeleteUser().Id(userId1).ExecuteAsync()).Wait();
+#else
             await pubnub.DeleteUser().Id(userId1).ExecuteAsync();
+#endif
 
             System.Diagnostics.Debug.WriteLine("pubnub.DeleteUser() 2 STARTED");
+#if NET40
+            Task.Factory.StartNew(async () => await pubnub.DeleteUser().Id(userId2).ExecuteAsync()).Wait();
+#else
             await pubnub.DeleteUser().Id(userId2).ExecuteAsync();
+#endif
 
             System.Diagnostics.Debug.WriteLine("pubnub.DeleteSpace() STARTED");
+#if NET40
+            Task.Factory.StartNew(async () => await pubnub.DeleteSpace().Id(spaceId).ExecuteAsync()).Wait();
+#else
             await pubnub.DeleteSpace().Id(spaceId).ExecuteAsync();
+#endif
 
             receivedMessage = false;
             #region "CreateUser 1"
             System.Diagnostics.Debug.WriteLine("pubnub.CreateUser() 1 STARTED");
+#if NET40
+            PNResult<PNCreateUserResult> createUser1Result = Task.Factory.StartNew(async () => await pubnub.CreateUser().Id(userId1).Name("pandu-ut-un1").ExecuteAsync()).Result.Result;
+#else
             PNResult<PNCreateUserResult> createUser1Result = await pubnub.CreateUser().Id(userId1).Name("pandu-ut-un1").ExecuteAsync();
+#endif
             if (createUser1Result.Result != null && createUser1Result.Status.StatusCode == 200 && !createUser1Result.Status.Error)
             {
                 pubnub.JsonPluggableLibrary.SerializeToJsonString(createUser1Result.Result);
@@ -911,7 +998,11 @@ namespace PubNubMessaging.Tests
                 receivedMessage = false;
                 #region "CreateUser 2"
                 System.Diagnostics.Debug.WriteLine("pubnub.CreateUser() 2 STARTED");
+#if NET40
+                PNResult<PNCreateUserResult> createUser2Result = Task.Factory.StartNew(async () => await pubnub.CreateUser().Id(userId2).Name("pandu-ut-un2").ExecuteAsync()).Result.Result;
+#else
                 PNResult<PNCreateUserResult> createUser2Result = await pubnub.CreateUser().Id(userId2).Name("pandu-ut-un2").ExecuteAsync();
+#endif
                 if (createUser2Result.Result != null && createUser2Result.Status.StatusCode == 200 && !createUser2Result.Status.Error)
                 {
                     pubnub.JsonPluggableLibrary.SerializeToJsonString(createUser2Result.Result);
@@ -927,7 +1018,11 @@ namespace PubNubMessaging.Tests
                 receivedMessage = false;
                 #region "CreateSpace"
                 System.Diagnostics.Debug.WriteLine("pubnub.CreateSpace() STARTED");
+#if NET40
+                PNResult<PNCreateSpaceResult> createSpaceResult = Task.Factory.StartNew(async () => await pubnub.CreateSpace().Id(spaceId).Name("pandu-ut-spname").ExecuteAsync()).Result.Result;
+#else
                 PNResult<PNCreateSpaceResult> createSpaceResult = await pubnub.CreateSpace().Id(spaceId).Name("pandu-ut-spname").ExecuteAsync();
+#endif
                 if (createSpaceResult.Result != null && createSpaceResult.Status.StatusCode == 200 && !createSpaceResult.Status.Error)
                 {
                     pubnub.JsonPluggableLibrary.SerializeToJsonString(createSpaceResult.Result);
@@ -944,6 +1039,15 @@ namespace PubNubMessaging.Tests
                 receivedMessage = false;
                 #region "Members Add"
                 System.Diagnostics.Debug.WriteLine("pubnub.Members() ADD STARTED");
+#if NET40
+                PNResult<PNManageMembersResult> manageMemberResult = Task.Factory.StartNew(async () => await pubnub.ManageMembers().SpaceId(spaceId)
+                    .Add(new List<PNMember>()
+                            {
+                            new PNMember() { UserId = userId1 },
+                            new PNMember() { UserId = userId2 }
+                    })
+                    .ExecuteAsync()).Result.Result;
+#else
                 PNResult<PNManageMembersResult> manageMemberResult = await pubnub.ManageMembers().SpaceId(spaceId)
                     .Add(new List<PNMember>()
                             {
@@ -951,6 +1055,7 @@ namespace PubNubMessaging.Tests
                             new PNMember() { UserId = userId2 }
                     })
                     .ExecuteAsync();
+#endif
                 if (manageMemberResult.Result != null && manageMemberResult.Status.StatusCode == 200 && !manageMemberResult.Status.Error)
                 {
                     pubnub.JsonPluggableLibrary.SerializeToJsonString(manageMemberResult.Result);
@@ -964,6 +1069,8 @@ namespace PubNubMessaging.Tests
                 #endregion
             }
 
+            Thread.Sleep(2000);
+            
             if (receivedMessage)
             {
                 receivedMessage = false;
@@ -971,6 +1078,15 @@ namespace PubNubMessaging.Tests
                 if (!string.IsNullOrEmpty(config.SecretKey))
                 {
                     System.Diagnostics.Debug.WriteLine("pubnub.Members() UPDATE/REMOVE STARTED");
+#if NET40
+                    PNResult<PNManageMembersResult> manageMmbrUpdResult = Task.Factory.StartNew(async () => await pubnub.ManageMembers().SpaceId(spaceId)
+                        .Update(new List<PNMember>()
+                                {
+                            new PNMember() { UserId = userId1, Custom = new Dictionary<string, object>(){ { "color", "green1" } } }
+                        })
+                        .Remove(new List<string>() { userId2 })
+                        .ExecuteAsync()).Result.Result;
+#else
                     PNResult<PNManageMembersResult> manageMmbrUpdResult = await pubnub.ManageMembers().SpaceId(spaceId)
                         .Update(new List<PNMember>()
                                 {
@@ -978,6 +1094,7 @@ namespace PubNubMessaging.Tests
                         })
                         .Remove(new List<string>() { userId2 })
                         .ExecuteAsync();
+#endif
                     if (manageMmbrUpdResult.Result != null && manageMmbrUpdResult.Status.StatusCode == 200 && !manageMmbrUpdResult.Status.Error)
                     {
                         pubnub.JsonPluggableLibrary.SerializeToJsonString(manageMmbrUpdResult.Result);
@@ -991,9 +1108,15 @@ namespace PubNubMessaging.Tests
                 else
                 {
                     System.Diagnostics.Debug.WriteLine("pubnub.Members() REMOVE STARTED");
+#if NET40
+                    PNResult<PNManageMembersResult> manageMmbrDelResult = Task.Factory.StartNew(async () => await pubnub.ManageMembers().SpaceId(spaceId)
+                        .Remove(new List<string>() { userId2 })
+                        .ExecuteAsync()).Result.Result;
+#else
                     PNResult<PNManageMembersResult> manageMmbrDelResult = await pubnub.ManageMembers().SpaceId(spaceId)
                         .Remove(new List<string>() { userId2 })
                         .ExecuteAsync();
+#endif
                     if (manageMmbrDelResult.Result != null && manageMmbrDelResult.Status.StatusCode == 200 && !manageMmbrDelResult.Status.Error)
                     {
                         pubnub.JsonPluggableLibrary.SerializeToJsonString(manageMmbrDelResult.Result);
@@ -1003,9 +1126,10 @@ namespace PubNubMessaging.Tests
                 #endregion
             }
 
-            Thread.Sleep(2000);
+            Thread.Sleep(4000);
             /* */
             pubnub.Unsubscribe<string>().Channels(new string[] { userId1, userId2, spaceId }).Execute();
+            Thread.Sleep(1000);
             pubnub.RemoveListener(eventListener);
 
             if (!string.IsNullOrEmpty(config.SecretKey))

@@ -323,11 +323,11 @@ namespace PubnubApi.EndPoint
             {
                 requestState.UsePostMethod = true;
                 string postMessage = JsonEncodePublishMsg(message);
-                JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false, postMessage);
+                JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false, postMessage).ConfigureAwait(false);
             }
             else
             {
-                JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false);
+                JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false).ConfigureAwait(false);
             }
             ret.Status = JsonAndStatusTuple.Item2;
             string json = JsonAndStatusTuple.Item1;
