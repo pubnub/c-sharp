@@ -341,7 +341,11 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void FetchHistoryWithAsyncShouldReturnDecryptMessage()
+#else
         public static async Task FetchHistoryWithAsyncShouldReturnDecryptMessage()
+#endif
         {
             server.ClearRequests();
 
@@ -387,8 +391,13 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
+#if NET40
+            PNResult<PNPublishResult> publishResult = Task.Factory.StartNew(async () => await pubnub.Publish().Channel(channel).Message(message).ShouldStore(true)
+                .ExecuteAsync()).Result.Result;
+#else
             PNResult<PNPublishResult> publishResult = await pubnub.Publish().Channel(channel).Message(message).ShouldStore(true)
                 .ExecuteAsync();
+#endif
             if (publishResult.Result != null && publishResult.Status.StatusCode == 200 && !publishResult.Status.Error)
             {
                 publishTimetoken = publishResult.Result.Timetoken;
@@ -419,6 +428,16 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
+#if NET40
+                PNResult<PNFetchHistoryResult> fetchHistResult = Task.Factory.StartNew(async () => await pubnub.FetchHistory()
+                    .Channels(new string[] { channel })
+                    .Start(publishTimetoken - 1)
+                    .End(publishTimetoken)
+                    .MaximumPerChannel(1)
+                    .Reverse(false)
+                    .IncludeMeta(false)
+                    .ExecuteAsync()).Result.Result;
+#else
                 PNResult<PNFetchHistoryResult> fetchHistResult = await pubnub.FetchHistory()
                     .Channels(new string[] { channel })
                     .Start(publishTimetoken - 1)
@@ -427,6 +446,7 @@ namespace PubNubMessaging.Tests
                     .Reverse(false)
                     .IncludeMeta(false)
                     .ExecuteAsync();
+#endif
                 if (fetchHistResult.Result != null && fetchHistResult.Status.StatusCode == 200 && !fetchHistResult.Status.Error 
                     && fetchHistResult.Result.Messages != null && fetchHistResult.Result.Messages.ContainsKey(channel) 
                     && fetchHistResult.Result.Messages[channel].Count > 0)
@@ -521,7 +541,11 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void FetchHistoryWithAsyncCount10ReturnsRecords()
+#else
         public static async Task FetchHistoryWithAsyncCount10ReturnsRecords()
+#endif
         {
             server.ClearRequests();
 
@@ -566,10 +590,17 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
+#if NET40
+            PNResult<PNFetchHistoryResult> fetchHistResult = Task.Factory.StartNew(async () => await pubnub.FetchHistory().Channels(new string[] { channel })
+                .MaximumPerChannel(10)
+                .IncludeMeta(false)
+                .ExecuteAsync()).Result.Result;
+#else
             PNResult<PNFetchHistoryResult> fetchHistResult = await pubnub.FetchHistory().Channels(new string[] { channel })
                 .MaximumPerChannel(10)
                 .IncludeMeta(false)
                 .ExecuteAsync();
+#endif
             if (fetchHistResult.Result != null && fetchHistResult.Status.StatusCode == 200 && !fetchHistResult.Status.Error 
                 && fetchHistResult.Result.Messages != null && fetchHistResult.Result.Messages.ContainsKey(channel) 
                 && fetchHistResult.Result.Messages[channel].Count >= 10)
@@ -648,7 +679,11 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void FetchHistoryWithAsyncWithMessageActionsReturnsRecords()
+#else
         public static async Task FetchHistoryWithAsyncWithMessageActionsReturnsRecords()
+#endif
         {
             server.ClearRequests();
 
@@ -689,10 +724,17 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
+#if NET40
+            PNResult<PNFetchHistoryResult> fetchHistResult = Task.Factory.StartNew(async () => await pubnub.FetchHistory().Channels(new string[] { channel })
+                .IncludeMeta(false)
+                .IncludeMessageActions(true)
+                .ExecuteAsync()).Result.Result;
+#else
             PNResult<PNFetchHistoryResult> fetchHistResult = await pubnub.FetchHistory().Channels(new string[] { channel })
                 .IncludeMeta(false)
                 .IncludeMessageActions(true)
                 .ExecuteAsync();
+#endif
             if (fetchHistResult.Result != null && fetchHistResult.Status.StatusCode == 200 && !fetchHistResult.Status.Error 
                 && fetchHistResult.Result.Messages != null && fetchHistResult.Result.Messages.ContainsKey(channel) 
                 && fetchHistResult.Result.Messages[channel].Count >= 10)
@@ -909,7 +951,11 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void FetchHistoryWithAsyncStartWithReverseTrue()
+#else
         public static async Task FetchHistoryWithAsyncStartWithReverseTrue()
+#endif
         {
             server.ClearRequests();
 
@@ -956,7 +1002,11 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
+#if NET40
+            PNResult<PNTimeResult> timeResult = Task.Factory.StartNew(async () => await pubnub.Time().ExecuteAsync()).Result.Result;
+#else
             PNResult<PNTimeResult> timeResult = await pubnub.Time().ExecuteAsync();
+#endif
             try
             {
                 Debug.WriteLine("result={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(timeResult.Result));
@@ -980,9 +1030,15 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
+#if NET40
+                PNResult<PNPublishResult> publishResult = Task.Factory.StartNew(async () => await pubnub.Publish().Channel(channel)
+                    .Message(string.Format("DetailedHistoryStartTimeWithReverseTrue {0}", index))
+                    .ExecuteAsync()).Result.Result;
+#else
                 PNResult<PNPublishResult> publishResult = await pubnub.Publish().Channel(channel)
                     .Message(string.Format("DetailedHistoryStartTimeWithReverseTrue {0}", index))
                     .ExecuteAsync();
+#endif
                 if (publishResult.Result != null && publishResult.Status.StatusCode == 200 && !publishResult.Status.Error && publishResult.Result.Timetoken > 0)
                 {
                     receivedMessage = true;
@@ -1011,11 +1067,19 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
+#if NET40
+                PNResult<PNFetchHistoryResult> fetchHistResult = Task.Factory.StartNew(async () => await pubnub.FetchHistory().Channels(new string[] { channel })
+                    .Start(currentTimetoken)
+                    .Reverse(false)
+                    .IncludeMeta(false)
+                    .ExecuteAsync()).Result.Result;
+#else
                 PNResult<PNFetchHistoryResult> fetchHistResult = await pubnub.FetchHistory().Channels(new string[] { channel })
                     .Start(currentTimetoken)
                     .Reverse(false)
                     .IncludeMeta(false)
                     .ExecuteAsync();
+#endif
                 if (fetchHistResult.Result != null && fetchHistResult.Status.StatusCode == 200 && !fetchHistResult.Status.Error && fetchHistResult.Result.Messages != null && fetchHistResult.Result.Messages.Count >= 10)
                 {
                     receivedMessage = true;
@@ -1081,10 +1145,18 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void FetchHistoryWithAsyncShouldReturnUnencrypedSecretMessage()
+#else
         public static async Task FetchHistoryWithAsyncShouldReturnUnencrypedSecretMessage()
+#endif
         {
             server.ClearRequests();
+#if NET40
+            bool receivedMessage = Task.Factory.StartNew(async () => await CommonFetchHistoryWithAsyncShouldReturnUnencryptedMessageBasedOnParams(PubnubCommon.SecretKey, "", false)).Result.Result;
+#else
             bool receivedMessage = await CommonFetchHistoryWithAsyncShouldReturnUnencryptedMessageBasedOnParams(PubnubCommon.SecretKey, "", false);
+#endif
             Assert.IsTrue(receivedMessage, "FetchHistoryWithAsyncShouldReturnUnencrypedSecretMessage - Fetch History Result not expected");
         }
 
@@ -1098,10 +1170,18 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void FetchHistoryWithAsyncShouldReturnUnencrypedMessage()
+#else
         public static async Task FetchHistoryWithAsyncShouldReturnUnencrypedMessage()
+#endif
         {
             server.ClearRequests();
+#if NET40
+            bool receivedMessage = Task.Factory.StartNew(async () => await CommonFetchHistoryWithAsyncShouldReturnUnencryptedMessageBasedOnParams("", "", false)).Result.Result;
+#else
             bool receivedMessage = await CommonFetchHistoryWithAsyncShouldReturnUnencryptedMessageBasedOnParams("", "", false);
+#endif
             Assert.IsTrue(receivedMessage, "FetchHistoryWithAsyncShouldReturnUnencrypedMessage - Fetch History Result not expected");
         }
 
@@ -1116,10 +1196,18 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void FetchHistoryWithAsyncShouldReturnUnencrypedSecretSSLMessage()
+#else
         public static async Task FetchHistoryWithAsyncShouldReturnUnencrypedSecretSSLMessage()
+#endif
         {
             server.ClearRequests();
+#if NET40
+            bool receivedMessage = Task.Factory.StartNew(async () => await CommonFetchHistoryWithAsyncShouldReturnUnencryptedMessageBasedOnParams(PubnubCommon.SecretKey, "", true)).Result.Result;
+#else
             bool receivedMessage = await CommonFetchHistoryWithAsyncShouldReturnUnencryptedMessageBasedOnParams(PubnubCommon.SecretKey, "", true);
+#endif
             Assert.IsTrue(receivedMessage, "FetchHistoryWithAsyncShouldReturnUnencrypedSecretSSLMessage - Fetch History Result not expected");
         }
 
@@ -1133,10 +1221,18 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void FetchHistoryWithAsyncShouldReturnUnencrypedSSLMessage()
+#else
         public static async Task FetchHistoryWithAsyncShouldReturnUnencrypedSSLMessage()
+#endif
         {
             server.ClearRequests();
+#if NET40
+            bool receivedMessage = Task.Factory.StartNew(async () => await CommonFetchHistoryWithAsyncShouldReturnUnencryptedMessageBasedOnParams("", "", true)).Result.Result;
+#else
             bool receivedMessage = await CommonFetchHistoryWithAsyncShouldReturnUnencryptedMessageBasedOnParams("", "", true);
+#endif
             Assert.IsTrue(receivedMessage, "FetchHistoryWithAsyncShouldReturnUnencrypedSSLMessage - Fetch History Result not expected");
         }
 
@@ -1150,10 +1246,18 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void FetchHistoryWithAsyncShouldReturnEncrypedMessage()
+#else
         public static async Task FetchHistoryWithAsyncShouldReturnEncrypedMessage()
+#endif
         {
             server.ClearRequests();
+#if NET40
+            bool receivedMessage = Task.Factory.StartNew(async () => await CommonFetchHistoryWithAsyncShouldReturnEncryptedMessageBasedOnParams("", "enigma", false)).Result.Result;
+#else
             bool receivedMessage = await CommonFetchHistoryWithAsyncShouldReturnEncryptedMessageBasedOnParams("", "enigma", false);
+#endif
             Assert.IsTrue(receivedMessage, "FetchHistoryShouldReturnEncrypedMessage - Fetch History Result not expected");
         }
 
@@ -1168,10 +1272,18 @@ namespace PubNubMessaging.Tests
         }
         
         [Test]
+#if NET40
+        public static void FetchHistoryWithAsyncShouldReturnEncrypedSecretMessage()
+#else
         public static async Task FetchHistoryWithAsyncShouldReturnEncrypedSecretMessage()
+#endif
         {
             server.ClearRequests();
+#if NET40
+            bool receivedMessage = Task.Factory.StartNew(async () => await CommonFetchHistoryWithAsyncShouldReturnEncryptedMessageBasedOnParams(PubnubCommon.SecretKey, "enigma", false)).Result.Result;
+#else
             bool receivedMessage = await CommonFetchHistoryWithAsyncShouldReturnEncryptedMessageBasedOnParams(PubnubCommon.SecretKey, "enigma", false);
+#endif
             Assert.IsTrue(receivedMessage, "FetchHistoryShouldReturnEncrypedSecretMessage - Fetch History Result not expected");
         }
 
@@ -1185,10 +1297,18 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void FetchHistoryWithAsyncShouldReturnEncrypedSecretSSLMessage()
+#else
         public static async Task FetchHistoryWithAsyncShouldReturnEncrypedSecretSSLMessage()
+#endif
         {
             server.ClearRequests();
+#if NET40
+            bool receivedMessage = Task.Factory.StartNew(async () => await CommonFetchHistoryWithAsyncShouldReturnEncryptedMessageBasedOnParams(PubnubCommon.SecretKey, "enigma", true)).Result.Result;
+#else
             bool receivedMessage = await CommonFetchHistoryWithAsyncShouldReturnEncryptedMessageBasedOnParams(PubnubCommon.SecretKey, "enigma", true);
+#endif
             Assert.IsTrue(receivedMessage, "FetchHistoryShouldReturnEncrypedSecretSSLMessage - Fetch History Result not expected");
         }
 
@@ -1203,10 +1323,18 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void FetchHistoryWithAsyncShouldReturnEncrypedSSLMessage()
+#else
         public static async Task FetchHistoryWithAsyncShouldReturnEncrypedSSLMessage()
+#endif
         {
             server.ClearRequests();
+#if NET40
+            bool receivedMessage = Task.Factory.StartNew(async () => await CommonFetchHistoryWithAsyncShouldReturnEncryptedMessageBasedOnParams("", "enigma", true)).Result.Result;
+#else
             bool receivedMessage = await CommonFetchHistoryWithAsyncShouldReturnEncryptedMessageBasedOnParams("", "enigma", true);
+#endif
             Assert.IsTrue(receivedMessage, "FetchHistoryShouldReturnEncrypedSSLMessage - Fetch History Result not expected");
         }
 

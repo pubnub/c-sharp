@@ -268,7 +268,11 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void ThenWithAsyncUnencryptPublishGETShouldReturnSuccessCodeAndInfo()
+#else
         public static async Task ThenWithAsyncUnencryptPublishGETShouldReturnSuccessCodeAndInfo()
+#endif
         {
             server.ClearRequests();
 
@@ -308,7 +312,11 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
+#if NET40
+            PNResult<PNPublishResult> respPub = Task.Factory.StartNew(async () => await pubnub.Publish().Channel(channel).Message(message).ExecuteAsync()).Result.Result;
+#else
             PNResult<PNPublishResult> respPub = await pubnub.Publish().Channel(channel).Message(message).ExecuteAsync();
+#endif
             if (respPub.Result != null && respPub.Status.StatusCode == 200 && !respPub.Status.Error)
             {
                 publishTimetoken = respPub.Result.Timetoken;
@@ -339,11 +347,19 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
+#if NET40
+                PNResult<PNHistoryResult> respHist = Task.Factory.StartNew(async () => await pubnub.History().Channel(channel)
+                    .End(PubnubCommon.EnableStubTest ? 14715278266153304 : publishTimetoken)
+                    .Reverse(false)
+                    .IncludeTimetoken(true)
+                    .ExecuteAsync()).Result.Result;
+#else
                 PNResult<PNHistoryResult> respHist = await pubnub.History().Channel(channel)
                     .End(PubnubCommon.EnableStubTest ? 14715278266153304 : publishTimetoken)
                     .Reverse(false)
                     .IncludeTimetoken(true)
                     .ExecuteAsync();
+#endif
                 if (respHist.Result != null)
                 {
                     Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(respHist.Result));

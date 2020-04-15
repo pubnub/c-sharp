@@ -302,7 +302,7 @@ namespace PubnubApi.EndPoint
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
             Uri request = urlBuilder.BuildMembersAddUpdateRemoveRequest("PATCH", patchMessage, spaceId, internalPage.Next, internalPage.Prev, limit, includeCount, includeOptions, sort, externalQueryParam);
 
-            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false, patchMessage);
+            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false, patchMessage).ConfigureAwait(false);
             ret.Status = JsonAndStatusTuple.Item2;
             string json = JsonAndStatusTuple.Item1;
             if (!string.IsNullOrEmpty(json))

@@ -450,7 +450,11 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void ThenWithAsyncAuditPushChannelProvisionsShouldReturnSuccess()
+#else
         public static async Task ThenWithAsyncAuditPushChannelProvisionsShouldReturnSuccess()
+#endif
         {
             server.ClearRequests();
 
@@ -487,8 +491,13 @@ namespace PubNubMessaging.Tests
 
             mrePush = new ManualResetEvent(false);
 
+#if NET40
+            PNResult<PNPushListProvisionsResult> resp = Task.Factory.StartNew(async () => await pubnub.AuditPushChannelProvisions().DeviceId("4e71acc275a8eeb400654d923724c073956661455697c92ca6c5438f2c19aa7b").PushType(PNPushType.APNS)
+                .ExecuteAsync()).Result.Result;
+#else
             PNResult<PNPushListProvisionsResult> resp = await pubnub.AuditPushChannelProvisions().DeviceId("4e71acc275a8eeb400654d923724c073956661455697c92ca6c5438f2c19aa7b").PushType(PNPushType.APNS)
                 .ExecuteAsync();
+#endif
             if (resp.Result != null)
             {
                 receivedMessage = true;
@@ -562,7 +571,11 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void ThenWithAsyncAPNS2AddDeviceToPushChannelShouldReturnSuccess()
+#else
         public static async Task ThenWithAsyncAPNS2AddDeviceToPushChannelShouldReturnSuccess()
+#endif        
         {
             server.ClearRequests();
 
@@ -599,6 +612,15 @@ namespace PubNubMessaging.Tests
 
             mrePush = new ManualResetEvent(false);
 
+#if NET40
+            PNResult<PNPushAddChannelResult> resp = Task.Factory.StartNew(async () => await pubnub.AddPushNotificationsOnChannels()
+                .Channels(new string[] { channel })
+                .DeviceId("4e71acc275a8eeb400654d923724c073956661455697c92ca6c5438f2c19aa7b")
+                .PushType(PNPushType.APNS2)
+                .Environment(PushEnvironment.Development)
+                .Topic("My Sample Topic")
+                .ExecuteAsync()).Result.Result;
+#else
             PNResult<PNPushAddChannelResult> resp = await pubnub.AddPushNotificationsOnChannels()
                 .Channels(new string[] { channel })
                 .DeviceId("4e71acc275a8eeb400654d923724c073956661455697c92ca6c5438f2c19aa7b")
@@ -606,6 +628,7 @@ namespace PubNubMessaging.Tests
                 .Environment(PushEnvironment.Development)
                 .Topic("My Sample Topic")
                 .ExecuteAsync();
+#endif
             if (resp.Result != null)
             {
                 System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(resp.Result));
@@ -680,7 +703,11 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void ThenWithAsyncAPNS2RemovePushChannelFromDeviceShouldReturnSuccess()
+#else
         public static async Task ThenWithAsyncAPNS2RemovePushChannelFromDeviceShouldReturnSuccess()
+#endif        
         {
             server.ClearRequests();
 
@@ -717,6 +744,15 @@ namespace PubNubMessaging.Tests
 
             mrePush = new ManualResetEvent(false);
 
+#if NET40
+            PNResult<PNPushRemoveChannelResult> resp = Task.Factory.StartNew(async () => await pubnub.RemovePushNotificationsFromChannels()
+                .Channels(new string[] { channel })
+                .DeviceId("4e71acc275a8eeb400654d923724c073956661455697c92ca6c5438f2c19aa7b")
+                .PushType(PNPushType.APNS2)
+                .Environment(PushEnvironment.Development)
+                .Topic("My Sample Topic")
+                .ExecuteAsync()).Result.Result;
+#else
             PNResult<PNPushRemoveChannelResult> resp = await pubnub.RemovePushNotificationsFromChannels()
                 .Channels(new string[] { channel })
                 .DeviceId("4e71acc275a8eeb400654d923724c073956661455697c92ca6c5438f2c19aa7b")
@@ -724,6 +760,7 @@ namespace PubNubMessaging.Tests
                 .Environment(PushEnvironment.Development)
                 .Topic("My Sample Topic")
                 .ExecuteAsync();
+#endif
             if (resp.Result != null)
             {
                 System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(resp.Result));
@@ -797,7 +834,11 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void ThenWithAsyncAPNS2ListPushChannelsFromDeviceShouldReturnSuccess()
+#else
         public static async Task ThenWithAsyncAPNS2ListPushChannelsFromDeviceShouldReturnSuccess()
+#endif
         {
             server.ClearRequests();
 
@@ -830,12 +871,21 @@ namespace PubNubMessaging.Tests
 
             pubnub = createPubNubInstance(config);
 
+#if NET40
+            PNResult<PNPushListProvisionsResult> resp = Task.Factory.StartNew(async () => await pubnub.AuditPushChannelProvisions()
+                .DeviceId("4e71acc275a8eeb400654d923724c073956661455697c92ca6c5438f2c19aa7b")
+                .PushType(PNPushType.APNS2)
+                .Environment(PushEnvironment.Development)
+                .Topic("My Sample Topic")
+                .ExecuteAsync()).Result.Result;
+#else
             PNResult<PNPushListProvisionsResult> resp = await pubnub.AuditPushChannelProvisions()
                 .DeviceId("4e71acc275a8eeb400654d923724c073956661455697c92ca6c5438f2c19aa7b")
                 .PushType(PNPushType.APNS2)
                 .Environment(PushEnvironment.Development)
                 .Topic("My Sample Topic")
                 .ExecuteAsync();
+#endif
             if (resp.Result != null)
             {
                 System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(resp.Result));
@@ -909,7 +959,11 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void ThenWithAsyncAPNS2RemoveDeviceFromPushShouldReturnSuccess()
+#else
         public static async Task ThenWithAsyncAPNS2RemoveDeviceFromPushShouldReturnSuccess()
+#endif
         {
             server.ClearRequests();
 
@@ -944,12 +998,21 @@ namespace PubNubMessaging.Tests
 
             manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
 
+#if NET40
+            PNResult<PNPushRemoveAllChannelsResult> resp = Task.Factory.StartNew(async () => await pubnub.RemoveAllPushNotificationsFromDeviceWithPushToken()
+                .DeviceId("4e71acc275a8eeb400654d923724c073956661455697c92ca6c5438f2c19aa7b")
+                .PushType(PNPushType.APNS2)
+                .Environment(PushEnvironment.Development)
+                .Topic("My Sample Topic")
+                .ExecuteAsync()).Result.Result;
+#else
             PNResult<PNPushRemoveAllChannelsResult> resp = await pubnub.RemoveAllPushNotificationsFromDeviceWithPushToken()
                 .DeviceId("4e71acc275a8eeb400654d923724c073956661455697c92ca6c5438f2c19aa7b")
                 .PushType(PNPushType.APNS2)
                 .Environment(PushEnvironment.Development)
                 .Topic("My Sample Topic")
                 .ExecuteAsync();
+#endif
             if (resp.Result != null)
             {
                 System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(resp.Result));

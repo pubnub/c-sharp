@@ -436,7 +436,7 @@ namespace PubnubApi.EndPoint
             requestState.EndPointOperation = this;
 
             //Set TerminateSubRequest to true to bounce the long-polling subscribe requests to update user state
-            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false);
+            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false).ConfigureAwait(false);
             ret.Status = JsonAndStatusTuple.Item2;
             string json = JsonAndStatusTuple.Item1;
             if (!string.IsNullOrEmpty(json))

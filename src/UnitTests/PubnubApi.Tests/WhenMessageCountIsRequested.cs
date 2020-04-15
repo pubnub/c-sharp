@@ -161,7 +161,11 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void ThenWithAsyncChannel1Timetoken1ShouldReturnSuccess()
+#else
         public static async Task ThenWithAsyncChannel1Timetoken1ShouldReturnSuccess()
+#endif
         {
             server.ClearRequests();
 
@@ -202,10 +206,17 @@ namespace PubNubMessaging.Tests
 
             unittestManualEvent = new ManualResetEvent(false);
 
+#if NET40
+            PNResult<PNMessageCountResult> resp = Task.Factory.StartNew(async () => await pubnub.MessageCounts()
+                .Channels(new[] { channelName1 })
+                .ChannelsTimetoken(new long[] { 15505396580138884 })
+                .ExecuteAsync()).Result.Result;
+#else
             PNResult<PNMessageCountResult> resp = await pubnub.MessageCounts()
                 .Channels(new[] { channelName1 })
                 .ChannelsTimetoken(new long[] { 15505396580138884 })
                 .ExecuteAsync();
+#endif
             if (resp.Result != null && resp.Result.Channels != null)
             {
                 receivedMessage = true;
@@ -283,7 +294,11 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void ThenWithAsyncChannel2Timetoken2ShouldReturnSuccess()
+#else
         public static async Task ThenWithAsyncChannel2Timetoken2ShouldReturnSuccess()
+#endif
         {
             server.ClearRequests();
 
@@ -324,10 +339,17 @@ namespace PubNubMessaging.Tests
 
             unittestManualEvent = new ManualResetEvent(false);
 
+#if NET40
+            PNResult<PNMessageCountResult> resp = Task.Factory.StartNew(async () => await pubnub.MessageCounts()
+                .Channels(new[] { channelName1, channelName2 })
+                .ChannelsTimetoken(new long[] { 15505396580138884, 15505396580138884 })
+                .ExecuteAsync()).Result.Result;
+#else
             PNResult<PNMessageCountResult> resp = await pubnub.MessageCounts()
                 .Channels(new[] { channelName1, channelName2 })
                 .ChannelsTimetoken(new long[] { 15505396580138884, 15505396580138884 })
                 .ExecuteAsync();
+#endif
             if (resp.Result != null && resp.Result.Channels != null)
             {
                 receivedMessage = true;

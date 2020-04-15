@@ -275,7 +275,7 @@ namespace PubnubApi.EndPoint
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
             Uri request = urlBuilder.BuildGrantV3AccessRequest("POST", postMessage, externalQueryParam);
 
-            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false, postMessage);
+            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false, postMessage).ConfigureAwait(false);
             ret.Status = JsonAndStatusTuple.Item2;
             string json = JsonAndStatusTuple.Item1;
             if (!string.IsNullOrEmpty(json))
@@ -295,7 +295,7 @@ namespace PubnubApi.EndPoint
                             .Read(true)
                             .TTL(ttl)
                             .AuthKeys(new[] { this.pamv2AuthenticationKey })
-                            .ExecuteAsync();
+                            .ExecuteAsync().ConfigureAwait(false);
                     }
                 }
             }

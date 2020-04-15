@@ -537,7 +537,11 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void IfWithAsyncHereNowIsCalledThenItShouldReturnInfo()
+#else
         public static async Task IfWithAsyncHereNowIsCalledThenItShouldReturnInfo()
+#endif
         {
             server.ClearRequests();
 
@@ -622,7 +626,11 @@ namespace PubNubMessaging.Tests
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
+#if NET40
+                PNResult<PNHereNowResult> r = Task.Factory.StartNew(async () => await pubnub.HereNow().Channels(new[] { channel }).ExecuteAsync()).Result.Result;
+#else
                 PNResult<PNHereNowResult> r = await pubnub.HereNow().Channels(new[] { channel }).ExecuteAsync();
+#endif
                 if (r.Result != null)
                 {
                     Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
@@ -2067,7 +2075,11 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void IfWithAsyncWhereNowIsCalledThenItShouldReturnInfo()
+#else
         public static async Task IfWithAsyncWhereNowIsCalledThenItShouldReturnInfo()
+#endif
         {
             server.ClearRequests();
 
@@ -2153,7 +2165,11 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
+#if NET40
+            PNResult<PNWhereNowResult> r = Task.Factory.StartNew(async () => await pubnub.WhereNow().Uuid(config.Uuid).ExecuteAsync()).Result.Result;
+#else
             PNResult<PNWhereNowResult> r = await pubnub.WhereNow().Uuid(config.Uuid).ExecuteAsync();
+#endif
             if (r.Result != null)
             {
                 Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));

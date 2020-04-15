@@ -122,7 +122,11 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void ThenWithAsyncUserLevelWithReadWriteShouldReturnSuccess()
+#else
         public static async Task ThenWithAsyncUserLevelWithReadWriteShouldReturnSuccess()
+#endif
         {
             server.ClearRequests();
 
@@ -162,7 +166,11 @@ namespace PubNubMessaging.Tests
 
             if (PubnubCommon.PAMServerSideGrant)
             {
+#if NET40
+                PNResult<PNAccessManagerGrantResult> result = Task.Factory.StartNew(async () => await pubnub.Grant().Channels(new[] { channel }).AuthKeys(new[] { authKey }).Read(true).Write(true).Manage(false).TTL(5).ExecuteAsync()).Result.Result;
+#else
                 PNResult<PNAccessManagerGrantResult> result = await pubnub.Grant().Channels(new[] { channel }).AuthKeys(new[] { authKey }).Read(true).Write(true).Manage(false).TTL(5).ExecuteAsync();
+#endif
                 if (result.Result != null && result.Result.Channels != null && result.Result.Channels.Count > 0)
                 {
                     var read = result.Result.Channels[channel][authKey].ReadEnabled;
@@ -244,7 +252,11 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void ThenWithAsyncUserLevelWithReadShouldReturnSuccess()
+#else
         public static async Task ThenWithAsyncUserLevelWithReadShouldReturnSuccess()
+#endif
         {
             server.ClearRequests();
 
@@ -285,7 +297,11 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMServerSideGrant)
             {
                 grantManualEvent = new ManualResetEvent(false);
+#if NET40
+                PNResult<PNAccessManagerGrantResult> result = Task.Factory.StartNew(async () => await pubnub.Grant().Channels(new[] { channel }).AuthKeys(new[] { authKey }).Read(true).Write(false).Manage(false).TTL(5).ExecuteAsync()).Result.Result;
+#else
                 PNResult<PNAccessManagerGrantResult> result = await pubnub.Grant().Channels(new[] { channel }).AuthKeys(new[] { authKey }).Read(true).Write(false).Manage(false).TTL(5).ExecuteAsync();
+#endif
                 if (result.Result != null && result.Result.Channels != null && result.Result.Channels.Count > 0)
                 {
                     var read = result.Result.Channels[channel][authKey].ReadEnabled;
@@ -856,7 +872,11 @@ namespace PubNubMessaging.Tests
 
 
         [Test]
+#if NET40
+        public static void ThenWithAsyncPAMv3ChannelShouldReturnTokenSuccess()
+#else
         public static async Task ThenWithAsyncPAMv3ChannelShouldReturnTokenSuccess()
+#endif
         {
             server.ClearRequests();
 
@@ -930,7 +950,8 @@ namespace PubNubMessaging.Tests
 
             if (PubnubCommon.PAMServerSideGrant)
             {
-                PNResult< PNAccessManagerTokenResult> tokenResult = await pubnub.GrantToken()
+#if NET40
+                PNResult< PNAccessManagerTokenResult> tokenResult = Task.Factory.StartNew(async () => await pubnub.GrantToken()
                             .Users(new Dictionary<string, PNResourcePermission>() {
                                 { "pandu_userid0", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
                                 { "pandu_userid1", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
@@ -949,10 +970,33 @@ namespace PubNubMessaging.Tests
                             .Spaces(new Dictionary<string, PNResourcePermission>() {
                                 { "^public-*", new PNResourcePermission() { Read = true } },
                                 { "^private-*", new PNResourcePermission() { Read = true, Write = true, Create = true, Delete = true } } }, true)
-
+                            .TTL(30 * 24 * 60)
+                            .AuthKey("myauth")
+                            .ExecuteAsync()).Result.Result;
+#else
+                PNResult<PNAccessManagerTokenResult> tokenResult = await pubnub.GrantToken()
+                            .Users(new Dictionary<string, PNResourcePermission>() {
+                                { "pandu_userid0", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
+                                { "pandu_userid1", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
+                                { "pandu-ut-uid", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
+                                { "pandu-ut-uid1", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
+                                { "pandu-ut-uid2", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } } })
+                            .Spaces(new Dictionary<string, PNResourcePermission>() {
+                                { "pandu_spaceid0", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
+                                { "pandu_spaceid1", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
+                                { "pandu-ut-sid", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
+                                { "pandu-ut-sid1", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
+                                { "pandu-ut-sid2", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } } })
+                            .Users(new Dictionary<string, PNResourcePermission>() {
+                                { "^emp-gen-*", new PNResourcePermission() { Read = true, Write = true } },
+                                { "^emp-mgr-*", new PNResourcePermission() { Read = true, Write = true, Create = true, Delete = true } } }, true)
+                            .Spaces(new Dictionary<string, PNResourcePermission>() {
+                                { "^public-*", new PNResourcePermission() { Read = true } },
+                                { "^private-*", new PNResourcePermission() { Read = true, Write = true, Create = true, Delete = true } } }, true)
                             .TTL(30 * 24 * 60)
                             .AuthKey("myauth")
                             .ExecuteAsync();
+#endif
 
                 Thread.Sleep(1000);
 

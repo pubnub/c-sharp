@@ -143,7 +143,11 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void ThenWithAsyncAddChannelShouldReturnSuccess()
+#else
         public static async Task ThenWithAsyncAddChannelShouldReturnSuccess()
+#endif
         {
             server.ClearRequests();
 
@@ -182,7 +186,11 @@ namespace PubNubMessaging.Tests
 
             channelGroupManualEvent = new ManualResetEvent(false);
 
+#if NET40
+            PNResult<PNChannelGroupsAddChannelResult> cgAddResult = Task.Factory.StartNew(async () => await pubnub.AddChannelsToChannelGroup().Channels(new[] { channelName }).ChannelGroup(channelGroupName).ExecuteAsync()).Result.Result;
+#else
             PNResult<PNChannelGroupsAddChannelResult> cgAddResult = await pubnub.AddChannelsToChannelGroup().Channels(new[] { channelName }).ChannelGroup(channelGroupName).ExecuteAsync();
+#endif
             Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(cgAddResult.Status));
 
             if (cgAddResult.Result != null)
@@ -256,7 +264,11 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void ThenWithAsyncRemoveChannelShouldReturnSuccess()
+#else
         public static async Task ThenWithAsyncRemoveChannelShouldReturnSuccess()
+#endif
         {
             server.ClearRequests();
 
@@ -296,7 +308,11 @@ namespace PubNubMessaging.Tests
 
             channelGroupManualEvent = new ManualResetEvent(false);
 
+#if NET40
+            PNResult<PNChannelGroupsRemoveChannelResult> cgRemoveChannelResult = Task.Factory.StartNew(async () => await pubnub.RemoveChannelsFromChannelGroup().Channels(new[] { channelName }).ChannelGroup(channelGroupName).ExecuteAsync()).Result.Result;
+#else
             PNResult<PNChannelGroupsRemoveChannelResult> cgRemoveChannelResult = await pubnub.RemoveChannelsFromChannelGroup().Channels(new[] { channelName }).ChannelGroup(channelGroupName).ExecuteAsync();
+#endif
             Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(cgRemoveChannelResult.Status));
 
             if (cgRemoveChannelResult.Result != null)
@@ -371,7 +387,11 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void ThenWithAsyncGetChannelListShouldReturnSuccess()
+#else
         public static async Task ThenWithAsyncGetChannelListShouldReturnSuccess()
+#endif
         {
             server.ClearRequests();
 
@@ -410,7 +430,11 @@ namespace PubNubMessaging.Tests
 
             channelGroupManualEvent = new ManualResetEvent(false);
 
+#if NET40
+            PNResult<PNChannelGroupsAllChannelsResult> cgAllChannelsResult = Task.Factory.StartNew(async () => await pubnub.ListChannelsForChannelGroup().ChannelGroup(channelGroupName).ExecuteAsync()).Result.Result;
+#else
             PNResult<PNChannelGroupsAllChannelsResult> cgAllChannelsResult = await pubnub.ListChannelsForChannelGroup().ChannelGroup(channelGroupName).ExecuteAsync();
+#endif
             Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(cgAllChannelsResult.Status));
 
             if (cgAllChannelsResult.Result != null)
@@ -486,7 +510,11 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void ThenWithAsyncGetAllChannelGroupShouldReturnSuccess()
+#else
         public static async Task ThenWithAsyncGetAllChannelGroupShouldReturnSuccess()
+#endif
         {
             server.ClearRequests();
             if (!PubnubCommon.PAMServerSideRun)
@@ -528,7 +556,11 @@ namespace PubNubMessaging.Tests
 
             channelGroupManualEvent = new ManualResetEvent(false);
 
+#if NET40
+            PNResult<PNChannelGroupsListAllResult> cgListAllResult = Task.Factory.StartNew(async () => await pubnub.ListChannelGroups().ExecuteAsync()).Result.Result;
+#else
             PNResult<PNChannelGroupsListAllResult> cgListAllResult = await pubnub.ListChannelGroups().ExecuteAsync();
+#endif
             Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(cgListAllResult.Status));
 
             if (cgListAllResult.Result != null)
