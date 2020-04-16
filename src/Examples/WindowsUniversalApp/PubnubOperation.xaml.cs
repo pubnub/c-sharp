@@ -272,18 +272,32 @@ namespace WindowsUniversalApp
         private async void btnHistory_Click(object sender, RoutedEventArgs e)
         {
             channel = txtChannel.Text;
-            await DisplayMessageInTextBoxAsync("Running Detailed History:").ConfigureAwait(false);
-            pubnub.History()
-                .Channel(channel)
-                .Count(100)
-                .Execute(new PNHistoryResultExt(
-                    async (r, s) =>
-                    {
-                        if (r != null)
+            DisplayMessageInTextBox("Running Detailed History:");
+            if (useAsyncAwait)
+            {
+                PNResult<PNHistoryResult> respHistory = Task.Run(async () => await pubnub.History()
+                    .Channel(channel)
+                    .Count(100)
+                    .ExecuteAsync()).Result;
+                if (respHistory.Result != null)
+                {
+                    await DisplayMessageInTextBoxAsync("Async History Message Count = " + respHistory.Result.Messages.Count.ToString()).ConfigureAwait(false);
+                }
+            }
+            else
+            {
+                pubnub.History()
+                    .Channel(channel)
+                    .Count(100)
+                    .Execute(new PNHistoryResultExt(
+                        async (r, s) =>
                         {
-                            await DisplayMessageInTextBoxAsync("Message Count = " + r.Messages.Count.ToString()).ConfigureAwait(false);
-                        }
-                    }));
+                            if (r != null)
+                            {
+                                await DisplayMessageInTextBoxAsync("Async History Message Count = " + r.Messages.Count.ToString()).ConfigureAwait(false);
+                            }
+                        }));
+            }
         }
 
         private void btnGlobalHereNow_Click(object sender, RoutedEventArgs e)
@@ -322,7 +336,7 @@ namespace WindowsUniversalApp
                     CheckBox chkIncludeUserState = control.FindName("chkHereIncludeUserState") as CheckBox;
                     bool includeState = (chkIncludeUserState != null) ? chkIncludeUserState.IsChecked.Value : false;
 
-                    await DisplayMessageInTextBoxAsync("Running GlobalHereNow:").ConfigureAwait(false);
+                    DisplayMessageInTextBox("Running GlobalHereNow:");
                     pubnub.HereNow()
                     .IncludeUUIDs(showUUID)
                     .IncludeState(includeState)
@@ -379,20 +393,38 @@ namespace WindowsUniversalApp
                     CheckBox chkIncludeUserState = control.FindName("chkHereIncludeUserState") as CheckBox;
                     bool includeState = (chkIncludeUserState != null) ? chkIncludeUserState.IsChecked.Value : false;
 
-                    await DisplayMessageInTextBoxAsync("Running HereNow:").ConfigureAwait(false);
-                    pubnub.HereNow()
-                    .Channels(new[] { channel })
-                    .IncludeUUIDs(showUUID)
-                    .IncludeState(includeState)
-                    .Execute(new PNHereNowResultEx(
-                        async (r, s) =>
+                    DisplayMessageInTextBox("Running HereNow:");
+                    
+                    if (useAsyncAwait)
+                    {
+                        PNResult<PNHereNowResult> respHereNow = Task.Run(async () => await pubnub.HereNow()
+                        .Channels(new[] { channel })
+                        .IncludeUUIDs(showUUID)
+                        .IncludeState(includeState)
+                        .ExecuteAsync()).Result;
+
+                        if (respHereNow.Result != null)
                         {
-                            if (r != null)
+                            DisplayMessageInTextBox("Async TotalChannels = " + respHereNow.Result.TotalChannels.ToString());
+                            DisplayMessageInTextBox("Async TotalOccupancy = " + respHereNow.Result.TotalOccupancy.ToString());
+                        }
+                    }
+                    else
+                    {
+                        pubnub.HereNow()
+                        .Channels(new[] { channel })
+                        .IncludeUUIDs(showUUID)
+                        .IncludeState(includeState)
+                        .Execute(new PNHereNowResultEx(
+                            async (r, s) =>
                             {
-                                await DisplayMessageInTextBoxAsync("TotalChannels = " + r.TotalChannels.ToString()).ConfigureAwait(false);
-                                await DisplayMessageInTextBoxAsync("TotalOccupancy = " + r.TotalOccupancy.ToString()).ConfigureAwait(false);
-                            }
-                        }));
+                                if (r != null)
+                                {
+                                    await DisplayMessageInTextBoxAsync("TotalChannels = " + r.TotalChannels.ToString()).ConfigureAwait(false);
+                                    await DisplayMessageInTextBoxAsync("TotalOccupancy = " + r.TotalOccupancy.ToString()).ConfigureAwait(false);
+                                }
+                            }));
+                    }
                 }
                 hereNowPopup = null;
                 this.IsEnabled = true;
@@ -455,7 +487,7 @@ namespace WindowsUniversalApp
                     RadioButton radGrantPAMChannel = control.FindName("radGrantChannel") as RadioButton;
                     if (radGrantPAMChannel != null && radGrantPAMChannel.IsChecked.Value)
                     {
-                        await DisplayMessageInTextBoxAsync("Running GrantAccess:").ConfigureAwait(false);
+                        DisplayMessageInTextBox("Running GrantAccess:");
                         int ttlInMinutes = 1440;
                         pubnub.Grant()
                         .Channels(new[] { pamUserChannelName })
@@ -475,7 +507,7 @@ namespace WindowsUniversalApp
                     RadioButton radAuditChannel = control.FindName("radAuditChannel") as RadioButton;
                     if (radAuditChannel != null && radAuditChannel.IsChecked.Value)
                     {
-                        await DisplayMessageInTextBoxAsync("Running AuditAccess:").ConfigureAwait(false);
+                        DisplayMessageInTextBox("Running AuditAccess:");
                         pubnub.Audit()
                         .Channel(pamUserChannelName)
                         .AuthKeys(new[] { pamAuthKey })
@@ -492,7 +524,7 @@ namespace WindowsUniversalApp
                     RadioButton radRevokeChannel = control.FindName("radRevokeChannel") as RadioButton;
                     if (radRevokeChannel != null && radRevokeChannel.IsChecked.Value)
                     {
-                        await DisplayMessageInTextBoxAsync("Running Revoke Access:").ConfigureAwait(false);
+                        DisplayMessageInTextBox("Running Revoke Access:");
                         await Task.Run(() =>
                          {
                              pubnub.Grant()
@@ -573,7 +605,7 @@ namespace WindowsUniversalApp
                         RadioButton radGrantPAMChannelGroup = control.FindName("radGrantChannelGroup") as RadioButton;
                         if (radGrantPAMChannelGroup != null && radGrantPAMChannelGroup.IsChecked.Value)
                         {
-                            await DisplayMessageInTextBoxAsync("Running ChannelGroupGrantAccess:").ConfigureAwait(false);
+                            DisplayMessageInTextBox("Running ChannelGroupGrantAccess:");
                             pubnub.Grant()
                             .ChannelGroups(new[] { pamUserChannelGroup })
                             .AuthKeys(new[] { pamAuthKey })
@@ -592,7 +624,7 @@ namespace WindowsUniversalApp
                         RadioButton radAuditPAMChannelGroup = control.FindName("radAuditChannelGroup") as RadioButton;
                         if (radAuditPAMChannelGroup != null && radAuditPAMChannelGroup.IsChecked.Value)
                         {
-                            await DisplayMessageInTextBoxAsync("Running ChannelGroupAuditAccess:").ConfigureAwait(false);
+                            DisplayMessageInTextBox("Running ChannelGroupAuditAccess:");
                             pubnub.Audit()
                             .ChannelGroup(pamUserChannelGroup)
                             .AuthKeys(new[] { pamAuthKey })
@@ -609,7 +641,7 @@ namespace WindowsUniversalApp
                         RadioButton radRevokePAMChannelGroup = control.FindName("radRevokeChannelGroup") as RadioButton;
                         if (radRevokePAMChannelGroup != null && radRevokePAMChannelGroup.IsChecked.Value)
                         {
-                            await DisplayMessageInTextBoxAsync("Running ChannelGroup Revoke Access:").ConfigureAwait(false);
+                            DisplayMessageInTextBox("Running ChannelGroup Revoke Access:");
                             pubnub.Grant()
                             .ChannelGroups(new[] { pamUserChannelGroup })
                             .AuthKeys(new[] { pamAuthKey })
@@ -683,7 +715,7 @@ namespace WindowsUniversalApp
                             userStateValue1 = txtSetUserStateVal1.Text;
                         }
 
-                        await DisplayMessageInTextBoxAsync("Running Set User State:").ConfigureAwait(false);
+                        DisplayMessageInTextBox("Running Set User State:");
 
                         int valueInt;
                         double valueDouble;
@@ -738,7 +770,7 @@ namespace WindowsUniversalApp
                         txtGetUserStateUUID = control.FindName("txtGetUserStateUUID") as TextBox;
                         if (txtGetUserStateUUID != null)
                         {
-                            await DisplayMessageInTextBoxAsync("Running Get User State:").ConfigureAwait(false);
+                            DisplayMessageInTextBox("Running Get User State:");
                             string userStateUUID = txtGetUserStateUUID.Text.Trim();
 
                             pubnub.GetPresenceState()
@@ -799,7 +831,7 @@ namespace WindowsUniversalApp
                     {
                         string whereNowUUID = txtWhereNowUUIDConfirm.Text.Trim();
 
-                        await DisplayMessageInTextBoxAsync("Running WhereNow:").ConfigureAwait(false);
+                        DisplayMessageInTextBox("Running WhereNow:");
 
                         pubnub.WhereNow()
                         .Uuid(whereNowUUID)
@@ -927,7 +959,7 @@ namespace WindowsUniversalApp
                         RadioButton radGetChannelsOfChannelGroup = control.FindName("radGetChannelsOfChannelGroup") as RadioButton;
                         if (radGetChannelsOfChannelGroup != null && radGetChannelsOfChannelGroup.IsChecked.Value)
                         {
-                            await DisplayMessageInTextBoxAsync("Running GetChannelsForChannelGroup:").ConfigureAwait(false);
+                            DisplayMessageInTextBox("Running GetChannelsForChannelGroup:");
                             pubnub.ListChannelsForChannelGroup()
                             .ChannelGroup(userChannelGroup)
                             .Execute(new PNChannelGroupsAllChannelsResultExt(async (r, s) =>
