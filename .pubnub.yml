@@ -4,12 +4,14 @@ schema: 1
 scm: github.com/pubnub/c-sharp
 changelog: 
   - version: 4.6.0.0
-    date: April 9, 2020
+    date: April 30, 2020
     changes:
       - type: Improvement
         text: Added async/await support for feature method calls.
       - type: Improvement
         text: Added sort for Objects API.
+      - type: Improvement
+        text: Typo correction SupressLeaveEvents to SuppressLeaveEvents in PNConfiguration.
   - version: 4.5.0.0
     date: January 9, 2020
     changes:
@@ -432,6 +434,7 @@ features:
     - PUBLISH-WITH-METADATA
     - PUBLISH-GET
     - PUBLISH-POST
+    - PUBLISH-SYNC
     - PUBLISH-ASYNC
     - PUBLISH-FIRE 
     - PUBLISH-REPLICATION-FLAG
