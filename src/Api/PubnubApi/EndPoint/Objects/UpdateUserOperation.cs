@@ -115,11 +115,7 @@ namespace PubnubApi.EndPoint
         }
         public async Task<PNResult<PNUpdateUserResult>> ExecuteAsync()
         {
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             return await UpdateUser(this.usrId, this.usrName, this.usrExternalId, this.usrProfileUrl, this.usrEmail, this.usrCustom, this.queryParam).ConfigureAwait(false);
-#else
-            return await UpdateUser(this.usrId, this.usrName, this.usrExternalId, this.usrProfileUrl, this.usrEmail, this.usrCustom, this.queryParam).ConfigureAwait(false);
-#endif
         }
 
         internal void Retry()

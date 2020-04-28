@@ -153,11 +153,7 @@ namespace PubnubApi.EndPoint
                 throw new NotSupportedException("Only one channel can be used along with MessageActions");
             }
 
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             return await History(this.channelNames, this.startTimetoken, this.endTimetoken, this.perChannelCount, this.reverseOption, this.withMetaOption, this.withMessageActionsOption, this.queryParam).ConfigureAwait(false);
-#else
-            return await History(this.channelNames, this.startTimetoken, this.endTimetoken, this.perChannelCount, this.reverseOption, this.withMetaOption, this.withMessageActionsOption, this.queryParam).ConfigureAwait(false);
-#endif
         }
 
         internal void Retry()

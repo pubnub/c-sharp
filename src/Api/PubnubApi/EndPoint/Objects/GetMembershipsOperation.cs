@@ -126,11 +126,7 @@ namespace PubnubApi.EndPoint
 
         public async Task<PNResult<PNGetMembershipsResult>> ExecuteAsync()
         {
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             return await GetMembershipsList(this.usrId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membershipsFilter, this.sortField, this.queryParam).ConfigureAwait(false);
-#else
-            return await GetMembershipsList(this.usrId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membershipsFilter, this.sortField, this.queryParam).ConfigureAwait(false);
-#endif
         }
 
         internal void Retry()

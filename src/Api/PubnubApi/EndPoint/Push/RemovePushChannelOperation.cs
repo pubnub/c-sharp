@@ -122,11 +122,7 @@ namespace PubnubApi.EndPoint
 
         public async Task<PNResult<PNPushRemoveChannelResult>> ExecuteAsync()
         {
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             return await RemoveChannelForDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, this.pushEnvironment, this.deviceTopic, this.queryParam).ConfigureAwait(false);
-#else
-            return await RemoveChannelForDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, this.pushEnvironment, this.deviceTopic, this.queryParam).ConfigureAwait(false);
-#endif
         }
 
         internal void Retry()

@@ -88,11 +88,7 @@ namespace PubnubApi.EndPoint
 
         public async Task<PNResult<PNGetUserResult>> ExecuteAsync()
         {
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             return await GetSingleUser(this.usrId, this.includeCustom, this.queryParam).ConfigureAwait(false);
-#else
-            return await GetSingleUser(this.usrId, this.includeCustom, this.queryParam).ConfigureAwait(false);
-#endif
         }
 
         internal void Retry()

@@ -91,11 +91,7 @@ namespace PubnubApi.EndPoint
 
         public async Task<PNResult<PNHereNowResult>> ExecuteAsync()
         {
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             return await HereNow(this.channelNames, this.channelGroupNames, this.includeChannelUUIDs, this.includeUserState, this.queryParam).ConfigureAwait(false);
-#else
-            return await HereNow(this.channelNames, this.channelGroupNames, this.includeChannelUUIDs, this.includeUserState, this.queryParam).ConfigureAwait(false);
-#endif
         }
 
 

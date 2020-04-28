@@ -160,11 +160,7 @@ namespace PubnubApi.EndPoint
 
         public async Task<PNResult<PNAccessManagerTokenResult>> ExecuteAsync()
         {
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             return await GrantAccess(this.pubnubChannelNames, this.pubnubChannelGroupNames, this.pubnubUsers, this.pubnubSpaces, this.pubnubChannelNamesPattern, this.pubnubChannelGroupNamesPattern, this.pubnubUsersPattern, this.pubnubSpacesPattern, this.grantTTL, this.grantMeta, this.queryParam).ConfigureAwait(false);
-#else
-            return await GrantAccess(this.pubnubChannelNames, this.pubnubChannelGroupNames, this.pubnubUsers, this.pubnubSpaces, this.pubnubChannelNamesPattern, this.pubnubChannelGroupNamesPattern, this.pubnubUsersPattern, this.pubnubSpacesPattern, this.grantTTL, this.grantMeta, this.queryParam).ConfigureAwait(false);
-#endif
         }
 
         internal void Retry()
