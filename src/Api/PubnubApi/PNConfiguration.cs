@@ -97,7 +97,7 @@ namespace PubnubApi
 
         public bool DedupOnSubscribe { get; set; }
 
-        public bool SupressLeaveEvents { get; set; }
+        public bool SuppressLeaveEvents { get; set; }
 
         public bool EnableTokenManager { get; set; } = true;
 
@@ -120,7 +120,7 @@ namespace PubnubApi
             this.IncludeInstanceIdentifier = false;
             this.DedupOnSubscribe = false;
             this.MaximumMessagesCacheSize = 100;
-            this.SupressLeaveEvents = false;
+            this.SuppressLeaveEvents = false;
         }
 
         public PNConfiguration SetPresenceTimeoutWithCustomInterval(int timeout, int interval)

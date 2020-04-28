@@ -75,7 +75,7 @@ namespace PubnubApi.EndPoint
                     }
                 }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 
-                if (type == PNOperationType.PNUnsubscribeOperation && !config.SupressLeaveEvents)
+                if (type == PNOperationType.PNUnsubscribeOperation && !config.SuppressLeaveEvents)
                 {
                     //just fire leave() event to REST API for safeguard
                     string channelsJsonState = BuildJsonUserState(currentChannels, currentChannelGroups, false);
