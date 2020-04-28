@@ -111,11 +111,7 @@ namespace PubnubApi.EndPoint
                 throw new MissingMemberException("Invalid Subscribe Key");
             }
 
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             return await DeleteMessage(this.channelName, this.startTimetoken, this.endTimetoken, this.queryParam).ConfigureAwait(false);
-#else
-            return await DeleteMessage(this.channelName, this.startTimetoken, this.endTimetoken, this.queryParam).ConfigureAwait(false);
-#endif
         }
 
         internal void Retry()

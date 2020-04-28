@@ -116,11 +116,7 @@ namespace PubnubApi.EndPoint
 
         public async Task<PNResult<PNCreateUserResult>> ExecuteAsync()
         {
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             return await CreateUser(this.usrId, this.usrName, this.usrExternalId, this.usrProfileUrl, this.usrEmail, this.usrCustom, this.queryParam).ConfigureAwait(false);
-#else
-            return await CreateUser(this.usrId, this.usrName, this.usrExternalId, this.usrProfileUrl, this.usrEmail, this.usrCustom, this.queryParam).ConfigureAwait(false);
-#endif
         }
 
 

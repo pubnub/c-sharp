@@ -114,11 +114,7 @@ namespace PubnubApi.EndPoint
 
         public async Task<PNResult<PNGetUsersResult>> ExecuteAsync()
         {
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             return await GetUserList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.sortField, this.queryParam).ConfigureAwait(false);
-#else
-            return await GetUserList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.sortField, this.queryParam).ConfigureAwait(false);
-#endif
         }
 
 

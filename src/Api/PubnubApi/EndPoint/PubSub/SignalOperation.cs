@@ -87,11 +87,7 @@ namespace PubnubApi.EndPoint
 
         public async Task<PNResult<PNPublishResult>> ExecuteAsync()
         {
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             return await Signal(this.channelName, this.msg, null, this.queryParam).ConfigureAwait(false);
-#else
-            return await Signal(this.channelName, this.msg, null, this.queryParam).ConfigureAwait(false);
-#endif
         }
 
         internal void Retry()

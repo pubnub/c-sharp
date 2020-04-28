@@ -76,11 +76,7 @@ namespace PubnubApi.EndPoint
 
         public async Task<PNResult<PNChannelGroupsRemoveChannelResult>> ExecuteAsync()
         {
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             return await RemoveChannelsFromChannelGroup(this.channelNames, "", this.channelGroupName, this.queryParam).ConfigureAwait(false);
-#else
-            return await RemoveChannelsFromChannelGroup(this.channelNames, "", this.channelGroupName, this.queryParam).ConfigureAwait(false);
-#endif
         }
 
         internal void Retry()

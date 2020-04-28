@@ -124,13 +124,8 @@ namespace PubnubApi.EndPoint
 
         public async Task<PNResult<PNSetStateResult>> ExecuteAsync()
         {
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             string serializedState = jsonLibrary.SerializeToJsonString(this.userState);
             return await SetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, serializedState, this.queryParam).ConfigureAwait(false);
-#else
-            string serializedState = jsonLibrary.SerializeToJsonString(this.userState);
-            return await SetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, serializedState, this.queryParam).ConfigureAwait(false);
-#endif
         }
 
         internal void Retry()

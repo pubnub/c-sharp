@@ -82,11 +82,7 @@ namespace PubnubApi.EndPoint
 
         public async Task<PNResult<PNDeleteUserResult>> ExecuteAsync()
         {
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             return await DeleteUser(this.usrId, this.queryParam).ConfigureAwait(false);
-#else
-            return await DeleteUser(this.usrId, this.queryParam).ConfigureAwait(false);
-#endif
         }
 
         internal void Retry()

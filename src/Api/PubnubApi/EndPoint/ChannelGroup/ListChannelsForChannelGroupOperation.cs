@@ -69,11 +69,7 @@ namespace PubnubApi.EndPoint
 
         public async Task<PNResult<PNChannelGroupsAllChannelsResult>> ExecuteAsync()
         {
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             return await GetChannelsForChannelGroup(this.channelGroupName, this.queryParam).ConfigureAwait(false);
-#else
-            return await GetChannelsForChannelGroup(this.channelGroupName, this.queryParam).ConfigureAwait(false);
-#endif
         }
 
         internal void Retry()

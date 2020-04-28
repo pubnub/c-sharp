@@ -62,11 +62,7 @@ namespace PubnubApi.EndPoint
 
         public async Task<PNResult<PNTimeResult>> ExecuteAsync()
         {
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             return await Time(this.queryParam).ConfigureAwait(false);
-#else
-            return await Time(this.queryParam).ConfigureAwait(false);
-#endif
         }
 
         internal void Retry()
