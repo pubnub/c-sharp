@@ -1177,6 +1177,12 @@ namespace PubNubMessaging.Tests
 #endif
         {
             server.ClearRequests();
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                Assert.Ignore("Ignored for Server side run");
+                return;
+            }
+
 #if NET40
             bool receivedMessage = Task.Factory.StartNew(async () => await CommonFetchHistoryWithAsyncShouldReturnUnencryptedMessageBasedOnParams("", "", false)).Result.Result;
 #else
@@ -1228,6 +1234,12 @@ namespace PubNubMessaging.Tests
 #endif
         {
             server.ClearRequests();
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                Assert.Ignore("Ignored for Server side run");
+                return;
+            }
+
 #if NET40
             bool receivedMessage = Task.Factory.StartNew(async () => await CommonFetchHistoryWithAsyncShouldReturnUnencryptedMessageBasedOnParams("", "", true)).Result.Result;
 #else
@@ -1253,6 +1265,12 @@ namespace PubNubMessaging.Tests
 #endif
         {
             server.ClearRequests();
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                Assert.Ignore("Ignored for Server side run");
+                return;
+            }
+
 #if NET40
             bool receivedMessage = Task.Factory.StartNew(async () => await CommonFetchHistoryWithAsyncShouldReturnEncryptedMessageBasedOnParams("", "enigma", false)).Result.Result;
 #else
@@ -1330,6 +1348,12 @@ namespace PubNubMessaging.Tests
 #endif
         {
             server.ClearRequests();
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                Assert.Ignore("Ignored for Server side run");
+                return;
+            }
+
 #if NET40
             bool receivedMessage = Task.Factory.StartNew(async () => await CommonFetchHistoryWithAsyncShouldReturnEncryptedMessageBasedOnParams("", "enigma", true)).Result.Result;
 #else
