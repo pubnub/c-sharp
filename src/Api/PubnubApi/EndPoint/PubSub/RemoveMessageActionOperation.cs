@@ -118,6 +118,16 @@ namespace PubnubApi.EndPoint
 #endif
         }
 
+        public async Task<PNResult<PNRemoveMessageActionResult>> ExecuteAsync()
+        {
+            if (config == null || string.IsNullOrEmpty(config.SubscribeKey) || config.SubscribeKey.Trim().Length <= 0)
+            {
+                throw new MissingMemberException("subscribe key is required");
+            }
+
+            return await RemoveMessageAction(this.msgActionChannelName, this.messageTimetoken, this.actionTimetoken, this.msgActionUuid, this.queryParam).ConfigureAwait(false);
+        }
+
         internal void Retry()
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
@@ -170,16 +180,67 @@ namespace PubnubApi.EndPoint
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;
 
-            string json = UrlProcessRequest(request, requestState, false);
-
-            if (!string.IsNullOrEmpty(json))
+            UrlProcessRequest(request, requestState, false).ContinueWith(r =>
             {
-                List<object> result = ProcessJsonResponse(requestState, json);
+                string json = r.Result.Item1;
+                if (!string.IsNullOrEmpty(json))
+                {
+                    List<object> result = ProcessJsonResponse(requestState, json);
 
-                ProcessResponseCallbacks(result, requestState);
+                    ProcessResponseCallbacks(result, requestState);
+                }
+
+                CleanUp();
+            }, TaskContinuationOptions.ExecuteSynchronously).Wait();
+        }
+
+        private async Task<PNResult<PNRemoveMessageActionResult>> RemoveMessageAction(string channel, long messageTimetoken, long actionTimetoken, string messageActionUuid, Dictionary<string, object> externalQueryParam)
+        {
+            PNResult<PNRemoveMessageActionResult> ret = new PNResult<PNRemoveMessageActionResult>();
+
+            if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()))
+            {
+                PNStatus status = new PNStatus();
+                status.Error = true;
+                status.ErrorData = new PNErrorData("Missing Channel or MessageAction", new ArgumentException("Missing Channel or MessageAction"));
+                ret.Status = status;
+                return ret;
             }
 
-            CleanUp();
+            if (string.IsNullOrEmpty(config.SubscribeKey) || string.IsNullOrEmpty(config.SubscribeKey.Trim()) || config.SubscribeKey.Length <= 0)
+            {
+                PNStatus status = new PNStatus();
+                status.Error = true;
+                status.ErrorData = new PNErrorData("Invalid subscribe key", new MissingMemberException("Invalid publish key"));
+                ret.Status = status;
+                return ret;
+            }
+
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            Uri request = urlBuilder.BuildRemoveMessageActionRequest("DELETE", "", channel, messageTimetoken, actionTimetoken, messageActionUuid, externalQueryParam);
+
+            RequestState<PNRemoveMessageActionResult> requestState = new RequestState<PNRemoveMessageActionResult>();
+            requestState.Channels = new[] { channel };
+            requestState.ResponseType = PNOperationType.PNRemoveMessageActionOperation;
+            requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
+
+            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false).ConfigureAwait(false);
+            ret.Status = JsonAndStatusTuple.Item2;
+            string json = JsonAndStatusTuple.Item1;
+            if (!string.IsNullOrEmpty(json))
+            {
+                List<object> resultList = ProcessJsonResponse(requestState, json);
+                ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+                PNRemoveMessageActionResult responseResult = responseBuilder.JsonToObject<PNRemoveMessageActionResult>(resultList, true);
+                if (responseResult != null)
+                {
+                    ret.Result = responseResult;
+                }
+            }
+
+            return ret;
         }
 
         private void CleanUp()

@@ -277,7 +277,7 @@ namespace PubnubApi
             bool successFlag = false;
             try
             {
-                var response = await httpClient.GetAsync(requestUri);
+                var response = await httpClient.GetAsync(requestUri).ConfigureAwait(false);
                 successFlag = response.IsSuccessStatusCode;
                 if (successFlag)
                 {
@@ -303,7 +303,7 @@ namespace PubnubApi
                 HttpWebRequest myRequest = null;
                 myRequest = (HttpWebRequest)System.Net.WebRequest.Create(requestUri);
                 myRequest.Method = "GET";
-                using (HttpWebResponse response = await Task.Factory.FromAsync<HttpWebResponse>(myRequest.BeginGetResponse, asyncPubnubResult => (HttpWebResponse)myRequest.EndGetResponse(asyncPubnubResult), null))
+                using (HttpWebResponse response = await Task.Factory.FromAsync<HttpWebResponse>(myRequest.BeginGetResponse, asyncPubnubResult => (HttpWebResponse)myRequest.EndGetResponse(asyncPubnubResult), null).ConfigureAwait(false))
                 {
                     if (response != null)
                     {
@@ -362,7 +362,7 @@ namespace PubnubApi
             finally
             {
 #if NET35 || NET40
-                await Task.Factory.StartNew(() => { });
+                await Task.Factory.StartNew(() => { }).ConfigureAwait(false);
 #else
                 await Task.Delay(1).ConfigureAwait(false);
 #endif

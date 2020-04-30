@@ -9,7 +9,7 @@ namespace PubnubApi
     {
         internal static PNCreateUserResult GetObject(List<object> listObject)
         {
-            Dictionary<string, object> createUserDicObj = JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[1]);
+            Dictionary<string, object> createUserDicObj = (listObject != null && listObject.Count >= 2) ? JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[1]) : null;
             PNCreateUserResult result = null;
             if (createUserDicObj != null && createUserDicObj.ContainsKey("data"))
             {

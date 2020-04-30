@@ -122,6 +122,12 @@ namespace PubnubApi.EndPoint
 #endif
         }
 
+        public async Task<PNResult<PNSetStateResult>> ExecuteAsync()
+        {
+            string serializedState = jsonLibrary.SerializeToJsonString(this.userState);
+            return await SetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, serializedState, this.queryParam).ConfigureAwait(false);
+        }
+
         internal void Retry()
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
@@ -231,7 +237,7 @@ namespace PubnubApi.EndPoint
             SharedSetUserState(filteredChannels, filteredChannelGroups, uuid, jsonUserState, jsonUserState, externalQueryParam, callback);
         }
 
-        internal void SetUserState(string[] channels, string[] channelGroups, string uuid, KeyValuePair<string, object> keyValuePair, Dictionary<string, object> externalQueryParam, PNCallback<PNSetStateResult> callback)
+        internal async Task<PNResult<PNSetStateResult>> SetUserState(string[] channels, string[] channelGroups, string uuid, string jsonUserState, Dictionary<string, object> externalQueryParam)
         {
             if ((channels == null && channelGroups == null)
                             || (channels != null && channelGroups != null && channels.Length == 0 && channelGroups.Length == 0))
@@ -239,128 +245,152 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Either Channel Or Channel Group or Both should be provided");
             }
 
+            if (string.IsNullOrEmpty(jsonUserState) || string.IsNullOrEmpty(jsonUserState.Trim()))
+            {
+                throw new ArgumentException("Missing User State");
+            }
+
             List<string> channelList = new List<string>();
             List<string> channelGroupList = new List<string>();
+            string[] filteredChannels = channels;
+            string[] filteredChannelGroups = channelGroups;
 
             if (channels != null && channels.Length > 0)
             {
                 channelList = new List<string>(channels);
                 channelList = channelList.Where(ch => !string.IsNullOrEmpty(ch) && ch.Trim().Length > 0).Distinct<string>().ToList();
-                channels = channelList.ToArray();
+                filteredChannels = channelList.ToArray();
             }
 
             if (channelGroups != null && channelGroups.Length > 0)
             {
                 channelGroupList = new List<string>(channelGroups);
                 channelGroupList = channelGroupList.Where(cg => !string.IsNullOrEmpty(cg) && cg.Trim().Length > 0).Distinct<string>().ToList();
-                channelGroups = channelGroupList.ToArray();
+                filteredChannelGroups = channelGroupList.ToArray();
             }
 
-            string key = keyValuePair.Key;
-
-            int valueInt;
-            double valueDouble;
-            bool valueBool;
-            bool stateChanged = false;
-            string currentChannelUserState = "";
-            string currentChannelGroupUserState = "";
-
-            for (int channelIndex = 0; channelIndex < channelList.Count; channelIndex++)
+            if (!jsonLibrary.IsDictionaryCompatible(jsonUserState, PNOperationType.PNSetStateOperation))
             {
-                string currentChannel = channelList[channelIndex];
-
-                string oldJsonChannelState = GetLocalUserState(currentChannel, "");
-
-                if (keyValuePair.Value == null)
+                throw new MissingMemberException("Missing json format for user state");
+            }
+            else
+            {
+                Dictionary<string, object> deserializeUserState = jsonLibrary.DeserializeToDictionaryOfObject(jsonUserState);
+                if (deserializeUserState == null)
                 {
-                    currentChannelUserState = SetLocalUserState(currentChannel, "", key, null);
-                }
-                else if (Int32.TryParse(keyValuePair.Value.ToString(), out valueInt))
-                {
-                    currentChannelUserState = SetLocalUserState(currentChannel, "", key, valueInt);
-                }
-                else if (Double.TryParse(keyValuePair.Value.ToString(), out valueDouble))
-                {
-                    currentChannelUserState = SetLocalUserState(currentChannel, "", key, valueDouble);
-                }
-                else if (Boolean.TryParse(keyValuePair.Value.ToString(), out valueBool))
-                {
-                    currentChannelUserState = SetLocalUserState(currentChannel, "", key, valueBool);
+                    throw new MissingMemberException("Missing json format user state");
                 }
                 else
                 {
-                    currentChannelUserState = SetLocalUserState(currentChannel, "", key, keyValuePair.Value.ToString());
-                }
-                if (oldJsonChannelState != currentChannelUserState)
-                {
-                    stateChanged = true;
-                    break;
-                }
-            }
+                    bool stateChanged = false;
 
-            if (!stateChanged)
-            {
-                for (int channelGroupIndex = 0; channelGroupIndex < channelGroupList.Count; channelGroupIndex++)
-                {
-                    string currentChannelGroup = channelGroupList[channelGroupIndex];
+                    for (int channelIndex = 0; channelIndex < channelList.Count; channelIndex++)
+                    {
+                        string currentChannel = channelList[channelIndex];
 
-                    string oldJsonChannelGroupState = GetLocalUserState("", currentChannelGroup);
+                        string oldJsonChannelState = GetLocalUserState(currentChannel, "");
 
-                    if (keyValuePair.Value == null)
-                    {
-                        currentChannelGroupUserState = SetLocalUserState("", currentChannelGroup, key, null);
-                    }
-                    else if (Int32.TryParse(keyValuePair.Value.ToString(), out valueInt))
-                    {
-                        currentChannelGroupUserState = SetLocalUserState("", currentChannelGroup, key, valueInt);
-                    }
-                    else if (Double.TryParse(keyValuePair.Value.ToString(), out valueDouble))
-                    {
-                        currentChannelGroupUserState = SetLocalUserState("", currentChannelGroup, key, valueDouble);
-                    }
-                    else if (Boolean.TryParse(keyValuePair.Value.ToString(), out valueBool))
-                    {
-                        currentChannelGroupUserState = SetLocalUserState("", currentChannelGroup, key, valueBool);
-                    }
-                    else
-                    {
-                        currentChannelGroupUserState = SetLocalUserState("", currentChannelGroup, key, keyValuePair.Value.ToString());
+                        if (oldJsonChannelState != jsonUserState)
+                        {
+                            stateChanged = true;
+                            break;
+                        }
                     }
 
-                    if (oldJsonChannelGroupState != currentChannelGroupUserState)
+                    if (!stateChanged)
                     {
-                        stateChanged = true;
-                        break;
+                        for (int channelGroupIndex = 0; channelGroupIndex < channelGroupList.Count; channelGroupIndex++)
+                        {
+                            string currentChannelGroup = channelGroupList[channelGroupIndex];
+
+                            string oldJsonChannelGroupState = GetLocalUserState("", currentChannelGroup);
+
+                            if (oldJsonChannelGroupState != jsonUserState)
+                            {
+                                stateChanged = true;
+                                break;
+                            }
+                        }
                     }
+
+                    if (!stateChanged)
+                    {
+                        PNResult<PNSetStateResult> errRet = new PNResult<PNSetStateResult>();
+
+                        StatusBuilder statusBuilder = new StatusBuilder(config, jsonLibrary);
+                        PNStatus status = statusBuilder.CreateStatusResponse<PNSetStateResult>(PNOperationType.PNSetStateOperation, PNStatusCategory.PNUnknownCategory, null, (int)System.Net.HttpStatusCode.NotModified, null);
+                        errRet.Status = status;
+                        return errRet;
+                    }
+
                 }
             }
 
-
-            if (!stateChanged)
-            {
-                StatusBuilder statusBuilder = new StatusBuilder(config, jsonLibrary);
-                PNStatus status = statusBuilder.CreateStatusResponse<PNSetStateResult>(PNOperationType.PNSetStateOperation, PNStatusCategory.PNUnknownCategory, null, (int)System.Net.HttpStatusCode.NotModified, null);
-
-                Announce(status);
-                return;
-            }
-
-            if (currentChannelUserState.Trim() == "")
-            {
-                currentChannelUserState = "{}";
-            }
-            if (currentChannelGroupUserState == "")
-            {
-                currentChannelGroupUserState = "{}";
-            }
-
-            SharedSetUserState(channels, channelGroups, uuid, currentChannelUserState, currentChannelGroupUserState, externalQueryParam, callback);
+            return await SharedSetUserState(filteredChannels, filteredChannelGroups, uuid, jsonUserState, jsonUserState, externalQueryParam).ConfigureAwait(false);
         }
 
         private void SharedSetUserState(string[] channels, string[] channelGroups, string uuid, string jsonChannelUserState, string jsonChannelGroupUserState, Dictionary<string, object> externalQueryParam, PNCallback<PNSetStateResult> callback)
         {
-            List<string> channelList = new List<string>();
-            List<string> channelGroupList = new List<string>();
+            List<string> channelList;
+            List<string> channelGroupList;
+            string currentUuid = uuid;
+
+            string[] channelArray = null;
+            if (channels != null && channels.Length > 0)
+            {
+                channelList = new List<string>(channels);
+                channelList = channelList.Where(ch => !string.IsNullOrEmpty(ch) && ch.Trim().Length > 0).Distinct<string>().ToList();
+                channelArray = channelList.ToArray();
+            }
+
+            string[] channelGroupsArray = null;
+            if (channelGroups != null && channelGroups.Length > 0)
+            {
+                channelGroupList = new List<string>(channelGroups);
+                channelGroupList = channelGroupList.Where(cg => !string.IsNullOrEmpty(cg) && cg.Trim().Length > 0).Distinct<string>().ToList();
+                channelGroupsArray = channelGroupList.ToArray();
+            }
+
+            string commaDelimitedChannels = (channelArray != null && channelArray.Length > 0) ? string.Join(",", channelArray.OrderBy(x => x).ToArray()) : "";
+            string commaDelimitedChannelGroups = (channelGroupsArray != null && channelGroupsArray.Length > 0) ? string.Join(",", channelGroupsArray.OrderBy(x => x).ToArray()) : "";
+
+            if (string.IsNullOrEmpty(uuid))
+            {
+                currentUuid = config.Uuid;
+            }            
+
+            string jsonUserState = GetJsonSharedSetUserStateInternal(channels, channelGroups, jsonChannelUserState, jsonChannelGroupUserState);
+
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            Uri request = urlBuilder.BuildSetUserStateRequest("GET", "", commaDelimitedChannels, commaDelimitedChannelGroups, currentUuid, jsonUserState, externalQueryParam);
+
+            RequestState<PNSetStateResult> requestState = new RequestState<PNSetStateResult>();
+            requestState.Channels = channelArray;
+            requestState.ChannelGroups = channelGroupsArray;
+            requestState.ResponseType = PNOperationType.PNSetStateOperation;
+            requestState.PubnubCallback = callback;
+            requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
+
+            //Set TerminateSubRequest to true to bounce the long-polling subscribe requests to update user state
+            UrlProcessRequest(request, requestState, false).ContinueWith(r =>
+            {
+                string json = r.Result.Item1;
+                if (!string.IsNullOrEmpty(json))
+                {
+                    List<object> result = ProcessJsonResponse(requestState, json);
+                    ProcessResponseCallbacks(result, requestState);
+                }
+            }, TaskContinuationOptions.ExecuteSynchronously).Wait();
+        }
+
+        private async Task<PNResult<PNSetStateResult>> SharedSetUserState(string[] channels, string[] channelGroups, string uuid, string jsonChannelUserState, string jsonChannelGroupUserState, Dictionary<string, object> externalQueryParam)
+        {
+            PNResult<PNSetStateResult> ret = new PNResult<PNSetStateResult>();
+
+            List<string> channelList;
+            List<string> channelGroupList;
             string currentUuid = uuid;
 
             string[] channelArray = null;
@@ -387,10 +417,58 @@ namespace PubnubApi.EndPoint
                 currentUuid = config.Uuid;
             }
 
+            string jsonUserState = GetJsonSharedSetUserStateInternal(channels, channelGroups, jsonChannelUserState, jsonChannelGroupUserState);
+
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            Uri request = urlBuilder.BuildSetUserStateRequest("GET", "", commaDelimitedChannels, commaDelimitedChannelGroups, currentUuid, jsonUserState, externalQueryParam);
+
+            RequestState<PNSetStateResult> requestState = new RequestState<PNSetStateResult>();
+            requestState.Channels = channelArray;
+            requestState.ChannelGroups = channelGroupsArray;
+            requestState.ResponseType = PNOperationType.PNSetStateOperation;
+            requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
+
+            //Set TerminateSubRequest to true to bounce the long-polling subscribe requests to update user state
+            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false).ConfigureAwait(false);
+            ret.Status = JsonAndStatusTuple.Item2;
+            string json = JsonAndStatusTuple.Item1;
+            if (!string.IsNullOrEmpty(json))
+            {
+                List<object> resultList = ProcessJsonResponse(requestState, json);
+                ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+                PNSetStateResult responseResult = responseBuilder.JsonToObject<PNSetStateResult>(resultList, true);
+                if (responseResult != null)
+                {
+                    ret.Result = responseResult;
+                }
+            }
+
+            return ret;
+        }
+
+        private string GetJsonSharedSetUserStateInternal(string[] channels, string[] channelGroups, string jsonChannelUserState, string jsonChannelGroupUserState)
+        {
+            List<string> channelList = new List<string>();
+            List<string> channelGroupList = new List<string>();
+
+            if (channels != null && channels.Length > 0)
+            {
+                channelList = new List<string>(channels);
+                channelList = channelList.Where(ch => !string.IsNullOrEmpty(ch) && ch.Trim().Length > 0).Distinct<string>().ToList();
+            }
+
+            if (channelGroups != null && channelGroups.Length > 0)
+            {
+                channelGroupList = new List<string>(channelGroups);
+                channelGroupList = channelGroupList.Where(cg => !string.IsNullOrEmpty(cg) && cg.Trim().Length > 0).Distinct<string>().ToList();
+            }
+
             Dictionary<string, object> deserializeChannelUserState = jsonLibrary.DeserializeToDictionaryOfObject(jsonChannelUserState);
             Dictionary<string, object> deserializeChannelGroupUserState = jsonLibrary.DeserializeToDictionaryOfObject(jsonChannelGroupUserState);
 
-            for (int channelIndex=0; channelIndex < channelList.Count; channelIndex++)
+            for (int channelIndex = 0; channelIndex < channelList.Count; channelIndex++)
             {
                 string currentChannel = channelList[channelIndex];
 
@@ -398,7 +476,7 @@ namespace PubnubApi.EndPoint
                 ChannelLocalUserState[PubnubInstance.InstanceId].AddOrUpdate(currentChannel.Trim(), deserializeChannelUserState, (oldState, newState) => deserializeChannelUserState);
             }
 
-            for (int channelGroupIndex=0; channelGroupIndex < channelGroupList.Count; channelGroupIndex++)
+            for (int channelGroupIndex = 0; channelGroupIndex < channelGroupList.Count; channelGroupIndex++)
             {
                 string currentChannelGroup = channelGroupList[channelGroupIndex];
 
@@ -448,139 +526,7 @@ namespace PubnubApi.EndPoint
                 jsonUserState = string.Format("{{{0}}}", jsonUserState);
             }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildSetUserStateRequest("GET", "", commaDelimitedChannels, commaDelimitedChannelGroups, currentUuid, jsonUserState, externalQueryParam);
-
-            RequestState<PNSetStateResult> requestState = new RequestState<PNSetStateResult>();
-            requestState.Channels = channelArray;
-            requestState.ChannelGroups = channelGroupsArray;
-            requestState.ResponseType = PNOperationType.PNSetStateOperation;
-            requestState.PubnubCallback = callback;
-            requestState.Reconnect = false;
-            requestState.EndPointOperation = this;
-
-            //Set TerminateSubRequest to true to bounce the long-polling subscribe requests to update user state
-            string json = UrlProcessRequest<PNSetStateResult>(request, requestState, true);
-            if (!string.IsNullOrEmpty(json))
-            {
-                List<object> result = ProcessJsonResponse<PNSetStateResult>(requestState, json);
-                ProcessResponseCallbacks(result, requestState);
-            }
-        }
-
-        private string AddOrUpdateOrDeleteLocalUserState(string channel, string channelGroup, string userStateKey, object userStateValue)
-        {
-            string retJsonUserState = "";
-
-            Dictionary<string, object> channelUserStateDictionary = null;
-            Dictionary<string, object> channelGroupUserStateDictionary = null;
-
-            if (!string.IsNullOrEmpty(channel) && channel.Trim().Length > 0)
-            {
-                if (ChannelLocalUserState[PubnubInstance.InstanceId].ContainsKey(channel))
-                {
-                    if (ChannelLocalUserState[PubnubInstance.InstanceId].TryGetValue(channel, out channelUserStateDictionary) && channelUserStateDictionary != null)
-                    {
-                        if (channelUserStateDictionary.ContainsKey(userStateKey))
-                        {
-                            if (userStateValue != null)
-                            {
-                                channelUserStateDictionary[userStateKey] = userStateValue;
-                            }
-                            else
-                            {
-                                channelUserStateDictionary.Remove(userStateKey);
-                            }
-                        }
-                        else
-                        {
-                            if (!string.IsNullOrEmpty(userStateKey) && userStateKey.Trim().Length > 0 && userStateValue != null)
-                            {
-                                channelUserStateDictionary.Add(userStateKey, userStateValue);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        channelUserStateDictionary = new Dictionary<string, object>();
-                        channelUserStateDictionary.Add(userStateKey, userStateValue);
-                    }
-
-                    ChannelLocalUserState[PubnubInstance.InstanceId].AddOrUpdate(channel, channelUserStateDictionary, (oldData, newData) => channelUserStateDictionary);
-                }
-                else
-                {
-                    if (!string.IsNullOrEmpty(userStateKey) && userStateKey.Trim().Length > 0 && userStateValue != null)
-                    {
-                        channelUserStateDictionary = new Dictionary<string, object>();
-                        channelUserStateDictionary.Add(userStateKey, userStateValue);
-
-                        ChannelLocalUserState[PubnubInstance.InstanceId].AddOrUpdate(channel, channelUserStateDictionary, (oldData, newData) => channelUserStateDictionary);
-                    }
-                }
-            }
-            
-            if (!string.IsNullOrEmpty(channelGroup) && channelGroup.Trim().Length > 0)
-            {
-                if (ChannelGroupLocalUserState[PubnubInstance.InstanceId].ContainsKey(channelGroup))
-                {
-                    if (ChannelGroupLocalUserState[PubnubInstance.InstanceId].TryGetValue(channelGroup, out channelGroupUserStateDictionary) && channelGroupUserStateDictionary != null)
-                    {
-                        if (channelGroupUserStateDictionary.ContainsKey(userStateKey))
-                        {
-                            if (userStateValue != null)
-                            {
-                                channelGroupUserStateDictionary[userStateKey] = userStateValue;
-                            }
-                            else
-                            {
-                                channelGroupUserStateDictionary.Remove(userStateKey);
-                            }
-                        }
-                        else
-                        {
-                            if (!string.IsNullOrEmpty(userStateKey) && userStateKey.Trim().Length > 0 && userStateValue != null)
-                            {
-                                channelGroupUserStateDictionary.Add(userStateKey, userStateValue);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        channelGroupUserStateDictionary = new Dictionary<string, object>();
-                        channelGroupUserStateDictionary.Add(userStateKey, userStateValue);
-                    }
-
-                    ChannelGroupLocalUserState[PubnubInstance.InstanceId].AddOrUpdate(channelGroup, channelGroupUserStateDictionary, (oldData, newData) => channelGroupUserStateDictionary);
-                }
-                else
-                {
-                    if (!string.IsNullOrEmpty(userStateKey) && userStateKey.Trim().Length > 0 && userStateValue != null)
-                    {
-                        channelGroupUserStateDictionary = new Dictionary<string, object>();
-                        channelGroupUserStateDictionary.Add(userStateKey, userStateValue);
-
-                        ChannelGroupLocalUserState[PubnubInstance.InstanceId].AddOrUpdate(channelGroup, channelGroupUserStateDictionary, (oldData, newData) => channelGroupUserStateDictionary);
-                    }
-                }
-            }
-
-            string jsonChannelUserState = BuildJsonUserState(channel, "", true);
-            string jsonChannelGroupUserState = BuildJsonUserState("", channelGroup, true);
-            if (jsonChannelUserState != "" && jsonChannelGroupUserState != "")
-            {
-                retJsonUserState = string.Format("{{\"{0}\":{{{1}}},\"{2}\":{{{3}}}}}", channel, jsonChannelUserState, channelGroup, jsonChannelGroupUserState);
-            }
-            else if (jsonChannelUserState != "")
-            {
-                retJsonUserState = string.Format("{{{0}}}", jsonChannelUserState);
-            }
-            else if (jsonChannelGroupUserState != "")
-            {
-                retJsonUserState = string.Format("{{{0}}}", jsonChannelGroupUserState);
-            }
-            return retJsonUserState;
+            return jsonUserState;
         }
 
         private string GetLocalUserState(string channel, string channelGroup)
@@ -610,26 +556,6 @@ namespace PubnubApi.EndPoint
             }
 
             return retJsonUserState;
-        }
-
-        private string SetLocalUserState(string channel, string channelGroup, string userStateKey, int userStateValue)
-        {
-            return AddOrUpdateOrDeleteLocalUserState(channel, channelGroup, userStateKey, userStateValue);
-        }
-
-        private string SetLocalUserState(string channel, string channelGroup, string userStateKey, double userStateValue)
-        {
-            return AddOrUpdateOrDeleteLocalUserState(channel, channelGroup, userStateKey, userStateValue);
-        }
-
-        private string SetLocalUserState(string channel, string channelGroup, string userStateKey, bool userStateValue)
-        {
-            return AddOrUpdateOrDeleteLocalUserState(channel, channelGroup, userStateKey, userStateValue);
-        }
-
-        private string SetLocalUserState(string channel, string channelGroup, string userStateKey, string userStateValue)
-        {
-            return AddOrUpdateOrDeleteLocalUserState(channel, channelGroup, userStateKey, userStateValue);
         }
     }
 }

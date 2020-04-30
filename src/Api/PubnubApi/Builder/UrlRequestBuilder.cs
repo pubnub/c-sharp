@@ -1295,7 +1295,7 @@ namespace PubnubApi
             return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
-        Uri IUrlRequestBuilder.BuildGetAllUsersRequest(string requestMethod, string requestBody, string start, string end, int limit, bool includeCount, bool includeCustom, string filter, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildGetAllUsersRequest(string requestMethod, string requestBody, string start, string end, int limit, bool includeCount, bool includeCustom, string filter, List<string> sort, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PNGetUsersOperation;
 
@@ -1329,6 +1329,10 @@ namespace PubnubApi
             if (!string.IsNullOrEmpty(filter))
             {
                 requestQueryStringParams.Add("filter", UriUtil.EncodeUriComponent(filter, currentType, false, false, false));
+            }
+            if (sort != null && sort.Count > 0)
+            {
+                requestQueryStringParams.Add("sort", UriUtil.EncodeUriComponent(string.Join(",",sort.ToArray()), currentType, false, false, false));
             }
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
@@ -1467,7 +1471,7 @@ namespace PubnubApi
             return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
-        Uri IUrlRequestBuilder.BuildGetAllSpacesRequest(string requestMethod, string requestBody, string start, string end, int limit, bool includeCount, bool includeCustom, string filter, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildGetAllSpacesRequest(string requestMethod, string requestBody, string start, string end, int limit, bool includeCount, bool includeCustom, string filter, List<string> sort, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PNGetSpacesOperation;
 
@@ -1501,6 +1505,10 @@ namespace PubnubApi
             if (!string.IsNullOrEmpty(filter))
             {
                 requestQueryStringParams.Add("filter", UriUtil.EncodeUriComponent(filter, currentType, false, false, false));
+            }
+            if (sort != null && sort.Count > 0)
+            {
+                requestQueryStringParams.Add("sort", UriUtil.EncodeUriComponent(string.Join(",", sort.ToArray()), currentType, false, false, false));
             }
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
@@ -1550,7 +1558,7 @@ namespace PubnubApi
             return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
-        Uri IUrlRequestBuilder.BuildUpdateSpaceMembershipsWithUserRequest(string requestMethod, string requestBody, string userId, string start, string end, int limit, bool includeCount, string includeOptions, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildUpdateSpaceMembershipsWithUserRequest(string requestMethod, string requestBody, string userId, string start, string end, int limit, bool includeCount, string includeOptions, List<string> sort, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PNManageMembershipsOperation;
 
@@ -1583,6 +1591,10 @@ namespace PubnubApi
             {
                 requestQueryStringParams.Add("include", UriUtil.EncodeUriComponent(includeOptions, currentType, false, false, false));
             }
+            if (sort != null && sort.Count > 0)
+            {
+                requestQueryStringParams.Add("sort", UriUtil.EncodeUriComponent(string.Join(",", sort.ToArray()), currentType, false, false, false));
+            }
             if (externalQueryParam != null && externalQueryParam.Count > 0)
             {
                 foreach (KeyValuePair<string, object> kvp in externalQueryParam)
@@ -1598,7 +1610,7 @@ namespace PubnubApi
             return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
-        Uri IUrlRequestBuilder.BuildMembersAddUpdateRemoveRequest(string requestMethod, string requestBody, string spaceId, string start, string end, int limit, bool includeCount, string includeOptions, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildMembersAddUpdateRemoveRequest(string requestMethod, string requestBody, string spaceId, string start, string end, int limit, bool includeCount, string includeOptions, List<string> sort, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PNManageMembersOperation;
 
@@ -1631,6 +1643,10 @@ namespace PubnubApi
             {
                 requestQueryStringParams.Add("include", UriUtil.EncodeUriComponent(includeOptions, currentType, false, false, false));
             }
+            if (sort != null && sort.Count > 0)
+            {
+                requestQueryStringParams.Add("sort", UriUtil.EncodeUriComponent(string.Join(",", sort.ToArray()), currentType, false, false, false));
+            }
             if (externalQueryParam != null && externalQueryParam.Count > 0)
             {
                 foreach (KeyValuePair<string, object> kvp in externalQueryParam)
@@ -1646,7 +1662,7 @@ namespace PubnubApi
             return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
-        Uri IUrlRequestBuilder.BuildGetAllMembershipsRequest(string requestMethod, string requestBody, string userId, string start, string end, int limit, bool includeCount, string includeOptions, string filter, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildGetAllMembershipsRequest(string requestMethod, string requestBody, string userId, string start, string end, int limit, bool includeCount, string includeOptions, string filter, List<string> sort, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PNGetMembershipsOperation;
 
@@ -1683,6 +1699,10 @@ namespace PubnubApi
             {
                 requestQueryStringParams.Add("filter", UriUtil.EncodeUriComponent(filter, currentType, false, false, false));
             }
+            if (sort != null && sort.Count > 0)
+            {
+                requestQueryStringParams.Add("sort", UriUtil.EncodeUriComponent(string.Join(",", sort.ToArray()), currentType, false, false, false));
+            }
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
             {
@@ -1699,7 +1719,7 @@ namespace PubnubApi
             return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
-        Uri IUrlRequestBuilder.BuildGetAllMembersRequest(string requestMethod, string requestBody, string spaceId, string start, string end, int limit, bool includeCount, string includeOptions, string filter, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildGetAllMembersRequest(string requestMethod, string requestBody, string spaceId, string start, string end, int limit, bool includeCount, string includeOptions, string filter, List<string> sort, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PNGetMembersOperation;
 
@@ -1735,6 +1755,10 @@ namespace PubnubApi
             if (!string.IsNullOrEmpty(filter))
             {
                 requestQueryStringParams.Add("filter", UriUtil.EncodeUriComponent(filter, currentType, false, false, false));
+            }
+            if (sort != null && sort.Count > 0)
+            {
+                requestQueryStringParams.Add("sort", UriUtil.EncodeUriComponent(string.Join(",", sort.ToArray()), currentType, false, false, false));
             }
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)

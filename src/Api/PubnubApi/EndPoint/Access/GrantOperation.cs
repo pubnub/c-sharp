@@ -120,6 +120,15 @@ namespace PubnubApi.EndPoint
 #endif
         }
 
+        public async Task<PNResult<PNAccessManagerGrantResult>> ExecuteAsync()
+        {
+            if (config != null && pubnubLog != null)
+            {
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, WARNING: Grant() signature has changed! This specific call will be making a request to PAMv2. Please update your code if this is not the intended action.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+            }
+            return await GrantAccess(this.pubnubChannelNames, this.pubnubChannelGroupNames, this.pamAuthenticationKeys, this.grantRead, this.grantWrite, this.grantDelete, this.grantManage, this.grantTTL, this.queryParam).ConfigureAwait(false);
+        }
+
         internal void Retry()
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
@@ -181,12 +190,82 @@ namespace PubnubApi.EndPoint
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;
 
-            string json = UrlProcessRequest<PNAccessManagerGrantResult>(request, requestState, false);
+            UrlProcessRequest(request, requestState, false).ContinueWith(r =>
+            {
+                string json = r.Result.Item1;
+                if (!string.IsNullOrEmpty(json))
+                {
+                    List<object> result = ProcessJsonResponse(requestState, json);
+                    ProcessResponseCallbacks(result, requestState);
+                }
+            }, TaskContinuationOptions.ExecuteSynchronously).Wait();
+            
+        }
+
+        internal async Task<PNResult<PNAccessManagerGrantResult>> GrantAccess(string[] channels, string[] channelGroups, string[] authKeys, bool read, bool write, bool delete, bool manage, long ttl, Dictionary<string, object> externalQueryParam)
+        {
+            if (string.IsNullOrEmpty(config.SecretKey) || string.IsNullOrEmpty(config.SecretKey.Trim()) || config.SecretKey.Length <= 0)
+            {
+                throw new MissingMemberException("Invalid secret key");
+            }
+
+            PNResult<PNAccessManagerGrantResult> ret = new PNResult<PNAccessManagerGrantResult>();
+
+            List<string> channelList = new List<string>();
+            List<string> channelGroupList = new List<string>();
+            List<string> authList = new List<string>();
+
+            if (channels != null && channels.Length > 0)
+            {
+                channelList = new List<string>(channels);
+                channelList = channelList.Where(ch => !string.IsNullOrEmpty(ch) && ch.Trim().Length > 0).Distinct<string>().ToList();
+            }
+
+            if (channelGroups != null && channelGroups.Length > 0)
+            {
+                channelGroupList = new List<string>(channelGroups);
+                channelGroupList = channelGroupList.Where(cg => !string.IsNullOrEmpty(cg) && cg.Trim().Length > 0).Distinct<string>().ToList();
+            }
+
+            if (authKeys != null && authKeys.Length > 0)
+            {
+                authList = new List<string>(authKeys);
+                authList = authList.Where(auth => !string.IsNullOrEmpty(auth) && auth.Trim().Length > 0).Distinct<string>().ToList();
+            }
+
+            string channelsCommaDelimited = string.Join(",", channelList.ToArray().OrderBy(x => x).ToArray());
+            string channelGroupsCommaDelimited = string.Join(",", channelGroupList.ToArray().OrderBy(x => x).ToArray());
+            string authKeysCommaDelimited = string.Join(",", authList.ToArray().OrderBy(x => x).ToArray());
+
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, null);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            Uri request = urlBuilder.BuildGrantV2AccessRequest("GET", "", channelsCommaDelimited, channelGroupsCommaDelimited, authKeysCommaDelimited, read, write, delete, manage, ttl, externalQueryParam);
+
+            RequestState<PNAccessManagerGrantResult> requestState = new RequestState<PNAccessManagerGrantResult>();
+            requestState.Channels = channels;
+            requestState.ChannelGroups = channelGroups;
+            requestState.ResponseType = PNOperationType.PNAccessManagerGrant;
+            requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
+
+            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false).ConfigureAwait(false);
+            ret.Status = JsonAndStatusTuple.Item2;
+            string json = JsonAndStatusTuple.Item1;
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = ProcessJsonResponse<PNAccessManagerGrantResult>(requestState, json);
-                ProcessResponseCallbacks(result, requestState);
+                List<object> resultList = ProcessJsonResponse(requestState, json);
+                if (resultList != null && resultList.Count > 0)
+                {
+                    ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+                    PNAccessManagerGrantResult responseResult = responseBuilder.JsonToObject<PNAccessManagerGrantResult>(resultList, true);
+                    if (responseResult != null)
+                    {
+                        ret.Result = responseResult;
+                    }
+                }
             }
+            
+            return ret;
         }
 
         internal void CurrentPubnubInstance(Pubnub instance)

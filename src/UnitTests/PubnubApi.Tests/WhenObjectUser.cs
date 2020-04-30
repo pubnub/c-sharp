@@ -4,6 +4,7 @@ using PubnubApi;
 using System.Collections.Generic;
 using MockServer;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace PubNubMessaging.Tests
 {
@@ -240,6 +241,156 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void ThenWithAsyncUserCRUDShouldReturnSuccessCodeAndInfo()
+#else
+        public static async Task ThenWithAsyncUserCRUDShouldReturnSuccessCodeAndInfo()
+#endif        
+        {
+            server.ClearRequests();
+
+            if (PubnubCommon.EnableStubTest)
+            {
+                Assert.Ignore("Ignored ThenWithAsyncUserCRUDShouldReturnSuccessCodeAndInfo");
+                return;
+            }
+
+            bool receivedMessage = false;
+
+            string userId = "pandu-ut-uid";
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+                Secure = false,
+                IncludeInstanceIdentifier = false,
+                IncludeRequestIdentifier = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+            server.RunOnHttps(false);
+            pubnub = createPubNubInstance(config);
+            if (!PubnubCommon.PAMServerSideRun && !string.IsNullOrEmpty(authToken))
+            {
+                pubnub.ClearTokens();
+                pubnub.SetToken(authToken);
+            }
+
+            System.Diagnostics.Debug.WriteLine("pubnub.DeleteUser() STARTED");
+#if NET40
+            Task.Factory.StartNew(async () => await pubnub.DeleteUser().Id(userId).ExecuteAsync());
+#else
+            await pubnub.DeleteUser().Id(userId).ExecuteAsync();
+#endif
+
+            #region "CreateUser"
+            System.Diagnostics.Debug.WriteLine("pubnub.CreateUser() STARTED");
+#if NET40
+            PNResult<PNCreateUserResult> createUserResult = Task.Factory.StartNew(async () => await pubnub.CreateUser().Id(userId).Name("pandu-ut-un").ExecuteAsync()).Result.Result;
+#else
+            PNResult<PNCreateUserResult> createUserResult = await pubnub.CreateUser().Id(userId).Name("pandu-ut-un").ExecuteAsync();
+#endif
+            if (createUserResult.Result != null && createUserResult.Status.StatusCode == 200 && !createUserResult.Status.Error)
+            {
+                pubnub.JsonPluggableLibrary.SerializeToJsonString(createUserResult.Result);
+                if (userId == createUserResult.Result.Id)
+                {
+                    receivedMessage = true;
+                }
+            }
+            #endregion
+
+            if (receivedMessage)
+            {
+                receivedMessage = false;
+                #region "UpdateUser"
+                System.Diagnostics.Debug.WriteLine("pubnub.UpdateUser() STARTED");
+#if NET40
+                PNResult<PNUpdateUserResult> updateUserResult = Task.Factory.StartNew(async () => await pubnub.UpdateUser().Id(userId).Name("pandu-ut-un-upd")
+                    .ProfileUrl("pandu-sample-profile-url").ExternalId("pandu-sample-ext-id")
+                    .Email("test@test.com")
+                    .CustomObject(new Dictionary<string, object>() { { "color", "red" } })
+                        .ExecuteAsync()).Result.Result;
+#else
+                PNResult<PNUpdateUserResult> updateUserResult = await pubnub.UpdateUser().Id(userId).Name("pandu-ut-un-upd")
+                    .ProfileUrl("pandu-sample-profile-url").ExternalId("pandu-sample-ext-id")
+                    .Email("test@test.com")
+                    .CustomObject(new Dictionary<string, object>() { { "color", "red" } })
+                        .ExecuteAsync();
+#endif
+                if (updateUserResult.Result != null && updateUserResult.Status.StatusCode == 200 && !updateUserResult.Status.Error)
+                {
+                    pubnub.JsonPluggableLibrary.SerializeToJsonString(updateUserResult.Result);
+                    if (userId == updateUserResult.Result.Id)
+                    {
+                        receivedMessage = true;
+                    }
+                }
+                #endregion
+            }
+
+            if (receivedMessage)
+            {
+                receivedMessage = false;
+                #region "GetUser"
+                System.Diagnostics.Debug.WriteLine("pubnub.GetUser() STARTED");
+#if NET40
+                PNResult<PNGetUserResult> getUserResult = Task.Factory.StartNew(async () => await pubnub.GetUser().UserId(userId).IncludeCustom(true).ExecuteAsync()).Result.Result;
+#else
+                PNResult<PNGetUserResult> getUserResult = await pubnub.GetUser().UserId(userId).IncludeCustom(true).ExecuteAsync();
+#endif
+                if (getUserResult.Result != null && getUserResult.Status.StatusCode == 200 && !getUserResult.Status.Error)
+                {
+                    pubnub.JsonPluggableLibrary.SerializeToJsonString(getUserResult.Result);
+                    if (userId == getUserResult.Result.Id)
+                    {
+                        receivedMessage = true;
+                    }
+                }
+                #endregion
+            }
+
+            if (receivedMessage)
+            {
+                receivedMessage = false;
+                #region "GetUsers"
+                System.Diagnostics.Debug.WriteLine("pubnub.GetUsers() STARTED");
+#if NET40
+                PNResult<PNGetUsersResult> getUsersResult = Task.Factory.StartNew(async () => await pubnub.GetUsers().IncludeCount(true).ExecuteAsync()).Result.Result;
+#else
+                PNResult<PNGetUsersResult> getUsersResult = await pubnub.GetUsers().IncludeCount(true).ExecuteAsync();
+#endif
+                if (getUsersResult.Result != null && getUsersResult.Status.StatusCode == 200 && !getUsersResult.Status.Error)
+                {
+                    pubnub.JsonPluggableLibrary.SerializeToJsonString(getUsersResult.Result);
+                    List<PNUserResult> userList = getUsersResult.Result.Users;
+                    if (userList != null && userList.Count > 0 && userList.Find(x => x.Id == userId) != null)
+                    {
+                        receivedMessage = true;
+                    }
+                }
+                #endregion
+            }
+
+            if (!receivedMessage)
+            {
+                Assert.IsTrue(receivedMessage, "CreateUser/UpdateUser/DeleteUser Failed");
+            }
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
+
+        [Test]
         public static void ThenUserUpdateDeleteShouldReturnEventInfo()
         {
             server.ClearRequests();
@@ -368,7 +519,7 @@ namespace PubNubMessaging.Tests
                 manualEvent.WaitOne(2000);
             }
 
-            Thread.Sleep(2000);
+            Thread.Sleep(4000);
 
             pubnub.Unsubscribe<string>().Channels(new string[] { userId }).Execute();
             pubnub.RemoveListener(eventListener);
@@ -381,5 +532,153 @@ namespace PubNubMessaging.Tests
 
         }
 
+        [Test]
+#if NET40
+        public static void ThenWithAsyncUserUpdateDeleteShouldReturnEventInfo()
+#else
+        public static async Task ThenWithAsyncUserUpdateDeleteShouldReturnEventInfo()
+#endif        
+        {
+            server.ClearRequests();
+
+            if (PubnubCommon.EnableStubTest)
+            {
+                Assert.Ignore("Ignored ThenWithAsyncUserUpdateDeleteShouldReturnEventInfo");
+                return;
+            }
+
+            bool receivedMessage = false;
+            bool receivedDeleteEvent = false;
+            bool receivedUpdateEvent = false;
+
+            string userId = "pandu-ut-uid";
+            manualResetEventWaitTimeout = 310 * 1000;
+
+            SubscribeCallbackExt eventListener = new SubscribeCallbackExt(
+                delegate (Pubnub pnObj, PNObjectApiEventResult eventResult)
+                {
+                    System.Diagnostics.Debug.WriteLine("EVENT:" + pubnub.JsonPluggableLibrary.SerializeToJsonString(eventResult));
+                    if (eventResult.Type.ToLowerInvariant() == "user")
+                    {
+                        if (eventResult.Event.ToLowerInvariant() == "update")
+                        {
+                            receivedUpdateEvent = true;
+                        }
+                        else if (eventResult.Event.ToLowerInvariant() == "delete")
+                        {
+                            receivedDeleteEvent = true;
+                        }
+                    }
+                },
+                delegate (Pubnub pnObj, PNStatus status)
+                {
+
+                }
+                );
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+                Secure = false,
+                AuthKey = "myauth"
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+            server.RunOnHttps(false);
+            pubnub = createPubNubInstance(config);
+            if (!PubnubCommon.PAMServerSideRun && !string.IsNullOrEmpty(authToken))
+            {
+                pubnub.ClearTokens();
+                pubnub.SetToken(authToken);
+            }
+            pubnub.AddListener(eventListener);
+
+            ManualResetEvent manualEvent = new ManualResetEvent(false);
+            pubnub.Subscribe<string>().Channels(new string[] { userId }).Execute();
+            manualEvent.WaitOne(2000);
+
+            System.Diagnostics.Debug.WriteLine("pubnub.DeleteUser() STARTED");
+#if NET40
+            Task.Factory.StartNew(async () => await pubnub.DeleteUser().Id(userId).ExecuteAsync());
+#else
+            await pubnub.DeleteUser().Id(userId).ExecuteAsync();
+#endif
+
+            #region "CreateUser"
+            System.Diagnostics.Debug.WriteLine("pubnub.CreateUser() STARTED");
+#if NET40
+            PNResult<PNCreateUserResult> createUserResult = Task.Factory.StartNew(async () => await pubnub.CreateUser().Id(userId).Name("pandu-ut-un").ExecuteAsync()).Result.Result;
+#else
+            PNResult<PNCreateUserResult> createUserResult = await pubnub.CreateUser().Id(userId).Name("pandu-ut-un").ExecuteAsync();
+#endif
+            if (createUserResult.Result != null && createUserResult.Status.StatusCode == 200 && !createUserResult.Status.Error)
+            {
+                pubnub.JsonPluggableLibrary.SerializeToJsonString(createUserResult.Result);
+                if (userId == createUserResult.Result.Id)
+                {
+                    receivedMessage = true;
+                }
+            }
+            #endregion
+
+            if (receivedMessage)
+            {
+                receivedMessage = false;
+                #region "UpdateUser"
+                System.Diagnostics.Debug.WriteLine("pubnub.UpdateUser() STARTED");
+#if NET40
+                PNResult<PNUpdateUserResult> updateUserResult = Task.Factory.StartNew(async () => await pubnub.UpdateUser().Id(userId).Name("pandu-ut-un-upd")
+                    .ProfileUrl("pandu-sample-profile-url").ExternalId("pandu-sample-ext-id")
+                    .Email("test@test.com")
+                    .CustomObject(new Dictionary<string, object>() { { "color", "red" } })
+                        .ExecuteAsync()).Result.Result;
+#else
+                PNResult<PNUpdateUserResult> updateUserResult = await pubnub.UpdateUser().Id(userId).Name("pandu-ut-un-upd")
+                    .ProfileUrl("pandu-sample-profile-url").ExternalId("pandu-sample-ext-id")
+                    .Email("test@test.com")
+                    .CustomObject(new Dictionary<string, object>() { { "color", "red" } })
+                        .ExecuteAsync();
+#endif
+                if (updateUserResult.Result != null && updateUserResult.Status.StatusCode == 200 && !updateUserResult.Status.Error)
+                {
+                    pubnub.JsonPluggableLibrary.SerializeToJsonString(updateUserResult.Result);
+                    if (userId == updateUserResult.Result.Id)
+                    {
+                        receivedMessage = true;
+                    }
+                }
+                #endregion
+            }
+
+            if (!receivedDeleteEvent)
+            {
+                System.Diagnostics.Debug.WriteLine("pubnub.DeleteUser() 2 STARTED");
+#if NET40
+                Task.Factory.StartNew(async () => await pubnub.DeleteUser().Id(userId).ExecuteAsync());
+#else
+                await pubnub.DeleteUser().Id(userId).ExecuteAsync();
+#endif
+            }
+
+            Thread.Sleep(2000);
+
+            pubnub.Unsubscribe<string>().Channels(new string[] { userId }).Execute();
+            pubnub.RemoveListener(eventListener);
+
+            Assert.IsTrue(receivedDeleteEvent && receivedUpdateEvent, "User events Failed");
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+
+        }
     }
 }

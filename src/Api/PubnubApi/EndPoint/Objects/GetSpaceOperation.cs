@@ -86,6 +86,11 @@ namespace PubnubApi.EndPoint
 #endif
         }
 
+        public async Task<PNResult<PNGetSpaceResult>> ExecuteAsync()
+        {
+            return await GetSingleSpace(this.spcId, this.includeCustom, this.queryParam).ConfigureAwait(false);
+        }
+
         internal void Retry()
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
@@ -123,17 +128,51 @@ namespace PubnubApi.EndPoint
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;
 
-            string json = "";
-
             requestState.UsePostMethod = false;
-            json = UrlProcessRequest<PNGetSpaceResult>(request, requestState, false);
-
-            if (!string.IsNullOrEmpty(json))
+            UrlProcessRequest(request, requestState, false).ContinueWith(r =>
             {
-                List<object> result = ProcessJsonResponse<PNGetSpaceResult>(requestState, json);
-                ProcessResponseCallbacks(result, requestState);
-            }
+                string json = r.Result.Item1;
+                if (!string.IsNullOrEmpty(json))
+                {
+                    List<object> result = ProcessJsonResponse(requestState, json);
+                    ProcessResponseCallbacks(result, requestState);
+                }
+            }, TaskContinuationOptions.ExecuteSynchronously).Wait();
         }
 
+        private async Task<PNResult<PNGetSpaceResult>> GetSingleSpace(string spaceId, bool includeCustom, Dictionary<string, object> externalQueryParam)
+        {
+            if (string.IsNullOrEmpty(spaceId))
+            {
+                throw new ArgumentException("Missing spaceId");
+            }
+            PNResult<PNGetSpaceResult> ret = new PNResult<PNGetSpaceResult>();
+
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            Uri request = urlBuilder.BuildGetSingleSpaceRequest("GET", "", spaceId, includeCustom, externalQueryParam);
+
+            RequestState<PNGetSpaceResult> requestState = new RequestState<PNGetSpaceResult>();
+            requestState.ResponseType = PNOperationType.PNGetSpaceOperation;
+            requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
+
+            requestState.UsePostMethod = false;
+            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false).ConfigureAwait(false);
+            ret.Status = JsonAndStatusTuple.Item2;
+            string json = JsonAndStatusTuple.Item1;
+            if (!string.IsNullOrEmpty(json))
+            {
+                List<object> resultList = ProcessJsonResponse(requestState, json);
+                ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+                PNGetSpaceResult responseResult = responseBuilder.JsonToObject<PNGetSpaceResult>(resultList, true);
+                if (responseResult != null)
+                {
+                    ret.Result = responseResult;
+                }
+            }
+
+            return ret;
+        }
     }
 }

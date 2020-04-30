@@ -60,6 +60,11 @@ namespace PubnubApi.EndPoint
 #endif
         }
 
+        public async Task<PNResult<PNTimeResult>> ExecuteAsync()
+        {
+            return await Time(this.queryParam).ConfigureAwait(false);
+        }
+
         internal void Retry()
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
@@ -89,12 +94,49 @@ namespace PubnubApi.EndPoint
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;
 
-            string json = UrlProcessRequest<PNTimeResult>(request, requestState, false);
+            UrlProcessRequest(request, requestState, false).ContinueWith(r => 
+            {
+                string json = r.Result.Item1;
+                if (!string.IsNullOrEmpty(json))
+                {
+                    List<object> result = ProcessJsonResponse(requestState, json);
+                    ProcessResponseCallbacks(result, requestState);
+                }
+            }, TaskContinuationOptions.ExecuteSynchronously).Wait();
+        }
+
+        internal async Task<PNResult<PNTimeResult>> Time(Dictionary<string, object> externalQueryParam)
+        {
+            PNResult<PNTimeResult> ret = new PNResult<PNTimeResult>();
+
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, null);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            Uri request = urlBuilder.BuildTimeRequest("GET", "", externalQueryParam);
+
+            RequestState<PNTimeResult> requestState = new RequestState<PNTimeResult>();
+            requestState.Channels = null;
+            requestState.ResponseType = PNOperationType.PNTimeOperation;
+            requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
+
+            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false).ConfigureAwait(false);
+            ret.Status = JsonAndStatusTuple.Item2;
+            string json = JsonAndStatusTuple.Item1;
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = ProcessJsonResponse<PNTimeResult>(requestState, json);
-                ProcessResponseCallbacks(result, requestState);
+                List<object> resultList = ProcessJsonResponse<PNTimeResult>(requestState, json);
+                if (resultList != null && resultList.Count > 0)
+                {
+                    ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+                    PNTimeResult responseResult = responseBuilder.JsonToObject<PNTimeResult>(resultList, true);
+                    if (responseResult != null)
+                    {
+                        ret.Result = responseResult;
+                    }
+                }
             }
+
+            return ret;
         }
 
         internal void CurrentPubnubInstance(Pubnub instance)

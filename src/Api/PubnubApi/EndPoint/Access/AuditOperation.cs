@@ -80,6 +80,12 @@ namespace PubnubApi.EndPoint
 #endif
         }
 
+
+        public async Task<PNResult<PNAccessManagerAuditResult>> ExecuteAsync()
+        {
+            return await AuditAccess(this.channelName, this.channelGroupName, this.authenticationKeys, this.queryParam).ConfigureAwait(false);
+        }
+
         internal void Retry()
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
@@ -123,12 +129,69 @@ namespace PubnubApi.EndPoint
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;
 
-            string json = UrlProcessRequest<PNAccessManagerAuditResult>(request, requestState, false);
+            UrlProcessRequest(request, requestState, false).ContinueWith(r =>
+            {
+                string json = r.Result.Item1;
+                if (!string.IsNullOrEmpty(json))
+                {
+                    List<object> result = ProcessJsonResponse(requestState, json);
+                    ProcessResponseCallbacks(result, requestState);
+                }
+
+            }, TaskContinuationOptions.ExecuteSynchronously).Wait();
+            
+        }
+
+        internal async Task<PNResult<PNAccessManagerAuditResult>> AuditAccess(string channel, string channelGroup, string[] authKeys, Dictionary<string, object> externalQueryParam)
+        {
+            if (string.IsNullOrEmpty(config.SecretKey) || string.IsNullOrEmpty(config.SecretKey.Trim()) || config.SecretKey.Length <= 0)
+            {
+                throw new MissingMemberException("Invalid secret key");
+            }
+
+            PNResult<PNAccessManagerAuditResult> ret = new PNResult<PNAccessManagerAuditResult>();
+
+            string authKeysCommaDelimited = (authKeys != null && authKeys.Length > 0) ? string.Join(",", authKeys.OrderBy(x => x).ToArray()) : "";
+
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, null);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            Uri request = urlBuilder.BuildAuditAccessRequest("GET", "", channel, channelGroup, authKeysCommaDelimited, externalQueryParam);
+
+            RequestState<PNAccessManagerAuditResult> requestState = new RequestState<PNAccessManagerAuditResult>();
+            if (!string.IsNullOrEmpty(channel))
+            {
+                requestState.Channels = new[] { channel };
+            }
+            if (!string.IsNullOrEmpty(channelGroup))
+            {
+                requestState.ChannelGroups = new[] { channelGroup };
+            }
+            requestState.ResponseType = PNOperationType.PNAccessManagerAudit;
+            requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
+
+            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false).ConfigureAwait(false);
+            ret.Status = JsonAndStatusTuple.Item2;
+            string json = JsonAndStatusTuple.Item1;
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = ProcessJsonResponse<PNAccessManagerAuditResult>(requestState, json);
-                ProcessResponseCallbacks(result, requestState);
+                List<object> result = ProcessJsonResponse(requestState, json);
+                if (result != null)
+                {
+                    List<object> resultList = ProcessJsonResponse(requestState, json);
+                    if (resultList != null && resultList.Count > 0)
+                    {
+                        ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+                        PNAccessManagerAuditResult responseResult = responseBuilder.JsonToObject<PNAccessManagerAuditResult>(resultList, true);
+                        if (responseResult != null)
+                        {
+                            ret.Result = responseResult;
+                        }
+                    }
+                }
             }
+
+            return ret;
         }
 
         internal void CurrentPubnubInstance(Pubnub instance)

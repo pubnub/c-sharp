@@ -9,7 +9,7 @@ namespace PubnubApi
     {
         internal static PNCreateSpaceResult GetObject(List<object> listObject)
         {
-            Dictionary<string, object> createSpaceDicObj = JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[1]);
+            Dictionary<string, object> createSpaceDicObj = (listObject != null && listObject.Count >= 2) ? JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[1]) : null;
             PNCreateSpaceResult result = null;
             if (createSpaceDicObj != null && createSpaceDicObj.ContainsKey("data"))
             {

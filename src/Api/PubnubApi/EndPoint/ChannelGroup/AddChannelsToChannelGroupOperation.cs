@@ -74,6 +74,11 @@ namespace PubnubApi.EndPoint
 #endif
         }
 
+        public async Task<PNResult<PNChannelGroupsAddChannelResult>> ExecuteAsync()
+        {
+            return await AddChannelsToChannelGroup(this.channelNames, "", this.channelGroupName, this.queryParam).ConfigureAwait(false);
+        }
+
         internal void Retry()
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
@@ -122,12 +127,64 @@ namespace PubnubApi.EndPoint
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;
 
-            string json = UrlProcessRequest<PNChannelGroupsAddChannelResult>(request, requestState, false);
+            UrlProcessRequest(request, requestState, false).ContinueWith(r =>
+            {
+                string json = r.Result.Item1;
+                if (!string.IsNullOrEmpty(json))
+                {
+                    List<object> result = ProcessJsonResponse(requestState, json);
+                    ProcessResponseCallbacks(result, requestState);
+                }
+            }, TaskContinuationOptions.ExecuteSynchronously).Wait();
+        }
+
+        internal async Task<PNResult<PNChannelGroupsAddChannelResult>> AddChannelsToChannelGroup(string[] channels, string nameSpace, string groupName, Dictionary<string, object> externalQueryParam)
+        {
+            if (channels == null || channels.Length == 0)
+            {
+                throw new ArgumentException("Missing channel(s)");
+            }
+
+            if (nameSpace == null)
+            {
+                throw new ArgumentException("Missing nameSpace");
+            }
+
+            if (string.IsNullOrEmpty(groupName) || groupName.Trim().Length == 0)
+            {
+                throw new ArgumentException("Missing groupName");
+            }
+            PNResult<PNChannelGroupsAddChannelResult> ret = new PNResult<PNChannelGroupsAddChannelResult>();
+
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pnTelemetryMgr, pubnubTokenMgr);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+
+            string channelsCommaDelimited = string.Join(",", channels.OrderBy(x => x).ToArray());
+
+            Uri request = urlBuilder.BuildAddChannelsToChannelGroupRequest("GET", "", channelsCommaDelimited, nameSpace, groupName, externalQueryParam);
+
+            RequestState<PNChannelGroupsAddChannelResult> requestState = new RequestState<PNChannelGroupsAddChannelResult>();
+            requestState.ResponseType = PNOperationType.PNAddChannelsToGroupOperation;
+            requestState.Channels = new string[] { };
+            requestState.ChannelGroups = new[] { groupName };
+            requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
+
+            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false).ConfigureAwait(false);
+            ret.Status = JsonAndStatusTuple.Item2;
+            string json = JsonAndStatusTuple.Item1;
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = ProcessJsonResponse<PNChannelGroupsAddChannelResult>(requestState, json);
-                ProcessResponseCallbacks(result, requestState);
+                List<object> resultList = ProcessJsonResponse(requestState, json);
+                ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+                PNChannelGroupsAddChannelResult responseResult = responseBuilder.JsonToObject<PNChannelGroupsAddChannelResult>(resultList, true);
+                if (responseResult != null)
+                {
+                    ret.Result = responseResult;
+                }
             }
+
+            return ret;
         }
 
         internal void CurrentPubnubInstance(Pubnub instance)

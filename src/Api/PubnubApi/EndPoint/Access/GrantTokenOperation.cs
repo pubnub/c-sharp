@@ -158,6 +158,11 @@ namespace PubnubApi.EndPoint
 #endif
         }
 
+        public async Task<PNResult<PNAccessManagerTokenResult>> ExecuteAsync()
+        {
+            return await GrantAccess(this.pubnubChannelNames, this.pubnubChannelGroupNames, this.pubnubUsers, this.pubnubSpaces, this.pubnubChannelNamesPattern, this.pubnubChannelGroupNamesPattern, this.pubnubUsersPattern, this.pubnubSpacesPattern, this.grantTTL, this.grantMeta, this.queryParam).ConfigureAwait(false);
+        }
+
         internal void Retry()
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
@@ -193,12 +198,110 @@ namespace PubnubApi.EndPoint
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;
-
-
             requestState.UsePostMethod = true;
 
+            string postMessage = GetGrantAccessPostMessage(channelsPermission, channelGroupsPermission, usersPermission, spacesPermission, channelsPatternPermission, channelGroupsPatternPermission, usersPatternPermission, spacesPatternPermission, ttl, meta);
+
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            Uri request = urlBuilder.BuildGrantV3AccessRequest("POST", postMessage, externalQueryParam);
+
+            UrlProcessRequest(request, requestState, false, postMessage).ContinueWith(r =>
+            {
+                string json = r.Result.Item1;
+                if (!string.IsNullOrEmpty(json))
+                {
+                    List<object> result = ProcessJsonResponse(requestState, json);
+                    ProcessResponseCallbacks(result, requestState);
+                    if (result != null && result.Count > 0)
+                    {
+                        Dictionary<string, object> dicResult = jsonLibrary.ConvertToDictionaryObject(result[0]);
+                        if (dicResult != null && dicResult.Count > 0 && dicResult.ContainsKey("status") && dicResult["status"].ToString() == "200")
+                        {
+
+                            TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
+                            EndPoint.GrantOperation pamv2GrantOperation = new GrantOperation(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, PubnubInstance);
+                            pamv2GrantOperation
+                                .Channels(usersPermission.Keys.Concat(spacesPermission.Keys).ToArray())
+                                .Read(true)
+                                .TTL(ttl)
+                                .AuthKeys(new[] { this.pamv2AuthenticationKey })
+                                .Execute(new PNAccessManagerGrantResultExt((pamv2Result, pamv2Status) =>
+                                {
+                                    if (pamv2Result != null && !pamv2Status.Error)
+                                    {
+                                        tcs.SetResult(true);
+                                    }
+                                    else
+                                    {
+                                        tcs.SetResult(false);
+                                    }
+                                }));
+                            tcs.Task.Wait(config.NonSubscribeRequestTimeout * 1000);
+                        }
+                    }
+                }
+            }, TaskContinuationOptions.ExecuteSynchronously).Wait();
+        }
+
+        internal async Task<PNResult<PNAccessManagerTokenResult>> GrantAccess(Dictionary<string, PNResourcePermission> channelsPermission, Dictionary<string, PNResourcePermission> channelGroupsPermission, Dictionary<string, PNResourcePermission> usersPermission, Dictionary<string, PNResourcePermission> spacesPermission, Dictionary<string, PNResourcePermission> channelsPatternPermission, Dictionary<string, PNResourcePermission> channelGroupsPatternPermission, Dictionary<string, PNResourcePermission> usersPatternPermission, Dictionary<string, PNResourcePermission> spacesPatternPermission, long ttl, Dictionary<string, object> meta, Dictionary<string, object> externalQueryParam)
+        {
+            if (string.IsNullOrEmpty(config.SecretKey) || string.IsNullOrEmpty(config.SecretKey.Trim()) || config.SecretKey.Length <= 0)
+            {
+                throw new MissingMemberException("Invalid secret key");
+            }
+
+            if (this.grantTTL <= 0)
+            {
+                throw new MissingMemberException("Invalid TTL value");
+            }
+            PNResult<PNAccessManagerTokenResult> ret = new PNResult<PNAccessManagerTokenResult>();
+
+            RequestState<PNAccessManagerTokenResult> requestState = new RequestState<PNAccessManagerTokenResult>();
+            requestState.Channels = channelsPermission.Keys.ToArray();
+            requestState.ChannelGroups = channelGroupsPermission.Keys.ToArray();
+            requestState.ResponseType = PNOperationType.PNAccessManagerGrantToken;
+            requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
+            requestState.UsePostMethod = true;
+
+            string postMessage = GetGrantAccessPostMessage(channelsPermission, channelGroupsPermission, usersPermission, spacesPermission, channelsPatternPermission, channelGroupsPatternPermission, usersPatternPermission, spacesPatternPermission, ttl, meta);
+
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            Uri request = urlBuilder.BuildGrantV3AccessRequest("POST", postMessage, externalQueryParam);
+
+            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false, postMessage).ConfigureAwait(false);
+            ret.Status = JsonAndStatusTuple.Item2;
+            string json = JsonAndStatusTuple.Item1;
+            if (!string.IsNullOrEmpty(json))
+            {
+                List<object> resultList = ProcessJsonResponse(requestState, json);
+                ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+                PNAccessManagerTokenResult responseResult = responseBuilder.JsonToObject<PNAccessManagerTokenResult>(resultList, true);
+                if (responseResult != null)
+                {
+                    ret.Result = responseResult;
+                    Dictionary<string, object> dicResult = jsonLibrary.ConvertToDictionaryObject(resultList[0]);
+                    if (dicResult != null && dicResult.Count > 0 && dicResult.ContainsKey("status") && dicResult["status"].ToString() == "200")
+                    {
+                        EndPoint.GrantOperation pamv2GrantOperation = new GrantOperation(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, PubnubInstance);
+                        await pamv2GrantOperation
+                            .Channels(usersPermission.Keys.Concat(spacesPermission.Keys).ToArray())
+                            .Read(true)
+                            .TTL(ttl)
+                            .AuthKeys(new[] { this.pamv2AuthenticationKey })
+                            .ExecuteAsync().ConfigureAwait(false);
+                    }
+                }
+            }
+            return ret;
+        }
+
+        private string GetGrantAccessPostMessage(Dictionary<string, PNResourcePermission> channelsPermission, Dictionary<string, PNResourcePermission> channelGroupsPermission, Dictionary<string, PNResourcePermission> usersPermission, Dictionary<string, PNResourcePermission> spacesPermission, Dictionary<string, PNResourcePermission> channelsPatternPermission, Dictionary<string, PNResourcePermission> channelGroupsPatternPermission, Dictionary<string, PNResourcePermission> usersPatternPermission, Dictionary<string, PNResourcePermission> spacesPatternPermission, long ttl, Dictionary<string, object> meta)
+        {
             Dictionary<string, int> chBitmaskPermDic = new Dictionary<string, int>();
-            foreach(KeyValuePair<string, PNResourcePermission> kvp in channelsPermission)
+            foreach (KeyValuePair<string, PNResourcePermission> kvp in channelsPermission)
             {
                 PNResourcePermission perm = kvp.Value;
                 int bitMaskPermissionValue = 0;
@@ -318,46 +421,8 @@ namespace PubnubApi.EndPoint
             messageEnvelope.Add("permissions", permissionDic);
             string postMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildGrantV3AccessRequest("POST", postMessage, externalQueryParam);
-
-            string json = UrlProcessRequest<PNAccessManagerTokenResult>(request, requestState, false, postMessage);
-
-            if (!string.IsNullOrEmpty(json))
-            {
-                List<object> result = ProcessJsonResponse<PNAccessManagerTokenResult>(requestState, json);
-                ProcessResponseCallbacks(result, requestState);
-                if (result != null && result.Count > 0)
-                {
-                    Dictionary<string, object> dicResult = jsonLibrary.ConvertToDictionaryObject(result[0]);
-                    if (dicResult != null && dicResult.Count > 0 && dicResult.ContainsKey("status") && dicResult["status"].ToString() == "200")
-                    {
-
-                        TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
-                        EndPoint.GrantOperation pamv2GrantOperation = new GrantOperation(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, PubnubInstance);
-                        pamv2GrantOperation
-                            .Channels(usersPermission.Keys.Concat(spacesPermission.Keys).ToArray())
-                            .Read(true)
-                            .TTL(ttl)
-                            .AuthKeys(new [] { this.pamv2AuthenticationKey })
-                            .Execute(new PNAccessManagerGrantResultExt((pamv2Result, pamv2Status) => 
-                            {
-                                if (pamv2Result != null && !pamv2Status.Error)
-                                {
-                                    tcs.SetResult(true);
-                                }
-                                else
-                                {
-                                    tcs.SetResult(false);
-                                }
-                            }));
-                        tcs.Task.Wait(config.NonSubscribeRequestTimeout * 1000);
-                    }
-                }
-            }
+            return postMessage;
         }
-
         private static int CalculateGrantBitMaskValue(bool read, bool write, bool manage, bool delete, bool create)
         {
             int result = 0;

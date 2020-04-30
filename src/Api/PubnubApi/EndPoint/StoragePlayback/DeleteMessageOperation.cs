@@ -104,6 +104,16 @@ namespace PubnubApi.EndPoint
 #endif
         }
 
+        public async Task<PNResult<PNDeleteMessageResult>> ExecuteAsync()
+        {
+            if (string.IsNullOrEmpty(config.SubscribeKey) || config.SubscribeKey.Trim().Length == 0)
+            {
+                throw new MissingMemberException("Invalid Subscribe Key");
+            }
+
+            return await DeleteMessage(this.channelName, this.startTimetoken, this.endTimetoken, this.queryParam).ConfigureAwait(false);
+        }
+
         internal void Retry()
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
@@ -138,13 +148,50 @@ namespace PubnubApi.EndPoint
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;
 
-            string json = UrlProcessRequest<PNDeleteMessageResult>(request, requestState, false);
-            if (!string.IsNullOrEmpty(json))
+            UrlProcessRequest(request, requestState, false).ContinueWith(r =>
             {
-                List<object> result = ProcessJsonResponse<PNDeleteMessageResult>(requestState, json);
-                ProcessResponseCallbacks(result, requestState);
-            }
+                string json = r.Result.Item1;
+                if (!string.IsNullOrEmpty(json))
+                {
+                    List<object> result = ProcessJsonResponse(requestState, json);
+                    ProcessResponseCallbacks(result, requestState);
+                }
+            }, TaskContinuationOptions.ExecuteSynchronously).Wait();
         }
 
+        internal async Task<PNResult<PNDeleteMessageResult>> DeleteMessage(string channel, long start, long end, Dictionary<string, object> externalQueryParam)
+        {
+            if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()))
+            {
+                throw new ArgumentException("Missing Channel");
+            }
+            PNResult<PNDeleteMessageResult> ret = new PNResult<PNDeleteMessageResult>();
+
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            Uri request = urlBuilder.BuildDeleteMessageRequest("DELETE", "", channel, start, end, externalQueryParam);
+
+            RequestState<PNDeleteMessageResult> requestState = new RequestState<PNDeleteMessageResult>();
+            requestState.Channels = new[] { channel };
+            requestState.ResponseType = PNOperationType.PNDeleteMessageOperation;
+            requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
+
+            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false).ConfigureAwait(false);
+            ret.Status = JsonAndStatusTuple.Item2;
+            string json = JsonAndStatusTuple.Item1;
+            if (!string.IsNullOrEmpty(json))
+            {
+                List<object> resultList = ProcessJsonResponse(requestState, json);
+                ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+                PNDeleteMessageResult responseResult = responseBuilder.JsonToObject<PNDeleteMessageResult>(resultList, true);
+                if (responseResult != null)
+                {
+                    ret.Result = responseResult;
+                }
+            }
+
+            return ret;
+        }
     }
 }

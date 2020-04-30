@@ -14,10 +14,7 @@ namespace PubnubApi
             Dictionary<string, object> msgActionEventDicObj = JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[0]);
             if (msgActionEventDicObj != null)
             {
-                if (result == null)
-                {
-                    result = new PNMessageActionEventResult();
-                }
+                result = new PNMessageActionEventResult();
 
                 if (msgActionEventDicObj.ContainsKey("event") && msgActionEventDicObj["event"] != null)
                 {

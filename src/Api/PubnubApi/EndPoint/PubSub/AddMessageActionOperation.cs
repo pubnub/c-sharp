@@ -107,6 +107,17 @@ namespace PubnubApi.EndPoint
 #endif
         }
 
+        public async Task<PNResult<PNAddMessageActionResult>> ExecuteAsync()
+        {
+            if (config == null || string.IsNullOrEmpty(config.SubscribeKey) || config.SubscribeKey.Trim().Length <= 0)
+            {
+                throw new MissingMemberException("subscribe key is required");
+            }
+
+            return await Publish(this.msgActionChannelName, this.messageTimetoken, this.addMessageAction, this.queryParam).ConfigureAwait(false);
+        }
+
+
         internal void Retry()
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
@@ -162,16 +173,69 @@ namespace PubnubApi.EndPoint
             requestState.EndPointOperation = this;
             requestState.UsePostMethod = true;
 
-            string json = UrlProcessRequest(request, requestState, false, postMessage);
-
-            if (!string.IsNullOrEmpty(json))
+            UrlProcessRequest(request, requestState, false, postMessage).ContinueWith(r =>
             {
-                List<object> result = ProcessJsonResponse(requestState, json);
+                string json = r.Result.Item1;
+                if (!string.IsNullOrEmpty(json))
+                {
+                    List<object> result = ProcessJsonResponse(requestState, json);
 
-                ProcessResponseCallbacks(result, requestState);
+                    ProcessResponseCallbacks(result, requestState);
+                }
+                CleanUp();
+            }, TaskContinuationOptions.ExecuteSynchronously).Wait();
+        }
+
+        private async Task<PNResult<PNAddMessageActionResult>> Publish(string channel, long messageTimetoken, PNMessageAction messageAction, Dictionary<string, object> externalQueryParam)
+        {
+            PNResult<PNAddMessageActionResult> ret = new PNResult<PNAddMessageActionResult>();
+
+            if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()) || messageAction == null)
+            {
+                PNStatus status = new PNStatus();
+                status.Error = true;
+                status.ErrorData = new PNErrorData("Missing Channel or MessageAction", new ArgumentException("Missing Channel or MessageAction"));
+                ret.Status = status;
+                return ret;
             }
 
-            CleanUp();
+            if (string.IsNullOrEmpty(config.SubscribeKey) || string.IsNullOrEmpty(config.SubscribeKey.Trim()) || config.SubscribeKey.Length <= 0)
+            {
+                PNStatus status = new PNStatus();
+                status.Error = true;
+                status.ErrorData = new PNErrorData("Invalid subscribe key", new MissingMemberException("Invalid publish key"));
+                ret.Status = status;
+                return ret;
+            }
+
+            string requestMethodName = "POST";
+            string postMessage = jsonLibrary.SerializeToJsonString(messageAction);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            Uri request = urlBuilder.BuildAddMessageActionRequest(requestMethodName, postMessage, channel, messageTimetoken, externalQueryParam);
+
+            RequestState<PNAddMessageActionResult> requestState = new RequestState<PNAddMessageActionResult>();
+            requestState.Channels = new[] { channel };
+            requestState.ResponseType = PNOperationType.PNAddMessageActionOperation;
+            requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
+            requestState.UsePostMethod = true;
+
+            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false, postMessage).ConfigureAwait(false);
+            ret.Status = JsonAndStatusTuple.Item2;
+            string json = JsonAndStatusTuple.Item1;
+            if (!string.IsNullOrEmpty(json))
+            {
+                List<object> resultList = ProcessJsonResponse(requestState, json);
+                ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+                PNAddMessageActionResult responseResult = responseBuilder.JsonToObject<PNAddMessageActionResult>(resultList, true);
+                if (responseResult != null)
+                {
+                    ret.Result = responseResult;
+                }
+            }
+
+            return ret;
         }
 
         private void CleanUp()

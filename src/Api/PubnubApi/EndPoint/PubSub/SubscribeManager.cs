@@ -75,7 +75,7 @@ namespace PubnubApi.EndPoint
                     }
                 }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 
-                if (type == PNOperationType.PNUnsubscribeOperation && !config.SupressLeaveEvents)
+                if (type == PNOperationType.PNUnsubscribeOperation && !config.SuppressLeaveEvents)
                 {
                     //just fire leave() event to REST API for safeguard
                     string channelsJsonState = BuildJsonUserState(currentChannels, currentChannelGroups, false);
@@ -89,10 +89,11 @@ namespace PubnubApi.EndPoint
                     requestState.ResponseType = PNOperationType.Leave;
                     requestState.Reconnect = false;
 
-                    UrlProcessRequest<T>(request, requestState, false);
-
-                    MultiChannelSubscribe[PubnubInstance.InstanceId].Clear();
-                    MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Clear();
+                    UrlProcessRequest<T>(request, requestState, false).ContinueWith(r => 
+                    {
+                        MultiChannelSubscribe[PubnubInstance.InstanceId].Clear();
+                        MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Clear();
+                    });
                 }
             }
 
@@ -249,7 +250,7 @@ namespace PubnubApi.EndPoint
                             requestState.ResponseType = PNOperationType.Leave;
                             requestState.Reconnect = false;
 
-                            UrlProcessRequest<T>(request, requestState, false);
+                            UrlProcessRequest<T>(request, requestState, false).ContinueWith(r => { }, TaskContinuationOptions.ExecuteSynchronously).Wait(); 
                         }
                     }
 
@@ -668,7 +669,11 @@ namespace PubnubApi.EndPoint
                 pubnubRequestState.Timetoken = Convert.ToInt64(timetoken.ToString());
 
                 // Wait for message
-                string json = UrlProcessRequest<T>(request, pubnubRequestState, false);
+                string json = "";
+                UrlProcessRequest<T>(request, pubnubRequestState, false).ContinueWith(r =>
+                {
+                    json = r.Result.Item1;
+                }, TaskContinuationOptions.ExecuteSynchronously).Wait();
                 if (!string.IsNullOrEmpty(json))
                 {
                     string subscribedChannels = (MultiChannelSubscribe.ContainsKey(PubnubInstance.InstanceId) && MultiChannelSubscribe[PubnubInstance.InstanceId].Count > 0) ? MultiChannelSubscribe[PubnubInstance.InstanceId].Keys.OrderBy(x=>x).Aggregate((x, y) => x + "," + y) : "";
@@ -1385,12 +1390,15 @@ namespace PubnubApi.EndPoint
                         requestState.Reconnect = false;
                         requestState.Response = null;
 
-                        string json = UrlProcessRequest<PNHeartbeatResult>(request, requestState, false);
-                        if (!string.IsNullOrEmpty(json))
+                        UrlProcessRequest(request, requestState, false).ContinueWith(r =>
                         {
-                            List<object> result = ProcessJsonResponse<PNHeartbeatResult>(requestState, json);
-                            ProcessResponseCallbacks(result, requestState);
-                        }
+                            string json = r.Result.Item1;
+                            if (!string.IsNullOrEmpty(json))
+                            {
+                                List<object> result = ProcessJsonResponse(requestState, json);
+                                ProcessResponseCallbacks(result, requestState);
+                            }
+                        }, TaskContinuationOptions.ExecuteSynchronously).Wait();
                     }
                 }
                 else

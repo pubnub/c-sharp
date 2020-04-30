@@ -9,6 +9,7 @@ using System.Collections;
 using PubnubApi;
 using MockServer;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace PubNubMessaging.Tests
 {
@@ -534,6 +535,133 @@ namespace PubNubMessaging.Tests
             pubnub = null;
             Assert.IsTrue(receivedHereNowMessage, "here_now message not received");
         }
+
+        [Test]
+#if NET40
+        public static void IfWithAsyncHereNowIsCalledThenItShouldReturnInfo()
+#else
+        public static async Task IfWithAsyncHereNowIsCalledThenItShouldReturnInfo()
+#endif
+        {
+            server.ClearRequests();
+
+            bool receivedHereNowMessage = false;
+            bool receivedErrorMessage = false;
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+            server.RunOnHttps(false);
+
+            ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
+            SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
+                (o, m) => { Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                (o, p) => {
+                    subscribeManualEvent.Set();
+                },
+                (o, s) => {
+                    Debug.WriteLine(string.Format("{0} {1} {2}", s.Operation, s.Category, s.StatusCode));
+                    if (s.StatusCode != 200 || s.Error)
+                    {
+                        receivedErrorMessage = true;
+                        if (s.ErrorData != null) { Debug.WriteLine(s.ErrorData.Information); }
+                    }
+                    subscribeManualEvent.Set();
+                });
+            pubnub = createPubNubInstance(config);
+            if (!pubnub.AddListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
+            }
+
+            string channel = "hello_my_channel";
+            manualResetEventWaitTimeout = 310 * 1000;
+
+            string expected = "{\"t\":{\"t\":\"14828455563482572\",\"r\":7},\"m\":[]}";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, channel))
+                    .WithParameter("heartbeat", "300")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("tt", "0")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            expected = "{}";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, channel))
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            pubnub.Subscribe<string>().Channels(new[] { channel }).Execute();
+            subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            if (!receivedErrorMessage)
+            {
+                if (!PubnubCommon.EnableStubTest) { Thread.Sleep(2000); }
+                else Thread.Sleep(200);
+
+                expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"Presence\", \"uuids\": [\"mytestuuid\"], \"occupancy\": 1}";
+
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+#if NET40
+                PNResult<PNHereNowResult> r = Task.Factory.StartNew(async () => await pubnub.HereNow().Channels(new[] { channel }).ExecuteAsync()).Result.Result;
+#else
+                PNResult<PNHereNowResult> r = await pubnub.HereNow().Channels(new[] { channel }).ExecuteAsync();
+#endif
+                if (r.Result != null)
+                {
+                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                    receivedHereNowMessage = true;
+                }
+
+                expected = "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}";
+
+                server.AddRequest(new Request()
+                        .WithMethod("GET")
+                        .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/leave", PubnubCommon.SubscribeKey, channel))
+                        .WithResponse(expected)
+                        .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+                pubnub.Unsubscribe<string>().Channels(new[] { channel }).Execute();
+
+                if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
+                else Thread.Sleep(100);
+            }
+
+
+            if (!pubnub.RemoveListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: RemoveListener failed");
+            }
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+            Assert.IsTrue(receivedHereNowMessage, "here_now message not received");
+        }
+
 
         [Test]
         public static void IfHereNowIsCalledThenItShouldReturnInfoCipher()
@@ -1945,6 +2073,132 @@ namespace PubNubMessaging.Tests
             pubnub = null;
             Assert.IsTrue(receivedWhereNowMessage, "where_now message not received");
         }
+
+        [Test]
+#if NET40
+        public static void IfWithAsyncWhereNowIsCalledThenItShouldReturnInfo()
+#else
+        public static async Task IfWithAsyncWhereNowIsCalledThenItShouldReturnInfo()
+#endif
+        {
+            server.ClearRequests();
+
+            bool receivedWhereNowMessage = false;
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+
+            server.RunOnHttps(false);
+
+            ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
+            SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
+                (o, m) => { Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                (o, p) => {
+                    subscribeManualEvent.Set();
+                },
+                (o, s) => {
+                    Debug.WriteLine(string.Format("{0} {1} {2}", s.Operation, s.Category, s.StatusCode));
+                    if (s.StatusCode != 200 || s.Error)
+                    {
+                        if (s.ErrorData != null) { Debug.WriteLine(s.ErrorData.Information); }
+                    }
+                    subscribeManualEvent.Set();
+                });
+            pubnub = createPubNubInstance(config);
+            if (!pubnub.AddListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
+            }
+
+            string channel = "hello_my_channel";
+            manualResetEventWaitTimeout = 310 * 1000;
+
+            string expected = "{\"t\":{\"t\":\"14827658395446362\",\"r\":7},\"m\":[]}";
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, channel))
+                    .WithParameter("heartbeat", "300")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("tt", "0")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            expected = "{}";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, channel))
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+
+            pubnub.Subscribe<string>().Channels(new[] { channel }).Execute();
+            subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            if (!PubnubCommon.EnableStubTest) Thread.Sleep(2000);
+            else Thread.Sleep(200);
+
+            expected = "{\"status\": 200, \"message\": \"OK\", \"payload\": {\"channels\": {}, \"total_channels\": 0, \"total_occupancy\": 0}, \"service\": \"Presence\"}";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/presence/sub_key/{0}/uuid/{1}", PubnubCommon.SubscribeKey, config.Uuid))
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+#if NET40
+            PNResult<PNWhereNowResult> r = Task.Factory.StartNew(async () => await pubnub.WhereNow().Uuid(config.Uuid).ExecuteAsync()).Result.Result;
+#else
+            PNResult<PNWhereNowResult> r = await pubnub.WhereNow().Uuid(config.Uuid).ExecuteAsync();
+#endif
+            if (r.Result != null)
+            {
+                Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                receivedWhereNowMessage = true;
+            }
+
+            expected = "[[],\"14740704540745015\"]";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/leave", PubnubCommon.SubscribeKey, channel))
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            pubnub.Unsubscribe<string>().Channels(new[] { channel }).Execute();
+
+            if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
+            else Thread.Sleep(100);
+
+            if (!pubnub.RemoveListener(listenerSubCallack))
+            {
+                System.Diagnostics.Debug.WriteLine("ATTENTION: RemoveListener failed");
+            }
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+            Assert.IsTrue(receivedWhereNowMessage, "where_now message not received");
+        }
+
 
         [Test]
         public static void IfSetAndGetUserStateThenItShouldReturnInfo()

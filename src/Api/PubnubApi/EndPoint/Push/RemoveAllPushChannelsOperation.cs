@@ -97,6 +97,11 @@ namespace PubnubApi.EndPoint
 #endif
         }
 
+        public async Task<PNResult<PNPushRemoveAllChannelsResult>> ExecuteAsync()
+        {
+            return await RemoveAllChannelsForDevice(this.pubnubPushType, this.deviceTokenId, this.pushEnvironment, this.deviceTopic, this.queryParam).ConfigureAwait(false);
+        }
+
         internal void Retry()
         {
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
@@ -135,12 +140,54 @@ namespace PubnubApi.EndPoint
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;
 
-            string json = UrlProcessRequest<PNPushRemoveAllChannelsResult>(request, requestState, false);
+            UrlProcessRequest(request, requestState, false).ContinueWith(r =>
+            {
+                string json = r.Result.Item1;
+                if (!string.IsNullOrEmpty(json))
+                {
+                    List<object> result = ProcessJsonResponse<PNPushRemoveAllChannelsResult>(requestState, json);
+                    ProcessResponseCallbacks(result, requestState);
+                }
+            }, TaskContinuationOptions.ExecuteSynchronously).Wait();
+        }
+
+        internal async Task<PNResult<PNPushRemoveAllChannelsResult>> RemoveAllChannelsForDevice(PNPushType pushType, string pushToken, PushEnvironment environment, string deviceTopic, Dictionary<string, object> externalQueryParam)
+        {
+            if (pushToken == null)
+            {
+                throw new ArgumentException("Missing deviceId");
+            }
+
+            if (pushType == PNPushType.APNS2 && string.IsNullOrEmpty(deviceTopic))
+            {
+                throw new ArgumentException("Missing Topic");
+            }
+            PNResult<PNPushRemoveAllChannelsResult> ret = new PNResult<PNPushRemoveAllChannelsResult>();
+
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
+            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            Uri request = urlBuilder.BuildUnregisterDevicePushRequest("GET", "", pushType, pushToken, environment, deviceTopic, externalQueryParam);
+
+            RequestState<PNPushRemoveAllChannelsResult> requestState = new RequestState<PNPushRemoveAllChannelsResult>();
+            requestState.ResponseType = PNOperationType.PushUnregister;
+            requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
+
+            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false).ConfigureAwait(false);
+            ret.Status = JsonAndStatusTuple.Item2;
+            string json = JsonAndStatusTuple.Item1;
             if (!string.IsNullOrEmpty(json))
             {
-                List<object> result = ProcessJsonResponse<PNPushRemoveAllChannelsResult>(requestState, json);
-                ProcessResponseCallbacks(result, requestState);
+                List<object> resultList = ProcessJsonResponse(requestState, json);
+                ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+                PNPushRemoveAllChannelsResult responseResult = responseBuilder.JsonToObject<PNPushRemoveAllChannelsResult>(resultList, true);
+                if (responseResult != null)
+                {
+                    ret.Result = responseResult;
+                }
             }
+
+            return ret;
         }
 
         internal void CurrentPubnubInstance(Pubnub instance)

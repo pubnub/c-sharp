@@ -11,7 +11,7 @@ namespace PubnubApi
         {
             PNObjectApiEventResult result = null;
 
-            Dictionary<string, object> objectEventDicObj = JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[0]);
+            Dictionary<string, object> objectEventDicObj = (listObject != null && listObject.Count > 0) ? JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[0]) : null;
             if (objectEventDicObj != null)
             {
                 if (result == null)

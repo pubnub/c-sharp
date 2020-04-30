@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using MockServer;
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace PubNubMessaging.Tests
 {
@@ -160,6 +161,75 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void ThenWithAsyncChannel1Timetoken1ShouldReturnSuccess()
+#else
+        public static async Task ThenWithAsyncChannel1Timetoken1ShouldReturnSuccess()
+#endif
+        {
+            server.ClearRequests();
+
+            currentUnitTestCase = "ThenWithAsyncChannel1Timetoken1ShouldReturnSuccess";
+            receivedMessage = false;
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+                Secure = true
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+
+            pubnub = createPubNubInstance(config);
+
+            string expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(string.Format("/v1/channel-registration/sub-key/{0}/channel-group/{1}", PubnubCommon.SubscribeKey, channelGroupName))
+                    .WithParameter("add", channelName1)
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("signature", "yo21VoxIksrH3Iozeaz5Zw4BX18N3vU9PLa-zVxRXsU=")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            unittestManualEvent = new ManualResetEvent(false);
+
+#if NET40
+            PNResult<PNMessageCountResult> resp = Task.Factory.StartNew(async () => await pubnub.MessageCounts()
+                .Channels(new[] { channelName1 })
+                .ChannelsTimetoken(new long[] { 15505396580138884 })
+                .ExecuteAsync()).Result.Result;
+#else
+            PNResult<PNMessageCountResult> resp = await pubnub.MessageCounts()
+                .Channels(new[] { channelName1 })
+                .ChannelsTimetoken(new long[] { 15505396580138884 })
+                .ExecuteAsync();
+#endif
+            if (resp.Result != null && resp.Result.Channels != null)
+            {
+                receivedMessage = true;
+            }
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+            Assert.IsTrue(receivedMessage, "WhenMessageCountIsRequested -> ThenChannel1Timetoken1ShouldReturnSuccess failed.");
+
+        }
+
+        [Test]
         public static void ThenChannel2Timetoken2ShouldReturnSuccess()
         {
             server.ClearRequests();
@@ -220,6 +290,75 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedMessage, "WhenMessageCountIsRequested -> ThenChannel1Timetoken1ShouldReturnSuccess failed.");
+
+        }
+
+        [Test]
+#if NET40
+        public static void ThenWithAsyncChannel2Timetoken2ShouldReturnSuccess()
+#else
+        public static async Task ThenWithAsyncChannel2Timetoken2ShouldReturnSuccess()
+#endif
+        {
+            server.ClearRequests();
+
+            currentUnitTestCase = "ThenWithAsyncChannel2Timetoken2ShouldReturnSuccess";
+            receivedMessage = false;
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+                Secure = true
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+
+            pubnub = createPubNubInstance(config);
+
+            string expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}";
+
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(string.Format("/v1/channel-registration/sub-key/{0}/channel-group/{1}", PubnubCommon.SubscribeKey, channelGroupName))
+                    .WithParameter("add", channelName2)
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("timestamp", "1356998400")
+                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("signature", "yo21VoxIksrH3Iozeaz5Zw4BX18N3vU9PLa-zVxRXsU=")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            unittestManualEvent = new ManualResetEvent(false);
+
+#if NET40
+            PNResult<PNMessageCountResult> resp = Task.Factory.StartNew(async () => await pubnub.MessageCounts()
+                .Channels(new[] { channelName1, channelName2 })
+                .ChannelsTimetoken(new long[] { 15505396580138884, 15505396580138884 })
+                .ExecuteAsync()).Result.Result;
+#else
+            PNResult<PNMessageCountResult> resp = await pubnub.MessageCounts()
+                .Channels(new[] { channelName1, channelName2 })
+                .ChannelsTimetoken(new long[] { 15505396580138884, 15505396580138884 })
+                .ExecuteAsync();
+#endif
+            if (resp.Result != null && resp.Result.Channels != null)
+            {
+                receivedMessage = true;
+            }
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+            Assert.IsTrue(receivedMessage, "WhenMessageCountIsRequested -> ThenWithAsyncChannel2Timetoken2ShouldReturnSuccess failed.");
 
         }
     }
