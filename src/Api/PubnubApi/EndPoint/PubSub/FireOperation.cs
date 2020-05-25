@@ -75,6 +75,21 @@ namespace PubnubApi.EndPoint
 
         public void Execute(PNCallback<PNPublishResult> callback)
         {
+            if (string.IsNullOrEmpty(this.channelName) || string.IsNullOrEmpty(this.channelName.Trim()) || this.msg == null)
+            {
+                throw new ArgumentException("Missing Channel or Message");
+            }
+
+            if (string.IsNullOrEmpty(config.PublishKey) || string.IsNullOrEmpty(config.PublishKey.Trim()) || config.PublishKey.Length <= 0)
+            {
+                throw new MissingMemberException("Invalid publish key");
+            }
+
+            if (callback == null)
+            {
+                throw new ArgumentException("Missing userCallback");
+            }
+
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
@@ -142,17 +157,21 @@ namespace PubnubApi.EndPoint
         {
             if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()) || message == null)
             {
-                throw new ArgumentException("Missing Channel or Message");
+                PNStatus status = new PNStatus() { Error = true, ErrorData = new PNErrorData("Missing Channel or Message", new ArgumentException("Missing Channel or Message")) };
+                callback.OnResponse(null, status);
+                return;
             }
 
             if (string.IsNullOrEmpty(config.PublishKey) || string.IsNullOrEmpty(config.PublishKey.Trim()) || config.PublishKey.Length <= 0)
             {
-                throw new MissingMemberException("Invalid publish key");
+                PNStatus status = new PNStatus() { Error = true, ErrorData = new PNErrorData("Invalid publish key", new ArgumentException("Invalid publish key")) };
+                callback.OnResponse(null, status);
+                return;
             }
 
             if (callback == null)
             {
-                throw new ArgumentException("Missing userCallback");
+                return;
             }
 
             Dictionary<string, string> urlParam = new Dictionary<string, string>();
@@ -225,18 +244,14 @@ namespace PubnubApi.EndPoint
 
             if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()) || message == null)
             {
-                PNStatus errStatus = new PNStatus();
-                errStatus.Error = true;
-                errStatus.ErrorData = new PNErrorData("Missing Channel or Message", new ArgumentException("Missing Channel or Message"));
+                PNStatus errStatus = new PNStatus() { Error = true, ErrorData = new PNErrorData("Missing Channel or Message", new ArgumentException("Missing Channel or Message")) };
                 ret.Status = errStatus;
                 return ret;
             }
 
             if (string.IsNullOrEmpty(config.PublishKey) || string.IsNullOrEmpty(config.PublishKey.Trim()) || config.PublishKey.Length <= 0)
             {
-                PNStatus errStatus = new PNStatus();
-                errStatus.Error = true;
-                errStatus.ErrorData = new PNErrorData("Invalid publish key", new MissingMemberException("Invalid publish key"));
+                PNStatus errStatus = new PNStatus() { Error = true, ErrorData = new PNErrorData("Invalid publish key", new ArgumentException("Invalid publish key")) };
                 ret.Status = errStatus;
                 return ret;
             }
