@@ -94,9 +94,9 @@ namespace PubnubApi.EndPoint
 
         public void Execute(PNCallback<PNPublishResult> callback)
         {
-            if (this.msg == null)
+            if (string.IsNullOrEmpty(this.channelName) || string.IsNullOrEmpty(channelName.Trim()) || this.msg == null)
             {
-                throw new ArgumentException("message cannot be null");
+                throw new ArgumentException("Missing Channel or Message");
             }
 
             if (config == null || string.IsNullOrEmpty(config.PublishKey) || config.PublishKey.Trim().Length <= 0)
@@ -129,16 +129,6 @@ namespace PubnubApi.EndPoint
 
         public async Task<PNResult<PNPublishResult>> ExecuteAsync()
         {
-            if (this.msg == null)
-            {
-                throw new ArgumentException("message cannot be null");
-            }
-
-            if (config == null || string.IsNullOrEmpty(config.PublishKey) || config.PublishKey.Trim().Length <= 0)
-            {
-                throw new MissingMemberException("publish key is required");
-            }
-
             syncRequest = false;
             return await Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, this.queryParam).ConfigureAwait(false);
         }

@@ -69,17 +69,53 @@ namespace PubnubApi.EndPoint
 
         public void Execute(PNCallback<PNPublishResult> callback)
         {
+            if (string.IsNullOrEmpty(this.channelName) || string.IsNullOrEmpty(channelName.Trim()) || this.msg == null)
+            {
+                throw new ArgumentException("Missing Channel or Message");
+            }
+
+            if (string.IsNullOrEmpty(config.PublishKey) || string.IsNullOrEmpty(config.PublishKey.Trim()) || config.PublishKey.Length <= 0)
+            {
+                throw new MissingMemberException("Invalid publish key");
+            }
+
+            if (string.IsNullOrEmpty(config.SubscribeKey) || string.IsNullOrEmpty(config.SubscribeKey.Trim()) || config.SubscribeKey.Length <= 0)
+            {
+                throw new MissingMemberException("Invalid subscribe key");
+            }
+
+            if (callback == null)
+            {
+                throw new ArgumentException("Missing userCallback");
+            }
+
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
-                Signal(this.channelName, this.msg, null, this.queryParam, callback);
+                try
+                {
+                    Signal(this.channelName, this.msg, null, this.queryParam, callback);
+                }
+                catch(Exception ex)
+                {
+                    PNStatus unexpectedExceptionStatus = new PNStatus { Error = true, ErrorData = new PNErrorData("Unexpected exception", ex) };
+                    callback.OnResponse(null, unexpectedExceptionStatus);
+                }
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
             new Thread(() =>
             {
                 this.savedCallback = callback;
-                Signal(this.channelName, this.msg, null, this.queryParam, callback);
+                try
+                {
+                    Signal(this.channelName, this.msg, null, this.queryParam, callback);
+                }
+                catch(Exception ex)
+                {
+                    PNStatus unexpectedExceptionStatus = new PNStatus { Error = true, ErrorData = new PNErrorData("Unexpected exception", ex) };
+                    callback.OnResponse(null, unexpectedExceptionStatus);
+                }
             })
             { IsBackground = true }.Start();
 #endif
@@ -110,22 +146,23 @@ namespace PubnubApi.EndPoint
         {
             if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()) || message == null)
             {
-                throw new ArgumentException("Missing Channel or Message");
+                PNStatus status = new PNStatus { Error = true, ErrorData = new PNErrorData("Missing Channel or Message", new ArgumentException("Missing Channel or Message"))};
+                callback.OnResponse(null, status);
+                return;
             }
 
             if (string.IsNullOrEmpty(config.PublishKey) || string.IsNullOrEmpty(config.PublishKey.Trim()) || config.PublishKey.Length <= 0)
             {
-                throw new MissingMemberException("Invalid publish key");
+                PNStatus status = new PNStatus { Error = true, ErrorData = new PNErrorData("Invalid publish key", new ArgumentException("Invalid publish key")) };
+                callback.OnResponse(null, status);
+                return;
             }
 
             if (string.IsNullOrEmpty(config.SubscribeKey) || string.IsNullOrEmpty(config.SubscribeKey.Trim()) || config.SubscribeKey.Length <= 0)
             {
-                throw new MissingMemberException("Invalid subscribe key");
-            }
-
-            if (callback == null)
-            {
-                throw new ArgumentException("Missing userCallback");
+                PNStatus status = new PNStatus { Error = true, ErrorData = new PNErrorData("Invalid subscribe key", new ArgumentException("Invalid subscribe key")) };
+                callback.OnResponse(null, status);
+                return;
             }
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
@@ -174,22 +211,28 @@ namespace PubnubApi.EndPoint
 
         private async Task<PNResult<PNPublishResult>> Signal(string channel, object message, Dictionary<string, object> metaData, Dictionary<string, object> externalQueryParam)
         {
+            PNResult<PNPublishResult> ret = new PNResult<PNPublishResult>();
+
             if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()) || message == null)
             {
-                throw new ArgumentException("Missing Channel or Message");
+                PNStatus errStatus = new PNStatus { Error = true, ErrorData = new PNErrorData("Missing Channel or Message", new ArgumentException("Missing Channel or Message")) };
+                ret.Status = errStatus;
+                return ret;
             }
 
             if (string.IsNullOrEmpty(config.PublishKey) || string.IsNullOrEmpty(config.PublishKey.Trim()) || config.PublishKey.Length <= 0)
             {
-                throw new MissingMemberException("Invalid publish key");
+                PNStatus errStatus = new PNStatus { Error = true, ErrorData = new PNErrorData("Invalid publish key", new ArgumentException("Invalid publish key")) };
+                ret.Status = errStatus;
+                return ret;
             }
 
             if (string.IsNullOrEmpty(config.SubscribeKey) || string.IsNullOrEmpty(config.SubscribeKey.Trim()) || config.SubscribeKey.Length <= 0)
             {
-                throw new MissingMemberException("Invalid subscribe key");
+                PNStatus errStatus = new PNStatus { Error = true, ErrorData = new PNErrorData("Invalid subscribe key", new ArgumentException("Invalid subscribe key")) };
+                ret.Status = errStatus;
+                return ret;
             }
-
-            PNResult<PNPublishResult> ret = new PNResult<PNPublishResult>();
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
             urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
