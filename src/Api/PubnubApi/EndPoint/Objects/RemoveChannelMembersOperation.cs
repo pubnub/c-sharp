@@ -252,7 +252,7 @@ namespace PubnubApi.EndPoint
                     Dictionary<string, Dictionary<string, string>> currentMemberFormat = new Dictionary<string, Dictionary<string, string>>();
                     if (!string.IsNullOrEmpty(removeMemberList[index]))
                     {
-                        currentMemberFormat.Add("uuid", new Dictionary<string, string>() { { "id", removeMemberList[index] } });
+                        currentMemberFormat.Add("uuid", new Dictionary<string, string> { { "id", removeMemberList[index] } });
                         removeMemberFormatList.Add(currentMemberFormat);
                     }
                 }

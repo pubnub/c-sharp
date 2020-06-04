@@ -187,7 +187,7 @@ namespace PubnubApi.EndPoint
                 for (int index=0; index < setMembership.Count; index++)
                 {
                     Dictionary<string, object> currentMembershipFormat = new Dictionary<string, object>();
-                    currentMembershipFormat.Add("channel", new Dictionary<string, string>() { { "id", setMembership[index].Channel } });
+                    currentMembershipFormat.Add("channel", new Dictionary<string, string> { { "id", setMembership[index].Channel } });
                     if (setMembership[index].Custom != null)
                     {
                         currentMembershipFormat.Add("custom", setMembership[index].Custom);
@@ -207,7 +207,7 @@ namespace PubnubApi.EndPoint
                     Dictionary<string, Dictionary<string, string>> currentMembershipFormat = new Dictionary<string, Dictionary<string, string>>();
                     if (!string.IsNullOrEmpty(removeMembership[index]))
                     {
-                        currentMembershipFormat.Add("channel", new Dictionary<string, string>() { { "id", removeMembership[index] } });
+                        currentMembershipFormat.Add("channel", new Dictionary<string, string> { { "id", removeMembership[index] } });
                         removeMembershipFormatList.Add(currentMembershipFormat);
                     }
                 }

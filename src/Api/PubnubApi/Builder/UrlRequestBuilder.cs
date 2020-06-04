@@ -16,7 +16,7 @@ namespace PubnubApi
         private readonly IJsonPluggableLibrary jsonLib ;
         private readonly IPubnubUnitTest pubnubUnitTest;
         private readonly IPubnubLog pubnubLog;
-        private string pubnubInstanceId = "";
+        private readonly string pubnubInstanceId;
         private readonly EndPoint.TelemetryManager telemetryMgr;
 
         public UrlRequestBuilder(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager pubnubTelemetryMgr, string pnInstanceId)
@@ -26,15 +26,8 @@ namespace PubnubApi
             this.pubnubUnitTest = pubnubUnitTest;
             this.pubnubLog = log;
             this.telemetryMgr = pubnubTelemetryMgr;
-            this.pubnubInstanceId = pnInstanceId;
+            this.pubnubInstanceId = string.IsNullOrEmpty(pnInstanceId) ? "" : pnInstanceId;
         }
-
-        //string IUrlRequestBuilder.PubnubInstanceId
-        //{
-        //    get { return pubnubInstanceId; }
-        //    set { pubnubInstanceId = value; }
-        //}
-
 
         Uri IUrlRequestBuilder.BuildTimeRequest(string requestMethod, string requestBody, Dictionary<string, object> externalQueryParam)
         {

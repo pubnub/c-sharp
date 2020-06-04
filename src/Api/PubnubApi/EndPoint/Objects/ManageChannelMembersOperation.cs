@@ -275,7 +275,7 @@ namespace PubnubApi.EndPoint
                 for (int index = 0; index < setMemberList.Count; index++)
                 {
                     Dictionary<string, object> currentMemberFormat = new Dictionary<string, object>();
-                    currentMemberFormat.Add("uuid", new Dictionary<string, string>() { { "id", setMemberList[index].Uuid } });
+                    currentMemberFormat.Add("uuid", new Dictionary<string, string> { { "id", setMemberList[index].Uuid } });
                     if (setMemberList[index].Custom != null)
                     {
                         currentMemberFormat.Add("custom", setMemberList[index].Custom);
@@ -295,7 +295,7 @@ namespace PubnubApi.EndPoint
                     Dictionary<string, Dictionary<string, string>> currentMemberFormat = new Dictionary<string, Dictionary<string, string>>();
                     if (!string.IsNullOrEmpty(removeMemberList[index]))
                     {
-                        currentMemberFormat.Add("uuid", new Dictionary<string, string>() { { "id", removeMemberList[index] } });
+                        currentMemberFormat.Add("uuid", new Dictionary<string, string> { { "id", removeMemberList[index] } });
                         removeMemberFormatList.Add(currentMemberFormat);
                     }
                 }
