@@ -108,20 +108,18 @@ namespace PubnubApi.EndPoint
                 case PNOperationType.PNSignalOperation:
                     endpoint = "l_sig";
                     break;
-                case PNOperationType.PNCreateUserOperation:
-                case PNOperationType.PNUpdateUserOperation:
-                case PNOperationType.PNDeleteUserOperation:
-                case PNOperationType.PNGetUsersOperation:
-                case PNOperationType.PNGetUserOperation:
-                case PNOperationType.PNCreateSpaceOperation:
-                case PNOperationType.PNUpdateSpaceOperation:
-                case PNOperationType.PNDeleteSpaceOperation:
-                case PNOperationType.PNGetSpacesOperation:
-                case PNOperationType.PNGetSpaceOperation:
+                case PNOperationType.PNSetUuidMetadataOperation:
+                case PNOperationType.PNDeleteUuidMetadataOperation:
+                case PNOperationType.PNGetAllUuidMetadataOperation:
+                case PNOperationType.PNGetUuidMetadataOperation:
+                case PNOperationType.PNSetChannelMetadataOperation:
+                case PNOperationType.PNDeleteChannelMetadataOperation:
+                case PNOperationType.PNGetAllChannelMetadataOperation:
+                case PNOperationType.PNGetChannelMetadataOperation:
                 case PNOperationType.PNGetMembershipsOperation:
                 case PNOperationType.PNManageMembershipsOperation:
-                case PNOperationType.PNGetMembersOperation:
-                case PNOperationType.PNManageMembersOperation:
+                case PNOperationType.PNGetChannelMembersOperation:
+                case PNOperationType.PNManageChannelMembersOperation:
                     endpoint = "l_obj";
                     break;
                 case PNOperationType.PNAddMessageActionOperation:

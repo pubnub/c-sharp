@@ -67,8 +67,7 @@
     <Compile Include="..\PubnubApi.Tests\WhenMessageDeletedFromChannel.cs" Link="WhenMessageDeletedFromChannel.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenObjectMember.cs" Link="WhenObjectMember.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenObjectMembership.cs" Link="WhenObjectMembership.cs" />
-    <Compile Include="..\PubnubApi.Tests\WhenObjectSpace.cs" Link="WhenObjectSpace.cs" />
-    <Compile Include="..\PubnubApi.Tests\WhenObjectUser.cs" Link="WhenObjectUser.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenObjectUuidMetadata.cs" Link="WhenObjectUuidMetadata.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenPushIsRequested.cs" Link="WhenPushIsRequested.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenSubscribedToAChannel.cs" Link="WhenSubscribedToAChannel.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenSubscribedToAChannel2.cs" Link="WhenSubscribedToAChannel2.cs" />

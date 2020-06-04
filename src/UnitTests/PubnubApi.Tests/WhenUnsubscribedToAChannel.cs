@@ -233,7 +233,7 @@ namespace PubNubMessaging.Tests
                 throw new NotImplementedException();
             }
 
-            public override void ObjectEvent(Pubnub pubnub, PNObjectApiEventResult objectEvent)
+            public override void ObjectEvent(Pubnub pubnub, PNObjectEventResult objectEvent)
             {
                 throw new NotImplementedException();
             }

@@ -1,0 +1,94 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace PubnubApi
+{
+    internal static class PNChannelMembersJsonDataParse
+    {
+        internal static PNChannelMembersResult GetObject(List<object> listObject)
+        {
+            PNChannelMembersResult result = null;
+            for (int listIndex = 0; listIndex < listObject.Count; listIndex++)
+            {
+                Dictionary<string, object> dicObj = JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[listIndex]);
+                if (dicObj != null && dicObj.Count > 0)
+                {
+                    if (result == null)
+                    {
+                        result = new PNChannelMembersResult();
+                    }
+                    if (dicObj.ContainsKey("data") && dicObj["data"] != null)
+                    {
+                        result.ChannelMembers = new List<PNChannelMembersItemResult>();
+
+                        object[] userArray = JsonDataParseInternalUtil.ConvertToObjectArray(dicObj["data"]);
+                        if (userArray != null && userArray.Length > 0)
+                        {
+                            for (int index = 0; index < userArray.Length; index++)
+                            {
+                                Dictionary<string, object> getMbrItemDataDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(userArray[index]);
+                                if (getMbrItemDataDic != null && getMbrItemDataDic.Count > 0)
+                                {
+                                    var mbrItem = new PNChannelMembersItemResult
+                                    {
+                                        Updated = (getMbrItemDataDic.ContainsKey("updated") && getMbrItemDataDic["updated"] != null) ? getMbrItemDataDic["updated"].ToString() : ""
+                                    };
+                                    if (getMbrItemDataDic.ContainsKey("custom"))
+                                    {
+                                        mbrItem.Custom = JsonDataParseInternalUtil.ConvertToDictionaryObject(getMbrItemDataDic["custom"]);
+                                    }
+                                    if (getMbrItemDataDic.ContainsKey("uuid"))
+                                    {
+                                        Dictionary<string, object> uuidMetadataDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(getMbrItemDataDic["uuid"]);
+                                        if (uuidMetadataDic != null && uuidMetadataDic.Count > 0)
+                                        {
+                                            var uuidMetadataResult = new PNUuidMetadataResult
+                                            {
+                                                Uuid = (uuidMetadataDic.ContainsKey("id") && uuidMetadataDic["id"] != null) ? uuidMetadataDic["id"].ToString() : "",
+                                                Name = (uuidMetadataDic.ContainsKey("name") && uuidMetadataDic["name"] != null) ? uuidMetadataDic["name"].ToString() : "",
+                                                ExternalId = (uuidMetadataDic.ContainsKey("externalId") && uuidMetadataDic["externalId"] != null) ? uuidMetadataDic["externalId"].ToString() : "",
+                                                ProfileUrl = (uuidMetadataDic.ContainsKey("profileUrl") && uuidMetadataDic["profileUrl"] != null) ? uuidMetadataDic["profileUrl"].ToString() : "",
+                                                Email = (uuidMetadataDic.ContainsKey("email") && uuidMetadataDic["email"] != null) ? uuidMetadataDic["email"].ToString() : "",
+                                                Updated = (uuidMetadataDic.ContainsKey("updated") && uuidMetadataDic["updated"] != null) ? uuidMetadataDic["updated"].ToString() : "",
+                                                Custom = (uuidMetadataDic.ContainsKey("custom") && uuidMetadataDic["custom"] != null) ? JsonDataParseInternalUtil.ConvertToDictionaryObject(uuidMetadataDic["custom"]) : null
+                                            };
+                                            mbrItem.UuidMetadata = uuidMetadataResult;
+                                        }
+                                    }
+                                    result.ChannelMembers.Add(mbrItem);
+                                }
+                            }
+                        }
+
+
+                    }
+                    else if (dicObj.ContainsKey("totalCount") && dicObj["totalCount"] != null)
+                    {
+                        int usersCount;
+                        Int32.TryParse(dicObj["totalCount"].ToString(), out usersCount);
+                        result.TotalCount = usersCount;
+                    }
+                    else if (dicObj.ContainsKey("next") && dicObj["next"] != null)
+                    {
+                        if (result.Page == null)
+                        {
+                            result.Page = new PNPageObject();
+                        }
+                        result.Page.Next = dicObj["next"].ToString();
+                    }
+                    else if (dicObj.ContainsKey("prev") && dicObj["prev"] != null)
+                    {
+                        if (result.Page == null)
+                        {
+                            result.Page = new PNPageObject();
+                        }
+                        result.Page.Prev = dicObj["prev"].ToString();
+                    }
+                }
+            }
+            return result;
+        }
+    }
+}

@@ -57,16 +57,6 @@ namespace PubnubApi
                             }
                         }
                         break;
-                    case PNOperationType.PNAccessManagerGrantToken:
-                        if (savedEndpointOperation is GrantTokenOperation)
-                        {
-                            GrantTokenOperation endpoint = savedEndpointOperation as GrantTokenOperation;
-                            if (endpoint != null)
-                            {
-                                endpoint.Retry();
-                            }
-                        }
-                        break;
                     case PNOperationType.PNAccessManagerGrant:
                         if (savedEndpointOperation is GrantOperation)
                         {
@@ -257,100 +247,80 @@ namespace PubnubApi
                             }
                         }
                         break;
-                    case PNOperationType.PNCreateUserOperation:
-                        if (savedEndpointOperation is CreateUserOperation)
+                    case PNOperationType.PNSetUuidMetadataOperation:
+                        if (savedEndpointOperation is SetUuidMetadataOperation)
                         {
-                            CreateUserOperation endpoint = savedEndpointOperation as CreateUserOperation;
+                            SetUuidMetadataOperation endpoint = savedEndpointOperation as SetUuidMetadataOperation;
                             if (endpoint != null)
                             {
                                 endpoint.Retry();
                             }
                         }
                         break;
-                    case PNOperationType.PNCreateSpaceOperation:
-                        if (savedEndpointOperation is CreateSpaceOperation)
+                    case PNOperationType.PNSetChannelMetadataOperation:
+                        if (savedEndpointOperation is SetChannelMetadataOperation)
                         {
-                            CreateSpaceOperation endpoint = savedEndpointOperation as CreateSpaceOperation;
+                            SetChannelMetadataOperation endpoint = savedEndpointOperation as SetChannelMetadataOperation;
                             if (endpoint != null)
                             {
                                 endpoint.Retry();
                             }
                         }
                         break;
-                    case PNOperationType.PNUpdateUserOperation:
-                        if (savedEndpointOperation is UpdateUserOperation)
+                    case PNOperationType.PNDeleteUuidMetadataOperation:
+                        if (savedEndpointOperation is RemoveUuidMetadataOperation)
                         {
-                            UpdateUserOperation endpoint = savedEndpointOperation as UpdateUserOperation;
+                            RemoveUuidMetadataOperation endpoint = savedEndpointOperation as RemoveUuidMetadataOperation;
                             if (endpoint != null)
                             {
                                 endpoint.Retry();
                             }
                         }
                         break;
-                    case PNOperationType.PNUpdateSpaceOperation:
-                        if (savedEndpointOperation is UpdateSpaceOperation)
+                    case PNOperationType.PNDeleteChannelMetadataOperation:
+                        if (savedEndpointOperation is RemoveChannelMetadataOperation)
                         {
-                            UpdateSpaceOperation endpoint = savedEndpointOperation as UpdateSpaceOperation;
+                            RemoveChannelMetadataOperation endpoint = savedEndpointOperation as RemoveChannelMetadataOperation;
                             if (endpoint != null)
                             {
                                 endpoint.Retry();
                             }
                         }
                         break;
-                    case PNOperationType.PNDeleteUserOperation:
-                        if (savedEndpointOperation is DeleteUserOperation)
+                    case PNOperationType.PNGetUuidMetadataOperation:
+                        if (savedEndpointOperation is GetUuidMetadataOperation)
                         {
-                            DeleteUserOperation endpoint = savedEndpointOperation as DeleteUserOperation;
+                            GetUuidMetadataOperation endpoint = savedEndpointOperation as GetUuidMetadataOperation;
                             if (endpoint != null)
                             {
                                 endpoint.Retry();
                             }
                         }
                         break;
-                    case PNOperationType.PNDeleteSpaceOperation:
-                        if (savedEndpointOperation is DeleteSpaceOperation)
+                    case PNOperationType.PNGetChannelMetadataOperation:
+                        if (savedEndpointOperation is GetChannelMetadataOperation)
                         {
-                            DeleteSpaceOperation endpoint = savedEndpointOperation as DeleteSpaceOperation;
+                            GetChannelMetadataOperation endpoint = savedEndpointOperation as GetChannelMetadataOperation;
                             if (endpoint != null)
                             {
                                 endpoint.Retry();
                             }
                         }
                         break;
-                    case PNOperationType.PNGetUserOperation:
-                        if (savedEndpointOperation is GetUserOperation)
+                    case PNOperationType.PNGetAllUuidMetadataOperation:
+                        if (savedEndpointOperation is GetAllUuidMetadataOperation)
                         {
-                            GetUserOperation endpoint = savedEndpointOperation as GetUserOperation;
+                            GetAllUuidMetadataOperation endpoint = savedEndpointOperation as GetAllUuidMetadataOperation;
                             if (endpoint != null)
                             {
                                 endpoint.Retry();
                             }
                         }
                         break;
-                    case PNOperationType.PNGetSpaceOperation:
-                        if (savedEndpointOperation is GetSpaceOperation)
+                    case PNOperationType.PNGetAllChannelMetadataOperation:
+                        if (savedEndpointOperation is GetAllChannelMetadataOperation)
                         {
-                            GetSpaceOperation endpoint = savedEndpointOperation as GetSpaceOperation;
-                            if (endpoint != null)
-                            {
-                                endpoint.Retry();
-                            }
-                        }
-                        break;
-                    case PNOperationType.PNGetUsersOperation:
-                        if (savedEndpointOperation is GetUsersOperation)
-                        {
-                            GetUsersOperation endpoint = savedEndpointOperation as GetUsersOperation;
-                            if (endpoint != null)
-                            {
-                                endpoint.Retry();
-                            }
-                        }
-                        break;
-                    case PNOperationType.PNGetSpacesOperation:
-                        if (savedEndpointOperation is GetSpacesOperation)
-                        {
-                            GetSpacesOperation endpoint = savedEndpointOperation as GetSpacesOperation;
+                            GetAllChannelMetadataOperation endpoint = savedEndpointOperation as GetAllChannelMetadataOperation;
                             if (endpoint != null)
                             {
                                 endpoint.Retry();
@@ -367,10 +337,10 @@ namespace PubnubApi
                             }
                         }
                         break;
-                    case PNOperationType.PNManageMembersOperation:
-                        if (savedEndpointOperation is ManageMembersOperation)
+                    case PNOperationType.PNManageChannelMembersOperation:
+                        if (savedEndpointOperation is ManageChannelMembersOperation)
                         {
-                            ManageMembersOperation endpoint = savedEndpointOperation as ManageMembersOperation;
+                            ManageChannelMembersOperation endpoint = savedEndpointOperation as ManageChannelMembersOperation;
                             if (endpoint != null)
                             {
                                 endpoint.Retry();
@@ -387,10 +357,10 @@ namespace PubnubApi
                             }
                         }
                         break;
-                    case PNOperationType.PNGetMembersOperation:
-                        if (savedEndpointOperation is GetMembersOperation)
+                    case PNOperationType.PNGetChannelMembersOperation:
+                        if (savedEndpointOperation is GetChannelMembersOperation)
                         {
-                            GetMembersOperation endpoint = savedEndpointOperation as GetMembersOperation;
+                            GetChannelMembersOperation endpoint = savedEndpointOperation as GetChannelMembersOperation;
                             if (endpoint != null)
                             {
                                 endpoint.Retry();

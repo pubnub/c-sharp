@@ -1,8 +1,15 @@
 name: c-sharp
-version: "4.7.0.0"
+version: "4.8.0.0"
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog: 
+  - version: 4.8.0.0
+    date: June 04, 2020
+    changes:
+      - type: Improvement
+        text: Removed V1 Objects API feature.
+      - type: Improvement
+        text: Added Objects Simplification API feature.
   - version: 4.7.0.0
     date: May 27, 2020
     changes:
@@ -480,20 +487,22 @@ features:
   signal:
     - SIGNAL-SEND
   objects:
-    - OBJECTS-GET-USERS
-    - OBJECTS-GET-USER
-    - OBJECTS-CREATE-USER
-    - OBJECTS-UPDATE-USER
-    - OBJECTS-DELETE-USER
-    - OBJECTS-GET-SPACES
-    - OBJECTS-CREATE-SPACE
-    - OBJECTS-GET-SPACE
-    - OBJECTS-UPDATE-SPACE
-    - OBJECTS-DELETE-SPACE
-    - OBJECTS-GET-MEMBERSHIPS
-    - OBJECTS-MANAGE-MEMBERSHIPS
-    - OBJECTS-GET-MEMBERS
-    - OBJECTS-MANAGE-MEMBERS
+    - OBJECTS-GET-ALL-UUID-METADATA
+    - OBJECTS-GET-UUID-METADATA
+    - OBJECTS-SET-UUID-METADATA
+    - OBJECTS-REMOVE-UUID-METADATA
+    - OBJECTS-GET-ALL-CHANNEL-METADATA
+    - OBJECTS-GET-CHANNEL-METADATA
+    - OBJECTS-SET-CHANNEL-METADATA
+    - OBJECTS-REMOVE-CHANNEL-METADATA
+    - OBJECTS-GET-MEMBERSHIPS-V2
+    - OBJECTS-SET-MEMBERSHIPS-V2
+    - OBJECTS-REMOVE-MEMBERSHIPS-V2
+    - OBJECTS-MANAGE-MEMBERSHIPS-V2
+    - OBJECTS-GET-CHANNEL-MEMBERS-V2
+    - OBJECTS-SET-CHANNEL-MEMBERS-V2
+    - OBJECTS-REMOVE-CHANNEL-MEMBERS-V2
+    - OBJECTS-MANAGE-CHANNEL-MEMBERS-V2
     - OBJECTS-FILTERING
     - OBJECTS-SORTING
   message-actions:
@@ -505,7 +514,7 @@ features:
     - QUERY-PARAM    
 supported-platforms:
   - 
-    version: Pubnub 'C#' 4.7.0.0
+    version: Pubnub 'C#' 4.8.0.0
     platforms:
       - Windows 10 and up
       - Windows Server 2008 and up
@@ -515,7 +524,7 @@ supported-platforms:
       - .Net Framework 4.5
       - .Net Framework 4.6.1+
   - 
-    version: PubnubPCL 'C#' 4.7.0.0
+    version: PubnubPCL 'C#' 4.8.0.0
     platforms:
       - Xamarin.Android
       - Xamarin.iOS
@@ -531,9 +540,10 @@ supported-platforms:
       - .Net Standard 1.3
       - .Net Standard 1.4
       - .Net Standard 2.0
+      - .Net Standard 2.1
       - .Net Core
   - 
-    version: PubnubUWP 'C#' 4.7.0.0
+    version: PubnubUWP 'C#' 4.8.0.0
     platforms:
       - Windows Phone 10
       - Universal Windows Apps

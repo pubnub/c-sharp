@@ -99,8 +99,6 @@ namespace PubnubApi
 
         public bool SuppressLeaveEvents { get; set; }
 
-        public bool EnableTokenManager { get; set; } = true;
-
         public PNConfiguration()
         {
             this.Origin = "ps.pndsn.com";

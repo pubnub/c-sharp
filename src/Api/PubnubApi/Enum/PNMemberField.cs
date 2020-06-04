@@ -8,7 +8,7 @@ namespace PubnubApi
     public enum PNMemberField
     {
         CUSTOM,
-        USER,
-        USER_CUSTOM
+        UUID,
+        UUID_CUSTOM
     }
 }
