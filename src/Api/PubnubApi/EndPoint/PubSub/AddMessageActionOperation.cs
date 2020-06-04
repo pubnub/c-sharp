@@ -159,8 +159,8 @@ namespace PubnubApi.EndPoint
 
             string requestMethodName = "POST";
             string postMessage = jsonLibrary.SerializeToJsonString(messageAction);
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            
             Uri request = urlBuilder.BuildAddMessageActionRequest(requestMethodName, postMessage, channel, messageTimetoken, externalQueryParam);
 
             RequestState<PNAddMessageActionResult> requestState = new RequestState<PNAddMessageActionResult>();
@@ -208,8 +208,8 @@ namespace PubnubApi.EndPoint
 
             string requestMethodName = "POST";
             string postMessage = jsonLibrary.SerializeToJsonString(messageAction);
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            
             Uri request = urlBuilder.BuildAddMessageActionRequest(requestMethodName, postMessage, channel, messageTimetoken, externalQueryParam);
 
             RequestState<PNAddMessageActionResult> requestState = new RequestState<PNAddMessageActionResult>();

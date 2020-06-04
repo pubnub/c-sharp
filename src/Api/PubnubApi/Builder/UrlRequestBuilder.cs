@@ -19,27 +19,21 @@ namespace PubnubApi
         private string pubnubInstanceId = "";
         private readonly EndPoint.TelemetryManager telemetryMgr;
 
-        public UrlRequestBuilder(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager pubnubTelemetryMgr)
+        public UrlRequestBuilder(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager pubnubTelemetryMgr, string pnInstanceId)
         {
             this.pubnubConfig = config;
             this.jsonLib = jsonPluggableLibrary;
             this.pubnubUnitTest = pubnubUnitTest;
             this.pubnubLog = log;
             this.telemetryMgr = pubnubTelemetryMgr;
+            this.pubnubInstanceId = pnInstanceId;
         }
 
-        string IUrlRequestBuilder.PubnubInstanceId
-        {
-            get
-            {
-                return pubnubInstanceId;
-            }
-
-            set
-            {
-                pubnubInstanceId = value;
-            }
-        }
+        //string IUrlRequestBuilder.PubnubInstanceId
+        //{
+        //    get { return pubnubInstanceId; }
+        //    set { pubnubInstanceId = value; }
+        //}
 
 
         Uri IUrlRequestBuilder.BuildTimeRequest(string requestMethod, string requestBody, Dictionary<string, object> externalQueryParam)
@@ -1543,7 +1537,7 @@ namespace PubnubApi
                     }
                 }
             }
-            string queryString = BuildQueryString(currentType, requestQueryStringParams, "user", uuid, false);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
             return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
@@ -1595,7 +1589,7 @@ namespace PubnubApi
                     }
                 }
             }
-            string queryString = BuildQueryString(currentType, requestQueryStringParams, "space", channel, false);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
             return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
@@ -1652,7 +1646,7 @@ namespace PubnubApi
                     }
                 }
             }
-            string queryString = BuildQueryString(currentType, requestQueryStringParams, "user", uuid, false);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
             return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
@@ -1709,7 +1703,7 @@ namespace PubnubApi
                     }
                 }
             }
-            string queryString = BuildQueryString(currentType, requestQueryStringParams, "space", channel, false);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
             return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
@@ -1823,7 +1817,7 @@ namespace PubnubApi
             return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
-        private Dictionary<string, string> GenerateCommonQueryParams(PNOperationType type, string resourceType, string resourceId, bool checkResourcePattern, string uuid)
+        private Dictionary<string, string> GenerateCommonQueryParams(PNOperationType type, string uuid)
         {
             long timeStamp = TranslateUtcDateTimeToSeconds(DateTime.UtcNow);
             string requestid = Guid.NewGuid().ToString();
@@ -1945,11 +1939,6 @@ namespace PubnubApi
 
         private string BuildQueryString(PNOperationType type, Dictionary<string, string> queryStringParamDic)
         {
-            return BuildQueryString(type, queryStringParamDic, "", "", false);
-        }
-
-        private string BuildQueryString(PNOperationType type, Dictionary<string, string> queryStringParamDic, string resourceType, string resourceId, bool checkResourcePattern)
-        {
             string queryString = "";
 
             try
@@ -1962,7 +1951,7 @@ namespace PubnubApi
 
                 string qsUuid = internalQueryStringParamDic.ContainsKey("uuid") ? internalQueryStringParamDic["uuid"] : null;
                 
-                Dictionary<string, string> commonQueryStringParams = GenerateCommonQueryParams(type, resourceType, resourceId, checkResourcePattern, qsUuid);
+                Dictionary<string, string> commonQueryStringParams = GenerateCommonQueryParams(type, qsUuid);
                 Dictionary<string, string> queryStringParams = new Dictionary<string, string>(commonQueryStringParams.Concat(internalQueryStringParamDic).GroupBy(item => item.Key).ToDictionary(item => item.Key, item => item.First().Value));
 
                 queryString = string.Join("&", queryStringParams.OrderBy(kvp => kvp.Key, StringComparer.Ordinal).Select(kvp => string.Format("{0}={1}", kvp.Key, kvp.Value)).ToArray());

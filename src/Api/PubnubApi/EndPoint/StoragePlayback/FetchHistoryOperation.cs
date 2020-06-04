@@ -178,8 +178,8 @@ namespace PubnubApi.EndPoint
             }
             string channel = string.Join(",", channels);
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            
             Uri request = urlBuilder.BuildFetchRequest("GET", "", channels, start, end, count, reverse, includeMeta, includeMsgActions, externalQueryParam);
 
             RequestState<PNFetchHistoryResult> requestState = new RequestState<PNFetchHistoryResult>();
@@ -209,8 +209,8 @@ namespace PubnubApi.EndPoint
             PNResult<PNFetchHistoryResult> ret = new PNResult<PNFetchHistoryResult>();
             string channel = string.Join(",", channels);
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            
             Uri request = urlBuilder.BuildFetchRequest("GET", "", channels, start, end, count, reverse, includeMeta, includeMsgActions, externalQueryParam);
 
             RequestState<PNFetchHistoryResult> requestState = new RequestState<PNFetchHistoryResult>();

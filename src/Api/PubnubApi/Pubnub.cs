@@ -565,6 +565,7 @@ namespace PubnubApi
             {
                 telemetryManager = new EndPoint.TelemetryManager(pubnubConfig, pubnubLog);
             }
+            CheckRequiredConfigValues();
             if (config != null && pubnubLog != null)
             {
                 PNPlatform.Print(config, pubnubLog);

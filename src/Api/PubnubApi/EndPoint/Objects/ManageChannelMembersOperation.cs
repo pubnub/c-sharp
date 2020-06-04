@@ -187,7 +187,7 @@ namespace PubnubApi.EndPoint
                 for (int index = 0; index < setMemberList.Count; index++)
                 {
                     Dictionary<string, object> currentMemberFormat = new Dictionary<string, object>();
-                    currentMemberFormat.Add("uuid", new Dictionary<string, string>() { { "id", setMemberList[index].Uuid } });
+                    currentMemberFormat.Add("uuid", new Dictionary<string, string> { { "id", setMemberList[index].Uuid } });
                     if (setMemberList[index].Custom != null)
                     {
                         currentMemberFormat.Add("custom", setMemberList[index].Custom);
@@ -207,7 +207,7 @@ namespace PubnubApi.EndPoint
                     Dictionary<string, Dictionary<string, string>> currentMemberFormat = new Dictionary<string, Dictionary<string, string>>();
                     if (!string.IsNullOrEmpty(removeMemberList[index]))
                     {
-                        currentMemberFormat.Add("uuid", new Dictionary<string, string>() { { "id", removeMemberList[index] } });
+                        currentMemberFormat.Add("uuid", new Dictionary<string, string> { { "id", removeMemberList[index] } });
                         removeMemberFormatList.Add(currentMemberFormat);
                     }
                 }
@@ -218,8 +218,7 @@ namespace PubnubApi.EndPoint
             }
             string patchMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
             Uri request = urlBuilder.BuildMemberAddUpdateRemoveChannelRequest("PATCH", patchMessage, spaceId, internalPage.Next, internalPage.Prev, limit, includeCount, includeOptions, sort, externalQueryParam);
 
             UrlProcessRequest(request, requestState, false, patchMessage).ContinueWith(r =>
@@ -307,8 +306,7 @@ namespace PubnubApi.EndPoint
             }
             string patchMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
             Uri request = urlBuilder.BuildMemberAddUpdateRemoveChannelRequest("PATCH", patchMessage, channel, internalPage.Next, internalPage.Prev, limit, includeCount, includeOptions, sort, externalQueryParam);
 
             Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false, patchMessage).ConfigureAwait(false);

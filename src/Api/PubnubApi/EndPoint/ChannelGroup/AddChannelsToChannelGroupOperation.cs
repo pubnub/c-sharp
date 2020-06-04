@@ -110,8 +110,7 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing groupName");
             }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pnTelemetryMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pnTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
 
             string channelsCommaDelimited = string.Join(",", channels.OrderBy(x => x).ToArray());
 
@@ -154,8 +153,7 @@ namespace PubnubApi.EndPoint
             }
             PNResult<PNChannelGroupsAddChannelResult> ret = new PNResult<PNChannelGroupsAddChannelResult>();
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pnTelemetryMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pnTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
 
             string channelsCommaDelimited = string.Join(",", channels.OrderBy(x => x).ToArray());
 

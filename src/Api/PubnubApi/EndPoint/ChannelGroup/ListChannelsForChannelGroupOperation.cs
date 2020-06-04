@@ -93,8 +93,7 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing groupName");
             }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
 
             Uri request = urlBuilder.BuildGetChannelsForChannelGroupRequest("GET", "", null, groupName, false, externalQueryParam);
 
@@ -124,8 +123,7 @@ namespace PubnubApi.EndPoint
             }
             PNResult<PNChannelGroupsAllChannelsResult> ret = new PNResult<PNChannelGroupsAllChannelsResult>();
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
 
             Uri request = urlBuilder.BuildGetChannelsForChannelGroupRequest("GET", "", null, groupName, false, externalQueryParam);
 

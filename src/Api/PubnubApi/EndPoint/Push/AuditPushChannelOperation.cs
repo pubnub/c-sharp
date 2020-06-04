@@ -128,8 +128,8 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing Topic");
             }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            
             Uri request = urlBuilder.BuildGetChannelsPushRequest("GET", "", pushType, pushToken, environment, deviceTopic, externalQueryParam);
 
             RequestState<PNPushListProvisionsResult> requestState = new RequestState<PNPushListProvisionsResult>();
@@ -162,8 +162,8 @@ namespace PubnubApi.EndPoint
             }
             PNResult<PNPushListProvisionsResult> ret = new PNResult<PNPushListProvisionsResult>();
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            
             Uri request = urlBuilder.BuildGetChannelsPushRequest("GET", "", pushType, pushToken, environment, deviceTopic, externalQueryParam);
 
             RequestState<PNPushListProvisionsResult> requestState = new RequestState<PNPushListProvisionsResult>();

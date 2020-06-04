@@ -186,8 +186,7 @@ namespace PubnubApi.EndPoint
             }
             string patchMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
             Uri request = urlBuilder.BuildSetUuidMetadataRequest("PATCH", patchMessage, uuid, includeCustom, externalQueryParam);
 
             UrlProcessRequest(request, requestState, false, patchMessage).ContinueWith(r =>
@@ -217,7 +216,6 @@ namespace PubnubApi.EndPoint
             requestState.UsePatchMethod = true;
 
             Dictionary<string, object> messageEnvelope = new Dictionary<string, object>();
-            //messageEnvelope.Add("uuid", userId);
             messageEnvelope.Add("name", uuidName);
             if (uuidExternalId != null)
             {
@@ -237,8 +235,7 @@ namespace PubnubApi.EndPoint
             }
             string patchMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
             Uri request = urlBuilder.BuildSetUuidMetadataRequest("PATCH", patchMessage, uuid, includeCustom, externalQueryParam);
 
             Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false, patchMessage).ConfigureAwait(false);

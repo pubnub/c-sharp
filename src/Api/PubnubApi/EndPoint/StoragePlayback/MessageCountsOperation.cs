@@ -112,8 +112,8 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing Channel");
             }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            
             Uri request = urlBuilder.BuildMessageCountsRequest("GET", "", channels, timetokens, externalQueryParam);
 
             RequestState<PNMessageCountResult> requestState = new RequestState<PNMessageCountResult>();
@@ -142,8 +142,8 @@ namespace PubnubApi.EndPoint
             }
             PNResult<PNMessageCountResult> ret = new PNResult<PNMessageCountResult>();
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            
             Uri request = urlBuilder.BuildMessageCountsRequest("GET", "", channels, timetokens, externalQueryParam);
 
             RequestState<PNMessageCountResult> requestState = new RequestState<PNMessageCountResult>();

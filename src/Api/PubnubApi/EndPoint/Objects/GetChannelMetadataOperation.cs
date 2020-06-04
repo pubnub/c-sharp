@@ -116,8 +116,8 @@ namespace PubnubApi.EndPoint
 
         private void GetSingleChannelMetadata(string spaceId, bool includeCustom, Dictionary<string, object> externalQueryParam, PNCallback<PNGetChannelMetadataResult> callback)
         {
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            
             Uri request = urlBuilder.BuildGetSingleChannelMetadataRequest("GET", "", spaceId, includeCustom, externalQueryParam);
 
             RequestState<PNGetChannelMetadataResult> requestState = new RequestState<PNGetChannelMetadataResult>();
@@ -156,8 +156,8 @@ namespace PubnubApi.EndPoint
                 return ret;
             }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            
             Uri request = urlBuilder.BuildGetSingleChannelMetadataRequest("GET", "", spaceId, includeCustom, externalQueryParam);
 
             RequestState<PNGetChannelMetadataResult> requestState = new RequestState<PNGetChannelMetadataResult>();

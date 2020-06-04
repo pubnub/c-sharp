@@ -116,8 +116,8 @@ namespace PubnubApi.EndPoint
                 uuid = config.Uuid;
             }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            
             Uri request = urlBuilder.BuildGetSingleUuidMetadataRequest("GET", "", uuid, includeCustom, externalQueryParam);
 
             RequestState<PNGetUuidMetadataResult> requestState = new RequestState<PNGetUuidMetadataResult>();
@@ -153,8 +153,8 @@ namespace PubnubApi.EndPoint
             }
             PNResult<PNGetUuidMetadataResult> ret = new PNResult<PNGetUuidMetadataResult>();
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            
             Uri request = urlBuilder.BuildGetSingleUuidMetadataRequest("GET", "", uuid, includeCustom, externalQueryParam);
 
             RequestState<PNGetUuidMetadataResult> requestState = new RequestState<PNGetUuidMetadataResult>();

@@ -112,8 +112,8 @@ namespace PubnubApi.EndPoint
         internal void HereNow(string[] channels, string[] channelGroups, bool showUUIDList, bool includeUserState, Dictionary<string, object> externalQueryParam, PNCallback<PNHereNowResult> callback)
         {
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            
             Uri request = urlBuilder.BuildHereNowRequest("GET", "", channels, channelGroups, showUUIDList, includeUserState, externalQueryParam);
 
             RequestState<PNHereNowResult> requestState = new RequestState<PNHereNowResult>();
@@ -139,8 +139,8 @@ namespace PubnubApi.EndPoint
         {
             PNResult<PNHereNowResult> ret = new PNResult<PNHereNowResult>();
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            
             Uri request = urlBuilder.BuildHereNowRequest("GET", "", channels, channelGroups, showUUIDList, includeUserState, externalQueryParam);
 
             RequestState<PNHereNowResult> requestState = new RequestState<PNHereNowResult>();

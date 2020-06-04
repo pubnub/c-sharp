@@ -28,13 +28,6 @@ namespace PubnubApi.EndPoint
 
         private PNCallback<PNMembershipsResult> savedCallback;
         private Dictionary<string, object> queryParam;
-
-        private class PNDeleteMembership
-        {
-            [JsonProperty(PropertyName = "id")]
-            public string ChannelId { get; set; }
-        }
-
         public RemoveMembershipsOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, instance)
         {
             config = pubnubConfig;
@@ -199,8 +192,7 @@ namespace PubnubApi.EndPoint
             }
             string patchMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
             Uri request = urlBuilder.BuildMembershipAddUpdateRemoveUserRequest("PATCH", patchMessage, uuid, internalPage.Next, internalPage.Prev, limit, includeCount, includeOptions, sort, externalQueryParam);
 
             UrlProcessRequest(request, requestState, false, patchMessage).ContinueWith(r =>
@@ -256,7 +248,7 @@ namespace PubnubApi.EndPoint
                     Dictionary<string, Dictionary<string, string>> currentMembershipFormat = new Dictionary<string, Dictionary<string, string>>();
                     if (!string.IsNullOrEmpty(removeMembership[index]))
                     {
-                        currentMembershipFormat.Add("channel", new Dictionary<string, string>() { { "id", removeMembership[index] } });
+                        currentMembershipFormat.Add("channel", new Dictionary<string, string> { { "id", removeMembership[index] } });
                         removeMembershipFormatList.Add(currentMembershipFormat);
                     }
                 }
@@ -267,8 +259,7 @@ namespace PubnubApi.EndPoint
             }
             string patchMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
             Uri request = urlBuilder.BuildMembershipAddUpdateRemoveUserRequest("PATCH", patchMessage, uuid, internalPage.Next, internalPage.Prev, limit, includeCount, includeOptions, sort, externalQueryParam);
 
             Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false, patchMessage).ConfigureAwait(false);

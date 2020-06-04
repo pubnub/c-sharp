@@ -647,7 +647,7 @@ namespace PubnubApi
                                             && objectsDic.ContainsKey("source") && objectsDic.ContainsKey("version")
                                             && objectsDic["source"].ToString() == "objects" && Double.TryParse(objectsDic["version"].ToString(), out objectsVersion))
                                         {
-                                            if (objectsVersion == 2D) //Process only version=2 for Objects Simplification. Ignore 1. 
+                                            if (objectsVersion.CompareTo(2D) == 0) //Process only version=2 for Objects Simplification. Ignore 1. 
                                             {
                                                 payloadContainer.Add(payload);
                                             }

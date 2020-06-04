@@ -104,8 +104,8 @@ namespace PubnubApi.EndPoint
                 currentUuid = uuid;
             }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            
             Uri request = urlBuilder.BuildWhereNowRequest("GET", "", currentUuid, externalQueryParam);
 
             RequestState<PNWhereNowResult> requestState = new RequestState<PNWhereNowResult>();
@@ -144,8 +144,8 @@ namespace PubnubApi.EndPoint
                 currentUuid = uuid;
             }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            
             Uri request = urlBuilder.BuildWhereNowRequest("GET", "", currentUuid, externalQueryParam);
 
             RequestState<PNWhereNowResult> requestState = new RequestState<PNWhereNowResult>();
