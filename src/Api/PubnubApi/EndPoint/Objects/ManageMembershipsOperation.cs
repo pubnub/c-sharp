@@ -219,7 +219,7 @@ namespace PubnubApi.EndPoint
             string patchMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
-            Uri request = urlBuilder.BuildMembershipAddUpdateRemoveUserRequest("PATCH", patchMessage, uuid, internalPage.Next, internalPage.Prev, limit, includeCount, includeOptions, sort, externalQueryParam);
+            Uri request = urlBuilder.BuildMembershipSetRemoveManageUserRequest(requestState.ResponseType, "PATCH", patchMessage, uuid, internalPage.Next, internalPage.Prev, limit, includeCount, includeOptions, sort, externalQueryParam);
 
             UrlProcessRequest(request, requestState, false, patchMessage).ContinueWith(r =>
             {
@@ -304,7 +304,7 @@ namespace PubnubApi.EndPoint
             string patchMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
-            Uri request = urlBuilder.BuildMembershipAddUpdateRemoveUserRequest("PATCH", patchMessage, uuid, internalPage.Next, internalPage.Prev, limit, includeCount, includeOptions, sort, externalQueryParam);
+            Uri request = urlBuilder.BuildMembershipSetRemoveManageUserRequest(requestState.ResponseType, "PATCH", patchMessage, uuid, internalPage.Next, internalPage.Prev, limit, includeCount, includeOptions, sort, externalQueryParam);
 
             Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false, patchMessage).ConfigureAwait(false);
             ret.Status = JsonAndStatusTuple.Item2;

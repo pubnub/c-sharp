@@ -1483,9 +1483,9 @@ namespace PubnubApi
             return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
-        Uri IUrlRequestBuilder.BuildMembershipAddUpdateRemoveUserRequest(string requestMethod, string requestBody, string uuid, string start, string end, int limit, bool includeCount, string includeOptions, List<string> sort, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildMembershipSetRemoveManageUserRequest(PNOperationType type, string requestMethod, string requestBody, string uuid, string start, string end, int limit, bool includeCount, string includeOptions, List<string> sort, Dictionary<string, object> externalQueryParam)
         {
-            PNOperationType currentType = PNOperationType.PNManageMembershipsOperation;
+            PNOperationType currentType = type;
 
             List<string> url = new List<string>();
             url.Add("v2");

@@ -836,10 +836,14 @@ namespace PubnubApi
                     case PNOperationType.PNDeleteChannelMetadataOperation:
                     case PNOperationType.PNGetAllChannelMetadataOperation:
                     case PNOperationType.PNGetChannelMetadataOperation:
-                    case PNOperationType.PNManageMembershipsOperation:
-                    case PNOperationType.PNManageChannelMembersOperation:
                     case PNOperationType.PNGetMembershipsOperation:
+                    case PNOperationType.PNManageMembershipsOperation:
+                    case PNOperationType.PNSetMembershipsOperation:
+                    case PNOperationType.PNRemoveMembershipsOperation:
                     case PNOperationType.PNGetChannelMembersOperation:
+                    case PNOperationType.PNManageChannelMembersOperation:
+                    case PNOperationType.PNSetChannelMembersOperation:
+                    case PNOperationType.PNRemoveChannelMembersOperation:
                     case PNOperationType.PNAddMessageActionOperation:
                     case PNOperationType.PNRemoveMessageActionOperation:
                     case PNOperationType.PNGetMessageActionsOperation:

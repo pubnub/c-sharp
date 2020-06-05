@@ -118,8 +118,12 @@ namespace PubnubApi.EndPoint
                 case PNOperationType.PNGetChannelMetadataOperation:
                 case PNOperationType.PNGetMembershipsOperation:
                 case PNOperationType.PNManageMembershipsOperation:
+                case PNOperationType.PNSetMembershipsOperation:
+                case PNOperationType.PNRemoveMembershipsOperation:
                 case PNOperationType.PNGetChannelMembersOperation:
                 case PNOperationType.PNManageChannelMembersOperation:
+                case PNOperationType.PNSetChannelMembersOperation:
+                case PNOperationType.PNRemoveChannelMembersOperation:
                     endpoint = "l_obj";
                     break;
                 case PNOperationType.PNAddMessageActionOperation:

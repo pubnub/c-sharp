@@ -337,10 +337,50 @@ namespace PubnubApi
                             }
                         }
                         break;
+                    case PNOperationType.PNSetMembershipsOperation:
+                        if (savedEndpointOperation is SetMembershipsOperation)
+                        {
+                            SetMembershipsOperation endpoint = savedEndpointOperation as SetMembershipsOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
+                    case PNOperationType.PNRemoveMembershipsOperation:
+                        if (savedEndpointOperation is RemoveMembershipsOperation)
+                        {
+                            RemoveMembershipsOperation endpoint = savedEndpointOperation as RemoveMembershipsOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
                     case PNOperationType.PNManageChannelMembersOperation:
                         if (savedEndpointOperation is ManageChannelMembersOperation)
                         {
                             ManageChannelMembersOperation endpoint = savedEndpointOperation as ManageChannelMembersOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
+                    case PNOperationType.PNSetChannelMembersOperation:
+                        if (savedEndpointOperation is SetChannelMembersOperation)
+                        {
+                            SetChannelMembersOperation endpoint = savedEndpointOperation as SetChannelMembersOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
+                    case PNOperationType.PNRemoveChannelMembersOperation:
+                        if (savedEndpointOperation is RemoveChannelMembersOperation)
+                        {
+                            RemoveChannelMembersOperation endpoint = savedEndpointOperation as RemoveChannelMembersOperation;
                             if (endpoint != null)
                             {
                                 endpoint.Retry();
