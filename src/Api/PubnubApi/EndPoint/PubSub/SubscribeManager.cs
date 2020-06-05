@@ -30,8 +30,9 @@ namespace PubnubApi.EndPoint
             pubnubTelemetryMgr = telemetryManager;
         }
 
-
+#pragma warning disable
         internal void MultiChannelUnSubscribeAll<T>(PNOperationType type, Dictionary<string, object> externalQueryParam)
+#pragma warning restore
         {
             //Retrieve the current channels already subscribed previously and terminate them
             string[] currentChannels = MultiChannelSubscribe[PubnubInstance.InstanceId].Keys.ToArray<string>();
@@ -1361,7 +1362,9 @@ namespace PubnubApi.EndPoint
             }
         }
 
+#pragma warning disable
         void OnPresenceHeartbeatIntervalTimeout<T>(System.Object presenceHeartbeatState)
+#pragma warning restore
         {
             //Make presence heartbeat call
             RequestState<T> currentState = presenceHeartbeatState as RequestState<T>;
