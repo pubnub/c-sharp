@@ -76,7 +76,7 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
-        public GetChannelMembersOperation Include(PNMemberField[] includeOptions)
+        public GetChannelMembersOperation Include(PNChannelMemberField[] includeOptions)
         {
             if (includeOptions != null)
             {

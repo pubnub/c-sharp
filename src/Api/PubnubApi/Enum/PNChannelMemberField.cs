@@ -5,7 +5,7 @@ using System.Text;
 
 namespace PubnubApi
 {
-    public enum PNMemberField
+    public enum PNChannelMemberField
     {
         CUSTOM,
         UUID,

@@ -273,9 +273,9 @@ namespace PubnubApiDemo
 
             config.Secure = (enableSSL.Trim().ToLower() == "y");
             config.CipherKey = cipherKey;
-            config.SubscribeKey = subscribeKey;// "sub-c-d7da9e58-c997-11e9-a139-dab2c75acd6f";// subscribeKey;
-            config.PublishKey = publishKey;// "pub-c-03f156ea-a2e3-4c35-a733-9535824be897";// publishKey;
-            config.SecretKey = secretKey;// "";// secretKey;
+            config.SubscribeKey = subscribeKey;
+            config.PublishKey = publishKey;
+            config.SecretKey = secretKey;
             config.ReconnectionPolicy = PNReconnectionPolicy.LINEAR;
             //config.UseClassicHttpWebRequest = true;
             //config.FilterExpression = "uuid == '" + config.Uuid +  "'";
@@ -349,21 +349,18 @@ namespace PubnubApiDemo
                     menuOptionsStringBuilder.AppendLine("Enter 44 FOR Remove UUID");
                     menuOptionsStringBuilder.AppendLine("Enter 45 FOR Set Channel Metadata");
                     menuOptionsStringBuilder.AppendLine("Enter 46 FOR Get Channel(s) Metadata");
-                    menuOptionsStringBuilder.AppendLine("Enter 48 FOR Delete Channel Metadata");
-
-                    menuOptionsStringBuilder.AppendLine("Enter 49 FOR Manage Memberships");
-                    menuOptionsStringBuilder.AppendLine("Enter 50 FOR Manage Members");
-                    menuOptionsStringBuilder.AppendLine("Enter 51 FOR Get Memberships");
-                    menuOptionsStringBuilder.AppendLine("Enter 52 FOR Get Members");
-
-                    menuOptionsStringBuilder.AppendLine("Enter 53 FOR Set Memberships");
-                    menuOptionsStringBuilder.AppendLine("Enter 54 FOR Remove Members");
-
-                    menuOptionsStringBuilder.AppendLine("Enter 55 FOR Set Channel Members");
-                    menuOptionsStringBuilder.AppendLine("Enter 56 FOR Remove Channel Members");
-                    menuOptionsStringBuilder.AppendLine("Enter 57 FOR Add MessageAction");
-                    menuOptionsStringBuilder.AppendLine("Enter 58 FOR Remove MessageAction");
-                    menuOptionsStringBuilder.AppendLine("Enter 59 FOR Get MessageActions");
+                    menuOptionsStringBuilder.AppendLine("Enter 47 FOR Remove Channel Metadata");
+                    menuOptionsStringBuilder.AppendLine("Enter 48 FOR Manage Memberships");
+                    menuOptionsStringBuilder.AppendLine("Enter 49 FOR Manage Members");
+                    menuOptionsStringBuilder.AppendLine("Enter 50 FOR Get Memberships");
+                    menuOptionsStringBuilder.AppendLine("Enter 51 FOR Get Members");
+                    menuOptionsStringBuilder.AppendLine("Enter 52 FOR Set Memberships");
+                    menuOptionsStringBuilder.AppendLine("Enter 53 FOR Remove Members");
+                    menuOptionsStringBuilder.AppendLine("Enter 54 FOR Set Channel Members");
+                    menuOptionsStringBuilder.AppendLine("Enter 55 FOR Remove Channel Members");
+                    menuOptionsStringBuilder.AppendLine("Enter 56 FOR Add MessageAction");
+                    menuOptionsStringBuilder.AppendLine("Enter 57 FOR Remove MessageAction");
+                    menuOptionsStringBuilder.AppendLine("Enter 58 FOR Get MessageActions");
 
                     menuOptionsStringBuilder.AppendLine("ENTER 99 FOR EXIT OR QUIT");
                     Console.WriteLine(menuOptionsStringBuilder.ToString());
@@ -1445,10 +1442,6 @@ namespace PubnubApiDemo
                         pubnub.SetUuidMetadata()
                                 .Uuid(setUuidMetadataId)
                                 .Name(setUuidMetadataName)
-                                .Email(setUuidMetadataId+ "@test.com")
-                                .ExternalId("someexternalid")
-                                .ProfileUrl("someprofileurl")
-                                .Custom(new Dictionary<string, object>() { { "color", "red" } })
                                 .IncludeCustom(true)
                                 .Execute(new PNSetUuidMetadataResultExt((r, s) =>
                                 {
@@ -1478,7 +1471,6 @@ namespace PubnubApiDemo
                             pubnub.GetAllUuidMetadata()
                                 .IncludeCount(true)
                                 .IncludeCustom(true)
-                                //.Filter("name=='newnamemodified'")
                                 .Page(new PNPageObject() { Next = "", Prev = "" })
                                 .Execute(new PNGetAllUuidMetadataResultExt((r, s) =>
                                 {
@@ -1515,8 +1507,6 @@ namespace PubnubApiDemo
                             pubnub.SetChannelMetadata()
                                 .Channel(setChannelMetaId)
                                 .Name(setChannelMetaName)
-                                .Description("sample description")
-                                .Custom(new Dictionary<string, object>() { { "color", "blue" } })
                                 .IncludeCustom(true)
                                 .Execute(new PNSetChannelMetadataResultExt((r, s) =>
                                 {
@@ -1547,7 +1537,6 @@ namespace PubnubApiDemo
                             pubnub.GetAllChannelMetadata()
                                 .IncludeCount(true)
                                 .IncludeCustom(true)
-                                //.Limit(2)
                                 .Page(new PNPageObject() { Next = "", Prev = "" })
                                 .Execute(new PNGetAllChannelMetadataResultExt((r, s) =>
                                 {
@@ -1557,7 +1546,7 @@ namespace PubnubApiDemo
                                 ));
                         }
                         break;
-                    case "48":
+                    case "47":
                         Console.WriteLine("Enter Channel to remove.");
                         string removeChannelMetadataId = Console.ReadLine();
                         if (!string.IsNullOrWhiteSpace(removeChannelMetadataId))
@@ -1576,7 +1565,7 @@ namespace PubnubApiDemo
                             Console.WriteLine("Invalid Channel. Try again.");
                         }
                         break;
-                    case "49":
+                    case "48":
                         Console.WriteLine("Enter UUID");
                         string manageMembershipUuidMetaId = Console.ReadLine();
                         Console.WriteLine("Enter Channel to set");
@@ -1610,7 +1599,7 @@ namespace PubnubApiDemo
                             }
                             ));
                         break;
-                    case "50":
+                    case "49":
                         Console.WriteLine("Enter Channel");
                         string manageMemberChMetadataId = Console.ReadLine();
                         Console.WriteLine("Enter UUID to add");
@@ -1640,7 +1629,7 @@ namespace PubnubApiDemo
                                 .Channel(manageMemberChMetadataId)
                                 .Set(manageSetMemberList)
                                 .Remove(manageRemMemberList)
-                                .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.UUID, PNMemberField.UUID_CUSTOM })
+                                .Include(new PNChannelMemberField[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID, PNChannelMemberField.UUID_CUSTOM })
                                 .IncludeCount(true)
                                 .Page(new PNPageObject() { Next = "", Prev = "" })
                                 .Execute(new PNChannelMembersResultExt((r, s) =>
@@ -1651,7 +1640,7 @@ namespace PubnubApiDemo
                                 ));
                         }
                         break;
-                    case "51":
+                    case "50":
                         Console.WriteLine("Enter UUID to Get Memberships.");
                         string getMembershipsUuid = Console.ReadLine();
                         pubnub.GetMemberships()
@@ -1666,14 +1655,14 @@ namespace PubnubApiDemo
                             }
                             ));
                         break;
-                    case "52":
+                    case "51":
                         Console.WriteLine("Enter Channel to Get Channel Members.");
                         string getMembersChannelId = Console.ReadLine();
                         if (!string.IsNullOrEmpty(getMembersChannelId))
                         {
                             pubnub.GetChannelMembers()
                                 .Channel(getMembersChannelId)
-                                .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.UUID, PNMemberField.UUID_CUSTOM })
+                                .Include(new PNChannelMemberField[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID, PNChannelMemberField.UUID_CUSTOM })
                                 .IncludeCount(true)
                                 .Page(new PNPageObject() { Next = "", Prev = "" })
                                 .Execute(new PNChannelMembersResultExt((r, s) =>
@@ -1688,7 +1677,7 @@ namespace PubnubApiDemo
                             Console.WriteLine("Invalid Channel!!!");
                         }
                         break;
-                    case "53":
+                    case "52":
                         Console.WriteLine("Enter UUID");
                         string setMembershipUuidMetaId = Console.ReadLine();
                         Console.WriteLine("Enter Channel to add");
@@ -1707,7 +1696,6 @@ namespace PubnubApiDemo
                             .Include(new PNMembershipField[] { PNMembershipField.CUSTOM, PNMembershipField.CHANNEL, PNMembershipField.CHANNEL_CUSTOM })
                             .IncludeCount(true)
                             .Page(new PNPageObject() { Next = "", Prev = "" })
-                                //.Sort(new List<string>() { "channel.name:asc" })
                             .Execute(new PNMembershipsResultExt((r, s) =>
                             {
                                 if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
@@ -1715,7 +1703,7 @@ namespace PubnubApiDemo
                             }
                             ));
                         break;
-                    case "54":
+                    case "53":
                         Console.WriteLine("Enter UUID");
                         string removeMemshipUuidMetaId = Console.ReadLine();
                         Console.WriteLine("Enter Chanel to remove");
@@ -1734,7 +1722,6 @@ namespace PubnubApiDemo
                             .Include(new PNMembershipField[] { PNMembershipField.CUSTOM, PNMembershipField.CHANNEL, PNMembershipField.CHANNEL_CUSTOM })
                             .IncludeCount(true)
                             .Page(new PNPageObject() { Next = "", Prev = "" })
-                            //.Sort(new List<string>() { "channel.name:asc" })
                             .Execute(new PNMembershipsResultExt((r, s) =>
                             {
                                 if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
@@ -1742,7 +1729,7 @@ namespace PubnubApiDemo
                             }
                             ));
                         break;
-                    case "55":
+                    case "54":
                         Console.WriteLine("Enter Channel");
                         string setmemberChMetadataId = Console.ReadLine();
                         Console.WriteLine("Enter UUID to add");
@@ -1764,19 +1751,18 @@ namespace PubnubApiDemo
                             pubnub.SetChannelMembers()
                                 .Channel(setmemberChMetadataId)
                                 .Uuids(setMemberChannelList)
-                                .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.UUID, PNMemberField.UUID_CUSTOM })
+                                .Include(new PNChannelMemberField[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID, PNChannelMemberField.UUID_CUSTOM })
                                 .IncludeCount(true)
                                 .Page(new PNPageObject() { Next = "", Prev = "" })
-                            //.Sort(new List<string>() { "user.name:desc" })
-                            .Execute(new PNChannelMembersResultExt((r, s) =>
-                            {
-                                if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
-                                else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
-                            }
-                            ));
+                                .Execute(new PNChannelMembersResultExt((r, s) =>
+                                {
+                                    if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
+                                    else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
+                                }
+                                ));
                         }
                         break;
-                    case "56":
+                    case "55":
                         Console.WriteLine("Enter Channel");
                         string removeChMemberMetadataId = Console.ReadLine();
                         Console.WriteLine("Enter UUID to remove");
@@ -1798,10 +1784,9 @@ namespace PubnubApiDemo
                             pubnub.RemoveChannelMembers()
                                 .Channel(removeChMemberMetadataId)
                                 .Uuids(removeChannelMemberList)
-                                .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.UUID, PNMemberField.UUID_CUSTOM })
+                                .Include(new PNChannelMemberField[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID, PNChannelMemberField.UUID_CUSTOM })
                                 .IncludeCount(true)
                                 .Page(new PNPageObject() { Next = "", Prev = "" })
-                            //.Sort(new List<string>() { "user.name:desc" })
                                 .Execute(new PNChannelMembersResultExt((r, s) =>
                                 {
                                     if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
@@ -1810,7 +1795,7 @@ namespace PubnubApiDemo
                                 ));
                         }
                         break;
-                    case "57":
+                    case "56":
                         Console.WriteLine("Enter Channel Name to Add Message Actions");
                         string addMsgActionChannelName = Console.ReadLine();
                         Console.WriteLine("Enter MessageTimetoken");
@@ -1838,7 +1823,7 @@ namespace PubnubApiDemo
                                 }
                             }));
                         break;
-                    case "58":
+                    case "57":
                         Console.WriteLine("Enter Channel Name to Remove Message Actions");
                         string rmMsgActionChannelName = Console.ReadLine();
                         Console.WriteLine("Enter MessageTimetoken");
@@ -1869,7 +1854,7 @@ namespace PubnubApiDemo
                                 }
                             }));
                         break;
-                    case "59":
+                    case "58":
                         Console.WriteLine("Enter Channel Name to Get Message Actions");
                         string getMsgActionChannelName = Console.ReadLine();
 

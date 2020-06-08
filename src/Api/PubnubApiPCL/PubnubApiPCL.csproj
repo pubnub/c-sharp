@@ -172,13 +172,13 @@
       <Link>EndPoint\TimeOperation.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\Enum\GrantBitFlag.cs" Link="Enum\GrantBitFlag.cs" />
+    <Compile Include="..\PubnubApi\Enum\PNChannelMemberField.cs" Link="Enum\PNChannelMemberField.cs" />
     <Compile Include="..\PubnubApi\Enum\PNHeartbeatNotificationOption.cs">
       <Link>Enum\PNHeartbeatNotificationOption.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\Enum\PNLogVerbosity.cs">
       <Link>Enum\PNLogVerbosity.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\Enum\PNMemberField.cs" Link="Enum\PNMemberField.cs" />
     <Compile Include="..\PubnubApi\Enum\PNMembershipField.cs" Link="Enum\PNMembershipField.cs" />
     <Compile Include="..\PubnubApi\Enum\PNOperationType.cs">
       <Link>Enum\PNOperationType.cs</Link>

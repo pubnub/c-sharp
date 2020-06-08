@@ -355,21 +355,18 @@ namespace PubnubApiAsyncAwaitDemo
                     menuOptionsStringBuilder.AppendLine("Enter 44 FOR Remove UUID");
                     menuOptionsStringBuilder.AppendLine("Enter 45 FOR Set Channel Metadata");
                     menuOptionsStringBuilder.AppendLine("Enter 46 FOR Get Channel(s) Metadata");
-                    menuOptionsStringBuilder.AppendLine("Enter 48 FOR Delete Channel Metadata");
-                    
-                    menuOptionsStringBuilder.AppendLine("Enter 49 FOR Manage Memberships");
-                    menuOptionsStringBuilder.AppendLine("Enter 50 FOR Manage Members");
-                    menuOptionsStringBuilder.AppendLine("Enter 51 FOR Get Memberships");
-                    menuOptionsStringBuilder.AppendLine("Enter 52 FOR Get Members");
-
-                    menuOptionsStringBuilder.AppendLine("Enter 53 FOR Set Memberships");
-                    menuOptionsStringBuilder.AppendLine("Enter 54 FOR Remove Members");
-
-                    menuOptionsStringBuilder.AppendLine("Enter 55 FOR Set Channel Members");
-                    menuOptionsStringBuilder.AppendLine("Enter 56 FOR Remove Channel Members");
-                    menuOptionsStringBuilder.AppendLine("Enter 57 FOR Add MessageAction");
-                    menuOptionsStringBuilder.AppendLine("Enter 58 FOR Remove MessageAction");
-                    menuOptionsStringBuilder.AppendLine("Enter 59 FOR Get MessageActions");
+                    menuOptionsStringBuilder.AppendLine("Enter 47 FOR Remove Channel Metadata");
+                    menuOptionsStringBuilder.AppendLine("Enter 48 FOR Manage Memberships");
+                    menuOptionsStringBuilder.AppendLine("Enter 49 FOR Manage Members");
+                    menuOptionsStringBuilder.AppendLine("Enter 50 FOR Get Memberships");
+                    menuOptionsStringBuilder.AppendLine("Enter 51 FOR Get Members");
+                    menuOptionsStringBuilder.AppendLine("Enter 52 FOR Set Memberships");
+                    menuOptionsStringBuilder.AppendLine("Enter 53 FOR Remove Members");
+                    menuOptionsStringBuilder.AppendLine("Enter 54 FOR Set Channel Members");
+                    menuOptionsStringBuilder.AppendLine("Enter 55 FOR Remove Channel Members");
+                    menuOptionsStringBuilder.AppendLine("Enter 56 FOR Add MessageAction");
+                    menuOptionsStringBuilder.AppendLine("Enter 57 FOR Remove MessageAction");
+                    menuOptionsStringBuilder.AppendLine("Enter 58 FOR Get MessageActions");
 
                     menuOptionsStringBuilder.AppendLine("ENTER 99 FOR EXIT OR QUIT");
                     Console.WriteLine(menuOptionsStringBuilder.ToString());
@@ -1463,19 +1460,11 @@ namespace PubnubApiAsyncAwaitDemo
                         PNResult<PNSetUuidMetadataResult> setUuidMetadataResponse = await pubnub.SetUuidMetadata()
                             .Uuid(setUuidMetadataId)
                             .Name(setUuidMetadataName)
-                            .Email(setUuidMetadataId+"@test.com")
-                            .ExternalId("someexternalid")
-                            .ProfileUrl("someprofileurl")
-                            .Custom(new Dictionary<string, object>() { { "color", "red" } })
                             .IncludeCustom(true)
                             .ExecuteAsync();
+
                         PNSetUuidMetadataResult setUuidMetadataResult = setUuidMetadataResponse.Result;
                         PNStatus status = setUuidMetadataResponse.Status;
-
-                        //PNResult<PNSetUuidMetadataResult> setUuidMetadataResponse = await pubnub.SetUuidMetadata()
-                        //        .Uuid(setUuid)
-                        //        .Name(setUuidName)
-                        //        .ExecuteAsync();
 
                         if (setUuidMetadataResponse.Status.Error) { Console.WriteLine(status.ErrorData.Information); }
                         else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(setUuidMetadataResult)); }
@@ -1491,15 +1480,8 @@ namespace PubnubApiAsyncAwaitDemo
                                 .Uuid(getSingleUuidMetadata)
                                 .IncludeCustom(true)
                                 .ExecuteAsync();
-                            //PNGetUuidMetadataResult getUuidMetadataResult = getUuidMetadataResponse.Result;
-                            //PNStatus status = getUuidMetadataResponse.Status;
 
-                            //PNResult<PNGetUuidMetadataResult> getUuidMetadataResponse = await pubnub.GetUuidMetadata()
-                            //    .Uuid(getSingleUuidMetadata)
-                            //    .Include(new PNIncludeObject() { CustomFields = true })
-                            //    .ExecuteAsync();
-
-                            if (getUuidMetadataResponse.Status.Error) { Console.WriteLine(getUuidMetadataResponse.Status.ErrorData.Information); }
+                           if (getUuidMetadataResponse.Status.Error) { Console.WriteLine(getUuidMetadataResponse.Status.ErrorData.Information); }
                             else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(getUuidMetadataResponse.Result)); }
                         }
                         else
@@ -1507,12 +1489,8 @@ namespace PubnubApiAsyncAwaitDemo
                             PNResult<PNGetAllUuidMetadataResult> getAllUuidMetadataResponse = await pubnub.GetAllUuidMetadata()
                                 .IncludeCustom(true)
                                 .IncludeCount(true)
-                                //.Filter("name=='newnamemodified'")
-                                //.Sort(new List<string>() { "name:desc", "created:asc"})
                                 .Page(new PNPageObject() { Next = "", Prev = "" })
                                 .ExecuteAsync();
-                            //PNGetAllUuidMetadataResult getAllUuidMetadataResult = getAllUuidMetadataResponse.Result;
-                            //PNStatus status = getAllUuidMetadataResponse.Status;
 
                             if (getAllUuidMetadataResponse.Status.Error) { Console.WriteLine(getAllUuidMetadataResponse.Status.ErrorData.Information); }
                             else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(getAllUuidMetadataResponse.Result)); }
@@ -1543,8 +1521,6 @@ namespace PubnubApiAsyncAwaitDemo
                             PNResult<PNSetChannelMetadataResult> setChannelMetadataResponse = await pubnub.SetChannelMetadata()
                                 .Channel(setChannelMetaId)
                                 .Name(setChannelMetaName)
-                                .Description("sample description")
-                                .Custom(new Dictionary<string, object>() { { "color", "blue" } })
                                 .IncludeCustom(true)
                                 .ExecuteAsync();
 
@@ -1571,8 +1547,6 @@ namespace PubnubApiAsyncAwaitDemo
                             PNResult<PNGetAllChannelMetadataResult> getAllChannelMetadataResponse = await pubnub.GetAllChannelMetadata()
                                 .IncludeCount(true)
                                 .IncludeCustom(true)
-                                //.Limit(2)
-                                //.Sort(new List<string>() { "name:asc" })
                                 .Page(new PNPageObject() { Next = "", Prev = "" })
                                 .ExecuteAsync();
 
@@ -1580,17 +1554,11 @@ namespace PubnubApiAsyncAwaitDemo
                             else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(getAllChannelMetadataResponse.Result)); }
                         }
                         break;
-                    case "48":
+                    case "47":
                         Console.WriteLine("Enter Channel to remove.");
                         string removeChannelMetadataId = Console.ReadLine();
                         if (!string.IsNullOrWhiteSpace(removeChannelMetadataId))
                         {
-                            //PNResult<PNDeleteChannelMetadataResult> delChannelResponse = await pubnub.RemoveChannelMetadata()
-                            //    .Channel("mychannel")
-                            //    .ExecuteAsync();
-                            //PNDeleteChannelMetadataResult delChannelResult = delChannelResponse.Result;
-                            //PNStatus status = delChannelResponse.Status;
-
                             PNResult<PNRemoveChannelMetadataResult> removeChannelMetadataResponse = await pubnub.RemoveChannelMetadata()
                                 .Channel(removeChannelMetadataId)
                                 .ExecuteAsync();
@@ -1603,7 +1571,7 @@ namespace PubnubApiAsyncAwaitDemo
                             Console.WriteLine("Invalid Channel. Try again.");
                         }
                         break;
-                    case "49":
+                    case "48":
                         Console.WriteLine("Enter UUID");
                         string manageMembershipUuidMetaId = Console.ReadLine();
                         Console.WriteLine("Enter Channel to set");
@@ -1630,13 +1598,12 @@ namespace PubnubApiAsyncAwaitDemo
                             .Include(new PNMembershipField[] { PNMembershipField.CUSTOM, PNMembershipField.CHANNEL, PNMembershipField.CHANNEL_CUSTOM })
                             .IncludeCount(true)
                             .Page(new PNPageObject() { Next = "", Prev = "" })
-                            //.Sort(new List<string>() { "channel.name:asc" })
                             .ExecuteAsync();
 
                         if (manageMembershipResponse.Status.Error) { Console.WriteLine(manageMembershipResponse.Status.ErrorData.Information); }
                         else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(manageMembershipResponse.Result)); }
                         break;
-                    case "50":
+                    case "49":
                         Console.WriteLine("Enter Channel");
                         string manageMemberChMetadataId = Console.ReadLine();
                         Console.WriteLine("Enter UUID to add");
@@ -1666,17 +1633,16 @@ namespace PubnubApiAsyncAwaitDemo
                                 .Channel(manageMemberChMetadataId)
                                 .Set(manageSetMemberList)
                                 .Remove(manageRemMemberList)
-                                .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.UUID, PNMemberField.UUID_CUSTOM })
+                                .Include(new PNChannelMemberField[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID, PNChannelMemberField.UUID_CUSTOM })
                                 .IncludeCount(true)
                                 .Page(new PNPageObject() { Next = "", Prev = "" })
-                                //.Sort(new List<string>() { "user.name:desc" })
                                 .ExecuteAsync();
 
                             if (manageMemberResponse.Status.Error) { Console.WriteLine(manageMemberResponse.Status.ErrorData.Information); }
                             else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(manageMemberResponse.Result)); }
                         }
                         break;
-                    case "51":
+                    case "50":
                         Console.WriteLine("Enter UUID to Get Memberships.");
                         string getMembershipsUuid = Console.ReadLine();
 
@@ -1684,25 +1650,21 @@ namespace PubnubApiAsyncAwaitDemo
                             .Uuid(getMembershipsUuid)
                             .Include(new PNMembershipField[] { PNMembershipField.CUSTOM, PNMembershipField.CHANNEL, PNMembershipField.CHANNEL_CUSTOM })
                             .IncludeCount(true)
-                            //.Sort(new List<string>() { "name:asc" })
                             .Page(new PNPageObject() { Next = "", Prev = "" })
                             .ExecuteAsync();
-                        PNMembershipsResult getMembeshipsResult = getMembershipsResponse.Result;
-                        PNStatus status1 = getMembershipsResponse.Status;
 
                         if (getMembershipsResponse.Status.Error) { Console.WriteLine(getMembershipsResponse.Status.ErrorData.Information); }
                         else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(getMembershipsResponse.Result)); }
                         break;
-                    case "52":
+                    case "51":
                         Console.WriteLine("Enter Channel to Get Channel Members.");
                         string getMembersChannelId = Console.ReadLine();
                         if (!string.IsNullOrEmpty(getMembersChannelId))
                         {
                             PNResult<PNChannelMembersResult> getMembersResponse = await pubnub.GetChannelMembers()
                                 .Channel(getMembersChannelId)
-                                .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.UUID, PNMemberField.UUID_CUSTOM })
+                                .Include(new PNChannelMemberField[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID, PNChannelMemberField.UUID_CUSTOM })
                                 .IncludeCount(true)
-                                //.Sort(new List<string>() { "user.name:asc" })
                                 .Page(new PNPageObject() { Next = "", Prev = "" })
                                 .ExecuteAsync();
 
@@ -1714,7 +1676,7 @@ namespace PubnubApiAsyncAwaitDemo
                             Console.WriteLine("Invalid Channel!!!");
                         }
                         break;
-                    case "53":
+                    case "52":
                         Console.WriteLine("Enter UUID");
                         string setMembershipUuidMetaId = Console.ReadLine();
                         Console.WriteLine("Enter Channel to add");
@@ -1733,13 +1695,12 @@ namespace PubnubApiAsyncAwaitDemo
                             .Include(new PNMembershipField[] { PNMembershipField.CUSTOM, PNMembershipField.CHANNEL, PNMembershipField.CHANNEL_CUSTOM })
                             .IncludeCount(true)
                             .Page(new PNPageObject() { Next = "", Prev = "" })
-                            //.Sort(new List<string>() { "channel.name:asc" })
                             .ExecuteAsync();
 
                         if (setMembershipsResponse.Status.Error) { Console.WriteLine(setMembershipsResponse.Status.ErrorData.Information); }
                         else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(setMembershipsResponse.Result)); }
                         break;
-                    case "54":
+                    case "53":
                         Console.WriteLine("Enter UUID");
                         string removeMemshipUuidMetaId = Console.ReadLine();
                         Console.WriteLine("Enter Chanel to remove");
@@ -1758,13 +1719,12 @@ namespace PubnubApiAsyncAwaitDemo
                             .Include(new PNMembershipField[] { PNMembershipField.CUSTOM, PNMembershipField.CHANNEL, PNMembershipField.CHANNEL_CUSTOM })
                             .IncludeCount(true)
                             .Page(new PNPageObject() { Next = "", Prev = "" })
-                            //.Sort(new List<string>() { "channel.name:asc" })
                             .ExecuteAsync();
 
                         if (removeMembershipsResponse.Status.Error) { Console.WriteLine(removeMembershipsResponse.Status.ErrorData.Information); }
                         else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(removeMembershipsResponse.Result)); }
                         break;
-                    case "55":
+                    case "54":
                         Console.WriteLine("Enter Channel");
                         string setmemberChMetadataId = Console.ReadLine();
                         Console.WriteLine("Enter UUID to add");
@@ -1786,17 +1746,16 @@ namespace PubnubApiAsyncAwaitDemo
                             PNResult<PNChannelMembersResult> setChannelMembersResponse = await pubnub.SetChannelMembers()
                                 .Channel(setmemberChMetadataId)
                                 .Uuids(setMemberChannelList)
-                                .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.UUID, PNMemberField.UUID_CUSTOM })
+                                .Include(new PNChannelMemberField[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID, PNChannelMemberField.UUID_CUSTOM })
                                 .IncludeCount(true)
                                 .Page(new PNPageObject() { Next = "", Prev = "" })
-                                //.Sort(new List<string>() { "user.name:desc" })
                                 .ExecuteAsync();
 
                             if (setChannelMembersResponse.Status.Error) { Console.WriteLine(setChannelMembersResponse.Status.ErrorData.Information); }
                             else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(setChannelMembersResponse.Result)); }
                         }
                         break;
-                    case "56":
+                    case "55":
                         Console.WriteLine("Enter Channel");
                         string removeChMemberMetadataId = Console.ReadLine();
                         Console.WriteLine("Enter UUID to remove");
@@ -1818,17 +1777,16 @@ namespace PubnubApiAsyncAwaitDemo
                             PNResult<PNChannelMembersResult> manageMemberResponse = await pubnub.RemoveChannelMembers()
                                 .Channel(removeChMemberMetadataId)
                                 .Uuids(removeChannelMemberList)
-                                .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.UUID, PNMemberField.UUID_CUSTOM })
+                                .Include(new PNChannelMemberField[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID, PNChannelMemberField.UUID_CUSTOM })
                                 .IncludeCount(true)
                                 .Page(new PNPageObject() { Next = "", Prev = "" })
-                                //.Sort(new List<string>() { "user.name:desc" })
                                 .ExecuteAsync();
 
                             if (manageMemberResponse.Status.Error) { Console.WriteLine(manageMemberResponse.Status.ErrorData.Information); }
                             else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(manageMemberResponse.Result)); }
                         }
                         break;
-                    case "57":
+                    case "56":
                         Console.WriteLine("Enter Channel Name to Add Message Actions");
                         string addMsgActionChannelName = Console.ReadLine();
                         Console.WriteLine("Enter MessageTimetoken");
@@ -1855,7 +1813,7 @@ namespace PubnubApiAsyncAwaitDemo
                             Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(respAddMsgAction.Status));
                         }
                         break;
-                    case "58":
+                    case "57":
                         Console.WriteLine("Enter Channel Name to Remove Message Actions");
                         string rmMsgActionChannelName = Console.ReadLine();
                         Console.WriteLine("Enter MessageTimetoken");
@@ -1885,7 +1843,7 @@ namespace PubnubApiAsyncAwaitDemo
                             Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(respRmMsgAction.Status));
                         }
                         break;
-                    case "59":
+                    case "58":
                         Console.WriteLine("Enter Channel Name to Get Message Actions");
                         string getMsgActionChannelName = Console.ReadLine();
 

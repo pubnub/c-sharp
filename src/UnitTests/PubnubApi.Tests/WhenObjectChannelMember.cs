@@ -215,7 +215,7 @@ namespace PubNubMessaging.Tests
                             new PNChannelMember() { Uuid = uuidMetadataId1 },
                             new PNChannelMember() { Uuid = uuidMetadataId2 }
                     })
-                    .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.UUID, PNMemberField.UUID_CUSTOM })
+                    .Include(new PNChannelMemberField[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID, PNChannelMemberField.UUID_CUSTOM })
                     .IncludeCount(true)
                     .Page(new PNPageObject() { Next = "", Prev = "" })
                     .Execute(new PNChannelMembersResultExt((r, s) =>
@@ -248,7 +248,7 @@ namespace PubNubMessaging.Tests
                             new PNChannelMember() { Uuid = uuidMetadataId1, Custom = new Dictionary<string, object>(){ { "color", "green1" } } },
                             new PNChannelMember() { Uuid = uuidMetadataId2, Custom = new Dictionary<string, object>(){ { "color", "green2" } } }
                     })
-                    .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.UUID, PNMemberField.UUID_CUSTOM })
+                    .Include(new PNChannelMemberField[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID, PNChannelMemberField.UUID_CUSTOM })
                     .IncludeCount(true)
                     .Page(new PNPageObject() { Next = "", Prev = "" })
                     .Execute(new PNChannelMembersResultExt((r, s) =>
@@ -277,7 +277,7 @@ namespace PubNubMessaging.Tests
                 System.Diagnostics.Debug.WriteLine("pubnub.ManageChannelMembers() STARTED");
                 pubnub.ManageChannelMembers().Channel(channelMetadataId)
                     .Remove(new List<string>() { uuidMetadataId2 })
-                    .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.UUID, PNMemberField.UUID_CUSTOM })
+                    .Include(new PNChannelMemberField[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID, PNChannelMemberField.UUID_CUSTOM })
                     .IncludeCount(true)
                     .Page(new PNPageObject() { Next = "", Prev = "" })
                     .Execute(new PNChannelMembersResultExt((r, s) =>
@@ -462,7 +462,7 @@ namespace PubNubMessaging.Tests
                             new PNChannelMember() { Uuid = uuidMetadataId1 },
                             new PNChannelMember() { Uuid = uuidMetadataId2 }
                     })
-                    .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.UUID, PNMemberField.UUID_CUSTOM })
+                    .Include(new PNChannelMemberField[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID, PNChannelMemberField.UUID_CUSTOM })
                     .IncludeCount(true)
                     .Page(new PNPageObject() { Next = "", Prev = "" })
                     .ExecuteAsync()).Result.Result;
@@ -473,7 +473,7 @@ namespace PubNubMessaging.Tests
                             new PNChannelMember() { Uuid = uuidMetadataId1 },
                             new PNChannelMember() { Uuid = uuidMetadataId2 }
                     })
-                    .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.UUID, PNMemberField.UUID_CUSTOM })
+                    .Include(new PNChannelMemberField[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID, PNChannelMemberField.UUID_CUSTOM })
                     .IncludeCount(true)
                     .Page(new PNPageObject() { Next = "", Prev = "" })
                     .ExecuteAsync();
@@ -503,7 +503,7 @@ namespace PubNubMessaging.Tests
                             new PNChannelMember() { Uuid = uuidMetadataId1, Custom = new Dictionary<string, object>(){ { "color", "green1" } } },
                             new PNChannelMember() { Uuid = uuidMetadataId2, Custom = new Dictionary<string, object>(){ { "color", "green2" } } }
                     })
-                    .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.UUID, PNMemberField.UUID_CUSTOM })
+                    .Include(new PNChannelMemberField[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID, PNChannelMemberField.UUID_CUSTOM })
                     .IncludeCount(true)
                     .Page(new PNPageObject() { Next = "", Prev = "" })
                     .ExecuteAsync()).Result.Result;
@@ -514,7 +514,7 @@ namespace PubNubMessaging.Tests
                             new PNChannelMember() { Uuid = uuidMetadataId1, Custom = new Dictionary<string, object>(){ { "color", "green1" } } },
                             new PNChannelMember() { Uuid = uuidMetadataId2, Custom = new Dictionary<string, object>(){ { "color", "green2" } } }
                     })
-                    .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.UUID, PNMemberField.UUID_CUSTOM })
+                    .Include(new PNChannelMemberField[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID, PNChannelMemberField.UUID_CUSTOM })
                     .IncludeCount(true)
                     .Page(new PNPageObject() { Next = "", Prev = "" })
                     .ExecuteAsync();
@@ -540,14 +540,14 @@ namespace PubNubMessaging.Tests
 #if NET40
                 PNResult<PNChannelMembersResult> manageMmbrDelResult = Task.Factory.StartNew(async () => await pubnub.ManageChannelMembers().Channel(channelMetadataId)
                     .Remove(new List<string>() { uuidMetadataId2 })
-                    .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.UUID, PNMemberField.UUID_CUSTOM })
+                    .Include(new PNChannelMemberField[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID, PNChannelMemberField.UUID_CUSTOM })
                     .IncludeCount(true)
                     .Page(new PNPageObject() { Next = "", Prev = "" })
                     .ExecuteAsync()).Result.Result;
 #else
                 PNResult<PNChannelMembersResult> manageMmbrDelResult = await pubnub.ManageChannelMembers().Channel(channelMetadataId)
                     .Remove(new List<string>() { uuidMetadataId2 })
-                    .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.UUID, PNMemberField.UUID_CUSTOM })
+                    .Include(new PNChannelMemberField[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID, PNChannelMemberField.UUID_CUSTOM })
                     .IncludeCount(true)
                     .Page(new PNPageObject() { Next = "", Prev = "" })
                     .ExecuteAsync();
@@ -729,7 +729,7 @@ namespace PubNubMessaging.Tests
                             new PNChannelMember() { Uuid = uuidMetadataId1 },
                             new PNChannelMember() { Uuid = uuidMetadataId2 }
                     })
-                    .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.UUID, PNMemberField.UUID_CUSTOM })
+                    .Include(new PNChannelMemberField[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID, PNChannelMemberField.UUID_CUSTOM })
                     .IncludeCount(true)
                     .Page(new PNPageObject() { Next = "", Prev = "" })
                     .Execute(new PNChannelMembersResultExt((r, s) =>
@@ -762,7 +762,7 @@ namespace PubNubMessaging.Tests
                             new PNChannelMember() { Uuid = uuidMetadataId1, Custom = new Dictionary<string, object>(){ { "color", "green1" } } },
                             new PNChannelMember() { Uuid = uuidMetadataId2, Custom = new Dictionary<string, object>(){ { "color", "green2" } } }
                     })
-                    .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.UUID, PNMemberField.UUID_CUSTOM })
+                    .Include(new PNChannelMemberField[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID, PNChannelMemberField.UUID_CUSTOM })
                     .IncludeCount(true)
                     .Page(new PNPageObject() { Next = "", Prev = "" })
                     .Execute(new PNChannelMembersResultExt((r, s) =>
@@ -791,7 +791,7 @@ namespace PubNubMessaging.Tests
                 System.Diagnostics.Debug.WriteLine("pubnub.RemoveChannelMembers() STARTED");
                 pubnub.RemoveChannelMembers().Channel(channelMetadataId)
                     .Uuids(new List<string>() { uuidMetadataId2 })
-                    .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.UUID, PNMemberField.UUID_CUSTOM })
+                    .Include(new PNChannelMemberField[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID, PNChannelMemberField.UUID_CUSTOM })
                     .IncludeCount(true)
                     .Page(new PNPageObject() { Next = "", Prev = "" })
                     .Execute(new PNChannelMembersResultExt((r, s) =>
@@ -977,7 +977,7 @@ namespace PubNubMessaging.Tests
                             new PNChannelMember() { Uuid = uuidMetadataId1 },
                             new PNChannelMember() { Uuid = uuidMetadataId2 }
                     })
-                    .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.UUID, PNMemberField.UUID_CUSTOM })
+                    .Include(new PNChannelMemberField[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID, PNChannelMemberField.UUID_CUSTOM })
                     .IncludeCount(true)
                     .Page(new PNPageObject() { Next = "", Prev = "" })
                     .ExecuteAsync()).Result.Result;
@@ -988,7 +988,7 @@ namespace PubNubMessaging.Tests
                             new PNChannelMember() { Uuid = uuidMetadataId1 },
                             new PNChannelMember() { Uuid = uuidMetadataId2 }
                     })
-                    .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.UUID, PNMemberField.UUID_CUSTOM })
+                    .Include(new PNChannelMemberField[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID, PNChannelMemberField.UUID_CUSTOM })
                     .IncludeCount(true)
                     .Page(new PNPageObject() { Next = "", Prev = "" })
                     .ExecuteAsync();
@@ -1018,7 +1018,7 @@ namespace PubNubMessaging.Tests
                             new PNChannelMember() { Uuid = uuidMetadataId1, Custom = new Dictionary<string, object>(){ { "color", "green1" } } },
                             new PNChannelMember() { Uuid = uuidMetadataId2, Custom = new Dictionary<string, object>(){ { "color", "green2" } } }
                     })
-                    .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.UUID, PNMemberField.UUID_CUSTOM })
+                    .Include(new PNChannelMemberField[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID, PNChannelMemberField.UUID_CUSTOM })
                     .IncludeCount(true)
                     .Page(new PNPageObject() { Next = "", Prev = "" })
                     .ExecuteAsync()).Result.Result;
@@ -1029,7 +1029,7 @@ namespace PubNubMessaging.Tests
                             new PNChannelMember() { Uuid = uuidMetadataId1, Custom = new Dictionary<string, object>(){ { "color", "green1" } } },
                             new PNChannelMember() { Uuid = uuidMetadataId2, Custom = new Dictionary<string, object>(){ { "color", "green2" } } }
                     })
-                    .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.UUID, PNMemberField.UUID_CUSTOM })
+                    .Include(new PNChannelMemberField[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID, PNChannelMemberField.UUID_CUSTOM })
                     .IncludeCount(true)
                     .Page(new PNPageObject() { Next = "", Prev = "" })
                     .ExecuteAsync();
@@ -1055,14 +1055,14 @@ namespace PubNubMessaging.Tests
 #if NET40
                 PNResult<PNChannelMembersResult> manageMmbrDelResult = Task.Factory.StartNew(async () => await pubnub.RemoveChannelMembers().Channel(channelMetadataId)
                     .Uuids(new List<string>() { uuidMetadataId2 })
-                    .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.UUID, PNMemberField.UUID_CUSTOM })
+                    .Include(new PNChannelMemberField[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID, PNChannelMemberField.UUID_CUSTOM })
                     .IncludeCount(true)
                     .Page(new PNPageObject() { Next = "", Prev = "" })
                     .ExecuteAsync()).Result.Result;
 #else
                 PNResult<PNChannelMembersResult> manageMmbrDelResult = await pubnub.RemoveChannelMembers().Channel(channelMetadataId)
                     .Uuids(new List<string>() { uuidMetadataId2 })
-                    .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.UUID, PNMemberField.UUID_CUSTOM })
+                    .Include(new PNChannelMemberField[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID, PNChannelMemberField.UUID_CUSTOM })
                     .IncludeCount(true)
                     .Page(new PNPageObject() { Next = "", Prev = "" })
                     .ExecuteAsync();
