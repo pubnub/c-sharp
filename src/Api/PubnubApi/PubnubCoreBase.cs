@@ -42,7 +42,6 @@ namespace PubnubApi
         private static IPubnubUnitTest unitTest;
         private static ConcurrentDictionary<string, IPubnubLog> pubnubLog { get; } = new ConcurrentDictionary<string, IPubnubLog>();
         private static EndPoint.TelemetryManager pubnubTelemetryMgr;
-        private readonly EndPoint.TokenManager pubnubTokenMgr;
         private static EndPoint.DuplicationManager pubnubSubscribeDuplicationManager { get; set; }
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
         private static HttpClient httpClientSubscribe { get; set; }
@@ -143,13 +142,12 @@ namespace PubnubApi
             set;
         } = new ConcurrentDictionary<string, DateTime>();
 
-        protected PubnubCoreBase(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance)
+        protected PubnubCoreBase(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, Pubnub instance)
         {
             if (pubnubConfiguation == null)
             {
                 throw new ArgumentException("PNConfiguration missing");
             }
-            this.pubnubTokenMgr = tokenManager;
             if (jsonPluggableLibrary == null)
             {
                 InternalConstructor(pubnubConfiguation, new NewtonsoftJsonDotNet(pubnubConfiguation,log), pubnubUnitTest, log, telemetryManager, instance);
@@ -637,9 +635,33 @@ namespace PubnubApi
                                     object payload = currentMessage.Payload;
 
                                     List<object> payloadContainer = new List<object>(); //First item always message
-                                    if (currentMessageChannel.Contains("-pnpres") || currentMessageChannel.Contains(".*-pnpres") || currentMessage.MessageType == 2)
+                                    if (currentMessageChannel.Contains("-pnpres") || currentMessageChannel.Contains(".*-pnpres"))
                                     {
                                         payloadContainer.Add(payload);
+                                    }
+                                    else if (currentMessage.MessageType == 2) //Objects Simplification events
+                                    {
+                                        double objectsVersion = -1;
+                                        Dictionary<string, object> objectsDic = payload as Dictionary<string, object>;
+                                        if (objectsDic != null 
+                                            && objectsDic.ContainsKey("source") && objectsDic.ContainsKey("version")
+                                            && objectsDic["source"].ToString() == "objects" && Double.TryParse(objectsDic["version"].ToString(), out objectsVersion))
+                                        {
+                                            if (objectsVersion.CompareTo(2D) == 0) //Process only version=2 for Objects Simplification. Ignore 1. 
+                                            {
+                                                payloadContainer.Add(payload);
+                                            }
+                                            else
+                                            {
+                                                LoggingMethod.WriteToLog(currentLog, string.Format("DateTime: {0}, ResponseToUserCallback - Legacy Objects V1. Ignoring this.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), currentConfig.LogVerbosity);
+                                                continue;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            LoggingMethod.WriteToLog(currentLog, string.Format("DateTime: {0}, ResponseToUserCallback - MessageType =2 but NOT valid format to process", DateTime.Now.ToString(CultureInfo.InvariantCulture)), currentConfig.LogVerbosity);
+                                            continue;
+                                        }
                                     }
                                     else
                                     {
@@ -728,7 +750,7 @@ namespace PubnubApi
                                     else if (currentMessage.MessageType == 2)
                                     {
                                         ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
-                                        PNObjectApiEventResult objectApiEvent = responseBuilder.JsonToObject<PNObjectApiEventResult>(payloadContainer, true);
+                                        PNObjectEventResult objectApiEvent = responseBuilder.JsonToObject<PNObjectEventResult>(payloadContainer, true);
                                         if (objectApiEvent != null)
                                         {
                                             Announce(objectApiEvent);
@@ -806,20 +828,22 @@ namespace PubnubApi
                     case PNOperationType.PNRemoveGroupOperation:
                     case PNOperationType.ChannelGroupGet:
                     case PNOperationType.ChannelGroupAllGet:
-                    case PNOperationType.PNCreateUserOperation:
-                    case PNOperationType.PNUpdateUserOperation:
-                    case PNOperationType.PNDeleteUserOperation:
-                    case PNOperationType.PNGetUsersOperation:
-                    case PNOperationType.PNGetUserOperation:
-                    case PNOperationType.PNCreateSpaceOperation:
-                    case PNOperationType.PNUpdateSpaceOperation:
-                    case PNOperationType.PNDeleteSpaceOperation:
-                    case PNOperationType.PNGetSpacesOperation:
-                    case PNOperationType.PNGetSpaceOperation:
-                    case PNOperationType.PNManageMembershipsOperation:
-                    case PNOperationType.PNManageMembersOperation:
+                    case PNOperationType.PNSetUuidMetadataOperation:
+                    case PNOperationType.PNDeleteUuidMetadataOperation:
+                    case PNOperationType.PNGetAllUuidMetadataOperation:
+                    case PNOperationType.PNGetUuidMetadataOperation:
+                    case PNOperationType.PNSetChannelMetadataOperation:
+                    case PNOperationType.PNDeleteChannelMetadataOperation:
+                    case PNOperationType.PNGetAllChannelMetadataOperation:
+                    case PNOperationType.PNGetChannelMetadataOperation:
                     case PNOperationType.PNGetMembershipsOperation:
-                    case PNOperationType.PNGetMembersOperation:
+                    case PNOperationType.PNManageMembershipsOperation:
+                    case PNOperationType.PNSetMembershipsOperation:
+                    case PNOperationType.PNRemoveMembershipsOperation:
+                    case PNOperationType.PNGetChannelMembersOperation:
+                    case PNOperationType.PNManageChannelMembersOperation:
+                    case PNOperationType.PNSetChannelMembersOperation:
+                    case PNOperationType.PNRemoveChannelMembersOperation:
                     case PNOperationType.PNAddMessageActionOperation:
                     case PNOperationType.PNRemoveMessageActionOperation:
                     case PNOperationType.PNGetMessageActionsOperation:
@@ -1375,10 +1399,8 @@ namespace PubnubApi
                         case PNOperationType.PushGet:
                         case PNOperationType.PushUnregister:
                         case PNOperationType.Leave:
-                        case PNOperationType.PNCreateUserOperation:
-                        case PNOperationType.PNUpdateUserOperation:
-                        case PNOperationType.PNCreateSpaceOperation:
-                        case PNOperationType.PNUpdateSpaceOperation:
+                        case PNOperationType.PNSetUuidMetadataOperation:
+                        case PNOperationType.PNSetChannelMetadataOperation:
                         case PNOperationType.PNAddMessageActionOperation:
                         case PNOperationType.PNRemoveMessageActionOperation:
                         case PNOperationType.PNGetMessageActionsOperation:
@@ -1811,14 +1833,6 @@ namespace PubnubApi
             }
         }
 
-        protected void TerminateTokenManager()
-        {
-            if (pubnubTokenMgr != null)
-            {
-                pubnubTokenMgr.Destroy();
-            }
-        }
-
         protected static void TerminateDedupeManager()
         {
             if (pubnubSubscribeDuplicationManager != null)
@@ -1996,7 +2010,6 @@ namespace PubnubApi
             TerminatePresenceHeartbeatTimer();
             TerminateTelemetry();
             TerminateDedupeManager();
-            TerminateTokenManager();
 
             if (MultiChannelSubscribe.Count > 0 && MultiChannelSubscribe.ContainsKey(PubnubInstance.InstanceId))
             {
@@ -2152,7 +2165,7 @@ namespace PubnubApi
             }
         }
 
-        internal void Announce(PNObjectApiEventResult objectApiEvent)
+        internal void Announce(PNObjectEventResult objectApiEvent)
         {
             if (PubnubInstance != null && SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
             {

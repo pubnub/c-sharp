@@ -693,8 +693,8 @@ namespace PubnubApi
             try
             {
                 request.Method = (pubnubRequestState != null && (pubnubRequestState.ResponseType == PNOperationType.PNDeleteMessageOperation 
-                    || pubnubRequestState.ResponseType == PNOperationType.PNDeleteUserOperation
-                    || pubnubRequestState.ResponseType == PNOperationType.PNDeleteSpaceOperation
+                    || pubnubRequestState.ResponseType == PNOperationType.PNDeleteUuidMetadataOperation
+                    || pubnubRequestState.ResponseType == PNOperationType.PNDeleteChannelMetadataOperation
                     || pubnubRequestState.ResponseType == PNOperationType.PNRemoveMessageActionOperation)) ? "DELETE" : "GET";
                 System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Before BeginGetResponse", DateTime.Now.ToString(CultureInfo.InvariantCulture)));
                 System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
@@ -1069,8 +1069,8 @@ namespace PubnubApi
         private static string FindHttpGetOrDeleteMethod<T>(RequestState<T> pubnubRequestState)
         {
             return (pubnubRequestState != null && (pubnubRequestState.ResponseType == PNOperationType.PNDeleteMessageOperation
-                                                || pubnubRequestState.ResponseType == PNOperationType.PNDeleteUserOperation
-                                                || pubnubRequestState.ResponseType == PNOperationType.PNDeleteSpaceOperation
+                                                || pubnubRequestState.ResponseType == PNOperationType.PNDeleteUuidMetadataOperation
+                                                || pubnubRequestState.ResponseType == PNOperationType.PNDeleteChannelMetadataOperation
                                                 || pubnubRequestState.ResponseType == PNOperationType.PNRemoveMessageActionOperation)) ? "DELETE" : "GET";
 
         }

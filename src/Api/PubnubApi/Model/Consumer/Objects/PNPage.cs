@@ -5,9 +5,9 @@ using System.Text;
 
 namespace PubnubApi
 {
-    public class PNPage
+    public class PNPageObject
     {
-        public PNPage()
+        public PNPageObject()
         {
             Next = "";
             Prev = "";

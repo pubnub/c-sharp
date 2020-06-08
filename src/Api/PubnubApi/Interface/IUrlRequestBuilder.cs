@@ -7,12 +7,6 @@ namespace PubnubApi.Interface
 {
     public interface IUrlRequestBuilder
     {
-        string PubnubInstanceId
-        {
-            get;
-            set;
-        }
-
         Uri BuildTimeRequest(string requestMethod, string requestBody, Dictionary<string, object> externalQueryParam);
 
         Uri BuildMultiChannelSubscribeRequest(string requestMethod, string requestBody, string[] channels, string[] channelGroups, long timetoken, string channelsJsonState, Dictionary<string, string> initialSubscribeUrlParams, Dictionary<string, object> externalQueryParam);
@@ -63,33 +57,29 @@ namespace PubnubApi.Interface
 
         Uri BuildMessageCountsRequest(string requestMethod, string requestBody, string[] channels, long[] timetokens, Dictionary<string, object> externalQueryParam);
 
-        Uri BuildCreateUserRequest(string requestMethod, string requestBody, string userId, Dictionary<string, object> userCustom, Dictionary<string, object> externalQueryParam);
+        Uri BuildSetUuidMetadataRequest(string requestMethod, string requestBody, string uuid, bool includeCustom, Dictionary<string, object> externalQueryParam);
 
-        Uri BuildUpdateUserRequest(string requestMethod, string requestBody, string userId, Dictionary<string, object> userCustom, Dictionary<string, object> externalQueryParam);
+        Uri BuildDeleteUuidMetadataRequest(string requestMethod, string requestBody, string uuid, Dictionary<string, object> externalQueryParam);
 
-        Uri BuildDeleteUserRequest(string requestMethod, string requestBody, string userId, Dictionary<string, object> externalQueryParam);
+        Uri BuildGetAllUuidMetadataRequest(string requestMethod, string requestBody, string start, string end, int limit, bool includeCount, bool includeCustom, string filter, List<string> sort, Dictionary<string, object> externalQueryParam);
 
-        Uri BuildGetAllUsersRequest(string requestMethod, string requestBody, string start, string end, int limit, bool includeCount, bool includeCustom, string filter, List<string> sort, Dictionary<string, object> externalQueryParam);
+        Uri BuildGetSingleUuidMetadataRequest(string requestMethod, string requestBody, string uuid, bool includeCustom, Dictionary<string, object> externalQueryParam);
 
-        Uri BuildGetSingleUserRequest(string requestMethod, string requestBody, string userId, bool includeCustom, Dictionary<string, object> externalQueryParam);
+        Uri BuildSetChannelMetadataRequest(string requestMethod, string requestBody, string channel, bool includeCustom, Dictionary<string, object> externalQueryParam);
 
-        Uri BuildCreateSpaceRequest(string requestMethod, string requestBody, string spaceId, Dictionary<string, object> spaceCustom, Dictionary<string, object> externalQueryParam);
+        Uri BuildDeleteChannelMetadataRequest(string requestMethod, string requestBody, string channel, Dictionary<string, object> externalQueryParam);
 
-        Uri BuildUpdateSpaceRequest(string requestMethod, string requestBody, string spaceId, Dictionary<string, object> spaceCustom, Dictionary<string, object> externalQueryParam);
+        Uri BuildGetAllChannelMetadataRequest(string requestMethod, string requestBody, string start, string end, int limit, bool includeCount, bool includeCustom, string filter, List<string> sort, Dictionary<string, object> externalQueryParam);
 
-        Uri BuildDeleteSpaceRequest(string requestMethod, string requestBody, string spaceId, Dictionary<string, object> externalQueryParam);
+        Uri BuildGetSingleChannelMetadataRequest(string requestMethod, string requestBody, string channel, bool includeCustom, Dictionary<string, object> externalQueryParam);
 
-        Uri BuildGetAllSpacesRequest(string requestMethod, string requestBody, string start, string end, int limit, bool includeCount, bool includeCustom, string filter, List<string> sort, Dictionary<string, object> externalQueryParam);
+        Uri BuildMembershipSetRemoveManageUserRequest(PNOperationType type, string requestMethod, string requestBody, string uuid, string start, string end, int limit, bool includeCount, string includeOptions, List<string> sort, Dictionary<string, object> externalQueryParam);
 
-        Uri BuildGetSingleSpaceRequest(string requestMethod, string requestBody, string spaceId, bool includeCustom, Dictionary<string, object> externalQueryParam);
+        Uri BuildMemberAddUpdateRemoveChannelRequest(string requestMethod, string requestBody, string channel, string start, string end, int limit, bool includeCount, string includeOptions, List<string> sort, Dictionary<string, object> externalQueryParam);
 
-        Uri BuildUpdateSpaceMembershipsWithUserRequest(string requestMethod, string requestBody, string userId, string start, string end, int limit, bool includeCount, string includeOptions, List<string> sort, Dictionary<string, object> externalQueryParam);
+        Uri BuildGetAllMembershipsRequest(string requestMethod, string requestBody, string uuid, string start, string end, int limit, bool includeCount, string includeOptions, string filter, List<string> sort, Dictionary<string, object> externalQueryParam);
 
-        Uri BuildMembersAddUpdateRemoveRequest(string requestMethod, string requestBody, string spaceId, string start, string end, int limit, bool includeCount, string includeOptions, List<string> sort, Dictionary<string, object> externalQueryParam);
-
-        Uri BuildGetAllMembershipsRequest(string requestMethod, string requestBody, string userId, string start, string end, int limit, bool includeCount, string includeOptions, string filter, List<string> sort, Dictionary<string, object> externalQueryParam);
-
-        Uri BuildGetAllMembersRequest(string requestMethod, string requestBody, string spaceId, string start, string end, int limit, bool includeCount, string includeOptions, string filter, List<string> sort, Dictionary<string, object> externalQueryParam);
+        Uri BuildGetAllMembersRequest(string requestMethod, string requestBody, string channel, string start, string end, int limit, bool includeCount, string includeOptions, string filter, List<string> sort, Dictionary<string, object> externalQueryParam);
 
         Uri BuildAddMessageActionRequest(string requestMethod, string requestBody, string channel, long messageTimetoken, Dictionary<string, object> externalQueryParam);
 

@@ -135,19 +135,6 @@ namespace PubnubApi
             return JsonConvert.SerializeObject(objectToSerialize);
         }
 
-#pragma warning disable S2325,2325
-        /// <summary>
-        /// Use this to serialize Dictionary<PNTokenKey, string>
-        /// </summary>
-        /// <param name="objectToSerialize"></param>
-        /// <returns></returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Codacy.Sonar", "S2325:Methods and properties that don't access instance data should be static")]
-        public string SerializeDictionaryOfTokenKey(Dictionary<PNTokenKey, string> objectToSerialize) // NOSONAR
-        {
-            return JsonConvert.SerializeObject(objectToSerialize, new EndPoint.TokenManager.TokenManagerConverter());
-        }
-#pragma warning restore S2325,2325
-
         public List<object> DeserializeToListOfObject(string jsonString)
         {
             List<object> result = JsonConvert.DeserializeObject<List<object>>(jsonString);
@@ -627,13 +614,6 @@ namespace PubnubApi
 
                 ret = (T)Convert.ChangeType(ack, typeof(PNAccessManagerGrantResult), CultureInfo.InvariantCulture);
 #endregion
-            }
-            else if (typeof(T) == typeof(PNAccessManagerTokenResult))
-            {
-                #region "PNAccessManagerTokenResult"
-                PNAccessManagerTokenResult result = PNGrantTokenJsonDataParse.GetObject(listObject);
-                ret = (T)Convert.ChangeType(result, typeof(PNAccessManagerTokenResult), CultureInfo.InvariantCulture);
-                #endregion
             }
             else if (typeof(T) == typeof(PNAccessManagerAuditResult))
             {
@@ -1315,109 +1295,81 @@ namespace PubnubApi
                 ret = (T)Convert.ChangeType(result, typeof(PNHeartbeatResult), CultureInfo.InvariantCulture);
 #endregion
             }
-            else if (typeof(T) == typeof(PNCreateUserResult))
+            else if (typeof(T) == typeof(PNSetUuidMetadataResult))
             {
-                #region "PNCreateUserResult"
-                PNCreateUserResult result = PNCreateUserJsonDataParse.GetObject(listObject);
-                ret = (T)Convert.ChangeType(result, typeof(PNCreateUserResult), CultureInfo.InvariantCulture);
+                #region "PNSetUuidMetadataResult"
+                PNSetUuidMetadataResult result = PNSetUuidMetadataJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNSetUuidMetadataResult), CultureInfo.InvariantCulture);
                 #endregion
             }
-            else if (typeof(T) == typeof(PNUpdateUserResult))
+            else if (typeof(T) == typeof(PNRemoveUuidMetadataResult))
             {
-                #region "PNUpdateUserResult"
-                PNUpdateUserResult result = PNUpdateUserJsonDataParse.GetObject(listObject);
-                ret = (T)Convert.ChangeType(result, typeof(PNUpdateUserResult), CultureInfo.InvariantCulture);
+                #region "PNDeleteUuidMetadataResult"
+                PNRemoveUuidMetadataResult ack = new PNRemoveUuidMetadataResult();
+                ret = (T)Convert.ChangeType(ack, typeof(PNRemoveUuidMetadataResult), CultureInfo.InvariantCulture);
                 #endregion
             }
-            else if (typeof(T) == typeof(PNDeleteUserResult))
+            else if (typeof(T) == typeof(PNGetAllUuidMetadataResult))
             {
-                #region "PNDeleteUserResult"
-                PNDeleteUserResult ack = new PNDeleteUserResult();
-                ret = (T)Convert.ChangeType(ack, typeof(PNDeleteUserResult), CultureInfo.InvariantCulture);
+                #region "PNGetAllUuidMetadataResult"
+                PNGetAllUuidMetadataResult result = PNGetAllUuidMetadataJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNGetAllUuidMetadataResult), CultureInfo.InvariantCulture);
                 #endregion
             }
-            else if (typeof(T) == typeof(PNGetUsersResult))
+            else if (typeof(T) == typeof(PNGetUuidMetadataResult))
             {
-                #region "PNGetUsersResult"
-                PNGetUsersResult result = PNGetUsersJsonDataParse.GetObject(listObject);
-                ret = (T)Convert.ChangeType(result, typeof(PNGetUsersResult), CultureInfo.InvariantCulture);
+                #region "PNGetUuidMetadataResult"
+                PNGetUuidMetadataResult result = PNGetUuidMetadataJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNGetUuidMetadataResult), CultureInfo.InvariantCulture);
                 #endregion
             }
-            else if (typeof(T) == typeof(PNGetUserResult))
+            else if (typeof(T) == typeof(PNSetChannelMetadataResult))
             {
-                #region "PNGetUserResult"
-                PNGetUserResult result = PNGetUserJsonDataParse.GetObject(listObject);
-                ret = (T)Convert.ChangeType(result, typeof(PNGetUserResult), CultureInfo.InvariantCulture);
+                #region "PNSetChannelMetadataResult"
+                PNSetChannelMetadataResult result = PNSetChannelMetadataJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNSetChannelMetadataResult), CultureInfo.InvariantCulture);
                 #endregion
             }
-            else if (typeof(T) == typeof(PNCreateSpaceResult))
-            {
-                #region "PNCreateSpaceResult"
-                PNCreateSpaceResult result = PNCreateSpaceJsonDataParse.GetObject(listObject);
-                ret = (T)Convert.ChangeType(result, typeof(PNCreateSpaceResult), CultureInfo.InvariantCulture);
-                #endregion
-            }
-            else if (typeof(T) == typeof(PNUpdateSpaceResult))
-            {
-                #region "PNUpdateSpaceResult"
-                PNUpdateSpaceResult result = PNUpdateSpaceJsonDataParse.GetObject(listObject);
-                ret = (T)Convert.ChangeType(result, typeof(PNUpdateSpaceResult), CultureInfo.InvariantCulture);
-                #endregion
-            }
-            else if (typeof(T) == typeof(PNDeleteSpaceResult))
+            else if (typeof(T) == typeof(PNRemoveChannelMetadataResult))
             {
                 #region "PNDeleteUserResult"
-                PNDeleteSpaceResult ack = new PNDeleteSpaceResult();
-                ret = (T)Convert.ChangeType(ack, typeof(PNDeleteSpaceResult), CultureInfo.InvariantCulture);
+                PNRemoveChannelMetadataResult ack = new PNRemoveChannelMetadataResult();
+                ret = (T)Convert.ChangeType(ack, typeof(PNRemoveChannelMetadataResult), CultureInfo.InvariantCulture);
                 #endregion
             }
-            else if (typeof(T) == typeof(PNGetSpacesResult))
+            else if (typeof(T) == typeof(PNGetAllChannelMetadataResult))
             {
                 #region "PNGetSpacesResult"
-                PNGetSpacesResult result = PNGetSpacesJsonDataParse.GetObject(listObject);
-                ret = (T)Convert.ChangeType(result, typeof(PNGetSpacesResult), CultureInfo.InvariantCulture);
+                PNGetAllChannelMetadataResult result = PNGetAllChannelMetadataJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNGetAllChannelMetadataResult), CultureInfo.InvariantCulture);
                 #endregion
             }
-            else if (typeof(T) == typeof(PNGetSpaceResult))
+            else if (typeof(T) == typeof(PNGetChannelMetadataResult))
             {
                 #region "PNGetSpaceResult"
-                PNGetSpaceResult result = PNGetSpaceJsonDataParse.GetObject(listObject);
-                ret = (T)Convert.ChangeType(result, typeof(PNGetSpaceResult), CultureInfo.InvariantCulture);
+                PNGetChannelMetadataResult result = PNGetChannelMetadataJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNGetChannelMetadataResult), CultureInfo.InvariantCulture);
                 #endregion
             }
-            else if (typeof(T) == typeof(PNManageMembershipsResult))
+            else if (typeof(T) == typeof(PNMembershipsResult))
             {
                 #region "PNMembershipsResult"
-                PNManageMembershipsResult result = PNMembershipsJsonDataParse.GetObject(listObject);
-                ret = (T)Convert.ChangeType(result, typeof(PNManageMembershipsResult), CultureInfo.InvariantCulture);
+                PNMembershipsResult result = PNMembershipsJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNMembershipsResult), CultureInfo.InvariantCulture);
                 #endregion
             }
-            else if (typeof(T) == typeof(PNManageMembersResult))
+            else if (typeof(T) == typeof(PNChannelMembersResult))
             {
-                #region "PNMembersResult"
-                PNManageMembersResult result = PNManageMembersJsonDataParse.GetObject(listObject);
-                ret = (T)Convert.ChangeType(result, typeof(PNManageMembersResult), CultureInfo.InvariantCulture);
+                #region "PNChannelMembersResult"
+                PNChannelMembersResult result = PNChannelMembersJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNChannelMembersResult), CultureInfo.InvariantCulture);
                 #endregion
             }
-            else if (typeof(T) == typeof(PNGetMembershipsResult))
+            else if (typeof(T) == typeof(PNObjectEventResult))
             {
-                #region "PNGetMembershipsResult"
-                PNGetMembershipsResult result = PNGetMembershipsJsonDataParse.GetObject(listObject);
-                ret = (T)Convert.ChangeType(result, typeof(PNGetMembershipsResult), CultureInfo.InvariantCulture);
-                #endregion
-            }
-            else if (typeof(T) == typeof(PNGetMembersResult))
-            {
-                #region "PNGetMembersResult"
-                PNGetMembersResult result = PNGetMembersJsonDataParse.GetObject(listObject);
-                ret = (T)Convert.ChangeType(result, typeof(PNGetMembersResult), CultureInfo.InvariantCulture);
-                #endregion
-            }
-            else if (typeof(T) == typeof(PNObjectApiEventResult))
-            {
-                #region "PNGetMembersResult"
-                PNObjectApiEventResult result = PNObjectApiEventJsonDataParse.GetObject(listObject);
-                ret = (T)Convert.ChangeType(result, typeof(PNObjectApiEventResult), CultureInfo.InvariantCulture);
+                #region "PNObjectEventResult"
+                PNObjectEventResult result = PNObjectEventJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNObjectEventResult), CultureInfo.InvariantCulture);
                 #endregion
             }
             else if (typeof(T) == typeof(PNMessageActionEventResult))

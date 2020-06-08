@@ -12,7 +12,7 @@ namespace PubnubApi
 
         public abstract void Signal<T>(Pubnub pubnub, PNSignalResult<T> signal);
 
-        public abstract void ObjectEvent(Pubnub pubnub, PNObjectApiEventResult objectEvent);
+        public abstract void ObjectEvent(Pubnub pubnub, PNObjectEventResult objectEvent);
 
         public abstract void MessageAction(Pubnub pubnub, PNMessageActionEventResult messageAction);
     }
