@@ -7,7 +7,7 @@ changelog:
     date: June 10, 2020
     changes:
       - type: Improvement
-        text: Removed V1 Objects API feature.
+        text: Removed V1 Objects API feature. BREAKING CHANGE if you are using V1 Objects.
       - type: Improvement
         text: Added Objects Simplification API feature.
   - version: 4.7.0.0
