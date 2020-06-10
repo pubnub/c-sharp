@@ -16,7 +16,6 @@ namespace PubnubApi.EndPoint
         private readonly IPubnubUnitTest unit;
         private readonly IPubnubLog pubnubLog;
         private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
-        private readonly EndPoint.TokenManager pubnubTokenMgr;
 
         private string[] channelNames;
         private string[] channelGroupNames;
@@ -25,14 +24,13 @@ namespace PubnubApi.EndPoint
         private PNCallback<PNSetStateResult> savedCallback;
         private Dictionary<string, object> queryParam;
 
-        public SetStateOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
+        public SetStateOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, instance)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
             pubnubLog = log;
             pubnubTelemetryMgr = telemetryManager;
-            pubnubTokenMgr = tokenManager;
 
             PubnubInstance = instance;
 
@@ -361,8 +359,8 @@ namespace PubnubApi.EndPoint
 
             string jsonUserState = GetJsonSharedSetUserStateInternal(channels, channelGroups, jsonChannelUserState, jsonChannelGroupUserState);
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            
             Uri request = urlBuilder.BuildSetUserStateRequest("GET", "", commaDelimitedChannels, commaDelimitedChannelGroups, currentUuid, jsonUserState, externalQueryParam);
 
             RequestState<PNSetStateResult> requestState = new RequestState<PNSetStateResult>();
@@ -419,8 +417,8 @@ namespace PubnubApi.EndPoint
 
             string jsonUserState = GetJsonSharedSetUserStateInternal(channels, channelGroups, jsonChannelUserState, jsonChannelGroupUserState);
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            
             Uri request = urlBuilder.BuildSetUserStateRequest("GET", "", commaDelimitedChannels, commaDelimitedChannelGroups, currentUuid, jsonUserState, externalQueryParam);
 
             RequestState<PNSetStateResult> requestState = new RequestState<PNSetStateResult>();

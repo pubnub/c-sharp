@@ -78,7 +78,7 @@ namespace PubnubApiDemo
             Console.ForegroundColor = ConsoleColor.Blue;
             if (origin.Trim() == "")
             {
-                origin = "ps.pndsn.com";
+                origin = "ps.pndsn.com";// "balancer1g.bronze.aws-pdx-1.ps.pn";// "ps.pndsn.com";
                 Console.WriteLine("Default Origin selected");
             }
             else
@@ -290,10 +290,10 @@ namespace PubnubApiDemo
                 delegate (Pubnub pnObj, PNMessageResult<object> pubMsg) { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(pubMsg)); },
                 delegate (Pubnub pnObj, PNPresenceEventResult presenceEvnt) { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(presenceEvnt)); },
                 delegate (Pubnub pnObj, PNSignalResult<object> signalMsg) { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(signalMsg)); },
-                delegate (Pubnub pnObj, PNObjectApiEventResult objectApiEventObj)
+                delegate (Pubnub pnObj, PNObjectEventResult objectApiEventObj)
                 {
-                    if (objectApiEventObj.Type == "user") { /* got user related event. */ }
-                    else if (objectApiEventObj.Type == "space") { /* got space related event. */ }
+                    if (objectApiEventObj.Type == "uuid") { /* got uuid metadata related event. */ }
+                    else if (objectApiEventObj.Type == "channel") { /* got channel metadata related event. */ }
                     else if (objectApiEventObj.Type == "membership") { /* got membership related event. */ }
                     Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(objectApiEventObj));
                 },
@@ -344,23 +344,24 @@ namespace PubnubApiDemo
                     menuOptionsStringBuilder.AppendLine("Enter 39 FOR Channel Group - Remove channel/group/namespace");
                     menuOptionsStringBuilder.AppendLine("Enter 40 FOR Channel Group - Get channel(s)/namespace(s)");
                     menuOptionsStringBuilder.AppendLine("Enter 41 FOR Signal");
-                    menuOptionsStringBuilder.AppendLine("Enter 42 FOR Create User");
-                    menuOptionsStringBuilder.AppendLine("Enter 43 FOR Get User(s)");
-                    menuOptionsStringBuilder.AppendLine("Enter 44 FOR Delete User");
-                    menuOptionsStringBuilder.AppendLine("Enter 45 FOR Update User");
-                    menuOptionsStringBuilder.AppendLine("Enter 46 FOR Create Space");
-                    menuOptionsStringBuilder.AppendLine("Enter 47 FOR Get Space(s)");
-                    menuOptionsStringBuilder.AppendLine("Enter 48 FOR Delete Space");
-                    menuOptionsStringBuilder.AppendLine("Enter 49 FOR Update Space");
-                    menuOptionsStringBuilder.AppendLine("Enter 50 FOR Add/Update/Remove Memberships");
-                    menuOptionsStringBuilder.AppendLine("Enter 51 FOR Add/Update/Remove Members");
-                    menuOptionsStringBuilder.AppendLine("Enter 52 FOR Get Memberships");
-                    menuOptionsStringBuilder.AppendLine("Enter 53 FOR Get Members");
-                    menuOptionsStringBuilder.AppendLine("Enter 54 FOR GrantToken");
-                    menuOptionsStringBuilder.AppendLine("Enter 55 FOR SetToken");
+                    menuOptionsStringBuilder.AppendLine("Enter 42 FOR Set UUID Metadata");
+                    menuOptionsStringBuilder.AppendLine("Enter 43 FOR Get UUID(s) Metadata");
+                    menuOptionsStringBuilder.AppendLine("Enter 44 FOR Remove UUID");
+                    menuOptionsStringBuilder.AppendLine("Enter 45 FOR Set Channel Metadata");
+                    menuOptionsStringBuilder.AppendLine("Enter 46 FOR Get Channel(s) Metadata");
+                    menuOptionsStringBuilder.AppendLine("Enter 47 FOR Remove Channel Metadata");
+                    menuOptionsStringBuilder.AppendLine("Enter 48 FOR Manage Memberships");
+                    menuOptionsStringBuilder.AppendLine("Enter 49 FOR Manage Members");
+                    menuOptionsStringBuilder.AppendLine("Enter 50 FOR Get Memberships");
+                    menuOptionsStringBuilder.AppendLine("Enter 51 FOR Get Members");
+                    menuOptionsStringBuilder.AppendLine("Enter 52 FOR Set Memberships");
+                    menuOptionsStringBuilder.AppendLine("Enter 53 FOR Remove Members");
+                    menuOptionsStringBuilder.AppendLine("Enter 54 FOR Set Channel Members");
+                    menuOptionsStringBuilder.AppendLine("Enter 55 FOR Remove Channel Members");
                     menuOptionsStringBuilder.AppendLine("Enter 56 FOR Add MessageAction");
                     menuOptionsStringBuilder.AppendLine("Enter 57 FOR Remove MessageAction");
                     menuOptionsStringBuilder.AppendLine("Enter 58 FOR Get MessageActions");
+
                     menuOptionsStringBuilder.AppendLine("ENTER 99 FOR EXIT OR QUIT");
                     Console.WriteLine(menuOptionsStringBuilder.ToString());
                     userinput = Console.ReadLine();
@@ -1433,38 +1434,32 @@ namespace PubnubApiDemo
                         }
                         break;
                     case "42":
-                        Console.WriteLine("Enter User Id to create User");
-                        string createUserId = Console.ReadLine();
-                        Console.WriteLine("Enter User Name to create User");
-                        string createUserName = Console.ReadLine();
+                        Console.WriteLine("Enter UUID to set UUID Metadata");
+                        string setUuidMetadataId = Console.ReadLine();
+                        Console.WriteLine("Enter UUID Name");
+                        string setUuidMetadataName = Console.ReadLine();
 
-                        if (string.IsNullOrEmpty(createUserId))
-                        {
-                            Console.WriteLine("Invalid UserId");
-                        }
-                        else
-                        {
-                            pubnub.CreateUser()
-                                    .Id(createUserId)
-                                    .Name(createUserName)
-                                    .Execute(new PNCreateUserResultExt((r, s) =>
-                                    {
-                                        if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
-                                        else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
-                                    }
-                                    ));
-                        }
+                        pubnub.SetUuidMetadata()
+                                .Uuid(setUuidMetadataId)
+                                .Name(setUuidMetadataName)
+                                .IncludeCustom(true)
+                                .Execute(new PNSetUuidMetadataResultExt((r, s) =>
+                                {
+                                    if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
+                                    else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
+                                }
+                                ));
                         break;
                     case "43":
-                        Console.WriteLine("Enter User Id to retrieve User, else press ENTER.");
-                        string singleUserId = Console.ReadLine();
+                        Console.WriteLine("Enter UUID Id to retrieve UUID Metadata, else press ENTER.");
+                        string getSingleUuidMetadata = Console.ReadLine();
 
-                        if (!string.IsNullOrWhiteSpace(singleUserId))
+                        if (!string.IsNullOrWhiteSpace(getSingleUuidMetadata))
                         {
-                            pubnub.GetUser()
-                                .UserId(singleUserId)
+                            pubnub.GetUuidMetadata()
+                                .Uuid(getSingleUuidMetadata)
                                 .IncludeCustom(true)
-                                .Execute(new PNGetUserResultExt((r, s) =>
+                                .Execute(new PNGetUuidMetadataResultExt((r, s) =>
                                 {
                                     if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
                                     else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
@@ -1473,12 +1468,11 @@ namespace PubnubApiDemo
                         }
                         else
                         {
-                            pubnub.GetUsers()
+                            pubnub.GetAllUuidMetadata()
                                 .IncludeCount(true)
                                 .IncludeCustom(true)
-                                .Filter("name=='newnamemodified'")
-                                .Page(new PNPage() { Next = "", Prev = "" })
-                                .Execute(new PNGetUsersResultExt((r, s) =>
+                                .Page(new PNPageObject() { Next = "", Prev = "" })
+                                .Execute(new PNGetAllUuidMetadataResultExt((r, s) =>
                                 {
                                     if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
                                     else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
@@ -1487,40 +1481,34 @@ namespace PubnubApiDemo
                         }
                         break;
                     case "44":
-                        Console.WriteLine("Enter User Id to delete User.");
-                        string deleteUserId = Console.ReadLine();
-                        if (!string.IsNullOrWhiteSpace(deleteUserId))
-                        {
-                            pubnub.DeleteUser()
-                                .Id(deleteUserId)
-                                .Execute(new PNDeleteUserResultExt((r, s) =>
-                                {
-                                    if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
-                                    else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
-                                }
-                                ));
-                        }
-                        else
-                        {
-                            Console.WriteLine("Invalid User Id. Try again.");
-                        }
+                        Console.WriteLine("Enter UUID to remove.");
+                        string removeUuidId = Console.ReadLine();
+                        pubnub.RemoveUuidMetadata()
+                            .Uuid(removeUuidId)
+                            .Execute(new PNRemoveUuidMetadataResultExt((r, s) =>
+                            {
+                                if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
+                                else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
+                            }
+                            ));
                         break;
                     case "45":
-                        Console.WriteLine("Enter User Id to update User");
-                        string updUserId = Console.ReadLine();
-                        Console.WriteLine("Enter User Name to update User");
-                        string updUserName = Console.ReadLine();
+                        Console.WriteLine("Enter Channel");
+                        string setChannelMetaId = Console.ReadLine();
+                        Console.WriteLine("Enter Name for Channel");
+                        string setChannelMetaName = Console.ReadLine();
 
-                        if (string.IsNullOrEmpty(updUserId))
+                        if (string.IsNullOrEmpty(setChannelMetaId))
                         {
-                            Console.WriteLine("Invalid UserId");
+                            Console.WriteLine("Invalid Channel");
                         }
                         else
                         {
-                            pubnub.UpdateUser()
-                                .Id(updUserId)
-                                .Name(updUserName)
-                                .Execute(new PNUpdateUserResultExt((r, s) =>
+                            pubnub.SetChannelMetadata()
+                                .Channel(setChannelMetaId)
+                                .Name(setChannelMetaName)
+                                .IncludeCustom(true)
+                                .Execute(new PNSetChannelMetadataResultExt((r, s) =>
                                 {
                                     if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
                                     else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
@@ -1529,21 +1517,28 @@ namespace PubnubApiDemo
                         }
                         break;
                     case "46":
-                        Console.WriteLine("Enter SpaceId to create Space");
-                        string createSpaceId = Console.ReadLine();
-                        Console.WriteLine("Enter Space Name to create Space");
-                        string createSpaceName = Console.ReadLine();
+                        Console.WriteLine("Enter Channel to retrieve, else press ENTER.");
+                        string singleChannelMetadataId = Console.ReadLine();
 
-                        if (string.IsNullOrEmpty(createSpaceId))
+                        if (!string.IsNullOrWhiteSpace(singleChannelMetadataId))
                         {
-                            Console.WriteLine("Invalid SpaceId");
+                            pubnub.GetChannelMetadata()
+                                .Channel(singleChannelMetadataId)
+                                .IncludeCustom(true)
+                                .Execute(new PNGetChannelMetadataResultExt((r, s) =>
+                                {
+                                    if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
+                                    else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
+                                }
+                                ));
                         }
                         else
                         {
-                            pubnub.CreateSpace()
-                                .Id(createSpaceId)
-                                .Name(createSpaceName)
-                                .Execute(new PNCreateSpaceResultExt((r, s) =>
+                            pubnub.GetAllChannelMetadata()
+                                .IncludeCount(true)
+                                .IncludeCustom(true)
+                                .Page(new PNPageObject() { Next = "", Prev = "" })
+                                .Execute(new PNGetAllChannelMetadataResultExt((r, s) =>
                                 {
                                     if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
                                     else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
@@ -1552,15 +1547,13 @@ namespace PubnubApiDemo
                         }
                         break;
                     case "47":
-                        Console.WriteLine("Enter Space Id to retrieve specific Space, else press ENTER.");
-                        string singleSpaceId = Console.ReadLine();
-
-                        if (!string.IsNullOrWhiteSpace(singleSpaceId))
+                        Console.WriteLine("Enter Channel to remove.");
+                        string removeChannelMetadataId = Console.ReadLine();
+                        if (!string.IsNullOrWhiteSpace(removeChannelMetadataId))
                         {
-                            pubnub.GetSpace()
-                                .SpaceId(singleSpaceId)
-                                .IncludeCustom(true)
-                                .Execute(new PNGetSpaceResultExt((r, s) =>
+                            pubnub.RemoveChannelMetadata()
+                                .Channel(removeChannelMetadataId)
+                                .Execute(new PNRemoveChannelMetadataResultExt((r, s) =>
                                 {
                                     if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
                                     else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
@@ -1569,57 +1562,77 @@ namespace PubnubApiDemo
                         }
                         else
                         {
-                            pubnub.GetSpaces()
-                                .IncludeCount(true)
-                                .IncludeCustom(true)
-                                //.Limit(2)
-                                .Page(new PNPage() { Next = "", Prev = "" })
-                                .Execute(new PNGetSpacesResultExt((r, s) =>
-                                {
-                                    if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
-                                    else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
-                                }
-                                ));
+                            Console.WriteLine("Invalid Channel. Try again.");
                         }
                         break;
                     case "48":
-                        Console.WriteLine("Enter Space Id to delete Space.");
-                        string deleteSpaceId = Console.ReadLine();
-                        if (!string.IsNullOrWhiteSpace(deleteSpaceId))
+                        Console.WriteLine("Enter UUID");
+                        string manageMembershipUuidMetaId = Console.ReadLine();
+                        Console.WriteLine("Enter Channel to set");
+                        string manageMemshipSetChannelMetaId = Console.ReadLine();
+                        Console.WriteLine("Enter Channel to remove");
+                        string manageMemshipRemChannelMetaId = Console.ReadLine();
+
+                        List<PNMembership> manageSetMembershipList = new List<PNMembership>();
+                        if (!string.IsNullOrEmpty(manageMemshipSetChannelMetaId))
                         {
-                            pubnub.DeleteSpace()
-                                .Id(deleteSpaceId)
-                                .Execute(new PNDeleteSpaceResultExt((r, s) =>
-                                {
-                                    if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
-                                    else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
-                                }
-                                ));
+                            manageSetMembershipList.Add(new PNMembership() { Channel = manageMemshipSetChannelMetaId, Custom = new Dictionary<string, object>() { { "item", "book" } } });
                         }
-                        else
+
+                        List<string> manageRemoveMembershipList = new List<string>();
+                        if (!string.IsNullOrEmpty(manageMemshipRemChannelMetaId))
                         {
-                            Console.WriteLine("Invalid Space Id. Try again.");
+                            manageRemoveMembershipList.Add(manageMemshipRemChannelMetaId);
                         }
+
+                        pubnub.ManageMemberships()
+                            .Uuid(manageMembershipUuidMetaId)
+                            .Set(manageSetMembershipList)
+                            .Remove(manageRemoveMembershipList)
+                            .Include(new PNMembershipField[] { PNMembershipField.CUSTOM, PNMembershipField.CHANNEL, PNMembershipField.CHANNEL_CUSTOM })
+                            .IncludeCount(true)
+                            .Page(new PNPageObject() { Next = "", Prev = "" })
+                            .Execute(new PNMembershipsResultExt((r, s) =>
+                            {
+                                if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
+                                else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
+                            }
+                            ));
                         break;
                     case "49":
-                        Console.WriteLine("Enter SpaceId to update Space");
-                        string updSpaceId = Console.ReadLine();
-                        Console.WriteLine("Enter Space Name to update Space");
-                        string updSpaceName = Console.ReadLine();
-                        Console.WriteLine("Enter Space Description");
-                        string updSpaceDesc = Console.ReadLine();
+                        Console.WriteLine("Enter Channel");
+                        string manageMemberChMetadataId = Console.ReadLine();
+                        Console.WriteLine("Enter UUID to add");
+                        string manageMemberAddUuid = Console.ReadLine();
+                        Console.WriteLine("Enter UUID to remove");
+                        string manageMemberRemUuid = Console.ReadLine();
 
-                        if (string.IsNullOrEmpty(updSpaceId))
+                        List<PNChannelMember> manageSetMemberList = new List<PNChannelMember>();
+                        if (!string.IsNullOrEmpty(manageMemberAddUuid))
                         {
-                            Console.WriteLine("Invalid SpaceId");
+                            manageSetMemberList.Add(new PNChannelMember() { Uuid = manageMemberAddUuid, Custom = new Dictionary<string, object>() { { "planet", "earth" } } });
+                        }
+
+                        List<string> manageRemMemberList = new List<string>();
+                        if (!string.IsNullOrEmpty(manageMemberRemUuid))
+                        {
+                            manageRemMemberList.Add(manageMemberRemUuid);
+                        }
+
+                        if (string.IsNullOrEmpty(manageMemberChMetadataId))
+                        {
+                            Console.WriteLine("Invalid Channel");
                         }
                         else
                         {
-                            pubnub.UpdateSpace()
-                                .Id(updSpaceId)
-                                .Name(updSpaceName)
-                                .Description(updSpaceDesc)
-                                .Execute(new PNUpdateSpaceResultExt((r, s) =>
+                            pubnub.ManageChannelMembers()
+                                .Channel(manageMemberChMetadataId)
+                                .Set(manageSetMemberList)
+                                .Remove(manageRemMemberList)
+                                .Include(new PNChannelMemberField[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID, PNChannelMemberField.UUID_CUSTOM })
+                                .IncludeCount(true)
+                                .Page(new PNPageObject() { Next = "", Prev = "" })
+                                .Execute(new PNChannelMembersResultExt((r, s) =>
                                 {
                                     if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
                                     else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
@@ -1628,36 +1641,14 @@ namespace PubnubApiDemo
                         }
                         break;
                     case "50":
-                        Console.WriteLine("Enter UserID");
-                        string memshipUserId = Console.ReadLine();
-                        Console.WriteLine("Enter SpaceId to add");
-                        string memshipAddSpaceId = Console.ReadLine();
-                        Console.WriteLine("Enter SpaceId to remove");
-                        string memshipRemSpaceId = Console.ReadLine();
-
-                        List<PNMembership> addList = new List<PNMembership>();
-                        if (!string.IsNullOrEmpty(memshipAddSpaceId))
-                        {
-                            addList.Add(new PNMembership() { SpaceId = memshipAddSpaceId });
-                        }
-
-                        List<PNMembership> updateList = new List<PNMembership>();
-
-                        List<string> removeList = new List<string>();
-                        if (!string.IsNullOrEmpty(memshipRemSpaceId))
-                        {
-                            removeList.Add(memshipRemSpaceId);
-                        }
-
-                        pubnub.ManageMemberships()
-                            .UserId(memshipUserId)
-                            .Add(addList)
-                            .Update(updateList)
-                            .Remove(removeList)
-                            .Include(new PNMembershipField[] { PNMembershipField.CUSTOM, PNMembershipField.SPACE, PNMembershipField.SPACE_CUSTOM })
+                        Console.WriteLine("Enter UUID to Get Memberships.");
+                        string getMembershipsUuid = Console.ReadLine();
+                        pubnub.GetMemberships()
+                            .Uuid(getMembershipsUuid)
+                            .Include(new PNMembershipField[] { PNMembershipField.CUSTOM, PNMembershipField.CHANNEL, PNMembershipField.CHANNEL_CUSTOM })
                             .IncludeCount(true)
-                            .Page(new PNPage() { Next = "", Prev = "" })
-                            .Execute(new PNManageMembershipsResultExt((r, s) =>
+                            .Page(new PNPageObject() { Next = "", Prev = "" })
+                            .Execute(new PNMembershipsResultExt((r, s) =>
                             {
                                 if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
                                 else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
@@ -1665,178 +1656,144 @@ namespace PubnubApiDemo
                             ));
                         break;
                     case "51":
-                        Console.WriteLine("Enter SpaceId");
-                        string memberSpaceId = Console.ReadLine();
-                        Console.WriteLine("Enter UserId to add");
-                        string meberAddUserId = Console.ReadLine();
-                        Console.WriteLine("Enter UserId to remove");
-                        string memberRemUserId = Console.ReadLine();
-
-                        List<PNMember> addMemberList = new List<PNMember>();
-                        if (!string.IsNullOrEmpty(meberAddUserId))
+                        Console.WriteLine("Enter Channel to Get Channel Members.");
+                        string getMembersChannelId = Console.ReadLine();
+                        if (!string.IsNullOrEmpty(getMembersChannelId))
                         {
-                            addMemberList.Add(new PNMember() { UserId = meberAddUserId });
-                        }
-
-                        List<PNMember> updMemberList = new List<PNMember>();
-                        //updMemberList.Add(new PNMember { UserId = "pandu_userid0", Custom = new Dictionary<string, object>() { {"foo","bar" } } });
-
-                        List<string> remMemberList = new List<string>();
-                        if (!string.IsNullOrEmpty(memberRemUserId))
-                        {
-                            remMemberList.Add(memberRemUserId);
-                        }
-
-                        if (string.IsNullOrEmpty(memberSpaceId))
-                        {
-                            Console.WriteLine("Invalid SpaceId");
-                        }
-                        else
-                        {
-                            pubnub.ManageMembers()
-                                .SpaceId(memberSpaceId)
-                                .Add(addMemberList)
-                                .Update(updMemberList)
-                                .Remove(remMemberList)
-                                .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.USER, PNMemberField.USER_CUSTOM })
+                            pubnub.GetChannelMembers()
+                                .Channel(getMembersChannelId)
+                                .Include(new PNChannelMemberField[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID, PNChannelMemberField.UUID_CUSTOM })
                                 .IncludeCount(true)
-                                .Page(new PNPage() { Next = "", Prev = "" })
-                                .Execute(new PNManageMembersResultExt((r, s) =>
+                                .Page(new PNPageObject() { Next = "", Prev = "" })
+                                .Execute(new PNChannelMembersResultExt((r, s) =>
                                 {
                                     if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
                                     else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
                                 }
                                 ));
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid Channel!!!");
                         }
                         break;
                     case "52":
-                        Console.WriteLine("Enter User Id to Get Memberships.");
-                        string getMembershipsUserId = Console.ReadLine();
-                        if (!string.IsNullOrEmpty(getMembershipsUserId))
+                        Console.WriteLine("Enter UUID");
+                        string setMembershipUuidMetaId = Console.ReadLine();
+                        Console.WriteLine("Enter Channel to add");
+                        string seMembershipChannelMetaId = Console.ReadLine();
+
+                        List<PNMembership> setMembershipChannelMetadataIdList = new List<PNMembership>();
+                        if (!string.IsNullOrEmpty(seMembershipChannelMetaId))
                         {
-                            pubnub.GetMemberships()
-                                .UserId(getMembershipsUserId)
-                                .Include(new PNMembershipField[] { PNMembershipField.CUSTOM, PNMembershipField.SPACE, PNMembershipField.SPACE_CUSTOM })
-                                .IncludeCount(true)
-                                .Page(new PNPage() { Next = "", Prev = "" })
-                                .Execute(new PNGetMembershipsResultExt((r, s) =>
-                                {
-                                    if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
-                                    else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
-                                }
-                                ));
+                            setMembershipChannelMetadataIdList.Add(new PNMembership() { Channel = seMembershipChannelMetaId, Custom = new Dictionary<string, object>() { { "item", "book" } } });
                         }
-                        else
-                        {
-                            Console.WriteLine("Invalid UserId!!!");
-                        }
+
+                        Console.WriteLine("Running SetMemberships()");
+                        pubnub.SetMemberships()
+                            .Uuid(setMembershipUuidMetaId)
+                            .Channels(setMembershipChannelMetadataIdList)
+                            .Include(new PNMembershipField[] { PNMembershipField.CUSTOM, PNMembershipField.CHANNEL, PNMembershipField.CHANNEL_CUSTOM })
+                            .IncludeCount(true)
+                            .Page(new PNPageObject() { Next = "", Prev = "" })
+                            .Execute(new PNMembershipsResultExt((r, s) =>
+                            {
+                                if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
+                                else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
+                            }
+                            ));
                         break;
                     case "53":
-                        Console.WriteLine("Enter Space Id to Get Members.");
-                        string getMembersSpaceId = Console.ReadLine();
-                        if (!string.IsNullOrEmpty(getMembersSpaceId))
+                        Console.WriteLine("Enter UUID");
+                        string removeMemshipUuidMetaId = Console.ReadLine();
+                        Console.WriteLine("Enter Chanel to remove");
+                        string removeMembershipChannelMetaId = Console.ReadLine();
+
+                        List<string> removeMembershipList = new List<string>();
+                        if (!string.IsNullOrEmpty(removeMembershipChannelMetaId))
                         {
-                            pubnub.GetMembers()
-                                .SpaceId(getMembersSpaceId)
-                                .Include(new PNMemberField[] { PNMemberField.CUSTOM, PNMemberField.USER, PNMemberField.USER_CUSTOM })
+                            removeMembershipList.Add(removeMembershipChannelMetaId);
+                        }
+
+                        Console.WriteLine("Running RemoveMemberships()");
+                        pubnub.RemoveMemberships()
+                            .Uuid(removeMemshipUuidMetaId)
+                            .Channels(removeMembershipList)
+                            .Include(new PNMembershipField[] { PNMembershipField.CUSTOM, PNMembershipField.CHANNEL, PNMembershipField.CHANNEL_CUSTOM })
+                            .IncludeCount(true)
+                            .Page(new PNPageObject() { Next = "", Prev = "" })
+                            .Execute(new PNMembershipsResultExt((r, s) =>
+                            {
+                                if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
+                                else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
+                            }
+                            ));
+                        break;
+                    case "54":
+                        Console.WriteLine("Enter Channel");
+                        string setmemberChMetadataId = Console.ReadLine();
+                        Console.WriteLine("Enter UUID to add");
+                        string setMemberChUuid = Console.ReadLine();
+
+                        List<PNChannelMember> setMemberChannelList = new List<PNChannelMember>();
+                        if (!string.IsNullOrEmpty(setMemberChUuid))
+                        {
+                            setMemberChannelList.Add(new PNChannelMember() { Uuid = setMemberChUuid, Custom = new Dictionary<string, object>() { { "planet", "earth" } } });
+                        }
+
+                        if (string.IsNullOrEmpty(setmemberChMetadataId))
+                        {
+                            Console.WriteLine("Invalid Channel");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Running SetChannelMembers()");
+                            pubnub.SetChannelMembers()
+                                .Channel(setmemberChMetadataId)
+                                .Uuids(setMemberChannelList)
+                                .Include(new PNChannelMemberField[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID, PNChannelMemberField.UUID_CUSTOM })
                                 .IncludeCount(true)
-                                .Page(new PNPage() { Next = "", Prev = "" })
-                                .Execute(new PNGetMembersResultExt((r, s) =>
+                                .Page(new PNPageObject() { Next = "", Prev = "" })
+                                .Execute(new PNChannelMembersResultExt((r, s) =>
                                 {
                                     if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
                                     else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
                                 }
                                 ));
                         }
-                        else
-                        {
-                            Console.WriteLine("Invalid SpaceId!!!");
-                        }
-                        break;
-                    case "54":
-                        Console.WriteLine("Enter UserId for PAM Grant.");
-                        string grantUserId = Console.ReadLine();
-
-                        Console.WriteLine("Enter SpaceId for PAM Grant.");
-                        string grantSpaceId = Console.ReadLine();
-
-                        Console.WriteLine("Enter the auth_key for PAMv2 Grant (optional).");
-                        string grantAuth = Console.ReadLine();
-
-                        Console.WriteLine("Read Access? Enter Y for Yes (default), N for No.");
-                        string grantReadAccess = Console.ReadLine();
-                        bool grantRead = !(grantReadAccess.ToLower() == "n");
-
-                        Console.WriteLine("Write Access? Enter Y for Yes (default), N for No.");
-                        string grantwriteAccess = Console.ReadLine();
-                        bool grantWrite = !(grantwriteAccess.ToLower() == "n");
-
-                        Console.WriteLine("Delete Access? Enter Y for Yes (default), N for No.");
-                        string grantDeleteAccess = Console.ReadLine();
-                        bool grantDelete = !(grantDeleteAccess.ToLower() == "n");
-
-                        Console.WriteLine("Create Access? Enter Y for Yes (default), N for No.");
-                        string grantCreateAccess = Console.ReadLine();
-                        bool grantCreate = !(grantCreateAccess.ToLower() == "n");
-
-                        Console.WriteLine("Manage Access? Enter Y for Yes (default), N for No.");
-                        string grantManageAccess = Console.ReadLine();
-                        bool grantManage = (grantManageAccess.ToLower() == "n") ? false : true;
-
-                        Console.WriteLine("How many minutes do you want to allow Grant Access? Enter the number of minutes." + System.Environment.NewLine + "Default = 1440 minutes (24 hours). Press ENTER now to accept default value.");
-                        int grantTokenTTL;
-                        string grantTokenTimeLimit = Console.ReadLine();
-                        if (string.IsNullOrEmpty(grantTokenTimeLimit.Trim()))
-                        {
-                            grantTokenTTL = 1440;
-                        }
-                        else
-                        {
-                            Int32.TryParse(grantTokenTimeLimit, out grantTokenTTL);
-                            if (grantTokenTTL <= 0) grantTokenTTL = 1440;
-                        }
-
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        StringBuilder pamTokenGrantStringBuilder = new StringBuilder();
-                        pamTokenGrantStringBuilder.AppendLine(string.Format("UserId = {0}", grantUserId));
-                        pamTokenGrantStringBuilder.AppendLine(string.Format("SpaceId = {0}", grantSpaceId));
-                        pamTokenGrantStringBuilder.AppendLine(string.Format("auth_key = {0}", grantAuth));
-                        pamTokenGrantStringBuilder.AppendLine(string.Format("Read Access = {0}", grantRead.ToString()));
-                        pamTokenGrantStringBuilder.AppendLine(string.Format("Write Access = {0}", grantWrite.ToString()));
-                        pamTokenGrantStringBuilder.AppendLine(string.Format("Delete Access = {0}", grantDelete.ToString()));
-                        pamTokenGrantStringBuilder.AppendLine(string.Format("Create Access = {0}", grantCreate.ToString()));
-                        pamTokenGrantStringBuilder.AppendLine(string.Format("Manage Access = {0}", grantManage.ToString()));
-                        pamTokenGrantStringBuilder.AppendLine(string.Format("TTL = {0}", grantTokenTTL.ToString()));
-                        Console.WriteLine(pamTokenGrantStringBuilder.ToString());
-                        Console.ResetColor();
-                        Console.WriteLine();
-
-                        Console.WriteLine("Running PamGrantToken()");
-                        pubnub.GrantToken()
-                            .Users(new Dictionary<string, PNResourcePermission>() {
-                                { grantUserId, new PNResourcePermission() { Read = grantRead, Write = grantWrite, Manage= grantManage, Create = grantCreate, Delete=grantDelete } } })
-                            .Spaces(new Dictionary<string, PNResourcePermission>() {
-                                { grantSpaceId, new PNResourcePermission() { Read = grantRead, Write = grantWrite, Manage= grantManage, Create = grantCreate, Delete=grantDelete } } })
-                            .TTL(grantTokenTTL)
-                            .Execute(new PNAccessManagerTokenResultExt((result, status) =>
-                            {
-                                if (result != null)
-                                {
-                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-                                }
-                                else
-                                {
-                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-                                }
-                            }));
-
                         break;
                     case "55":
-                        Console.WriteLine("Enter PAMv3 token (ensure NO secret key in config)");
-                        grantToken = Console.ReadLine();
-                        pubnub.SetToken(grantToken);
-                        Console.WriteLine();
-                        Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(pubnub.ParseToken(grantToken)));
+                        Console.WriteLine("Enter Channel");
+                        string removeChMemberMetadataId = Console.ReadLine();
+                        Console.WriteLine("Enter UUID to remove");
+                        string removeMemberChUuid = Console.ReadLine();
+
+                        List<string> removeChannelMemberList = new List<string>();
+                        if (!string.IsNullOrEmpty(removeMemberChUuid))
+                        {
+                            removeChannelMemberList.Add(removeMemberChUuid);
+                        }
+
+                        if (string.IsNullOrEmpty(removeChMemberMetadataId))
+                        {
+                            Console.WriteLine("Invalid Channel");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Running RemoveChannelMembers()");
+                            pubnub.RemoveChannelMembers()
+                                .Channel(removeChMemberMetadataId)
+                                .Uuids(removeChannelMemberList)
+                                .Include(new PNChannelMemberField[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID, PNChannelMemberField.UUID_CUSTOM })
+                                .IncludeCount(true)
+                                .Page(new PNPageObject() { Next = "", Prev = "" })
+                                .Execute(new PNChannelMembersResultExt((r, s) =>
+                                {
+                                    if (s.Error) { Console.WriteLine(s.ErrorData.Information); }
+                                    else { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r)); }
+                                }
+                                ));
+                        }
                         break;
                     case "56":
                         Console.WriteLine("Enter Channel Name to Add Message Actions");

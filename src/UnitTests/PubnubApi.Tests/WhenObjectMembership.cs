@@ -29,9 +29,9 @@ namespace PubNubMessaging.Tests
             if (!PubnubCommon.PAMServerSideGrant) { return; }
 
             bool receivedGrantMessage = false;
-            string userId = "pandu-ut-uid";
-            string spaceId1 = "pandu-ut-sid1";
-            string spaceId2 = "pandu-ut-sid2";
+            string uuidMetadataId = "pandu-ut-uid";
+            string channelMetadataId1 = "pandu-ut-sid1";
+            string channelMetadataId2 = "pandu-ut-sid2";
 
             PNConfiguration config = new PNConfiguration
             {
@@ -45,38 +45,30 @@ namespace PubNubMessaging.Tests
             server.RunOnHttps(false);
 
             pubnub = createPubNubInstance(config);
-            PNResourcePermission perm = new PNResourcePermission();
-            perm.Read = true;
-            perm.Write = true;
-            perm.Manage = true;
-            perm.Delete = true;
-            perm.Create = true;
 
             ManualResetEvent grantManualEvent = new ManualResetEvent(false);
-            pubnub.GrantToken()
-                .Users(new Dictionary<string, PNResourcePermission>() { { userId, perm } })
-                .Spaces(new Dictionary<string, PNResourcePermission>() { { spaceId1, perm }, { spaceId2, perm } })
-                .AuthKey(authKey)
-                .TTL(20)
-                .Execute(new PNAccessManagerTokenResultExt(
+            pubnub.Grant().Channels(new[] { uuidMetadataId, channelMetadataId1, channelMetadataId2 }).AuthKeys(new[] { authKey }).Read(true).Write(true).Manage(true).TTL(20)
+                .Execute(new PNAccessManagerGrantResultExt(
                                 (r, s) =>
                                 {
                                     try
                                     {
                                         Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
-                                        if (r != null && !string.IsNullOrEmpty(r.Token))
+                                        if (r != null)
                                         {
-                                            Debug.WriteLine("PNAccessManagerTokenResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
-                                            authToken = r.Token;
-                                            receivedGrantMessage = true;
+                                            Debug.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                                            if (r.Channels != null && r.Channels.Count > 0)
+                                            {
+                                                receivedGrantMessage = true;
+                                            }
                                         }
                                     }
+                                    catch { /* ignore */  }
                                     finally
                                     {
                                         grantManualEvent.Set();
                                     }
                                 }));
-
             if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
 
             grantManualEvent.WaitOne();
@@ -84,7 +76,7 @@ namespace PubNubMessaging.Tests
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Assert.IsTrue(receivedGrantMessage, "WhenAMessageIsPublished Grant access failed.");
+            Assert.IsTrue(receivedGrantMessage, "WhenObjectMembership Grant access failed.");
         }
 
         [TearDown]
@@ -94,21 +86,21 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public static void ThenAddUpdateRemoveSpaceShouldReturnSuccessCodeAndInfo()
+        public static void ThenSetRemoveChannelMetadataWithManageMembershipShouldReturnSuccessCodeAndInfo()
         {
             server.ClearRequests();
 
             if (PubnubCommon.EnableStubTest)
             {
-                Assert.Ignore("Ignored ThenAddUpdateRemoveSpaceShouldReturnSuccessCodeAndInfo");
+                Assert.Ignore("Ignored ThenSetRemoveChannelMetadataWithManageMembershipShouldReturnSuccessCodeAndInfo");
                 return;
             }
 
             bool receivedMessage = false;
 
-            string userId = "pandu-ut-uid";
-            string spaceId1 = "pandu-ut-sid1";
-            string spaceId2 = "pandu-ut-sid2";
+            string uuidMetadataId = "pandu-ut-uid";
+            string channelMetadataId1 = "pandu-ut-sid1";
+            string channelMetadataId2 = "pandu-ut-sid2";
 
             PNConfiguration config = new PNConfiguration
             {
@@ -127,40 +119,35 @@ namespace PubNubMessaging.Tests
             }
             server.RunOnHttps(false);
             pubnub = createPubNubInstance(config);
-            if (!PubnubCommon.PAMServerSideRun && !string.IsNullOrEmpty(authToken))
-            {
-                pubnub.ClearTokens();
-                pubnub.SetToken(authToken);
-            }
             ManualResetEvent manualEvent = new ManualResetEvent(false);
 
             manualResetEventWaitTimeout = 310 * 1000;
-            System.Diagnostics.Debug.WriteLine("pubnub.DeleteUser() STARTED");
-            pubnub.DeleteUser().Id(userId).Execute(new PNDeleteUserResultExt(
-                delegate (PNDeleteUserResult result, PNStatus status) { }));
+            System.Diagnostics.Debug.WriteLine("pubnub.RemoveUuidMetadata() STARTED");
+            pubnub.RemoveUuidMetadata().Uuid(uuidMetadataId).Execute(new PNRemoveUuidMetadataResultExt(
+                delegate (PNRemoveUuidMetadataResult result, PNStatus status) { }));
             manualEvent.WaitOne(2000);
 
-            System.Diagnostics.Debug.WriteLine("pubnub.DeleteSpace() 1 STARTED");
-            pubnub.DeleteSpace().Id(spaceId1).Execute(new PNDeleteSpaceResultExt(
-                delegate (PNDeleteSpaceResult result, PNStatus status) { }));
+            System.Diagnostics.Debug.WriteLine("pubnub.RemoveChannelMetadata() 1 STARTED");
+            pubnub.RemoveChannelMetadata().Channel(channelMetadataId1).Execute(new PNRemoveChannelMetadataResultExt(
+                delegate (PNRemoveChannelMetadataResult result, PNStatus status) { }));
             manualEvent.WaitOne(2000);
 
-            System.Diagnostics.Debug.WriteLine("pubnub.DeleteSpace() 2 STARTED");
-            pubnub.DeleteSpace().Id(spaceId2).Execute(new PNDeleteSpaceResultExt(
-                delegate (PNDeleteSpaceResult result, PNStatus status) { }));
+            System.Diagnostics.Debug.WriteLine("pubnub.RemoveChannelMetadata() 2 STARTED");
+            pubnub.RemoveChannelMetadata().Channel(channelMetadataId2).Execute(new PNRemoveChannelMetadataResultExt(
+                delegate (PNRemoveChannelMetadataResult result, PNStatus status) { }));
             manualEvent.WaitOne(2000);
 
             manualEvent = new ManualResetEvent(false);
             receivedMessage = false;
-            #region "CreateUser"
-            System.Diagnostics.Debug.WriteLine("pubnub.CreateUser() STARTED");
-            pubnub.CreateUser().Id(userId).Name("pandu-ut-un")
-                    .Execute(new PNCreateUserResultExt((r, s) =>
+            #region "SetUuidMetadata"
+            System.Diagnostics.Debug.WriteLine("pubnub.SetUuidMetadata() STARTED");
+            pubnub.SetUuidMetadata().Uuid(uuidMetadataId).Name("pandu-ut-un")
+                    .Execute(new PNSetUuidMetadataResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
                             pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
-                            if (userId == r.Id)
+                            if (uuidMetadataId == r.Uuid)
                             {
                                 receivedMessage = true;
                             }
@@ -174,15 +161,15 @@ namespace PubNubMessaging.Tests
             {
                 receivedMessage = false;
                 manualEvent = new ManualResetEvent(false);
-                #region "CreateSpace 1"
-                System.Diagnostics.Debug.WriteLine("pubnub.CreateSpace() 1 STARTED");
-                pubnub.CreateSpace().Id(spaceId1).Name("pandu-ut-spname")
-                        .Execute(new PNCreateSpaceResultExt((r, s) =>
+                #region "SetChannelMetadata 1"
+                System.Diagnostics.Debug.WriteLine("pubnub.SetChannelMetadata() 1 STARTED");
+                pubnub.SetChannelMetadata().Channel(channelMetadataId1).Name("pandu-ut-spname")
+                        .Execute(new PNSetChannelMetadataResultExt((r, s) =>
                         {
                             if (r != null && s.StatusCode == 200 && !s.Error)
                             {
                                 pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
-                                if (spaceId1 == r.Id)
+                                if (channelMetadataId1 == r.Channel)
                                 {
                                     receivedMessage = true;
                                 }
@@ -196,15 +183,15 @@ namespace PubNubMessaging.Tests
             {
                 receivedMessage = false;
                 manualEvent = new ManualResetEvent(false);
-                #region "CreateSpace 2"
-                System.Diagnostics.Debug.WriteLine("pubnub.CreateSpace() 2 STARTED");
-                pubnub.CreateSpace().Id(spaceId2).Name("pandu-ut-spname")
-                        .Execute(new PNCreateSpaceResultExt((r, s) =>
+                #region "SetChannelMetadata 2"
+                System.Diagnostics.Debug.WriteLine("pubnub.SetChannelMetadata() 2 STARTED");
+                pubnub.SetChannelMetadata().Channel(channelMetadataId2).Name("pandu-ut-spname")
+                        .Execute(new PNSetChannelMetadataResultExt((r, s) =>
                         {
                             if (r != null && s.StatusCode == 200 && !s.Error)
                             {
                                 pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
-                                if (spaceId2 == r.Id)
+                                if (channelMetadataId2 == r.Channel)
                                 {
                                     receivedMessage = true;
                                 }
@@ -221,20 +208,20 @@ namespace PubNubMessaging.Tests
                 manualEvent = new ManualResetEvent(false);
                 #region "Memberships Add"
                 System.Diagnostics.Debug.WriteLine("pubnub.Memberships() ADD STARTED");
-                pubnub.ManageMemberships().UserId(userId)
-                    .Add(new List<PNMembership>()
+                pubnub.ManageMemberships().Uuid(uuidMetadataId)
+                    .Set(new List<PNMembership>()
                             {
-                            new PNMembership() { SpaceId = spaceId1 },
-                            new PNMembership() { SpaceId = spaceId2 }
+                            new PNMembership() { Channel = channelMetadataId1   },
+                            new PNMembership() { Channel = channelMetadataId2   }
                     })
-                    .Execute(new PNManageMembershipsResultExt((r, s) =>
+                    .Execute(new PNMembershipsResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
                             pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
-                            if (r.Memberships != null 
-                            && r.Memberships.Find(x=> x.SpaceId == spaceId1) != null
-                            && r.Memberships.Find(x => x.SpaceId == spaceId2) != null)
+                            if (r.Memberships != null
+                            && r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null
+                            && r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId2) != null)
                             {
                                 receivedMessage = true;
                             }
@@ -251,20 +238,20 @@ namespace PubNubMessaging.Tests
                 manualEvent = new ManualResetEvent(false);
                 #region "Memberships Update"
                 System.Diagnostics.Debug.WriteLine("pubnub.Memberships() UPDATE STARTED");
-                pubnub.ManageMemberships().UserId(userId)
-                    .Update(new List<PNMembership>()
+                pubnub.ManageMemberships().Uuid(uuidMetadataId)
+                    .Set(new List<PNMembership>()
                             {
-                            new PNMembership() { SpaceId = spaceId1, Custom = new Dictionary<string, object>(){ { "color", "green1" } } },
-                            new PNMembership() { SpaceId = spaceId2, Custom = new Dictionary<string, object>(){ { "color", "green2" } } }
+                            new PNMembership() { Channel = channelMetadataId1 , Custom = new Dictionary<string, object>(){ { "color", "green1" } } },
+                            new PNMembership() { Channel = channelMetadataId2 , Custom = new Dictionary<string, object>(){ { "color", "green2" } } }
                     })
-                    .Execute(new PNManageMembershipsResultExt((r, s) =>
+                    .Execute(new PNMembershipsResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
                             pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
                             if (r.Memberships != null
-                            && r.Memberships.Find(x => x.SpaceId == spaceId1) != null
-                            && r.Memberships.Find(x => x.SpaceId == spaceId2) != null)
+                            && r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null
+                            && r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId2) != null)
                             {
                                 receivedMessage = true;
                             }
@@ -281,9 +268,9 @@ namespace PubNubMessaging.Tests
                 manualEvent = new ManualResetEvent(false);
                 #region "Memberships Remove"
                 System.Diagnostics.Debug.WriteLine("pubnub.Memberships() REMOVE STARTED");
-                pubnub.ManageMemberships().UserId(userId)
-                    .Remove(new List<string>() { spaceId2 })
-                    .Execute(new PNManageMembershipsResultExt((r, s) =>
+                pubnub.ManageMemberships().Uuid(uuidMetadataId)
+                    .Remove(new List<string>() { channelMetadataId2 })
+                    .Execute(new PNMembershipsResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
@@ -305,14 +292,14 @@ namespace PubNubMessaging.Tests
                 manualEvent = new ManualResetEvent(false);
                 #region "GetMemberships"
                 System.Diagnostics.Debug.WriteLine("pubnub.GetMemberships() STARTED");
-                pubnub.GetMemberships().UserId(userId)
-                    .Execute(new PNGetMembershipsResultExt((r, s) =>
+                pubnub.GetMemberships().Uuid(uuidMetadataId)
+                    .Execute(new PNMembershipsResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
                             pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
                             if (r.Memberships != null
-                            && r.Memberships.Find(x => x.SpaceId == spaceId1) != null)
+                            && r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null)
                             {
                                 receivedMessage = true;
                             }
@@ -325,7 +312,7 @@ namespace PubNubMessaging.Tests
 
             if (!receivedMessage)
             {
-                Assert.IsTrue(receivedMessage, "CreateUser/CreateSpace/Membership AddUpdateRemove Failed");
+                Assert.IsTrue(receivedMessage, "SetUuidMetadata/CreateSpace/Membership Manage Failed");
             }
 
             pubnub.Destroy();
@@ -335,24 +322,24 @@ namespace PubNubMessaging.Tests
 
         [Test]
 #if NET40
-        public static void ThenWithAsyncAddUpdateRemoveSpaceShouldReturnSuccessCodeAndInfo()
+        public static void ThenWithAsyncSetRemoveChannelMetadataWithManageMembershipShouldReturnSuccessCodeAndInfo()
 #else
-        public static async Task ThenWithAsyncAddUpdateRemoveSpaceShouldReturnSuccessCodeAndInfo()
+        public static async Task ThenWithAsyncSetRemoveChannelMetadataWithManageMembershipShouldReturnSuccessCodeAndInfo()
 #endif
         {
             server.ClearRequests();
 
             if (PubnubCommon.EnableStubTest)
             {
-                Assert.Ignore("Ignored ThenWithAsyncAddUpdateRemoveSpaceShouldReturnSuccessCodeAndInfo");
+                Assert.Ignore("Ignored ThenWithAsyncSetRemoveChannelMetadataWithManageMembershipShouldReturnSuccessCodeAndInfo");
                 return;
             }
 
             bool receivedMessage = false;
 
-            string userId = "pandu-ut-uid";
-            string spaceId1 = "pandu-ut-sid1";
-            string spaceId2 = "pandu-ut-sid2";
+            string uuidMetadataId = "pandu-ut-uid";
+            string channelMetadataId1 = "pandu-ut-sid1";
+            string channelMetadataId2 = "pandu-ut-sid2";
 
             PNConfiguration config = new PNConfiguration
             {
@@ -371,45 +358,40 @@ namespace PubNubMessaging.Tests
             }
             server.RunOnHttps(false);
             pubnub = createPubNubInstance(config);
-            if (!PubnubCommon.PAMServerSideRun && !string.IsNullOrEmpty(authToken))
-            {
-                pubnub.ClearTokens();
-                pubnub.SetToken(authToken);
-            }
 
-            System.Diagnostics.Debug.WriteLine("pubnub.DeleteUser() STARTED");
+            System.Diagnostics.Debug.WriteLine("pubnub.RemoveUuidMetadata() STARTED");
 #if NET40
-            Task.Factory.StartNew(async () => await pubnub.DeleteUser().Id(userId).ExecuteAsync()).Wait();
+            Task.Factory.StartNew(async () => await pubnub.RemoveUuidMetadata().Uuid(uuidMetadataId).ExecuteAsync()).Wait();
 #else
-            await pubnub.DeleteUser().Id(userId).ExecuteAsync();
+            await pubnub.RemoveUuidMetadata().Uuid(uuidMetadataId).ExecuteAsync();
 #endif
 
-            System.Diagnostics.Debug.WriteLine("pubnub.DeleteSpace() 1 STARTED");
+            System.Diagnostics.Debug.WriteLine("pubnub.RemoveChannelMetadata() 1 STARTED");
 #if NET40
-            Task.Factory.StartNew(async () => await pubnub.DeleteSpace().Id(spaceId1).ExecuteAsync()).Wait();
+            Task.Factory.StartNew(async () => await pubnub.RemoveChannelMetadata().Channel(channelMetadataId1).ExecuteAsync()).Wait();
 #else
-            await pubnub.DeleteSpace().Id(spaceId1).ExecuteAsync();
+            await pubnub.RemoveChannelMetadata().Channel(channelMetadataId1).ExecuteAsync();
 #endif
 
-            System.Diagnostics.Debug.WriteLine("pubnub.DeleteSpace() 2 STARTED");
+            System.Diagnostics.Debug.WriteLine("pubnub.RemoveChannelMetadata() 2 STARTED");
 #if NET40
-            Task.Factory.StartNew(async () => await pubnub.DeleteSpace().Id(spaceId2).ExecuteAsync()).Wait();
+            Task.Factory.StartNew(async () => await pubnub.RemoveChannelMetadata().Channel(channelMetadataId2).ExecuteAsync()).Wait();
 #else
-            await pubnub.DeleteSpace().Id(spaceId2).ExecuteAsync();
+            await pubnub.RemoveChannelMetadata().Channel(channelMetadataId2).ExecuteAsync();
 #endif
 
             receivedMessage = false;
-            #region "CreateUser"
-            System.Diagnostics.Debug.WriteLine("pubnub.CreateUser() STARTED");
+            #region "SetUuidMetadata"
+            System.Diagnostics.Debug.WriteLine("pubnub.SetUuidMetadata() STARTED");
 #if NET40
-            PNResult<PNCreateUserResult> createUserResult = Task.Factory.StartNew(async () => await pubnub.CreateUser().Id(userId).Name("pandu-ut-un").ExecuteAsync()).Result.Result;
+            PNResult<PNSetUuidMetadataResult> createUserResult = Task.Factory.StartNew(async () => await pubnub.SetUuidMetadata().Uuid(uuidMetadataId).Name("pandu-ut-un").ExecuteAsync()).Result.Result;
 #else
-            PNResult<PNCreateUserResult> createUserResult = await pubnub.CreateUser().Id(userId).Name("pandu-ut-un").ExecuteAsync();
+            PNResult<PNSetUuidMetadataResult> createUserResult = await pubnub.SetUuidMetadata().Uuid(uuidMetadataId).Name("pandu-ut-un").ExecuteAsync();
 #endif
             if (createUserResult.Result != null && createUserResult.Status.StatusCode == 200 && !createUserResult.Status.Error)
             {
                 pubnub.JsonPluggableLibrary.SerializeToJsonString(createUserResult.Result);
-                if (userId == createUserResult.Result.Id)
+                if (uuidMetadataId == createUserResult.Result.Uuid)
                 {
                     receivedMessage = true;
                 }
@@ -419,17 +401,17 @@ namespace PubNubMessaging.Tests
             if (receivedMessage)
             {
                 receivedMessage = false;
-                #region "CreateSpace 1"
-                System.Diagnostics.Debug.WriteLine("pubnub.CreateSpace() 1 STARTED");
+                #region "SetChannelMetadata 1"
+                System.Diagnostics.Debug.WriteLine("pubnub.SetChannelMetadata() 1 STARTED");
 #if NET40
-                PNResult<PNCreateSpaceResult> createSpace1Result = Task.Factory.StartNew(async () => await pubnub.CreateSpace().Id(spaceId1).Name("pandu-ut-spname").ExecuteAsync()).Result.Result;
+                PNResult<PNSetChannelMetadataResult> createSpace1Result = Task.Factory.StartNew(async () => await pubnub.SetChannelMetadata().Channel(channelMetadataId1).Name("pandu-ut-spname").ExecuteAsync()).Result.Result;
 #else
-                PNResult<PNCreateSpaceResult> createSpace1Result = await pubnub.CreateSpace().Id(spaceId1).Name("pandu-ut-spname").ExecuteAsync();
+                PNResult<PNSetChannelMetadataResult> createSpace1Result = await pubnub.SetChannelMetadata().Channel(channelMetadataId1).Name("pandu-ut-spname").ExecuteAsync();
 #endif
                 if (createSpace1Result.Result != null && createSpace1Result.Status.StatusCode == 200 && !createSpace1Result.Status.Error)
                 {
                     pubnub.JsonPluggableLibrary.SerializeToJsonString(createSpace1Result.Result);
-                    if (spaceId1 == createSpace1Result.Result.Id)
+                    if (channelMetadataId1 == createSpace1Result.Result.Channel)
                     {
                         receivedMessage = true;
                     }
@@ -439,17 +421,17 @@ namespace PubNubMessaging.Tests
             if (receivedMessage)
             {
                 receivedMessage = false;
-                #region "CreateSpace 2"
-                System.Diagnostics.Debug.WriteLine("pubnub.CreateSpace() 2 STARTED");
+                #region "SetChannelMetadata 2"
+                System.Diagnostics.Debug.WriteLine("pubnub.SetChannelMetadata() 2 STARTED");
 #if NET40
-                PNResult<PNCreateSpaceResult> createSpace2Result = Task.Factory.StartNew(async () => await pubnub.CreateSpace().Id(spaceId2).Name("pandu-ut-spname").ExecuteAsync()).Result.Result;
+                PNResult<PNSetChannelMetadataResult> createSpace2Result = Task.Factory.StartNew(async () => await pubnub.SetChannelMetadata().Channel(channelMetadataId2).Name("pandu-ut-spname").ExecuteAsync()).Result.Result;
 #else
-                PNResult<PNCreateSpaceResult> createSpace2Result = await pubnub.CreateSpace().Id(spaceId2).Name("pandu-ut-spname").ExecuteAsync();
+                PNResult<PNSetChannelMetadataResult> createSpace2Result = await pubnub.SetChannelMetadata().Channel(channelMetadataId2).Name("pandu-ut-spname").ExecuteAsync();
 #endif
                 if (createSpace2Result.Result != null && createSpace2Result.Status.StatusCode == 200 && !createSpace2Result.Status.Error)
                 {
                     pubnub.JsonPluggableLibrary.SerializeToJsonString(createSpace2Result.Result);
-                    if (spaceId2 == createSpace2Result.Result.Id)
+                    if (channelMetadataId2 == createSpace2Result.Result.Channel)
                     {
                         receivedMessage = true;
                     }
@@ -463,19 +445,19 @@ namespace PubNubMessaging.Tests
                 #region "Memberships Add"
                 System.Diagnostics.Debug.WriteLine("pubnub.Memberships() ADD STARTED");
 #if NET40
-                PNResult<PNManageMembershipsResult> manageMbrshipAddResult = Task.Factory.StartNew(async () => await pubnub.ManageMemberships().UserId(userId)
-                    .Add(new List<PNMembership>()
+                PNResult<PNMembershipsResult> manageMbrshipAddResult = Task.Factory.StartNew(async () => await pubnub.ManageMemberships().Uuid(uuidMetadataId)
+                    .Set(new List<PNMembership>()
                             {
-                            new PNMembership() { SpaceId = spaceId1 },
-                            new PNMembership() { SpaceId = spaceId2 }
+                                new PNMembership() { Channel = channelMetadataId1  },
+                                new PNMembership() { Channel = channelMetadataId2  }
                     })
                     .ExecuteAsync()).Result.Result;
 #else
-                PNResult<PNManageMembershipsResult> manageMbrshipAddResult = await pubnub.ManageMemberships().UserId(userId)
-                    .Add(new List<PNMembership>()
+                PNResult<PNMembershipsResult> manageMbrshipAddResult = await pubnub.ManageMemberships().Uuid(uuidMetadataId)
+                    .Set(new List<PNMembership>()
                             {
-                            new PNMembership() { SpaceId = spaceId1 },
-                            new PNMembership() { SpaceId = spaceId2 }
+                            new PNMembership() { Channel = channelMetadataId1  },
+                            new PNMembership() { Channel = channelMetadataId2  }
                     })
                     .ExecuteAsync();
 #endif
@@ -483,8 +465,8 @@ namespace PubNubMessaging.Tests
                 {
                     pubnub.JsonPluggableLibrary.SerializeToJsonString(manageMbrshipAddResult.Result);
                     if (manageMbrshipAddResult.Result.Memberships != null
-                    && manageMbrshipAddResult.Result.Memberships.Find(x => x.SpaceId == spaceId1) != null
-                    && manageMbrshipAddResult.Result.Memberships.Find(x => x.SpaceId == spaceId2) != null)
+                    && manageMbrshipAddResult.Result.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null
+                    && manageMbrshipAddResult.Result.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId2) != null)
                     {
                         receivedMessage = true;
                     }
@@ -498,19 +480,19 @@ namespace PubNubMessaging.Tests
                 #region "Memberships Update"
                 System.Diagnostics.Debug.WriteLine("pubnub.Memberships() UPDATE STARTED");
 #if NET40
-                PNResult<PNManageMembershipsResult> manageMbrshipUpdResult = Task.Factory.StartNew(async () => await pubnub.ManageMemberships().UserId(userId)
-                    .Update(new List<PNMembership>()
+                PNResult<PNMembershipsResult> manageMbrshipUpdResult = Task.Factory.StartNew(async () => await pubnub.ManageMemberships().Uuid(uuidMetadataId)
+                    .Set(new List<PNMembership>()
                             {
-                            new PNMembership() { SpaceId = spaceId1, Custom = new Dictionary<string, object>(){ { "color", "green1" } } },
-                            new PNMembership() { SpaceId = spaceId2, Custom = new Dictionary<string, object>(){ { "color", "green2" } } }
+                            new PNMembership() { Channel = channelMetadataId1, Custom = new Dictionary<string, object>(){ { "color", "green1" } } },
+                            new PNMembership() { Channel = channelMetadataId2, Custom = new Dictionary<string, object>(){ { "color", "green2" } } }
                     })
                     .ExecuteAsync()).Result.Result;
 #else
-                PNResult<PNManageMembershipsResult> manageMbrshipUpdResult = await pubnub.ManageMemberships().UserId(userId)
-                    .Update(new List<PNMembership>()
+                PNResult<PNMembershipsResult> manageMbrshipUpdResult = await pubnub.ManageMemberships().Uuid(uuidMetadataId)
+                    .Set(new List<PNMembership>()
                             {
-                            new PNMembership() { SpaceId = spaceId1, Custom = new Dictionary<string, object>(){ { "color", "green1" } } },
-                            new PNMembership() { SpaceId = spaceId2, Custom = new Dictionary<string, object>(){ { "color", "green2" } } }
+                            new PNMembership() { Channel = channelMetadataId1, Custom = new Dictionary<string, object>(){ { "color", "green1" } } },
+                            new PNMembership() { Channel = channelMetadataId2, Custom = new Dictionary<string, object>(){ { "color", "green2" } } }
                     })
                     .ExecuteAsync();
 #endif
@@ -518,8 +500,8 @@ namespace PubNubMessaging.Tests
                 {
                     pubnub.JsonPluggableLibrary.SerializeToJsonString(manageMbrshipUpdResult.Result);
                     if (manageMbrshipUpdResult.Result.Memberships != null
-                    && manageMbrshipUpdResult.Result.Memberships.Find(x => x.SpaceId == spaceId1) != null
-                    && manageMbrshipUpdResult.Result.Memberships.Find(x => x.SpaceId == spaceId2) != null)
+                    && manageMbrshipUpdResult.Result.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null
+                    && manageMbrshipUpdResult.Result.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId2) != null)
                     {
                         receivedMessage = true;
                     }
@@ -533,12 +515,12 @@ namespace PubNubMessaging.Tests
                 #region "Memberships Remove"
                 System.Diagnostics.Debug.WriteLine("pubnub.Memberships() REMOVE STARTED");
 #if NET40
-                PNResult<PNManageMembershipsResult> manageMbrshipDelResult = Task.Factory.StartNew(async () => await pubnub.ManageMemberships().UserId(userId)
-                    .Remove(new List<string>() { spaceId2 })
+                PNResult<PNMembershipsResult> manageMbrshipDelResult = Task.Factory.StartNew(async () => await pubnub.ManageMemberships().Uuid(uuidMetadataId)
+                    .Remove(new List<string>() { channelMetadataId2 })
                     .ExecuteAsync()).Result.Result;
 #else
-                PNResult<PNManageMembershipsResult> manageMbrshipDelResult = await pubnub.ManageMemberships().UserId(userId)
-                    .Remove(new List<string>() { spaceId2 })
+                PNResult<PNMembershipsResult> manageMbrshipDelResult = await pubnub.ManageMemberships().Uuid(uuidMetadataId)
+                    .Remove(new List<string>() { channelMetadataId2 })
                     .ExecuteAsync();
 #endif
                 if (manageMbrshipDelResult.Result != null && manageMbrshipDelResult.Status.StatusCode == 200 && !manageMbrshipDelResult.Status.Error)
@@ -558,15 +540,15 @@ namespace PubNubMessaging.Tests
                 #region "GetMemberships"
                 System.Diagnostics.Debug.WriteLine("pubnub.GetMemberships() STARTED");
 #if NET40
-                PNResult<PNGetMembershipsResult> getMbrshipResult = Task.Factory.StartNew(async () => await pubnub.GetMemberships().UserId(userId).ExecuteAsync()).Result.Result;
+                PNResult<PNMembershipsResult> getMbrshipResult = Task.Factory.StartNew(async () => await pubnub.GetMemberships().Uuid(uuidMetadataId).ExecuteAsync()).Result.Result;
 #else
-                PNResult<PNGetMembershipsResult> getMbrshipResult = await pubnub.GetMemberships().UserId(userId).ExecuteAsync();
+                PNResult<PNMembershipsResult> getMbrshipResult = await pubnub.GetMemberships().Uuid(uuidMetadataId).ExecuteAsync();
 #endif
                 if (getMbrshipResult.Result != null && getMbrshipResult.Status.StatusCode == 200 && !getMbrshipResult.Status.Error)
                 {
                     pubnub.JsonPluggableLibrary.SerializeToJsonString(getMbrshipResult.Result);
                     if (getMbrshipResult.Result.Memberships != null
-                    && getMbrshipResult.Result.Memberships.Find(x => x.SpaceId == spaceId1) != null)
+                    && getMbrshipResult.Result.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null)
                     {
                         receivedMessage = true;
                     }
@@ -576,7 +558,7 @@ namespace PubNubMessaging.Tests
 
             if (!receivedMessage)
             {
-                Assert.IsTrue(receivedMessage, "With Async CreateUser/CreateSpace/Membership AddUpdateRemove Failed");
+                Assert.IsTrue(receivedMessage, "With Async SetUuidMetadata/CreateSpace/Membership Manage Failed");
             }
 
             pubnub.Destroy();
@@ -585,58 +567,28 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public static void ThenMembershipAddUpdateRemoveShouldReturnEventInfo()
+        public static void ThenSetRemoveChannelMetadataWithSetRemoveMembershipShouldReturnSuccessCodeAndInfo()
         {
             server.ClearRequests();
 
             if (PubnubCommon.EnableStubTest)
             {
-                Assert.Ignore("Ignored ThenMembershipAddUpdateRemoveShouldReturnEventInfo");
+                Assert.Ignore("Ignored ThenSetRemoveChannelMetadataWithSetRemoveMembershipShouldReturnSuccessCodeAndInfo");
                 return;
             }
 
             bool receivedMessage = false;
-            bool receivedCreateEvent = false;
-            bool receivedDeleteEvent = false;
-            bool receivedUpdateEvent = false;
 
-            string userId = "pandu-ut-uid";
-            string spaceId1 = "pandu-ut-sid1";
-            string spaceId2 = "pandu-ut-sid2";
-
-            SubscribeCallbackExt eventListener = new SubscribeCallbackExt(
-                delegate (Pubnub pnObj, PNObjectApiEventResult eventResult)
-                {
-                    System.Diagnostics.Debug.WriteLine("EVENT:" + pubnub.JsonPluggableLibrary.SerializeToJsonString(eventResult));
-                    if (eventResult.Type.ToLowerInvariant() == "membership")
-                    {
-                        if (eventResult.Event.ToLowerInvariant() == "create")
-                        {
-                            receivedCreateEvent = true;
-                        }
-                        else if (eventResult.Event.ToLowerInvariant() == "update")
-                        {
-                            receivedUpdateEvent = true;
-                        }
-                        else if (eventResult.Event.ToLowerInvariant() == "delete")
-                        {
-                            receivedDeleteEvent = true;
-                        }
-                    }
-                },
-                delegate (Pubnub pnObj, PNStatus status)
-                {
-
-                }
-                );
+            string uuidMetadataId = "pandu-ut-uid";
+            string channelMetadataId1 = "pandu-ut-sid1";
+            string channelMetadataId2 = "pandu-ut-sid2";
 
             PNConfiguration config = new PNConfiguration
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Uuid = "mytestuuid",
-                Secure = false,
-                AuthKey = "myauth"
+                Secure = false
             };
             if (PubnubCommon.PAMServerSideRun)
             {
@@ -648,48 +600,35 @@ namespace PubNubMessaging.Tests
             }
             server.RunOnHttps(false);
             pubnub = createPubNubInstance(config);
-            if (!PubnubCommon.PAMServerSideRun && !string.IsNullOrEmpty(authToken))
-            {
-                pubnub.ClearTokens();
-                pubnub.SetToken(authToken);
-            }
-            pubnub.AddListener(eventListener);
-
             ManualResetEvent manualEvent = new ManualResetEvent(false);
-            pubnub.Subscribe<string>().Channels(new string[] { userId, spaceId1, spaceId2 }).Execute();
-            manualEvent.WaitOne(2000);
-
 
             manualResetEventWaitTimeout = 310 * 1000;
-            System.Diagnostics.Debug.WriteLine("pubnub.DeleteUser() STARTED");
-            manualEvent = new ManualResetEvent(false);
-            pubnub.DeleteUser().Id(userId).Execute(new PNDeleteUserResultExt(
-                delegate (PNDeleteUserResult result, PNStatus status) { }));
+            System.Diagnostics.Debug.WriteLine("pubnub.RemoveUuidMetadata() STARTED");
+            pubnub.RemoveUuidMetadata().Uuid(uuidMetadataId).Execute(new PNRemoveUuidMetadataResultExt(
+                delegate (PNRemoveUuidMetadataResult result, PNStatus status) { }));
             manualEvent.WaitOne(2000);
 
-            System.Diagnostics.Debug.WriteLine("pubnub.DeleteSpace() 1 STARTED");
-            manualEvent = new ManualResetEvent(false);
-            pubnub.DeleteSpace().Id(spaceId1).Execute(new PNDeleteSpaceResultExt(
-                delegate (PNDeleteSpaceResult result, PNStatus status) { }));
+            System.Diagnostics.Debug.WriteLine("pubnub.RemoveChannelMetadata() 1 STARTED");
+            pubnub.RemoveChannelMetadata().Channel(channelMetadataId1).Execute(new PNRemoveChannelMetadataResultExt(
+                delegate (PNRemoveChannelMetadataResult result, PNStatus status) { }));
             manualEvent.WaitOne(2000);
 
-            System.Diagnostics.Debug.WriteLine("pubnub.DeleteSpace() 2 STARTED");
-            manualEvent = new ManualResetEvent(false);
-            pubnub.DeleteSpace().Id(spaceId2).Execute(new PNDeleteSpaceResultExt(
-                delegate (PNDeleteSpaceResult result, PNStatus status) { }));
+            System.Diagnostics.Debug.WriteLine("pubnub.RemoveChannelMetadata() 2 STARTED");
+            pubnub.RemoveChannelMetadata().Channel(channelMetadataId2).Execute(new PNRemoveChannelMetadataResultExt(
+                delegate (PNRemoveChannelMetadataResult result, PNStatus status) { }));
             manualEvent.WaitOne(2000);
 
             manualEvent = new ManualResetEvent(false);
             receivedMessage = false;
-            #region "CreateUser"
-            System.Diagnostics.Debug.WriteLine("pubnub.CreateUser() STARTED");
-            pubnub.CreateUser().Id(userId).Name("pandu-ut-un")
-                    .Execute(new PNCreateUserResultExt((r, s) =>
+            #region "SetUuidMetadata"
+            System.Diagnostics.Debug.WriteLine("pubnub.SetUuidMetadata() STARTED");
+            pubnub.SetUuidMetadata().Uuid(uuidMetadataId).Name("pandu-ut-un")
+                    .Execute(new PNSetUuidMetadataResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
                             pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
-                            if (userId == r.Id)
+                            if (uuidMetadataId == r.Uuid)
                             {
                                 receivedMessage = true;
                             }
@@ -703,15 +642,15 @@ namespace PubNubMessaging.Tests
             {
                 receivedMessage = false;
                 manualEvent = new ManualResetEvent(false);
-                #region "CreateSpace 1"
-                System.Diagnostics.Debug.WriteLine("pubnub.CreateSpace() 1 STARTED");
-                pubnub.CreateSpace().Id(spaceId1).Name("pandu-ut-spname")
-                        .Execute(new PNCreateSpaceResultExt((r, s) =>
+                #region "SetChannelMetadata 1"
+                System.Diagnostics.Debug.WriteLine("pubnub.SetChannelMetadata() 1 STARTED");
+                pubnub.SetChannelMetadata().Channel(channelMetadataId1).Name("pandu-ut-spname")
+                        .Execute(new PNSetChannelMetadataResultExt((r, s) =>
                         {
                             if (r != null && s.StatusCode == 200 && !s.Error)
                             {
                                 pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
-                                if (spaceId1 == r.Id)
+                                if (channelMetadataId1 == r.Channel)
                                 {
                                     receivedMessage = true;
                                 }
@@ -725,15 +664,15 @@ namespace PubNubMessaging.Tests
             {
                 receivedMessage = false;
                 manualEvent = new ManualResetEvent(false);
-                #region "CreateSpace 2"
-                System.Diagnostics.Debug.WriteLine("pubnub.CreateSpace() 2 STARTED");
-                pubnub.CreateSpace().Id(spaceId2).Name("pandu-ut-spname")
-                        .Execute(new PNCreateSpaceResultExt((r, s) =>
+                #region "SetChannelMetadata 2"
+                System.Diagnostics.Debug.WriteLine("pubnub.SetChannelMetadata() 2 STARTED");
+                pubnub.SetChannelMetadata().Channel(channelMetadataId2).Name("pandu-ut-spname")
+                        .Execute(new PNSetChannelMetadataResultExt((r, s) =>
                         {
                             if (r != null && s.StatusCode == 200 && !s.Error)
                             {
                                 pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
-                                if (spaceId2 == r.Id)
+                                if (channelMetadataId2 == r.Channel)
                                 {
                                     receivedMessage = true;
                                 }
@@ -748,22 +687,22 @@ namespace PubNubMessaging.Tests
             {
                 receivedMessage = false;
                 manualEvent = new ManualResetEvent(false);
-                #region "Memberships Add"
-                System.Diagnostics.Debug.WriteLine("pubnub.Memberships() ADD STARTED");
-                pubnub.ManageMemberships().UserId(userId)
-                    .Add(new List<PNMembership>()
+                #region "SetMemberships ADD"
+                System.Diagnostics.Debug.WriteLine("pubnub.SetMemberships() ADD STARTED");
+                pubnub.SetMemberships().Uuid(uuidMetadataId)
+                    .Channels(new List<PNMembership>()
                             {
-                            new PNMembership() { SpaceId = spaceId1 },
-                            new PNMembership() { SpaceId = spaceId2 }
+                            new PNMembership() { Channel = channelMetadataId1   },
+                            new PNMembership() { Channel = channelMetadataId2   }
                     })
-                    .Execute(new PNManageMembershipsResultExt((r, s) =>
+                    .Execute(new PNMembershipsResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
                             pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
                             if (r.Memberships != null
-                            && r.Memberships.Find(x => x.SpaceId == spaceId1) != null
-                            && r.Memberships.Find(x => x.SpaceId == spaceId2) != null)
+                            && r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null
+                            && r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId2) != null)
                             {
                                 receivedMessage = true;
                             }
@@ -778,61 +717,83 @@ namespace PubNubMessaging.Tests
             {
                 receivedMessage = false;
                 manualEvent = new ManualResetEvent(false);
-                #region "Memberships Update/Remove"
-                if (!string.IsNullOrEmpty(config.SecretKey))
-                {
-                    System.Diagnostics.Debug.WriteLine("pubnub.Memberships() UPDATE/REMOVE STARTED");
-                    pubnub.ManageMemberships().UserId(userId)
-                        .Update(new List<PNMembership>()
-                                {
-                            new PNMembership() { SpaceId = spaceId1, Custom = new Dictionary<string, object>(){ { "color", "green1" } } }
-                        })
-                        .Remove(new List<string>() { spaceId2 })
-                        .Execute(new PNManageMembershipsResultExt((r, s) =>
-                        {
-                            if (r != null && s.StatusCode == 200 && !s.Error)
+                #region "SetMemberships Update"
+                System.Diagnostics.Debug.WriteLine("pubnub.SetMemberships() UPDATE STARTED");
+                pubnub.SetMemberships().Uuid(uuidMetadataId)
+                    .Channels(new List<PNMembership>()
                             {
-                                pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
-                                if (r.Memberships != null
-                                && r.Memberships.Find(x => x.SpaceId == spaceId1) != null)
-                                {
-                                    receivedMessage = true;
-                                }
-                            }
-                            manualEvent.Set();
-                        }));
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("pubnub.Memberships() REMOVE STARTED");
-                    pubnub.ManageMemberships().UserId(userId)
-                        .Remove(new List<string>() { spaceId2 })
-                        .Execute(new PNManageMembershipsResultExt((r, s) =>
+                            new PNMembership() { Channel = channelMetadataId1 , Custom = new Dictionary<string, object>(){ { "color", "green1" } } },
+                            new PNMembership() { Channel = channelMetadataId2 , Custom = new Dictionary<string, object>(){ { "color", "green2" } } }
+                    })
+                    .Execute(new PNMembershipsResultExt((r, s) =>
+                    {
+                        if (r != null && s.StatusCode == 200 && !s.Error)
                         {
-                            if (r != null && s.StatusCode == 200 && !s.Error)
+                            pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
+                            if (r.Memberships != null
+                            && r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null
+                            && r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId2) != null)
                             {
-                                pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
                                 receivedMessage = true;
                             }
-                            manualEvent.Set();
-                        }));
-                }
+                        }
+                        manualEvent.Set();
+                    }));
                 #endregion
                 manualEvent.WaitOne(manualResetEventWaitTimeout);
             }
 
-            Thread.Sleep(2000);
-
-            pubnub.Unsubscribe<string>().Channels(new string[] { userId, spaceId1, spaceId2 }).Execute();
-            pubnub.RemoveListener(eventListener);
-
-            if (!string.IsNullOrEmpty(config.SecretKey))
+            if (receivedMessage)
             {
-                Assert.IsTrue(receivedDeleteEvent && receivedUpdateEvent && receivedCreateEvent, "Membership events Failed");
+                receivedMessage = false;
+                manualEvent = new ManualResetEvent(false);
+                #region "RemoveMemberships Remove"
+                System.Diagnostics.Debug.WriteLine("pubnub.RemoveMemberships() REMOVE STARTED");
+                pubnub.RemoveMemberships().Uuid(uuidMetadataId)
+                    .Channels(new List<string>() { channelMetadataId2 })
+                    .Execute(new PNMembershipsResultExt((r, s) =>
+                    {
+                        if (r != null && s.StatusCode == 200 && !s.Error)
+                        {
+                            pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
+                            if (r.Memberships != null)
+                            {
+                                receivedMessage = true;
+                            }
+                        }
+                        manualEvent.Set();
+                    }));
+                #endregion
+                manualEvent.WaitOne(manualResetEventWaitTimeout);
             }
-            else
+
+            if (receivedMessage)
             {
-                Assert.IsTrue(receivedDeleteEvent && receivedCreateEvent, "Membership events Failed");
+                receivedMessage = false;
+                manualEvent = new ManualResetEvent(false);
+                #region "GetMemberships"
+                System.Diagnostics.Debug.WriteLine("pubnub.GetMemberships() STARTED");
+                pubnub.GetMemberships().Uuid(uuidMetadataId)
+                    .Execute(new PNMembershipsResultExt((r, s) =>
+                    {
+                        if (r != null && s.StatusCode == 200 && !s.Error)
+                        {
+                            pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
+                            if (r.Memberships != null
+                            && r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null)
+                            {
+                                receivedMessage = true;
+                            }
+                        }
+                        manualEvent.Set();
+                    }));
+                #endregion
+                manualEvent.WaitOne(manualResetEventWaitTimeout);
+            }
+
+            if (!receivedMessage)
+            {
+                Assert.IsTrue(receivedMessage, "SetUuidMetadata/CreateSpace/SetMemberships/RemoveMemberships Failed");
             }
 
             pubnub.Destroy();
@@ -842,41 +803,279 @@ namespace PubNubMessaging.Tests
 
         [Test]
 #if NET40
-        public static void ThenWithAsyncMembershipAddUpdateRemoveShouldReturnEventInfo()
+        public static void ThenWithAsyncSetRemoveChannelMetadataWithSetRemoveMembershipShouldReturnSuccessCodeAndInfo()
 #else
-        public static async Task ThenWithAsyncMembershipAddUpdateRemoveShouldReturnEventInfo()
+        public static async Task ThenWithAsyncSetRemoveChannelMetadataWithSetRemoveMembershipShouldReturnSuccessCodeAndInfo()
 #endif
         {
             server.ClearRequests();
 
             if (PubnubCommon.EnableStubTest)
             {
-                Assert.Ignore("Ignored ThenWithAsyncMembershipAddUpdateRemoveShouldReturnEventInfo");
+                Assert.Ignore("Ignored ThenWithAsyncSetRemoveChannelMetadataWithSetRemoveMembershipShouldReturnSuccessCodeAndInfo");
                 return;
             }
 
             bool receivedMessage = false;
-            bool receivedCreateEvent = false;
-            bool receivedDeleteEvent = false;
-            bool receivedUpdateEvent = false;
 
-            string userId = "pandu-ut-uid";
-            string spaceId1 = "pandu-ut-sid1";
-            string spaceId2 = "pandu-ut-sid2";
+            string uuidMetadataId = "pandu-ut-uid";
+            string channelMetadataId1 = "pandu-ut-sid1";
+            string channelMetadataId2 = "pandu-ut-sid2";
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+            server.RunOnHttps(false);
+            pubnub = createPubNubInstance(config);
+
+            System.Diagnostics.Debug.WriteLine("pubnub.RemoveUuidMetadata() STARTED");
+#if NET40
+            Task.Factory.StartNew(async () => await pubnub.RemoveUuidMetadata().Uuid(uuidMetadataId).ExecuteAsync()).Wait();
+#else
+            await pubnub.RemoveUuidMetadata().Uuid(uuidMetadataId).ExecuteAsync();
+#endif
+
+            System.Diagnostics.Debug.WriteLine("pubnub.RemoveChannelMetadata() 1 STARTED");
+#if NET40
+            Task.Factory.StartNew(async () => await pubnub.RemoveChannelMetadata().Channel(channelMetadataId1).ExecuteAsync()).Wait();
+#else
+            await pubnub.RemoveChannelMetadata().Channel(channelMetadataId1).ExecuteAsync();
+#endif
+
+            System.Diagnostics.Debug.WriteLine("pubnub.RemoveChannelMetadata() 2 STARTED");
+#if NET40
+            Task.Factory.StartNew(async () => await pubnub.RemoveChannelMetadata().Channel(channelMetadataId2).ExecuteAsync()).Wait();
+#else
+            await pubnub.RemoveChannelMetadata().Channel(channelMetadataId2).ExecuteAsync();
+#endif
+
+            receivedMessage = false;
+            #region "SetUuidMetadata"
+            System.Diagnostics.Debug.WriteLine("pubnub.SetUuidMetadata() STARTED");
+#if NET40
+            PNResult<PNSetUuidMetadataResult> createUserResult = Task.Factory.StartNew(async () => await pubnub.SetUuidMetadata().Uuid(uuidMetadataId).Name("pandu-ut-un").ExecuteAsync()).Result.Result;
+#else
+            PNResult<PNSetUuidMetadataResult> createUserResult = await pubnub.SetUuidMetadata().Uuid(uuidMetadataId).Name("pandu-ut-un").ExecuteAsync();
+#endif
+            if (createUserResult.Result != null && createUserResult.Status.StatusCode == 200 && !createUserResult.Status.Error)
+            {
+                pubnub.JsonPluggableLibrary.SerializeToJsonString(createUserResult.Result);
+                if (uuidMetadataId == createUserResult.Result.Uuid)
+                {
+                    receivedMessage = true;
+                }
+            }
+            #endregion
+
+            if (receivedMessage)
+            {
+                receivedMessage = false;
+                #region "SetChannelMetadata 1"
+                System.Diagnostics.Debug.WriteLine("pubnub.SetChannelMetadata() 1 STARTED");
+#if NET40
+                PNResult<PNSetChannelMetadataResult> createSpace1Result = Task.Factory.StartNew(async () => await pubnub.SetChannelMetadata().Channel(channelMetadataId1).Name("pandu-ut-spname").ExecuteAsync()).Result.Result;
+#else
+                PNResult<PNSetChannelMetadataResult> createSpace1Result = await pubnub.SetChannelMetadata().Channel(channelMetadataId1).Name("pandu-ut-spname").ExecuteAsync();
+#endif
+                if (createSpace1Result.Result != null && createSpace1Result.Status.StatusCode == 200 && !createSpace1Result.Status.Error)
+                {
+                    pubnub.JsonPluggableLibrary.SerializeToJsonString(createSpace1Result.Result);
+                    if (channelMetadataId1 == createSpace1Result.Result.Channel)
+                    {
+                        receivedMessage = true;
+                    }
+                }
+                #endregion
+            }
+            if (receivedMessage)
+            {
+                receivedMessage = false;
+                #region "SetChannelMetadata 2"
+                System.Diagnostics.Debug.WriteLine("pubnub.SetChannelMetadata() 2 STARTED");
+#if NET40
+                PNResult<PNSetChannelMetadataResult> createSpace2Result = Task.Factory.StartNew(async () => await pubnub.SetChannelMetadata().Channel(channelMetadataId2).Name("pandu-ut-spname").ExecuteAsync()).Result.Result;
+#else
+                PNResult<PNSetChannelMetadataResult> createSpace2Result = await pubnub.SetChannelMetadata().Channel(channelMetadataId2).Name("pandu-ut-spname").ExecuteAsync();
+#endif
+                if (createSpace2Result.Result != null && createSpace2Result.Status.StatusCode == 200 && !createSpace2Result.Status.Error)
+                {
+                    pubnub.JsonPluggableLibrary.SerializeToJsonString(createSpace2Result.Result);
+                    if (channelMetadataId2 == createSpace2Result.Result.Channel)
+                    {
+                        receivedMessage = true;
+                    }
+                }
+                #endregion
+            }
+
+            if (receivedMessage)
+            {
+                receivedMessage = false;
+                #region "SetMemberships Add"
+                System.Diagnostics.Debug.WriteLine("pubnub.SetMemberships() ADD STARTED");
+#if NET40
+                PNResult<PNMembershipsResult> manageMbrshipAddResult = Task.Factory.StartNew(async () => await pubnub.SetMemberships().Uuid(uuidMetadataId)
+                    .Channels(new List<PNMembership>()
+                            {
+                                new PNMembership() { Channel = channelMetadataId1  },
+                                new PNMembership() { Channel = channelMetadataId2  }
+                    })
+                    .ExecuteAsync()).Result.Result;
+#else
+                PNResult<PNMembershipsResult> manageMbrshipAddResult = await pubnub.SetMemberships().Uuid(uuidMetadataId)
+                    .Channels(new List<PNMembership>()
+                            {
+                            new PNMembership() { Channel = channelMetadataId1  },
+                            new PNMembership() { Channel = channelMetadataId2  }
+                    })
+                    .ExecuteAsync();
+#endif
+                if (manageMbrshipAddResult.Result != null && manageMbrshipAddResult.Status.StatusCode == 200 && !manageMbrshipAddResult.Status.Error)
+                {
+                    pubnub.JsonPluggableLibrary.SerializeToJsonString(manageMbrshipAddResult.Result);
+                    if (manageMbrshipAddResult.Result.Memberships != null
+                    && manageMbrshipAddResult.Result.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null
+                    && manageMbrshipAddResult.Result.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId2) != null)
+                    {
+                        receivedMessage = true;
+                    }
+                }
+                #endregion
+            }
+
+            if (receivedMessage && !string.IsNullOrEmpty(config.SecretKey))
+            {
+                receivedMessage = false;
+                #region "SetMemberships Update"
+                System.Diagnostics.Debug.WriteLine("pubnub.SetMemberships() UPDATE STARTED");
+#if NET40
+                PNResult<PNMembershipsResult> manageMbrshipUpdResult = Task.Factory.StartNew(async () => await pubnub.SetMemberships().Uuid(uuidMetadataId)
+                    .Channels(new List<PNMembership>()
+                            {
+                            new PNMembership() { Channel = channelMetadataId1, Custom = new Dictionary<string, object>(){ { "color", "green1" } } },
+                            new PNMembership() { Channel = channelMetadataId2, Custom = new Dictionary<string, object>(){ { "color", "green2" } } }
+                    })
+                    .ExecuteAsync()).Result.Result;
+#else
+                PNResult<PNMembershipsResult> manageMbrshipUpdResult = await pubnub.SetMemberships().Uuid(uuidMetadataId)
+                    .Channels(new List<PNMembership>()
+                            {
+                            new PNMembership() { Channel = channelMetadataId1, Custom = new Dictionary<string, object>(){ { "color", "green1" } } },
+                            new PNMembership() { Channel = channelMetadataId2, Custom = new Dictionary<string, object>(){ { "color", "green2" } } }
+                    })
+                    .ExecuteAsync();
+#endif
+                if (manageMbrshipUpdResult.Result != null && manageMbrshipUpdResult.Status.StatusCode == 200 && !manageMbrshipUpdResult.Status.Error)
+                {
+                    pubnub.JsonPluggableLibrary.SerializeToJsonString(manageMbrshipUpdResult.Result);
+                    if (manageMbrshipUpdResult.Result.Memberships != null
+                    && manageMbrshipUpdResult.Result.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null
+                    && manageMbrshipUpdResult.Result.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId2) != null)
+                    {
+                        receivedMessage = true;
+                    }
+                }
+                #endregion
+            }
+
+            if (receivedMessage)
+            {
+                receivedMessage = false;
+                #region "RemoveMemberships Remove"
+                System.Diagnostics.Debug.WriteLine("pubnub.RemoveMemberships() REMOVE STARTED");
+#if NET40
+                PNResult<PNMembershipsResult> manageMbrshipDelResult = Task.Factory.StartNew(async () => await pubnub.RemoveMemberships().Uuid(uuidMetadataId)
+                    .Channels(new List<string>() { channelMetadataId2 })
+                    .ExecuteAsync()).Result.Result;
+#else
+                PNResult<PNMembershipsResult> manageMbrshipDelResult = await pubnub.RemoveMemberships().Uuid(uuidMetadataId)
+                    .Channels(new List<string>() { channelMetadataId2 })
+                    .ExecuteAsync();
+#endif
+                if (manageMbrshipDelResult.Result != null && manageMbrshipDelResult.Status.StatusCode == 200 && !manageMbrshipDelResult.Status.Error)
+                {
+                    pubnub.JsonPluggableLibrary.SerializeToJsonString(manageMbrshipDelResult.Result);
+                    if (manageMbrshipDelResult.Result.Memberships != null)
+                    {
+                        receivedMessage = true;
+                    }
+                }
+                #endregion
+            }
+
+            if (receivedMessage)
+            {
+                receivedMessage = false;
+                #region "GetMemberships"
+                System.Diagnostics.Debug.WriteLine("pubnub.GetMemberships() STARTED");
+#if NET40
+                PNResult<PNMembershipsResult> getMbrshipResult = Task.Factory.StartNew(async () => await pubnub.GetMemberships().Uuid(uuidMetadataId).ExecuteAsync()).Result.Result;
+#else
+                PNResult<PNMembershipsResult> getMbrshipResult = await pubnub.GetMemberships().Uuid(uuidMetadataId).ExecuteAsync();
+#endif
+                if (getMbrshipResult.Result != null && getMbrshipResult.Status.StatusCode == 200 && !getMbrshipResult.Status.Error)
+                {
+                    pubnub.JsonPluggableLibrary.SerializeToJsonString(getMbrshipResult.Result);
+                    if (getMbrshipResult.Result.Memberships != null
+                    && getMbrshipResult.Result.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null)
+                    {
+                        receivedMessage = true;
+                    }
+                }
+                #endregion
+            }
+
+            if (!receivedMessage)
+            {
+                Assert.IsTrue(receivedMessage, "With Async SetUuidMetadata/CreateSpace/Membership Manage Failed");
+            }
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
+
+
+        [Test]
+        public static void ThenManageMembershipShouldReturnEventInfo()
+        {
+            server.ClearRequests();
+
+            if (PubnubCommon.EnableStubTest)
+            {
+                Assert.Ignore("Ignored ThenManageMembershipShouldReturnEventInfo");
+                return;
+            }
+
+            bool receivedMessage = false;
+            bool receivedSetEvent = false;
+            bool receivedDeleteEvent = false;
+
+            string uuidMetadataId = "pandu-ut-uid";
+            string channelMetadataId1 = "pandu-ut-sid1";
+            string channelMetadataId2 = "pandu-ut-sid2";
 
             SubscribeCallbackExt eventListener = new SubscribeCallbackExt(
-                delegate (Pubnub pnObj, PNObjectApiEventResult eventResult)
+                delegate (Pubnub pnObj, PNObjectEventResult eventResult)
                 {
                     System.Diagnostics.Debug.WriteLine("EVENT:" + pubnub.JsonPluggableLibrary.SerializeToJsonString(eventResult));
                     if (eventResult.Type.ToLowerInvariant() == "membership")
                     {
-                        if (eventResult.Event.ToLowerInvariant() == "create")
+                        if (eventResult.Event.ToLowerInvariant() == "set")
                         {
-                            receivedCreateEvent = true;
-                        }
-                        else if (eventResult.Event.ToLowerInvariant() == "update")
-                        {
-                            receivedUpdateEvent = true;
+                            receivedSetEvent = true;
                         }
                         else if (eventResult.Event.ToLowerInvariant() == "delete")
                         {
@@ -908,51 +1107,288 @@ namespace PubNubMessaging.Tests
             }
             server.RunOnHttps(false);
             pubnub = createPubNubInstance(config);
-            if (!PubnubCommon.PAMServerSideRun && !string.IsNullOrEmpty(authToken))
-            {
-                pubnub.ClearTokens();
-                pubnub.SetToken(authToken);
-            }
             pubnub.AddListener(eventListener);
 
             ManualResetEvent manualEvent = new ManualResetEvent(false);
-            pubnub.Subscribe<string>().Channels(new string[] { userId, spaceId1, spaceId2 }).Execute();
+            pubnub.Subscribe<string>().Channels(new string[] { uuidMetadataId, channelMetadataId1, channelMetadataId2 }).Execute();
             manualEvent.WaitOne(2000);
 
-            System.Diagnostics.Debug.WriteLine("pubnub.DeleteUser() STARTED");
-#if NET40
-            Task.Factory.StartNew(async () => await pubnub.DeleteUser().Id(userId).ExecuteAsync()).Wait();
-#else
-            await pubnub.DeleteUser().Id(userId).ExecuteAsync();
-#endif
 
-            System.Diagnostics.Debug.WriteLine("pubnub.DeleteSpace() 1 STARTED");
-#if NET40
-            Task.Factory.StartNew(async () => await pubnub.DeleteSpace().Id(spaceId1).ExecuteAsync()).Wait();
-#else
-            await pubnub.DeleteSpace().Id(spaceId1).ExecuteAsync();
-#endif
+            manualResetEventWaitTimeout = 310 * 1000;
+            System.Diagnostics.Debug.WriteLine("pubnub.DeleteUuidMetadata() STARTED");
+            manualEvent = new ManualResetEvent(false);
+            pubnub.RemoveUuidMetadata().Uuid(uuidMetadataId).Execute(new PNRemoveUuidMetadataResultExt(
+                delegate (PNRemoveUuidMetadataResult result, PNStatus status) { }));
+            manualEvent.WaitOne(2000);
 
-            System.Diagnostics.Debug.WriteLine("pubnub.DeleteSpace() 2 STARTED");
-#if NET40
-            Task.Factory.StartNew(async () => await pubnub.DeleteSpace().Id(spaceId2).ExecuteAsync()).Wait();
-#else
-            await pubnub.DeleteSpace().Id(spaceId2).ExecuteAsync();
-#endif
+            System.Diagnostics.Debug.WriteLine("pubnub.RemoveChannelMetadata() 1 STARTED");
+            manualEvent = new ManualResetEvent(false);
+            pubnub.RemoveChannelMetadata().Channel(channelMetadataId1).Execute(new PNRemoveChannelMetadataResultExt(
+                delegate (PNRemoveChannelMetadataResult result, PNStatus status) { }));
+            manualEvent.WaitOne(2000);
+
+            System.Diagnostics.Debug.WriteLine("pubnub.RemoveChannelMetadata() 2 STARTED");
+            manualEvent = new ManualResetEvent(false);
+            pubnub.RemoveChannelMetadata().Channel(channelMetadataId2).Execute(new PNRemoveChannelMetadataResultExt(
+                delegate (PNRemoveChannelMetadataResult result, PNStatus status) { }));
+            manualEvent.WaitOne(2000);
 
             manualEvent = new ManualResetEvent(false);
             receivedMessage = false;
-            #region "CreateUser"
-            System.Diagnostics.Debug.WriteLine("pubnub.CreateUser() STARTED");
+            #region "SetUuidMetadata"
+            System.Diagnostics.Debug.WriteLine("pubnub.SetUuidMetadata() STARTED");
+            pubnub.SetUuidMetadata().Uuid(uuidMetadataId).Name("pandu-ut-un")
+                    .Execute(new PNSetUuidMetadataResultExt((r, s) =>
+                    {
+                        if (r != null && s.StatusCode == 200 && !s.Error)
+                        {
+                            pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
+                            if (uuidMetadataId == r.Uuid)
+                            {
+                                receivedMessage = true;
+                            }
+                        }
+                        manualEvent.Set();
+                    }));
+            #endregion
+            manualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            if (receivedMessage)
+            {
+                receivedMessage = false;
+                manualEvent = new ManualResetEvent(false);
+                #region "SetChannelMetadata 1"
+                System.Diagnostics.Debug.WriteLine("pubnub.SetChannelMetadata() 1 STARTED");
+                pubnub.SetChannelMetadata().Channel(channelMetadataId1).Name("pandu-ut-spname")
+                        .Execute(new PNSetChannelMetadataResultExt((r, s) =>
+                        {
+                            if (r != null && s.StatusCode == 200 && !s.Error)
+                            {
+                                pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
+                                if (channelMetadataId1 == r.Channel)
+                                {
+                                    receivedMessage = true;
+                                }
+                            }
+                            manualEvent.Set();
+                        }));
+                #endregion
+                manualEvent.WaitOne(manualResetEventWaitTimeout);
+            }
+            if (receivedMessage)
+            {
+                receivedMessage = false;
+                manualEvent = new ManualResetEvent(false);
+                #region "SetChannelMetadata 2"
+                System.Diagnostics.Debug.WriteLine("pubnub.SetChannelMetadata() 2 STARTED");
+                pubnub.SetChannelMetadata().Channel(channelMetadataId2).Name("pandu-ut-spname")
+                        .Execute(new PNSetChannelMetadataResultExt((r, s) =>
+                        {
+                            if (r != null && s.StatusCode == 200 && !s.Error)
+                            {
+                                pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
+                                if (channelMetadataId2 == r.Channel)
+                                {
+                                    receivedMessage = true;
+                                }
+                            }
+                            manualEvent.Set();
+                        }));
+                #endregion
+                manualEvent.WaitOne(manualResetEventWaitTimeout);
+            }
+
+            if (receivedMessage)
+            {
+                receivedMessage = false;
+                manualEvent = new ManualResetEvent(false);
+                #region "Memberships Add"
+                System.Diagnostics.Debug.WriteLine("pubnub.Memberships() ADD STARTED");
+                pubnub.ManageMemberships().Uuid(uuidMetadataId)
+                    .Set(new List<PNMembership>()
+                            {
+                            new PNMembership() { Channel = channelMetadataId1  },
+                            new PNMembership() { Channel = channelMetadataId2  }
+                    })
+                    .Execute(new PNMembershipsResultExt((r, s) =>
+                    {
+                        if (r != null && s.StatusCode == 200 && !s.Error)
+                        {
+                            pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
+                            if (r.Memberships != null
+                            && r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null
+                            && r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId2) != null)
+                            {
+                                receivedMessage = true;
+                            }
+                        }
+                        manualEvent.Set();
+                    }));
+                #endregion
+                manualEvent.WaitOne(manualResetEventWaitTimeout);
+            }
+
+            if (receivedMessage)
+            {
+                receivedMessage = false;
+                manualEvent = new ManualResetEvent(false);
+                #region "Memberships Update/Remove"
+                if (!string.IsNullOrEmpty(config.SecretKey))
+                {
+                    System.Diagnostics.Debug.WriteLine("pubnub.Memberships() UPDATE/REMOVE STARTED");
+                    pubnub.ManageMemberships().Uuid(uuidMetadataId)
+                        .Set(new List<PNMembership>()
+                                {
+                            new PNMembership() { Channel = channelMetadataId1, Custom = new Dictionary<string, object>(){ { "color", "green1" } } }
+                        })
+                        .Remove(new List<string>() { channelMetadataId2 })
+                        .Execute(new PNMembershipsResultExt((r, s) =>
+                        {
+                            if (r != null && s.StatusCode == 200 && !s.Error)
+                            {
+                                pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
+                                if (r.Memberships != null
+                                && r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null)
+                                {
+                                    receivedMessage = true;
+                                }
+                            }
+                            manualEvent.Set();
+                        }));
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("pubnub.Memberships() REMOVE STARTED");
+                    pubnub.ManageMemberships().Uuid(uuidMetadataId)
+                        .Remove(new List<string>() { channelMetadataId2 })
+                        .Execute(new PNMembershipsResultExt((r, s) =>
+                        {
+                            if (r != null && s.StatusCode == 200 && !s.Error)
+                            {
+                                pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
+                                receivedMessage = true;
+                            }
+                            manualEvent.Set();
+                        }));
+                }
+                #endregion
+                manualEvent.WaitOne(manualResetEventWaitTimeout);
+            }
+
+            Thread.Sleep(2000);
+
+            pubnub.Unsubscribe<string>().Channels(new string[] { uuidMetadataId, channelMetadataId1, channelMetadataId2 }).Execute();
+            pubnub.RemoveListener(eventListener);
+
+            Assert.IsTrue(receivedDeleteEvent && receivedSetEvent, "Manage Membership events Failed");
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
+
+        [Test]
 #if NET40
-            PNResult<PNCreateUserResult> createUserResult = Task.Factory.StartNew(async () => await pubnub.CreateUser().Id(userId).Name("pandu-ut-un").ExecuteAsync()).Result.Result;
+        public static void ThenWithAsyncManageMembershipShouldReturnEventInfo()
 #else
-            PNResult<PNCreateUserResult> createUserResult = await pubnub.CreateUser().Id(userId).Name("pandu-ut-un").ExecuteAsync();
+        public static async Task ThenWithAsyncManageMembershipShouldReturnEventInfo()
+#endif
+        {
+            server.ClearRequests();
+
+            if (PubnubCommon.EnableStubTest)
+            {
+                Assert.Ignore("Ignored ThenWithAsyncManageMembershipShouldReturnEventInfo");
+                return;
+            }
+
+            bool receivedMessage = false;
+            bool receivedSetEvent = false;
+            bool receivedDeleteEvent = false;
+
+            string uuidMetadataId = "pandu-ut-uid";
+            string channelMetadataId1 = "pandu-ut-sid1";
+            string channelMetadataId2 = "pandu-ut-sid2";
+
+            SubscribeCallbackExt eventListener = new SubscribeCallbackExt(
+                delegate (Pubnub pnObj, PNObjectEventResult eventResult)
+                {
+                    System.Diagnostics.Debug.WriteLine("EVENT:" + pubnub.JsonPluggableLibrary.SerializeToJsonString(eventResult));
+                    if (eventResult.Type.ToLowerInvariant() == "membership")
+                    {
+                        if (eventResult.Event.ToLowerInvariant() == "set")
+                        {
+                            receivedSetEvent = true;
+                        }
+                        else if (eventResult.Event.ToLowerInvariant() == "delete")
+                        {
+                            receivedDeleteEvent = true;
+                        }
+                    }
+                },
+                delegate (Pubnub pnObj, PNStatus status)
+                {
+
+                }
+                );
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+                Secure = false,
+                AuthKey = "myauth"
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+            server.RunOnHttps(false);
+            pubnub = createPubNubInstance(config);
+            pubnub.AddListener(eventListener);
+
+            ManualResetEvent manualEvent = new ManualResetEvent(false);
+            pubnub.Subscribe<string>().Channels(new string[] { uuidMetadataId, channelMetadataId1, channelMetadataId2 }).Execute();
+            manualEvent.WaitOne(2000);
+
+            System.Diagnostics.Debug.WriteLine("pubnub.RemoveUuidMetadata() STARTED");
+#if NET40
+            Task.Factory.StartNew(async () => await pubnub.RemoveUuidMetadata().Uuid(uuidMetadataId).ExecuteAsync()).Wait();
+#else
+            await pubnub.RemoveUuidMetadata().Uuid(uuidMetadataId).ExecuteAsync();
+#endif
+
+            System.Diagnostics.Debug.WriteLine("pubnub.RemoveChannelMetadata() 1 STARTED");
+#if NET40
+            Task.Factory.StartNew(async () => await pubnub.RemoveChannelMetadata().Channel(channelMetadataId1).ExecuteAsync()).Wait();
+#else
+            await pubnub.RemoveChannelMetadata().Channel(channelMetadataId1).ExecuteAsync();
+#endif
+
+            System.Diagnostics.Debug.WriteLine("pubnub.RemoveChannelMetadata() 2 STARTED");
+#if NET40
+            Task.Factory.StartNew(async () => await pubnub.RemoveChannelMetadata().Channel(channelMetadataId2).ExecuteAsync()).Wait();
+#else
+            await pubnub.RemoveChannelMetadata().Channel(channelMetadataId2).ExecuteAsync();
+#endif
+
+            receivedMessage = false;
+            #region "SetUuidMetadata"
+            System.Diagnostics.Debug.WriteLine("pubnub.SetUuidMetadata() STARTED");
+#if NET40
+            PNResult<PNSetUuidMetadataResult> createUserResult = Task.Factory.StartNew(async () => await pubnub.SetUuidMetadata().Uuid(uuidMetadataId).Name("pandu-ut-un").ExecuteAsync()).Result.Result;
+#else
+            PNResult<PNSetUuidMetadataResult> createUserResult = await pubnub.SetUuidMetadata().Uuid(uuidMetadataId).Name("pandu-ut-un").ExecuteAsync();
 #endif
             if (createUserResult.Result != null && createUserResult.Status.StatusCode == 200 && !createUserResult.Status.Error)
             {
                 pubnub.JsonPluggableLibrary.SerializeToJsonString(createUserResult.Result);
-                if (userId == createUserResult.Result.Id)
+                if (uuidMetadataId == createUserResult.Result.Uuid)
                 {
                     receivedMessage = true;
                 }
@@ -963,16 +1399,16 @@ namespace PubNubMessaging.Tests
             {
                 receivedMessage = false;
                 #region "CreateSpace 1"
-                System.Diagnostics.Debug.WriteLine("pubnub.CreateSpace() 1 STARTED");
+                System.Diagnostics.Debug.WriteLine("pubnub.SetChannelMetadata() 1 STARTED");
 #if NET40
-                PNResult<PNCreateSpaceResult> createSpace1Result = Task.Factory.StartNew(async () => await pubnub.CreateSpace().Id(spaceId1).Name("pandu-ut-spname").ExecuteAsync()).Result.Result;
+                PNResult<PNSetChannelMetadataResult> createSpace1Result = Task.Factory.StartNew(async () => await pubnub.SetChannelMetadata().Channel(channelMetadataId1).Name("pandu-ut-spname").ExecuteAsync()).Result.Result;
 #else
-                PNResult<PNCreateSpaceResult> createSpace1Result = await pubnub.CreateSpace().Id(spaceId1).Name("pandu-ut-spname").ExecuteAsync();
+                PNResult<PNSetChannelMetadataResult> createSpace1Result = await pubnub.SetChannelMetadata().Channel(channelMetadataId1).Name("pandu-ut-spname").ExecuteAsync();
 #endif
                 if (createSpace1Result.Result != null && createSpace1Result.Status.StatusCode == 200 && !createSpace1Result.Status.Error)
                 {
                     pubnub.JsonPluggableLibrary.SerializeToJsonString(createSpace1Result.Result);
-                    if (spaceId1 == createSpace1Result.Result.Id)
+                    if (channelMetadataId1 == createSpace1Result.Result.Channel)
                     {
                         receivedMessage = true;
                     }
@@ -983,16 +1419,16 @@ namespace PubNubMessaging.Tests
             {
                 receivedMessage = false;
                 #region "CreateSpace 2"
-                System.Diagnostics.Debug.WriteLine("pubnub.CreateSpace() 2 STARTED");
+                System.Diagnostics.Debug.WriteLine("pubnub.SetChannelMetadata() 2 STARTED");
 #if NET40
-                PNResult<PNCreateSpaceResult> createSpace2Result = Task.Factory.StartNew(async () => await pubnub.CreateSpace().Id(spaceId2).Name("pandu-ut-spname").ExecuteAsync()).Result.Result;
+                PNResult<PNSetChannelMetadataResult> createSpace2Result = Task.Factory.StartNew(async () => await pubnub.SetChannelMetadata().Channel(channelMetadataId2).Name("pandu-ut-spname").ExecuteAsync()).Result.Result;
 #else
-                PNResult<PNCreateSpaceResult> createSpace2Result = await pubnub.CreateSpace().Id(spaceId2).Name("pandu-ut-spname").ExecuteAsync();
+                PNResult<PNSetChannelMetadataResult> createSpace2Result = await pubnub.SetChannelMetadata().Channel(channelMetadataId2).Name("pandu-ut-spname").ExecuteAsync();
 #endif
                 if (createSpace2Result.Result != null && createSpace2Result.Status.StatusCode == 200 && !createSpace2Result.Status.Error)
                 {
                     pubnub.JsonPluggableLibrary.SerializeToJsonString(createSpace2Result.Result);
-                    if (spaceId2 == createSpace2Result.Result.Id)
+                    if (channelMetadataId2 == createSpace2Result.Result.Channel)
                     {
                         receivedMessage = true;
                     }
@@ -1003,23 +1439,22 @@ namespace PubNubMessaging.Tests
             if (receivedMessage)
             {
                 receivedMessage = false;
-                //manualEvent = new ManualResetEvent(false);
                 #region "Memberships Add"
                 System.Diagnostics.Debug.WriteLine("pubnub.Memberships() ADD STARTED");
 #if NET40
-                PNResult<PNManageMembershipsResult> manageMbrshipAddResult = Task.Factory.StartNew(async () => await pubnub.ManageMemberships().UserId(userId)
-                    .Add(new List<PNMembership>()
+                PNResult<PNMembershipsResult> manageMbrshipAddResult = Task.Factory.StartNew(async () => await pubnub.ManageMemberships().Uuid(uuidMetadataId)
+                    .Set(new List<PNMembership>()
                             {
-                            new PNMembership() { SpaceId = spaceId1 },
-                            new PNMembership() { SpaceId = spaceId2 }
+                            new PNMembership() { Channel = channelMetadataId1  },
+                            new PNMembership() { Channel = channelMetadataId2  }
                     })
                     .ExecuteAsync()).Result.Result;
 #else
-                PNResult<PNManageMembershipsResult> manageMbrshipAddResult = await pubnub.ManageMemberships().UserId(userId)
-                    .Add(new List<PNMembership>()
+                PNResult<PNMembershipsResult> manageMbrshipAddResult = await pubnub.ManageMemberships().Uuid(uuidMetadataId)
+                    .Set(new List<PNMembership>()
                             {
-                            new PNMembership() { SpaceId = spaceId1 },
-                            new PNMembership() { SpaceId = spaceId2 }
+                            new PNMembership() { Channel = channelMetadataId1  },
+                            new PNMembership() { Channel = channelMetadataId2  }
                     })
                     .ExecuteAsync();
 #endif
@@ -1027,46 +1462,44 @@ namespace PubNubMessaging.Tests
                 {
                     pubnub.JsonPluggableLibrary.SerializeToJsonString(manageMbrshipAddResult.Result);
                     if (manageMbrshipAddResult.Result.Memberships != null
-                    && manageMbrshipAddResult.Result.Memberships.Find(x => x.SpaceId == spaceId1) != null
-                    && manageMbrshipAddResult.Result.Memberships.Find(x => x.SpaceId == spaceId2) != null)
+                    && manageMbrshipAddResult.Result.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null
+                    && manageMbrshipAddResult.Result.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId2) != null)
                     {
                         receivedMessage = true;
                     }
                 }
                 #endregion
-                //manualEvent.WaitOne(manualResetEventWaitTimeout);
             }
 
             if (receivedMessage)
             {
                 receivedMessage = false;
-                //manualEvent = new ManualResetEvent(false);
                 #region "Memberships Update/Remove"
                 if (!string.IsNullOrEmpty(config.SecretKey))
                 {
                     System.Diagnostics.Debug.WriteLine("pubnub.Memberships() UPDATE/REMOVE STARTED");
 #if NET40
-                    PNResult<PNManageMembershipsResult> manageMbrshipUpdResult = Task.Factory.StartNew(async () => await pubnub.ManageMemberships().UserId(userId)
-                        .Update(new List<PNMembership>()
+                    PNResult<PNMembershipsResult> manageMbrshipUpdResult = Task.Factory.StartNew(async () => await pubnub.ManageMemberships().Uuid(uuidMetadataId)
+                        .Set(new List<PNMembership>()
                                 {
-                            new PNMembership() { SpaceId = spaceId1, Custom = new Dictionary<string, object>(){ { "color", "green1" } } }
+                            new PNMembership() { Channel = channelMetadataId1 , Custom = new Dictionary<string, object>(){ { "color", "green1" } } }
                         })
-                        .Remove(new List<string>() { spaceId2 })
+                        .Remove(new List<string>() { channelMetadataId2 })
                         .ExecuteAsync()).Result.Result;
 #else
-                    PNResult<PNManageMembershipsResult> manageMbrshipUpdResult = await pubnub.ManageMemberships().UserId(userId)
-                        .Update(new List<PNMembership>()
+                    PNResult<PNMembershipsResult> manageMbrshipUpdResult = await pubnub.ManageMemberships().Uuid(uuidMetadataId)
+                        .Set(new List<PNMembership>()
                                 {
-                            new PNMembership() { SpaceId = spaceId1, Custom = new Dictionary<string, object>(){ { "color", "green1" } } }
+                            new PNMembership() { Channel = channelMetadataId1 , Custom = new Dictionary<string, object>(){ { "color", "green1" } } }
                         })
-                        .Remove(new List<string>() { spaceId2 })
+                        .Remove(new List<string>() { channelMetadataId2 })
                         .ExecuteAsync();
 #endif
                     if (manageMbrshipUpdResult.Result != null && manageMbrshipUpdResult.Status.StatusCode == 200 && !manageMbrshipUpdResult.Status.Error)
                     {
                         pubnub.JsonPluggableLibrary.SerializeToJsonString(manageMbrshipUpdResult.Result);
                         if (manageMbrshipUpdResult.Result.Memberships != null
-                        && manageMbrshipUpdResult.Result.Memberships.Find(x => x.SpaceId == spaceId1) != null)
+                        && manageMbrshipUpdResult.Result.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null)
                         {
                             receivedMessage = true;
                         }
@@ -1076,12 +1509,12 @@ namespace PubNubMessaging.Tests
                 {
                     System.Diagnostics.Debug.WriteLine("pubnub.Memberships() REMOVE STARTED");
 #if NET40
-                    PNResult<PNManageMembershipsResult> manageMbrshipDelResult = Task.Factory.StartNew(async () => await pubnub.ManageMemberships().UserId(userId)
-                        .Remove(new List<string>() { spaceId2 })
+                    PNResult<PNMembershipsResult> manageMbrshipDelResult = Task.Factory.StartNew(async () => await pubnub.ManageMemberships().Uuid(uuidMetadataId)
+                        .Remove(new List<string>() { channelMetadataId2 })
                         .ExecuteAsync()).Result.Result;
 #else
-                    PNResult<PNManageMembershipsResult> manageMbrshipDelResult = await pubnub.ManageMemberships().UserId(userId)
-                        .Remove(new List<string>() { spaceId2 })
+                    PNResult<PNMembershipsResult> manageMbrshipDelResult = await pubnub.ManageMemberships().Uuid(uuidMetadataId)
+                        .Remove(new List<string>() { channelMetadataId2 })
                         .ExecuteAsync();
 #endif
                     if (manageMbrshipDelResult.Result != null && manageMbrshipDelResult.Status.StatusCode == 200 && !manageMbrshipDelResult.Status.Error)
@@ -1091,26 +1524,482 @@ namespace PubNubMessaging.Tests
                     }
                 }
                 #endregion
-                //manualEvent.WaitOne(manualResetEventWaitTimeout);
             }
 
             Thread.Sleep(2000);
 
-            pubnub.Unsubscribe<string>().Channels(new string[] { userId, spaceId1, spaceId2 }).Execute();
+            pubnub.Unsubscribe<string>().Channels(new string[] { uuidMetadataId, channelMetadataId1, channelMetadataId2 }).Execute();
             pubnub.RemoveListener(eventListener);
 
-            if (!string.IsNullOrEmpty(config.SecretKey))
-            {
-                Assert.IsTrue(receivedDeleteEvent && receivedUpdateEvent && receivedCreateEvent, "Membership events Failed");
-            }
-            else
-            {
-                Assert.IsTrue(receivedDeleteEvent && receivedCreateEvent, "With Async Membership events Failed");
-            }
+            Assert.IsTrue(receivedDeleteEvent && receivedSetEvent, "With Async Manage Membership events Failed");
 
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
         }
+
+        [Test]
+        public static void ThenSetRemoveMembershipsShouldReturnEventInfo()
+        {
+            server.ClearRequests();
+
+            if (PubnubCommon.EnableStubTest)
+            {
+                Assert.Ignore("Ignored ThenSetRemoveMembershipsShouldReturnEventInfo");
+                return;
+            }
+
+            bool receivedMessage = false;
+            bool receivedSetEvent = false;
+            bool receivedDeleteEvent = false;
+
+            string uuidMetadataId = "pandu-ut-uid";
+            string channelMetadataId1 = "pandu-ut-sid1";
+            string channelMetadataId2 = "pandu-ut-sid2";
+
+            SubscribeCallbackExt eventListener = new SubscribeCallbackExt(
+                delegate (Pubnub pnObj, PNObjectEventResult eventResult)
+                {
+                    System.Diagnostics.Debug.WriteLine("EVENT:" + pubnub.JsonPluggableLibrary.SerializeToJsonString(eventResult));
+                    if (eventResult.Type.ToLowerInvariant() == "membership")
+                    {
+                        if (eventResult.Event.ToLowerInvariant() == "set")
+                        {
+                            receivedSetEvent = true;
+                        }
+                        else if (eventResult.Event.ToLowerInvariant() == "delete")
+                        {
+                            receivedDeleteEvent = true;
+                        }
+                    }
+                },
+                delegate (Pubnub pnObj, PNStatus status)
+                {
+
+                }
+                );
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+                Secure = false,
+                AuthKey = "myauth"
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+            server.RunOnHttps(false);
+            pubnub = createPubNubInstance(config);
+            pubnub.AddListener(eventListener);
+
+            ManualResetEvent manualEvent = new ManualResetEvent(false);
+            pubnub.Subscribe<string>().Channels(new string[] { uuidMetadataId, channelMetadataId1, channelMetadataId2 }).Execute();
+            manualEvent.WaitOne(2000);
+
+
+            manualResetEventWaitTimeout = 310 * 1000;
+            System.Diagnostics.Debug.WriteLine("pubnub.DeleteUuidMetadata() STARTED");
+            manualEvent = new ManualResetEvent(false);
+            pubnub.RemoveUuidMetadata().Uuid(uuidMetadataId).Execute(new PNRemoveUuidMetadataResultExt(
+                delegate (PNRemoveUuidMetadataResult result, PNStatus status) { }));
+            manualEvent.WaitOne(2000);
+
+            System.Diagnostics.Debug.WriteLine("pubnub.RemoveChannelMetadata() 1 STARTED");
+            manualEvent = new ManualResetEvent(false);
+            pubnub.RemoveChannelMetadata().Channel(channelMetadataId1).Execute(new PNRemoveChannelMetadataResultExt(
+                delegate (PNRemoveChannelMetadataResult result, PNStatus status) { }));
+            manualEvent.WaitOne(2000);
+
+            System.Diagnostics.Debug.WriteLine("pubnub.RemoveChannelMetadata() 2 STARTED");
+            manualEvent = new ManualResetEvent(false);
+            pubnub.RemoveChannelMetadata().Channel(channelMetadataId2).Execute(new PNRemoveChannelMetadataResultExt(
+                delegate (PNRemoveChannelMetadataResult result, PNStatus status) { }));
+            manualEvent.WaitOne(2000);
+
+            manualEvent = new ManualResetEvent(false);
+            receivedMessage = false;
+            #region "SetUuidMetadata"
+            System.Diagnostics.Debug.WriteLine("pubnub.SetUuidMetadata() STARTED");
+            pubnub.SetUuidMetadata().Uuid(uuidMetadataId).Name("pandu-ut-un")
+                    .Execute(new PNSetUuidMetadataResultExt((r, s) =>
+                    {
+                        if (r != null && s.StatusCode == 200 && !s.Error)
+                        {
+                            pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
+                            if (uuidMetadataId == r.Uuid)
+                            {
+                                receivedMessage = true;
+                            }
+                        }
+                        manualEvent.Set();
+                    }));
+            #endregion
+            manualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            if (receivedMessage)
+            {
+                receivedMessage = false;
+                manualEvent = new ManualResetEvent(false);
+                #region "SetChannelMetadata 1"
+                System.Diagnostics.Debug.WriteLine("pubnub.SetChannelMetadata() 1 STARTED");
+                pubnub.SetChannelMetadata().Channel(channelMetadataId1).Name("pandu-ut-spname")
+                        .Execute(new PNSetChannelMetadataResultExt((r, s) =>
+                        {
+                            if (r != null && s.StatusCode == 200 && !s.Error)
+                            {
+                                pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
+                                if (channelMetadataId1 == r.Channel)
+                                {
+                                    receivedMessage = true;
+                                }
+                            }
+                            manualEvent.Set();
+                        }));
+                #endregion
+                manualEvent.WaitOne(manualResetEventWaitTimeout);
+            }
+            if (receivedMessage)
+            {
+                receivedMessage = false;
+                manualEvent = new ManualResetEvent(false);
+                #region "SetChannelMetadata 2"
+                System.Diagnostics.Debug.WriteLine("pubnub.SetChannelMetadata() 2 STARTED");
+                pubnub.SetChannelMetadata().Channel(channelMetadataId2).Name("pandu-ut-spname")
+                        .Execute(new PNSetChannelMetadataResultExt((r, s) =>
+                        {
+                            if (r != null && s.StatusCode == 200 && !s.Error)
+                            {
+                                pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
+                                if (channelMetadataId2 == r.Channel)
+                                {
+                                    receivedMessage = true;
+                                }
+                            }
+                            manualEvent.Set();
+                        }));
+                #endregion
+                manualEvent.WaitOne(manualResetEventWaitTimeout);
+            }
+
+            if (receivedMessage)
+            {
+                receivedMessage = false;
+                manualEvent = new ManualResetEvent(false);
+                #region "SetMemberships Add"
+                System.Diagnostics.Debug.WriteLine("pubnub.SetMemberships() SET STARTED");
+                pubnub.SetMemberships().Uuid(uuidMetadataId)
+                    .Channels(new List<PNMembership>()
+                            {
+                            new PNMembership() { Channel = channelMetadataId1  },
+                            new PNMembership() { Channel = channelMetadataId2  }
+                    })
+                    .Execute(new PNMembershipsResultExt((r, s) =>
+                    {
+                        if (r != null && s.StatusCode == 200 && !s.Error)
+                        {
+                            pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
+                            if (r.Memberships != null
+                            && r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null
+                            && r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId2) != null)
+                            {
+                                receivedMessage = true;
+                            }
+                        }
+                        manualEvent.Set();
+                    }));
+                #endregion
+                manualEvent.WaitOne(manualResetEventWaitTimeout);
+            }
+
+            if (receivedMessage)
+            {
+                receivedMessage = false;
+                manualEvent = new ManualResetEvent(false);
+                #region "SetMemberships Update"
+                if (!string.IsNullOrEmpty(config.SecretKey))
+                {
+                    System.Diagnostics.Debug.WriteLine("pubnub.RemoveMemberships() REMOVE STARTED");
+                    pubnub.RemoveMemberships().Uuid(uuidMetadataId)
+                        .Channels(new List<string>() { channelMetadataId2 })
+                        .Execute(new PNMembershipsResultExt((r, s) =>
+                        {
+                            if (r != null && s.StatusCode == 200 && !s.Error)
+                            {
+                                pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
+                                receivedMessage = true;
+                            }
+                            manualEvent.Set();
+                        }));
+
+                    //System.Diagnostics.Debug.WriteLine("pubnub.SetMemberships() UPDATE STARTED");
+                    //pubnub.SetMemberships().Uuid(uuidMetadataId)
+                    //    .Channels(new List<PNMembership>()
+                    //            {
+                    //        new PNMembership() { Channel = channelMetadataId1, Custom = new Dictionary<string, object>(){ { "color", "green1" } } }
+                    //    })
+                    //    .Execute(new PNMembershipsResultExt((r, s) =>
+                    //    {
+                    //        if (r != null && s.StatusCode == 200 && !s.Error)
+                    //        {
+                    //            pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
+                    //            if (r.Memberships != null
+                    //            && r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null)
+                    //            {
+                    //                receivedMessage = true;
+                    //            }
+                    //        }
+                    //        manualEvent.Set();
+                    //    }));
+                }
+                else
+                {
+                }
+                #endregion
+                manualEvent.WaitOne(manualResetEventWaitTimeout);
+            }
+
+            Thread.Sleep(2000);
+
+            pubnub.Unsubscribe<string>().Channels(new string[] { uuidMetadataId, channelMetadataId1, channelMetadataId2 }).Execute();
+            pubnub.RemoveListener(eventListener);
+
+            Assert.IsTrue(receivedDeleteEvent && receivedSetEvent, "Manage Membership events Failed");
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
+
+        [Test]
+#if NET40
+        public static void ThenWithAsyncSetRemoveMembershipsShouldReturnEventInfo()
+#else
+        public static async Task ThenWithAsyncSetRemoveMembershipsShouldReturnEventInfo()
+#endif
+        {
+            server.ClearRequests();
+
+            if (PubnubCommon.EnableStubTest)
+            {
+                Assert.Ignore("Ignored ThenWithAsyncSetRemoveMembershipsShouldReturnEventInfo");
+                return;
+            }
+
+            bool receivedMessage = false;
+            bool receivedSetEvent = false;
+            bool receivedDeleteEvent = false;
+
+            string uuidMetadataId = "pandu-ut-uid";
+            string channelMetadataId1 = "pandu-ut-sid1";
+            string channelMetadataId2 = "pandu-ut-sid2";
+
+            SubscribeCallbackExt eventListener = new SubscribeCallbackExt(
+                delegate (Pubnub pnObj, PNObjectEventResult eventResult)
+                {
+                    System.Diagnostics.Debug.WriteLine("EVENT:" + pubnub.JsonPluggableLibrary.SerializeToJsonString(eventResult));
+                    if (eventResult.Type.ToLowerInvariant() == "membership")
+                    {
+                        if (eventResult.Event.ToLowerInvariant() == "set")
+                        {
+                            receivedSetEvent = true;
+                        }
+                        else if (eventResult.Event.ToLowerInvariant() == "delete")
+                        {
+                            receivedDeleteEvent = true;
+                        }
+                    }
+                },
+                delegate (Pubnub pnObj, PNStatus status)
+                {
+
+                }
+                );
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "mytestuuid",
+                Secure = false,
+                AuthKey = "myauth"
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+            server.RunOnHttps(false);
+            pubnub = createPubNubInstance(config);
+            pubnub.AddListener(eventListener);
+
+            ManualResetEvent manualEvent = new ManualResetEvent(false);
+            pubnub.Subscribe<string>().Channels(new string[] { uuidMetadataId, channelMetadataId1, channelMetadataId2 }).Execute();
+            manualEvent.WaitOne(2000);
+
+            System.Diagnostics.Debug.WriteLine("pubnub.RemoveUuidMetadata() STARTED");
+#if NET40
+            Task.Factory.StartNew(async () => await pubnub.RemoveUuidMetadata().Uuid(uuidMetadataId).ExecuteAsync()).Wait();
+#else
+            await pubnub.RemoveUuidMetadata().Uuid(uuidMetadataId).ExecuteAsync();
+#endif
+
+            System.Diagnostics.Debug.WriteLine("pubnub.RemoveChannelMetadata() 1 STARTED");
+#if NET40
+            Task.Factory.StartNew(async () => await pubnub.RemoveChannelMetadata().Channel(channelMetadataId1).ExecuteAsync()).Wait();
+#else
+            await pubnub.RemoveChannelMetadata().Channel(channelMetadataId1).ExecuteAsync();
+#endif
+
+            System.Diagnostics.Debug.WriteLine("pubnub.RemoveChannelMetadata() 2 STARTED");
+#if NET40
+            Task.Factory.StartNew(async () => await pubnub.RemoveChannelMetadata().Channel(channelMetadataId2).ExecuteAsync()).Wait();
+#else
+            await pubnub.RemoveChannelMetadata().Channel(channelMetadataId2).ExecuteAsync();
+#endif
+
+            receivedMessage = false;
+            #region "SetUuidMetadata"
+            System.Diagnostics.Debug.WriteLine("pubnub.SetUuidMetadata() STARTED");
+#if NET40
+            PNResult<PNSetUuidMetadataResult> createUserResult = Task.Factory.StartNew(async () => await pubnub.SetUuidMetadata().Uuid(uuidMetadataId).Name("pandu-ut-un").ExecuteAsync()).Result.Result;
+#else
+            PNResult<PNSetUuidMetadataResult> createUserResult = await pubnub.SetUuidMetadata().Uuid(uuidMetadataId).Name("pandu-ut-un").ExecuteAsync();
+#endif
+            if (createUserResult.Result != null && createUserResult.Status.StatusCode == 200 && !createUserResult.Status.Error)
+            {
+                pubnub.JsonPluggableLibrary.SerializeToJsonString(createUserResult.Result);
+                if (uuidMetadataId == createUserResult.Result.Uuid)
+                {
+                    receivedMessage = true;
+                }
+            }
+            #endregion
+
+            if (receivedMessage)
+            {
+                receivedMessage = false;
+                #region "SetChannelMetadata 1"
+                System.Diagnostics.Debug.WriteLine("pubnub.SetChannelMetadata() 1 STARTED");
+#if NET40
+                PNResult<PNSetChannelMetadataResult> createSpace1Result = Task.Factory.StartNew(async () => await pubnub.SetChannelMetadata().Channel(channelMetadataId1).Name("pandu-ut-spname").ExecuteAsync()).Result.Result;
+#else
+                PNResult<PNSetChannelMetadataResult> createSpace1Result = await pubnub.SetChannelMetadata().Channel(channelMetadataId1).Name("pandu-ut-spname").ExecuteAsync();
+#endif
+                if (createSpace1Result.Result != null && createSpace1Result.Status.StatusCode == 200 && !createSpace1Result.Status.Error)
+                {
+                    pubnub.JsonPluggableLibrary.SerializeToJsonString(createSpace1Result.Result);
+                    if (channelMetadataId1 == createSpace1Result.Result.Channel)
+                    {
+                        receivedMessage = true;
+                    }
+                }
+                #endregion
+            }
+            if (receivedMessage)
+            {
+                receivedMessage = false;
+                #region "SetChannelMetadata 2"
+                System.Diagnostics.Debug.WriteLine("pubnub.SetChannelMetadata() 2 STARTED");
+#if NET40
+                PNResult<PNSetChannelMetadataResult> createSpace2Result = Task.Factory.StartNew(async () => await pubnub.SetChannelMetadata().Channel(channelMetadataId2).Name("pandu-ut-spname").ExecuteAsync()).Result.Result;
+#else
+                PNResult<PNSetChannelMetadataResult> createSpace2Result = await pubnub.SetChannelMetadata().Channel(channelMetadataId2).Name("pandu-ut-spname").ExecuteAsync();
+#endif
+                if (createSpace2Result.Result != null && createSpace2Result.Status.StatusCode == 200 && !createSpace2Result.Status.Error)
+                {
+                    pubnub.JsonPluggableLibrary.SerializeToJsonString(createSpace2Result.Result);
+                    if (channelMetadataId2 == createSpace2Result.Result.Channel)
+                    {
+                        receivedMessage = true;
+                    }
+                }
+                #endregion
+            }
+
+            if (receivedMessage)
+            {
+                receivedMessage = false;
+                #region "SetMemberships Add"
+                System.Diagnostics.Debug.WriteLine("pubnub.SetMemberships() ADD STARTED");
+#if NET40
+                PNResult<PNMembershipsResult> manageMbrshipAddResult = Task.Factory.StartNew(async () => await pubnub.SetMemberships().Uuid(uuidMetadataId)
+                    .Channels(new List<PNMembership>()
+                            {
+                            new PNMembership() { Channel = channelMetadataId1  },
+                            new PNMembership() { Channel = channelMetadataId2  }
+                    })
+                    .ExecuteAsync()).Result.Result;
+#else
+                PNResult<PNMembershipsResult> manageMbrshipAddResult = await pubnub.SetMemberships().Uuid(uuidMetadataId)
+                    .Channels(new List<PNMembership>()
+                            {
+                            new PNMembership() { Channel = channelMetadataId1  },
+                            new PNMembership() { Channel = channelMetadataId2  }
+                    })
+                    .ExecuteAsync();
+#endif
+                if (manageMbrshipAddResult.Result != null && manageMbrshipAddResult.Status.StatusCode == 200 && !manageMbrshipAddResult.Status.Error)
+                {
+                    pubnub.JsonPluggableLibrary.SerializeToJsonString(manageMbrshipAddResult.Result);
+                    if (manageMbrshipAddResult.Result.Memberships != null
+                    && manageMbrshipAddResult.Result.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null
+                    && manageMbrshipAddResult.Result.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId2) != null)
+                    {
+                        receivedMessage = true;
+                    }
+                }
+                #endregion
+            }
+
+            if (receivedMessage)
+            {
+                receivedMessage = false;
+                #region "SetMemberships Update"
+                if (!string.IsNullOrEmpty(config.SecretKey))
+                {
+                    System.Diagnostics.Debug.WriteLine("pubnub.RemoveMemberships() REMOVE STARTED");
+#if NET40
+                    PNResult<PNMembershipsResult> manageMbrshipDelResult = Task.Factory.StartNew(async () => await pubnub.RemoveMemberships().Uuid(uuidMetadataId)
+                        .Channels(new List<string>() { channelMetadataId2 })
+                        .ExecuteAsync()).Result.Result;
+#else
+                    PNResult<PNMembershipsResult> manageMbrshipDelResult = await pubnub.RemoveMemberships().Uuid(uuidMetadataId)
+                        .Channels(new List<string>() { channelMetadataId2 })
+                        .ExecuteAsync();
+#endif
+                    if (manageMbrshipDelResult.Result != null && manageMbrshipDelResult.Status.StatusCode == 200 && !manageMbrshipDelResult.Status.Error)
+                    {
+                        pubnub.JsonPluggableLibrary.SerializeToJsonString(manageMbrshipDelResult.Result);
+                        receivedMessage = true;
+                    }
+                }
+                else
+                {
+                }
+                #endregion
+            }
+
+            Thread.Sleep(2000);
+
+            pubnub.Unsubscribe<string>().Channels(new string[] { uuidMetadataId, channelMetadataId1, channelMetadataId2 }).Execute();
+            pubnub.RemoveListener(eventListener);
+
+            Assert.IsTrue(receivedDeleteEvent && receivedSetEvent, "With Async Set/Remove Membership events Failed");
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
+
     }
 }

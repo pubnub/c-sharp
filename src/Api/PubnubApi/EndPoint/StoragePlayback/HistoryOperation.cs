@@ -16,7 +16,6 @@ namespace PubnubApi.EndPoint
         private readonly IPubnubUnitTest unit;
         private readonly IPubnubLog pubnubLog;
         private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
-        private readonly EndPoint.TokenManager pubnubTokenMgr;
 
         private bool reverseOption;
         private bool includeTimetokenOption;
@@ -29,14 +28,13 @@ namespace PubnubApi.EndPoint
         private string channelName = "";
         private PNCallback<PNHistoryResult> savedCallback;
 
-        public HistoryOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
+        public HistoryOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, instance)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
             pubnubLog = log;
             pubnubTelemetryMgr = telemetryManager;
-            pubnubTokenMgr = tokenManager;
 
             PubnubInstance = instance;
 
@@ -165,8 +163,8 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing Channel");
             }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            
             Uri request = urlBuilder.BuildHistoryRequest("GET", "", channel, start, end, count, reverse, includeToken, includeMeta, externalQueryParam);
 
             RequestState<PNHistoryResult> requestState = new RequestState<PNHistoryResult>();
@@ -196,8 +194,8 @@ namespace PubnubApi.EndPoint
 
             PNResult<PNHistoryResult> ret = new PNResult<PNHistoryResult>();
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            
             Uri request = urlBuilder.BuildHistoryRequest("GET", "", channel, start, end, count, reverse, includeToken, includeMeta, externalQueryParam);
 
             RequestState<PNHistoryResult> requestState = new RequestState<PNHistoryResult>();

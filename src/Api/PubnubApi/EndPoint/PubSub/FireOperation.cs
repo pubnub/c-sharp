@@ -16,7 +16,6 @@ namespace PubnubApi.EndPoint
         private readonly IPubnubUnitTest unit;
         private readonly IPubnubLog pubnubLog;
         private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
-        private readonly EndPoint.TokenManager pubnubTokenMgr;
 
         private object msg;
         private string channelName = "";
@@ -27,14 +26,13 @@ namespace PubnubApi.EndPoint
         private bool syncRequest;
         private Dictionary<string, object> queryParam;
 
-        public FireOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
+        public FireOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, instance)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
             pubnubLog = log;
             pubnubTelemetryMgr = telemetryManager;
-            pubnubTokenMgr = tokenManager;
         }
 
         public FireOperation Message(object message)
@@ -178,8 +176,8 @@ namespace PubnubApi.EndPoint
             urlParam.Add("norep", "true");
 
             string requestMethodName = (this.httpPost) ? "POST" : "GET";
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            
             Uri request = urlBuilder.BuildPublishRequest(requestMethodName, "", channel, message, storeInHistory, ttl, metaData, urlParam, externalQueryParam);
 
             RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>();
@@ -260,8 +258,8 @@ namespace PubnubApi.EndPoint
             urlParam.Add("norep", "true");
 
             string requestMethodName = (this.httpPost) ? "POST" : "GET";
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            
             Uri request = urlBuilder.BuildPublishRequest(requestMethodName, "", channel, message, storeInHistory, ttl, metaData, urlParam, externalQueryParam);
 
             RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>();

@@ -13,7 +13,7 @@ namespace PubnubApi
         readonly Action<Pubnub, PNPresenceEventResult> presenceAction;
         readonly Action<Pubnub, PNSignalResult<object>> signalAction;
         readonly Action<Pubnub, PNStatus> statusAction;
-        readonly Action<Pubnub, PNObjectApiEventResult> objectApiAction;
+        readonly Action<Pubnub, PNObjectEventResult> objectApiAction;
         readonly Action<Pubnub, PNMessageActionEventResult> messageAction;
 
         public SubscribeCallbackExt(Action<Pubnub, PNMessageResult<object>> messageCallback, Action<Pubnub, PNPresenceEventResult> presenceCallback, Action<Pubnub, PNStatus> statusCallback)
@@ -34,7 +34,7 @@ namespace PubnubApi
             objectApiAction = null;
         }
 
-        public SubscribeCallbackExt(Action<Pubnub, PNObjectApiEventResult> objectApiCallback, Action<Pubnub, PNStatus> statusCallback)
+        public SubscribeCallbackExt(Action<Pubnub, PNObjectEventResult> objectApiCallback, Action<Pubnub, PNStatus> statusCallback)
         {
             subscribeAction = null;
             presenceAction = null;
@@ -69,7 +69,7 @@ namespace PubnubApi
         public SubscribeCallbackExt(Action<Pubnub, PNMessageResult<object>> messageCallback, 
             Action<Pubnub, PNPresenceEventResult> presenceCallback, 
             Action<Pubnub, PNSignalResult<object>> signalCallback, 
-            Action<Pubnub, PNObjectApiEventResult> objectApiCallback, 
+            Action<Pubnub, PNObjectEventResult> objectApiCallback, 
             Action<Pubnub, PNStatus> statusCallback)
         {
             subscribeAction = messageCallback;
@@ -82,7 +82,7 @@ namespace PubnubApi
         public SubscribeCallbackExt(Action<Pubnub, PNMessageResult<object>> messageCallback, 
             Action<Pubnub, PNPresenceEventResult> presenceCallback, 
             Action<Pubnub, PNSignalResult<object>> signalCallback, 
-            Action<Pubnub, PNObjectApiEventResult> objectApiCallback, 
+            Action<Pubnub, PNObjectEventResult> objectApiCallback, 
             Action<Pubnub, PNMessageActionEventResult> messageActionCallback, 
             Action<Pubnub, PNStatus> statusCallback)
         {
@@ -130,7 +130,7 @@ namespace PubnubApi
             signalAction?.Invoke(pubnub, message1);
         }
 
-        public override void ObjectEvent(Pubnub pubnub, PNObjectApiEventResult objectEvent)
+        public override void ObjectEvent(Pubnub pubnub, PNObjectEventResult objectEvent)
         {
             objectApiAction?.Invoke(pubnub, objectEvent);
         }
