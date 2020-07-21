@@ -17,7 +17,6 @@ namespace PubnubApi.EndPoint
         private readonly IPubnubLog pubnubLog;
         private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 
-        private PNCallback<PNGenerateFileUploadUrlResult> savedCallback;
         private Dictionary<string, object> queryParam;
 
         private string channelName;
@@ -81,14 +80,12 @@ namespace PubnubApi.EndPoint
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
-                this.savedCallback = callback;
-                GenerateFileUploadUrl(this.queryParam, savedCallback);
+                GenerateFileUploadUrl(this.queryParam, callback);
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
             new Thread(() =>
             {
-                this.savedCallback = callback;
-                GenerateFileUploadUrl(this.queryParam, savedCallback);
+                GenerateFileUploadUrl(this.queryParam, callback);
             })
             { IsBackground = true }.Start();
 #endif

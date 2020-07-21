@@ -165,7 +165,7 @@ namespace PubnubApi.EndPoint
             PNFileUrlResult result = new PNFileUrlResult();
             result.Url = request.ToString();
 
-            PNStatus status = new PNStatus() { Error = false, StatusCode = 200 };
+            PNStatus status = new PNStatus { Error = false, StatusCode = 200 };
 
             ret.Result = result;
             ret.Status = status;

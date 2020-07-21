@@ -115,7 +115,7 @@ namespace PubnubApi
                 }
                 else
                 {
-                    return await SendRequestAndGetStreamResponseHttpClient(requestUri, pubnubRequestState, request).ConfigureAwait(false);
+                    return await SendRequestAndGetStreamResponseHttpClient(requestUri, pubnubRequestState).ConfigureAwait(false);
                 }
 #else
                 return await SendRequestAndGetStreamResponseTaskFactory(pubnubRequestState, request).ConfigureAwait(false);
@@ -264,7 +264,7 @@ namespace PubnubApi
             return jsonString;
         }
 
-        async Task<byte[]> SendRequestAndGetStreamResponseHttpClient<T>(Uri requestUri, RequestState<T> pubnubRequestState, HttpWebRequest request)
+        async Task<byte[]> SendRequestAndGetStreamResponseHttpClient<T>(Uri requestUri, RequestState<T> pubnubRequestState)
         {
             byte[] streamBytes = null;
             HttpResponseMessage response = null;
@@ -289,11 +289,6 @@ namespace PubnubApi
                         stream.CopyTo(ms);
                         streamBytes = ms.ToArray();
                     }
-                    //using (StreamReader streamReader = new StreamReader(stream))
-                    //{
-                    //    jsonString = await streamReader.ReadToEndAsync().ConfigureAwait(false);
-                    //    pubnubRequestState.GotJsonResponse = true;
-                    //}
                     System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Got HttpResponseMessage for {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), requestUri));
                 }
                 else
@@ -1187,7 +1182,6 @@ namespace PubnubApi
                 request.Method = "PATCH";
                 request.ContentType = "application/json";
 
-                //byte[] data = Encoding.UTF8.GetBytes(patchData);
                 System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
                 stopWatch.Start();
 #if !NET35 && !NET40 && !NET45 && !NET461

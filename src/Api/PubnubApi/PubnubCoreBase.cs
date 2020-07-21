@@ -1000,7 +1000,9 @@ namespace PubnubApi
             return await UrlProcessRequest(requestUri, pubnubRequestState, terminateCurrentSubRequest, null).ConfigureAwait(false);
         }
 
+#pragma warning disable
         internal protected async Task<Tuple<string, PNStatus>> UrlProcessRequest<T>(Uri requestUri, RequestState<T> pubnubRequestState, bool terminateCurrentSubRequest, byte[] postOrPatchData)
+#pragma warning restore
         {
             return await UrlProcessRequest(requestUri, pubnubRequestState, terminateCurrentSubRequest, postOrPatchData,"").ConfigureAwait(false);
         }

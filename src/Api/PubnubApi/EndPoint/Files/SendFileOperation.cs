@@ -143,24 +143,6 @@ namespace PubnubApi.EndPoint
             return await ProcessFileUpload(this.queryParam).ConfigureAwait(false);
         }
 
-        //        internal void Retry()
-        //        {
-        //#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
-        //            Task.Factory.StartNew(() =>
-        //            {
-        //                ProcessFileUpload(this.queryParam, savedCallback);
-        //            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
-        //#else
-        //            new Thread(() =>
-        //            {
-        //                ProcessFileUpload(this.queryParam, savedCallback);
-        //            })
-        //            { IsBackground = true }.Start();
-        //#endif
-        //        }
-
-        
-
         private void ProcessFileUpload(Dictionary<string, object> externalQueryParam, PNCallback<PNFileUploadResult> callback)
         {
             PNResult<PNGenerateFileUploadUrlResult> generateFileUploadUrl = GenerateFileUploadUrl(externalQueryParam).Result;
@@ -306,7 +288,7 @@ namespace PubnubApi.EndPoint
                     publishPayload.Add("message", this.publishMessage);
                 }
                 currentFileId = generateFileUploadUrlResult.FileId;
-                publishPayload.Add("file", new Dictionary<string, string>() {
+                publishPayload.Add("file", new Dictionary<string, string> {
                         { "id", generateFileUploadUrlResult.FileId },
                         { "name", generateFileUploadUrlResult.FileName } });
 

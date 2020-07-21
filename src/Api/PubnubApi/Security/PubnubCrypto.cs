@@ -112,11 +112,12 @@ namespace PubnubApi
             }
             if (pnUnit != null && pnUnit.IV != null && pnUnit.IV.Length == 16)
             {
-                ivBytes = pnUnit.IV; //new byte[] { 76, 224, 5, 202, 19, 66, 254, 23, 44, 240, 122, 244, 252, 13, 74, 61 };// 
+                ivBytes = pnUnit.IV;
             }
-#if DEBUG
-            System.Diagnostics.Debug.WriteLine("IV = " + GetDisplayableBytes(ivBytes));
-#endif
+            if (config != null)
+            {
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} IV = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), GetDisplayableBytes(ivBytes)), config.LogVerbosity);
+            }
 #if NET35
             Aes aesAlg = Aes.Create();
             aesAlg.KeySize = 256;
