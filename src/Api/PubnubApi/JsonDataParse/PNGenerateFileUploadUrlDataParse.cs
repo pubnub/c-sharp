@@ -34,7 +34,7 @@ namespace PubnubApi
                         Dictionary<string, object> generateFileUploadUrlDicUploadReq = JsonDataParseInternalUtil.ConvertToDictionaryObject(dicObj["file_upload_request"]);
                         if (generateFileUploadUrlDicUploadReq != null && generateFileUploadUrlDicUploadReq.Count > 0)
                         {
-                            result.FileUploadRequest = new PNGenerateFileUploadUrlData()
+                            result.FileUploadRequest = new PNGenerateFileUploadUrlData
                             {
                                 Url = generateFileUploadUrlDicUploadReq.ContainsKey("url") && generateFileUploadUrlDicUploadReq["url"] != null ? generateFileUploadUrlDicUploadReq["url"].ToString() : null,
                                 Method = generateFileUploadUrlDicUploadReq.ContainsKey("method") && generateFileUploadUrlDicUploadReq["method"] != null ? generateFileUploadUrlDicUploadReq["method"].ToString() : null,

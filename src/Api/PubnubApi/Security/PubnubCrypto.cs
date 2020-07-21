@@ -202,7 +202,7 @@ namespace PubnubApi
             }
         }
 
-        private string GetDisplayableBytes(byte[] currentBytes)
+        private static string GetDisplayableBytes(byte[] currentBytes)
         {
             StringBuilder outBuilder = new StringBuilder("{ ");
             for (int di = 0; di < currentBytes.Length; di++)

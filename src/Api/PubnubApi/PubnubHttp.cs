@@ -104,7 +104,7 @@ namespace PubnubApi
         {
             if (pubnubConfig.UseClassicHttpWebRequest)
             {
-                return await SendRequestAndGetStreamResponseClassicHttp(requestUri, pubnubRequestState, request).ConfigureAwait(false);
+                return await SendRequestAndGetStreamResponseClassicHttp(pubnubRequestState, request).ConfigureAwait(false);
             }
             else
             {
@@ -129,7 +129,7 @@ namespace PubnubApi
             LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, postData bytearray len= {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), postData.Length), pubnubConfig.LogVerbosity);
             if (pubnubConfig.UseClassicHttpWebRequest)
             {
-                return await SendRequestAndGetJsonResponseClassicHttpWithPOST(requestUri, pubnubRequestState, request, postData, contentType).ConfigureAwait(false);
+                return await SendRequestAndGetJsonResponseClassicHttpWithPOST(pubnubRequestState, request, postData, contentType).ConfigureAwait(false);
             }
             else
             {
@@ -140,7 +140,7 @@ namespace PubnubApi
                 }
                 else
                 {
-                    return await SendRequestAndGetJsonResponseHttpClientWithPOST(requestUri, pubnubRequestState, request, postData, contentType).ConfigureAwait(false);
+                    return await SendRequestAndGetJsonResponseHttpClientWithPOST(requestUri, pubnubRequestState, postData, contentType).ConfigureAwait(false);
                 }
 #else
                 return await SendRequestAndGetJsonResponseTaskFactoryWithPOST(pubnubRequestState, request, postData, contentType).ConfigureAwait(false);
@@ -357,7 +357,7 @@ namespace PubnubApi
             return streamBytes;
         }
 
-        async Task<string> SendRequestAndGetJsonResponseHttpClientWithPOST<T>(Uri requestUri, RequestState<T> pubnubRequestState, HttpWebRequest request, byte[] postData, string contentType)
+        async Task<string> SendRequestAndGetJsonResponseHttpClientWithPOST<T>(Uri requestUri, RequestState<T> pubnubRequestState, byte[] postData, string contentType)
         {
             string jsonString = "";
             HttpResponseMessage response = null;
@@ -368,15 +368,6 @@ namespace PubnubApi
                 cts.CancelAfter(GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType) * 1000);
                 System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
                 stopWatch.Start();
-                //StringContent jsonPostString = new StringContent(postData, Encoding.UTF8);
-                //HttpRequestMessage requestMsg = new HttpRequestMessage(HttpMethod.Post, requestUri)
-                //{
-                //    Content = new ByteArrayContent(postData)
-                //};
-                //jsonPostString.Headers.ContentType = new MediaTypeHeaderValue(contentType);
-                //HttpContent postStreamContent = new StreamContent(new MemoryStream(postData));
-                //postStreamContent.Headers.ContentType = new MediaTypeHeaderValue(contentType);
-                //HttpContent postContent = postStreamContent;
                 ByteArrayContent postDataContent = new ByteArrayContent(postData);
                 postDataContent.Headers.Remove("Content-Type");
                 if (string.IsNullOrEmpty(contentType))
@@ -387,7 +378,6 @@ namespace PubnubApi
                 {
                     postDataContent.Headers.TryAddWithoutValidation("Content-Type", contentType);
                 }
-                //postDataContent.Headers.ContentType = new MediaTypeHeaderValue(contentType);
                 if (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation)
                 {
                     response = await httpClientSubscribe.PostAsync(requestUri, postDataContent, cts.Token).ConfigureAwait(false);
@@ -484,8 +474,6 @@ namespace PubnubApi
                 System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
                 stopWatch.Start();
                 HttpMethod httpMethod = new HttpMethod("PATCH");
-                //StringContent jsonPatchString = new StringContent(patchData, Encoding.UTF8);
-                //jsonPatchString.Headers.ContentType = new MediaTypeHeaderValue("application/json");
                 HttpRequestMessage requestMsg = new HttpRequestMessage(httpMethod, requestUri)
                 {
                     Content = new ByteArrayContent(patchData)
@@ -667,7 +655,7 @@ namespace PubnubApi
                 System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, status code = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), statusCode));
                 using (Stream stream = response.GetResponseStream())
                 {
-                    long totalSize = 0;// stream.Length;
+                    long totalSize = 0;
                     long receivedSize = 0;
                     //Allocate 1K buffer
                     byte[] buffer = new byte[1024];
@@ -714,8 +702,9 @@ namespace PubnubApi
                 }
                 return null;
             }
-            catch
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Exception in SendRequestAndGetStreamResponseTaskFactory {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex));
                 throw;
             }
         }
@@ -733,7 +722,6 @@ namespace PubnubApi
 
                 request.ContentType = contentType;
 
-                //byte[] data = Encoding.UTF8.GetBytes(postData);
                 using (var requestStream = await Task<Stream>.Factory.FromAsync(request.BeginGetRequestStream, request.EndGetRequestStream, pubnubRequestState).ConfigureAwait(false))
                 {
 #if NET35 || NET40
@@ -815,8 +803,9 @@ namespace PubnubApi
                 }
                 return "";
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Exception in SendRequestAndGetJsonResponseTaskFactoryWithPOST {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex));
                 throw;
             }
         }
@@ -834,7 +823,6 @@ namespace PubnubApi
 
                 request.ContentType = "application/json";
 
-                //byte[] data = Encoding.UTF8.GetBytes(patchData);
                 using (var requestStream = await Task<Stream>.Factory.FromAsync(request.BeginGetRequestStream, request.EndGetRequestStream, pubnubRequestState).ConfigureAwait(false))
                 {
 #if NET35 || NET40
@@ -1000,7 +988,7 @@ namespace PubnubApi
             }
         }
 
-        async Task<byte[]> SendRequestAndGetStreamResponseClassicHttp<T>(Uri requestUri, RequestState<T> pubnubRequestState, HttpWebRequest request)
+        async Task<byte[]> SendRequestAndGetStreamResponseClassicHttp<T>(RequestState<T> pubnubRequestState, HttpWebRequest request)
         {
             LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Inside SendRequestAndGetStreamResponseClassicHttp", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
             var taskComplete = new TaskCompletionSource<byte[]>();
@@ -1035,7 +1023,6 @@ namespace PubnubApi
                                 System.Diagnostics.Debug.WriteLine(jsonString);
                                 System.Diagnostics.Debug.WriteLine("");
                                 System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Retrieved JSON", DateTime.Now.ToString(CultureInfo.InvariantCulture)));
-                                //taskComplete.TrySetResult(jsonString);
                                 taskComplete.TrySetResult(null);
                             }
                             if (asyncRequestState.Response != null)
@@ -1088,7 +1075,7 @@ namespace PubnubApi
             }
         }
 
-        async Task<string> SendRequestAndGetJsonResponseClassicHttpWithPOST<T>(Uri requestUri, RequestState<T> pubnubRequestState, HttpWebRequest request, byte[] postData, string contentType)
+        async Task<string> SendRequestAndGetJsonResponseClassicHttpWithPOST<T>(RequestState<T> pubnubRequestState, HttpWebRequest request, byte[] postData, string contentType)
         {
             LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Inside SendRequestAndGetJsonResponseClassicHttpWithPOST", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
             var taskComplete = new TaskCompletionSource<string>();
@@ -1097,7 +1084,6 @@ namespace PubnubApi
                 request.Method = "POST";
                 request.ContentType = contentType;
 
-                //byte[] data = Encoding.UTF8.GetBytes(postData);
                 System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
                 stopWatch.Start();
 #if !NET35 && !NET40 && !NET45 && !NET461

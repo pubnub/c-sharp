@@ -11,7 +11,7 @@ namespace PubnubApi
         public string Subscription { get; set; }
         public string Publisher { get; set; }
         public long Timetoken { get; set; }
-        public object Message { get; set; }
+        public T Message { get; set; }
         public string FileId { get; set; }
         public string FileName { get; set; }
 

@@ -781,9 +781,9 @@ namespace PubnubApi
                                             Dictionary<string, object> pnMsgObjDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(pnFileResult.Message);
                                             if (pnMsgObjDic != null && pnMsgObjDic.Count > 0)
                                             {
-                                                if (pnMsgObjDic.ContainsKey("message"))
+                                                if (pnMsgObjDic.ContainsKey("message") && pnMsgObjDic["message"]!= null)
                                                 {
-                                                    fileMessage.Message = pnMsgObjDic["message"];
+                                                    fileMessage.Message = (T)pnMsgObjDic["message"];
                                                 }
                                                 if (pnMsgObjDic.ContainsKey("file"))
                                                 {
@@ -797,8 +797,10 @@ namespace PubnubApi
                                             }
                                             else
                                             {
-                                                fileMessage.Message = pnFileResult.Message.ToString();
-
+                                                if (pnFileResult.Message != null)
+                                                {
+                                                    fileMessage.Message = (T)pnFileResult.Message;
+                                                }
                                             }
                                             Announce(fileMessage);
                                         }

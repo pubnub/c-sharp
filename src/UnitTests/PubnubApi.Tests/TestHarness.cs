@@ -28,7 +28,7 @@ namespace PubNubMessaging.Tests
             }
             else
             {
-                pnConfiguration.Origin = "ingress-files.aws-pdx-1.ps.pn";//"ps.pndsn.com";
+                pnConfiguration.Origin = "ps.pndsn.com";
                 pubnub = new Pubnub(pnConfiguration);
             }
             return pubnub;

@@ -17,12 +17,12 @@ namespace PubnubApi
     {
         private readonly string cipherKey;
         private readonly PNConfiguration config;
-        public PubnubCryptoBase(string cipher_key, PNConfiguration pubnubConfig)
+        protected PubnubCryptoBase(string cipher_key, PNConfiguration pubnubConfig)
         {
             this.cipherKey = cipher_key;
             this.config = pubnubConfig;
         }
-        public PubnubCryptoBase(string cipher_key)
+        protected PubnubCryptoBase(string cipher_key)
         {
             this.cipherKey = cipher_key;
             this.config = null;
@@ -183,10 +183,9 @@ namespace PubnubApi
 #endif
         }
 
-        public byte[] PubnubAccessManagerSign(string key, byte[] dataBytes)
+        public static byte[] PubnubAccessManagerSign(string key, byte[] dataBytes)
         {
             string secret = key;
-            //string message = data;
 
             var encoding = new System.Text.UTF8Encoding();
             byte[] keyByte = encoding.GetBytes(secret);

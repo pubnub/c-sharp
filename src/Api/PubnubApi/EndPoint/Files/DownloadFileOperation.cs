@@ -161,9 +161,6 @@ namespace PubnubApi.EndPoint
                         {
                             PubnubCrypto aes = new PubnubCrypto(currentCipherKey, config, pubnubLog, null);
                             outputBytes = aes.Decrypt(item1Bytes, true);
-//#if !NETSTANDARD10 && !NETSTANDARD11
-//                            System.IO.File.WriteAllBytes(@"C:\Pandu\temp\new\output\pandu_download_test.gif", outputBytes);
-//#endif
                             LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Stream length (after Decrypt)= {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), item1Bytes.Length), config.LogVerbosity);
                         }
                         catch (Exception ex)

@@ -429,19 +429,55 @@ namespace PubnubApi
                             }
                         }
                         break;
-                    case PNOperationType.PNGenerateFileUploadUrlOperation:
-                        //if (savedEndpointOperation is GenerateFileUploadUrlOperation)
-                        //{
-                        //    GenerateFileUploadUrlOperation endpoint = savedEndpointOperation as GenerateFileUploadUrlOperation;
-                        //    if (endpoint != null)
-                        //    {
-                        //        endpoint.Retry();
-                        //    }
-                        //}
-                        break;
                     case PNOperationType.PNPublishFileMessageOperation:
+                        if (savedEndpointOperation is PublishFileMessageOperation)
+                        {
+                            PublishFileMessageOperation endpoint = savedEndpointOperation as PublishFileMessageOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
+                    case PNOperationType.PNFileUrlOperation:
+                        if (savedEndpointOperation is GetFileUrlOperation)
+                        {
+                            GetFileUrlOperation endpoint = savedEndpointOperation as GetFileUrlOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
+                    case PNOperationType.PNListFilesOperation:
+                        if (savedEndpointOperation is ListFilesOperation)
+                        {
+                            ListFilesOperation endpoint = savedEndpointOperation as ListFilesOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
+                    case PNOperationType.PNDeleteFileOperation:
+                        if (savedEndpointOperation is DeleteFileOperation)
+                        {
+                            DeleteFileOperation endpoint = savedEndpointOperation as DeleteFileOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
                         break;
                     case PNOperationType.PNDownloadFileOperation:
+                        if (savedEndpointOperation is DownloadFileOperation)
+                        {
+                            DownloadFileOperation endpoint = savedEndpointOperation as DownloadFileOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
                         break;
                     default:
                         break;

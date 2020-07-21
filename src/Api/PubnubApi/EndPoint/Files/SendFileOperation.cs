@@ -19,14 +19,12 @@ namespace PubnubApi.EndPoint
         private readonly IPubnubLog pubnubLog;
         private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 
-        private PNCallback<PNFileUploadResult> savedCallback;
         private Dictionary<string, object> queryParam;
 
         private string channelName;
         private object publishMessage;
         private string sendFileFullPath;
-        private byte[] sendFileByteArray;
-        private string sendFileName;
+        private string sendFileName = "";
         private string currentFileCipherKey;
         private string currentFileId;
         private bool storeInHistory = true;
@@ -102,18 +100,6 @@ namespace PubnubApi.EndPoint
 #endif      
         }
 
-        //public SendFileOperation File(Stream fileStream)
-        //{
-        //    this.sendFileStream = fileStream;
-        //    return this;
-        //}
-
-        //public SendFileOperation File(byte[] fileBytes)
-        //{
-        //    this.sendFileByteArray = fileBytes;
-        //    return this;
-        //}
-
         public SendFileOperation CipherKey(string cipherKeyForFile)
         {
             this.currentFileCipherKey = cipherKeyForFile;
@@ -133,10 +119,6 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing callback");
             }
 
-            //if (string.IsNullOrEmpty(this.sendFileName) && this.sendFileStream == null && this.sendFileByteArray == null)
-            //{
-            //    throw new ArgumentException("Missing File or FileStream or FileBytes");
-            //}
             if (string.IsNullOrEmpty(this.sendFileName))
             {
                 throw new ArgumentException("Missing File");
@@ -145,14 +127,12 @@ namespace PubnubApi.EndPoint
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
-                this.savedCallback = callback;
-                ProcessFileUpload(this.queryParam, savedCallback);
+                ProcessFileUpload(this.queryParam, callback);
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
             new Thread(() =>
             {
-                this.savedCallback = callback;
-                ProcessFileUpload(this.queryParam, savedCallback);
+                ProcessFileUpload(this.queryParam, callback);
             })
             { IsBackground = true }.Start();
 #endif
@@ -205,12 +185,13 @@ namespace PubnubApi.EndPoint
 
             requestState.UsePostMethod = true;
 
-            sendFileByteArray = GetByteArrayFromFilePath(sendFileFullPath);
+            byte[] sendFileByteArray = GetByteArrayFromFilePath(sendFileFullPath);
 
             
             string dataBoundary = String.Format("----------{0:N}", Guid.NewGuid());
             string contentType = "multipart/form-data; boundary=" + dataBoundary;
-            byte[] postData = GetMultipartFormData(generateFileUploadUrlResult.FileName, generateFileUploadUrlResult.FileUploadRequest.FormFields, dataBoundary);
+            string currentCipherKey = !string.IsNullOrEmpty(this.currentFileCipherKey) ? this.currentFileCipherKey : config.CipherKey;
+            byte[] postData = GetMultipartFormData(sendFileByteArray,generateFileUploadUrlResult.FileName, generateFileUploadUrlResult.FileUploadRequest.FormFields, dataBoundary, currentCipherKey, config, pubnubLog);
 
             string json;
             UrlProcessRequest(new Uri(generateFileUploadUrlResult.FileUploadRequest.Url.Replace("https://","http://")), requestState, false, postData, contentType).ContinueWith(r =>
@@ -225,7 +206,7 @@ namespace PubnubApi.EndPoint
                     if (this.publishMessage != null && !string.IsNullOrEmpty(this.publishMessage.ToString())){
                         publishPayload.Add("message", this.publishMessage);
                     }
-                    publishPayload.Add("file", new Dictionary<string, string>() { 
+                    publishPayload.Add("file", new Dictionary<string, string> { 
                         { "id", generateFileUploadUrlResult.FileId },
                         { "name", generateFileUploadUrlResult.FileName } });
 
@@ -279,12 +260,6 @@ namespace PubnubApi.EndPoint
         {
             PNResult<PNFileUploadResult> ret = new PNResult<PNFileUploadResult>();
 
-            //if (string.IsNullOrEmpty(this.sendFileName) && this.sendFileStream == null && this.sendFileByteArray == null)
-            //{
-            //    PNStatus errStatus = new PNStatus { Error = true, ErrorData = new PNErrorData("Missing File or FileStream or FileBytes", new ArgumentException("Missing File or FileStream or FileBytes")) };
-            //    ret.Status = errStatus;
-            //    return ret;
-            //}
             if (string.IsNullOrEmpty(this.sendFileName))
             {
                 PNStatus errStatus = new PNStatus { Error = true, ErrorData = new PNErrorData("Missing File", new ArgumentException("Missing File")) };
@@ -293,7 +268,7 @@ namespace PubnubApi.EndPoint
             }
 
 
-            PNResult<PNGenerateFileUploadUrlResult> generateFileUploadUrl = await GenerateFileUploadUrl(externalQueryParam);
+            PNResult<PNGenerateFileUploadUrlResult> generateFileUploadUrl = await GenerateFileUploadUrl(externalQueryParam).ConfigureAwait(false);
             PNGenerateFileUploadUrlResult generateFileUploadUrlResult = generateFileUploadUrl.Result;
             PNStatus generateFileUploadUrlStatus = generateFileUploadUrl.Status;
             if (generateFileUploadUrlStatus.Error || generateFileUploadUrlResult == null)
@@ -311,11 +286,12 @@ namespace PubnubApi.EndPoint
 
             requestState.UsePostMethod = true;
 
-            sendFileByteArray = GetByteArrayFromFilePath(sendFileFullPath);
+            byte[] sendFileByteArray = GetByteArrayFromFilePath(sendFileFullPath);
 
             string dataBoundary = String.Format("----------{0:N}", Guid.NewGuid());
             string contentType = "multipart/form-data; boundary=" + dataBoundary;
-            byte[] postData = GetMultipartFormData(generateFileUploadUrlResult.FileName, generateFileUploadUrlResult.FileUploadRequest.FormFields, dataBoundary);
+            string currentCipherKey = !string.IsNullOrEmpty(this.currentFileCipherKey) ? this.currentFileCipherKey : config.CipherKey;
+            byte[] postData = GetMultipartFormData(sendFileByteArray, generateFileUploadUrlResult.FileName, generateFileUploadUrlResult.FileUploadRequest.FormFields, dataBoundary, currentCipherKey, config, pubnubLog);
 
             Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(new Uri(generateFileUploadUrlResult.FileUploadRequest.Url), requestState, false, postData, contentType).ConfigureAwait(false);
             ret.Status = JsonAndStatusTuple.Item2;
@@ -340,7 +316,7 @@ namespace PubnubApi.EndPoint
                 do
                 {
                     currentFileRetryCount += 1;
-                    PNResult<PNPublishFileMessageResult> publishFileMessageResponse = await PublishFileMessage(publishPayload, queryParam);
+                    PNResult<PNPublishFileMessageResult> publishFileMessageResponse = await PublishFileMessage(publishPayload, queryParam).ConfigureAwait(false);
                     PNPublishFileMessageResult publishFileMessage = publishFileMessageResponse.Result;
                     PNStatus publishFileMessageStatus = publishFileMessageResponse.Status;
                     if (!publishFileMessageStatus.Error && publishFileMessage != null)
@@ -455,23 +431,13 @@ namespace PubnubApi.EndPoint
             return ret;
         }
 
-        private byte[] GetByteArrayFromFilePath(string filePath)
+        private static byte[] GetByteArrayFromFilePath(string filePath)
         {
 #if !NETSTANDARD10 && !NETSTANDARD11
             byte[] byteArray = null;
             if (!string.IsNullOrEmpty(filePath))
             {
                 byteArray = System.IO.File.ReadAllBytes(filePath);
-                //using (System.IO.MemoryStream ms = new MemoryStream())
-                //{
-                //    using (FileStream file = new FileStream(filePath, FileMode.Open, FileAccess.Read))
-                //    {
-                //        byte[] bytes = new byte[file.Length];
-                //        file.Read(bytes, 0, (int)file.Length);
-                //        ms.Write(bytes, 0, (int)file.Length);
-                //        byteArray = ms.ToArray();
-                //    }
-                //}
             }
             return byteArray;
 #else
@@ -480,7 +446,7 @@ namespace PubnubApi.EndPoint
 
         }
 
-        private byte[] GetMultipartFormData(string fileName, Dictionary<string, object> formFields, string dataBoundary)
+        private static byte[] GetMultipartFormData(byte[] sendFileByteArray, string fileName, Dictionary<string, object> formFields, string dataBoundary, string currentCipherKey, PNConfiguration config, IPubnubLog pubnubLog)
         {
             byte[] ret = null;
             using (Stream dataStream = new System.IO.MemoryStream())
@@ -506,7 +472,6 @@ namespace PubnubApi.EndPoint
                 byte[] postHeaderData = Encoding.UTF8.GetBytes(header);
 
                 dataStream.Write(postHeaderData, 0, postHeaderData.Length);
-                string currentCipherKey = !string.IsNullOrEmpty(this.currentFileCipherKey) ? this.currentFileCipherKey : config.CipherKey;
                 if (currentCipherKey.Length > 0)
                 {
                     try
@@ -531,7 +496,8 @@ namespace PubnubApi.EndPoint
 
                 dataStream.Position = 0;
                 ret = new byte[dataStream.Length];
-                dataStream.Read(ret, 0, ret.Length);
+                int bytesRead = dataStream.Read(ret, 0, ret.Length);
+                System.Diagnostics.Debug.WriteLine(string.Format("MultipartFormData byte count = {0}", bytesRead));
 #if NET35 || NET40 || NET45 || NET461
                 dataStream.Close();
 #endif
