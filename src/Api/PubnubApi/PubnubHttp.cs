@@ -315,16 +315,6 @@ namespace PubnubApi
                                 streamBytes = ms.ToArray();
                                 System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Retrieved Stream Bytes from HttpClient WebException response", DateTime.Now.ToString(CultureInfo.InvariantCulture)));
                             }
-                            //using (StreamReader streamReader = new StreamReader(currentWebException.Response.GetResponseStream()))
-                            //{
-                            //    var stream = streamReader.
-                            //    //Need to return this response 
-                            //    jsonString = await streamReader.ReadToEndAsync().ConfigureAwait(false);
-                            //    System.Diagnostics.Debug.WriteLine(jsonString);
-                            //    System.Diagnostics.Debug.WriteLine("");
-                            //    System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Retrieved JSON from HttpClient WebException response", DateTime.Now.ToString(CultureInfo.InvariantCulture)));
-                            //    return jsonString;
-                            //}
                         }
                     }
 
