@@ -361,7 +361,7 @@ namespace PubnubApiAsyncAwaitDemo
                     menuOptionsStringBuilder.AppendLine("Enter 50 FOR Get Memberships");
                     menuOptionsStringBuilder.AppendLine("Enter 51 FOR Get Members");
                     menuOptionsStringBuilder.AppendLine("Enter 52 FOR Set Memberships");
-                    menuOptionsStringBuilder.AppendLine("Enter 53 FOR Remove Members");
+                    menuOptionsStringBuilder.AppendLine("Enter 53 FOR Remove Memberships");
                     menuOptionsStringBuilder.AppendLine("Enter 54 FOR Set Channel Members");
                     menuOptionsStringBuilder.AppendLine("Enter 55 FOR Remove Channel Members");
                     menuOptionsStringBuilder.AppendLine("Enter 56 FOR Add MessageAction");

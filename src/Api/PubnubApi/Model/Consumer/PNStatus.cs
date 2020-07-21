@@ -41,6 +41,8 @@ namespace PubnubApi
         public List<string> AffectedChannels { get; set; } = new List<string>();
         public List<string> AffectedChannelGroups { get; set; } = new List<string>();
 
+        public object AdditonalData { get; set; } = new object();
+
         public void Retry()
         {
             if (savedEndpointOperation != null)
@@ -426,6 +428,20 @@ namespace PubnubApi
                                 endpoint.Retry();
                             }
                         }
+                        break;
+                    case PNOperationType.PNGenerateFileUploadUrlOperation:
+                        //if (savedEndpointOperation is GenerateFileUploadUrlOperation)
+                        //{
+                        //    GenerateFileUploadUrlOperation endpoint = savedEndpointOperation as GenerateFileUploadUrlOperation;
+                        //    if (endpoint != null)
+                        //    {
+                        //        endpoint.Retry();
+                        //    }
+                        //}
+                        break;
+                    case PNOperationType.PNPublishFileMessageOperation:
+                        break;
+                    case PNOperationType.PNDownloadFileOperation:
                         break;
                     default:
                         break;

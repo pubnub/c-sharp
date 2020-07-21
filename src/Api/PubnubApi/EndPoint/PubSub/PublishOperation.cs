@@ -223,7 +223,8 @@ namespace PubnubApi.EndPoint
             {
                 requestState.UsePostMethod = true;
                 string postMessage = JsonEncodePublishMsg(message);
-                UrlProcessRequest<PNPublishResult>(request, requestState, false, postMessage).ContinueWith(r =>
+                byte[] postData = Encoding.UTF8.GetBytes(postMessage);
+                UrlProcessRequest<PNPublishResult>(request, requestState, false, postData).ContinueWith(r =>
                 {
                     json = r.Result.Item1;
                 }, TaskContinuationOptions.ExecuteSynchronously).Wait();
@@ -306,7 +307,8 @@ namespace PubnubApi.EndPoint
             {
                 requestState.UsePostMethod = true;
                 string postMessage = JsonEncodePublishMsg(message);
-                JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false, postMessage).ConfigureAwait(false);
+                byte[] postData = Encoding.UTF8.GetBytes(postMessage);
+                JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false, postData).ConfigureAwait(false);
             }
             else
             {
@@ -366,7 +368,7 @@ namespace PubnubApi.EndPoint
 
             if (config.CipherKey.Length > 0)
             {
-                PubnubCrypto aes = new PubnubCrypto(config.CipherKey, config, pubnubLog);
+                PubnubCrypto aes = new PubnubCrypto(config.CipherKey, config, pubnubLog, null);
                 string encryptMessage = aes.Encrypt(message);
                 message = jsonLibrary.SerializeToJsonString(encryptMessage);
             }

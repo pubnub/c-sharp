@@ -1,8 +1,13 @@
 name: c-sharp
-version: "4.8.0.0"
+version: "4.9.0.0"
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog: 
+  - version: 4.9.0.0
+    date: July 23, 2020
+    changes:
+      - type: Improvement
+        text: Added files feature
   - version: 4.8.0.0
     date: June 10, 2020
     changes:
@@ -505,6 +510,12 @@ features:
     - OBJECTS-MANAGE-CHANNEL-MEMBERS-V2
     - OBJECTS-FILTERING
     - OBJECTS-SORTING
+  files:
+    - FILES-SEND-FILE
+    - FILES-LIST-FILES
+    - FILES-GET-FILE-URL
+    - FILES-DELETE-FILE
+    - FILES-DOWNLOAD-FILE    
   message-actions:
     - MESSAGE-ACTIONS-GET
     - MESSAGE-ACTIONS-ADD
@@ -514,7 +525,7 @@ features:
     - QUERY-PARAM    
 supported-platforms:
   - 
-    version: Pubnub 'C#' 4.8.0.0
+    version: Pubnub 'C#' 4.9.0.0
     platforms:
       - Windows 10 and up
       - Windows Server 2008 and up
@@ -524,7 +535,7 @@ supported-platforms:
       - .Net Framework 4.5
       - .Net Framework 4.6.1+
   - 
-    version: PubnubPCL 'C#' 4.8.0.0
+    version: PubnubPCL 'C#' 4.9.0.0
     platforms:
       - Xamarin.Android
       - Xamarin.iOS
@@ -543,7 +554,7 @@ supported-platforms:
       - .Net Standard 2.1
       - .Net Core
   - 
-    version: PubnubUWP 'C#' 4.8.0.0
+    version: PubnubUWP 'C#' 4.9.0.0
     platforms:
       - Windows Phone 10
       - Universal Windows Apps

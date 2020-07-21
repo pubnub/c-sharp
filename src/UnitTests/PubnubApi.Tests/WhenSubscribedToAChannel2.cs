@@ -647,7 +647,10 @@ namespace PubNubMessaging.Tests
 
             }
 
-
+            public override void File<T>(Pubnub pubnub, PNFileEventResult<T> fileEvent)
+            {
+                throw new NotImplementedException();
+            }
         }
 
         public class UTPublishResult : PNCallback<PNPublishResult>

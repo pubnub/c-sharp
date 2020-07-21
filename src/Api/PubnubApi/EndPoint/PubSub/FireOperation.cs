@@ -195,7 +195,8 @@ namespace PubnubApi.EndPoint
                 Dictionary<string, object> messageEnvelope = new Dictionary<string, object>();
                 messageEnvelope.Add("message", message);
                 string postMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
-                UrlProcessRequest(request, requestState, false, postMessage).ContinueWith(r =>
+                byte[] postData = Encoding.UTF8.GetBytes(postMessage);
+                UrlProcessRequest(request, requestState, false, postData).ContinueWith(r =>
                 {
                     json = r.Result.Item1;
                 }, TaskContinuationOptions.ExecuteSynchronously).Wait();
@@ -276,7 +277,8 @@ namespace PubnubApi.EndPoint
                 Dictionary<string, object> messageEnvelope = new Dictionary<string, object>();
                 messageEnvelope.Add("message", message);
                 string postMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
-                JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false, postMessage).ConfigureAwait(false);
+                byte[] postData = Encoding.UTF8.GetBytes(postMessage);
+                JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false, postData).ConfigureAwait(false);
             }
             else
             {

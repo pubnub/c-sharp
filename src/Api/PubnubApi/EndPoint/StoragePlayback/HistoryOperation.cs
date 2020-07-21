@@ -19,7 +19,9 @@ namespace PubnubApi.EndPoint
 
         private bool reverseOption;
         private bool includeTimetokenOption;
+        private bool includeMessageType = true; //default to  true
         private bool withMetaOption;
+        private bool withUuidOption = true; //default to  true
         private long startTimetoken = -1;
         private long endTimetoken = -1;
         private int historyCount = -1;
@@ -77,6 +79,18 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
+        public HistoryOperation IncludeMessageType(bool withMessageType)
+        {
+            includeMessageType = withMessageType;
+            return this;
+        }
+
+        public HistoryOperation IncludeUuid(bool withUuid)
+        {
+            withUuidOption = withUuid;
+            return this;
+        }
+
         public HistoryOperation Start(long start)
         {
             startTimetoken = start;
@@ -118,13 +132,13 @@ namespace PubnubApi.EndPoint
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
-                History(this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, this.withMetaOption, this.queryParam, callback);
+                History(callback);
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
             new Thread(() =>
             {
                 this.savedCallback = callback;
-                History(this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, this.withMetaOption, this.queryParam, callback);
+                History(callback);
             })
             { IsBackground = true }.Start();
 #endif
@@ -137,7 +151,7 @@ namespace PubnubApi.EndPoint
                 throw new MissingMemberException("Invalid Subscribe Key");
             }
 
-            return await History(this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, this.withMetaOption, this.queryParam).ConfigureAwait(false);
+            return await History().ConfigureAwait(false);
         }
 
         internal void Retry()
@@ -145,30 +159,30 @@ namespace PubnubApi.EndPoint
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
-                History(this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, this.withMetaOption, this.queryParam, savedCallback);
+                History(savedCallback);
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
             new Thread(() =>
             {
-                History(this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, this.withMetaOption, this.queryParam, savedCallback);
+                History(savedCallback);
             })
             { IsBackground = true }.Start();
 #endif
         }
 
-        internal void History(string channel, long start, long end, int count, bool reverse, bool includeToken, bool includeMeta, Dictionary<string, object> externalQueryParam, PNCallback<PNHistoryResult> callback)
+        internal void History(PNCallback<PNHistoryResult> callback)
         {
-            if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()))
+            if (string.IsNullOrEmpty(this.channelName) || string.IsNullOrEmpty(this.channelName.Trim()))
             {
                 throw new ArgumentException("Missing Channel");
             }
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
             
-            Uri request = urlBuilder.BuildHistoryRequest("GET", "", channel, start, end, count, reverse, includeToken, includeMeta, externalQueryParam);
+            Uri request = urlBuilder.BuildHistoryRequest("GET", "", this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, this.withMetaOption, this.withUuidOption, this.includeMessageType, this.queryParam);
 
             RequestState<PNHistoryResult> requestState = new RequestState<PNHistoryResult>();
-            requestState.Channels = new [] { channel };
+            requestState.Channels = new [] { this.channelName };
             requestState.ResponseType = PNOperationType.PNHistoryOperation;
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
@@ -185,9 +199,9 @@ namespace PubnubApi.EndPoint
             }, TaskContinuationOptions.ExecuteSynchronously).Wait();
         }
 
-        internal async Task<PNResult<PNHistoryResult>> History(string channel, long start, long end, int count, bool reverse, bool includeToken, bool includeMeta, Dictionary<string, object> externalQueryParam)
+        internal async Task<PNResult<PNHistoryResult>> History()
         {
-            if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()))
+            if (string.IsNullOrEmpty(this.channelName) || string.IsNullOrEmpty(this.channelName.Trim()))
             {
                 throw new ArgumentException("Missing Channel");
             }
@@ -196,10 +210,10 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
             
-            Uri request = urlBuilder.BuildHistoryRequest("GET", "", channel, start, end, count, reverse, includeToken, includeMeta, externalQueryParam);
+            Uri request = urlBuilder.BuildHistoryRequest("GET", "", this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, this.withMetaOption, this.withUuidOption, this.includeMessageType, this.queryParam);
 
             RequestState<PNHistoryResult> requestState = new RequestState<PNHistoryResult>();
-            requestState.Channels = new[] { channel };
+            requestState.Channels = new[] { this.channelName };
             requestState.ResponseType = PNOperationType.PNHistoryOperation;
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;

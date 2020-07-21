@@ -338,9 +338,45 @@ namespace PubnubApi
             }
             return ret;
         }
-#endregion
+        #endregion
 
-#region "PubNub API Other Methods"
+        public EndPoint.SendFileOperation SendFile()
+        {
+            EndPoint.SendFileOperation uploadFileOperation = new EndPoint.SendFileOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
+            return uploadFileOperation;
+        }
+
+        public EndPoint.GetFileUrlOperation GetFileUrl()
+        {
+            EndPoint.GetFileUrlOperation getFileUrlOperation = new EndPoint.GetFileUrlOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
+            return getFileUrlOperation;
+        }
+
+        public EndPoint.DownloadFileOperation DownloadFile()
+        {
+            EndPoint.DownloadFileOperation downloadFileOperation = new EndPoint.DownloadFileOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
+            return downloadFileOperation;
+        }
+
+        public EndPoint.ListFilesOperation ListFiles()
+        {
+            EndPoint.ListFilesOperation listFilesOperation = new EndPoint.ListFilesOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
+            return listFilesOperation;
+        }
+
+        public EndPoint.DeleteFileOperation DeleteFile()
+        {
+            EndPoint.DeleteFileOperation deleteFileOperation = new EndPoint.DeleteFileOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
+            return deleteFileOperation;
+        }
+
+        public EndPoint.PublishFileMessageOperation PublishFileMessage()
+        {
+            EndPoint.PublishFileMessageOperation publshFileMessageOperation = new EndPoint.PublishFileMessageOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);
+            return publshFileMessageOperation;
+        }
+
+        #region "PubNub API Other Methods"
         public void TerminateCurrentSubscriberRequest()
 		{
             EndPoint.OtherOperation endpoint = new EndPoint.OtherOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, this);
@@ -410,7 +446,7 @@ namespace PubnubApi
         public bool Reconnect<T>()
         {
             bool ret = false;
-            if (savedSubscribeOperation != null && savedSubscribeOperation is EndPoint.SubscribeOperation<T>)
+            if (savedSubscribeOperation is EndPoint.SubscribeOperation<T>)
             {
                 EndPoint.SubscribeOperation<T> subscibeOperationInstance = savedSubscribeOperation as EndPoint.SubscribeOperation<T>;
                 if (subscibeOperationInstance != null)

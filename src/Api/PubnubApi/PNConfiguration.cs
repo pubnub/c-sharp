@@ -99,6 +99,9 @@ namespace PubnubApi
 
         public bool SuppressLeaveEvents { get; set; }
 
+        public bool UseRandomInitializationVector { get; set; }
+        public int FileMessagePublishRetryLimit { get; set; }
+
         public PNConfiguration()
         {
             this.Origin = "ps.pndsn.com";
@@ -119,6 +122,8 @@ namespace PubnubApi
             this.DedupOnSubscribe = false;
             this.MaximumMessagesCacheSize = 100;
             this.SuppressLeaveEvents = false;
+            this.UseRandomInitializationVector = false;
+            this.FileMessagePublishRetryLimit = 5;
         }
 
         public PNConfiguration SetPresenceTimeoutWithCustomInterval(int timeout, int interval)

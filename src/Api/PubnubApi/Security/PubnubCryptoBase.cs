@@ -15,10 +15,17 @@ namespace PubnubApi
 {
     public abstract class PubnubCryptoBase
     {
-        private readonly string cipherKey = "";
+        private readonly string cipherKey;
+        private readonly PNConfiguration config;
+        public PubnubCryptoBase(string cipher_key, PNConfiguration pubnubConfig)
+        {
+            this.cipherKey = cipher_key;
+            this.config = pubnubConfig;
+        }
         public PubnubCryptoBase(string cipher_key)
         {
             this.cipherKey = cipher_key;
+            this.config = null;
         }
 
         /// <summary>
@@ -55,23 +62,52 @@ namespace PubnubApi
          * for decrypt type = false
          */
         //private string EncryptOrDecrypt(bool type, string plainStr)
-        protected abstract string EncryptOrDecrypt(bool type, string plainStr);
+        protected abstract string EncryptOrDecrypt(bool type, string dataStr, bool dynamicIV);
+        protected abstract byte[] EncryptOrDecrypt(bool type, byte[] dataBytes, bool dynamicIV);
 
 
         // encrypt string
         public string Encrypt(string plainText)
         {
             if (plainText == null || plainText.Length <= 0) { throw new ArgumentNullException("plainText"); }
+            bool dynamicIV = (config != null && config.UseRandomInitializationVector);
+            return EncryptOrDecrypt(true, plainText, dynamicIV);
+        }
 
-            return EncryptOrDecrypt(true, plainText);
+        public byte[] Encrypt(byte[] plainBytes)
+        {
+            if (plainBytes == null || plainBytes.Length <= 0) { throw new ArgumentNullException("plainBytes"); }
+            bool dynamicIV = (config != null && config.UseRandomInitializationVector);
+            return EncryptOrDecrypt(true, plainBytes, dynamicIV);
+        }
+
+        public byte[] Encrypt(byte[] plainBytes, bool file)
+        {
+            if (plainBytes == null || plainBytes.Length <= 0) { throw new ArgumentNullException("plainBytes"); }
+            bool dynamicIV = file || (config != null && config.UseRandomInitializationVector);
+            return EncryptOrDecrypt(true, plainBytes, dynamicIV);
         }
 
         // decrypt string
         public string Decrypt(string cipherText)
         {
             if (cipherText == null) { throw new ArgumentNullException("cipherText"); }
+            bool dynamicIV = (config != null && config.UseRandomInitializationVector);
+            return EncryptOrDecrypt(false, cipherText, dynamicIV);
+        }
 
-            return EncryptOrDecrypt(false, cipherText);
+        public byte[] Decrypt(byte[] cipherBytes)
+        {
+            if (cipherBytes == null) { throw new ArgumentNullException("cipherBytes"); }
+            bool dynamicIV = (config != null && config.UseRandomInitializationVector);
+            return EncryptOrDecrypt(false, cipherBytes, dynamicIV);
+        }
+
+        public byte[] Decrypt(byte[] cipherBytes, bool file)
+        {
+            if (cipherBytes == null) { throw new ArgumentNullException("cipherBytes"); }
+            bool dynamicIV = file || (config != null && config.UseRandomInitializationVector);
+            return EncryptOrDecrypt(false, cipherBytes, dynamicIV);
         }
 
         /// <summary>
@@ -144,6 +180,35 @@ namespace PubnubApi
             byte[] hashmessage = new byte[mac.GetMacSize()];
             mac.DoFinal(hashmessage, 0);
             return Convert.ToBase64String(hashmessage).Replace('+', '-').Replace('/', '_');
+#endif
+        }
+
+        public byte[] PubnubAccessManagerSign(string key, byte[] dataBytes)
+        {
+            string secret = key;
+            //string message = data;
+
+            var encoding = new System.Text.UTF8Encoding();
+            byte[] keyByte = encoding.GetBytes(secret);
+            byte[] messageBytes = dataBytes;
+
+#if NET35
+            using (var hmacsha256 = new HMACSHA256(keyByte))
+            {
+                byte[] hashmessage = hmacsha256.ComputeHash(messageBytes);
+                return hashmessage;
+            }
+#else
+
+            //http://mycsharp.de/wbb2/thread.php?postid=3550104
+            KeyParameter paramKey = new KeyParameter(keyByte);
+            IMac mac = MacUtilities.GetMac("HMac-SHA256");
+            mac.Init(paramKey);
+            mac.Reset();
+            mac.BlockUpdate(messageBytes, 0, messageBytes.Length);
+            byte[] hashmessage = new byte[mac.GetMacSize()];
+            mac.DoFinal(hashmessage, 0);
+            return hashmessage;
 #endif
         }
 

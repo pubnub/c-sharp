@@ -167,12 +167,13 @@ namespace PubnubApi.EndPoint
                 messageEnvelope.Add("custom", chMetaCustom);
             }
             string patchMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
+            byte[] patchData = Encoding.UTF8.GetBytes(patchMessage);
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
             
             Uri request = urlBuilder.BuildSetChannelMetadataRequest("PATCH", patchMessage, channelMetaId, includeCustom, externalQueryParam);
 
-            UrlProcessRequest(request, requestState, false, patchMessage).ContinueWith(r =>
+            UrlProcessRequest(request, requestState, false, patchData).ContinueWith(r =>
             {
                 string json = r.Result.Item1;
                 if (!string.IsNullOrEmpty(json))
@@ -222,12 +223,13 @@ namespace PubnubApi.EndPoint
                 messageEnvelope.Add("custom", chMetaCustom);
             }
             string patchMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
+            byte[] patchData = Encoding.UTF8.GetBytes(patchMessage);
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
             
             Uri request = urlBuilder.BuildSetChannelMetadataRequest("PATCH", patchMessage, channelMetaId, includeCustom, externalQueryParam);
 
-            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false, patchMessage).ConfigureAwait(false);
+            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false, patchData).ConfigureAwait(false);
             ret.Status = JsonAndStatusTuple.Item2;
             string json = JsonAndStatusTuple.Item1;
             if (!string.IsNullOrEmpty(json))

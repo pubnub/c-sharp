@@ -157,7 +157,7 @@ namespace PubnubApi.EndPoint
             {
                 PNStatus status = new PNStatus();
                 status.Error = true;
-                status.ErrorData = new PNErrorData("Invalid subscribe key", new MissingMemberException("Invalid publish key"));
+                status.ErrorData = new PNErrorData("Invalid subscribe key", new MissingMemberException("Invalid subscribe key"));
                 callback.OnResponse(null, status);
                 return;
             }
@@ -209,7 +209,7 @@ namespace PubnubApi.EndPoint
             {
                 PNStatus status = new PNStatus();
                 status.Error = true;
-                status.ErrorData = new PNErrorData("Invalid subscribe key", new MissingMemberException("Invalid publish key"));
+                status.ErrorData = new PNErrorData("Invalid subscribe key", new MissingMemberException("Invalid subscribe key"));
                 ret.Status = status;
                 return ret;
             }
