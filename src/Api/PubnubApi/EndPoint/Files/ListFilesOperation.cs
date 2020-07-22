@@ -23,7 +23,7 @@ namespace PubnubApi.EndPoint
 
         private string channelName;
         private string nextFileBatchToken;
-        private int limitFileCount;
+        private int limitFileCount=-1;
 
         public ListFilesOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, instance)
         {

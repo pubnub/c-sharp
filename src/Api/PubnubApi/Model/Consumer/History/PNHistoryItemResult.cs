@@ -12,6 +12,6 @@ namespace PubnubApi
         public object Meta { get; set; }
         public object Actions { get; set; }
         public string Uuid { get; set; }
-        public int EntityType { get; set; }
+        public int MessageType { get; set; }
     }
 }

@@ -769,7 +769,7 @@ namespace PubNubMessaging.Tests
 
             }
 
-            public override void File<T>(Pubnub pubnub, PNFileEventResult<T> fileEvent)
+            public override void File(Pubnub pubnub, PNFileEventResult fileEvent)
             {
                 throw new NotImplementedException();
             }

@@ -771,7 +771,7 @@ namespace PubnubApi
                                         PNMessageResult<object> pnFileResult = responseBuilder.JsonToObject<PNMessageResult<object>>(payloadContainer, true);
                                         if (pnFileResult != null)
                                         {
-                                            PNFileEventResult<T> fileMessage = new PNFileEventResult<T>
+                                            PNFileEventResult fileMessage = new PNFileEventResult
                                             {
                                                 Channel = pnFileResult.Channel,
                                                 Subscription = pnFileResult.Subscription,
@@ -783,7 +783,7 @@ namespace PubnubApi
                                             {
                                                 if (pnMsgObjDic.ContainsKey("message") && pnMsgObjDic["message"]!= null)
                                                 {
-                                                    fileMessage.Message = (T)pnMsgObjDic["message"];
+                                                    fileMessage.Message = pnMsgObjDic["message"];
                                                 }
                                                 if (pnMsgObjDic.ContainsKey("file"))
                                                 {
@@ -799,7 +799,7 @@ namespace PubnubApi
                                             {
                                                 if (pnFileResult.Message != null)
                                                 {
-                                                    fileMessage.Message = (T)pnFileResult.Message;
+                                                    fileMessage.Message = pnFileResult.Message;
                                                 }
                                             }
                                             Announce(fileMessage);
@@ -1051,12 +1051,9 @@ namespace PubnubApi
                 request = pubnubHttp.SetTimeout<T>(pubnubRequestState, request);
                 if (string.IsNullOrEmpty(contentType))
                 {
-                    request.ContentType = contentType;
+                    contentType = "application/json";
                 }
-                else
-                {
-                    request.ContentType = "application/json";
-                }
+                request.ContentType = contentType;
 
                 pubnubRequestState.Request = request;
 
@@ -1229,12 +1226,9 @@ namespace PubnubApi
                 request = pubnubHttp.SetTimeout<T>(pubnubRequestState, request);
                 if (string.IsNullOrEmpty(contentType))
                 {
-                    request.ContentType = contentType;
+                    contentType = "application/json";
                 }
-                else
-                {
-                    request.ContentType = "application/json";
-                }
+                request.ContentType = contentType;
 
                 pubnubRequestState.Request = request;
 
@@ -2360,7 +2354,7 @@ namespace PubnubApi
             }
         }
 
-        internal void Announce<T>(PNFileEventResult<T> message)
+        internal void Announce(PNFileEventResult message)
         {
             if (PubnubInstance != null && SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
             {

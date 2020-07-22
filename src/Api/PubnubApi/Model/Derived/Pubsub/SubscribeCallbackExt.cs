@@ -15,7 +15,7 @@ namespace PubnubApi
         readonly Action<Pubnub, PNStatus> statusAction;
         readonly Action<Pubnub, PNObjectEventResult> objectEventAction;
         readonly Action<Pubnub, PNMessageActionEventResult> messageAction;
-        readonly Action<Pubnub, PNFileEventResult<object>> fileAction;
+        readonly Action<Pubnub, PNFileEventResult> fileAction;
 
         public SubscribeCallbackExt(Action<Pubnub, PNMessageResult<object>> messageCallback, Action<Pubnub, PNPresenceEventResult> presenceCallback, Action<Pubnub, PNStatus> statusCallback)
         {
@@ -58,7 +58,7 @@ namespace PubnubApi
             fileAction = null;
         }
 
-        public SubscribeCallbackExt(Action<Pubnub, PNFileEventResult<object>> fileCallback, Action<Pubnub, PNStatus> statusCallback)
+        public SubscribeCallbackExt(Action<Pubnub, PNFileEventResult> fileCallback, Action<Pubnub, PNStatus> statusCallback)
         {
             subscribeAction = null;
             presenceAction = null;
@@ -113,7 +113,7 @@ namespace PubnubApi
             Action<Pubnub, PNSignalResult<object>> signalCallback,
             Action<Pubnub, PNObjectEventResult> objectEventCallback,
             Action<Pubnub, PNMessageActionEventResult> messageActionCallback,
-            Action<Pubnub, PNFileEventResult<object>> fileCallback,
+            Action<Pubnub, PNFileEventResult> fileCallback,
             Action<Pubnub, PNStatus> statusCallback)
         {
             subscribeAction = messageCallback;
@@ -171,9 +171,9 @@ namespace PubnubApi
             messageAction?.Invoke(pubnub, messageActionEvent);
         }
 
-        public override void File<T>(Pubnub pubnub, PNFileEventResult<T> fileEvent)
+        public override void File(Pubnub pubnub, PNFileEventResult fileEvent)
         {
-            PNFileEventResult<object> message1 = new PNFileEventResult<object>();
+            PNFileEventResult message1 = new PNFileEventResult();
             message1.Channel = fileEvent.Channel;
             message1.Message = fileEvent.Message;
             message1.Subscription = fileEvent.Subscription;
