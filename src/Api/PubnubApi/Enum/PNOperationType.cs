@@ -68,6 +68,13 @@ namespace PubnubApi
         PNGetStateOperation,
         PNAccessManagerAudit,
         PNAccessManagerGrantToken,
-        PNAccessManagerGrant
+        PNAccessManagerGrant,
+        PNGenerateFileUploadUrlOperation,
+        PNFileUploadOperation,
+        PNPublishFileMessageOperation,
+        PNFileUrlOperation,
+        PNDownloadFileOperation,
+        PNListFilesOperation,
+        PNDeleteFileOperation
     }
 }

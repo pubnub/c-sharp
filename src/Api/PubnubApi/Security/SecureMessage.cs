@@ -28,7 +28,7 @@ namespace PubnubApi
 
             if (config.CipherKey.Length > 0)
             {
-                PubnubCrypto aes = new PubnubCrypto(config.CipherKey, config, pubnubLog);
+                PubnubCrypto aes = new PubnubCrypto(config.CipherKey, config, pubnubLog, null);
                 object[] myObjectArray = (from item in messageList
                                      select item as object).ToArray();
                 object[] enumerable = myObjectArray[0] as object[];
@@ -127,7 +127,7 @@ namespace PubnubApi
                                 {
                                     if (kvpValue.Key == "message" && config.CipherKey.Length > 0)
                                     {
-                                        PubnubCrypto aes = new PubnubCrypto(config.CipherKey, config, pubnubLog);
+                                        PubnubCrypto aes = new PubnubCrypto(config.CipherKey, config, pubnubLog, null);
                                         string decryptMessage = "";
                                         try
                                         {

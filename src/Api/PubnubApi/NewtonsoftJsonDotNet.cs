@@ -54,7 +54,8 @@ namespace PubnubApi
             {
                 if (operationType == PNOperationType.PNPublishOperation 
                     || operationType == PNOperationType.PNHistoryOperation 
-                    || operationType == PNOperationType.PNTimeOperation)
+                    || operationType == PNOperationType.PNTimeOperation
+                    || operationType == PNOperationType.PNPublishFileMessageOperation)
                 {
                     JArray.Parse(jsonString);
                 }
@@ -70,7 +71,8 @@ namespace PubnubApi
                 {
                     if (operationType == PNOperationType.PNPublishOperation
                         || operationType == PNOperationType.PNHistoryOperation
-                        || operationType == PNOperationType.PNTimeOperation)
+                        || operationType == PNOperationType.PNTimeOperation
+                        || operationType == PNOperationType.PNPublishFileMessageOperation)
                     {
                         JObject.Parse(jsonString);
                         ret = true;
@@ -1399,6 +1401,37 @@ namespace PubnubApi
                 PNGetMessageActionsResult result = PNGetMessageActionsJsonDataParse.GetObject(listObject);
                 ret = (T)Convert.ChangeType(result, typeof(PNGetMessageActionsResult), CultureInfo.InvariantCulture);
                 #endregion
+            }
+            else if (typeof(T) == typeof(PNGenerateFileUploadUrlResult))
+            {
+                #region "PNGenerateFileUploadUrlResult"
+                PNGenerateFileUploadUrlResult result = PNGenerateFileUploadUrlDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNGenerateFileUploadUrlResult), CultureInfo.InvariantCulture);
+                #endregion
+
+            }
+            else if (typeof(T) == typeof(PNPublishFileMessageResult))
+            {
+                #region "PNPublishFileMessageResult"
+                PNPublishFileMessageResult result = PNPublishFileMessageJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNPublishFileMessageResult), CultureInfo.InvariantCulture);
+                #endregion
+
+            }
+            else if (typeof(T) == typeof(PNListFilesResult))
+            {
+                #region "PNListFilesResult"
+                PNListFilesResult result = PNListFilesJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNListFilesResult), CultureInfo.InvariantCulture);
+                #endregion
+            }
+            else if (typeof(T) == typeof(PNDeleteFileResult))
+            {
+                #region "PNDeleteFileResult"
+                PNDeleteFileResult ack = new PNDeleteFileResult();
+                ret = (T)Convert.ChangeType(ack, typeof(PNDeleteFileResult), CultureInfo.InvariantCulture);
+                #endregion
+
             }
             else
             {

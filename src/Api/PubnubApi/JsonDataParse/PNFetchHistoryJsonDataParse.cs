@@ -55,6 +55,15 @@ namespace PubnubApi
                                         {
                                             result.Actions = messagesContainer["actions"];
                                         }
+                                        if (messagesContainer.ContainsKey("uuid") && messagesContainer["uuid"] != null)
+                                        {
+                                            result.Uuid = messagesContainer["uuid"].ToString();
+                                        }
+                                        int messageType;
+                                        if (messagesContainer.ContainsKey("message_type") && messagesContainer["message_type"] != null && Int32.TryParse(messagesContainer["message_type"].ToString(), out messageType))
+                                        {
+                                            result.MessageType = messageType;
+                                        }
                                     }
                                     resultList.Add(result);
                                 }

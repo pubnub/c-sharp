@@ -131,6 +131,11 @@ namespace PubnubApi.EndPoint
                 case PNOperationType.PNGetMessageActionsOperation:
                     endpoint = "l_msga";
                     break;
+                case PNOperationType.PNGenerateFileUploadUrlOperation:
+                case PNOperationType.PNPublishFileMessageOperation:
+                case PNOperationType.PNDownloadFileOperation:
+                    endpoint = "l_file";
+                    break;
                 default:
                     endpoint = "";
                     break;

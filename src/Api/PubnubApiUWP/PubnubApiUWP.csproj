@@ -15,7 +15,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubUWP</PackageId>
-    <PackageVersion>4.8.0.0</PackageVersion>
+    <PackageVersion>4.9.0.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -23,8 +23,7 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>Removed V1 Objects API feature. BREAKING CHANGE if you are using V1 Objects.
-Added Objects Simplication API feature</PackageReleaseNotes>
+    <PackageReleaseNotes>Added Files feature.</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
@@ -205,6 +204,13 @@ Added Objects Simplication API feature</PackageReleaseNotes>
     <Compile Include="..\PubnubApi\EndPoint\ChannelGroup\RemoveChannelsFromChannelGroupOperation.cs">
       <Link>EndPoint\ChannelGroup\RemoveChannelsFromChannelGroupOperation.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\Files\DeleteFileOperation.cs" Link="EndPoint\Files\DeleteFileOperation.cs" />
+    <Compile Include="..\PubnubApi\EndPoint\Files\DownloadFileOperation.cs" Link="EndPoint\Files\DownloadFileOperation.cs" />
+    <Compile Include="..\PubnubApi\EndPoint\Files\GenerateFileUploadUrlOperation.cs" Link="EndPoint\Files\GenerateFileUploadUrlOperation.cs" />
+    <Compile Include="..\PubnubApi\EndPoint\Files\GetFileUrlOperation.cs" Link="EndPoint\Files\GetFileUrlOperation.cs" />
+    <Compile Include="..\PubnubApi\EndPoint\Files\ListFilesOperation.cs" Link="EndPoint\Files\ListFilesOperation.cs" />
+    <Compile Include="..\PubnubApi\EndPoint\Files\PublishFileMessage.cs" Link="EndPoint\Files\PublishFileMessage.cs" />
+    <Compile Include="..\PubnubApi\EndPoint\Files\SendFileOperation.cs" Link="EndPoint\Files\SendFileOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\Objects\GetAllChannelMetadataOperation.cs" Link="EndPoint\Objects\GetAllChannelMetadataOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\Objects\GetAllUuidMetadataOperation.cs" Link="EndPoint\Objects\GetAllUuidMetadataOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\Objects\GetChannelMembersOperation.cs" Link="EndPoint\Objects\GetChannelMembersOperation.cs" />
@@ -343,15 +349,18 @@ Added Objects Simplication API feature</PackageReleaseNotes>
     <Compile Include="..\PubnubApi\JsonDataParse\PNAddMessageActionJsonDataParse.cs" Link="JsonDataParse\PNAddMessageActionJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNChannelMembersJsonDataParse.cs" Link="JsonDataParse\PNChannelMembersJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNFetchHistoryJsonDataParse.cs" Link="JsonDataParse\PNFetchHistoryJsonDataParse.cs" />
+    <Compile Include="..\PubnubApi\JsonDataParse\PNGenerateFileUploadUrlDataParse.cs" Link="JsonDataParse\PNGenerateFileUploadUrlDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNGetAllChannelMetadataJsonDataParse.cs" Link="JsonDataParse\PNGetAllChannelMetadataJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNGetAllUuidMetadataJsonDataParse.cs" Link="JsonDataParse\PNGetAllUuidMetadataJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNGetChannelMetadataJsonDataParse.cs" Link="JsonDataParse\PNGetChannelMetadataJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNGetMessageActionsJsonDataParse.cs" Link="JsonDataParse\PNGetMessageActionsJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNGetUuidMetadataJsonDataParse.cs" Link="JsonDataParse\PNGetUuidMetadataJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNHistoryJsonDataParse.cs" Link="JsonDataParse\PNHistoryJsonDataParse.cs" />
+    <Compile Include="..\PubnubApi\JsonDataParse\PNListFilesJsonDataParse.cs" Link="JsonDataParse\PNListFilesJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNMembershipsJsonDataParse.cs" Link="JsonDataParse\PNMembershipsJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNMessageActionEventJsonDataParse.cs" Link="JsonDataParse\PNMessageActionEventJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNObjectEventJsonDataParse.cs" Link="JsonDataParse\PNObjectEventJsonDataParse.cs" />
+    <Compile Include="..\PubnubApi\JsonDataParse\PNPublishFileMessageJsonDataParse.cs" Link="JsonDataParse\PNPublishFileMessageJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNRemoveMessageActionJsonDataParse.cs" Link="JsonDataParse\PNRemoveMessageActionJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNSetChannelMetadataJsonDataParse.cs" Link="JsonDataParse\PNSetChannelMetadataJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNSetUuidMetadataJsonDataParse.cs" Link="JsonDataParse\PNSetUuidMetadataJsonDataParse.cs" />
@@ -389,6 +398,15 @@ Added Objects Simplication API feature</PackageReleaseNotes>
       <Link>Model\Consumer\ChannelGroup\PNChannelGroupsRemoveChannelResult.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\Model\Consumer\DeleteMessage\PNDeleteMessageResult.cs" Link="Model\Consumer\DeleteMessage\PNDeleteMessageResult.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\Files\PNDeleteFileResult.cs" Link="Model\Consumer\Files\PNDeleteFileResult.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\Files\PNDownloadFileResult.cs" Link="Model\Consumer\Files\PNDownloadFileResult.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\Files\PNFileResult.cs" Link="Model\Consumer\Files\PNFileResult.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\Files\PNFileUploadResult.cs" Link="Model\Consumer\Files\PNFileUploadResult.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\Files\PNFileUrlResult.cs" Link="Model\Consumer\Files\PNFileUrlResult.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\Files\PNGenerateFileUploadUrlData.cs" Link="Model\Consumer\Files\PNGenerateFileUploadUrlData.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\Files\PNGenerateFileUploadUrlResult.cs" Link="Model\Consumer\Files\PNGenerateFileUploadUrlResult.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\Files\PNListFilesResult.cs" Link="Model\Consumer\Files\PNListFilesResult.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\Files\PNPublishFileMessageResult.cs" Link="Model\Consumer\Files\PNPublishFileMessageResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\History\PNFetchHistoryResult.cs" Link="Model\Consumer\History\PNFetchHistoryResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\History\PNHistoryItemResult.cs">
       <Link>Model\Consumer\History\PNHistoryItemResult.cs</Link>
@@ -448,6 +466,7 @@ Added Objects Simplication API feature</PackageReleaseNotes>
     <Compile Include="..\PubnubApi\Model\Consumer\Pubsub\PNMessageActionEventResult.cs" Link="Model\Consumer\Pubsub\PNMessageActionEventResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Pubsub\PNMessageActionItem.cs" Link="Model\Consumer\Pubsub\PNMessageActionItem.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Pubsub\PNObjectEventResult.cs" Link="Model\Consumer\Pubsub\PNObjectEventResult.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\Pubsub\PNFileEventResult.cs" Link="Model\Consumer\Pubsub\PNFileEventResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Pubsub\PNMessageResult.cs">
       <Link>Model\Consumer\Pubsub\PNMessageResult.cs</Link>
     </Compile>
@@ -493,6 +512,13 @@ Added Objects Simplication API feature</PackageReleaseNotes>
       <Link>Model\Derived\ChannelGroup\PNChannelGroupsRemoveChannelResultExt.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\Model\Derived\DeleteMessage\PNDeleteMessageResultExt.cs" Link="Model\Derived\DeleteMessage\PNDeleteMessageResultExt.cs" />
+    <Compile Include="..\PubnubApi\Model\Derived\Files\PNDeleteFileResultExt.cs" Link="Model\Derived\Files\PNDeleteFileResultExt.cs" />
+    <Compile Include="..\PubnubApi\Model\Derived\Files\PNDownloadFileResultExt.cs" Link="Model\Derived\Files\PNDownloadFileResultExt.cs" />
+    <Compile Include="..\PubnubApi\Model\Derived\Files\PNFileUploadResultExt.cs" Link="Model\Derived\Files\PNFileUploadResultExt.cs" />
+    <Compile Include="..\PubnubApi\Model\Derived\Files\PNFileUrlResultExt.cs" Link="Model\Derived\Files\PNFileUrlResultExt.cs" />
+    <Compile Include="..\PubnubApi\Model\Derived\Files\PNGenerateFileUploadUrlResultExt.cs" Link="Model\Derived\Files\PNGenerateFileUploadUrlResultExt.cs" />
+    <Compile Include="..\PubnubApi\Model\Derived\Files\PNListFilesResultExt.cs" Link="Model\Derived\Files\PNListFilesResultExt.cs" />
+    <Compile Include="..\PubnubApi\Model\Derived\Files\PNPublishFileMessageResultExt.cs" Link="Model\Derived\Files\PNPublishFileMessageResultExt.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\History\PNFetchHistoryResultExt.cs" Link="Model\Derived\History\PNFetchHistoryResultExt.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\History\PNHistoryResultExt.cs">
       <Link>Model\Derived\History\PNHistoryResultExt.cs</Link>
@@ -639,11 +665,14 @@ Added Objects Simplication API feature</PackageReleaseNotes>
     <None Include="pubnub.snk" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="EndPoint\Files\" />
     <Folder Include="EndPoint\StoragePlayback\" />
     <Folder Include="EndPoint\Objects\" />
     <Folder Include="Model\Consumer\DeleteMessage\" />
+    <Folder Include="Model\Consumer\Files\" />
     <Folder Include="Model\Consumer\Objects\" />
     <Folder Include="Model\Derived\DeleteMessage\" />
+    <Folder Include="Model\Derived\Files\" />
     <Folder Include="Model\Derived\Objects\" />
     <Folder Include="JsonDataParse\" />
     <Folder Include="Helper\" />

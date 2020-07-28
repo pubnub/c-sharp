@@ -668,7 +668,7 @@ namespace PubnubApi
                                         if (currentConfig.CipherKey.Length > 0 && currentMessage.MessageType != 1) //decrypt the subscriber message if cipherkey is available
                                         {
                                             string decryptMessage = "";
-                                            PubnubCrypto aes = new PubnubCrypto(currentConfig.CipherKey, currentConfig, currentLog);
+                                            PubnubCrypto aes = new PubnubCrypto(currentConfig.CipherKey, currentConfig, currentLog, null);
                                             try
                                             {
                                                 decryptMessage = aes.Decrypt(payload.ToString());
@@ -765,6 +765,46 @@ namespace PubnubApi
                                             Announce(msgActionEventEvent);
                                         }
                                     }
+                                    else if (currentMessage.MessageType == 4)
+                                    {
+                                        ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
+                                        PNMessageResult<object> pnFileResult = responseBuilder.JsonToObject<PNMessageResult<object>>(payloadContainer, true);
+                                        if (pnFileResult != null)
+                                        {
+                                            PNFileEventResult fileMessage = new PNFileEventResult
+                                            {
+                                                Channel = pnFileResult.Channel,
+                                                Subscription = pnFileResult.Subscription,
+                                                Timetoken = pnFileResult.Timetoken,
+                                                Publisher = pnFileResult.Publisher,
+                                            };
+                                            Dictionary<string, object> pnMsgObjDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(pnFileResult.Message);
+                                            if (pnMsgObjDic != null && pnMsgObjDic.Count > 0)
+                                            {
+                                                if (pnMsgObjDic.ContainsKey("message") && pnMsgObjDic["message"]!= null)
+                                                {
+                                                    fileMessage.Message = pnMsgObjDic["message"];
+                                                }
+                                                if (pnMsgObjDic.ContainsKey("file"))
+                                                {
+                                                    Dictionary<string, object> fileObjDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(pnMsgObjDic["file"]);
+                                                    if (fileObjDic != null && fileObjDic.ContainsKey("id") && fileObjDic.ContainsKey("name"))
+                                                    {
+                                                        fileMessage.FileId = fileObjDic["id"].ToString();
+                                                        fileMessage.FileName = fileObjDic["name"].ToString();
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if (pnFileResult.Message != null)
+                                                {
+                                                    fileMessage.Message = pnFileResult.Message;
+                                                }
+                                            }
+                                            Announce(fileMessage);
+                                        }
+                                    }
                                     else if (currentMessageChannel.Contains("-pnpres"))
                                     {
                                         ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
@@ -847,6 +887,10 @@ namespace PubnubApi
                     case PNOperationType.PNAddMessageActionOperation:
                     case PNOperationType.PNRemoveMessageActionOperation:
                     case PNOperationType.PNGetMessageActionsOperation:
+                    case PNOperationType.PNGenerateFileUploadUrlOperation:
+                    case PNOperationType.PNPublishFileMessageOperation:
+                    case PNOperationType.PNListFilesOperation:
+                    case PNOperationType.PNDeleteFileOperation:
                         if (result != null && result.Count > 0)
                         {
                             ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
@@ -953,10 +997,17 @@ namespace PubnubApi
 #region "Build, process and send request"
         internal protected async Task<Tuple<string, PNStatus>> UrlProcessRequest<T>(Uri requestUri, RequestState<T> pubnubRequestState, bool terminateCurrentSubRequest)
         {
-            return await UrlProcessRequest(requestUri, pubnubRequestState, terminateCurrentSubRequest, "").ConfigureAwait(false);
+            return await UrlProcessRequest(requestUri, pubnubRequestState, terminateCurrentSubRequest, null).ConfigureAwait(false);
         }
 
-        internal protected async Task<Tuple<string, PNStatus>> UrlProcessRequest<T>(Uri requestUri, RequestState<T> pubnubRequestState, bool terminateCurrentSubRequest, string jsonPostOrPatchData)
+#pragma warning disable
+        internal protected async Task<Tuple<string, PNStatus>> UrlProcessRequest<T>(Uri requestUri, RequestState<T> pubnubRequestState, bool terminateCurrentSubRequest, byte[] postOrPatchData)
+#pragma warning restore
+        {
+            return await UrlProcessRequest(requestUri, pubnubRequestState, terminateCurrentSubRequest, postOrPatchData,"").ConfigureAwait(false);
+        }
+
+        internal protected async Task<Tuple<string, PNStatus>> UrlProcessRequest<T>(Uri requestUri, RequestState<T> pubnubRequestState, bool terminateCurrentSubRequest, byte[] postOrPatchData, string contentType)
         {
             string channel = "";
             PNConfiguration currentConfig;
@@ -998,6 +1049,11 @@ namespace PubnubApi
                 request = pubnubHttp.SetNoCache<T>(request);
                 request = pubnubHttp.SetProxy<T>(request);
                 request = pubnubHttp.SetTimeout<T>(pubnubRequestState, request);
+                if (string.IsNullOrEmpty(contentType))
+                {
+                    contentType = "application/json";
+                }
+                request.ContentType = contentType;
 
                 pubnubRequestState.Request = request;
 
@@ -1021,11 +1077,11 @@ namespace PubnubApi
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
                 if (pubnubRequestState != null && pubnubRequestState.UsePostMethod)
                 {
-                    jsonString = await pubnubHttp.SendRequestAndGetJsonResponseWithPOST(requestUri, pubnubRequestState, null, jsonPostOrPatchData).ConfigureAwait(false);
+                    jsonString = await pubnubHttp.SendRequestAndGetJsonResponseWithPOST(requestUri, pubnubRequestState, null, postOrPatchData, contentType).ConfigureAwait(false);
                 }
                 else if (pubnubRequestState != null && pubnubRequestState.UsePatchMethod)
                 {
-                    jsonString = await pubnubHttp.SendRequestAndGetJsonResponseWithPATCH(requestUri, pubnubRequestState, null, jsonPostOrPatchData).ConfigureAwait(false);
+                    jsonString = await pubnubHttp.SendRequestAndGetJsonResponseWithPATCH(requestUri, pubnubRequestState, null, postOrPatchData).ConfigureAwait(false);
                 }
                 else
                 {
@@ -1034,11 +1090,11 @@ namespace PubnubApi
 #else
                 if (pubnubRequestState != null && pubnubRequestState.UsePostMethod)
                 {
-                    jsonString = await pubnubHttp.SendRequestAndGetJsonResponseWithPOST(requestUri, pubnubRequestState, request, jsonPostOrPatchData).ConfigureAwait(false);
+                    jsonString = await pubnubHttp.SendRequestAndGetJsonResponseWithPOST(requestUri, pubnubRequestState, request, postOrPatchData, contentType).ConfigureAwait(false);
                 }
                 else if (pubnubRequestState != null && pubnubRequestState.UsePatchMethod)
                 {
-                    jsonString = await pubnubHttp.SendRequestAndGetJsonResponseWithPATCH(requestUri, pubnubRequestState, request, jsonPostOrPatchData).ConfigureAwait(false);
+                    jsonString = await pubnubHttp.SendRequestAndGetJsonResponseWithPATCH(requestUri, pubnubRequestState, request, postOrPatchData).ConfigureAwait(false);
                 }
                 else
                 {
@@ -1126,6 +1182,147 @@ namespace PubnubApi
             }
         }
 
+        internal protected async Task<Tuple<byte[], PNStatus>> UrlProcessRequestForStream<T>(Uri requestUri, RequestState<T> pubnubRequestState, bool terminateCurrentSubRequest, string contentType)
+        {
+            string channel = "";
+            PNConfiguration currentConfig;
+            IPubnubLog currentLog;
+
+            try
+            {
+                if (terminateCurrentSubRequest)
+                {
+                    TerminateCurrentSubscriberRequest();
+                }
+
+                if (PubnubInstance == null)
+                {
+                    System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, PubnubInstance is null. Exiting UrlProcessRequest", DateTime.Now.ToString(CultureInfo.InvariantCulture)));
+                    return new Tuple<byte[], PNStatus>(null, null);
+                }
+
+                if (pubnubRequestState != null)
+                {
+                    channel = (pubnubRequestState.Channels != null && pubnubRequestState.Channels.Length > 0) ? string.Join(",", pubnubRequestState.Channels.OrderBy(x => x).ToArray()) : ",";
+
+                    if (ChannelRequest.ContainsKey(PubnubInstance.InstanceId) && !channel.Equals(",", StringComparison.CurrentCultureIgnoreCase) && !ChannelRequest[PubnubInstance.InstanceId].ContainsKey(channel) && (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation || pubnubRequestState.ResponseType == PNOperationType.Presence))
+                    {
+                        if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig) && pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog))
+                        {
+                            LoggingMethod.WriteToLog(currentLog, string.Format("DateTime {0}, UrlProcessRequest ChannelRequest PubnubInstance.InstanceId Channel NOT matching", DateTime.Now.ToString(CultureInfo.InvariantCulture)), currentConfig.LogVerbosity);
+                        }
+                        return new Tuple<byte[], PNStatus>(null, null);
+                    }
+                }
+
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+                //do nothing
+#else
+                // Create Request
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(requestUri);
+
+                request = pubnubHttp.SetNoCache<T>(request);
+                request = pubnubHttp.SetProxy<T>(request);
+                request = pubnubHttp.SetTimeout<T>(pubnubRequestState, request);
+                if (string.IsNullOrEmpty(contentType))
+                {
+                    contentType = "application/json";
+                }
+                request.ContentType = contentType;
+
+                pubnubRequestState.Request = request;
+
+                if (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation || pubnubRequestState.ResponseType == PNOperationType.Presence)
+                {
+                    ChannelRequest[PubnubInstance.InstanceId].AddOrUpdate(channel, pubnubRequestState.Request, (key, oldState) => pubnubRequestState.Request);
+                }
+#endif
+
+                if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig) && pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog))
+                {
+                    LoggingMethod.WriteToLog(currentLog, string.Format("DateTime {0}, Request={1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), requestUri.ToString()), currentConfig.LogVerbosity);
+                }
+
+                if (pubnubRequestState != null && pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation)
+                {
+                    SubscribeRequestTracker.AddOrUpdate(PubnubInstance.InstanceId, DateTime.Now, (key, oldState) => DateTime.Now);
+                }
+
+                byte[] streamBytes;
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+                streamBytes = await pubnubHttp.SendRequestAndGetStreamResponse(requestUri, pubnubRequestState, null).ConfigureAwait(false);
+#else
+                streamBytes = await pubnubHttp.SendRequestAndGetStreamResponse(requestUri, pubnubRequestState, request).ConfigureAwait(false);
+#endif
+                if (streamBytes != null && pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig) && pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog))
+                {
+                    LoggingMethod.WriteToLog(currentLog, string.Format("DateTime {0}, Stream length= {1} for request={2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), streamBytes.Length, requestUri), currentConfig.LogVerbosity);
+                }
+                PNStatus errStatus = GetStatusIfError<T>(pubnubRequestState, null);
+                if (errStatus == null && pubnubRequestState != null)
+                {
+                    PNStatus status = new StatusBuilder(currentConfig, jsonLib).CreateStatusResponse(pubnubRequestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, pubnubRequestState, (int)HttpStatusCode.OK, null);
+                    return new Tuple<byte[], PNStatus>(streamBytes, status);
+                }
+                else
+                {
+                    return new Tuple<byte[], PNStatus>(null, errStatus);
+                }
+            }
+            catch (Exception ex)
+            {
+                string exceptionMessage = "";
+                Exception innerEx = null;
+                WebException webEx = null;
+                PNStatus status = null;
+
+                if (ex.InnerException != null)
+                {
+                    if (ex is WebException)
+                    {
+                        webEx = ex as WebException;
+                        exceptionMessage = webEx.ToString();
+                    }
+                    else
+                    {
+                        innerEx = ex.InnerException;
+                        exceptionMessage = innerEx.ToString();
+                    }
+                }
+                else
+                {
+                    innerEx = ex;
+                    exceptionMessage = innerEx.ToString();
+                }
+
+                if (exceptionMessage.IndexOf("The request was aborted: The request was canceled", StringComparison.CurrentCultureIgnoreCase) == -1
+                && exceptionMessage.IndexOf("Machine suspend mode enabled. No request will be processed.", StringComparison.CurrentCultureIgnoreCase) == -1
+                && (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation && exceptionMessage.IndexOf("The operation has timed out", StringComparison.CurrentCultureIgnoreCase) == -1)
+                && exceptionMessage.IndexOf("A task was canceled", StringComparison.CurrentCultureIgnoreCase) == -1)
+                {
+                    PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(webEx == null ? innerEx : webEx);
+                    if (PubnubInstance != null && pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig))
+                    {
+                        status = new StatusBuilder(currentConfig, jsonLib).CreateStatusResponse<T>(pubnubRequestState.ResponseType, category, pubnubRequestState, (int)HttpStatusCode.NotFound, new PNException(ex));
+                        if (pubnubRequestState != null && pubnubRequestState.PubnubCallback != null)
+                        {
+                            pubnubRequestState.PubnubCallback.OnResponse(default(T), status);
+                        }
+                        else
+                        {
+                            Announce(status);
+                        }
+                    }
+
+                    if (PubnubInstance != null && pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig) && pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog))
+                    {
+                        LoggingMethod.WriteToLog(currentLog, string.Format("DateTime {0} PubnubBaseCore UrlProcessRequest Exception={1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), webEx != null ? webEx.ToString() : exceptionMessage), currentConfig.LogVerbosity);
+                    }
+                }
+
+                return new Tuple<byte[], PNStatus>(null, status);
+            }
+        }
         internal protected List<object> ProcessJsonResponse<T>(RequestState<T> asyncRequestState, string jsonString)
         {
             List<object> result = new List<object>();
@@ -1404,6 +1601,10 @@ namespace PubnubApi
                         case PNOperationType.PNAddMessageActionOperation:
                         case PNOperationType.PNRemoveMessageActionOperation:
                         case PNOperationType.PNGetMessageActionsOperation:
+                        case PNOperationType.PNGenerateFileUploadUrlOperation:
+                        case PNOperationType.PNPublishFileMessageOperation:
+                        case PNOperationType.PNListFilesOperation:
+                        case PNOperationType.PNDeleteFileOperation:
                             result.Add(multiChannel);
                             break;
                         case PNOperationType.PNAddChannelsToGroupOperation:
@@ -2149,6 +2350,18 @@ namespace PubnubApi
                 for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
                 {
                     callbackList[listenerIndex].Signal(PubnubInstance, message);
+                }
+            }
+        }
+
+        internal void Announce(PNFileEventResult message)
+        {
+            if (PubnubInstance != null && SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
+            {
+                List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
+                for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
+                {
+                    callbackList[listenerIndex].File(PubnubInstance, message);
                 }
             }
         }

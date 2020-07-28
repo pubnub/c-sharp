@@ -41,6 +41,8 @@ namespace PubnubApi
         public List<string> AffectedChannels { get; set; } = new List<string>();
         public List<string> AffectedChannelGroups { get; set; } = new List<string>();
 
+        public object AdditonalData { get; set; } = new object();
+
         public void Retry()
         {
             if (savedEndpointOperation != null)
@@ -421,6 +423,56 @@ namespace PubnubApi
                         if (savedEndpointOperation is RemoveMessageActionOperation)
                         {
                             RemoveMessageActionOperation endpoint = savedEndpointOperation as RemoveMessageActionOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
+                    case PNOperationType.PNPublishFileMessageOperation:
+                        if (savedEndpointOperation is PublishFileMessageOperation)
+                        {
+                            PublishFileMessageOperation endpoint = savedEndpointOperation as PublishFileMessageOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
+                    case PNOperationType.PNFileUrlOperation:
+                        if (savedEndpointOperation is GetFileUrlOperation)
+                        {
+                            GetFileUrlOperation endpoint = savedEndpointOperation as GetFileUrlOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
+                    case PNOperationType.PNListFilesOperation:
+                        if (savedEndpointOperation is ListFilesOperation)
+                        {
+                            ListFilesOperation endpoint = savedEndpointOperation as ListFilesOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
+                    case PNOperationType.PNDeleteFileOperation:
+                        if (savedEndpointOperation is DeleteFileOperation)
+                        {
+                            DeleteFileOperation endpoint = savedEndpointOperation as DeleteFileOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
+                    case PNOperationType.PNDownloadFileOperation:
+                        if (savedEndpointOperation is DownloadFileOperation)
+                        {
+                            DownloadFileOperation endpoint = savedEndpointOperation as DownloadFileOperation;
                             if (endpoint != null)
                             {
                                 endpoint.Retry();

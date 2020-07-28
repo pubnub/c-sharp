@@ -100,10 +100,6 @@ namespace PubnubApi.EndPoint
 
         public void Execute(PNCallback<PNAccessManagerGrantResult> callback)
         {
-            if (config != null && pubnubLog != null)
-            {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, WARNING: Grant() signature has changed! This specific call will be making a request to PAMv2. Please update your code if this is not the intended action.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
-            }
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
@@ -122,10 +118,6 @@ namespace PubnubApi.EndPoint
 
         public async Task<PNResult<PNAccessManagerGrantResult>> ExecuteAsync()
         {
-            if (config != null && pubnubLog != null)
-            {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, WARNING: Grant() signature has changed! This specific call will be making a request to PAMv2. Please update your code if this is not the intended action.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
-            }
             return await GrantAccess(this.pubnubChannelNames, this.pubnubChannelGroupNames, this.pamAuthenticationKeys, this.grantRead, this.grantWrite, this.grantDelete, this.grantManage, this.grantTTL, this.queryParam).ConfigureAwait(false);
         }
 

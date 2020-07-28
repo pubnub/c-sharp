@@ -147,7 +147,7 @@ namespace PubnubApi.EndPoint
             {
                 PNStatus status = new PNStatus();
                 status.Error = true;
-                status.ErrorData = new PNErrorData("Invalid subscribe key", new MissingMemberException("Invalid publish key"));
+                status.ErrorData = new PNErrorData("Invalid subscribe key", new MissingMemberException("Invalid subscribe key"));
                 callback.OnResponse(null, status);
                 return;
             }
@@ -159,6 +159,7 @@ namespace PubnubApi.EndPoint
 
             string requestMethodName = "POST";
             string postMessage = jsonLibrary.SerializeToJsonString(messageAction);
+            byte[] postData = Encoding.UTF8.GetBytes(postMessage);
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
             
             Uri request = urlBuilder.BuildAddMessageActionRequest(requestMethodName, postMessage, channel, messageTimetoken, externalQueryParam);
@@ -171,7 +172,7 @@ namespace PubnubApi.EndPoint
             requestState.EndPointOperation = this;
             requestState.UsePostMethod = true;
 
-            UrlProcessRequest(request, requestState, false, postMessage).ContinueWith(r =>
+            UrlProcessRequest(request, requestState, false, postData).ContinueWith(r =>
             {
                 string json = r.Result.Item1;
                 if (!string.IsNullOrEmpty(json))
@@ -201,13 +202,14 @@ namespace PubnubApi.EndPoint
             {
                 PNStatus status = new PNStatus();
                 status.Error = true;
-                status.ErrorData = new PNErrorData("Invalid subscribe key", new MissingMemberException("Invalid publish key"));
+                status.ErrorData = new PNErrorData("Invalid subscribe key", new MissingMemberException("Invalid subscribe key"));
                 ret.Status = status;
                 return ret;
             }
 
             string requestMethodName = "POST";
             string postMessage = jsonLibrary.SerializeToJsonString(messageAction);
+            byte[] postData = Encoding.UTF8.GetBytes(postMessage);
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
             
             Uri request = urlBuilder.BuildAddMessageActionRequest(requestMethodName, postMessage, channel, messageTimetoken, externalQueryParam);
@@ -219,7 +221,7 @@ namespace PubnubApi.EndPoint
             requestState.EndPointOperation = this;
             requestState.UsePostMethod = true;
 
-            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false, postMessage).ConfigureAwait(false);
+            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false, postData).ConfigureAwait(false);
             ret.Status = JsonAndStatusTuple.Item2;
             string json = JsonAndStatusTuple.Item1;
             if (!string.IsNullOrEmpty(json))

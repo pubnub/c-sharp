@@ -17,7 +17,7 @@ namespace PubnubApi.EndPoint
             this.pubnubConfig = config;
             this.jsonLib = jsonPluggableLibrary;
             this.pubnubLog = log;
-            dedupHasher = new PubnubCrypto(null, null, null);
+            dedupHasher = new PubnubCrypto(null, null, null, null);
         }
 
         private string GetSubscribeMessageHashKey(SubscribeMessage message)
