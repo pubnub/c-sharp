@@ -59,6 +59,7 @@
     <Compile Include="..\PubnubApi.Tests\WhenChannelGroupIsRequested.cs" Link="WhenChannelGroupIsRequested.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenDetailedHistoryIsRequested.cs" Link="WhenDetailedHistoryIsRequested.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenFetchHistoryIsRequested.cs" Link="WhenFetchHistoryIsRequested.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenFileIsRequested.cs" Link="WhenFileIsRequested.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenGetRequestServerTime.cs" Link="WhenGetRequestServerTime.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenGetRequestServerTimeMultiInstance.cs" Link="WhenGetRequestServerTimeMultiInstance.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenGrantIsRequested.cs" Link="WhenGrantIsRequested.cs" />

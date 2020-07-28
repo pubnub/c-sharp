@@ -16,6 +16,12 @@ namespace PubNubMessaging.Tests
             set;
         }
 
+        byte[] IPubnubUnitTest.IV
+        {
+            get;
+            set;
+        }
+
         bool IPubnubUnitTest.InternetAvailable
         {
             get;

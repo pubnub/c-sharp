@@ -18,12 +18,14 @@ namespace PubnubApi
     {
         private readonly PNConfiguration config;
         private readonly IPubnubLog pubnubLog;
+        private readonly IPubnubUnitTest pnUnit;
 
-        public PubnubCrypto(string cipher_key, PNConfiguration pubnubConfig, IPubnubLog log)
-            : base(cipher_key)
+        public PubnubCrypto(string cipher_key, PNConfiguration pubnubConfig, IPubnubLog log, IPubnubUnitTest pubnubUnit)
+            : base(cipher_key, pubnubConfig)
         {
             this.config = pubnubConfig;
             this.pubnubLog = log;
+            this.pnUnit = pubnubUnit;
         }
 
         public PubnubCrypto(string cipher_key)
@@ -48,23 +50,84 @@ namespace PubnubApi
 #endif
         }
 
-        protected override string EncryptOrDecrypt(bool type, string plainStr)
+        protected override string EncryptOrDecrypt(bool type, string dataStr, bool dynamicIV)
         {
-            //Demo params
-            string keyString = GetEncryptionKey();
+            byte[] dataBytes = null;
+            if (type)
+            {
+                //encrypt
+                string input = EncodeNonAsciiCharacters(dataStr);
+                dataBytes = Encoding.UTF8.GetBytes(input);
+            }
+            else
+            {
+                //decrypt
+                dataBytes = Convert.FromBase64CharArray(dataStr.ToCharArray(), 0, dataStr.Length);
+            }
 
+            byte[] retBytes = EncryptOrDecrypt(type, dataBytes, dynamicIV);
+
+            if (type)
+            {
+                //encrypt
+                return Convert.ToBase64String(retBytes); 
+            }
+            else
+            {
+                //decrypt
+                return Encoding.UTF8.GetString(retBytes, 0, retBytes.Length);
+            }
+        }
+
+        protected override byte[] EncryptOrDecrypt(bool type, byte[] dataBytes, bool dynamicIV)
+        {
+            string keyString = GetEncryptionKey();
+            byte[] ivBytes = new byte[16];
+            if (type)
+            {
+                //encrypt
+                if (dynamicIV)
+                {
+                    new Random().NextBytes(ivBytes);
+                }
+                else
+                {
+                    ivBytes = Encoding.UTF8.GetBytes("0123456789012345");
+                }
+            }
+            else
+            {
+                //decrypt - check if random IV is part of the message
+                if (dynamicIV)
+                {
+                    Array.Copy(dataBytes, 0, ivBytes, 0, 16);
+                    byte[] receivedBytes = new byte[dataBytes.Length - 16];
+                    Array.Copy(dataBytes, 16, receivedBytes, 0, dataBytes.Length-16);
+                    dataBytes = receivedBytes;
+                }
+                else
+                {
+                    ivBytes = System.Text.Encoding.UTF8.GetBytes("0123456789012345");
+                }
+            }
+            if (pnUnit != null && pnUnit.IV != null && pnUnit.IV.Length == 16)
+            {
+                ivBytes = pnUnit.IV;
+            }
+            if (config != null)
+            {
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} IV = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), GetDisplayableBytes(ivBytes)), config.LogVerbosity);
+            }
 #if NET35
             Aes aesAlg = Aes.Create();
             aesAlg.KeySize = 256;
             aesAlg.BlockSize = 128;
             aesAlg.Mode = CipherMode.CBC;
             aesAlg.Padding = PaddingMode.PKCS7;
-            aesAlg.IV = System.Text.Encoding.UTF8.GetBytes("0123456789012345");
+            aesAlg.IV = ivBytes;
             aesAlg.Key = System.Text.Encoding.UTF8.GetBytes(keyString);
 #else
-            string input = plainStr;
-            byte[] inputBytes;
-            byte[] iv = System.Text.Encoding.UTF8.GetBytes("0123456789012345");
+            byte[] iv = ivBytes;
             byte[] keyBytes = System.Text.Encoding.UTF8.GetBytes(keyString);
 
             //Set up
@@ -79,52 +142,55 @@ namespace PubnubApi
             if (type)
             {
                 // Encrypt
+                byte[] outputBytes = null;
 #if NET35
-                byte[] cipherText = null;
-                plainStr = EncodeNonAsciiCharacters(plainStr);
                 ICryptoTransform crypto = aesAlg.CreateEncryptor();
-                byte[] plainText = Encoding.UTF8.GetBytes(plainStr);
-
-                cipherText = crypto.TransformFinalBlock(plainText, 0, plainText.Length);
-
-                return Convert.ToBase64String(cipherText);
+                byte[] plainBytes = dataBytes;
+                outputBytes = crypto.TransformFinalBlock(plainBytes, 0, plainBytes.Length);
 #else
-                input = EncodeNonAsciiCharacters(input);
-                inputBytes = Encoding.UTF8.GetBytes(input);
+                byte[] inputBytes = dataBytes;
                 cipher.Init(true, keyParamWithIV);
-                byte[] outputBytes = new byte[cipher.GetOutputSize(inputBytes.Length)];
+                outputBytes = new byte[cipher.GetOutputSize(inputBytes.Length)];
                 int length = cipher.ProcessBytes(inputBytes, outputBytes, 0);
                 cipher.DoFinal(outputBytes, length); //Do the final block
-                string encryptedInput = Convert.ToBase64String(outputBytes);
-
-                return encryptedInput;
 #endif
+                byte[] newOutputBytes = null;
+                if (dynamicIV)
+                {
+                    newOutputBytes = new byte[ivBytes.Length + outputBytes.Length];
+                    Buffer.BlockCopy(ivBytes, 0, newOutputBytes, 0, ivBytes.Length);
+                    Buffer.BlockCopy(outputBytes, 0, newOutputBytes, ivBytes.Length, outputBytes.Length);
+                }
+                else
+                {
+                    newOutputBytes = outputBytes;
+                }
+
+                return newOutputBytes;
             }
             else
             {
+                byte[] newOutputBytes = null;
                 try
                 {
                     //Decrypt
 #if NET35
-                    string decrypted = "";
-                    byte[] decryptedBytes = Convert.FromBase64CharArray(plainStr.ToCharArray(), 0, plainStr.Length);
+                    byte[] decryptedBytes = dataBytes;
                     ICryptoTransform decrypto = aesAlg.CreateDecryptor();
 
                     var data = decrypto.TransformFinalBlock(decryptedBytes, 0, decryptedBytes.Length);
-                    decrypted = System.Text.Encoding.UTF8.GetString(data, 0, data.Length);
-                    return decrypted;
+                    newOutputBytes = data;
 #else
-                    inputBytes = Convert.FromBase64CharArray(input.ToCharArray(), 0, input.Length);
+                    byte[] inputBytes = dataBytes;
                     cipher.Init(false, keyParamWithIV);
                     byte[] encryptedBytes = new byte[cipher.GetOutputSize(inputBytes.Length)];
-                    int encryptLength = cipher.ProcessBytes(inputBytes, encryptedBytes, 0);
-                    cipher.DoFinal(encryptedBytes, encryptLength); //Do the final block
-                    int len = Array.IndexOf(encryptedBytes, (byte)0);
-                    len = (len == -1) ? encryptedBytes.Length : len;
-                    string actualInput = Encoding.UTF8.GetString(encryptedBytes, 0, len);
-                    return actualInput;
+                    var encryptLength = cipher.ProcessBytes(inputBytes, encryptedBytes, 0);
+                    var lastBytesLength = cipher.DoFinal(encryptedBytes, encryptLength); //Do the final block
+                    var totalBytesLength = encryptLength + lastBytesLength;
+                    newOutputBytes = new byte[totalBytesLength];
+                    Array.Copy(encryptedBytes, newOutputBytes, totalBytesLength);
 #endif
-
+                    return newOutputBytes;
                 }
                 catch (Exception ex)
                 {
@@ -137,5 +203,19 @@ namespace PubnubApi
             }
         }
 
+        private static string GetDisplayableBytes(byte[] currentBytes)
+        {
+            StringBuilder outBuilder = new StringBuilder("{ ");
+            for (int di = 0; di < currentBytes.Length; di++)
+            {
+                outBuilder.Append(currentBytes[di]);
+                if (di < currentBytes.Length - 1)
+                {
+                    outBuilder.Append(", ");
+                }
+            }
+            outBuilder.Append(" }");
+            return outBuilder.ToString();
+        }
     }
 }

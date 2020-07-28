@@ -15,5 +15,7 @@ namespace PubnubApi
         public abstract void ObjectEvent(Pubnub pubnub, PNObjectEventResult objectEvent);
 
         public abstract void MessageAction(Pubnub pubnub, PNMessageActionEventResult messageAction);
+
+        public abstract void File(Pubnub pubnub, PNFileEventResult fileEvent);
     }
 }

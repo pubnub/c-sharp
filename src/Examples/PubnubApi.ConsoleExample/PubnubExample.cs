@@ -287,17 +287,66 @@ namespace PubnubApiDemo
 
             //Add listener to receive published messages and presence events
             pubnub.AddListener(new SubscribeCallbackExt(
-                delegate (Pubnub pnObj, PNMessageResult<object> pubMsg) { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(pubMsg)); },
-                delegate (Pubnub pnObj, PNPresenceEventResult presenceEvnt) { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(presenceEvnt)); },
-                delegate (Pubnub pnObj, PNSignalResult<object> signalMsg) { Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(signalMsg)); },
-                delegate (Pubnub pnObj, PNObjectEventResult objectApiEventObj)
-                {
-                    if (objectApiEventObj.Type == "uuid") { /* got uuid metadata related event. */ }
-                    else if (objectApiEventObj.Type == "channel") { /* got channel metadata related event. */ }
-                    else if (objectApiEventObj.Type == "membership") { /* got membership related event. */ }
-                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(objectApiEventObj));
+                delegate (Pubnub pnObj, PNMessageResult<object> pubMsg) 
+                { 
+                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(pubMsg));
+                    var channelName = pubMsg.Channel;
+                    var channelGroupName = pubMsg.Subscription;
+                    var pubTT = pubMsg.Timetoken;
+                    var msg = pubMsg.Message;
+                    var publisher = pubMsg.Publisher;
                 },
-                delegate (Pubnub pnObj, PNStatus pnStatus) { Console.WriteLine("{0} {1} {2}", pnStatus.Operation, pnStatus.Category, pnStatus.StatusCode); }
+                delegate (Pubnub pnObj, PNPresenceEventResult presenceEvnt) 
+                { 
+                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(presenceEvnt));
+                    var action = presenceEvnt.Event; // Can be join, leave, state-change or timeout
+                    var channelName = presenceEvnt.Channel; // The channel for which the message belongs
+                    var occupancy = presenceEvnt.Occupancy; // No. of users connected with the channel
+                    var state = presenceEvnt.State; // User State
+                    var channelGroupName = presenceEvnt.Subscription; //  The channel group or wildcard subscription match (if exists)
+                    var publishTime = presenceEvnt.Timestamp; // Publish timetoken
+                    var timetoken = presenceEvnt.Timetoken;  // Current timetoken
+                    var uuid = presenceEvnt.Uuid; // UUIDs of users who are connected with the channel
+                },
+                delegate (Pubnub pnObj, PNSignalResult<object> signalMsg) 
+                { 
+                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(signalMsg));
+                    var channelName = signalMsg.Channel; // The channel for which the signal belongs
+                    var channelGroupName = signalMsg.Subscription; // The channel group or wildcard subscription match (if exists)
+                    var pubTT = signalMsg.Timetoken; // Publish timetoken
+                    var msg = signalMsg.Message; // The Payload
+                    var publisher = signalMsg.Publisher; //The Publisher
+                },
+                delegate (Pubnub pnObj, PNObjectEventResult objectEventObj)
+                {
+                    var channelName = objectEventObj.Channel; // Channel
+                    var channelMetadata = objectEventObj.ChannelMetadata; //Channel Metadata
+                    var uidMetadata = objectEventObj.UuidMetadata; // UUID metadata
+                    var evnt = objectEventObj.Event; // Event
+                    var type = objectEventObj.Type; // Event type
+                    
+                    if (objectEventObj.Type == "uuid") { /* got uuid metadata related event. */ }
+                    else if (objectEventObj.Type == "channel") { /* got channel metadata related event. */ }
+                    else if (objectEventObj.Type == "membership") { /* got membership related event. */ }
+                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(objectEventObj));
+                },
+                delegate (Pubnub pnObj, PNMessageActionEventResult msgActionEvent)
+                {
+                    //handle message action
+                    var channelName = msgActionEvent.Channel; // The channel for which the message belongs
+                    var msgEvent = msgActionEvent.Action; // message action added or removed
+                    var msgActionType = msgActionEvent.Event; // message action type
+                    var messageTimetoken = msgActionEvent.MessageTimetoken; // The timetoken of the original message
+                    var actionTimetoken = msgActionEvent.ActionTimetoken; //The timetoken of the message action
+                },
+                delegate (Pubnub pnObj, PNStatus pnStatus) 
+                { 
+                    Console.WriteLine("{0} {1} {2}", pnStatus.Operation, pnStatus.Category, pnStatus.StatusCode);
+                    var affectedChannelGroups = pnStatus.AffectedChannelGroups; // The channel groups affected in the operation, of type array.
+                    var affectedChannels = pnStatus.AffectedChannels; // The channels affected in the operation, of type array.
+                    var category = pnStatus.Category; //Returns PNConnectedCategory
+                    var operation = pnStatus.Operation; //Returns PNSubscribeOperation
+                }
                 ));
 
             bool exitFlag = false;
@@ -308,7 +357,7 @@ namespace PubnubApiDemo
             Console.WriteLine("");
             while (!exitFlag)
             {
-                if (currentUserChoice < 1 || (currentUserChoice > 58 && currentUserChoice != 99))
+                if (currentUserChoice < 1 || (currentUserChoice > 64 && currentUserChoice != 99))
                 {
                     StringBuilder menuOptionsStringBuilder = new StringBuilder();
                     menuOptionsStringBuilder.AppendLine("ENTER 1 FOR Subscribe channel/channelgroup");
@@ -355,12 +404,18 @@ namespace PubnubApiDemo
                     menuOptionsStringBuilder.AppendLine("Enter 50 FOR Get Memberships");
                     menuOptionsStringBuilder.AppendLine("Enter 51 FOR Get Members");
                     menuOptionsStringBuilder.AppendLine("Enter 52 FOR Set Memberships");
-                    menuOptionsStringBuilder.AppendLine("Enter 53 FOR Remove Members");
+                    menuOptionsStringBuilder.AppendLine("Enter 53 FOR Remove Memberships");
                     menuOptionsStringBuilder.AppendLine("Enter 54 FOR Set Channel Members");
                     menuOptionsStringBuilder.AppendLine("Enter 55 FOR Remove Channel Members");
                     menuOptionsStringBuilder.AppendLine("Enter 56 FOR Add MessageAction");
                     menuOptionsStringBuilder.AppendLine("Enter 57 FOR Remove MessageAction");
                     menuOptionsStringBuilder.AppendLine("Enter 58 FOR Get MessageActions");
+                    menuOptionsStringBuilder.AppendLine("Enter 59 FOR SendFile");
+                    menuOptionsStringBuilder.AppendLine("Enter 60 FOR DownloadFile");
+                    menuOptionsStringBuilder.AppendLine("Enter 61 FOR FileUrl");
+                    menuOptionsStringBuilder.AppendLine("Enter 62 FOR DeleteFile");
+                    menuOptionsStringBuilder.AppendLine("Enter 63 FOR PublishFileMessage");
+                    menuOptionsStringBuilder.AppendLine("Enter 64 FOR ListAllFiles");
 
                     menuOptionsStringBuilder.AppendLine("ENTER 99 FOR EXIT OR QUIT");
                     Console.WriteLine(menuOptionsStringBuilder.ToString());
@@ -1861,6 +1916,142 @@ namespace PubnubApiDemo
                         pubnub.GetMessageActions()
                             .Channel(getMsgActionChannelName)
                             .Execute(new PNGetMessageActionsResultExt((result, status) =>
+                            {
+                                if (result != null)
+                                {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                                }
+                                else
+                                {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                                }
+                            }));
+                        break;
+                    case "59":
+                        Console.WriteLine("Enter Channel Name for SendFile");
+                        string sendFileChannelName = Console.ReadLine();
+                        Console.WriteLine("Enter full file path which needs to be sent");
+                        string sendFileFullPath = Console.ReadLine();
+                        Console.WriteLine("Enter file message");
+                        string sendFileMessage = Console.ReadLine();
+
+                        pubnub.SendFile()
+                            .Channel(sendFileChannelName)
+                            .File(sendFileFullPath)
+                            .Message(sendFileMessage)
+                            .ShouldStore(true)
+                            .Meta(new Dictionary<string, object>() { { "color", "red" } })
+                            .Ttl(2000)
+                            .Execute(new PNFileUploadResultExt((result,status)=> 
+                            {
+                                if (result != null)
+                                {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                                }
+                                else
+                                {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                                }
+                            }));
+
+                        break;
+                    case "60": //DownloadFile
+                        Console.WriteLine("Enter Channel Name");
+                        string downloadFileUrlChannelName = Console.ReadLine();
+                        Console.WriteLine("Enter file id");
+                        string downloadUrlFileId = Console.ReadLine();
+                        Console.WriteLine("Enter file name");
+                        string downloadUrlFileName = Console.ReadLine();
+                        pubnub.DownloadFile()
+                            .Channel(downloadFileUrlChannelName)
+                            .FileId(downloadUrlFileId)
+                            .FileName(downloadUrlFileName)
+                            .Execute(new PNDownloadFileResultExt((result, status) =>
+                            {
+                                if (result != null)
+                                {
+                                    result.SaveFileToLocal(downloadUrlFileName);
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result.FileName));
+                                }
+                                else
+                                {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                                }
+                            }));
+
+                        break;
+                    case "61"://GetFileUrl
+                        Console.WriteLine("Enter Channel Name");
+                        string getFileUrlChannelName = Console.ReadLine();
+                        Console.WriteLine("Enter file id");
+                        string getUrlFileId = Console.ReadLine();
+                        Console.WriteLine("Enter file name");
+                        string getUrlFileName = Console.ReadLine();
+                        pubnub.GetFileUrl()
+                            .Channel(getFileUrlChannelName)
+                            .FileId(getUrlFileId)
+                            .FileName(getUrlFileName)
+                            .Execute(new PNFileUrlResultExt((result, status) =>
+                            {
+                                if (result != null)
+                                {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                                }
+                                else
+                                {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                                }
+                            }));
+
+                        break;
+                    case "62":
+                        Console.WriteLine("Enter Channel Name");
+                        string deleteFileUrlChannelName = Console.ReadLine();
+                        Console.WriteLine("Enter file id");
+                        string deleteFileId = Console.ReadLine();
+                        Console.WriteLine("Enter file name");
+                        string deleteFileName = Console.ReadLine();
+                        pubnub.DeleteFile()
+                            .Channel(deleteFileUrlChannelName)
+                            .FileId(deleteFileId)
+                            .FileName(deleteFileName)
+                            .Execute(new PNDeleteFileResultExt((result, status) =>
+                            {
+                                if (result != null)
+                                {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                                }
+                                else
+                                {
+                                    Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                                }
+                            }));
+
+                        break;
+                    case "63":
+                        Console.WriteLine("Enter Channel Name for PublishFileMessage");
+                        string pubFileMessageChannelName = Console.ReadLine();
+                        Console.WriteLine("Enter file id");
+                        string pubFileId = Console.ReadLine();
+                        Console.WriteLine("Enter file name");
+                        string pubFileName = Console.ReadLine();
+                        Console.WriteLine("Enter file message");
+                        string pubFileMessage = Console.ReadLine();
+                        pubnub.PublishFileMessage()
+                            .Channel(pubFileMessageChannelName)
+                            .FileId(pubFileId)
+                            .FileName(pubFileName)
+                            .Message(pubFileMessage)
+                            .Meta(new Dictionary<string, object>() { { "hello","world" } })
+                            .ShouldStore(true)
+                            .Execute(new PNPublishFileMessageResultExt((r, s) => { if (s.Error) { Console.WriteLine(s.ErrorData.Information); } else { Console.WriteLine(r.Timetoken); } }));
+                        break;
+                    case "64":
+                        Console.WriteLine("Enter Channel Name");
+                        string listFilesChannelName = Console.ReadLine();
+                        pubnub.ListFiles()
+                            .Channel(listFilesChannelName)
+                            .Execute(new PNListFilesResultExt((result, status) =>
                             {
                                 if (result != null)
                                 {

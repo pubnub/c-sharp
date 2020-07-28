@@ -13,8 +13,9 @@ namespace PubnubApi
         readonly Action<Pubnub, PNPresenceEventResult> presenceAction;
         readonly Action<Pubnub, PNSignalResult<object>> signalAction;
         readonly Action<Pubnub, PNStatus> statusAction;
-        readonly Action<Pubnub, PNObjectEventResult> objectApiAction;
+        readonly Action<Pubnub, PNObjectEventResult> objectEventAction;
         readonly Action<Pubnub, PNMessageActionEventResult> messageAction;
+        readonly Action<Pubnub, PNFileEventResult> fileAction;
 
         public SubscribeCallbackExt(Action<Pubnub, PNMessageResult<object>> messageCallback, Action<Pubnub, PNPresenceEventResult> presenceCallback, Action<Pubnub, PNStatus> statusCallback)
         {
@@ -22,7 +23,8 @@ namespace PubnubApi
             presenceAction = presenceCallback;
             statusAction = statusCallback;
             signalAction = null;
-            objectApiAction = null;
+            objectEventAction = null;
+            fileAction = null;
         }
 
         public SubscribeCallbackExt(Action<Pubnub, PNSignalResult<object>> signalCallback, Action<Pubnub, PNStatus> statusCallback)
@@ -31,17 +33,18 @@ namespace PubnubApi
             presenceAction = null;
             statusAction = statusCallback;
             signalAction = signalCallback;
-            objectApiAction = null;
+            objectEventAction = null;
+            fileAction = null;
         }
 
-        public SubscribeCallbackExt(Action<Pubnub, PNObjectEventResult> objectApiCallback, Action<Pubnub, PNStatus> statusCallback)
+        public SubscribeCallbackExt(Action<Pubnub, PNObjectEventResult> objectEventCallback, Action<Pubnub, PNStatus> statusCallback)
         {
             subscribeAction = null;
             presenceAction = null;
             signalAction = null;
             statusAction = statusCallback;
-            objectApiAction = objectApiCallback;
-
+            objectEventAction = objectEventCallback;
+            fileAction = null;
         }
 
         public SubscribeCallbackExt(Action<Pubnub, PNMessageActionEventResult> messageActionCallback, Action<Pubnub, PNStatus> statusCallback)
@@ -49,9 +52,20 @@ namespace PubnubApi
             subscribeAction = null;
             presenceAction = null;
             signalAction = null;
-            statusAction = null;
-            objectApiAction = null;
+            statusAction = statusCallback;
+            objectEventAction = null;
             messageAction = messageActionCallback;
+            fileAction = null;
+        }
+
+        public SubscribeCallbackExt(Action<Pubnub, PNFileEventResult> fileCallback, Action<Pubnub, PNStatus> statusCallback)
+        {
+            subscribeAction = null;
+            presenceAction = null;
+            statusAction = statusCallback;
+            signalAction = null;
+            objectEventAction = null;
+            fileAction = fileCallback;
         }
 
         public SubscribeCallbackExt(Action<Pubnub, PNMessageResult<object>> messageCallback, 
@@ -63,26 +77,26 @@ namespace PubnubApi
             presenceAction = presenceCallback;
             statusAction = statusCallback;
             signalAction = signalCallback;
-            objectApiAction = null;
+            objectEventAction = null;
         }
 
         public SubscribeCallbackExt(Action<Pubnub, PNMessageResult<object>> messageCallback, 
             Action<Pubnub, PNPresenceEventResult> presenceCallback, 
             Action<Pubnub, PNSignalResult<object>> signalCallback, 
-            Action<Pubnub, PNObjectEventResult> objectApiCallback, 
+            Action<Pubnub, PNObjectEventResult> objectEventCallback, 
             Action<Pubnub, PNStatus> statusCallback)
         {
             subscribeAction = messageCallback;
             presenceAction = presenceCallback;
             statusAction = statusCallback;
             signalAction = signalCallback;
-            objectApiAction = objectApiCallback;
+            objectEventAction = objectEventCallback;
         }
 
         public SubscribeCallbackExt(Action<Pubnub, PNMessageResult<object>> messageCallback, 
             Action<Pubnub, PNPresenceEventResult> presenceCallback, 
             Action<Pubnub, PNSignalResult<object>> signalCallback, 
-            Action<Pubnub, PNObjectEventResult> objectApiCallback, 
+            Action<Pubnub, PNObjectEventResult> objectEventCallback, 
             Action<Pubnub, PNMessageActionEventResult> messageActionCallback, 
             Action<Pubnub, PNStatus> statusCallback)
         {
@@ -90,8 +104,25 @@ namespace PubnubApi
             presenceAction = presenceCallback;
             statusAction = statusCallback;
             signalAction = signalCallback;
-            objectApiAction = objectApiCallback;
+            objectEventAction = objectEventCallback;
             messageAction = messageActionCallback;
+        }
+
+        public SubscribeCallbackExt(Action<Pubnub, PNMessageResult<object>> messageCallback,
+            Action<Pubnub, PNPresenceEventResult> presenceCallback,
+            Action<Pubnub, PNSignalResult<object>> signalCallback,
+            Action<Pubnub, PNObjectEventResult> objectEventCallback,
+            Action<Pubnub, PNMessageActionEventResult> messageActionCallback,
+            Action<Pubnub, PNFileEventResult> fileCallback,
+            Action<Pubnub, PNStatus> statusCallback)
+        {
+            subscribeAction = messageCallback;
+            presenceAction = presenceCallback;
+            statusAction = statusCallback;
+            signalAction = signalCallback;
+            objectEventAction = objectEventCallback;
+            messageAction = messageActionCallback;
+            fileAction = fileCallback;
         }
 
         public override void Message<T>(Pubnub pubnub, PNMessageResult<T> message)
@@ -132,12 +163,26 @@ namespace PubnubApi
 
         public override void ObjectEvent(Pubnub pubnub, PNObjectEventResult objectEvent)
         {
-            objectApiAction?.Invoke(pubnub, objectEvent);
+            objectEventAction?.Invoke(pubnub, objectEvent);
         }
 
         public override void MessageAction(Pubnub pubnub, PNMessageActionEventResult messageActionEvent)
         {
             messageAction?.Invoke(pubnub, messageActionEvent);
+        }
+
+        public override void File(Pubnub pubnub, PNFileEventResult fileEvent)
+        {
+            PNFileEventResult message1 = new PNFileEventResult();
+            message1.Channel = fileEvent.Channel;
+            message1.Message = fileEvent.Message;
+            message1.Subscription = fileEvent.Subscription;
+            message1.Timetoken = fileEvent.Timetoken;
+            message1.Publisher = fileEvent.Publisher;
+            message1.FileId = fileEvent.FileId;
+            message1.FileName = fileEvent.FileName;
+
+            fileAction?.Invoke(pubnub, message1);
         }
     }
 }
