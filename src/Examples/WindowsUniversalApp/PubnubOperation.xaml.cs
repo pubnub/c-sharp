@@ -1133,7 +1133,7 @@ namespace WindowsUniversalApp
             }
         }
 
-        public override void ObjectEvent(Pubnub pubnub, PNObjectApiEventResult objectEvent)
+        public override void ObjectEvent(Pubnub pubnub, PNObjectEventResult objectEvent)
         {
             if (objectEvent != null)
             {
@@ -1176,6 +1176,14 @@ namespace WindowsUniversalApp
             {
                 // Handle messsage decryption error. Probably client configured to
                 // encrypt messages and on live data feed it received plain text.
+            }
+        }
+
+        public override void File(Pubnub pubnub, PNFileEventResult fileEvent)
+        {
+            if (fileEvent != null)
+            {
+                this.callback(pubnub.JsonPluggableLibrary.SerializeToJsonString(fileEvent));
             }
         }
     }

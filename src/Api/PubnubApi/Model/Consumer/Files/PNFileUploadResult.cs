@@ -7,8 +7,8 @@ namespace PubnubApi
 {
     public class PNFileUploadResult
     {
-        public long Timetoken { get; set; }
-        public string FileId { get; set; }
-        public string FileName { get; set; }
+        public long Timetoken { get; internal set; }
+        public string FileId { get; internal set; }
+        public string FileName { get; internal set; }
     }
 }

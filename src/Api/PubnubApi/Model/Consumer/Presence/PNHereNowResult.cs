@@ -4,8 +4,8 @@ namespace PubnubApi
 {
     public class PNHereNowResult
     {
-        public int TotalChannels { get; set; }
-        public int TotalOccupancy { get; set; }
-        public Dictionary<string, PNHereNowChannelData> Channels { get; set; } = new Dictionary<string, PNHereNowChannelData>();
+        public int TotalChannels { get; internal set; }
+        public int TotalOccupancy { get; internal set; }
+        public Dictionary<string, PNHereNowChannelData> Channels { get; internal set; } = new Dictionary<string, PNHereNowChannelData>();
     }
 }

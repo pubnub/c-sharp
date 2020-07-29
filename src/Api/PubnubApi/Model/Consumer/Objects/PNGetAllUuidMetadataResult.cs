@@ -7,8 +7,8 @@ namespace PubnubApi
 {
     public class PNGetAllUuidMetadataResult
     {
-        public List<PNUuidMetadataResult> Uuids { get; set; }
-        public int TotalCount { get; set; }
-        public PNPageObject Page { get; set; }
+        public List<PNUuidMetadataResult> Uuids { get; internal set; }
+        public int TotalCount { get; internal set; }
+        public PNPageObject Page { get; internal set; }
     }
 }

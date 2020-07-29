@@ -12,21 +12,21 @@ namespace PubnubApi
             this.Channel = "";
             this.Subscription = "";
         }
-        public string Event { get; set; }
+        public string Event { get; internal set; }
 
-        public string Uuid { get; set; }
-        public long Timestamp { get; set; }
-        public int Occupancy { get; set; }
-        public Dictionary<string, object> State { get; set; }
+        public string Uuid { get; internal set; }
+        public long Timestamp { get; internal set; }
+        public int Occupancy { get; internal set; }
+        public Dictionary<string, object> State { get; internal set; }
 
-        public string Channel { get; set; }
-        public string Subscription { get; set; }
+        public string Channel { get; internal set; }
+        public string Subscription { get; internal set; }
 
-        public long Timetoken { get; set; }
-        public object UserMetadata { get; set; }
-        public string[] Join { get; set; } //New
-        public string[] Timeout { get; set; } //New
-        public string[] Leave { get; set; } //New
-        public bool HereNowRefresh { get; set; }
+        public long Timetoken { get; internal set; }
+        public object UserMetadata { get; internal set; }
+        public string[] Join { get; internal set; }
+        public string[] Timeout { get; internal set; }
+        public string[] Leave { get; internal set; }
+        public bool HereNowRefresh { get; internal set; }
     }
 }

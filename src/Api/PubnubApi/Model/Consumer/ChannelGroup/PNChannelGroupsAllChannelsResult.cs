@@ -5,7 +5,7 @@ namespace PubnubApi
 {
     public class PNChannelGroupsAllChannelsResult
     {
-        public List<string> Channels { get; set; }
-        public string ChannelGroup { get; set; }
+        public List<string> Channels { get; internal set; }
+        public string ChannelGroup { get; internal set; }
     }
 }

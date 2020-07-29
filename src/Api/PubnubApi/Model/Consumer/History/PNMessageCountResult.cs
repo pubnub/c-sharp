@@ -5,6 +5,6 @@ namespace PubnubApi
 {
     public class PNMessageCountResult
     {
-        public Dictionary<string, long> Channels { get; set; }
+        public Dictionary<string, long> Channels { get; internal set; }
     }
 }

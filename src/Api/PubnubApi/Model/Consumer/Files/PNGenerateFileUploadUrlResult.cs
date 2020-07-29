@@ -7,8 +7,8 @@ namespace PubnubApi
 {
     public class PNGenerateFileUploadUrlResult
     {
-        public string FileId { get; set; }
-        public string FileName { get; set; }
-        public PNGenerateFileUploadUrlData FileUploadRequest { get; set; }
+        public string FileId { get; internal set; }
+        public string FileName { get; internal set; }
+        public PNGenerateFileUploadUrlData FileUploadRequest { get; internal set; }
     }
 }

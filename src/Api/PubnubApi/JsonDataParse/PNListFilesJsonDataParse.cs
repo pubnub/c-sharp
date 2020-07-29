@@ -30,14 +30,14 @@ namespace PubnubApi
                                 Dictionary<string, object> getFileDataDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(fileDataArray[index]);
                                 if (getFileDataDic != null && getFileDataDic.Count > 0)
                                 {
-                                    long fileSize;
+                                    int fileSize;
                                     var fileItem = new PNFileResult
                                     {
                                         Name = (getFileDataDic.ContainsKey("name") && getFileDataDic["name"] != null) ? getFileDataDic["name"].ToString() : null,
                                         Id = (getFileDataDic.ContainsKey("id") && getFileDataDic["id"] != null) ? getFileDataDic["id"].ToString() : null,
                                         Created = (getFileDataDic.ContainsKey("created") && getFileDataDic["created"] != null) ? getFileDataDic["created"].ToString() : null
                                     };
-                                    if (getFileDataDic.ContainsKey("size") && getFileDataDic["size"] != null && Int64.TryParse(getFileDataDic["size"].ToString(), out fileSize))
+                                    if (getFileDataDic.ContainsKey("size") && getFileDataDic["size"] != null && Int32.TryParse(getFileDataDic["size"].ToString(), out fileSize))
                                     {
                                         fileItem.Size = fileSize;
                                     }

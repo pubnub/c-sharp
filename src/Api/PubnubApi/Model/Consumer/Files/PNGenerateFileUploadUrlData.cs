@@ -7,9 +7,9 @@ namespace PubnubApi
 {
     public class PNGenerateFileUploadUrlData
     {
-        public string Url { get; set; }
-        public string Method { get; set; }
-        public string ExpirationDate { get; set; }
-        public Dictionary<string, object> FormFields { get; set; }
+        public string Url { get; internal set; }
+        public string Method { get; internal set; }
+        public string ExpirationDate { get; internal set; }
+        public Dictionary<string, object> FormFields { get; internal set; }
     }
 }

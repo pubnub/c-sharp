@@ -14,7 +14,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubPCL</PackageId>
-    <PackageVersion>4.9.0.0</PackageVersion>
+    <PackageVersion>4.10.0.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -292,6 +292,7 @@
     <Compile Include="..\PubnubApi\Model\Consumer\DeleteMessage\PNDeleteMessageResult.cs" Link="Model\Consumer\DeleteMessage\PNDeleteMessageResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Files\PNDeleteFileResult.cs" Link="Model\Consumer\Files\PNDeleteFileResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Files\PNDownloadFileResult.cs" Link="Model\Consumer\Files\PNDownloadFileResult.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\Files\PNFile.cs" Link="Model\Consumer\Files\PNFile.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Files\PNFileResult.cs" Link="Model\Consumer\Files\PNFileResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Files\PNFileUploadResult.cs" Link="Model\Consumer\Files\PNFileUploadResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Files\PNFileUrlResult.cs" Link="Model\Consumer\Files\PNFileUrlResult.cs" />
@@ -410,6 +411,7 @@
     <Compile Include="..\PubnubApi\Model\Derived\Files\PNFileUrlResultExt.cs" Link="Model\Derived\Files\PNFileUrlResultExt.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\Files\PNGenerateFileUploadUrlResultExt.cs" Link="Model\Derived\Files\PNGenerateFileUploadUrlResultExt.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\Files\PNListFilesResultExt.cs" Link="Model\Derived\Files\PNListFilesResultExt.cs" />
+    <Compile Include="..\PubnubApi\Model\Derived\Files\PNPublishFileMessageResultExt.cs" Link="Model\Derived\Files\PNPublishFileMessageResultExt.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\History\PNFetchHistoryResultExt.cs" Link="Model\Derived\History\PNFetchHistoryResultExt.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\History\PNHistoryResultExt.cs">
       <Link>Model\Derived\History\PNHistoryResultExt.cs</Link>

@@ -259,45 +259,42 @@ namespace PubNubMessaging.Tests
         }
 
         //[Test]
-        public void TestFileDecryptionFromPath()
-        {
-            PNConfiguration config = new PNConfiguration { UseRandomInitializationVector = true };
-            PubnubCrypto pc = new PubnubCrypto("enigma", config, null, null);
-            byte[] fileByteArray = System.IO.File.ReadAllBytes(@"C:\Pandu\temp\new\input\word_test_enc.txt");
+        //public void TestLocalFileDecryptionFromPath()
+        //{
+        //    PNConfiguration config = new PNConfiguration { UseRandomInitializationVector = true };
+        //    PubnubCrypto pc = new PubnubCrypto("enigma", config, null, null);
+        //    byte[] fileByteArray = System.IO.File.ReadAllBytes(@"C:\Pandu\temp\new\input\word_test_enc.txt");
 
-            byte[] decryptedBytes = pc.Decrypt(fileByteArray, true);
-            System.IO.File.WriteAllBytes(@"C:\Pandu\temp\new\input\word_test_decrypted.txt", decryptedBytes);
-            byte[] expectedBytes = new byte[] { 104, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100, 33, 33 };
-            Assert.AreEqual(expectedBytes, decryptedBytes);
+        //    byte[] decryptedBytes = pc.Decrypt(fileByteArray, true);
+        //    System.IO.File.WriteAllBytes(@"C:\Pandu\temp\new\input\word_test_decrypted.txt", decryptedBytes);
+        //    byte[] expectedBytes = new byte[] { 104, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100, 33, 33 };
+        //    Assert.AreEqual(expectedBytes, decryptedBytes);
 
-        }
+        //}
 
-        //[Test]
-        public void TestRajatFileEncryptionFromPath()
+        [Test]
+        public void TestLocalFileEncryptionFromPath()
         {
             IPubnubUnitTest pubnubUnitTest = new PubnubUnitTest();
             pubnubUnitTest.IV = new byte[16] { 133, 126, 158, 123, 43, 95, 96, 90, 215, 178, 17, 73, 166, 130, 79, 156 };
-            PNConfiguration config = new PNConfiguration { UseRandomInitializationVector = true, LogVerbosity = PNLogVerbosity.BODY };
-            PubnubCrypto pc = new PubnubCrypto("enigma", config, null, pubnubUnitTest);
-            byte[] fileByteArray = System.IO.File.ReadAllBytes(@"C:\Pandu\temp\new\input\file_upload_original.txt");
-
-            byte[] decryptedBytes = pc.Encrypt(fileByteArray, true);
-            System.IO.File.WriteAllBytes(@"C:\Pandu\temp\new\input\file_upload_original_encrypted.txt", decryptedBytes);
-            byte[] expectedBytes = new byte[] { 104, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100, 33, 33 };
-            Assert.AreEqual(expectedBytes, decryptedBytes);
+            string sourceFile = @"C:\Pandu\temp\new\input\file_upload_original.txt";
+            string destFile = @"C:\Pandu\temp\new\input\file_upload_original_encrypted.txt";
+            PNConfiguration config = new PNConfiguration();
+            Pubnub pn = new Pubnub(config);
+            pn.EncryptFile(sourceFile, destFile, "enigma");
+            Assert.IsTrue(System.IO.File.Exists(destFile));
 
         }
 
-        //[Test]
-        public void TestRajatFileDecryptionFromPath()
+        [Test]
+        public void TestLocalFileDecryptionFromPath()
         {
-            PNConfiguration config = new PNConfiguration { UseRandomInitializationVector = true };
-            PubnubCrypto pc = new PubnubCrypto("enigma", config, null, null);
-            byte[] fileByteArray = System.IO.File.ReadAllBytes(@"C:\Pandu\temp\new\input\file_image_enc.jpg");
-
-            byte[] decryptedBytes = pc.Decrypt(fileByteArray, true);
-            System.IO.File.WriteAllBytes(@"C:\Pandu\temp\new\input\file_image_enc_decrypted_to_original.jpg", decryptedBytes);
-            Assert.IsTrue(decryptedBytes.Length  > 0);
+            string sourceFile = @"C:\Pandu\temp\new\input\file_image_enc.jpg";
+            string destFile = @"C:\Pandu\temp\new\input\file_image_enc_decrypted_to_original.jpg";
+            PNConfiguration config = new PNConfiguration();
+            Pubnub pn = new Pubnub(config);
+            pn.DecryptFile(sourceFile, destFile, "enigma");
+            Assert.IsTrue(System.IO.File.Exists(destFile));
 
         }
 

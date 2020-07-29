@@ -7,9 +7,9 @@ namespace PubnubApi
 {
     public class PNFileResult
     {
-        public string Name { get; set; }
-        public string Id { get; set; }
-        public long Size { get; set; }
-        public string Created { get; set; }
+        public string Name { get; internal set; }
+        public string Id { get; internal set; }
+        public int Size { get; internal set; }
+        public string Created { get; internal set; }
     }
 }

@@ -4,14 +4,14 @@ namespace PubnubApi
 {
     public class PNAccessManagerKeyData
     {
-        public bool ReadEnabled { get; set; }
+        public bool ReadEnabled { get; internal set; }
 
-        public bool WriteEnabled { get; set; }
+        public bool WriteEnabled { get; internal set; }
 
-        public bool ManageEnabled { get; set; }
+        public bool ManageEnabled { get; internal set; }
 
-        public bool DeleteEnabled { get; set; }
+        public bool DeleteEnabled { get; internal set; }
 
-        public bool CreateEnabled { get; set; }
+        public bool CreateEnabled { get; internal set; }
     }
 }

@@ -345,6 +345,18 @@ namespace PubnubApiAsyncAwaitDemo
                     var messageTimetoken = msgActionEvent.MessageTimetoken; // The timetoken of the original message
                     var actionTimetoken = msgActionEvent.ActionTimetoken; //The timetoken of the message action
                 },
+                delegate (Pubnub pnObj, PNFileEventResult fileEvent)
+                {
+                    //handle file message event
+                    var channelName = fileEvent.Channel;
+                    var chanelGroupName = fileEvent.Subscription;
+                    var fieldId = (fileEvent.File != null) ? fileEvent.File.Id : null;
+                    var fileName = (fileEvent.File != null) ? fileEvent.File.Name : null;
+                    var fileUrl = (fileEvent.File != null) ? fileEvent.File.Url : null;
+                    var fileMessage = fileEvent.Message;
+                    var filePublisher = fileEvent.Publisher;
+                    var filePubTT = fileEvent.Timetoken;
+                },
                 delegate (Pubnub pnObj, PNStatus pnStatus)
                 {
                     Console.WriteLine("{0} {1} {2}", pnStatus.Operation, pnStatus.Category, pnStatus.StatusCode);
@@ -745,6 +757,7 @@ namespace PubnubApiAsyncAwaitDemo
                         break;
                     case "6":
                         Console.WriteLine("Running time()");
+                        
                         PNResult<PNTimeResult> respTime = await pubnub.Time().ExecuteAsync();
                         if (respTime.Result != null)
                         {
@@ -1927,9 +1940,6 @@ namespace PubnubApiAsyncAwaitDemo
                             .Channel(sendFileChannelName)
                             .File(sendFileFullPath)
                             .Message(sendFileMessage)
-                            .ShouldStore(true)
-                            .Meta(new Dictionary<string, object>() { { "color", "red" } })
-                            .Ttl(2000)
                             .ExecuteAsync();
                         PNFileUploadResult fileUploadResult = fileUploadResponse.Result;
                         PNStatus fileUploadStatus = fileUploadResponse.Status;
@@ -1941,7 +1951,6 @@ namespace PubnubApiAsyncAwaitDemo
                         {
                             Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(fileUploadStatus));
                         }
-
                         break;
                     case "60": //DownloadFile
                         Console.WriteLine("Enter Channel Name");
@@ -2027,8 +2036,6 @@ namespace PubnubApiAsyncAwaitDemo
                             .FileId(pubFileId)
                             .FileName(pubFileName)
                             .Message(pubFileMessage)
-                            .Meta(new Dictionary<string, object>() { { "hello", "world" } })
-                            .ShouldStore(true)
                             .ExecuteAsync();
                         PNPublishFileMessageResult publishFileMsgResult = publishFileMsgResponse.Result;
                         PNStatus publishFileMsgStatus = publishFileMsgResponse.Status;

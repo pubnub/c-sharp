@@ -176,7 +176,7 @@ namespace PubnubApi.EndPoint
             byte[] postData = GetMultipartFormData(sendFileByteArray,generateFileUploadUrlResult.FileName, generateFileUploadUrlResult.FileUploadRequest.FormFields, dataBoundary, currentCipherKey, config, pubnubLog);
 
             string json;
-            UrlProcessRequest(new Uri(generateFileUploadUrlResult.FileUploadRequest.Url.Replace("https://","http://")), requestState, false, postData, contentType).ContinueWith(r =>
+            UrlProcessRequest(new Uri(generateFileUploadUrlResult.FileUploadRequest.Url), requestState, false, postData, contentType).ContinueWith(r =>
             {
                 json = r.Result.Item1;
                 if (!string.IsNullOrEmpty(json) && string.Compare(json,"{}", StringComparison.CurrentCultureIgnoreCase) == 0)

@@ -4,7 +4,7 @@ schema: 1
 scm: github.com/pubnub/c-sharp
 changelog: 
   - version: 4.9.0.0
-    date: July 23, 2020
+    date: July 28, 2020
     changes:
       - type: Improvement
         text: Added files feature

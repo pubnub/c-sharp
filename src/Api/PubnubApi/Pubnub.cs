@@ -539,9 +539,169 @@ namespace PubnubApi
             return pc.Encrypt(inputString);
         }
 
-#endregion
+        public byte[] EncryptFile(byte[] inputBytes)
+        {
+            if (inputBytes == null)
+            {
+                throw new ArgumentException("inputBytes is not valid");
+            }
+            if (pubnubConfig == null || string.IsNullOrEmpty(pubnubConfig.CipherKey))
+            {
+                throw new MissingMemberException("CipherKey missing");
+            }
+            PubnubCrypto pc = new PubnubCrypto(pubnubConfig.CipherKey);
+            return pc.Encrypt(inputBytes, true);
+        }
+        public byte[] EncryptFile(byte[] inputBytes, string cipherKey)
+        {
+            if (inputBytes == null)
+            {
+                throw new ArgumentException("inputBytes is not valid");
+            }
 
-#region "Properties"
+            PubnubCrypto pc = new PubnubCrypto(cipherKey);
+            return pc.Encrypt(inputBytes, true);
+        }
+        public void EncryptFile(string sourceFile, string destinationFile)
+        {
+            if (string.IsNullOrEmpty(sourceFile) || sourceFile.Length < 1)
+            {
+                throw new ArgumentException("sourceFile is not valid");
+            }
+            if (pubnubConfig == null || string.IsNullOrEmpty(pubnubConfig.CipherKey))
+            {
+                throw new MissingMemberException("CipherKey missing");
+            }
+#if !NETSTANDARD10 && !NETSTANDARD11
+            bool validSource = System.IO.File.Exists(sourceFile);
+            if (!validSource)
+            {
+                throw new ArgumentException("sourceFile is not valid");
+            }
+            string destDirectory = System.IO.Path.GetDirectoryName(destinationFile);
+            bool validDest = System.IO.Directory.Exists(destDirectory);
+            if (!string.IsNullOrEmpty(destDirectory) && !validDest)
+            {
+                throw new ArgumentException("destination path is not valid");
+            }
+            byte[] inputBytes = System.IO.File.ReadAllBytes(sourceFile);
+            byte[] outputBytes = EncryptFile(inputBytes);
+            System.IO.File.WriteAllBytes(destinationFile, outputBytes);
+#else
+            throw new NotSupportedException("FileSystem not supported in NetStandard 1.0/1.1. Consider higher version of .NetStandard.");
+#endif
+        }
+        public void EncryptFile(string sourceFile, string destinationFile, string cipherKey)
+        {
+            if (string.IsNullOrEmpty(sourceFile) || sourceFile.Length < 1)
+            {
+                throw new ArgumentException("sourceFile is not valid");
+            }
+
+#if !NETSTANDARD10 && !NETSTANDARD11
+            bool validSource = System.IO.File.Exists(sourceFile);
+            if (!validSource)
+            {
+                throw new ArgumentException("sourceFile is not valid");
+            }
+            string destDirectory = System.IO.Path.GetDirectoryName(destinationFile);
+            bool validDest = System.IO.Directory.Exists(destDirectory);
+            if (!string.IsNullOrEmpty(destDirectory) && !validDest)
+            {
+                throw new ArgumentException("destination path is not valid");
+            }
+            byte[] inputBytes = System.IO.File.ReadAllBytes(sourceFile);
+            byte[] outputBytes = EncryptFile(inputBytes, cipherKey);
+            System.IO.File.WriteAllBytes(destinationFile, outputBytes);
+#else
+            throw new NotSupportedException("FileSystem not supported in NetStandard 1.0/1.1. Consider higher version of .NetStandard.");
+#endif
+        }
+
+        public byte[] DecryptFile(byte[] inputBytes)
+        {
+            if (inputBytes == null)
+            {
+                throw new ArgumentException("inputBytes is not valid");
+            }
+
+            if (pubnubConfig == null || string.IsNullOrEmpty(pubnubConfig.CipherKey))
+            {
+                throw new ArgumentException("CipherKey missing");
+            }
+
+            PubnubCrypto pc = new PubnubCrypto(pubnubConfig.CipherKey);
+            return pc.Decrypt(inputBytes, true);
+        }
+        public void DecryptFile(string sourceFile, string destinationFile)
+        {
+            if (string.IsNullOrEmpty(sourceFile) || sourceFile.Length < 1)
+            {
+                throw new ArgumentException("sourceFile is not valid");
+            }
+
+            if (pubnubConfig == null || string.IsNullOrEmpty(pubnubConfig.CipherKey))
+            {
+                throw new ArgumentException("CipherKey missing");
+            }
+
+#if !NETSTANDARD10 && !NETSTANDARD11
+            bool validSource = System.IO.File.Exists(sourceFile);
+            if (!validSource)
+            {
+                throw new ArgumentException("sourceFile is not valid");
+            }
+            string destDirectory = System.IO.Path.GetDirectoryName(destinationFile);
+            bool validDest = System.IO.Directory.Exists(destDirectory);
+            if (!string.IsNullOrEmpty(destDirectory) && !validDest)
+            {
+                throw new ArgumentException("destination path is not valid");
+            }
+            byte[] inputBytes = System.IO.File.ReadAllBytes(sourceFile);
+            byte[] outputBytes = DecryptFile(inputBytes, pubnubConfig.CipherKey);
+            System.IO.File.WriteAllBytes(destinationFile, outputBytes);
+#else
+            throw new NotSupportedException("FileSystem not supported in NetStandard 1.0/1.1. Consider higher version of .NetStandard.");
+#endif
+        }
+        public byte[] DecryptFile(byte[] inputBytes, string cipherKey)
+        {
+            if (inputBytes == null)
+            {
+                throw new ArgumentException("inputBytes is not valid");
+            }
+
+            PubnubCrypto pc = new PubnubCrypto(cipherKey);
+            return pc.Decrypt(inputBytes, true);
+        }
+        public void DecryptFile(string sourceFile, string destinationFile, string cipherKey)
+        {
+            if (string.IsNullOrEmpty(sourceFile) || sourceFile.Length < 1)
+            {
+                throw new ArgumentException("inputFile is not valid");
+            }
+#if !NETSTANDARD10 && !NETSTANDARD11
+            bool validSource = System.IO.File.Exists(sourceFile);
+            if (!validSource)
+            {
+                throw new ArgumentException("sourceFile is not valid");
+            }
+            string destDirectory = System.IO.Path.GetDirectoryName(destinationFile);
+            bool validDest = System.IO.Directory.Exists(destDirectory);
+            if (!string.IsNullOrEmpty(destDirectory) && !validDest)
+            {
+                throw new ArgumentException("destination path is not valid");
+            }
+            byte[] inputBytes = System.IO.File.ReadAllBytes(sourceFile);
+            byte[] outputBytes = DecryptFile(inputBytes, cipherKey);
+            System.IO.File.WriteAllBytes(destinationFile, outputBytes);
+#else
+            throw new NotSupportedException("FileSystem not supported in NetStandard 1.0/1.1. Consider higher version of .NetStandard.");
+#endif
+        }
+        #endregion
+
+        #region "Properties"
         public IPubnubUnitTest PubnubUnitTest
         {
             get

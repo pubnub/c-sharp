@@ -9,9 +9,9 @@ namespace PubnubApi
             this.Service = "";
         }
 
-        public int Status { get; set; }
-        public string Message { get; set; }
-        public string Service { get; set; }
-        public bool Error { get; set; }
+        public int Status { get; internal set; }
+        public string Message { get; internal set; }
+        public string Service { get; internal set; }
+        public bool Error { get; internal set; }
     }
 }
