@@ -113,11 +113,6 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing File Id or Name");
             }
 
-            if (this.msg == null)
-            {
-                throw new ArgumentException("Missing Message");
-            }
-
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
@@ -157,7 +152,7 @@ namespace PubnubApi.EndPoint
 
         private void ProcessFileMessagePublish(Dictionary<string, object> externalQueryParam, PNCallback<PNPublishFileMessageResult> callback)
         {
-            if (string.IsNullOrEmpty(this.channelName) || string.IsNullOrEmpty(this.channelName.Trim()) || this.msg == null)
+            if (string.IsNullOrEmpty(this.channelName) || string.IsNullOrEmpty(this.channelName.Trim()))
             {
                 PNStatus status = new PNStatus();
                 status.Error = true;
@@ -165,6 +160,15 @@ namespace PubnubApi.EndPoint
                 callback.OnResponse(null, status);
                 return;
             }
+
+            Dictionary<string, object> publishPayload = new Dictionary<string, object>();
+            if (this.msg != null && !string.IsNullOrEmpty(this.msg.ToString()))
+            {
+                publishPayload.Add("message", this.msg);
+            }
+            publishPayload.Add("file", new Dictionary<string, string> {
+                        { "id", currentFileId },
+                        { "name", currentFileName } });
 
             RequestState<PNPublishFileMessageResult> requestState = new RequestState<PNPublishFileMessageResult>();
             requestState.ResponseType = PNOperationType.PNPublishFileMessageOperation;
@@ -174,7 +178,7 @@ namespace PubnubApi.EndPoint
 
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
-            Uri request = urlBuilder.BuildPublishFileMessageRequest("GET", "", this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, null, externalQueryParam);
+            Uri request = urlBuilder.BuildPublishFileMessageRequest("GET", "", this.channelName, publishPayload, this.storeInHistory, this.ttl, this.userMetadata, null, externalQueryParam);
 
             string json = "";
             UrlProcessRequest(request, requestState, false).ContinueWith(r =>
@@ -220,12 +224,21 @@ namespace PubnubApi.EndPoint
                 ret.Status = errStatus;
                 return ret;
             }
-            if (string.IsNullOrEmpty(this.channelName) || string.IsNullOrEmpty(this.channelName.Trim()) || this.msg == null)
+            if (string.IsNullOrEmpty(this.channelName) || string.IsNullOrEmpty(this.channelName.Trim()))
             {
-                PNStatus errStatus = new PNStatus { Error = true, ErrorData = new PNErrorData("Missing Channel or Message", new ArgumentException("Missing Channel or Message")) };
+                PNStatus errStatus = new PNStatus { Error = true, ErrorData = new PNErrorData("Missing Channel", new ArgumentException("Missing Channel")) };
                 ret.Status = errStatus;
                 return ret;
             }
+
+            Dictionary<string, object> publishPayload = new Dictionary<string, object>();
+            if (this.msg != null && !string.IsNullOrEmpty(this.msg.ToString()))
+            {
+                publishPayload.Add("message", this.msg);
+            }
+            publishPayload.Add("file", new Dictionary<string, string> {
+                        { "id", currentFileId },
+                        { "name", currentFileName } });
 
             RequestState<PNPublishFileMessageResult> requestState = new RequestState<PNPublishFileMessageResult>();
             requestState.ResponseType = PNOperationType.PNPublishFileMessageOperation;
@@ -233,7 +246,7 @@ namespace PubnubApi.EndPoint
             requestState.EndPointOperation = this;
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
-            Uri request = urlBuilder.BuildPublishFileMessageRequest("GET", "", this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, null, externalQueryParam);
+            Uri request = urlBuilder.BuildPublishFileMessageRequest("GET", "", this.channelName, publishPayload, this.storeInHistory, this.ttl, this.userMetadata, null, externalQueryParam);
 
             Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false).ConfigureAwait(false);
             ret.Status = JsonAndStatusTuple.Item2;
