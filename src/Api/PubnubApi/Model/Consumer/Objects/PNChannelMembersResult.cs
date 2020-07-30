@@ -7,8 +7,8 @@ namespace PubnubApi
 {
     public class PNChannelMembersResult
     {
-        public List<PNChannelMembersItemResult> ChannelMembers { get; set; }
-        public int TotalCount { get; set; }
-        public PNPageObject Page { get; set; }
+        public List<PNChannelMembersItemResult> ChannelMembers { get; internal set; }
+        public int TotalCount { get; internal set; }
+        public PNPageObject Page { get; internal set; }
     }
 }

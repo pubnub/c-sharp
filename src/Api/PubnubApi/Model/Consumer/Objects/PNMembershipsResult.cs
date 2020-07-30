@@ -7,8 +7,8 @@ namespace PubnubApi
 {
     public class PNMembershipsResult
     {
-        public List<PNMembershipsItemResult> Memberships { get; set; }
-        public int TotalCount { get; set; }
-        public PNPageObject Page { get; set; }
+        public List<PNMembershipsItemResult> Memberships { get; internal set; }
+        public int TotalCount { get; internal set; }
+        public PNPageObject Page { get; internal set; }
     }
 }

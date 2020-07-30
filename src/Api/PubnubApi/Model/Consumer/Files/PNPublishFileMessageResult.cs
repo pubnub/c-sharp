@@ -7,6 +7,6 @@ namespace PubnubApi
 {
     public class PNPublishFileMessageResult
     {
-        public long Timetoken { get; set; }
+        public long Timetoken { get; internal set; }
     }
 }

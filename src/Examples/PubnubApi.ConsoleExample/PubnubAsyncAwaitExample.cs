@@ -338,6 +338,7 @@ namespace PubnubApiAsyncAwaitDemo
                 },
                 delegate (Pubnub pnObj, PNMessageActionEventResult msgActionEvent)
                 {
+                    System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(msgActionEvent));
                     //handle message action
                     var channelName = msgActionEvent.Channel; // The channel for which the message belongs
                     var msgEvent = msgActionEvent.Action; // message action added or removed
@@ -347,11 +348,13 @@ namespace PubnubApiAsyncAwaitDemo
                 },
                 delegate (Pubnub pnObj, PNFileEventResult fileEvent)
                 {
+                    System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(fileEvent));
                     //handle file message event
                     var channelName = fileEvent.Channel;
                     var chanelGroupName = fileEvent.Subscription;
-                    var fieldId = fileEvent.FileId;
-                    var fileName = fileEvent.FileName;
+                    var fieldId = (fileEvent.File != null) ? fileEvent.File.Id : null;
+                    var fileName = (fileEvent.File != null) ? fileEvent.File.Name : null;
+                    var fileUrl = (fileEvent.File != null) ? fileEvent.File.Url : null;
                     var fileMessage = fileEvent.Message;
                     var filePublisher = fileEvent.Publisher;
                     var filePubTT = fileEvent.Timetoken;
@@ -667,6 +670,8 @@ namespace PubnubApiAsyncAwaitDemo
                             .Count(100)
                             .IncludeTimetoken(true)
                             .IncludeMeta(true)
+                            .IncludeMessageType(true)
+                            .IncludeUuid(true)
                             .ExecuteAsync();
                         if (respHistory.Result != null)
                         {
@@ -1936,13 +1941,13 @@ namespace PubnubApiAsyncAwaitDemo
                         string sendFileMessage = Console.ReadLine();
 
                         PNResult<PNFileUploadResult> fileUploadResponse = await pubnub.SendFile()
-                            .Channel(sendFileChannelName)
-                            .File(sendFileFullPath)
-                            .Message(sendFileMessage)
-                            .ExecuteAsync();
+                        .Channel(sendFileChannelName)
+                        .File(sendFileFullPath) //checks the bin folder if no path is provided
+                        .Message(sendFileMessage)
+                        .ExecuteAsync();
                         PNFileUploadResult fileUploadResult = fileUploadResponse.Result;
                         PNStatus fileUploadStatus = fileUploadResponse.Status;
-                        if (fileUploadResult != null)
+                        if (!fileUploadStatus.Error && fileUploadResult != null)
                         {
                             Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(fileUploadResult));
                         }
@@ -1965,7 +1970,7 @@ namespace PubnubApiAsyncAwaitDemo
                             .ExecuteAsync();
                         PNDownloadFileResult fileDownloadResult = fileDownloadResponse.Result;
                         PNStatus fileDownloadStatus = fileDownloadResponse.Status;
-                        if (fileDownloadResult != null)
+                        if (!fileDownloadStatus.Error && fileDownloadResult != null)
                         {
                             fileDownloadResult.SaveFileToLocal(downloadUrlFileName);
                             Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(fileDownloadResult.FileName));
@@ -1989,7 +1994,7 @@ namespace PubnubApiAsyncAwaitDemo
                             .ExecuteAsync();
                         PNFileUrlResult getFileUrlResult = getFileUrlResponse.Result;
                         PNStatus getFileUrlStatus = getFileUrlResponse.Status;
-                        if (getFileUrlResult != null)
+                        if (!getFileUrlStatus.Error && getFileUrlResult != null)
                         {
                             Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(getFileUrlResult));
                         }
@@ -2012,7 +2017,7 @@ namespace PubnubApiAsyncAwaitDemo
                             .ExecuteAsync();
                         PNDeleteFileResult deleteFileResult = deleteFileResponse.Result;
                         PNStatus deleteFileStatus = deleteFileResponse.Status;
-                        if (deleteFileResult != null)
+                        if (!deleteFileStatus.Error && deleteFileResult != null)
                         {
                             Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(deleteFileResult));
                         }
@@ -2038,7 +2043,7 @@ namespace PubnubApiAsyncAwaitDemo
                             .ExecuteAsync();
                         PNPublishFileMessageResult publishFileMsgResult = publishFileMsgResponse.Result;
                         PNStatus publishFileMsgStatus = publishFileMsgResponse.Status;
-                        if (publishFileMsgResult != null)
+                        if (!publishFileMsgStatus.Error && publishFileMsgResult != null)
                         {
                             Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(publishFileMsgResult));
                         }
@@ -2055,7 +2060,7 @@ namespace PubnubApiAsyncAwaitDemo
                             .ExecuteAsync();
                         PNListFilesResult listFilesResult = listFilesResponse.Result;
                         PNStatus listFilesStatus = listFilesResponse.Status;
-                        if (listFilesResult != null)
+                        if (!listFilesStatus.Error && listFilesResult != null)
                         {
                             Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(listFilesResult));
                         }

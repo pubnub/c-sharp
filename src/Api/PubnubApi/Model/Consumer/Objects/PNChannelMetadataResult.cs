@@ -7,10 +7,10 @@ namespace PubnubApi
 {
     public class PNChannelMetadataResult
     {
-        public string Channel { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public Dictionary<string, object> Custom { get; set; }
-        public string Updated { get; set; }
+        public string Channel { get; internal set; }
+        public string Name { get; internal set; }
+        public string Description { get; internal set; }
+        public Dictionary<string, object> Custom { get; internal set; }
+        public string Updated { get; internal set; }
     }
 }

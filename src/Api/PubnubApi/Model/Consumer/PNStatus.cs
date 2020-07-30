@@ -20,28 +20,28 @@ namespace PubnubApi
         }
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public PNStatusCategory Category { get; set; }
+        public PNStatusCategory Category { get; internal set; }
 
-        public PNErrorData ErrorData { get; set; }
-        public bool Error { get; set; }
+        public PNErrorData ErrorData { get; internal set; }
+        public bool Error { get; internal set; }
 
-        public int StatusCode { get; set; }
+        public int StatusCode { get; internal set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public PNOperationType Operation { get; set; }
+        public PNOperationType Operation { get; internal set; }
 
-        public bool TlsEnabled { get; set; }
+        public bool TlsEnabled { get; internal set; }
 
-        public string Uuid { get; set; }
-        public string AuthKey { get; set; }
-        public string Origin { get; set; }
-        public object ClientRequest { get; set; }
+        public string Uuid { get; internal set; }
+        public string AuthKey { get; internal set; }
+        public string Origin { get; internal set; }
+        public object ClientRequest { get; internal set; }
 
         // send back channel, channel groups that were affected by this operation
-        public List<string> AffectedChannels { get; set; } = new List<string>();
-        public List<string> AffectedChannelGroups { get; set; } = new List<string>();
+        public List<string> AffectedChannels { get; internal set; } = new List<string>();
+        public List<string> AffectedChannelGroups { get; internal set; } = new List<string>();
 
-        public object AdditonalData { get; set; } = new object();
+        public object AdditonalData { get; internal set; } = new object();
 
         public void Retry()
         {

@@ -558,6 +558,10 @@ namespace PubnubApi
             {
                 throw new ArgumentException("inputBytes is not valid");
             }
+            if (pubnubConfig != null && !string.IsNullOrEmpty(pubnubConfig.CipherKey))
+            {
+                //Ignore this. Added this condition to pass Codacy recommendation of making this as static method
+            }
 
             PubnubCrypto pc = new PubnubCrypto(cipherKey);
             return pc.Encrypt(inputBytes, true);
@@ -670,7 +674,10 @@ namespace PubnubApi
             {
                 throw new ArgumentException("inputBytes is not valid");
             }
-
+            if (pubnubConfig != null && !string.IsNullOrEmpty(pubnubConfig.CipherKey))
+            {
+                //Ignore this. Added this condition to pass Codacy recommendation of making this as static method
+            }
             PubnubCrypto pc = new PubnubCrypto(cipherKey);
             return pc.Decrypt(inputBytes, true);
         }

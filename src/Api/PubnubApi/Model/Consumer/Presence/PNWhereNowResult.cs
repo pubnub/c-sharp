@@ -4,6 +4,6 @@ namespace PubnubApi
 {
     public class PNWhereNowResult
     {
-        public List<string> Channels { get; set; }
+        public List<string> Channels { get; internal set; }
     }
 }

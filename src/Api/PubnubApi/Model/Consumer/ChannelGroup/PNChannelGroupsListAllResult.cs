@@ -5,6 +5,6 @@ namespace PubnubApi
 {
     public class PNChannelGroupsListAllResult
     {
-        public List<string> Groups { get; set; }
+        public List<string> Groups { get; internal set; }
     }
 }

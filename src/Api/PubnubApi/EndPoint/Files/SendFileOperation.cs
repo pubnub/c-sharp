@@ -176,7 +176,7 @@ namespace PubnubApi.EndPoint
             byte[] postData = GetMultipartFormData(sendFileByteArray,generateFileUploadUrlResult.FileName, generateFileUploadUrlResult.FileUploadRequest.FormFields, dataBoundary, currentCipherKey, config, pubnubLog);
 
             string json;
-            UrlProcessRequest(new Uri(generateFileUploadUrlResult.FileUploadRequest.Url.Replace("https://","http://")), requestState, false, postData, contentType).ContinueWith(r =>
+            UrlProcessRequest(new Uri(generateFileUploadUrlResult.FileUploadRequest.Url), requestState, false, postData, contentType).ContinueWith(r =>
             {
                 json = r.Result.Item1;
                 if (!string.IsNullOrEmpty(json) && string.Compare(json,"{}", StringComparison.CurrentCultureIgnoreCase) == 0)
@@ -209,6 +209,7 @@ namespace PubnubApi.EndPoint
                             result.FileId = generateFileUploadUrlResult.FileId;
                             result.FileName = generateFileUploadUrlResult.FileName;
                             LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} GenerateFileUploadUrl -> file upload -> PublishFileMessage -> OK.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                            r.Result.Item2.Error = false;
                             callback.OnResponse(result, r.Result.Item2);
                         }
                         else
@@ -309,6 +310,7 @@ namespace PubnubApi.EndPoint
                         result.FileId = generateFileUploadUrlResult.FileId;
                         result.FileName = generateFileUploadUrlResult.FileName;
                         ret.Result = result;
+                        ret.Status.Error = false;
                         LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} GenerateFileUploadUrl -> file upload -> PublishFileMessage -> OK.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);                //do internal publish after successful file upload
                     }
                     else
