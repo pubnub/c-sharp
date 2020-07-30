@@ -7,8 +7,8 @@ namespace PubnubApi
 {
     public class PNListFilesResult
     {
-        public List<PNFileResult> FilesList { get; set; }
-        public int Count { get; set; }
-        public string Next { get; set; }
+        public List<PNFileResult> FilesList { get; internal set; }
+        public int Count { get; internal set; }
+        public string Next { get; internal set; }
     }
 }

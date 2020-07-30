@@ -7,14 +7,8 @@ namespace PubnubApi
 {
     public class PNDownloadFileResult
     {
-        public PNDownloadFileResult() { }
-        public PNDownloadFileResult(byte[] fileBytes, string fileName)
-        {
-            this.FileBytes = fileBytes;
-            this.FileName = fileName;
-        }
-        public byte[] FileBytes { get; private set; }
-        public string FileName { get; private set; }
+        public byte[] FileBytes { get; internal set; }
+        public string FileName { get; internal set; }
 
         public bool SaveFileToLocal(string destinationFullFilePath)
         {

@@ -172,7 +172,9 @@ namespace PubnubApi.EndPoint
                     {
                         outputBytes = item1Bytes;
                     }
-                    PNDownloadFileResult result = new PNDownloadFileResult(outputBytes, currentFileName);
+                    PNDownloadFileResult result = new PNDownloadFileResult();
+                    result.FileBytes = outputBytes;
+                    result.FileName = currentFileName;
                     callback.OnResponse(result, r.Result.Item2);
                 }
                 else
@@ -240,7 +242,9 @@ namespace PubnubApi.EndPoint
                     outputBytes = item1Bytes;
                 }
                 
-                PNDownloadFileResult result = new PNDownloadFileResult(outputBytes, currentFileName);
+                PNDownloadFileResult result = new PNDownloadFileResult();
+                result.FileBytes = outputBytes;
+                result.FileName = currentFileName;
                 ret.Result = result;
             }
 

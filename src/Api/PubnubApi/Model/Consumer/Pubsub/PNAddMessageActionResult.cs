@@ -7,9 +7,9 @@ namespace PubnubApi
 {
     public class PNAddMessageActionResult
     {
-        public long MessageTimetoken { get; set; }
-        public long ActionTimetoken { get; set; }
-        public PNMessageAction Action { get; set; }
-        public string Uuid { get; set; }
+        public long MessageTimetoken { get; internal set; }
+        public long ActionTimetoken { get; internal set; }
+        public PNMessageAction Action { get; internal set; }
+        public string Uuid { get; internal set; }
     }
 }

@@ -7,8 +7,8 @@ namespace PubnubApi
 {
     public class PNMembershipsItemResult
     {
-        public PNChannelMetadataResult ChannelMetadata { get; set; }
-        public Dictionary<string, object> Custom { get; set; }
-        public string Updated { get; set; }
+        public PNChannelMetadataResult ChannelMetadata { get; internal set; }
+        public Dictionary<string, object> Custom { get; internal set; }
+        public string Updated { get; internal set; }
     }
 }

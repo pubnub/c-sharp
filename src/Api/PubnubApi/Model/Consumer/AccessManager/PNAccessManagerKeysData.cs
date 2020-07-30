@@ -5,6 +5,6 @@ namespace PubnubApi
 {
     public class PNAccessManagerKeysData
     {
-        public Dictionary<string, PNAccessManagerKeyData> AuthKeys { get; set; }
+        public Dictionary<string, PNAccessManagerKeyData> AuthKeys { get; internal set; }
     }
 }

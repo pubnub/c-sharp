@@ -3,7 +3,7 @@ namespace PubnubApi
 {
     public class PNResult<T>
     {
-        public T Result { get; set; }
-        public PNStatus Status { get; set; }
+        public T Result { get; internal set; }
+        public PNStatus Status { get; internal set; }
     }
 }

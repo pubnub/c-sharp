@@ -9,12 +9,12 @@ namespace PubnubApi
     {
         public class MoreInfo
         {
-            public long Start { get; set; }
-            public long End { get; set; }
-            public int Limit { get; set; }
+            public long Start { get; internal set; }
+            public long End { get; internal set; }
+            public int Limit { get; internal set; }
         }
 
-        public List<PNMessageActionItem> MessageActions { get; set; }
-        public MoreInfo More { get; set; }
+        public List<PNMessageActionItem> MessageActions { get; internal set; }
+        public MoreInfo More { get; internal set; }
     }
 }

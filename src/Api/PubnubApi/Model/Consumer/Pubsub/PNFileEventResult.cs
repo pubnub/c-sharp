@@ -7,13 +7,11 @@ namespace PubnubApi
 {
     public class PNFileEventResult
     {
-        public string Channel { get; set; }
-        public string Subscription { get; set; }
-        public string Publisher { get; set; }
-        public long Timetoken { get; set; }
-        public object Message { get; set; }
-        public string FileId { get; set; }
-        public string FileName { get; set; }
-
+        public string Channel { get; internal set; }
+        public string Subscription { get; internal set; }
+        public string Publisher { get; internal set; }
+        public long Timetoken { get; internal set; }
+        public object Message { get; internal set; }
+        public PNFile File { get; internal set; }
     }
 }

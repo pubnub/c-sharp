@@ -4,7 +4,7 @@ namespace PubnubApi
 {
     public class PNHereNowOccupantData
     {
-        public string Uuid { get; set; } = "";
-        public object State { get; set; }
+        public string Uuid { get; internal set; } = "";
+        public object State { get; internal set; }
     }
 }

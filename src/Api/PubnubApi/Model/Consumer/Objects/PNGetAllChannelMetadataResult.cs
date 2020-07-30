@@ -7,9 +7,9 @@ namespace PubnubApi
 {
     public class PNGetAllChannelMetadataResult
     {
-        public List<PNChannelMetadataResult> Channels { get; set; }
-        public int TotalCount { get; set; }
-        public PNPageObject Page { get; set; }
+        public List<PNChannelMetadataResult> Channels { get; internal set; }
+        public int TotalCount { get; internal set; }
+        public PNPageObject Page { get; internal set; }
     }
 
 }

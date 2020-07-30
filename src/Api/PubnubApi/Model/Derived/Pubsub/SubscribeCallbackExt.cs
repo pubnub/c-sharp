@@ -179,8 +179,7 @@ namespace PubnubApi
             message1.Subscription = fileEvent.Subscription;
             message1.Timetoken = fileEvent.Timetoken;
             message1.Publisher = fileEvent.Publisher;
-            message1.FileId = fileEvent.FileId;
-            message1.FileName = fileEvent.FileName;
+            message1.File = fileEvent.File;
 
             fileAction?.Invoke(pubnub, message1);
         }

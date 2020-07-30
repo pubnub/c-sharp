@@ -13,11 +13,11 @@ namespace PubnubApi
             this.Type = "";  //values = uuid/channel/membership
             this.Channel = "";
         }
-        public string Event { get; set; }
-        public string Type { get; set; }
-        public PNUuidMetadataResult UuidMetadata { get; set; } //Populate when Type = uuid
-        public PNChannelMetadataResult ChannelMetadata { get; set; } //Populate when Type = channel
-        public long Timestamp { get; set; }
-        public string Channel { get; set; } //Subscribed channel
+        public string Event { get; internal set; }
+        public string Type { get; internal set; }
+        public PNUuidMetadataResult UuidMetadata { get; internal set; } //Populate when Type = uuid
+        public PNChannelMetadataResult ChannelMetadata { get; internal set; } //Populate when Type = channel
+        public long Timestamp { get; internal set; }
+        public string Channel { get; internal set; } //Subscribed channel
     }
 }
