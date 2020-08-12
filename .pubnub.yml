@@ -314,7 +314,7 @@ changelog:
       - type: Improvement
         text: Added HereNowRefresh to PNPresenceEventResult
       - type: Improvement
-        text: PCL version duplicate message fix for multiple disconnet/reconnect
+        text: PCL version duplicate message fix for multiple disconnect/reconnect
   - version: 4.0.3.1
     date: Aug 18, 17
     changes:
