@@ -22,7 +22,7 @@ namespace PubnubApi
             {
                 string destDirectory = System.IO.Path.GetDirectoryName(destinationFullFilePath);
                 bool validDest = System.IO.Directory.Exists(destDirectory);
-                if (validDest && System.IO.Path.HasExtension(destinationFullFilePath))
+                if ((string.IsNullOrEmpty(destDirectory) || validDest) && System.IO.Path.HasExtension(destinationFullFilePath))
                 {
                     System.IO.File.WriteAllBytes(destinationFullFilePath, this.FileBytes);
                     ret = true;

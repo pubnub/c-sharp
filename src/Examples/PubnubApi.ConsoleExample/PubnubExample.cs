@@ -654,8 +654,6 @@ namespace PubnubApiDemo
                             .Count(100)
                             .IncludeTimetoken(true)
                             .IncludeMeta(true)
-                            .IncludeMessageType(true)
-                            .IncludeUuid(true)
                             .Execute(new PNHistoryResultExt(
                                 (r, s) =>
                                 {
@@ -1983,7 +1981,7 @@ namespace PubnubApiDemo
                             {
                                 if (!status.Error && result != null)
                                 {
-                                    result.SaveFileToLocal(downloadUrlFileName);
+                                    result.SaveFileToLocal(result.FileName);
                                     Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result.FileName));
                                 }
                                 else
