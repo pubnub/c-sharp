@@ -670,8 +670,6 @@ namespace PubnubApiAsyncAwaitDemo
                             .Count(100)
                             .IncludeTimetoken(true)
                             .IncludeMeta(true)
-                            .IncludeMessageType(true)
-                            .IncludeUuid(true)
                             .ExecuteAsync();
                         if (respHistory.Result != null)
                         {

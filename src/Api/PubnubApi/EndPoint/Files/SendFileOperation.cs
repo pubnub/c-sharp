@@ -433,10 +433,15 @@ namespace PubnubApi.EndPoint
         private static byte[] GetMultipartFormData(byte[] sendFileByteArray, string fileName, Dictionary<string, object> formFields, string dataBoundary, string currentCipherKey, PNConfiguration config, IPubnubLog pubnubLog)
         {
             byte[] ret = null;
+            string fileContentType = "application/octet-stream";
             using (Stream dataStream = new System.IO.MemoryStream())
             {
                 foreach (var kvp in formFields)
                 {
+                    if (kvp.Key == "Content-Type" && kvp.Value != null && !string.IsNullOrEmpty(kvp.Value.ToString()))
+                    {
+                        fileContentType = kvp.Value.ToString();
+                    }
                     string postParamData = string.Format("--{0}\r\nContent-Disposition: form-data; name=\"{1}\"\r\n\r\n{2}",
                             dataBoundary,
                             kvp.Key,
@@ -452,7 +457,7 @@ namespace PubnubApi.EndPoint
                             dataBoundary,
                             "file",
                             fileName,
-                            "application/octet-stream");
+                            fileContentType);
                 byte[] postHeaderData = Encoding.UTF8.GetBytes(header);
 
                 dataStream.Write(postHeaderData, 0, postHeaderData.Length);

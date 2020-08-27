@@ -19,9 +19,7 @@ namespace PubnubApi.EndPoint
 
         private bool reverseOption;
         private bool includeTimetokenOption;
-        private bool includeMessageType = true; //default to  true
         private bool withMetaOption;
-        private bool withUuidOption = true; //default to  true
         private long startTimetoken = -1;
         private long endTimetoken = -1;
         private int historyCount = -1;
@@ -76,18 +74,6 @@ namespace PubnubApi.EndPoint
         public HistoryOperation IncludeMeta(bool withMeta)
         {
             withMetaOption = withMeta;
-            return this;
-        }
-
-        public HistoryOperation IncludeMessageType(bool withMessageType)
-        {
-            includeMessageType = withMessageType;
-            return this;
-        }
-
-        public HistoryOperation IncludeUuid(bool withUuid)
-        {
-            withUuidOption = withUuid;
             return this;
         }
 
@@ -179,7 +165,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
             
-            Uri request = urlBuilder.BuildHistoryRequest("GET", "", this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, this.withMetaOption, this.withUuidOption, this.includeMessageType, this.queryParam);
+            Uri request = urlBuilder.BuildHistoryRequest("GET", "", this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, this.withMetaOption, this.queryParam);
 
             RequestState<PNHistoryResult> requestState = new RequestState<PNHistoryResult>();
             requestState.Channels = new [] { this.channelName };
@@ -210,7 +196,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
             
-            Uri request = urlBuilder.BuildHistoryRequest("GET", "", this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, this.withMetaOption, this.withUuidOption, this.includeMessageType, this.queryParam);
+            Uri request = urlBuilder.BuildHistoryRequest("GET", "", this.channelName, this.startTimetoken, this.endTimetoken, this.historyCount, this.reverseOption, this.includeTimetokenOption, this.withMetaOption, this.queryParam);
 
             RequestState<PNHistoryResult> requestState = new RequestState<PNHistoryResult>();
             requestState.Channels = new[] { this.channelName };
