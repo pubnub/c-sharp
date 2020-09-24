@@ -18,5 +18,7 @@ namespace PubnubApi
 
         public Dictionary<string, Dictionary<string, PNAccessManagerKeyData>> ChannelGroups { get; internal set; }
 
+        public Dictionary<string, Dictionary<string, PNAccessManagerKeyData>> TargetUuids { get; internal set; }
+
     }
 }
