@@ -1,4 +1,5 @@
----//awesome project!!!i love it
+---
+//awesome project!!!i love it
 exclude_paths:
   - '**/Examples/**'
   - '**/UnitTests/**'
