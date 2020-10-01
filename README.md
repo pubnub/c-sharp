@@ -12,7 +12,7 @@ For Universal Windows https://www.nuget.org/packages/PubnubUWP/
 
 ## Communication
 
-- If you **need help** or have a **general question**, contact <support@pubnub.com>
-- NOTE: The example projects available in GitHub repo may not build/run successfully in Visual Studio due to missing dependencies/nuget packages. Please uninstall Pubnub/PubnubPCL/PubnubUWP, Newtonsoft.Json, Portable.BouncyCastle and re-install Pubnub/PubnubPCL/PubnubUWP with its dependencies for successful build/run.
+- If you **need help** or have a **general question/query**, contact <support@pubnub.com>
+- NOTE: The example projects available in GitHub repo may not build/run successfully in Visual Studio due to missing dependencies/nuget packages. Please uninstall Pubnub/PubnubPCL/PubnubUWP, Newtonsoft.Json, Portable.BouncyCastle and re-install Pubnub/PubnubPCL/PubnubUWP with its dependencies for a successful build/run.
 
 
