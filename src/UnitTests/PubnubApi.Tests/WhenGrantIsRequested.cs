@@ -39,6 +39,7 @@ namespace PubNubMessaging.Tests
         private static string currentUnitTestCase = "";
         private static string channel = "hello_my_channel";
         private static string channelGroup = "myChannelGroup";
+        private static string targetUuid = "my_target_uuid";
         private static string authKey = "hello_my_authkey";
         private static string[] channelBuilder;
         private static string[] authKeyBuilder;
@@ -716,6 +717,210 @@ namespace PubNubMessaging.Tests
                 Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenChannelGroupLevelWithReadShouldReturnSuccess.");
             }
         }
+
+        [Test]
+        public static void ThenUuidWithGetUpdateDeleteShouldReturnSuccess()
+        {
+            server.ClearRequests();
+
+            currentUnitTestCase = "ThenUuidWithGetUpdateDeleteShouldReturnSuccess";
+
+            receivedGrantMessage = false;
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
+
+            pubnub = createPubNubInstance(config);
+            server.RunOnHttps(config.Secure);
+
+            if (PubnubCommon.PAMServerSideGrant)
+            {
+                grantManualEvent = new ManualResetEvent(false);
+                pubnub.Grant().Uuids(new[] { targetUuid }).AuthKeys(new[] { authKey }).Get(true).Update(true).Delete(true).TTL(5)
+                    .Execute(new PNAccessManagerGrantResultExt((r, s) => 
+                    { 
+                        if (r != null)
+                        {
+                            receivedGrantMessage = true;
+                        }
+                        grantManualEvent.Set();
+                    }));
+                Thread.Sleep(1000);
+
+                grantManualEvent.WaitOne();
+
+                pubnub.Destroy();
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
+                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUuidWithGetUpdateDeleteShouldReturnSuccess failed.");
+            }
+            else
+            {
+                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenUuidWithGetUpdateDeleteShouldReturnSuccess.");
+            }
+        }
+
+        [Test]
+        public static void ThenUuidWithReadPermisionShouldReturnError()
+        {
+            server.ClearRequests();
+
+            currentUnitTestCase = "ThenUuidWithReadPermisionShouldReturnError";
+
+            receivedGrantMessage = false;
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
+
+            pubnub = createPubNubInstance(config);
+            server.RunOnHttps(config.Secure);
+
+            if (PubnubCommon.PAMServerSideGrant)
+            {
+                try
+                {
+                    grantManualEvent = new ManualResetEvent(false);
+                    pubnub.Grant().Uuids(new[] { targetUuid }).AuthKeys(new[] { authKey }).Read(true).TTL(5)
+                        .Execute(new PNAccessManagerGrantResultExt((r, s) =>
+                        {
+                            grantManualEvent.Set();
+                        }));
+                    grantManualEvent.WaitOne();
+                    Thread.Sleep(1000);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                    receivedGrantMessage = true;
+                    grantManualEvent.Set();
+                }
+
+
+                pubnub.Destroy();
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
+                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUuidWithReadPermisionShouldReturnError failed.");
+            }
+            else
+            {
+                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenUuidWithReadPermisionShouldReturnError.");
+            }
+        }
+
+        [Test]
+        public static void ThenUuidAndChannelShouldReturnError()
+        {
+            server.ClearRequests();
+
+            currentUnitTestCase = "ThenUuidAndChannelShouldReturnError";
+
+            receivedGrantMessage = false;
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
+
+            pubnub = createPubNubInstance(config);
+            server.RunOnHttps(config.Secure);
+
+            if (PubnubCommon.PAMServerSideGrant)
+            {
+                try
+                {
+                    grantManualEvent = new ManualResetEvent(false);
+                    pubnub.Grant().Uuids(new[] { targetUuid }).Channels(new[] { channel }).AuthKeys(new[] { authKey }).Read(true).TTL(5)
+                        .Execute(new PNAccessManagerGrantResultExt((r, s) =>
+                        {
+                            grantManualEvent.Set();
+                        }));
+                    grantManualEvent.WaitOne();
+                    Thread.Sleep(1000);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                    receivedGrantMessage = true;
+                    grantManualEvent.Set();
+                }
+
+
+                pubnub.Destroy();
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
+                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUuidAndChannelShouldReturnError failed.");
+            }
+            else
+            {
+                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenUuidAndChannelShouldReturnError.");
+            }
+        }
+
+        [Test]
+        public static void ThenUuidAndChannelGroupShouldReturnError()
+        {
+            server.ClearRequests();
+
+            currentUnitTestCase = "ThenUuidAndChannelGroupShouldReturnError";
+
+            receivedGrantMessage = false;
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
+
+            pubnub = createPubNubInstance(config);
+            server.RunOnHttps(config.Secure);
+
+            if (PubnubCommon.PAMServerSideGrant)
+            {
+                try
+                {
+                    grantManualEvent = new ManualResetEvent(false);
+                    pubnub.Grant().Uuids(new[] { targetUuid }).ChannelGroups(new[] { channelGroup }).AuthKeys(new[] { authKey }).Read(true).TTL(5)
+                        .Execute(new PNAccessManagerGrantResultExt((r, s) =>
+                        {
+                            grantManualEvent.Set();
+                        }));
+                    grantManualEvent.WaitOne();
+                    Thread.Sleep(1000);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                    receivedGrantMessage = true;
+                    grantManualEvent.Set();
+                }
+
+
+                pubnub.Destroy();
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
+                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUuidAndChannelGroupShouldReturnError failed.");
+            }
+            else
+            {
+                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenUuidAndChannelGroupShouldReturnError.");
+            }
+        }
+
 
         public static byte[] HexStringToByteArray(string hex)
         {

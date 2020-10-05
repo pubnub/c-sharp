@@ -538,7 +538,7 @@ namespace PubnubApi
             return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
-        Uri IUrlRequestBuilder.BuildGrantV2AccessRequest(string requestMethod, string requestBody, string channelsCommaDelimited, string channelGroupsCommaDelimited, string authKeysCommaDelimited, bool read, bool write, bool delete, bool manage, long ttl, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildGrantV2AccessRequest(string requestMethod, string requestBody, string channelsCommaDelimited, string channelGroupsCommaDelimited, string targetUuidsCommaDelimited, string authKeysCommaDelimited, bool read, bool write, bool delete, bool manage, bool get, bool update, bool join, long ttl, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PNAccessManagerGrant;
 
@@ -566,6 +566,11 @@ namespace PubnubApi
                 requestQueryStringParams.Add("channel-group", UriUtil.EncodeUriComponent(channelGroupsCommaDelimited, currentType, false, false, false));
             }
 
+            if (!string.IsNullOrEmpty(targetUuidsCommaDelimited))
+            {
+                requestQueryStringParams.Add("target-uuid", UriUtil.EncodeUriComponent(targetUuidsCommaDelimited, currentType, false, false, false));
+            }
+
             if (ttl > -1)
             {
                 requestQueryStringParams.Add("ttl", ttl.ToString());
@@ -575,34 +580,9 @@ namespace PubnubApi
             requestQueryStringParams.Add("w", Convert.ToInt32(write).ToString());
             requestQueryStringParams.Add("d", Convert.ToInt32(delete).ToString());
             requestQueryStringParams.Add("m", Convert.ToInt32(manage).ToString());
-
-            if (externalQueryParam != null && externalQueryParam.Count > 0)
-            {
-                foreach (KeyValuePair<string, object> kvp in externalQueryParam)
-                {
-                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
-                    {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
-                    }
-                }
-            }
-
-            string queryString = BuildQueryString(currentType, requestQueryStringParams);
-
-            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
-        }
-
-        Uri IUrlRequestBuilder.BuildGrantV3AccessRequest(string requestMethod, string requestBody, Dictionary<string, object> externalQueryParam)
-        {
-            PNOperationType currentType = PNOperationType.PNAccessManagerGrantToken;
-
-            List<string> url = new List<string>();
-            url.Add("v3");
-            url.Add("pam");
-            url.Add(pubnubConfig.SubscribeKey);
-            url.Add("grant");
-
-            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+            requestQueryStringParams.Add("g", Convert.ToInt32(get).ToString());
+            requestQueryStringParams.Add("u", Convert.ToInt32(update).ToString());
+            requestQueryStringParams.Add("j", Convert.ToInt32(join).ToString());
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
             {

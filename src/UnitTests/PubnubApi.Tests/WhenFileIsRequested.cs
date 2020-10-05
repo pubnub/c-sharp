@@ -145,6 +145,10 @@ namespace PubNubMessaging.Tests
                         fileName = result.FileName;
                         receivedMessage = true;
                     }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine("SendFile failed = " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                    }
                     mre.Set();
                 }));
             Thread.Sleep(1000);
