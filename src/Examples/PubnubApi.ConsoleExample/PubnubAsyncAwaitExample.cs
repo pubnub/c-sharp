@@ -372,6 +372,7 @@ namespace PubnubApiAsyncAwaitDemo
             bool exitFlag = false;
             string channel = "";
             string channelGroup = "";
+            string targetUuid = "";
             int currentUserChoice = 0;
             string userinput = "";
             Console.WriteLine("");
@@ -787,32 +788,46 @@ namespace PubnubApiAsyncAwaitDemo
                             channelGroup = "";
                         }
 
-                        if (channel.Trim().Length <= 0 && channelGroup.Trim().Length <= 0)
+                        Console.WriteLine("Enter UUID(s) for PAM Grant. ENTER only when no channel/channel-groups are provided");
+                        targetUuid = Console.ReadLine();
+                        if (targetUuid.Trim().Length <= 0)
                         {
-                            Console.WriteLine("Channel or ChannelGroup not provided. Please try again.");
+                            targetUuid = "";
+                        }
+
+                        if (channel.Trim().Length <= 0 && channelGroup.Trim().Length <= 0 && targetUuid.Trim().Length <= 0)
+                        {
+                            Console.WriteLine("Channel or ChannelGroup or UUID not provided. Please try again.");
                             break;
                         }
                         string[] channelList = channel.Split(',');
                         string[] channelGroupList = channelGroup.Split(',');
+                        string[] targetUuidList = targetUuid.Split(',');
 
                         Console.WriteLine("Enter the auth_key for PAM Grant (optional)" + System.Environment.NewLine + "Press Enter Key if there is no auth_key at this time.");
                         string authGrant = Console.ReadLine();
                         string[] authKeyList = authGrant.Split(',');
 
-                        Console.WriteLine("Read Access? Enter Y for Yes (default), N for No.");
-                        string readAccess = Console.ReadLine();
-                        bool read = (readAccess.ToLower() == "n") ? false : true;
-
+                        bool read = false;
                         bool write = false;
+                        bool uuidJoin = false;
                         if (channel.Trim().Length > 0)
                         {
+                            Console.WriteLine("Read Access? Enter Y for Yes (default), N for No.");
+                            string readAccess = Console.ReadLine();
+                            read = (readAccess.ToLower() == "n") ? false : true;
+
                             Console.WriteLine("Write Access? Enter Y for Yes (default), N for No.");
                             string writeAccess = Console.ReadLine();
                             write = (writeAccess.ToLower() == "n") ? false : true;
+
+                            Console.WriteLine("Join Access? Enter Y for Yes (default), N for No.");
+                            string joinAccess = Console.ReadLine();
+                            uuidJoin = joinAccess.ToLower() != "n";
                         }
 
                         bool delete = false;
-                        if (channel.Trim().Length > 0)
+                        if (channel.Trim().Length > 0 || targetUuid.Trim().Length > 0)
                         {
                             Console.WriteLine("Delete Access? Enter Y for Yes (default), N for No.");
                             string deleteAccess = Console.ReadLine();
@@ -826,6 +841,21 @@ namespace PubnubApiAsyncAwaitDemo
                             string manageAccess = Console.ReadLine();
                             manage = (manageAccess.ToLower() == "n") ? false : true;
                         }
+
+                        bool uuidGet = false;
+                        bool uuidUpdate = false;
+                        if (targetUuid.Trim().Length > 0)
+                        {
+                            Console.WriteLine("Get Access? Enter Y for Yes (default), N for No.");
+                            string getAccess = Console.ReadLine();
+                            uuidGet = getAccess.ToLower() != "n";
+
+                            Console.WriteLine("Update Access? Enter Y for Yes (default), N for No.");
+                            string updateAccess = Console.ReadLine();
+                            uuidUpdate = updateAccess.ToLower() != "n";
+
+                        }
+
                         Console.WriteLine("How many minutes do you want to allow Grant Access? Enter the number of minutes." + System.Environment.NewLine + "Default = 1440 minutes (24 hours). Press ENTER now to accept default value.");
                         int grantTimeLimitInMinutes;
                         string grantTimeLimit = Console.ReadLine();
@@ -844,40 +874,56 @@ namespace PubnubApiAsyncAwaitDemo
                         pamGrantStringBuilder.AppendLine(string.Format("Channel = {0}", channel));
                         pamGrantStringBuilder.AppendLine(string.Format("ChannelGroup = {0}", channelGroup));
                         pamGrantStringBuilder.AppendLine(string.Format("auth_key = {0}", authGrant));
-                        pamGrantStringBuilder.AppendLine(string.Format("Read Access = {0}", read.ToString()));
                         if (channel.Trim().Length > 0)
                         {
+                            pamGrantStringBuilder.AppendLine(string.Format("Read Access = {0}", read.ToString()));
                             pamGrantStringBuilder.AppendLine(string.Format("Write Access = {0}", write.ToString()));
-                            pamGrantStringBuilder.AppendLine(string.Format("Delete Access = {0}", delete.ToString()));
                         }
+                        pamGrantStringBuilder.AppendLine(string.Format("Delete Access = {0}", delete.ToString()));
                         if (channelGroup.Trim().Length > 0)
                         {
                             pamGrantStringBuilder.AppendLine(string.Format("Manage Access = {0}", manage.ToString()));
                         }
+                        if (targetUuid.Trim().Length > 0)
+                        {
+                            pamGrantStringBuilder.AppendLine(string.Format("Get Access = {0}", uuidGet.ToString()));
+                            pamGrantStringBuilder.AppendLine(string.Format("Update Access = {0}", uuidUpdate.ToString()));
+                        }
+                        pamGrantStringBuilder.AppendLine(string.Format("Join Access = {0}", uuidJoin.ToString()));
                         pamGrantStringBuilder.AppendLine(string.Format("Grant Access Time Limit = {0}", grantTimeLimitInMinutes.ToString()));
                         Console.WriteLine(pamGrantStringBuilder.ToString());
                         Console.ResetColor();
                         Console.WriteLine();
 
                         Console.WriteLine("Running PamGrant()");
-
-                        PNResult<PNAccessManagerGrantResult> respGrant = await pubnub.Grant()
-                            .Channels(channelList)
-                            .ChannelGroups(channelGroupList)
-                            .AuthKeys(authKeyList)
-                            .Read(read)
-                            .Write(write)
-                            .Delete(delete)
-                            .Manage(manage)
-                            .TTL(grantTimeLimitInMinutes)
-                            .ExecuteAsync();
-                        if (respGrant.Result != null)
+                        try
                         {
-                            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(respGrant.Result));
+                            PNResult<PNAccessManagerGrantResult> respGrant = await pubnub.Grant()
+                                .Channels(channelList != null && channelList.Length > 0 && !string.IsNullOrEmpty(channelList[0]) ? channelList : null)
+                                .ChannelGroups(channelGroupList != null && channelGroupList.Length > 0 && !string.IsNullOrEmpty(channelGroupList[0]) ? channelGroupList : null)
+                                .Uuids(targetUuidList != null && targetUuidList.Length > 0 && !string.IsNullOrEmpty(targetUuidList[0]) ? targetUuidList : null)
+                                .AuthKeys(authKeyList)
+                                .Read(read)
+                                .Write(write)
+                                .Delete(delete)
+                                .Manage(manage)
+                                .Get(uuidGet)
+                                .Update(uuidUpdate)
+                                .Join(uuidJoin)
+                                .TTL(grantTimeLimitInMinutes)
+                                .ExecuteAsync();
+                            if (respGrant.Result != null)
+                            {
+                                Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(respGrant.Result));
+                            }
+                            else if (respGrant.Status != null)
+                            {
+                                Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(respGrant.Status));
+                            }
                         }
-                        else if (respGrant.Status != null)
+                        catch (Exception ex)
                         {
-                            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(respGrant.Status));
+                            Console.WriteLine(ex.ToString());
                         }
                         break;
                     case "9":
