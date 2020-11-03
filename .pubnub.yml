@@ -93,9 +93,6 @@ changelog:
         text: "Provided option to store published message or not in history."
         type: feature
       - 
-        text: "Implemented Push notification feature supporting MPNS for windows phone 8 client.."
-        type: feature
-      - 
         text: "Implemented Channel Groups."
         type: feature
       - 
