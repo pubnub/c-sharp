@@ -455,7 +455,6 @@ features:
     - PUSH-TYPE-APNS
     - PUSH-TYPE-APNS2
     - PUSH-TYPE-FCM
-    - PUSH-TYPE-MPNS
     - PUSH-TYPE-GCM
   presence:
     - PRESENCE-HERE-NOW
