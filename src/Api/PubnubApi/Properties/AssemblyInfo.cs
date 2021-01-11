@@ -11,8 +11,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyProduct("Pubnub C# SDK")]
 [assembly: AssemblyCopyright("Copyright ©  2020")]
 [assembly: AssemblyTrademark("")]
-[assembly: AssemblyVersion("4.12.0.0")]
-[assembly: AssemblyFileVersion("4.12.0.0")]
+[assembly: AssemblyVersion("4.12.1.0")]
+[assembly: AssemblyFileVersion("4.12.1.0")]
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
 // COM, set the ComVisible attribute to true on that type.
