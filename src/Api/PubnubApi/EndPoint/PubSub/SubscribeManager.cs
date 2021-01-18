@@ -35,8 +35,8 @@ namespace PubnubApi.EndPoint
 #pragma warning restore
         {
             //Retrieve the current channels already subscribed previously and terminate them
-            string[] currentChannels = MultiChannelSubscribe[PubnubInstance.InstanceId].Keys.ToArray<string>();
-            string[] currentChannelGroups = MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Keys.ToArray<string>();
+            string[] currentChannels = (MultiChannelSubscribe.ContainsKey(PubnubInstance.InstanceId) && MultiChannelSubscribe[PubnubInstance.InstanceId] != null) ? MultiChannelSubscribe[PubnubInstance.InstanceId].Keys.ToArray<string>() : null;
+            string[] currentChannelGroups = (MultiChannelGroupSubscribe.ContainsKey(PubnubInstance.InstanceId) && MultiChannelGroupSubscribe[PubnubInstance.InstanceId] != null) ? MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Keys.ToArray<string>() : null;
 
             if (currentChannels != null && currentChannels.Length >= 0)
             {
