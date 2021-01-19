@@ -377,7 +377,7 @@ namespace PubnubApi
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
 
-            requestQueryStringParams.Add("max", (count <= -1) ? "100" : count.ToString());
+            requestQueryStringParams.Add("max", (count <= -1) ? (includeMessageActions || (channels != null && channels.Length > 1) ? "25" : "100") : count.ToString());
 
             if (reverse)
             {
