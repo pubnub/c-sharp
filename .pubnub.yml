@@ -6,411 +6,411 @@ changelog:
   - version: 4.13.0.0
     date: January 18, 2021
     changes:
-      - type: Improvement
+      - type: improvement
         text: Increase message count default limit for History v3 api call to 100 for single channel.
-      - type: bug fix
+      - type: bug
         text: UnsubscribeAll fix when no channels subscribed.
   - version: 4.12.0.0
     date: October 05, 2020
     changes:
-      - type: Improvement
+      - type: improvement
         text: Added support to Objects Access Manager
   - version: 4.11.0.0
     date: August 27, 2020
     changes:
-      - type: Improvement
+      - type: improvement
         text: Fix for SaveFileToLocal in PNDownloadFileResult
-      - type: Improvement
+      - type: improvement
         text: Code refactor to use file Content-Type from generate-upload-url form fields
-      - type: Improvement
+      - type: improvement
         text: Removed IncludeUuid and IncludeMessageType from v2/history endpoint
   - version: 4.10.0.0
     date: July 30, 2020
     changes:
-      - type: Improvement
+      - type: improvement
         text: Fix for publish file message
-      - type: Improvement
+      - type: improvement
         text: Modified PNFileEventResult model class and applied internal set accessor for models.
   - version: 4.9.0.0
     date: July 28, 2020
     changes:
-      - type: Improvement
+      - type: improvement
         text: Added files feature
   - version: 4.8.0.0
     date: June 10, 2020
     changes:
-      - type: Improvement
+      - type: improvement
         text: Removed V1 Objects API feature. BREAKING CHANGE if you are using V1 Objects.
-      - type: Improvement
+      - type: improvement
         text: Added Objects Simplification API feature.
   - version: 4.7.0.0
     date: May 27, 2020
     changes:
-      - type: Improvement
+      - type: improvement
         text: Code refactor for Signal, Publish, Fire input validation.
   - version: 4.6.0.0
     date: April 30, 2020
     changes:
-      - type: Improvement
+      - type: improvement
         text: Added async/await support for feature method calls.
-      - type: Improvement
+      - type: improvement
         text: Added sort for Objects API.
-      - type: Improvement
+      - type: improvement
         text: Typo correction SupressLeaveEvents to SuppressLeaveEvents in PNConfiguration.
   - version: 4.5.0.0
     date: January 9, 2020
     changes:
-      - type: Improvement
+      - type: improvement
         text: Code refactor to fix Objects and MessageActions using POST/PATCH/DELETE based requests.
-      - type: Improvement
+      - type: improvement
         text: Added filter support for Objects API.
   - version: 4.4.0.0
     date: December 19, 2019
     changes:
-      - type: Improvement
+      - type: improvement
         text: Refactored code related to TMS GetToken and GetTokens
-      - type: Improvement
+      - type: improvement
         text: Refactored code to retrieve assembly version
   - version: 4.3.0.0
     date: December 12, 2019
     changes:
-      - type: Improvement
+      - type: improvement
         text: Added APNS2 support for mobile push.
-      - type: Improvement
+      - type: improvement
         text: Added helper class to build mobile push payload.
-      - type: Improvement
+      - type: improvement
         text: Refactored code for PAM Signature.
   - version: 4.2.0.0
     date: October 15, 2019
     changes:
-      - type: Improvement
+      - type: improvement
         text: Added IncludeMeta option to History.
-      - type: Improvement
+      - type: improvement
         text: Added new feature FetchHistory.
-      - type: Improvement
+      - type: improvement
         text: Added support for Message Actions.
-      - type: Improvement
+      - type: improvement
         text: Fix for ManageMembers and ManageMemberships when multiple include fields are provided.
   - version: 4.1.0.0
     date: September 26, 2019
     changes:
-      - type: Improvement
+      - type: improvement
         text: Fix for MessageCounts when multiple channels are used.
-      - type: Improvement
+      - type: improvement
         text: Fix for PAM Signature when case-sensitive param keys are provided.
-      - type: Improvement
+      - type: improvement
         text: Refactored all calls that use PAM signature to use  v2 format signature.
-      - type: Improvement
+      - type: improvement
         text: Implemented PAMv3 to all Objects.
-      - type: Improvement
+      - type: improvement
         text: New feature Token Management System to all Objects.
   - version: 4.0.33.0
     date: August 22, 2019
     changes:
-      - type: Improvement
+      - type: improvement
         text: Modified Signal listener message type to PNSignalResult.
-      - type: Improvement
+      - type: improvement
         text: Added ObjectsAPI feature.
   - version: 4.0.32.0
     date: August 08, 2019
     changes:
-      - type: Improvement
+      - type: improvement
         text: Async() is deprecated. Use Execute() instead.
-      - type: Improvement
+      - type: improvement
         text: Added Signal feature.
   - version: 4.0.31.0
     date: July 25, 2019
     changes:
-      - type: Improvement
+      - type: improvement
         text: Refactored code to encode unsafe chars ignored by EscapeDataString in NET35/NET40
   - version: 4.0.30.0
     date: May 28, 2019
     changes:
-      - type: Improvement
+      - type: improvement
         text: Refactored code to enforce minimum PresenceTimeout value to 20
-      - type: Improvement
+      - type: improvement
         text: Refactored code to handle bool type in presence state
   - version: 4.0.29.0
     date: Apr 25, 2019
     changes:
-      - type: Improvement
+      - type: improvement
         text: Fix to retrieve channel name for PNPresenceEventResult when channel group is used
   - version: 4.0.28.0
     date: Mar 28, 2019
     changes:
-      - type: Improvement
+      - type: improvement
         text: Fix for MessageCounts feature when multiple channels or timetokens are used with PAM enabled keys
   - version: 4.0.27.0
     date: Mar 13, 2019
     changes:
-      - type: Improvement
+      - type: improvement
         text: Added MessageCounts feature to get count of messages published since a given time
   - version: 4.0.26.0
     date: Feb 14, 2019
     changes:
-      - type: Improvement
+      - type: improvement
         text: Fix to capture last timetoken when subscribe request timeout/terminated
   - version: 4.0.25.0
     date: Feb 07, 2019
     changes:
-      - type: Improvement
+      - type: improvement
         text: Refactored code to allow tilde char for publish GET with secret key
-      - type: Improvement
+      - type: improvement
         text: Minor code refactoring based on Codacy analysis
   - version: 4.0.24.0
     date: Oct 11, 2018
     changes:
-      - type: Improvement
+      - type: improvement
         text: Code refactor to check null value of variables related to Reconnect usage
   - version: 4.0.23.0
     date: Oct 01, 2018
     changes:
-      - type: Improvement
+      - type: improvement
         text: Code refactor based on codacy rules on unused code
-      - type: Improvement
+      - type: improvement
         text: Refactored code to handle WebException from HttpRequestException for NetStandard platforms
   - version: 4.0.22.0
     date: Sept 06, 2018
     changes:
-      - type: Improvement
+      - type: improvement
         text: Added Grant delete permission feature
-      - type: Improvement
+      - type: improvement
         text: Modified SDK dependency Portable.BouncyCastle minimum version to 1.8.1.2
   - version: 4.0.21.0
     date: Aug 13, 2018
     changes:
-      - type: Improvement
+      - type: improvement
         text: Refactored code for performance improvement
-      - type: Improvement
+      - type: improvement
         text: Refactored CleanupTelemetryData
   - version: 4.0.20.0
     date: Aug 06, 2018
     changes:
-      - type: Improvement
+      - type: improvement
         text: Refactored code to publish multiple emoji characters
-      - type: Improvement
+      - type: improvement
         text: Refactored code to improve performance of Publish/Fire/Grant/Subscribe/Unsubscribe requests targeting .net framework
   - version: 4.0.19.0
     date: Jul 12, 2018
     changes:
-      - type: Improvement
+      - type: improvement
         text: Code refactor to maintain separate instance id during multi-instancing
   - version: 4.0.18.0
     date: Jun 20, 2018
     changes:
-      - type: Improvement
+      - type: improvement
         text: Added Publisher property to PNMessageResult of subscribe
-      - type: Improvement
+      - type: improvement
         text: Added PNException class and refactored code internally around status response
   - version: 4.0.17.0
     date: May 30, 2018
     changes:
-      - type: Improvement
+      - type: improvement
         text: Code refactor related to MultiplexExceptionHandler
-      - type: Improvement
+      - type: improvement
         text: Support to Apple Watch
-      - type: Improvement
+      - type: improvement
         text: Code refactor related to PubnubInstance
   - version: 4.0.16.0
     date: Apr 09, 2018
     changes:
-      - type: Improvement
+      - type: improvement
         text: Code refactor to ClientNetworkStatus
-      - type: Improvement
+      - type: improvement
         text: Proxy support for HttpClient
-      - type: Improvement
+      - type: improvement
         text: Code refactor to Telemetry
-      - type: Improvement
+      - type: improvement
         text: Reduced internal subscribe heartbeat interval for improvement in message delivery
   - version: 4.0.15.0
     date: Mar 22, 2018
     changes:
-      - type: Improvement
+      - type: improvement
         text: Feature to add external query params
-      - type: Improvement
+      - type: improvement
         text: Internal deduping mechanism when devices cross regions (DedupOnSubscribe)
-      - type: Improvement
+      - type: improvement
         text: Added provision to SupressLeaveEvents
-      - type: Improvement
+      - type: improvement
         text: Refactored code related to network check time request for non-200 response logging
   - version: 4.0.14.0
     date: Feb 15, 2018
     changes:
-      - type: Improvement
+      - type: improvement
         text: Fix for Publish Sync 
-      - type: Improvement
+      - type: improvement
         text: Refactored Int32/Int64 Parse to TryParse
-      - type: Improvement
+      - type: improvement
         text: Code refactor based on Codacy
   - version: 4.0.13.0
     date: Jan 18, 2018
     changes:
-      - type: Improvement
+      - type: improvement
         text: Relay server sent error status to PNStatus for Publish request 
-      - type: Improvement
+      - type: improvement
         text: Refactored to allow colon char for publish with secret key
   - version: 4.0.12.0
     date: Dec 21, 17
     changes:
-      - type: Improvement
+      - type: improvement
         text: Relay server sent 403 status to PNStatus for PCL 
-      - type: Improvement
+      - type: improvement
         text: Resolved array type published message for Subscribe&lt;string&gt;
   - version: 4.0.11.0
     date: Dec 14, 17
     changes:
-      - type: Improvement
+      - type: improvement
         text: Refactored by applying JArray.Parse for history and time json response
   - version: 4.0.10.0
     date: Dec 13, 17
     changes:
-      - type: Improvement
+      - type: improvement
         text: Refactored code by replacing Add with AddOrGet for ConcurrentDictionary
-      - type: Improvement
+      - type: improvement
         text: Added exception handling in TerminateReconnectTimer
-      - type: Improvement
+      - type: improvement
         text: Code refactor based on Codacy recommendation
   - version: 4.0.9.0
     date: Dec 05, 17
     changes:
-      - type: Improvement
+      - type: improvement
         text: Return PNStatus for non-subscribe requests timeout
-      - type: Improvement
+      - type: improvement
         text: Fix for PAM Grant requests to work independent of device locale
-      - type: Improvement
+      - type: improvement
         text: Code refactor based on Codacy recommendation
   - version: 4.0.8.0
     date: Nov 09, 17
     changes:
-      - type: Improvement
+      - type: improvement
         text: Added bool return value for AddListener and RemoveListener
-      - type: Improvement
+      - type: improvement
         text: ResetTimeToken option for Reconnect and bool return for Reconnect/Disconnect
-      - type: Improvement
+      - type: improvement
         text: Resubscribe fix when channelgroup is used
   - version: 4.0.7.0
     date: Nov 01, 17
     changes:
-      - type: Improvement
+      - type: improvement
         text: Added exception handling to AddListener and RemoveListener
-      - type: Improvement
+      - type: improvement
         text: Code refactor to address collection modified error in TelemetryManager
-      - type: Improvement
+      - type: improvement
         text: Code refactor based on Codacy recommendation
   - version: 4.0.6.0
     date: Oct 27, 17
     changes:
-      - type: Improvement
+      - type: improvement
         text: Added null check in exception catch block during network reconnect
-      - type: Improvement
+      - type: improvement
         text: Refactored code to send correct channel group, if exist, to PNStatus during network reconnect
-      - type: Improvement
+      - type: improvement
         text: Fix for delete message from history
-      - type: Improvement
+      - type: improvement
         text: Code refactor based on Codacy recommendation
   - version: 4.0.5.2
     date: Oct 10, 17
     changes:
-      - type: Improvement
+      - type: improvement
         text: Added exception handling for subscribe and unsubscribe internal exceptions
   - version: 4.0.5.1
     date: Sept 26, 17
     changes:
-      - type: Improvement
+      - type: improvement
         text: Added new method RemoveAllPushNotificationsFromDeviceWithPushToken
-      - type: Improvement
+      - type: improvement
         text: Code refactor on Reconnect
-      - type: Improvement
+      - type: improvement
         text: Code refactor based on Codacy recommendation
   - version: 4.0.4.1
     date: Sept 19, 17
     changes:
-      - type: Improvement
+      - type: improvement
         text: Added Telemetry feature
-      - type: Improvement
+      - type: improvement
         text: Fix for PNPushListProvisionsResult
   - version: 4.0.3.2
     date: Sept 06, 17
     changes:
-      - type: Improvement
+      - type: improvement
         text: Added HereNowRefresh to PNPresenceEventResult
-      - type: Improvement
+      - type: improvement
         text: PCL version duplicate message fix for multiple disconnect/reconnect
   - version: 4.0.3.1
     date: Aug 18, 17
     changes:
-      - type: Improvement
+      - type: improvement
         text: Refactored code to handle exception in Unsubscribe and query builder functionality
-      - type: Improvement
+      - type: improvement
         text: Migrated source code from VS 2015 to VS 2017
-      - type: Improvement
+      - type: improvement
         text: Added DeleteMessages feature
   - version: 4.0.2.2
     date: Jul 20, 17
     changes:
-      - type: Improvement
+      - type: improvement
         text: Code refactor to fix subscribe timeout and reconnect
   - version: 4.0.2.0
     date: Jul 05, 17
     changes:
-      - type: Improvement
+      - type: improvement
         text: Refactored code for application level grant
-      - type: Improvement
+      - type: improvement
         text: Refactored code to reuse HttpClient instance
-      - type: Improvement
+      - type: improvement
         text: Refactored code to handle Pubnub multi-instancing
   - version: 4.0.1.7
     date: Jun 07, 17
     changes:
-      - type: Improvement
+      - type: improvement
         text: Fix for publish with UsePOST and cipher key
-      - type: Improvement
+      - type: improvement
         text: Handling object array for History response
   - version: 4.0.1.6
     date: Apr 15, 17
     changes:
-      - type: Improvement
+      - type: improvement
         text: Fix for subscribe connect status callback
-      - type: Improvement
+      - type: improvement
         text: Message null value check for publish
   - version: 4.0.1.5
     date: Apr 06, 17
     changes:
-      - type: Improvement
+      - type: improvement
         text: Refactored to handle thread blocking
   - version: 4.0.1.4
     date: Mar 31, 17
     changes:
-      - type: Improvement
+      - type: improvement
         text: Fix to support Xamarin.Android Pubnub SDK install using Visual Studio
   - version: 4.0.1.3
     date: Mar 29, 17
     changes:
-      - type: Improvement
+      - type: improvement
         text: Added code to handle presence interval event
-      - type: Improvement
+      - type: improvement
         text: Code refactor per CA2000 code analysis
   - version: 4.0.1.3-rc13
     changes:
-      - type: Improvement
+      - type: improvement
         text: Refactored to address false alert log and timeout messages.
   - version: 4.0.1.3-rc12
     changes:
-      - type: Improvement
+      - type: improvement
         text: Support for ASP.NET/MVC project template projects.
   - version: 4.0.1.3-rc11
     changes:
-      - type: Improvement
+      - type: improvement
         text: Replaced HttpClient with compatible lib for .net 4.5/4.61 to support VS 2013.
   - version: 4.0.1.3-rc10
     changes:
-      - type: bug fix
+      - type: bug
         text: Comma encoding fix for multi channelgroups
-      - type: bug fix
+      - type: bug
         text: Fixed channel remove from channelgroup
   - version: 4.0.1.3-rc9
     changes:
-      - type: bug fix
+      - type: bug
         text: Message fix for history when timetoken=false.
   - version: 4.0.1.3-rc8
     changes:
@@ -418,16 +418,18 @@ changelog:
         text: Added pn- prefix to default uuid.
   - version: 4.0.1.3-rc7
     changes:
-      - type: bug fix
+      - type: bug
         text: pcl profile 111 subscribe message fix.
   - version: 4.0.1.3-rc6
     changes:
-      - type: bug fix
+      - type: bug
         text: Timetoken fix for subscribed messages.
   - version: 4.0.1.3-rc5
     changes:
-      - type: improvement and bug fix
-        text: HttpClient to supported platforms. Fixed Unsubscribe issue.
+      - type: improvement
+        text: HttpClient to supported platforms.
+      - type: bug
+        text: Fixed Unsubscribe issue.
   - version: 4.0.1.3-rc1
     changes:
       - type: improvement
