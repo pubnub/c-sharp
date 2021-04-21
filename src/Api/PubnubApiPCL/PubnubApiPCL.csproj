@@ -665,7 +665,7 @@
     <PackageReference Include="System.Text.Encoding.Extensions" Version="4.3.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.Net.Http" Version="4.3.0">
+    <PackageReference Include="System.Net.Http" Version="4.3.4">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="System.Net.Primitives" Version="4.3.0">
@@ -685,7 +685,7 @@
     <PackageReference Include="System.Linq.Queryable" Version="4.0.1" />
     <PackageReference Include="System.Text.Encoding" Version="4.3.0" />
     <PackageReference Include="System.Text.Encoding.Extensions" Version="4.0.11" />
-    <PackageReference Include="System.Net.Http" Version="4.3.0" />
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
     <PackageReference Include="System.Net.Primitives" Version="4.3.0" />
   </ItemGroup>-->
 
@@ -717,7 +717,7 @@
     <PackageReference Include="System.Text.Encoding.Extensions" Version="4.3.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.Net.Http" Version="4.3.0">
+    <PackageReference Include="System.Net.Http" Version="4.3.4">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="System.Net.Primitives" Version="4.3.0">
@@ -756,7 +756,7 @@
     <PackageReference Include="System.Text.Encoding.Extensions" Version="4.3.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.Net.Http" Version="4.3.0">
+    <PackageReference Include="System.Net.Http" Version="4.3.4">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="System.Net.Primitives" Version="4.3.0">
@@ -817,7 +817,7 @@
     <PackageReference Include="System.Linq.Queryable" Version="4.0.1" />
     <PackageReference Include="System.Text.Encoding" Version="4.3.0" />
     <PackageReference Include="System.Text.Encoding.Extensions" Version="4.0.11" />
-    <PackageReference Include="System.Net.Http" Version="4.3.0" />
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
     <PackageReference Include="System.Net.Primitives" Version="4.3.0" />
   </ItemGroup>-->
 
