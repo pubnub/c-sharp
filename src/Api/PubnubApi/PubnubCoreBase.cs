@@ -1640,7 +1640,7 @@ namespace PubnubApi
         protected void ProcessResponseCallbacks<T>(List<object> result, RequestState<T> asyncRequestState)
         {
             bool callbackAvailable = false;
-            if (result != null && result.Count >= 1 && asyncRequestState.PubnubCallback != null || SubscribeCallbackListenerList.Count >= 1)
+            if (result != null && result.Count >= 1 && (asyncRequestState.PubnubCallback != null || SubscribeCallbackListenerList.Count >= 1))
             {
                 callbackAvailable = true;
             }

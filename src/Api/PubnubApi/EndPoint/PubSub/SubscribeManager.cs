@@ -1033,11 +1033,11 @@ namespace PubnubApi.EndPoint
                     if (networkConnection && PubnubInstance != null && SubscribeRequestTracker.ContainsKey(PubnubInstance.InstanceId))
                     {
                         DateTime lastSubscribeRequestTime = SubscribeRequestTracker[PubnubInstance.InstanceId];
-                        if ((DateTime.Now - lastSubscribeRequestTime).TotalSeconds <= config.SubscribeTimeout)
+                        if ((DateTime.Now - lastSubscribeRequestTime).TotalSeconds < config.SubscribeTimeout)
                         {
                             LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - ok. expected subscribe within threshold limit of SubscribeTimeout. No action needed", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
                         }
-                        else if ((DateTime.Now - lastSubscribeRequestTime).TotalSeconds > 2 * config.SubscribeTimeout)
+                        else if ((DateTime.Now - lastSubscribeRequestTime).TotalSeconds > 2 * (config.SubscribeTimeout - config.SubscribeTimeout/2))
                         {
                             LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - **No auto subscribe within threshold limit of SubscribeTimeout**. Calling MultiChannelSubscribeRequest", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
                             Task.Factory.StartNew(() =>
