@@ -1419,6 +1419,15 @@ namespace PubnubApi
                 }
 
             }
+            else if (jsonString.ToLower().TrimStart().IndexOf("<head", StringComparison.CurrentCultureIgnoreCase) == 0
+                || jsonString.ToLower().TrimStart().IndexOf("<html", StringComparison.CurrentCultureIgnoreCase) == 0
+                || jsonString.ToLower().TrimStart().IndexOf("<!doctype", StringComparison.CurrentCultureIgnoreCase) == 0)//Html is not expected. Only json format messages are expected.
+            {
+                if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig))
+                {
+                    status = new StatusBuilder(currentConfig, jsonLib).CreateStatusResponse<T>(type, PNStatusCategory.PNNetworkIssuesCategory, asyncRequestState, (int)HttpStatusCode.NotFound, new PNException(jsonString));
+                }
+            }
 
             return status;
         }
