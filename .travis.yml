@@ -1,0 +1,44 @@
+language: node_js
+node_js: '12'
+os: linux
+
+env:
+  global:
+    - SOURCE_FOLDER_PATH="./"
+    - TARGET_FOLDER_PATH="./"
+
+
+before_install:
+  - ./.travis/bootstrap.sh
+  - ./.travis/scripts/key_decrypt.sh deployment_keys.tar deployment_keys $encrypted_106984091d02_key $encrypted_106984091d02_iv
+  - ./.travis/scripts/git_config.sh
+
+
+stages:
+  - name: "release candidate"
+    if: |
+      type != pull_request \
+      AND tag IS present \
+      AND tag =~ ^((.+\-)?v?\d+\.\d+\.\d+(\.\d+)?-(rc|alpha|beta)\.\d+)$
+  - name: "release"
+    if: |
+      type != pull_request \
+      AND tag IS present \
+      AND tag =~ ^((.+\-)?v?\d+\.\d+\.\d+(\.\d+)?)$
+  - name: "synchronize"
+    if: |
+      type != pull_request \
+      AND tag IS present \
+      AND tag =~ ^(v?\d+\.\d+\.\d+(\.\d+)?-nodeploy\.\d+)$
+
+jobs:
+  include:
+    - stage: "release candidate"
+      name: "Deploy release candidate"
+      script: ./.travis/scripts/deploy.sh release-candidate pubnub/c-sharp
+    - stage: "release"
+      name: "Deploy release"
+      script: ./.travis/scripts/deploy.sh release pubnub/c-sharp
+    - stage: "synchronize"
+      name: "Not deployable synchronization"
+      script: ./.travis/scripts/synchronization.sh pubnub/c-sharp

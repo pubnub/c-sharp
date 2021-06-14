@@ -122,7 +122,7 @@ namespace PubnubApi
             this.DedupOnSubscribe = false;
             this.MaximumMessagesCacheSize = 100;
             this.SuppressLeaveEvents = false;
-            this.UseRandomInitializationVector = false;
+            this.UseRandomInitializationVector = true;
             this.FileMessagePublishRetryLimit = 5;
         }
 
