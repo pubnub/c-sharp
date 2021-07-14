@@ -57,7 +57,7 @@ namespace PubNubMessaging.Tests
             string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group\",\"subscribe_key\":\"demo-36\",\"ttl\":20,\"channel-groups\":{\"hello_my_group\":{\"r\":1,\"w\":0,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
 
 
-            pubnub.Grant().Channels(new[] { channelName }).AuthKeys(new[] { authKey }).Read(true).Write(true).Manage(true).TTL(20)
+            pubnub.Grant().Channels(new[] { channelName }).AuthKeys(new[] { authKey }).Read(true).Write(true).Manage(true).Delete(true).TTL(20)
                 .Execute(new PNAccessManagerGrantResultExt((r,s)=> 
                 { 
                     if (r != null)
@@ -133,7 +133,7 @@ namespace PubNubMessaging.Tests
             string fileId = "";
             string fileName = "";
             receivedMessage = false;
-            string targetFileUpload = @"C:\Pandu\pubnub\word_test.txt";
+            string targetFileUpload = @"fileupload.txt";
             //string targetFileDownload = @"c:\pandu\temp\pandu_test.gif";
             pubnub.SendFile().Channel(channelName).File(targetFileUpload).CipherKey("enigma").Message("This is my sample file")
                 .Execute(new PNFileUploadResultExt((result, status) =>
@@ -154,21 +154,23 @@ namespace PubNubMessaging.Tests
             Thread.Sleep(1000);
             mre.WaitOne();
 
-            receivedMessage = false;
-            mre = new ManualResetEvent(false);
-            pubnub.ListFiles().Channel(channelName)
-                .Execute(new PNListFilesResultExt((result, status) =>
-                {
-                    if (result != null)
+            if (receivedMessage)
+            {
+                receivedMessage = false;
+                mre = new ManualResetEvent(false);
+                pubnub.ListFiles().Channel(channelName)
+                    .Execute(new PNListFilesResultExt((result, status) =>
                     {
-                        System.Diagnostics.Debug.WriteLine("ListFiles result = " + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-                        receivedMessage = true;
-                    }
-                    mre.Set();
-                }));
-            Thread.Sleep(1000);
-            mre.WaitOne();
-
+                        if (result != null)
+                        {
+                            System.Diagnostics.Debug.WriteLine("ListFiles result = " + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                            receivedMessage = true;
+                        }
+                        mre.Set();
+                    }));
+                Thread.Sleep(1000);
+                mre.WaitOne();
+            }
 
             if (receivedMessage)
             {
@@ -266,7 +268,7 @@ namespace PubNubMessaging.Tests
             string fileId = "";
             string fileName = "";
             receivedMessage = false;
-            string targetFileUpload = @"C:\Pandu\pubnub\word_test.txt";
+            string targetFileUpload = @"fileupload.txt";
             Dictionary<string, object> myInternalMsg = new Dictionary<string, object>();
             myInternalMsg.Add("color", "red");
             myInternalMsg.Add("name", "John Doe");

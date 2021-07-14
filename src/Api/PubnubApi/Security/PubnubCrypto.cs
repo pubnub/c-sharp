@@ -2,9 +2,11 @@
 using System.Text;
 using System.Globalization;
 
-#if NET35
+#if !NETSTANDARD10 && !NETSTANDARD11
 using System.Security.Cryptography;
-#else
+#endif
+
+#if !NET35
 using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Crypto.Engines;
 using Org.BouncyCastle.Crypto.Modes;
@@ -88,7 +90,11 @@ namespace PubnubApi
                 //encrypt
                 if (dynamicIV)
                 {
+#if NETSTANDARD10 || NETSTANDARD11
                     new Random().NextBytes(ivBytes);
+#else
+                    RandomNumberGenerator.Create().GetBytes(ivBytes);
+#endif
                 }
                 else
                 {

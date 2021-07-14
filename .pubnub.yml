@@ -9,31 +9,31 @@ changelog:
       - type: feature
         text: "BREAKING CHANGE - UseRandomInitializationVector is true by default."
   - version: 4.15.0.0
-    date: May 27, 2021
+    date: 2021-05-27
     changes:
       - type: improvement
         text: Refactored code to handle malformed message for reconnection policy.
   - version: 4.14.0.0
-    date: May 18, 2021
+    date: 2021-05-18
     changes:
       - type: bug
         text: Refactored code to handle malformed message for re-subscribe.
       - type: improvement
         text: Upgraded System.Net.Http minimum version to 4.3.4, to address security advisory CVE-2018-8292 in PubnubPCL.
   - version: 4.13.0.0
-    date: January 18, 2021
+    date: 2021-01-18
     changes:
       - type: improvement
         text: Increase message count default limit for History v3 api call to 100 for single channel.
       - type: bug
         text: UnsubscribeAll fix when no channels subscribed.
   - version: 4.12.0.0
-    date: October 05, 2020
+    date: 2020-10-05
     changes:
       - type: improvement
         text: Added support to Objects Access Manager
   - version: 4.11.0.0
-    date: August 27, 2020
+    date: 2020-08-27
     changes:
       - type: improvement
         text: Fix for SaveFileToLocal in PNDownloadFileResult
@@ -42,31 +42,31 @@ changelog:
       - type: improvement
         text: Removed IncludeUuid and IncludeMessageType from v2/history endpoint
   - version: 4.10.0.0
-    date: July 30, 2020
+    date: 2020-07-30
     changes:
       - type: improvement
         text: Fix for publish file message
       - type: improvement
         text: Modified PNFileEventResult model class and applied internal set accessor for models.
   - version: 4.9.0.0
-    date: July 28, 2020
+    date: 2020-07-28
     changes:
       - type: improvement
         text: Added files feature
   - version: 4.8.0.0
-    date: June 10, 2020
+    date: 2020-06-10
     changes:
       - type: improvement
         text: Removed V1 Objects API feature. BREAKING CHANGE if you are using V1 Objects.
       - type: improvement
         text: Added Objects Simplification API feature.
   - version: 4.7.0.0
-    date: May 27, 2020
+    date: 2020-05-27
     changes:
       - type: improvement
         text: Code refactor for Signal, Publish, Fire input validation.
   - version: 4.6.0.0
-    date: April 30, 2020
+    date: 2020-04-30
     changes:
       - type: improvement
         text: Added async/await support for feature method calls.
@@ -75,21 +75,21 @@ changelog:
       - type: improvement
         text: Typo correction SupressLeaveEvents to SuppressLeaveEvents in PNConfiguration.
   - version: 4.5.0.0
-    date: January 9, 2020
+    date: 2020-01-09
     changes:
       - type: improvement
         text: Code refactor to fix Objects and MessageActions using POST/PATCH/DELETE based requests.
       - type: improvement
         text: Added filter support for Objects API.
   - version: 4.4.0.0
-    date: December 19, 2019
+    date: 2019-12-19
     changes:
       - type: improvement
         text: Refactored code related to TMS GetToken and GetTokens
       - type: improvement
         text: Refactored code to retrieve assembly version
   - version: 4.3.0.0
-    date: December 12, 2019
+    date: 2019-12-12
     changes:
       - type: improvement
         text: Added APNS2 support for mobile push.
@@ -98,7 +98,7 @@ changelog:
       - type: improvement
         text: Refactored code for PAM Signature.
   - version: 4.2.0.0
-    date: October 15, 2019
+    date: 2019-10-15
     changes:
       - type: improvement
         text: Added IncludeMeta option to History.
@@ -109,7 +109,7 @@ changelog:
       - type: improvement
         text: Fix for ManageMembers and ManageMemberships when multiple include fields are provided.
   - version: 4.1.0.0
-    date: September 26, 2019
+    date: 2019-09-26
     changes:
       - type: improvement
         text: Fix for MessageCounts when multiple channels are used.
@@ -122,105 +122,105 @@ changelog:
       - type: improvement
         text: New feature Token Management System to all Objects.
   - version: 4.0.33.0
-    date: August 22, 2019
+    date: 2019-08-22
     changes:
       - type: improvement
         text: Modified Signal listener message type to PNSignalResult.
       - type: improvement
         text: Added ObjectsAPI feature.
   - version: 4.0.32.0
-    date: August 08, 2019
+    date: 2019-08-08
     changes:
       - type: improvement
         text: Async() is deprecated. Use Execute() instead.
       - type: improvement
         text: Added Signal feature.
   - version: 4.0.31.0
-    date: July 25, 2019
+    date: 2019-07-25
     changes:
       - type: improvement
         text: Refactored code to encode unsafe chars ignored by EscapeDataString in NET35/NET40
   - version: 4.0.30.0
-    date: May 28, 2019
+    date: 2019-05-28
     changes:
       - type: improvement
         text: Refactored code to enforce minimum PresenceTimeout value to 20
       - type: improvement
         text: Refactored code to handle bool type in presence state
   - version: 4.0.29.0
-    date: Apr 25, 2019
+    date: 2019-04-25
     changes:
       - type: improvement
         text: Fix to retrieve channel name for PNPresenceEventResult when channel group is used
   - version: 4.0.28.0
-    date: Mar 28, 2019
+    date: 2019-03-28
     changes:
       - type: improvement
         text: Fix for MessageCounts feature when multiple channels or timetokens are used with PAM enabled keys
   - version: 4.0.27.0
-    date: Mar 13, 2019
+    date: 2019-03-13
     changes:
       - type: improvement
         text: Added MessageCounts feature to get count of messages published since a given time
   - version: 4.0.26.0
-    date: Feb 14, 2019
+    date: 2019-02-14
     changes:
       - type: improvement
         text: Fix to capture last timetoken when subscribe request timeout/terminated
   - version: 4.0.25.0
-    date: Feb 07, 2019
+    date: 2019-02-07
     changes:
       - type: improvement
         text: Refactored code to allow tilde char for publish GET with secret key
       - type: improvement
         text: Minor code refactoring based on Codacy analysis
   - version: 4.0.24.0
-    date: Oct 11, 2018
+    date: 2018-10-11
     changes:
       - type: improvement
         text: Code refactor to check null value of variables related to Reconnect usage
   - version: 4.0.23.0
-    date: Oct 01, 2018
+    date: 2018-10-01
     changes:
       - type: improvement
         text: Code refactor based on codacy rules on unused code
       - type: improvement
         text: Refactored code to handle WebException from HttpRequestException for NetStandard platforms
   - version: 4.0.22.0
-    date: Sept 06, 2018
+    date: 2018-09-06
     changes:
       - type: improvement
         text: Added Grant delete permission feature
       - type: improvement
         text: Modified SDK dependency Portable.BouncyCastle minimum version to 1.8.1.2
   - version: 4.0.21.0
-    date: Aug 13, 2018
+    date: 2018-08-13
     changes:
       - type: improvement
         text: Refactored code for performance improvement
       - type: improvement
         text: Refactored CleanupTelemetryData
   - version: 4.0.20.0
-    date: Aug 06, 2018
+    date: 2018-08-06
     changes:
       - type: improvement
         text: Refactored code to publish multiple emoji characters
       - type: improvement
         text: Refactored code to improve performance of Publish/Fire/Grant/Subscribe/Unsubscribe requests targeting .net framework
   - version: 4.0.19.0
-    date: Jul 12, 2018
+    date: 2018-07-12
     changes:
       - type: improvement
         text: Code refactor to maintain separate instance id during multi-instancing
   - version: 4.0.18.0
-    date: Jun 20, 2018
+    date: 2018-06-20
     changes:
       - type: improvement
         text: Added Publisher property to PNMessageResult of subscribe
       - type: improvement
         text: Added PNException class and refactored code internally around status response
   - version: 4.0.17.0
-    date: May 30, 2018
+    date: 2018-05-30
     changes:
       - type: improvement
         text: Code refactor related to MultiplexExceptionHandler
@@ -229,7 +229,7 @@ changelog:
       - type: improvement
         text: Code refactor related to PubnubInstance
   - version: 4.0.16.0
-    date: Apr 09, 2018
+    date: 2018-04-09
     changes:
       - type: improvement
         text: Code refactor to ClientNetworkStatus
@@ -240,7 +240,7 @@ changelog:
       - type: improvement
         text: Reduced internal subscribe heartbeat interval for improvement in message delivery
   - version: 4.0.15.0
-    date: Mar 22, 2018
+    date: 2018-03-22
     changes:
       - type: improvement
         text: Feature to add external query params
@@ -251,7 +251,7 @@ changelog:
       - type: improvement
         text: Refactored code related to network check time request for non-200 response logging
   - version: 4.0.14.0
-    date: Feb 15, 2018
+    date: 2018-02-15
     changes:
       - type: improvement
         text: Fix for Publish Sync 
@@ -260,26 +260,26 @@ changelog:
       - type: improvement
         text: Code refactor based on Codacy
   - version: 4.0.13.0
-    date: Jan 18, 2018
+    date: 2018-01-18
     changes:
       - type: improvement
         text: Relay server sent error status to PNStatus for Publish request 
       - type: improvement
         text: Refactored to allow colon char for publish with secret key
   - version: 4.0.12.0
-    date: Dec 21, 17
+    date: 2017-12-21
     changes:
       - type: improvement
         text: Relay server sent 403 status to PNStatus for PCL 
       - type: improvement
         text: Resolved array type published message for Subscribe&lt;string&gt;
   - version: 4.0.11.0
-    date: Dec 14, 17
+    date: 2017-12-14
     changes:
       - type: improvement
         text: Refactored by applying JArray.Parse for history and time json response
   - version: 4.0.10.0
-    date: Dec 13, 17
+    date: 2017-12-13
     changes:
       - type: improvement
         text: Refactored code by replacing Add with AddOrGet for ConcurrentDictionary
@@ -288,7 +288,7 @@ changelog:
       - type: improvement
         text: Code refactor based on Codacy recommendation
   - version: 4.0.9.0
-    date: Dec 05, 17
+    date: 2017-12-05
     changes:
       - type: improvement
         text: Return PNStatus for non-subscribe requests timeout
@@ -297,7 +297,7 @@ changelog:
       - type: improvement
         text: Code refactor based on Codacy recommendation
   - version: 4.0.8.0
-    date: Nov 09, 17
+    date: 2017-11-09
     changes:
       - type: improvement
         text: Added bool return value for AddListener and RemoveListener
@@ -306,7 +306,7 @@ changelog:
       - type: improvement
         text: Resubscribe fix when channelgroup is used
   - version: 4.0.7.0
-    date: Nov 01, 17
+    date: 2017-11-01
     changes:
       - type: improvement
         text: Added exception handling to AddListener and RemoveListener
@@ -315,7 +315,7 @@ changelog:
       - type: improvement
         text: Code refactor based on Codacy recommendation
   - version: 4.0.6.0
-    date: Oct 27, 17
+    date: 2017-10-27
     changes:
       - type: improvement
         text: Added null check in exception catch block during network reconnect
@@ -326,12 +326,12 @@ changelog:
       - type: improvement
         text: Code refactor based on Codacy recommendation
   - version: 4.0.5.2
-    date: Oct 10, 17
+    date: 2017-10-10
     changes:
       - type: improvement
         text: Added exception handling for subscribe and unsubscribe internal exceptions
   - version: 4.0.5.1
-    date: Sept 26, 17
+    date: 2017-09-26
     changes:
       - type: improvement
         text: Added new method RemoveAllPushNotificationsFromDeviceWithPushToken
@@ -340,21 +340,21 @@ changelog:
       - type: improvement
         text: Code refactor based on Codacy recommendation
   - version: 4.0.4.1
-    date: Sept 19, 17
+    date: 2017-09-19
     changes:
       - type: improvement
         text: Added Telemetry feature
       - type: improvement
         text: Fix for PNPushListProvisionsResult
   - version: 4.0.3.2
-    date: Sept 06, 17
+    date: 2017-09-06
     changes:
       - type: improvement
         text: Added HereNowRefresh to PNPresenceEventResult
       - type: improvement
         text: PCL version duplicate message fix for multiple disconnect/reconnect
   - version: 4.0.3.1
-    date: Aug 18, 17
+    date: 2017-08-18
     changes:
       - type: improvement
         text: Refactored code to handle exception in Unsubscribe and query builder functionality
@@ -363,12 +363,12 @@ changelog:
       - type: improvement
         text: Added DeleteMessages feature
   - version: 4.0.2.2
-    date: Jul 20, 17
+    date: 2017-07-20
     changes:
       - type: improvement
         text: Code refactor to fix subscribe timeout and reconnect
   - version: 4.0.2.0
-    date: Jul 05, 17
+    date: 2017-07-05
     changes:
       - type: improvement
         text: Refactored code for application level grant
@@ -377,85 +377,97 @@ changelog:
       - type: improvement
         text: Refactored code to handle Pubnub multi-instancing
   - version: 4.0.1.7
-    date: Jun 07, 17
+    date: 2017-06-07
     changes:
       - type: improvement
         text: Fix for publish with UsePOST and cipher key
       - type: improvement
         text: Handling object array for History response
   - version: 4.0.1.6
-    date: Apr 15, 17
+    date: 2017-04-15
     changes:
       - type: improvement
         text: Fix for subscribe connect status callback
       - type: improvement
         text: Message null value check for publish
   - version: 4.0.1.5
-    date: Apr 06, 17
+    date: 2017-04-06
     changes:
       - type: improvement
         text: Refactored to handle thread blocking
   - version: 4.0.1.4
-    date: Mar 31, 17
+    date: 2017-03-31
     changes:
       - type: improvement
         text: Fix to support Xamarin.Android Pubnub SDK install using Visual Studio
   - version: 4.0.1.3
-    date: Mar 29, 17
+    date: 2017-03-29
     changes:
       - type: improvement
         text: Added code to handle presence interval event
       - type: improvement
         text: Code refactor per CA2000 code analysis
   - version: 4.0.1.3-rc13
+    date: 2017-03-28
     changes:
       - type: improvement
         text: Refactored to address false alert log and timeout messages.
   - version: 4.0.1.3-rc12
+    date: 2017-03-16
     changes:
       - type: improvement
         text: Support for ASP.NET/MVC project template projects.
   - version: 4.0.1.3-rc11
+    date: 2017-03-11
     changes:
       - type: improvement
         text: Replaced HttpClient with compatible lib for .net 4.5/4.61 to support VS 2013.
   - version: 4.0.1.3-rc10
+    date: 2017-03-08
     changes:
       - type: bug
         text: Comma encoding fix for multi channelgroups
       - type: bug
         text: Fixed channel remove from channelgroup
   - version: 4.0.1.3-rc9
+    date: 2017-03-03
     changes:
       - type: bug
         text: Message fix for history when timetoken=false.
   - version: 4.0.1.3-rc8
+    date: 2017-03-02
     changes:
       - type: improvement
         text: Added pn- prefix to default uuid.
   - version: 4.0.1.3-rc7
+    date: 2017-02-20
     changes:
       - type: bug
         text: pcl profile 111 subscribe message fix.
   - version: 4.0.1.3-rc6
+    date: 2017-02-17
     changes:
       - type: bug
         text: Timetoken fix for subscribed messages.
   - version: 4.0.1.3-rc5
+    date: 2017-02-07
     changes:
       - type: improvement
         text: HttpClient to supported platforms.
       - type: bug
         text: Fixed Unsubscribe issue.
   - version: 4.0.1.3-rc1
+    date: 2017-01-17
     changes:
       - type: improvement
         text: Derived classes for inline coding.
   - version: 4.0.1.2-rc1
+    date: 2016-12-16
     changes:
       - type: improvement
         text: Cipher typo, Origin change.
   - version: 4.0.1.0-rc1
+    date: 2016-12-12
     changes:
       - type: improvement
         text: initial v4 version.
@@ -481,7 +493,6 @@ features:
     - PUSH-TYPE-APNS
     - PUSH-TYPE-APNS2
     - PUSH-TYPE-FCM
-    - PUSH-TYPE-GCM
   presence:
     - PRESENCE-HERE-NOW
     - PRESENCE-WHERE-NOW
@@ -605,3 +616,824 @@ supported-platforms:
       - Windows Phone 10
       - Universal Windows Apps
       - Windows 10
+sdks:
+  -
+    full-name: Pubnub C# SDK
+    short-name: C#
+    artifacts:
+      -
+        artifact-type: api-client
+        language: c#
+        tier: 1
+        tags:
+          - Desktop
+          - Server
+        source-repository: https://github.com/pubnub/c-sharp
+        documentation: https://www.pubnub.com/docs/sdks/c-sharp
+        distributions:
+          -
+            distribution-type: source
+            distribution-repository: Github
+            package-name: Pubnub
+            location: https://github.com/pubnub/c-sharp/releases/tag/v5.0.0
+            requires:
+              -
+                name: ".Net"
+                min-version: "3.5 or higher"
+                license: "MS-EULA"
+                license-url: "https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm"
+                location: "Should be installed on computer"
+                is-required: "Required"    
+              -
+                name: "Newtonsoft.Json"
+                min-version: "9.0.1"
+                license: "MIT"
+                license-url: "https://raw.githubusercontent.com/JamesNK/Newtonsoft.Json/master/LICENSE.md"
+                location: "External"
+                is-required: "Required"          
+              -
+                name: "Portable.BouncyCastle"
+                min-version: "1.8.1.2"
+                license: "MIT,X11"
+                license-url: "https://www.nuget.org/packages/Portable.BouncyCastle/1.8.1.2"
+                location: "External"
+                is-required: "Required"
+              -
+                name: "AsyncBridge.Net35"
+                min-version: "0.2.0"
+                license: "MIT"
+                license-url: "https://www.nuget.org/packages/AsyncBridge.Net35/0.2.0"
+                location: "External"
+                is-required: "Optional, only required for .NET 3.5"
+              -
+                name: "TaskParallelLibrary"
+                min-version: "1.0.2856"
+                license: "MS-EULA"
+                license-url: "https://go.microsoft.com/fwlink/?LinkID=186234"
+                location: "External"
+                is-required: "Optional, only required for .NET 3.5"
+              -
+                name: "AsyncBridge.JetBrains"
+                min-version: "0.1.1"
+                license: "GNU General Public License v3.0"
+                license-url: "https://libraries.io/nuget/AsyncBridge.JetBrains"
+                location: "External"
+                is-required: "Optional, only required for .NET 4.0"              
+            supported-platforms:
+                supported-operating-systems:
+                  Windows:
+                    target-architecture:
+                      - x86-64
+                    runtime-version:
+                      - .NET 4.x Equivalent
+                    api-compatibility:
+                      - .NET 4.x
+                    minimum-os-version:
+                      - Windows 10 Home
+                      - Windows 10 Pro
+                      - Windows 10 Pro for Workstations
+                      - Windows 10 Pro Education
+                      - Windows 10 Enterprise
+                      - Windows 10 Enterprise LTSC (formerly LTSB)
+                      - Windows 10 Education  
+                      - Windows Server 2019 Essentials
+                      - Windows Server 2019 Standard
+                      - Windows Server 2019 Datacenter
+                      - Windows Server 2016 Essentials
+                      - Windows Server 2016 Standard
+                      - Windows Server 2016 Datacenter
+                      - Windows Server 2012 R2 Foundation
+                      - Windows Server 2012 R2 Essentials
+                      - Windows Server 2012 R2 Standard
+                      - Windows Server 2012 R2 Datacenter
+                      - Windows Server 2012 Foundation
+                      - Windows Server 2012 Essentials
+                      - Windows Server 2012 Standard
+                      - Windows Server 2012 Datacenter
+                      - Windows MultiPoint Server 2012
+                      - Windows Server 2008 R2 Foundation
+                      - Windows Server 2008 R2 Standard
+                      - Windows Server 2008 R2 Enterprise
+                      - Windows Server 2008 R2 Datacenter
+                      - Windows Server 2008 R2 for Itanium-based Systems
+                      - Windows Web Server 2008 R2
+                      - Windows Storage Server 2008 R2
+                      - Windows HPC Server 2008 R2
+                      - Windows Small Business Server 2011
+                      - Windows MultiPoint Server 2011
+                      - Windows Home Server 2011
+                      - Windows MultiPoint Server 2010
+                      - Windows Server 2008
+                    maximum-os-version:
+                      - Windows 10 Home
+                      - Windows 10 Pro
+                      - Windows 10 Pro for Workstations
+                      - Windows 10 Pro Education
+                      - Windows 10 Enterprise
+                      - Windows 10 Enterprise LTSC (formerly LTSB)
+                      - Windows 10 Education  
+                      - Windows Server 2019 Essentials
+                      - Windows Server 2019 Standard
+                      - Windows Server 2019 Datacenter
+                      - Windows Server 2016 Essentials
+                      - Windows Server 2016 Standard
+                      - Windows Server 2016 Datacenter
+                      - Windows Server 2012 R2 Foundation
+                      - Windows Server 2012 R2 Essentials
+                      - Windows Server 2012 R2 Standard
+                      - Windows Server 2012 R2 Datacenter
+                      - Windows Server 2012 Foundation
+                      - Windows Server 2012 Essentials
+                      - Windows Server 2012 Standard
+                      - Windows Server 2012 Datacenter
+                      - Windows MultiPoint Server 2012
+                      - Windows Server 2008 R2 Foundation
+                      - Windows Server 2008 R2 Standard
+                      - Windows Server 2008 R2 Enterprise
+                      - Windows Server 2008 R2 Datacenter
+                      - Windows Server 2008 R2 for Itanium-based Systems
+                      - Windows Web Server 2008 R2
+                      - Windows Storage Server 2008 R2
+                      - Windows HPC Server 2008 R2
+                      - Windows Small Business Server 2011
+                      - Windows MultiPoint Server 2011
+                      - Windows Home Server 2011
+                      - Windows MultiPoint Server 2010
+                      - Windows Server 2008
+      -
+        artifact-type: package
+        language: c#
+        tier: 1
+        tags:
+          - Desktop
+          - Server
+        source-repository: https://github.com/pubnub/c-sharp
+        documentation: https://www.pubnub.com/docs/sdks/c-sharp
+        distributions:
+          -
+            distribution-type: package
+            distribution-repository: NuGet
+            package-name: Pubnub
+            location: https://www.nuget.org/packages/Pubnub/
+            requires:
+              -
+                name: ".Net"
+                min-version: "3.5 or higher"
+                license: "MS-EULA"
+                license-url: "https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm"
+                location: "Should be installed on computer"
+                is-required: "Required"    
+              -
+                name: "Newtonsoft.Json"
+                min-version: "9.0.1"
+                license: "MIT"
+                license-url: "https://raw.githubusercontent.com/JamesNK/Newtonsoft.Json/master/LICENSE.md"
+                location: "External"
+                is-required: "Required"          
+              -
+                name: "Portable.BouncyCastle"
+                min-version: "1.8.1.2"
+                license: "MIT,X11"
+                license-url: "https://www.nuget.org/packages/Portable.BouncyCastle/1.8.1.2"
+                location: "External"
+                is-required: "Required"
+              -
+                name: "AsyncBridge.Net35"
+                min-version: "0.2.0"
+                license: "MIT"
+                license-url: "https://www.nuget.org/packages/AsyncBridge.Net35/0.2.0"
+                location: "External"
+                is-required: "Optional, only required for .NET 3.5"
+              -
+                name: "TaskParallelLibrary"
+                min-version: "1.0.2856"
+                license: "MS-EULA"
+                license-url: "https://go.microsoft.com/fwlink/?LinkID=186234"
+                location: "External"
+                is-required: "Optional, only required for .NET 3.5"
+              -
+                name: "AsyncBridge.JetBrains"
+                min-version: "0.1.1"
+                license: "GNU General Public License v3.0"
+                license-url: "https://libraries.io/nuget/AsyncBridge.JetBrains"
+                location: "External"
+                is-required: "Optional, only required for .NET 4.0"              
+            supported-platforms:
+                supported-operating-systems:
+                  Windows:
+                    target-architecture:
+                      - x86-64
+                    runtime-version:
+                      - .NET 4.x Equivalent
+                    api-compatibility:
+                      - .NET 4.x
+                    minimum-os-version:
+                      - Windows 10 Home
+                      - Windows 10 Pro
+                      - Windows 10 Pro for Workstations
+                      - Windows 10 Pro Education
+                      - Windows 10 Enterprise
+                      - Windows 10 Enterprise LTSC (formerly LTSB)
+                      - Windows 10 Education  
+                      - Windows Server 2019 Essentials
+                      - Windows Server 2019 Standard
+                      - Windows Server 2019 Datacenter
+                      - Windows Server 2016 Essentials
+                      - Windows Server 2016 Standard
+                      - Windows Server 2016 Datacenter
+                      - Windows Server 2012 R2 Foundation
+                      - Windows Server 2012 R2 Essentials
+                      - Windows Server 2012 R2 Standard
+                      - Windows Server 2012 R2 Datacenter
+                      - Windows Server 2012 Foundation
+                      - Windows Server 2012 Essentials
+                      - Windows Server 2012 Standard
+                      - Windows Server 2012 Datacenter
+                      - Windows MultiPoint Server 2012
+                      - Windows Server 2008 R2 Foundation
+                      - Windows Server 2008 R2 Standard
+                      - Windows Server 2008 R2 Enterprise
+                      - Windows Server 2008 R2 Datacenter
+                      - Windows Server 2008 R2 for Itanium-based Systems
+                      - Windows Web Server 2008 R2
+                      - Windows Storage Server 2008 R2
+                      - Windows HPC Server 2008 R2
+                      - Windows Small Business Server 2011
+                      - Windows MultiPoint Server 2011
+                      - Windows Home Server 2011
+                      - Windows MultiPoint Server 2010
+                      - Windows Server 2008
+                    maximum-os-version:
+                      - Windows 10 Home
+                      - Windows 10 Pro
+                      - Windows 10 Pro for Workstations
+                      - Windows 10 Pro Education
+                      - Windows 10 Enterprise
+                      - Windows 10 Enterprise LTSC (formerly LTSB)
+                      - Windows 10 Education  
+                      - Windows Server 2019 Essentials
+                      - Windows Server 2019 Standard
+                      - Windows Server 2019 Datacenter
+                      - Windows Server 2016 Essentials
+                      - Windows Server 2016 Standard
+                      - Windows Server 2016 Datacenter
+                      - Windows Server 2012 R2 Foundation
+                      - Windows Server 2012 R2 Essentials
+                      - Windows Server 2012 R2 Standard
+                      - Windows Server 2012 R2 Datacenter
+                      - Windows Server 2012 Foundation
+                      - Windows Server 2012 Essentials
+                      - Windows Server 2012 Standard
+                      - Windows Server 2012 Datacenter
+                      - Windows MultiPoint Server 2012
+                      - Windows Server 2008 R2 Foundation
+                      - Windows Server 2008 R2 Standard
+                      - Windows Server 2008 R2 Enterprise
+                      - Windows Server 2008 R2 Datacenter
+                      - Windows Server 2008 R2 for Itanium-based Systems
+                      - Windows Web Server 2008 R2
+                      - Windows Storage Server 2008 R2
+                      - Windows HPC Server 2008 R2
+                      - Windows Small Business Server 2011
+                      - Windows MultiPoint Server 2011
+                      - Windows Home Server 2011
+                      - Windows MultiPoint Server 2010
+                      - Windows Server 2008
+  -
+    full-name: Pubnub C# PCL SDK
+    short-name: C# PCL
+    artifacts:
+      -
+        artifact-type: api-client
+        language: c#
+        tier: 1
+        tags:
+          - Desktop
+          - Mobile
+          - Server
+        source-repository: https://github.com/pubnub/c-sharp
+        documentation: https://www.pubnub.com/docs/sdks/c-sharp
+        distributions:
+          -
+            distribution-type: source
+            distribution-repository: GitHub
+            package-name: PubNubPCL
+            location: https://github.com/pubnub/c-sharp/releases/tag/v5.0.0
+            requires:
+              -
+                name: ".Net Core"
+                min-version: "1.x or higher"
+                license: "MS-EULA"
+                license-url: "https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm"
+                location: "Should be installed on computer"
+                is-required: "Required"    
+              -
+                name: "Newtonsoft.Json"
+                min-version: "9.0.1"
+                license: "MIT"
+                license-url: "https://raw.githubusercontent.com/JamesNK/Newtonsoft.Json/master/LICENSE.md"
+                location: "External"
+                is-required: "Required"          
+              -
+                name: "Portable.BouncyCastle"
+                min-version: "1.8.1.2"
+                license: "MIT,X11"
+                license-url: "https://www.nuget.org/packages/Portable.BouncyCastle/1.8.1.2"
+                location: "External"
+                is-required: "Required"
+            supported-platforms:
+                supported-operating-systems:
+                  Android:
+                    runtime-version:
+                      - .NET 4.x Equivalent
+                    api-compatibility:
+                      - .NET Core 2
+                      - .NET 4.x
+                    target-api-level: 
+                      - 11
+                    minimum-api-level:
+                      - 4.1
+                    maximum-api-level:
+                      - 30  
+                    ndk-verison:
+                      - 8
+                    target-architecture:
+                      - armeabi-v7a
+                      - atom
+                    additional-requirements:  
+                      - OpenGL ES 2.0 or later.
+                      - ARMv7 (Cortex) CPU with NEON support
+                  iOS:
+                    runtime-version:
+                      - .NET 4.x Equivalent
+                    api-compatibility:
+                      - .NET Core 2
+                      - .NET 4.x
+                    minimum-os-version: 
+                      - iOS 9.0
+                    maximum-os-version:
+                      - iOS 14.4.2
+                    target-architecture:
+                      - arm64
+                    target-devices:
+                      - iPad
+                      - iPhone                
+                  Windows:
+                    target-architecture:
+                      - x86-64
+                    runtime-version:
+                      - .NET 4.x Equivalent
+                    api-compatibility:
+                      - .NET Core 2
+                      - .NET 4.x
+                    minimum-os-version:
+                      - Windows 10 Home
+                      - Windows 10 Pro
+                      - Windows 10 Pro for Workstations
+                      - Windows 10 Pro Education
+                      - Windows 10 Enterprise
+                      - Windows 10 Enterprise LTSC (formerly LTSB)
+                      - Windows 10 Education  
+                      - Windows Server 2019 Essentials
+                      - Windows Server 2019 Standard
+                      - Windows Server 2019 Datacenter
+                      - Windows Server 2016 Essentials
+                      - Windows Server 2016 Standard
+                      - Windows Server 2016 Datacenter
+                      - Windows Server 2012 R2 Foundation
+                      - Windows Server 2012 R2 Essentials
+                      - Windows Server 2012 R2 Standard
+                      - Windows Server 2012 R2 Datacenter
+                      - Windows Server 2012 Foundation
+                      - Windows Server 2012 Essentials
+                      - Windows Server 2012 Standard
+                      - Windows Server 2012 Datacenter
+                      - Windows MultiPoint Server 2012
+                      - Windows Server 2008 R2 Foundation
+                      - Windows Server 2008 R2 Standard
+                      - Windows Server 2008 R2 Enterprise
+                      - Windows Server 2008 R2 Datacenter
+                      - Windows Server 2008 R2 for Itanium-based Systems
+                      - Windows Web Server 2008 R2
+                      - Windows Storage Server 2008 R2
+                      - Windows HPC Server 2008 R2
+                      - Windows Small Business Server 2011
+                      - Windows MultiPoint Server 2011
+                      - Windows Home Server 2011
+                      - Windows MultiPoint Server 2010
+                      - Windows Server 2008
+                    maximum-os-version:
+                      - Windows 10 Home
+                      - Windows 10 Pro
+                      - Windows 10 Pro for Workstations
+                      - Windows 10 Pro Education
+                      - Windows 10 Enterprise
+                      - Windows 10 Enterprise LTSC (formerly LTSB)
+                      - Windows 10 Education  
+                      - Windows Server 2019 Essentials
+                      - Windows Server 2019 Standard
+                      - Windows Server 2019 Datacenter
+                      - Windows Server 2016 Essentials
+                      - Windows Server 2016 Standard
+                      - Windows Server 2016 Datacenter
+                      - Windows Server 2012 R2 Foundation
+                      - Windows Server 2012 R2 Essentials
+                      - Windows Server 2012 R2 Standard
+                      - Windows Server 2012 R2 Datacenter
+                      - Windows Server 2012 Foundation
+                      - Windows Server 2012 Essentials
+                      - Windows Server 2012 Standard
+                      - Windows Server 2012 Datacenter
+                      - Windows MultiPoint Server 2012
+                      - Windows Server 2008 R2 Foundation
+                      - Windows Server 2008 R2 Standard
+                      - Windows Server 2008 R2 Enterprise
+                      - Windows Server 2008 R2 Datacenter
+                      - Windows Server 2008 R2 for Itanium-based Systems
+                      - Windows Web Server 2008 R2
+                      - Windows Storage Server 2008 R2
+                      - Windows HPC Server 2008 R2
+                      - Windows Small Business Server 2011
+                      - Windows MultiPoint Server 2011
+                      - Windows Home Server 2011
+                      - Windows MultiPoint Server 2010
+                      - Windows Server 2008
+                  Linux:
+                    target-architecture:
+                      - x86-64
+                    runtime-version:
+                      - .NET 4.x Equivalent
+                    api-compatibility:
+                      - .NET Core 2
+                    maximum-os-version:
+                      - Ubuntu 20.04 LTS
+                    minimum-os-version:
+                      - Ubuntu 12.04
+                  macOS:
+                    target-architecture:
+                      - x86-64
+                    runtime-version:
+                      - .NET 4.x Equivalent
+                    api-compatibility:
+                      - .NET Core 2
+                      - .NET 4.x
+                    minimum-os-version:
+                      - Mac OS X 10.8
+                    maximum-os-version:
+                      - macOS 10.14.6
+      -
+        artifact-type: package
+        language: c#
+        tier: 1
+        tags:
+          - Desktop
+          - Mobile
+          - Server
+        source-repository: https://github.com/pubnub/c-sharp
+        documentation: https://www.pubnub.com/docs/sdks/c-sharp
+        distributions:
+          -
+            distribution-type: package
+            distribution-repository: NuGet
+            package-name: PubNubPCL
+            location: https://www.nuget.org/packages/PubnubPCL/
+            requires:
+              -
+                name: ".Net Core"
+                min-version: "1.x or higher"
+                license: "MS-EULA"
+                license-url: "https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm"
+                location: "Should be installed on computer"
+                is-required: "Required"    
+              -
+                name: "Newtonsoft.Json"
+                min-version: "9.0.1"
+                license: "MIT"
+                license-url: "https://raw.githubusercontent.com/JamesNK/Newtonsoft.Json/master/LICENSE.md"
+                location: "External"
+                is-required: "Required"          
+              -
+                name: "Portable.BouncyCastle"
+                min-version: "1.8.1.2"
+                license: "MIT,X11"
+                license-url: "https://www.nuget.org/packages/Portable.BouncyCastle/1.8.1.2"
+                location: "External"
+                is-required: "Required"
+            supported-platforms:
+                supported-operating-systems:
+                  Android:
+                    runtime-version:
+                      - .NET 4.x Equivalent
+                    api-compatibility:
+                      - .NET Core 2
+                    target-api-level: 
+                      - 11
+                    minimum-api-level:
+                      - 4.1
+                    maximum-api-level:
+                      - 30  
+                    ndk-verison:
+                      - 8
+                    target-architecture:
+                      - armeabi-v7a
+                      - atom
+                    additional-requirements:  
+                      - OpenGL ES 2.0 or later.
+                      - ARMv7 (Cortex) CPU with NEON support
+                  iOS:
+                    runtime-version:
+                      - .NET 4.x Equivalent
+                    api-compatibility:
+                      - .NET Core 2
+                      - .NET 4.x
+                    minimum-os-version: 
+                      - iOS 9.0
+                    maximum-os-version:
+                      - iOS 14.4.2
+                    target-architecture:
+                      - arm64
+                    target-devices:
+                      - iPad
+                      - iPhone                
+                  Windows:
+                    target-architecture:
+                      - x86-64
+                    runtime-version:
+                      - .NET 4.x Equivalent
+                    api-compatibility:
+                      - .NET Core 2
+                      - .NET 4.x
+                    minimum-os-version:
+                      - Windows 10 Home
+                      - Windows 10 Pro
+                      - Windows 10 Pro for Workstations
+                      - Windows 10 Pro Education
+                      - Windows 10 Enterprise
+                      - Windows 10 Enterprise LTSC (formerly LTSB)
+                      - Windows 10 Education  
+                      - Windows Server 2019 Essentials
+                      - Windows Server 2019 Standard
+                      - Windows Server 2019 Datacenter
+                      - Windows Server 2016 Essentials
+                      - Windows Server 2016 Standard
+                      - Windows Server 2016 Datacenter
+                      - Windows Server 2012 R2 Foundation
+                      - Windows Server 2012 R2 Essentials
+                      - Windows Server 2012 R2 Standard
+                      - Windows Server 2012 R2 Datacenter
+                      - Windows Server 2012 Foundation
+                      - Windows Server 2012 Essentials
+                      - Windows Server 2012 Standard
+                      - Windows Server 2012 Datacenter
+                      - Windows MultiPoint Server 2012
+                      - Windows Server 2008 R2 Foundation
+                      - Windows Server 2008 R2 Standard
+                      - Windows Server 2008 R2 Enterprise
+                      - Windows Server 2008 R2 Datacenter
+                      - Windows Server 2008 R2 for Itanium-based Systems
+                      - Windows Web Server 2008 R2
+                      - Windows Storage Server 2008 R2
+                      - Windows HPC Server 2008 R2
+                      - Windows Small Business Server 2011
+                      - Windows MultiPoint Server 2011
+                      - Windows Home Server 2011
+                      - Windows MultiPoint Server 2010
+                      - Windows Server 2008
+                    maximum-os-version:
+                      - Windows 10 Home
+                      - Windows 10 Pro
+                      - Windows 10 Pro for Workstations
+                      - Windows 10 Pro Education
+                      - Windows 10 Enterprise
+                      - Windows 10 Enterprise LTSC (formerly LTSB)
+                      - Windows 10 Education  
+                      - Windows Server 2019 Essentials
+                      - Windows Server 2019 Standard
+                      - Windows Server 2019 Datacenter
+                      - Windows Server 2016 Essentials
+                      - Windows Server 2016 Standard
+                      - Windows Server 2016 Datacenter
+                      - Windows Server 2012 R2 Foundation
+                      - Windows Server 2012 R2 Essentials
+                      - Windows Server 2012 R2 Standard
+                      - Windows Server 2012 R2 Datacenter
+                      - Windows Server 2012 Foundation
+                      - Windows Server 2012 Essentials
+                      - Windows Server 2012 Standard
+                      - Windows Server 2012 Datacenter
+                      - Windows MultiPoint Server 2012
+                      - Windows Server 2008 R2 Foundation
+                      - Windows Server 2008 R2 Standard
+                      - Windows Server 2008 R2 Enterprise
+                      - Windows Server 2008 R2 Datacenter
+                      - Windows Server 2008 R2 for Itanium-based Systems
+                      - Windows Web Server 2008 R2
+                      - Windows Storage Server 2008 R2
+                      - Windows HPC Server 2008 R2
+                      - Windows Small Business Server 2011
+                      - Windows MultiPoint Server 2011
+                      - Windows Home Server 2011
+                      - Windows MultiPoint Server 2010
+                      - Windows Server 2008
+                  Linux:
+                    target-architecture:
+                      - x86-64
+                    runtime-version:
+                      - .NET 4.x Equivalent
+                    api-compatibility:
+                      - .NET Core 2
+                      - .NET 4.x
+                    maximum-os-version:
+                      - Ubuntu 20.04 LTS
+                    minimum-os-version:
+                      - Ubuntu 12.04
+                  macOS:
+                    target-architecture:
+                      - x86-64
+                    runtime-version:
+                      - .NET 4.x Equivalent
+                    api-compatibility:
+                      - .NET Core 2
+                      - .NET 4.x
+                    minimum-os-version:
+                      - Mac OS X 10.8
+                    maximum-os-version:
+                      - macOS 10.14.6
+  -
+    full-name: Pubnub C# UWP SDK
+    short-name: C# UWP
+    artifacts:
+      -
+        artifact-type: api-client
+        language: c#
+        tier: 1
+        tags:
+          - Desktop
+          - Server
+        source-repository: https://github.com/pubnub/c-sharp
+        documentation: https://www.pubnub.com/docs/sdks/c-sharp
+        distributions:
+          -
+            distribution-type: source
+            distribution-repository: Github
+            package-name: PubnubUWP
+            location: https://github.com/pubnub/c-sharp/releases/tag/v5.0.0
+            requires:
+              -
+                name: "Universal Windows Platform Development"
+                min-version: "10.0.10240 or higher"
+                license: "MS-EULA"
+                license-url: "https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm"
+                location: "Should be installed on computer"
+                is-required: "Required"    
+              -
+                name: "Windows 10 SDK"
+                min-version: "10.0.19041.0 or higher"
+                license: "MS-EULA"
+                license-url: "https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm"
+                location: "Should be installed on computer"
+                is-required: "Required"    
+              -
+                name: "Newtonsoft.Json"
+                min-version: "9.0.1"
+                license: "MIT"
+                license-url: "https://raw.githubusercontent.com/JamesNK/Newtonsoft.Json/master/LICENSE.md"
+                location: "External"
+                is-required: "Required"          
+              -
+                name: "Portable.BouncyCastle"
+                min-version: "1.8.1.2"
+                license: "MIT,X11"
+                license-url: "https://www.nuget.org/packages/Portable.BouncyCastle/1.8.1.2"
+                location: "External"
+                is-required: "Required"         
+            supported-platforms:
+                supported-operating-systems:
+                  Windows:
+                    target-architecture:
+                      - x86-64
+                    runtime-version:
+                      - .NET Native
+                    minimum-os-version:
+                      - Windows 10 Home
+                      - Windows 10 Pro
+                      - Windows 10 Pro for Workstations
+                      - Windows 10 Pro Education
+                      - Windows 10 Enterprise
+                      - Windows 10 Enterprise LTSC (formerly LTSB)
+                      - Windows 10 Education  
+                      - Windows Server 2019 Essentials
+                      - Windows Server 2019 Standard
+                      - Windows Server 2019 Datacenter
+                      - Windows Server 2016 Essentials
+                      - Windows Server 2016 Standard
+                      - Windows Server 2016 Datacenter
+                      - Windows Server 2012 R2 Foundation
+                      - Windows Server 2012 R2 Essentials
+                      - Windows Server 2012 R2 Standard
+                      - Windows Server 2012 R2 Datacenter
+                    maximum-os-version:
+                      - Windows 10 Home
+                      - Windows 10 Pro
+                      - Windows 10 Pro for Workstations
+                      - Windows 10 Pro Education
+                      - Windows 10 Enterprise
+                      - Windows 10 Enterprise LTSC (formerly LTSB)
+                      - Windows 10 Education  
+                      - Windows Server 2019 Essentials
+                      - Windows Server 2019 Standard
+                      - Windows Server 2019 Datacenter
+                      - Windows Server 2016 Essentials
+                      - Windows Server 2016 Standard
+                      - Windows Server 2016 Datacenter
+                      - Windows Server 2012 R2 Foundation
+                      - Windows Server 2012 R2 Essentials
+                      - Windows Server 2012 R2 Standard
+                      - Windows Server 2012 R2 Datacenter
+      -
+        artifact-type: package
+        language: c#
+        tier: 1
+        tags:
+          - Desktop
+          - Server
+        source-repository: https://github.com/pubnub/c-sharp
+        documentation: https://www.pubnub.com/docs/sdks/c-sharp
+        distributions:
+          -
+            distribution-type: package
+            distribution-repository: NuGet
+            package-name: PubnubUWP
+            location: https://www.nuget.org/packages/PubnubUWP/
+            requires:
+              -
+                name: "Universal Windows Platform Development"
+                min-version: "10.0.10240 or higher"
+                license: "MS-EULA"
+                license-url: "https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm"
+                location: "Should be installed on computer"
+                is-required: "Required"    
+              -
+                name: "Windows 10 SDK"
+                min-version: "10.0.19041.0 or higher"
+                license: "MS-EULA"
+                license-url: "https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm"
+                location: "Should be installed on computer"
+                is-required: "Required"    
+              -
+                name: "Newtonsoft.Json"
+                min-version: "9.0.1"
+                license: "MIT"
+                license-url: "https://raw.githubusercontent.com/JamesNK/Newtonsoft.Json/master/LICENSE.md"
+                location: "External"
+                is-required: "Required"          
+              -
+                name: "Portable.BouncyCastle"
+                min-version: "1.8.1.2"
+                license: "MIT,X11"
+                license-url: "https://www.nuget.org/packages/Portable.BouncyCastle/1.8.1.2"
+                location: "External"
+                is-required: "Required"                         
+            supported-platforms:
+                supported-operating-systems:
+                  Windows:
+                    target-architecture:
+                      - x86-64
+                    runtime-version:
+                      - .NET Native
+                    minimum-os-version:
+                      - Windows 10 Home
+                      - Windows 10 Pro
+                      - Windows 10 Pro for Workstations
+                      - Windows 10 Pro Education
+                      - Windows 10 Enterprise
+                      - Windows 10 Enterprise LTSC (formerly LTSB)
+                      - Windows 10 Education
+                      - Windows Server 2019 Essentials
+                      - Windows Server 2019 Standard
+                      - Windows Server 2019 Datacenter
+                      - Windows Server 2016 Essentials
+                      - Windows Server 2016 Standard
+                      - Windows Server 2016 Datacenter
+                      - Windows Server 2012 R2 Foundation
+                      - Windows Server 2012 R2 Essentials
+                      - Windows Server 2012 R2 Standard
+                      - Windows Server 2012 R2 Datacenter
+                    maximum-os-version:
+                      - Windows 10 Home
+                      - Windows 10 Pro
+                      - Windows 10 Pro for Workstations
+                      - Windows 10 Pro Education
+                      - Windows 10 Enterprise
+                      - Windows 10 Enterprise LTSC (formerly LTSB)
+                      - Windows 10 Education  
+                      - Windows Server 2019 Essentials
+                      - Windows Server 2019 Standard
+                      - Windows Server 2019 Datacenter
+                      - Windows Server 2016 Essentials
+                      - Windows Server 2016 Standard
+                      - Windows Server 2016 Datacenter
+                      - Windows Server 2012 R2 Foundation
+                      - Windows Server 2012 R2 Essentials
+                      - Windows Server 2012 R2 Standard
+                      - Windows Server 2012 R2 Datacenter
