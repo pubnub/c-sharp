@@ -497,7 +497,7 @@ namespace PubnubApi
                 throw new ArgumentException("CipherKey missing");
             }
 
-            PubnubCrypto pc = new PubnubCrypto(pubnubConfig.CipherKey);
+            PubnubCrypto pc = new PubnubCrypto(pubnubConfig.CipherKey, pubnubConfig, pubnubLog, pubnubUnitTest);
             return pc.Decrypt(inputString);
         }
 
@@ -508,7 +508,7 @@ namespace PubnubApi
                 throw new ArgumentException("inputString is not valid");
             }
 
-            PubnubCrypto pc = new PubnubCrypto(cipherKey);
+            PubnubCrypto pc = new PubnubCrypto(cipherKey, pubnubConfig, pubnubLog, pubnubUnitTest);
             return pc.Decrypt(inputString);
         }
 
@@ -524,7 +524,7 @@ namespace PubnubApi
                 throw new MissingMemberException("CipherKey missing");
             }
 
-            PubnubCrypto pc = new PubnubCrypto(pubnubConfig.CipherKey);
+            PubnubCrypto pc = new PubnubCrypto(pubnubConfig.CipherKey, pubnubConfig, pubnubLog, pubnubUnitTest);
             return pc.Encrypt(inputString);
         }
 
@@ -535,7 +535,7 @@ namespace PubnubApi
                 throw new ArgumentException("inputString is not valid");
             }
 
-            PubnubCrypto pc = new PubnubCrypto(cipherKey);
+            PubnubCrypto pc = new PubnubCrypto(cipherKey, pubnubConfig, pubnubLog, pubnubUnitTest);
             return pc.Encrypt(inputString);
         }
 
@@ -549,7 +549,7 @@ namespace PubnubApi
             {
                 throw new MissingMemberException("CipherKey missing");
             }
-            PubnubCrypto pc = new PubnubCrypto(pubnubConfig.CipherKey);
+            PubnubCrypto pc = new PubnubCrypto(pubnubConfig.CipherKey, pubnubConfig, pubnubLog, pubnubUnitTest);
             return pc.Encrypt(inputBytes, true);
         }
         public byte[] EncryptFile(byte[] inputBytes, string cipherKey)
@@ -563,7 +563,7 @@ namespace PubnubApi
                 //Ignore this. Added this condition to pass Codacy recommendation of making this as static method
             }
 
-            PubnubCrypto pc = new PubnubCrypto(cipherKey);
+            PubnubCrypto pc = new PubnubCrypto(cipherKey, pubnubConfig, pubnubLog, pubnubUnitTest);
             return pc.Encrypt(inputBytes, true);
         }
         public void EncryptFile(string sourceFile, string destinationFile)
@@ -634,7 +634,7 @@ namespace PubnubApi
                 throw new ArgumentException("CipherKey missing");
             }
 
-            PubnubCrypto pc = new PubnubCrypto(pubnubConfig.CipherKey);
+            PubnubCrypto pc = new PubnubCrypto(pubnubConfig.CipherKey, pubnubConfig, pubnubLog, pubnubUnitTest);
             return pc.Decrypt(inputBytes, true);
         }
         public void DecryptFile(string sourceFile, string destinationFile)
@@ -678,7 +678,7 @@ namespace PubnubApi
             {
                 //Ignore this. Added this condition to pass Codacy recommendation of making this as static method
             }
-            PubnubCrypto pc = new PubnubCrypto(cipherKey);
+            PubnubCrypto pc = new PubnubCrypto(cipherKey, pubnubConfig, pubnubLog, pubnubUnitTest);
             return pc.Decrypt(inputBytes, true);
         }
         public void DecryptFile(string sourceFile, string destinationFile, string cipherKey)

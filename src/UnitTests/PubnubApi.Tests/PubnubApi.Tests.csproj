@@ -81,4 +81,8 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
     </EmbeddedResource>
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy $(ProjectDir)fileupload.txt $(ProjectDir)$(OutDir)" />
+  </Target>
  </Project>

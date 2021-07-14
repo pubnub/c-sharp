@@ -187,7 +187,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
 
-            Uri request = urlBuilder.BuildGetFileUrlOrDeleteReqest("DELETE", "", this.channelName, this.currentFileId, this.currentFileName, externalQueryParam, PNOperationType.PNFileUrlOperation);
+            Uri request = urlBuilder.BuildGetFileUrlOrDeleteReqest("DELETE", "", this.channelName, this.currentFileId, this.currentFileName, externalQueryParam, PNOperationType.PNDeleteFileOperation);
 
             RequestState<PNDeleteFileResult> requestState = new RequestState<PNDeleteFileResult>();
             requestState.ResponseType = PNOperationType.PNDeleteFileOperation;

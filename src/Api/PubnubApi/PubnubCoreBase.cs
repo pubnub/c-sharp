@@ -1428,6 +1428,14 @@ namespace PubnubApi
                     status = new StatusBuilder(currentConfig, jsonLib).CreateStatusResponse<T>(type, PNStatusCategory.PNNetworkIssuesCategory, asyncRequestState, (int)HttpStatusCode.NotFound, new PNException(jsonString));
                 }
             }
+            else if (jsonString.ToLower().TrimStart().IndexOf("<?xml", StringComparison.CurrentCultureIgnoreCase) == 0
+                  || jsonString.ToLower().TrimStart().IndexOf("<Error", StringComparison.CurrentCultureIgnoreCase) == 0)
+            {
+                if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig))
+                {
+                    status = new StatusBuilder(currentConfig, jsonLib).CreateStatusResponse<T>(type, PNStatusCategory.PNNetworkIssuesCategory, asyncRequestState, (int)HttpStatusCode.NotFound, new PNException(jsonString));
+                }
+            }
 
             return status;
         }
