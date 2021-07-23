@@ -15,7 +15,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubUWP</PackageId>
-    <PackageVersion>5.0.1.0</PackageVersion>
+    <PackageVersion>5.1.0.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -23,9 +23,7 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>Replaced Random class with RandomNumberGenerator for secure random bytes
-Handling of SendFile file size exceeded error message and refactored DeleteFile
-Refactored Encrypt/Decrypt methods in calling PubnubCrypto constructor with config.</PackageReleaseNotes>
+    <PackageReleaseNotes>PAMv3 support</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
@@ -157,10 +155,6 @@ Refactored Encrypt/Decrypt methods in calling PubnubCrypto constructor with conf
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
-    <EmbeddedResource Remove="CBOR\**" />
-    <None Remove="CBOR\**" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="..\PubnubApi\Builder\ResponseBuilder.cs">
       <Link>Builder\ResponseBuilder.cs</Link>
     </Compile>
@@ -191,7 +185,10 @@ Refactored Encrypt/Decrypt methods in calling PubnubCrypto constructor with conf
     <Compile Include="..\PubnubApi\EndPoint\Access\GrantOperation.cs">
       <Link>EndPoint\Access\GrantOperation.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\EndPoint\ChannelGroup\AddChannelsToChannelGroupOperation.cs">
+	  <Compile Include="..\PubnubApi\EndPoint\Access\GrantTokenOperation.cs">
+		  <Link>EndPoint\Access\GrantTokenOperation.cs</Link>
+	  </Compile>
+	  <Compile Include="..\PubnubApi\EndPoint\ChannelGroup\AddChannelsToChannelGroupOperation.cs">
       <Link>EndPoint\ChannelGroup\AddChannelsToChannelGroupOperation.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\EndPoint\ChannelGroup\DeleteChannelGroupOperation.cs">
@@ -288,6 +285,7 @@ Refactored Encrypt/Decrypt methods in calling PubnubCrypto constructor with conf
     <Compile Include="..\PubnubApi\EndPoint\TimeOperation.cs">
       <Link>EndPoint\TimeOperation.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\TokenManager.cs" Link="EndPoint\TokenManager.cs" />
     <Compile Include="..\PubnubApi\Enum\GrantBitFlag.cs" Link="Enum\GrantBitFlag.cs" />
     <Compile Include="..\PubnubApi\Enum\PNHeartbeatNotificationOption.cs">
       <Link>Enum\PNHeartbeatNotificationOption.cs</Link>
@@ -358,6 +356,7 @@ Refactored Encrypt/Decrypt methods in calling PubnubCrypto constructor with conf
     <Compile Include="..\PubnubApi\JsonDataParse\PNGetChannelMetadataJsonDataParse.cs" Link="JsonDataParse\PNGetChannelMetadataJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNGetMessageActionsJsonDataParse.cs" Link="JsonDataParse\PNGetMessageActionsJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNGetUuidMetadataJsonDataParse.cs" Link="JsonDataParse\PNGetUuidMetadataJsonDataParse.cs" />
+    <Compile Include="..\PubnubApi\JsonDataParse\PNGrantTokenJsonDataParse.cs" Link="JsonDataParse\PNGrantTokenJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNHistoryJsonDataParse.cs" Link="JsonDataParse\PNHistoryJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNListFilesJsonDataParse.cs" Link="JsonDataParse\PNListFilesJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNMembershipsJsonDataParse.cs" Link="JsonDataParse\PNMembershipsJsonDataParse.cs" />
@@ -385,7 +384,11 @@ Refactored Encrypt/Decrypt methods in calling PubnubCrypto constructor with conf
     <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNAccessManagerKeysData.cs">
       <Link>Model\Consumer\AccessManager\PNAccessManagerKeysData.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\Model\Consumer\ChannelGroup\PNChannelGroupsAddChannelResult.cs">
+	<Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNAccessManagerTokenResult.cs" Link="Model\Consumer\AccessManager\PNAccessManagerTokenResult.cs" />
+	<Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNGrantToken.cs" Link="Model\Consumer\AccessManager\PNGrantToken.cs" />
+	<Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNResourcePermission.cs" Link="Model\Consumer\AccessManager\PNResourcePermission.cs" />
+
+	  <Compile Include="..\PubnubApi\Model\Consumer\ChannelGroup\PNChannelGroupsAddChannelResult.cs">
       <Link>Model\Consumer\ChannelGroup\PNChannelGroupsAddChannelResult.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\Model\Consumer\ChannelGroup\PNChannelGroupsAllChannelsResult.cs">
@@ -446,6 +449,7 @@ Refactored Encrypt/Decrypt methods in calling PubnubCrypto constructor with conf
     <Compile Include="..\PubnubApi\Model\Consumer\PNTimeResult.cs">
       <Link>Model\Consumer\PNTimeResult.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\PNTokenKey.cs" Link="Model\Consumer\PNTokenKey.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Presence\PNGetStateResult.cs">
       <Link>Model\Consumer\Presence\PNGetStateResult.cs</Link>
     </Compile>
@@ -500,7 +504,8 @@ Refactored Encrypt/Decrypt methods in calling PubnubCrypto constructor with conf
     <Compile Include="..\PubnubApi\Model\Derived\AccessManager\PNAccessManagerGrantResultExt.cs">
       <Link>Model\Derived\AccessManager\PNAccessManagerGrantResultExt.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\Model\Derived\ChannelGroup\PNChannelGroupsAddChannelResultExt.cs">
+    <Compile Include="..\PubnubApi\Model\Derived\AccessManager\PNAccessManagerTokenResultExt.cs" Link="Model\Derived\AccessManager\PNAccessManagerTokenResultExt.cs" />
+	  <Compile Include="..\PubnubApi\Model\Derived\ChannelGroup\PNChannelGroupsAddChannelResultExt.cs">
       <Link>Model\Derived\ChannelGroup\PNChannelGroupsAddChannelResultExt.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\Model\Derived\ChannelGroup\PNChannelGroupsAllChannelsResultExt.cs">
@@ -661,6 +666,7 @@ Refactored Encrypt/Decrypt methods in calling PubnubCrypto constructor with conf
     <PackageReference Include="Newtonsoft.Json">
       <Version>9.0.1</Version>
     </PackageReference>
+    <PackageReference Include="PeterO.Cbor" Version="4.4.4" />
     <PackageReference Include="Portable.BouncyCastle">
       <Version>1.8.1.2</Version>
     </PackageReference>

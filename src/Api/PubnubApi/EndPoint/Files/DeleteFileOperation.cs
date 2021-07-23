@@ -17,6 +17,7 @@ namespace PubnubApi.EndPoint
         private readonly IPubnubUnitTest unit;
         private readonly IPubnubLog pubnubLog;
         private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
+        private readonly EndPoint.TokenManager pubnubTokenMgr;
 
         private PNCallback<PNDeleteFileResult> savedCallback;
         private Dictionary<string, object> queryParam;
@@ -25,13 +26,14 @@ namespace PubnubApi.EndPoint
         private string currentFileId;
         private string currentFileName;
 
-        public DeleteFileOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, instance)
+        public DeleteFileOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
             pubnubLog = log;
             pubnubTelemetryMgr = telemetryManager;
+            pubnubTokenMgr = tokenManager;
 
             if (instance != null)
             {
@@ -132,7 +134,7 @@ namespace PubnubApi.EndPoint
 
         private void ProcessDeleteFileRequest(Dictionary<string, object> externalQueryParam, PNCallback<PNDeleteFileResult> callback)
         {
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
 
             Uri request = urlBuilder.BuildGetFileUrlOrDeleteReqest("DELETE", "", this.channelName, this.currentFileId, this.currentFileName, externalQueryParam, PNOperationType.PNDeleteFileOperation);
 
@@ -185,7 +187,7 @@ namespace PubnubApi.EndPoint
                 return ret;
             }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
 
             Uri request = urlBuilder.BuildGetFileUrlOrDeleteReqest("DELETE", "", this.channelName, this.currentFileId, this.currentFileName, externalQueryParam, PNOperationType.PNDeleteFileOperation);
 

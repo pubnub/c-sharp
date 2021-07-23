@@ -14,7 +14,7 @@ namespace PubnubApi.EndPoint
         private readonly PNConfiguration pubnubConfig;
         private readonly IPubnubLog pubnubLog;
 
-        public ListenerManager(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, Pubnub instance) : base(config, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, instance)
+        public ListenerManager(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance) : base(config, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
         {
             this.pubnubConfig = config;
             this.pubnubLog = log;

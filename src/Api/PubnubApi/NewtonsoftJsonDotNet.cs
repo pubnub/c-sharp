@@ -137,6 +137,19 @@ namespace PubnubApi
             return JsonConvert.SerializeObject(objectToSerialize);
         }
 
+#pragma warning disable S2325, 2325
+        /// <summary>
+        /// Use this to serialize Dictionary<PNTokenKey, string>
+        /// </summary>
+        /// <param name="objectToSerialize"></param>
+        /// <returns></returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Codacy.Sonar", "S2325:Methods and properties that don't access instance data should be static")]
+        public string SerializeDictionaryOfTokenKey(Dictionary<PNTokenKey, string> objectToSerialize) // NOSONAR
+        {
+            return JsonConvert.SerializeObject(objectToSerialize, new EndPoint.TokenManager.TokenManagerConverter());
+        }
+#pragma warning restore S2325,2325
+
         public List<object> DeserializeToListOfObject(string jsonString)
         {
             List<object> result = JsonConvert.DeserializeObject<List<object>>(jsonString);
@@ -388,6 +401,13 @@ namespace PubnubApi
                 PNAccessManagerGrantResult result = PNAccessManagerGrantJsonDataParse.GetObject(listObject);
                 ret = (T)Convert.ChangeType(result, typeof(PNAccessManagerGrantResult), CultureInfo.InvariantCulture);
 #endregion
+            }
+            else if (typeof(T) == typeof(PNAccessManagerTokenResult))
+            {
+                #region "PNAccessManagerTokenResult"
+                PNAccessManagerTokenResult result = PNGrantTokenJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNAccessManagerTokenResult), CultureInfo.InvariantCulture);
+                #endregion
             }
             else if (typeof(T) == typeof(PNAccessManagerAuditResult))
             {

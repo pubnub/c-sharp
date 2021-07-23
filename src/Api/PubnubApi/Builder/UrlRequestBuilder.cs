@@ -18,14 +18,16 @@ namespace PubnubApi
         private readonly IPubnubLog pubnubLog;
         private readonly string pubnubInstanceId;
         private readonly EndPoint.TelemetryManager telemetryMgr;
+        private readonly EndPoint.TokenManager tokenMgr;
 
-        public UrlRequestBuilder(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager pubnubTelemetryMgr, string pnInstanceId)
+        public UrlRequestBuilder(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager pubnubTelemetryMgr, EndPoint.TokenManager pubnubTokenMgr, string pnInstanceId)
         {
             this.pubnubConfig = config;
             this.jsonLib = jsonPluggableLibrary;
             this.pubnubUnitTest = pubnubUnitTest;
             this.pubnubLog = log;
             this.telemetryMgr = pubnubTelemetryMgr;
+            this.tokenMgr = pubnubTokenMgr;
             this.pubnubInstanceId = string.IsNullOrEmpty(pnInstanceId) ? "" : pnInstanceId;
         }
 
@@ -583,6 +585,34 @@ namespace PubnubApi
             requestQueryStringParams.Add("g", Convert.ToInt32(get).ToString());
             requestQueryStringParams.Add("u", Convert.ToInt32(update).ToString());
             requestQueryStringParams.Add("j", Convert.ToInt32(join).ToString());
+
+            if (externalQueryParam != null && externalQueryParam.Count > 0)
+            {
+                foreach (KeyValuePair<string, object> kvp in externalQueryParam)
+                {
+                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    {
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
+                    }
+                }
+            }
+
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
+
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
+        }
+
+        Uri IUrlRequestBuilder.BuildGrantV3AccessRequest(string requestMethod, string requestBody, Dictionary<string, object> externalQueryParam)
+        {
+            PNOperationType currentType = PNOperationType.PNAccessManagerGrantToken;
+
+            List<string> url = new List<string>();
+            url.Add("v3");
+            url.Add("pam");
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("grant");
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
             {
@@ -1956,7 +1986,7 @@ namespace PubnubApi
         }
 
 
-        private Dictionary<string, string> GenerateCommonQueryParams(PNOperationType type, string uuid)
+        private Dictionary<string, string> GenerateCommonQueryParams(PNOperationType type, string resourceType, string resourceId, bool checkResourcePattern, string uuid)
         {
             long timeStamp = TranslateUtcDateTimeToSeconds(DateTime.UtcNow);
             string requestid = Guid.NewGuid().ToString();
@@ -2017,10 +2047,28 @@ namespace PubnubApi
 
                 if (type != PNOperationType.PNTimeOperation
                         && type != PNOperationType.PNAccessManagerGrant && type != PNOperationType.PNAccessManagerGrantToken && type != PNOperationType.ChannelGroupGrantAccess
-                        && type != PNOperationType.PNAccessManagerAudit && type != PNOperationType.ChannelGroupAuditAccess
-                        && !string.IsNullOrEmpty(this.pubnubConfig.AuthKey))
+                        && type != PNOperationType.PNAccessManagerAudit && type != PNOperationType.ChannelGroupAuditAccess)
                 {
-                    ret.Add("auth", UriUtil.EncodeUriComponent(this.pubnubConfig.AuthKey, type, false, false, false));
+                    if (tokenMgr != null)
+                    {
+                        string resourceToken = "";
+                        if (string.IsNullOrEmpty(resourceId) && checkResourcePattern)
+                        {
+                            resourceToken = tokenMgr.GetToken(resourceType, resourceId, checkResourcePattern);
+                        }
+                        else
+                        {
+                            resourceToken = tokenMgr.GetToken(resourceType, resourceId);
+                        }
+                        if (!string.IsNullOrEmpty(resourceToken))
+                        {
+                            ret.Add("auth", UriUtil.EncodeUriComponent(resourceToken, type, false, false, false));
+                        }
+                    }
+                    else if (!string.IsNullOrEmpty(this.pubnubConfig.AuthKey))
+                    {
+                        ret.Add("auth", UriUtil.EncodeUriComponent(this.pubnubConfig.AuthKey, type, false, false, false));
+                    }
                 }
             }
 
@@ -2078,6 +2126,11 @@ namespace PubnubApi
 
         private string BuildQueryString(PNOperationType type, Dictionary<string, string> queryStringParamDic)
         {
+            return BuildQueryString(type, queryStringParamDic, "", "", false);
+        }
+
+        private string BuildQueryString(PNOperationType type, Dictionary<string, string> queryStringParamDic, string resourceType, string resourceId, bool checkResourcePattern)
+        {
             string queryString = "";
 
             try
@@ -2090,7 +2143,7 @@ namespace PubnubApi
 
                 string qsUuid = internalQueryStringParamDic.ContainsKey("uuid") ? internalQueryStringParamDic["uuid"] : null;
                 
-                Dictionary<string, string> commonQueryStringParams = GenerateCommonQueryParams(type, qsUuid);
+                Dictionary<string, string> commonQueryStringParams = GenerateCommonQueryParams(type, resourceType, resourceId, checkResourcePattern, qsUuid);
                 Dictionary<string, string> queryStringParams = new Dictionary<string, string>(commonQueryStringParams.Concat(internalQueryStringParamDic).GroupBy(item => item.Key).ToDictionary(item => item.Key, item => item.First().Value));
 
                 queryString = string.Join("&", queryStringParams.OrderBy(kvp => kvp.Key, StringComparer.Ordinal).Select(kvp => string.Format("{0}={1}", kvp.Key, kvp.Value)).ToArray());
