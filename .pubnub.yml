@@ -620,11 +620,11 @@ sdks:
   -
     full-name: Pubnub C# SDK
     short-name: C#
+    tier: 1
     artifacts:
       -
         artifact-type: api-client
         language: c#
-        tier: 1
         tags:
           - Desktop
           - Server
@@ -763,7 +763,6 @@ sdks:
       -
         artifact-type: package
         language: c#
-        tier: 1
         tags:
           - Desktop
           - Server
@@ -902,11 +901,12 @@ sdks:
   -
     full-name: Pubnub C# PCL SDK
     short-name: C# PCL
+    tier: 2
+    parent: C#
     artifacts:
       -
         artifact-type: api-client
         language: c#
-        tier: 1
         tags:
           - Desktop
           - Mobile
@@ -1084,7 +1084,6 @@ sdks:
       -
         artifact-type: package
         language: c#
-        tier: 1
         tags:
           - Desktop
           - Mobile
@@ -1262,11 +1261,12 @@ sdks:
   -
     full-name: Pubnub C# UWP SDK
     short-name: C# UWP
+    tier: 2
+    parent: C#
     artifacts:
       -
         artifact-type: api-client
         language: c#
-        tier: 1
         tags:
           - Desktop
           - Server
@@ -1353,7 +1353,6 @@ sdks:
       -
         artifact-type: package
         language: c#
-        tier: 1
         tags:
           - Desktop
           - Server
