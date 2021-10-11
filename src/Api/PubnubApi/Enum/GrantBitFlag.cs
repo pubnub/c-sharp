@@ -11,6 +11,9 @@ namespace PubnubApi
         WRITE = 2,
         MANAGE = 4,
         DELETE = 8,
-        CREATE = 16
+        CREATE = 16,
+        GET = 32,
+        UPDATE = 64,
+        JOIN = 128
     }
 }

@@ -93,7 +93,20 @@ namespace PubnubApi
 #if NETSTANDARD10 || NETSTANDARD11
                     new Random().NextBytes(ivBytes);
 #else
-                    RandomNumberGenerator.Create().GetBytes(ivBytes);
+                    var rng = RandomNumberGenerator.Create();
+                    
+                    try
+                    {
+                        rng.GetBytes(ivBytes);
+                    }
+                    finally 
+                    {
+                        var disposable = rng as IDisposable;
+                        if (disposable != null)
+                        {
+                            disposable.Dispose();
+                        }
+                    }
 #endif
                 }
                 else

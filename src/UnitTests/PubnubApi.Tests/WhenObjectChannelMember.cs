@@ -14,7 +14,7 @@ namespace PubNubMessaging.Tests
         private static int manualResetEventWaitTimeout = 310 * 1000;
         private static Pubnub pubnub;
         private static Server server;
-        private static string authKey = "myauth";
+        private static string authToken = "myauth";
 
         [SetUp]
         public static void Init()
@@ -37,7 +37,6 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
-                AuthKey = authKey,
                 Uuid = "mytestuuid",
                 Secure = false
             };
@@ -46,8 +45,20 @@ namespace PubNubMessaging.Tests
             pubnub = createPubNubInstance(config);
 
             ManualResetEvent grantManualEvent = new ManualResetEvent(false);
-            pubnub.Grant().Channels(new[] { uuidMetadataId1, uuidMetadataId2, channelMetadataId }).AuthKeys(new[] { authKey }).Read(true).Write(true).Manage(true).TTL(20)
-                .Execute(new PNAccessManagerGrantResultExt(
+            pubnub.GrantToken()
+                    .Resources(new PNTokenResources()
+                    {
+                        Channels = new Dictionary<string, PNTokenAuthValues>() {
+                                            { channelMetadataId, new PNTokenAuthValues() { Read = true, Write = true, Manage= true, Create = true, Delete=true, Get = true, Update = true, Join = true } },
+                                            { uuidMetadataId1, new PNTokenAuthValues() { Read = true, Write = true, Manage= true, Create = true, Delete=true, Get = true, Update = true, Join = true } },
+                                            { uuidMetadataId2, new PNTokenAuthValues() { Read = true, Write = true, Manage= true, Create = true, Delete=true, Get = true, Update = true, Join = true } }},
+                        Uuids = new Dictionary<string, PNTokenAuthValues>() {
+                                            { uuidMetadataId1, new PNTokenAuthValues() { Read = true, Write = true, Manage= true, Create = true, Delete=true, Get = true, Update = true, Join = true } },
+                                            { uuidMetadataId2, new PNTokenAuthValues() { Read = true, Write = true, Manage= true, Create = true, Delete=true, Get = true, Update = true, Join = true } }},
+                    }
+                    )
+                .TTL(20)
+                .Execute(new PNAccessManagerTokenResultExt(
                                 (r, s) =>
                                 {
                                     try
@@ -56,8 +67,9 @@ namespace PubNubMessaging.Tests
                                         if (r != null)
                                         {
                                             Debug.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
-                                            if (r.Channels != null && r.Channels.Count > 0)
+                                            if (!string.IsNullOrEmpty(r.Token))
                                             {
+                                                authToken = r.Token;
                                                 receivedGrantMessage = true;
                                             }
                                         }
@@ -112,13 +124,13 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
 
             server.RunOnHttps(false);
             pubnub = createPubNubInstance(config);
+            if (!string.IsNullOrEmpty(authToken))
+            {
+                pubnub.SetAuthToken(authToken);
+            }
             ManualResetEvent manualEvent = new ManualResetEvent(false);
 
             manualResetEventWaitTimeout = 310 * 1000;
@@ -362,13 +374,13 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
 
             server.RunOnHttps(false);
             pubnub = createPubNubInstance(config);
+            if (!string.IsNullOrEmpty(authToken))
+            {
+                pubnub.SetAuthToken(authToken);
+            }
 
             System.Diagnostics.Debug.WriteLine("pubnub.RemoveUuidMetadata() 1 STARTED");
 #if NET40
@@ -626,13 +638,13 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
 
             server.RunOnHttps(false);
             pubnub = createPubNubInstance(config);
+            if (!string.IsNullOrEmpty(authToken))
+            {
+                pubnub.SetAuthToken(authToken);
+            }
             ManualResetEvent manualEvent = new ManualResetEvent(false);
 
             manualResetEventWaitTimeout = 310 * 1000;
@@ -877,13 +889,13 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
 
             server.RunOnHttps(false);
             pubnub = createPubNubInstance(config);
+            if (!string.IsNullOrEmpty(authToken))
+            {
+                pubnub.SetAuthToken(authToken);
+            }
 
             System.Diagnostics.Debug.WriteLine("pubnub.RemoveUuidMetadata() 1 STARTED");
 #if NET40
@@ -1160,18 +1172,17 @@ namespace PubNubMessaging.Tests
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Uuid = "mytestuuid",
                 Secure = false,
-                AuthKey = "myauth"
             };
             if (PubnubCommon.PAMServerSideRun)
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
             server.RunOnHttps(false);
             pubnub = createPubNubInstance(config);
+            if (!string.IsNullOrEmpty(authToken))
+            {
+                pubnub.SetAuthToken(authToken);
+            }
             pubnub.AddListener(eventListener);
 
             ManualResetEvent manualEvent = new ManualResetEvent(false);
@@ -1403,18 +1414,17 @@ namespace PubNubMessaging.Tests
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Uuid = "mytestuuid",
                 Secure = false,
-                AuthKey = "myauth"
             };
             if (PubnubCommon.PAMServerSideRun)
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
             server.RunOnHttps(false);
             pubnub = createPubNubInstance(config);
+            if (!string.IsNullOrEmpty(authToken))
+            {
+                pubnub.SetAuthToken(authToken);
+            }
             pubnub.AddListener(eventListener);
 
             ManualResetEvent manualEvent = new ManualResetEvent(false);
@@ -1630,7 +1640,7 @@ namespace PubNubMessaging.Tests
                 delegate (Pubnub pnObj, PNObjectEventResult eventResult)
                 {
                     System.Diagnostics.Debug.WriteLine("EVENT:" + pubnub.JsonPluggableLibrary.SerializeToJsonString(eventResult));
-                    if (eventResult.Type.ToLowerInvariant() == "membership")
+                    if (eventResult.Type.ToLowerInvariant() == "channel" || eventResult.Type.ToLowerInvariant() == "uuid")
                     {
                         if (eventResult.Event.ToLowerInvariant() == "set")
                         {
@@ -1654,18 +1664,17 @@ namespace PubNubMessaging.Tests
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Uuid = "mytestuuid",
                 Secure = false,
-                AuthKey = "myauth"
             };
             if (PubnubCommon.PAMServerSideRun)
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
             server.RunOnHttps(false);
             pubnub = createPubNubInstance(config);
+            if (!string.IsNullOrEmpty(authToken))
+            {
+                pubnub.SetAuthToken(authToken);
+            }
             pubnub.AddListener(eventListener);
 
             ManualResetEvent manualEvent = new ManualResetEvent(false);
@@ -1773,7 +1782,7 @@ namespace PubNubMessaging.Tests
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
-                            pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
+                            System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                             if (r.ChannelMembers != null
                             && r.ChannelMembers.Find(x => x.UuidMetadata.Uuid == uuidMetadataId1) != null
                             && r.ChannelMembers.Find(x => x.UuidMetadata.Uuid == uuidMetadataId2) != null)
@@ -1851,7 +1860,7 @@ namespace PubNubMessaging.Tests
                 delegate (Pubnub pnObj, PNObjectEventResult eventResult)
                 {
                     System.Diagnostics.Debug.WriteLine("EVENT:" + pubnub.JsonPluggableLibrary.SerializeToJsonString(eventResult));
-                    if (eventResult.Type.ToLowerInvariant() == "membership")
+                    if (eventResult.Type.ToLowerInvariant() == "channel" || eventResult.Type.ToLowerInvariant() == "uuid")
                     {
                         if (eventResult.Event.ToLowerInvariant() == "set")
                         {
@@ -1875,18 +1884,17 @@ namespace PubNubMessaging.Tests
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Uuid = "mytestuuid",
                 Secure = false,
-                AuthKey = "myauth"
             };
             if (PubnubCommon.PAMServerSideRun)
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
             server.RunOnHttps(false);
             pubnub = createPubNubInstance(config);
+            if (!string.IsNullOrEmpty(authToken))
+            {
+                pubnub.SetAuthToken(authToken);
+            }
             pubnub.AddListener(eventListener);
 
             ManualResetEvent manualEvent = new ManualResetEvent(false);

@@ -450,9 +450,14 @@ namespace PubnubApi
             endpoint.EndPendingRequests();
         }
 
-        public PNGrantToken ParseToken(string token)
+        /// <summary>
+        /// Parses the token and provides token details. This is client only method (works without secret key)
+        /// </summary>
+        /// <param name="token">string</param>
+        /// <returns>PNTokenContent</returns>
+        public PNTokenContent ParseToken(string token)
         {
-            PNGrantToken result = null;
+            PNTokenContent result = null;
             if (tokenManager != null)
             {
                 result = tokenManager.ParseToken(token);
@@ -460,60 +465,15 @@ namespace PubnubApi
             return result;
         }
 
-        public void SetToken(string token)
+        /// <summary>
+        /// Sets the auth token.  This is client only method (works without secret key)
+        /// </summary>
+        /// <param name="token"></param>
+        public void SetAuthToken(string token)
         {
             if (tokenManager != null)
             {
-                tokenManager.SetToken(token);
-            }
-        }
-
-        public void SetTokens(string[] tokens)
-        {
-            if (tokenManager != null)
-            {
-                for (int index = 0; index < tokens.Length; index++)
-                {
-                    tokenManager.SetToken(tokens[index]);
-                }
-            }
-        }
-
-        public Dictionary<PNTokenKey, string> GetTokens()
-        {
-            Dictionary<PNTokenKey, string> result = null;
-            if (tokenManager != null)
-            {
-                result = tokenManager.GetAllTokens();
-            }
-            return result;
-        }
-
-        public string GetToken(string resourceType, string resourceId)
-        {
-            string result = "";
-            if (tokenManager != null)
-            {
-                result = tokenManager.GetToken(resourceType, resourceId);
-            }
-            return result;
-        }
-
-        public Dictionary<PNTokenKey, string> GetTokensByResource(string resourceType)
-        {
-            Dictionary<PNTokenKey, string> result = null;
-            if (tokenManager != null)
-            {
-                result = tokenManager.GetTokensByResource(resourceType);
-            }
-            return result;
-        }
-
-        public void ClearTokens()
-        {
-            if (tokenManager != null)
-            {
-                tokenManager.ClearTokens();
+                tokenManager.SetAuthToken(token);
             }
         }
 
@@ -843,7 +803,7 @@ namespace PubnubApi
                 telemetryManager = new EndPoint.TelemetryManager(pubnubConfig, pubnubLog);
             }
             CheckRequiredConfigValues();
-            if (config != null && string.IsNullOrEmpty(config.SecretKey) && config.EnableTokenManager)
+            if (config != null)
             {
                 tokenManager = new EndPoint.TokenManager(pubnubConfig, JsonPluggableLibrary, pubnubLog, this.InstanceId);
             }

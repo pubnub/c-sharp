@@ -23,7 +23,8 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>PAMv3 support</PackageReleaseNotes>
+    <PackageReleaseNotes>Dispose RandomNumberGenerator.
+Added PAMv3 support - GrantToken, ParseToken, SetAuthToken.</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
@@ -385,10 +386,11 @@
       <Link>Model\Consumer\AccessManager\PNAccessManagerKeysData.cs</Link>
     </Compile>
 	<Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNAccessManagerTokenResult.cs" Link="Model\Consumer\AccessManager\PNAccessManagerTokenResult.cs" />
-	<Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNGrantToken.cs" Link="Model\Consumer\AccessManager\PNGrantToken.cs" />
-	<Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNResourcePermission.cs" Link="Model\Consumer\AccessManager\PNResourcePermission.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNTokenAuthValues.cs" Link="Model\Consumer\AccessManager\PNTokenAuthValues.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNTokenContent.cs" Link="Model\Consumer\AccessManager\PNTokenContent.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNTokenPermissionMappingBase.cs" Link="Model\Consumer\AccessManager\PNTokenPermissionMappingBase.cs" />
 
-	  <Compile Include="..\PubnubApi\Model\Consumer\ChannelGroup\PNChannelGroupsAddChannelResult.cs">
+    <Compile Include="..\PubnubApi\Model\Consumer\ChannelGroup\PNChannelGroupsAddChannelResult.cs">
       <Link>Model\Consumer\ChannelGroup\PNChannelGroupsAddChannelResult.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\Model\Consumer\ChannelGroup\PNChannelGroupsAllChannelsResult.cs">
@@ -449,7 +451,6 @@
     <Compile Include="..\PubnubApi\Model\Consumer\PNTimeResult.cs">
       <Link>Model\Consumer\PNTimeResult.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\Model\Consumer\PNTokenKey.cs" Link="Model\Consumer\PNTokenKey.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Presence\PNGetStateResult.cs">
       <Link>Model\Consumer\Presence\PNGetStateResult.cs</Link>
     </Compile>

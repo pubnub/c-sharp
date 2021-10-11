@@ -17,21 +17,25 @@ namespace PubnubApi.EndPoint
         private readonly IPubnubUnitTest unit;
         private readonly IPubnubLog pubnubLog;
         private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
-        private readonly EndPoint.TokenManager pubnubTokenMgr;
 
-        private Dictionary<string, PNResourcePermission> pubnubChannelNames = new Dictionary<string, PNResourcePermission>();
-        private Dictionary<string, PNResourcePermission> pubnubChannelGroupNames = new Dictionary<string, PNResourcePermission>();
-        private Dictionary<string, PNResourcePermission> pubnubUsers = new Dictionary<string, PNResourcePermission>();
-        private Dictionary<string, PNResourcePermission> pubnubSpaces = new Dictionary<string, PNResourcePermission>();
+        private PNTokenResources pubnubResources = new PNTokenResources() 
+        { 
+            Channels = new Dictionary<string, PNTokenAuthValues>(),
+            ChannelGroups = new Dictionary<string, PNTokenAuthValues>(),
+            Uuids = new Dictionary<string, PNTokenAuthValues>()
+        };
+        private PNTokenPatterns pubnubPatterns = new PNTokenPatterns() 
+        {
+            Channels = new Dictionary<string, PNTokenAuthValues>(),
+            ChannelGroups = new Dictionary<string, PNTokenAuthValues>(),
+            Uuids = new Dictionary<string, PNTokenAuthValues>()
+        };
 
-        private Dictionary<string, PNResourcePermission> pubnubChannelNamesPattern = new Dictionary<string, PNResourcePermission>();
-        private Dictionary<string, PNResourcePermission> pubnubChannelGroupNamesPattern = new Dictionary<string, PNResourcePermission>();
-        private Dictionary<string, PNResourcePermission> pubnubUsersPattern = new Dictionary<string, PNResourcePermission> { {"^$", new PNResourcePermission { Read=true } } };
-        private Dictionary<string, PNResourcePermission> pubnubSpacesPattern = new Dictionary<string, PNResourcePermission> { { "^$", new PNResourcePermission { Read = true } } };
-        private long grantTTL = -1;
+        private int grantTTL = -1;
         private PNCallback<PNAccessManagerTokenResult> savedCallbackGrantToken;
         private Dictionary<string, object> queryParam;
         private Dictionary<string, object> grantMeta;
+        private string pubnubAuthorizedUuid = string.Empty;
 
         public GrantTokenOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
         {
@@ -40,7 +44,6 @@ namespace PubnubApi.EndPoint
             unit = pubnubUnit;
             pubnubLog = log;
             pubnubTelemetryMgr = telemetryManager;
-            pubnubTokenMgr = tokenManager;
             PubnubInstance = instance;
 
             if (!ChannelRequest.ContainsKey(instance.InstanceId))
@@ -57,123 +60,56 @@ namespace PubnubApi.EndPoint
             }
         }
 
-        public GrantTokenOperation Users(Dictionary<string, PNResourcePermission> userPermissions)
+        public GrantTokenOperation AuthorizedUuid(string uuid)
         {
-            if (userPermissions != null)
-            {
-                this.pubnubUsers = userPermissions;
-            }
+            this.pubnubAuthorizedUuid = uuid;
             return this;
         }
 
-        public GrantTokenOperation Users(Dictionary<string, PNResourcePermission> userPermissions, bool pattern)
+        public GrantTokenOperation Resources(PNTokenResources resources)
         {
-            if (userPermissions != null)
+            if (pubnubResources != null)
             {
-                if (pattern)
+                pubnubResources = resources;
+                if (pubnubResources.Channels == null)
                 {
-                    this.pubnubUsersPattern = userPermissions;
-                    if (!this.pubnubUsersPattern.ContainsKey("^$"))
-                    {
-                        this.pubnubUsersPattern.Add("^$", new PNResourcePermission { Read = true });
-                    }
+                    pubnubResources.Channels = new Dictionary<string, PNTokenAuthValues>();
                 }
-                else
+                if (pubnubResources.ChannelGroups == null)
                 {
-                    this.pubnubUsers = userPermissions;
+                    pubnubResources.ChannelGroups = new Dictionary<string, PNTokenAuthValues>();
+                }
+                if (pubnubResources.Uuids == null)
+                {
+                    pubnubResources.Uuids = new Dictionary<string, PNTokenAuthValues>();
                 }
             }
             return this;
         }
 
-        public GrantTokenOperation Spaces(Dictionary<string, PNResourcePermission> spacePermissions)
+        public GrantTokenOperation Patterns(PNTokenPatterns patterns)
         {
-            if (spacePermissions != null)
+            if (pubnubPatterns != null)
             {
-                this.pubnubSpaces = spacePermissions;
+                pubnubPatterns = patterns;
+                if (pubnubPatterns.Channels == null)
+                {
+                    pubnubPatterns.Channels = new Dictionary<string, PNTokenAuthValues>();
+                }
+                if (pubnubPatterns.ChannelGroups == null)
+                {
+                    pubnubPatterns.ChannelGroups = new Dictionary<string, PNTokenAuthValues>();
+                }
+                if (pubnubPatterns.Uuids == null)
+                {
+                    pubnubPatterns.Uuids = new Dictionary<string, PNTokenAuthValues>();
+                }
+
             }
             return this;
         }
 
-        public GrantTokenOperation Spaces(Dictionary<string, PNResourcePermission> spacePermissions, bool pattern)
-        {
-            if (spacePermissions != null)
-            {
-                if (pattern)
-                {
-                    this.pubnubSpacesPattern = spacePermissions;
-                    if (!this.pubnubSpacesPattern.ContainsKey("^$"))
-                    {
-                        this.pubnubSpacesPattern.Add("^$", new PNResourcePermission { Read = true });
-                    }
-                }
-                else
-                {
-                    this.pubnubSpaces = spacePermissions;
-                }
-            }
-            return this;
-        }
-
-        public GrantTokenOperation Channels(Dictionary<string, PNResourcePermission> channelPermissions)
-        {
-            if (channelPermissions != null)
-            {
-                this.pubnubChannelNames = channelPermissions;
-            }
-            return this;
-        }
-
-        public GrantTokenOperation Channels(Dictionary<string, PNResourcePermission> channelPermissions, bool pattern)
-        {
-            if (channelPermissions != null)
-            {
-                if (pattern)
-                {
-                    this.pubnubChannelNamesPattern = channelPermissions;
-                    if (!this.pubnubChannelNamesPattern.ContainsKey("^$"))
-                    {
-                        this.pubnubChannelNamesPattern.Add("^$", new PNResourcePermission { Read = true });
-                    }
-                }
-                else
-                {
-                    this.pubnubChannelNames = channelPermissions;
-                }
-            }
-            return this;
-        }
-
-        public GrantTokenOperation ChannelGroups(Dictionary<string, PNResourcePermission> channelGroupPermissions)
-        {
-            if (channelGroupPermissions != null)
-            {
-                this.pubnubChannelGroupNames = channelGroupPermissions;
-            }
-            return this;
-        }
-
-        public GrantTokenOperation ChannelGroups(Dictionary<string, PNResourcePermission> channelGroupPermissions, bool pattern)
-        {
-            if (channelGroupPermissions != null)
-            {
-                if (pattern)
-                {
-                    this.pubnubChannelGroupNamesPattern = channelGroupPermissions;
-                    if (!this.pubnubChannelGroupNamesPattern.ContainsKey("^$"))
-                    {
-                        this.pubnubChannelGroupNamesPattern.Add("^$", new PNResourcePermission { Read = true });
-                    }
-                }
-                else
-                {
-                    this.pubnubChannelGroupNames = channelGroupPermissions;
-                }
-            }
-            return this;
-        }
-
-        public GrantTokenOperation TTL(long ttl)
+        public GrantTokenOperation TTL(int ttl)
         {
             this.grantTTL = ttl;
             return this;
@@ -197,16 +133,21 @@ namespace PubnubApi.EndPoint
             Task.Factory.StartNew(() =>
             {
                 this.savedCallbackGrantToken = callback;
-                GrantAccess(this.pubnubChannelNames, this.pubnubChannelGroupNames, this.pubnubUsers, this.pubnubSpaces, this.pubnubChannelNamesPattern, this.pubnubChannelGroupNamesPattern, this.pubnubUsersPattern, this.pubnubSpacesPattern, this.grantTTL, this.grantMeta, this.queryParam, callback);
+                GrantAccess(callback);
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
             new Thread(() =>
             {
                 this.savedCallbackGrantToken = callback;
-                GrantAccess(this.pubnubChannelNames, this.pubnubChannelGroupNames, this.pubnubUsers, this.pubnubSpaces, this.pubnubChannelNamesPattern, this.pubnubChannelGroupNamesPattern, this.pubnubUsersPattern, this.pubnubSpacesPattern, this.grantTTL, this.grantMeta, this.queryParam, callback);
+                GrantAccess(callback);
             })
             { IsBackground = true }.Start();
 #endif
+        }
+
+        public async Task<PNResult<PNAccessManagerTokenResult>> ExecuteAsync()
+        {
+            return await GrantAccess().ConfigureAwait(false);
         }
 
         internal void Retry()
@@ -214,18 +155,18 @@ namespace PubnubApi.EndPoint
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
-                    GrantAccess(this.pubnubChannelNames, this.pubnubChannelGroupNames, this.pubnubUsers, this.pubnubSpaces, this.pubnubChannelNamesPattern, this.pubnubChannelGroupNamesPattern, this.pubnubUsersPattern, this.pubnubSpacesPattern, this.grantTTL, this.grantMeta, this.queryParam, savedCallbackGrantToken);
+                GrantAccess(savedCallbackGrantToken);
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
             new Thread(() =>
             {
-                GrantAccess(this.pubnubChannelNames, this.pubnubChannelGroupNames, this.pubnubUsers, this.pubnubSpaces, this.pubnubChannelNamesPattern, this.pubnubChannelGroupNamesPattern, this.pubnubUsersPattern, this.pubnubSpacesPattern, this.grantTTL, this.grantMeta, this.queryParam, savedCallbackGrantToken);
+                GrantAccess(savedCallbackGrantToken);
             })
             { IsBackground = true }.Start();
 #endif
         }
-
-        internal void GrantAccess(Dictionary<string, PNResourcePermission> channelsPermission, Dictionary<string, PNResourcePermission> channelGroupsPermission, Dictionary<string, PNResourcePermission> usersPermission, Dictionary<string, PNResourcePermission> spacesPermission, Dictionary<string, PNResourcePermission> channelsPatternPermission, Dictionary<string, PNResourcePermission> channelGroupsPatternPermission, Dictionary<string, PNResourcePermission> usersPatternPermission, Dictionary<string, PNResourcePermission> spacesPatternPermission, long ttl, Dictionary<string, object> meta, Dictionary<string, object> externalQueryParam, PNCallback<PNAccessManagerTokenResult> callback)
+        
+        internal void GrantAccess(PNCallback<PNAccessManagerTokenResult> callback)
         {
             if (string.IsNullOrEmpty(config.SecretKey) || string.IsNullOrEmpty(config.SecretKey.Trim()) || config.SecretKey.Length <= 0)
             {
@@ -238,8 +179,8 @@ namespace PubnubApi.EndPoint
             }
 
             RequestState<PNAccessManagerTokenResult> requestState = new RequestState<PNAccessManagerTokenResult>();
-            requestState.Channels = channelsPermission.Keys.ToArray();
-            requestState.ChannelGroups = channelGroupsPermission.Keys.ToArray();
+            requestState.Channels = pubnubResources.Channels.Keys.ToArray();
+            requestState.ChannelGroups = pubnubResources.ChannelGroups.Keys.ToArray();
             requestState.ResponseType = PNOperationType.PNAccessManagerGrantToken;
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
@@ -248,166 +189,239 @@ namespace PubnubApi.EndPoint
 
             requestState.UsePostMethod = true;
 
-            Dictionary<string, int> chBitmaskPermDic = new Dictionary<string, int>();
-            foreach(KeyValuePair<string, PNResourcePermission> kvp in channelsPermission)
+            bool atleastOnePermission = false;
+            Dictionary<string, int> chBitmaskPermCollection = null;
+            atleastOnePermission = FillPermissionMappingWithMaskValues(this.pubnubResources.Channels, atleastOnePermission, out chBitmaskPermCollection);
+
+            Dictionary<string, int> chPatternBitmaskPermCollection = null;
+            atleastOnePermission = FillPermissionMappingWithMaskValues(this.pubnubPatterns.Channels, atleastOnePermission, out chPatternBitmaskPermCollection);
+
+            Dictionary<string, int> cgBitmaskPermCollection = null;
+            atleastOnePermission = FillPermissionMappingWithMaskValues(this.pubnubResources.ChannelGroups, atleastOnePermission, out cgBitmaskPermCollection);
+
+            Dictionary<string, int> cgPatternBitmaskPermCollection = null;
+            atleastOnePermission = FillPermissionMappingWithMaskValues(this.pubnubPatterns.ChannelGroups, atleastOnePermission, out cgPatternBitmaskPermCollection);
+
+            Dictionary<string, int> uuidBitmaskPermCollection = null;
+            atleastOnePermission = FillPermissionMappingWithMaskValues(this.pubnubResources.Uuids, atleastOnePermission, out uuidBitmaskPermCollection);
+
+            Dictionary<string, int> uuidPatternBitmaskPermCollection = null;
+            atleastOnePermission = FillPermissionMappingWithMaskValues(this.pubnubPatterns.Uuids, atleastOnePermission, out uuidPatternBitmaskPermCollection);
+
+            if (!atleastOnePermission)
             {
-                PNResourcePermission perm = kvp.Value;
-                int bitMaskPermissionValue = 0;
-                if (perm != null)
-                {
-                    bitMaskPermissionValue = CalculateGrantBitMaskValue(perm.Read, perm.Write, perm.Manage, perm.Delete, perm.Create);
-                }
-                chBitmaskPermDic.Add(kvp.Key, bitMaskPermissionValue);
-            }
-            Dictionary<string, int> chPatternBitmaskPermDic = new Dictionary<string, int>();
-            foreach (KeyValuePair<string, PNResourcePermission> kvp in channelsPatternPermission)
-            {
-                PNResourcePermission perm = kvp.Value;
-                int bitMaskPermissionValue = 0;
-                if (perm != null)
-                {
-                    bitMaskPermissionValue = CalculateGrantBitMaskValue(perm.Read, perm.Write, perm.Manage, perm.Delete, perm.Create);
-                }
-                chPatternBitmaskPermDic.Add(kvp.Key, bitMaskPermissionValue);
+                throw new MissingMemberException("At least one permission is needed for at least one or more of uuids, channels or groups");
             }
 
+            Dictionary<string, object> resourcesCollection = new Dictionary<string, object>();
+            resourcesCollection.Add("channels", chBitmaskPermCollection);
+            resourcesCollection.Add("groups", cgBitmaskPermCollection);
+            resourcesCollection.Add("uuids", uuidBitmaskPermCollection);
+            resourcesCollection.Add("users", new Dictionary<string, int>()); //Empty object for users for json structure
+            resourcesCollection.Add("spaces", new Dictionary<string, int>()); //Empty object for spaces for json structure
 
-            Dictionary<string, int> cgBitmaskPermDic = new Dictionary<string, int>();
-            foreach (KeyValuePair<string, PNResourcePermission> kvp in channelGroupsPermission)
-            {
-                PNResourcePermission perm = kvp.Value;
-                int bitMaskPermissionValue = 0;
-                if (perm != null)
-                {
-                    bitMaskPermissionValue = CalculateGrantBitMaskValue(perm.Read, perm.Write, perm.Manage, perm.Delete, perm.Create);
-                }
-                cgBitmaskPermDic.Add(kvp.Key, bitMaskPermissionValue);
-            }
-            Dictionary<string, int> cgPatternBitmaskPermDic = new Dictionary<string, int>();
-            foreach (KeyValuePair<string, PNResourcePermission> kvp in channelGroupsPatternPermission)
-            {
-                PNResourcePermission perm = kvp.Value;
-                int bitMaskPermissionValue = 0;
-                if (perm != null)
-                {
-                    bitMaskPermissionValue = CalculateGrantBitMaskValue(perm.Read, perm.Write, perm.Manage, perm.Delete, perm.Create);
-                }
-                cgPatternBitmaskPermDic.Add(kvp.Key, bitMaskPermissionValue);
-            }
-
-            Dictionary<string, int> userBitmaskPermDic = new Dictionary<string, int>();
-            foreach (KeyValuePair<string, PNResourcePermission> kvp in usersPermission)
-            {
-                PNResourcePermission perm = kvp.Value;
-                int bitMaskPermissionValue = 0;
-                if (perm != null)
-                {
-                    bitMaskPermissionValue = CalculateGrantBitMaskValue(perm.Read, perm.Write, perm.Manage, perm.Delete, perm.Create);
-                }
-                userBitmaskPermDic.Add(kvp.Key, bitMaskPermissionValue);
-            }
-            Dictionary<string, int> userPatternBitmaskPermDic = new Dictionary<string, int>();
-            foreach (KeyValuePair<string, PNResourcePermission> kvp in usersPatternPermission)
-            {
-                PNResourcePermission perm = kvp.Value;
-                int bitMaskPermissionValue = 0;
-                if (perm != null)
-                {
-                    bitMaskPermissionValue = CalculateGrantBitMaskValue(perm.Read, perm.Write, perm.Manage, perm.Delete, perm.Create);
-                }
-                userPatternBitmaskPermDic.Add(kvp.Key, bitMaskPermissionValue);
-            }
-
-            Dictionary<string, int> spaceBitmaskPermDic = new Dictionary<string, int>();
-            foreach (KeyValuePair<string, PNResourcePermission> kvp in spacesPermission)
-            {
-                PNResourcePermission perm = kvp.Value;
-                int bitMaskPermissionValue = 0;
-                if (perm != null)
-                {
-                    bitMaskPermissionValue = CalculateGrantBitMaskValue(perm.Read, perm.Write, perm.Manage, perm.Delete, perm.Create);
-                }
-                spaceBitmaskPermDic.Add(kvp.Key, bitMaskPermissionValue);
-            }
-            Dictionary<string, int> spacePatternBitmaskPermDic = new Dictionary<string, int>();
-            foreach (KeyValuePair<string, PNResourcePermission> kvp in spacesPatternPermission)
-            {
-                PNResourcePermission perm = kvp.Value;
-                int bitMaskPermissionValue = 0;
-                if (perm != null)
-                {
-                    bitMaskPermissionValue = CalculateGrantBitMaskValue(perm.Read, perm.Write, perm.Manage, perm.Delete, perm.Create);
-                }
-                spacePatternBitmaskPermDic.Add(kvp.Key, bitMaskPermissionValue);
-            }
-
-            Dictionary<string, object> resourcesDic = new Dictionary<string, object>();
-            resourcesDic.Add("channels", chBitmaskPermDic);
-            resourcesDic.Add("groups", cgBitmaskPermDic);
-            resourcesDic.Add("users", userBitmaskPermDic);
-            resourcesDic.Add("spaces", spaceBitmaskPermDic);
-
-            Dictionary<string, object> patternsDic = new Dictionary<string, object>();
-            patternsDic.Add("channels", chPatternBitmaskPermDic);
-            patternsDic.Add("groups", cgPatternBitmaskPermDic);
-            patternsDic.Add("users", userPatternBitmaskPermDic);
-            patternsDic.Add("spaces", spacePatternBitmaskPermDic);
+            Dictionary<string, object> patternsCollection = new Dictionary<string, object>();
+            patternsCollection.Add("channels", chPatternBitmaskPermCollection);
+            patternsCollection.Add("groups", cgPatternBitmaskPermCollection);
+            patternsCollection.Add("uuids", uuidPatternBitmaskPermCollection);
+            patternsCollection.Add("users", new Dictionary<string, int>()); //Empty object for users for json structure
+            patternsCollection.Add("spaces", new Dictionary<string, int>()); //Empty object for spaces for json structure
 
             Dictionary<string, object> optimizedMeta = new Dictionary<string, object>();
-            if (meta != null)
+            if (this.grantMeta != null)
             {
-                optimizedMeta = meta;
+                optimizedMeta = this.grantMeta;
             }
 
-            Dictionary<string, object> permissionDic = new Dictionary<string, object>();
-            permissionDic.Add("resources", resourcesDic);
-            permissionDic.Add("patterns", patternsDic);
-            permissionDic.Add("meta", optimizedMeta);
+            Dictionary<string, object> permissionCollection = new Dictionary<string, object>();
+            permissionCollection.Add("resources", resourcesCollection);
+            permissionCollection.Add("patterns", patternsCollection);
+            permissionCollection.Add("meta", optimizedMeta);
+            if (!string.IsNullOrEmpty(this.pubnubAuthorizedUuid) && this.pubnubAuthorizedUuid.Trim().Length > 0)
+            {
+                permissionCollection.Add("uuid", this.pubnubAuthorizedUuid);
+            }
 
             Dictionary<string, object> messageEnvelope = new Dictionary<string, object>();
-            messageEnvelope.Add("ttl", ttl);
-            messageEnvelope.Add("permissions", permissionDic);
+            messageEnvelope.Add("ttl", this.grantTTL);
+            messageEnvelope.Add("permissions", permissionCollection);
 
             string requestMethodName = "POST";
             string postMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
             byte[] postData = Encoding.UTF8.GetBytes(postMessage);
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
-            Uri request = urlBuilder.BuildGrantV3AccessRequest(requestMethodName, postMessage, externalQueryParam);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            Uri request = urlBuilder.BuildGrantV3AccessRequest(requestMethodName, postMessage, this.queryParam);
 
             UrlProcessRequest(request, requestState, false, postData).ContinueWith(r => 
             {
                 string json = r.Result.Item1;
                 if (!string.IsNullOrEmpty(json))
                 {
-                    List<object> result = ProcessJsonResponse<PNAccessManagerTokenResult>(requestState, json);
+                    List<object> result = ProcessJsonResponse(requestState, json);
                     ProcessResponseCallbacks(result, requestState);
                 }
             }, TaskContinuationOptions.ExecuteSynchronously).Wait();
         }
 
-        private static int CalculateGrantBitMaskValue(bool read, bool write, bool manage, bool delete, bool create)
+        private bool FillPermissionMappingWithMaskValues(Dictionary<string, PNTokenAuthValues> dPerms, bool currentAtleastOnePermission, out Dictionary<string, int> dPermsWithMaskValues)
+        {
+            dPermsWithMaskValues = new Dictionary<string, int>();
+            bool internalAtleastOnePermission = currentAtleastOnePermission;
+            foreach (KeyValuePair<string, PNTokenAuthValues> kvp in dPerms)
+            {
+                PNTokenAuthValues perm = kvp.Value;
+                int bitMaskPermissionValue = 0;
+                if (!string.IsNullOrEmpty(kvp.Key) && kvp.Key.Trim().Length > 0 && perm != null)
+                {
+                    bitMaskPermissionValue = CalculateGrantBitMaskValue(perm);
+                    if (!internalAtleastOnePermission && bitMaskPermissionValue > 0) { internalAtleastOnePermission = true; }
+                }
+                dPermsWithMaskValues.Add(kvp.Key, bitMaskPermissionValue);
+            }
+            return internalAtleastOnePermission;
+        }
+
+        internal async Task<PNResult<PNAccessManagerTokenResult>> GrantAccess()
+        {
+            if (string.IsNullOrEmpty(config.SecretKey) || string.IsNullOrEmpty(config.SecretKey.Trim()) || config.SecretKey.Length <= 0)
+            {
+                throw new MissingMemberException("Invalid secret key");
+            }
+
+            if (this.grantTTL <= 0)
+            {
+                throw new MissingMemberException("Invalid TTL value");
+            }
+
+            PNResult<PNAccessManagerTokenResult> ret = new PNResult<PNAccessManagerTokenResult>();
+
+            bool atleastOnePermission = false;
+            Dictionary<string, int> chBitmaskPermCollection = null;
+            atleastOnePermission = FillPermissionMappingWithMaskValues(this.pubnubResources.Channels, atleastOnePermission, out chBitmaskPermCollection);
+
+            Dictionary<string, int> chPatternBitmaskPermCollection = null;
+            atleastOnePermission = FillPermissionMappingWithMaskValues(this.pubnubPatterns.Channels, atleastOnePermission, out chPatternBitmaskPermCollection);
+
+            Dictionary<string, int> cgBitmaskPermCollection = null;
+            atleastOnePermission = FillPermissionMappingWithMaskValues(this.pubnubResources.ChannelGroups, atleastOnePermission, out cgBitmaskPermCollection);
+
+            Dictionary<string, int> cgPatternBitmaskPermCollection = null;
+            atleastOnePermission = FillPermissionMappingWithMaskValues(this.pubnubPatterns.ChannelGroups, atleastOnePermission, out cgPatternBitmaskPermCollection);
+
+            Dictionary<string, int> uuidBitmaskPermCollection = null;
+            atleastOnePermission = FillPermissionMappingWithMaskValues(this.pubnubResources.Uuids, atleastOnePermission, out uuidBitmaskPermCollection);
+
+            Dictionary<string, int> uuidPatternBitmaskPermCollection = null;
+            atleastOnePermission = FillPermissionMappingWithMaskValues(this.pubnubPatterns.Uuids, atleastOnePermission, out uuidPatternBitmaskPermCollection);
+
+            if (!atleastOnePermission)
+            {
+                throw new MissingMemberException("At least one permission is needed for at least one or more of uuids, channels or groups");
+            }
+
+            Dictionary<string, object> resourcesCollection = new Dictionary<string, object>();
+            resourcesCollection.Add("channels", chBitmaskPermCollection);
+            resourcesCollection.Add("groups", cgBitmaskPermCollection);
+            resourcesCollection.Add("uuids", uuidBitmaskPermCollection);
+            resourcesCollection.Add("users", new Dictionary<string, int>()); //Empty object for users for json structure
+            resourcesCollection.Add("spaces", new Dictionary<string, int>()); //Empty object for spaces for json structure
+
+            Dictionary<string, object> patternsCollection = new Dictionary<string, object>();
+            patternsCollection.Add("channels", chPatternBitmaskPermCollection);
+            patternsCollection.Add("groups", cgPatternBitmaskPermCollection);
+            patternsCollection.Add("uuids", uuidPatternBitmaskPermCollection);
+            patternsCollection.Add("users", new Dictionary<string, int>()); //Empty object for users for json structure
+            patternsCollection.Add("spaces", new Dictionary<string, int>()); //Empty object for spaces for json structure
+
+            Dictionary<string, object> optimizedMeta = new Dictionary<string, object>();
+            if (this.grantMeta != null)
+            {
+                optimizedMeta = this.grantMeta;
+            }
+
+            Dictionary<string, object> permissionCollection = new Dictionary<string, object>();
+            permissionCollection.Add("resources", resourcesCollection);
+            permissionCollection.Add("patterns", patternsCollection);
+            permissionCollection.Add("meta", optimizedMeta);
+            if (!string.IsNullOrEmpty(this.pubnubAuthorizedUuid) && this.pubnubAuthorizedUuid.Trim().Length > 0)
+            {
+                permissionCollection.Add("uuid", this.pubnubAuthorizedUuid);
+            }
+
+            Dictionary<string, object> messageEnvelope = new Dictionary<string, object>();
+            messageEnvelope.Add("ttl", this.grantTTL);
+            messageEnvelope.Add("permissions", permissionCollection);
+
+            string requestMethodName = "POST";
+            string postMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
+            byte[] postData = Encoding.UTF8.GetBytes(postMessage);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            Uri request = urlBuilder.BuildGrantV3AccessRequest(requestMethodName, postMessage, this.queryParam);
+
+            RequestState<PNAccessManagerTokenResult> requestState = new RequestState<PNAccessManagerTokenResult>();
+            requestState.Channels = pubnubResources.Channels.Keys.ToArray();
+            requestState.ChannelGroups = pubnubResources.ChannelGroups.Keys.ToArray();
+            requestState.ResponseType = PNOperationType.PNAccessManagerGrantToken;
+            requestState.Reconnect = false;
+            requestState.EndPointOperation = this;
+
+            requestState.UsePostMethod = true;
+
+            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false, postData).ConfigureAwait(false);
+            ret.Status = JsonAndStatusTuple.Item2;
+            string json = JsonAndStatusTuple.Item1;
+            if (!string.IsNullOrEmpty(json))
+            {
+                List<object> resultList = ProcessJsonResponse(requestState, json);
+                if (resultList != null && resultList.Count > 0)
+                {
+                    ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+                    PNAccessManagerTokenResult responseResult = responseBuilder.JsonToObject<PNAccessManagerTokenResult>(resultList, true);
+                    if (responseResult != null)
+                    {
+                        ret.Result = responseResult;
+                    }
+                }
+            }
+
+            return ret;
+        }
+
+        private static int CalculateGrantBitMaskValue(PNTokenAuthValues perm)
         {
             int result = 0;
 
-            if (read)
+            if (perm.Read)
             {
                 result = (int)GrantBitFlag.READ;
             }
-            if (write)
+            if (perm.Write)
             {
                 result = result + (int)GrantBitFlag.WRITE;
             }
-            if (manage)
+            if (perm.Manage)
             {
                 result = result + (int)GrantBitFlag.MANAGE;
             }
-            if (delete)
+            if (perm.Delete)
             {
                 result = result + (int)GrantBitFlag.DELETE;
             }
-            if (create)
+            if (perm.Create)
             {
                 result = result + (int)GrantBitFlag.CREATE;
+            }
+            if (perm.Get)
+            {
+                result = result + (int)GrantBitFlag.GET;
+            }
+            if (perm.Update)
+            {
+                result = result + (int)GrantBitFlag.UPDATE;
+            }
+            if (perm.Join)
+            {
+                result = result + (int)GrantBitFlag.JOIN;
             }
 
             return result;

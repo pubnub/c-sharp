@@ -2049,23 +2049,11 @@ namespace PubnubApi
                         && type != PNOperationType.PNAccessManagerGrant && type != PNOperationType.PNAccessManagerGrantToken && type != PNOperationType.ChannelGroupGrantAccess
                         && type != PNOperationType.PNAccessManagerAudit && type != PNOperationType.ChannelGroupAuditAccess)
                 {
-                    if (tokenMgr != null)
+                    if (tokenMgr != null && !string.IsNullOrEmpty(tokenMgr.AuthToken) && tokenMgr.AuthToken.Trim().Length > 0)
                     {
-                        string resourceToken = "";
-                        if (string.IsNullOrEmpty(resourceId) && checkResourcePattern)
-                        {
-                            resourceToken = tokenMgr.GetToken(resourceType, resourceId, checkResourcePattern);
-                        }
-                        else
-                        {
-                            resourceToken = tokenMgr.GetToken(resourceType, resourceId);
-                        }
-                        if (!string.IsNullOrEmpty(resourceToken))
-                        {
-                            ret.Add("auth", UriUtil.EncodeUriComponent(resourceToken, type, false, false, false));
-                        }
+                        ret.Add("auth", UriUtil.EncodeUriComponent(tokenMgr.AuthToken, type, false, false, false));
                     }
-                    else if (!string.IsNullOrEmpty(this.pubnubConfig.AuthKey))
+                    else if (!string.IsNullOrEmpty(this.pubnubConfig.AuthKey) && this.pubnubConfig.AuthKey.Trim().Length > 0)
                     {
                         ret.Add("auth", UriUtil.EncodeUriComponent(this.pubnubConfig.AuthKey, type, false, false, false));
                     }

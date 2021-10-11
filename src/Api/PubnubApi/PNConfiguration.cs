@@ -99,8 +99,6 @@ namespace PubnubApi
 
         public bool SuppressLeaveEvents { get; set; }
 
-        public bool EnableTokenManager { get; set; } = true;
-
         public bool UseRandomInitializationVector { get; set; }
         public int FileMessagePublishRetryLimit { get; set; }
 
