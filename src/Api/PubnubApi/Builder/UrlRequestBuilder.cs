@@ -1986,7 +1986,7 @@ namespace PubnubApi
         }
 
 
-        private Dictionary<string, string> GenerateCommonQueryParams(PNOperationType type, string resourceType, string resourceId, bool checkResourcePattern, string uuid)
+        private Dictionary<string, string> GenerateCommonQueryParams(PNOperationType type, string uuid)
         {
             long timeStamp = TranslateUtcDateTimeToSeconds(DateTime.UtcNow);
             string requestid = Guid.NewGuid().ToString();
@@ -2114,11 +2114,6 @@ namespace PubnubApi
 
         private string BuildQueryString(PNOperationType type, Dictionary<string, string> queryStringParamDic)
         {
-            return BuildQueryString(type, queryStringParamDic, "", "", false);
-        }
-
-        private string BuildQueryString(PNOperationType type, Dictionary<string, string> queryStringParamDic, string resourceType, string resourceId, bool checkResourcePattern)
-        {
             string queryString = "";
 
             try
@@ -2131,7 +2126,7 @@ namespace PubnubApi
 
                 string qsUuid = internalQueryStringParamDic.ContainsKey("uuid") ? internalQueryStringParamDic["uuid"] : null;
                 
-                Dictionary<string, string> commonQueryStringParams = GenerateCommonQueryParams(type, resourceType, resourceId, checkResourcePattern, qsUuid);
+                Dictionary<string, string> commonQueryStringParams = GenerateCommonQueryParams(type, qsUuid);
                 Dictionary<string, string> queryStringParams = new Dictionary<string, string>(commonQueryStringParams.Concat(internalQueryStringParamDic).GroupBy(item => item.Key).ToDictionary(item => item.Key, item => item.First().Value));
 
                 queryString = string.Join("&", queryStringParams.OrderBy(kvp => kvp.Key, StringComparer.Ordinal).Select(kvp => string.Format("{0}={1}", kvp.Key, kvp.Value)).ToArray());

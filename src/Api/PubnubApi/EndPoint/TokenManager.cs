@@ -82,14 +82,14 @@ namespace PubnubApi.EndPoint
                         {
                             result = new PNTokenContent();
                             result.Meta = new Dictionary<string, object>();
-                            result.Resources = new PNTokenResources() { 
+                            result.Resources = new PNTokenResources { 
                                 Channels = new Dictionary<string, PNTokenAuthValues>(),
                                 ChannelGroups = new Dictionary<string, PNTokenAuthValues>(),
                                 Uuids = new Dictionary<string, PNTokenAuthValues>(),
                                 Users = new Dictionary<string, PNTokenAuthValues>(),
                                 Spaces = new Dictionary<string, PNTokenAuthValues>()
                             };
-                            result.Patterns = new PNTokenPatterns() {
+                            result.Patterns = new PNTokenPatterns {
                                 Channels = new Dictionary<string, PNTokenAuthValues>(),
                                 ChannelGroups = new Dictionary<string, PNTokenAuthValues>(),
                                 Uuids = new Dictionary<string, PNTokenAuthValues>(),

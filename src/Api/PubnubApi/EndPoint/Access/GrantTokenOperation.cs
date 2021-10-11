@@ -18,13 +18,13 @@ namespace PubnubApi.EndPoint
         private readonly IPubnubLog pubnubLog;
         private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 
-        private PNTokenResources pubnubResources = new PNTokenResources() 
+        private PNTokenResources pubnubResources = new PNTokenResources
         { 
             Channels = new Dictionary<string, PNTokenAuthValues>(),
             ChannelGroups = new Dictionary<string, PNTokenAuthValues>(),
             Uuids = new Dictionary<string, PNTokenAuthValues>()
         };
-        private PNTokenPatterns pubnubPatterns = new PNTokenPatterns() 
+        private PNTokenPatterns pubnubPatterns = new PNTokenPatterns
         {
             Channels = new Dictionary<string, PNTokenAuthValues>(),
             ChannelGroups = new Dictionary<string, PNTokenAuthValues>(),
