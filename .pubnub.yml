@@ -6,13 +6,6 @@ changelog:
   - version: v5.1.0
     date: 2021-10-12
     changes:
-      - type: feature
-        text: "Added PAMv3 support - GrantToken, ParseToken, SetAuthToken."
-      - type: bug
-        text: "Dispose RandomNumberGenerator."
-  - version: v5.1.0
-    date: 2021-10-12
-    changes:
       - type: improvement
         text: Dispose RandomNumberGenerator
       - type: feature
