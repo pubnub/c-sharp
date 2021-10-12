@@ -1,6 +1,10 @@
+v5.1.0 - October 12 2021
+-----------------------------
+
+- Added: added PAMv3 support - GrantToken, ParseToken, SetAuthToken. 
+- Fixed: dispose RandomNumberGenerator. 
+
 v5.0.0 - June 14 2021
 -----------------------------
 
 - Added: bREAKING CHANGE - UseRandomInitializationVector is true by default. 
-
-

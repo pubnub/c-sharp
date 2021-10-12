@@ -921,6 +921,109 @@ namespace PubNubMessaging.Tests
             }
         }
 
+        [Test]
+        public static void ThenGrantTokenShouldReturnSuccess()
+        {
+            server.ClearRequests();
+
+            currentUnitTestCase = "ThenGrantTokenShouldReturnSuccess";
+
+            receivedGrantMessage = false;
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
+
+            pubnub = createPubNubInstance(config);
+            server.RunOnHttps(config.Secure);
+
+            try
+            {
+                grantManualEvent = new ManualResetEvent(false);
+                pubnub.GrantToken()
+                    .Resources(new PNTokenResources() 
+                        { 
+                            Channels=new Dictionary<string, PNTokenAuthValues>() {
+                                            { "ch1", new PNTokenAuthValues() { Read = true, Write = true, Manage= true, Create = true, Delete=true, Get = true, Update = true, Join = true } } },
+                            ChannelGroups = new Dictionary<string, PNTokenAuthValues>() {
+                                            { "cg1", new PNTokenAuthValues() { Read = true, Write = true, Manage= true, Create = true, Delete=true, Get = true, Update = true, Join = true } } },
+                            Uuids = new Dictionary<string, PNTokenAuthValues>() {
+                                            { "uuid1", new PNTokenAuthValues() { Read = true, Write = true, Manage= true, Create = true, Delete=true, Get = true, Update = true, Join = true } } },
+                    }
+                    )
+                    .TTL(10)
+                    .Execute(new PNAccessManagerTokenResultExt((result, status) =>
+                    {
+                        if (result != null)
+                        {
+                            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                        }
+                        else
+                        {
+                            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                        }
+                        receivedGrantMessage = true;
+                        grantManualEvent.Set();
+                    }));
+                grantManualEvent.WaitOne();
+                Thread.Sleep(1000);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                receivedGrantMessage = true;
+                grantManualEvent.Set();
+            }
+
+        }
+
+
+        [Test]
+#if NET40
+        public static void ThenWithAsyncGrantTokenShouldReturnSuccess()
+#else
+        public static async Task ThenWithAsyncGrantTokenShouldReturnSuccess()
+#endif
+        {
+            server.ClearRequests();
+
+            currentUnitTestCase = "ThenWithAsyncGrantTokenShouldReturnSuccess";
+
+            receivedGrantMessage = false;
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
+
+            pubnub = createPubNubInstance(config);
+            server.RunOnHttps(config.Secure);
+
+#if NET40
+#else
+            PNResult<PNAccessManagerTokenResult> result = await pubnub.GrantToken()
+                    .Resources(new PNTokenResources()
+                    {
+                        Channels = new Dictionary<string, PNTokenAuthValues>() {
+                                            { "ch1", new PNTokenAuthValues() { Read = true, Write = true, Manage= true, Create = true, Delete=true, Get = true, Update = true, Join = true } } },
+                        ChannelGroups = new Dictionary<string, PNTokenAuthValues>() {
+                                            { "cg1", new PNTokenAuthValues() { Read = true, Write = true, Manage= true, Create = true, Delete=true, Get = true, Update = true, Join = true } } },
+                        Uuids = new Dictionary<string, PNTokenAuthValues>() {
+                                            { "uuid1", new PNTokenAuthValues() { Read = true, Write = true, Manage= true, Create = true, Delete=true, Get = true, Update = true, Join = true } } },
+                    }
+                    )
+                .TTL(10)
+                .ExecuteAsync();
+#endif
+
+        }
 
         public static byte[] HexStringToByteArray(string hex)
         {

@@ -13,7 +13,7 @@
 
   <PropertyGroup>
     <PackageId>Pubnub</PackageId>
-    <PackageVersion>5.0.1.0</PackageVersion>
+    <PackageVersion>5.1.0.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -21,9 +21,8 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>Replaced Random class with RandomNumberGenerator for secure random bytes
-Handling of SendFile file size exceeded error message and refactored DeleteFile
-Refactored Encrypt/Decrypt methods in calling PubnubCrypto constructor with config.</PackageReleaseNotes>
+    <PackageReleaseNotes>Dispose RandomNumberGenerator.
+Added PAMv3 support - GrantToken, ParseToken, SetAuthToken.</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
@@ -64,6 +63,7 @@ Refactored Encrypt/Decrypt methods in calling PubnubCrypto constructor with conf
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="PeterO.Cbor" Version="4.4.4" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net35'">

@@ -378,7 +378,7 @@ namespace PubnubApiAsyncAwaitDemo
             Console.WriteLine("");
             while (!exitFlag)
             {
-                if (currentUserChoice < 1 || (currentUserChoice > 64 && currentUserChoice != 99))
+                if (currentUserChoice < 1 || (currentUserChoice > 67 && currentUserChoice != 99))
                 {
                     StringBuilder menuOptionsStringBuilder = new StringBuilder();
                     menuOptionsStringBuilder.AppendLine("ENTER 1 FOR Subscribe channel/channelgroup");
@@ -437,6 +437,9 @@ namespace PubnubApiAsyncAwaitDemo
                     menuOptionsStringBuilder.AppendLine("Enter 62 FOR DeleteFile");
                     menuOptionsStringBuilder.AppendLine("Enter 63 FOR PublishFileMessage");
                     menuOptionsStringBuilder.AppendLine("Enter 64 FOR ListAllFiles");
+                    menuOptionsStringBuilder.AppendLine("Enter 65 FOR GrantToken");
+                    menuOptionsStringBuilder.AppendLine("Enter 66 FOR SetToken");
+                    menuOptionsStringBuilder.AppendLine("Enter 67 FOR ParseToken");
 
                     menuOptionsStringBuilder.AppendLine("ENTER 99 FOR EXIT OR QUIT");
                     Console.WriteLine(menuOptionsStringBuilder.ToString());
@@ -2112,6 +2115,123 @@ namespace PubnubApiAsyncAwaitDemo
                         {
                             Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(listFilesStatus));
                         }
+                        break;
+                    case "65":
+                        Console.WriteLine("Enter Channel Name for PAM GrantToken.");
+                        string grantChannelName = Console.ReadLine();
+
+                        Console.WriteLine("Enter ChannelGroup Name for PAM GrantToken.");
+                        string grantChannelGroupName = Console.ReadLine();
+
+                        Console.WriteLine("Enter UUID for PAM GrantToken.");
+                        string grantUuiIdEntry = Console.ReadLine();
+
+                        Console.WriteLine("Enter Authorized UUID for PAM GrantToken.");
+                        string grantAuthorizedUuiIdEntry = Console.ReadLine();
+
+                        Console.WriteLine("Read Access? Enter Y for Yes (default), N for No.");
+                        string grantReadAccess = Console.ReadLine();
+                        bool grantRead = (grantReadAccess.ToLower() == "n") ? false : true;
+
+                        Console.WriteLine("Write Access? Enter Y for Yes (default), N for No.");
+                        string grantwriteAccess = Console.ReadLine();
+                        bool grantWrite = (grantwriteAccess.ToLower() == "n") ? false : true;
+
+                        Console.WriteLine("Delete Access? Enter Y for Yes (default), N for No.");
+                        string grantDeleteAccess = Console.ReadLine();
+                        bool grantDelete = (grantDeleteAccess.ToLower() == "n") ? false : true;
+
+                        Console.WriteLine("Create Access? Enter Y for Yes (default), N for No.");
+                        string grantCreateAccess = Console.ReadLine();
+                        bool grantCreate = (grantCreateAccess.ToLower() == "n") ? false : true;
+
+                        Console.WriteLine("Manage Access? Enter Y for Yes (default), N for No.");
+                        string grantManageAccess = Console.ReadLine();
+                        bool grantManage = (grantManageAccess.ToLower() == "n") ? false : true;
+
+                        Console.WriteLine("Get Access? Enter Y for Yes (default), N for No.");
+                        string grantGetAccess = Console.ReadLine();
+                        bool grantGet = (grantGetAccess.ToLower() == "n") ? false : true;
+
+                        Console.WriteLine("Update Access? Enter Y for Yes (default), N for No.");
+                        string grantUpdateAccess = Console.ReadLine();
+                        bool grantUpdate = (grantUpdateAccess.ToLower() == "n") ? false : true;
+
+                        Console.WriteLine("Join Access? Enter Y for Yes (default), N for No.");
+                        string grantJoinAccess = Console.ReadLine();
+                        bool grantJoin = (grantJoinAccess.ToLower() == "n") ? false : true;
+
+                        Console.WriteLine("How many minutes do you want to allow Grant Access? Enter the number of minutes." + System.Environment.NewLine + "Default = 1440 minutes (24 hours). Press ENTER now to accept default value.");
+                        int grantTokenTTL;
+                        string grantTokenTimeLimit = Console.ReadLine();
+                        if (string.IsNullOrEmpty(grantTokenTimeLimit.Trim()))
+                        {
+                            grantTokenTTL = 1440;
+                        }
+                        else
+                        {
+                            Int32.TryParse(grantTokenTimeLimit, out grantTokenTTL);
+                            if (grantTokenTTL <= 0) grantTokenTTL = 1440;
+                        }
+
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        StringBuilder pamTokenGrantStringBuilder = new StringBuilder();
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("Channel = {0}", grantChannelName));
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("ChannelGroup = {0}", grantChannelGroupName));
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("UUID = {0}", grantUuiIdEntry));
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("AuthorizedUUID = {0}", grantAuthorizedUuiIdEntry));
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("Read Access = {0}", grantRead.ToString()));
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("Write Access = {0}", grantWrite.ToString()));
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("Delete Access = {0}", grantDelete.ToString()));
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("Create Access = {0}", grantCreate.ToString()));
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("Manage Access = {0}", grantManage.ToString()));
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("Get Access = {0}", grantGet.ToString()));
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("Update Access = {0}", grantUpdate.ToString()));
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("Join Access = {0}", grantJoin.ToString()));
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("TTL = {0}", grantTokenTTL.ToString()));
+                        Console.WriteLine(pamTokenGrantStringBuilder.ToString());
+                        Console.ResetColor();
+                        Console.WriteLine();
+
+                        Console.WriteLine("Running PamGrantToken()");
+                        PNResult<PNAccessManagerTokenResult> grantTokenResponse = await pubnub.GrantToken()
+                            .TTL(grantTokenTTL)
+                            .Meta(new Dictionary<string, object>() { { "score", 100 }, { "color", "red" }, { "author", "pandu" } })
+                            .AuthorizedUuid(grantAuthorizedUuiIdEntry)
+                            .Resources(new PNTokenResources()
+                            {
+                                Channels = new Dictionary<string, PNTokenAuthValues>() {
+                                                    { grantChannelName, new PNTokenAuthValues() { Read = grantRead, Write = grantWrite, Manage= grantManage, Create = grantCreate, Delete=grantDelete, Get = grantGet, Update = grantUpdate, Join = grantJoin } } },
+                                ChannelGroups = new Dictionary<string, PNTokenAuthValues>() {
+                                                    {grantChannelGroupName, new PNTokenAuthValues() { Read = grantRead, Write = grantWrite, Manage= grantManage, Create = grantCreate, Delete=grantDelete, Get = grantGet, Update = grantUpdate, Join = grantJoin } } },
+                                Uuids = new Dictionary<string, PNTokenAuthValues>() {
+                                                    { grantUuiIdEntry, new PNTokenAuthValues() { Read = grantRead, Write = grantWrite, Manage= grantManage, Create = grantCreate, Delete=grantDelete, Get = grantGet, Update = grantUpdate, Join = grantJoin } } },
+                            })
+                            .ExecuteAsync();
+                        PNAccessManagerTokenResult grantTokenResult = grantTokenResponse.Result;
+                        PNStatus grantTokenStatus = grantTokenResponse.Status;
+                        if (!grantTokenStatus.Error && grantTokenResult != null)
+                        {
+                            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(grantTokenResult));
+                        }
+                        else
+                        {
+                            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(grantTokenStatus));
+                        }
+                        break;
+                    case "66":
+                        Console.WriteLine("Enter PAMv3 auth token to set (ensure NO secret key in config)");
+                        grantToken = Console.ReadLine();
+                        pubnub.SetAuthToken(grantToken);
+                        Console.WriteLine();
+                        Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(pubnub.ParseToken(grantToken)));
+                        break;
+                    case "67":
+                        Console.WriteLine("Enter PAMv3 token for parsing");
+                        grantToken = Console.ReadLine();
+                        PNTokenContent tokenContent = pubnub.ParseToken(grantToken);
+                        Console.WriteLine();
+                        Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(tokenContent));
                         break;
                     default:
                         Console.ForegroundColor = ConsoleColor.Red;

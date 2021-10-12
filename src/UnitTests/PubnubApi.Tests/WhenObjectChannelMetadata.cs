@@ -45,7 +45,7 @@ namespace PubNubMessaging.Tests
             pubnub = createPubNubInstance(config);
 
             ManualResetEvent grantManualEvent = new ManualResetEvent(false);
-            pubnub.Grant().Channels(new[] { channelMetadataId }).AuthKeys(new[] { authKey }).Read(true).Write(true).Manage(true).TTL(20)
+            pubnub.Grant().Channels(new[] { channelMetadataId }).AuthKeys(new[] { authKey }).Read(true).Write(true).Manage(true).Update(true).Delete(true).Get(true).TTL(20)
                 .Execute(new PNAccessManagerGrantResultExt(
                                 (r, s) =>
                                 {

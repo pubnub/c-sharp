@@ -42,6 +42,7 @@ namespace PubnubApi
         private static IPubnubUnitTest unitTest;
         private static ConcurrentDictionary<string, IPubnubLog> pubnubLog { get; } = new ConcurrentDictionary<string, IPubnubLog>();
         private static EndPoint.TelemetryManager pubnubTelemetryMgr;
+        protected static ConcurrentDictionary<string, EndPoint.TokenManager> PubnubTokenMgrCollection { get; } = new ConcurrentDictionary<string, EndPoint.TokenManager>();
         private static EndPoint.DuplicationManager pubnubSubscribeDuplicationManager { get; set; }
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
         private static HttpClient httpClientSubscribe { get; set; }
@@ -142,29 +143,31 @@ namespace PubnubApi
             set;
         } = new ConcurrentDictionary<string, DateTime>();
 
-        protected PubnubCoreBase(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, Pubnub instance)
+        protected PubnubCoreBase(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance)
         {
             if (pubnubConfiguation == null)
             {
                 throw new ArgumentException("PNConfiguration missing");
             }
+            
             if (jsonPluggableLibrary == null)
             {
-                InternalConstructor(pubnubConfiguation, new NewtonsoftJsonDotNet(pubnubConfiguation,log), pubnubUnitTest, log, telemetryManager, instance);
+                InternalConstructor(pubnubConfiguation, new NewtonsoftJsonDotNet(pubnubConfiguation,log), pubnubUnitTest, log, telemetryManager, tokenManager, instance);
             }
             else
             {
-                InternalConstructor(pubnubConfiguation, jsonPluggableLibrary, pubnubUnitTest, log, telemetryManager, instance);
+                InternalConstructor(pubnubConfiguation, jsonPluggableLibrary, pubnubUnitTest, log, telemetryManager, tokenManager, instance);
             }
         }
 
-        private void InternalConstructor(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, Pubnub instance)
+        private void InternalConstructor(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance)
         {
             PubnubInstance = instance;
             pubnubConfig.AddOrUpdate(instance.InstanceId, pubnubConfiguation, (k,o)=> pubnubConfiguation);
             jsonLib = jsonPluggableLibrary;
             unitTest = pubnubUnitTest;
             pubnubLog.AddOrUpdate(instance.InstanceId, log, (k, o) => log);
+            PubnubTokenMgrCollection.AddOrUpdate(instance.InstanceId, tokenManager, (k,o)=> tokenManager);
             pubnubTelemetryMgr = telemetryManager;
             pubnubSubscribeDuplicationManager = new EndPoint.DuplicationManager(pubnubConfiguation, jsonPluggableLibrary, log);
 
@@ -791,7 +794,7 @@ namespace PubnubApi
                                                     if (fileObjDic != null && fileObjDic.ContainsKey("id") && fileObjDic.ContainsKey("name"))
                                                     {
                                                         fileMessage.File = new PNFile { Id = fileObjDic["id"].ToString(), Name = fileObjDic["name"].ToString() };
-                                                        PubnubApi.Interface.IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(currentConfig, jsonLib, unitTest, currentLog, pubnubTelemetryMgr, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+                                                        PubnubApi.Interface.IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(currentConfig, jsonLib, unitTest, currentLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
                                                         Uri fileUrlRequest = urlBuilder.BuildGetFileUrlOrDeleteReqest("GET", "", fileMessage.Channel, fileMessage.File.Id, fileMessage.File.Name, null, type);
                                                         fileMessage.File.Url = fileUrlRequest.ToString();
                                                     }
@@ -1419,17 +1422,17 @@ namespace PubnubApi
                 }
 
             }
-            else if (jsonString.ToLower().TrimStart().IndexOf("<head", StringComparison.CurrentCultureIgnoreCase) == 0
-                || jsonString.ToLower().TrimStart().IndexOf("<html", StringComparison.CurrentCultureIgnoreCase) == 0
-                || jsonString.ToLower().TrimStart().IndexOf("<!doctype", StringComparison.CurrentCultureIgnoreCase) == 0)//Html is not expected. Only json format messages are expected.
+            else if (jsonString.ToLowerInvariant().TrimStart().IndexOf("<head", StringComparison.CurrentCultureIgnoreCase) == 0
+                || jsonString.ToLowerInvariant().TrimStart().IndexOf("<html", StringComparison.CurrentCultureIgnoreCase) == 0
+                || jsonString.ToLowerInvariant().TrimStart().IndexOf("<!doctype", StringComparison.CurrentCultureIgnoreCase) == 0)//Html is not expected. Only json format messages are expected.
             {
                 if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig))
                 {
                     status = new StatusBuilder(currentConfig, jsonLib).CreateStatusResponse<T>(type, PNStatusCategory.PNNetworkIssuesCategory, asyncRequestState, (int)HttpStatusCode.NotFound, new PNException(jsonString));
                 }
             }
-            else if (jsonString.ToLower().TrimStart().IndexOf("<?xml", StringComparison.CurrentCultureIgnoreCase) == 0
-                  || jsonString.ToLower().TrimStart().IndexOf("<Error", StringComparison.CurrentCultureIgnoreCase) == 0)
+            else if (jsonString.ToLowerInvariant().TrimStart().IndexOf("<?xml", StringComparison.CurrentCultureIgnoreCase) == 0
+                  || jsonString.ToLowerInvariant().TrimStart().IndexOf("<Error", StringComparison.CurrentCultureIgnoreCase) == 0)
             {
                 if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig))
                 {
@@ -2053,6 +2056,21 @@ namespace PubnubApi
             }
         }
 
+        protected void TerminateTokenManagerCollection()
+        {
+            if (PubnubTokenMgrCollection != null && PubnubTokenMgrCollection.Count > 0)
+            {
+                List<string> tokenMgrList = PubnubTokenMgrCollection.Keys.ToList();
+                foreach(string key in tokenMgrList)
+                {
+                    if (PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId))
+                    {
+                        PubnubTokenMgrCollection[PubnubInstance.InstanceId].Destroy();
+                    }
+                }
+            }
+        }
+
         protected static void TerminateDedupeManager()
         {
             if (pubnubSubscribeDuplicationManager != null)
@@ -2230,6 +2248,7 @@ namespace PubnubApi
             TerminatePresenceHeartbeatTimer();
             TerminateTelemetry();
             TerminateDedupeManager();
+            TerminateTokenManagerCollection();
 
             if (MultiChannelSubscribe.Count > 0 && MultiChannelSubscribe.ContainsKey(PubnubInstance.InstanceId))
             {

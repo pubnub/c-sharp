@@ -1,8 +1,31 @@
 name: c-sharp
-version: "5.0.0"
+version: "5.1.0"
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog: 
+  - version: v5.1.0
+    date: 2021-10-12
+    changes:
+      - type: feature
+        text: "Added PAMv3 support - GrantToken, ParseToken, SetAuthToken."
+      - type: bug
+        text: "Dispose RandomNumberGenerator."
+  - version: v5.1.0
+    date: 2021-10-12
+    changes:
+      - type: improvement
+        text: Dispose RandomNumberGenerator
+      - type: feature
+        text: Added PAMv3 support - GrantToken, ParseToken, SetAuthToken. 
+  - version: v5.0.1
+    date: 2021-07-14
+    changes:
+      - type: improvement
+        text: Replaced Random class with RandomNumberGenerator for secure random bytes.
+      - type: improvement
+        text: Handling of SendFile file size exceeded error message and refactored DeleteFile. 
+      - type: improvement
+        text: Refactored Encrypt/Decrypt methods in calling PubnubCrypto constructor with config. 
   - version: v5.0.0
     date: 2021-06-14
     changes:
@@ -478,6 +501,9 @@ features:
     - ACCESS-GRANT-DELETE
     - ACCESS-SECRET-KEY-ALL-ACCESS   
     - ACCESS-OBJECTS-V2-MANAGEMENT 
+    - ACCESS-GRANT-TOKEN
+    - ACCESS-PARSE-TOKEN
+    - ACCESS-SET-TOKEN
   channel-groups:
     - CHANNEL-GROUPS-ADD-CHANNELS
     - CHANNEL-GROUPS-REMOVE-CHANNELS
@@ -582,7 +608,7 @@ features:
     - QUERY-PARAM    
 supported-platforms:
   - 
-    version: Pubnub 'C#' 5.0.0
+    version: Pubnub 'C#' 5.1.0
     platforms:
       - Windows 10 and up
       - Windows Server 2008 and up
@@ -592,7 +618,7 @@ supported-platforms:
       - .Net Framework 4.5
       - .Net Framework 4.6.1+
   - 
-    version: PubnubPCL 'C#' 5.0.0
+    version: PubnubPCL 'C#' 5.1.0
     platforms:
       - Xamarin.Android
       - Xamarin.iOS
@@ -611,7 +637,7 @@ supported-platforms:
       - .Net Standard 2.1
       - .Net Core
   - 
-    version: PubnubUWP 'C#' 5.0.0
+    version: PubnubUWP 'C#' 5.1.0
     platforms:
       - Windows Phone 10
       - Universal Windows Apps
@@ -656,6 +682,13 @@ sdks:
                 min-version: "1.8.1.2"
                 license: "MIT,X11"
                 license-url: "https://www.nuget.org/packages/Portable.BouncyCastle/1.8.1.2"
+                location: "External"
+                is-required: "Required"
+              -
+                name: "PeterO.Cbor"
+                min-version: "4.4.4"
+                license: "CC0-1.0"
+                license-url: "https://www.nuget.org/packages/PeterO.Cbor/4.4.4"
                 location: "External"
                 is-required: "Required"
               -
@@ -798,6 +831,13 @@ sdks:
                 location: "External"
                 is-required: "Required"
               -
+                name: "PeterO.Cbor"
+                min-version: "4.4.4"
+                license: "CC0-1.0"
+                license-url: "https://www.nuget.org/packages/PeterO.Cbor/4.4.4"
+                location: "External"
+                is-required: "Required"
+              -
                 name: "AsyncBridge.Net35"
                 min-version: "0.2.0"
                 license: "MIT"
@@ -906,7 +946,7 @@ sdks:
       -
         artifact-type: api-client
         language: c#
-        tier: 1
+        tier: 2
         tags:
           - Desktop
           - Mobile
@@ -939,6 +979,13 @@ sdks:
                 min-version: "1.8.1.2"
                 license: "MIT,X11"
                 license-url: "https://www.nuget.org/packages/Portable.BouncyCastle/1.8.1.2"
+                location: "External"
+                is-required: "Required"
+              -
+                name: "PeterO.Cbor"
+                min-version: "4.4.4"
+                license: "CC0-1.0"
+                license-url: "https://www.nuget.org/packages/PeterO.Cbor/4.4.4"
                 location: "External"
                 is-required: "Required"
             supported-platforms:
@@ -1084,7 +1131,7 @@ sdks:
       -
         artifact-type: package
         language: c#
-        tier: 1
+        tier: 2
         tags:
           - Desktop
           - Mobile
@@ -1117,6 +1164,13 @@ sdks:
                 min-version: "1.8.1.2"
                 license: "MIT,X11"
                 license-url: "https://www.nuget.org/packages/Portable.BouncyCastle/1.8.1.2"
+                location: "External"
+                is-required: "Required"
+              -
+                name: "PeterO.Cbor"
+                min-version: "4.4.4"
+                license: "CC0-1.0"
+                license-url: "https://www.nuget.org/packages/PeterO.Cbor/4.4.4"
                 location: "External"
                 is-required: "Required"
             supported-platforms:
@@ -1266,7 +1320,7 @@ sdks:
       -
         artifact-type: api-client
         language: c#
-        tier: 1
+        tier: 2
         tags:
           - Desktop
           - Server
@@ -1307,6 +1361,13 @@ sdks:
                 license-url: "https://www.nuget.org/packages/Portable.BouncyCastle/1.8.1.2"
                 location: "External"
                 is-required: "Required"         
+              -
+                name: "PeterO.Cbor"
+                min-version: "4.4.4"
+                license: "CC0-1.0"
+                license-url: "https://www.nuget.org/packages/PeterO.Cbor/4.4.4"
+                location: "External"
+                is-required: "Required"
             supported-platforms:
                 supported-operating-systems:
                   Windows:
@@ -1353,7 +1414,7 @@ sdks:
       -
         artifact-type: package
         language: c#
-        tier: 1
+        tier: 2
         tags:
           - Desktop
           - Server
@@ -1394,6 +1455,13 @@ sdks:
                 license-url: "https://www.nuget.org/packages/Portable.BouncyCastle/1.8.1.2"
                 location: "External"
                 is-required: "Required"                         
+              -
+                name: "PeterO.Cbor"
+                min-version: "4.4.4"
+                license: "CC0-1.0"
+                license-url: "https://www.nuget.org/packages/PeterO.Cbor/4.4.4"
+                location: "External"
+                is-required: "Required"
             supported-platforms:
                 supported-operating-systems:
                   Windows:

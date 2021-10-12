@@ -14,8 +14,7 @@ namespace PubNubMessaging.Tests
         private static int manualResetEventWaitTimeout = 310 * 1000;
         private static Pubnub pubnub;
         private static Server server;
-        private static string authKey = "myauth";
-        private static string authToken = "";
+        private static string authToken = "myauth";
 
         [SetUp]
         public static void Init()
@@ -36,7 +35,6 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
-                AuthKey = authKey,
                 Uuid = "mytestuuid",
                 Secure = false
             };
@@ -45,8 +43,18 @@ namespace PubNubMessaging.Tests
             pubnub = createPubNubInstance(config);
 
             ManualResetEvent grantManualEvent = new ManualResetEvent(false);
-            pubnub.Grant().Channels(new[] { uuid_metadata_id }).AuthKeys(new[] { authKey }).Read(true).Write(true).Manage(true).TTL(20)
-                .Execute(new PNAccessManagerGrantResultExt(
+            pubnub.GrantToken()
+                .TTL(20)
+                .Resources(new PNTokenResources()
+                {
+                    Channels = new Dictionary<string, PNTokenAuthValues>() {
+                                        { uuid_metadata_id, new PNTokenAuthValues() { Read = true, Write = true, Manage= true, Create = true, Delete=true, Get = true, Update = true, Join = true } },
+                                        },
+                    Uuids = new Dictionary<string, PNTokenAuthValues>() {
+                                        { uuid_metadata_id, new PNTokenAuthValues() { Read = true, Write = true, Manage= true, Create = true, Delete=true, Get = true, Update = true, Join = true } } },
+                }
+                )
+                .Execute(new PNAccessManagerTokenResultExt(
                                 (r, s) =>
                                 {
                                     try
@@ -55,11 +63,10 @@ namespace PubNubMessaging.Tests
                                         if (r != null)
                                         {
                                             Debug.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
-                                            if (r.Channels != null && r.Channels.Count > 0)
+                                            if (!string.IsNullOrEmpty(r.Token))
                                             {
-                                                var read = r.Channels[uuid_metadata_id][authKey].ReadEnabled;
-                                                var write = r.Channels[uuid_metadata_id][authKey].WriteEnabled;
-                                                if (read && write) { receivedGrantMessage = true; }
+                                                authToken = r.Token;
+                                                receivedGrantMessage = true;
                                             }
                                         }
                                     }
@@ -114,12 +121,12 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
             server.RunOnHttps(false);
             pubnub = createPubNubInstance(config);
+            if (!string.IsNullOrEmpty(authToken))
+            {
+                pubnub.SetAuthToken(authToken);
+            }
             ManualResetEvent manualEvent = new ManualResetEvent(false);
 
             manualResetEventWaitTimeout = 310 * 1000;
@@ -262,12 +269,12 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
             server.RunOnHttps(false);
             pubnub = createPubNubInstance(config);
+            if (!string.IsNullOrEmpty(authToken))
+            {
+                pubnub.SetAuthToken(authToken);
+            }
 
             System.Diagnostics.Debug.WriteLine("pubnub.DeleteUuidMetadata() STARTED");
 #if NET40
@@ -421,18 +428,17 @@ namespace PubNubMessaging.Tests
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Uuid = "mytestuuid",
                 Secure = false,
-                AuthKey = "myauth"
             };
             if (PubnubCommon.PAMServerSideRun)
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
             server.RunOnHttps(false);
             pubnub = createPubNubInstance(config);
+            if (!string.IsNullOrEmpty(authToken))
+            {
+                pubnub.SetAuthToken(authToken);
+            }
             pubnub.AddListener(eventListener);
 
             ManualResetEvent manualEvent = new ManualResetEvent(false);
@@ -562,18 +568,17 @@ namespace PubNubMessaging.Tests
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Uuid = "mytestuuid",
                 Secure = false,
-                AuthKey = "myauth"
             };
             if (PubnubCommon.PAMServerSideRun)
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
             server.RunOnHttps(false);
             pubnub = createPubNubInstance(config);
+            if (!string.IsNullOrEmpty(authToken))
+            {
+                pubnub.SetAuthToken(authToken);
+            }
             pubnub.AddListener(eventListener);
 
             ManualResetEvent manualEvent = new ManualResetEvent(false);

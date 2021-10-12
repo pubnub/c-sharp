@@ -18,14 +18,16 @@ namespace PubnubApi
         private readonly IPubnubLog pubnubLog;
         private readonly string pubnubInstanceId;
         private readonly EndPoint.TelemetryManager telemetryMgr;
+        private readonly EndPoint.TokenManager tokenMgr;
 
-        public UrlRequestBuilder(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager pubnubTelemetryMgr, string pnInstanceId)
+        public UrlRequestBuilder(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager pubnubTelemetryMgr, EndPoint.TokenManager pubnubTokenMgr, string pnInstanceId)
         {
             this.pubnubConfig = config;
             this.jsonLib = jsonPluggableLibrary;
             this.pubnubUnitTest = pubnubUnitTest;
             this.pubnubLog = log;
             this.telemetryMgr = pubnubTelemetryMgr;
+            this.tokenMgr = pubnubTokenMgr;
             this.pubnubInstanceId = string.IsNullOrEmpty(pnInstanceId) ? "" : pnInstanceId;
         }
 
@@ -583,6 +585,34 @@ namespace PubnubApi
             requestQueryStringParams.Add("g", Convert.ToInt32(get).ToString());
             requestQueryStringParams.Add("u", Convert.ToInt32(update).ToString());
             requestQueryStringParams.Add("j", Convert.ToInt32(join).ToString());
+
+            if (externalQueryParam != null && externalQueryParam.Count > 0)
+            {
+                foreach (KeyValuePair<string, object> kvp in externalQueryParam)
+                {
+                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    {
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
+                    }
+                }
+            }
+
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
+
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
+        }
+
+        Uri IUrlRequestBuilder.BuildGrantV3AccessRequest(string requestMethod, string requestBody, Dictionary<string, object> externalQueryParam)
+        {
+            PNOperationType currentType = PNOperationType.PNAccessManagerGrantToken;
+
+            List<string> url = new List<string>();
+            url.Add("v3");
+            url.Add("pam");
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("grant");
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
             {
@@ -2017,10 +2047,16 @@ namespace PubnubApi
 
                 if (type != PNOperationType.PNTimeOperation
                         && type != PNOperationType.PNAccessManagerGrant && type != PNOperationType.PNAccessManagerGrantToken && type != PNOperationType.ChannelGroupGrantAccess
-                        && type != PNOperationType.PNAccessManagerAudit && type != PNOperationType.ChannelGroupAuditAccess
-                        && !string.IsNullOrEmpty(this.pubnubConfig.AuthKey))
+                        && type != PNOperationType.PNAccessManagerAudit && type != PNOperationType.ChannelGroupAuditAccess)
                 {
-                    ret.Add("auth", UriUtil.EncodeUriComponent(this.pubnubConfig.AuthKey, type, false, false, false));
+                    if (tokenMgr != null && !string.IsNullOrEmpty(tokenMgr.AuthToken) && tokenMgr.AuthToken.Trim().Length > 0)
+                    {
+                        ret.Add("auth", UriUtil.EncodeUriComponent(tokenMgr.AuthToken, type, false, false, false));
+                    }
+                    else if (!string.IsNullOrEmpty(this.pubnubConfig.AuthKey) && this.pubnubConfig.AuthKey.Trim().Length > 0)
+                    {
+                        ret.Add("auth", UriUtil.EncodeUriComponent(this.pubnubConfig.AuthKey, type, false, false, false));
+                    }
                 }
             }
 

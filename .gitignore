@@ -155,13 +155,3 @@ src/Examples/PubnubApiPCL.XamariniMacExample/obj/*
 *.suo
 src/UnitTests/MockServer/bin/*
 src/UnitTests/MockServer/obj/*
-
-deployment_keys
-deployment_keys-private
-deployment_keys.tar
-
-.travis/README.md
-.travis/scripts
-
-.travis/github-labels-policy.json
-.travis/github-labels.json

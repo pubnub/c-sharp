@@ -8,6 +8,7 @@ using System.Globalization;
 using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Linq;
+using PeterO.Cbor;
 
 namespace PubNubMessaging.Tests
 {
@@ -141,6 +142,36 @@ namespace PubNubMessaging.Tests
     [TestFixture]
     public class EncryptionTests
     {
+        [Test]
+        public void ParseGrantTokenTest()
+        {
+            string expected = "{\"Version\":2,\"Timestamp\":1568739458,\"TTL\":100,\"Resources\":{\"Channels\":{},\"ChannelGroups\":{},\"Uuids\":{},\"Users\":{},\"Spaces\":{}},\"Patterns\":{\"Channels\":{},\"ChannelGroups\":{},\"Uuids\":{},\"Users\":{\"^emp-*\":{\"Read\":true,\"Write\":true,\"Manage\":false,\"Delete\":false,\"Create\":false,\"Get\":false,\"Update\":false,\"Join\":false},\"^mgr-*\":{\"Read\":true,\"Write\":true,\"Manage\":false,\"Delete\":true,\"Create\":true,\"Get\":false,\"Update\":false,\"Join\":false}},\"Spaces\":{\"^public-*\":{\"Read\":true,\"Write\":true,\"Manage\":false,\"Delete\":false,\"Create\":false,\"Get\":false,\"Update\":false,\"Join\":false},\"^private-*\":{\"Read\":true,\"Write\":true,\"Manage\":false,\"Delete\":true,\"Create\":true,\"Get\":false,\"Update\":false,\"Join\":false}}},\"Meta\":{},\"AuthorizedUuid\":null,\"Signature\":\"LL8xpndq3ILa/a3LOK9ragvO2EqaUmKrPQin2jOSEWQ=\"}";
+            string actual = "";
+            string token = "p0F2AkF0Gl2BEIJDdHRsGGRDcmVzpERjaGFuoENncnCgQ3VzcqBDc3BjoENwYXSkRGNoYW6gQ2dycKBDdXNyomZeZW1wLSoDZl5tZ3ItKhgbQ3NwY6JpXnB1YmxpYy0qA2pecHJpdmF0ZS0qGBtEbWV0YaBDc2lnWCAsvzGmd2rcgtr9rcs4r2tqC87YSppSYqs9CKfaM5IRZA==";
+            //string token = "qEF2AkF0GmFLd-NDdHRsGQWgQ3Jlc6VEY2hhbqFjY2gxGP9DZ3JwoWNjZzEY_0N1c3KgQ3NwY6BEdXVpZKFldXVpZDEY_0NwYXSlRGNoYW6gQ2dycKBDdXNyoENzcGOgRHV1aWShYl4kAURtZXRho2VzY29yZRhkZWNvbG9yY3JlZGZhdXRob3JlcGFuZHVEdXVpZGtteWF1dGh1dWlkMUNzaWdYIP2vlxHik0EPZwtgYxAW3-LsBaX_WgWdYvtAXpYbKll3";
+            try
+            {
+                PNConfiguration config = new PNConfiguration
+                {
+                    SubscribeKey = PubnubCommon.SubscribeKey,
+                    PublishKey = PubnubCommon.PublishKey,
+                };
+                Pubnub pubnub = new Pubnub(config);
+                PNTokenContent pnGrant = pubnub.ParseToken(token);
+
+                if (pnGrant != null)
+                {
+                    actual = Newtonsoft.Json.JsonConvert.SerializeObject(pnGrant);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Exception = " + ex.ToString());
+            }
+            Assert.AreEqual(actual, expected);
+        }
+
         /// <summary>
         /// Tests the null encryption.
         /// The input is serialized
