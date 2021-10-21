@@ -4,13 +4,9 @@ on:
   push:
     branches: 
       - master
-      - acceptance-test
-      - removed-throw-ex
   pull_request:
     branches: 
       - master
-      - acceptance-test
-      - removed-throw-ex
 defaults:
   run:
     working-directory: ./src
