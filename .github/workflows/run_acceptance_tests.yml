@@ -43,6 +43,6 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: cd ./Api/PubnubApiPCL && dotnet build --no-restore
+      run: cd ./UnitTests/AcceptanceTests && dotnet build --no-restore
     - name: Test
-      run: cd ./Api/PubnubApiPCL && dotnet test --no-build --verbosity normal
+      run: cd ./UnitTests/AcceptanceTests && dotnet test --no-build --verbosity normal
