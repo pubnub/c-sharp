@@ -45,4 +45,8 @@ jobs:
     - name: Build
       run: cd ./UnitTests/AcceptanceTests && dotnet build --no-restore
     - name: Test
+      env: 
+       PN_PUB_KEY: ${{ secrets.PN_PUB_KEY }}
+       PN_SUB_KEY: ${{ secrets.PN_SUB_KEY }}
+       PN_SEC_KEY: ${{ secrets.PN_SEC_KEY }}    
       run: cd ./UnitTests/AcceptanceTests && dotnet test --no-build --verbosity normal
