@@ -52,4 +52,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: acceptance-test-reports
-        path: ./results/**
+        path: ./UnitTests/AcceptanceTests/results/**
