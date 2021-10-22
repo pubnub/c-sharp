@@ -54,4 +54,6 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: acceptance-test-reports
-        path: ${{ github.workspace }}/src/UnitTests/AcceptanceTests/results/
+        path: |
+          ${{ github.workspace }}/src/UnitTests/AcceptanceTests/Features/
+          ${{ github.workspace }}/src/UnitTests/AcceptanceTests/results/
