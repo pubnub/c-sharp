@@ -46,7 +46,9 @@ jobs:
        PN_PUB_KEY: ${{ secrets.PN_PUB_KEY }}
        PN_SUB_KEY: ${{ secrets.PN_SUB_KEY }}
        PN_SEC_KEY: ${{ secrets.PN_SEC_KEY }}    
-      run: cd ./UnitTests/AcceptanceTests && dotnet test --no-build --verbosity normal --logger trx --results-directory ./results
+      run: |
+        copy /Y ${{ github.workspace }}/sdk-specifications/features/access ${{ github.workspace }}/src/UnitTests/AcceptanceTests/Features
+        cd ./UnitTests/AcceptanceTests && dotnet test --no-build --verbosity normal --logger trx --results-directory ./results
     - name: Upload acceptance tests reports
       if: always()
       uses: actions/upload-artifact@v2
