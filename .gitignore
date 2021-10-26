@@ -2,6 +2,13 @@
 *~
 src/.vs/Pubnub/v15/sqlite3/storage.ide
 
+/src/UnitTests/AcceptanceTests/bin/Debug/*
+/src/UnitTests/AcceptanceTests/obj/Debug/*
+/src/UnitTests/AcceptanceTests/bin/Release/*
+/src/UnitTests/AcceptanceTests/obj/Release/*
+/src/UnitTests/AcceptanceTests/*.user
+/src/UnitTests/AcceptanceTests/obj/*
+
 /src/UnitTests/MockServerPubnubApi/bin/Debug/*
 /src/UnitTests/MockServerPubnubApi/obj/Debug/*
 /src/UnitTests/MockServerPubnubApi/bin/Release/*
