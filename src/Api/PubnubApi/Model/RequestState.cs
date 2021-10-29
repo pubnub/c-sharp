@@ -14,6 +14,7 @@ namespace PubnubApi
         public bool Timeout { get; internal set; }
         public bool Reconnect { get; internal set; }
         public long Timetoken { get; internal set; }
+        public int Region { get; internal set; }
         public PNCallback<T> PubnubCallback { get; internal set; }
         public bool UsePostMethod { get; internal set; }
         public bool UsePatchMethod { get; internal set; }

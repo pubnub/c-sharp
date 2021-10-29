@@ -56,7 +56,7 @@ namespace PubnubApi
             return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
-        Uri IUrlRequestBuilder.BuildMultiChannelSubscribeRequest(string requestMethod, string requestBody, string[] channels, string[] channelGroups, long timetoken, string channelsJsonState, Dictionary<string, string> initialSubscribeUrlParams, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildMultiChannelSubscribeRequest(string requestMethod, string requestBody, string[] channels, string[] channelGroups, long timetoken, int region, string channelsJsonState, Dictionary<string, string> initialSubscribeUrlParams, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PNSubscribeOperation;
             string channelForUrl = (channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : ",";
@@ -84,6 +84,11 @@ namespace PubnubApi
             if (!requestQueryStringParams.ContainsKey("tt"))
             {
                 requestQueryStringParams.Add("tt", timetoken.ToString());
+            }
+
+            if (!requestQueryStringParams.ContainsKey("tr") && region > 0)
+            {
+                requestQueryStringParams.Add("tr", region.ToString());
             }
 
             if (pubnubConfig.PresenceTimeout != 0)
