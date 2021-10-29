@@ -2,8 +2,8 @@ using System;
 
 namespace PubnubApi
 {
-	internal class ReconnectState<T>
-	{
+    internal class ReconnectState<T>
+    {
         public string[] Channels { get; internal set; }
         public string[] ChannelGroups { get; internal set; }
         public PNOperationType ResponseType { get; internal set; }
@@ -20,5 +20,5 @@ namespace PubnubApi
             Timetoken = null;
             Reconnect = false;
         }
-	}
+    }
 }
