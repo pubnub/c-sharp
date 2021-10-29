@@ -210,7 +210,7 @@ namespace PubnubApi.EndPoint
 
             if (!atleastOnePermission)
             {
-                throw new MissingMemberException("At least one permission is needed for at least one or more of uuids, channels or groups");
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} At least one permission is needed for at least one or more of uuids, channels or groups",DateTime.Now.ToString(CultureInfo.InvariantCulture)), PNLogVerbosity.BODY);
             }
 
             Dictionary<string, object> resourcesCollection = new Dictionary<string, object>();
@@ -316,7 +316,7 @@ namespace PubnubApi.EndPoint
 
             if (!atleastOnePermission)
             {
-                throw new MissingMemberException("At least one permission is needed for at least one or more of uuids, channels or groups");
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} At least one permission is needed for at least one or more of uuids, channels or groups", DateTime.Now.ToString(CultureInfo.InvariantCulture)), PNLogVerbosity.BODY);
             }
 
             Dictionary<string, object> resourcesCollection = new Dictionary<string, object>();

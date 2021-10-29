@@ -16,7 +16,6 @@ namespace AcceptanceTests.Steps
         private readonly ScenarioContext _scenarioContext;
         private Pubnub pn;
         private PNConfiguration config = null;
-        private PubnubApi.EndPoint.GrantTokenOperation  gtOp;
         GrantInput grantInput = null;
         PNAccessManagerTokenResult grantResult = null;
         PNStatus grantStatus = null;
