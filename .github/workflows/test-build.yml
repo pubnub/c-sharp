@@ -16,18 +16,19 @@ jobs:
           ref: master
       - name: Build packages
         run: |
-          set RELEASES_PATH="${{ github.workspace }}\.github\.release"
-          echo "%RELEASES_PATH%"
-          mkdir "%RELEASES_PATH%"
+          $RELEASES_PATH="${{ github.workspace }}\.github\.release"
+          Get-ChildItem "${{ github.workspace }}\*" -Name -Include *.nupkg
+          echo "-----> $RELEASES_PATH"
+          mkdir "$RELEASES_PATH"
 
           cd "${{ github.workspace }}\src\Api\PubnubApi"
-          dotnet pack -o "%RELEASES_PATH%" -c Release
-          dir /a-d
+          dotnet pack -o "$RELEASES_PATH" -c Release
+          Get-ChildItem "${{ github.workspace }}\*" -Name -Include *.nupkg
 
           cd "${{ github.workspace }}\src\Api\PubnubApiPCL"
-          dotnet pack -o "%RELEASES_PATH%" -c Release
-          dir /a-d
+          dotnet pack -o "$RELEASES_PATH" -c Release
+          Get-ChildItem "${{ github.workspace }}\*" -Name -Include *.nupkg
 
           cd "${{ github.workspace }}\src\Api\PubnubApiUWP"
-          msbuild PubnubApiUWP.csproj /t:Pack /p:Configuration=Release /p:PackageOutputPath="%RELEASES_PATH%" /v:n
-          dir /a-d
+          msbuild PubnubApiUWP.csproj /t:Pack /p:Configuration=Release /p:PackageOutputPath="$RELEASES_PATH" /v:n
+          Get-ChildItem "${{ github.workspace }}\*" -Name -Include *.nupkg
