@@ -20,11 +20,11 @@ jobs:
           repository: pubnub/client-engineering-deployment-tools
           ref: v1
           token: ${{ secrets.GH_TOKEN }}
-          path: .github/.release/client-engineering-deployment-tools
+          path: .github/.release/actions
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.0.3
       - name: Publish to NuGet
-        uses: ./client-engineering-deployment-tools/actions/services/nuget
+        uses: ./.github/.release/actions/actions/services/nuget
         with:
           token: ${{ secrets.GH_TOKEN }}
           project-path: "${{ github.workspace }}\\src\\Api\\PubnubApi"
