@@ -24,7 +24,7 @@ jobs:
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.0.3
       - name: Publish to NuGet
-        uses: ".\\.github\\.release\\actions\\actions\\services\\nuget"
+        uses: github/.release/actions/actions/services/nuget
         with:
           token: ${{ secrets.GH_TOKEN }}
           project-path: "${{ github.workspace }}\\src\\Api\\PubnubApi"
