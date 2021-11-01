@@ -22,17 +22,17 @@ jobs:
           echo "PATH -----> $RELEASES_PATH"
           mkdir "$RELEASES_PATH"
           dir "$RELEASES_PATH"
-          $VAR1 = Get-ChildItem -Name -Include *.nupkg
+          $VAR1 = Get-ChildItem -Name -Path "$RELEASES_PATH\*" -Include *.nupkg
           Write-Output "VAR1 ----> $VAR1"
 
           cd "${{ github.workspace }}\src\Api\PubnubApi"
           dotnet pack -o "$RELEASES_PATH" -c Release
           dir "$RELEASES_PATH"
-          $VAR2 = Get-ChildItem -Name -Include *.nupkg
+          $VAR2 = Get-ChildItem -Name -Path "$RELEASES_PATH\*" -Include *.nupkg
           Write-Output "VAR2 ----> $VAR2"
 
           cd "${{ github.workspace }}\src\Api\PubnubApiPCL"
           dotnet pack -o "$RELEASES_PATH" -c Release
           dir "$RELEASES_PATH"
-          $VAR3 = Get-ChildItem -Name -Include *.nupkg
+          $VAR3 = Get-ChildItem -Name -Path "$RELEASES_PATH\*" -Include *.nupkg
           Write-Output "VAR3 ----> $VAR3"
