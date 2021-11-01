@@ -27,5 +27,5 @@ jobs:
         uses: ./client-engineering-deployment-tools/actions/services/nuget
         with:
           token: ${{ secrets.GH_TOKEN }}
-          project-path: "${{ github.workspace }}\src\Api\PubnubApi"
+          project-path: "${{ github.workspace }}\\src\\Api\\PubnubApi"
           package-type: API
