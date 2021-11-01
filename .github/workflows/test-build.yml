@@ -20,8 +20,8 @@ jobs:
         run: |
           $RELEASES_PATH="${{ github.workspace }}\.github\.release"
           echo "PATH -----> $RELEASES_PATH"
-          dir "$RELEASES_PATH"
           mkdir "$RELEASES_PATH"
+          dir "$RELEASES_PATH"
 
           cd "${{ github.workspace }}\src\Api\PubnubApi"
           dotnet pack -o "$RELEASES_PATH" -c Release
