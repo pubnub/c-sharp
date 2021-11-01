@@ -1,0 +1,34 @@
+on: 
+  workflow_dispatch:
+
+
+
+jobs:
+  publish-nuget:
+    name: Publish to NuGet
+    runs-on: windows-latest
+    needs: check-release
+    if: ${{ needs.check-release.outputs.release == 'true' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          # This should be the same as the one specified for on.pull_request.branches
+          ref: master
+      - name: Build packages
+        run: |
+          WORKSPACE_PATH="$(echo "${{ github.workspace }}" | tr '\\' '/')"
+          RELEASES_PATH="${WORKSPACE_PATH}/.github/.release"
+          mkdir "$RELEASES_PATH"
+
+          cd "${WORKSPACE_PATH}/src/Api/PubnubApi"
+          dotnet pack -o "$RELEASES_PATH" -c Release
+          ls -la
+
+          cd "${WORKSPACE_PATH}/src/Api/PubnubApiPCL"
+          dotnet pack -o "$RELEASES_PATH" -c Release
+          ls -la
+
+          cd "${WORKSPACE_PATH}/src/Api/PubnubApiUWP"
+          msbuild PubnubApiUWP.csproj /t:Pack /p:Configuration=Release /p:PackageOutputPath="$RELEASES_PATH" /v:n
+          ls -la
