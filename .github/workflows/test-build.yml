@@ -19,20 +19,29 @@ jobs:
       - name: Build packages
         run: |
           $RELEASES_PATH = "${{ github.workspace }}\.github\.release"
-          echo "PATH -----> $RELEASES_PATH"
           mkdir "$RELEASES_PATH"
-          dir "$RELEASES_PATH"
-          $VAR1 = Get-ChildItem -Name -Path "$RELEASES_PATH\*" -Include *.nupkg
-          Write-Output "VAR1 ----> $VAR1"
+          mkdir "$RELEASES_PATH\Api"
+          mkdir "$RELEASES_PATH\PCL"
+          mkdir "$RELEASES_PATH\UWP"
 
+          // Build Api package.
           cd "${{ github.workspace }}\src\Api\PubnubApi"
-          dotnet pack -o "$RELEASES_PATH" -c Release
-          dir "$RELEASES_PATH"
-          $VAR2 = Get-ChildItem -Name -Path "$RELEASES_PATH\*" -Include *.nupkg
-          Write-Output "VAR2 ----> $VAR2"
+          dotnet pack -o "$RELEASES_PATH\Api" -c Release
+          $PACKAGE_NAME = Get-ChildItem -Name -Path "$RELEASES_PATH\Api\*" -Include *.nupkg
+          $PACKAGE_PATH = "$RELEASES_PATH\Api\$PACKAGE_NAME"
+          Write-Output "PACKAGE_PATH ----> $PACKAGE_PATH"
 
+          // Build PCL package.
           cd "${{ github.workspace }}\src\Api\PubnubApiPCL"
-          dotnet pack -o "$RELEASES_PATH" -c Release
-          dir "$RELEASES_PATH"
-          $VAR3 = Get-ChildItem -Name -Path "$RELEASES_PATH\*" -Include *.nupkg
-          Write-Output "VAR3 ----> $VAR3"
+          dotnet pack -o "$RELEASES_PATH\PCL" -c Release
+          $PCL_PACKAGE_NAME = Get-ChildItem -Name -Path "$RELEASES_PATH\PCL\*" -Include *.nupkg
+          $PCL_PACKAGE_PATH = "$RELEASES_PATH\PCL\$PCL_PACKAGE_NAME"
+          Write-Output "PCL_PACKAGE_PATH ----> $PCL_PACKAGE_PATH"
+
+          // Build UWP package.
+          cd "${{ github.workspace }}\src\Api\PubnubApiUWP"
+          dotnet restore
+          msbuild PubnubApiUWP.csproj /t:Pack /p:Configuration=Release /p:PackageOutputPath="$RELEASES_PATH\UWP" /v:n
+          $UWP_PACKAGE_NAME = Get-ChildItem -Name -Path "$RELEASES_PATH\UWP\*" -Include *.nupkg
+          $UWP_PACKAGE_PATH = "$RELEASES_PATH\UWP\$UWP_PACKAGE_NAME"
+          Write-Output "UWP_PACKAGE_PATH ----> $UWP_PACKAGE_PATH"
