@@ -19,22 +19,19 @@ jobs:
       - name: Build packages
         run: |
           $RELEASES_PATH="${{ github.workspace }}\.github\.release"
-          $FILES_LIST=Get-ChildItem "${{ github.workspace }}\*" -Name -Include *.nupkg
           echo "PATH -----> $RELEASES_PATH"
-          echo "FILES -----> $FILES_LIST"
+          dir "$RELEASES_PATH"
           mkdir "$RELEASES_PATH"
 
           cd "${{ github.workspace }}\src\Api\PubnubApi"
           dotnet pack -o "$RELEASES_PATH" -c Release
-          $FILES_LIST=Get-ChildItem "${{ github.workspace }}\*" -Name -Include *.nupkg
-          echo "FILES -----> $FILES_LIST"
+          dir "$RELEASES_PATH"
 
           cd "${{ github.workspace }}\src\Api\PubnubApiPCL"
           dotnet pack -o "$RELEASES_PATH" -c Release
-          $FILES_LIST=Get-ChildItem "${{ github.workspace }}\*" -Name -Include *.nupkg
-          echo "FILES -----> $FILES_LIST"
+          dir "$RELEASES_PATH"
 
           cd "${{ github.workspace }}\src\Api\PubnubApiUWP"
+          dotnet restore
           msbuild PubnubApiUWP.csproj /t:Pack /p:Configuration=Release /p:PackageOutputPath="$RELEASES_PATH" /v:n
-          $FILES_LIST=Get-ChildItem "${{ github.workspace }}\*" -Name -Include *.nupkg
-          echo "FILES -----> $FILES_LIST"
+          dir "$RELEASES_PATH"
