@@ -8,8 +8,6 @@ jobs:
   publish-nuget:
     name: Publish to NuGet
     runs-on: windows-latest
-    needs: check-release
-    if: ${{ needs.check-release.outputs.release == 'true' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
