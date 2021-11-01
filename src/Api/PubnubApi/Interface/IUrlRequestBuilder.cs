@@ -9,7 +9,7 @@ namespace PubnubApi.Interface
     {
         Uri BuildTimeRequest(string requestMethod, string requestBody, Dictionary<string, object> externalQueryParam);
 
-        Uri BuildMultiChannelSubscribeRequest(string requestMethod, string requestBody, string[] channels, string[] channelGroups, long timetoken, string channelsJsonState, Dictionary<string, string> initialSubscribeUrlParams, Dictionary<string, object> externalQueryParam);
+        Uri BuildMultiChannelSubscribeRequest(string requestMethod, string requestBody, string[] channels, string[] channelGroups, long timetoken, int region, string channelsJsonState, Dictionary<string, string> initialSubscribeUrlParams, Dictionary<string, object> externalQueryParam);
 
         Uri BuildMultiChannelLeaveRequest(string requestMethod, string requestBody, string[] channels, string[] channelGroups, string jsonUserState, Dictionary<string, object> externalQueryParam);
 

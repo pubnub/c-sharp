@@ -61,6 +61,7 @@ namespace PubnubApi
         protected string CurrentUuid { get; set; }
 
         protected static ConcurrentDictionary<string, long> LastSubscribeTimetoken { get; set; } = new ConcurrentDictionary<string, long>();
+        protected static ConcurrentDictionary<string, int> LastSubscribeRegion { get; set; } = new ConcurrentDictionary<string, int>();
 
         protected static int PubnubNetworkTcpCheckIntervalInSeconds { get; set; } = 3;
         private static int PubnubLocalHeartbeatCheckIntervalInSeconds { get; set; } = 30;
@@ -356,6 +357,35 @@ namespace PubnubApi
             }
 
             return jsonTimetoken;
+        }
+
+        protected static int GetRegionFromMultiplexResult(List<object> result)
+        {
+            int jsonRegion = 0;
+            Dictionary<string, object> timetokenObj = jsonLib.ConvertToDictionaryObject(result[0]);
+
+            if (timetokenObj != null && timetokenObj.Count > 0 && timetokenObj.ContainsKey("t"))
+            {
+                Dictionary<string, object> timeAndRegionDictionary = timetokenObj["t"] as Dictionary<string, object>;
+                if (timeAndRegionDictionary != null && timeAndRegionDictionary.Count > 0 && timeAndRegionDictionary.ContainsKey("r"))
+                {
+                    Int32.TryParse(timeAndRegionDictionary["r"].ToString(), out jsonRegion);
+                }
+            }
+            else
+            {
+                timetokenObj = jsonLib.ConvertToDictionaryObject(result[1]);
+                if (timetokenObj != null && timetokenObj.Count > 0 && timetokenObj.ContainsKey("t"))
+                {
+                    Dictionary<string, object> timeAndRegionDictionary = timetokenObj["t"] as Dictionary<string, object>;
+                    if (timeAndRegionDictionary != null && timeAndRegionDictionary.Count > 0 && timeAndRegionDictionary.ContainsKey("r"))
+                    {
+                        Int32.TryParse(timeAndRegionDictionary["r"].ToString(), out jsonRegion);
+                    }
+                }
+            }
+
+            return jsonRegion;
         }
 
         private static List<SubscribeMessage> GetMessageFromMultiplexResult(List<object> result)
@@ -1477,6 +1507,9 @@ namespace PubnubApi
                             }
                             result.Add(multiChannelGroup);
                             result.Add(multiChannel);
+
+                            int receivedRegion = GetRegionFromMultiplexResult(result);
+                            LastSubscribeRegion[PubnubInstance.InstanceId] = receivedRegion;
 
                             long receivedTimetoken = GetTimetokenFromMultiplexResult(result);
 

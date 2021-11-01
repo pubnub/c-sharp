@@ -1,8 +1,15 @@
 name: c-sharp
-version: "5.1.0"
+version: "5.2.0"
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog: 
+  - version: v5.2.0
+    date: 2021-11-01
+    changes:
+      - type: improvement
+        text: Capture region for subscribe.
+      - type: improvement
+        text: Removed throw exception on atleast one PAM permission validation. 
   - version: v5.1.0
     date: 2021-10-12
     changes:
@@ -601,7 +608,7 @@ features:
     - QUERY-PARAM    
 supported-platforms:
   - 
-    version: Pubnub 'C#' 5.1.0
+    version: Pubnub 'C#' 5.2.0
     platforms:
       - Windows 10 and up
       - Windows Server 2008 and up
@@ -611,7 +618,7 @@ supported-platforms:
       - .Net Framework 4.5
       - .Net Framework 4.6.1+
   - 
-    version: PubnubPCL 'C#' 5.1.0
+    version: PubnubPCL 'C#' 5.2.0
     platforms:
       - Xamarin.Android
       - Xamarin.iOS
@@ -630,7 +637,7 @@ supported-platforms:
       - .Net Standard 2.1
       - .Net Core
   - 
-    version: PubnubUWP 'C#' 5.1.0
+    version: PubnubUWP 'C#' 5.2.0
     platforms:
       - Windows Phone 10
       - Universal Windows Apps
