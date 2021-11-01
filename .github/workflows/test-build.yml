@@ -18,20 +18,21 @@ jobs:
         uses: microsoft/setup-msbuild@v1.0.3
       - name: Build packages
         run: |
-          $RELEASES_PATH="${{ github.workspace }}\.github\.release"
+          $RELEASES_PATH = "${{ github.workspace }}\.github\.release"
           echo "PATH -----> $RELEASES_PATH"
           mkdir "$RELEASES_PATH"
           dir "$RELEASES_PATH"
+          $VAR1 = dir -i *.nupkg
+          Write-Output $VAR1
 
           cd "${{ github.workspace }}\src\Api\PubnubApi"
           dotnet pack -o "$RELEASES_PATH" -c Release
           dir "$RELEASES_PATH"
+          $VAR2 = dir -i *.nupkg
+          Write-Output $VAR2
 
           cd "${{ github.workspace }}\src\Api\PubnubApiPCL"
           dotnet pack -o "$RELEASES_PATH" -c Release
           dir "$RELEASES_PATH"
-
-          cd "${{ github.workspace }}\src\Api\PubnubApiUWP"
-          dotnet restore
-          msbuild PubnubApiUWP.csproj /t:Pack /p:Configuration=Release /p:PackageOutputPath="$RELEASES_PATH" /v:n
-          dir "$RELEASES_PATH"
+          $VAR3 = dir -i *.nupkg
+          Write-Output $VAR3
