@@ -1,0 +1,48 @@
+{
+  ".pubnub.yml": [
+    { 
+      "pattern": "\/c-sharp\/releases/tag\/(v?(\\d+\\.?){2,}([a-zA-Z0-9-]+(\\.?\\d+)?)?)$",
+      "versionComponents": 3, 
+      "cleared": false
+    },
+    { 
+      "pattern": "^version: \"(v?(\\d+\\.?){2,}([a-zA-Z0-9-]+(\\.?\\d+)?)?)\"$",
+      "versionComponents": 3, 
+      "cleared": false 
+    },
+    { 
+      "pattern": "^\\s{2,}version: Pubnub.*'C#' (v?(\\d+\\.?){2,}([a-zA-Z0-9-]+(\\.?\\d+)?)?)$",
+      "versionComponents": 3,
+      "clearedPrefix": true,
+      "clearedSuffix": false
+    }
+  ],
+  "src/Api/PubnubApi/Properties/AssemblyInfo.cs": [
+    { "pattern": "AssemblyVersion\\(\"(v?(\\d+\\.?){2,}([a-zA-Z0-9-]+(\\.?\\d+)?)?)\"\\)", "cleared": true },
+    { "pattern": "AssemblyFileVersion\\(\"(v?(\\d+\\.?){2,}([a-zA-Z0-9-]+(\\.?\\d+)?)?)\"\\)", "cleared": true }
+  ],
+  "src/Api/PubnubApi/PubnubApi.csproj": [
+    {
+      "pattern": "^\\s{2,}<PackageVersion>(v?(\\d+\\.?){2,}([a-zA-Z0-9-]+(\\.?\\d+)?)?)<\/PackageVersion>$",
+      "versionComponents": 3,
+      "clearedPrefix": true,
+      "clearedSuffix": false
+    }
+  ],
+  "src/Api/PubnubApiPCL/PubnubApiPCL.csproj": [
+    {
+      "pattern": "^\\s{2,}<PackageVersion>(v?(\\d+\\.?){2,}([a-zA-Z0-9-]+(\\.?\\d+)?)?)<\/PackageVersion>$",
+      "versionComponents": 3,
+      "clearedPrefix": true,
+      "clearedSuffix": false
+    }
+  ],
+  "src/Api/PubnubApiUWP/PubnubApiUWP.csproj": [
+    {
+      "pattern": "^\\s{2,}<PackageVersion>(v?(\\d+\\.?){2,}([a-zA-Z0-9-]+(\\.?\\d+)?)?)<\/PackageVersion>$",
+      "versionComponents": 3,
+      "clearedPrefix": true,
+      "clearedSuffix": false
+    }
+  ]
+}
