@@ -16,18 +16,17 @@ jobs:
           ref: master
       - name: Build packages
         run: |
-          WORKSPACE_PATH="$(echo "${{ github.workspace }}" | tr '\\' '/')"
-          RELEASES_PATH="${WORKSPACE_PATH}/.github/.release"
+          RELEASES_PATH="${{ github.workspace }}\.github\.release"
           mkdir "$RELEASES_PATH"
 
-          cd "${WORKSPACE_PATH}/src/Api/PubnubApi"
+          cd "${{ github.workspace }}\src\Api\PubnubApi"
           dotnet pack -o "$RELEASES_PATH" -c Release
           ls -la
 
-          cd "${WORKSPACE_PATH}/src/Api/PubnubApiPCL"
+          cd "${{ github.workspace }}\src\Api\PubnubApiPCL"
           dotnet pack -o "$RELEASES_PATH" -c Release
           ls -la
 
-          cd "${WORKSPACE_PATH}/src/Api/PubnubApiUWP"
+          cd "${{ github.workspace }}\src\Api\PubnubApiUWP"
           msbuild PubnubApiUWP.csproj /t:Pack /p:Configuration=Release /p:PackageOutputPath="$RELEASES_PATH" /v:n
           ls -la
