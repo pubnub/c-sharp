@@ -20,7 +20,7 @@ jobs:
           repository: pubnub/client-engineering-deployment-tools
           ref: v1
           token: ${{ secrets.GH_TOKEN }}
-          path: .github/.release/actions
+          path: .github/.release/client-engineering-deployment-tools
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.0.3
       - name: Publish to NuGet
