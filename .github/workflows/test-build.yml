@@ -16,8 +16,9 @@ jobs:
           ref: master
       - name: Build packages
         run: |
-          SET RELEASES_PATH="${{ github.workspace }}\.github\.release"
-          mkdir "$RELEASES_PATH"
+          set RELEASES_PATH="${{ github.workspace }}\.github\.release"
+          echo "%RELEASES_PATH%"
+          mkdir "%RELEASES_PATH%"
 
           cd "${{ github.workspace }}\src\Api\PubnubApi"
           dotnet pack -o "%RELEASES_PATH%" -c Release
