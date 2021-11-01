@@ -14,21 +14,18 @@ jobs:
         with:
           # This should be the same as the one specified for on.pull_request.branches
           ref: master
+      - name: Checkout actions
+        uses: actions/checkout@v2
+        with:
+          repository: pubnub/client-engineering-deployment-tools
+          ref: v1
+          token: ${{ secrets.GH_TOKEN }}
+          path: .github/.release/actions
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.0.3
-      - name: Build packages
-        run: |
-          $RELEASES_PATH = "${{ github.workspace }}\.github\.release"
-          mkdir "$RELEASES_PATH"
-          mkdir "$RELEASES_PATH\Api"
-          mkdir "$RELEASES_PATH\PCL"
-          mkdir "$RELEASES_PATH\UWP"
-
-          # Build Api package.
-          cd "${{ github.workspace }}\src\Api\PubnubApi"
-          dotnet pack -o "$RELEASES_PATH\Api" -c Release
-          $PACKAGE_NAME = Get-ChildItem -Name -Path "$RELEASES_PATH\Api\*" -Include *.nupkg
-          $PACKAGE_PATH = "$RELEASES_PATH\Api\$PACKAGE_NAME"
-          Write-Output "PACKAGE_PATH ----> $PACKAGE_PATH"
-          
-          nuget.exe push $PACKAGE_PATH -Source "https://www.nuget.org" -ApiKey hello-there
+      - name: Publish to NuGet
+        uses: ./client-engineering-deployment-tools/actions/services/nuget
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          project-path: "${{ github.workspace }}\src\Api\PubnubApi"
+          package-type: API
