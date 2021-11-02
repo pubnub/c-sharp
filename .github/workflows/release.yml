@@ -19,9 +19,8 @@ jobs:
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.0.3
       - name: Build packages
-        shell: pwsh
-        run: |
-          .\.github\workflows\build-packages.ps1 "${{ github.workspace }}"
+        run: .\.github\workflows\build-packages.ps1 -githubWorkspace "${{ github.workspace }}"
+        shell: powershell
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
