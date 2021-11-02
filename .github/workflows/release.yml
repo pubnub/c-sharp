@@ -1,0 +1,30 @@
+name: Automated product release
+
+on:
+  pull_request:
+    branches: 
+      - master
+
+
+jobs:
+  publish-nuget:
+    name: Publish to NuGet
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          # This should be the same as the one specified for on.pull_request.branches
+          ref: master
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.0.3
+      - name: Build packages
+        shell: pwsh
+        run: |
+          .\.github\workflows\build-packages.ps1 "${{ github.workspace }}"
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: nuget-packages
+          path: ${{ github.workspace }}\.github\.release\*.nupkg
+          retention-days: 1
