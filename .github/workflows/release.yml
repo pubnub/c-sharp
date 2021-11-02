@@ -50,4 +50,4 @@ jobs:
           path: ${{ github.workspace }}/.github/.release/artifacts
       - name: List artifacts
         run: |
-          ln ${{ github.workspace }}/.github/.release/artifacts
+          ls -la ${{ github.workspace }}/.github/.release/artifacts
