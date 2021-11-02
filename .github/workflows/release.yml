@@ -25,7 +25,7 @@ jobs:
         run: "dir ${{ github.workspace }}\\.github\\workflows"
         shell: powershell
       - name: Build packages
-        run: "${{ github.workspace }}\\.github\\workflows\\build-packages.ps1"
+        run: .\\.github\\workflows\\build-packages.ps1 -githubWorkspace ${{ github.workspace }}
         shell: powershell
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
