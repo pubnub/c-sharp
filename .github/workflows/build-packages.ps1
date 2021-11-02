@@ -1,7 +1,7 @@
 $githubWorkspace = $args[0]
 $secret = $args[1]
 
-$ghWorkspace1 = Get-Variable WORKSPACE_PATH -valueOnly
+$ghWorkspace1 = $env:WORKSPACE_PATH
 $ghWorkspace2 = Get-ChildItem -Path Env:\WORKSPACE_PATH
 
 Write-Output "~~~~> ghWorkspace1: '$ghWorkspace1'"
