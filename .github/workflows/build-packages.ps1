@@ -1,6 +1,12 @@
 $githubWorkspace = $args[0]
 $secret = $args[1]
 
+$ghWorkspace1 = Get-ChildItem -Path Env:WORKSPACE_PATH
+$ghWorkspace2 = Get-ChildItem -Path Env:\WORKSPACE_PATH
+
+Write-Output "~~~~> ghWorkspace1: '$ghWorkspace1'"
+Write-Output "~~~~> ghWorkspace2: '$ghWorkspace2'"
+
 # Create required directory structure.
 $RELEASES_PATH = "$githubWorkspace\.github\.release"
 $ARTIFACTS_PATH = "$RELEASES_PATH\artifacts"
