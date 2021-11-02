@@ -48,7 +48,6 @@ jobs:
         with:
           name: nuget-packages
           path: ${{ github.workspace }}/.github/.release/artifacts
-          retention-days: 1
       - name: List artifacts
         run: |
-          ln -ls ${{ github.workspace }}/.github/.release/artifacts
+          ln ${{ github.workspace }}/.github/.release/artifacts
