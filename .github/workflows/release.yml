@@ -18,6 +18,9 @@ jobs:
           ref: master
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.0.3
+      - name: List home directory
+        run: dir ${{ github.workspace }}
+        shell: powershell
       - name: Build packages
         run: "${{ github.workspace }}\\.github\\workflows\\build-packages.ps1"
         shell: powershell
