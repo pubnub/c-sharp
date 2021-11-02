@@ -1,7 +1,7 @@
 $githubWorkspace = $args[0]
 $secret = $args[1]
 
-$ghWorkspace1 = Get-ChildItem -Path Env:WORKSPACE_PATH
+$ghWorkspace1 = Get-Variable WORKSPACE_PATH -valueOnly
 $ghWorkspace2 = Get-ChildItem -Path Env:\WORKSPACE_PATH
 
 Write-Output "~~~~> ghWorkspace1: '$ghWorkspace1'"
@@ -25,13 +25,13 @@ cd "$githubWorkspace\src\Api\PubnubApi"
 dotnet pack -o "$RELEASES_PATH\Api" -c Release
 
 # Build PCL package.
-cd "$githubWorkspace\src\Api\PubnubApiPCL"
-dotnet pack -o "$RELEASES_PATH\PCL" -c Release
+#cd "$githubWorkspace\src\Api\PubnubApiPCL"
+#dotnet pack -o "$RELEASES_PATH\PCL" -c Release
 
 # Build UWP package.
-cd "$githubWorkspace\src\Api\PubnubApiUWP"
-dotnet restore
-msbuild PubnubApiUWP.csproj /t:Pack /p:Configuration=Release /p:PackageOutputPath="$RELEASES_PATH\UWP" /v:n
+#cd "$githubWorkspace\src\Api\PubnubApiUWP"
+#dotnet restore
+#msbuild PubnubApiUWP.csproj /t:Pack /p:Configuration=Release /p:PackageOutputPath="$RELEASES_PATH\UWP" /v:n
 
 
 # Copy built packages to artifacts folder.
@@ -39,10 +39,10 @@ $PACKAGE_NAME = Get-ChildItem -Name -Path "$RELEASES_PATH\Api\*" -Include *.nupk
 $PACKAGE_PATH = "$RELEASES_PATH\Api\$PACKAGE_NAME"
 cp "$PACKAGE_PATH" "$ARTIFACTS_PATH\$PACKAGE_NAME"
 
-$PCL_PACKAGE_NAME = Get-ChildItem -Name -Path "$RELEASES_PATH\PCL\*" -Include *.nupkg
-$PCL_PACKAGE_PATH = "$RELEASES_PATH\PCL\$PCL_PACKAGE_NAME"
-cp "$PCL_PACKAGE_PATH" "$ARTIFACTS_PATH\$PCL_PACKAGE_NAME"
+#$PCL_PACKAGE_NAME = Get-ChildItem -Name -Path "$RELEASES_PATH\PCL\*" -Include *.nupkg
+#$PCL_PACKAGE_PATH = "$RELEASES_PATH\PCL\$PCL_PACKAGE_NAME"
+#cp "$PCL_PACKAGE_PATH" "$ARTIFACTS_PATH\$PCL_PACKAGE_NAME"
 
-$UWP_PACKAGE_NAME = Get-ChildItem -Name -Path "$RELEASES_PATH\UWP\*" -Include *.nupkg
-$UWP_PACKAGE_PATH = "$RELEASES_PATH\UWP\$UWP_PACKAGE_NAME"
-cp "$UWP_PACKAGE_PATH" "$ARTIFACTS_PATH\$UWP_PACKAGE_NAME"
+#$UWP_PACKAGE_NAME = Get-ChildItem -Name -Path "$RELEASES_PATH\UWP\*" -Include *.nupkg
+#$UWP_PACKAGE_PATH = "$RELEASES_PATH\UWP\$UWP_PACKAGE_NAME"
+#cp "$UWP_PACKAGE_PATH" "$ARTIFACTS_PATH\$UWP_PACKAGE_NAME"
