@@ -40,47 +40,26 @@ jobs:
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.0.3
       - name: Build packages
-        run: |
-          $RELEASES_PATH = "${{ github.workspace }}\.github\.release"
-          mkdir "$RELEASES_PATH"
-          mkdir "$RELEASES_PATH\Api"
-          mkdir "$RELEASES_PATH\PCL"
-          mkdir "$RELEASES_PATH\UWP"
-
-          # Build Api package.
-          cd "${{ github.workspace }}\src\Api\PubnubApi"
-          dotnet pack -o "$RELEASES_PATH\Api" -c Release
-
-          # Build PCL package.
-          cd "${{ github.workspace }}\src\Api\PubnubApiPCL"
-          dotnet pack -o "$RELEASES_PATH\PCL" -c Release
-
-          # Build UWP package.
-          cd "${{ github.workspace }}\src\Api\PubnubApiUWP"
-          dotnet restore
-          msbuild PubnubApiUWP.csproj /t:Pack /p:Configuration=Release /p:PackageOutputPath="$RELEASES_PATH\UWP" /v:n
+        env:
+          WORKSPACE_PATH: ${{ github.workspace }}
+        run: .\\.github\\workflows\\build-packages.ps1
+        shell: powershell
       - name: Publish packages
-        run: |
-          $RELEASES_PATH = "${{ github.workspace }}\.github\.release"
-
-          # Publish package
-          $PACKAGE_NAME = Get-ChildItem -Name -Path "$RELEASES_PATH\Api\*" -Include *.nupkg
-          $PACKAGE_PATH = "$RELEASES_PATH\Api\$PACKAGE_NAME"
-          nuget.exe push $PACKAGE_PATH -Source "https://www.nuget.org" -ApiKey ${{ secrets.NUGET_API_KEY }}
-
-          # Publish PCL package.
-          $PCL_PACKAGE_NAME = Get-ChildItem -Name -Path "$RELEASES_PATH\PCL\*" -Include *.nupkg
-          $PCL_PACKAGE_PATH = "$RELEASES_PATH\PCL\$PCL_PACKAGE_NAME"
-          nuget.exe push $PCL_PACKAGE_PATH -Source "https://www.nuget.org" -ApiKey ${{ secrets.NUGET_API_KEY }}
-          
-          # Publish UWP package.
-          $UWP_PACKAGE_NAME = Get-ChildItem -Name -Path "$RELEASES_PATH\UWP\*" -Include *.nupkg
-          $UWP_PACKAGE_PATH = "$RELEASES_PATH\UWP\$UWP_PACKAGE_NAME"
-          nuget.exe push $UWP_PACKAGE_PATH -Source "https://www.nuget.org" -ApiKey ${{ secrets.NUGET_API_KEY }}
+        env:
+          WORKSPACE_PATH: ${{ github.workspace }}
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: .\\.github\\workflows\\publish-packages.ps1
+        shell: powershell
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: nuget-packages
+          path: ${{ github.workspace }}\.github\.release\artifacts\*.nupkg
+          retention-days: 1
   publish:
     name: Publish package
     runs-on: ubuntu-latest
-    needs: check-release
+    needs: publish-nuget
     if: ${{ needs.check-release.outputs.release == 'true' }}
     steps:
       - name: Checkout repository
@@ -95,6 +74,11 @@ jobs:
           ref: v1
           token: ${{ secrets.GH_TOKEN }}
           path: .github/.release/actions
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: nuget-packages
+          path: ${{ github.workspace }}/.github/.release/artifacts
       - name: Create Release
         uses: ./.github/.release/actions/actions/services/github-release
         with:
