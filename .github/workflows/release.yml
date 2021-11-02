@@ -21,6 +21,9 @@ jobs:
       - name: List home directory
         run: dir ${{ github.workspace }}
         shell: powershell
+      - name: List workflows directory
+        run: "dir ${{ github.workspace }}\\.github\\workflows"
+        shell: powershell
       - name: Build packages
         run: "${{ github.workspace }}\\.github\\workflows\\build-packages.ps1"
         shell: powershell
