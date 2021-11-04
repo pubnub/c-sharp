@@ -93,6 +93,7 @@ namespace PubnubApi.EndPoint
                     endpoint = "l_push";
                     break;
                 case PNOperationType.PNAccessManagerGrantToken:
+                case PNOperationType.PNAccessManagerRevokeToken:
                     endpoint = "l_pamv3";
                     break;
                 case PNOperationType.PNAccessManagerAudit:

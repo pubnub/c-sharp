@@ -378,7 +378,7 @@ namespace PubnubApiAsyncAwaitDemo
             Console.WriteLine("");
             while (!exitFlag)
             {
-                if (currentUserChoice < 1 || (currentUserChoice > 67 && currentUserChoice != 99))
+                if (currentUserChoice < 1 || (currentUserChoice > 68 && currentUserChoice != 99))
                 {
                     StringBuilder menuOptionsStringBuilder = new StringBuilder();
                     menuOptionsStringBuilder.AppendLine("ENTER 1 FOR Subscribe channel/channelgroup");
@@ -440,6 +440,7 @@ namespace PubnubApiAsyncAwaitDemo
                     menuOptionsStringBuilder.AppendLine("Enter 65 FOR GrantToken");
                     menuOptionsStringBuilder.AppendLine("Enter 66 FOR SetToken");
                     menuOptionsStringBuilder.AppendLine("Enter 67 FOR ParseToken");
+                    menuOptionsStringBuilder.AppendLine("Enter 67 FOR RevokeToken");
 
                     menuOptionsStringBuilder.AppendLine("ENTER 99 FOR EXIT OR QUIT");
                     Console.WriteLine(menuOptionsStringBuilder.ToString());
@@ -2232,6 +2233,21 @@ namespace PubnubApiAsyncAwaitDemo
                         PNTokenContent tokenContent = pubnub.ParseToken(grantToken);
                         Console.WriteLine();
                         Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(tokenContent));
+                        break;
+                    case "68":
+                        Console.WriteLine("Enter PAMv3 token for revoke");
+                        string revokeTknString = Console.ReadLine();
+                        PNResult<PNAccessManagerRevokeTokenResult> revokeTokenResponse = await pubnub.RevokeToken().Token(revokeTknString).ExecuteAsync();
+                        PNAccessManagerRevokeTokenResult revokeTokenResult = revokeTokenResponse.Result;
+                        PNStatus revokeTokenStatus = revokeTokenResponse.Status;
+                        if (!revokeTokenStatus.Error && revokeTokenResult != null)
+                        {
+                            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(revokeTokenResult));
+                        }
+                        else
+                        {
+                            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(revokeTokenStatus));
+                        }
                         break;
                     default:
                         Console.ForegroundColor = ConsoleColor.Red;

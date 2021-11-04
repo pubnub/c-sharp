@@ -635,6 +635,35 @@ namespace PubnubApi
             return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
+        Uri IUrlRequestBuilder.BuildRevokeV3AccessRequest(string requestMethod, string requestBody, string token, Dictionary<string, object> externalQueryParam)
+        {
+            PNOperationType currentType = PNOperationType.PNAccessManagerRevokeToken;
+
+            List<string> url = new List<string>();
+            url.Add("v3");
+            url.Add("pam");
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("grant");
+            url.Add(token);
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+
+            if (externalQueryParam != null && externalQueryParam.Count > 0)
+            {
+                foreach (KeyValuePair<string, object> kvp in externalQueryParam)
+                {
+                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    {
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
+                    }
+                }
+            }
+
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
+
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
+        }
+
         Uri IUrlRequestBuilder.BuildAuditAccessRequest(string requestMethod, string requestBody, string channel, string channelGroup, string authKeysCommaDelimited, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PNAccessManagerAudit;
@@ -2051,7 +2080,7 @@ namespace PubnubApi
                 }
 
                 if (type != PNOperationType.PNTimeOperation
-                        && type != PNOperationType.PNAccessManagerGrant && type != PNOperationType.PNAccessManagerGrantToken && type != PNOperationType.ChannelGroupGrantAccess
+                        && type != PNOperationType.PNAccessManagerGrant && type != PNOperationType.PNAccessManagerGrantToken && type != PNOperationType.PNAccessManagerRevokeToken && type != PNOperationType.ChannelGroupGrantAccess
                         && type != PNOperationType.PNAccessManagerAudit && type != PNOperationType.ChannelGroupAuditAccess)
                 {
                     if (tokenMgr != null && !string.IsNullOrEmpty(tokenMgr.AuthToken) && tokenMgr.AuthToken.Trim().Length > 0)

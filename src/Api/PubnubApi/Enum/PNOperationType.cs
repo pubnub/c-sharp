@@ -69,6 +69,7 @@ namespace PubnubApi
         PNAccessManagerAudit,
         PNAccessManagerGrantToken,
         PNAccessManagerGrant,
+        PNAccessManagerRevokeToken,
         PNGenerateFileUploadUrlOperation,
         PNFileUploadOperation,
         PNPublishFileMessageOperation,

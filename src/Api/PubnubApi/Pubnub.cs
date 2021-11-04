@@ -130,6 +130,12 @@ namespace PubnubApi
             return grantOperation;
         }
 
+        public EndPoint.RevokeTokenOperation RevokeToken()
+        {
+            EndPoint.RevokeTokenOperation revokeTokenOperation = new EndPoint.RevokeTokenOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
+            return revokeTokenOperation;
+        }
+
         public EndPoint.GrantOperation Grant()
         {
             EndPoint.GrantOperation grantOperation = new EndPoint.GrantOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, this);

@@ -78,6 +78,7 @@ Removed throw exception on atleast one PAM permission validation</PackageRelease
       <Link>EndPoint\Access\GrantOperation.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\EndPoint\Access\GrantTokenOperation.cs" Link="EndPoint\Access\GrantTokenOperation.cs" />
+    <Compile Include="..\PubnubApi\EndPoint\Access\RevokeTokenOperation.cs" Link="EndPoint\Access\RevokeTokenOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\ChannelGroup\AddChannelsToChannelGroupOperation.cs">
       <Link>EndPoint\ChannelGroup\AddChannelsToChannelGroupOperation.cs</Link>
     </Compile>
@@ -254,6 +255,7 @@ Removed throw exception on atleast one PAM permission validation</PackageRelease
     <Compile Include="..\PubnubApi\JsonDataParse\PNObjectEventJsonDataParse.cs" Link="JsonDataParse\PNObjectEventJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNPublishFileMessageJsonDataParse.cs" Link="JsonDataParse\PNPublishFileMessageJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNRemoveMessageActionJsonDataParse.cs" Link="JsonDataParse\PNRemoveMessageActionJsonDataParse.cs" />
+    <Compile Include="..\PubnubApi\JsonDataParse\PNRevokeTokenJsonDataParse.cs" Link="JsonDataParse\PNRevokeTokenJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNSetChannelMetadataJsonDataParse.cs" Link="JsonDataParse\PNSetChannelMetadataJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNSetUuidMetadataJsonDataParse.cs" Link="JsonDataParse\PNSetUuidMetadataJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\Log\LoggingMethod.cs">
@@ -274,6 +276,7 @@ Removed throw exception on atleast one PAM permission validation</PackageRelease
     <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNAccessManagerKeysData.cs">
       <Link>Model\Consumer\AccessManager\PNAccessManagerKeysData.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNAccessManagerRevokeTokenResult.cs" Link="Model\Consumer\AccessManager\PNAccessManagerRevokeTokenResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNAccessManagerTokenResult.cs" Link="Model\Consumer\AccessManager\PNAccessManagerTokenResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNTokenAuthValues.cs" Link="Model\Consumer\AccessManager\PNTokenAuthValues.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNTokenContent.cs" Link="Model\Consumer\AccessManager\PNTokenContent.cs" />
@@ -393,6 +396,7 @@ Removed throw exception on atleast one PAM permission validation</PackageRelease
     <Compile Include="..\PubnubApi\Model\Derived\AccessManager\PNAccessManagerGrantResultExt.cs">
       <Link>Model\Derived\AccessManager\PNAccessManagerGrantResultExt.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\AccessManager\PNAccessManagerRevokeTokenResultExt.cs" Link="Model\Derived\AccessManager\PNAccessManagerRevokeTokenResultExt.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\AccessManager\PNAccessManagerTokenResultExt.cs" Link="Model\Derived\AccessManager\PNAccessManagerTokenResultExt.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\ChannelGroup\PNChannelGroupsAddChannelResultExt.cs">
       <Link>Model\Derived\ChannelGroup\PNChannelGroupsAddChannelResultExt.cs</Link>
