@@ -162,3 +162,8 @@ src/Examples/PubnubApiPCL.XamariniMacExample/obj/*
 *.suo
 src/UnitTests/MockServer/bin/*
 src/UnitTests/MockServer/obj/*
+
+
+# GitHub Actions #
+##################
+.github/.release
