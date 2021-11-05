@@ -12,6 +12,7 @@ namespace AcceptanceTests.Steps
     [Binding]
     public class GrantAccessTokenSteps
     {
+        public static string currentFeature = string.Empty;
         private string acceptance_test_origin = "localhost:8090";
         private readonly ScenarioContext _scenarioContext;
         private Pubnub pn;
@@ -19,7 +20,7 @@ namespace AcceptanceTests.Steps
         GrantInput grantInput = null;
         PNAccessManagerTokenResult grantResult = null;
         PNStatus grantStatus = null;
-        GrantTokenError grantError = null;
+        PubnubError grantError = null;
         public enum PermissionType { Channel, Group, Uuid};
 
         private string tokenInput = string.Empty;
@@ -32,7 +33,7 @@ namespace AcceptanceTests.Steps
 
         ResourcePermType currentResPermType;
 
-        public class GrantTokenError
+        public class PubnubError
         {
             public ErrorMsg error;
             public string service;
@@ -75,21 +76,56 @@ namespace AcceptanceTests.Steps
             _scenarioContext = scenarioContext;
         }
 
+        [BeforeFeature]
+        public static void BeforeFeature(FeatureContext featureContext)
+        {
+            if (featureContext.FeatureInfo != null && featureContext.FeatureInfo.Tags.Length > 0)
+            {
+                List<string> tagList = featureContext.FeatureInfo.Tags.AsEnumerable<string>().ToList();
+                foreach (string tag in tagList)
+                {
+                    if (tag.IndexOf("featureSet=") == 0)
+                    {
+                        currentFeature = tag.Replace("featureSet=", "");
+                        break;
+                    }
+                }
+            }
+
+            Console.WriteLine("Starting " + featureContext.FeatureInfo.Title);
+        }
+
+        [AfterFeature]
+        public static void AfterFeature(FeatureContext featureContext)
+        {
+            Console.WriteLine("Finished " + featureContext.FeatureInfo.Title);
+        }
+
         [BeforeScenario()]
         public void BeforeScenario()
         {
-            string testFeature = "";
-            string testContract = "";
-            if (_scenarioContext.ScenarioInfo != null && _scenarioContext.ScenarioInfo.Tags.Length == 2)
+            string currentContract = "";
+            if (_scenarioContext.ScenarioInfo != null && _scenarioContext.ScenarioInfo.Tags.Length > 0)
             {
-                testFeature = _scenarioContext.ScenarioInfo.Tags[0];
-                testContract = _scenarioContext.ScenarioInfo.Tags[1];
-                string mockInitContract = string.Format("http://{0}/init?__contract__script__={1}", acceptance_test_origin, testContract.Replace("contract=",""));
-                System.Diagnostics.Debug.WriteLine(mockInitContract);
-                WebClient webClient = new WebClient();
-                string mockInitResponse = webClient.DownloadString(mockInitContract);
-                System.Diagnostics.Debug.WriteLine(mockInitResponse);
+                List<string> tagList = _scenarioContext.ScenarioInfo.Tags.AsEnumerable<string>().ToList();
+                foreach (string tag in tagList)
+                {
+                    if (tag.IndexOf("contract=") == 0)
+                    {
+                        currentContract = tag.Replace("contract=", "");
+                        break;
+                    }
+                }
+                if (!string.IsNullOrEmpty(currentContract))
+                {
+                    string mockInitContract = string.Format("http://{0}/init?__contract__script__={1}", acceptance_test_origin, currentContract);
+                    System.Diagnostics.Debug.WriteLine(mockInitContract);
+                    WebClient webClient = new WebClient();
+                    string mockInitResponse = webClient.DownloadString(mockInitContract);
+                    System.Diagnostics.Debug.WriteLine(mockInitResponse);
+                }
             }
+
             grantInput = new GrantInput();
             tokenInput = string.Empty;
         }
@@ -317,6 +353,13 @@ namespace AcceptanceTests.Steps
             if (perms != null) { perms.Read = false; }
         }
 
+        [Given(@"deny resource permission GET")]
+        public void GivenDenyResourcePermissionGET()
+        {
+            PNTokenAuthValues perms = GetCurrentGivenGrantResourcePermissionsByPermType();
+            if (perms != null) { perms.Get = false; }
+        }
+
         [Given(@"I have a known token containing an authorized UUID")]
         public void GivenIHaveAKnownTokenContainingAnAuthorizedUUID()
         {
@@ -359,7 +402,7 @@ namespace AcceptanceTests.Steps
             grantStatus = pamGrantResult.Status;
             if (grantStatus.Error)
             {
-                grantError = pn.JsonPluggableLibrary.DeserializeToObject<GrantTokenError>(grantStatus.ErrorData.Information);
+                grantError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(grantStatus.ErrorData.Information);
             }
         }
         
@@ -387,7 +430,7 @@ namespace AcceptanceTests.Steps
             grantStatus = pamGrantResult.Status;
             if (grantStatus.Error)
             {
-                grantError = pn.JsonPluggableLibrary.DeserializeToObject<GrantTokenError>(grantStatus.ErrorData.Information);
+                grantError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(grantStatus.ErrorData.Information);
             }
         }
 
