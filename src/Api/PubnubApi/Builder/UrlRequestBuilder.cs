@@ -2217,7 +2217,16 @@ namespace PubnubApi
             if (this.pubnubConfig.SecretKey.Length > 0)
             {
                 StringBuilder partialUrl = new StringBuilder();
-                partialUrl.Append(requestUri.AbsolutePath);
+                if (type == PNOperationType.PNAccessManagerRevokeToken)
+                {
+                    string uriLastPart = requestUri.Segments.Last();
+                    string uriLastPartModified = uriLastPart.Replace("%3D", "=");
+                    partialUrl.Append(requestUri.AbsolutePath.Replace(uriLastPart, uriLastPartModified));
+                }
+                else
+                {
+                    partialUrl.Append(requestUri.AbsolutePath);
+                }
 
                 string signature;
                 if (isPamV3Sign)
