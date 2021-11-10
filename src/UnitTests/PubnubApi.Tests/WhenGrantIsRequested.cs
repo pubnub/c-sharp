@@ -936,6 +936,7 @@ namespace PubNubMessaging.Tests
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
                 Uuid = "mytestuuid",
+                Secure = false
             };
 
             pubnub = createPubNubInstance(config);
@@ -1024,6 +1025,63 @@ namespace PubNubMessaging.Tests
 #endif
 
         }
+
+        [Test]
+        public static void ThenRevokeTokenShouldReturnSuccess()
+        {
+            server.ClearRequests();
+
+            currentUnitTestCase = "ThenRevokeTokenShouldReturnSuccess";
+
+            receivedRevokeMessage = false;
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+                Secure = false
+            };
+
+            pubnub = createPubNubInstance(config);
+            server.RunOnHttps(config.Secure);
+
+            try
+            {
+                PNResult<PNAccessManagerTokenResult> grantResult = pubnub.GrantToken().TTL(5).Resources(new PNTokenResources() { Channels = new Dictionary<string, PNTokenAuthValues>() { { "ch1", new PNTokenAuthValues() { Read = true } } } }).ExecuteAsync().Result;
+                if (grantResult.Result != null && !string.IsNullOrEmpty(grantResult.Result.Token))
+                {
+                    revokeManualEvent = new ManualResetEvent(false);
+                    pubnub.RevokeToken()
+                        .Token(grantResult.Result.Token)
+                        .Execute(new PNAccessManagerRevokeTokenResultExt((result, status) =>
+                        {
+                            if (result != null)
+                            {
+                                Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                            }
+                            else
+                            {
+                                Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                            }
+                            receivedRevokeMessage = true;
+                            revokeManualEvent.Set();
+                        }));
+                    revokeManualEvent.WaitOne();
+                    Thread.Sleep(1000);
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                receivedRevokeMessage = true;
+                revokeManualEvent.Set();
+            }
+
+        }
+
 
         public static byte[] HexStringToByteArray(string hex)
         {
