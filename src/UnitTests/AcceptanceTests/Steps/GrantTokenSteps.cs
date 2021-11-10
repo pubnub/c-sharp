@@ -10,7 +10,7 @@ using System.Net;
 namespace AcceptanceTests.Steps
 {
     [Binding]
-    public class GrantAccessTokenSteps
+    public partial class FeatureAccessSteps
     {
         public static string currentFeature = string.Empty;
         private string acceptance_test_origin = "localhost:8090";
@@ -19,8 +19,8 @@ namespace AcceptanceTests.Steps
         private PNConfiguration config = null;
         GrantInput grantInput = null;
         PNAccessManagerTokenResult grantResult = null;
-        PNStatus grantStatus = null;
-        PubnubError grantError = null;
+        PNStatus pnStatus = null;
+        PubnubError pnError = null;
         public enum PermissionType { Channel, Group, Uuid};
 
         private string tokenInput = string.Empty;
@@ -71,7 +71,7 @@ namespace AcceptanceTests.Steps
             public int TTL { get; set; }
             public string AuthorizedUuid;
         }
-        public GrantAccessTokenSteps(ScenarioContext scenarioContext)
+        public FeatureAccessSteps(ScenarioContext scenarioContext)
         {
             _scenarioContext = scenarioContext;
         }
@@ -92,13 +92,13 @@ namespace AcceptanceTests.Steps
                 }
             }
 
-            Console.WriteLine("Starting " + featureContext.FeatureInfo.Title);
+            System.Diagnostics.Debug.WriteLine("Starting " + featureContext.FeatureInfo.Title);
         }
 
         [AfterFeature]
         public static void AfterFeature(FeatureContext featureContext)
         {
-            Console.WriteLine("Finished " + featureContext.FeatureInfo.Title);
+            System.Diagnostics.Debug.WriteLine("Finished " + featureContext.FeatureInfo.Title);
         }
 
         [BeforeScenario()]
@@ -399,10 +399,10 @@ namespace AcceptanceTests.Steps
                 })
                 .ExecuteAsync();
             grantResult = pamGrantResult.Result;
-            grantStatus = pamGrantResult.Status;
-            if (grantStatus.Error)
+            pnStatus = pamGrantResult.Status;
+            if (pnStatus.Error)
             {
-                grantError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(grantStatus.ErrorData.Information);
+                pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
         }
         
@@ -427,10 +427,10 @@ namespace AcceptanceTests.Steps
                 })
                 .ExecuteAsync();
             grantResult = pamGrantResult.Result;
-            grantStatus = pamGrantResult.Status;
-            if (grantStatus.Error)
+            pnStatus = pamGrantResult.Status;
+            if (pnStatus.Error)
             {
-                grantError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(grantStatus.ErrorData.Information);
+                pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
         }
 
@@ -698,15 +698,15 @@ namespace AcceptanceTests.Steps
         [Then(@"an error is returned")]
         public void ThenAnErrorIsReturned()
         {
-            Assert.IsTrue(grantStatus.Error);
+            Assert.IsTrue(pnStatus.Error);
         }
         
         [Then(@"the error status code is (.*)")]
         public void ThenTheErrorStatusCodeIs(int p0)
         {
-            if (grantError != null)
+            if (pnError != null)
             {
-                Assert.AreEqual(p0, grantError.status);
+                Assert.AreEqual(p0, pnError.status);
             }
             else
             {
@@ -717,9 +717,9 @@ namespace AcceptanceTests.Steps
         [Then(@"the error message is '(.*)'")]
         public void ThenTheErrorMessageIs(string p0)
         {
-            if (grantError != null)
+            if (pnError != null)
             {
-                Assert.AreEqual(p0, grantError.error.message);
+                Assert.AreEqual(p0, pnError.error.message);
             }
             else
             {
@@ -730,9 +730,9 @@ namespace AcceptanceTests.Steps
         [Then(@"the error source is '(.*)'")]
         public void ThenTheErrorSourceIs(string p0)
         {
-            if (grantError != null)
+            if (pnError != null)
             {
-                Assert.AreEqual(p0, grantError.error.source);
+                Assert.AreEqual(p0, pnError.error.source);
             }
             else
             {
@@ -743,9 +743,9 @@ namespace AcceptanceTests.Steps
         [Then(@"the error detail message is '(.*)'")]
         public void ThenTheErrorDetailMessageIs(string p0)
         {
-            if (grantError != null && grantError.error.details.Count > 0)
+            if (pnError != null && pnError.error.details.Count > 0)
             {
-                Assert.AreEqual(p0, grantError.error.details[0].message);
+                Assert.AreEqual(p0, pnError.error.details[0].message);
             }
             else
             {
@@ -756,9 +756,9 @@ namespace AcceptanceTests.Steps
         [Then(@"the error detail location is '(.*)'")]
         public void ThenTheErrorDetailLocationIs(string p0)
         {
-            if (grantError != null && grantError.error.details.Count > 0)
+            if (pnError != null && pnError.error.details.Count > 0)
             {
-                Assert.AreEqual(p0, grantError.error.details[0].location);
+                Assert.AreEqual(p0, pnError.error.details[0].location);
             }
             else
             {
@@ -769,9 +769,9 @@ namespace AcceptanceTests.Steps
         [Then(@"the error detail location type is '(.*)'")]
         public void ThenTheErrorDetailLocationTypeIs(string p0)
         {
-            if (grantError != null && grantError.error.details.Count > 0)
+            if (pnError != null && pnError.error.details.Count > 0)
             {
-                Assert.AreEqual(p0, grantError.error.details[0].locationType);
+                Assert.AreEqual(p0, pnError.error.details[0].locationType);
             }
             else
             {
