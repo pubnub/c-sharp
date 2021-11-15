@@ -75,6 +75,7 @@ for (let change of changelog.entries) {
 
 
 // Update C# project files 'PackageReleaseNotes' nodes.
+const localCopyPath = process.argv.pop()
 const nodeMatcher = new RegExp('<PackageReleaseNotes>((.|[\r\n])+)</PackageReleaseNotes>', 'gm');
 const nodeChangelog = changeEntries.join('\n');
 const projectPaths = [
@@ -84,7 +85,7 @@ const projectPaths = [
 ];
 
 for (var projectIdx = projectPaths.length - 1; projectIdx >= 0; projectIdx--) {
-	const projectFilePath = path.join(process.env['GITHUB_WORKSPACE'], projectPaths[projectIdx]);
+	const projectFilePath = path.join(localCopyPath, projectPaths[projectIdx]);
   console.log('~~~~~> PROJECT FILE PATH:', projectFilePath)
   let match;
 
