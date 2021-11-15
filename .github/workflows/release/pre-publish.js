@@ -37,9 +37,12 @@ const changelogContent = fs.readFileSync(changelogPath).toString('utf8');
 let changeEntries = [];
 let changelog;
 
+console.log('~~~~~> CHANGELOG PATH:', changelogPath)
+
 if (changelogContent) {
 	try {
     changelog = JSON.parse(changelogContent);
+    console.log('~~~~~> CHANGELOG:', changelogContent)
 
 	} catch (error) {
     console.error(`Unable to parse changelog file content: '${error}'`);
@@ -80,17 +83,25 @@ const projectPaths = [
 
 for (var projectIdx = projectPaths.length - 1; projectIdx >= 0; projectIdx--) {
 	const projectFilePath = path.join(process.env['GITHUB_WORKSPACE'], projectPaths[projectIdx]);
+  console.log('~~~~~> PROJECT FILE PATH:', projectFilePath)
   let match;
 
 	if (fs.existsSync(projectFilePath)) {
     let projectContent = fs.readFileSync(projectFilePath).toString('utf8');
 
     if (projectContent) {
+      // REPLACING IN:     <PackageVersion>5.3.0</PackageVersion>
       while ((match = nodeMatcher.exec(projectContent)) !== null) {
+        console.log('~~~~~> REPLACING IN:', match[0])
       	const updated = match[0].replace(match[1], nodeChangelog)
+        console.log('~~~~~> AFTER REPLACEMENT:', updated)
         projectContent = replaceString(projectContent, match[0], updated, match.index)
         fs.writeFileSync(projectFilePath, projectContent, {encoding: 'utf8'})
       }
+    } else {
+      console.log('~~~~~> UNABLE TO LOAD PROJECT FILE')
     }
-	}
+	} else {
+    console.log('~~~~~> PROJECT FILE DOESN\'T EXISTS AT:', projectFilePath)
+  }
 }
