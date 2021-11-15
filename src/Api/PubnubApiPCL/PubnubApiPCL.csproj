@@ -14,7 +14,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubPCL</PackageId>
-    <PackageVersion>5.2.0.0</PackageVersion>
+    <PackageVersion>5.3.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
