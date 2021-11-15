@@ -39,6 +39,8 @@ let changelog;
 
 console.log('~~~~~> CHANGELOG PATH:', changelogPath)
 
+console.log('~~~~~> ARGUMENTS:', process.argv);
+
 if (changelogContent) {
 	try {
     changelog = JSON.parse(changelogContent);
