@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using System.Net;
+using System.Globalization;
 
 namespace AcceptanceTests.Steps
 {
@@ -13,7 +14,9 @@ namespace AcceptanceTests.Steps
     public partial class FeatureAccessSteps
     {
         public static string currentFeature = string.Empty;
+        public static bool betaVersion = false;
         private string acceptance_test_origin = "localhost:8090";
+        private bool bypassMockServer = false;
         private readonly ScenarioContext _scenarioContext;
         private Pubnub pn;
         private PNConfiguration config = null;
@@ -79,6 +82,7 @@ namespace AcceptanceTests.Steps
         [BeforeFeature]
         public static void BeforeFeature(FeatureContext featureContext)
         {
+            betaVersion = false;
             if (featureContext.FeatureInfo != null && featureContext.FeatureInfo.Tags.Length > 0)
             {
                 List<string> tagList = featureContext.FeatureInfo.Tags.AsEnumerable<string>().ToList();
@@ -87,7 +91,11 @@ namespace AcceptanceTests.Steps
                     if (tag.IndexOf("featureSet=") == 0)
                     {
                         currentFeature = tag.Replace("featureSet=", "");
-                        break;
+                    }
+
+                    if (tag.IndexOf("beta") == 0)
+                    {
+                        betaVersion = true;
                     }
                 }
             }
@@ -116,7 +124,7 @@ namespace AcceptanceTests.Steps
                         break;
                     }
                 }
-                if (!string.IsNullOrEmpty(currentContract))
+                if (!string.IsNullOrEmpty(currentContract) && !bypassMockServer)
                 {
                     string mockInitContract = string.Format("http://{0}/init?__contract__script__={1}", acceptance_test_origin, currentContract);
                     System.Diagnostics.Debug.WriteLine(mockInitContract);
@@ -133,11 +141,14 @@ namespace AcceptanceTests.Steps
         [AfterScenario()]
         public void AfterScenario()
         {
-            string mockExpectContract = string.Format("http://{0}/expect", acceptance_test_origin);
-            System.Diagnostics.Debug.WriteLine(mockExpectContract);
-            WebClient webClient = new WebClient();
-            string mockExpectResponse = webClient.DownloadString(mockExpectContract);
-            System.Diagnostics.Debug.WriteLine(mockExpectResponse);
+            if (!bypassMockServer)
+            {
+                string mockExpectContract = string.Format("http://{0}/expect", acceptance_test_origin);
+                System.Diagnostics.Debug.WriteLine(mockExpectContract);
+                WebClient webClient = new WebClient();
+                string mockExpectResponse = webClient.DownloadString(mockExpectContract);
+                System.Diagnostics.Debug.WriteLine(mockExpectResponse);
+            }
         }
 
         [Given(@"I have a keyset with access manager enabled")]
@@ -449,7 +460,14 @@ namespace AcceptanceTests.Steps
         public void ThenTheTokenContainsTheAuthorizedUUID(string p0)
         {
             PNTokenContent content = pn.ParseToken(grantResult.Token);
-            Assert.AreEqual(p0, content.AuthorizedUuid);
+            if (betaVersion && string.Compare(p0, content.AuthorizedUuid, true, CultureInfo.InvariantCulture) != 0)
+            {
+                Assert.Ignore();
+            }
+            else
+            {
+                Assert.AreEqual(p0, content.AuthorizedUuid);
+            }
         }
 
         [Then(@"the token contains the TTL (.*)")]

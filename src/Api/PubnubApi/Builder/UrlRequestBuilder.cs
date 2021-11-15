@@ -2197,6 +2197,10 @@ namespace PubnubApi
                 {
                     url.Append(UriUtil.EncodeUriComponent(urlComponents[componentIndex], type, false, true, false));
                 }
+                else if (type == PNOperationType.PNAccessManagerRevokeToken)
+                {
+                    url.Append(UriUtil.EncodeUriComponent(urlComponents[componentIndex], type, false, false, false));
+                }
                 else
                 {
                     url.Append(UriUtil.EncodeUriComponent(urlComponents[componentIndex], type, true, false, false));

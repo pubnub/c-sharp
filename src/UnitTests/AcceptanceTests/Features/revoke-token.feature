@@ -37,3 +37,9 @@ Feature: Revoke an access token
     * the error detail location is 'subscribe-key'
     * the error detail location type is 'path'
     * the error service is 'Access Manager'
+
+  @contract=revokeEncodePathParameter
+  Scenario: Revoke a token with characters that require url encoding
+    Given the token string 'unescaped-_.ABCabc123 escaped;,/?:@&=+$#'
+    When I revoke a token
+    Then I get confirmation that token has been revoked
