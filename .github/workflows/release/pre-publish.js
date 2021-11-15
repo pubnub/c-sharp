@@ -72,6 +72,7 @@ for (let change of changelog.entries) {
 // Update C# project files 'PackageReleaseNotes' nodes.
 const nodeMatcher = new RegExp('<PackageReleaseNotes>((.|[\r\n])+)</PackageReleaseNotes>', 'gm');
 const nodeChangelog = changeEntries.join('\n');
+const localCopyPath = process.argv.pop()
 const projectPaths = [
   'src/Api/PubnubApi/PubnubApi.csproj',
   'src/Api/PubnubApiPCL/PubnubApiPCL.csproj',
@@ -79,7 +80,7 @@ const projectPaths = [
 ];
 
 for (var projectIdx = projectPaths.length - 1; projectIdx >= 0; projectIdx--) {
-	const projectFilePath = path.join(process.env['GITHUB_WORKSPACE'], projectPaths[projectIdx]);
+	const projectFilePath = path.join(localCopyPath, projectPaths[projectIdx]);
   let match;
 
 	if (fs.existsSync(projectFilePath)) {
