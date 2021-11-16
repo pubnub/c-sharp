@@ -1,13 +1,8 @@
 name: c-sharp
-version: "v5.3.0"
+version: "5.2.0"
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog:
-  - date: 2021-11-15
-    version: v5.3.0
-    changes:
-      - type: feature
-        text: "Added RevokeToken feature."
   - version: v5.2.0
     date: 2021-11-01
     changes:
