@@ -1,8 +1,13 @@
 name: c-sharp
-version: "5.2.0"
+version: "5.3.0"
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog:
+  - date: 2021-11-16
+    version: v5.3.0
+    changes:
+      - type: feature
+        text: "Added RevokeToken feature."
   - version: v5.2.0
     date: 2021-11-01
     changes:
@@ -661,7 +666,7 @@ sdks:
             distribution-type: source
             distribution-repository: Github
             package-name: Pubnub
-            location: https://github.com/pubnub/c-sharp/releases/tag/v5.3.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v5.3.0.0
             requires:
               -
                 name: ".Net"
@@ -958,7 +963,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: PubNubPCL
-            location: https://github.com/pubnub/c-sharp/releases/tag/v5.3.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v5.3.0.0
             requires:
               -
                 name: ".Net Core"
@@ -1331,7 +1336,7 @@ sdks:
             distribution-type: source
             distribution-repository: Github
             package-name: PubnubUWP
-            location: https://github.com/pubnub/c-sharp/releases/tag/v5.3.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v5.3.0.0
             requires:
               -
                 name: "Universal Windows Platform Development"
