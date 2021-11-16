@@ -887,6 +887,7 @@ namespace PubnubApi
                     case PNOperationType.PNWhereNowOperation:
                     case PNOperationType.PNAccessManagerGrantToken:
                     case PNOperationType.PNAccessManagerGrant:
+                    case PNOperationType.PNAccessManagerRevokeToken:
                     case PNOperationType.PNAccessManagerAudit:
                     case PNOperationType.RevokeAccess:
                     case PNOperationType.ChannelGroupGrantAccess:
@@ -1620,6 +1621,7 @@ namespace PubnubApi
                             break;
                         case PNOperationType.PNAccessManagerGrantToken:
                         case PNOperationType.PNAccessManagerGrant:
+                        case PNOperationType.PNAccessManagerRevokeToken:
                         case PNOperationType.PNAccessManagerAudit:
                         case PNOperationType.RevokeAccess:
                             Dictionary<string, object> grantDictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
@@ -2471,6 +2473,23 @@ namespace PubnubApi
                     callbackList[listenerIndex].MessageAction(PubnubInstance, messageActionEvent);
                 }
             }
+        }
+
+        internal void InitializeDefaultVariableObjectStates()
+        {
+            if (!ChannelRequest.ContainsKey(PubnubInstance.InstanceId))
+            {
+                ChannelRequest.GetOrAdd(PubnubInstance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
+            }
+            if (!ChannelInternetStatus.ContainsKey(PubnubInstance.InstanceId))
+            {
+                ChannelInternetStatus.GetOrAdd(PubnubInstance.InstanceId, new ConcurrentDictionary<string, bool>());
+            }
+            if (!ChannelGroupInternetStatus.ContainsKey(PubnubInstance.InstanceId))
+            {
+                ChannelGroupInternetStatus.GetOrAdd(PubnubInstance.InstanceId, new ConcurrentDictionary<string, bool>());
+            }
+
         }
     }
 }

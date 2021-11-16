@@ -1362,6 +1362,7 @@ namespace PubnubApi
                                                 || pubnubRequestState.ResponseType == PNOperationType.PNDeleteUuidMetadataOperation
                                                 || pubnubRequestState.ResponseType == PNOperationType.PNDeleteChannelMetadataOperation
                                                 || pubnubRequestState.ResponseType == PNOperationType.PNRemoveMessageActionOperation
+                                                || pubnubRequestState.ResponseType == PNOperationType.PNAccessManagerRevokeToken
                                                 || pubnubRequestState.ResponseType == PNOperationType.PNDeleteFileOperation)) ? "DELETE" : "GET";
 
         }

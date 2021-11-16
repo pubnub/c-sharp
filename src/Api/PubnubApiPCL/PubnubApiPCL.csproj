@@ -14,7 +14,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubPCL</PackageId>
-    <PackageVersion>5.2.0.0</PackageVersion>
+    <PackageVersion>5.3.0.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -22,8 +22,7 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>Capture region for subscribe
-Removed throw exception on atleast one PAM permission validation</PackageReleaseNotes>
+    <PackageReleaseNotes>Added RevokeToken feature.</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
@@ -78,6 +77,7 @@ Removed throw exception on atleast one PAM permission validation</PackageRelease
       <Link>EndPoint\Access\GrantOperation.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\EndPoint\Access\GrantTokenOperation.cs" Link="EndPoint\Access\GrantTokenOperation.cs" />
+    <Compile Include="..\PubnubApi\EndPoint\Access\RevokeTokenOperation.cs" Link="EndPoint\Access\RevokeTokenOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\ChannelGroup\AddChannelsToChannelGroupOperation.cs">
       <Link>EndPoint\ChannelGroup\AddChannelsToChannelGroupOperation.cs</Link>
     </Compile>
@@ -254,6 +254,7 @@ Removed throw exception on atleast one PAM permission validation</PackageRelease
     <Compile Include="..\PubnubApi\JsonDataParse\PNObjectEventJsonDataParse.cs" Link="JsonDataParse\PNObjectEventJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNPublishFileMessageJsonDataParse.cs" Link="JsonDataParse\PNPublishFileMessageJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNRemoveMessageActionJsonDataParse.cs" Link="JsonDataParse\PNRemoveMessageActionJsonDataParse.cs" />
+    <Compile Include="..\PubnubApi\JsonDataParse\PNRevokeTokenJsonDataParse.cs" Link="JsonDataParse\PNRevokeTokenJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNSetChannelMetadataJsonDataParse.cs" Link="JsonDataParse\PNSetChannelMetadataJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNSetUuidMetadataJsonDataParse.cs" Link="JsonDataParse\PNSetUuidMetadataJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\Log\LoggingMethod.cs">
@@ -274,6 +275,7 @@ Removed throw exception on atleast one PAM permission validation</PackageRelease
     <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNAccessManagerKeysData.cs">
       <Link>Model\Consumer\AccessManager\PNAccessManagerKeysData.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNAccessManagerRevokeTokenResult.cs" Link="Model\Consumer\AccessManager\PNAccessManagerRevokeTokenResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNAccessManagerTokenResult.cs" Link="Model\Consumer\AccessManager\PNAccessManagerTokenResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNTokenAuthValues.cs" Link="Model\Consumer\AccessManager\PNTokenAuthValues.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNTokenContent.cs" Link="Model\Consumer\AccessManager\PNTokenContent.cs" />
@@ -393,6 +395,7 @@ Removed throw exception on atleast one PAM permission validation</PackageRelease
     <Compile Include="..\PubnubApi\Model\Derived\AccessManager\PNAccessManagerGrantResultExt.cs">
       <Link>Model\Derived\AccessManager\PNAccessManagerGrantResultExt.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\AccessManager\PNAccessManagerRevokeTokenResultExt.cs" Link="Model\Derived\AccessManager\PNAccessManagerRevokeTokenResultExt.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\AccessManager\PNAccessManagerTokenResultExt.cs" Link="Model\Derived\AccessManager\PNAccessManagerTokenResultExt.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\ChannelGroup\PNChannelGroupsAddChannelResultExt.cs">
       <Link>Model\Derived\ChannelGroup\PNChannelGroupsAddChannelResultExt.cs</Link>

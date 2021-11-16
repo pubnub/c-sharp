@@ -6,20 +6,24 @@ using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using System.Net;
+using System.Globalization;
 
 namespace AcceptanceTests.Steps
 {
     [Binding]
-    public class GrantAccessTokenSteps
+    public partial class FeatureAccessSteps
     {
+        public static string currentFeature = string.Empty;
+        public static bool betaVersion = false;
         private string acceptance_test_origin = "localhost:8090";
+        private bool bypassMockServer = false;
         private readonly ScenarioContext _scenarioContext;
         private Pubnub pn;
         private PNConfiguration config = null;
         GrantInput grantInput = null;
         PNAccessManagerTokenResult grantResult = null;
-        PNStatus grantStatus = null;
-        GrantTokenError grantError = null;
+        PNStatus pnStatus = null;
+        PubnubError pnError = null;
         public enum PermissionType { Channel, Group, Uuid};
 
         private string tokenInput = string.Empty;
@@ -32,7 +36,7 @@ namespace AcceptanceTests.Steps
 
         ResourcePermType currentResPermType;
 
-        public class GrantTokenError
+        public class PubnubError
         {
             public ErrorMsg error;
             public string service;
@@ -70,26 +74,66 @@ namespace AcceptanceTests.Steps
             public int TTL { get; set; }
             public string AuthorizedUuid;
         }
-        public GrantAccessTokenSteps(ScenarioContext scenarioContext)
+        public FeatureAccessSteps(ScenarioContext scenarioContext)
         {
             _scenarioContext = scenarioContext;
+        }
+
+        [BeforeFeature]
+        public static void BeforeFeature(FeatureContext featureContext)
+        {
+            betaVersion = false;
+            if (featureContext.FeatureInfo != null && featureContext.FeatureInfo.Tags.Length > 0)
+            {
+                List<string> tagList = featureContext.FeatureInfo.Tags.AsEnumerable<string>().ToList();
+                foreach (string tag in tagList)
+                {
+                    if (tag.IndexOf("featureSet=") == 0)
+                    {
+                        currentFeature = tag.Replace("featureSet=", "");
+                    }
+
+                    if (tag.IndexOf("beta") == 0)
+                    {
+                        betaVersion = true;
+                    }
+                }
+            }
+
+            System.Diagnostics.Debug.WriteLine("Starting " + featureContext.FeatureInfo.Title);
+        }
+
+        [AfterFeature]
+        public static void AfterFeature(FeatureContext featureContext)
+        {
+            System.Diagnostics.Debug.WriteLine("Finished " + featureContext.FeatureInfo.Title);
         }
 
         [BeforeScenario()]
         public void BeforeScenario()
         {
-            string testFeature = "";
-            string testContract = "";
-            if (_scenarioContext.ScenarioInfo != null && _scenarioContext.ScenarioInfo.Tags.Length == 2)
+            string currentContract = "";
+            if (_scenarioContext.ScenarioInfo != null && _scenarioContext.ScenarioInfo.Tags.Length > 0)
             {
-                testFeature = _scenarioContext.ScenarioInfo.Tags[0];
-                testContract = _scenarioContext.ScenarioInfo.Tags[1];
-                string mockInitContract = string.Format("http://{0}/init?__contract__script__={1}", acceptance_test_origin, testContract.Replace("contract=",""));
-                System.Diagnostics.Debug.WriteLine(mockInitContract);
-                WebClient webClient = new WebClient();
-                string mockInitResponse = webClient.DownloadString(mockInitContract);
-                System.Diagnostics.Debug.WriteLine(mockInitResponse);
+                List<string> tagList = _scenarioContext.ScenarioInfo.Tags.AsEnumerable<string>().ToList();
+                foreach (string tag in tagList)
+                {
+                    if (tag.IndexOf("contract=") == 0)
+                    {
+                        currentContract = tag.Replace("contract=", "");
+                        break;
+                    }
+                }
+                if (!string.IsNullOrEmpty(currentContract) && !bypassMockServer)
+                {
+                    string mockInitContract = string.Format("http://{0}/init?__contract__script__={1}", acceptance_test_origin, currentContract);
+                    System.Diagnostics.Debug.WriteLine(mockInitContract);
+                    WebClient webClient = new WebClient();
+                    string mockInitResponse = webClient.DownloadString(mockInitContract);
+                    System.Diagnostics.Debug.WriteLine(mockInitResponse);
+                }
             }
+
             grantInput = new GrantInput();
             tokenInput = string.Empty;
         }
@@ -97,11 +141,14 @@ namespace AcceptanceTests.Steps
         [AfterScenario()]
         public void AfterScenario()
         {
-            string mockExpectContract = string.Format("http://{0}/expect", acceptance_test_origin);
-            System.Diagnostics.Debug.WriteLine(mockExpectContract);
-            WebClient webClient = new WebClient();
-            string mockExpectResponse = webClient.DownloadString(mockExpectContract);
-            System.Diagnostics.Debug.WriteLine(mockExpectResponse);
+            if (!bypassMockServer)
+            {
+                string mockExpectContract = string.Format("http://{0}/expect", acceptance_test_origin);
+                System.Diagnostics.Debug.WriteLine(mockExpectContract);
+                WebClient webClient = new WebClient();
+                string mockExpectResponse = webClient.DownloadString(mockExpectContract);
+                System.Diagnostics.Debug.WriteLine(mockExpectResponse);
+            }
         }
 
         [Given(@"I have a keyset with access manager enabled")]
@@ -317,6 +364,13 @@ namespace AcceptanceTests.Steps
             if (perms != null) { perms.Read = false; }
         }
 
+        [Given(@"deny resource permission GET")]
+        public void GivenDenyResourcePermissionGET()
+        {
+            PNTokenAuthValues perms = GetCurrentGivenGrantResourcePermissionsByPermType();
+            if (perms != null) { perms.Get = false; }
+        }
+
         [Given(@"I have a known token containing an authorized UUID")]
         public void GivenIHaveAKnownTokenContainingAnAuthorizedUUID()
         {
@@ -356,10 +410,10 @@ namespace AcceptanceTests.Steps
                 })
                 .ExecuteAsync();
             grantResult = pamGrantResult.Result;
-            grantStatus = pamGrantResult.Status;
-            if (grantStatus.Error)
+            pnStatus = pamGrantResult.Status;
+            if (pnStatus.Error)
             {
-                grantError = pn.JsonPluggableLibrary.DeserializeToObject<GrantTokenError>(grantStatus.ErrorData.Information);
+                pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
         }
         
@@ -384,10 +438,10 @@ namespace AcceptanceTests.Steps
                 })
                 .ExecuteAsync();
             grantResult = pamGrantResult.Result;
-            grantStatus = pamGrantResult.Status;
-            if (grantStatus.Error)
+            pnStatus = pamGrantResult.Status;
+            if (pnStatus.Error)
             {
-                grantError = pn.JsonPluggableLibrary.DeserializeToObject<GrantTokenError>(grantStatus.ErrorData.Information);
+                pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
         }
 
@@ -406,7 +460,14 @@ namespace AcceptanceTests.Steps
         public void ThenTheTokenContainsTheAuthorizedUUID(string p0)
         {
             PNTokenContent content = pn.ParseToken(grantResult.Token);
-            Assert.AreEqual(p0, content.AuthorizedUuid);
+            if (betaVersion && string.Compare(p0, content.AuthorizedUuid, true, CultureInfo.InvariantCulture) != 0)
+            {
+                Assert.Ignore();
+            }
+            else
+            {
+                Assert.AreEqual(p0, content.AuthorizedUuid);
+            }
         }
 
         [Then(@"the token contains the TTL (.*)")]
@@ -655,15 +716,15 @@ namespace AcceptanceTests.Steps
         [Then(@"an error is returned")]
         public void ThenAnErrorIsReturned()
         {
-            Assert.IsTrue(grantStatus.Error);
+            Assert.IsTrue(pnStatus.Error);
         }
         
         [Then(@"the error status code is (.*)")]
         public void ThenTheErrorStatusCodeIs(int p0)
         {
-            if (grantError != null)
+            if (pnError != null)
             {
-                Assert.AreEqual(p0, grantError.status);
+                Assert.AreEqual(p0, pnError.status);
             }
             else
             {
@@ -674,9 +735,9 @@ namespace AcceptanceTests.Steps
         [Then(@"the error message is '(.*)'")]
         public void ThenTheErrorMessageIs(string p0)
         {
-            if (grantError != null)
+            if (pnError != null)
             {
-                Assert.AreEqual(p0, grantError.error.message);
+                Assert.AreEqual(p0, pnError.error.message);
             }
             else
             {
@@ -687,9 +748,9 @@ namespace AcceptanceTests.Steps
         [Then(@"the error source is '(.*)'")]
         public void ThenTheErrorSourceIs(string p0)
         {
-            if (grantError != null)
+            if (pnError != null)
             {
-                Assert.AreEqual(p0, grantError.error.source);
+                Assert.AreEqual(p0, pnError.error.source);
             }
             else
             {
@@ -700,9 +761,9 @@ namespace AcceptanceTests.Steps
         [Then(@"the error detail message is '(.*)'")]
         public void ThenTheErrorDetailMessageIs(string p0)
         {
-            if (grantError != null && grantError.error.details.Count > 0)
+            if (pnError != null && pnError.error.details.Count > 0)
             {
-                Assert.AreEqual(p0, grantError.error.details[0].message);
+                Assert.AreEqual(p0, pnError.error.details[0].message);
             }
             else
             {
@@ -713,9 +774,9 @@ namespace AcceptanceTests.Steps
         [Then(@"the error detail location is '(.*)'")]
         public void ThenTheErrorDetailLocationIs(string p0)
         {
-            if (grantError != null && grantError.error.details.Count > 0)
+            if (pnError != null && pnError.error.details.Count > 0)
             {
-                Assert.AreEqual(p0, grantError.error.details[0].location);
+                Assert.AreEqual(p0, pnError.error.details[0].location);
             }
             else
             {
@@ -726,9 +787,9 @@ namespace AcceptanceTests.Steps
         [Then(@"the error detail location type is '(.*)'")]
         public void ThenTheErrorDetailLocationTypeIs(string p0)
         {
-            if (grantError != null && grantError.error.details.Count > 0)
+            if (pnError != null && pnError.error.details.Count > 0)
             {
-                Assert.AreEqual(p0, grantError.error.details[0].locationType);
+                Assert.AreEqual(p0, pnError.error.details[0].locationType);
             }
             else
             {
