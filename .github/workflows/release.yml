@@ -42,13 +42,13 @@ jobs:
       - name: Build packages
         env:
           WORKSPACE_PATH: ${{ github.workspace }}
-        run: .\\.github\\workflows\\build-packages.ps1
+        run: .\\.github\\workflows\\release\\build-packages.ps1
         shell: powershell
       - name: Publish packages
         env:
           WORKSPACE_PATH: ${{ github.workspace }}
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-        run: .\\.github\\workflows\\publish-packages.ps1
+        run: .\\.github\\workflows\\release\\publish-packages.ps1
         shell: powershell
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
