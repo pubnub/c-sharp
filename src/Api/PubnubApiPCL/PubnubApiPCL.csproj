@@ -582,6 +582,7 @@ Removed throw exception on atleast one PAM permission validation</PackageRelease
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="PeterO.Cbor" Version="4.4.4" />
+    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.0" />
     <Reference Include="System.Runtime" />
   </ItemGroup>
 

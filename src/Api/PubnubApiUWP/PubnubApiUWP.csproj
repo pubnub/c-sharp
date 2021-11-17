@@ -671,6 +671,7 @@ Removed throw exception on atleast one PAM permission validation</PackageRelease
     <PackageReference Include="Portable.BouncyCastle">
       <Version>1.8.1.2</Version>
     </PackageReference>
+    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
     <None Include="pubnub.snk" />

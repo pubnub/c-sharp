@@ -115,6 +115,9 @@ Removed throw exception on atleast one PAM permission validation
     <PackageReference Include="Portable.BouncyCastle" Version="1.8.1.2">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="System.Security.Cryptography.Algorithms">
+      <Version>4.3.0</Version>
+    </PackageReference>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
     <PackageReference Include="System.ValueTuple" Version="4.4.0">
