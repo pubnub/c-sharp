@@ -2,12 +2,7 @@
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
-
-#if NET35
 using System.Security.Cryptography;
-#else
-using System.Security.Cryptography;
-#endif
 
 namespace PubnubApi
 {
