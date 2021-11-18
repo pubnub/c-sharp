@@ -31,6 +31,8 @@ namespace PubnubApi.Interface
 
         Uri BuildGrantV3AccessRequest(string requestMethod, string requestBody, Dictionary<string, object> externalQueryParam);
 
+        Uri BuildRevokeV3AccessRequest(string requestMethod, string requestBody, string token, Dictionary<string, object> externalQueryParam);
+
         Uri BuildAuditAccessRequest(string requestMethod, string requestBody, string channel, string channelGroup, string authKeysCommaDelimited, Dictionary<string, object> externalQueryParam);
 
         Uri BuildGetUserStateRequest(string requestMethod, string requestBody, string channelsCommaDelimited, string channelGroupsCommaDelimited, string uuid, Dictionary<string, object> externalQueryParam);

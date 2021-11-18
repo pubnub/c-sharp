@@ -1,5 +1,6 @@
+@featureSet=access
 Feature: Grant an access token
-  As a PubNub customer I want to restrict and allow access to 
+  As a PubNub customer I want to restrict and allow access to
   specific PubNub resources (channels, channel groups, uuids)
   by my user base (both people and devices) which are each
   identified by a unique UUID.
@@ -7,9 +8,9 @@ Feature: Grant an access token
   Background: I have enabled access manager
     Given I have a keyset with access manager enabled
 
-  @feature=access @contract=grantAllPermissions
+  @contract=grantAllPermissions
   Scenario: Grant an access token with all permissions on all resource types with authorized uuid
-  # Ensure the grant request supports the correct set of access permissions for each resource type
+    # Ensure the grant request supports the correct set of access permissions for each resource type
     Given the authorized UUID "test-authorized-uuid"
     Given the TTL 60
     Given the 'channel-1' CHANNEL resource access permissions
@@ -76,7 +77,7 @@ Feature: Grant an access token
     * token pattern permission UPDATE
     * token pattern permission DELETE
 
-  @feature=access @contract=grantWithoutAuthorizedUUID
+  @contract=grantWithoutAuthorizedUUID
   Scenario: Grant an access token without an authorized uuid
     Given the TTL 60
     Given the 'channel-1' CHANNEL resource access permissions
@@ -87,7 +88,7 @@ Feature: Grant an access token
     Then the token has 'channel-1' CHANNEL resource access permissions
     * token resource permission READ
 
-  @feature=access @contract=grantWithAuthorizedUUID
+  @contract=grantWithAuthorizedUUID
   Scenario: Grant an access token successfully with an authorized uuid
     Given the authorized UUID "test-authorized-uuid"
     Given the TTL 60
@@ -99,11 +100,11 @@ Feature: Grant an access token
     Then the token has 'channel-1' CHANNEL resource access permissions
     * token resource permission READ
 
-  @feature=access @contract=grantWithoutAnyPermissionsError
+  @contract=grantWithoutAnyPermissionsError
   Scenario: Attempt to grant an access token with all permissions empty or false and expect a server error
     Given the TTL 60
     Given the 'uuid-1' UUID resource access permissions
-    * deny resource permission READ
+    * deny resource permission GET
     When I attempt to grant a token specifying those permissions
     Then an error is returned
     * the error status code is 400
@@ -113,11 +114,11 @@ Feature: Grant an access token
     * the error detail location is 'permissions.resources.uuids.uuid-1'
     * the error detail location type is 'body'
 
-  @feature=access @contract=grantWithRegExpSyntaxError
+  @contract=grantWithRegExpSyntaxError
   Scenario: Attempt to grant an access token with a regular expression containing a syntax error and expect a server error
     Given the TTL 60
     Given the '!<[^>]+>++' UUID pattern access permissions
-    * grant pattern permission READ
+    * grant pattern permission GET
     When I attempt to grant a token specifying those permissions
     Then an error is returned
     * the error status code is 400
@@ -127,11 +128,11 @@ Feature: Grant an access token
     * the error detail location is 'permissions.patterns.uuids.!<[^>]+>++'
     * the error detail location type is 'body'
 
-  @feature=access @contract=grantWithRegExpNonCapturingError
+  @contract=grantWithRegExpNonCapturingError
   Scenario: Attempt to grant an access token with a regular expression containing capturing groups and expect a server error
     Given the TTL 60
     Given the '(!<[^>]+>)+' UUID pattern access permissions
-    * grant pattern permission READ
+    * grant pattern permission GET
     When I attempt to grant a token specifying those permissions
     Then an error is returned
     * the error status code is 400
@@ -141,20 +142,17 @@ Feature: Grant an access token
     * the error detail location is 'permissions.patterns.uuids.(!<[^>]+>)+'
     * the error detail location type is 'body'
 
-  @feature=access
   Scenario: Validate that a token containing authorized uuid can be parsed correctly
     Given I have a known token containing an authorized UUID
     When I parse the token
     Then the parsed token output contains the authorized UUID "test-authorized-uuid"
 
-  @feature=access
   Scenario: Validate that a token containing uuid resource permissions can be parsed correctly
     Given I have a known token containing UUID resource permissions
     When I parse the token
     Then the token has 'uuid-1' UUID resource access permissions
     * token resource permission GET
-    
-  @feature=access
+
   Scenario: Validate that a token containing uuid pattern permissions can be parsed correctly
     Given I have a known token containing UUID pattern Permissions
     When I parse the token

@@ -396,6 +396,13 @@ namespace PubnubApi
                 ret = (T)Convert.ChangeType(result, typeof(PNAccessManagerTokenResult), CultureInfo.InvariantCulture);
                 #endregion
             }
+            else if (typeof(T) == typeof(PNAccessManagerRevokeTokenResult))
+            {
+                #region "PNAccessManagerRevokeTokenResult"
+                PNAccessManagerRevokeTokenResult result = PNRevokeTokenJsonDataParse.GetObject(listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNAccessManagerRevokeTokenResult), CultureInfo.InvariantCulture);
+                #endregion
+            }
             else if (typeof(T) == typeof(PNAccessManagerAuditResult))
             {
 #region "PNAccessManagerAuditResult"

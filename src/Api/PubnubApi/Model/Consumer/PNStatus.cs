@@ -69,7 +69,16 @@ namespace PubnubApi
                             }
                         }
                         break;
-
+                    case PNOperationType.PNAccessManagerRevokeToken:
+                        if (savedEndpointOperation is RevokeTokenOperation)
+                        {
+                            RevokeTokenOperation endpoint = savedEndpointOperation as RevokeTokenOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
                     case PNOperationType.PNAccessManagerGrant:
                         if (savedEndpointOperation is GrantOperation)
                         {

@@ -1,31 +1,36 @@
 name: c-sharp
-version: "5.2.0"
+version: "5.3.0"
 schema: 1
 scm: github.com/pubnub/c-sharp
-changelog: 
+changelog:
+  - date: 2021-11-16
+    version: v5.3.0
+    changes:
+      - type: feature
+        text: "Added RevokeToken feature."
   - version: v5.2.0
     date: 2021-11-01
     changes:
       - type: improvement
         text: Capture region for subscribe.
       - type: improvement
-        text: Removed throw exception on atleast one PAM permission validation. 
+        text: Removed throw exception on atleast one PAM permission validation.
   - version: v5.1.0
     date: 2021-10-12
     changes:
       - type: improvement
         text: Dispose RandomNumberGenerator
       - type: feature
-        text: Added PAMv3 support - GrantToken, ParseToken, SetAuthToken. 
+        text: Added PAMv3 support - GrantToken, ParseToken, SetAuthToken.
   - version: v5.0.1
     date: 2021-07-14
     changes:
       - type: improvement
         text: Replaced Random class with RandomNumberGenerator for secure random bytes.
       - type: improvement
-        text: Handling of SendFile file size exceeded error message and refactored DeleteFile. 
+        text: Handling of SendFile file size exceeded error message and refactored DeleteFile.
       - type: improvement
-        text: Refactored Encrypt/Decrypt methods in calling PubnubCrypto constructor with config. 
+        text: Refactored Encrypt/Decrypt methods in calling PubnubCrypto constructor with config.
   - version: v5.0.0
     date: 2021-06-14
     changes:
@@ -277,7 +282,7 @@ changelog:
     date: 2018-02-15
     changes:
       - type: improvement
-        text: Fix for Publish Sync 
+        text: Fix for Publish Sync
       - type: improvement
         text: Refactored Int32/Int64 Parse to TryParse
       - type: improvement
@@ -286,14 +291,14 @@ changelog:
     date: 2018-01-18
     changes:
       - type: improvement
-        text: Relay server sent error status to PNStatus for Publish request 
+        text: Relay server sent error status to PNStatus for Publish request
       - type: improvement
         text: Refactored to allow colon char for publish with secret key
   - version: 4.0.12.0
     date: 2017-12-21
     changes:
       - type: improvement
-        text: Relay server sent 403 status to PNStatus for PCL 
+        text: Relay server sent 403 status to PNStatus for PCL
       - type: improvement
         text: Resolved array type published message for Subscribe&lt;string&gt;
   - version: 4.0.11.0
@@ -494,14 +499,15 @@ changelog:
     changes:
       - type: improvement
         text: initial v4 version.
-features: 
+features:
   access:
     - ACCESS-GRANT
     - ACCESS-GRANT-MANAGE
     - ACCESS-GRANT-DELETE
-    - ACCESS-SECRET-KEY-ALL-ACCESS   
-    - ACCESS-OBJECTS-V2-MANAGEMENT 
+    - ACCESS-SECRET-KEY-ALL-ACCESS
+    - ACCESS-OBJECTS-V2-MANAGEMENT
     - ACCESS-GRANT-TOKEN
+    - ACCESS-REVOKE-TOKEN
     - ACCESS-PARSE-TOKEN
     - ACCESS-SET-TOKEN
   channel-groups:
@@ -535,7 +541,7 @@ features:
     - PUBLISH-POST
     - PUBLISH-SYNC
     - PUBLISH-ASYNC
-    - PUBLISH-FIRE 
+    - PUBLISH-FIRE
     - PUBLISH-REPLICATION-FLAG
     - PUBLISH-MESSAGE-TTL
     - PUBLISH-FILE-MESSAGE
@@ -569,7 +575,7 @@ features:
     - SUBSCRIBE-SPACE-LISTENER
     - SUBSCRIBE-USER-LISTENER
     - SUBSCRIBE-MESSAGE-ACTIONS-LISTENER
-  unsubscribe: 
+  unsubscribe:
     - UNSUBSCRIBE-ALL
     - UNSUBSCRIBE-SUPPRESS-LEAVE-EVENTS
   signal:
@@ -598,17 +604,17 @@ features:
     - FILES-LIST-FILES
     - FILES-GET-FILE-URL
     - FILES-DELETE-FILE
-    - FILES-DOWNLOAD-FILE    
+    - FILES-DOWNLOAD-FILE
   message-actions:
     - MESSAGE-ACTIONS-GET
     - MESSAGE-ACTIONS-ADD
-    - MESSAGE-ACTIONS-REMOVE    
+    - MESSAGE-ACTIONS-REMOVE
   others:
     - TELEMETRY
-    - QUERY-PARAM    
+    - QUERY-PARAM
 supported-platforms:
-  - 
-    version: Pubnub 'C#' 5.2.0
+  -
+    version: Pubnub 'C#' 5.3.0
     platforms:
       - Windows 10 and up
       - Windows Server 2008 and up
@@ -617,8 +623,8 @@ supported-platforms:
       - .Net Framework 4.0
       - .Net Framework 4.5
       - .Net Framework 4.6.1+
-  - 
-    version: PubnubPCL 'C#' 5.2.0
+  -
+    version: PubnubPCL 'C#' 5.3.0
     platforms:
       - Xamarin.Android
       - Xamarin.iOS
@@ -627,7 +633,7 @@ supported-platforms:
       - Windows 10
       - Mac OS X 10 and up
       - Windows Server 2008 and up
-    frameworks:      
+    frameworks:
       - Mono 4.8.0
       - .Net Standard 1.0
       - .Net Standard 1.1
@@ -636,8 +642,8 @@ supported-platforms:
       - .Net Standard 2.0
       - .Net Standard 2.1
       - .Net Core
-  - 
-    version: PubnubUWP 'C#' 5.2.0
+  -
+    version: PubnubUWP 'C#' 5.3.0
     platforms:
       - Windows Phone 10
       - Universal Windows Apps
@@ -661,7 +667,7 @@ sdks:
             distribution-type: source
             distribution-repository: Github
             package-name: Pubnub
-            location: https://github.com/pubnub/c-sharp/releases/tag/v5.0.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v5.3.0.0
             requires:
               -
                 name: ".Net"
@@ -669,14 +675,14 @@ sdks:
                 license: "MS-EULA"
                 license-url: "https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm"
                 location: "Should be installed on computer"
-                is-required: "Required"    
+                is-required: "Required"
               -
                 name: "Newtonsoft.Json"
                 min-version: "9.0.1"
                 license: "MIT"
                 license-url: "https://raw.githubusercontent.com/JamesNK/Newtonsoft.Json/master/LICENSE.md"
                 location: "External"
-                is-required: "Required"          
+                is-required: "Required"
               -
                 name: "Portable.BouncyCastle"
                 min-version: "1.8.1.2"
@@ -711,7 +717,7 @@ sdks:
                 license: "GNU General Public License v3.0"
                 license-url: "https://libraries.io/nuget/AsyncBridge.JetBrains"
                 location: "External"
-                is-required: "Optional, only required for .NET 4.0"              
+                is-required: "Optional, only required for .NET 4.0"
             supported-platforms:
                 supported-operating-systems:
                   Windows:
@@ -728,7 +734,7 @@ sdks:
                       - Windows 10 Pro Education
                       - Windows 10 Enterprise
                       - Windows 10 Enterprise LTSC (formerly LTSB)
-                      - Windows 10 Education  
+                      - Windows 10 Education
                       - Windows Server 2019 Essentials
                       - Windows Server 2019 Standard
                       - Windows Server 2019 Datacenter
@@ -764,7 +770,7 @@ sdks:
                       - Windows 10 Pro Education
                       - Windows 10 Enterprise
                       - Windows 10 Enterprise LTSC (formerly LTSB)
-                      - Windows 10 Education  
+                      - Windows 10 Education
                       - Windows Server 2019 Essentials
                       - Windows Server 2019 Standard
                       - Windows Server 2019 Datacenter
@@ -815,14 +821,14 @@ sdks:
                 license: "MS-EULA"
                 license-url: "https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm"
                 location: "Should be installed on computer"
-                is-required: "Required"    
+                is-required: "Required"
               -
                 name: "Newtonsoft.Json"
                 min-version: "9.0.1"
                 license: "MIT"
                 license-url: "https://raw.githubusercontent.com/JamesNK/Newtonsoft.Json/master/LICENSE.md"
                 location: "External"
-                is-required: "Required"          
+                is-required: "Required"
               -
                 name: "Portable.BouncyCastle"
                 min-version: "1.8.1.2"
@@ -857,7 +863,7 @@ sdks:
                 license: "GNU General Public License v3.0"
                 license-url: "https://libraries.io/nuget/AsyncBridge.JetBrains"
                 location: "External"
-                is-required: "Optional, only required for .NET 4.0"              
+                is-required: "Optional, only required for .NET 4.0"
             supported-platforms:
                 supported-operating-systems:
                   Windows:
@@ -874,7 +880,7 @@ sdks:
                       - Windows 10 Pro Education
                       - Windows 10 Enterprise
                       - Windows 10 Enterprise LTSC (formerly LTSB)
-                      - Windows 10 Education  
+                      - Windows 10 Education
                       - Windows Server 2019 Essentials
                       - Windows Server 2019 Standard
                       - Windows Server 2019 Datacenter
@@ -910,7 +916,7 @@ sdks:
                       - Windows 10 Pro Education
                       - Windows 10 Enterprise
                       - Windows 10 Enterprise LTSC (formerly LTSB)
-                      - Windows 10 Education  
+                      - Windows 10 Education
                       - Windows Server 2019 Essentials
                       - Windows Server 2019 Standard
                       - Windows Server 2019 Datacenter
@@ -958,7 +964,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: PubNubPCL
-            location: https://github.com/pubnub/c-sharp/releases/tag/v5.0.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v5.3.0.0
             requires:
               -
                 name: ".Net Core"
@@ -966,14 +972,14 @@ sdks:
                 license: "MS-EULA"
                 license-url: "https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm"
                 location: "Should be installed on computer"
-                is-required: "Required"    
+                is-required: "Required"
               -
                 name: "Newtonsoft.Json"
                 min-version: "9.0.1"
                 license: "MIT"
                 license-url: "https://raw.githubusercontent.com/JamesNK/Newtonsoft.Json/master/LICENSE.md"
                 location: "External"
-                is-required: "Required"          
+                is-required: "Required"
               -
                 name: "Portable.BouncyCastle"
                 min-version: "1.8.1.2"
@@ -996,18 +1002,18 @@ sdks:
                     api-compatibility:
                       - .NET Core 2
                       - .NET 4.x
-                    target-api-level: 
+                    target-api-level:
                       - 11
                     minimum-api-level:
                       - 4.1
                     maximum-api-level:
-                      - 30  
+                      - 30
                     ndk-verison:
                       - 8
                     target-architecture:
                       - armeabi-v7a
                       - atom
-                    additional-requirements:  
+                    additional-requirements:
                       - OpenGL ES 2.0 or later.
                       - ARMv7 (Cortex) CPU with NEON support
                   iOS:
@@ -1016,7 +1022,7 @@ sdks:
                     api-compatibility:
                       - .NET Core 2
                       - .NET 4.x
-                    minimum-os-version: 
+                    minimum-os-version:
                       - iOS 9.0
                     maximum-os-version:
                       - iOS 14.4.2
@@ -1024,7 +1030,7 @@ sdks:
                       - arm64
                     target-devices:
                       - iPad
-                      - iPhone                
+                      - iPhone
                   Windows:
                     target-architecture:
                       - x86-64
@@ -1040,7 +1046,7 @@ sdks:
                       - Windows 10 Pro Education
                       - Windows 10 Enterprise
                       - Windows 10 Enterprise LTSC (formerly LTSB)
-                      - Windows 10 Education  
+                      - Windows 10 Education
                       - Windows Server 2019 Essentials
                       - Windows Server 2019 Standard
                       - Windows Server 2019 Datacenter
@@ -1076,7 +1082,7 @@ sdks:
                       - Windows 10 Pro Education
                       - Windows 10 Enterprise
                       - Windows 10 Enterprise LTSC (formerly LTSB)
-                      - Windows 10 Education  
+                      - Windows 10 Education
                       - Windows Server 2019 Essentials
                       - Windows Server 2019 Standard
                       - Windows Server 2019 Datacenter
@@ -1151,14 +1157,14 @@ sdks:
                 license: "MS-EULA"
                 license-url: "https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm"
                 location: "Should be installed on computer"
-                is-required: "Required"    
+                is-required: "Required"
               -
                 name: "Newtonsoft.Json"
                 min-version: "9.0.1"
                 license: "MIT"
                 license-url: "https://raw.githubusercontent.com/JamesNK/Newtonsoft.Json/master/LICENSE.md"
                 location: "External"
-                is-required: "Required"          
+                is-required: "Required"
               -
                 name: "Portable.BouncyCastle"
                 min-version: "1.8.1.2"
@@ -1180,18 +1186,18 @@ sdks:
                       - .NET 4.x Equivalent
                     api-compatibility:
                       - .NET Core 2
-                    target-api-level: 
+                    target-api-level:
                       - 11
                     minimum-api-level:
                       - 4.1
                     maximum-api-level:
-                      - 30  
+                      - 30
                     ndk-verison:
                       - 8
                     target-architecture:
                       - armeabi-v7a
                       - atom
-                    additional-requirements:  
+                    additional-requirements:
                       - OpenGL ES 2.0 or later.
                       - ARMv7 (Cortex) CPU with NEON support
                   iOS:
@@ -1200,7 +1206,7 @@ sdks:
                     api-compatibility:
                       - .NET Core 2
                       - .NET 4.x
-                    minimum-os-version: 
+                    minimum-os-version:
                       - iOS 9.0
                     maximum-os-version:
                       - iOS 14.4.2
@@ -1208,7 +1214,7 @@ sdks:
                       - arm64
                     target-devices:
                       - iPad
-                      - iPhone                
+                      - iPhone
                   Windows:
                     target-architecture:
                       - x86-64
@@ -1224,7 +1230,7 @@ sdks:
                       - Windows 10 Pro Education
                       - Windows 10 Enterprise
                       - Windows 10 Enterprise LTSC (formerly LTSB)
-                      - Windows 10 Education  
+                      - Windows 10 Education
                       - Windows Server 2019 Essentials
                       - Windows Server 2019 Standard
                       - Windows Server 2019 Datacenter
@@ -1260,7 +1266,7 @@ sdks:
                       - Windows 10 Pro Education
                       - Windows 10 Enterprise
                       - Windows 10 Enterprise LTSC (formerly LTSB)
-                      - Windows 10 Education  
+                      - Windows 10 Education
                       - Windows Server 2019 Essentials
                       - Windows Server 2019 Standard
                       - Windows Server 2019 Datacenter
@@ -1331,7 +1337,7 @@ sdks:
             distribution-type: source
             distribution-repository: Github
             package-name: PubnubUWP
-            location: https://github.com/pubnub/c-sharp/releases/tag/v5.0.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v5.3.0.0
             requires:
               -
                 name: "Universal Windows Platform Development"
@@ -1339,122 +1345,28 @@ sdks:
                 license: "MS-EULA"
                 license-url: "https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm"
                 location: "Should be installed on computer"
-                is-required: "Required"    
+                is-required: "Required"
               -
                 name: "Windows 10 SDK"
                 min-version: "10.0.19041.0 or higher"
                 license: "MS-EULA"
                 license-url: "https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm"
                 location: "Should be installed on computer"
-                is-required: "Required"    
+                is-required: "Required"
               -
                 name: "Newtonsoft.Json"
                 min-version: "9.0.1"
                 license: "MIT"
                 license-url: "https://raw.githubusercontent.com/JamesNK/Newtonsoft.Json/master/LICENSE.md"
-                location: "External"
-                is-required: "Required"          
-              -
-                name: "Portable.BouncyCastle"
-                min-version: "1.8.1.2"
-                license: "MIT,X11"
-                license-url: "https://www.nuget.org/packages/Portable.BouncyCastle/1.8.1.2"
-                location: "External"
-                is-required: "Required"         
-              -
-                name: "PeterO.Cbor"
-                min-version: "4.4.4"
-                license: "CC0-1.0"
-                license-url: "https://www.nuget.org/packages/PeterO.Cbor/4.4.4"
                 location: "External"
                 is-required: "Required"
-            supported-platforms:
-                supported-operating-systems:
-                  Windows:
-                    target-architecture:
-                      - x86-64
-                    runtime-version:
-                      - .NET Native
-                    minimum-os-version:
-                      - Windows 10 Home
-                      - Windows 10 Pro
-                      - Windows 10 Pro for Workstations
-                      - Windows 10 Pro Education
-                      - Windows 10 Enterprise
-                      - Windows 10 Enterprise LTSC (formerly LTSB)
-                      - Windows 10 Education  
-                      - Windows Server 2019 Essentials
-                      - Windows Server 2019 Standard
-                      - Windows Server 2019 Datacenter
-                      - Windows Server 2016 Essentials
-                      - Windows Server 2016 Standard
-                      - Windows Server 2016 Datacenter
-                      - Windows Server 2012 R2 Foundation
-                      - Windows Server 2012 R2 Essentials
-                      - Windows Server 2012 R2 Standard
-                      - Windows Server 2012 R2 Datacenter
-                    maximum-os-version:
-                      - Windows 10 Home
-                      - Windows 10 Pro
-                      - Windows 10 Pro for Workstations
-                      - Windows 10 Pro Education
-                      - Windows 10 Enterprise
-                      - Windows 10 Enterprise LTSC (formerly LTSB)
-                      - Windows 10 Education  
-                      - Windows Server 2019 Essentials
-                      - Windows Server 2019 Standard
-                      - Windows Server 2019 Datacenter
-                      - Windows Server 2016 Essentials
-                      - Windows Server 2016 Standard
-                      - Windows Server 2016 Datacenter
-                      - Windows Server 2012 R2 Foundation
-                      - Windows Server 2012 R2 Essentials
-                      - Windows Server 2012 R2 Standard
-                      - Windows Server 2012 R2 Datacenter
-      -
-        artifact-type: package
-        language: c#
-        tier: 2
-        tags:
-          - Desktop
-          - Server
-        source-repository: https://github.com/pubnub/c-sharp
-        documentation: https://www.pubnub.com/docs/sdks/c-sharp
-        distributions:
-          -
-            distribution-type: package
-            distribution-repository: NuGet
-            package-name: PubnubUWP
-            location: https://www.nuget.org/packages/PubnubUWP/
-            requires:
-              -
-                name: "Universal Windows Platform Development"
-                min-version: "10.0.10240 or higher"
-                license: "MS-EULA"
-                license-url: "https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm"
-                location: "Should be installed on computer"
-                is-required: "Required"    
-              -
-                name: "Windows 10 SDK"
-                min-version: "10.0.19041.0 or higher"
-                license: "MS-EULA"
-                license-url: "https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm"
-                location: "Should be installed on computer"
-                is-required: "Required"    
-              -
-                name: "Newtonsoft.Json"
-                min-version: "9.0.1"
-                license: "MIT"
-                license-url: "https://raw.githubusercontent.com/JamesNK/Newtonsoft.Json/master/LICENSE.md"
-                location: "External"
-                is-required: "Required"          
               -
                 name: "Portable.BouncyCastle"
                 min-version: "1.8.1.2"
                 license: "MIT,X11"
                 license-url: "https://www.nuget.org/packages/Portable.BouncyCastle/1.8.1.2"
                 location: "External"
-                is-required: "Required"                         
+                is-required: "Required"
               -
                 name: "PeterO.Cbor"
                 min-version: "4.4.4"
@@ -1494,7 +1406,101 @@ sdks:
                       - Windows 10 Pro Education
                       - Windows 10 Enterprise
                       - Windows 10 Enterprise LTSC (formerly LTSB)
-                      - Windows 10 Education  
+                      - Windows 10 Education
+                      - Windows Server 2019 Essentials
+                      - Windows Server 2019 Standard
+                      - Windows Server 2019 Datacenter
+                      - Windows Server 2016 Essentials
+                      - Windows Server 2016 Standard
+                      - Windows Server 2016 Datacenter
+                      - Windows Server 2012 R2 Foundation
+                      - Windows Server 2012 R2 Essentials
+                      - Windows Server 2012 R2 Standard
+                      - Windows Server 2012 R2 Datacenter
+      -
+        artifact-type: package
+        language: c#
+        tier: 2
+        tags:
+          - Desktop
+          - Server
+        source-repository: https://github.com/pubnub/c-sharp
+        documentation: https://www.pubnub.com/docs/sdks/c-sharp
+        distributions:
+          -
+            distribution-type: package
+            distribution-repository: NuGet
+            package-name: PubnubUWP
+            location: https://www.nuget.org/packages/PubnubUWP/
+            requires:
+              -
+                name: "Universal Windows Platform Development"
+                min-version: "10.0.10240 or higher"
+                license: "MS-EULA"
+                license-url: "https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm"
+                location: "Should be installed on computer"
+                is-required: "Required"
+              -
+                name: "Windows 10 SDK"
+                min-version: "10.0.19041.0 or higher"
+                license: "MS-EULA"
+                license-url: "https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm"
+                location: "Should be installed on computer"
+                is-required: "Required"
+              -
+                name: "Newtonsoft.Json"
+                min-version: "9.0.1"
+                license: "MIT"
+                license-url: "https://raw.githubusercontent.com/JamesNK/Newtonsoft.Json/master/LICENSE.md"
+                location: "External"
+                is-required: "Required"
+              -
+                name: "Portable.BouncyCastle"
+                min-version: "1.8.1.2"
+                license: "MIT,X11"
+                license-url: "https://www.nuget.org/packages/Portable.BouncyCastle/1.8.1.2"
+                location: "External"
+                is-required: "Required"
+              -
+                name: "PeterO.Cbor"
+                min-version: "4.4.4"
+                license: "CC0-1.0"
+                license-url: "https://www.nuget.org/packages/PeterO.Cbor/4.4.4"
+                location: "External"
+                is-required: "Required"
+            supported-platforms:
+                supported-operating-systems:
+                  Windows:
+                    target-architecture:
+                      - x86-64
+                    runtime-version:
+                      - .NET Native
+                    minimum-os-version:
+                      - Windows 10 Home
+                      - Windows 10 Pro
+                      - Windows 10 Pro for Workstations
+                      - Windows 10 Pro Education
+                      - Windows 10 Enterprise
+                      - Windows 10 Enterprise LTSC (formerly LTSB)
+                      - Windows 10 Education
+                      - Windows Server 2019 Essentials
+                      - Windows Server 2019 Standard
+                      - Windows Server 2019 Datacenter
+                      - Windows Server 2016 Essentials
+                      - Windows Server 2016 Standard
+                      - Windows Server 2016 Datacenter
+                      - Windows Server 2012 R2 Foundation
+                      - Windows Server 2012 R2 Essentials
+                      - Windows Server 2012 R2 Standard
+                      - Windows Server 2012 R2 Datacenter
+                    maximum-os-version:
+                      - Windows 10 Home
+                      - Windows 10 Pro
+                      - Windows 10 Pro for Workstations
+                      - Windows 10 Pro Education
+                      - Windows 10 Enterprise
+                      - Windows 10 Enterprise LTSC (formerly LTSB)
+                      - Windows 10 Education
                       - Windows Server 2019 Essentials
                       - Windows Server 2019 Standard
                       - Windows Server 2019 Datacenter
