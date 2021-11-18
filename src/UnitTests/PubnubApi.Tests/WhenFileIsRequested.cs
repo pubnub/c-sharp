@@ -69,7 +69,7 @@ namespace PubNubMessaging.Tests
 
             Thread.Sleep(1000);
 
-            grantManualEvent.WaitOne();
+            grantManualEvent.WaitOne(2000);
 
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
@@ -152,7 +152,7 @@ namespace PubNubMessaging.Tests
                     mre.Set();
                 }));
             Thread.Sleep(1000);
-            mre.WaitOne();
+            mre.WaitOne(3 * 1000 * 60);
 
             if (receivedMessage)
             {
@@ -169,7 +169,7 @@ namespace PubNubMessaging.Tests
                         mre.Set();
                     }));
                 Thread.Sleep(1000);
-                mre.WaitOne();
+                mre.WaitOne(2 * 1000 * 60);
             }
 
             if (receivedMessage)
@@ -186,7 +186,7 @@ namespace PubNubMessaging.Tests
                     }
                     mre.Set();
                 }));
-                mre.WaitOne();
+                mre.WaitOne(2 * 1000 * 60);
             }
 
             if (receivedMessage)
@@ -204,7 +204,7 @@ namespace PubNubMessaging.Tests
                         mre.Set();
                     }));
                 Thread.Sleep(1000);
-                mre.WaitOne();
+                mre.WaitOne(2 * 1000 * 60);
 
             }
 
@@ -298,7 +298,7 @@ namespace PubNubMessaging.Tests
                     mre.Set();
                 }));
             Thread.Sleep(1000);
-            mre.WaitOne();
+            mre.WaitOne(2 * 1000 * 60);
 
 
             if (receivedMessage)
@@ -314,7 +314,7 @@ namespace PubNubMessaging.Tests
                     }
                     mre.Set();
                 }));
-                mre.WaitOne();
+                mre.WaitOne(2 * 1000 * 60);
             }
 
             if (receivedMessage)
@@ -332,7 +332,7 @@ namespace PubNubMessaging.Tests
                         mre.Set();
                     }));
                 Thread.Sleep(1000);
-                mre.WaitOne();
+                mre.WaitOne(2 * 1000 * 60);
 
             }
 
