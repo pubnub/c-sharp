@@ -174,6 +174,7 @@ namespace PubNubMessaging.Tests
 
             if (receivedMessage)
             {
+                System.Net.ServicePointManager.SecurityProtocol = (System.Net.SecurityProtocolType)3072; //Need this line for .net 3.5/4.0/4.5
                 receivedMessage = false;
                 mre = new ManualResetEvent(false);
                 pubnub.DownloadFile().Channel(channelName).FileId(fileId).FileName(fileName).Execute(new PNDownloadFileResultExt((result, status) =>
@@ -303,6 +304,7 @@ namespace PubNubMessaging.Tests
 
             if (receivedMessage)
             {
+                System.Net.ServicePointManager.SecurityProtocol = (System.Net.SecurityProtocolType)3072; //Need this line for .net 3.5/4.0/4.5
                 receivedMessage = false;
                 mre = new ManualResetEvent(false);
                 pubnub.DownloadFile().Channel(channelName).FileId(fileId).FileName(fileName).Execute(new PNDownloadFileResultExt((result, status) =>
