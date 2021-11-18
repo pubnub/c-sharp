@@ -30,7 +30,7 @@ Feature: Revoke an access token
     Given a token
     When I revoke a token
     Then an error is returned
-    * the error status code is 403
+    * the error status code is 400
     * the error message is 'Feature disabled'
     * the error source is 'revoke'
     * the error detail message is 'Token revocation is disabled.'
