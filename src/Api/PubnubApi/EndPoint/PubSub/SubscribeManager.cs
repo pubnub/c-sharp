@@ -419,6 +419,7 @@ namespace PubnubApi.EndPoint
             {
                 bool channelGroupSubscribeOnly = false;
                 SubscribeDisconnected[PubnubInstance.InstanceId] = false;
+                SubscribeAccessDenied[PubnubInstance.InstanceId] = false;
 
                 if (rawChannels != null && rawChannels.Length > 0)
                 {
@@ -555,20 +556,25 @@ namespace PubnubApi.EndPoint
                     ResetInternetCheckSettings(channels, channelGroups);
                     MultiChannelSubscribeRequest<T>(responseType, channels, channelGroups, 0, 0, false, initialSubscribeUrlParams, externalQueryParam);
 
-                    if (SubscribeHeartbeatCheckTimer != null)
-                    {
-                        try
-                        {
-                            SubscribeHeartbeatCheckTimer.Change(Timeout.Infinite, Timeout.Infinite);
-                        }
-                        catch {  /* ignore */ }
-                    }
+                    CheckAndDisableubscribeHeartbeatCheckTimer();
                     SubscribeHeartbeatCheckTimer = new Timer(StartSubscribeHeartbeatCheckCallback<T>, null, config.SubscribeTimeout * 500, config.SubscribeTimeout * 500);
                 }
             }
             catch(Exception ex)
             {
                 LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} SubscribeManager=> MultiChannelSubscribeInit \n channel(s)={1} \n cg(s)={2} \n Exception Details={3}", DateTime.Now.ToString(CultureInfo.InvariantCulture), string.Join(",", validChannels.OrderBy(x => x).ToArray()), string.Join(",", validChannelGroups.OrderBy(x => x).ToArray()), ex), config.LogVerbosity);
+            }
+        }
+
+        private static void CheckAndDisableubscribeHeartbeatCheckTimer()
+        {
+            if (SubscribeHeartbeatCheckTimer != null)
+            {
+                try
+                {
+                    SubscribeHeartbeatCheckTimer.Change(Timeout.Infinite, Timeout.Infinite);
+                }
+                catch {  /* ignore */ }
             }
         }
 
@@ -738,15 +744,13 @@ namespace PubnubApi.EndPoint
                         Announce(pnStatus); //Announce to subscribe callback when 403
 
                         ///Disabling flags/checks which can invoke resubscribe
-                        if (SubscribeHeartbeatCheckTimer != null)
+                        SubscribeAccessDenied[PubnubInstance.InstanceId] = true;
+                        Task.Factory.StartNew(() =>
                         {
-                            try
-                            {
-                                SubscribeHeartbeatCheckTimer.Change(Timeout.Infinite, Timeout.Infinite);
-                            }
-                            catch {  /* ignore */ }
-                        }
-                        TerminateCurrentSubscriberRequest();
+                            TerminateCurrentSubscriberRequest();
+                        }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
+
+                        CheckAndDisableubscribeHeartbeatCheckTimer();
                         return;
                     }
 
@@ -1045,6 +1049,12 @@ namespace PubnubApi.EndPoint
                 if (SubscribeDisconnected[PubnubInstance.InstanceId])
                 {
                     LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - SubscribeDisconnected. No heartbeat check.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                    return;
+                }
+                if (SubscribeAccessDenied[PubnubInstance.InstanceId])
+                {
+                    CheckAndDisableubscribeHeartbeatCheckTimer();
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - SubscribeAccessDenied. Exiting StartSubscribeHeartbeatCheckCallback.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
                     return;
                 }
 
