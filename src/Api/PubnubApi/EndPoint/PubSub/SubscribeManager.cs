@@ -732,9 +732,22 @@ namespace PubnubApi.EndPoint
                 }
                 else
                 {
-                    if (pnStatus != null && pnStatus.StatusCode == 403)
+                    if (pnStatus != null && pnStatus.Category ==  PNStatusCategory.PNAccessDeniedCategory)
                     {
+                        //Announce 403 and exit subscribe on 403
                         Announce(pnStatus); //Announce to subscribe callback when 403
+
+                        ///Disabling flags/checks which can invoke resubscribe
+                        if (SubscribeHeartbeatCheckTimer != null)
+                        {
+                            try
+                            {
+                                SubscribeHeartbeatCheckTimer.Change(Timeout.Infinite, Timeout.Infinite);
+                            }
+                            catch {  /* ignore */ }
+                        }
+                        TerminateCurrentSubscriberRequest();
+                        return;
                     }
 
                     if (multiplexExceptionTimer != null)
