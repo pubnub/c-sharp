@@ -670,9 +670,11 @@ namespace PubnubApi.EndPoint
 
                 // Wait for message
                 string json = "";
+                PNStatus pnStatus = null;
                 UrlProcessRequest<T>(request, pubnubRequestState, false).ContinueWith(r =>
                 {
                     json = r.Result.Item1;
+                    pnStatus = r.Result.Item2;
                 }, TaskContinuationOptions.ExecuteSynchronously).Wait();
                 if (!string.IsNullOrEmpty(json))
                 {
@@ -730,6 +732,11 @@ namespace PubnubApi.EndPoint
                 }
                 else
                 {
+                    if (pnStatus != null && pnStatus.StatusCode == 403)
+                    {
+                        Announce(pnStatus); //Announce to subscribe callback when 403
+                    }
+
                     if (multiplexExceptionTimer != null)
                     {
                         multiplexExceptionTimer.Change(Timeout.Infinite, Timeout.Infinite);
