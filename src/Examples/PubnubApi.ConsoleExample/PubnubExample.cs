@@ -371,6 +371,10 @@ namespace PubnubApiDemo
                     var affectedChannels = pnStatus.AffectedChannels; // The channels affected in the operation, of type array.
                     var category = pnStatus.Category; //Returns PNConnectedCategory
                     var operation = pnStatus.Operation; //Returns PNSubscribeOperation
+                    if (pnStatus.Category == PNStatusCategory.PNAccessDeniedCategory)
+                    {
+                        pubnub.Disconnect<string>();
+                    }
                 }
                 ));
 
