@@ -5,7 +5,6 @@ using System.IO;
 using System.Collections;
 using System.Text;
 using System.Collections.Generic;
-using System.Numerics;
 
 namespace PubNubMessaging.Tests
 {
@@ -21,8 +20,9 @@ namespace PubNubMessaging.Tests
             //For console
             //string folder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments); // For iOS
             System.Diagnostics.Debug.WriteLine(folder);
-            logFilePath = System.IO.Path.Combine(folder, "pubnubUnitTestLog.log");
-            Trace.Listeners.Add(new TextWriterTraceListener(logFilePath));
+            //For CI test, commented the below. Uncomment for local troubleshooting 
+            //logFilePath = System.IO.Path.Combine(folder, "pubnubUnitTestLog.log");
+            //Trace.Listeners.Add(new TextWriterTraceListener(logFilePath));
         }
 
         /// <summary>

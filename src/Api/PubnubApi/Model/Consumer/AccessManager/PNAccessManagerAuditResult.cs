@@ -12,13 +12,13 @@ namespace PubnubApi
             this.ChannelGroup = "";
         }
 
-        public string Level { get; set; }
-        public string SubscribeKey { get; set; }
+        public string Level { get; internal set; }
+        public string SubscribeKey { get; internal set; }
 
-        public string Channel { get; set; }
+        public string Channel { get; internal set; }
 
-        public string ChannelGroup { get; set; }
+        public string ChannelGroup { get; internal set; }
 
-        public Dictionary<string, PNAccessManagerKeyData> AuthKeys { get; set; }
+        public Dictionary<string, PNAccessManagerKeyData> AuthKeys { get; internal set; }
     }
 }

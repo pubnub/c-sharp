@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using PubnubApi.CBOR;
 using System.Collections;
 using System.Reflection;
 #if DEBUG && NET461
 #endif
 using Newtonsoft.Json;
+using PeterO.Cbor;
+using System.Globalization;
 
 namespace PubnubApi.EndPoint
 {
@@ -18,57 +19,11 @@ namespace PubnubApi.EndPoint
         private readonly IJsonPluggableLibrary jsonLib;
         private readonly IPubnubLog pubnubLog;
         private readonly string pubnubInstanceId;
-        private static ConcurrentDictionary<string, ConcurrentDictionary<PNTokenKey, string>> dicToken
+        private static ConcurrentDictionary<string, string> dToken
         {
             get;
             set;
-        } = new ConcurrentDictionary<string, ConcurrentDictionary<PNTokenKey, string>>();
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Codacy.Sonar", "S1144:Unused private types or members should be removed")]
-        internal class TokenManagerConverter : JsonConverter // NOSONAR
-        {
-            public override bool CanConvert(Type objectType)
-            {
-                return (typeof(IDictionary).IsAssignableFrom(objectType) ||
-                        TypeImplementsGenericInterface(objectType, typeof(IDictionary<,>)));
-            }
-
-            private static bool TypeImplementsGenericInterface(Type concreteType, Type interfaceType)
-            {
-#if NET35 || NET40
-                return concreteType.GetInterfaces()
-                       .Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == interfaceType);
-#else
-                return concreteType.GetInterfaces()
-                       .Any(i => i.GetTypeInfo().IsGenericType && i.GetGenericTypeDefinition() == interfaceType);
-#endif
-            }
-
-            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-            {
-                Type type = value.GetType();
-                IEnumerable keys = (IEnumerable)type.GetProperty("Keys").GetValue(value, null);
-                IEnumerable values = (IEnumerable)type.GetProperty("Values").GetValue(value, null);
-                IEnumerator valueEnumerator = values.GetEnumerator();
-
-                writer.WriteStartArray();
-                foreach (object key in keys)
-                {
-                    valueEnumerator.MoveNext();
-
-                    writer.WriteStartArray();
-                    serializer.Serialize(writer, key);
-                    serializer.Serialize(writer, valueEnumerator.Current);
-                    writer.WriteEndArray();
-                }
-                writer.WriteEndArray();
-            }
-
-            public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-            {
-                throw new NotImplementedException();
-            }
-        }
+        } = new ConcurrentDictionary<string, string>();
 
         public TokenManager(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubLog log, string instanceId)
         {
@@ -76,217 +31,74 @@ namespace PubnubApi.EndPoint
             this.pubnubLog = log;
             this.jsonLib = jsonPluggableLibrary;
             this.pubnubInstanceId = instanceId;
-            if (!dicToken.ContainsKey(instanceId))
+            if (!dToken.ContainsKey(instanceId))
             {
-                dicToken.GetOrAdd(instanceId, new ConcurrentDictionary<PNTokenKey, string>());
+                dToken.GetOrAdd(instanceId, null);
             }
             
         }
 
-        public PNGrantToken ParseToken(string token)
+        public string AuthToken 
         {
-            PNGrantToken result = null;
+            get 
+            { 
+                string tkn;
+                dToken.TryGetValue(pubnubInstanceId, out tkn); 
+                return tkn; 
+            } 
+        }
+        
+        private static string GetDisplayableBytes(byte[] currentBytes)
+        {
+            StringBuilder outBuilder = new StringBuilder("{ ");
+            for (int di = 0; di < currentBytes.Length; di++)
+            {
+                outBuilder.Append(currentBytes[di]);
+                if (di < currentBytes.Length - 1)
+                {
+                    outBuilder.Append(", ");
+                }
+            }
+            outBuilder.Append(" }");
+            return outBuilder.ToString();
+        }
+
+        public PNTokenContent ParseToken(string token)
+        {
+            PNTokenContent result = null;
             try
             {
                 if (!string.IsNullOrEmpty(token) && token.Trim().Length > 0)
                 {
                     string refinedToken = token.Replace('_', '/').Replace('-', '+');
                     byte[] tokenByteArray = Convert.FromBase64String(refinedToken);
-                    System.IO.MemoryStream ms = new System.IO.MemoryStream(tokenByteArray);
-
-                    object cborItemListObj = ms.DecodeAllCBORItems();
-                    if (cborItemListObj != null)
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} Token Bytes = {1}", DateTime.Now.ToString(System.Globalization.CultureInfo.InvariantCulture), GetDisplayableBytes(tokenByteArray)), PNLogVerbosity.BODY);
+                    using (System.IO.MemoryStream ms = new System.IO.MemoryStream(tokenByteArray))
                     {
-                        System.Diagnostics.Debug.WriteLine(jsonLib.SerializeToJsonString(cborItemListObj));
+                        CBORObject cborObj = CBORObject.DecodeFromBytes(tokenByteArray);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, RAW CBOR {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), cborObj.ToJSONString()), (pubnubConfig != null) ? pubnubConfig.LogVerbosity : PNLogVerbosity.NONE);
 
-                        List<object> cborItemList = cborItemListObj as List<object>;
-                        if (cborItemList != null && cborItemList.Count > 0)
+                        if (cborObj != null)
                         {
-                            object tokenItem = cborItemList[0];
-                            Dictionary<string, object> dicTokenContainer = jsonLib.ConvertToDictionaryObject(tokenItem);
-                            if (dicTokenContainer != null)
-                            {
-                                result = new PNGrantToken();
-
-                                int tokenVersion;
-                                if (dicTokenContainer.ContainsKey("v"))
-                                {
-                                    if (Int32.TryParse(dicTokenContainer["v"].ToString(), out tokenVersion))
-                                    {
-                                        result.Version = tokenVersion;
-                                    }
-                                }
-
-                                long tokenTs;
-                                if (dicTokenContainer.ContainsKey("t"))
-                                {
-                                    if (Int64.TryParse(dicTokenContainer["t"].ToString(), out tokenTs))
-                                    {
-                                        result.Timestamp = tokenTs;
-                                    }
-                                }
-
-                                int tokenTtl;
-                                if (dicTokenContainer.ContainsKey("ttl"))
-                                {
-                                    if (Int32.TryParse(dicTokenContainer["ttl"].ToString(), out tokenTtl))
-                                    {
-                                        result.TTL = tokenTtl;
-                                    }
-                                }
-
-                                if (dicTokenContainer.ContainsKey("res"))
-                                {
-                                    Dictionary<string, object> dicResPerm = jsonLib.ConvertToDictionaryObject(dicTokenContainer["res"]);
-                                    if (dicResPerm != null)
-                                    {
-                                        if (dicResPerm.ContainsKey("chan"))
-                                        {
-                                            result.Channels = new Dictionary<string, PNResourcePermission>();
-                                            Dictionary<string, object> dicChannelPerm = jsonLib.ConvertToDictionaryObject(dicResPerm["chan"]);
-                                            if (dicChannelPerm != null && dicChannelPerm.Count > 0)
-                                            {
-                                                foreach (KeyValuePair<string, object> kvp in dicChannelPerm)
-                                                {
-                                                    int maskedPerm;
-                                                    int.TryParse(kvp.Value.ToString(), out maskedPerm);
-                                                    PNResourcePermission rp = GetResourcePermission(maskedPerm);
-                                                    result.Channels.Add(kvp.Key, rp);
-                                                }
-                                            }
-                                        }
-                                        if (dicResPerm.ContainsKey("grp"))
-                                        {
-                                            result.ChannelGroups = new Dictionary<string, PNResourcePermission>();
-                                            Dictionary<string, object> dicCgPerm = jsonLib.ConvertToDictionaryObject(dicResPerm["grp"]);
-                                            if (dicCgPerm != null && dicCgPerm.Count > 0)
-                                            {
-                                                foreach (KeyValuePair<string, object> kvp in dicCgPerm)
-                                                {
-                                                    int maskedPerm;
-                                                    int.TryParse(kvp.Value.ToString(), out maskedPerm);
-                                                    PNResourcePermission rp = GetResourcePermission(maskedPerm);
-                                                    result.ChannelGroups.Add(kvp.Key, rp);
-                                                }
-                                            }
-                                        }
-                                        if (dicResPerm.ContainsKey("usr"))
-                                        {
-                                            result.Users = new Dictionary<string, PNResourcePermission>();
-                                            Dictionary<string, object> dicUserPerm = jsonLib.ConvertToDictionaryObject(dicResPerm["usr"]);
-                                            if (dicUserPerm != null && dicUserPerm.Count > 0)
-                                            {
-                                                foreach (KeyValuePair<string, object> kvp in dicUserPerm)
-                                                {
-                                                    int maskedPerm;
-                                                    int.TryParse(kvp.Value.ToString(), out maskedPerm);
-                                                    PNResourcePermission rp = GetResourcePermission(maskedPerm);
-                                                    result.Users.Add(kvp.Key, rp);
-                                                }
-                                            }
-                                        }
-                                        if (dicResPerm.ContainsKey("spc"))
-                                        {
-                                            result.Spaces = new Dictionary<string, PNResourcePermission>();
-                                            Dictionary<string, object> dicSpacePerm = jsonLib.ConvertToDictionaryObject(dicResPerm["spc"]);
-                                            if (dicSpacePerm != null && dicSpacePerm.Count > 0)
-                                            {
-                                                foreach (KeyValuePair<string, object> kvp in dicSpacePerm)
-                                                {
-                                                    int maskedPerm;
-                                                    int.TryParse(kvp.Value.ToString(), out maskedPerm);
-                                                    PNResourcePermission rp = GetResourcePermission(maskedPerm);
-                                                    result.Spaces.Add(kvp.Key, rp);
-                                                }
-                                            }
-                                        }
-
-                                    }
-                                }
-
-                                if (dicTokenContainer.ContainsKey("pat"))
-                                {
-                                    Dictionary<string, object> dicResPerm = jsonLib.ConvertToDictionaryObject(dicTokenContainer["pat"]);
-                                    if (dicResPerm != null)
-                                    {
-                                        if (dicResPerm.ContainsKey("chan"))
-                                        {
-                                            result.ChannelPatterns = new Dictionary<string, PNResourcePermission>();
-                                            Dictionary<string, object> dicChannelPerm = jsonLib.ConvertToDictionaryObject(dicResPerm["chan"]);
-                                            if (dicChannelPerm != null && dicChannelPerm.Count > 0)
-                                            {
-                                                foreach (KeyValuePair<string, object> kvp in dicChannelPerm)
-                                                {
-                                                    int maskedPerm;
-                                                    int.TryParse(kvp.Value.ToString(), out maskedPerm);
-                                                    PNResourcePermission rp = GetResourcePermission(maskedPerm);
-                                                    result.ChannelPatterns.Add(kvp.Key, rp);
-                                                }
-                                            }
-                                        }
-                                        if (dicResPerm.ContainsKey("grp"))
-                                        {
-                                            result.GroupPatterns = new Dictionary<string, PNResourcePermission>();
-                                            Dictionary<string, object> dicCgPerm = jsonLib.ConvertToDictionaryObject(dicResPerm["grp"]);
-                                            if (dicCgPerm != null && dicCgPerm.Count > 0)
-                                            {
-                                                foreach (KeyValuePair<string, object> kvp in dicCgPerm)
-                                                {
-                                                    int maskedPerm;
-                                                    int.TryParse(kvp.Value.ToString(), out maskedPerm);
-                                                    PNResourcePermission rp = GetResourcePermission(maskedPerm);
-                                                    result.GroupPatterns.Add(kvp.Key, rp);
-                                                }
-                                            }
-                                        }
-                                        if (dicResPerm.ContainsKey("usr"))
-                                        {
-                                            result.UserPatterns = new Dictionary<string, PNResourcePermission>();
-                                            Dictionary<string, object> dicUserPerm = jsonLib.ConvertToDictionaryObject(dicResPerm["usr"]);
-                                            if (dicUserPerm != null && dicUserPerm.Count > 0)
-                                            {
-                                                foreach (KeyValuePair<string, object> kvp in dicUserPerm)
-                                                {
-                                                    int maskedPerm;
-                                                    int.TryParse(kvp.Value.ToString(), out maskedPerm);
-                                                    PNResourcePermission rp = GetResourcePermission(maskedPerm);
-                                                    result.UserPatterns.Add(kvp.Key, rp);
-                                                }
-                                            }
-                                        }
-                                        if (dicResPerm.ContainsKey("spc"))
-                                        {
-                                            result.SpacePatterns = new Dictionary<string, PNResourcePermission>();
-                                            Dictionary<string, object> dicSpacePerm = jsonLib.ConvertToDictionaryObject(dicResPerm["spc"]);
-                                            if (dicSpacePerm != null && dicSpacePerm.Count > 0)
-                                            {
-                                                foreach (KeyValuePair<string, object> kvp in dicSpacePerm)
-                                                {
-                                                    int maskedPerm;
-                                                    int.TryParse(kvp.Value.ToString(), out maskedPerm);
-                                                    PNResourcePermission rp = GetResourcePermission(maskedPerm);
-                                                    result.SpacePatterns.Add(kvp.Key, rp);
-                                                }
-                                            }
-                                        }
-
-                                    }
-                                }
-
-                                if (dicTokenContainer.ContainsKey("meta"))
-                                {
-                                    Dictionary<string, object> dicMeta = jsonLib.ConvertToDictionaryObject(dicTokenContainer["meta"]);
-                                    result.Meta = dicMeta;
-                                }
-
-                                if (dicTokenContainer.ContainsKey("sig"))
-                                {
-                                    byte[] sigBytes = (byte[])dicTokenContainer["sig"];
-                                    string base64String = Convert.ToBase64String(sigBytes);
-                                    result.Signature = base64String;
-                                }
-                            }
+                            result = new PNTokenContent();
+                            result.Meta = new Dictionary<string, object>();
+                            result.Resources = new PNTokenResources { 
+                                Channels = new Dictionary<string, PNTokenAuthValues>(),
+                                ChannelGroups = new Dictionary<string, PNTokenAuthValues>(),
+                                Uuids = new Dictionary<string, PNTokenAuthValues>(),
+                                Users = new Dictionary<string, PNTokenAuthValues>(),
+                                Spaces = new Dictionary<string, PNTokenAuthValues>()
+                            };
+                            result.Patterns = new PNTokenPatterns {
+                                Channels = new Dictionary<string, PNTokenAuthValues>(),
+                                ChannelGroups = new Dictionary<string, PNTokenAuthValues>(),
+                                Uuids = new Dictionary<string, PNTokenAuthValues>(),
+                                Users = new Dictionary<string, PNTokenAuthValues>(),
+                                Spaces = new Dictionary<string, PNTokenAuthValues>()
+                            };
+                            ParseCBOR(cborObj, "", ref result);
                         }
+
                     }
                 }
             }
@@ -304,168 +116,231 @@ namespace PubnubApi.EndPoint
             return result;
         }
 
-        public void SetToken(string token)
+        private void ParseCBOR(CBORObject cbor, string parent, ref PNTokenContent pnGrantTokenDecoded)
         {
-            PNGrantToken tokenObj = ParseToken(token);
-            if (tokenObj != null)
+            foreach (KeyValuePair<CBORObject, CBORObject> kvp in cbor.Entries)
             {
-#region "Non-Pattern Resources"
-                if (tokenObj.Channels != null && tokenObj.Channels.Count > 0)
+                if (kvp.Key.Type.ToString().Equals("ByteString"))
                 {
-                    foreach(KeyValuePair<string, PNResourcePermission> kvp in tokenObj.Channels)
-                    {
-                        PNTokenKey key = new PNTokenKey { ResourceType = "channel", ResourceId = kvp.Key, PatternFlag = 0 };
-                        dicToken[pubnubInstanceId].AddOrUpdate(key, token, (oldVal, newVal) => token);
-                    }
-                }
-                if (tokenObj.ChannelGroups != null && tokenObj.ChannelGroups.Count > 0)
-                {
-                    foreach (KeyValuePair<string, PNResourcePermission> kvp in tokenObj.ChannelGroups)
-                    {
-                        PNTokenKey key = new PNTokenKey { ResourceType = "group", ResourceId = kvp.Key, PatternFlag = 0 };
-                        dicToken[pubnubInstanceId].AddOrUpdate(key, token, (oldVal, newVal) => token);
-                    }
-                }
-                if (tokenObj.Users != null && tokenObj.Users.Count > 0)
-                {
-                    foreach (KeyValuePair<string, PNResourcePermission> kvp in tokenObj.Users)
-                    {
-                        PNTokenKey key = new PNTokenKey { ResourceType = "user", ResourceId = kvp.Key, PatternFlag = 0 };
-                        dicToken[pubnubInstanceId].AddOrUpdate(key, token, (oldVal, newVal) => token);
-                    }
-                }
-                if (tokenObj.Spaces != null && tokenObj.Spaces.Count > 0)
-                {
-                    foreach (KeyValuePair<string, PNResourcePermission> kvp in tokenObj.Spaces)
-                    {
-                        PNTokenKey key = new PNTokenKey { ResourceType = "space", ResourceId = kvp.Key, PatternFlag = 0 };
-                        dicToken[pubnubInstanceId].AddOrUpdate(key, token, (oldVal, newVal) => token);
-                    }
-                }
-#endregion
-#region "Pattern Resources"
-                if (tokenObj.ChannelPatterns != null && tokenObj.ChannelPatterns.Count > 0)
-                {
-                    foreach (KeyValuePair<string, PNResourcePermission> kvp in tokenObj.ChannelPatterns)
-                    {
-                        PNTokenKey key = new PNTokenKey { ResourceType = "channel", ResourceId = kvp.Key, PatternFlag = 1 };
-                        dicToken[pubnubInstanceId].AddOrUpdate(key, token, (oldVal, newVal) => token);
-                    }
-                }
-                if (tokenObj.GroupPatterns != null && tokenObj.GroupPatterns.Count > 0)
-                {
-                    foreach (KeyValuePair<string, PNResourcePermission> kvp in tokenObj.GroupPatterns)
-                    {
-                        PNTokenKey key = new PNTokenKey { ResourceType = "group", ResourceId = kvp.Key, PatternFlag = 1 };
-                        dicToken[pubnubInstanceId].AddOrUpdate(key, token, (oldVal, newVal) => token);
-                    }
-                }
-                if (tokenObj.UserPatterns != null && tokenObj.UserPatterns.Count > 0)
-                {
-                    foreach (KeyValuePair<string, PNResourcePermission> kvp in tokenObj.UserPatterns)
-                    {
-                        PNTokenKey key = new PNTokenKey { ResourceType = "user", ResourceId = kvp.Key, PatternFlag = 1 };
-                        dicToken[pubnubInstanceId].AddOrUpdate(key, token, (oldVal, newVal) => token);
-                    }
-                }
-                if (tokenObj.SpacePatterns != null && tokenObj.SpacePatterns.Count > 0)
-                {
-                    foreach (KeyValuePair<string, PNResourcePermission> kvp in tokenObj.SpacePatterns)
-                    {
-                        PNTokenKey key = new PNTokenKey { ResourceType = "space", ResourceId = kvp.Key, PatternFlag = 1 };
-                        dicToken[pubnubInstanceId].AddOrUpdate(key, token, (oldVal, newVal) => token);
-                    }
-                }
-#endregion
-            }
-#if DEBUG
-            System.Diagnostics.Debug.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(dicToken, new TokenManagerConverter()));
+#if NETSTANDARD10 || NETSTANDARD11
+                    UTF8Encoding utf8 = new UTF8Encoding(true, true);
+                    byte[] keyBytes = kvp.Key.GetByteString();
+                    string key = utf8.GetString(keyBytes, 0, keyBytes.Length);
+#else
+                    string key = Encoding.ASCII.GetString(kvp.Key.GetByteString());
 #endif
-        }
-
-        public string GetToken(string resourceType, string resourceId)
-        {
-            string resultToken = "";
-
-            PNTokenKey key = new PNTokenKey { ResourceType = resourceType, ResourceId = resourceId, PatternFlag = 0 };
-            if (!string.IsNullOrEmpty(pubnubInstanceId) && dicToken[pubnubInstanceId].ContainsKey(key))
-            {
-                resultToken = dicToken[pubnubInstanceId][key];
-            }
-            else
-            {
-                resultToken = GetToken(resourceType, resourceId, true);
-            }
-
-            return resultToken;
-        }
-
-        public string GetToken(string resourceType, string resourceId, bool pattern)
-        {
-            string resultToken = "";
-            int patterFlag = (pattern) ? 1 : 0;
-            try
-            {
-                List<string> tokenKeyPatternList = dicToken[pubnubInstanceId].Keys.Where(k => patterFlag == k.PatternFlag && resourceType == k.ResourceType && Regex.IsMatch(resourceId, k.ResourceId)).Select(k => k.ResourceId).ToList();
-                string targetResourceId = (tokenKeyPatternList != null && tokenKeyPatternList.Count > 0) ? tokenKeyPatternList[0] : "";
-
-                PNTokenKey key = new PNTokenKey { ResourceType = resourceType, ResourceId = targetResourceId, PatternFlag = patterFlag };
-                if (!string.IsNullOrEmpty(pubnubInstanceId) && dicToken[pubnubInstanceId].ContainsKey(key))
-                {
-                    resultToken = dicToken[pubnubInstanceId][key];
+                    ParseCBORValue(key, parent, kvp, ref pnGrantTokenDecoded);
                 }
-            }
-            catch (Exception ex)
-            {
-                if (this.pubnubLog != null && this.pubnubConfig != null)
+                else if (kvp.Key.Type.ToString().Equals("TextString"))
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, ex.ToString(), pubnubConfig.LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TextString Key {1}-{2}-{3}", DateTime.Now.ToString(CultureInfo.InvariantCulture), kvp.Key.ToString(), kvp.Value.ToString(), kvp.Value.Type), (pubnubConfig != null) ? pubnubConfig.LogVerbosity : PNLogVerbosity.NONE);
+                    ParseCBORValue(kvp.Key.ToString(), parent, kvp, ref pnGrantTokenDecoded);
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine(ex);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Others Key {1}-{2}-{3}-{4}", DateTime.Now.ToString(CultureInfo.InvariantCulture), kvp.Key, kvp.Key.Type, kvp.Value, kvp.Value.Type), (pubnubConfig != null) ? pubnubConfig.LogVerbosity : PNLogVerbosity.NONE);
                 }
-            }
 
-            return resultToken;
+            }
         }
 
-        public Dictionary<PNTokenKey,string> GetAllTokens()
+        private void ParseCBORValue(string key, string parent, KeyValuePair<CBORObject, CBORObject> kvp, ref PNTokenContent pnGrantTokenDecoded)
         {
-            Dictionary<PNTokenKey, string> tokenList = null;
-
-            if (!string.IsNullOrEmpty(pubnubInstanceId) && dicToken != null && dicToken.ContainsKey(pubnubInstanceId))
+            if (kvp.Value.Type.ToString().Equals("Map"))
             {
-                ConcurrentDictionary<PNTokenKey, string> currentInstanceTokens = dicToken[pubnubInstanceId];
-                tokenList = new Dictionary<PNTokenKey, string>(currentInstanceTokens);
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Map Key {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), key), (pubnubConfig != null) ? pubnubConfig.LogVerbosity : PNLogVerbosity.NONE);
+                var p = string.Format("{0}{1}{2}", parent, string.IsNullOrEmpty(parent) ? "" : ":", key);
+                ParseCBOR(kvp.Value, p, ref pnGrantTokenDecoded);
             }
-
-            return tokenList;
-        }
-
-        public Dictionary<PNTokenKey, string> GetTokensByResource(string resourceType)
-        {
-            Dictionary<PNTokenKey, string> tokenList = null;
-
-            if (!string.IsNullOrEmpty(pubnubInstanceId) && dicToken != null && dicToken.ContainsKey(pubnubInstanceId))
+            else if (kvp.Value.Type.ToString().Equals("ByteString"))
             {
-                tokenList = dicToken[pubnubInstanceId].Where(tk=> tk.Key.ResourceType == resourceType).ToDictionary(kvp=> kvp.Key, kvp=> kvp.Value);
+#if NETSTANDARD10 || NETSTANDARD11
+                    UTF8Encoding utf8 = new UTF8Encoding(true, true);
+                    byte[] valBytes = kvp.Value.GetByteString();
+                    string val = utf8.GetString(valBytes, 0, valBytes.Length);
+#else
+                string val = System.Text.Encoding.ASCII.GetString(kvp.Value.GetByteString());
+#endif
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, ByteString Value {1}-{2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), key, val), (pubnubConfig != null) ? pubnubConfig.LogVerbosity : PNLogVerbosity.NONE);
+                FillGrantToken(parent, key, kvp.Value, typeof(string), ref pnGrantTokenDecoded);
             }
-
-            return tokenList;
-        }
-
-        public void ClearTokens()
-        {
-            if (!string.IsNullOrEmpty(pubnubInstanceId) && dicToken != null && dicToken.ContainsKey(pubnubInstanceId))
+            else if (kvp.Value.Type.ToString().Equals("Integer"))
             {
-                dicToken[pubnubInstanceId].Clear();
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Integer Value {1}-{2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), key, kvp.Value), (pubnubConfig != null) ? pubnubConfig.LogVerbosity : PNLogVerbosity.NONE);
+                FillGrantToken(parent, key, kvp.Value, typeof(int), ref pnGrantTokenDecoded);
+            }
+            else if (kvp.Value.Type.ToString().Equals("TextString"))
+            {
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TextString Value {1}-{2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), key, kvp.Value), (pubnubConfig != null) ? pubnubConfig.LogVerbosity : PNLogVerbosity.NONE);
+                FillGrantToken(parent, key, kvp.Value, typeof(string), ref pnGrantTokenDecoded);
+            }
+            else
+            {
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Others Key Value {1}-{2}-{3}-{4}", DateTime.Now.ToString(CultureInfo.InvariantCulture), kvp.Key.Type, kvp.Value.Type, key, kvp.Value), (pubnubConfig != null) ? pubnubConfig.LogVerbosity : PNLogVerbosity.NONE);
             }
         }
 
-        private static PNResourcePermission GetResourcePermission(int combinedVal)
+        private string ReplaceBoundaryQuotes(string key)
         {
-            PNResourcePermission rp = new PNResourcePermission();
+            if (key != null && !string.IsNullOrEmpty(key) && key.Length >= 2 
+                && key.Substring(0, 1).CompareTo("\"") == 0
+                && key.Substring(key.Length - 1, 1).CompareTo("\"") == 0)
+            {
+                key = key.Remove(key.Length - 1, 1).Remove(0, 1);
+            }
+            return key;
+        }
+
+        private void FillGrantToken(string parent, string key, object val, Type type, ref PNTokenContent pnGrantTokenDecoded)
+        {
+            key = ReplaceBoundaryQuotes(key);
+            int i = 0;
+            long l = 0;
+            switch (type.Name)
+            {
+                case "Int32":
+                    if (!int.TryParse(val.ToString(), out i))
+                    {
+                        //do nothing.
+                    }
+                    break;
+                case "Int64":
+                    if (!long.TryParse(val.ToString(), out l))
+                    {
+                        //do nothing
+                    }
+                    break;
+                case "String":
+                    // do nothing 
+                    break;
+                default:
+                    break;
+            }
+            switch (key)
+            {
+                case "v":
+                    pnGrantTokenDecoded.Version = i;
+                    break;
+                case "t":
+                    pnGrantTokenDecoded.Timestamp = i;
+                    break;
+                case "ttl":
+                    pnGrantTokenDecoded.TTL = i;
+                    break;
+                case "meta":
+                    pnGrantTokenDecoded.Meta = val as Dictionary<string, object>;
+                    break;
+                case "uuid":
+                    pnGrantTokenDecoded.AuthorizedUuid = ((CBORObject)val).AsString();
+                    break;
+                case "sig":
+#if NETSTANDARD10 || NETSTANDARD11
+                    UTF8Encoding utf8 = new UTF8Encoding(true, true);
+                    byte[] keyBytes = (byte[])val;
+                    pnGrantTokenDecoded.Signature = utf8.GetString(keyBytes, 0, keyBytes.Length);
+#else
+                    byte[] sigBytes = ((CBORObject)val).GetByteString();
+                    string base64String = Convert.ToBase64String(sigBytes);
+                    pnGrantTokenDecoded.Signature = base64String;
+#endif
+                    break;
+                default:
+                    PNTokenAuthValues rp = GetResourcePermission(i);
+                    switch (parent)
+                    {
+                        case "meta":
+                            if (!pnGrantTokenDecoded.Meta.ContainsKey(key))
+                            {
+                                switch (type.Name)
+                                {
+                                    case "Int32":
+                                        pnGrantTokenDecoded.Meta.Add(key, ((CBORObject)val).AsInt32());
+                                        break;
+                                    case "Int64":
+                                        pnGrantTokenDecoded.Meta.Add(key, ((CBORObject)val).ToObject<long>());
+                                        break;
+                                    case "String":
+                                        pnGrantTokenDecoded.Meta.Add(key, ((CBORObject)val).AsString());
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+                            break;
+                        case "res:spc":
+                            if (!pnGrantTokenDecoded.Resources.Spaces.ContainsKey(key))
+                            {
+                                pnGrantTokenDecoded.Resources.Spaces.Add(key, rp);
+                            }
+                            break;
+                        case "res:usr":
+                            if (!pnGrantTokenDecoded.Resources.Users.ContainsKey(key))
+                            {
+                                pnGrantTokenDecoded.Resources.Users.Add(key, rp);
+                            }
+                            break;
+                        case "res:uuid":
+                            if (!pnGrantTokenDecoded.Resources.Uuids.ContainsKey(key))
+                            {
+                                pnGrantTokenDecoded.Resources.Uuids.Add(key, rp);
+                            }
+                            break;
+                        case "res:chan":
+                            if (!pnGrantTokenDecoded.Resources.Channels.ContainsKey(key))
+                            {
+                                pnGrantTokenDecoded.Resources.Channels.Add(key, rp);
+                            }
+                            break;
+                        case "res:grp":
+                            if (!pnGrantTokenDecoded.Resources.ChannelGroups.ContainsKey(key))
+                            {
+                                pnGrantTokenDecoded.Resources.ChannelGroups.Add(key, rp);
+                            }
+                            break;
+                        case "pat:spc":
+                            if (!pnGrantTokenDecoded.Patterns.Spaces.ContainsKey(key))
+                            {
+                                pnGrantTokenDecoded.Patterns.Spaces.Add(key, rp);
+                            }
+                            break;
+                        case "pat:usr":
+                            if (!pnGrantTokenDecoded.Patterns.Users.ContainsKey(key))
+                            {
+                                pnGrantTokenDecoded.Patterns.Users.Add(key, rp);
+                            }
+                            break;
+                        case "pat:uuid":
+                            if (!pnGrantTokenDecoded.Patterns.Uuids.ContainsKey(key))
+                            {
+                                pnGrantTokenDecoded.Patterns.Uuids.Add(key, rp);
+                            }
+                            break;
+                        case "pat:chan":
+                            if (!pnGrantTokenDecoded.Patterns.Channels.ContainsKey(key))
+                            {
+                                pnGrantTokenDecoded.Patterns.Channels.Add(key, rp);
+                            }
+                            break;
+                        case "pat:grp":
+                            if (!pnGrantTokenDecoded.Patterns.ChannelGroups.ContainsKey(key))
+                            {
+                                pnGrantTokenDecoded.Patterns.ChannelGroups.Add(key, rp);
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+            }
+        }
+        public void SetAuthToken(string token)
+        {
+            dToken.AddOrUpdate(pubnubInstanceId, token, (k, o) => token);
+        }
+
+        private static PNTokenAuthValues GetResourcePermission(int combinedVal)
+        {
+            PNTokenAuthValues rp = new PNTokenAuthValues();
             if (combinedVal > 0)
             {
                 rp.Read = (combinedVal & (int)GrantBitFlag.READ) != 0;
@@ -473,16 +348,18 @@ namespace PubnubApi.EndPoint
                 rp.Manage = (combinedVal & (int)GrantBitFlag.MANAGE) != 0;
                 rp.Create = (combinedVal & (int)GrantBitFlag.CREATE) != 0;
                 rp.Delete = (combinedVal & (int)GrantBitFlag.DELETE) != 0;
+                rp.Get = (combinedVal & (int)GrantBitFlag.GET) != 0;
+                rp.Update = (combinedVal & (int)GrantBitFlag.UPDATE) != 0;
+                rp.Join = (combinedVal & (int)GrantBitFlag.JOIN) != 0;
             }
             return rp;
         }
 
         internal void Destroy()
         {
-            if (!string.IsNullOrEmpty(pubnubInstanceId) && dicToken != null && dicToken.ContainsKey(pubnubInstanceId))
+            if (!string.IsNullOrEmpty(pubnubInstanceId) && dToken != null && dToken.ContainsKey(pubnubInstanceId))
             {
-                dicToken[pubnubInstanceId].Clear();
-                dicToken[pubnubInstanceId] = null;
+                dToken[pubnubInstanceId] = null;
             }
             
         }
@@ -494,10 +371,9 @@ namespace PubnubApi.EndPoint
         {
             if (!disposedValue)
             {
-                if (!string.IsNullOrEmpty(pubnubInstanceId) && dicToken != null && dicToken.ContainsKey(pubnubInstanceId))
+                if (!string.IsNullOrEmpty(pubnubInstanceId) && dToken != null && dToken.ContainsKey(pubnubInstanceId))
                 {
-                    dicToken[pubnubInstanceId].Clear();
-                    dicToken[pubnubInstanceId] = null;
+                    dToken[pubnubInstanceId] = null;
                 }
 
                 disposedValue = true;

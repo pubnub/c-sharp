@@ -20,6 +20,12 @@ namespace PubnubApi
             set;
         }
 
+        byte[] IV
+        {
+            get;
+            set;
+        }
+
         bool InternetAvailable
         {
             get;

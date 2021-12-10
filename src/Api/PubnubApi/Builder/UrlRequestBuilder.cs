@@ -16,11 +16,11 @@ namespace PubnubApi
         private readonly IJsonPluggableLibrary jsonLib ;
         private readonly IPubnubUnitTest pubnubUnitTest;
         private readonly IPubnubLog pubnubLog;
-        private string pubnubInstanceId = "";
+        private readonly string pubnubInstanceId;
         private readonly EndPoint.TelemetryManager telemetryMgr;
         private readonly EndPoint.TokenManager tokenMgr;
 
-        public UrlRequestBuilder(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager pubnubTelemetryMgr, EndPoint.TokenManager pubnubTokenMgr)
+        public UrlRequestBuilder(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager pubnubTelemetryMgr, EndPoint.TokenManager pubnubTokenMgr, string pnInstanceId)
         {
             this.pubnubConfig = config;
             this.jsonLib = jsonPluggableLibrary;
@@ -28,21 +28,8 @@ namespace PubnubApi
             this.pubnubLog = log;
             this.telemetryMgr = pubnubTelemetryMgr;
             this.tokenMgr = pubnubTokenMgr;
+            this.pubnubInstanceId = string.IsNullOrEmpty(pnInstanceId) ? "" : pnInstanceId;
         }
-
-        string IUrlRequestBuilder.PubnubInstanceId
-        {
-            get
-            {
-                return pubnubInstanceId;
-            }
-
-            set
-            {
-                pubnubInstanceId = value;
-            }
-        }
-
 
         Uri IUrlRequestBuilder.BuildTimeRequest(string requestMethod, string requestBody, Dictionary<string, object> externalQueryParam)
         {
@@ -69,7 +56,7 @@ namespace PubnubApi
             return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
-        Uri IUrlRequestBuilder.BuildMultiChannelSubscribeRequest(string requestMethod, string requestBody, string[] channels, string[] channelGroups, long timetoken, string channelsJsonState, Dictionary<string, string> initialSubscribeUrlParams, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildMultiChannelSubscribeRequest(string requestMethod, string requestBody, string[] channels, string[] channelGroups, long timetoken, int region, string channelsJsonState, Dictionary<string, string> initialSubscribeUrlParams, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PNSubscribeOperation;
             string channelForUrl = (channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : ",";
@@ -97,6 +84,11 @@ namespace PubnubApi
             if (!requestQueryStringParams.ContainsKey("tt"))
             {
                 requestQueryStringParams.Add("tt", timetoken.ToString());
+            }
+
+            if (!requestQueryStringParams.ContainsKey("tr") && region > 0)
+            {
+                requestQueryStringParams.Add("tr", region.ToString());
             }
 
             if (pubnubConfig.PresenceTimeout != 0)
@@ -376,7 +368,7 @@ namespace PubnubApi
             return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
-        Uri IUrlRequestBuilder.BuildFetchRequest(string requestMethod, string requestBody, string[] channels, long start, long end, int count, bool reverse, bool includeMeta, bool includeMessageActions, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildFetchRequest(string requestMethod, string requestBody, string[] channels, long start, long end, int count, bool reverse, bool includeMeta, bool includeMessageActions, bool includeUuid, bool includeMessageType, Dictionary<string, object> externalQueryParam)
         {
             string channel = (channels != null && channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : "";
 
@@ -392,7 +384,7 @@ namespace PubnubApi
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
 
-            requestQueryStringParams.Add("max", (count <= -1) ? "100" : count.ToString());
+            requestQueryStringParams.Add("max", (count <= -1) ? (includeMessageActions || (channels != null && channels.Length > 1) ? "25" : "100") : count.ToString());
 
             if (reverse)
             {
@@ -410,6 +402,16 @@ namespace PubnubApi
             if (includeMeta)
             {
                 requestQueryStringParams.Add("include_meta", "true");
+            }
+
+            if (includeUuid)
+            {
+                requestQueryStringParams.Add("include_uuid", "true");
+            }
+
+            if (includeMessageType)
+            {
+                requestQueryStringParams.Add("include_message_type", "true");
             }
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
@@ -543,7 +545,7 @@ namespace PubnubApi
             return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
-        Uri IUrlRequestBuilder.BuildGrantV2AccessRequest(string requestMethod, string requestBody, string channelsCommaDelimited, string channelGroupsCommaDelimited, string authKeysCommaDelimited, bool read, bool write, bool delete, bool manage, long ttl, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildGrantV2AccessRequest(string requestMethod, string requestBody, string channelsCommaDelimited, string channelGroupsCommaDelimited, string targetUuidsCommaDelimited, string authKeysCommaDelimited, bool read, bool write, bool delete, bool manage, bool get, bool update, bool join, long ttl, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PNAccessManagerGrant;
 
@@ -571,6 +573,11 @@ namespace PubnubApi
                 requestQueryStringParams.Add("channel-group", UriUtil.EncodeUriComponent(channelGroupsCommaDelimited, currentType, false, false, false));
             }
 
+            if (!string.IsNullOrEmpty(targetUuidsCommaDelimited))
+            {
+                requestQueryStringParams.Add("target-uuid", UriUtil.EncodeUriComponent(targetUuidsCommaDelimited, currentType, false, false, false));
+            }
+
             if (ttl > -1)
             {
                 requestQueryStringParams.Add("ttl", ttl.ToString());
@@ -580,6 +587,9 @@ namespace PubnubApi
             requestQueryStringParams.Add("w", Convert.ToInt32(write).ToString());
             requestQueryStringParams.Add("d", Convert.ToInt32(delete).ToString());
             requestQueryStringParams.Add("m", Convert.ToInt32(manage).ToString());
+            requestQueryStringParams.Add("g", Convert.ToInt32(get).ToString());
+            requestQueryStringParams.Add("u", Convert.ToInt32(update).ToString());
+            requestQueryStringParams.Add("j", Convert.ToInt32(join).ToString());
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
             {
@@ -606,6 +616,35 @@ namespace PubnubApi
             url.Add("pam");
             url.Add(pubnubConfig.SubscribeKey);
             url.Add("grant");
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+
+            if (externalQueryParam != null && externalQueryParam.Count > 0)
+            {
+                foreach (KeyValuePair<string, object> kvp in externalQueryParam)
+                {
+                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    {
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
+                    }
+                }
+            }
+
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
+
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
+        }
+
+        Uri IUrlRequestBuilder.BuildRevokeV3AccessRequest(string requestMethod, string requestBody, string token, Dictionary<string, object> externalQueryParam)
+        {
+            PNOperationType currentType = PNOperationType.PNAccessManagerRevokeToken;
+
+            List<string> url = new List<string>();
+            url.Add("v3");
+            url.Add("pam");
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("grant");
+            url.Add(token);
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
 
@@ -1206,18 +1245,19 @@ namespace PubnubApi
             return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
-        Uri IUrlRequestBuilder.BuildCreateUserRequest(string requestMethod, string requestBody, string userId, Dictionary<string, object> userCustom, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildSetUuidMetadataRequest(string requestMethod, string requestBody, string uuid, bool includeCustom, Dictionary<string, object> externalQueryParam)
         {
-            PNOperationType currentType = PNOperationType.PNCreateUserOperation;
+            PNOperationType currentType = PNOperationType.PNSetUuidMetadataOperation;
 
             List<string> url = new List<string>();
-            url.Add("v1");
+            url.Add("v2");
             url.Add("objects");
             url.Add(pubnubConfig.SubscribeKey);
-            url.Add("users");
+            url.Add("uuids");
+            url.Add(string.IsNullOrEmpty(uuid) ? "" : uuid);
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
-            if (userCustom != null)
+            if (includeCustom)
             {
                 requestQueryStringParams.Add("include", "custom");
             }
@@ -1231,52 +1271,21 @@ namespace PubnubApi
                     }
                 }
             }
-            string queryString = BuildQueryString(currentType, requestQueryStringParams, "user", userId, false);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
             return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
-        Uri IUrlRequestBuilder.BuildUpdateUserRequest(string requestMethod, string requestBody, string userId, Dictionary<string, object> userCustom, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildDeleteUuidMetadataRequest(string requestMethod, string requestBody, string uuid, Dictionary<string, object> externalQueryParam)
         {
-            PNOperationType currentType = PNOperationType.PNUpdateUserOperation;
+            PNOperationType currentType = PNOperationType.PNDeleteUuidMetadataOperation;
 
             List<string> url = new List<string>();
-            url.Add("v1");
+            url.Add("v2");
             url.Add("objects");
             url.Add(pubnubConfig.SubscribeKey);
-            url.Add("users");
-            url.Add(userId);
-
-            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
-            if (userCustom != null)
-            {
-                requestQueryStringParams.Add("include", "custom");
-            }
-            if (externalQueryParam != null && externalQueryParam.Count > 0)
-            {
-                foreach (KeyValuePair<string, object> kvp in externalQueryParam)
-                {
-                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
-                    {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
-                    }
-                }
-            }
-            string queryString = BuildQueryString(currentType, requestQueryStringParams, "user", userId, false);
-
-            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
-        }
-
-        Uri IUrlRequestBuilder.BuildDeleteUserRequest(string requestMethod, string requestBody, string userId, Dictionary<string, object> externalQueryParam)
-        {
-            PNOperationType currentType = PNOperationType.PNDeleteUserOperation;
-
-            List<string> url = new List<string>();
-            url.Add("v1");
-            url.Add("objects");
-            url.Add(pubnubConfig.SubscribeKey);
-            url.Add("users");
-            url.Add(string.IsNullOrEmpty(userId) ? "" : userId);
+            url.Add("uuids");
+            url.Add(string.IsNullOrEmpty(uuid) ? "" : uuid);
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
             if (externalQueryParam != null && externalQueryParam.Count > 0)
@@ -1290,20 +1299,20 @@ namespace PubnubApi
                 }
             }
 
-            string queryString = BuildQueryString(currentType, requestQueryStringParams, "user", userId, false);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
             return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
-        Uri IUrlRequestBuilder.BuildGetAllUsersRequest(string requestMethod, string requestBody, string start, string end, int limit, bool includeCount, bool includeCustom, string filter, List<string> sort, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildGetAllUuidMetadataRequest(string requestMethod, string requestBody, string start, string end, int limit, bool includeCount, bool includeCustom, string filter, List<string> sort, Dictionary<string, object> externalQueryParam)
         {
-            PNOperationType currentType = PNOperationType.PNGetUsersOperation;
+            PNOperationType currentType = PNOperationType.PNGetAllUuidMetadataOperation;
 
             List<string> url = new List<string>();
-            url.Add("v1");
+            url.Add("v2");
             url.Add("objects");
             url.Add(pubnubConfig.SubscribeKey);
-            url.Add("users");
+            url.Add("uuids");
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
             if (!string.IsNullOrEmpty(start))
@@ -1345,21 +1354,21 @@ namespace PubnubApi
                     }
                 }
             }
-            string queryString = BuildQueryString(currentType, requestQueryStringParams, "user", "", true);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
             return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
-        Uri IUrlRequestBuilder.BuildGetSingleUserRequest(string requestMethod, string requestBody, string userId, bool includeCustom, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildGetSingleUuidMetadataRequest(string requestMethod, string requestBody, string uuid, bool includeCustom, Dictionary<string, object> externalQueryParam)
         {
-            PNOperationType currentType = PNOperationType.PNGetUserOperation;
+            PNOperationType currentType = PNOperationType.PNGetUuidMetadataOperation;
 
             List<string> url = new List<string>();
-            url.Add("v1");
+            url.Add("v2");
             url.Add("objects");
             url.Add(pubnubConfig.SubscribeKey);
-            url.Add("users");
-            url.Add(string.IsNullOrEmpty(userId) ? "": userId);
+            url.Add("uuids");
+            url.Add(string.IsNullOrEmpty(uuid) ? "": uuid);
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
             if (includeCustom)
@@ -1377,23 +1386,24 @@ namespace PubnubApi
                     }
                 }
             }
-            string queryString = BuildQueryString(currentType, requestQueryStringParams, "user", userId, false);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
             return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
-        Uri IUrlRequestBuilder.BuildCreateSpaceRequest(string requestMethod, string requestBody, string spaceId, Dictionary<string, object> spaceCustom, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildSetChannelMetadataRequest(string requestMethod, string requestBody, string channel, bool includeCustom, Dictionary<string, object> externalQueryParam)
         {
-            PNOperationType currentType = PNOperationType.PNCreateSpaceOperation;
+            PNOperationType currentType = PNOperationType.PNSetChannelMetadataOperation;
 
             List<string> url = new List<string>();
-            url.Add("v1");
+            url.Add("v2");
             url.Add("objects");
             url.Add(pubnubConfig.SubscribeKey);
-            url.Add("spaces");
+            url.Add("channels");
+            url.Add(string.IsNullOrEmpty(channel) ? "" : channel);
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
-            if (spaceCustom != null)
+            if (includeCustom)
             {
                 requestQueryStringParams.Add("include", "custom");
             }
@@ -1407,52 +1417,21 @@ namespace PubnubApi
                     }
                 }
             }
-            string queryString = BuildQueryString(currentType, requestQueryStringParams, "space", spaceId, false);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
             return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
-        Uri IUrlRequestBuilder.BuildUpdateSpaceRequest(string requestMethod, string requestBody, string spaceId, Dictionary<string, object> spaceCustom, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildDeleteChannelMetadataRequest(string requestMethod, string requestBody, string channel, Dictionary<string, object> externalQueryParam)
         {
-            PNOperationType currentType = PNOperationType.PNUpdateUserOperation;
+            PNOperationType currentType = PNOperationType.PNDeleteChannelMetadataOperation;
 
             List<string> url = new List<string>();
-            url.Add("v1");
+            url.Add("v2");
             url.Add("objects");
             url.Add(pubnubConfig.SubscribeKey);
-            url.Add("spaces");
-            url.Add(spaceId);
-
-            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
-            if (spaceCustom != null)
-            {
-                requestQueryStringParams.Add("include", "custom");
-            }
-            if (externalQueryParam != null && externalQueryParam.Count > 0)
-            {
-                foreach (KeyValuePair<string, object> kvp in externalQueryParam)
-                {
-                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
-                    {
-                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
-                    }
-                }
-            }
-            string queryString = BuildQueryString(currentType, requestQueryStringParams, "space", spaceId, false);
-
-            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
-        }
-
-        Uri IUrlRequestBuilder.BuildDeleteSpaceRequest(string requestMethod, string requestBody, string spaceId, Dictionary<string, object> externalQueryParam)
-        {
-            PNOperationType currentType = PNOperationType.PNDeleteSpaceOperation;
-
-            List<string> url = new List<string>();
-            url.Add("v1");
-            url.Add("objects");
-            url.Add(pubnubConfig.SubscribeKey);
-            url.Add("spaces");
-            url.Add(string.IsNullOrEmpty(spaceId) ? "" : spaceId);
+            url.Add("channels");
+            url.Add(string.IsNullOrEmpty(channel) ? "" : channel);
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
             if (externalQueryParam != null && externalQueryParam.Count > 0)
@@ -1466,20 +1445,20 @@ namespace PubnubApi
                 }
             }
 
-            string queryString = BuildQueryString(currentType, requestQueryStringParams, "space", spaceId, false);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
             return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
-        Uri IUrlRequestBuilder.BuildGetAllSpacesRequest(string requestMethod, string requestBody, string start, string end, int limit, bool includeCount, bool includeCustom, string filter, List<string> sort, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildGetAllChannelMetadataRequest(string requestMethod, string requestBody, string start, string end, int limit, bool includeCount, bool includeCustom, string filter, List<string> sort, Dictionary<string, object> externalQueryParam)
         {
-            PNOperationType currentType = PNOperationType.PNGetSpacesOperation;
+            PNOperationType currentType = PNOperationType.PNGetAllChannelMetadataOperation;
 
             List<string> url = new List<string>();
-            url.Add("v1");
+            url.Add("v2");
             url.Add("objects");
             url.Add(pubnubConfig.SubscribeKey);
-            url.Add("spaces");
+            url.Add("channels");
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
             if (!string.IsNullOrEmpty(start))
@@ -1521,21 +1500,21 @@ namespace PubnubApi
                     }
                 }
             }
-            string queryString = BuildQueryString(currentType, requestQueryStringParams, "space","", true);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
             return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
-        Uri IUrlRequestBuilder.BuildGetSingleSpaceRequest(string requestMethod, string requestBody, string spaceId, bool includeCustom, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildGetSingleChannelMetadataRequest(string requestMethod, string requestBody, string channel, bool includeCustom, Dictionary<string, object> externalQueryParam)
         {
-            PNOperationType currentType = PNOperationType.PNGetSpaceOperation;
+            PNOperationType currentType = PNOperationType.PNGetChannelMetadataOperation;
 
             List<string> url = new List<string>();
-            url.Add("v1");
+            url.Add("v2");
             url.Add("objects");
             url.Add(pubnubConfig.SubscribeKey);
-            url.Add("spaces");
-            url.Add(string.IsNullOrEmpty(spaceId) ? "" : spaceId);
+            url.Add("channels");
+            url.Add(string.IsNullOrEmpty(channel) ? "" : channel);
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
             if (includeCustom)
@@ -1553,22 +1532,22 @@ namespace PubnubApi
                     }
                 }
             }
-            string queryString = BuildQueryString(currentType, requestQueryStringParams, "space", spaceId, false);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
             return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
-        Uri IUrlRequestBuilder.BuildUpdateSpaceMembershipsWithUserRequest(string requestMethod, string requestBody, string userId, string start, string end, int limit, bool includeCount, string includeOptions, List<string> sort, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildMembershipSetRemoveManageUserRequest(PNOperationType type, string requestMethod, string requestBody, string uuid, string start, string end, int limit, bool includeCount, string includeOptions, List<string> sort, Dictionary<string, object> externalQueryParam)
         {
-            PNOperationType currentType = PNOperationType.PNManageMembershipsOperation;
+            PNOperationType currentType = type;
 
             List<string> url = new List<string>();
-            url.Add("v1");
+            url.Add("v2");
             url.Add("objects");
             url.Add(pubnubConfig.SubscribeKey);
-            url.Add("users");
-            url.Add(string.IsNullOrEmpty(userId) ? "" : userId);
-            url.Add("spaces");
+            url.Add("uuids");
+            url.Add(string.IsNullOrEmpty(uuid) ? "" : uuid);
+            url.Add("channels");
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
             if (!string.IsNullOrEmpty(start))
@@ -1605,22 +1584,22 @@ namespace PubnubApi
                     }
                 }
             }
-            string queryString = BuildQueryString(currentType, requestQueryStringParams, "user", userId, false);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
             return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
-        Uri IUrlRequestBuilder.BuildMembersAddUpdateRemoveRequest(string requestMethod, string requestBody, string spaceId, string start, string end, int limit, bool includeCount, string includeOptions, List<string> sort, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildMemberAddUpdateRemoveChannelRequest(string requestMethod, string requestBody, string channel, string start, string end, int limit, bool includeCount, string includeOptions, List<string> sort, Dictionary<string, object> externalQueryParam)
         {
-            PNOperationType currentType = PNOperationType.PNManageMembersOperation;
+            PNOperationType currentType = PNOperationType.PNManageChannelMembersOperation;
 
             List<string> url = new List<string>();
-            url.Add("v1");
+            url.Add("v2");
             url.Add("objects");
             url.Add(pubnubConfig.SubscribeKey);
-            url.Add("spaces");
-            url.Add(string.IsNullOrEmpty(spaceId) ? "" : spaceId);
-            url.Add("users");
+            url.Add("channels");
+            url.Add(string.IsNullOrEmpty(channel) ? "" : channel);
+            url.Add("uuids");
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
             if (!string.IsNullOrEmpty(start))
@@ -1657,22 +1636,22 @@ namespace PubnubApi
                     }
                 }
             }
-            string queryString = BuildQueryString(currentType, requestQueryStringParams, "space", spaceId, false);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
             return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
-        Uri IUrlRequestBuilder.BuildGetAllMembershipsRequest(string requestMethod, string requestBody, string userId, string start, string end, int limit, bool includeCount, string includeOptions, string filter, List<string> sort, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildGetAllMembershipsRequest(string requestMethod, string requestBody, string uuid, string start, string end, int limit, bool includeCount, string includeOptions, string filter, List<string> sort, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PNGetMembershipsOperation;
 
             List<string> url = new List<string>();
-            url.Add("v1");
+            url.Add("v2");
             url.Add("objects");
             url.Add(pubnubConfig.SubscribeKey);
-            url.Add("users");
-            url.Add(string.IsNullOrEmpty(userId) ? "" : userId);
-            url.Add("spaces");
+            url.Add("uuids");
+            url.Add(string.IsNullOrEmpty(uuid) ? "" : uuid);
+            url.Add("channels");
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
             if (!string.IsNullOrEmpty(start))
@@ -1714,22 +1693,22 @@ namespace PubnubApi
                     }
                 }
             }
-            string queryString = BuildQueryString(currentType, requestQueryStringParams, "user", userId, false);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
             return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
-        Uri IUrlRequestBuilder.BuildGetAllMembersRequest(string requestMethod, string requestBody, string spaceId, string start, string end, int limit, bool includeCount, string includeOptions, string filter, List<string> sort, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildGetAllMembersRequest(string requestMethod, string requestBody, string channel, string start, string end, int limit, bool includeCount, string includeOptions, string filter, List<string> sort, Dictionary<string, object> externalQueryParam)
         {
-            PNOperationType currentType = PNOperationType.PNGetMembersOperation;
+            PNOperationType currentType = PNOperationType.PNGetChannelMembersOperation;
 
             List<string> url = new List<string>();
-            url.Add("v1");
+            url.Add("v2");
             url.Add("objects");
             url.Add(pubnubConfig.SubscribeKey);
-            url.Add("spaces");
-            url.Add(string.IsNullOrEmpty(spaceId) ? "" : spaceId);
-            url.Add("users");
+            url.Add("channels");
+            url.Add(string.IsNullOrEmpty(channel) ? "" : channel);
+            url.Add("uuids");
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
             if (!string.IsNullOrEmpty(start))
@@ -1771,7 +1750,7 @@ namespace PubnubApi
                     }
                 }
             }
-            string queryString = BuildQueryString(currentType, requestQueryStringParams, "space", spaceId, false);
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
 
             return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
@@ -1885,7 +1864,163 @@ namespace PubnubApi
             return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
-        private Dictionary<string, string> GenerateCommonQueryParams(PNOperationType type, string resourceType, string resourceId, bool checkResourcePattern, string uuid)
+        Uri IUrlRequestBuilder.BuildGenerateFileUploadUrlRequest(string requestMethod, string requestBody, string channel, Dictionary<string, object> externalQueryParam)
+        {
+            PNOperationType currentType = PNOperationType.PNGenerateFileUploadUrlOperation;
+
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("files");
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("channels");
+            url.Add(channel);
+            url.Add("generate-upload-url");
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+            if (externalQueryParam != null && externalQueryParam.Count > 0)
+            {
+                foreach (KeyValuePair<string, object> kvp in externalQueryParam)
+                {
+                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    {
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
+                    }
+                }
+            }
+
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
+
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
+        }
+
+        Uri IUrlRequestBuilder.BuildPublishFileMessageRequest(string requestMethod, string requestBody, string channel, object originalMessage, bool storeInHistory, int ttl, Dictionary<string, object> userMetaData, Dictionary<string, string> additionalUrlParams, Dictionary<string, object> externalQueryParam)
+        {
+            PNOperationType currentType = PNOperationType.PNPublishFileMessageOperation;
+
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("files");
+            url.Add("publish-file");
+            url.Add(pubnubConfig.PublishKey);
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("0");
+            url.Add(channel);
+            url.Add("0");
+            if (requestMethod.ToUpperInvariant() == "GET")
+            {
+                string message = JsonEncodePublishMsg(originalMessage, currentType);
+                url.Add(message);
+            }
+
+            Dictionary<string, string> additionalUrlParamsDic = new Dictionary<string, string>();
+            if (additionalUrlParams != null)
+            {
+                additionalUrlParamsDic = additionalUrlParams;
+            }
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>(additionalUrlParamsDic);
+
+            if (userMetaData != null)
+            {
+                string jsonMetaData = jsonLib.SerializeToJsonString(userMetaData);
+                requestQueryStringParams.Add("meta", UriUtil.EncodeUriComponent(jsonMetaData, currentType, false, false, false));
+            }
+
+            if (storeInHistory && ttl >= 0)
+            {
+                requestQueryStringParams.Add("tt1", ttl.ToString());
+            }
+
+            if (!storeInHistory)
+            {
+                requestQueryStringParams.Add("store", "0");
+            }
+
+            if (externalQueryParam != null && externalQueryParam.Count > 0)
+            {
+                foreach (KeyValuePair<string, object> kvp in externalQueryParam)
+                {
+                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    {
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
+                    }
+                }
+            }
+
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
+
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
+        }
+
+        Uri IUrlRequestBuilder.BuildGetFileUrlOrDeleteReqest(string requestMethod, string requestBody, string channel, string fileId, string fileName, Dictionary<string, object> externalQueryParam, PNOperationType operationType)
+        {
+            PNOperationType currentType = operationType;
+
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("files");
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("channels");
+            url.Add(channel);
+            url.Add("files");
+            url.Add(fileId);
+            url.Add(fileName);
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+
+            if (externalQueryParam != null && externalQueryParam.Count > 0)
+            {
+                foreach (KeyValuePair<string, object> kvp in externalQueryParam)
+                {
+                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    {
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
+                    }
+                }
+            }
+
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
+
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
+        }
+
+        Uri IUrlRequestBuilder.BuildListFilesReqest(string requestMethod, string requestBody, string channel, int limit, string nextToken, Dictionary<string, object> externalQueryParam, PNOperationType operationType)
+        {
+            PNOperationType currentType = operationType;
+
+            List<string> url = new List<string>();
+            url.Add("v1");
+            url.Add("files");
+            url.Add(pubnubConfig.SubscribeKey);
+            url.Add("channels");
+            url.Add(channel);
+            url.Add("files");
+
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+            requestQueryStringParams.Add("limit", (limit <= -1) ? "100" : limit.ToString());
+            if (!string.IsNullOrEmpty(nextToken))
+            {
+                requestQueryStringParams.Add("next", nextToken);
+            }
+
+            if (externalQueryParam != null && externalQueryParam.Count > 0)
+            {
+                foreach (KeyValuePair<string, object> kvp in externalQueryParam)
+                {
+                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    {
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), currentType, false, false, false));
+                    }
+                }
+            }
+
+            string queryString = BuildQueryString(currentType, requestQueryStringParams);
+
+            return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
+        }
+
+
+        private Dictionary<string, string> GenerateCommonQueryParams(PNOperationType type, string uuid)
         {
             long timeStamp = TranslateUtcDateTimeToSeconds(DateTime.UtcNow);
             string requestid = Guid.NewGuid().ToString();
@@ -1945,35 +2080,14 @@ namespace PubnubApi
                 }
 
                 if (type != PNOperationType.PNTimeOperation
-                        && type != PNOperationType.PNAccessManagerGrant && type != PNOperationType.PNAccessManagerGrantToken && type != PNOperationType.ChannelGroupGrantAccess
+                        && type != PNOperationType.PNAccessManagerGrant && type != PNOperationType.PNAccessManagerGrantToken && type != PNOperationType.PNAccessManagerRevokeToken && type != PNOperationType.ChannelGroupGrantAccess
                         && type != PNOperationType.PNAccessManagerAudit && type != PNOperationType.ChannelGroupAuditAccess)
                 {
-                    if (type == PNOperationType.PNCreateUserOperation || type == PNOperationType.PNCreateSpaceOperation
-                        || type == PNOperationType.PNUpdateUserOperation || type == PNOperationType.PNUpdateSpaceOperation
-                        || type == PNOperationType.PNDeleteUserOperation || type == PNOperationType.PNDeleteSpaceOperation
-                        || type == PNOperationType.PNGetUserOperation || type == PNOperationType.PNGetSpaceOperation
-                        || type == PNOperationType.PNGetUsersOperation || type == PNOperationType.PNGetSpacesOperation
-                        || type == PNOperationType.PNGetMembersOperation || type == PNOperationType.PNGetMembershipsOperation
-                        || type == PNOperationType.PNManageMembersOperation || type == PNOperationType.PNManageMembershipsOperation)
+                    if (tokenMgr != null && !string.IsNullOrEmpty(tokenMgr.AuthToken) && tokenMgr.AuthToken.Trim().Length > 0)
                     {
-                        if (tokenMgr != null)
-                        {
-                            string resourceToken = "";
-                            if (string.IsNullOrEmpty(resourceId) && checkResourcePattern)
-                            {
-                                resourceToken = tokenMgr.GetToken(resourceType, resourceId, checkResourcePattern);
-                            }
-                            else
-                            {
-                                resourceToken = tokenMgr.GetToken(resourceType, resourceId);
-                            }
-                            if (!string.IsNullOrEmpty(resourceToken))
-                            {
-                                ret.Add("auth", UriUtil.EncodeUriComponent(resourceToken, type, false, false, false));
-                            }
-                        }
+                        ret.Add("auth", UriUtil.EncodeUriComponent(tokenMgr.AuthToken, type, false, false, false));
                     }
-                    else if (!string.IsNullOrEmpty(this.pubnubConfig.AuthKey))
+                    else if (!string.IsNullOrEmpty(this.pubnubConfig.AuthKey) && this.pubnubConfig.AuthKey.Trim().Length > 0)
                     {
                         ret.Add("auth", UriUtil.EncodeUriComponent(this.pubnubConfig.AuthKey, type, false, false, false));
                     }
@@ -1991,7 +2105,7 @@ namespace PubnubApi
             string_to_sign.Append(partialUrl).Append("\n");
             string_to_sign.Append(queryStringToSign);
 
-            PubnubCrypto pubnubCrypto = new PubnubCrypto((opType != PNOperationType.PNSignalOperation) ? this.pubnubConfig.CipherKey : "", this.pubnubConfig, this.pubnubLog);
+            PubnubCrypto pubnubCrypto = new PubnubCrypto((opType != PNOperationType.PNSignalOperation) ? this.pubnubConfig.CipherKey : "", this.pubnubConfig, this.pubnubLog, null);
             signature = pubnubCrypto.PubnubAccessManagerSign(this.pubnubConfig.SecretKey, string_to_sign.ToString());
             if (this.pubnubLog != null && this.pubnubConfig != null)
             {
@@ -2016,7 +2130,7 @@ namespace PubnubApi
             string_to_sign.AppendFormat("{0}\n", queryStringToSign);
             string_to_sign.Append(requestBody);
 
-            PubnubCrypto pubnubCrypto = new PubnubCrypto((opType != PNOperationType.PNSignalOperation) ? this.pubnubConfig.CipherKey : "", this.pubnubConfig, this.pubnubLog);
+            PubnubCrypto pubnubCrypto = new PubnubCrypto((opType != PNOperationType.PNSignalOperation) ? this.pubnubConfig.CipherKey : "", this.pubnubConfig, this.pubnubLog, null);
             signature = pubnubCrypto.PubnubAccessManagerSign(this.pubnubConfig.SecretKey, string_to_sign.ToString());
             signature = string.Format("v2.{0}", signature.TrimEnd(new [] { '=' }));
             if (this.pubnubLog != null && this.pubnubConfig != null)
@@ -2034,11 +2148,6 @@ namespace PubnubApi
 
         private string BuildQueryString(PNOperationType type, Dictionary<string, string> queryStringParamDic)
         {
-            return BuildQueryString(type, queryStringParamDic, "", "", false);
-        }
-
-        private string BuildQueryString(PNOperationType type, Dictionary<string, string> queryStringParamDic, string resourceType, string resourceId, bool checkResourcePattern)
-        {
             string queryString = "";
 
             try
@@ -2051,7 +2160,7 @@ namespace PubnubApi
 
                 string qsUuid = internalQueryStringParamDic.ContainsKey("uuid") ? internalQueryStringParamDic["uuid"] : null;
                 
-                Dictionary<string, string> commonQueryStringParams = GenerateCommonQueryParams(type, resourceType, resourceId, checkResourcePattern, qsUuid);
+                Dictionary<string, string> commonQueryStringParams = GenerateCommonQueryParams(type, qsUuid);
                 Dictionary<string, string> queryStringParams = new Dictionary<string, string>(commonQueryStringParams.Concat(internalQueryStringParamDic).GroupBy(item => item.Key).ToDictionary(item => item.Key, item => item.First().Value));
 
                 queryString = string.Join("&", queryStringParams.OrderBy(kvp => kvp.Key, StringComparer.Ordinal).Select(kvp => string.Format("{0}={1}", kvp.Key, kvp.Value)).ToArray());
@@ -2084,9 +2193,13 @@ namespace PubnubApi
             {
                 url.Append("/");
 
-                if (type == PNOperationType.PNPublishOperation && componentIndex == urlComponents.Count - 1)
+                if ((type == PNOperationType.PNPublishOperation || type == PNOperationType.PNPublishFileMessageOperation) && componentIndex == urlComponents.Count - 1)
                 {
                     url.Append(UriUtil.EncodeUriComponent(urlComponents[componentIndex], type, false, true, false));
+                }
+                else if (type == PNOperationType.PNAccessManagerRevokeToken)
+                {
+                    url.Append(UriUtil.EncodeUriComponent(urlComponents[componentIndex], type, false, false, false));
                 }
                 else
                 {
@@ -2099,7 +2212,7 @@ namespace PubnubApi
             System.Diagnostics.Debug.WriteLine("sb = " + url);
             Uri requestUri = new Uri(url.ToString());
 
-            if (type == PNOperationType.PNPublishOperation || type == PNOperationType.PNSubscribeOperation || type == PNOperationType.Presence)
+            if (type == PNOperationType.PNPublishOperation || type == PNOperationType.PNPublishFileMessageOperation || type == PNOperationType.PNSubscribeOperation || type == PNOperationType.Presence)
             {
                 ForceCanonicalPathAndQuery(requestUri);
             }
@@ -2135,7 +2248,7 @@ namespace PubnubApi
 
             if (pubnubConfig.CipherKey.Length > 0 && opType != PNOperationType.PNSignalOperation)
             {
-                PubnubCrypto aes = new PubnubCrypto(pubnubConfig.CipherKey, pubnubConfig, pubnubLog);
+                PubnubCrypto aes = new PubnubCrypto(pubnubConfig.CipherKey, pubnubConfig, pubnubLog, null);
                 string encryptMessage = aes.Encrypt(message);
                 message = jsonLib.SerializeToJsonString(encryptMessage);
             }

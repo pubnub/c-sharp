@@ -15,17 +15,16 @@ namespace PubnubApi.EndPoint
         private readonly IPubnubUnitTest unit;
         private readonly IPubnubLog pubnubLog;
         private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
-        private readonly EndPoint.TokenManager pubnubTokenMgr;
 
-        private string usrId = "";
+        private string uuidMetadataId = "";
         private int limit = -1;
         private bool includeCount;
         private string commandDelimitedIncludeOptions = "";
         private string membershipsFilter;
-        private PNPage page;
+        private PNPageObject page;
         private List<string> sortField;
 
-        private PNCallback<PNGetMembershipsResult> savedCallback;
+        private PNCallback<PNMembershipsResult> savedCallback;
         private Dictionary<string, object> queryParam;
 
         public GetMembershipsOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
@@ -35,7 +34,6 @@ namespace PubnubApi.EndPoint
             unit = pubnubUnit;
             pubnubLog = log;
             pubnubTelemetryMgr = telemetryManager;
-            pubnubTokenMgr = tokenManager;
 
             if (instance != null)
             {
@@ -54,15 +52,15 @@ namespace PubnubApi.EndPoint
             }
         }
 
-        public GetMembershipsOperation UserId(string id)
+        public GetMembershipsOperation Uuid(string id)
         {
-            this.usrId = id;
+            this.uuidMetadataId = id;
             return this;
         }
 
-        public GetMembershipsOperation Page(PNPage bookmarkPage)
+        public GetMembershipsOperation Page(PNPageObject pageObject)
         {
-            this.page = bookmarkPage;
+            this.page = pageObject;
             return this;
         }
 
@@ -106,31 +104,32 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
-        public void Execute(PNCallback<PNGetMembershipsResult> callback)
+        public void Execute(PNCallback<PNMembershipsResult> callback)
         {
+            if (callback == null)
+            {
+                throw new ArgumentException("Missing callback");
+            }
+
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
                 this.savedCallback = callback;
-                GetMembershipsList(this.usrId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membershipsFilter, this.sortField, this.queryParam, savedCallback);
+                GetMembershipsList(this.uuidMetadataId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membershipsFilter, this.sortField, this.queryParam, savedCallback);
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
             new Thread(() =>
             {
                 this.savedCallback = callback;
-                GetMembershipsList(this.usrId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membershipsFilter, this.sortField, this.queryParam, savedCallback);
+                GetMembershipsList(this.uuidMetadataId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membershipsFilter, this.sortField, this.queryParam, savedCallback);
             })
             { IsBackground = true }.Start();
 #endif
         }
 
-        public async Task<PNResult<PNGetMembershipsResult>> ExecuteAsync()
+        public async Task<PNResult<PNMembershipsResult>> ExecuteAsync()
         {
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
-            return await GetMembershipsList(this.usrId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membershipsFilter, this.sortField, this.queryParam).ConfigureAwait(false);
-#else
-            return await GetMembershipsList(this.usrId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membershipsFilter, this.sortField, this.queryParam).ConfigureAwait(false);
-#endif
+            return await GetMembershipsList(this.uuidMetadataId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membershipsFilter, this.sortField, this.queryParam).ConfigureAwait(false);
         }
 
         internal void Retry()
@@ -138,32 +137,33 @@ namespace PubnubApi.EndPoint
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
-                GetMembershipsList(this.usrId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membershipsFilter, this.sortField, this.queryParam, savedCallback);
+                GetMembershipsList(this.uuidMetadataId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membershipsFilter, this.sortField, this.queryParam, savedCallback);
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
             new Thread(() =>
             {
-                GetMembershipsList(this.usrId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membershipsFilter, this.sortField, this.queryParam, savedCallback);
+                GetMembershipsList(this.uuidMetadataId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membershipsFilter, this.sortField, this.queryParam, savedCallback);
             })
             { IsBackground = true }.Start();
 #endif
         }
 
-        private void GetMembershipsList(string userId, PNPage page, int limit, bool includeCount, string includeOptions, string filter, List<string> sort, Dictionary<string, object> externalQueryParam, PNCallback<PNGetMembershipsResult> callback)
+        private void GetMembershipsList(string uuid, PNPageObject page, int limit, bool includeCount, string includeOptions, string filter, List<string> sort, Dictionary<string, object> externalQueryParam, PNCallback<PNMembershipsResult> callback)
         {
-            if (callback == null)
+            if (string.IsNullOrEmpty(uuid))
             {
-                throw new ArgumentException("Missing callback");
+                uuid = config.Uuid;
             }
-            PNPage internalPage;
-            if (page == null) { internalPage = new PNPage(); }
+
+            PNPageObject internalPage;
+            if (page == null) { internalPage = new PNPageObject(); }
             else { internalPage = page; }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildGetAllMembershipsRequest("GET", "", userId, internalPage.Next, internalPage.Prev, limit, includeCount, includeOptions, filter, sort, externalQueryParam);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            
+            Uri request = urlBuilder.BuildGetAllMembershipsRequest("GET", "", uuid, internalPage.Next, internalPage.Prev, limit, includeCount, includeOptions, filter, sort, externalQueryParam);
 
-            RequestState<PNGetMembershipsResult> requestState = new RequestState<PNGetMembershipsResult>();
+            RequestState<PNMembershipsResult> requestState = new RequestState<PNMembershipsResult>();
             requestState.ResponseType = PNOperationType.PNGetMembershipsOperation;
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
@@ -178,23 +178,35 @@ namespace PubnubApi.EndPoint
                     List<object> result = ProcessJsonResponse(requestState, json);
                     ProcessResponseCallbacks(result, requestState);
                 }
+                else
+                {
+                    if (r.Result.Item2 != null)
+                    {
+                        callback.OnResponse(null, r.Result.Item2);
+                    }
+                }
             }, TaskContinuationOptions.ExecuteSynchronously).Wait();
 
         }
 
-        private async Task<PNResult<PNGetMembershipsResult>> GetMembershipsList(string userId, PNPage page, int limit, bool includeCount, string includeOptions, string filter, List<string> sort, Dictionary<string, object> externalQueryParam)
+        private async Task<PNResult<PNMembershipsResult>> GetMembershipsList(string uuid, PNPageObject page, int limit, bool includeCount, string includeOptions, string filter, List<string> sort, Dictionary<string, object> externalQueryParam)
         {
-            PNResult<PNGetMembershipsResult> ret = new PNResult<PNGetMembershipsResult>();
+            PNResult<PNMembershipsResult> ret = new PNResult<PNMembershipsResult>();
 
-            PNPage internalPage;
-            if (page == null) { internalPage = new PNPage(); }
+            if (string.IsNullOrEmpty(uuid))
+            {
+                uuid = config.Uuid;
+            }
+
+            PNPageObject internalPage;
+            if (page == null) { internalPage = new PNPageObject(); }
             else { internalPage = page; }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-            Uri request = urlBuilder.BuildGetAllMembershipsRequest("GET", "", userId, internalPage.Next, internalPage.Prev, limit, includeCount, includeOptions, filter, sort, externalQueryParam);
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            
+            Uri request = urlBuilder.BuildGetAllMembershipsRequest("GET", "", uuid, internalPage.Next, internalPage.Prev, limit, includeCount, includeOptions, filter, sort, externalQueryParam);
 
-            RequestState<PNGetMembershipsResult> requestState = new RequestState<PNGetMembershipsResult>();
+            RequestState<PNMembershipsResult> requestState = new RequestState<PNMembershipsResult>();
             requestState.ResponseType = PNOperationType.PNGetMembershipsOperation;
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;
@@ -207,7 +219,7 @@ namespace PubnubApi.EndPoint
             {
                 List<object> resultList = ProcessJsonResponse(requestState, json);
                 ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
-                PNGetMembershipsResult responseResult = responseBuilder.JsonToObject<PNGetMembershipsResult>(resultList, true);
+                PNMembershipsResult responseResult = responseBuilder.JsonToObject<PNMembershipsResult>(resultList, true);
                 if (responseResult != null)
                 {
                     ret.Result = responseResult;
@@ -224,13 +236,13 @@ namespace PubnubApi.EndPoint
             {
                 ret = "custom";
             }
-            else if (enumValue.ToLowerInvariant() == "space")
+            else if (enumValue.ToLowerInvariant() == "channel")
             {
-                ret = "space";
+                ret = "channel";
             }
-            else if (enumValue.ToLowerInvariant() == "space_custom")
+            else if (enumValue.ToLowerInvariant() == "channel_custom")
             {
-                ret = "space.custom";
+                ret = "channel.custom";
             }
             return ret;
         }

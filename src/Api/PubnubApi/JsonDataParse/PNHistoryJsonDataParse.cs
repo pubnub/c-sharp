@@ -58,6 +58,15 @@ namespace PubnubApi
                             {
                                 result.Meta = dicMessageTimetoken["meta"];
                             }
+                            if (dicMessageTimetoken.ContainsKey("uuid") && dicMessageTimetoken["uuid"] != null)
+                            {
+                                result.Uuid = dicMessageTimetoken["uuid"].ToString();
+                            }
+                            int messageType;
+                            if (dicMessageTimetoken.ContainsKey("message_type") && dicMessageTimetoken["message_type"] != null && Int32.TryParse(dicMessageTimetoken["message_type"].ToString(), out messageType))
+                            {
+                                result.MessageType = messageType;
+                            }
                         }
                         else
                         {

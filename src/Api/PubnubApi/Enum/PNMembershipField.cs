@@ -8,7 +8,7 @@ namespace PubnubApi
     public enum PNMembershipField
     {
         CUSTOM,
-        SPACE,
-        SPACE_CUSTOM
+        CHANNEL,
+        CHANNEL_CUSTOM
     }
 }

@@ -16,7 +16,6 @@ namespace PubnubApi.EndPoint
         private readonly IPubnubUnitTest unit;
         private readonly IPubnubLog pubnubLog;
         private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
-        private readonly EndPoint.TokenManager pubnubTokenMgr;
 
         private string messageActionChannelName = "";
         private long startTT = -1;
@@ -32,7 +31,6 @@ namespace PubnubApi.EndPoint
             unit = pubnubUnit;
             pubnubLog = log;
             pubnubTelemetryMgr = telemetryManager;
-            pubnubTokenMgr = tokenManager;
 
             PubnubInstance = instance;
 
@@ -115,11 +113,7 @@ namespace PubnubApi.EndPoint
                 throw new MissingMemberException("subscribe key is required");
             }
 
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             return await GetMessageActions(this.messageActionChannelName, this.startTT, this.endTT, this.limitRecords, this.queryParam).ConfigureAwait(false);
-#else
-            return await GetMessageActions(this.messageActionChannelName, this.startTT, this.endTT, this.limitRecords, this.queryParam).ConfigureAwait(false);
-#endif
         }
 
         internal void Retry()
@@ -153,7 +147,7 @@ namespace PubnubApi.EndPoint
             {
                 PNStatus status = new PNStatus();
                 status.Error = true;
-                status.ErrorData = new PNErrorData("Invalid subscribe key", new MissingMemberException("Invalid publish key"));
+                status.ErrorData = new PNErrorData("Invalid subscribe key", new MissingMemberException("Invalid subscribe key"));
                 callback.OnResponse(null, status);
                 return;
             }
@@ -163,8 +157,8 @@ namespace PubnubApi.EndPoint
                 return;
             }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            
             Uri request = urlBuilder.BuildGetMessageActionsRequest("GET", "", channel, start, end, limit, externalQueryParam);
 
             RequestState<PNGetMessageActionsResult> requestState = new RequestState<PNGetMessageActionsResult>();
@@ -205,13 +199,13 @@ namespace PubnubApi.EndPoint
             {
                 PNStatus status = new PNStatus();
                 status.Error = true;
-                status.ErrorData = new PNErrorData("Invalid subscribe key", new MissingMemberException("Invalid publish key"));
+                status.ErrorData = new PNErrorData("Invalid subscribe key", new MissingMemberException("Invalid subscribe key"));
                 ret.Status = status;
                 return ret;
             }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            
             Uri request = urlBuilder.BuildGetMessageActionsRequest("GET", "", channel, start, end, limit, externalQueryParam);
 
             RequestState<PNGetMessageActionsResult> requestState = new RequestState<PNGetMessageActionsResult>();

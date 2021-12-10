@@ -11,7 +11,7 @@ namespace PubnubApi
         {
             PNAccessManagerTokenResult result = null;
 
-            Dictionary<string, object> grantDicObj = (listObject != null && listObject.Count > 0) ? JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[0]) : null;
+            Dictionary<string, object> grantDicObj = JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[0]);
             if (grantDicObj != null && grantDicObj.ContainsKey("data"))
             {
                 result = new PNAccessManagerTokenResult();

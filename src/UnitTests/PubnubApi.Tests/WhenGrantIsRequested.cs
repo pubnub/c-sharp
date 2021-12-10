@@ -39,6 +39,7 @@ namespace PubNubMessaging.Tests
         private static string currentUnitTestCase = "";
         private static string channel = "hello_my_channel";
         private static string channelGroup = "myChannelGroup";
+        private static string targetUuid = "my_target_uuid";
         private static string authKey = "hello_my_authkey";
         private static string[] channelBuilder;
         private static string[] authKeyBuilder;
@@ -717,323 +718,377 @@ namespace PubNubMessaging.Tests
             }
         }
 
+        [Test]
+        public static void ThenUuidWithGetUpdateDeleteShouldReturnSuccess()
+        {
+            server.ClearRequests();
+
+            currentUnitTestCase = "ThenUuidWithGetUpdateDeleteShouldReturnSuccess";
+
+            receivedGrantMessage = false;
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
+
+            pubnub = createPubNubInstance(config);
+            server.RunOnHttps(config.Secure);
+
+            if (PubnubCommon.PAMServerSideGrant)
+            {
+                grantManualEvent = new ManualResetEvent(false);
+                pubnub.Grant().Uuids(new[] { targetUuid }).AuthKeys(new[] { authKey }).Get(true).Update(true).Delete(true).TTL(5)
+                    .Execute(new PNAccessManagerGrantResultExt((r, s) => 
+                    { 
+                        if (r != null)
+                        {
+                            receivedGrantMessage = true;
+                        }
+                        grantManualEvent.Set();
+                    }));
+                Thread.Sleep(1000);
+
+                grantManualEvent.WaitOne();
+
+                pubnub.Destroy();
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
+                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUuidWithGetUpdateDeleteShouldReturnSuccess failed.");
+            }
+            else
+            {
+                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenUuidWithGetUpdateDeleteShouldReturnSuccess.");
+            }
+        }
+
+        [Test]
+        public static void ThenUuidWithReadPermisionShouldReturnError()
+        {
+            server.ClearRequests();
+
+            currentUnitTestCase = "ThenUuidWithReadPermisionShouldReturnError";
+
+            receivedGrantMessage = false;
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
+
+            pubnub = createPubNubInstance(config);
+            server.RunOnHttps(config.Secure);
+
+            if (PubnubCommon.PAMServerSideGrant)
+            {
+                try
+                {
+                    grantManualEvent = new ManualResetEvent(false);
+                    pubnub.Grant().Uuids(new[] { targetUuid }).AuthKeys(new[] { authKey }).Read(true).TTL(5)
+                        .Execute(new PNAccessManagerGrantResultExt((r, s) =>
+                        {
+                            grantManualEvent.Set();
+                        }));
+                    grantManualEvent.WaitOne();
+                    Thread.Sleep(1000);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                    receivedGrantMessage = true;
+                    grantManualEvent.Set();
+                }
+
+
+                pubnub.Destroy();
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
+                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUuidWithReadPermisionShouldReturnError failed.");
+            }
+            else
+            {
+                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenUuidWithReadPermisionShouldReturnError.");
+            }
+        }
+
+        [Test]
+        public static void ThenUuidAndChannelShouldReturnError()
+        {
+            server.ClearRequests();
+
+            currentUnitTestCase = "ThenUuidAndChannelShouldReturnError";
+
+            receivedGrantMessage = false;
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
+
+            pubnub = createPubNubInstance(config);
+            server.RunOnHttps(config.Secure);
+
+            if (PubnubCommon.PAMServerSideGrant)
+            {
+                try
+                {
+                    grantManualEvent = new ManualResetEvent(false);
+                    pubnub.Grant().Uuids(new[] { targetUuid }).Channels(new[] { channel }).AuthKeys(new[] { authKey }).Read(true).TTL(5)
+                        .Execute(new PNAccessManagerGrantResultExt((r, s) =>
+                        {
+                            grantManualEvent.Set();
+                        }));
+                    grantManualEvent.WaitOne();
+                    Thread.Sleep(1000);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                    receivedGrantMessage = true;
+                    grantManualEvent.Set();
+                }
+
+
+                pubnub.Destroy();
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
+                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUuidAndChannelShouldReturnError failed.");
+            }
+            else
+            {
+                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenUuidAndChannelShouldReturnError.");
+            }
+        }
+
+        [Test]
+        public static void ThenUuidAndChannelGroupShouldReturnError()
+        {
+            server.ClearRequests();
+
+            currentUnitTestCase = "ThenUuidAndChannelGroupShouldReturnError";
+
+            receivedGrantMessage = false;
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
+
+            pubnub = createPubNubInstance(config);
+            server.RunOnHttps(config.Secure);
+
+            if (PubnubCommon.PAMServerSideGrant)
+            {
+                try
+                {
+                    grantManualEvent = new ManualResetEvent(false);
+                    pubnub.Grant().Uuids(new[] { targetUuid }).ChannelGroups(new[] { channelGroup }).AuthKeys(new[] { authKey }).Read(true).TTL(5)
+                        .Execute(new PNAccessManagerGrantResultExt((r, s) =>
+                        {
+                            grantManualEvent.Set();
+                        }));
+                    grantManualEvent.WaitOne();
+                    Thread.Sleep(1000);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                    receivedGrantMessage = true;
+                    grantManualEvent.Set();
+                }
+
+
+                pubnub.Destroy();
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
+                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenUuidAndChannelGroupShouldReturnError failed.");
+            }
+            else
+            {
+                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenUuidAndChannelGroupShouldReturnError.");
+            }
+        }
+
+        [Test]
+        public static void ThenGrantTokenShouldReturnSuccess()
+        {
+            server.ClearRequests();
+
+            currentUnitTestCase = "ThenGrantTokenShouldReturnSuccess";
+
+            receivedGrantMessage = false;
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+                Secure = false
+            };
+
+            pubnub = createPubNubInstance(config);
+            server.RunOnHttps(config.Secure);
+
+            try
+            {
+                grantManualEvent = new ManualResetEvent(false);
+                pubnub.GrantToken()
+                    .Resources(new PNTokenResources() 
+                        { 
+                            Channels=new Dictionary<string, PNTokenAuthValues>() {
+                                            { "ch1", new PNTokenAuthValues() { Read = true, Write = true, Manage= true, Create = true, Delete=true, Get = true, Update = true, Join = true } } },
+                            ChannelGroups = new Dictionary<string, PNTokenAuthValues>() {
+                                            { "cg1", new PNTokenAuthValues() { Read = true, Write = true, Manage= true, Create = true, Delete=true, Get = true, Update = true, Join = true } } },
+                            Uuids = new Dictionary<string, PNTokenAuthValues>() {
+                                            { "uuid1", new PNTokenAuthValues() { Read = true, Write = true, Manage= true, Create = true, Delete=true, Get = true, Update = true, Join = true } } },
+                    }
+                    )
+                    .TTL(10)
+                    .Execute(new PNAccessManagerTokenResultExt((result, status) =>
+                    {
+                        if (result != null)
+                        {
+                            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                        }
+                        else
+                        {
+                            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                        }
+                        receivedGrantMessage = true;
+                        grantManualEvent.Set();
+                    }));
+                grantManualEvent.WaitOne();
+                Thread.Sleep(1000);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                receivedGrantMessage = true;
+                grantManualEvent.Set();
+            }
+
+        }
+
+
+        [Test]
+#if NET40
+        public static void ThenWithAsyncGrantTokenShouldReturnSuccess()
+#else
+        public static async Task ThenWithAsyncGrantTokenShouldReturnSuccess()
+#endif
+        {
+            server.ClearRequests();
+
+            currentUnitTestCase = "ThenWithAsyncGrantTokenShouldReturnSuccess";
+
+            receivedGrantMessage = false;
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+            };
+
+            pubnub = createPubNubInstance(config);
+            server.RunOnHttps(config.Secure);
+
+#if NET40
+#else
+            PNResult<PNAccessManagerTokenResult> result = await pubnub.GrantToken()
+                    .Resources(new PNTokenResources()
+                    {
+                        Channels = new Dictionary<string, PNTokenAuthValues>() {
+                                            { "ch1", new PNTokenAuthValues() { Read = true, Write = true, Manage= true, Create = true, Delete=true, Get = true, Update = true, Join = true } } },
+                        ChannelGroups = new Dictionary<string, PNTokenAuthValues>() {
+                                            { "cg1", new PNTokenAuthValues() { Read = true, Write = true, Manage= true, Create = true, Delete=true, Get = true, Update = true, Join = true } } },
+                        Uuids = new Dictionary<string, PNTokenAuthValues>() {
+                                            { "uuid1", new PNTokenAuthValues() { Read = true, Write = true, Manage= true, Create = true, Delete=true, Get = true, Update = true, Join = true } } },
+                    }
+                    )
+                .TTL(10)
+                .ExecuteAsync();
+#endif
+
+        }
+
+        [Test]
+        public static void ThenRevokeTokenShouldReturnSuccess()
+        {
+            server.ClearRequests();
+
+            currentUnitTestCase = "ThenRevokeTokenShouldReturnSuccess";
+
+            receivedRevokeMessage = false;
+
+            PNConfiguration config = new PNConfiguration
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Uuid = "mytestuuid",
+                Secure = false
+            };
+
+            pubnub = createPubNubInstance(config);
+            server.RunOnHttps(config.Secure);
+
+            try
+            {
+                PNResult<PNAccessManagerTokenResult> grantResult = pubnub.GrantToken().TTL(5).Resources(new PNTokenResources() { Channels = new Dictionary<string, PNTokenAuthValues>() { { "ch1", new PNTokenAuthValues() { Read = true } } } }).ExecuteAsync().Result;
+                if (grantResult.Result != null && !string.IsNullOrEmpty(grantResult.Result.Token))
+                {
+                    revokeManualEvent = new ManualResetEvent(false);
+                    pubnub.RevokeToken()
+                        .Token(grantResult.Result.Token)
+                        .Execute(new PNAccessManagerRevokeTokenResultExt((result, status) =>
+                        {
+                            if (result != null)
+                            {
+                                Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                            }
+                            else
+                            {
+                                Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                            }
+                            receivedRevokeMessage = true;
+                            revokeManualEvent.Set();
+                        }));
+                    revokeManualEvent.WaitOne();
+                    Thread.Sleep(1000);
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                receivedRevokeMessage = true;
+                revokeManualEvent.Set();
+            }
+
+        }
+
+
         public static byte[] HexStringToByteArray(string hex)
         {
             return Enumerable.Range(0, hex.Length)
                              .Where(x => x % 2 == 0)
                              .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
                              .ToArray();
-        }
-
-        [Test]
-        public static void ThenPAMv3ChannelShouldReturnTokenSuccess()
-        {
-            server.ClearRequests();
-
-            currentUnitTestCase = "ThenPAMv3ChannelShouldReturnSuccess";
-
-            receivedGrantMessage = false;
-
-            PNConfiguration config = new PNConfiguration
-            {
-                PublishKey = PubnubCommon.PublishKey,
-                SubscribeKey = PubnubCommon.SubscribeKey,
-                SecretKey = PubnubCommon.SecretKey,
-                Secure = false,
-                EnableTelemetry = false,
-                IncludeInstanceIdentifier = false,
-                IncludeRequestIdentifier = true,
-                Uuid = "csharpuuid"
-            };
-
-            pubnub = createPubNubInstance(config);
-
-            server.RunOnHttps(config.Secure);
-            string expected = "";
-
-            Dictionary<string, int> chBitmaskPermDic = new Dictionary<string, int>();
-
-            Dictionary<string, int> cgBitmaskPermDic = new Dictionary<string, int>();
-
-            Dictionary<string, int> userBitmaskPermDic = new Dictionary<string, int>();
-
-            Dictionary<string, int> spaceBitmaskPermDic = new Dictionary<string, int>();
-
-            Dictionary<string, object> resourcesDic = new Dictionary<string, object>();
-            resourcesDic.Add("channels", chBitmaskPermDic);
-            resourcesDic.Add("groups", cgBitmaskPermDic);
-            resourcesDic.Add("users", userBitmaskPermDic);
-            resourcesDic.Add("spaces", spaceBitmaskPermDic);
-
-
-            Dictionary<string, int> dummyBitmaskPermDic = new Dictionary<string, int>();
-
-            Dictionary<string, object> patternsDic = new Dictionary<string, object>();
-            patternsDic.Add("channels", dummyBitmaskPermDic);
-            patternsDic.Add("groups", dummyBitmaskPermDic);
-            patternsDic.Add("users", dummyBitmaskPermDic);
-            patternsDic.Add("spaces", dummyBitmaskPermDic);
-
-            Dictionary<string, object> meta = new Dictionary<string, object>();
-            meta.Add("user-id", "jay@example.com");
-            meta.Add("contains-unicode", "The 💩 test.");
-
-            Dictionary<string, object> permissionDic = new Dictionary<string, object>();
-            permissionDic.Add("resources", resourcesDic);
-            permissionDic.Add("patterns", patternsDic);
-            permissionDic.Add("meta", meta);
-
-            Dictionary<string, object> messageEnvelope = new Dictionary<string, object>();
-            messageEnvelope.Add("ttl", 1440);
-            messageEnvelope.Add("permissions", permissionDic);
-            string postMessage = Newtonsoft.Json.JsonConvert.SerializeObject(messageEnvelope);
-
-            server.AddRequest(new Request()
-                    .WithMethod("POST")
-                    .WithPath(string.Format("/v3/pam/{0}/grant", PubnubCommon.SubscribeKey))
-                    .WithContent(postMessage)
-                    .WithParameter("PoundsSterling", "£13.37")
-                    .WithParameter("timestamp", "123456789")
-                    .WithParameter("signature", "v2.k80LsDMD-sImA8rCBj-ntRKhZ8mSjHY8Ivngt9W3Yc4")
-                    .WithResponse(expected)
-                    .WithStatusCode(System.Net.HttpStatusCode.OK));
-
-            if (PubnubCommon.PAMServerSideGrant)
-            {
-                
-                grantManualEvent = new ManualResetEvent(false);
-
-                pubnub.GrantToken()
-                            .Users(new Dictionary<string, PNResourcePermission>() {
-                                { "pandu_userid0", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
-                                { "pandu_userid1", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
-                                { "pandu-ut-uid", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
-                                { "pandu-ut-uid1", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
-                                { "pandu-ut-uid2", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } } })
-                            .Spaces(new Dictionary<string, PNResourcePermission>() {
-                                { "pandu_spaceid0", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
-                                { "pandu_spaceid1", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
-                                { "pandu-ut-sid", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
-                                { "pandu-ut-sid1", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
-                                { "pandu-ut-sid2", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } } })
-                            .Users(new Dictionary<string, PNResourcePermission>() {
-                                { "^emp-gen-*", new PNResourcePermission() { Read = true, Write = true } },
-                                { "^emp-mgr-*", new PNResourcePermission() { Read = true, Write = true, Create = true, Delete = true } } }, true)
-                            .Spaces(new Dictionary<string, PNResourcePermission>() {
-                                { "^public-*", new PNResourcePermission() { Read = true } },
-                                { "^private-*", new PNResourcePermission() { Read = true, Write = true, Create = true, Delete = true } } }, true)
-
-                            .TTL(30*24*60)
-                            .AuthKey("myauth")
-                    .Execute(new PNAccessManagerTokenResultExt((result, status)=> 
-                    {
-                        if (result != null)
-                        {
-                            try
-                            {
-                                string token = result.Token;
-                                PNConfiguration config2 = new PNConfiguration 
-                                {
-                                    EnableTokenManager = true
-                                };
-                                Pubnub pubnub2 = new Pubnub(config2);
-                                PNGrantToken grantObject = pubnub2.ParseToken(token);
-                                System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(grantObject));
-                            }
-                            catch (Exception ex)
-                            {
-                                System.Diagnostics.Debug.WriteLine(ex.ToString());
-                            }
-                            receivedGrantMessage = true;
-                        }
-                        else
-                        {
-                            System.Diagnostics.Debug.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(status));
-                        }
-                        grantManualEvent.Set();
-                    }));
-
-                Thread.Sleep(1000);
-
-                grantManualEvent.WaitOne();
-                Thread.Sleep(2000);
-
-                pubnub.Destroy();
-                pubnub.PubnubUnitTest = null;
-                pubnub = null;
-                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenPAMv3ChannelShouldReturnSuccess failed.");
-
-            }
-            else
-            {
-                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenPAMv3ChannelShouldReturnSuccess.");
-            }
-        }
-
-
-        [Test]
-#if NET40
-        public static void ThenWithAsyncPAMv3ChannelShouldReturnTokenSuccess()
-#else
-        public static async Task ThenWithAsyncPAMv3ChannelShouldReturnTokenSuccess()
-#endif
-        {
-            server.ClearRequests();
-
-            currentUnitTestCase = "ThenWithAsyncPAMv3ChannelShouldReturnTokenSuccess";
-
-            receivedGrantMessage = false;
-
-            PNConfiguration config = new PNConfiguration
-            {
-                PublishKey = PubnubCommon.PublishKey,
-                SubscribeKey = PubnubCommon.SubscribeKey,
-                SecretKey = PubnubCommon.SecretKey,
-                Secure = false,
-                EnableTelemetry = false,
-                IncludeInstanceIdentifier = false,
-                IncludeRequestIdentifier = true,
-                Uuid = "csharpuuid"
-            };
-
-            pubnub = createPubNubInstance(config);
-
-            server.RunOnHttps(config.Secure);
-            string expected = "";
-
-            Dictionary<string, int> chBitmaskPermDic = new Dictionary<string, int>();
-
-            Dictionary<string, int> cgBitmaskPermDic = new Dictionary<string, int>();
-
-            Dictionary<string, int> userBitmaskPermDic = new Dictionary<string, int>();
-
-            Dictionary<string, int> spaceBitmaskPermDic = new Dictionary<string, int>();
-
-            Dictionary<string, object> resourcesDic = new Dictionary<string, object>();
-            resourcesDic.Add("channels", chBitmaskPermDic);
-            resourcesDic.Add("groups", cgBitmaskPermDic);
-            resourcesDic.Add("users", userBitmaskPermDic);
-            resourcesDic.Add("spaces", spaceBitmaskPermDic);
-
-
-            Dictionary<string, int> dummyBitmaskPermDic = new Dictionary<string, int>();
-
-            Dictionary<string, object> patternsDic = new Dictionary<string, object>();
-            patternsDic.Add("channels", dummyBitmaskPermDic);
-            patternsDic.Add("groups", dummyBitmaskPermDic);
-            patternsDic.Add("users", dummyBitmaskPermDic);
-            patternsDic.Add("spaces", dummyBitmaskPermDic);
-
-            Dictionary<string, object> meta = new Dictionary<string, object>();
-            meta.Add("user-id", "jay@example.com");
-            meta.Add("contains-unicode", "The 💩 test.");
-
-            Dictionary<string, object> permissionDic = new Dictionary<string, object>();
-            permissionDic.Add("resources", resourcesDic);
-            permissionDic.Add("patterns", patternsDic);
-            permissionDic.Add("meta", meta);
-
-            Dictionary<string, object> messageEnvelope = new Dictionary<string, object>();
-            messageEnvelope.Add("ttl", 1440);
-            messageEnvelope.Add("permissions", permissionDic);
-            string postMessage = Newtonsoft.Json.JsonConvert.SerializeObject(messageEnvelope);
-
-            server.AddRequest(new Request()
-                    .WithMethod("POST")
-                    .WithPath(string.Format("/v3/pam/{0}/grant", PubnubCommon.SubscribeKey))
-                    .WithContent(postMessage)
-                    .WithParameter("PoundsSterling", "£13.37")
-                    .WithParameter("timestamp", "123456789")
-                    .WithParameter("signature", "v2.k80LsDMD-sImA8rCBj-ntRKhZ8mSjHY8Ivngt9W3Yc4")
-                    .WithResponse(expected)
-                    .WithStatusCode(System.Net.HttpStatusCode.OK));
-
-            if (PubnubCommon.PAMServerSideGrant)
-            {
-#if NET40
-                PNResult< PNAccessManagerTokenResult> tokenResult = Task.Factory.StartNew(async () => await pubnub.GrantToken()
-                            .Users(new Dictionary<string, PNResourcePermission>() {
-                                { "pandu_userid0", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
-                                { "pandu_userid1", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
-                                { "pandu-ut-uid", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
-                                { "pandu-ut-uid1", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
-                                { "pandu-ut-uid2", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } } })
-                            .Spaces(new Dictionary<string, PNResourcePermission>() {
-                                { "pandu_spaceid0", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
-                                { "pandu_spaceid1", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
-                                { "pandu-ut-sid", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
-                                { "pandu-ut-sid1", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
-                                { "pandu-ut-sid2", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } } })
-                            .Users(new Dictionary<string, PNResourcePermission>() {
-                                { "^emp-gen-*", new PNResourcePermission() { Read = true, Write = true } },
-                                { "^emp-mgr-*", new PNResourcePermission() { Read = true, Write = true, Create = true, Delete = true } } }, true)
-                            .Spaces(new Dictionary<string, PNResourcePermission>() {
-                                { "^public-*", new PNResourcePermission() { Read = true } },
-                                { "^private-*", new PNResourcePermission() { Read = true, Write = true, Create = true, Delete = true } } }, true)
-                            .TTL(30 * 24 * 60)
-                            .AuthKey("myauth")
-                            .ExecuteAsync()).Result.Result;
-#else
-                PNResult<PNAccessManagerTokenResult> tokenResult = await pubnub.GrantToken()
-                            .Users(new Dictionary<string, PNResourcePermission>() {
-                                { "pandu_userid0", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
-                                { "pandu_userid1", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
-                                { "pandu-ut-uid", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
-                                { "pandu-ut-uid1", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
-                                { "pandu-ut-uid2", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } } })
-                            .Spaces(new Dictionary<string, PNResourcePermission>() {
-                                { "pandu_spaceid0", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
-                                { "pandu_spaceid1", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
-                                { "pandu-ut-sid", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
-                                { "pandu-ut-sid1", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } },
-                                { "pandu-ut-sid2", new PNResourcePermission() { Read = true, Write = true, Manage= true, Create = true, Delete=true } } })
-                            .Users(new Dictionary<string, PNResourcePermission>() {
-                                { "^emp-gen-*", new PNResourcePermission() { Read = true, Write = true } },
-                                { "^emp-mgr-*", new PNResourcePermission() { Read = true, Write = true, Create = true, Delete = true } } }, true)
-                            .Spaces(new Dictionary<string, PNResourcePermission>() {
-                                { "^public-*", new PNResourcePermission() { Read = true } },
-                                { "^private-*", new PNResourcePermission() { Read = true, Write = true, Create = true, Delete = true } } }, true)
-                            .TTL(30 * 24 * 60)
-                            .AuthKey("myauth")
-                            .ExecuteAsync();
-#endif
-
-                Thread.Sleep(1000);
-
-                if (tokenResult.Result != null)
-                {
-                    try
-                    {
-                        string token = tokenResult.Result.Token;
-                        PNConfiguration config2 = new PNConfiguration
-                        {
-                            EnableTokenManager = true
-                        };
-                        Pubnub pubnub2 = new Pubnub(config2);
-                        PNGrantToken grantObject = pubnub2.ParseToken(token);
-                        System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(grantObject));
-                    }
-                    catch (Exception ex)
-                    {
-                        System.Diagnostics.Debug.WriteLine(ex.ToString());
-                    }
-                    receivedGrantMessage = true;
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(tokenResult.Status));
-                }
-
-                pubnub.Destroy();
-                pubnub.PubnubUnitTest = null;
-                pubnub = null;
-                Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenWithAsyncPAMv3ChannelShouldReturnTokenSuccess failed.");
-
-            }
-            else
-            {
-                Assert.Ignore("PAM Not Enabled for WhenGrantIsRequested -> ThenPAMv3ChannelShouldReturnSuccess.");
-            }
         }
 
         private class GrantResult : PNCallback<PNAccessManagerGrantResult>

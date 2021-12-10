@@ -99,7 +99,8 @@ namespace PubnubApi
 
         public bool SuppressLeaveEvents { get; set; }
 
-        public bool EnableTokenManager { get; set; } = true;
+        public bool UseRandomInitializationVector { get; set; }
+        public int FileMessagePublishRetryLimit { get; set; }
 
         public PNConfiguration()
         {
@@ -121,6 +122,8 @@ namespace PubnubApi
             this.DedupOnSubscribe = false;
             this.MaximumMessagesCacheSize = 100;
             this.SuppressLeaveEvents = false;
+            this.UseRandomInitializationVector = true;
+            this.FileMessagePublishRetryLimit = 5;
         }
 
         public PNConfiguration SetPresenceTimeoutWithCustomInterval(int timeout, int interval)

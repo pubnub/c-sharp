@@ -16,7 +16,6 @@ namespace PubnubApi.EndPoint
         private static IPubnubUnitTest unit;
         private static IPubnubLog pubnubLog;
         private static EndPoint.TelemetryManager pubnubTelemetryMgr;
-        private readonly EndPoint.TokenManager pubnubTokenMgr;
 
         private static Timer SubscribeHeartbeatCheckTimer;
         private Timer multiplexExceptionTimer;
@@ -29,15 +28,15 @@ namespace PubnubApi.EndPoint
             unit = pubnubUnit;
             pubnubLog = log;
             pubnubTelemetryMgr = telemetryManager;
-            this.pubnubTokenMgr = tokenManager;
         }
 
-
+#pragma warning disable
         internal void MultiChannelUnSubscribeAll<T>(PNOperationType type, Dictionary<string, object> externalQueryParam)
+#pragma warning restore
         {
             //Retrieve the current channels already subscribed previously and terminate them
-            string[] currentChannels = MultiChannelSubscribe[PubnubInstance.InstanceId].Keys.ToArray<string>();
-            string[] currentChannelGroups = MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Keys.ToArray<string>();
+            string[] currentChannels = (MultiChannelSubscribe.ContainsKey(PubnubInstance.InstanceId) && MultiChannelSubscribe[PubnubInstance.InstanceId] != null) ? MultiChannelSubscribe[PubnubInstance.InstanceId].Keys.ToArray<string>() : null;
+            string[] currentChannelGroups = (MultiChannelGroupSubscribe.ContainsKey(PubnubInstance.InstanceId) && MultiChannelGroupSubscribe[PubnubInstance.InstanceId] != null) ? MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Keys.ToArray<string>() : null;
 
             if (currentChannels != null && currentChannels.Length >= 0)
             {
@@ -79,8 +78,8 @@ namespace PubnubApi.EndPoint
                 {
                     //just fire leave() event to REST API for safeguard
                     string channelsJsonState = BuildJsonUserState(currentChannels, currentChannelGroups, false);
-                    IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
-                    urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+                    IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+                    
                     Uri request = urlBuilder.BuildMultiChannelLeaveRequest("GET", "", currentChannels, currentChannelGroups, channelsJsonState, externalQueryParam);
 
                     RequestState<T> requestState = new RequestState<T>();
@@ -240,8 +239,8 @@ namespace PubnubApi.EndPoint
                         {
                             //just fire leave() event to REST API for safeguard
                             string channelsJsonState = BuildJsonUserState(validChannels.ToArray(), validChannelGroups.ToArray(), false);
-                            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
-                            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+                            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+                            
                             Uri request = urlBuilder.BuildMultiChannelLeaveRequest("GET", "", validChannels.ToArray(), validChannelGroups.ToArray(), channelsJsonState, externalQueryParam);
 
                             RequestState<T> requestState = new RequestState<T>();
@@ -391,7 +390,7 @@ namespace PubnubApi.EndPoint
 
 
                         //Continue with any remaining channels for subscribe/presence
-                        MultiChannelSubscribeRequest<T>(PNOperationType.PNSubscribeOperation, channels, channelGroups, 0, false, null, this.customQueryParam);
+                        MultiChannelSubscribeRequest<T>(PNOperationType.PNSubscribeOperation, channels, channelGroups, 0, 0, false, null, this.customQueryParam);
                     }
                     else
                     {
@@ -420,6 +419,7 @@ namespace PubnubApi.EndPoint
             {
                 bool channelGroupSubscribeOnly = false;
                 SubscribeDisconnected[PubnubInstance.InstanceId] = false;
+                SubscribeAccessDenied[PubnubInstance.InstanceId] = false;
 
                 if (rawChannels != null && rawChannels.Length > 0)
                 {
@@ -554,16 +554,9 @@ namespace PubnubApi.EndPoint
                     }
 
                     ResetInternetCheckSettings(channels, channelGroups);
-                    MultiChannelSubscribeRequest<T>(responseType, channels, channelGroups, 0, false, initialSubscribeUrlParams, externalQueryParam);
+                    MultiChannelSubscribeRequest<T>(responseType, channels, channelGroups, 0, 0, false, initialSubscribeUrlParams, externalQueryParam);
 
-                    if (SubscribeHeartbeatCheckTimer != null)
-                    {
-                        try
-                        {
-                            SubscribeHeartbeatCheckTimer.Change(Timeout.Infinite, Timeout.Infinite);
-                        }
-                        catch {  /* ignore */ }
-                    }
+                    CheckAndDisableubscribeHeartbeatCheckTimer();
                     SubscribeHeartbeatCheckTimer = new Timer(StartSubscribeHeartbeatCheckCallback<T>, null, config.SubscribeTimeout * 500, config.SubscribeTimeout * 500);
                 }
             }
@@ -573,7 +566,19 @@ namespace PubnubApi.EndPoint
             }
         }
 
-        private void MultiChannelSubscribeRequest<T>(PNOperationType type, string[] channels, string[] channelGroups, object timetoken, bool reconnect, Dictionary<string, string> initialSubscribeUrlParams, Dictionary<string, object> externalQueryParam)
+        private static void CheckAndDisableubscribeHeartbeatCheckTimer()
+        {
+            if (SubscribeHeartbeatCheckTimer != null)
+            {
+                try
+                {
+                    SubscribeHeartbeatCheckTimer.Change(Timeout.Infinite, Timeout.Infinite);
+                }
+                catch {  /* ignore */ }
+            }
+        }
+
+        private void MultiChannelSubscribeRequest<T>(PNOperationType type, string[] channels, string[] channelGroups, object timetoken, int region, bool reconnect, Dictionary<string, string> initialSubscribeUrlParams, Dictionary<string, object> externalQueryParam)
         {
             if (SubscribeDisconnected[PubnubInstance.InstanceId])
             {
@@ -607,7 +612,7 @@ namespace PubnubApi.EndPoint
                 || (multiChannelGroup != "" && ChannelGroupInternetStatus[PubnubInstance.InstanceId].ContainsKey(multiChannelGroup) && ChannelGroupInternetStatus[PubnubInstance.InstanceId].TryGetValue(multiChannelGroup, out channelGroupInternetFlag) && !channelGroupInternetFlag))
                 && PubnetSystemActive)
             {
-                if (ReconnectNetworkIfOverrideTcpKeepAlive<T>(type, channels, channelGroups, timetoken, networkConnection))
+                if (ReconnectNetworkIfOverrideTcpKeepAlive<T>(type, channels, channelGroups, timetoken, region, networkConnection))
                 {
                     return;
                 }
@@ -657,9 +662,9 @@ namespace PubnubApi.EndPoint
                 // Build URL
                 string channelsJsonState = BuildJsonUserState(channels, channelGroups, false);
                 config.Uuid = CurrentUuid; // to make sure we capture if UUID is changed
-                IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
-                urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
-                Uri request = urlBuilder.BuildMultiChannelSubscribeRequest("GET", "", channels, channelGroups, (Convert.ToInt64(timetoken.ToString()) == 0) ? Convert.ToInt64(timetoken.ToString()) : lastTimetoken, channelsJsonState, initialSubscribeUrlParams, externalQueryParam);
+                IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+                
+                Uri request = urlBuilder.BuildMultiChannelSubscribeRequest("GET", "", channels, channelGroups, (Convert.ToInt64(timetoken.ToString()) == 0) ? Convert.ToInt64(timetoken.ToString()) : lastTimetoken, region, channelsJsonState, initialSubscribeUrlParams, externalQueryParam);
 
                 pubnubRequestState = new RequestState<T>();
                 pubnubRequestState.Channels = channels;
@@ -667,12 +672,15 @@ namespace PubnubApi.EndPoint
                 pubnubRequestState.ResponseType = type;
                 pubnubRequestState.Reconnect = reconnect;
                 pubnubRequestState.Timetoken = Convert.ToInt64(timetoken.ToString());
+                pubnubRequestState.Region = region;
 
                 // Wait for message
                 string json = "";
+                PNStatus pnStatus = null;
                 UrlProcessRequest<T>(request, pubnubRequestState, false).ContinueWith(r =>
                 {
                     json = r.Result.Item1;
+                    pnStatus = r.Result.Item2;
                 }, TaskContinuationOptions.ExecuteSynchronously).Wait();
                 if (!string.IsNullOrEmpty(json))
                 {
@@ -730,6 +738,22 @@ namespace PubnubApi.EndPoint
                 }
                 else
                 {
+                    if (pnStatus != null && pnStatus.Category ==  PNStatusCategory.PNAccessDeniedCategory)
+                    {
+                        //Announce 403 and exit subscribe on 403
+                        Announce(pnStatus); //Announce to subscribe callback when 403
+
+                        ///Disabling flags/checks which can invoke resubscribe
+                        SubscribeAccessDenied[PubnubInstance.InstanceId] = true;
+                        Task.Factory.StartNew(() =>
+                        {
+                            TerminateCurrentSubscriberRequest();
+                        }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
+
+                        CheckAndDisableubscribeHeartbeatCheckTimer();
+                        return;
+                    }
+
                     if (multiplexExceptionTimer != null)
                     {
                         multiplexExceptionTimer.Change(Timeout.Infinite, Timeout.Infinite);
@@ -759,7 +783,7 @@ namespace PubnubApi.EndPoint
 
                 Announce(status);
 
-                MultiChannelSubscribeRequest<T>(type, channels, channelGroups, LastSubscribeTimetoken[PubnubInstance.InstanceId], false, null, externalQueryParam);
+                MultiChannelSubscribeRequest<T>(type, channels, channelGroups, LastSubscribeTimetoken[PubnubInstance.InstanceId], LastSubscribeRegion[PubnubInstance.InstanceId], false, null, externalQueryParam);
             }
         }
 
@@ -828,10 +852,11 @@ namespace PubnubApi.EndPoint
                 }
 
                 long timetoken = GetTimetokenFromMultiplexResult(message);
+                int region = GetRegionFromMultiplexResult(message);
                 Task.Factory.StartNew(() =>
                 {
                     LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} MultiplexInternalCallback timetoken = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), timetoken), config.LogVerbosity);
-                    MultiChannelSubscribeRequest<T>(type, channels, channelGroups, timetoken, false, null, this.customQueryParam);
+                    MultiChannelSubscribeRequest<T>(type, channels, channelGroups, timetoken, region, false, null, this.customQueryParam);
                 }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
             }
             else
@@ -840,7 +865,7 @@ namespace PubnubApi.EndPoint
             }
         }
 
-        private bool ReconnectNetworkIfOverrideTcpKeepAlive<T>(PNOperationType type, string[] channels, string[] channelGroups, object timetoken, bool networkAvailable)
+        private bool ReconnectNetworkIfOverrideTcpKeepAlive<T>(PNOperationType type, string[] channels, string[] channelGroups, object timetoken, int region, bool networkAvailable)
         {
             if (OverrideTcpKeepAlive)
             {
@@ -849,6 +874,7 @@ namespace PubnubApi.EndPoint
                 netState.ChannelGroups = channelGroups;
                 netState.ResponseType = type;
                 netState.Timetoken = timetoken;
+                netState.Region = region;
 
                 if (SubscribeDisconnected[PubnubInstance.InstanceId])
                 {
@@ -993,8 +1019,9 @@ namespace PubnubApi.EndPoint
                 if (resetSubscribeTimetoken)
                 {
                     LastSubscribeTimetoken[PubnubInstance.InstanceId] = 0;
+                    LastSubscribeRegion[PubnubInstance.InstanceId] = 0;
                 }
-                MultiChannelSubscribeRequest<T>(PNOperationType.PNSubscribeOperation, GetCurrentSubscriberChannels(), GetCurrentSubscriberChannelGroups(), LastSubscribeTimetoken[PubnubInstance.InstanceId], false, null, this.customQueryParam);
+                MultiChannelSubscribeRequest<T>(PNOperationType.PNSubscribeOperation, GetCurrentSubscriberChannels(), GetCurrentSubscriberChannelGroups(), LastSubscribeTimetoken[PubnubInstance.InstanceId], LastSubscribeRegion[PubnubInstance.InstanceId], false, null, this.customQueryParam);
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 
             return true;
@@ -1024,6 +1051,12 @@ namespace PubnubApi.EndPoint
                     LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - SubscribeDisconnected. No heartbeat check.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
                     return;
                 }
+                if (SubscribeAccessDenied[PubnubInstance.InstanceId])
+                {
+                    CheckAndDisableubscribeHeartbeatCheckTimer();
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - SubscribeAccessDenied. Exiting StartSubscribeHeartbeatCheckCallback.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                    return;
+                }
 
                 string[] channels = GetCurrentSubscriberChannels();
                 string[] chananelGroups = GetCurrentSubscriberChannelGroups();
@@ -1034,17 +1067,17 @@ namespace PubnubApi.EndPoint
                     if (networkConnection && PubnubInstance != null && SubscribeRequestTracker.ContainsKey(PubnubInstance.InstanceId))
                     {
                         DateTime lastSubscribeRequestTime = SubscribeRequestTracker[PubnubInstance.InstanceId];
-                        if ((DateTime.Now - lastSubscribeRequestTime).TotalSeconds <= config.SubscribeTimeout)
+                        if ((DateTime.Now - lastSubscribeRequestTime).TotalSeconds < config.SubscribeTimeout)
                         {
                             LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - ok. expected subscribe within threshold limit of SubscribeTimeout. No action needed", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
                         }
-                        else if ((DateTime.Now - lastSubscribeRequestTime).TotalSeconds > 2 * config.SubscribeTimeout)
+                        else if ((DateTime.Now - lastSubscribeRequestTime).TotalSeconds > 2 * (config.SubscribeTimeout - config.SubscribeTimeout/2))
                         {
                             LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - **No auto subscribe within threshold limit of SubscribeTimeout**. Calling MultiChannelSubscribeRequest", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
                             Task.Factory.StartNew(() =>
                             {
                                 TerminateCurrentSubscriberRequest();
-                                MultiChannelSubscribeRequest<T>(PNOperationType.PNSubscribeOperation, channels, chananelGroups, LastSubscribeTimetoken[PubnubInstance.InstanceId], false, null, this.customQueryParam);
+                                MultiChannelSubscribeRequest<T>(PNOperationType.PNSubscribeOperation, channels, chananelGroups, LastSubscribeTimetoken[PubnubInstance.InstanceId], LastSubscribeRegion[PubnubInstance.InstanceId], false, null, this.customQueryParam);
                             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
                         }
                         else
@@ -1075,7 +1108,7 @@ namespace PubnubApi.EndPoint
                             Task.Factory.StartNew(() =>
                             {
                                 TerminateCurrentSubscriberRequest();
-                                MultiChannelSubscribeRequest<T>(PNOperationType.PNSubscribeOperation, GetCurrentSubscriberChannels(), GetCurrentSubscriberChannelGroups(), LastSubscribeTimetoken[PubnubInstance.InstanceId], false, null, this.customQueryParam);
+                                MultiChannelSubscribeRequest<T>(PNOperationType.PNSubscribeOperation, GetCurrentSubscriberChannels(), GetCurrentSubscriberChannelGroups(), LastSubscribeTimetoken[PubnubInstance.InstanceId], LastSubscribeRegion[PubnubInstance.InstanceId], false, null, this.customQueryParam);
                             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
                         }
                     }
@@ -1220,7 +1253,7 @@ namespace PubnubApi.EndPoint
                             {
                                 case PNOperationType.PNSubscribeOperation:
                                 case PNOperationType.Presence:
-                                    MultiChannelSubscribeRequest<T>(netState.ResponseType, netState.Channels, netState.ChannelGroups, netState.Timetoken, true, null, this.customQueryParam);
+                                    MultiChannelSubscribeRequest<T>(netState.ResponseType, netState.Channels, netState.ChannelGroups, netState.Timetoken, netState.Region, true, null, this.customQueryParam);
                                     break;
                                 default:
                                     break;
@@ -1300,7 +1333,7 @@ namespace PubnubApi.EndPoint
                             {
                                 case PNOperationType.PNSubscribeOperation:
                                 case PNOperationType.Presence:
-                                    MultiChannelSubscribeRequest<T>(netState.ResponseType, netState.Channels, netState.ChannelGroups, netState.Timetoken, true, null, this.customQueryParam);
+                                    MultiChannelSubscribeRequest<T>(netState.ResponseType, netState.Channels, netState.ChannelGroups, netState.Timetoken, netState.Region, true, null, this.customQueryParam);
                                     break;
                                 default:
                                     break;
@@ -1363,7 +1396,9 @@ namespace PubnubApi.EndPoint
             }
         }
 
-        private void OnPresenceHeartbeatIntervalTimeout<T>(System.Object presenceHeartbeatState)
+#pragma warning disable
+        void OnPresenceHeartbeatIntervalTimeout<T>(System.Object presenceHeartbeatState)
+#pragma warning restore
         {
             //Make presence heartbeat call
             RequestState<T> currentState = presenceHeartbeatState as RequestState<T>;
@@ -1378,8 +1413,8 @@ namespace PubnubApi.EndPoint
                     if ((subscriberChannels != null && subscriberChannels.Length > 0) || (subscriberChannelGroups != null && subscriberChannelGroups.Length > 0))
                     {
                         string channelsJsonState = BuildJsonUserState(subscriberChannels, subscriberChannelGroups, false);
-                        IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
-                        urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+                        IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+                        
                         Uri request = urlBuilder.BuildPresenceHeartbeatRequest("GET", "", subscriberChannels, subscriberChannelGroups, channelsJsonState);
 
                         RequestState<PNHeartbeatResult> requestState = new RequestState<PNHeartbeatResult>();

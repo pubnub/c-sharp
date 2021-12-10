@@ -73,7 +73,7 @@ namespace PubnubApi
             {
                 return a;
             }
-            set
+            internal set
             {
                 a = value;
             }
@@ -85,7 +85,7 @@ namespace PubnubApi
             {
                 return b;
             }
-            set
+            internal set
             {
                 b = value;
             }
@@ -97,7 +97,7 @@ namespace PubnubApi
             {
                 return e;
             }
-            set
+            internal set
             {
                 e = value;
             }
@@ -109,7 +109,7 @@ namespace PubnubApi
             {
                 return c;
             }
-            set
+            internal set
             {
                 c = value;
             }
@@ -121,7 +121,7 @@ namespace PubnubApi
             {
                 return d;
             }
-            set
+            internal set
             {
                 d = value;
             }
@@ -133,7 +133,7 @@ namespace PubnubApi
             {
                 return f;
             }
-            set
+            internal set
             {
                 f = value;
             }
@@ -145,7 +145,7 @@ namespace PubnubApi
             {
                 return i;
             }
-            set
+            internal set
             {
                 i = value;
             }
@@ -157,7 +157,7 @@ namespace PubnubApi
             {
                 return k;
             }
-            set
+            internal set
             {
                 k = value;
             }
@@ -169,7 +169,7 @@ namespace PubnubApi
             {
                 return s;
             }
-            set
+            internal set
             {
                 s = value;
             }
@@ -181,7 +181,7 @@ namespace PubnubApi
             {
                 return o;
             }
-            set
+            internal set
             {
                 o = value;
             }
@@ -193,7 +193,7 @@ namespace PubnubApi
             {
                 return p;
             }
-            set
+            internal set
             {
                 p = value;
             }
@@ -205,7 +205,7 @@ namespace PubnubApi
             {
                 return u;
             }
-            set
+            internal set
             {
                 u = value;
             }

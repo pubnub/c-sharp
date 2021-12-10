@@ -4,6 +4,6 @@ namespace PubnubApi
 {
     public class PNGetStateResult
     {
-        public Dictionary<string, object> StateByUUID { get; set; }
+        public Dictionary<string, object> StateByUUID { get; internal set; }
     }
 }

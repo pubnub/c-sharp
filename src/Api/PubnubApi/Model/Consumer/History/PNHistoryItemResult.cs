@@ -7,9 +7,11 @@ namespace PubnubApi
 {
     public class PNHistoryItemResult
     {
-        public long Timetoken { get; set; }
-        public object Entry { get; set; }
-        public object Meta { get; set; }
-        public object Actions { get; set; }
+        public long Timetoken { get; internal set; }
+        public object Entry { get; internal set; }
+        public object Meta { get; internal set; }
+        public object Actions { get; internal set; }
+        public string Uuid { get; internal set; }
+        public int MessageType { get; internal set; }
     }
 }

@@ -36,7 +36,11 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+#if NET40
+        public static void ThenItShouldReturnTimeStamp()
+#else
         public static async Task ThenItShouldReturnTimeStamp()
+#endif
         {
             server.ClearRequests();
 
@@ -66,6 +70,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
+#if NET40
             pubnub.Time().Execute(new PNTimeResultExt((result, status)=> 
             {
                 try
@@ -99,12 +104,28 @@ namespace PubNubMessaging.Tests
                 }
             }));
             mreTime.WaitOne(310 * 1000);
-
+#else
             PNResult<PNTimeResult> timeResult = await pubnub.Time().ExecuteAsync();
             if (timeResult.Result != null)
             {
                 Debug.WriteLine(string.Format("ASYNC RESULT = {0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(timeResult.Result)));
+                if (timeResult.Status.StatusCode == 200 && timeResult.Status.Error == false)
+                {
+                    if (PubnubCommon.EnableStubTest)
+                    {
+                        if (expectedTime == timeResult.Result.Timetoken)
+                        {
+                            timeReceived = true;
+                        }
+                    }
+                    else if (timeResult.Result.Timetoken > 0)
+                    {
+                        timeReceived = true;
+                    }
+                }
             }
+#endif
+
 
 
 

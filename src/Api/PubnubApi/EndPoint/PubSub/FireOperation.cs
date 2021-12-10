@@ -16,7 +16,6 @@ namespace PubnubApi.EndPoint
         private readonly IPubnubUnitTest unit;
         private readonly IPubnubLog pubnubLog;
         private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
-        private readonly EndPoint.TokenManager pubnubTokenMgr;
 
         private object msg;
         private string channelName = "";
@@ -34,7 +33,6 @@ namespace PubnubApi.EndPoint
             unit = pubnubUnit;
             pubnubLog = log;
             pubnubTelemetryMgr = telemetryManager;
-            pubnubTokenMgr = tokenManager;
         }
 
         public FireOperation Message(object message)
@@ -75,6 +73,21 @@ namespace PubnubApi.EndPoint
 
         public void Execute(PNCallback<PNPublishResult> callback)
         {
+            if (string.IsNullOrEmpty(this.channelName) || string.IsNullOrEmpty(this.channelName.Trim()) || this.msg == null)
+            {
+                throw new ArgumentException("Missing Channel or Message");
+            }
+
+            if (string.IsNullOrEmpty(config.PublishKey) || string.IsNullOrEmpty(config.PublishKey.Trim()) || config.PublishKey.Length <= 0)
+            {
+                throw new MissingMemberException("Invalid publish key");
+            }
+
+            if (callback == null)
+            {
+                throw new ArgumentException("Missing userCallback");
+            }
+
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
@@ -95,13 +108,8 @@ namespace PubnubApi.EndPoint
 
         public async Task<PNResult<PNPublishResult>> ExecuteAsync()
         {
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             syncRequest = false;
             return await Fire(this.channelName, this.msg, false, this.ttl, this.userMetadata, this.queryParam).ConfigureAwait(false);
-#else
-            syncRequest = false;
-            return await Fire(this.channelName, this.msg, false, this.ttl, this.userMetadata, this.queryParam).ConfigureAwait(false);
-#endif
         }
 
         public PNPublishResult Sync()
@@ -147,25 +155,29 @@ namespace PubnubApi.EndPoint
         {
             if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()) || message == null)
             {
-                throw new ArgumentException("Missing Channel or Message");
+                PNStatus status = new PNStatus { Error = true, ErrorData = new PNErrorData("Missing Channel or Message", new ArgumentException("Missing Channel or Message")) };
+                callback.OnResponse(null, status);
+                return;
             }
 
             if (string.IsNullOrEmpty(config.PublishKey) || string.IsNullOrEmpty(config.PublishKey.Trim()) || config.PublishKey.Length <= 0)
             {
-                throw new MissingMemberException("Invalid publish key");
+                PNStatus status = new PNStatus { Error = true, ErrorData = new PNErrorData("Invalid publish key", new ArgumentException("Invalid publish key")) };
+                callback.OnResponse(null, status);
+                return;
             }
 
             if (callback == null)
             {
-                throw new ArgumentException("Missing userCallback");
+                return;
             }
 
             Dictionary<string, string> urlParam = new Dictionary<string, string>();
             urlParam.Add("norep", "true");
 
             string requestMethodName = (this.httpPost) ? "POST" : "GET";
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            
             Uri request = urlBuilder.BuildPublishRequest(requestMethodName, "", channel, message, storeInHistory, ttl, metaData, urlParam, externalQueryParam);
 
             RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>();
@@ -183,7 +195,8 @@ namespace PubnubApi.EndPoint
                 Dictionary<string, object> messageEnvelope = new Dictionary<string, object>();
                 messageEnvelope.Add("message", message);
                 string postMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
-                UrlProcessRequest(request, requestState, false, postMessage).ContinueWith(r =>
+                byte[] postData = Encoding.UTF8.GetBytes(postMessage);
+                UrlProcessRequest(request, requestState, false, postData).ContinueWith(r =>
                 {
                     json = r.Result.Item1;
                 }, TaskContinuationOptions.ExecuteSynchronously).Wait();
@@ -230,18 +243,14 @@ namespace PubnubApi.EndPoint
 
             if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()) || message == null)
             {
-                PNStatus errStatus = new PNStatus();
-                errStatus.Error = true;
-                errStatus.ErrorData = new PNErrorData("Missing Channel or Message", new ArgumentException("Missing Channel or Message"));
+                PNStatus errStatus = new PNStatus { Error = true, ErrorData = new PNErrorData("Missing Channel or Message", new ArgumentException("Missing Channel or Message")) };
                 ret.Status = errStatus;
                 return ret;
             }
 
             if (string.IsNullOrEmpty(config.PublishKey) || string.IsNullOrEmpty(config.PublishKey.Trim()) || config.PublishKey.Length <= 0)
             {
-                PNStatus errStatus = new PNStatus();
-                errStatus.Error = true;
-                errStatus.ErrorData = new PNErrorData("Invalid publish key", new MissingMemberException("Invalid publish key"));
+                PNStatus errStatus = new PNStatus { Error = true, ErrorData = new PNErrorData("Invalid publish key", new ArgumentException("Invalid publish key")) };
                 ret.Status = errStatus;
                 return ret;
             }
@@ -250,8 +259,8 @@ namespace PubnubApi.EndPoint
             urlParam.Add("norep", "true");
 
             string requestMethodName = (this.httpPost) ? "POST" : "GET";
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            
             Uri request = urlBuilder.BuildPublishRequest(requestMethodName, "", channel, message, storeInHistory, ttl, metaData, urlParam, externalQueryParam);
 
             RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>();
@@ -268,7 +277,8 @@ namespace PubnubApi.EndPoint
                 Dictionary<string, object> messageEnvelope = new Dictionary<string, object>();
                 messageEnvelope.Add("message", message);
                 string postMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
-                JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false, postMessage).ConfigureAwait(false);
+                byte[] postData = Encoding.UTF8.GetBytes(postMessage);
+                JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false, postData).ConfigureAwait(false);
             }
             else
             {

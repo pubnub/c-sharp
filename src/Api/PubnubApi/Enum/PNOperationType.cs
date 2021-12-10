@@ -23,22 +23,26 @@ namespace PubnubApi
         PNRemoveGroupOperation,
         PNChannelsForGroupOperation,
 
-        PNCreateUserOperation,
-        PNUpdateUserOperation,
-        PNDeleteUserOperation,
-        PNGetUserOperation,
-        PNGetUsersOperation,
+        PNSetUuidMetadataOperation,
+        PNGetUuidMetadataOperation,
+        PNGetAllUuidMetadataOperation,
+        PNDeleteUuidMetadataOperation,
 
-        PNCreateSpaceOperation,
-        PNUpdateSpaceOperation,
-        PNDeleteSpaceOperation,
-        PNGetSpacesOperation,
-        PNGetSpaceOperation,
+        PNSetChannelMetadataOperation,
+        PNGetChannelMetadataOperation,
+        PNGetAllChannelMetadataOperation,
+        PNDeleteChannelMetadataOperation,
 
-        PNManageMembershipsOperation,
-        PNManageMembersOperation,
+
+        PNGetChannelMembersOperation,
+        PNSetChannelMembersOperation,
+        PNRemoveChannelMembersOperation,
+        PNManageChannelMembersOperation,
+
         PNGetMembershipsOperation,
-        PNGetMembersOperation,
+        PNSetMembershipsOperation,
+        PNRemoveMembershipsOperation,
+        PNManageMembershipsOperation,
 
         PNAddMessageActionOperation,
         PNRemoveMessageActionOperation,
@@ -64,6 +68,14 @@ namespace PubnubApi
         PNGetStateOperation,
         PNAccessManagerAudit,
         PNAccessManagerGrantToken,
-        PNAccessManagerGrant
+        PNAccessManagerGrant,
+        PNAccessManagerRevokeToken,
+        PNGenerateFileUploadUrlOperation,
+        PNFileUploadOperation,
+        PNPublishFileMessageOperation,
+        PNFileUrlOperation,
+        PNDownloadFileOperation,
+        PNListFilesOperation,
+        PNDeleteFileOperation
     }
 }

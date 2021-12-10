@@ -4,6 +4,6 @@ namespace PubnubApi
 {
     public class PNSetStateResult
     {
-        public Dictionary<string, object> State { get; set; }
+        public Dictionary<string, object> State { get; internal set; }
     }
 }

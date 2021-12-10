@@ -124,10 +124,16 @@ namespace PubnubApi
             return auditOperation;
         }
 
-		public EndPoint.GrantTokenOperation GrantToken()
-		{
+        public EndPoint.GrantTokenOperation GrantToken()
+        {
             EndPoint.GrantTokenOperation grantOperation = new EndPoint.GrantTokenOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
             return grantOperation;
+        }
+
+        public EndPoint.RevokeTokenOperation RevokeToken()
+        {
+            EndPoint.RevokeTokenOperation revokeTokenOperation = new EndPoint.RevokeTokenOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
+            return revokeTokenOperation;
         }
 
         public EndPoint.GrantOperation Grant()
@@ -176,76 +182,52 @@ namespace PubnubApi
             return auditPushChannelOperation;
         }
 
-        public EndPoint.CreateUserOperation CreateUser()
+        public EndPoint.SetUuidMetadataOperation SetUuidMetadata()
         {
-            EndPoint.CreateUserOperation createUserOperation = new EndPoint.CreateUserOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
-            return createUserOperation;
+            EndPoint.SetUuidMetadataOperation setUuidMetadataOperation = new EndPoint.SetUuidMetadataOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
+            return setUuidMetadataOperation;
         }
 
-        public EndPoint.UpdateUserOperation UpdateUser()
+        public EndPoint.RemoveUuidMetadataOperation RemoveUuidMetadata()
         {
-            EndPoint.UpdateUserOperation updateUserOperation = new EndPoint.UpdateUserOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
-            return updateUserOperation;
+            EndPoint.RemoveUuidMetadataOperation removeUuidMetadataOperation = new EndPoint.RemoveUuidMetadataOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
+            return removeUuidMetadataOperation;
         }
 
-        public EndPoint.DeleteUserOperation DeleteUser()
+        public EndPoint.GetAllUuidMetadataOperation GetAllUuidMetadata()
         {
-            EndPoint.DeleteUserOperation deleteUserOperation = new EndPoint.DeleteUserOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
-            return deleteUserOperation;
+            EndPoint.GetAllUuidMetadataOperation getAllUuidMetadataOperation = new EndPoint.GetAllUuidMetadataOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
+            return getAllUuidMetadataOperation;
         }
 
-        public EndPoint.GetUsersOperation GetUsers()
+        public EndPoint.GetUuidMetadataOperation GetUuidMetadata()
         {
-            EndPoint.GetUsersOperation getUsersOperation = new EndPoint.GetUsersOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
-            return getUsersOperation;
+            EndPoint.GetUuidMetadataOperation getUuidMetadataOperation = new EndPoint.GetUuidMetadataOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
+            return getUuidMetadataOperation;
         }
 
-        public EndPoint.GetUserOperation GetUser()
+        public EndPoint.SetChannelMetadataOperation SetChannelMetadata()
         {
-            EndPoint.GetUserOperation getUserOperation = new EndPoint.GetUserOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
-            return getUserOperation;
+            EndPoint.SetChannelMetadataOperation setChannelMetadataOperation = new EndPoint.SetChannelMetadataOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
+            return setChannelMetadataOperation;
         }
 
-        public EndPoint.CreateSpaceOperation CreateSpace()
+        public EndPoint.RemoveChannelMetadataOperation RemoveChannelMetadata()
         {
-            EndPoint.CreateSpaceOperation createSpaceOperation = new EndPoint.CreateSpaceOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
-            return createSpaceOperation;
+            EndPoint.RemoveChannelMetadataOperation removeChannelMetadataOperation = new EndPoint.RemoveChannelMetadataOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
+            return removeChannelMetadataOperation;
         }
 
-        public EndPoint.UpdateSpaceOperation UpdateSpace()
+        public EndPoint.GetAllChannelMetadataOperation GetAllChannelMetadata()
         {
-            EndPoint.UpdateSpaceOperation updateSpaceOperation = new EndPoint.UpdateSpaceOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
-            return updateSpaceOperation;
+            EndPoint.GetAllChannelMetadataOperation getAllChannelMetadataOperation = new EndPoint.GetAllChannelMetadataOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
+            return getAllChannelMetadataOperation;
         }
 
-        public EndPoint.DeleteSpaceOperation DeleteSpace()
+        public EndPoint.GetChannelMetadataOperation GetChannelMetadata()
         {
-            EndPoint.DeleteSpaceOperation deleteSpaceOperation = new EndPoint.DeleteSpaceOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
-            return deleteSpaceOperation;
-        }
-
-        public EndPoint.GetSpacesOperation GetSpaces()
-        {
-            EndPoint.GetSpacesOperation getAllSpacesOperation = new EndPoint.GetSpacesOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
-            return getAllSpacesOperation;
-        }
-
-        public EndPoint.GetSpaceOperation GetSpace()
-        {
-            EndPoint.GetSpaceOperation getSingleSpaceOperation = new EndPoint.GetSpaceOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
+            EndPoint.GetChannelMetadataOperation getSingleSpaceOperation = new EndPoint.GetChannelMetadataOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
             return getSingleSpaceOperation;
-        }
-
-        public EndPoint.ManageMembershipsOperation ManageMemberships()
-        {
-            EndPoint.ManageMembershipsOperation membershipOperation = new EndPoint.ManageMembershipsOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
-            return membershipOperation;
-        }
-
-        public EndPoint.ManageMembersOperation ManageMembers()
-        {
-            EndPoint.ManageMembersOperation membersOperation = new EndPoint.ManageMembersOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
-            return membersOperation;
         }
 
         public EndPoint.GetMembershipsOperation GetMemberships()
@@ -254,10 +236,44 @@ namespace PubnubApi
             return getMembershipOperation;
         }
 
-        public EndPoint.GetMembersOperation GetMembers()
+        public EndPoint.SetMembershipsOperation SetMemberships()
         {
-            EndPoint.GetMembersOperation getMembersOperation = new EndPoint.GetMembersOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
-            return getMembersOperation;
+            EndPoint.SetMembershipsOperation setMembershipsOperation = new EndPoint.SetMembershipsOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
+            return setMembershipsOperation;
+        }
+        public EndPoint.RemoveMembershipsOperation RemoveMemberships()
+        {
+            EndPoint.RemoveMembershipsOperation removeMembershipsOperation = new EndPoint.RemoveMembershipsOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
+            return removeMembershipsOperation;
+        }
+        public EndPoint.ManageMembershipsOperation ManageMemberships()
+        {
+            EndPoint.ManageMembershipsOperation manageMembershipsOperation = new EndPoint.ManageMembershipsOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
+            return manageMembershipsOperation;
+        }
+
+        public EndPoint.GetChannelMembersOperation GetChannelMembers()
+        {
+            EndPoint.GetChannelMembersOperation getChannelMembersOperation = new EndPoint.GetChannelMembersOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
+            return getChannelMembersOperation;
+        }
+
+        public EndPoint.SetChannelMembersOperation SetChannelMembers()
+        {
+            EndPoint.SetChannelMembersOperation setChannelMembersOperation = new EndPoint.SetChannelMembersOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
+            return setChannelMembersOperation;
+        }
+
+        public EndPoint.RemoveChannelMembersOperation RemoveChannelMembers()
+        {
+            EndPoint.RemoveChannelMembersOperation removeChannelMembersOperation = new EndPoint.RemoveChannelMembersOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
+            return removeChannelMembersOperation;
+        }
+
+        public EndPoint.ManageChannelMembersOperation ManageChannelMembers()
+        {
+            EndPoint.ManageChannelMembersOperation channelMembersOperation = new EndPoint.ManageChannelMembersOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
+            return channelMembersOperation;
         }
 
         public EndPoint.AddMessageActionOperation AddMessageAction()
@@ -335,9 +351,45 @@ namespace PubnubApi
             }
             return ret;
         }
-#endregion
+        #endregion
 
-#region "PubNub API Other Methods"
+        public EndPoint.SendFileOperation SendFile()
+        {
+            EndPoint.SendFileOperation uploadFileOperation = new EndPoint.SendFileOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
+            return uploadFileOperation;
+        }
+
+        public EndPoint.GetFileUrlOperation GetFileUrl()
+        {
+            EndPoint.GetFileUrlOperation getFileUrlOperation = new EndPoint.GetFileUrlOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
+            return getFileUrlOperation;
+        }
+
+        public EndPoint.DownloadFileOperation DownloadFile()
+        {
+            EndPoint.DownloadFileOperation downloadFileOperation = new EndPoint.DownloadFileOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
+            return downloadFileOperation;
+        }
+
+        public EndPoint.ListFilesOperation ListFiles()
+        {
+            EndPoint.ListFilesOperation listFilesOperation = new EndPoint.ListFilesOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
+            return listFilesOperation;
+        }
+
+        public EndPoint.DeleteFileOperation DeleteFile()
+        {
+            EndPoint.DeleteFileOperation deleteFileOperation = new EndPoint.DeleteFileOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
+            return deleteFileOperation;
+        }
+
+        public EndPoint.PublishFileMessageOperation PublishFileMessage()
+        {
+            EndPoint.PublishFileMessageOperation publshFileMessageOperation = new EndPoint.PublishFileMessageOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
+            return publshFileMessageOperation;
+        }
+
+        #region "PubNub API Other Methods"
         public void TerminateCurrentSubscriberRequest()
 		{
             EndPoint.OtherOperation endpoint = new EndPoint.OtherOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, this);
@@ -384,14 +436,14 @@ namespace PubnubApi
 
         public List<string> GetSubscribedChannels()
         {
-            EndPoint.OtherOperation endpoint = new EndPoint.OtherOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, null, this);
+            EndPoint.OtherOperation endpoint = new EndPoint.OtherOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, this);
             endpoint.CurrentPubnubInstance(this);
             return endpoint.GetSubscribedChannels();
         }
 
         public List<string> GetSubscribedChannelGroups()
         {
-            EndPoint.OtherOperation endpoint = new EndPoint.OtherOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, null, this);
+            EndPoint.OtherOperation endpoint = new EndPoint.OtherOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, this);
             endpoint.CurrentPubnubInstance(this);
             return endpoint.GetSubscribedChannelGroups();
         }
@@ -399,14 +451,19 @@ namespace PubnubApi
         public void Destroy()
         {
             savedSubscribeOperation = null;
-            EndPoint.OtherOperation endpoint = new EndPoint.OtherOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, null, this);
+            EndPoint.OtherOperation endpoint = new EndPoint.OtherOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, this);
             endpoint.CurrentPubnubInstance(this);
             endpoint.EndPendingRequests();
         }
 
-        public PNGrantToken ParseToken(string token)
+        /// <summary>
+        /// Parses the token and provides token details. This is client only method (works without secret key)
+        /// </summary>
+        /// <param name="token">string</param>
+        /// <returns>PNTokenContent</returns>
+        public PNTokenContent ParseToken(string token)
         {
-            PNGrantToken result = null;
+            PNTokenContent result = null;
             if (tokenManager != null)
             {
                 result = tokenManager.ParseToken(token);
@@ -414,67 +471,22 @@ namespace PubnubApi
             return result;
         }
 
-        public void SetToken(string token)
+        /// <summary>
+        /// Sets the auth token.  This is client only method (works without secret key)
+        /// </summary>
+        /// <param name="token"></param>
+        public void SetAuthToken(string token)
         {
             if (tokenManager != null)
             {
-                tokenManager.SetToken(token);
-            }
-        }
-
-        public void SetTokens(string[] tokens)
-        {
-            if (tokenManager != null)
-            {
-                for (int index=0; index < tokens.Length; index++)
-                {
-                    tokenManager.SetToken(tokens[index]);
-                }
-            }
-        }
-
-        public Dictionary<PNTokenKey, string> GetTokens()
-        {
-            Dictionary<PNTokenKey, string> result = null;
-            if (tokenManager != null)
-            {
-                result = tokenManager.GetAllTokens();
-            }
-            return result;
-        }
-
-        public string GetToken(string resourceType, string resourceId)
-        {
-            string result = "";
-            if (tokenManager != null)
-            {
-                result = tokenManager.GetToken(resourceType, resourceId);
-            }
-            return result;
-        }
-
-        public Dictionary<PNTokenKey, string> GetTokensByResource(string resourceType)
-        {
-            Dictionary<PNTokenKey, string> result = null;
-            if (tokenManager != null)
-            {
-                result = tokenManager.GetTokensByResource(resourceType);
-            }
-            return result;
-        }
-
-        public void ClearTokens()
-        {
-            if (tokenManager != null)
-            {
-                tokenManager.ClearTokens();
+                tokenManager.SetAuthToken(token);
             }
         }
 
         public bool Reconnect<T>()
         {
             bool ret = false;
-            if (savedSubscribeOperation != null && savedSubscribeOperation is EndPoint.SubscribeOperation<T>)
+            if (savedSubscribeOperation is EndPoint.SubscribeOperation<T>)
             {
                 EndPoint.SubscribeOperation<T> subscibeOperationInstance = savedSubscribeOperation as EndPoint.SubscribeOperation<T>;
                 if (subscibeOperationInstance != null)
@@ -525,7 +537,7 @@ namespace PubnubApi
                 throw new ArgumentException("CipherKey missing");
             }
 
-            PubnubCrypto pc = new PubnubCrypto(pubnubConfig.CipherKey);
+            PubnubCrypto pc = new PubnubCrypto(pubnubConfig.CipherKey, pubnubConfig, pubnubLog, pubnubUnitTest);
             return pc.Decrypt(inputString);
         }
 
@@ -536,7 +548,7 @@ namespace PubnubApi
                 throw new ArgumentException("inputString is not valid");
             }
 
-            PubnubCrypto pc = new PubnubCrypto(cipherKey);
+            PubnubCrypto pc = new PubnubCrypto(cipherKey, pubnubConfig, pubnubLog, pubnubUnitTest);
             return pc.Decrypt(inputString);
         }
 
@@ -552,7 +564,7 @@ namespace PubnubApi
                 throw new MissingMemberException("CipherKey missing");
             }
 
-            PubnubCrypto pc = new PubnubCrypto(pubnubConfig.CipherKey);
+            PubnubCrypto pc = new PubnubCrypto(pubnubConfig.CipherKey, pubnubConfig, pubnubLog, pubnubUnitTest);
             return pc.Encrypt(inputString);
         }
 
@@ -563,13 +575,180 @@ namespace PubnubApi
                 throw new ArgumentException("inputString is not valid");
             }
 
-            PubnubCrypto pc = new PubnubCrypto(cipherKey);
+            PubnubCrypto pc = new PubnubCrypto(cipherKey, pubnubConfig, pubnubLog, pubnubUnitTest);
             return pc.Encrypt(inputString);
         }
 
-#endregion
+        public byte[] EncryptFile(byte[] inputBytes)
+        {
+            if (inputBytes == null)
+            {
+                throw new ArgumentException("inputBytes is not valid");
+            }
+            if (pubnubConfig == null || string.IsNullOrEmpty(pubnubConfig.CipherKey))
+            {
+                throw new MissingMemberException("CipherKey missing");
+            }
+            PubnubCrypto pc = new PubnubCrypto(pubnubConfig.CipherKey, pubnubConfig, pubnubLog, pubnubUnitTest);
+            return pc.Encrypt(inputBytes, true);
+        }
+        public byte[] EncryptFile(byte[] inputBytes, string cipherKey)
+        {
+            if (inputBytes == null)
+            {
+                throw new ArgumentException("inputBytes is not valid");
+            }
+            if (pubnubConfig != null && !string.IsNullOrEmpty(pubnubConfig.CipherKey))
+            {
+                //Ignore this. Added this condition to pass Codacy recommendation of making this as static method
+            }
 
-#region "Properties"
+            PubnubCrypto pc = new PubnubCrypto(cipherKey, pubnubConfig, pubnubLog, pubnubUnitTest);
+            return pc.Encrypt(inputBytes, true);
+        }
+        public void EncryptFile(string sourceFile, string destinationFile)
+        {
+            if (string.IsNullOrEmpty(sourceFile) || sourceFile.Length < 1)
+            {
+                throw new ArgumentException("sourceFile is not valid");
+            }
+            if (pubnubConfig == null || string.IsNullOrEmpty(pubnubConfig.CipherKey))
+            {
+                throw new MissingMemberException("CipherKey missing");
+            }
+#if !NETSTANDARD10 && !NETSTANDARD11
+            bool validSource = System.IO.File.Exists(sourceFile);
+            if (!validSource)
+            {
+                throw new ArgumentException("sourceFile is not valid");
+            }
+            string destDirectory = System.IO.Path.GetDirectoryName(destinationFile);
+            bool validDest = System.IO.Directory.Exists(destDirectory);
+            if (!string.IsNullOrEmpty(destDirectory) && !validDest)
+            {
+                throw new ArgumentException("destination path is not valid");
+            }
+            byte[] inputBytes = System.IO.File.ReadAllBytes(sourceFile);
+            byte[] outputBytes = EncryptFile(inputBytes);
+            System.IO.File.WriteAllBytes(destinationFile, outputBytes);
+#else
+            throw new NotSupportedException("FileSystem not supported in NetStandard 1.0/1.1. Consider higher version of .NetStandard.");
+#endif
+        }
+        public void EncryptFile(string sourceFile, string destinationFile, string cipherKey)
+        {
+            if (string.IsNullOrEmpty(sourceFile) || sourceFile.Length < 1)
+            {
+                throw new ArgumentException("sourceFile is not valid");
+            }
+
+#if !NETSTANDARD10 && !NETSTANDARD11
+            bool validSource = System.IO.File.Exists(sourceFile);
+            if (!validSource)
+            {
+                throw new ArgumentException("sourceFile is not valid");
+            }
+            string destDirectory = System.IO.Path.GetDirectoryName(destinationFile);
+            bool validDest = System.IO.Directory.Exists(destDirectory);
+            if (!string.IsNullOrEmpty(destDirectory) && !validDest)
+            {
+                throw new ArgumentException("destination path is not valid");
+            }
+            byte[] inputBytes = System.IO.File.ReadAllBytes(sourceFile);
+            byte[] outputBytes = EncryptFile(inputBytes, cipherKey);
+            System.IO.File.WriteAllBytes(destinationFile, outputBytes);
+#else
+            throw new NotSupportedException("FileSystem not supported in NetStandard 1.0/1.1. Consider higher version of .NetStandard.");
+#endif
+        }
+
+        public byte[] DecryptFile(byte[] inputBytes)
+        {
+            if (inputBytes == null)
+            {
+                throw new ArgumentException("inputBytes is not valid");
+            }
+
+            if (pubnubConfig == null || string.IsNullOrEmpty(pubnubConfig.CipherKey))
+            {
+                throw new ArgumentException("CipherKey missing");
+            }
+
+            PubnubCrypto pc = new PubnubCrypto(pubnubConfig.CipherKey, pubnubConfig, pubnubLog, pubnubUnitTest);
+            return pc.Decrypt(inputBytes, true);
+        }
+        public void DecryptFile(string sourceFile, string destinationFile)
+        {
+            if (string.IsNullOrEmpty(sourceFile) || sourceFile.Length < 1)
+            {
+                throw new ArgumentException("sourceFile is not valid");
+            }
+
+            if (pubnubConfig == null || string.IsNullOrEmpty(pubnubConfig.CipherKey))
+            {
+                throw new ArgumentException("CipherKey missing");
+            }
+
+#if !NETSTANDARD10 && !NETSTANDARD11
+            bool validSource = System.IO.File.Exists(sourceFile);
+            if (!validSource)
+            {
+                throw new ArgumentException("sourceFile is not valid");
+            }
+            string destDirectory = System.IO.Path.GetDirectoryName(destinationFile);
+            bool validDest = System.IO.Directory.Exists(destDirectory);
+            if (!string.IsNullOrEmpty(destDirectory) && !validDest)
+            {
+                throw new ArgumentException("destination path is not valid");
+            }
+            byte[] inputBytes = System.IO.File.ReadAllBytes(sourceFile);
+            byte[] outputBytes = DecryptFile(inputBytes, pubnubConfig.CipherKey);
+            System.IO.File.WriteAllBytes(destinationFile, outputBytes);
+#else
+            throw new NotSupportedException("FileSystem not supported in NetStandard 1.0/1.1. Consider higher version of .NetStandard.");
+#endif
+        }
+        public byte[] DecryptFile(byte[] inputBytes, string cipherKey)
+        {
+            if (inputBytes == null)
+            {
+                throw new ArgumentException("inputBytes is not valid");
+            }
+            if (pubnubConfig != null && !string.IsNullOrEmpty(pubnubConfig.CipherKey))
+            {
+                //Ignore this. Added this condition to pass Codacy recommendation of making this as static method
+            }
+            PubnubCrypto pc = new PubnubCrypto(cipherKey, pubnubConfig, pubnubLog, pubnubUnitTest);
+            return pc.Decrypt(inputBytes, true);
+        }
+        public void DecryptFile(string sourceFile, string destinationFile, string cipherKey)
+        {
+            if (string.IsNullOrEmpty(sourceFile) || sourceFile.Length < 1)
+            {
+                throw new ArgumentException("inputFile is not valid");
+            }
+#if !NETSTANDARD10 && !NETSTANDARD11
+            bool validSource = System.IO.File.Exists(sourceFile);
+            if (!validSource)
+            {
+                throw new ArgumentException("sourceFile is not valid");
+            }
+            string destDirectory = System.IO.Path.GetDirectoryName(destinationFile);
+            bool validDest = System.IO.Directory.Exists(destDirectory);
+            if (!string.IsNullOrEmpty(destDirectory) && !validDest)
+            {
+                throw new ArgumentException("destination path is not valid");
+            }
+            byte[] inputBytes = System.IO.File.ReadAllBytes(sourceFile);
+            byte[] outputBytes = DecryptFile(inputBytes, cipherKey);
+            System.IO.File.WriteAllBytes(destinationFile, outputBytes);
+#else
+            throw new NotSupportedException("FileSystem not supported in NetStandard 1.0/1.1. Consider higher version of .NetStandard.");
+#endif
+        }
+        #endregion
+
+        #region "Properties"
         public IPubnubUnitTest PubnubUnitTest
         {
             get
@@ -630,7 +809,7 @@ namespace PubnubApi
                 telemetryManager = new EndPoint.TelemetryManager(pubnubConfig, pubnubLog);
             }
             CheckRequiredConfigValues();
-            if (config != null && string.IsNullOrEmpty(config.SecretKey) && config.EnableTokenManager)
+            if (config != null)
             {
                 tokenManager = new EndPoint.TokenManager(pubnubConfig, JsonPluggableLibrary, pubnubLog, this.InstanceId);
             }

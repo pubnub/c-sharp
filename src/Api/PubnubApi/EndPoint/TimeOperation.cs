@@ -62,11 +62,7 @@ namespace PubnubApi.EndPoint
 
         public async Task<PNResult<PNTimeResult>> ExecuteAsync()
         {
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             return await Time(this.queryParam).ConfigureAwait(false);
-#else
-            return await Time(this.queryParam).ConfigureAwait(false);
-#endif
         }
 
         internal void Retry()
@@ -87,8 +83,8 @@ namespace PubnubApi.EndPoint
 
         internal void Time(Dictionary<string, object> externalQueryParam, PNCallback<PNTimeResult> callback)
         {
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, null);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            
             Uri request = urlBuilder.BuildTimeRequest("GET", "", externalQueryParam);
 
             RequestState<PNTimeResult> requestState = new RequestState<PNTimeResult>();
@@ -113,8 +109,8 @@ namespace PubnubApi.EndPoint
         {
             PNResult<PNTimeResult> ret = new PNResult<PNTimeResult>();
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, null);
-            urlBuilder.PubnubInstanceId = (PubnubInstance != null) ? PubnubInstance.InstanceId : "";
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            
             Uri request = urlBuilder.BuildTimeRequest("GET", "", externalQueryParam);
 
             RequestState<PNTimeResult> requestState = new RequestState<PNTimeResult>();

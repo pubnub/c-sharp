@@ -93,6 +93,7 @@ namespace PubnubApi.EndPoint
                     endpoint = "l_push";
                     break;
                 case PNOperationType.PNAccessManagerGrantToken:
+                case PNOperationType.PNAccessManagerRevokeToken:
                     endpoint = "l_pamv3";
                     break;
                 case PNOperationType.PNAccessManagerAudit:
@@ -108,26 +109,33 @@ namespace PubnubApi.EndPoint
                 case PNOperationType.PNSignalOperation:
                     endpoint = "l_sig";
                     break;
-                case PNOperationType.PNCreateUserOperation:
-                case PNOperationType.PNUpdateUserOperation:
-                case PNOperationType.PNDeleteUserOperation:
-                case PNOperationType.PNGetUsersOperation:
-                case PNOperationType.PNGetUserOperation:
-                case PNOperationType.PNCreateSpaceOperation:
-                case PNOperationType.PNUpdateSpaceOperation:
-                case PNOperationType.PNDeleteSpaceOperation:
-                case PNOperationType.PNGetSpacesOperation:
-                case PNOperationType.PNGetSpaceOperation:
+                case PNOperationType.PNSetUuidMetadataOperation:
+                case PNOperationType.PNDeleteUuidMetadataOperation:
+                case PNOperationType.PNGetAllUuidMetadataOperation:
+                case PNOperationType.PNGetUuidMetadataOperation:
+                case PNOperationType.PNSetChannelMetadataOperation:
+                case PNOperationType.PNDeleteChannelMetadataOperation:
+                case PNOperationType.PNGetAllChannelMetadataOperation:
+                case PNOperationType.PNGetChannelMetadataOperation:
                 case PNOperationType.PNGetMembershipsOperation:
                 case PNOperationType.PNManageMembershipsOperation:
-                case PNOperationType.PNGetMembersOperation:
-                case PNOperationType.PNManageMembersOperation:
+                case PNOperationType.PNSetMembershipsOperation:
+                case PNOperationType.PNRemoveMembershipsOperation:
+                case PNOperationType.PNGetChannelMembersOperation:
+                case PNOperationType.PNManageChannelMembersOperation:
+                case PNOperationType.PNSetChannelMembersOperation:
+                case PNOperationType.PNRemoveChannelMembersOperation:
                     endpoint = "l_obj";
                     break;
                 case PNOperationType.PNAddMessageActionOperation:
                 case PNOperationType.PNRemoveMessageActionOperation:
                 case PNOperationType.PNGetMessageActionsOperation:
                     endpoint = "l_msga";
+                    break;
+                case PNOperationType.PNGenerateFileUploadUrlOperation:
+                case PNOperationType.PNPublishFileMessageOperation:
+                case PNOperationType.PNDownloadFileOperation:
+                    endpoint = "l_file";
                     break;
                 default:
                     endpoint = "";
