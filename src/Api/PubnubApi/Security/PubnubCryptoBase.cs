@@ -2,14 +2,7 @@
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
-
-#if NET35
 using System.Security.Cryptography;
-#else
-using Org.BouncyCastle.Crypto;
-using Org.BouncyCastle.Crypto.Parameters;
-using Org.BouncyCastle.Security;
-#endif
 
 namespace PubnubApi
 {
@@ -163,24 +156,11 @@ namespace PubnubApi
             byte[] keyByte = encoding.GetBytes(secret);
             byte[] messageBytes = encoding.GetBytes(message);
 
-#if NET35
             using (var hmacsha256 = new HMACSHA256(keyByte))
             {
                 byte[] hashmessage = hmacsha256.ComputeHash(messageBytes);
                 return Convert.ToBase64String(hashmessage).Replace('+', '-').Replace('/', '_');
             }
-#else
-
-            //http://mycsharp.de/wbb2/thread.php?postid=3550104
-            KeyParameter paramKey = new KeyParameter(keyByte);
-            IMac mac = MacUtilities.GetMac("HMac-SHA256");
-            mac.Init(paramKey);
-            mac.Reset();
-            mac.BlockUpdate(messageBytes, 0, messageBytes.Length);
-            byte[] hashmessage = new byte[mac.GetMacSize()];
-            mac.DoFinal(hashmessage, 0);
-            return Convert.ToBase64String(hashmessage).Replace('+', '-').Replace('/', '_');
-#endif
         }
 
         public static byte[] PubnubAccessManagerSign(string key, byte[] dataBytes)
@@ -191,24 +171,11 @@ namespace PubnubApi
             byte[] keyByte = encoding.GetBytes(secret);
             byte[] messageBytes = dataBytes;
 
-#if NET35
             using (var hmacsha256 = new HMACSHA256(keyByte))
             {
                 byte[] hashmessage = hmacsha256.ComputeHash(messageBytes);
                 return hashmessage;
             }
-#else
-
-            //http://mycsharp.de/wbb2/thread.php?postid=3550104
-            KeyParameter paramKey = new KeyParameter(keyByte);
-            IMac mac = MacUtilities.GetMac("HMac-SHA256");
-            mac.Init(paramKey);
-            mac.Reset();
-            mac.BlockUpdate(messageBytes, 0, messageBytes.Length);
-            byte[] hashmessage = new byte[mac.GetMacSize()];
-            mac.DoFinal(hashmessage, 0);
-            return hashmessage;
-#endif
         }
 
         public string GetHashRaw(string input)

@@ -205,67 +205,81 @@ namespace PubnubApi.EndPoint
                 return;
             }
 
-            string requestMethodName = (this.httpPost) ? "POST" : "GET";
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
-            
-            Uri request = urlBuilder.BuildPublishRequest(requestMethodName, "", channel, message, storeInHistory, ttl, metaData, null, externalQueryParam);
-
             RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>();
-            requestState.Channels = new [] { channel };
-            requestState.ResponseType = PNOperationType.PNPublishOperation;
-            requestState.PubnubCallback = callback;
-            requestState.Reconnect = false;
-            requestState.EndPointOperation = this;
-
-            string json = "";
-
-            if (this.httpPost)
+            try
             {
-                requestState.UsePostMethod = true;
-                string postMessage = JsonEncodePublishMsg(message);
-                byte[] postData = Encoding.UTF8.GetBytes(postMessage);
-                UrlProcessRequest<PNPublishResult>(request, requestState, false, postData).ContinueWith(r =>
-                {
-                    json = r.Result.Item1;
-                }, TaskContinuationOptions.ExecuteSynchronously).Wait();
-            }
-            else
-            {
-                UrlProcessRequest<PNPublishResult>(request, requestState, false).ContinueWith(r =>
-                {
-                    json = r.Result.Item1;
-                }, TaskContinuationOptions.ExecuteSynchronously).Wait();
-            }
+                string requestMethodName = (this.httpPost) ? "POST" : "GET";
+                IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
 
-            if (!string.IsNullOrEmpty(json))
-            {
-                List<object> result = ProcessJsonResponse(requestState, json);
+                Uri request = urlBuilder.BuildPublishRequest(requestMethodName, "", channel, message, storeInHistory, ttl, metaData, null, externalQueryParam);
 
-                if (result != null && result.Count >= 3)
+                requestState.Channels = new[] { channel };
+                requestState.ResponseType = PNOperationType.PNPublishOperation;
+                requestState.PubnubCallback = callback;
+                requestState.Reconnect = false;
+                requestState.EndPointOperation = this;
+
+                string json = "";
+
+                if (this.httpPost)
                 {
-                    int publishStatus;
-                    Int32.TryParse(result[0].ToString(), out publishStatus);
-                    if (publishStatus == 1)
+                    requestState.UsePostMethod = true;
+                    string postMessage = JsonEncodePublishMsg(message);
+                    byte[] postData = Encoding.UTF8.GetBytes(postMessage);
+                    UrlProcessRequest<PNPublishResult>(request, requestState, false, postData).ContinueWith(r =>
                     {
-                        ProcessResponseCallbacks(result, requestState);
-                    }
-                    else
-                    {
-                        PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(400, result[1].ToString());
-                        PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<PNPublishResult>(PNOperationType.PNPublishOperation, category, requestState, 400, new PNException(json));
-                        if (requestState.PubnubCallback != null)
-                        {
-                            requestState.PubnubCallback.OnResponse(default(PNPublishResult), status);
-                        }
-                    }
+                        json = r.Result.Item1;
+                    }, TaskContinuationOptions.ExecuteSynchronously).Wait();
                 }
                 else
                 {
-                    ProcessResponseCallbacks(result, requestState);
+                    UrlProcessRequest<PNPublishResult>(request, requestState, false).ContinueWith(r =>
+                    {
+                        json = r.Result.Item1;
+                    }, TaskContinuationOptions.ExecuteSynchronously).Wait();
                 }
-            }
 
-            CleanUp();
+                if (!string.IsNullOrEmpty(json))
+                {
+                    List<object> result = ProcessJsonResponse(requestState, json);
+
+                    if (result != null && result.Count >= 3)
+                    {
+                        int publishStatus;
+                        Int32.TryParse(result[0].ToString(), out publishStatus);
+                        if (publishStatus == 1)
+                        {
+                            ProcessResponseCallbacks(result, requestState);
+                        }
+                        else
+                        {
+                            PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(400, result[1].ToString());
+                            PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<PNPublishResult>(PNOperationType.PNPublishOperation, category, requestState, 400, new PNException(json));
+                            if (requestState.PubnubCallback != null)
+                            {
+                                requestState.PubnubCallback.OnResponse(default(PNPublishResult), status);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        ProcessResponseCallbacks(result, requestState);
+                    }
+                }
+
+                CleanUp();
+            }
+            catch (Exception ex)
+            {
+                int statusCode = PNStatusCodeHelper.GetHttpStatusCode(ex.ToString());
+                PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, ex.ToString());
+                PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNPublishOperation, category, requestState, statusCode, new PNException(ex.ToString()));
+                if (requestState.PubnubCallback != null)
+                {
+                    requestState.PubnubCallback.OnResponse(default(PNPublishResult), status);
+                }
+
+            }
         }
 
         internal async Task<PNResult<PNPublishResult>> Publish(string channel, object message, bool storeInHistory, int ttl, Dictionary<string, object> metaData, Dictionary<string, object> externalQueryParam)
@@ -290,55 +304,65 @@ namespace PubnubApi.EndPoint
                 return ret;
             }
 
-            string requestMethodName = (this.httpPost) ? "POST" : "GET";
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
-            
-            Uri request = urlBuilder.BuildPublishRequest(requestMethodName, "", channel, message, storeInHistory, ttl, metaData, null, externalQueryParam);
-
             RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>();
-            requestState.Channels = new[] { channel };
-            requestState.ResponseType = PNOperationType.PNPublishOperation;
-            requestState.Reconnect = false;
-            requestState.EndPointOperation = this;
-
-            Tuple<string, PNStatus> JsonAndStatusTuple;
-
-            if (this.httpPost)
+            try
             {
-                requestState.UsePostMethod = true;
-                string postMessage = JsonEncodePublishMsg(message);
-                byte[] postData = Encoding.UTF8.GetBytes(postMessage);
-                JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false, postData).ConfigureAwait(false);
-            }
-            else
-            {
-                JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false).ConfigureAwait(false);
-            }
-            ret.Status = JsonAndStatusTuple.Item2;
-            string json = JsonAndStatusTuple.Item1;
+                string requestMethodName = (this.httpPost) ? "POST" : "GET";
+                IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
 
-            if (!string.IsNullOrEmpty(json))
-            {
-                List<object> result = ProcessJsonResponse(requestState, json);
+                Uri request = urlBuilder.BuildPublishRequest(requestMethodName, "", channel, message, storeInHistory, ttl, metaData, null, externalQueryParam);
 
-                if (result != null && result.Count >= 3)
+                requestState.Channels = new[] { channel };
+                requestState.ResponseType = PNOperationType.PNPublishOperation;
+                requestState.Reconnect = false;
+                requestState.EndPointOperation = this;
+
+                Tuple<string, PNStatus> JsonAndStatusTuple;
+
+                if (this.httpPost)
                 {
-                    int publishStatus;
-                    Int32.TryParse(result[0].ToString(), out publishStatus);
-                    if (publishStatus == 1)
+                    requestState.UsePostMethod = true;
+                    string postMessage = JsonEncodePublishMsg(message);
+                    byte[] postData = Encoding.UTF8.GetBytes(postMessage);
+                    JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false, postData).ConfigureAwait(false);
+                }
+                else
+                {
+                    JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false).ConfigureAwait(false);
+                }
+                ret.Status = JsonAndStatusTuple.Item2;
+                string json = JsonAndStatusTuple.Item1;
+
+                if (!string.IsNullOrEmpty(json))
+                {
+                    List<object> result = ProcessJsonResponse(requestState, json);
+
+                    if (result != null && result.Count >= 3)
                     {
-                        List<object> resultList = ProcessJsonResponse(requestState, json);
-                        if (resultList != null && resultList.Count > 0)
+                        int publishStatus;
+                        Int32.TryParse(result[0].ToString(), out publishStatus);
+                        if (publishStatus == 1)
                         {
-                            ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
-                            PNPublishResult responseResult = responseBuilder.JsonToObject<PNPublishResult>(resultList, true);
-                            if (responseResult != null)
+                            List<object> resultList = ProcessJsonResponse(requestState, json);
+                            if (resultList != null && resultList.Count > 0)
                             {
-                                ret.Result = responseResult;
+                                ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+                                PNPublishResult responseResult = responseBuilder.JsonToObject<PNPublishResult>(resultList, true);
+                                if (responseResult != null)
+                                {
+                                    ret.Result = responseResult;
+                                }
                             }
                         }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                int statusCode = PNStatusCodeHelper.GetHttpStatusCode(ex.ToString());
+                PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, ex.ToString());
+                PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNPublishOperation, category, requestState, statusCode, new PNException(ex.ToString()));
+                ret.Status = status;
             }
 
             return ret;

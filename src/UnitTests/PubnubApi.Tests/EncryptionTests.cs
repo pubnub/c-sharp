@@ -308,8 +308,12 @@ namespace PubNubMessaging.Tests
         {
             IPubnubUnitTest pubnubUnitTest = new PubnubUnitTest();
             pubnubUnitTest.IV = new byte[16] { 133, 126, 158, 123, 43, 95, 96, 90, 215, 178, 17, 73, 166, 130, 79, 156 };
-            string sourceFile = @"C:\Pandu\temp\new\input\file_upload_original.txt";
-            string destFile = @"C:\Pandu\temp\new\input\file_upload_original_encrypted.txt";
+            string sourceFile = "fileupload.txt";
+            string destFile = "fileupload_encrypted.txt";
+            if (System.IO.File.Exists(destFile))
+            {
+                System.IO.File.Delete(destFile);
+            }
             PNConfiguration config = new PNConfiguration();
             Pubnub pn = new Pubnub(config);
             pn.EncryptFile(sourceFile, destFile, "enigma");
@@ -320,8 +324,12 @@ namespace PubNubMessaging.Tests
         [Test]
         public void TestLocalFileDecryptionFromPath()
         {
-            string sourceFile = @"C:\Pandu\temp\new\input\file_image_enc.jpg";
-            string destFile = @"C:\Pandu\temp\new\input\file_image_enc_decrypted_to_original.jpg";
+            string sourceFile = "fileupload_enc.txt";
+            string destFile = "fileupload_enc_decrypted_to_original.txt";
+            if (System.IO.File.Exists(destFile))
+            {
+                System.IO.File.Delete(destFile);
+            }
             PNConfiguration config = new PNConfiguration();
             Pubnub pn = new Pubnub(config);
             pn.DecryptFile(sourceFile, destFile, "enigma");

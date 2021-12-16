@@ -69,7 +69,7 @@ namespace PubNubMessaging.Tests
 
             Thread.Sleep(1000);
 
-            grantManualEvent.WaitOne();
+            grantManualEvent.WaitOne(2000);
 
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
@@ -152,7 +152,7 @@ namespace PubNubMessaging.Tests
                     mre.Set();
                 }));
             Thread.Sleep(1000);
-            mre.WaitOne();
+            mre.WaitOne(3 * 1000 * 60);
 
             if (receivedMessage)
             {
@@ -169,11 +169,12 @@ namespace PubNubMessaging.Tests
                         mre.Set();
                     }));
                 Thread.Sleep(1000);
-                mre.WaitOne();
+                mre.WaitOne(2 * 1000 * 60);
             }
 
             if (receivedMessage)
             {
+                System.Net.ServicePointManager.SecurityProtocol = (System.Net.SecurityProtocolType)3072; //Need this line for .net 3.5/4.0/4.5
                 receivedMessage = false;
                 mre = new ManualResetEvent(false);
                 pubnub.DownloadFile().Channel(channelName).FileId(fileId).FileName(fileName).Execute(new PNDownloadFileResultExt((result, status) =>
@@ -186,7 +187,7 @@ namespace PubNubMessaging.Tests
                     }
                     mre.Set();
                 }));
-                mre.WaitOne();
+                mre.WaitOne(2 * 1000 * 60);
             }
 
             if (receivedMessage)
@@ -204,7 +205,7 @@ namespace PubNubMessaging.Tests
                         mre.Set();
                     }));
                 Thread.Sleep(1000);
-                mre.WaitOne();
+                mre.WaitOne(2 * 1000 * 60);
 
             }
 
@@ -298,11 +299,12 @@ namespace PubNubMessaging.Tests
                     mre.Set();
                 }));
             Thread.Sleep(1000);
-            mre.WaitOne();
+            mre.WaitOne(2 * 1000 * 60);
 
 
             if (receivedMessage)
             {
+                System.Net.ServicePointManager.SecurityProtocol = (System.Net.SecurityProtocolType)3072; //Need this line for .net 3.5/4.0/4.5
                 receivedMessage = false;
                 mre = new ManualResetEvent(false);
                 pubnub.DownloadFile().Channel(channelName).FileId(fileId).FileName(fileName).Execute(new PNDownloadFileResultExt((result, status) =>
@@ -314,7 +316,7 @@ namespace PubNubMessaging.Tests
                     }
                     mre.Set();
                 }));
-                mre.WaitOne();
+                mre.WaitOne(2 * 1000 * 60);
             }
 
             if (receivedMessage)
@@ -332,7 +334,7 @@ namespace PubNubMessaging.Tests
                         mre.Set();
                     }));
                 Thread.Sleep(1000);
-                mre.WaitOne();
+                mre.WaitOne(2 * 1000 * 60);
 
             }
 

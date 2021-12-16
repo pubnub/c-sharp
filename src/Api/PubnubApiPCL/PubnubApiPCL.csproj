@@ -14,7 +14,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubPCL</PackageId>
-    <PackageVersion>5.3.0.0</PackageVersion>
+    <PackageVersion>5.4.0.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -22,7 +22,8 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>Added RevokeToken feature.</PackageReleaseNotes>
+    <PackageReleaseNotes>Replaced BouncyCastle lib with System.Security.Cryptography.Algorithms.
+Added try/catch for publish operation to catch exceptions.</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
@@ -585,6 +586,7 @@
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="PeterO.Cbor" Version="4.4.4" />
+    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.0" />
     <Reference Include="System.Runtime" />
   </ItemGroup>
 
@@ -595,9 +597,6 @@
   </ItemGroup>
   
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
-    <PackageReference Include="Portable.BouncyCastle" Version="1.8.1.2">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
     <PackageReference Include="System.Net.Requests" Version="4.0.11">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
