@@ -271,8 +271,9 @@ namespace PubnubApi.EndPoint
             }
             catch (Exception ex)
             {
-                PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(400, ex.ToString());
-                PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNPublishOperation, category, requestState, 400, new PNException(ex.ToString()));
+                int statusCode = PNStatusCodeHelper.GetHttpStatusCode(ex.ToString());
+                PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, ex.ToString());
+                PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNPublishOperation, category, requestState, statusCode, new PNException(ex.ToString()));
                 if (requestState.PubnubCallback != null)
                 {
                     requestState.PubnubCallback.OnResponse(default(PNPublishResult), status);
@@ -358,8 +359,9 @@ namespace PubnubApi.EndPoint
             }
             catch (Exception ex)
             {
-                PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(400, ex.ToString());
-                PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNPublishOperation, category, requestState, 400, new PNException(ex.ToString()));
+                int statusCode = PNStatusCodeHelper.GetHttpStatusCode(ex.ToString());
+                PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, ex.ToString());
+                PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNPublishOperation, category, requestState, statusCode, new PNException(ex.ToString()));
                 ret.Status = status;
             }
 
