@@ -1,3 +1,8 @@
+v5.4.0 - December 16 2021
+-----------------------------
+- Fixed: replaced BouncyCastle lib with System.Security.Cryptography.Algorithms.
+- Fixed: added try/catch for publish operation to catch exceptions.
+
 v5.3.0 - November 16 2021
 -----------------------------
 - Added: added RevokeToken feature.
