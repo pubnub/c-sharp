@@ -57,7 +57,7 @@ namespace PubNubMessaging.Tests
             string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group\",\"subscribe_key\":\"demo-36\",\"ttl\":20,\"channel-groups\":{\"hello_my_group\":{\"r\":1,\"w\":0,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
 
 
-            pubnub.Grant().Channels(new[] { channelName }).AuthKeys(new[] { authKey }).Read(true).Write(true).Manage(true).Delete(true).TTL(20)
+            pubnub.Grant().Channels(new[] { channelName }).AuthKeys(new[] { authKey }).Read(true).Write(true).Manage(true).Delete(true).Update(true).TTL(20)
                 .Execute(new PNAccessManagerGrantResultExt((r,s)=> 
                 { 
                     if (r != null)

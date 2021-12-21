@@ -1176,7 +1176,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public static void ThenPubnubShouldGenerateUniqueIdentifier()
+        public static void ThenPubnubShouldFailOnWithoutSettingUuid()
         {
             PNConfiguration config = new PNConfiguration
             {
@@ -1184,9 +1184,11 @@ namespace PubNubMessaging.Tests
                 SubscribeKey = PubnubCommon.SubscribeKey,
             };
 
-            pubnub = createPubNubInstance(config);
+            Assert.Throws<MissingMemberException>(() =>
+            {
+                pubnub = createPubNubInstance(config);
+            });
 
-            Assert.IsNotNull(pubnub.GenerateGuid());
             pubnub = null;
         }
 
@@ -1197,6 +1199,7 @@ namespace PubNubMessaging.Tests
             {
                 PublishKey = "",
                 SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "nunit-demo-uuid"
             };
 
             pubnub = createPubNubInstance(config);
@@ -1293,6 +1296,7 @@ namespace PubNubMessaging.Tests
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
+                Uuid = "nunit-demo-uuid"
             };
             if (PubnubCommon.PAMServerSideRun)
             {

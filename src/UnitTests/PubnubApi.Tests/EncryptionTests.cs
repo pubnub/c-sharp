@@ -155,6 +155,7 @@ namespace PubNubMessaging.Tests
                 {
                     SubscribeKey = PubnubCommon.SubscribeKey,
                     PublishKey = PubnubCommon.PublishKey,
+                    Uuid = "unit-test-uuid"
                 };
                 Pubnub pubnub = new Pubnub(config);
                 PNTokenContent pnGrant = pubnub.ParseToken(token);
@@ -315,6 +316,7 @@ namespace PubNubMessaging.Tests
                 System.IO.File.Delete(destFile);
             }
             PNConfiguration config = new PNConfiguration();
+            config.Uuid = "unit-test-uuid";
             Pubnub pn = new Pubnub(config);
             pn.EncryptFile(sourceFile, destFile, "enigma");
             Assert.IsTrue(System.IO.File.Exists(destFile));
@@ -331,6 +333,7 @@ namespace PubNubMessaging.Tests
                 System.IO.File.Delete(destFile);
             }
             PNConfiguration config = new PNConfiguration();
+            config.Uuid = "unit-test-uuid";
             Pubnub pn = new Pubnub(config);
             pn.DecryptFile(sourceFile, destFile, "enigma");
             Assert.IsTrue(System.IO.File.Exists(destFile));

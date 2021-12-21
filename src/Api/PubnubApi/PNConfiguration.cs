@@ -106,7 +106,6 @@ namespace PubnubApi
         {
             this.Origin = "ps.pndsn.com";
             this.presenceHeartbeatTimeout = 300;
-            this.uuid = string.Format("pn-{0}", Guid.NewGuid().ToString());
             this.NonSubscribeRequestTimeout = 10;
             this.SubscribeTimeout = 310;
             this.LogVerbosity = PNLogVerbosity.NONE;

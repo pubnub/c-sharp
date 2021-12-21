@@ -825,6 +825,15 @@ namespace PubnubApi
                     LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, WARNING: The PresenceTimeout cannot be less than 20, defaulting the value to 20. Please update the settings in your code.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
                 }
             }
+            if (config != null && string.IsNullOrEmpty(config.Uuid))
+            {
+                if (pubnubLog != null)
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, PNConfiguration.Uuid is required to use the SDK.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                }
+                throw new MissingMemberException("PNConfiguration.Uuid is required to use the SDK");
+            }
+
         }
 
         private void CheckRequiredConfigValues()
