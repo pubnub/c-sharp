@@ -672,7 +672,7 @@ sdks:
         distributions:
           -
             distribution-type: source
-            distribution-repository: GitHub
+            distribution-repository: Github
             package-name: Pubnub
             location: https://github.com/pubnub/c-sharp/releases/tag/v5.4.0.0
             requires:
@@ -1342,7 +1342,7 @@ sdks:
         distributions:
           -
             distribution-type: source
-            distribution-repository: GitHub
+            distribution-repository: Github
             package-name: PubnubUWP
             location: https://github.com/pubnub/c-sharp/releases/tag/v5.4.0.0
             requires:
