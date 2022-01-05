@@ -428,19 +428,19 @@ namespace PubnubApi
         }
 
         public static long TranslateDateTimeToPubnubUnixNanoSeconds(DateTime dotNetUTCDateTime)
-		{
-			return EndPoint.OtherOperation.TranslateDateTimeToPubnubUnixNanoSeconds(dotNetUTCDateTime);
-		}
+        {
+            return EndPoint.OtherOperation.TranslateDateTimeToPubnubUnixNanoSeconds(dotNetUTCDateTime);
+        }
 
-		public static DateTime TranslatePubnubUnixNanoSecondsToDateTime(long unixNanoSecondTime)
-		{
-			return EndPoint.OtherOperation.TranslatePubnubUnixNanoSecondsToDateTime(unixNanoSecondTime);
-		}
+        public static DateTime TranslatePubnubUnixNanoSecondsToDateTime(long unixNanoSecondTime)
+        {
+            return EndPoint.OtherOperation.TranslatePubnubUnixNanoSecondsToDateTime(unixNanoSecondTime);
+        }
 
-		public static DateTime TranslatePubnubUnixNanoSecondsToDateTime(string unixNanoSecondTime)
-		{
-			return EndPoint.OtherOperation.TranslatePubnubUnixNanoSecondsToDateTime(unixNanoSecondTime);
-		}
+        public static DateTime TranslatePubnubUnixNanoSecondsToDateTime(string unixNanoSecondTime)
+        {
+            return EndPoint.OtherOperation.TranslatePubnubUnixNanoSecondsToDateTime(unixNanoSecondTime);
+        }
 
         public List<string> GetSubscribedChannels()
         {
