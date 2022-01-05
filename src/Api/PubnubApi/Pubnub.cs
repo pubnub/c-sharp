@@ -412,8 +412,8 @@ namespace PubnubApi
 			return Guid.NewGuid();
 		}
 
-		public void ChangeUUID(string newUUID)
-		{
+        public void ChangeUUID(string newUUID)
+        {
             if (newUUID != null && string.IsNullOrEmpty(newUUID.Trim()))
             {
                 if (pubnubLog != null)
@@ -425,9 +425,9 @@ namespace PubnubApi
             EndPoint.OtherOperation endPoint = new EndPoint.OtherOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
             endPoint.CurrentPubnubInstance(this);
             endPoint.ChangeUUID(newUUID);
-		}
+        }
 
-		public static long TranslateDateTimeToPubnubUnixNanoSeconds(DateTime dotNetUTCDateTime)
+        public static long TranslateDateTimeToPubnubUnixNanoSeconds(DateTime dotNetUTCDateTime)
 		{
 			return EndPoint.OtherOperation.TranslateDateTimeToPubnubUnixNanoSeconds(dotNetUTCDateTime);
 		}
