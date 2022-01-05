@@ -416,9 +416,9 @@ namespace PubnubApi
         {
             if (newUUID != null && string.IsNullOrEmpty(newUUID.Trim()))
             {
-                if (pubnubLog != null)
+                if (pubnubLog != null && pubnubConfig != null)
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, UUID cannot be null/empty.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, UUID cannot be null/empty.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
                 }
                 throw new MissingMemberException("UUID cannot be null/empty");
             }
