@@ -414,6 +414,14 @@ namespace PubnubApi
 
 		public void ChangeUUID(string newUUID)
 		{
+            if (newUUID != null && string.IsNullOrEmpty(newUUID.Trim()))
+            {
+                if (pubnubLog != null)
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, UUID cannot be null/empty.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                }
+                throw new MissingMemberException("UUID cannot be null/empty");
+            }
             EndPoint.OtherOperation endPoint = new EndPoint.OtherOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
             endPoint.CurrentPubnubInstance(this);
             endPoint.ChangeUUID(newUUID);
@@ -825,7 +833,7 @@ namespace PubnubApi
                     LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, WARNING: The PresenceTimeout cannot be less than 20, defaulting the value to 20. Please update the settings in your code.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
                 }
             }
-            if (config != null && string.IsNullOrEmpty(config.Uuid))
+            if (config != null && string.IsNullOrEmpty(config.Uuid) && string.IsNullOrEmpty(config.Uuid.Trim()))
             {
                 if (pubnubLog != null)
                 {
