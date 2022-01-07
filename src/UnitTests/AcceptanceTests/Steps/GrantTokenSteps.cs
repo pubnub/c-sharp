@@ -154,13 +154,12 @@ namespace AcceptanceTests.Steps
         [Given(@"I have a keyset with access manager enabled")]
         public void GivenIHaveAKeysetWithAccessManagerEnabled()
         {
-            config = new PNConfiguration();
+            config = new PNConfiguration("pn-csharp-acceptance-test-uuid");
             config.Origin = acceptance_test_origin;
             config.Secure = false;
             config.PublishKey = System.Environment.GetEnvironmentVariable("PN_PUB_KEY");
             config.SubscribeKey = System.Environment.GetEnvironmentVariable("PN_SUB_KEY");
             config.SecretKey = System.Environment.GetEnvironmentVariable("PN_SEC_KEY");
-            config.Uuid = "pn-csharp-acceptance-test-uuid";
 
             pn = new Pubnub(config);
         }

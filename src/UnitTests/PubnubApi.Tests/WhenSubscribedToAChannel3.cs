@@ -44,13 +44,12 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
                 AuthKey = authKey,
-                Uuid = "mytestuuid",
                 Secure = false
             };
             server.RunOnHttps(false);
@@ -113,12 +112,11 @@ namespace PubNubMessaging.Tests
                 Assert.Ignore("Ignored for Server side run");
             }
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 CipherKey = cipherKey,
-                Uuid = "mytestuuid",
                 Secure = ssl
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -229,12 +227,11 @@ namespace PubNubMessaging.Tests
                 Assert.Ignore("Ignored for Server side run");
             }
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 CipherKey = cipherKey,
-                Uuid = "mytestuuid",
                 Secure = ssl
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -419,12 +416,11 @@ namespace PubNubMessaging.Tests
                 Assert.Ignore("Ignored for Server side run");
             }
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 CipherKey = cipherKey,
-                Uuid = "mytestuuid",
                 Secure = ssl
             };
             if (PubnubCommon.PAMServerSideRun)

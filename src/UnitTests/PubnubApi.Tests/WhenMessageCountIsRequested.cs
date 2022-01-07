@@ -40,13 +40,12 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
                 AuthKey = authKey,
-                Uuid = "mytestuuid",
             };
 
             pubnub = createPubNubInstance(config);
@@ -104,11 +103,10 @@ namespace PubNubMessaging.Tests
             currentUnitTestCase = "ThenChannel1Timetoken1ShouldReturnSuccess";
             receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Secure = true
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -172,11 +170,10 @@ namespace PubNubMessaging.Tests
             currentUnitTestCase = "ThenWithAsyncChannel1Timetoken1ShouldReturnSuccess";
             receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Secure = true
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -237,11 +234,10 @@ namespace PubNubMessaging.Tests
             currentUnitTestCase = "ThenChannel1Timetoken1ShouldReturnSuccess";
             receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Secure = true
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -305,11 +301,10 @@ namespace PubNubMessaging.Tests
             currentUnitTestCase = "ThenWithAsyncChannel2Timetoken2ShouldReturnSuccess";
             receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Secure = true
             };
             if (PubnubCommon.PAMServerSideRun)

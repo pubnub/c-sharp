@@ -102,8 +102,13 @@ namespace PubnubApi
         public bool UseRandomInitializationVector { get; set; }
         public int FileMessagePublishRetryLimit { get; set; }
 
-        public PNConfiguration()
+        public PNConfiguration(string uuid)
         {
+            if (string.IsNullOrEmpty(uuid) || string.IsNullOrEmpty(uuid.Trim()))
+            {
+                throw new ArgumentException("Missing or Incorrect uuid value");
+            }
+
             this.Origin = "ps.pndsn.com";
             this.presenceHeartbeatTimeout = 300;
             this.NonSubscribeRequestTimeout = 10;
@@ -123,6 +128,7 @@ namespace PubnubApi
             this.SuppressLeaveEvents = false;
             this.UseRandomInitializationVector = true;
             this.FileMessagePublishRetryLimit = 5;
+            this.Uuid = uuid;
         }
 
         public PNConfiguration SetPresenceTimeoutWithCustomInterval(int timeout, int interval)

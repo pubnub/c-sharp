@@ -42,13 +42,12 @@ namespace PubNubMessaging.Tests
 
             bool receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
                 AuthKey = authKey,
-                Uuid = "mytestuuid",
                 Secure = false,
                 LogVerbosity = PNLogVerbosity.BODY,
                 PubnubLog = new TestLog()
@@ -442,12 +441,11 @@ namespace PubNubMessaging.Tests
             bool internalReceivedMessage = false;
             bool receivedErrorMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 CipherKey = cipherKey,
-                Uuid = "mytestuuid",
                 Secure = ssl,
                 LogVerbosity = PNLogVerbosity.BODY,
                 PubnubLog = new TestLog()
@@ -659,12 +657,11 @@ namespace PubNubMessaging.Tests
             bool internalReceivedMessage = false;
             bool receivedErrorMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 CipherKey = cipherKey,
-                Uuid = "mytestuuid",
                 Secure = ssl
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -849,11 +846,10 @@ namespace PubNubMessaging.Tests
 
             bool receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 AuthKey = authKey,
                 Secure = false
             };
@@ -1086,11 +1082,10 @@ namespace PubNubMessaging.Tests
             bool receivedMessage = false;
             bool receivedErrorMessage = true;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Secure = false,
                 LogVerbosity = PNLogVerbosity.BODY,
                 PubnubLog = new TestLog(),

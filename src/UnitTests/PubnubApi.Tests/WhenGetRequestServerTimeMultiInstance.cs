@@ -38,18 +38,16 @@ namespace PubNubMessaging.Tests
             server.ClearRequests();
             bool timeReceived1 = false;
 
-            PNConfiguration config1 = new PNConfiguration
+            PNConfiguration config1 = new PNConfiguration("mytestuuid1")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid1",
                 Secure = false
             };
-            PNConfiguration config2 = new PNConfiguration
+            PNConfiguration config2 = new PNConfiguration("mytestuuid2")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid2",
                 Secure = false
             };
             server.RunOnHttps(false);
@@ -133,11 +131,10 @@ namespace PubNubMessaging.Tests
             server.ClearRequests();
             bool timeReceived1 = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
             };
 
             server.RunOnHttps(true);
@@ -189,11 +186,10 @@ namespace PubNubMessaging.Tests
 
             bool timeReceived1 = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Proxy = (PubnubCommon.EnableStubTest) ? proxy : null,
                 Secure = false
             };
@@ -257,11 +253,10 @@ namespace PubNubMessaging.Tests
 
             bool timeReceived1 = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Proxy = (PubnubCommon.EnableStubTest) ? proxy : null
             };
             server.RunOnHttps(true);
