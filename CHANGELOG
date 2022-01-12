@@ -1,3 +1,7 @@
+v6.0.0 - January 12 2022
+-----------------------------
+- BREAKING CHANGES: UUID is mandatory to use SDK.
+
 v5.4.0 - December 16 2021
 -----------------------------
 - Fixed: replaced BouncyCastle lib with System.Security.Cryptography.Algorithms.
