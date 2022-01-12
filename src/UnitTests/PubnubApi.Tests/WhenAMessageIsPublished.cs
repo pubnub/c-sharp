@@ -40,13 +40,12 @@ namespace PubNubMessaging.Tests
             bool receivedGrantMessage = false;
             string channel = "hello_my_channel";
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
                 AuthKey = authKey,
-                Uuid = "mytestuuid",
                 Secure = false
             };
             server.RunOnHttps(false);
@@ -122,11 +121,10 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             object message = null;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
             };
             if (PubnubCommon.PAMServerSideRun)
             {
@@ -176,12 +174,11 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             string message = messageForUnencryptPublish;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Secure = false,
-                Uuid = "mytestuuid"
             };
             if (PubnubCommon.PAMServerSideRun)
             {
@@ -283,12 +280,11 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             string message = messageForUnencryptPublish;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Secure = false,
-                Uuid = "mytestuuid"
             };
             if (PubnubCommon.PAMServerSideRun)
             {
@@ -385,12 +381,11 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             string message = messageForUnencryptPublish;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Secure = false,
-                Uuid = "mytestuuid"
             };
             if (PubnubCommon.PAMServerSideRun)
             {
@@ -449,12 +444,11 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             string message = messageForUnencryptPublish;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Secure = false,
-                Uuid = "mytestuuid"
             };
             if (PubnubCommon.PAMServerSideRun)
             {
@@ -552,11 +546,10 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             object message = new CustomClass();
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
             };
             if (PubnubCommon.PAMServerSideRun)
             {
@@ -654,12 +647,11 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             object message = new SecretCustomClass();
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 CipherKey = "enigma",
-                Uuid = "mytestuuid",
                 Secure = false
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -757,12 +749,11 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             object message = new SecretCustomClass();
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 CipherKey = "enigma",
-                Uuid = "mytestuuid",
                 Secure = true
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -860,12 +851,11 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             string message = messageForEncryptPublish;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 CipherKey = "enigma",
-                Uuid = "mytestuuid",
                 Secure = false
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -972,12 +962,11 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             string message = messageForSecretEncryptPublish;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 CipherKey = "enigma",
-                Uuid = "mytestuuid",
                 Secure = false
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -1081,11 +1070,10 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             object message = new PubnubDemoObject();
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid4",
                 Secure = false
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -1176,24 +1164,26 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public static void ThenPubnubShouldGenerateUniqueIdentifier()
+        public static void ThenPubnubShouldFailOnWithoutSettingUuid()
         {
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
             };
 
-            pubnub = createPubNubInstance(config);
+            Assert.Throws<MissingMemberException>(() =>
+            {
+                pubnub = createPubNubInstance(config);
+            });
 
-            Assert.IsNotNull(pubnub.GenerateGuid());
             pubnub = null;
         }
 
         [Test]
         public static void ThenPublishKeyShouldNotBeEmpty()
         {
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = "",
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -1222,12 +1212,11 @@ namespace PubNubMessaging.Tests
             bool receivedPublishMessage = false;
             long publishTimetoken = 0;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Secure = false,
-                Uuid = "mytestuuid"
             };
             if (PubnubCommon.PAMServerSideRun)
             {
@@ -1289,7 +1278,7 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             string message = "Pubnub API Usage Example";
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -1505,15 +1494,12 @@ namespace PubNubMessaging.Tests
             bool receivedPublishMessage = false;
             long publishTimetoken = 0;
 
-            //string channel = "hello_my_channel ~!@#$%^&()+=[]{}|;\"<>?-_.aA1©®€™₹😜🎉";
             string channel = "hello_my_channel";
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("myuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                //Uuid = "my ~`!@#$%^&*()+=[]\\{}|;':\",/<>?-_.aA1©®€™₹😜🎉uuid",
-                Uuid = "myuuid",
                 Secure = false,
                 IncludeRequestIdentifier = false,
             };
@@ -1583,12 +1569,11 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel ~!@#$%^&()+=[]{}|;\"<>?-_.aA1©®€™₹😜🎉";
             string message = " ~`!@#$%^&*()+=[]\\{}|;':\",/<>?-_.aA1©®€™₹😜🎉";
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("my ~`!@#$%^&*()+=[]\\{}|;':\",/<>?-_.aA1©®€™₹😜🎉uuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 CipherKey = "enigma",
-                Uuid = "my ~`!@#$%^&*()+=[]\\{}|;':\",/<>?-_.aA1©®€™₹😜🎉uuid",
                 Secure = false,
                 IncludeRequestIdentifier = false,
             };
@@ -1664,12 +1649,10 @@ namespace PubNubMessaging.Tests
             //var message = new { a="!" };
             //":";
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("my ~`!@#$%^&*()+=[]\\{}|;':\",/<>?-_.aA1©®€™₹😜🎉uuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "my ~`!@#$%^&*()+=[]\\{}|;':\",/<>?-_.aA1©®€™₹😜🎉uuid",
-                //Uuid = "myuuid",
                 Secure = false,
                 IncludeRequestIdentifier = false,
             };
@@ -1738,12 +1721,11 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel ~!@#$%^&()+=[]{}|;\"<>?-_.aA1©®€™₹😜🎉";
             string message = " ~`!@#$%^&*()+=[]\\{}|;':\",/<>?-_.aA1©®€™₹😜🎉";
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("my ~`!@#$%^&*()+=[]\\{}|;':\",/<>?-_.aA1©®€™₹😜🎉uuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 CipherKey = "enigma",
-                Uuid = "my ~`!@#$%^&*()+=[]\\{}|;':\",/<>?-_.aA1©®€™₹😜🎉uuid",
                 Secure = false,
                 IncludeRequestIdentifier = false,
             };

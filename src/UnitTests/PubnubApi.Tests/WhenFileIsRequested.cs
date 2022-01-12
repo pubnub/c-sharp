@@ -42,13 +42,12 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
                 AuthKey = authKey,
-                Uuid = "mytestuuid",
                 Secure = false
             };
 
@@ -57,7 +56,7 @@ namespace PubNubMessaging.Tests
             string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group\",\"subscribe_key\":\"demo-36\",\"ttl\":20,\"channel-groups\":{\"hello_my_group\":{\"r\":1,\"w\":0,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
 
 
-            pubnub.Grant().Channels(new[] { channelName }).AuthKeys(new[] { authKey }).Read(true).Write(true).Manage(true).Delete(true).TTL(20)
+            pubnub.Grant().Channels(new[] { channelName }).AuthKeys(new[] { authKey }).Read(true).Write(true).Manage(true).Delete(true).Update(true).TTL(20)
                 .Execute(new PNAccessManagerGrantResultExt((r,s)=> 
                 { 
                     if (r != null)
@@ -103,12 +102,10 @@ namespace PubNubMessaging.Tests
                 }
                 );
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                //CipherKey = "enigma",
-                Uuid = "mytestuuid",
                 Secure = false
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -134,7 +131,6 @@ namespace PubNubMessaging.Tests
             string fileName = "";
             receivedMessage = false;
             string targetFileUpload = @"fileupload.txt";
-            //string targetFileDownload = @"c:\pandu\temp\pandu_test.gif";
             pubnub.SendFile().Channel(channelName).File(targetFileUpload).CipherKey("enigma").Message("This is my sample file")
                 .Execute(new PNFileUploadResultExt((result, status) =>
                 {
@@ -183,7 +179,6 @@ namespace PubNubMessaging.Tests
                     {
                         System.Diagnostics.Debug.WriteLine("DownloadFile result = " + result.FileBytes.Length);
                         receivedMessage = true;
-                        //System.IO.File.WriteAllBytes(targetFileDownload, result.FileBytes);
                     }
                     mre.Set();
                 }));
@@ -239,12 +234,10 @@ namespace PubNubMessaging.Tests
                 }
                 );
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                //CipherKey = "enigma",
-                Uuid = "mytestuuid",
                 Secure = false
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -351,12 +344,10 @@ namespace PubNubMessaging.Tests
 
             receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                //CipherKey = "enigma",
-                Uuid = "mytestuuid",
                 Secure = false
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -404,12 +395,10 @@ namespace PubNubMessaging.Tests
 
             receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                //CipherKey = "enigma",
-                Uuid = "mytestuuid",
                 Secure = false
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -456,12 +445,11 @@ namespace PubNubMessaging.Tests
 
             receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 CipherKey = "enigma",
-                Uuid = "mytestuuid",
                 Secure = false
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -506,12 +494,11 @@ namespace PubNubMessaging.Tests
 
             receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 CipherKey = "enigma",
-                Uuid = "mytestuuid",
                 Secure = false
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -587,12 +574,11 @@ namespace PubNubMessaging.Tests
 
             receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 CipherKey = "enigma",
-                Uuid = "mytestuuid",
                 Secure = false
             };
             if (PubnubCommon.PAMServerSideRun)

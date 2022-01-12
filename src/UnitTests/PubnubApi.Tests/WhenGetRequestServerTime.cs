@@ -48,11 +48,10 @@ namespace PubNubMessaging.Tests
             timeReceived = false;
             mreTime = new ManualResetEvent(false);
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Secure = false
             };
             server.RunOnHttps(false);
@@ -145,11 +144,10 @@ namespace PubNubMessaging.Tests
             timeReceived = false;
             mreTime = new ManualResetEvent(false);
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
             };
 
             server.RunOnHttps(true);
@@ -189,11 +187,10 @@ namespace PubNubMessaging.Tests
             timeReceived = false;
             mreTime = new ManualResetEvent(false);
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Proxy = (PubnubCommon.EnableStubTest) ? proxy : null,
                 Secure = false
             };
@@ -243,11 +240,10 @@ namespace PubNubMessaging.Tests
             timeReceived = false;
             mreTime = new ManualResetEvent(false);
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Proxy = (PubnubCommon.EnableStubTest) ? proxy : null
             };
             server.RunOnHttps(true);

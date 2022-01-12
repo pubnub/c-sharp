@@ -1,8 +1,13 @@
 name: c-sharp
-version: "5.4.0"
+version: "6.0.0"
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog:
+  - date: 2022-01-12
+    version: v6.0.0
+    changes:
+      - type: improvement
+        text: "BREAKING CHANGES: UUID is mandatory to use SDK."
   - date: 2021-12-16
     version: v5.4.0
     changes:
@@ -621,7 +626,7 @@ features:
     - QUERY-PARAM
 supported-platforms:
   -
-    version: Pubnub 'C#' 5.4.0
+    version: Pubnub 'C#' 6.0.0
     platforms:
       - Windows 10 and up
       - Windows Server 2008 and up
@@ -631,7 +636,7 @@ supported-platforms:
       - .Net Framework 4.5
       - .Net Framework 4.6.1+
   -
-    version: PubnubPCL 'C#' 5.4.0
+    version: PubnubPCL 'C#' 6.0.0
     platforms:
       - Xamarin.Android
       - Xamarin.iOS
@@ -650,7 +655,7 @@ supported-platforms:
       - .Net Standard 2.1
       - .Net Core
   -
-    version: PubnubUWP 'C#' 5.4.0
+    version: PubnubUWP 'C#' 6.0.0
     platforms:
       - Windows Phone 10
       - Universal Windows Apps
@@ -672,9 +677,9 @@ sdks:
         distributions:
           -
             distribution-type: source
-            distribution-repository: Github
+            distribution-repository: GitHub
             package-name: Pubnub
-            location: https://github.com/pubnub/c-sharp/releases/tag/v5.4.0.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v6.0.0.0
             requires:
               -
                 name: ".Net"
@@ -971,7 +976,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: PubNubPCL
-            location: https://github.com/pubnub/c-sharp/releases/tag/v5.4.0.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v6.0.0.0
             requires:
               -
                 name: ".Net Core"
@@ -1342,9 +1347,9 @@ sdks:
         distributions:
           -
             distribution-type: source
-            distribution-repository: Github
+            distribution-repository: GitHub
             package-name: PubnubUWP
-            location: https://github.com/pubnub/c-sharp/releases/tag/v5.4.0.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v6.0.0.0
             requires:
               -
                 name: "Universal Windows Platform Development"

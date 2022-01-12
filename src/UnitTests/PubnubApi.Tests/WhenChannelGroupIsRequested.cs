@@ -42,13 +42,12 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
                 AuthKey = authKey,
-                Uuid = "mytestuuid",
             };
 
             pubnub = createPubNubInstance(config);
@@ -98,11 +97,10 @@ namespace PubNubMessaging.Tests
             currentUnitTestCase = "ThenAddChannelShouldReturnSuccess";
             receivedChannelGroupMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
             };
             if (PubnubCommon.PAMServerSideRun)
             {
@@ -154,11 +152,10 @@ namespace PubNubMessaging.Tests
             currentUnitTestCase = "ThenAddChannelShouldReturnSuccess";
             receivedChannelGroupMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
             };
             if (PubnubCommon.PAMServerSideRun)
             {
@@ -218,11 +215,10 @@ namespace PubNubMessaging.Tests
             string channelName = "hello_my_channel";
             receivedChannelGroupMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
             };
             if (PubnubCommon.PAMServerSideRun)
             {
@@ -276,11 +272,10 @@ namespace PubNubMessaging.Tests
             string channelName = "hello_my_channel";
             receivedChannelGroupMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
             };
             if (PubnubCommon.PAMServerSideRun)
             {
@@ -343,11 +338,10 @@ namespace PubNubMessaging.Tests
 
             receivedChannelGroupMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
             };
             if (PubnubCommon.PAMServerSideRun)
             {
@@ -399,11 +393,10 @@ namespace PubNubMessaging.Tests
 
             receivedChannelGroupMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
             };
             if (PubnubCommon.PAMServerSideRun)
             {
@@ -466,11 +459,10 @@ namespace PubNubMessaging.Tests
 
             receivedChannelGroupMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
             };
             if (PubnubCommon.PAMServerSideRun)
             {
@@ -525,11 +517,10 @@ namespace PubNubMessaging.Tests
 
             receivedChannelGroupMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
             };
             if (PubnubCommon.PAMServerSideRun)
             {

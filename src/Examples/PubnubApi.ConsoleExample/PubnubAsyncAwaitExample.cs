@@ -62,8 +62,6 @@ namespace PubnubApiAsyncAwaitDemo
             string EnvSubscribeKey = System.Environment.GetEnvironmentVariable("PN_SUB_KEY", EnvironmentVariableTarget.Machine);
             string EnvSecretKey = System.Environment.GetEnvironmentVariable("PN_SEC_KEY", EnvironmentVariableTarget.Machine);
 
-
-            PNConfiguration config = new PNConfiguration();
             AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionTrapper;
 
             StringBuilder hintStringBuilder = new StringBuilder();
@@ -93,6 +91,20 @@ namespace PubnubApiAsyncAwaitDemo
             }
             Console.ResetColor();
             Console.WriteLine();
+
+            Console.WriteLine("ENTER Custom Session UUID. Without it, you cannot consume Pubnub SDK");
+            string sessionUUID = Console.ReadLine();
+            if (string.IsNullOrEmpty(sessionUUID) || sessionUUID.Trim().Length == 0)
+            {
+                Console.WriteLine("Invalid UUID. Random GUID value  will be set for this example");
+                sessionUUID = "pn-" + Guid.NewGuid().ToString();
+            }
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("Accepted Custom Session UUID.");
+            Console.ResetColor();
+            Console.WriteLine();
+
+            PNConfiguration config = new PNConfiguration(sessionUUID);
 
             Console.WriteLine("Enable SSL? ENTER Y for Yes, else N. (Default N)");
             string enableSSL = Console.ReadLine();
@@ -172,31 +184,6 @@ namespace PubnubApiAsyncAwaitDemo
             Console.ResetColor();
             Console.WriteLine();
 
-            Console.WriteLine("Use Custom Session UUID? ENTER Y for Yes, else N");
-            string enableCustomUUID = Console.ReadLine();
-            if (enableCustomUUID.Trim().ToLowerInvariant() == "y")
-            {
-                Console.WriteLine("ENTER Session UUID.");
-                string sessionUUID = Console.ReadLine();
-                if (string.IsNullOrEmpty(sessionUUID) || sessionUUID.Trim().Length == 0)
-                {
-                    Console.WriteLine("Invalid UUID. Default value will be set.");
-                }
-                else
-                {
-                    config.Uuid = sessionUUID;
-                }
-                Console.ForegroundColor = ConsoleColor.Blue;
-                Console.WriteLine("Accepted Custom Session UUID.");
-                Console.ResetColor();
-            }
-            else
-            {
-                Console.ForegroundColor = ConsoleColor.Blue;
-                Console.WriteLine("Default Session UUID opted.");
-                Console.ResetColor();
-            }
-            Console.WriteLine();
 
             Console.WriteLine("Enter Auth Key. If you don't want to use Auth Key, Press ENTER Key");
             authKey = Console.ReadLine();
@@ -1188,11 +1175,18 @@ namespace PubnubApiAsyncAwaitDemo
                         break;
                     case "17":
                         Console.WriteLine("ENTER UUID.");
-                        string sessionUUID = Console.ReadLine();
-                        pubnub.ChangeUUID(sessionUUID);
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine("UUID = {0}", config.Uuid);
-                        Console.ResetColor();
+                        string newsessionUUID = Console.ReadLine();
+                        try 
+                        {
+                            pubnub.ChangeUUID(newsessionUUID);
+                            Console.ForegroundColor = ConsoleColor.Blue;
+                            Console.WriteLine("UUID = {0}", config.Uuid);
+                            Console.ResetColor();
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex.ToString());
+                        }
                         break;
                     case "18":
                         Console.WriteLine("Disconnect");

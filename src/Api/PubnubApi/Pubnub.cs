@@ -412,27 +412,35 @@ namespace PubnubApi
 			return Guid.NewGuid();
 		}
 
-		public void ChangeUUID(string newUUID)
-		{
+        public void ChangeUUID(string newUUID)
+        {
+            if (newUUID != null && string.IsNullOrEmpty(newUUID.Trim()))
+            {
+                if (pubnubLog != null && pubnubConfig != null)
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, UUID cannot be null/empty.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                }
+                throw new MissingMemberException("UUID cannot be null/empty");
+            }
             EndPoint.OtherOperation endPoint = new EndPoint.OtherOperation(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
             endPoint.CurrentPubnubInstance(this);
             endPoint.ChangeUUID(newUUID);
-		}
+        }
 
-		public static long TranslateDateTimeToPubnubUnixNanoSeconds(DateTime dotNetUTCDateTime)
-		{
-			return EndPoint.OtherOperation.TranslateDateTimeToPubnubUnixNanoSeconds(dotNetUTCDateTime);
-		}
+        public static long TranslateDateTimeToPubnubUnixNanoSeconds(DateTime dotNetUTCDateTime)
+        {
+            return EndPoint.OtherOperation.TranslateDateTimeToPubnubUnixNanoSeconds(dotNetUTCDateTime);
+        }
 
-		public static DateTime TranslatePubnubUnixNanoSecondsToDateTime(long unixNanoSecondTime)
-		{
-			return EndPoint.OtherOperation.TranslatePubnubUnixNanoSecondsToDateTime(unixNanoSecondTime);
-		}
+        public static DateTime TranslatePubnubUnixNanoSecondsToDateTime(long unixNanoSecondTime)
+        {
+            return EndPoint.OtherOperation.TranslatePubnubUnixNanoSecondsToDateTime(unixNanoSecondTime);
+        }
 
-		public static DateTime TranslatePubnubUnixNanoSecondsToDateTime(string unixNanoSecondTime)
-		{
-			return EndPoint.OtherOperation.TranslatePubnubUnixNanoSecondsToDateTime(unixNanoSecondTime);
-		}
+        public static DateTime TranslatePubnubUnixNanoSecondsToDateTime(string unixNanoSecondTime)
+        {
+            return EndPoint.OtherOperation.TranslatePubnubUnixNanoSecondsToDateTime(unixNanoSecondTime);
+        }
 
         public List<string> GetSubscribedChannels()
         {
@@ -825,6 +833,15 @@ namespace PubnubApi
                     LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, WARNING: The PresenceTimeout cannot be less than 20, defaulting the value to 20. Please update the settings in your code.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
                 }
             }
+            if (config != null && (string.IsNullOrEmpty(config.Uuid) || string.IsNullOrEmpty(config.Uuid.Trim())))
+            {
+                if (pubnubLog != null)
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, PNConfiguration.Uuid is required to use the SDK.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                }
+                throw new MissingMemberException("PNConfiguration.Uuid is required to use the SDK");
+            }
+
         }
 
         private void CheckRequiredConfigValues()

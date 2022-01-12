@@ -30,12 +30,11 @@ namespace PubNubMessaging.Tests
             bool receivedGrantMessage = false;
             string uuid_metadata_id = "pandu-ut-uid";
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
-                Uuid = "mytestuuid",
                 Secure = false
             };
             server.RunOnHttps(false);
@@ -108,11 +107,10 @@ namespace PubNubMessaging.Tests
 
             string uuidMetadataId = "pandu-ut-uid";
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Secure = false,
                 IncludeInstanceIdentifier = false,
                 IncludeRequestIdentifier = false
@@ -256,11 +254,10 @@ namespace PubNubMessaging.Tests
 
             string uuidMetadataId = "pandu-ut-uid";
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Secure = false,
                 IncludeInstanceIdentifier = false,
                 IncludeRequestIdentifier = false
@@ -422,11 +419,10 @@ namespace PubNubMessaging.Tests
                 }
                 );
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Secure = false,
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -562,11 +558,10 @@ namespace PubNubMessaging.Tests
                 }
                 );
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration("mytestuuid")
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Secure = false,
             };
             if (PubnubCommon.PAMServerSideRun)
