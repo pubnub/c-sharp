@@ -783,7 +783,16 @@ namespace PubnubApi.EndPoint
             }
             else
             {
-                result.Add(LastSubscribeTimetoken[PubnubInstance.InstanceId]); //get last timetoken of the current instance
+                long lastTT = LastSubscribeTimetoken[PubnubInstance.InstanceId]; //get last timetoken of the current instance
+                int lastRegionId = (LastSubscribeRegion != null && LastSubscribeRegion.ContainsKey(PubnubInstance.InstanceId)) ? LastSubscribeRegion[PubnubInstance.InstanceId] : 0; //get last region of the current instance
+
+                Dictionary<string, object> dictTimetokenAndRegion = new Dictionary<string, object>();
+                dictTimetokenAndRegion.Add("t", lastTT);
+                dictTimetokenAndRegion.Add("r", lastRegionId);
+
+                Dictionary<string, object> dictEnvelope = new Dictionary<string, object>();
+                dictEnvelope.Add("t", dictTimetokenAndRegion);
+                result.Add(dictEnvelope); 
             }
 
             if (channelGroups != null && channelGroups.Length > 0)
@@ -831,7 +840,7 @@ namespace PubnubApi.EndPoint
                 int region = GetRegionFromMultiplexResult(message);
                 Task.Factory.StartNew(() =>
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} MultiplexInternalCallback timetoken = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), timetoken), config.LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} MultiplexInternalCallback timetoken = {1}; region = {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), timetoken, region), config.LogVerbosity);
                     MultiChannelSubscribeRequest<T>(type, channels, channelGroups, timetoken, region, false, null, this.customQueryParam);
                 }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
             }
