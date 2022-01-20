@@ -1,3 +1,7 @@
+v6.1.0 - January 20 2022
+-----------------------------
+- Fixed: capture region when exception occur during subscribe.
+
 v6.0.0 - January 12 2022
 -----------------------------
 - BREAKING CHANGES: UUID is mandatory to use SDK.

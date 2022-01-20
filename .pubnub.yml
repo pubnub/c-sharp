@@ -1,8 +1,13 @@
 name: c-sharp
-version: "6.0.0"
+version: "6.1.0"
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog:
+  - date: 2022-01-20
+    version: v6.1.0
+    changes:
+      - type: bug
+        text: "Capture region when exception occur during subscribe."
   - date: 2022-01-12
     version: v6.0.0
     changes:
@@ -626,7 +631,7 @@ features:
     - QUERY-PARAM
 supported-platforms:
   -
-    version: Pubnub 'C#' 6.0.0
+    version: Pubnub 'C#' 6.1.0
     platforms:
       - Windows 10 and up
       - Windows Server 2008 and up
@@ -636,7 +641,7 @@ supported-platforms:
       - .Net Framework 4.5
       - .Net Framework 4.6.1+
   -
-    version: PubnubPCL 'C#' 6.0.0
+    version: PubnubPCL 'C#' 6.1.0
     platforms:
       - Xamarin.Android
       - Xamarin.iOS
@@ -655,7 +660,7 @@ supported-platforms:
       - .Net Standard 2.1
       - .Net Core
   -
-    version: PubnubUWP 'C#' 6.0.0
+    version: PubnubUWP 'C#' 6.1.0
     platforms:
       - Windows Phone 10
       - Universal Windows Apps
@@ -679,7 +684,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: Pubnub
-            location: https://github.com/pubnub/c-sharp/releases/tag/v6.0.0.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v6.1.0.0
             requires:
               -
                 name: ".Net"
@@ -976,7 +981,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: PubNubPCL
-            location: https://github.com/pubnub/c-sharp/releases/tag/v6.0.0.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v6.1.0.0
             requires:
               -
                 name: ".Net Core"
@@ -1349,7 +1354,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: PubnubUWP
-            location: https://github.com/pubnub/c-sharp/releases/tag/v6.0.0.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v6.1.0.0
             requires:
               -
                 name: "Universal Windows Platform Development"
