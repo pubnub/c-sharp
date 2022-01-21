@@ -62,7 +62,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="PeterO.Cbor" Version="4.4.4" />
+    <PackageReference Include="PeterO.Cbor" Version="4.5.1" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net35'">
