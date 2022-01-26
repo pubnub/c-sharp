@@ -39,20 +39,17 @@
     <StartupObject>PubnubApiDemo.PubnubExample</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BouncyCastle.Crypto, Version=1.8.1.0, Culture=neutral, PublicKeyToken=0e99375e54769942, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Portable.BouncyCastle.1.8.1.2\lib\net4\BouncyCastle.Crypto.dll</HintPath>
-    </Reference>
-    <Reference Include="CBOR, Version=4.4.4.0, Culture=neutral, PublicKeyToken=9cd62db60ea5554c, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\PeterO.Cbor.4.4.4\lib\net40\CBOR.dll</HintPath>
+    <Reference Include="CBOR, Version=4.5.2.0, Culture=neutral, PublicKeyToken=9cd62db60ea5554c, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\PeterO.Cbor.4.5.2\lib\net40\CBOR.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Numbers, Version=1.8.1.0, Culture=neutral, PublicKeyToken=9cd62db60ea5554c, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\PeterO.Numbers.1.8.1\lib\net40\Numbers.dll</HintPath>
+    <Reference Include="Numbers, Version=1.8.2.0, Culture=neutral, PublicKeyToken=9cd62db60ea5554c, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\PeterO.Numbers.1.8.2\lib\net40\Numbers.dll</HintPath>
     </Reference>
-    <Reference Include="Pubnub, Version=5.1.0.0, Culture=neutral, PublicKeyToken=dc66f52ce6619f44, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Pubnub.5.1.0\lib\net461\Pubnub.dll</HintPath>
+    <Reference Include="Pubnub, Version=6.1.0.0, Culture=neutral, PublicKeyToken=dc66f52ce6619f44, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Pubnub.6.1.0\lib\net461\Pubnub.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -67,6 +64,12 @@
     </Reference>
     <Reference Include="System.Net" />
     <Reference Include="System.Numerics" />
+    <Reference Include="System.Security.Cryptography.Algorithms, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Security.Cryptography.Algorithms.4.3.0\lib\net461\System.Security.Cryptography.Algorithms.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.Primitives, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Security.Cryptography.Primitives.4.3.0\lib\net46\System.Security.Cryptography.Primitives.dll</HintPath>
+    </Reference>
     <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\..\packages\System.ValueTuple.4.4.0\lib\net461\System.ValueTuple.dll</HintPath>
     </Reference>
