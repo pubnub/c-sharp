@@ -187,6 +187,7 @@ namespace PubnubApi.EndPoint
                 && key.Substring(key.Length - 1, 1).CompareTo("\"") == 0)
             {
                 key = key.Remove(key.Length - 1, 1).Remove(0, 1);
+                key = Regex.Unescape(key);
             }
             return key;
         }

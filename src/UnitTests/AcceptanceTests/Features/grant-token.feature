@@ -142,19 +142,16 @@ Feature: Grant an access token
     * the error detail location is 'permissions.patterns.uuids.(!<[^>]+>)+'
     * the error detail location type is 'body'
 
-  Scenario: Validate that a token containing authorized uuid can be parsed correctly
-    Given I have a known token containing an authorized UUID
-    When I parse the token
-    Then the parsed token output contains the authorized UUID "test-authorized-uuid"
-
-  Scenario: Validate that a token containing uuid resource permissions can be parsed correctly
-    Given I have a known token containing UUID resource permissions
-    When I parse the token
-    Then the token has 'uuid-1' UUID resource access permissions
-    * token resource permission GET
-
-  Scenario: Validate that a token containing uuid pattern permissions can be parsed correctly
-    Given I have a known token containing UUID pattern Permissions
-    When I parse the token
-    Then the token has '^uuid-\S*$' UUID pattern access permissions
-    * token pattern permission GET
+  @contract=grantWithTTLExceedMaxTTL @beta
+  Scenario: Attempt to grant an access token when ttl provided exceeds the max ttl configured (use default max 43200 for the test)
+    Given the TTL 43201
+    Given the 'channel-1' CHANNEL resource access permissions
+    * grant resource permission READ
+    When I attempt to grant a token specifying those permissions
+    Then an error is returned
+    * the error status code is 400
+    * the error message is 'Invalid ttl'
+    * the error source is 'grant'
+    * the error detail message is 'Range should be 1 to 43200 minute(s).'
+    * the error detail location is 'ttl'
+    * the error detail location type is 'body'
