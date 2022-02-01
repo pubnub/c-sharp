@@ -102,6 +102,8 @@ namespace PubnubApi
         public bool UseRandomInitializationVector { get; set; }
         public int FileMessagePublishRetryLimit { get; set; }
 
+        public bool EnableSubscribeBeta { get; set; }
+
         public PNConfiguration(string uuid)
         {
             if (string.IsNullOrEmpty(uuid) || string.IsNullOrEmpty(uuid.Trim()))

@@ -30,6 +30,31 @@ namespace PubnubApi.EndPoint
             pubnubTelemetryMgr = telemetryManager;
         }
 
+        internal void Handshake<T>(PNOperationType responseType, string[] rawChannels, string[] rawChannelGroups, Dictionary<string, string> initialSubscribeUrlParams, Dictionary<string, object> externalQueryParam)
+        {
+            MultiChannelSubscribeInit<T>(responseType, rawChannels, rawChannelGroups, initialSubscribeUrlParams, externalQueryParam);
+        }
+
+        internal void ReceiveMessages<T>(PNOperationType type, string[] channels, string[] channelGroups, object timetoken, int region, bool reconnect, Dictionary<string, string> initialSubscribeUrlParams, Dictionary<string, object> externalQueryParam)
+        {
+            MultiChannelSubscribeRequest<T>(type, channels, channelGroups, timetoken, region, reconnect, initialSubscribeUrlParams, externalQueryParam);
+        }
+
+        internal void IAmAway<T>(PNOperationType type, string channel, string channelGroup, Dictionary<string, object> externalQueryParam)
+        {
+            MultiChannelUnSubscribeInit<T>(type, channel, channelGroup, externalQueryParam);
+        }
+
+        internal void IamHere(string[] channels, string[] channelGroups)
+        {
+            RegisterPresenceHeartbeatTimer<string>(channels, channelGroups);
+        }
+
+        internal void SetPresenceState(string[] channels, string[] channelGroups, string uuid, string jsonUserState, Dictionary<string, object> externalQueryParam, PNCallback<PNSetStateResult> callback)
+        {
+
+        }
+
 #pragma warning disable
         internal void MultiChannelUnSubscribeAll<T>(PNOperationType type, Dictionary<string, object> externalQueryParam)
 #pragma warning restore

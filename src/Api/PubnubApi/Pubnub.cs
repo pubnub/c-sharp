@@ -847,7 +847,10 @@ namespace PubnubApi
                 }
                 throw new MissingMemberException("PNConfiguration.Uuid is required to use the SDK");
             }
-
+            if (config != null && config.EnableSubscribeBeta)
+            {
+                throw new NotImplementedException();
+            }
         }
 
         private void CheckRequiredConfigValues()
