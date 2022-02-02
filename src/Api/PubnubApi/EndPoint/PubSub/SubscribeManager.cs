@@ -1120,18 +1120,17 @@ namespace PubnubApi.EndPoint
 
         private async Task<Tuple<string,PNStatus>> Stateless_MultiChannelSubscribeRequest<T>(PNOperationType type, string[] channels, string[] channelGroups, object timetoken, int region, bool reconnect, Dictionary<string, string> initialSubscribeUrlParams, Dictionary<string, object> externalQueryParam)
         {
-            Tuple<string, PNStatus> ret = default(Tuple<string, PNStatus>);
             if (SubscribeDisconnected[PubnubInstance.InstanceId])
             {
                 LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeDisconnected. Exiting MultiChannelSubscribeRequest", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
-                return ret;
+                return default(Tuple<string, PNStatus>);
             }
 
             //Exit if the channel is unsubscribed
             if (MultiChannelSubscribe != null && MultiChannelSubscribe[PubnubInstance.InstanceId].Count <= 0 && MultiChannelGroupSubscribe != null && MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Count <= 0)
             {
                 LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Zero channels/channelGroups. Further subscription was stopped", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
-                return ret;
+                return default(Tuple<string, PNStatus>);
             }
 
             string multiChannel = (channels != null && channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : ",";
@@ -1140,7 +1139,7 @@ namespace PubnubApi.EndPoint
             if (!ChannelRequest.ContainsKey(PubnubInstance.InstanceId) || (!multiChannel.Equals(",", StringComparison.CurrentCultureIgnoreCase) && !ChannelRequest[PubnubInstance.InstanceId].ContainsKey(multiChannel)))
             {
                 LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, PubnubInstance.InstanceId NOT matching", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
-                return ret;
+                return default(Tuple<string, PNStatus>);
             }
 
             // Begin recursive subscribe
@@ -1193,7 +1192,7 @@ namespace PubnubApi.EndPoint
                 pubnubRequestState.Region = region;
 
                 // Wait for message
-                ret = await UrlProcessRequest<T>(request, pubnubRequestState, false);
+                return await UrlProcessRequest<T>(request, pubnubRequestState, false);
             }
             catch (Exception ex)
             {
@@ -1211,10 +1210,9 @@ namespace PubnubApi.EndPoint
                     status.AffectedChannels.AddRange(channelGroups);
                 }
 
-                ret.Item2 = status;
+                return new Tuple<string, PNStatus>(null, status);
             }
 
-            return ret;
         }
 
         private void MultiplexExceptionHandlerTimerCallback<T>(object state)
@@ -1304,7 +1302,7 @@ namespace PubnubApi.EndPoint
             }
         }
 
-        private void Stateless_MultiplexInternalCallback<T>(PNOperationType type, object multiplexResult)
+        private async Task<Tuple<string, PNStatus>> Stateless_MultiplexInternalCallback<T>(PNOperationType type, object multiplexResult)
         {
             List<object> message = multiplexResult as List<object>;
             string[] channels = null;
@@ -1338,15 +1336,14 @@ namespace PubnubApi.EndPoint
 
                 long timetoken = GetTimetokenFromMultiplexResult(message);
                 int region = GetRegionFromMultiplexResult(message);
-                Task.Factory.StartNew(() =>
-                {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} MultiplexInternalCallback timetoken = {1}; region = {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), timetoken, region), config.LogVerbosity);
-                    Stateless_MultiChannelSubscribeRequest<T>(type, channels, channelGroups, timetoken, region, false, null, this.customQueryParam);
-                }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
+
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} MultiplexInternalCallback timetoken = {1}; region = {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), timetoken, region), config.LogVerbosity);
+                
+                return await Stateless_MultiChannelSubscribeRequest<T>(type, channels, channelGroups, timetoken, region, false, null, this.customQueryParam);
             }
             else
             {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Lost Channel Name for resubscribe", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                return default(Tuple<string, PNStatus>);
             }
         }
 
