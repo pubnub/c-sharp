@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PubnubApi.EndPoint
 {
-    public class StatelessSubscribeOperation<T> : PubnubCoreBase
+    public class StatelessSubscribeOperation<T> : Stateless_PubnubCoreBase
     {
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
@@ -48,69 +48,42 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
-        public async Task<CancellationTokenSource> Handshake()
+        public async Task<CancellationToken> Handshake()
         {
             CancellationTokenSource handShakeTokenSource = new CancellationTokenSource();
-            SubscribeManager subscribeManager = new SubscribeManager(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, base.PubnubInstance);
-            subscribeManager.MultiChannelSubscribeInit<T>(PNOperationType.PNSubscribeOperation, channelList.ToArray(), channelgroupList.ToArray(), null, queryParam);
-#if NET35 || NET40
-            await Task.Factory.StartNew(() => { });
-#else
-            await Task.Delay(1); //Added this until this method gets await stmt.
-#endif
+            StatelessSubscribeManager subscribeManager = new StatelessSubscribeManager(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, base.PubnubInstance);
+            await subscribeManager.Handshake<T>(PNOperationType.PNSubscribeOperation, channelList.ToArray(), channelgroupList.ToArray(), null, queryParam, handShakeTokenSource.Token);
 
-            return handShakeTokenSource;
+            return handShakeTokenSource.Token;
         }
 
-        public async Task<CancellationTokenSource> ReceiveMessages(long timetoken, int region)
+        public async Task<CancellationToken> ReceiveMessages(long timetoken, int region)
         {
             CancellationTokenSource receiveMessagesTokenSource = new CancellationTokenSource();
 
-            Dictionary<string, string> additionalParams = new Dictionary<string, string>();
-            additionalParams.Add("tt", timetoken.ToString());
-            additionalParams.Add("r", region.ToString());
+            StatelessSubscribeManager subscribeManager = new StatelessSubscribeManager(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, base.PubnubInstance);
+            await subscribeManager.ReceiveMessages<T>(PNOperationType.PNSubscribeOperation, channelList.ToArray(), channelgroupList.ToArray(), timetoken, region, false, null, queryParam, receiveMessagesTokenSource.Token);
 
-            SubscribeManager subscribeManager = new SubscribeManager(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, base.PubnubInstance);
-            subscribeManager.MultiChannelSubscribeInit<T>(PNOperationType.PNSubscribeOperation, channelList.ToArray(), channelgroupList.ToArray(), additionalParams, queryParam);
-
-#if NET35 || NET40
-            await Task.Factory.StartNew(() => { });
-#else
-                await Task.Delay(30 * 1000); //Added this until this method gets await stmt.
-#endif
-
-            return receiveMessagesTokenSource;
+            return receiveMessagesTokenSource.Token;
         }
 
-        public async Task<CancellationTokenSource> IamHere()
+        public async Task<CancellationToken> IamHere()
         {
             CancellationTokenSource iamHereTokenSource = new CancellationTokenSource();
+            StatelessSubscribeManager subscribeManager = new StatelessSubscribeManager(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, base.PubnubInstance);
+            await subscribeManager.IamHere(PNOperationType.PNUnsubscribeOperation, channelList.ToArray(), channelgroupList.ToArray(), iamHereTokenSource.Token);
 
-            //Cannot route to Register PresenceHeartbeat without code refactoring.
-
-#if NET35 || NET40
-            await Task.Factory.StartNew(() => { });
-#else
-                await Task.Delay(30 * 1000); //Added this until this method gets await stmt.
-#endif
-
-            return iamHereTokenSource;
+            return iamHereTokenSource.Token;
         }
 
-        public async Task<CancellationTokenSource> IamAway(string unsubChannel, string unsubChannelGroup)
+        public async Task<CancellationToken> IamAway(string unsubChannel, string unsubChannelGroup)
         {
             CancellationTokenSource iamAwayTokenSource = new CancellationTokenSource();
 
-            SubscribeManager subscribeManager = new SubscribeManager(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, base.PubnubInstance);
-            subscribeManager.MultiChannelUnSubscribeInit<T>(PNOperationType.PNUnsubscribeOperation, unsubChannel, unsubChannelGroup, null);
+            StatelessSubscribeManager subscribeManager = new StatelessSubscribeManager(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, base.PubnubInstance);
+            await subscribeManager.IAmAway<T>(PNOperationType.PNUnsubscribeOperation, unsubChannel, unsubChannelGroup, null, iamAwayTokenSource.Token);
 
-#if NET35 || NET40
-            await Task.Factory.StartNew(() => { });
-#else
-                await Task.Delay(30 * 1000); //Added this until this method gets await stmt.
-#endif
-
-            return iamAwayTokenSource;
+            return iamAwayTokenSource.Token;
         }
     }
 

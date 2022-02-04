@@ -261,7 +261,10 @@
     <Compile Include="..\PubnubApi\EndPoint\PubSub\SubscribeManager.cs">
       <Link>EndPoint\PubSub\SubscribeManager.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\EndPoint\PubSub\SubscribeOperation.cs">
+	  <Compile Include="..\PubnubApi\EndPoint\PubSub\StatelessSubscribeManager.cs">
+		  <Link>EndPoint\PubSub\StatelessSubscribeManager.cs</Link>
+	  </Compile>
+	  <Compile Include="..\PubnubApi\EndPoint\PubSub\SubscribeOperation.cs">
       <Link>EndPoint\PubSub\SubscribeOperation.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\EndPoint\PubSub\StatelessSubscribe.cs">
@@ -342,7 +345,10 @@
     <Compile Include="..\PubnubApi\Interface\IPubnubHttp.cs">
       <Link>Interface\IPubnubHttp.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\Interface\IPubnubLog.cs">
+	  <Compile Include="..\PubnubApi\Interface\IStatelessPubnubHttp.cs">
+		  <Link>Interface\IStatelessPubnubHttp.cs</Link>
+	  </Compile>
+	  <Compile Include="..\PubnubApi\Interface\IPubnubLog.cs">
       <Link>Interface\IPubnubLog.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\Interface\IPubnubUnitTest.cs">
@@ -628,10 +634,16 @@
     <Compile Include="..\PubnubApi\PubnubCoreBase.cs">
       <Link>PubnubCoreBase.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\PubnubHttp.cs">
+	  <Compile Include="..\PubnubApi\Stateless_PubnubCoreBase.cs">
+		  <Link>Stateless_PubnubCoreBase.cs</Link>
+	  </Compile>
+	  <Compile Include="..\PubnubApi\PubnubHttp.cs">
       <Link>PubnubHttp.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\PubnubHttpClientHandler.cs" Link="PubnubHttpClientHandler.cs" />
+	  <Compile Include="..\PubnubApi\Stateless_PubnubHttp.cs">
+		  <Link>Stateless_PubnubHttp.cs</Link>
+	  </Compile>
+	  <Compile Include="..\PubnubApi\PubnubHttpClientHandler.cs" Link="PubnubHttpClientHandler.cs" />
     <Compile Include="..\PubnubApi\Push\Mpns\MpnsCycleTileNotification.cs">
       <Link>Push\Mpns\MpnsCycleTileNotification.cs</Link>
     </Compile>

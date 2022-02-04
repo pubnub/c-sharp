@@ -146,6 +146,7 @@
     <Compile Include="..\PubnubApi\EndPoint\PubSub\RemoveMessageActionOperation.cs" Link="EndPoint\PubSub\RemoveMessageActionOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\PubSub\SignalOperation.cs" Link="EndPoint\PubSub\SignalOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\PubSub\StatelessSubscribe.cs" Link="EndPoint\PubSub\StatelessSubscribe.cs" />
+    <Compile Include="..\PubnubApi\EndPoint\PubSub\StatelessSubscribeManager.cs" Link="EndPoint\PubSub\StatelessSubscribeManager.cs" />
     <Compile Include="..\PubnubApi\EndPoint\PubSub\SubscribeManager.cs">
       <Link>EndPoint\PubSub\SubscribeManager.cs</Link>
     </Compile>
@@ -233,6 +234,7 @@
     <Compile Include="..\PubnubApi\Interface\IPubnubUnitTest.cs">
       <Link>Interface\IPubnubUnitTest.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Interface\IStatelessPubnubHttp.cs" Link="Interface\IStatelessPubnubHttp.cs" />
     <Compile Include="..\PubnubApi\Interface\IUrlRequestBuilder.cs">
       <Link>Interface\IUrlRequestBuilder.cs</Link>
     </Compile>
@@ -543,6 +545,8 @@
     <Compile Include="..\PubnubApi\Security\SecureMessage.cs">
       <Link>Security\SecureMessage.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Stateless_PubnubCoreBase.cs" Link="Stateless_PubnubCoreBase.cs" />
+    <Compile Include="..\PubnubApi\Stateless_PubnubHttp.cs" Link="Stateless_PubnubHttp.cs" />
     <Compile Include="..\PubnubApi\Timer.cs">
       <Link>Timer.cs</Link>
     </Compile>
