@@ -50,7 +50,6 @@
     <Compile Include="..\PubnubApi.Tests\GenerateSampleGrant.cs" Link="GenerateSampleGrant.cs" />
     <Compile Include="..\PubnubApi.Tests\PubnubCommon.cs" Link="PubnubCommon.cs" />
     <Compile Include="..\PubnubApi.Tests\PubnubUnitTest.cs" Link="PubnubUnitTest.cs" />
-    <Compile Include="..\PubnubApi.Tests\SubscribeStatelessTest.cs" Link="SubscribeStatelessTest.cs" />
     <Compile Include="..\PubnubApi.Tests\TestHarness.cs" Link="TestHarness.cs" />
     <Compile Include="..\PubnubApi.Tests\UnitTestLog.cs" Link="UnitTestLog.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenAClientIsPresented.cs" Link="WhenAClientIsPresented.cs" />
