@@ -70,12 +70,6 @@ src/.vs/Pubnub/v15/sqlite3/storage.ide
 /src/Examples/PubnubApi.ASPNETWebFormExample/obj/*
 /src/Examples/PubnubApi.ASPNETWebFormExample/*.user
 
-/src/Examples/StatelessSubscribeExample/bin/Debug/*
-/src/Examples/StatelessSubscribeExample/obj/Debug/*
-/src/Examples/StatelessSubscribeExample/bin/Release/*
-/src/Examples/StatelessSubscribeExample/obj/Release/*
-/src/Examples/StatelessSubscribeExample/*.user
-
 /src/Examples/PubnubApi.ConsoleExample/bin/Debug/*
 /src/Examples/PubnubApi.ConsoleExample/obj/Debug/*
 /src/Examples/PubnubApi.ConsoleExample/bin/Release/*
