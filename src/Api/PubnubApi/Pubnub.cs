@@ -38,12 +38,6 @@ namespace PubnubApi
             return subscribeOperation;
         }
 
-        public EndPoint.StatelessSubscribeOperation<T> StatelessSubscribe<T>()
-        {
-            EndPoint.StatelessSubscribeOperation<T> statelessSubscribeOperation = new EndPoint.StatelessSubscribeOperation<T>(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, this);
-            return statelessSubscribeOperation;
-        }
-
         public EndPoint.UnsubscribeOperation<T> Unsubscribe<T>()
         {
             EndPoint.UnsubscribeOperation<T>  unsubscribeOperation = new EndPoint.UnsubscribeOperation<T>(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
