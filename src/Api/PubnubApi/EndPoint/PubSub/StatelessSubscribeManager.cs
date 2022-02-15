@@ -298,10 +298,7 @@ namespace PubnubApi.EndPoint
                             string channelName = rawChannelsFiltered[index].Trim();
                             if (!string.IsNullOrEmpty(channelName))
                             {
-                                if (MultiChannelSubscribe.ContainsKey(PubnubInstance.InstanceId) && !MultiChannelSubscribe[PubnubInstance.InstanceId].ContainsKey(channelName))
-                                {
-                                    validChannels.Add(channelName);
-                                }
+                                validChannels.Add(channelName);
                             }
                         }
                     }
@@ -320,57 +317,22 @@ namespace PubnubApi.EndPoint
                         if (rawChannelGroupsFiltered[index].Trim().Length > 0)
                         {
                             string channelGroupName = rawChannelGroupsFiltered[index].Trim();
-                            if (MultiChannelGroupSubscribe.ContainsKey(PubnubInstance.InstanceId) && !MultiChannelGroupSubscribe[PubnubInstance.InstanceId].ContainsKey(channelGroupName))
-                            {
-                                validChannelGroups.Add(channelGroupName);
-                            }
+                            validChannelGroups.Add(channelGroupName);
                         }
                     }
                 }
 
                 if (validChannels.Count > 0 || validChannelGroups.Count > 0)
                 {
-                    //Retrieve the current channels already subscribed previously and terminate them
-                    string[] currentChannels = MultiChannelSubscribe[PubnubInstance.InstanceId].Keys.ToArray<string>();
-                    string[] currentChannelGroups = MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Keys.ToArray<string>();
-
-                    //Add the valid channels to the channels subscribe list for tracking
-                    for (int index = 0; index < validChannels.Count; index++)
-                    {
-                        string currentLoopChannel = validChannels[index];
-                        MultiChannelSubscribe[PubnubInstance.InstanceId].GetOrAdd(currentLoopChannel, 0);
-                    }
-
-
-                    for (int index = 0; index < validChannelGroups.Count; index++)
-                    {
-                        string currentLoopChannelGroup = validChannelGroups[index];
-                        MultiChannelGroupSubscribe[PubnubInstance.InstanceId].GetOrAdd(currentLoopChannelGroup, 0);
-                    }
-
                     //Get all the channels
-                    string[] channels = MultiChannelSubscribe[PubnubInstance.InstanceId].Keys.ToArray<string>();
-                    string[] channelGroups = MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Keys.ToArray<string>();
+                    string[] channels = validChannels.ToArray<string>();
+                    string[] channelGroups = validChannelGroups.ToArray<string>();
 
                     if (channelGroups != null && channelGroups.Length > 0 && (channels == null || channels.Length == 0))
                     {
                         channelGroupSubscribeOnly = true;
                     }
 
-                    RequestState<T> state = new RequestState<T>();
-                    if (ChannelRequest.ContainsKey(PubnubInstance.InstanceId))
-                    {
-                        if (channelGroupSubscribeOnly)
-                        {
-                            ChannelRequest[PubnubInstance.InstanceId].AddOrUpdate(",", state.Request, (key, oldValue) => state.Request);
-                        }
-                        else
-                        {
-                            ChannelRequest[PubnubInstance.InstanceId].AddOrUpdate(string.Join(",", channels.OrderBy(x => x).ToArray()), state.Request, (key, oldValue) => state.Request);
-                        }
-                    }
-
-                    ResetInternetCheckSettings(channels, channelGroups);
                     ret = await Stateless_MultiChannelSubscribeRequest<T>(responseType, channels, channelGroups, 0, 0, false, initialSubscribeUrlParams, externalQueryParam, cancellationToken);
 
                 }
@@ -385,27 +347,8 @@ namespace PubnubApi.EndPoint
 
         private async Task<Tuple<string,PNStatus>> Stateless_MultiChannelSubscribeRequest<T>(PNOperationType type, string[] channels, string[] channelGroups, object timetoken, int region, bool reconnect, Dictionary<string, string> initialSubscribeUrlParams, Dictionary<string, object> externalQueryParam, CancellationToken cancellationToken)
         {
-            if (SubscribeDisconnected[PubnubInstance.InstanceId])
-            {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeDisconnected. Exiting MultiChannelSubscribeRequest", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
-                return default(Tuple<string, PNStatus>);
-            }
-
-            //Exit if the channel is unsubscribed
-            if (MultiChannelSubscribe != null && MultiChannelSubscribe[PubnubInstance.InstanceId].Count <= 0 && MultiChannelGroupSubscribe != null && MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Count <= 0)
-            {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Zero channels/channelGroups. Further subscription was stopped", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
-                return default(Tuple<string, PNStatus>);
-            }
-
             string multiChannel = (channels != null && channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : ",";
             string multiChannelGroup = (channelGroups != null && channelGroups.Length > 0) ? string.Join(",", channelGroups.OrderBy(x => x).ToArray()) : "";
-
-            if (!ChannelRequest.ContainsKey(PubnubInstance.InstanceId) || (!multiChannel.Equals(",", StringComparison.CurrentCultureIgnoreCase) && !ChannelRequest[PubnubInstance.InstanceId].ContainsKey(multiChannel)))
-            {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, PubnubInstance.InstanceId NOT matching", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
-                return default(Tuple<string, PNStatus>);
-            }
 
             // Begin recursive subscribe
             RequestState<T> pubnubRequestState = null;
@@ -415,34 +358,18 @@ namespace PubnubApi.EndPoint
                 //RegisterPresenceHeartbeatTimer<T>(channels, channelGroups); REMOVED FOR STATELESS
 
                 long lastTimetoken = 0;
-                long minimumTimetoken1 = (MultiChannelSubscribe[PubnubInstance.InstanceId].Count > 0) ? MultiChannelSubscribe[PubnubInstance.InstanceId].Min(token => token.Value) : 0;
-                long minimumTimetoken2 = (MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Count > 0) ? MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Min(token => token.Value) : 0;
+                long minimumTimetoken1 = 0;
+                long minimumTimetoken2 = 0;
                 long minimumTimetoken = Math.Max(minimumTimetoken1, minimumTimetoken2);
 
-                long maximumTimetoken1 = (MultiChannelSubscribe[PubnubInstance.InstanceId].Count > 0) ? MultiChannelSubscribe[PubnubInstance.InstanceId].Max(token => token.Value) : 0;
-                long maximumTimetoken2 = (MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Count > 0) ? MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Max(token => token.Value) : 0;
+                long maximumTimetoken1 = 0;
+                long maximumTimetoken2 = 0;
                 long maximumTimetoken = Math.Max(maximumTimetoken1, maximumTimetoken2);
 
 
-                if (minimumTimetoken == 0 || reconnect || UuidChanged)
-                {
-                    lastTimetoken = 0;
-                    UuidChanged = false;
-                }
-                else
-                {
-                    if (LastSubscribeTimetoken[PubnubInstance.InstanceId] == maximumTimetoken)
-                    {
-                        lastTimetoken = maximumTimetoken;
-                    }
-                    else
-                    {
-                        lastTimetoken = LastSubscribeTimetoken[PubnubInstance.InstanceId];
-                    }
-                }
                 LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Building request for channel(s)={1}, channelgroup(s)={2} with timetoken={3}", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannel, multiChannelGroup, lastTimetoken), config.LogVerbosity);
                 // Build URL
-                string channelsJsonState = BuildJsonUserState(channels, channelGroups, false);
+                string channelsJsonState = "";// BuildJsonUserState(channels, channelGroups, false);
                 config.Uuid = CurrentUuid; // to make sure we capture if UUID is changed
                 IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Stateless;
 
 namespace PubnubApi.EndPoint
 {
@@ -28,6 +29,86 @@ namespace PubnubApi.EndPoint
             pubnubLog = log;
             pubnubTelemetryMgr = telemetryManager;
             pubnubTokenMgr = tokenManager;
+
+            subscribeCall.Configure(SubscribeState.Stopped)
+                .Permit(SubscribeEvent.Subscribe, SubscribeState.Handshaking);
+
+            subscribeCall.Configure(SubscribeState.Handshaking)
+                .OnEntry(async () => await OnEntryHandshaking())
+                .Permit(SubscribeEvent.HandshakeSuccess, SubscribeState.Receiving)
+                .Permit(SubscribeEvent.Giveup, SubscribeState.HandshakeFailed)
+                .PermitReentry(SubscribeEvent.SubscriptionChange)
+                .PermitReentry(SubscribeEvent.Fail);
+
+
+            subscribeCall.Configure(SubscribeState.HandshakeFailed)
+                //.OnEntry(async () => await Handshake())
+                .Permit(SubscribeEvent.SubscriptionChange, SubscribeState.Handshaking)
+                .Permit(SubscribeEvent.Reconnect, SubscribeState.Handshaking);
+
+            subscribeCall.Configure(SubscribeState.Reconnecting)
+                //.OnEntry(async () => await Handshake())
+                .Permit(SubscribeEvent.ReceiveSuccess, SubscribeState.Delivering)
+                .Permit(SubscribeEvent.Giveup, SubscribeState.ReconnectionFailed)
+                .PermitReentry(SubscribeEvent.SubscriptionChange)
+                .PermitReentry(SubscribeEvent.Fail);
+
+            subscribeCall.Configure(SubscribeState.ReconnectionFailed)
+                //.OnEntry(async () => await Handshake())
+                .Permit(SubscribeEvent.SubscriptionChange, SubscribeState.Reconnecting)
+                .Permit(SubscribeEvent.Reconnect, SubscribeState.Reconnecting);
+
+            subscribeCall.Configure(SubscribeState.Unsubscribed)
+                .OnEntry(async()=> await IamAway(null, null))
+                .Permit(SubscribeEvent.Subscribe, SubscribeState.Handshaking)
+                .Permit(SubscribeEvent.Restore, SubscribeState.Reconnecting);
+
+            subscribeCall.Configure(SubscribeState.Preparing)
+                .Permit(SubscribeEvent.Reconnect, SubscribeState.Handshaking)
+                .PermitReentry(SubscribeEvent.SubscriptionChange);
+
+            subscribeCall.Configure(SubscribeState.Stopped)
+                .Permit(SubscribeEvent.Reconnect, SubscribeState.Reconnecting)
+                .PermitReentry(SubscribeEvent.SubscriptionChange);
+
+            var receiveSubscribeSuccessEvent = subscribeCall.SetTriggerParameters<long, int>(SubscribeEvent.ReceiveSuccess);
+            subscribeCall.Configure(SubscribeState.Receiving)
+                .OnEntry(async() => await OnEntryReceiving(0, 0))
+                .Permit(SubscribeEvent.ReceiveSuccess, SubscribeState.Delivering)
+                .Permit(SubscribeEvent.Fail, SubscribeState.Reconnecting)
+                .PermitReentry(SubscribeEvent.SubscriptionChange);
+
+            subscribeCall.Configure(SubscribeState.Delivering)
+                .OnEntry(() => System.Diagnostics.Debug.WriteLine("Message delivered logic"))
+                .Permit(SubscribeEvent.Done, SubscribeState.Receiving);
+        }
+
+        internal async Task<CancellationToken> OnEntryHandshaking()
+        {
+            CancellationTokenSource handShakeTokenSource = new CancellationTokenSource();
+            Tuple<string, PNStatus>  handshakeResponse = await Handshake(handShakeTokenSource.Token);
+            PNStatus status = handshakeResponse.Item2;
+            if (!status.Error && status.StatusCode == 200)
+            {
+                subscribeCall.Fire(SubscribeEvent.HandshakeSuccess);
+            }
+            return handShakeTokenSource.Token;
+        }
+
+        internal async Task<CancellationToken> OnEntryReceiving(long timetoken, int region)
+        {
+            CancellationTokenSource receivingTokenSource = new CancellationTokenSource();
+            Tuple<string, PNStatus> handshakeResponse = await ReceiveMessages(timetoken, region, receivingTokenSource.Token);
+            PNStatus status = handshakeResponse.Item2;
+            if (!status.Error && status.StatusCode == 200)
+            {
+                long currentTimetoken = 0; //TBD
+                int currentRegion = 0; //TBD
+               
+                subscribeCall.Fire(SubscribeEvent.ReceiveSuccess); //TBD - How to pass parameters to Fire
+            }
+            return receivingTokenSource.Token;
+
         }
 
         public StatelessSubscribeOperation<T> Channels(List<string> channels)
@@ -48,23 +129,30 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
-        public async Task<CancellationToken> Handshake()
+        private async Task<Tuple<string, PNStatus>> Handshake(CancellationToken cancellationToken)
         {
-            CancellationTokenSource handShakeTokenSource = new CancellationTokenSource();
+            System.Diagnostics.Debug.WriteLine("Handshake");
+            
             StatelessSubscribeManager subscribeManager = new StatelessSubscribeManager(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, base.PubnubInstance);
-            await subscribeManager.Handshake<T>(PNOperationType.PNSubscribeOperation, channelList.ToArray(), channelgroupList.ToArray(), null, queryParam, handShakeTokenSource.Token);
+            Tuple<string, PNStatus> handshakeResponse = await subscribeManager.Handshake<T>(PNOperationType.PNSubscribeOperation, channelList.ToArray(), (channelgroupList != null) ? channelgroupList.ToArray() : null, null, queryParam, cancellationToken);
 
-            return handShakeTokenSource.Token;
+            System.Diagnostics.Debug.WriteLine(handshakeResponse.Item1);
+            System.Diagnostics.Debug.WriteLine(jsonLibrary.SerializeToJsonString(handshakeResponse.Item2));
+            
+            return handshakeResponse;
         }
 
-        public async Task<CancellationToken> ReceiveMessages(long timetoken, int region)
+        public async Task<Tuple<string, PNStatus>> ReceiveMessages(long timetoken, int region, CancellationToken cancellationToken)
         {
-            CancellationTokenSource receiveMessagesTokenSource = new CancellationTokenSource();
-
+            System.Diagnostics.Debug.WriteLine("ReceiveMessages");
+            
             StatelessSubscribeManager subscribeManager = new StatelessSubscribeManager(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, base.PubnubInstance);
-            await subscribeManager.ReceiveMessages<T>(PNOperationType.PNSubscribeOperation, channelList.ToArray(), channelgroupList.ToArray(), timetoken, region, false, null, queryParam, receiveMessagesTokenSource.Token);
+            Tuple<string, PNStatus> receiveMessageResponse = await subscribeManager.ReceiveMessages<T>(PNOperationType.PNSubscribeOperation, channelList.ToArray(), (channelgroupList != null) ? channelgroupList.ToArray() : null, timetoken, region, false, null, queryParam, cancellationToken);
+            
+            System.Diagnostics.Debug.WriteLine(receiveMessageResponse.Item1);
+            System.Diagnostics.Debug.WriteLine(jsonLibrary.SerializeToJsonString(receiveMessageResponse.Item2));
 
-            return receiveMessagesTokenSource.Token;
+            return receiveMessageResponse;
         }
 
         public async Task<CancellationToken> IamHere()
@@ -85,10 +173,64 @@ namespace PubnubApi.EndPoint
 
             return iamAwayTokenSource.Token;
         }
+
+        StateMachine<SubscribeState, SubscribeEvent> subscribeCall = new StateMachine<SubscribeState, SubscribeEvent>(SubscribeState.Stopped);
+        public enum SubscribeState
+        {
+            HandshakeFailed,
+            Unsubscribed,
+            ReconnectionFailed,
+            Handshaking,
+            Preparing,
+            Stopped,
+            Reconnecting,
+            Receiving,
+            Delivering
+        }
+
+        public enum SubscribeEvent
+        {
+            Reconnect,
+            SubscriptionChange,
+            Fail,
+            Giveup,
+            HandshakeSuccess,
+            ReceiveSuccess,
+            ReconnectSuccess,
+            Subscribe,
+            Restore,
+            Disconnect,
+            Done
+        }
+
+        public void Execute()
+        {
+            string statePicture = Stateless.Graph.UmlDotGraph.Format(subscribeCall.GetInfo());
+            System.Diagnostics.Debug.WriteLine(statePicture);
+            subscribeCall.Fire(SubscribeEvent.Subscribe);
+        }
+
+        private void Reconnect()
+        {
+            System.Diagnostics.Debug.WriteLine("Reconnect");
+            subscribeCall.Fire(SubscribeEvent.Reconnect);
+        }
+
+        private void SubscriptionChange()
+        {
+            System.Diagnostics.Debug.WriteLine("SubscriptionChange");
+            subscribeCall.Fire(SubscribeEvent.SubscriptionChange);
+        }
+
+        public override string ToString()
+        {
+            return $"{nameof(SubscribeOperation<T>)}[state={subscribeCall.State}]";
+        }
     }
 
     public class SubscribeStateMachine
     {
+        StateMachine<SubscribeState, SubscribeEvent> subscribeCall = new StateMachine<SubscribeState, SubscribeEvent>(SubscribeState.Stopped);
         public enum SubscribeState
         {
             HandshakeFailed,
@@ -113,6 +255,12 @@ namespace PubnubApi.EndPoint
             Restore,
             Disconnect,
             Done
+        }
+
+        public SubscribeStateMachine()
+        {
+
+            //subscribeCall.Configure(SubscribeState)
         }
 
         public SubscribeState ChangeSubscribeState(SubscribeState current, SubscribeEvent subscribeEvt)
