@@ -358,13 +358,7 @@ namespace PubnubApi.EndPoint
                 //RegisterPresenceHeartbeatTimer<T>(channels, channelGroups); REMOVED FOR STATELESS
 
                 long lastTimetoken = 0;
-                long minimumTimetoken1 = 0;
-                long minimumTimetoken2 = 0;
-                long minimumTimetoken = Math.Max(minimumTimetoken1, minimumTimetoken2);
-
-                long maximumTimetoken1 = 0;
-                long maximumTimetoken2 = 0;
-                long maximumTimetoken = Math.Max(maximumTimetoken1, maximumTimetoken2);
+                Int64.TryParse(timetoken.ToString(), out lastTimetoken);
 
 
                 LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Building request for channel(s)={1}, channelgroup(s)={2} with timetoken={3}", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannel, multiChannelGroup, lastTimetoken), config.LogVerbosity);
@@ -373,7 +367,7 @@ namespace PubnubApi.EndPoint
                 config.Uuid = CurrentUuid; // to make sure we capture if UUID is changed
                 IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
 
-                Uri request = urlBuilder.BuildMultiChannelSubscribeRequest("GET", "", channels, channelGroups, (Convert.ToInt64(timetoken.ToString()) == 0) ? Convert.ToInt64(timetoken.ToString()) : lastTimetoken, region, channelsJsonState, initialSubscribeUrlParams, externalQueryParam);
+                Uri request = urlBuilder.BuildMultiChannelSubscribeRequest("GET", "", channels, channelGroups, lastTimetoken, region, channelsJsonState, initialSubscribeUrlParams, externalQueryParam);
 
                 pubnubRequestState = new RequestState<T>();
                 pubnubRequestState.Channels = channels;

@@ -25,7 +25,7 @@ namespace PubnubApi.EndPoint
         private StateMachine<SubscribeState, SubscribeEvent> subscribeCall = new StateMachine<SubscribeState, SubscribeEvent>(SubscribeState.Stopped);
         private StateMachine<SubscribeState, SubscribeEvent>.TriggerWithParameters<SubscribeData> handshakeEventTrigger;
         private StateMachine<SubscribeState, SubscribeEvent>.TriggerWithParameters<SubscribeData> receiveMessagesEventTrigger;
-        private StateMachine<SubscribeState, SubscribeEvent>.TriggerWithParameters<SubscribeData> deliveringMessagesEventTrigger;
+        //private StateMachine<SubscribeState, SubscribeEvent>.TriggerWithParameters<SubscribeData> deliveringMessagesEventTrigger;
 
         public StatelessSubscribeOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
         {
@@ -38,7 +38,7 @@ namespace PubnubApi.EndPoint
 
             handshakeEventTrigger = subscribeCall.SetTriggerParameters<SubscribeData>(SubscribeEvent.HandshakeSuccess);
             receiveMessagesEventTrigger = subscribeCall.SetTriggerParameters<SubscribeData>(SubscribeEvent.ReceiveSuccess);
-            deliveringMessagesEventTrigger = subscribeCall.SetTriggerParameters<SubscribeData>(SubscribeEvent.Done);
+            //deliveringMessagesEventTrigger = subscribeCall.SetTriggerParameters<SubscribeData>(SubscribeEvent.Done);
 
             subscribeCall.Configure(SubscribeState.Stopped)
                 .Permit(SubscribeEvent.Subscribe, SubscribeState.Handshaking);
@@ -99,62 +99,57 @@ namespace PubnubApi.EndPoint
 
             //var receiveSubscribeSuccessEventTrigger = subscribeCall.SetTriggerParameters<TimetokenAndRegion>(SubscribeEvent.ReceiveSuccess);
             subscribeCall.Configure(SubscribeState.Receiving)
-                .OnEntryFrom(handshakeEventTrigger, async (data) => 
+                .OnEntryFrom(handshakeEventTrigger, async (data) =>
                 {
                     System.Diagnostics.Debug.WriteLine($"OnEntry: State={subscribeCall.State} ");
-                    await OnEntryReceiving(data); 
+                    await OnEntryReceiving(data);
                 })
-                //.OnEntryFrom(handshakeEventTrigger, async (data) =>
-                //{
-                //    if (subscribeCall.IsInState(SubscribeState.Receiving) && subscribeCall.tran)
-                //    {
-                //        await OnEntryReceiving(data);
-                //    }
-                //})
-                .OnEntryFrom(receiveMessagesEventTrigger, async (data) => 
+                .OnEntryFrom(receiveMessagesEventTrigger, async (data) =>
                 {
                     System.Diagnostics.Debug.WriteLine($"OnEntry: State={subscribeCall.State} ");
-                    await OnEntryReceiving(data); 
+                    await OnEntryReceiving(data);
                 })
                 .OnExit((data) =>
                 {
                     System.Diagnostics.Debug.WriteLine($"OnExit: Trigger={data.Trigger}; Source={data.Source}; Destination={data.Destination}; IsRetrant={data.IsReentry.ToString()}");
                 })
-                .Permit(SubscribeEvent.ReceiveSuccess, SubscribeState.Delivering)
+                //.Permit(SubscribeEvent.ReceiveSuccess, SubscribeState.Receiving)
                 .Permit(SubscribeEvent.Fail, SubscribeState.Reconnecting)
-                .PermitReentry(SubscribeEvent.SubscriptionChange)
-                .PermitReentry(SubscribeEvent.Done);
+                //.Permit(SubscribeEvent.ReceiveSuccess, SubscribeState.Receiving)
+                .PermitReentry(SubscribeEvent.ReceiveSuccess)
+                //.PermitReentryIf(SubscribeEvent.ReceiveSuccess, ()=> subscribeCall.IsInState(SubscribeState.Receiving))
+                .PermitReentry(SubscribeEvent.SubscriptionChange);
                 //.PermitReentryIf(SubscribeEvent.Done, () => subscribeCall.IsInState(SubscribeState.Receiving));
                 //.Ignore(SubscribeEvent.Done);
                 //.PermitReentry(SubscribeEvent.ReceiveSuccess);
 
 
-            subscribeCall.Configure(SubscribeState.Delivering)
-                //.SubstateOf(SubscribeState.Receiving)
-                //.OnEntryFrom(receiveMessagesEventTrigger, async (data) => await OnEntryDelivering(data))
-                //.OnEntryFrom(deliveringMessagesEventTrigger, async (data) => await OnEntryDelivering(data))
-                .OnEntryFrom(receiveMessagesEventTrigger, async (data) => 
-                {
-                    System.Diagnostics.Debug.WriteLine($"OnEntry: State={subscribeCall.State} ");
-                    await OnEntryDelivering(data);
-                })
-                .OnExit((data) => 
-                {
-                    System.Diagnostics.Debug.WriteLine($"OnExit: Trigger={data.Trigger}; Source={data.Source}; Destination={data.Destination}; IsRetrant={data.IsReentry.ToString()}");
-                    //subscribeCall.Fire(SubscribeEvent.Done);
-                    if (data != null && data.Parameters != null && data.Parameters.Count() > 0)
-                    {
-                        //subscribeCall.Fire(receiveMessagesEventTrigger, data.Parameters[0]);
+            //subscribeCall.Configure(SubscribeState.Delivering)
+            //    //.SubstateOf(SubscribeState.Receiving)
+            //    //.OnEntryFrom(receiveMessagesEventTrigger, async (data) => await OnEntryDelivering(data))
+            //    //.OnEntryFrom(deliveringMessagesEventTrigger, async (data) => await OnEntryDelivering(data))
+            //    .OnEntryFrom(receiveMessagesEventTrigger, async (data) => 
+            //    {
+            //        System.Diagnostics.Debug.WriteLine($"OnEntry: State={subscribeCall.State} ");
+            //        await OnEntryDelivering(data);
+            //    })
+            //    .OnExit((data) => 
+            //    {
+            //        System.Diagnostics.Debug.WriteLine($"OnExit: Trigger={data.Trigger}; Source={data.Source}; Destination={data.Destination}; IsRetrant={data.IsReentry.ToString()}");
+            //        //subscribeCall.Fire(SubscribeEvent.Done);
+            //        if (data != null && data.Parameters != null && data.Parameters.Count() > 0)
+            //        {
+            //            //subscribeCall.Fire(receiveMessagesEventTrigger, data.Parameters[0]);
                         
-                    }
-                })
-                .OnEntryFrom(deliveringMessagesEventTrigger, async(data) => 
-                {
-                    System.Diagnostics.Debug.WriteLine($"OnEntry: State={subscribeCall.State} ");
-                    await OnEntryDelivering(data);
-                })
-                //.Ignore(SubscribeEvent.ReceiveSuccess)
-                .Permit(SubscribeEvent.Done, SubscribeState.Receiving);
+            //        }
+            //    })
+            //    .OnEntryFrom(deliveringMessagesEventTrigger, async(data) => 
+            //    {
+            //        System.Diagnostics.Debug.WriteLine($"OnEntry: State={subscribeCall.State} ");
+            //        await OnEntryDelivering(data);
+            //    })
+            //    //.Ignore(SubscribeEvent.ReceiveSuccess)
+            //    .Permit(SubscribeEvent.Done, SubscribeState.Receiving);
         }
 
         
@@ -224,6 +219,9 @@ namespace PubnubApi.EndPoint
                 receiveMessagesData.Region = jsonRegion;
                 receiveMessagesData.Message = $"Hello...I got some message at tt={jsonTimetoken} with region={jsonRegion}";
 
+                System.Diagnostics.Debug.WriteLine($"MESSAGE DELIVERED {receiveMessagesData.Message}");
+                //Announce()
+
                 subscribeCall.Fire(receiveMessagesEventTrigger, receiveMessagesData);
 
             }
@@ -235,27 +233,27 @@ namespace PubnubApi.EndPoint
 
         }
 
-        internal async Task<CancellationToken> OnEntryDelivering(SubscribeData obj)
-        {
-            System.Diagnostics.Debug.WriteLine("OnEntryDelivering");
-            CancellationTokenSource deliveringTokenSource = new CancellationTokenSource();
+//        internal async Task<CancellationToken> OnEntryDelivering(SubscribeData obj)
+//        {
+//            System.Diagnostics.Debug.WriteLine("OnEntryDelivering");
+//            CancellationTokenSource deliveringTokenSource = new CancellationTokenSource();
 
-#if NET40
-#else
-            await Task.Delay(1);
-#endif
-            System.Diagnostics.Debug.WriteLine($"MESSAGE DELIVERED: {obj.Message}");
+//#if NET40
+//#else
+//            await Task.Delay(1);
+//#endif
+//            System.Diagnostics.Debug.WriteLine($"MESSAGE DELIVERED: {obj.Message}");
 
-            subscribeCall.Fire(deliveringMessagesEventTrigger, obj);
-            //subscribeCall.Fire(receiveMessagesEventTrigger, obj);
+//            subscribeCall.Fire(deliveringMessagesEventTrigger, obj);
+//            //subscribeCall.Fire(receiveMessagesEventTrigger, obj);
 
-            //if (subscribeCall.CanFire(SubscribeEvent.Done))
-            //{
-            //    subscribeCall.Fire(SubscribeEvent.Done);
-            //}
+//            //if (subscribeCall.CanFire(SubscribeEvent.Done))
+//            //{
+//            //    subscribeCall.Fire(SubscribeEvent.Done);
+//            //}
 
-            return deliveringTokenSource.Token;
-        }
+//            return deliveringTokenSource.Token;
+//        }
 
         public StatelessSubscribeOperation<T> Channels(List<string> channels)
         {
