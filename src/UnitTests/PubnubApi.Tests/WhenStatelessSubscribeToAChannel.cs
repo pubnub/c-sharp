@@ -58,12 +58,12 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent mre = new ManualResetEvent(false);
             pubnub.StatelessSubscribe<string>().Channels(new List<string> { channel }).Execute();
-            mre.WaitOne(10*1000);
+            mre.WaitOne(600*1000);
 
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Assert.Ignore("WhenStatelessSubscribeToAChannel --> ThenStatelessSubscribeShouldReturnReceivedMessage Failed");
+            Assert.Ignore("WhenStatelessSubscribeToAChannel --> ThenStatelessSubscribeShouldReturnReceivedMessage");
         }
 
     }

@@ -1334,27 +1334,7 @@ namespace PubnubApi
         }
         internal protected List<object> ProcessJsonResponse<T>(RequestState<T> asyncRequestState, string jsonString)
         {
-            List<object> result = new List<object>();
-
-            bool errorCallbackRaised = false;
-            PNStatus status = GetStatusIfError<T>(asyncRequestState, jsonString);
-            if (status != null)
-            {
-                errorCallbackRaised = true;
-                if (asyncRequestState != null && asyncRequestState.PubnubCallback != null)
-                {
-                    asyncRequestState.PubnubCallback.OnResponse(default(T), status);
-                }
-                else
-                {
-                    Announce(status);
-                }
-            }
-            if (!errorCallbackRaised && asyncRequestState != null)
-            {
-                result = WrapResultBasedOnResponseType<T>(asyncRequestState.ResponseType, jsonString, asyncRequestState.Channels, asyncRequestState.ChannelGroups, asyncRequestState.Reconnect, asyncRequestState.Timetoken, asyncRequestState.PubnubCallback);
-            }
-
+            List<object> result = WrapResultBasedOnResponseType<T>(asyncRequestState.ResponseType, jsonString, asyncRequestState.Channels, asyncRequestState.ChannelGroups, asyncRequestState.Reconnect, asyncRequestState.Timetoken, asyncRequestState.PubnubCallback);
             return result;
         }
 

@@ -426,6 +426,7 @@ namespace PubnubApi.EndPoint
 
         }
 
+
         internal void CurrentPubnubInstance(Pubnub instance)
         {
             PubnubInstance = instance;
