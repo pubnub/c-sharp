@@ -40,7 +40,7 @@ namespace PubnubApi
 
         public EndPoint.StatelessSubscribeOperation<T> StatelessSubscribe<T>()
         {
-            EndPoint.StatelessSubscribeOperation<T> subscribeOperation = new EndPoint.StatelessSubscribeOperation<T>(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, this);
+            EndPoint.StatelessSubscribeOperation<T> subscribeOperation = new EndPoint.StatelessSubscribeOperation<T>(pubnubConfig, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager);
             //subscribeOperation.CurrentPubnubInstance(this);
             savedSubscribeOperation = subscribeOperation;
             return subscribeOperation;

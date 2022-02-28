@@ -19,7 +19,7 @@ namespace PubnubApi.EndPoint
 
         private Dictionary<string, object> customQueryParam;
 
-        public StatelessSubscribeManager(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
+        public StatelessSubscribeManager(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
@@ -50,7 +50,7 @@ namespace PubnubApi.EndPoint
 
         internal async Task<PNResult<PNSetStateResult>> SetPresenceState(string[] channels, string[] channelGroups, string uuid, string jsonUserState, Dictionary<string, object> externalQueryParam, PNCallback<PNSetStateResult> callback)
         {
-            EndPoint.SetStateOperation setStateOperation = new EndPoint.SetStateOperation(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, null, base.PubnubInstance);
+            EndPoint.SetStateOperation setStateOperation = new EndPoint.SetStateOperation(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, null, null);
             return await setStateOperation.Channels(channels).ChannelGroups(channelGroups).ExecuteAsync();
         }
 
@@ -63,12 +63,6 @@ namespace PubnubApi.EndPoint
             try
             {
                 this.customQueryParam = externalQueryParam;
-
-                if (PubnubInstance == null)
-                {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, PubnubInstance is null. exiting MultiChannelUnSubscribeInit", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
-                    return ret;
-                }
 
                 string[] rawChannels = (channel != null && channel.Trim().Length > 0) ? channel.Split(',') : new string[] { };
                 string[] rawChannelGroups = (channelGroup != null && channelGroup.Trim().Length > 0) ? channelGroup.Split(',') : new string[] { };
@@ -85,24 +79,6 @@ namespace PubnubApi.EndPoint
                                 continue;
                             }
 
-                            if (MultiChannelSubscribe.ContainsKey(PubnubInstance.InstanceId) && MultiChannelSubscribe[PubnubInstance.InstanceId] != null && !MultiChannelSubscribe[PubnubInstance.InstanceId].ContainsKey(channelName))
-                            {
-                                PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNUnsubscribeOperation, PNStatusCategory.PNUnexpectedDisconnectCategory, null, (int)HttpStatusCode.NotFound, null);
-                                if (!status.AffectedChannels.Contains(channelName))
-                                {
-                                    status.AffectedChannels.Add(channelName);
-                                }
-                                Announce(status);
-                            }
-                            else
-                            {
-                                validChannels.Add(channelName);
-                                string presenceChannelName = string.Format("{0}-pnpres", channelName);
-                                if (MultiChannelSubscribe.ContainsKey(PubnubInstance.InstanceId) && MultiChannelSubscribe[PubnubInstance.InstanceId] != null && MultiChannelSubscribe[PubnubInstance.InstanceId].ContainsKey(presenceChannelName))
-                                {
-                                    validChannels.Add(presenceChannelName);
-                                }
-                            }
                         }
                     }
                 }
@@ -119,24 +95,6 @@ namespace PubnubApi.EndPoint
                                 continue;
                             }
 
-                            if (MultiChannelGroupSubscribe.ContainsKey(PubnubInstance.InstanceId) && MultiChannelGroupSubscribe[PubnubInstance.InstanceId] != null && !MultiChannelGroupSubscribe[PubnubInstance.InstanceId].ContainsKey(channelGroupName))
-                            {
-                                PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNUnsubscribeOperation, PNStatusCategory.PNUnexpectedDisconnectCategory, null, (int)HttpStatusCode.NotFound, null);
-                                if (!status.AffectedChannelGroups.Contains(channelGroupName))
-                                {
-                                    status.AffectedChannelGroups.Add(channelGroupName);
-                                }
-                                Announce(status);
-                            }
-                            else
-                            {
-                                validChannelGroups.Add(channelGroupName);
-                                string presenceChannelGroupName = string.Format("{0}-pnpres", channelGroupName);
-                                if (MultiChannelGroupSubscribe.ContainsKey(PubnubInstance.InstanceId) && MultiChannelGroupSubscribe[PubnubInstance.InstanceId] != null && MultiChannelGroupSubscribe[PubnubInstance.InstanceId].ContainsKey(presenceChannelGroupName))
-                                {
-                                    validChannelGroups.Add(presenceChannelGroupName);
-                                }
-                            }
                         }
                     }
                 }
@@ -144,8 +102,8 @@ namespace PubnubApi.EndPoint
                 if (validChannels.Count > 0 || validChannelGroups.Count > 0)
                 {
                     //Retrieve the current channels already subscribed previously and terminate them
-                    string[] currentChannels = MultiChannelSubscribe[PubnubInstance.InstanceId].Keys.ToArray<string>();
-                    string[] currentChannelGroups = MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Keys.ToArray<string>();
+                    string[] currentChannels = null;// MultiChannelSubscribe[PubnubInstance.InstanceId].Keys.ToArray<string>();
+                    string[] currentChannelGroups = null;// MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Keys.ToArray<string>();
 
                     if (currentChannels != null && currentChannels.Length >= 0)
                     {
@@ -156,7 +114,7 @@ namespace PubnubApi.EndPoint
                         {
                             //just fire leave() event to REST API for safeguard
                             string channelsJsonState = BuildJsonUserState(validChannels.ToArray(), validChannelGroups.ToArray(), false);
-                            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+                            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, null , "");
 
                             Uri request = urlBuilder.BuildMultiChannelLeaveRequest("GET", "", validChannels.ToArray(), validChannelGroups.ToArray(), channelsJsonState, externalQueryParam);
 
@@ -172,14 +130,6 @@ namespace PubnubApi.EndPoint
 
                     Dictionary<string, long> originalMultiChannelSubscribe = null;
                     Dictionary<string, long> originalMultiChannelGroupSubscribe = null;
-                    if (PubnubInstance != null && MultiChannelSubscribe.ContainsKey(PubnubInstance.InstanceId))
-                    {
-                        originalMultiChannelSubscribe = MultiChannelSubscribe[PubnubInstance.InstanceId].Count > 0 ? MultiChannelSubscribe[PubnubInstance.InstanceId].ToDictionary(kvp => kvp.Key, kvp => kvp.Value) : null;
-                    }
-                    if (PubnubInstance != null && MultiChannelGroupSubscribe.ContainsKey(PubnubInstance.InstanceId))
-                    {
-                        originalMultiChannelGroupSubscribe = MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Count > 0 ? MultiChannelGroupSubscribe[PubnubInstance.InstanceId].ToDictionary(kvp => kvp.Key, kvp => kvp.Value) : null;
-                    }
 
                     PNStatus successStatus = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNUnsubscribeOperation, PNStatusCategory.PNDisconnectedCategory, null, (int)HttpStatusCode.OK, null);
                     PNStatus failStatus = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNUnsubscribeOperation, PNStatusCategory.PNDisconnectedCategory, null, (int)HttpStatusCode.NotFound, new PNException("Unsubscribe Error. Please retry unsubscribe operation"));
@@ -192,10 +142,6 @@ namespace PubnubApi.EndPoint
                         long timetokenValue;
                         string channelToBeRemoved = validChannels[index];
                         bool unsubscribeStatus = false;
-                        if (PubnubInstance != null && MultiChannelSubscribe.ContainsKey(PubnubInstance.InstanceId))
-                        {
-                            unsubscribeStatus = MultiChannelSubscribe[PubnubInstance.InstanceId].TryRemove(channelToBeRemoved, out timetokenValue);
-                        }
                         if (channelToBeRemoved.Contains("-pnpres"))
                         {
                             continue; //Do not send status for -pnpres channels
@@ -224,10 +170,6 @@ namespace PubnubApi.EndPoint
                         long timetokenValue;
                         string channelGroupToBeRemoved = validChannelGroups[index];
                         bool unsubscribeStatus = false;
-                        if (PubnubInstance != null && MultiChannelGroupSubscribe.ContainsKey(PubnubInstance.InstanceId))
-                        {
-                            unsubscribeStatus = MultiChannelGroupSubscribe[PubnubInstance.InstanceId].TryRemove(channelGroupToBeRemoved, out timetokenValue);
-                        }
                         if (channelGroupToBeRemoved.Contains("-pnpres"))
                         {
                             continue; //Do not send status for -pnpres channel-groups
@@ -252,15 +194,6 @@ namespace PubnubApi.EndPoint
                         }
                     }
 
-                    if (successExist && PubnubInstance != null)
-                    {
-                        Announce(successStatus);
-                    }
-
-                    if (failExist && PubnubInstance != null)
-                    {
-                        Announce(failStatus);
-                    }
 
                 }
             }
@@ -281,7 +214,6 @@ namespace PubnubApi.EndPoint
             try
             {
                 bool channelGroupSubscribeOnly = false;
-                SubscribeDisconnected[PubnubInstance.InstanceId] = false;
 
                 if (rawChannels != null && rawChannels.Length > 0)
                 {
@@ -365,7 +297,7 @@ namespace PubnubApi.EndPoint
                 // Build URL
                 string channelsJsonState = "";// BuildJsonUserState(channels, channelGroups, false);
                 config.Uuid = CurrentUuid; // to make sure we capture if UUID is changed
-                IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+                IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, null, "");
 
                 Uri request = urlBuilder.BuildMultiChannelSubscribeRequest("GET", "", channels, channelGroups, lastTimetoken, region, channelsJsonState, initialSubscribeUrlParams, externalQueryParam);
 
@@ -404,7 +336,7 @@ namespace PubnubApi.EndPoint
         private async Task<Tuple<string, PNStatus>> Stateless_PresenceHeartbeat(PNOperationType type, string[] channels, string[] channelGroups, CancellationToken cancellationToken)
         {
             string channelsJsonState = BuildJsonUserState(channels, channelGroups, false);
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, null, "");
 
             Uri request = urlBuilder.BuildPresenceHeartbeatRequest("GET", "", channels, channelGroups, channelsJsonState);
 
@@ -423,7 +355,7 @@ namespace PubnubApi.EndPoint
 
         internal void CurrentPubnubInstance(Pubnub instance)
         {
-            PubnubInstance = instance;
+            //PubnubInstance = instance;
         }
 
         #region IDisposable Support

@@ -688,7 +688,6 @@
       <Version>9.0.1</Version>
     </PackageReference>
     <PackageReference Include="PeterO.Cbor" Version="4.5.2" />
-    <PackageReference Include="stateless" Version="5.11.0" />
     <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>

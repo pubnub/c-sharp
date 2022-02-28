@@ -153,8 +153,11 @@ namespace PubnubApi
             }
 
 
-            status.Origin = config.Origin;
-            status.TlsEnabled = config.Secure;
+            if (config != null)
+            {
+                status.Origin = config.Origin;
+                status.TlsEnabled = config.Secure;
+            }
 
             return status;
         }

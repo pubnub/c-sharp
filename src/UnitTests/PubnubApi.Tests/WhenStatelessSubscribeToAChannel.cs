@@ -5,6 +5,7 @@ using PubnubApi;
 using System.Collections.Generic;
 using MockServer;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace PubNubMessaging.Tests
 {
@@ -42,7 +43,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public static void ThenStatelessSubscribeShouldReturnReceivedMessage()
+        public static async Task ThenStatelessSubscribeShouldReturnReceivedMessage()
         {
             server.ClearRequests();
             PNConfiguration config = new PNConfiguration("mytestuuid")
@@ -57,7 +58,7 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
 
             ManualResetEvent mre = new ManualResetEvent(false);
-            pubnub.StatelessSubscribe<string>().Channels(new List<string> { channel }).Execute();
+            await pubnub.StatelessSubscribe<string>().Channels(new List<string> { channel }).Execute();
             mre.WaitOne(600*1000);
 
             pubnub.Destroy();

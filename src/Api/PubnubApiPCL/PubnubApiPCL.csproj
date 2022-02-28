@@ -590,7 +590,6 @@
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="PeterO.Cbor" Version="4.5.2" />
-    <PackageReference Include="stateless" Version="5.11.0" />
     <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.0" />
     <Reference Include="System.Runtime" />
   </ItemGroup>
@@ -632,9 +631,6 @@
   </ItemGroup>
   
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
-    <PackageReference Include="Portable.BouncyCastle" Version="1.8.1.2">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
     <PackageReference Include="System.Net.Requests" Version="4.0.11">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
@@ -650,9 +646,6 @@
   </ItemGroup>
   
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-    <PackageReference Include="Portable.BouncyCastle" Version="1.8.1.2">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
     <PackageReference Include="System.Net.Requests" Version="4.0.11">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
@@ -689,7 +682,6 @@
   </ItemGroup>
   
   <!--<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-    <PackageReference Include="Portable.BouncyCastle" Version="1.8.1.1" />
     <PackageReference Include="System.Net.Requests" Version="4.0.11" />
     <PackageReference Include="System.Reflection.Primitives" Version="4.3.0" />
     <PackageReference Include="System.Reflection.TypeExtensions" Version="4.1.0" />
@@ -702,9 +694,6 @@
   </ItemGroup>-->
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.4' ">
-    <PackageReference Include="Portable.BouncyCastle" Version="1.8.1.2">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
     <PackageReference Include="System.Net.Requests" Version="4.0.11">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
@@ -741,7 +730,7 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <PackageReference Include="Portable.BouncyCastle" Version="1.8.1.2">
+    <PackageReference Include="NetStandard.Library" Version="2.0.0.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="System.Net.Requests" Version="4.0.11">
@@ -821,7 +810,6 @@
   </ItemGroup>
   
   <!--<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.4' ">
-    <PackageReference Include="Portable.BouncyCastle" Version="1.8.1.1" />
     <PackageReference Include="System.Net.Requests" Version="4.0.11" />
     <PackageReference Include="System.Reflection.Primitives" Version="4.3.0" />
     <PackageReference Include="System.Reflection.TypeExtensions" Version="4.1.0" />
