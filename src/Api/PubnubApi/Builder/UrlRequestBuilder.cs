@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using PubnubApi.Interface;
 using System.Globalization;
+using System.Threading.Tasks;
 #if !NETSTANDARD10 && !NETSTANDARD11 && !NETSTANDARD12 && !WP81
 using System.Reflection;
 #endif
@@ -2064,14 +2065,18 @@ namespace PubnubApi
 
                 if (pubnubConfig.EnableTelemetry && telemetryMgr != null)
                 {
-                    Dictionary<string, string> opsLatency = telemetryMgr.GetOperationsLatency().Result;
-                    if (opsLatency != null && opsLatency.Count > 0)
+                    var telemetryTask = Task.Factory.StartNew(async() => 
                     {
-                        foreach (string key in opsLatency.Keys)
+                        Dictionary<string, string> opsLatency = await telemetryMgr.GetOperationsLatency();
+                        if (opsLatency != null && opsLatency.Count > 0)
                         {
-                            ret.Add(key, opsLatency[key]);
+                            foreach (string key in opsLatency.Keys)
+                            {
+                                ret.Add(key, opsLatency[key]);
+                            }
                         }
-                    }
+                    }).Unwrap();
+                    telemetryTask.Wait();
                 }
 
                 if (!string.IsNullOrEmpty(pubnubConfig.SecretKey))
