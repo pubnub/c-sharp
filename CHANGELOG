@@ -1,3 +1,8 @@
+v6.3.0 - March 22 2022
+-----------------------------
+- Fixed: refactor Telemetry Task Result to GetAwaiter().GetResult() .
+- Fixed: removed SILVERLIGHT, WINDOWS_PHONE preprocessor directive code.
+
 v6.2.0 - January 27 2022
 -----------------------------
 - Modified: bumped PeterO.Cbor library version to 4.5.2.

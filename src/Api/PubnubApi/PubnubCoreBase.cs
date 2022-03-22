@@ -229,11 +229,6 @@ namespace PubnubApi
                 PubnubLocalHeartbeatCheckIntervalInSeconds = pubnubConfiguation.PresenceInterval;
             }
             enableResumeOnReconnect = pubnubConfiguation.ReconnectionPolicy != PNReconnectionPolicy.NONE;
-
-#if (SILVERLIGHT || WINDOWS_PHONE)
-            HttpWebRequest.RegisterPrefix("https://", WebRequestCreator.ClientHttp);
-            HttpWebRequest.RegisterPrefix("http://", WebRequestCreator.ClientHttp);
-#endif
         }
 
 
