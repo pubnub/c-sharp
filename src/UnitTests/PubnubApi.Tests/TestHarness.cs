@@ -15,7 +15,7 @@ namespace PubNubMessaging.Tests
                 #pragma warning restore CS0162 // Unreachable code detected
 
                 IPubnubUnitTest unitTest = new PubnubUnitTest();
-                unitTest.Timetoken = 1567581283;
+                unitTest.Timetoken = 1567581283; //Hardcoded timetoken
                 unitTest.RequestId = "myRequestId";
                 unitTest.InternetAvailable = true;
                 unitTest.SdkVersion = "Csharp";
