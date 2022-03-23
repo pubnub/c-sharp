@@ -6,15 +6,15 @@ PubNub takes care of the infrastructure and APIs needed for the realtime communi
 
 ## Get keys
 
-You will need the publish and subscribe keys to authenticate your app. Get your keys from the [Admin Portal](https://dashboard.pubnub.com/).
+You will need the publish and subscribe keys to authenticate your application. Get your keys from the [Admin Portal](https://dashboard.pubnub.com/).
 
 ## Configure PubNub
 
 1. Integrate PubNub into your project using one of the following NuGet packages:
 
-    * For .Net 3.5/4.0/4.5/4.61: [Pubnub package](https://www.nuget.org/packages/Pubnub/)
-    * For Xamarin.Android, Xamarin.iOS and .NetStandard/.NetCore: [PubnubPCL package](https://www.nuget.org/packages/PubnubPCL/)
-    * For Universal Windows: [PubnubUWP package](https://www.nuget.org/packages/PubnubUWP/)
+    * For .Net 3.5/4.0/4.5/4.61: [Pubnub package] (https://www.nuget.org/packages/Pubnub/)
+    * For Xamarin.Android, Xamarin.iOS and .NetStandard/.NetCore: [PubnubPCL package] (https://www.nuget.org/packages/PubnubPCL/)
+    * For Universal Windows: [PubnubUWP package] (https://www.nuget.org/packages/PubnubUWP/)
 
 1. Create a new class and add the following code:
 
