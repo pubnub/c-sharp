@@ -184,18 +184,53 @@ namespace PubnubApi
                 cts.CancelAfter(GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType) * 1000);
                 System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
                 stopWatch.Start();
+
                 if (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation)
                 {
+                    HttpRequestHeaders reqHeaderCollection = httpClientSubscribe.DefaultRequestHeaders;
+                    if (reqHeaderCollection != null && reqHeaderCollection.Count() > 0)
+                    {
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Request Headers START", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                        foreach (var item in reqHeaderCollection)
+                        {
+                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, {1} : {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), item.Key, string.Join(",",item.Value)), pubnubConfig.LogVerbosity);
+                        }
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Request Headers END", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                    }
+
                     response = await httpClientSubscribe.GetAsync(requestUri, cts.Token).ConfigureAwait(false);
                 }
                 else if (string.Compare(FindHttpGetOrDeleteMethod(pubnubRequestState), "DELETE", StringComparison.CurrentCultureIgnoreCase) == 0)
                 {
+                    HttpRequestHeaders reqHeaderCollection = httpClientNonsubscribe.DefaultRequestHeaders;
+                    if (reqHeaderCollection != null && reqHeaderCollection.Count() > 0)
+                    {
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Request Headers START", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                        foreach (var item in reqHeaderCollection)
+                        {
+                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, {1} : {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), item.Key, string.Join(",", item.Value)), pubnubConfig.LogVerbosity);
+                        }
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Request Headers END", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                    }
+
                     response = await httpClientNonsubscribe.DeleteAsync(requestUri, cts.Token).ConfigureAwait(false);
                 }
                 else
                 {
                     response = await httpClientNonsubscribe.GetAsync(requestUri, cts.Token).ConfigureAwait(false);
                 }
+
+                HttpResponseHeaders resHeaderCollection = response.Headers;
+                if (resHeaderCollection != null && resHeaderCollection.Count() > 0)
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Response Headers START", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                    foreach (var item in resHeaderCollection)
+                    {
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, {1} : {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), item.Key, string.Join(",", item.Value)), pubnubConfig.LogVerbosity);
+                    }
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Response Headers END", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                }
+
                 if (response.IsSuccessStatusCode || response.Content != null)
                 {
                     var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
@@ -275,7 +310,31 @@ namespace PubnubApi
                 cts.CancelAfter(GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType) * 1000);
                 System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
                 stopWatch.Start();
+
+                HttpRequestHeaders reqHeaderCollection = httpClientNonsubscribe.DefaultRequestHeaders;
+                if (reqHeaderCollection != null && reqHeaderCollection.Count() > 0)
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Request Headers START", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                    foreach (var item in reqHeaderCollection)
+                    {
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, {1} : {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), item.Key, string.Join(",", item.Value)), pubnubConfig.LogVerbosity);
+                    }
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Request Headers END", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                }
+
                 response = await httpClientNonsubscribe.GetAsync(requestUri, cts.Token).ConfigureAwait(false);
+
+                HttpResponseHeaders resHeaderCollection = response.Headers;
+                if (resHeaderCollection != null && resHeaderCollection.Count() > 0)
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Response Headers START", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                    foreach (var item in resHeaderCollection)
+                    {
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, {1} : {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), item.Key, string.Join(",", item.Value)), pubnubConfig.LogVerbosity);
+                    }
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Response Headers END", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                }
+
                 if (response.IsSuccessStatusCode || response.Content != null)
                 {
                     var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
@@ -363,6 +422,18 @@ namespace PubnubApi
                 {
                     postDataContent.Headers.TryAddWithoutValidation("Content-Type", contentType);
                 }
+
+                HttpContentHeaders reqHeaderCollection = postDataContent.Headers;
+                if (reqHeaderCollection != null && reqHeaderCollection.Count() > 0)
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Request Headers START", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                    foreach (var item in reqHeaderCollection)
+                    {
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, {1} : {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), item.Key, string.Join(",", item.Value)), pubnubConfig.LogVerbosity);
+                    }
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Request Headers END", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                }
+
                 if (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation)
                 {
                     response = await httpClientSubscribe.PostAsync(requestUri, postDataContent, cts.Token).ConfigureAwait(false);
@@ -370,6 +441,17 @@ namespace PubnubApi
                 else
                 {
                     response = await httpClientNonsubscribe.PostAsync(requestUri, postDataContent, cts.Token).ConfigureAwait(false);
+                }
+
+                HttpResponseHeaders resHeaderCollection = response.Headers;
+                if (resHeaderCollection != null && resHeaderCollection.Count() > 0)
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Response Headers START", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                    foreach (var item in resHeaderCollection)
+                    {
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, {1} : {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), item.Key, string.Join(",", item.Value)), pubnubConfig.LogVerbosity);
+                    }
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Response Headers END", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
                 }
 
                 if (response.IsSuccessStatusCode || response.Content != null)
@@ -463,6 +545,18 @@ namespace PubnubApi
                 {
                     Content = new ByteArrayContent(patchData)
                 };
+                
+                HttpRequestHeaders reqHeaderCollection = requestMsg.Headers;
+                if (reqHeaderCollection != null && reqHeaderCollection.Count() > 0)
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Request Headers START", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                    foreach (var item in reqHeaderCollection)
+                    {
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, {1} : {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), item.Key, string.Join(",", item.Value)), pubnubConfig.LogVerbosity);
+                    }
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Request Headers END", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                }
+
                 if (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation)
                 {
                     response = await httpClientSubscribe.SendAsync(requestMsg, cts.Token).ConfigureAwait(false);
@@ -472,6 +566,16 @@ namespace PubnubApi
                     response = await httpClientNonsubscribe.SendAsync(requestMsg, cts.Token).ConfigureAwait(false);
                 }
 
+                HttpResponseHeaders resHeaderCollection = response.Headers;
+                if (resHeaderCollection != null && resHeaderCollection.Count() > 0)
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Response Headers START", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                    foreach (var item in resHeaderCollection)
+                    {
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, {1} : {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), item.Key, string.Join(",", item.Value)), pubnubConfig.LogVerbosity);
+                    }
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Response Headers END", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                }
                 if (response.IsSuccessStatusCode || response.Content != null)
                 {
                     var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
@@ -551,7 +655,27 @@ namespace PubnubApi
                 new Timer(OnPubnubWebRequestTimeout<T>, pubnubRequestState, GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType) * 1000, Timeout.Infinite);
                 System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
                 stopWatch.Start();
+                WebHeaderCollection reqHeaderCollection = request.Headers;
+                if (reqHeaderCollection != null && reqHeaderCollection.Count > 0)
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Request Headers START", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                    foreach (string itemKey in reqHeaderCollection.AllKeys)
+                    {
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, {1} : {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), itemKey, reqHeaderCollection[itemKey]), pubnubConfig.LogVerbosity);
+                    }
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Request Headers END", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                }
                 response = await Task.Factory.FromAsync<HttpWebResponse>(request.BeginGetResponse, asyncPubnubResult => (HttpWebResponse)request.EndGetResponse(asyncPubnubResult), pubnubRequestState).ConfigureAwait(false);
+                WebHeaderCollection resHeaderCollection = response.Headers;
+                if (resHeaderCollection != null && resHeaderCollection.Count > 0)
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Response Headers START", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                    foreach (string itemKey in resHeaderCollection.AllKeys)
+                    {
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, {1} : {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), itemKey, resHeaderCollection[itemKey]), pubnubConfig.LogVerbosity);
+                    }
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Response Headers END", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                }
                 stopWatch.Stop();
                 if (pubnubConfig.EnableTelemetry && pubnubTelemetryMgr != null)
                 {
@@ -628,7 +752,28 @@ namespace PubnubApi
                 new Timer(OnPubnubWebRequestTimeout<T>, pubnubRequestState, GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType) * 1000, Timeout.Infinite);
                 System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
                 stopWatch.Start();
+
+                WebHeaderCollection reqHeaderCollection = request.Headers;
+                if (reqHeaderCollection != null && reqHeaderCollection.Count > 0)
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Request Headers START", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                    foreach (string itemKey in reqHeaderCollection.AllKeys)
+                    {
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, {1} : {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), itemKey, reqHeaderCollection[itemKey]), pubnubConfig.LogVerbosity);
+                    }
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Request Headers END", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                }
                 response = await Task.Factory.FromAsync<HttpWebResponse>(request.BeginGetResponse, asyncPubnubResult => (HttpWebResponse)request.EndGetResponse(asyncPubnubResult), pubnubRequestState).ConfigureAwait(false);
+                WebHeaderCollection resHeaderCollection = response.Headers;
+                if (resHeaderCollection != null && resHeaderCollection.Count > 0)
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Response Headers START", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                    foreach (string itemKey in resHeaderCollection.AllKeys)
+                    {
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, {1} : {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), itemKey, resHeaderCollection[itemKey]), pubnubConfig.LogVerbosity);
+                    }
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Response Headers END", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                }
                 stopWatch.Stop();
                 if (pubnubConfig.EnableTelemetry && pubnubTelemetryMgr != null)
                 {
@@ -719,7 +864,27 @@ namespace PubnubApi
 
                 }
 
+                WebHeaderCollection reqHeaderCollection = request.Headers;
+                if (reqHeaderCollection != null && reqHeaderCollection.Count > 0)
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Request Headers START", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                    foreach (string itemKey in reqHeaderCollection.AllKeys)
+                    {
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, {1} : {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), itemKey, reqHeaderCollection[itemKey]), pubnubConfig.LogVerbosity);
+                    }
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Request Headers END", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                }
                 WebResponse response = await Task.Factory.FromAsync(request.BeginGetResponse, request.EndGetResponse, pubnubRequestState).ConfigureAwait(false);
+                WebHeaderCollection resHeaderCollection = response.Headers;
+                if (resHeaderCollection != null && resHeaderCollection.Count > 0)
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Response Headers START", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                    foreach (string itemKey in resHeaderCollection.AllKeys)
+                    {
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, {1} : {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), itemKey, resHeaderCollection[itemKey]), pubnubConfig.LogVerbosity);
+                    }
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Response Headers END", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                }
                 stopWatch.Stop();
                 if (pubnubTelemetryMgr != null)
                 {
@@ -820,7 +985,27 @@ namespace PubnubApi
 
                 }
 
+                WebHeaderCollection reqHeaderCollection = request.Headers;
+                if (reqHeaderCollection != null && reqHeaderCollection.Count > 0)
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Request Headers START", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                    foreach (string itemKey in reqHeaderCollection.AllKeys)
+                    {
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, {1} : {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), itemKey, reqHeaderCollection[itemKey]), pubnubConfig.LogVerbosity);
+                    }
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Request Headers END", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                }
                 WebResponse response = await Task.Factory.FromAsync(request.BeginGetResponse, request.EndGetResponse, pubnubRequestState).ConfigureAwait(false);
+                WebHeaderCollection resHeaderCollection = response.Headers;
+                if (resHeaderCollection != null && resHeaderCollection.Count > 0)
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Response Headers START", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                    foreach (string itemKey in resHeaderCollection.AllKeys)
+                    {
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, {1} : {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), itemKey, resHeaderCollection[itemKey]), pubnubConfig.LogVerbosity);
+                    }
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Response Headers END", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                }
                 stopWatch.Stop();
                 if (pubnubTelemetryMgr != null)
                 {
