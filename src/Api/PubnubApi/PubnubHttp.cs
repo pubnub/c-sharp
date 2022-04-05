@@ -217,6 +217,17 @@ namespace PubnubApi
                 }
                 else
                 {
+                    HttpRequestHeaders reqHeaderCollection = httpClientNonsubscribe.DefaultRequestHeaders;
+                    if (reqHeaderCollection != null && reqHeaderCollection.Count() > 0)
+                    {
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Request Headers START", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                        foreach (var item in reqHeaderCollection)
+                        {
+                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, {1} : {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), item.Key, string.Join(",", item.Value)), pubnubConfig.LogVerbosity);
+                        }
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Request Headers END", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                    }
+
                     response = await httpClientNonsubscribe.GetAsync(requestUri, cts.Token).ConfigureAwait(false);
                 }
 
