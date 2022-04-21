@@ -235,6 +235,10 @@ namespace PubnubApi.EndPoint
             {
                 SubscribeDisconnected.GetOrAdd(instance.InstanceId, false);
             }
+            if (!SubscribeAccessDenied.ContainsKey(instance.InstanceId))
+            {
+                SubscribeAccessDenied.GetOrAdd(instance.InstanceId, false);
+            }
             if (!LastSubscribeTimetoken.ContainsKey(instance.InstanceId))
             {
                 LastSubscribeTimetoken.GetOrAdd(instance.InstanceId, 0);

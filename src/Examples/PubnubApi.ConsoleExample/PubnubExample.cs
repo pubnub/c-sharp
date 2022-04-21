@@ -2215,12 +2215,12 @@ namespace PubnubApiDemo
                             .AuthorizedUuid(grantAuthorizedUuiIdEntry)
                             .Resources(new PNTokenResources()
                             {
-                                Channels = new Dictionary<string, PNTokenAuthValues>() {
-                                                    { grantChannelName, new PNTokenAuthValues() { Read = grantRead, Write = grantWrite, Manage= grantManage, Create = grantCreate, Delete=grantDelete, Get = grantGet, Update = grantUpdate, Join = grantJoin } } },
-                                ChannelGroups = new Dictionary<string, PNTokenAuthValues>() {
-                                                    {grantChannelGroupName, new PNTokenAuthValues() { Read = grantRead, Write = grantWrite, Manage= grantManage, Create = grantCreate, Delete=grantDelete, Get = grantGet, Update = grantUpdate, Join = grantJoin } } },
-                                Uuids = new Dictionary<string, PNTokenAuthValues>() {
-                                                    { grantUuiIdEntry, new PNTokenAuthValues() { Read = grantRead, Write = grantWrite, Manage= grantManage, Create = grantCreate, Delete=grantDelete, Get = grantGet, Update = grantUpdate, Join = grantJoin } } },
+                                Channels = !string.IsNullOrEmpty(grantChannelName) ? new Dictionary<string, PNTokenAuthValues>() {
+                                                    { grantChannelName, new PNTokenAuthValues() { Read = grantRead, Write = grantWrite, Manage= grantManage, Create = grantCreate, Delete=grantDelete, Get = grantGet, Update = grantUpdate, Join = grantJoin } } } : null,
+                                ChannelGroups = !string.IsNullOrEmpty(grantChannelGroupName) ? new Dictionary<string, PNTokenAuthValues>() {
+                                                    {grantChannelGroupName, new PNTokenAuthValues() { Read = grantRead, Write = grantWrite, Manage= grantManage, Create = grantCreate, Delete=grantDelete, Get = grantGet, Update = grantUpdate, Join = grantJoin } } } : null,
+                                Uuids = !string.IsNullOrEmpty(grantUuiIdEntry) ? new Dictionary<string, PNTokenAuthValues>() {
+                                                    { grantUuiIdEntry, new PNTokenAuthValues() { Read = grantRead, Write = grantWrite, Manage= grantManage, Create = grantCreate, Delete=grantDelete, Get = grantGet, Update = grantUpdate, Join = grantJoin } } } : null,
                             })
                             .Execute(new PNAccessManagerTokenResultExt((result, status) =>
                             {
