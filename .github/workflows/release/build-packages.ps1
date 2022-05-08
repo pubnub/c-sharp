@@ -8,18 +8,22 @@ mkdir "$RELEASES_PATH"
 mkdir "$ARTIFACTS_PATH"
 
 # Build Api package.
+echo "Build Api package"
 cd "$githubWorkspace\src\Api\PubnubApi"
 dotnet pack -o "$RELEASES_PATH\Api" -c Release
 
 # Build PCL package.
+echo "Build PCL package"
 cd "$githubWorkspace\src\Api\PubnubApiPCL"
 dotnet pack -o "$RELEASES_PATH\PCL" -c Release
 
 # Build UWP package.
+echo "Build UWP package"
 cd "$githubWorkspace\src\Api\PubnubApiUWP"
 dotnet restore
 msbuild PubnubApiUWP.csproj /t:Pack /p:Configuration=Release /p:PackageOutputPath="$RELEASES_PATH\UWP" /v:n
 
+echo "Copy built packages"
 
 # Copy built packages to artifacts folder.
 $PACKAGE_NAME = Get-ChildItem -Name -Path "$RELEASES_PATH\Api\*" -Include *.nupkg
