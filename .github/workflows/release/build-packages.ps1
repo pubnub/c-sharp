@@ -11,17 +11,17 @@ mkdir "$ARTIFACTS_PATH"
 echo "Build Api package"
 cd "$githubWorkspace\src\Api\PubnubApi"
 dotnet pack -o "$RELEASES_PATH\Api" -c Release
-
-# Build PCL package.
-echo "Build PCL package"
-cd "$githubWorkspace\src\Api\PubnubApiPCL"
-dotnet pack -o "$RELEASES_PATH\PCL" -c Release
-
-# Build UWP package.
-echo "Build UWP package"
-cd "$githubWorkspace\src\Api\PubnubApiUWP"
-dotnet restore
-msbuild PubnubApiUWP.csproj /t:Pack /p:Configuration=Release /p:PackageOutputPath="$RELEASES_PATH\UWP" /v:n
+#
+# # Build PCL package.
+# echo "Build PCL package"
+# cd "$githubWorkspace\src\Api\PubnubApiPCL"
+# dotnet pack -o "$RELEASES_PATH\PCL" -c Release
+#
+# # Build UWP package.
+# echo "Build UWP package"
+# cd "$githubWorkspace\src\Api\PubnubApiUWP"
+# dotnet restore
+# msbuild PubnubApiUWP.csproj /t:Pack /p:Configuration=Release /p:PackageOutputPath="$RELEASES_PATH\UWP" /v:n
 
 echo "Copy built packages"
 
