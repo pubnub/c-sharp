@@ -1,0 +1,24 @@
+name: Tests
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  tests:
+    name: NuGet packages build
+    runs-on: windows-2019
+    needs: check-release
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          # This should be the same as the one specified for on.pull_request.branches
+          ref: master
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.0.3
+      - name: Build packages
+        env:
+          WORKSPACE_PATH: ${{ github.workspace }}
+        run: .\\.github\\workflows\\release\\build-packages.ps1
+        shell: powershell
