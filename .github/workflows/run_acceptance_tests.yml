@@ -33,10 +33,6 @@ jobs:
       with:
         token: ${{ secrets.GH_TOKEN }}
       
-    - name: Setup .NET 2.1.519
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 2.1.519
     - name: Setup .NET 5.0.x
       uses: actions/setup-dotnet@v1
       with:
@@ -45,13 +41,6 @@ jobs:
       run: dotnet restore
     - name: Build Projects
       run: cd ./UnitTests/AcceptanceTests && dotnet build --no-restore
-    - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v1.0.3      
-    - name: Build Nuget Packages
-      env:
-        WORKSPACE_PATH: ${{ github.workspace }}
-        run: .\\.github\\workflows\\release\\build-packages.ps1
-        shell: powershell
     - name: Test
       env: 
        PN_PUB_KEY: ${{ secrets.PN_PUB_KEY }}
@@ -60,6 +49,17 @@ jobs:
       run: |
         Copy-Item -Path "${{ github.workspace }}/sdk-specifications/features/access/*" -Destination "${{ github.workspace }}/src/UnitTests/AcceptanceTests/Features" -Recurse
         cd ./UnitTests/AcceptanceTests && dotnet test --no-build --verbosity normal --logger trx --results-directory ./results
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.3      
+    - name: Setup .NET 2.1.519
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 2.1.519
+    - name: Build Nuget Packages
+      env:
+        WORKSPACE_PATH: ${{ github.workspace }}
+        run: .\\.github\\workflows\\release\\build-packages.ps1
+        shell: powershell
     - name: Upload acceptance tests reports
       if: always()
       uses: actions/upload-artifact@v2
