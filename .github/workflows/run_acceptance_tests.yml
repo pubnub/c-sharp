@@ -39,8 +39,15 @@ jobs:
         dotnet-version: 5.0.x
     - name: Restore dependencies
       run: dotnet restore
-    - name: Build
+    - name: Build Projects
       run: cd ./UnitTests/AcceptanceTests && dotnet build --no-restore
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.3      
+    - name: Build Nuget Packages
+      env:
+        WORKSPACE_PATH: ${{ github.workspace }}
+        run: .\\.github\\workflows\\release\\build-packages.ps1
+        shell: powershell
     - name: Test
       env: 
        PN_PUB_KEY: ${{ secrets.PN_PUB_KEY }}
