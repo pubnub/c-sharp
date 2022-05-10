@@ -9,7 +9,7 @@ on:
 jobs:
   tests:
     name: NuGet packages build
-    runs-on: windows-2016
+    runs-on: windows-2019
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
