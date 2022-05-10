@@ -9,12 +9,20 @@ on:
 jobs:
   tests:
     name: NuGet packages build
-    runs-on: windows-2016
+    runs-on: windows-2019
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.0.3
+      - name: Setup .NET 2.1.x
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 2.1.x
+      - name: Setup .NET 5.0.x
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
       - name: Build packages
         env:
           WORKSPACE_PATH: ${{ github.workspace }}
