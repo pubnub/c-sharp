@@ -13,7 +13,7 @@ defaults:
     
 jobs:
   build:
-
+    name: Build
     runs-on: windows-2019
 
     steps:
@@ -33,13 +33,13 @@ jobs:
       with:
         token: ${{ secrets.GH_TOKEN }}
       
-    - name: Setup .NET
+    - name: Setup .NET 5.0.x
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.x
     - name: Restore dependencies
       run: dotnet restore
-    - name: Build
+    - name: Build Projects
       run: cd ./UnitTests/AcceptanceTests && dotnet build --no-restore
     - name: Test
       env: 
