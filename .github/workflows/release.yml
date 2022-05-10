@@ -39,10 +39,10 @@ jobs:
           ref: master
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.0.3
-      - name: Setup .NET 2.1.x
+      - name: Setup .NET 2.1.519
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 2.1.x
+          dotnet-version: 2.1.519
       - name: Setup .NET 5.0.x
         uses: actions/setup-dotnet@v1
         with:
