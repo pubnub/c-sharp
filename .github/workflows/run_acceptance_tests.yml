@@ -13,7 +13,7 @@ defaults:
     
 jobs:
   build:
-
+    name: Build
     runs-on: windows-2019
 
     steps:
@@ -49,6 +49,21 @@ jobs:
       run: |
         Copy-Item -Path "${{ github.workspace }}/sdk-specifications/features/access/*" -Destination "${{ github.workspace }}/src/UnitTests/AcceptanceTests/Features" -Recurse
         cd ./UnitTests/AcceptanceTests && dotnet test --no-build --verbosity normal --logger trx --results-directory ./results
+    - name: Upload acceptance tests reports
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: acceptance-test-reports
+        path: |
+          ${{ github.workspace }}/src/UnitTests/AcceptanceTests/Features/
+          ${{ github.workspace }}/src/UnitTests/AcceptanceTests/results/
+  package:
+    name: Package
+
+    runs-on: windows-2019
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v2
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.0.3      
     - name: Setup .NET 2.1.519
@@ -60,11 +75,3 @@ jobs:
         WORKSPACE_PATH: ${{ github.workspace }}
         run: .\\.github\\workflows\\release\\build-packages.ps1
         shell: powershell
-    - name: Upload acceptance tests reports
-      if: always()
-      uses: actions/upload-artifact@v2
-      with:
-        name: acceptance-test-reports
-        path: |
-          ${{ github.workspace }}/src/UnitTests/AcceptanceTests/Features/
-          ${{ github.workspace }}/src/UnitTests/AcceptanceTests/results/
