@@ -1,4 +1,4 @@
-цname: Automated product release
+name: Automated product release
 
 on:
   pull_request:
