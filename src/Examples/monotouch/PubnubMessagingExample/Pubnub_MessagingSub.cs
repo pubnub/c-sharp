@@ -943,7 +943,7 @@ namespace PubnubMessagingExample
         public PlatformPubnubLog ()
         {
             // Get folder path may vary based on environment
-            string folder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments); // For iOS
+            string folder = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments); // For iOS
             System.Diagnostics.Debug.WriteLine (folder);
             logFilePath = System.IO.Path.Combine (folder, "pubnubmessaging.log");
             System.Diagnostics.Trace.Listeners.Add (new System.Diagnostics.TextWriterTraceListener (logFilePath));
@@ -1092,6 +1092,12 @@ namespace PubnubMessagingExample
         {
             this.callback = displayCallback;
         }
+
+        public override void File(Pubnub pubnub, PNFileEventResult fileEvent)
+        {
+            throw new NotImplementedException();
+        }
+
         public override void Message<T> (Pubnub pubnub, PNMessageResult<T> message)
         {
             if (message != null) {
@@ -1099,11 +1105,26 @@ namespace PubnubMessagingExample
             }
         }
 
+        public override void MessageAction(Pubnub pubnub, PNMessageActionEventResult messageAction)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void ObjectEvent(Pubnub pubnub, PNObjectEventResult objectEvent)
+        {
+            throw new NotImplementedException();
+        }
+
         public override void Presence (Pubnub pubnub, PNPresenceEventResult presence)
         {
             if (presence != null) {
                 this.callback (pubnub.JsonPluggableLibrary.SerializeToJsonString (presence));
             }
+        }
+
+        public override void Signal<T>(Pubnub pubnub, PNSignalResult<T> signal)
+        {
+            throw new NotImplementedException();
         }
 
         public override void Status (Pubnub pubnub, PNStatus status)
