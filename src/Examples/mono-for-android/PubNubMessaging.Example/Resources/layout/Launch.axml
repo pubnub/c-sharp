@@ -8,7 +8,9 @@
         android:layout_height="fill_parent"
         android:padding="5dip"
         android:stretchColumns="*">
-        <TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
             <TextView
                 android:layout_column="0"
                 android:text="@string/subKey"
@@ -16,7 +18,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
         </TableRow>
-        <TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
             <EditText
                 android:layout_column="0"
                 android:layout_span="2"
@@ -24,9 +28,12 @@
                 android:background="#FFF"
                 android:textColor="@android:color/background_dark"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:inputType="text" />
         </TableRow>
-        <TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
             <TextView
                 android:layout_column="0"
                 android:text="@string/pubKey"
@@ -34,7 +41,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
         </TableRow>
-        <TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
             <EditText
                 android:layout_column="0"
                 android:layout_span="2"
@@ -42,9 +51,12 @@
                 android:background="#FFF"
                 android:textColor="@android:color/background_dark"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:inputType="text" />
         </TableRow>
-        <TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
             <TextView
                 android:layout_column="0"
                 android:text="@string/secKey"
@@ -52,7 +64,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
         </TableRow>
-        <TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
             <EditText
                 android:layout_column="0"
                 android:layout_span="2"
@@ -60,9 +74,12 @@
                 android:background="#FFF"
                 android:textColor="@android:color/background_dark"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:inputType="text" />
         </TableRow>
-        <TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
             <TextView
                 android:layout_column="0"
                 android:text="@string/channel"
@@ -70,7 +87,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
         </TableRow>
-        <TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
             <EditText
                 android:layout_column="0"
                 android:layout_span="2"
@@ -78,9 +97,12 @@
                 android:background="#FFF"
                 android:textColor="@android:color/background_dark"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:inputType="text" />
         </TableRow>
-        <TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
             <TextView
                 android:layout_column="0"
                 android:text="@string/channelGroup"
@@ -88,7 +110,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
         </TableRow>
-        <TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
             <EditText
                 android:layout_column="0"
                 android:layout_span="2"
@@ -96,9 +120,12 @@
                 android:background="#FFF"
                 android:textColor="@android:color/background_dark"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:inputType="text" />
         </TableRow>
-        <TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
             <TextView
                 android:layout_column="0"
                 android:text="@string/enablessl"
@@ -113,7 +140,9 @@
                 android:textOn="@string/sslOn"
                 android:textOff="@string/sslOff" />
         </TableRow>
-        <TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
             <TextView
                 android:layout_column="0"
                 android:layout_span="2"
@@ -122,7 +151,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
         </TableRow>
-        <TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
             <EditText
                 android:layout_column="0"
                 android:layout_span="2"
@@ -130,9 +161,12 @@
                 android:background="#FFF"
                 android:textColor="@android:color/background_dark"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:inputType="text" />
         </TableRow>
-        <TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
             <TextView
                 android:layout_column="0"
                 android:layout_span="2"
@@ -141,7 +175,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
         </TableRow>
-        <TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
             <EditText
                 android:layout_column="0"
                 android:layout_span="2"
@@ -149,9 +185,12 @@
                 android:background="#FFF"
                 android:textColor="@android:color/background_dark"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:inputType="text" />
         </TableRow>
-        <TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
             <TextView
                 android:layout_column="0"
                 android:text="@string/proxy"
@@ -166,14 +205,20 @@
                 android:padding="2dip"
                 android:id="@+id/btnProxy"
                 android:layout_height="30dp"
-                android:text="@string/setProxy" />
+                android:text="@string/setProxy"
+                android:layout_width="match_parent" />
         </TableRow>
-        <TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
             <View
                 android:layout_span="2"
-                android:layout_height="2dip" />
+                android:layout_height="2dip"
+                android:layout_width="match_parent" />
         </TableRow>
-        <TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
             <Button
                 android:gravity="center_horizontal"
                 android:layout_span="1"
