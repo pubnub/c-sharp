@@ -14,7 +14,7 @@ namespace PubnubApi
 {
     public sealed class UrlRequestBuilder : IUrlRequestBuilder
     {
-        private readonly PNConfiguration pubnubConfig;
+        private ConcurrentDictionary<string, PNConfiguration> pubnubConfig { get; } = new ConcurrentDictionary<string, PNConfiguration>();
         private readonly IJsonPluggableLibrary jsonLib ;
         private readonly IPubnubUnitTest pubnubUnitTest;
         private readonly IPubnubLog pubnubLog;
@@ -24,7 +24,7 @@ namespace PubnubApi
 
         public UrlRequestBuilder(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager pubnubTelemetryMgr, EndPoint.TokenManager pubnubTokenMgr, string pnInstanceId)
         {
-            this.pubnubConfig = config;
+            pubnubConfig.AddOrUpdate(pnInstanceId, config, (k, o) => config);
             this.jsonLib = jsonPluggableLibrary;
             this.pubnubUnitTest = pubnubUnitTest;
             this.pubnubLog = log;
@@ -66,7 +66,7 @@ namespace PubnubApi
             List<string> url = new List<string>();
             url.Add("v2");
             url.Add("subscribe");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             url.Add(channelForUrl);
             url.Add("0");
 
@@ -78,9 +78,9 @@ namespace PubnubApi
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>(internalInitialSubscribeUrlParams);
 
-            if (!requestQueryStringParams.ContainsKey("filter-expr") && !string.IsNullOrEmpty(pubnubConfig.FilterExpression))
+            if (!requestQueryStringParams.ContainsKey("filter-expr") && pubnubConfig.ContainsKey(pubnubInstanceId) && !string.IsNullOrEmpty(pubnubConfig[pubnubInstanceId].FilterExpression))
             {
-                requestQueryStringParams.Add("filter-expr", UriUtil.EncodeUriComponent(pubnubConfig.FilterExpression, currentType, false, false, false));
+                requestQueryStringParams.Add("filter-expr", UriUtil.EncodeUriComponent(pubnubConfig[pubnubInstanceId].FilterExpression, currentType, false, false, false));
             }
 
             if (!requestQueryStringParams.ContainsKey("tt"))
@@ -93,9 +93,9 @@ namespace PubnubApi
                 requestQueryStringParams.Add("tr", region.ToString());
             }
 
-            if (pubnubConfig.PresenceTimeout != 0)
+            if (pubnubConfig.ContainsKey(pubnubInstanceId) && pubnubConfig[pubnubInstanceId].PresenceTimeout != 0)
             {
-                requestQueryStringParams.Add("heartbeat", pubnubConfig.PresenceTimeout.ToString());
+                requestQueryStringParams.Add("heartbeat", pubnubConfig[pubnubInstanceId].PresenceTimeout.ToString());
             }
 
             if (channelGroups != null && channelGroups.Length > 0 && channelGroups[0] != "")
@@ -132,16 +132,16 @@ namespace PubnubApi
             url.Add("v2");
             url.Add("presence");
             url.Add("sub_key");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             url.Add("channel");
             url.Add(multiChannel);
             url.Add("leave");
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
 
-            if (pubnubConfig.PresenceTimeout != 0)
+            if (pubnubConfig.ContainsKey(pubnubInstanceId) && pubnubConfig[pubnubInstanceId].PresenceTimeout != 0)
             {
-                requestQueryStringParams.Add("heartbeat", pubnubConfig.PresenceTimeout.ToString());
+                requestQueryStringParams.Add("heartbeat", pubnubConfig[pubnubInstanceId].PresenceTimeout.ToString());
             }
 
             string channelsJsonState = jsonUserState;
@@ -177,8 +177,8 @@ namespace PubnubApi
 
             List<string> url = new List<string>();
             url.Add("publish");
-            url.Add(pubnubConfig.PublishKey);
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].PublishKey : "");
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             url.Add("0");
             url.Add(channel);
             url.Add("0");
@@ -235,8 +235,8 @@ namespace PubnubApi
 
             List<string> url = new List<string>();
             url.Add("signal");
-            url.Add(pubnubConfig.PublishKey);
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].PublishKey : "");
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             url.Add("0");
             url.Add(channel);
             url.Add("0");
@@ -278,7 +278,7 @@ namespace PubnubApi
             url.Add("v2");
             url.Add("presence");
             url.Add("sub_key");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             if (!string.IsNullOrEmpty(channel))
             {
                 url.Add("channel");
@@ -323,7 +323,7 @@ namespace PubnubApi
             url.Add("v2");
             url.Add("history");
             url.Add("sub-key");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             url.Add("channel");
             url.Add(channel);
 
@@ -380,7 +380,7 @@ namespace PubnubApi
             url.Add("v3");
             url.Add(includeMessageActions ? "history-with-actions" : "history");
             url.Add("sub-key");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             url.Add("channel");
             url.Add(channel);
 
@@ -441,7 +441,7 @@ namespace PubnubApi
             url.Add("v3");
             url.Add("history");
             url.Add("sub-key");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             url.Add("message-counts");
             if (!string.IsNullOrEmpty(channel))
             {
@@ -487,7 +487,7 @@ namespace PubnubApi
             url.Add("v3");
             url.Add("history");
             url.Add("sub-key");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             url.Add("channel");
             url.Add(channel);
 
@@ -526,7 +526,7 @@ namespace PubnubApi
             url.Add("v2");
             url.Add("presence");
             url.Add("sub_key");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             url.Add("uuid");
             url.Add(uuid);
 
@@ -556,7 +556,7 @@ namespace PubnubApi
             url.Add("auth");
             url.Add("grant");
             url.Add("sub-key");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
 
@@ -616,7 +616,7 @@ namespace PubnubApi
             List<string> url = new List<string>();
             url.Add("v3");
             url.Add("pam");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             url.Add("grant");
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
@@ -644,7 +644,7 @@ namespace PubnubApi
             List<string> url = new List<string>();
             url.Add("v3");
             url.Add("pam");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             url.Add("grant");
             url.Add(token);
 
@@ -675,7 +675,7 @@ namespace PubnubApi
             url.Add("auth");
             url.Add("audit");
             url.Add("sub-key");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
 
@@ -718,7 +718,7 @@ namespace PubnubApi
             url.Add("v2");
             url.Add("presence");
             url.Add("sub_key");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             url.Add("channel");
 
             if (string.IsNullOrEmpty(channelsCommaDelimited) || channelsCommaDelimited.Trim().Length <= 0)
@@ -774,7 +774,7 @@ namespace PubnubApi
             url.Add("v2");
             url.Add("presence");
             url.Add("sub_key");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             url.Add("channel");
             url.Add(internalChannelsCommaDelimited);
             url.Add("uuid");
@@ -817,7 +817,7 @@ namespace PubnubApi
             url.Add("v1");
             url.Add("channel-registration");
             url.Add("sub-key");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             if (!string.IsNullOrEmpty(nameSpace) && nameSpace.Trim().Length > 0)
             {
                 url.Add("namespace");
@@ -858,7 +858,7 @@ namespace PubnubApi
             url.Add("v1");
             url.Add("channel-registration");
             url.Add("sub-key");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             if (!string.IsNullOrEmpty(nameSpace) && nameSpace.Trim().Length > 0)
             {
                 nameSpaceAvailable = true;
@@ -925,7 +925,7 @@ namespace PubnubApi
             url.Add("v1");
             url.Add("channel-registration");
             url.Add("sub-key");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             if (!string.IsNullOrEmpty(nameSpace) && nameSpace.Trim().Length > 0)
             {
                 nameSpaceAvailable = true;
@@ -980,7 +980,7 @@ namespace PubnubApi
             url.Add("v1");
             url.Add("channel-registration");
             url.Add("sub-key");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             url.Add("channel-group");
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
@@ -1010,7 +1010,7 @@ namespace PubnubApi
                 url.Add("v2");
                 url.Add("push");
                 url.Add("sub-key");
-                url.Add(pubnubConfig.SubscribeKey);
+                url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
                 url.Add("devices-apns2");
                 url.Add(pushToken);
             }
@@ -1019,7 +1019,7 @@ namespace PubnubApi
                 url.Add("v1");
                 url.Add("push");
                 url.Add("sub-key");
-                url.Add(pubnubConfig.SubscribeKey);
+                url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
                 url.Add("devices");
                 url.Add(pushToken);
             }
@@ -1062,7 +1062,7 @@ namespace PubnubApi
                 url.Add("v2");
                 url.Add("push");
                 url.Add("sub-key");
-                url.Add(pubnubConfig.SubscribeKey);
+                url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
                 url.Add("devices-apns2");
                 url.Add(pushToken);
                 url.Add("remove");
@@ -1072,7 +1072,7 @@ namespace PubnubApi
                 url.Add("v1");
                 url.Add("push");
                 url.Add("sub-key");
-                url.Add(pubnubConfig.SubscribeKey);
+                url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
                 url.Add("devices");
                 url.Add(pushToken);
                 url.Add("remove");
@@ -1115,7 +1115,7 @@ namespace PubnubApi
                 url.Add("v2");
                 url.Add("push");
                 url.Add("sub-key");
-                url.Add(pubnubConfig.SubscribeKey);
+                url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
                 url.Add("devices-apns2");
                 url.Add(pushToken);
             }
@@ -1124,7 +1124,7 @@ namespace PubnubApi
                 url.Add("v1");
                 url.Add("push");
                 url.Add("sub-key");
-                url.Add(pubnubConfig.SubscribeKey);
+                url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
                 url.Add("devices");
                 url.Add(pushToken);
             }
@@ -1167,7 +1167,7 @@ namespace PubnubApi
                 url.Add("v2");
                 url.Add("push");
                 url.Add("sub-key");
-                url.Add(pubnubConfig.SubscribeKey);
+                url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
                 url.Add("devices-apns2");
                 url.Add(pushToken);
             }
@@ -1176,7 +1176,7 @@ namespace PubnubApi
                 url.Add("v1");
                 url.Add("push");
                 url.Add("sub-key");
-                url.Add(pubnubConfig.SubscribeKey);
+                url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
                 url.Add("devices");
                 url.Add(pushToken);
             }
@@ -1219,7 +1219,7 @@ namespace PubnubApi
             url.Add("v2");
             url.Add("presence");
             url.Add("sub_key");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             url.Add("channel");
             url.Add(multiChannel);
             url.Add("heartbeat");
@@ -1237,9 +1237,9 @@ namespace PubnubApi
                 requestQueryStringParams.Add("channel-group", UriUtil.EncodeUriComponent(string.Join(",", channelGroups.OrderBy(x => x).ToArray()), currentType, false, false, false));
             }
 
-            if (pubnubConfig.PresenceTimeout != 0)
+            if (pubnubConfig.ContainsKey(pubnubInstanceId) && pubnubConfig[pubnubInstanceId].PresenceTimeout != 0)
             {
-                requestQueryStringParams.Add("heartbeat", pubnubConfig.PresenceTimeout.ToString());
+                requestQueryStringParams.Add("heartbeat", pubnubConfig[pubnubInstanceId].PresenceTimeout.ToString());
             }
 
             string queryString = BuildQueryString(currentType, requestQueryStringParams);
@@ -1254,7 +1254,7 @@ namespace PubnubApi
             List<string> url = new List<string>();
             url.Add("v2");
             url.Add("objects");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             url.Add("uuids");
             url.Add(string.IsNullOrEmpty(uuid) ? "" : uuid);
 
@@ -1285,7 +1285,7 @@ namespace PubnubApi
             List<string> url = new List<string>();
             url.Add("v2");
             url.Add("objects");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             url.Add("uuids");
             url.Add(string.IsNullOrEmpty(uuid) ? "" : uuid);
 
@@ -1313,7 +1313,7 @@ namespace PubnubApi
             List<string> url = new List<string>();
             url.Add("v2");
             url.Add("objects");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             url.Add("uuids");
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
@@ -1368,7 +1368,7 @@ namespace PubnubApi
             List<string> url = new List<string>();
             url.Add("v2");
             url.Add("objects");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             url.Add("uuids");
             url.Add(string.IsNullOrEmpty(uuid) ? "": uuid);
 
@@ -1400,7 +1400,7 @@ namespace PubnubApi
             List<string> url = new List<string>();
             url.Add("v2");
             url.Add("objects");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             url.Add("channels");
             url.Add(string.IsNullOrEmpty(channel) ? "" : channel);
 
@@ -1431,7 +1431,7 @@ namespace PubnubApi
             List<string> url = new List<string>();
             url.Add("v2");
             url.Add("objects");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             url.Add("channels");
             url.Add(string.IsNullOrEmpty(channel) ? "" : channel);
 
@@ -1459,7 +1459,7 @@ namespace PubnubApi
             List<string> url = new List<string>();
             url.Add("v2");
             url.Add("objects");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             url.Add("channels");
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
@@ -1514,7 +1514,7 @@ namespace PubnubApi
             List<string> url = new List<string>();
             url.Add("v2");
             url.Add("objects");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             url.Add("channels");
             url.Add(string.IsNullOrEmpty(channel) ? "" : channel);
 
@@ -1546,7 +1546,7 @@ namespace PubnubApi
             List<string> url = new List<string>();
             url.Add("v2");
             url.Add("objects");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             url.Add("uuids");
             url.Add(string.IsNullOrEmpty(uuid) ? "" : uuid);
             url.Add("channels");
@@ -1598,7 +1598,7 @@ namespace PubnubApi
             List<string> url = new List<string>();
             url.Add("v2");
             url.Add("objects");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             url.Add("channels");
             url.Add(string.IsNullOrEmpty(channel) ? "" : channel);
             url.Add("uuids");
@@ -1650,7 +1650,7 @@ namespace PubnubApi
             List<string> url = new List<string>();
             url.Add("v2");
             url.Add("objects");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             url.Add("uuids");
             url.Add(string.IsNullOrEmpty(uuid) ? "" : uuid);
             url.Add("channels");
@@ -1707,7 +1707,7 @@ namespace PubnubApi
             List<string> url = new List<string>();
             url.Add("v2");
             url.Add("objects");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             url.Add("channels");
             url.Add(string.IsNullOrEmpty(channel) ? "" : channel);
             url.Add("uuids");
@@ -1764,7 +1764,7 @@ namespace PubnubApi
             List<string> url = new List<string>();
             url.Add("v1");
             url.Add("message-actions");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             url.Add("channel");
             url.Add(channel);
             url.Add("message");
@@ -1795,7 +1795,7 @@ namespace PubnubApi
             List<string> url = new List<string>();
             url.Add("v1");
             url.Add("message-actions");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             url.Add("channel");
             url.Add(channel);
             url.Add("message");
@@ -1832,7 +1832,7 @@ namespace PubnubApi
             List<string> url = new List<string>();
             url.Add("v1");
             url.Add("message-actions");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             url.Add("channel");
             url.Add(channel);
 
@@ -1873,7 +1873,7 @@ namespace PubnubApi
             List<string> url = new List<string>();
             url.Add("v1");
             url.Add("files");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             url.Add("channels");
             url.Add(channel);
             url.Add("generate-upload-url");
@@ -1903,8 +1903,8 @@ namespace PubnubApi
             url.Add("v1");
             url.Add("files");
             url.Add("publish-file");
-            url.Add(pubnubConfig.PublishKey);
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].PublishKey : "");
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             url.Add("0");
             url.Add(channel);
             url.Add("0");
@@ -1961,7 +1961,7 @@ namespace PubnubApi
             List<string> url = new List<string>();
             url.Add("v1");
             url.Add("files");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             url.Add("channels");
             url.Add(channel);
             url.Add("files");
@@ -1993,7 +1993,7 @@ namespace PubnubApi
             List<string> url = new List<string>();
             url.Add("v1");
             url.Add("files");
-            url.Add(pubnubConfig.SubscribeKey);
+            url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
             url.Add("channels");
             url.Add(channel);
             url.Add("files");
@@ -2034,11 +2034,11 @@ namespace PubnubApi
             }
 
             Dictionary<string, string> ret = new Dictionary<string, string>();
-            if (pubnubUnitTest != null)
+            if (pubnubUnitTest != null && pubnubConfig.ContainsKey(pubnubInstanceId))
             {
                 if (pubnubUnitTest.IncludeUuid)
                 {
-                    ret.Add("uuid", UriUtil.EncodeUriComponent(this.pubnubConfig.Uuid, PNOperationType.PNSubscribeOperation, false, false, true));
+                    ret.Add("uuid", UriUtil.EncodeUriComponent(pubnubConfig[pubnubInstanceId].Uuid, PNOperationType.PNSubscribeOperation, false, false, true));
                 }
 
                 if (pubnubUnitTest.IncludePnsdk)
@@ -2048,23 +2048,25 @@ namespace PubnubApi
             }
             else
             {
-                ret.Add("uuid", UriUtil.EncodeUriComponent(uuid != null ? uuid : this.pubnubConfig.Uuid, PNOperationType.PNSubscribeOperation, false, false, true));
+                ret.Add("uuid", UriUtil.EncodeUriComponent(uuid != null ? uuid : 
+                                        (pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].Uuid : ""), 
+                                        PNOperationType.PNSubscribeOperation, false, false, true));
                 ret.Add("pnsdk", UriUtil.EncodeUriComponent(Pubnub.Version, PNOperationType.PNSubscribeOperation, false, false, true));
             }
 
             if (pubnubConfig != null)
             {
-                if (pubnubConfig.IncludeRequestIdentifier)
+                if (pubnubConfig.ContainsKey(pubnubInstanceId) && pubnubConfig[pubnubInstanceId].IncludeRequestIdentifier)
                 {
                     ret.Add("requestid", requestid);
                 }
 
-                if (pubnubConfig.IncludeInstanceIdentifier && !string.IsNullOrEmpty(pubnubInstanceId) && pubnubInstanceId.Trim().Length > 0)
+                if (pubnubConfig.ContainsKey(pubnubInstanceId) && pubnubConfig[pubnubInstanceId].IncludeInstanceIdentifier && !string.IsNullOrEmpty(pubnubInstanceId) && pubnubInstanceId.Trim().Length > 0)
                 {
                     ret.Add("instanceid", pubnubInstanceId);
                 }
 
-                if (pubnubConfig.EnableTelemetry && telemetryMgr != null)
+                if (pubnubConfig.ContainsKey(pubnubInstanceId) && pubnubConfig[pubnubInstanceId].EnableTelemetry && telemetryMgr != null)
                 {
                     Dictionary<string, string> opsLatency = telemetryMgr.GetOperationsLatency().ConfigureAwait(false).GetAwaiter().GetResult();
                     if (opsLatency != null && opsLatency.Count > 0)
@@ -2076,7 +2078,7 @@ namespace PubnubApi
                     }
                 }
 
-                if (!string.IsNullOrEmpty(pubnubConfig.SecretKey))
+                if (pubnubConfig.ContainsKey(pubnubInstanceId) && !string.IsNullOrEmpty(pubnubConfig[pubnubInstanceId].SecretKey))
                 {
                     ret.Add("timestamp", timeStamp.ToString());
                 }
@@ -2089,9 +2091,9 @@ namespace PubnubApi
                     {
                         ret.Add("auth", UriUtil.EncodeUriComponent(tokenMgr.AuthToken, type, false, false, false));
                     }
-                    else if (!string.IsNullOrEmpty(this.pubnubConfig.AuthKey) && this.pubnubConfig.AuthKey.Trim().Length > 0)
+                    else if (pubnubConfig.ContainsKey(pubnubInstanceId) && !string.IsNullOrEmpty(pubnubConfig[pubnubInstanceId].AuthKey) && pubnubConfig[pubnubInstanceId].AuthKey.Trim().Length > 0)
                     {
-                        ret.Add("auth", UriUtil.EncodeUriComponent(this.pubnubConfig.AuthKey, type, false, false, false));
+                        ret.Add("auth", UriUtil.EncodeUriComponent(pubnubConfig[pubnubInstanceId].AuthKey, type, false, false, false));
                     }
                 }
             }
@@ -2103,21 +2105,24 @@ namespace PubnubApi
         {
             string signature = "";
             StringBuilder string_to_sign = new StringBuilder();
-            string_to_sign.Append(this.pubnubConfig.SubscribeKey).Append("\n").Append(this.pubnubConfig.PublishKey).Append("\n");
-            string_to_sign.Append(partialUrl).Append("\n");
-            string_to_sign.Append(queryStringToSign);
+            if (pubnubConfig.ContainsKey(pubnubInstanceId))
+            {
+                string_to_sign.Append(pubnubConfig[pubnubInstanceId].SubscribeKey).Append("\n").Append(pubnubConfig[pubnubInstanceId].PublishKey).Append("\n");
+                string_to_sign.Append(partialUrl).Append("\n");
+                string_to_sign.Append(queryStringToSign);
 
-            PubnubCrypto pubnubCrypto = new PubnubCrypto((opType != PNOperationType.PNSignalOperation) ? this.pubnubConfig.CipherKey : "", this.pubnubConfig, this.pubnubLog, null);
-            signature = pubnubCrypto.PubnubAccessManagerSign(this.pubnubConfig.SecretKey, string_to_sign.ToString());
-            if (this.pubnubLog != null && this.pubnubConfig != null)
-            {
-                LoggingMethod.WriteToLog(pubnubLog, "string_to_sign = " + string_to_sign, pubnubConfig.LogVerbosity);
-                LoggingMethod.WriteToLog(pubnubLog, "signature = " + signature, pubnubConfig.LogVerbosity);
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("string_to_sign = " + string_to_sign);
-                System.Diagnostics.Debug.WriteLine("signature = " + signature);
+                PubnubCrypto pubnubCrypto = new PubnubCrypto((opType != PNOperationType.PNSignalOperation) ? pubnubConfig[pubnubInstanceId].CipherKey : "", pubnubConfig[pubnubInstanceId], this.pubnubLog, null);
+                signature = pubnubCrypto.PubnubAccessManagerSign(pubnubConfig[pubnubInstanceId].SecretKey, string_to_sign.ToString());
+                if (this.pubnubLog != null && this.pubnubConfig != null)
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, "string_to_sign = " + string_to_sign, pubnubConfig[pubnubInstanceId].LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, "signature = " + signature, pubnubConfig[pubnubInstanceId].LogVerbosity);
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("string_to_sign = " + string_to_sign);
+                    System.Diagnostics.Debug.WriteLine("signature = " + signature);
+                }
             }
             return signature;
         }
@@ -2126,24 +2131,27 @@ namespace PubnubApi
         {
             string signature = "";
             StringBuilder string_to_sign = new StringBuilder();
-            string_to_sign.AppendFormat("{0}\n", method.ToUpperInvariant());
-            string_to_sign.AppendFormat("{0}\n", this.pubnubConfig.PublishKey);
-            string_to_sign.AppendFormat("{0}\n", partialUrl);
-            string_to_sign.AppendFormat("{0}\n", queryStringToSign);
-            string_to_sign.Append(requestBody);
+            if (pubnubConfig.ContainsKey(pubnubInstanceId))
+            {
+                string_to_sign.AppendFormat("{0}\n", method.ToUpperInvariant());
+                string_to_sign.AppendFormat("{0}\n", pubnubConfig[pubnubInstanceId].PublishKey);
+                string_to_sign.AppendFormat("{0}\n", partialUrl);
+                string_to_sign.AppendFormat("{0}\n", queryStringToSign);
+                string_to_sign.Append(requestBody);
 
-            PubnubCrypto pubnubCrypto = new PubnubCrypto((opType != PNOperationType.PNSignalOperation) ? this.pubnubConfig.CipherKey : "", this.pubnubConfig, this.pubnubLog, null);
-            signature = pubnubCrypto.PubnubAccessManagerSign(this.pubnubConfig.SecretKey, string_to_sign.ToString());
-            signature = string.Format("v2.{0}", signature.TrimEnd(new [] { '=' }));
-            if (this.pubnubLog != null && this.pubnubConfig != null)
-            {
-                LoggingMethod.WriteToLog(pubnubLog, "string_to_sign = " + string_to_sign, pubnubConfig.LogVerbosity);
-                LoggingMethod.WriteToLog(pubnubLog, "signature = " + signature, pubnubConfig.LogVerbosity);
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("string_to_sign = " + string_to_sign);
-                System.Diagnostics.Debug.WriteLine("signature = " + signature);
+                PubnubCrypto pubnubCrypto = new PubnubCrypto((opType != PNOperationType.PNSignalOperation) ? pubnubConfig[pubnubInstanceId].CipherKey : "", pubnubConfig[pubnubInstanceId], this.pubnubLog, null);
+                signature = pubnubCrypto.PubnubAccessManagerSign(pubnubConfig[pubnubInstanceId].SecretKey, string_to_sign.ToString());
+                signature = string.Format("v2.{0}", signature.TrimEnd(new[] { '=' }));
+                if (this.pubnubLog != null && this.pubnubConfig != null)
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, "string_to_sign = " + string_to_sign, pubnubConfig[pubnubInstanceId].LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, "signature = " + signature, pubnubConfig[pubnubInstanceId].LogVerbosity);
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("string_to_sign = " + string_to_sign);
+                    System.Diagnostics.Debug.WriteLine("signature = " + signature);
+                }
             }
             return signature;
         }
@@ -2170,7 +2178,7 @@ namespace PubnubApi
             }
             catch (Exception ex)
             {
-                LoggingMethod.WriteToLog(pubnubLog, "UrlRequestBuilder => BuildQueryString error " + ex, pubnubConfig.LogVerbosity);
+                LoggingMethod.WriteToLog(pubnubLog, "UrlRequestBuilder => BuildQueryString error " + ex, pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].LogVerbosity : PNLogVerbosity.BODY);
             }
 
             return queryString;
@@ -2180,7 +2188,7 @@ namespace PubnubApi
         {   
             StringBuilder url = new StringBuilder();
 
-            if (pubnubConfig.Secure)
+            if (pubnubConfig.ContainsKey(pubnubInstanceId) && pubnubConfig[pubnubInstanceId].Secure)
             {
                 url.Append("https://");
             }
@@ -2189,7 +2197,7 @@ namespace PubnubApi
                 url.Append("http://");
             }
 
-            url.Append(pubnubConfig.Origin);
+            url.Append(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].Origin : "");
 
             for (int componentIndex = 0; componentIndex < urlComponents.Count; componentIndex++)
             {
@@ -2220,7 +2228,7 @@ namespace PubnubApi
             }
             System.Diagnostics.Debug.WriteLine("Uri = " + requestUri.ToString());
 
-            if (this.pubnubConfig.SecretKey.Length > 0)
+            if (pubnubConfig.ContainsKey(pubnubInstanceId) && pubnubConfig[pubnubInstanceId].SecretKey.Length > 0)
             {
                 StringBuilder partialUrl = new StringBuilder();
                 partialUrl.Append(requestUri.AbsolutePath);
@@ -2248,9 +2256,9 @@ namespace PubnubApi
         {
             string message = jsonLib.SerializeToJsonString(originalMessage);
 
-            if (pubnubConfig.CipherKey.Length > 0 && opType != PNOperationType.PNSignalOperation)
+            if (pubnubConfig.ContainsKey(pubnubInstanceId) && pubnubConfig[pubnubInstanceId].CipherKey.Length > 0 && opType != PNOperationType.PNSignalOperation)
             {
-                PubnubCrypto aes = new PubnubCrypto(pubnubConfig.CipherKey, pubnubConfig, pubnubLog, null);
+                PubnubCrypto aes = new PubnubCrypto(pubnubConfig[pubnubInstanceId].CipherKey, pubnubConfig[pubnubInstanceId], pubnubLog, null);
                 string encryptMessage = aes.Encrypt(message);
                 message = jsonLib.SerializeToJsonString(encryptMessage);
             }
@@ -2261,7 +2269,7 @@ namespace PubnubApi
         private void ForceCanonicalPathAndQuery(Uri requestUri)
         {
 #if !NETSTANDARD10 && !NETSTANDARD11 && !NETSTANDARD12 && !WP81
-            LoggingMethod.WriteToLog(pubnubLog, "Inside ForceCanonicalPathAndQuery = " + requestUri.ToString(), pubnubConfig.LogVerbosity);
+            LoggingMethod.WriteToLog(pubnubLog, "Inside ForceCanonicalPathAndQuery = " + requestUri.ToString(), pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].LogVerbosity : PNLogVerbosity.NONE);
             try
             {
                 FieldInfo flagsFieldInfo = typeof(Uri).GetField("m_Flags", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -2274,7 +2282,7 @@ namespace PubnubApi
             }
             catch (Exception ex)
             {
-                LoggingMethod.WriteToLog(pubnubLog, "Exception Inside ForceCanonicalPathAndQuery = " + ex, pubnubConfig.LogVerbosity);
+                LoggingMethod.WriteToLog(pubnubLog, "Exception Inside ForceCanonicalPathAndQuery = " + ex, pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].LogVerbosity : PNLogVerbosity.BODY);
             }
 #endif
         }

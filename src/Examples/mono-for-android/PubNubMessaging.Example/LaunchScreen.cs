@@ -187,13 +187,18 @@ namespace PubNubMessaging.Example
         {
             EditText txtChannel = FindViewById<EditText> (Resource.Id.txtChannel);
             EditText txtChannelGroup = FindViewById<EditText> (Resource.Id.txtChannelGroup);
+            EditText txtCustomUuid = FindViewById<EditText>(Resource.Id.txtCustomUuid);
             if (String.IsNullOrWhiteSpace (txtChannel.Text.Trim ()) && String.IsNullOrWhiteSpace (txtChannelGroup.Text.Trim ())) {
                 ShowAlert ("Please enter a channel name or channelgroup or both");
-            } else {
+            }
+            else if (String.IsNullOrWhiteSpace(txtCustomUuid.Text.Trim()))
+            {
+                ShowAlert("Please enter UUID");
+            }
+            else {
 
                 ToggleButton tbSsl = FindViewById<ToggleButton> (Resource.Id.tbSsl);
                 EditText txtCipher = FindViewById<EditText> (Resource.Id.txtCipher);
-                EditText txtCustomUuid = FindViewById<EditText> (Resource.Id.txtCustomUuid);
 
                 var mainActivity = new Intent (this, typeof(MainActivity));
 
@@ -207,7 +212,7 @@ namespace PubNubMessaging.Example
                 }
 
                 mainActivity.PutExtra ("Cipher", txtCipher.Text.Trim ());
-                PNConfiguration config = new PNConfiguration ();
+                PNConfiguration config = new PNConfiguration (txtCustomUuid.Text);
                 config.PublishKey = txtPubKey.Text.Trim ();
                 config.SubscribeKey = txtSubKey.Text.Trim ();
                 config.SecretKey = txtSecKey.Text.Trim ();
