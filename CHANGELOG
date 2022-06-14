@@ -1,3 +1,7 @@
+v6.5.0 - June 14 2022
+-----------------------------
+- Fixed: suppress web request aborted exception message to callback.
+
 v6.4.0 - May 23 2022
 -----------------------------
 - Fixed: handle PNConfiguration for multi Pubnub instances.
