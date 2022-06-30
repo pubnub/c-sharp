@@ -873,13 +873,25 @@ namespace PubnubApi
                     LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, WARNING: The PresenceTimeout cannot be less than 20, defaulting the value to 20. Please update the settings in your code.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
                 }
             }
-            if (config != null && (string.IsNullOrEmpty(config.Uuid) || string.IsNullOrEmpty(config.Uuid.Trim())))
+            if (config != null)
             {
-                if (pubnubLog != null)
+                if ((string.IsNullOrEmpty(config.Uuid) || string.IsNullOrEmpty(config.Uuid.Trim())) &&
+                (config.UserId == null || string.IsNullOrEmpty(config.UserId.ToString())))
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, PNConfiguration.Uuid is required to use the SDK.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                    if (pubnubLog != null)
+                    {
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, PNConfiguration.Uuid or PNConfiguration.UserId is required to use the SDK.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                    }
+                    throw new MissingMemberException("PNConfiguration.Uuid or PNConfiguration.UserId is required to use the SDK");
                 }
-                throw new MissingMemberException("PNConfiguration.Uuid is required to use the SDK");
+                else if (!string.IsNullOrEmpty(config.Uuid) && config.UserId != null)
+                {
+                    if (pubnubLog != null)
+                    {
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Either PNConfiguration.Uuid or PNConfiguration.UserId is required, but not both.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                    }
+                    throw new MissingMemberException("PNConfiguration.Uuid or PNConfiguration.UserId is required, but not both");
+                }
             }
 
         }

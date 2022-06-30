@@ -389,6 +389,7 @@
     <Compile Include="..\PubnubApi\Model\Consumer\Push\PNPushRemoveChannelResult.cs">
       <Link>Model\Consumer\Push\PNPushRemoveChannelResult.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\UserId.cs" Link="Model\Consumer\UserId.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\AccessManager\PNAccessManagerAuditResultExt.cs">
       <Link>Model\Derived\AccessManager\PNAccessManagerAuditResultExt.cs</Link>
     </Compile>
