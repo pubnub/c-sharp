@@ -78,6 +78,7 @@
     <Compile Include="..\PubnubApi.Tests\WhenSubscribedToWildcardChannel.cs" Link="WhenSubscribedToWildcardChannel.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenUnsubscribedToAChannel.cs" Link="WhenUnsubscribedToAChannel.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenUnsubscribedToAChannelGroup.cs" Link="WhenUnsubscribedToAChannelGroup.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenUserIdInPNConfig.cs" Link="WhenUserIdInPNConfig.cs" />
   </ItemGroup>
 
   <ItemGroup>

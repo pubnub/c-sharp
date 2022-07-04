@@ -412,6 +412,7 @@ namespace PubnubApi
 			return Guid.NewGuid();
 		}
 
+        [Obsolete("ChangeUUID is deprecated, please use ChangeUserId instead.")]
         public void ChangeUUID(string newUUID)
         {
             if (newUUID != null && string.IsNullOrEmpty(newUUID.Trim()))
@@ -421,6 +422,21 @@ namespace PubnubApi
                     LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, UUID cannot be null/empty.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId].LogVerbosity : PNLogVerbosity.NONE);
                 }
                 throw new MissingMemberException("UUID cannot be null/empty");
+            }
+            EndPoint.OtherOperation endPoint = new EndPoint.OtherOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
+            endPoint.CurrentPubnubInstance(this);
+            endPoint.ChangeUUID(newUUID);
+        }
+
+        public void ChangeUserId(UserId newUserId)
+        {
+            if (newUserId == null || string.IsNullOrEmpty(newUserId.ToString().Trim()))
+            {
+                if (pubnubLog != null && pubnubConfig != null)
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, UUID cannot be null/empty.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId].LogVerbosity : PNLogVerbosity.NONE);
+                }
+                throw new MissingMemberException("UserId cannot be null/empty");
             }
             EndPoint.OtherOperation endPoint = new EndPoint.OtherOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
             endPoint.CurrentPubnubInstance(this);

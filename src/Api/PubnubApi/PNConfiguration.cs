@@ -9,8 +9,9 @@ namespace PubnubApi
     {
         private int presenceHeartbeatTimeout;
         private int presenceHeartbeatInterval;
-        private string uuid = "";
+        private string _uuid = "";
         private UserId _userId;
+        private bool usingDeprecatedUuid = false;
 
         public string Origin { get; set; }
 
@@ -53,18 +54,19 @@ namespace PubnubApi
         {
             get
             {
-                return uuid;
+                return _uuid;
             }
             set
             {
-                if (_userId != null)
+                if (_userId != null && !usingDeprecatedUuid)
                 {
                     throw new ArgumentException("Either UserId or Uuid can be used. Not both.");
                 }
 
                 if (value != null && value.Trim().Length > 0)
                 {
-                    uuid = value;
+                    _uuid = value;
+                    _userId = new UserId(value);
                 }
                 else
                 {
@@ -81,7 +83,7 @@ namespace PubnubApi
             }
             set
             {
-                if (uuid != null)
+                if (_uuid != null && usingDeprecatedUuid)
                 {
                     throw new ArgumentException("Either UserId or Uuid can be used. Not both.");
                 }
@@ -89,6 +91,7 @@ namespace PubnubApi
                 if (value != null && !string.IsNullOrEmpty(value.ToString()))
                 {
                     _userId = value;
+                    _uuid = value.ToString();
                 }
                 else
                 {
@@ -141,7 +144,7 @@ namespace PubnubApi
             {
                 throw new ArgumentException("Missing or Incorrect uuid value");
             }
-
+            usingDeprecatedUuid = true;
             ConstructorInit(uuid, null);
         }
 
@@ -151,6 +154,7 @@ namespace PubnubApi
             {
                 throw new ArgumentException("Missing or Incorrect UserId");
             }
+            usingDeprecatedUuid = false;
             ConstructorInit(null, userId);
         }
 
@@ -177,11 +181,13 @@ namespace PubnubApi
             this.FileMessagePublishRetryLimit = 5;
             if (!string.IsNullOrEmpty(currentUuid))
             {
-                Uuid = currentUuid;
+                _uuid = currentUuid;
+                _userId = new UserId(currentUuid);
             }
             else if (currentUserId != null && !string.IsNullOrEmpty(currentUserId.ToString()))
             {
                 _userId = currentUserId;
+                _uuid = currentUserId.ToString();
             }
         }
         public PNConfiguration SetPresenceTimeoutWithCustomInterval(int timeout, int interval)
