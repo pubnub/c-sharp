@@ -440,7 +440,7 @@ namespace PubnubApi
             }
             EndPoint.OtherOperation endPoint = new EndPoint.OtherOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
             endPoint.CurrentPubnubInstance(this);
-            endPoint.ChangeUUID(newUUID);
+            endPoint.ChangeUserId(newUserId);
         }
 
         public static long TranslateDateTimeToPubnubUnixNanoSeconds(DateTime dotNetUTCDateTime)
@@ -900,7 +900,7 @@ namespace PubnubApi
                     }
                     throw new MissingMemberException("PNConfiguration.Uuid or PNConfiguration.UserId is required to use the SDK");
                 }
-                else if (!string.IsNullOrEmpty(config.Uuid) && config.UserId != null)
+                else if (!string.IsNullOrEmpty(config.Uuid) && config.UserId != null && config.UserId.ToString() != config.Uuid)
                 {
                     if (pubnubLog != null)
                     {
