@@ -58,7 +58,7 @@ namespace PubnubApi
 
         protected bool UuidChanged { get; set; }
 
-        protected string CurrentUuid { get; set; }
+        protected static ConcurrentDictionary<string, string> CurrentUuid { get; set; } = new ConcurrentDictionary<string, string>();
 
         protected static ConcurrentDictionary<string, long> LastSubscribeTimetoken { get; set; } = new ConcurrentDictionary<string, long>();
         protected static ConcurrentDictionary<string, int> LastSubscribeRegion { get; set; } = new ConcurrentDictionary<string, int>();
@@ -172,7 +172,7 @@ namespace PubnubApi
             pubnubTelemetryMgr = telemetryManager;
             pubnubSubscribeDuplicationManager = new EndPoint.DuplicationManager(pubnubConfiguation, jsonPluggableLibrary, log);
 
-            CurrentUuid = pubnubConfiguation.Uuid;
+            CurrentUuid.AddOrUpdate(instance.InstanceId, pubnubConfiguation.Uuid, (k,o) => pubnubConfiguation.Uuid);
 
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
             if (httpClientSubscribe == null)

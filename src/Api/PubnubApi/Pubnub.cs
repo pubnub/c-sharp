@@ -417,7 +417,7 @@ namespace PubnubApi
         {
             if (newUUID != null && string.IsNullOrEmpty(newUUID.Trim()))
             {
-                if (pubnubLog != null && pubnubConfig != null)
+                if (pubnubLog != null && !pubnubConfig.ContainsKey(InstanceId) && pubnubConfig[InstanceId] == null)
                 {
                     LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, UUID cannot be null/empty.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId].LogVerbosity : PNLogVerbosity.NONE);
                 }
