@@ -85,8 +85,8 @@ namespace PubnubApi.EndPoint
                 {
                     UuidChanged = true;
 
-                    config.UserId = newUserId;
                     CurrentUuid.AddOrUpdate(PubnubInstance.InstanceId, newUserId.ToString(), (k, o) => newUserId.ToString());
+                    config.UserId = newUserId;
 
                     string[] channels = GetCurrentSubscriberChannels();
                     string[] channelGroups = GetCurrentSubscriberChannelGroups();
@@ -116,6 +116,16 @@ namespace PubnubApi.EndPoint
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
         }
 
+        public UserId GetCurrentUserId()
+        {
+            UserId ret = null;
+            string currentUuid;
+            if (CurrentUuid.TryGetValue(PubnubInstance.InstanceId, out currentUuid))
+            {
+                ret = new UserId(currentUuid);
+            }
+            return ret;
+        }
         public static long TranslateDateTimeToSeconds(DateTime dotNetUTCDateTime)
         {
             TimeSpan timeSpan = dotNetUTCDateTime - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);

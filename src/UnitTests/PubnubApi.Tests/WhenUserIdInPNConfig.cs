@@ -76,5 +76,40 @@ namespace PubNubMessaging.Tests
             Assert.AreEqual(config.UserId.ToString(), config.Uuid);
         }
 
+        [Test]
+        public static void ThenChangeUuidShouldGiveCurrentNewUuid()
+        {
+            ManualResetEvent mre = new ManualResetEvent(false);
+            PNConfiguration config = new PNConfiguration("olduuid")
+            {
+                SubscribeKey = "demo",
+                PublishKey = "demo",
+                LogVerbosity = PNLogVerbosity.BODY,
+                ReconnectionPolicy = PNReconnectionPolicy.LINEAR
+            };
+            Pubnub pubnub = new Pubnub(config);
+            Thread.Sleep(1000);
+            pubnub.ChangeUUID("newuuid");
+            mre.WaitOne(1000);
+            Assert.AreEqual(pubnub.GetCurrentUserId().ToString(), "newuuid");
+        }
+
+        [Test]
+        public static void ThenChangeUserIdShouldGiveCurrentNewUserId()
+        {
+            ManualResetEvent mre = new ManualResetEvent(false);
+            PNConfiguration config = new PNConfiguration(new UserId("olduserid"))
+            {
+                SubscribeKey = "demo",
+                PublishKey = "demo",
+                LogVerbosity = PNLogVerbosity.BODY,
+                ReconnectionPolicy = PNReconnectionPolicy.LINEAR
+            };
+            Pubnub pubnub = new Pubnub(config);
+            Thread.Sleep(1000);
+            pubnub.ChangeUserId(new UserId("newuserid"));
+            mre.WaitOne(1000);
+            Assert.AreEqual(pubnub.GetCurrentUserId().ToString(), "newuserid");
+        }
     }
 }

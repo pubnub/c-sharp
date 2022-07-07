@@ -458,6 +458,13 @@ namespace PubnubApi
             return EndPoint.OtherOperation.TranslatePubnubUnixNanoSecondsToDateTime(unixNanoSecondTime);
         }
 
+        public UserId GetCurrentUserId()
+        {
+            EndPoint.OtherOperation endPoint = new EndPoint.OtherOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
+            endPoint.CurrentPubnubInstance(this);
+            return endPoint.GetCurrentUserId();
+
+        }
         public List<string> GetSubscribedChannels()
         {
             EndPoint.OtherOperation endpoint = new EndPoint.OtherOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, this);
