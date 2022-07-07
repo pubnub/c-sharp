@@ -4,7 +4,7 @@ using System.Net;
 using System.Threading.Tasks;
 using System.IO;
 using System.Globalization;
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
 using System.Net.Http;
 using System.Net.Http.Headers;
 #endif
@@ -20,7 +20,7 @@ namespace PubnubApi
         private static IPubnubLog pubnubLog;
 
         private static bool networkStatus = true;
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
         private static HttpClient httpClient;
 #endif
 
@@ -72,7 +72,7 @@ namespace PubnubApi
             }
         }
 
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
         public static HttpClient RefHttpClient
         {
             set
@@ -221,7 +221,7 @@ namespace PubnubApi
                 }
                 else
                 {
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
                     if (pubnubConfig.UseTaskFactoryAsyncInsteadOfHttpClient)
                     {
                         gotTimeResp = await GetTimeWithTaskFactoryAsync(requestUri).ConfigureAwait(false);
@@ -271,7 +271,7 @@ namespace PubnubApi
 			internalcallback(false);
 		}
 
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
         private static async Task<bool> GetTimeWithHttpClient(Uri requestUri)
         {
             bool successFlag = false;
@@ -347,7 +347,7 @@ namespace PubnubApi
                                 }
                                 if (asyncRequestState.Response != null)
                                 {
-#if NET35 || NET40 || NET45 || NET461
+#if NET35 || NET40 || NET45 || NET461 || NET48
                                     pubnubRequestState.Response.Close();
 #endif
                                     asyncRequestState.Response = null;

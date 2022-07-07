@@ -122,7 +122,7 @@ namespace PubnubApi
                             }
                             jsonTxtreader.Close();
                         }
-#if (NET35 || NET40 || NET45 || NET461)
+#if (NET35 || NET40 || NET45 || NET461 || NET48)
                         strReader.Close();
 #endif
                     }
@@ -190,7 +190,7 @@ namespace PubnubApi
             bool ret = false;
             PNPlatform.Print(config, pubnubLog);
 
-#if (NET35 || NET40 || NET45 || NET461)
+#if (NET35 || NET40 || NET45 || NET461 || NET48)
             if (typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(PNMessageResult<>))
             {
                 ret = true;
@@ -216,7 +216,7 @@ namespace PubnubApi
         {
             T ret = default(T);
 
-#if NET35 || NET40 || NET45 || NET461
+#if NET35 || NET40 || NET45 || NET461 || NET48
             Type dataType = typeof(T).GetGenericArguments()[0];
             Type generic = typeof(PNMessageResult<>);
             Type specific = generic.MakeGenericType(dataType);

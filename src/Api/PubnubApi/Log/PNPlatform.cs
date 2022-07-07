@@ -38,6 +38,8 @@ namespace PubnubApi
                         LoggingMethod.WriteToLog(log, string.Format("DateTime {0} PLATFORM = NET45", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
 #elif NET461
             LoggingMethod.WriteToLog(log, string.Format("DateTime {0} PLATFORM = NET461", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+#elif NET48
+            LoggingMethod.WriteToLog(log, string.Format("DateTime {0} PLATFORM = NET48", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
 #else
             LoggingMethod.WriteToLog(log, string.Format("DateTime {0} PLATFORM = UNKNOWN", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
 #endif
@@ -96,6 +98,8 @@ namespace PubnubApi
                         result = "NET45";
 #elif NET461
                         result = "NET461";
+#elif NET48
+                        result = "NET48";
 #else
                         result = "UNKNOWN";
 #endif
