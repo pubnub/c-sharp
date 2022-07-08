@@ -681,6 +681,7 @@ supported-platforms:
       - .Net Standard 2.0
       - .Net Standard 2.1
       - .Net Core
+      - .Net 6.0
   -
     version: PubnubUWP 'C#' 6.5.0
     platforms:
@@ -723,17 +724,10 @@ sdks:
                 location: "External"
                 is-required: "Required"
               -
-                name: "Portable.BouncyCastle"
-                min-version: "1.8.1.2"
-                license: "MIT,X11"
-                license-url: "https://www.nuget.org/packages/Portable.BouncyCastle/1.8.1.2"
-                location: "External"
-                is-required: "Required"
-              -
                 name: "PeterO.Cbor"
-                min-version: "4.4.4"
+                min-version: "4.5.2"
                 license: "CC0-1.0"
-                license-url: "https://www.nuget.org/packages/PeterO.Cbor/4.4.4"
+                license-url: "https://www.nuget.org/packages/PeterO.Cbor/4.5.2"
                 location: "External"
                 is-required: "Required"
               -
@@ -869,17 +863,10 @@ sdks:
                 location: "External"
                 is-required: "Required"
               -
-                name: "Portable.BouncyCastle"
-                min-version: "1.8.1.2"
-                license: "MIT,X11"
-                license-url: "https://www.nuget.org/packages/Portable.BouncyCastle/1.8.1.2"
-                location: "External"
-                is-required: "Required"
-              -
                 name: "PeterO.Cbor"
-                min-version: "4.4.4"
+                min-version: "4.5.2"
                 license: "CC0-1.0"
-                license-url: "https://www.nuget.org/packages/PeterO.Cbor/4.4.4"
+                license-url: "https://www.nuget.org/packages/PeterO.Cbor/4.5.2"
                 location: "External"
                 is-required: "Required"
               -
@@ -1020,17 +1007,10 @@ sdks:
                 location: "External"
                 is-required: "Required"
               -
-                name: "Portable.BouncyCastle"
-                min-version: "1.8.1.2"
-                license: "MIT,X11"
-                license-url: "https://www.nuget.org/packages/Portable.BouncyCastle/1.8.1.2"
-                location: "External"
-                is-required: "Required"
-              -
                 name: "PeterO.Cbor"
-                min-version: "4.4.4"
+                min-version: "4.5.2"
                 license: "CC0-1.0"
-                license-url: "https://www.nuget.org/packages/PeterO.Cbor/4.4.4"
+                license-url: "https://www.nuget.org/packages/PeterO.Cbor/4.5.2"
                 location: "External"
                 is-required: "Required"
             supported-platforms:
@@ -1205,17 +1185,10 @@ sdks:
                 location: "External"
                 is-required: "Required"
               -
-                name: "Portable.BouncyCastle"
-                min-version: "1.8.1.2"
-                license: "MIT,X11"
-                license-url: "https://www.nuget.org/packages/Portable.BouncyCastle/1.8.1.2"
-                location: "External"
-                is-required: "Required"
-              -
                 name: "PeterO.Cbor"
-                min-version: "4.4.4"
+                min-version: "4.5.2"
                 license: "CC0-1.0"
-                license-url: "https://www.nuget.org/packages/PeterO.Cbor/4.4.4"
+                license-url: "https://www.nuget.org/packages/PeterO.Cbor/4.5.2"
                 location: "External"
                 is-required: "Required"
             supported-platforms:
@@ -1400,17 +1373,10 @@ sdks:
                 location: "External"
                 is-required: "Required"
               -
-                name: "Portable.BouncyCastle"
-                min-version: "1.8.1.2"
-                license: "MIT,X11"
-                license-url: "https://www.nuget.org/packages/Portable.BouncyCastle/1.8.1.2"
-                location: "External"
-                is-required: "Required"
-              -
                 name: "PeterO.Cbor"
-                min-version: "4.4.4"
+                min-version: "4.5.2"
                 license: "CC0-1.0"
-                license-url: "https://www.nuget.org/packages/PeterO.Cbor/4.4.4"
+                license-url: "https://www.nuget.org/packages/PeterO.Cbor/4.5.2"
                 location: "External"
                 is-required: "Required"
             supported-platforms:
@@ -1494,17 +1460,10 @@ sdks:
                 location: "External"
                 is-required: "Required"
               -
-                name: "Portable.BouncyCastle"
-                min-version: "1.8.1.2"
-                license: "MIT,X11"
-                license-url: "https://www.nuget.org/packages/Portable.BouncyCastle/1.8.1.2"
-                location: "External"
-                is-required: "Required"
-              -
                 name: "PeterO.Cbor"
-                min-version: "4.4.4"
+                min-version: "4.5.2"
                 license: "CC0-1.0"
-                license-url: "https://www.nuget.org/packages/PeterO.Cbor/4.4.4"
+                license-url: "https://www.nuget.org/packages/PeterO.Cbor/4.5.2"
                 location: "External"
                 is-required: "Required"
             supported-platforms:
