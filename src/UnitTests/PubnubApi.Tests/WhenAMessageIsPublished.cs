@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using MockServer;
 using System.Diagnostics;
 using System.Threading.Tasks;
-#if NETSTANDARD20
+#if NETSTANDARD20 || NET60
 using PubnubApiPCL.Tests;
 #else
 using PubnubApi.Tests;
@@ -1166,14 +1166,14 @@ namespace PubNubMessaging.Tests
         [Test]
         public static void ThenPubnubShouldFailOnWithoutSettingUuid()
         {
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            Assert.Throws<ArgumentException>(() =>
             {
-                PublishKey = PubnubCommon.PublishKey,
-                SubscribeKey = PubnubCommon.SubscribeKey,
-            };
+                PNConfiguration config = new PNConfiguration("")
+                {
+                    PublishKey = PubnubCommon.PublishKey,
+                    SubscribeKey = PubnubCommon.SubscribeKey,
+                };
 
-            Assert.Throws<MissingMemberException>(() =>
-            {
                 pubnub = createPubNubInstance(config);
             });
 
@@ -1832,8 +1832,8 @@ namespace PubNubMessaging.Tests
                 .Custom(pushTypeCustomData)
                 .GetPayload();
 
-            
-            pubnub = new Pubnub(null);
+            PNConfiguration config = new PNConfiguration("testuuid");
+            pubnub = new Pubnub(config);
             System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(payload));
 
             Assert.IsTrue(payload != null, "FAILED - IfMobilePayloadThenPublishReturnSuccess");
