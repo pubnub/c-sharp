@@ -113,7 +113,7 @@ namespace PubnubApi.EndPoint
         {
             if (string.IsNullOrEmpty(uuid))
             {
-                uuid = config.Uuid;
+                uuid = config.UserId.ToString();
             }
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
@@ -145,7 +145,7 @@ namespace PubnubApi.EndPoint
 
             if (string.IsNullOrEmpty(uuid))
             {
-                uuid = config.Uuid;
+                uuid = config.UserId.ToString();
             }
 
             if (string.IsNullOrEmpty(config.SubscribeKey) || string.IsNullOrEmpty(config.SubscribeKey.Trim()) || config.SubscribeKey.Length <= 0)

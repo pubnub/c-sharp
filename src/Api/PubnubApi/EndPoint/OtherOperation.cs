@@ -41,7 +41,7 @@ namespace PubnubApi.EndPoint
                 {
                     UuidChanged = true;
 
-                    CurrentUuid.AddOrUpdate(PubnubInstance.InstanceId, newUUID, (k, o) => newUUID);
+                    CurrentUserId.AddOrUpdate(PubnubInstance.InstanceId, new UserId(newUUID), (k, o) => new UserId(newUUID));
                     config.Uuid = newUUID;
 
                     string[] channels = GetCurrentSubscriberChannels();
@@ -85,7 +85,7 @@ namespace PubnubApi.EndPoint
                 {
                     UuidChanged = true;
 
-                    CurrentUuid.AddOrUpdate(PubnubInstance.InstanceId, newUserId.ToString(), (k, o) => newUserId.ToString());
+                    CurrentUserId.AddOrUpdate(PubnubInstance.InstanceId, newUserId, (k, o) => newUserId);
                     config.UserId = newUserId;
 
                     string[] channels = GetCurrentSubscriberChannels();
@@ -118,11 +118,10 @@ namespace PubnubApi.EndPoint
 
         public UserId GetCurrentUserId()
         {
-            UserId ret = null;
-            string currentUuid;
-            if (CurrentUuid.TryGetValue(PubnubInstance.InstanceId, out currentUuid))
+            UserId ret;
+            if (CurrentUserId.TryGetValue(PubnubInstance.InstanceId, out ret))
             {
-                ret = new UserId(currentUuid);
+                return ret;
             }
             return ret;
         }

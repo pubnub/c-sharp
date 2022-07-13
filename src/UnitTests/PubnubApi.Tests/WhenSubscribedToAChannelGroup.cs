@@ -74,7 +74,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("ttl", "20")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId.ToString())
                     .WithParameter("w", "1")
                     .WithParameter("signature", "oiUrVMZSf7NEGk6M9JrvpnffmMEy7wWLgYGHwMztIlU=")
                     .WithResponse(expected)
@@ -230,7 +230,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("auth", config.AuthKey)
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId.ToString())
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -269,7 +269,7 @@ namespace PubNubMessaging.Tests
                         .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                         .WithParameter("requestid", "myRequestId")
                         .WithParameter("tt", "0")
-                        .WithParameter("uuid", config.Uuid)
+                        .WithParameter("uuid", config.UserId.ToString())
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -387,7 +387,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("auth", config.AuthKey)
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId.ToString())
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -426,7 +426,7 @@ namespace PubNubMessaging.Tests
                         .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                         .WithParameter("requestid", "myRequestId")
                         .WithParameter("tt", "0")
-                        .WithParameter("uuid", config.Uuid)
+                        .WithParameter("uuid", config.UserId.ToString())
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -521,7 +521,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("auth", config.AuthKey)
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId.ToString())
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -558,7 +558,7 @@ namespace PubNubMessaging.Tests
                         .WithParameter("auth", config.AuthKey)
                         .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                         .WithParameter("requestid", "myRequestId")
-                        .WithParameter("uuid", config.Uuid)
+                        .WithParameter("uuid", config.UserId.ToString())
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -598,7 +598,7 @@ namespace PubNubMessaging.Tests
                         .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                         .WithParameter("requestid", "myRequestId")
                         .WithParameter("tt", "0")
-                        .WithParameter("uuid", config.Uuid)
+                        .WithParameter("uuid", config.UserId.ToString())
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 

@@ -2038,7 +2038,7 @@ namespace PubnubApi
             {
                 if (pubnubUnitTest.IncludeUuid)
                 {
-                    ret.Add("uuid", UriUtil.EncodeUriComponent(pubnubConfig[pubnubInstanceId].Uuid, PNOperationType.PNSubscribeOperation, false, false, true));
+                    ret.Add("uuid", UriUtil.EncodeUriComponent(pubnubConfig[pubnubInstanceId].UserId.ToString(), PNOperationType.PNSubscribeOperation, false, false, true));
                 }
 
                 if (pubnubUnitTest.IncludePnsdk)
@@ -2049,7 +2049,7 @@ namespace PubnubApi
             else
             {
                 ret.Add("uuid", UriUtil.EncodeUriComponent(uuid != null ? uuid : 
-                                        (pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].Uuid : ""), 
+                                        (pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].UserId.ToString() : ""), 
                                         PNOperationType.PNSubscribeOperation, false, false, true));
                 ret.Add("pnsdk", UriUtil.EncodeUriComponent(Pubnub.Version, PNOperationType.PNSubscribeOperation, false, false, true));
             }

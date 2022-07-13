@@ -111,7 +111,7 @@ namespace PubnubApi.EndPoint
             string internalUuid;
             if (string.IsNullOrEmpty(uuid) || uuid.Trim().Length == 0)
             {
-                internalUuid = config.Uuid;
+                internalUuid = config.UserId.ToString();
             }
             else {
                 internalUuid = uuid;
@@ -155,7 +155,7 @@ namespace PubnubApi.EndPoint
             string internalUuid;
             if (string.IsNullOrEmpty(uuid) || uuid.Trim().Length == 0)
             {
-                internalUuid = config.Uuid;
+                internalUuid = config.UserId.ToString();
             }
             else
             {
