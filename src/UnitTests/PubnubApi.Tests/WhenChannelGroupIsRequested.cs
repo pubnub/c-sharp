@@ -42,7 +42,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -97,7 +97,7 @@ namespace PubNubMessaging.Tests
             currentUnitTestCase = "ThenAddChannelShouldReturnSuccess";
             receivedChannelGroupMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -152,7 +152,7 @@ namespace PubNubMessaging.Tests
             currentUnitTestCase = "ThenAddChannelShouldReturnSuccess";
             receivedChannelGroupMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -215,7 +215,7 @@ namespace PubNubMessaging.Tests
             string channelName = "hello_my_channel";
             receivedChannelGroupMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -272,7 +272,7 @@ namespace PubNubMessaging.Tests
             string channelName = "hello_my_channel";
             receivedChannelGroupMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -338,7 +338,7 @@ namespace PubNubMessaging.Tests
 
             receivedChannelGroupMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -393,7 +393,7 @@ namespace PubNubMessaging.Tests
 
             receivedChannelGroupMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -459,7 +459,7 @@ namespace PubNubMessaging.Tests
 
             receivedChannelGroupMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -517,7 +517,7 @@ namespace PubNubMessaging.Tests
 
             receivedChannelGroupMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,

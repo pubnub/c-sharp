@@ -56,7 +56,7 @@ namespace PubnubApi
 
         protected Pubnub PubnubInstance { get; set; }
 
-        protected bool UuidChanged { get; set; }
+        protected static ConcurrentDictionary<string, bool> UserIdChanged { get; set; } = new ConcurrentDictionary<string, bool>();
 
         protected static ConcurrentDictionary<string, UserId> CurrentUserId { get; set; } = new ConcurrentDictionary<string, UserId>();
 

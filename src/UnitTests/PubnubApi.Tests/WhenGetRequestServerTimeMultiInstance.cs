@@ -38,13 +38,13 @@ namespace PubNubMessaging.Tests
             server.ClearRequests();
             bool timeReceived1 = false;
 
-            PNConfiguration config1 = new PNConfiguration("mytestuuid1")
+            PNConfiguration config1 = new PNConfiguration(new UserId("mytestuuid1"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Secure = false
             };
-            PNConfiguration config2 = new PNConfiguration("mytestuuid2")
+            PNConfiguration config2 = new PNConfiguration(new UserId("mytestuuid2"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -131,7 +131,7 @@ namespace PubNubMessaging.Tests
             server.ClearRequests();
             bool timeReceived1 = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -186,7 +186,7 @@ namespace PubNubMessaging.Tests
 
             bool timeReceived1 = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -253,7 +253,7 @@ namespace PubNubMessaging.Tests
 
             bool timeReceived1 = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,

@@ -42,7 +42,7 @@ namespace PubNubMessaging.Tests
             
             string[] channelsGrant = { "hello_my_channel", "hello_my_channel1", "hello_my_channel2" };
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -160,7 +160,7 @@ namespace PubNubMessaging.Tests
             bool receivedErrorMessage = false;
             CustomClass publishedMessage = new CustomClass();
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -380,7 +380,7 @@ namespace PubNubMessaging.Tests
 
             bool receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -463,7 +463,7 @@ namespace PubNubMessaging.Tests
 
             bool receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -574,7 +574,7 @@ namespace PubNubMessaging.Tests
 
             bool receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -690,7 +690,7 @@ namespace PubNubMessaging.Tests
             bool receivedErrorMessage = false;
             int numberOfReceivedMessages = 0;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,

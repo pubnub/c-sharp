@@ -89,9 +89,10 @@ namespace PubNubMessaging.Tests
             };
             Pubnub pubnub = new Pubnub(config);
             Thread.Sleep(1000);
-            pubnub.ChangeUUID("newuuid");
-            mre.WaitOne(1000);
-            Assert.AreEqual(pubnub.GetCurrentUserId().ToString(), "newuuid");
+            //pubnub.ChangeUUID("newuuid");
+            pubnub.ChangeUserId(new UserId("newuuid"));
+            mre.WaitOne(5000);
+            Assert.AreEqual("newuuid", pubnub.GetCurrentUserId().ToString());
         }
 
         [Test]
@@ -109,7 +110,7 @@ namespace PubNubMessaging.Tests
             Thread.Sleep(1000);
             pubnub.ChangeUserId(new UserId("newuserid"));
             mre.WaitOne(1000);
-            Assert.AreEqual(pubnub.GetCurrentUserId().ToString(), "newuserid");
+            Assert.AreEqual("newuserid", pubnub.GetCurrentUserId().ToString());
         }
     }
 }

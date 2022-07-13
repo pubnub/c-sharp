@@ -50,7 +50,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -126,7 +126,7 @@ namespace PubNubMessaging.Tests
             publishTimetoken = 0;
             currentTestCase = "ThenPublishMpnsToastShouldReturnSuccess";
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -190,7 +190,7 @@ namespace PubNubMessaging.Tests
             publishTimetoken = 0;
             currentTestCase = "ThenPublishMpnsFlipTileShouldReturnSuccess";
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -259,7 +259,7 @@ namespace PubNubMessaging.Tests
             publishTimetoken = 0;
             currentTestCase = "ThenPublishMpnsCycleTileShouldReturnSuccess";
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -328,7 +328,7 @@ namespace PubNubMessaging.Tests
             publishTimetoken = 0;
             currentTestCase = "ThenPublishMpnsIconicTileShouldReturnSuccess";
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -403,7 +403,7 @@ namespace PubNubMessaging.Tests
                 return;
             }
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Secure = false
@@ -461,7 +461,7 @@ namespace PubNubMessaging.Tests
                 return;
             }
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Secure = false
@@ -516,7 +516,7 @@ namespace PubNubMessaging.Tests
                 return;
             }
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Secure = false
@@ -580,7 +580,7 @@ namespace PubNubMessaging.Tests
                 return;
             }
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Secure = false
@@ -646,7 +646,7 @@ namespace PubNubMessaging.Tests
                 return;
             }
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Secure = false
@@ -710,7 +710,7 @@ namespace PubNubMessaging.Tests
                 return;
             }
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Secure = false
@@ -776,7 +776,7 @@ namespace PubNubMessaging.Tests
                 return;
             }
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Secure = false
@@ -839,7 +839,7 @@ namespace PubNubMessaging.Tests
                 return;
             }
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Secure = false
@@ -899,7 +899,7 @@ namespace PubNubMessaging.Tests
                 return;
             }
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Secure = false
@@ -962,7 +962,7 @@ namespace PubNubMessaging.Tests
                 return;
             }
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Secure = false

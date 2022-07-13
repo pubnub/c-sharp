@@ -641,10 +641,10 @@ namespace PubnubApi.EndPoint
                 long maximumTimetoken = Math.Max(maximumTimetoken1, maximumTimetoken2);
 
 
-                if (minimumTimetoken == 0 || reconnect || UuidChanged)
+                if (minimumTimetoken == 0 || reconnect || UserIdChanged[PubnubInstance.InstanceId])
                 {
                     lastTimetoken = 0;
-                    UuidChanged = false;
+                    UserIdChanged.AddOrUpdate(PubnubInstance.InstanceId, false, (k, o) => false);
                 }
                 else
                 {

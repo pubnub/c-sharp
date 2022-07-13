@@ -425,7 +425,7 @@ namespace PubnubApi
             }
             EndPoint.OtherOperation endPoint = new EndPoint.OtherOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
             endPoint.CurrentPubnubInstance(this);
-            endPoint.ChangeUUID(newUUID);
+            endPoint.ChangeUserId(new UserId(newUUID));
         }
 
         public void ChangeUserId(UserId newUserId)
@@ -898,22 +898,13 @@ namespace PubnubApi
             }
             if (config != null)
             {
-                if ((string.IsNullOrEmpty(config.Uuid) || string.IsNullOrEmpty(config.Uuid.Trim())) &&
-                (config.UserId == null || string.IsNullOrEmpty(config.UserId.ToString())))
+                if (config.UserId == null || string.IsNullOrEmpty(config.UserId.ToString()))
                 {
                     if (pubnubLog != null)
                     {
                         LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, PNConfiguration.Uuid or PNConfiguration.UserId is required to use the SDK.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
                     }
-                    throw new MissingMemberException("PNConfiguration.Uuid or PNConfiguration.UserId is required to use the SDK");
-                }
-                else if (!string.IsNullOrEmpty(config.Uuid) && config.UserId != null && config.UserId.ToString() != config.Uuid)
-                {
-                    if (pubnubLog != null)
-                    {
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, Either PNConfiguration.Uuid or PNConfiguration.UserId is required, but not both.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
-                    }
-                    throw new MissingMemberException("PNConfiguration.Uuid or PNConfiguration.UserId is required, but not both");
+                    throw new MissingMemberException("PNConfiguration.UserId is required to use the SDK");
                 }
             }
 

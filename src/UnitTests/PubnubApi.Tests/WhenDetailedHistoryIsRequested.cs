@@ -33,7 +33,7 @@ namespace PubNubMessaging.Tests
             bool receivedGrantMessage = false;
             string channel = "hello_my_channel";
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -113,7 +113,7 @@ namespace PubNubMessaging.Tests
             bool receivedMessage = true;
             long publishTimetoken = 0;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -220,7 +220,7 @@ namespace PubNubMessaging.Tests
             bool receivedMessage = false;
             long publishTimetoken = 0;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -334,7 +334,7 @@ namespace PubNubMessaging.Tests
 
             bool receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -398,7 +398,7 @@ namespace PubNubMessaging.Tests
 
             bool receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -464,7 +464,7 @@ namespace PubNubMessaging.Tests
             bool receivedMessage = false;
             long publishTimetoken = 0;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -594,7 +594,7 @@ namespace PubNubMessaging.Tests
 
             bool receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = null,
                 SubscribeKey = null,
@@ -715,7 +715,7 @@ namespace PubNubMessaging.Tests
             long midtime = 0;
             long endtime = 0;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -1056,7 +1056,7 @@ namespace PubNubMessaging.Tests
                 Assert.Ignore("Ignored for Server side run");
             }
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,

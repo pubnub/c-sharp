@@ -40,7 +40,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -103,7 +103,7 @@ namespace PubNubMessaging.Tests
             currentUnitTestCase = "ThenChannel1Timetoken1ShouldReturnSuccess";
             receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -170,7 +170,7 @@ namespace PubNubMessaging.Tests
             currentUnitTestCase = "ThenWithAsyncChannel1Timetoken1ShouldReturnSuccess";
             receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -234,7 +234,7 @@ namespace PubNubMessaging.Tests
             currentUnitTestCase = "ThenChannel1Timetoken1ShouldReturnSuccess";
             receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -301,7 +301,7 @@ namespace PubNubMessaging.Tests
             currentUnitTestCase = "ThenWithAsyncChannel2Timetoken2ShouldReturnSuccess";
             receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,

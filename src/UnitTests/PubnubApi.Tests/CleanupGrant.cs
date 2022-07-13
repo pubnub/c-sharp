@@ -28,7 +28,7 @@ namespace PubNubMessaging.Tests
             if (!PubnubCommon.EnableStubTest)
             {
                 receivedAuditMessage = false;
-                PNConfiguration config = new PNConfiguration("mytestuuid")
+                PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
                 {
                     PublishKey = PubnubCommon.PublishKey,
                     SubscribeKey = PubnubCommon.SubscribeKey,
@@ -123,7 +123,7 @@ namespace PubNubMessaging.Tests
             {
                 receivedAuditMessage = false;
 
-                PNConfiguration config = new PNConfiguration("mytestuuid")
+                PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
                 {
                     PublishKey = PubnubCommon.PublishKey,
                     SubscribeKey = PubnubCommon.SubscribeKey,

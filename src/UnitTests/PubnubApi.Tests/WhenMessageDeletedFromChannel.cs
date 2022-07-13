@@ -40,7 +40,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -100,7 +100,7 @@ namespace PubNubMessaging.Tests
             currentTestCase = "ThenDeleteMessageShouldReturnSuccessMessage";
             receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -162,7 +162,7 @@ namespace PubNubMessaging.Tests
             currentTestCase = "ThenWithAsyncDeleteMessageShouldReturnSuccessMessage";
             receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,

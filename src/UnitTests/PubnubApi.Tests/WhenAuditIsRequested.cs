@@ -42,7 +42,7 @@ namespace PubNubMessaging.Tests
             currentUnitTestCase = "ThenSubKeyLevelShouldReturnSuccess";
             receivedAuditMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -95,7 +95,7 @@ namespace PubNubMessaging.Tests
 
             receivedAuditMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -148,7 +148,7 @@ namespace PubNubMessaging.Tests
             string channelgroup = "hello_my_group";
             receivedAuditMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
