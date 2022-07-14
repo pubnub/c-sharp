@@ -415,17 +415,7 @@ namespace PubnubApi
         [Obsolete("ChangeUUID is deprecated, please use ChangeUserId instead.")]
         public void ChangeUUID(string newUUID)
         {
-            if (newUUID != null && string.IsNullOrEmpty(newUUID.Trim()))
-            {
-                if (pubnubLog != null && !pubnubConfig.ContainsKey(InstanceId) && pubnubConfig[InstanceId] == null)
-                {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, UUID cannot be null/empty.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId].LogVerbosity : PNLogVerbosity.NONE);
-                }
-                throw new MissingMemberException("UUID cannot be null/empty");
-            }
-            EndPoint.OtherOperation endPoint = new EndPoint.OtherOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
-            endPoint.CurrentPubnubInstance(this);
-            endPoint.ChangeUserId(new UserId(newUUID));
+            ChangeUserId(new UserId(newUUID));
         }
 
         public void ChangeUserId(UserId newUserId)
@@ -434,7 +424,7 @@ namespace PubnubApi
             {
                 if (pubnubLog != null && pubnubConfig != null)
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, UUID cannot be null/empty.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId].LogVerbosity : PNLogVerbosity.NONE);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, UserId cannot be null/empty.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId].LogVerbosity : PNLogVerbosity.NONE);
                 }
                 throw new MissingMemberException("UserId cannot be null/empty");
             }
@@ -905,6 +895,11 @@ namespace PubnubApi
                         LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, PNConfiguration.Uuid or PNConfiguration.UserId is required to use the SDK.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
                     }
                     throw new MissingMemberException("PNConfiguration.UserId is required to use the SDK");
+                }
+                
+                if (!config.Validate())
+                {
+                    throw new MissingMemberException("Invalid data. Validation failed.");
                 }
             }
 

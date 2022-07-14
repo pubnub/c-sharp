@@ -13,6 +13,11 @@ namespace PubnubApi
         private UserId _userId;
         private bool uuidSetFromConstructor = false;
 
+        internal bool Validate()
+        {
+            uuidSetFromConstructor = false;
+            return true;
+        }
         public string Origin { get; set; }
 
         public int PresenceTimeout
@@ -90,6 +95,7 @@ namespace PubnubApi
 
                 if (value != null && !string.IsNullOrEmpty(value.ToString()))
                 {
+                    uuidSetFromConstructor = false;
                     _userId = value;
                     //_uuid = value.ToString();
                 }
@@ -144,8 +150,9 @@ namespace PubnubApi
             {
                 throw new ArgumentException("Missing or Incorrect uuid value");
             }
+            System.Diagnostics.Debug.WriteLine(String.Format("setting uuid = {0}", uuid));
             uuidSetFromConstructor = true;
-            ConstructorInit(uuid, null);
+            ConstructorInit(new UserId(uuid));
         }
 
         public PNConfiguration(UserId userId)
@@ -155,40 +162,31 @@ namespace PubnubApi
                 throw new ArgumentException("Missing or Incorrect UserId");
             }
             uuidSetFromConstructor = false;
-            ConstructorInit(null, userId);
+            ConstructorInit(userId);
         }
 
-        private void ConstructorInit(string currentUuid, UserId currentUserId) 
+        private void ConstructorInit(UserId currentUserId) 
         {
-            this.Origin = "ps.pndsn.com";
-            this.presenceHeartbeatTimeout = 300;
-            this.NonSubscribeRequestTimeout = 10;
-            this.SubscribeTimeout = 310;
-            this.LogVerbosity = PNLogVerbosity.NONE;
-            this.CipherKey = "";
-            this.PublishKey = "";
-            this.SubscribeKey = "";
-            this.SecretKey = "";
-            this.Secure = true;
-            this.ReconnectionPolicy = PNReconnectionPolicy.NONE;
-            this.HeartbeatNotificationOption = PNHeartbeatNotificationOption.Failures;
-            this.IncludeRequestIdentifier = true;
-            this.IncludeInstanceIdentifier = false;
-            this.DedupOnSubscribe = false;
-            this.MaximumMessagesCacheSize = 100;
-            this.SuppressLeaveEvents = false;
-            this.UseRandomInitializationVector = true;
-            this.FileMessagePublishRetryLimit = 5;
-            if (!string.IsNullOrEmpty(currentUuid))
-            {
-                //_uuid = currentUuid;
-                _userId = new UserId(currentUuid);
-            }
-            else if (currentUserId != null && !string.IsNullOrEmpty(currentUserId.ToString()))
-            {
-                _userId = currentUserId;
-                //_uuid = currentUserId.ToString();
-            }
+            Origin = "ps.pndsn.com";
+            presenceHeartbeatTimeout = 300;
+            NonSubscribeRequestTimeout = 10;
+            SubscribeTimeout = 310;
+            LogVerbosity = PNLogVerbosity.NONE;
+            CipherKey = "";
+            PublishKey = "";
+            SubscribeKey = "";
+            SecretKey = "";
+            Secure = true;
+            ReconnectionPolicy = PNReconnectionPolicy.NONE;
+            HeartbeatNotificationOption = PNHeartbeatNotificationOption.Failures;
+            IncludeRequestIdentifier = true;
+            IncludeInstanceIdentifier = false;
+            DedupOnSubscribe = false;
+            MaximumMessagesCacheSize = 100;
+            SuppressLeaveEvents = false;
+            UseRandomInitializationVector = true;
+            FileMessagePublishRetryLimit = 5;
+            _userId = currentUserId;
         }
         public PNConfiguration SetPresenceTimeoutWithCustomInterval(int timeout, int interval)
         {

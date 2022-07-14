@@ -87,11 +87,11 @@ namespace PubNubMessaging.Tests
                 LogVerbosity = PNLogVerbosity.BODY,
                 ReconnectionPolicy = PNReconnectionPolicy.LINEAR
             };
+            
             Pubnub pubnub = new Pubnub(config);
             Thread.Sleep(1000);
-            //pubnub.ChangeUUID("newuuid");
-            pubnub.ChangeUserId(new UserId("newuuid"));
-            mre.WaitOne(5000);
+            pubnub.ChangeUUID("newuuid");
+            mre.WaitOne(1000);
             Assert.AreEqual("newuuid", pubnub.GetCurrentUserId().ToString());
         }
 
