@@ -26,52 +26,6 @@ namespace PubnubApi.EndPoint
             pubnubTelemetryMgr = telemetryManager;
         }
 
-
-        //[Obsolete("ChangeUUID is deprecated, please use ChangeUserId instead.")]
-        //public void ChangeUUID(string newUUID)
-        //{
-        //    if (string.IsNullOrEmpty(newUUID) || config.UserId.ToString() == newUUID)
-        //    {
-        //        return;
-        //    }
-
-        //    Task.Factory.StartNew(() =>
-        //    {
-        //        try
-        //        {
-        //            UserIdChanged.AddOrUpdate(PubnubInstance.InstanceId, true, (k, o) => true);
-
-        //            CurrentUserId.AddOrUpdate(PubnubInstance.InstanceId, new UserId(newUUID), (k, o) => new UserId(newUUID));
-        //            config.UserId = new UserId(newUUID);
-
-        //            string[] channels = GetCurrentSubscriberChannels();
-        //            string[] channelGroups = GetCurrentSubscriberChannelGroups();
-
-        //            channels = (channels != null) ? channels : new string[] { };
-        //            channelGroups = (channelGroups != null) ? channelGroups : new string[] { };
-
-        //            if (channels.Length > 0 || channelGroups.Length > 0)
-        //            {
-        //                string channelsJsonState = BuildJsonUserState(channels.ToArray(), channelGroups.ToArray(), false);
-        //                IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
-                        
-        //                Uri request = urlBuilder.BuildMultiChannelLeaveRequest("GET", "", channels, channelGroups, channelsJsonState, null);
-
-        //                RequestState<string> requestState = new RequestState<string>();
-        //                requestState.Channels = channels;
-        //                requestState.ChannelGroups = channelGroups;
-        //                requestState.ResponseType = PNOperationType.Leave;
-        //                requestState.Reconnect = false;
-
-        //                UrlProcessRequest(request, requestState, false).ContinueWith(r=> { }, TaskContinuationOptions.ExecuteSynchronously).Wait(); // connectCallback = null
-        //            }
-
-        //            TerminateCurrentSubscriberRequest();
-        //        }
-        //        catch {  /* ignore */ }
-        //    }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
-        //}
-
         public void ChangeUserId(UserId newUserId)
         {
             if (newUserId == null || string.IsNullOrEmpty(newUserId.ToString().Trim()) || config.UserId.ToString() == newUserId.ToString())

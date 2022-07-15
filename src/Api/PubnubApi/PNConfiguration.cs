@@ -9,7 +9,6 @@ namespace PubnubApi
     {
         private int presenceHeartbeatTimeout;
         private int presenceHeartbeatInterval;
-        //private string _uuid = "";
         private UserId _userId;
         private bool uuidSetFromConstructor = false;
 
@@ -70,7 +69,6 @@ namespace PubnubApi
 
                 if (value != null && value.Trim().Length > 0)
                 {
-                    //_uuid = value;
                     _userId = new UserId(value);
                 }
                 else
@@ -97,7 +95,6 @@ namespace PubnubApi
                 {
                     uuidSetFromConstructor = false;
                     _userId = value;
-                    //_uuid = value.ToString();
                 }
                 else
                 {
@@ -150,7 +147,6 @@ namespace PubnubApi
             {
                 throw new ArgumentException("Missing or Incorrect uuid value");
             }
-            System.Diagnostics.Debug.WriteLine(String.Format("setting uuid = {0}", uuid));
             uuidSetFromConstructor = true;
             ConstructorInit(new UserId(uuid));
         }
