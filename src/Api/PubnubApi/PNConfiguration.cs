@@ -12,10 +12,9 @@ namespace PubnubApi
         private UserId _userId;
         private bool uuidSetFromConstructor = false;
 
-        internal bool Validate()
+        internal void ResetUuidSetFromConstructor()
         {
             uuidSetFromConstructor = false;
-            return true;
         }
         public string Origin { get; set; }
 

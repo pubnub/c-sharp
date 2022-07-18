@@ -896,11 +896,8 @@ namespace PubnubApi
                     }
                     throw new MissingMemberException("PNConfiguration.UserId is required to use the SDK");
                 }
-                
-                if (!config.Validate())
-                {
-                    throw new MissingMemberException("Invalid data. Validation failed.");
-                }
+
+                config.ResetUuidSetFromConstructor();
             }
 
         }

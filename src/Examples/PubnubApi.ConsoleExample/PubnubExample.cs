@@ -389,7 +389,7 @@ namespace PubnubApiDemo
                     menuOptionsStringBuilder.AppendLine("Enter 14 TO Set User State by Deleting existing Key-Pair");
                     menuOptionsStringBuilder.AppendLine("Enter 15 TO Get User State");
                     menuOptionsStringBuilder.AppendLine("Enter 16 FOR WhereNow");
-                    menuOptionsStringBuilder.AppendLine(string.Format("Enter 17 TO change UUID. (Current value = {0})", pubnub.GetCurrentUserId().ToString()));
+                    menuOptionsStringBuilder.AppendLine(string.Format("Enter 17 TO change UUID. (Current value = {0})", pubnub.GetCurrentUserId()));
                     menuOptionsStringBuilder.AppendLine("Enter 18 FOR Disconnect");
                     menuOptionsStringBuilder.AppendLine("Enter 19 FOR Reconnect");
                     menuOptionsStringBuilder.AppendLine("Enter 20 FOR UnsubscribeAll");
@@ -1184,7 +1184,7 @@ namespace PubnubApiDemo
                             pubnub.ChangeUUID(newsessionUUID);
                             Console.ForegroundColor = ConsoleColor.Blue;
                             Thread.Sleep(1000);
-                            Console.WriteLine("UUID = {0}", pubnub.GetCurrentUserId().ToString());
+                            Console.WriteLine("UUID = {0}", pubnub.GetCurrentUserId());
                             Console.ResetColor();
                         }
                         catch (Exception ex)
