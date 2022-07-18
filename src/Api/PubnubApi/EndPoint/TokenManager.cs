@@ -5,8 +5,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Collections;
 using System.Reflection;
-#if DEBUG && NET461
-#endif
 using Newtonsoft.Json;
 using PeterO.Cbor;
 using System.Globalization;

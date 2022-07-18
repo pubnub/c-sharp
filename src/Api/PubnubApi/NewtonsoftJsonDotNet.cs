@@ -122,7 +122,7 @@ namespace PubnubApi
                             }
                             jsonTxtreader.Close();
                         }
-#if (NET35 || NET40 || NET45 || NET461)
+#if (NET35 || NET40 || NET45 || NET461 || NET48)
                         strReader.Close();
 #endif
                     }
@@ -190,13 +190,13 @@ namespace PubnubApi
             bool ret = false;
             PNPlatform.Print(config, pubnubLog);
 
-#if (NET35 || NET40 || NET45 || NET461)
+#if (NET35 || NET40 || NET45 || NET461 || NET48)
             if (typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(PNMessageResult<>))
             {
                 ret = true;
             }
             LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, NET35/40 IsGenericTypeForMessage = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ret.ToString()), config.LogVerbosity);
-#elif (NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12 || NETSTANDARD13 || NETSTANDARD14 || NETSTANDARD20 || UAP || NETFX_CORE || WINDOWS_UWP)
+#elif (NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12 || NETSTANDARD13 || NETSTANDARD14 || NETSTANDARD20 || NET60 || UAP || NETFX_CORE || WINDOWS_UWP)
             if (typeof(T).GetTypeInfo().IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(PNMessageResult<>))
             {
                 ret = true;
@@ -216,7 +216,7 @@ namespace PubnubApi
         {
             T ret = default(T);
 
-#if NET35 || NET40 || NET45 || NET461
+#if NET35 || NET40 || NET45 || NET461 || NET48
             Type dataType = typeof(T).GetGenericArguments()[0];
             Type generic = typeof(PNMessageResult<>);
             Type specific = generic.MakeGenericType(dataType);
@@ -289,7 +289,7 @@ namespace PubnubApi
 
                 ret = (T)Convert.ChangeType(message, specific, CultureInfo.InvariantCulture);
             }
-#elif NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12 || NETSTANDARD13 || NETSTANDARD14 || NETSTANDARD20 || UAP || NETFX_CORE || WINDOWS_UWP
+#elif NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12 || NETSTANDARD13 || NETSTANDARD14 || NETSTANDARD20 || NET60 || UAP || NETFX_CORE || WINDOWS_UWP
             Type dataType = typeof(T).GetTypeInfo().GenericTypeArguments[0];
             Type generic = typeof(PNMessageResult<>);
             Type specific = generic.MakeGenericType(dataType);

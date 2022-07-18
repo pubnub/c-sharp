@@ -8,7 +8,7 @@ using System.Net;
 using System.Collections;
 using System.Threading.Tasks;
 using System.Globalization;
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
 using System.Net.Http;
 using System.Net.Http.Headers;
 #endif
@@ -21,12 +21,12 @@ namespace PubnubApi
         private readonly IJsonPluggableLibrary jsonLib;
         private readonly IPubnubLog pubnubLog;
         private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
         private static HttpClient httpClientSubscribe;
         private static HttpClient httpClientNonsubscribe;
 #endif
 
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
         public PubnubHttp(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, HttpClient refHttpClientSubscribe, HttpClient refHttpClientNonsubscribe)
 #else
         public PubnubHttp(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubLog log, EndPoint.TelemetryManager telemetryManager)
@@ -36,7 +36,7 @@ namespace PubnubApi
             jsonLib = jsonPluggableLibrary;
             pubnubLog = log;
             pubnubTelemetryMgr = telemetryManager;
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
             httpClientSubscribe = refHttpClientSubscribe;
             httpClientNonsubscribe = refHttpClientNonsubscribe;
 #endif
@@ -55,7 +55,7 @@ namespace PubnubApi
 
         HttpWebRequest IPubnubHttp.SetTimeout<T>(RequestState<T> pubnubRequestState, HttpWebRequest request)
         {
-#if NET35 || NET40 || NET45 || NET461
+#if NET35 || NET40 || NET45 || NET461 || NET48
             request.Timeout = GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType) * 1000;
 #endif
             return request;
@@ -84,7 +84,7 @@ namespace PubnubApi
             }
             else
             {
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
                 if (pubnubConfig.UseTaskFactoryAsyncInsteadOfHttpClient)
                 {
                     return await SendRequestAndGetJsonResponseTaskFactory(pubnubRequestState, request).ConfigureAwait(false);
@@ -108,7 +108,7 @@ namespace PubnubApi
             }
             else
             {
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
                 if (pubnubConfig.UseTaskFactoryAsyncInsteadOfHttpClient)
                 {
                     return await SendRequestAndGetStreamResponseTaskFactory(pubnubRequestState, request).ConfigureAwait(false);
@@ -133,7 +133,7 @@ namespace PubnubApi
             }
             else
             {
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
                 if (pubnubConfig.UseTaskFactoryAsyncInsteadOfHttpClient)
                 {
                     return await SendRequestAndGetJsonResponseTaskFactoryWithPOST(pubnubRequestState, request, postData, contentType).ConfigureAwait(false);
@@ -157,7 +157,7 @@ namespace PubnubApi
             }
             else
             {
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
                 if (pubnubConfig.UseTaskFactoryAsyncInsteadOfHttpClient)
                 {
                     return await SendRequestAndGetJsonResponseTaskFactoryWithPATCH(pubnubRequestState, request, patchData).ConfigureAwait(false);
@@ -172,7 +172,7 @@ namespace PubnubApi
             }
         }
 
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
         async Task<string> SendRequestAndGetJsonResponseHttpClient<T>(Uri requestUri, RequestState<T> pubnubRequestState, HttpWebRequest request)
         {
             string jsonString = "";
@@ -574,7 +574,7 @@ namespace PubnubApi
 
                     if (pubnubRequestState.Response != null)
                     {
-#if NET35 || NET40 || NET45 || NET461
+#if NET35 || NET40 || NET45 || NET461 || NET48
                         pubnubRequestState.Response.Close();
 #endif
                         pubnubRequestState.Response = null;
@@ -668,7 +668,7 @@ namespace PubnubApi
 
                     if (pubnubRequestState.Response != null)
                     {
-#if NET35 || NET40 || NET45 || NET461
+#if NET35 || NET40 || NET45 || NET461 || NET48
                         pubnubRequestState.Response.Close();
 #endif
                         pubnubRequestState.Response = null;
@@ -750,7 +750,7 @@ namespace PubnubApi
 
                         if (pubnubRequestState.Response != null)
                         {
-#if NET35 || NET40 || NET45 || NET461
+#if NET35 || NET40 || NET45 || NET461 || NET48
                             pubnubRequestState.Response.Close();
 #endif
                             pubnubRequestState.Response = null;
@@ -843,7 +843,7 @@ namespace PubnubApi
 
                     if (pubnubRequestState.Response != null)
                     {
-#if NET35 || NET40 || NET45 || NET461
+#if NET35 || NET40 || NET45 || NET461 || NET48
                         pubnubRequestState.Response.Close();
 #endif
                         pubnubRequestState.Response = null;
@@ -925,7 +925,7 @@ namespace PubnubApi
                             }
                             if (asyncRequestState.Response != null)
                             {
-#if NET35 || NET40 || NET45 || NET461
+#if NET35 || NET40 || NET45 || NET461 || NET48
                                 pubnubRequestState.Response.Close();
 #endif
                                 asyncRequestState.Response = null;
@@ -1012,7 +1012,7 @@ namespace PubnubApi
                             }
                             if (asyncRequestState.Response != null)
                             {
-#if NET35 || NET40 || NET45 || NET461
+#if NET35 || NET40 || NET45 || NET461 || NET48
                                 pubnubRequestState.Response.Close();
 #endif
                                 asyncRequestState.Response = null;
@@ -1071,7 +1071,7 @@ namespace PubnubApi
 
                 System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
                 stopWatch.Start();
-#if !NET35 && !NET40 && !NET45 && !NET461
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48
                 using (var requestStream = await Task<Stream>.Factory.FromAsync(request.BeginGetRequestStream, request.EndGetRequestStream, pubnubRequestState).ConfigureAwait(false))
                 {
                     requestStream.Write(postData, 0, postData.Length);
@@ -1114,7 +1114,7 @@ namespace PubnubApi
                             }
                             if (asyncRequestState.Response != null)
                             {
-#if NET35 || NET40 || NET45 || NET461
+#if NET35 || NET40 || NET45 || NET461 || NET48
                                 pubnubRequestState.Response.Close();
 #endif
                                 asyncRequestState.Response = null;
@@ -1174,7 +1174,7 @@ namespace PubnubApi
 
                 System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
                 stopWatch.Start();
-#if !NET35 && !NET40 && !NET45 && !NET461
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48
                 using (var requestStream = await Task<Stream>.Factory.FromAsync(request.BeginGetRequestStream, request.EndGetRequestStream, pubnubRequestState).ConfigureAwait(false))
                 {
                     requestStream.Write(patchData, 0, patchData.Length);
@@ -1217,7 +1217,7 @@ namespace PubnubApi
                             }
                             if (asyncRequestState.Response != null)
                             {
-#if NET35 || NET40 || NET45 || NET461
+#if NET35 || NET40 || NET45 || NET461 || NET48
                                 pubnubRequestState.Response.Close();
 #endif
                                 asyncRequestState.Response = null;

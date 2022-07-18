@@ -13,7 +13,7 @@ using System.Threading;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
 using System.Net.Http;
 using System.Net.Http.Headers;
 #endif
@@ -44,7 +44,7 @@ namespace PubnubApi
         private static EndPoint.TelemetryManager pubnubTelemetryMgr;
         protected static ConcurrentDictionary<string, EndPoint.TokenManager> PubnubTokenMgrCollection { get; } = new ConcurrentDictionary<string, EndPoint.TokenManager>();
         private static EndPoint.DuplicationManager pubnubSubscribeDuplicationManager { get; set; }
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
         private static HttpClient httpClientSubscribe { get; set; }
         private static HttpClient httpClientNonsubscribe { get; set; }
         private static HttpClient httpClientNetworkStatus { get; set; }
@@ -56,9 +56,9 @@ namespace PubnubApi
 
         protected Pubnub PubnubInstance { get; set; }
 
-        protected bool UuidChanged { get; set; }
+        protected static ConcurrentDictionary<string, bool> UserIdChanged { get; set; } = new ConcurrentDictionary<string, bool>();
 
-        protected string CurrentUuid { get; set; }
+        protected static ConcurrentDictionary<string, UserId> CurrentUserId { get; set; } = new ConcurrentDictionary<string, UserId>();
 
         protected static ConcurrentDictionary<string, long> LastSubscribeTimetoken { get; set; } = new ConcurrentDictionary<string, long>();
         protected static ConcurrentDictionary<string, int> LastSubscribeRegion { get; set; } = new ConcurrentDictionary<string, int>();
@@ -172,9 +172,9 @@ namespace PubnubApi
             pubnubTelemetryMgr = telemetryManager;
             pubnubSubscribeDuplicationManager = new EndPoint.DuplicationManager(pubnubConfiguation, jsonPluggableLibrary, log);
 
-            CurrentUuid = pubnubConfiguation.Uuid;
+            CurrentUserId.AddOrUpdate(instance.InstanceId, pubnubConfiguation.UserId, (k,o) => pubnubConfiguation.UserId);
 
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
             if (httpClientSubscribe == null)
             {
                 if (pubnubConfiguation.Proxy != null)
@@ -297,7 +297,7 @@ namespace PubnubApi
             ClientNetworkStatus.JsonLibrary = jsonLib;
             ClientNetworkStatus.PubnubUnitTest = unitTest;
             ClientNetworkStatus.PubnubLog = currentLog;
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
             if (httpClientNetworkStatus == null)
             {
                 if (currentConfig.Proxy != null && pubnubHttpClientHandler != null)
@@ -1071,7 +1071,7 @@ namespace PubnubApi
                     }
                 }
 
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
                 //do nothing
 #else
                 // Create Request
@@ -1105,7 +1105,7 @@ namespace PubnubApi
                 }
 
                 string jsonString = "";
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
                 if (pubnubRequestState != null && pubnubRequestState.UsePostMethod)
                 {
                     jsonString = await pubnubHttp.SendRequestAndGetJsonResponseWithPOST(requestUri, pubnubRequestState, null, postOrPatchData, contentType).ConfigureAwait(false);
@@ -1248,7 +1248,7 @@ namespace PubnubApi
                     }
                 }
 
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
                 //do nothing
 #else
                 // Create Request
@@ -1282,7 +1282,7 @@ namespace PubnubApi
                 }
 
                 byte[] streamBytes;
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
                 streamBytes = await pubnubHttp.SendRequestAndGetStreamResponse(requestUri, pubnubRequestState, null).ConfigureAwait(false);
 #else
                 streamBytes = await pubnubHttp.SendRequestAndGetStreamResponse(requestUri, pubnubRequestState, request).ConfigureAwait(false);
@@ -2322,7 +2322,7 @@ namespace PubnubApi
         internal static void RemoveHttpClients()
         {
             //Conditionalmethod logic
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
             if (httpClientNetworkStatus != null)
             {
                 try{
@@ -2375,7 +2375,7 @@ namespace PubnubApi
                     catch { /* ignore */ }
                 }
             }
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
             if (httpClientSubscribe != null)
             {
                 try
@@ -2387,7 +2387,7 @@ namespace PubnubApi
 #endif
         }
 
-#endregion
+        #endregion
 
         internal void Announce(PNStatus status)
         {
