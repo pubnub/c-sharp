@@ -354,7 +354,7 @@ namespace PubnubApi.EndPoint
 
             if (string.IsNullOrEmpty(uuid))
             {
-                currentUuid = config.UserId.ToString();
+                currentUuid = config.UserId;
             }            
 
             string jsonUserState = GetJsonSharedSetUserStateInternal(channels, channelGroups, jsonChannelUserState, jsonChannelGroupUserState);
@@ -412,7 +412,7 @@ namespace PubnubApi.EndPoint
 
             if (string.IsNullOrEmpty(uuid))
             {
-                currentUuid = config.UserId.ToString();
+                currentUuid = config.UserId;
             }
 
             string jsonUserState = GetJsonSharedSetUserStateInternal(channels, channelGroups, jsonChannelUserState, jsonChannelGroupUserState);

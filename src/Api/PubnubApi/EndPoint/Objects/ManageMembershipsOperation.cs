@@ -166,7 +166,7 @@ namespace PubnubApi.EndPoint
         {
             if (string.IsNullOrEmpty(uuid))
             {
-                uuid = config.UserId.ToString();
+                uuid = config.UserId;
             }
 
             PNPageObject internalPage;
@@ -246,7 +246,7 @@ namespace PubnubApi.EndPoint
 
             if (string.IsNullOrEmpty(uuid))
             {
-                uuid = config.UserId.ToString();
+                uuid = config.UserId;
             }
 
             if (string.IsNullOrEmpty(config.SubscribeKey) || string.IsNullOrEmpty(config.SubscribeKey.Trim()) || config.SubscribeKey.Length <= 0)

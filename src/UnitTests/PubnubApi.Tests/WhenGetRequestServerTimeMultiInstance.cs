@@ -63,7 +63,7 @@ namespace PubNubMessaging.Tests
                     .WithPath("/time/0")
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId1")
-                    .WithParameter("uuid", config1.UserId.ToString())
+                    .WithParameter("uuid", config1.UserId)
                     .WithParameter("instanceid", pubnub1.InstanceId)
                     .WithResponse(expected1)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
@@ -73,7 +73,7 @@ namespace PubNubMessaging.Tests
                     .WithPath("/time/0")
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId2")
-                    .WithParameter("uuid", config2.UserId.ToString())
+                    .WithParameter("uuid", config2.UserId)
                     .WithParameter("instanceid", pubnub2.InstanceId)
                     .WithResponse(expected2)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
@@ -147,7 +147,7 @@ namespace PubNubMessaging.Tests
                     .WithPath("/time/0")
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
-                    .WithParameter("uuid", config.UserId.ToString())
+                    .WithParameter("uuid", config.UserId)
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -205,7 +205,7 @@ namespace PubNubMessaging.Tests
                     .WithPath("/time/0")
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
-                    .WithParameter("uuid", config.UserId.ToString())
+                    .WithParameter("uuid", config.UserId)
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -270,7 +270,7 @@ namespace PubNubMessaging.Tests
                     .WithPath("/time/0")
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
-                    .WithParameter("uuid", config.UserId.ToString())
+                    .WithParameter("uuid", config.UserId)
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 

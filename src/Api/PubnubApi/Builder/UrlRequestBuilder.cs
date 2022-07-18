@@ -2038,7 +2038,7 @@ namespace PubnubApi
             {
                 if (pubnubUnitTest.IncludeUuid)
                 {
-                    ret.Add("uuid", UriUtil.EncodeUriComponent(pubnubConfig[pubnubInstanceId].UserId.ToString(), PNOperationType.PNSubscribeOperation, false, false, true));
+                    ret.Add("uuid", UriUtil.EncodeUriComponent(pubnubConfig[pubnubInstanceId].UserId, PNOperationType.PNSubscribeOperation, false, false, true));
                 }
 
                 if (pubnubUnitTest.IncludePnsdk)

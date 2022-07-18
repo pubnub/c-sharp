@@ -152,7 +152,7 @@ namespace PubnubApi.EndPoint
         {
             if (string.IsNullOrEmpty(uuid))
             {
-                uuid = config.UserId.ToString();
+                uuid = config.UserId;
             }
 
             RequestState<PNSetUuidMetadataResult> requestState = new RequestState<PNSetUuidMetadataResult>();
@@ -205,7 +205,7 @@ namespace PubnubApi.EndPoint
         {
             if (string.IsNullOrEmpty(uuid))
             {
-                uuid = config.UserId.ToString();
+                uuid = config.UserId;
             }
             PNResult<PNSetUuidMetadataResult> ret = new PNResult<PNSetUuidMetadataResult>();
 
