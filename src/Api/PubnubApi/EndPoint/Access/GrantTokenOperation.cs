@@ -36,6 +36,7 @@ namespace PubnubApi.EndPoint
         private Dictionary<string, object> queryParam;
         private Dictionary<string, object> grantMeta;
         private string pubnubAuthorizedUuid = string.Empty;
+        private string pubnubAuthorizedUserId = string.Empty;
 
         public GrantTokenOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
         {
@@ -51,7 +52,21 @@ namespace PubnubApi.EndPoint
 
         public GrantTokenOperation AuthorizedUuid(string uuid)
         {
-            this.pubnubAuthorizedUuid = uuid;
+            if (!string.IsNullOrEmpty(pubnubAuthorizedUserId))
+            {
+                throw new ArgumentException("Either UUID or UserId can be used. Not both.");
+            }
+            pubnubAuthorizedUuid = uuid;
+            return this;
+        }
+
+        public GrantTokenOperation AuthorizedUser(UserId user)
+        {
+            if (!string.IsNullOrEmpty(pubnubAuthorizedUuid))
+            {
+                throw new ArgumentException("Either UUID or UserId can be used. Not both.");
+            }
+            pubnubAuthorizedUserId = user;
             return this;
         }
 

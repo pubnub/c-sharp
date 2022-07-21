@@ -1065,6 +1065,53 @@ namespace PubNubMessaging.Tests
 
         }
 
+        [Test]
+        public static void ThenSetAuthorizedUserFailsWhenAuthorizedUuidIsUsed()
+        {
+            server.ClearRequests();
+
+            PNConfiguration config = new PNConfiguration(new UserId("newuserid"))
+            {
+                SubscribeKey = "somesubkey",
+                PublishKey = "somepubkey",
+                SecretKey = "someseckey",
+                Secure = false
+            };
+            pubnub = createPubNubInstance(config);
+            server.RunOnHttps(config.Secure);
+
+            Assert.Throws<ArgumentException>(() =>
+            {
+                PNResult<PNAccessManagerTokenResult> grantResult = pubnub.GrantToken()
+                .AuthorizedUuid("someuuid")
+                .AuthorizedUser(new UserId("someuser"))
+                .ExecuteAsync().Result;
+            });
+        }
+
+        [Test]
+        public static void ThenSetAuthorizedUuidFailsWhenAuthorizedUserIsUsed()
+        {
+            server.ClearRequests();
+
+            PNConfiguration config = new PNConfiguration(new UserId("newuserid"))
+            {
+                SubscribeKey = "somesubkey",
+                PublishKey = "somepubkey",
+                SecretKey = "someseckey",
+                Secure = false
+            };
+            pubnub = createPubNubInstance(config);
+            server.RunOnHttps(config.Secure);
+
+            Assert.Throws<ArgumentException>(() =>
+            {
+                PNResult<PNAccessManagerTokenResult> grantResult = pubnub.GrantToken()
+                .AuthorizedUser(new UserId("someuser"))
+                .AuthorizedUuid("someuuid")
+                .ExecuteAsync().Result;
+            });
+        }
 
         public static byte[] HexStringToByteArray(string hex)
         {
