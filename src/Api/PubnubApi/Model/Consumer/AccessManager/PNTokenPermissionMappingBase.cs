@@ -16,6 +16,8 @@ namespace PubnubApi
     public class PNTokenPermissionMappingBase
     {
         public Dictionary<string, PNTokenAuthValues> Channels { get; set; }
+
+        [Obsolete]
         public Dictionary<string, PNTokenAuthValues> ChannelGroups { get; set; }
         public Dictionary<string, PNTokenAuthValues> Uuids { get; set; }
         public Dictionary<string, PNTokenAuthValues> Users { get; set; }

@@ -1113,6 +1113,69 @@ namespace PubNubMessaging.Tests
             });
         }
 
+        [Test]
+        public static void ThenSetChannelPermsFailsWhenSpacePermsIsUsed()
+        {
+            server.ClearRequests();
+
+            PNConfiguration config = new PNConfiguration(new UserId("newuserid"))
+            {
+                SubscribeKey = "somesubkey",
+                PublishKey = "somepubkey",
+                SecretKey = "someseckey",
+                Secure = false
+            };
+            pubnub = createPubNubInstance(config);
+            server.RunOnHttps(config.Secure);
+
+            Assert.Throws<ArgumentException>(() =>
+            {
+                PNResult<PNAccessManagerTokenResult> grantResult = 
+                pubnub.GrantToken()
+                .TTL(5)
+                .Resources(new PNTokenResources() { 
+                            Spaces = new Dictionary<string, PNTokenAuthValues>() { 
+                                { "sp1", new PNTokenAuthValues() { Read = true } } 
+                            },
+                            Channels = new Dictionary<string, PNTokenAuthValues>() {
+                                { "ch1", new PNTokenAuthValues() { Read = true } }
+                            }
+                }).ExecuteAsync().Result;
+            });
+        }
+
+        [Test]
+        public static void ThenSetSpacePermsFailsWhenChannelPermsIsUsed()
+        {
+            server.ClearRequests();
+
+            PNConfiguration config = new PNConfiguration(new UserId("newuserid"))
+            {
+                SubscribeKey = "somesubkey",
+                PublishKey = "somepubkey",
+                SecretKey = "someseckey",
+                Secure = false
+            };
+            pubnub = createPubNubInstance(config);
+            server.RunOnHttps(config.Secure);
+
+            Assert.Throws<ArgumentException>(() =>
+            {
+                PNResult<PNAccessManagerTokenResult> grantResult =
+                pubnub.GrantToken()
+                .TTL(5)
+                .Resources(new PNTokenResources()
+                {
+                    Channels = new Dictionary<string, PNTokenAuthValues>() {
+                                { "ch1", new PNTokenAuthValues() { Read = true } }
+                            },
+                    Spaces = new Dictionary<string, PNTokenAuthValues>() {
+                                { "sp1", new PNTokenAuthValues() { Read = true } }
+                            }
+                }).ExecuteAsync().Result;
+            });
+        }
+
         public static byte[] HexStringToByteArray(string hex)
         {
             return Enumerable.Range(0, hex.Length)
