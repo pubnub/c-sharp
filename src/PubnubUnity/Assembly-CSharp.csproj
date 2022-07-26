@@ -285,9 +285,6 @@
     <Reference Include="UnityEditor.UnityConnectModule">
       <HintPath>C:\Program Files\Unity\Hub\Editor\2020.3.25f1\Editor\Data\Managed\UnityEngine\UnityEditor.UnityConnectModule.dll</HintPath>
     </Reference>
-    <Reference Include="BouncyCastle.Crypto">
-      <HintPath>Assets\Plugins\BouncyCastle.Crypto.dll</HintPath>
-    </Reference>
     <Reference Include="PubnubApiUnity">
       <HintPath>Assets\netstandard2.0\PubnubApiUnity.dll</HintPath>
     </Reference>

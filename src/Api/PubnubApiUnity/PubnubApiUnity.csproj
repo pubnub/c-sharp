@@ -40,11 +40,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Remove="CBOR\**" />
-    <None Remove="CBOR\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Include="..\PubnubApi\Builder\ResponseBuilder.cs" Link="Builder\ResponseBuilder.cs" />
     <Compile Include="..\PubnubApi\Builder\StatusBuilder.cs" Link="Builder\StatusBuilder.cs" />
     <Compile Include="..\PubnubApi\Builder\UriUtil.cs" Link="Builder\UriUtil.cs" />

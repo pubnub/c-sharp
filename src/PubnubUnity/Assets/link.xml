@@ -1,6 +1,7 @@
 <linker>
   <assembly fullname="PubnubApiUnity" preserve="all"/>
   <assembly fullname="Newtonsoft.Json" preserve="all"/>
+  <assembly fullname="PeterO.Cbor" preserve="all"/>
   <assembly fullname="System.Core">
     <type fullname="System.Linq.Expressions.Interpreter.LightLambda" preserve="all" />
   </assembly>
