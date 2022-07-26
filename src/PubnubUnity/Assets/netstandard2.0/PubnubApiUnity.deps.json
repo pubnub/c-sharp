@@ -11,7 +11,7 @@
         "dependencies": {
           "NETStandard.Library": "2.0.3",
           "Newtonsoft.Json": "12.0.2",
-          "Portable.BouncyCastle": "1.8.1.2"
+          "PeterO.Cbor": "4.5.2"
         },
         "runtime": {
           "PubnubApiUnity.dll": {}
@@ -31,14 +31,31 @@
           }
         }
       },
-      "Portable.BouncyCastle/1.8.1.2": {
+      "PeterO.Cbor/4.5.2": {
         "dependencies": {
-          "NETStandard.Library": "2.0.3"
+          "PeterO.Numbers": "1.8.2",
+          "PeterO.URIUtility": "1.0.0"
         },
         "runtime": {
-          "lib/netstandard1.3/BouncyCastle.Crypto.dll": {
-            "assemblyVersion": "1.8.1.0",
-            "fileVersion": "1.8.1.0"
+          "lib/netstandard1.0/CBOR.dll": {
+            "assemblyVersion": "4.5.2.0",
+            "fileVersion": "4.5.2.0"
+          }
+        }
+      },
+      "PeterO.Numbers/1.8.2": {
+        "runtime": {
+          "lib/netstandard1.0/Numbers.dll": {
+            "assemblyVersion": "1.8.2.0",
+            "fileVersion": "1.8.2.0"
+          }
+        }
+      },
+      "PeterO.URIUtility/1.0.0": {
+        "runtime": {
+          "lib/netstandard1.0/URIUtility.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
           }
         }
       }
@@ -71,12 +88,26 @@
       "path": "newtonsoft.json/12.0.2",
       "hashPath": "newtonsoft.json.12.0.2.nupkg.sha512"
     },
-    "Portable.BouncyCastle/1.8.1.2": {
+    "PeterO.Cbor/4.5.2": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-G0pWrYwtjjiyka+twqqphegc4ddDWskvf2uWu2YiAUNdaAz0UYa/eXBlt+xjafby5Opa6J1ySw5MPezwiGi9aQ==",
-      "path": "portable.bouncycastle/1.8.1.2",
-      "hashPath": "portable.bouncycastle.1.8.1.2.nupkg.sha512"
+      "sha512": "sha512-/yiIEuawE2v/DtR8oKit5YgpOSLiWCVo7K0SkHrKVzTqh79nkEa7BgmCZ7siWQkWpO5XY9T0+lVcuuOTuT19ag==",
+      "path": "petero.cbor/4.5.2",
+      "hashPath": "petero.cbor.4.5.2.nupkg.sha512"
+    },
+    "PeterO.Numbers/1.8.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-d+A5KLoWbwOTpvubPaGXLgCzANE00jXmsT+yneHwLe2OlobBBFLaIHyoDwmekuHM17z9hU++RF6mL+zZ2x69nA==",
+      "path": "petero.numbers/1.8.2",
+      "hashPath": "petero.numbers.1.8.2.nupkg.sha512"
+    },
+    "PeterO.URIUtility/1.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-fpRTBsYACMp7NvTECauYRomubWTC3vUNw4hMXdIedP8ctBGK6tea9HOJwE+qVzis6MZYkL3LIs8qeY3rc6Jdlw==",
+      "path": "petero.uriutility/1.0.0",
+      "hashPath": "petero.uriutility.1.0.0.nupkg.sha512"
     }
   }
 }
