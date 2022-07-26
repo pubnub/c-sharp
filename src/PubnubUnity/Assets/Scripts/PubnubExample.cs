@@ -74,7 +74,7 @@ public class PubnubExample : MonoBehaviour
             {
                 DisplayText(pubnub.JsonPluggableLibrary.SerializeToJsonString(signal));
             },
-            delegate (Pubnub pnObj, PNObjectApiEventResult objectApiEventObj)
+            delegate (Pubnub pnObj, PNObjectEventResult objectApiEventObj)
             {
                 DisplayText(pubnub.JsonPluggableLibrary.SerializeToJsonString(objectApiEventObj));
             },
@@ -293,10 +293,10 @@ public class PubnubExample : MonoBehaviour
             DisplayText("To create User, ensure UserId is NOT empty");
             return;
         }
-        pubnub.CreateUser()
-            .Id(UserId.text)
+        pubnub.SetUuidMetadata()
+            .Uuid(UserId.text)
             .Name(UserName.text)
-            .Execute(new PNCreateUserResultExt((result, status) => 
+            .Execute(new PNSetUuidMetadataResultExt((result, status) => 
             {
                 if (result != null)
                 {
@@ -314,10 +314,10 @@ public class PubnubExample : MonoBehaviour
 
     public void handleUpdateUserButtonClick()
     {
-        pubnub.UpdateUser()
-            .Id(UserId.text)
+        pubnub.SetUuidMetadata()
+            .Uuid(UserId.text)
             .Name(UserName.text)
-            .Execute(new PNUpdateUserResultExt((result, status) =>
+            .Execute(new PNSetUuidMetadataResultExt((result, status) =>
             {
                 if (result != null)
                 {
@@ -335,9 +335,9 @@ public class PubnubExample : MonoBehaviour
 
     public void handleDeleteUserButtonClick()
     {
-        pubnub.DeleteUser()
-            .Id(UserId.text)
-            .Execute(new PNDeleteUserResultExt((result, status) =>
+        pubnub.RemoveUuidMetadata()
+            .Uuid(UserId.text)
+            .Execute(new PNRemoveUuidMetadataResultExt((result, status) =>
             {
                 if (result != null)
                 {
@@ -355,9 +355,9 @@ public class PubnubExample : MonoBehaviour
 
     public void handleGetUserButtonClick()
     {
-        pubnub.GetUser()
-            .UserId(UserId.text)
-            .Execute(new PNGetUserResultExt((result, status) =>
+        pubnub.GetUuidMetadata()
+            .Uuid(UserId.text)
+            .Execute(new PNGetUuidMetadataResultExt((result, status) =>
             {
                 if (result != null)
                 {
@@ -380,10 +380,10 @@ public class PubnubExample : MonoBehaviour
             DisplayText("To create Space, ensure SpaceId is NOT empty");
             return;
         }
-        pubnub.CreateSpace()
-            .Id(SpaceId.text)
+        pubnub.SetChannelMetadata()
+            .Channel(SpaceId.text)
             .Name(SpaceName.text)
-            .Execute(new PNCreateSpaceResultExt((result, status) =>
+            .Execute(new PNSetChannelMetadataResultExt((result, status) =>
             {
                 if (result != null)
                 {
@@ -401,10 +401,10 @@ public class PubnubExample : MonoBehaviour
 
     public void handleUpdateSpaceButtonClick()
     {
-        pubnub.UpdateSpace()
-            .Id(SpaceId.text)
+        pubnub.SetChannelMetadata()
+            .Channel(SpaceId.text)
             .Name(SpaceName.text)
-            .Execute(new PNUpdateSpaceResultExt((result, status) =>
+            .Execute(new PNSetChannelMetadataResultExt((result, status) =>
             {
                 if (result != null)
                 {
@@ -422,9 +422,9 @@ public class PubnubExample : MonoBehaviour
 
     public void handleDeleteSpaceButtonClick()
     {
-        pubnub.DeleteSpace()
-            .Id(SpaceId.text)
-            .Execute(new PNDeleteSpaceResultExt((result, status) =>
+        pubnub.RemoveChannelMetadata()
+            .Channel(SpaceId.text)
+            .Execute(new PNRemoveChannelMetadataResultExt((result, status) =>
             {
                 if (result != null)
                 {
@@ -442,9 +442,9 @@ public class PubnubExample : MonoBehaviour
 
     public void handleGetSpaceButtonClick()
     {
-        pubnub.GetSpace()
-            .SpaceId(SpaceId.text)
-            .Execute(new PNGetSpaceResultExt((result, status) =>
+        pubnub.GetChannelMetadata()
+            .Channel(SpaceId.text)
+            .Execute(new PNGetChannelMetadataResultExt((result, status) =>
             {
                 if (result != null)
                 {
