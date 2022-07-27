@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -2133,17 +2133,14 @@ namespace PubnubApiDemo
                             }));
                         break;
                     case "65":
-                        Console.WriteLine("Enter Channel Name for PAM GrantToken.");
-                        string grantChannelName = Console.ReadLine();
+                        Console.WriteLine("Enter Space Name for PAM GrantToken.");
+                        string grantSpaceName = Console.ReadLine();
 
-                        Console.WriteLine("Enter ChannelGroup Name for PAM GrantToken.");
-                        string grantChannelGroupName = Console.ReadLine();
+                        Console.WriteLine("Enter UserId for PAM GrantToken.");
+                        string grantUserIdEntry = Console.ReadLine();
 
-                        Console.WriteLine("Enter UUID for PAM GrantToken.");
-                        string grantUuiIdEntry = Console.ReadLine();
-
-                        Console.WriteLine("Enter Authorized UUID for PAM GrantToken.");
-                        string grantAuthorizedUuiIdEntry = Console.ReadLine();
+                        Console.WriteLine("Enter Authorized User for PAM GrantToken.");
+                        string grantAuthorizedUserIdEntry = Console.ReadLine();
 
                         Console.WriteLine("Read Access? Enter Y for Yes (default), N for No.");
                         string grantReadAccess = Console.ReadLine();
@@ -2192,10 +2189,9 @@ namespace PubnubApiDemo
 
                         Console.ForegroundColor = ConsoleColor.Blue;
                         StringBuilder pamTokenGrantStringBuilder = new StringBuilder();
-                        pamTokenGrantStringBuilder.AppendLine(string.Format("Channel = {0}", grantChannelName));
-                        pamTokenGrantStringBuilder.AppendLine(string.Format("ChannelGroup = {0}", grantChannelGroupName));
-                        pamTokenGrantStringBuilder.AppendLine(string.Format("UUID = {0}", grantUuiIdEntry));
-                        pamTokenGrantStringBuilder.AppendLine(string.Format("AuthorizedUUID = {0}", grantAuthorizedUuiIdEntry));
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("Space = {0}", grantSpaceName));
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("User = {0}", grantUserIdEntry));
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("AuthorizedUserId = {0}", grantAuthorizedUserIdEntry));
                         pamTokenGrantStringBuilder.AppendLine(string.Format("Read Access = {0}", grantRead.ToString()));
                         pamTokenGrantStringBuilder.AppendLine(string.Format("Write Access = {0}", grantWrite.ToString()));
                         pamTokenGrantStringBuilder.AppendLine(string.Format("Delete Access = {0}", grantDelete.ToString()));
@@ -2213,15 +2209,13 @@ namespace PubnubApiDemo
                         pubnub.GrantToken()
                             .TTL(grantTokenTTL)
                             .Meta(new Dictionary<string, object>() { { "score", 100 }, { "color", "red" }, { "author", "pandu" } })
-                            .AuthorizedUuid(grantAuthorizedUuiIdEntry)
+                            .AuthorizedUserId(grantAuthorizedUserIdEntry)
                             .Resources(new PNTokenResources()
                             {
-                                Channels = !string.IsNullOrEmpty(grantChannelName) ? new Dictionary<string, PNTokenAuthValues>() {
-                                                    { grantChannelName, new PNTokenAuthValues() { Read = grantRead, Write = grantWrite, Manage= grantManage, Create = grantCreate, Delete=grantDelete, Get = grantGet, Update = grantUpdate, Join = grantJoin } } } : null,
-                                ChannelGroups = !string.IsNullOrEmpty(grantChannelGroupName) ? new Dictionary<string, PNTokenAuthValues>() {
-                                                    {grantChannelGroupName, new PNTokenAuthValues() { Read = grantRead, Write = grantWrite, Manage= grantManage, Create = grantCreate, Delete=grantDelete, Get = grantGet, Update = grantUpdate, Join = grantJoin } } } : null,
-                                Uuids = !string.IsNullOrEmpty(grantUuiIdEntry) ? new Dictionary<string, PNTokenAuthValues>() {
-                                                    { grantUuiIdEntry, new PNTokenAuthValues() { Read = grantRead, Write = grantWrite, Manage= grantManage, Create = grantCreate, Delete=grantDelete, Get = grantGet, Update = grantUpdate, Join = grantJoin } } } : null,
+                                Spaces = new Dictionary<string, PNTokenAuthValues>() {
+                                                    { grantSpaceName, new PNTokenAuthValues() { Read = grantRead, Write = grantWrite, Manage= grantManage, Create = grantCreate, Delete=grantDelete, Get = grantGet, Update = grantUpdate, Join = grantJoin } } },
+                                Users = new Dictionary<string, PNTokenAuthValues>() {
+                                                    { grantUserIdEntry, new PNTokenAuthValues() { Read = grantRead, Write = grantWrite, Manage= grantManage, Create = grantCreate, Delete=grantDelete, Get = grantGet, Update = grantUpdate, Join = grantJoin } } },
                             })
                             .Execute(new PNAccessManagerTokenResultExt((result, status) =>
                             {
