@@ -54,7 +54,7 @@ public class PubnubExample : MonoBehaviour
             outputMsgQueue.Enqueue("..");
         }
 
-        PNConfiguration config = new PNConfiguration();
+        PNConfiguration config = new PNConfiguration(new UserId("unity-demo-user"));
         config.SubscribeKey = "demo-36";
         config.PublishKey = "demo-36";
         config.SecretKey = "demo-36";

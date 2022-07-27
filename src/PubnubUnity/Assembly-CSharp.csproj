@@ -285,6 +285,15 @@
     <Reference Include="UnityEditor.UnityConnectModule">
       <HintPath>C:\Program Files\Unity\Hub\Editor\2020.3.25f1\Editor\Data\Managed\UnityEngine\UnityEditor.UnityConnectModule.dll</HintPath>
     </Reference>
+    <Reference Include="CBOR">
+      <HintPath>Assets\Plugins\CBOR.dll</HintPath>
+    </Reference>
+    <Reference Include="Numbers">
+      <HintPath>Assets\Plugins\Numbers.dll</HintPath>
+    </Reference>
+    <Reference Include="URIUtility">
+      <HintPath>Assets\Plugins\URIUtility.dll</HintPath>
+    </Reference>
     <Reference Include="PubnubApiUnity">
       <HintPath>Assets\netstandard2.0\PubnubApiUnity.dll</HintPath>
     </Reference>
