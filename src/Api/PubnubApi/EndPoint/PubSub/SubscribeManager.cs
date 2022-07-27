@@ -419,7 +419,6 @@ namespace PubnubApi.EndPoint
             {
                 bool channelGroupSubscribeOnly = false;
                 SubscribeDisconnected[PubnubInstance.InstanceId] = false;
-                SubscribeAccessDenied[PubnubInstance.InstanceId] = false;
 
                 if (rawChannels != null && rawChannels.Length > 0)
                 {
@@ -573,18 +572,6 @@ namespace PubnubApi.EndPoint
             }
         }
 
-        private static void CheckAndDisableubscribeHeartbeatCheckTimer()
-        {
-            if (SubscribeHeartbeatCheckTimer != null)
-            {
-                try
-                {
-                    SubscribeHeartbeatCheckTimer.Change(Timeout.Infinite, Timeout.Infinite);
-                }
-                catch {  /* ignore */ }
-            }
-        }
-
         private void MultiChannelSubscribeRequest<T>(PNOperationType type, string[] channels, string[] channelGroups, object timetoken, int region, bool reconnect, Dictionary<string, string> initialSubscribeUrlParams, Dictionary<string, object> externalQueryParam)
         {
             if (!config.ContainsKey(PubnubInstance.InstanceId))
@@ -688,11 +675,9 @@ namespace PubnubApi.EndPoint
 
                 // Wait for message
                 string json = "";
-                PNStatus pnStatus = null;
                 UrlProcessRequest<T>(request, pubnubRequestState, false).ContinueWith(r =>
                 {
                     json = r.Result.Item1;
-                    pnStatus = r.Result.Item2;
                 }, TaskContinuationOptions.ExecuteSynchronously).Wait();
                 if (!string.IsNullOrEmpty(json))
                 {
@@ -750,22 +735,6 @@ namespace PubnubApi.EndPoint
                 }
                 else
                 {
-                    if (pnStatus != null && pnStatus.Category ==  PNStatusCategory.PNAccessDeniedCategory)
-                    {
-                        //Announce 403 and exit subscribe on 403
-                        Announce(pnStatus); //Announce to subscribe callback when 403
-
-                        ///Disabling flags/checks which can invoke resubscribe
-                        SubscribeAccessDenied[PubnubInstance.InstanceId] = true;
-                        Task.Factory.StartNew(() =>
-                        {
-                            TerminateCurrentSubscriberRequest();
-                        }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
-
-                        CheckAndDisableubscribeHeartbeatCheckTimer();
-                        return;
-                    }
-
                     if (multiplexExceptionTimer != null)
                     {
                         multiplexExceptionTimer.Change(Timeout.Infinite, Timeout.Infinite);
@@ -1079,12 +1048,6 @@ namespace PubnubApi.EndPoint
                 if (!config.ContainsKey(PubnubInstance.InstanceId))
                 {
                     LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, InstanceId Not Available. So No heartbeat check.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
-                    return;
-                }
-                if (SubscribeAccessDenied[PubnubInstance.InstanceId])
-                {
-                    CheckAndDisableubscribeHeartbeatCheckTimer();
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - SubscribeAccessDenied. Exiting StartSubscribeHeartbeatCheckCallback.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
                     return;
                 }
 

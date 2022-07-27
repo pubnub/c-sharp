@@ -53,7 +53,6 @@ namespace PubnubApi
 
         private bool clientNetworkStatusInternetStatus = true;
         protected static ConcurrentDictionary<string, bool> SubscribeDisconnected { get; set; } = new ConcurrentDictionary<string, bool>();
-        protected static ConcurrentDictionary<string, bool> SubscribeAccessDenied { get; set; } = new ConcurrentDictionary<string, bool>();
 
         protected Pubnub PubnubInstance { get; set; }
 
