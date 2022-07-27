@@ -15,9 +15,15 @@ namespace PubnubApi
     }
     public class PNTokenPermissionMappingBase
     {
+        [Obsolete("Channels is deprecated, please use Spaces instead.")]
         public Dictionary<string, PNTokenAuthValues> Channels { get; set; }
+
+        [Obsolete]
         public Dictionary<string, PNTokenAuthValues> ChannelGroups { get; set; }
+
+        [Obsolete("Uuids is deprecated, please use Users instead.")]
         public Dictionary<string, PNTokenAuthValues> Uuids { get; set; }
+
         public Dictionary<string, PNTokenAuthValues> Users { get; set; }
         public Dictionary<string, PNTokenAuthValues> Spaces { get; set; }
 

@@ -21,14 +21,18 @@ namespace PubnubApi.EndPoint
         private PNTokenResources pubnubResources = new PNTokenResources
         { 
             Channels = new Dictionary<string, PNTokenAuthValues>(),
+            Spaces = new Dictionary<string, PNTokenAuthValues>(),
             ChannelGroups = new Dictionary<string, PNTokenAuthValues>(),
-            Uuids = new Dictionary<string, PNTokenAuthValues>()
+            Uuids = new Dictionary<string, PNTokenAuthValues>(),
+            Users = new Dictionary<string, PNTokenAuthValues>()
         };
         private PNTokenPatterns pubnubPatterns = new PNTokenPatterns
         {
             Channels = new Dictionary<string, PNTokenAuthValues>(),
+            Spaces = new Dictionary<string, PNTokenAuthValues>(),
             ChannelGroups = new Dictionary<string, PNTokenAuthValues>(),
-            Uuids = new Dictionary<string, PNTokenAuthValues>()
+            Uuids = new Dictionary<string, PNTokenAuthValues>(),
+            Users = new Dictionary<string, PNTokenAuthValues>()
         };
 
         private int grantTTL = -1;
@@ -36,6 +40,7 @@ namespace PubnubApi.EndPoint
         private Dictionary<string, object> queryParam;
         private Dictionary<string, object> grantMeta;
         private string pubnubAuthorizedUuid = string.Empty;
+        private string pubnubAuthorizedUserId = string.Empty;
 
         public GrantTokenOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
         {
@@ -49,20 +54,49 @@ namespace PubnubApi.EndPoint
             InitializeDefaultVariableObjectStates();
         }
 
+        [Obsolete("AuthorizedUuid is deprecated, please use AuthorizedUserId instead.")]
         public GrantTokenOperation AuthorizedUuid(string uuid)
         {
-            this.pubnubAuthorizedUuid = uuid;
+            if (!string.IsNullOrEmpty(pubnubAuthorizedUserId))
+            {
+                throw new ArgumentException("Either UUID or UserId can be used. Not both.");
+            }
+            pubnubAuthorizedUuid = uuid;
+            return this;
+        }
+
+        public GrantTokenOperation AuthorizedUserId(UserId user)
+        {
+            if (!string.IsNullOrEmpty(pubnubAuthorizedUuid))
+            {
+                throw new ArgumentException("Either UUID or UserId can be used. Not both.");
+            }
+            pubnubAuthorizedUserId = user;
             return this;
         }
 
         public GrantTokenOperation Resources(PNTokenResources resources)
         {
-            if (pubnubResources != null)
+            if (pubnubResources != null && resources != null)
             {
+                if (resources.Channels != null && resources.Channels.Count > 0 &&
+                    resources.Spaces != null && resources.Spaces.Count > 0)
+                {
+                    throw new ArgumentException("Either Channels or Spaces can be used. Not both.");
+                }
+                if (resources.Uuids != null && resources.Uuids.Count > 0 &&
+                    resources.Users != null && resources.Users.Count > 0)
+                {
+                    throw new ArgumentException("Either Uuids or Users can be used. Not both.");
+                }
                 pubnubResources = resources;
                 if (pubnubResources.Channels == null)
                 {
                     pubnubResources.Channels = new Dictionary<string, PNTokenAuthValues>();
+                }
+                if (pubnubResources.Spaces == null)
+                {
+                    pubnubResources.Spaces = new Dictionary<string, PNTokenAuthValues>();
                 }
                 if (pubnubResources.ChannelGroups == null)
                 {
@@ -72,18 +106,37 @@ namespace PubnubApi.EndPoint
                 {
                     pubnubResources.Uuids = new Dictionary<string, PNTokenAuthValues>();
                 }
+                if (pubnubResources.Users == null)
+                {
+                    pubnubResources.Users = new Dictionary<string, PNTokenAuthValues>();
+                }
             }
             return this;
         }
 
         public GrantTokenOperation Patterns(PNTokenPatterns patterns)
         {
-            if (pubnubPatterns != null)
+            if (pubnubPatterns != null && patterns != null)
             {
+                if (patterns.Channels != null && patterns.Channels.Count > 0 &&
+                    patterns.Spaces != null && patterns.Spaces.Count > 0)
+                {
+                    throw new ArgumentException("Either Channels or Spaces can be used. Not both.");
+                }
+                if (patterns.Uuids != null && patterns.Uuids.Count > 0 &&
+                    patterns.Users != null && patterns.Users.Count > 0)
+                {
+                    throw new ArgumentException("Either Uuids or Users can be used. Not both.");
+                }
+
                 pubnubPatterns = patterns;
                 if (pubnubPatterns.Channels == null)
                 {
                     pubnubPatterns.Channels = new Dictionary<string, PNTokenAuthValues>();
+                }
+                if (pubnubPatterns.Spaces == null)
+                {
+                    pubnubPatterns.Spaces = new Dictionary<string, PNTokenAuthValues>();
                 }
                 if (pubnubPatterns.ChannelGroups == null)
                 {
@@ -92,6 +145,10 @@ namespace PubnubApi.EndPoint
                 if (pubnubPatterns.Uuids == null)
                 {
                     pubnubPatterns.Uuids = new Dictionary<string, PNTokenAuthValues>();
+                }
+                if (pubnubPatterns.Users == null)
+                {
+                    pubnubPatterns.Users = new Dictionary<string, PNTokenAuthValues>();
                 }
 
             }
@@ -185,6 +242,19 @@ namespace PubnubApi.EndPoint
             Dictionary<string, int> chPatternBitmaskPermCollection = null;
             atleastOnePermission = FillPermissionMappingWithMaskValues(this.pubnubPatterns.Channels, atleastOnePermission, out chPatternBitmaskPermCollection);
 
+            Dictionary<string, int> spBitmaskPermCollection = null;
+            Dictionary<string, int> spPatternBitmaskPermCollection = null;
+            if (pubnubResources.Channels.Count == 0 && pubnubPatterns.Channels.Count == 0)
+            {
+                atleastOnePermission = FillPermissionMappingWithMaskValues(this.pubnubResources.Spaces, atleastOnePermission, out spBitmaskPermCollection);
+                atleastOnePermission = FillPermissionMappingWithMaskValues(this.pubnubPatterns.Spaces, atleastOnePermission, out spPatternBitmaskPermCollection);
+            }
+            else
+            {
+                spBitmaskPermCollection = new Dictionary<string, int>();
+                spPatternBitmaskPermCollection = new Dictionary<string, int>();
+            }
+
             Dictionary<string, int> cgBitmaskPermCollection = null;
             atleastOnePermission = FillPermissionMappingWithMaskValues(this.pubnubResources.ChannelGroups, atleastOnePermission, out cgBitmaskPermCollection);
 
@@ -197,24 +267,38 @@ namespace PubnubApi.EndPoint
             Dictionary<string, int> uuidPatternBitmaskPermCollection = null;
             atleastOnePermission = FillPermissionMappingWithMaskValues(this.pubnubPatterns.Uuids, atleastOnePermission, out uuidPatternBitmaskPermCollection);
 
+            Dictionary<string, int> userBitmaskPermCollection = null;
+            Dictionary<string, int> userPatternBitmaskPermCollection = null;
+            if (pubnubResources.Uuids.Count == 0 && pubnubPatterns.Uuids.Count == 0)
+            {
+                atleastOnePermission = FillPermissionMappingWithMaskValues(this.pubnubResources.Users, atleastOnePermission, out userBitmaskPermCollection);
+                atleastOnePermission = FillPermissionMappingWithMaskValues(this.pubnubPatterns.Users, atleastOnePermission, out userPatternBitmaskPermCollection);
+            }
+            else
+            {
+                userBitmaskPermCollection = new Dictionary<string, int>();
+                userPatternBitmaskPermCollection = new Dictionary<string, int>();
+
+            }
+
             if (!atleastOnePermission)
             {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} At least one permission is needed for at least one or more of uuids, channels or groups",DateTime.Now.ToString(CultureInfo.InvariantCulture)), PNLogVerbosity.BODY);
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} At least one permission is needed for at least one or more of uuids/users, channels/spaces or groups",DateTime.Now.ToString(CultureInfo.InvariantCulture)), PNLogVerbosity.BODY);
             }
 
             Dictionary<string, object> resourcesCollection = new Dictionary<string, object>();
             resourcesCollection.Add("channels", chBitmaskPermCollection);
             resourcesCollection.Add("groups", cgBitmaskPermCollection);
             resourcesCollection.Add("uuids", uuidBitmaskPermCollection);
-            resourcesCollection.Add("users", new Dictionary<string, int>()); //Empty object for users for json structure
-            resourcesCollection.Add("spaces", new Dictionary<string, int>()); //Empty object for spaces for json structure
+            resourcesCollection.Add("users", userBitmaskPermCollection);
+            resourcesCollection.Add("spaces", spBitmaskPermCollection);
 
             Dictionary<string, object> patternsCollection = new Dictionary<string, object>();
             patternsCollection.Add("channels", chPatternBitmaskPermCollection);
             patternsCollection.Add("groups", cgPatternBitmaskPermCollection);
             patternsCollection.Add("uuids", uuidPatternBitmaskPermCollection);
-            patternsCollection.Add("users", new Dictionary<string, int>()); //Empty object for users for json structure
-            patternsCollection.Add("spaces", new Dictionary<string, int>()); //Empty object for spaces for json structure
+            patternsCollection.Add("users", userPatternBitmaskPermCollection);
+            patternsCollection.Add("spaces", spPatternBitmaskPermCollection);
 
             Dictionary<string, object> optimizedMeta = new Dictionary<string, object>();
             if (this.grantMeta != null)
@@ -230,7 +314,10 @@ namespace PubnubApi.EndPoint
             {
                 permissionCollection.Add("uuid", this.pubnubAuthorizedUuid);
             }
-
+            else if (!string.IsNullOrEmpty(this.pubnubAuthorizedUserId) && this.pubnubAuthorizedUserId.Trim().Length > 0)
+            {
+                permissionCollection.Add("uuid", this.pubnubAuthorizedUserId);
+            }
             Dictionary<string, object> messageEnvelope = new Dictionary<string, object>();
             messageEnvelope.Add("ttl", this.grantTTL);
             messageEnvelope.Add("permissions", permissionCollection);

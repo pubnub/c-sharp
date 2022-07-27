@@ -1,3 +1,7 @@
+v6.7.0 - July 27 2022
+-----------------------------
+- Modified: added support for Users/Spaces to GrantToken.
+
 v6.6.0 - July 18 2022
 -----------------------------
 - Modified: introduced UserId to PNConfiguration and deprecated UUID.
