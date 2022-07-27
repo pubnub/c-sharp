@@ -227,6 +227,7 @@
     <Compile Include="..\PubnubApi\Model\Consumer\Push\PNPushListProvisionsResult.cs" Link="Model\Consumer\Push\PNPushListProvisionsResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Push\PNPushRemoveAllChannelsResult.cs" Link="Model\Consumer\Push\PNPushRemoveAllChannelsResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Push\PNPushRemoveChannelResult.cs" Link="Model\Consumer\Push\PNPushRemoveChannelResult.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\UserId.cs" Link="Model\Consumer\UserId.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\AccessManager\PNAccessManagerAuditResultExt.cs" Link="Model\Derived\AccessManager\PNAccessManagerAuditResultExt.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\AccessManager\PNAccessManagerGrantResultExt.cs" Link="Model\Derived\AccessManager\PNAccessManagerGrantResultExt.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\AccessManager\PNAccessManagerTokenResultExt.cs" Link="Model\Derived\AccessManager\PNAccessManagerTokenResultExt.cs" />
