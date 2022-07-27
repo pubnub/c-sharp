@@ -54,13 +54,12 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
                 AuthKey = authKey,
-                Uuid = "mytestuuid",
                 Secure = false
             };
             server.RunOnHttps(false);
@@ -80,7 +79,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("ttl", "20")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithParameter("w", "1")
                     .WithParameter("signature", "hc7IKhEB7tyL6ENR3ndOOlHqPIG3RmzxwJMSGpofE6Q=")
                     .WithResponse(expected)
@@ -123,12 +122,11 @@ namespace PubNubMessaging.Tests
                 Assert.Ignore("Ignored for Server side run");
             }
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 CipherKey = cipherKey,
-                Uuid = "mytestuuid",
                 Secure = ssl,
                 LogVerbosity = PNLogVerbosity.BODY,
                 PubnubLog = new TestLog(),
@@ -164,7 +162,7 @@ namespace PubNubMessaging.Tests
                 .WithParameter("requestid", "myRequestId")
                 .WithParameter("timestamp", "1356998400")
                 .WithParameter("tt", "0")
-                .WithParameter("uuid", config.Uuid)
+                .WithParameter("uuid", config.UserId)
                 .WithResponse(expected)
                 .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -177,7 +175,7 @@ namespace PubNubMessaging.Tests
                 .WithParameter("requestid", "myRequestId")
                 .WithParameter("timestamp", "1356998400")
                 .WithParameter("tt", "0")
-                .WithParameter("uuid", config.Uuid)
+                .WithParameter("uuid", config.UserId)
                 .WithParameter("signature", "zJpO1HpSZxGkOr3EALbOk-vQgjIZTZ6AU5svzNU9l_A=")
                 .WithResponse(expected)
                 .WithStatusCode(System.Net.HttpStatusCode.OK));
@@ -321,12 +319,11 @@ namespace PubNubMessaging.Tests
                 Assert.Ignore("Ignored for Server side run");
             }
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 CipherKey = cipherKey,
-                Uuid = "mytestuuid",
                 Secure = ssl,
                 LogVerbosity = PNLogVerbosity.BODY,
                 PubnubLog = new TestLog(),
@@ -362,7 +359,7 @@ namespace PubNubMessaging.Tests
                 .WithParameter("requestid", "myRequestId")
                 .WithParameter("timestamp", "1356998400")
                 .WithParameter("tt", "0")
-                .WithParameter("uuid", config.Uuid)
+                .WithParameter("uuid", config.UserId)
                 .WithResponse(expected)
                 .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -375,7 +372,7 @@ namespace PubNubMessaging.Tests
                 .WithParameter("requestid", "myRequestId")
                 .WithParameter("timestamp", "1356998400")
                 .WithParameter("tt", "0")
-                .WithParameter("uuid", config.Uuid)
+                .WithParameter("uuid", config.UserId)
                 .WithParameter("signature", "zJpO1HpSZxGkOr3EALbOk-vQgjIZTZ6AU5svzNU9l_A=")
                 .WithResponse(expected)
                 .WithStatusCode(System.Net.HttpStatusCode.OK));

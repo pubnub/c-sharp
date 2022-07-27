@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <!--<Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />-->
   <PropertyGroup>
-    <TargetFrameworks>net35;net40;net45;net461</TargetFrameworks>
+    <TargetFrameworks>net35;net40;net45;net461;net48</TargetFrameworks>
     <IncludeSymbols>False</IncludeSymbols>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <AssemblyTitle>PubNub C# .NET - MockServerPubnubApi</AssemblyTitle>
@@ -28,6 +28,9 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <DefineConstants>$(DefineConstants);NET461</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net48' ">
+    <DefineConstants>$(DefineConstants);NET48</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(TargetFramework)|$(Platform)' == 'Debug|AnyCPU' ">
  

@@ -184,3 +184,5 @@ src/UnitTests/MockServer/obj/*
 # GitHub Actions #
 ##################
 .github/.release
+
+.idea

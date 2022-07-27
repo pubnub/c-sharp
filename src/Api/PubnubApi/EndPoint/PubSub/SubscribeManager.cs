@@ -11,7 +11,7 @@ namespace PubnubApi.EndPoint
 {
     internal class SubscribeManager : PubnubCoreBase, IDisposable
     {
-        private static PNConfiguration config;
+        private static ConcurrentDictionary<string, PNConfiguration> config { get; } = new ConcurrentDictionary<string, PNConfiguration>();
         private static IJsonPluggableLibrary jsonLibrary;
         private static IPubnubUnitTest unit;
         private static IPubnubLog pubnubLog;
@@ -23,7 +23,7 @@ namespace PubnubApi.EndPoint
 
         public SubscribeManager(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
         {
-            config = pubnubConfig;
+            config.AddOrUpdate(instance.InstanceId, pubnubConfig, (k, o) => pubnubConfig);
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
             pubnubLog = log;
@@ -47,7 +47,7 @@ namespace PubnubApi.EndPoint
                 {
                     if (ChannelRequest[PubnubInstance.InstanceId].ContainsKey(multiChannelName))
                     {
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Aborting previous subscribe/presence requests having channel(s)={1}; channelgroup(s)={2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannelName, multiChannelGroupName), config.LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Aborting previous subscribe/presence requests having channel(s)={1}; channelgroup(s)={2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannelName, multiChannelGroupName), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
 
                         HttpWebRequest webRequest;
                         ChannelRequest[PubnubInstance.InstanceId].TryGetValue(multiChannelName, out webRequest);
@@ -57,11 +57,11 @@ namespace PubnubApi.EndPoint
                         bool removedChannel = ChannelRequest[PubnubInstance.InstanceId].TryRemove(multiChannelName, out removedRequest);
                         if (removedChannel)
                         {
-                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Success to remove channel(s)={1}; channelgroup(s)={2} from _channelRequest (MultiChannelUnSubscribeInit).", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannelName, multiChannelGroupName), config.LogVerbosity);
+                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Success to remove channel(s)={1}; channelgroup(s)={2} from _channelRequest (MultiChannelUnSubscribeInit).", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannelName, multiChannelGroupName), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
                         }
                         else
                         {
-                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Unable to remove channel(s)={1}; channelgroup(s)={2} from _channelRequest (MultiChannelUnSubscribeInit).", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannelName, multiChannelGroupName), config.LogVerbosity);
+                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Unable to remove channel(s)={1}; channelgroup(s)={2} from _channelRequest (MultiChannelUnSubscribeInit).", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannelName, multiChannelGroupName), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
                         }
                         if (webRequest != null)
                         {
@@ -70,15 +70,15 @@ namespace PubnubApi.EndPoint
                     }
                     else
                     {
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Unable to capture channel(s)={1}; channelgroup(s)={2} from _channelRequest to abort request.", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannelName, multiChannelGroupName), config.LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Unable to capture channel(s)={1}; channelgroup(s)={2} from _channelRequest to abort request.", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannelName, multiChannelGroupName), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
                     }
                 }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 
-                if (type == PNOperationType.PNUnsubscribeOperation && !config.SuppressLeaveEvents)
+                if (type == PNOperationType.PNUnsubscribeOperation && config.ContainsKey(PubnubInstance.InstanceId) && !config[PubnubInstance.InstanceId].SuppressLeaveEvents)
                 {
                     //just fire leave() event to REST API for safeguard
                     string channelsJsonState = BuildJsonUserState(currentChannels, currentChannelGroups, false);
-                    IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+                    IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config[PubnubInstance.InstanceId], jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
                     
                     Uri request = urlBuilder.BuildMultiChannelLeaveRequest("GET", "", currentChannels, currentChannelGroups, channelsJsonState, externalQueryParam);
 
@@ -109,7 +109,7 @@ namespace PubnubApi.EndPoint
 
                 if (PubnubInstance == null)
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, PubnubInstance is null. exiting MultiChannelUnSubscribeInit", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, PubnubInstance is null. exiting MultiChannelUnSubscribeInit", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
                     return;
                 }
 
@@ -137,9 +137,9 @@ namespace PubnubApi.EndPoint
                                 continue;
                             }
 
-                            if (MultiChannelSubscribe.ContainsKey(PubnubInstance.InstanceId) && MultiChannelSubscribe[PubnubInstance.InstanceId] != null && !MultiChannelSubscribe[PubnubInstance.InstanceId].ContainsKey(channelName))
+                            if (config.ContainsKey(PubnubInstance.InstanceId) && MultiChannelSubscribe.ContainsKey(PubnubInstance.InstanceId) && MultiChannelSubscribe[PubnubInstance.InstanceId] != null && !MultiChannelSubscribe[PubnubInstance.InstanceId].ContainsKey(channelName))
                             {
-                                PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNUnsubscribeOperation, PNStatusCategory.PNUnexpectedDisconnectCategory, null, (int)HttpStatusCode.NotFound, null);
+                                PNStatus status = new StatusBuilder(config[PubnubInstance.InstanceId], jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNUnsubscribeOperation, PNStatusCategory.PNUnexpectedDisconnectCategory, null, (int)HttpStatusCode.NotFound, null);
                                 if (!status.AffectedChannels.Contains(channelName))
                                 {
                                     status.AffectedChannels.Add(channelName);
@@ -171,9 +171,9 @@ namespace PubnubApi.EndPoint
                                 continue;
                             }
 
-                            if (MultiChannelGroupSubscribe.ContainsKey(PubnubInstance.InstanceId) && MultiChannelGroupSubscribe[PubnubInstance.InstanceId] != null && !MultiChannelGroupSubscribe[PubnubInstance.InstanceId].ContainsKey(channelGroupName))
+                            if (config.ContainsKey(PubnubInstance.InstanceId) && MultiChannelGroupSubscribe.ContainsKey(PubnubInstance.InstanceId) && MultiChannelGroupSubscribe[PubnubInstance.InstanceId] != null && !MultiChannelGroupSubscribe[PubnubInstance.InstanceId].ContainsKey(channelGroupName))
                             {
-                                PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNUnsubscribeOperation, PNStatusCategory.PNUnexpectedDisconnectCategory, null, (int)HttpStatusCode.NotFound, null);
+                                PNStatus status = new StatusBuilder(config[PubnubInstance.InstanceId], jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNUnsubscribeOperation, PNStatusCategory.PNUnexpectedDisconnectCategory, null, (int)HttpStatusCode.NotFound, null);
                                 if (!status.AffectedChannelGroups.Contains(channelGroupName))
                                 {
                                     status.AffectedChannelGroups.Add(channelGroupName);
@@ -208,7 +208,7 @@ namespace PubnubApi.EndPoint
                         {
                             if (ChannelRequest[PubnubInstance.InstanceId].ContainsKey(multiChannelName))
                             {
-                                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Aborting previous subscribe/presence requests having channel(s)={1}; channelgroup(s)={2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannelName, multiChannelGroupName), config.LogVerbosity);
+                                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Aborting previous subscribe/presence requests having channel(s)={1}; channelgroup(s)={2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannelName, multiChannelGroupName), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
 
                                 HttpWebRequest webRequest;
                                 ChannelRequest[PubnubInstance.InstanceId].TryGetValue(multiChannelName, out webRequest);
@@ -218,11 +218,11 @@ namespace PubnubApi.EndPoint
                                 bool removedChannel = ChannelRequest[PubnubInstance.InstanceId].TryRemove(multiChannelName, out removedRequest);
                                 if (removedChannel)
                                 {
-                                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Success to remove channel(s)={1}; channelgroup(s)={2} from _channelRequest (MultiChannelUnSubscribeInit).", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannelName, multiChannelGroupName), config.LogVerbosity);
+                                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Success to remove channel(s)={1}; channelgroup(s)={2} from _channelRequest (MultiChannelUnSubscribeInit).", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannelName, multiChannelGroupName), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
                                 }
                                 else
                                 {
-                                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Unable to remove channel(s)={1}; channelgroup(s)={2} from _channelRequest (MultiChannelUnSubscribeInit).", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannelName, multiChannelGroupName), config.LogVerbosity);
+                                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Unable to remove channel(s)={1}; channelgroup(s)={2} from _channelRequest (MultiChannelUnSubscribeInit).", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannelName, multiChannelGroupName), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
                                 }
                                 if (webRequest != null)
                                 {
@@ -231,15 +231,15 @@ namespace PubnubApi.EndPoint
                             }
                             else
                             {
-                                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Unable to capture channel(s)={1}; channelgroup(s)={2} from _channelRequest to abort request.", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannelName, multiChannelGroupName), config.LogVerbosity);
+                                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Unable to capture channel(s)={1}; channelgroup(s)={2} from _channelRequest to abort request.", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannelName, multiChannelGroupName), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
                             }
                         }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 
-                        if (type == PNOperationType.PNUnsubscribeOperation)
+                        if (type == PNOperationType.PNUnsubscribeOperation && config.ContainsKey(PubnubInstance.InstanceId))
                         {
                             //just fire leave() event to REST API for safeguard
                             string channelsJsonState = BuildJsonUserState(validChannels.ToArray(), validChannelGroups.ToArray(), false);
-                            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+                            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config[PubnubInstance.InstanceId], jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
                             
                             Uri request = urlBuilder.BuildMultiChannelLeaveRequest("GET", "", validChannels.ToArray(), validChannelGroups.ToArray(), channelsJsonState, externalQueryParam);
 
@@ -264,8 +264,8 @@ namespace PubnubApi.EndPoint
                         originalMultiChannelGroupSubscribe = MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Count > 0 ? MultiChannelGroupSubscribe[PubnubInstance.InstanceId].ToDictionary(kvp => kvp.Key, kvp => kvp.Value) : null;
                     }
 
-                    PNStatus successStatus = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNUnsubscribeOperation, PNStatusCategory.PNDisconnectedCategory, null, (int)HttpStatusCode.OK, null);
-                    PNStatus failStatus = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNUnsubscribeOperation, PNStatusCategory.PNDisconnectedCategory, null, (int)HttpStatusCode.NotFound, new PNException("Unsubscribe Error. Please retry unsubscribe operation"));
+                    PNStatus successStatus = new StatusBuilder(config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId] : null, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNUnsubscribeOperation, PNStatusCategory.PNDisconnectedCategory, null, (int)HttpStatusCode.OK, null);
+                    PNStatus failStatus = new StatusBuilder(config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId] : null, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNUnsubscribeOperation, PNStatusCategory.PNDisconnectedCategory, null, (int)HttpStatusCode.NotFound, new PNException("Unsubscribe Error. Please retry unsubscribe operation"));
                     bool successExist = false;
                     bool failExist = false;
 
@@ -400,13 +400,13 @@ namespace PubnubApi.EndPoint
                             PresenceHeartbeatTimer.Dispose();
                             PresenceHeartbeatTimer = null;
                         }
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, All channels are Unsubscribed. Further subscription was stopped", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, All channels are Unsubscribed. Further subscription was stopped", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
                     }
                 }
             }
             catch(Exception ex)
             {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} SubscribeManager=> MultiChannelUnSubscribeInit \n channel(s)={1} \n cg(s)={2} \n Exception Details={3}", DateTime.Now.ToString(CultureInfo.InvariantCulture), string.Join(",", validChannels.OrderBy(x => x).ToArray()), string.Join(",", validChannelGroups.OrderBy(x => x).ToArray()), ex), config.LogVerbosity);
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} SubscribeManager=> MultiChannelUnSubscribeInit \n channel(s)={1} \n cg(s)={2} \n Exception Details={3}", DateTime.Now.ToString(CultureInfo.InvariantCulture), string.Join(",", validChannels.OrderBy(x => x).ToArray()), string.Join(",", validChannelGroups.OrderBy(x => x).ToArray()), ex), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
             }
         }
 
@@ -466,7 +466,7 @@ namespace PubnubApi.EndPoint
                     }
                 }
 
-                if (validChannels.Count > 0 || validChannelGroups.Count > 0)
+                if (validChannels.Count > 0 || validChannelGroups.Count > 0 && config.ContainsKey(PubnubInstance.InstanceId))
                 {
                     //Retrieve the current channels already subscribed previously and terminate them
                     string[] currentChannels = MultiChannelSubscribe[PubnubInstance.InstanceId].Keys.ToArray<string>();
@@ -483,7 +483,7 @@ namespace PubnubApi.EndPoint
                                 string multiChannelName = keysList[keyIndex];
                                 if (ChannelRequest[PubnubInstance.InstanceId].ContainsKey(multiChannelName))
                                 {
-                                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Aborting previous subscribe/presence requests having channel(s)={1}; channelgroup(s)={2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannelName, multiChannelGroupName), config.LogVerbosity);
+                                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Aborting previous subscribe/presence requests having channel(s)={1}; channelgroup(s)={2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannelName, multiChannelGroupName), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
                                     HttpWebRequest webRequest;
                                     ChannelRequest[PubnubInstance.InstanceId].TryGetValue(multiChannelName, out webRequest);
                                     ChannelRequest[PubnubInstance.InstanceId].TryUpdate(multiChannelName, null, webRequest);
@@ -492,11 +492,11 @@ namespace PubnubApi.EndPoint
                                     bool removedChannel = ChannelRequest[PubnubInstance.InstanceId].TryRemove(multiChannelName, out removedRequest);
                                     if (removedChannel)
                                     {
-                                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Success to remove channel(s)={1}; channelgroup(s)={2} from _channelRequest (MultiChannelSubscribeInit).", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannelName, multiChannelGroupName), config.LogVerbosity);
+                                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Success to remove channel(s)={1}; channelgroup(s)={2} from _channelRequest (MultiChannelSubscribeInit).", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannelName, multiChannelGroupName), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
                                     }
                                     else
                                     {
-                                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Unable to remove channel(s)={1}; channelgroup(s)={2} from _channelRequest (MultiChannelSubscribeInit).", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannelName, multiChannelGroupName), config.LogVerbosity);
+                                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Unable to remove channel(s)={1}; channelgroup(s)={2} from _channelRequest (MultiChannelSubscribeInit).", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannelName, multiChannelGroupName), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
                                     }
                                     if (webRequest != null)
                                     {
@@ -505,13 +505,13 @@ namespace PubnubApi.EndPoint
                                 }
                                 else
                                 {
-                                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Unable to capture channel(s)={1}; channelgroup(s)={2} from _channelRequest to abort request.", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannelName, multiChannelGroupName), config.LogVerbosity);
+                                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Unable to capture channel(s)={1}; channelgroup(s)={2} from _channelRequest to abort request.", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannelName, multiChannelGroupName), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
                                 }
                             }
                         }
                         else
                         {
-                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Unable to find instance id = {1} from _channelRequest.", DateTime.Now.ToString(CultureInfo.InvariantCulture), PubnubInstance.InstanceId), config.LogVerbosity);
+                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Unable to find instance id = {1} from _channelRequest.", DateTime.Now.ToString(CultureInfo.InvariantCulture), PubnubInstance.InstanceId), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
                         }
                     }
 
@@ -556,13 +556,20 @@ namespace PubnubApi.EndPoint
                     ResetInternetCheckSettings(channels, channelGroups);
                     MultiChannelSubscribeRequest<T>(responseType, channels, channelGroups, 0, 0, false, initialSubscribeUrlParams, externalQueryParam);
 
-                    CheckAndDisableubscribeHeartbeatCheckTimer();
-                    SubscribeHeartbeatCheckTimer = new Timer(StartSubscribeHeartbeatCheckCallback<T>, null, config.SubscribeTimeout * 500, config.SubscribeTimeout * 500);
+                    if (SubscribeHeartbeatCheckTimer != null)
+                    {
+                        try
+                        {
+                            SubscribeHeartbeatCheckTimer.Change(Timeout.Infinite, Timeout.Infinite);
+                        }
+                        catch {  /* ignore */ }
+                    }
+                    SubscribeHeartbeatCheckTimer = new Timer(StartSubscribeHeartbeatCheckCallback<T>, null, config[PubnubInstance.InstanceId].SubscribeTimeout * 500, config[PubnubInstance.InstanceId].SubscribeTimeout * 500);
                 }
             }
             catch(Exception ex)
             {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} SubscribeManager=> MultiChannelSubscribeInit \n channel(s)={1} \n cg(s)={2} \n Exception Details={3}", DateTime.Now.ToString(CultureInfo.InvariantCulture), string.Join(",", validChannels.OrderBy(x => x).ToArray()), string.Join(",", validChannelGroups.OrderBy(x => x).ToArray()), ex), config.LogVerbosity);
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} SubscribeManager=> MultiChannelSubscribeInit \n channel(s)={1} \n cg(s)={2} \n Exception Details={3}", DateTime.Now.ToString(CultureInfo.InvariantCulture), string.Join(",", validChannels.OrderBy(x => x).ToArray()), string.Join(",", validChannelGroups.OrderBy(x => x).ToArray()), ex), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
             }
         }
 
@@ -580,16 +587,21 @@ namespace PubnubApi.EndPoint
 
         private void MultiChannelSubscribeRequest<T>(PNOperationType type, string[] channels, string[] channelGroups, object timetoken, int region, bool reconnect, Dictionary<string, string> initialSubscribeUrlParams, Dictionary<string, object> externalQueryParam)
         {
+            if (!config.ContainsKey(PubnubInstance.InstanceId))
+            {
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, InstanceId Not Available. Exiting MultiChannelSubscribeRequest", DateTime.Now.ToString(CultureInfo.InvariantCulture)), PNLogVerbosity.BODY);
+                return;
+            }
             if (SubscribeDisconnected[PubnubInstance.InstanceId])
             {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeDisconnected. Exiting MultiChannelSubscribeRequest", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeDisconnected. Exiting MultiChannelSubscribeRequest", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config[PubnubInstance.InstanceId].LogVerbosity);
                 return;
             }
 
             //Exit if the channel is unsubscribed
             if (MultiChannelSubscribe != null && MultiChannelSubscribe[PubnubInstance.InstanceId].Count <= 0 && MultiChannelGroupSubscribe != null && MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Count <= 0)
             {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Zero channels/channelGroups. Further subscription was stopped", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Zero channels/channelGroups. Further subscription was stopped", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
                 return;
             }
 
@@ -620,7 +632,7 @@ namespace PubnubApi.EndPoint
 
             if (!ChannelRequest.ContainsKey(PubnubInstance.InstanceId) || (!multiChannel.Equals(",", StringComparison.CurrentCultureIgnoreCase) && !ChannelRequest[PubnubInstance.InstanceId].ContainsKey(multiChannel)))
             {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, PubnubInstance.InstanceId NOT matching", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, PubnubInstance.InstanceId NOT matching", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
                 return;
             }
 
@@ -642,10 +654,10 @@ namespace PubnubApi.EndPoint
                 long maximumTimetoken = Math.Max(maximumTimetoken1, maximumTimetoken2);
 
 
-                if (minimumTimetoken == 0 || reconnect || UuidChanged)
+                if (minimumTimetoken == 0 || reconnect || UserIdChanged[PubnubInstance.InstanceId])
                 {
                     lastTimetoken = 0;
-                    UuidChanged = false;
+                    UserIdChanged.AddOrUpdate(PubnubInstance.InstanceId, false, (k, o) => false);
                 }
                 else
                 {
@@ -658,11 +670,11 @@ namespace PubnubApi.EndPoint
                         lastTimetoken = LastSubscribeTimetoken[PubnubInstance.InstanceId];
                     }
                 }
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Building request for channel(s)={1}, channelgroup(s)={2} with timetoken={3}", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannel, multiChannelGroup, lastTimetoken), config.LogVerbosity);
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Building request for channel(s)={1}, channelgroup(s)={2} with timetoken={3}", DateTime.Now.ToString(CultureInfo.InvariantCulture), multiChannel, multiChannelGroup, lastTimetoken), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
                 // Build URL
                 string channelsJsonState = BuildJsonUserState(channels, channelGroups, false);
-                config.Uuid = CurrentUuid; // to make sure we capture if UUID is changed
-                IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+                config[PubnubInstance.InstanceId].UserId = CurrentUserId[PubnubInstance.InstanceId]; // to make sure we capture if UUID is changed
+                IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config[PubnubInstance.InstanceId], jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
                 
                 Uri request = urlBuilder.BuildMultiChannelSubscribeRequest("GET", "", channels, channelGroups, (Convert.ToInt64(timetoken.ToString()) == 0) ? Convert.ToInt64(timetoken.ToString()) : lastTimetoken, region, channelsJsonState, initialSubscribeUrlParams, externalQueryParam);
 
@@ -693,14 +705,14 @@ namespace PubnubApi.EndPoint
                     if (subscribedChannels.Equals(currentChannels, StringComparison.CurrentCultureIgnoreCase) && subscribedChannelGroups.Equals(currentChannelGroups, StringComparison.CurrentCultureIgnoreCase))
                     {
                         List<object> result = ProcessJsonResponse<T>(pubnubRequestState, json);
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, result count of ProcessJsonResponse = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), (result != null) ? result.Count : -1), config.LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, result count of ProcessJsonResponse = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), (result != null) ? result.Count : -1), config[PubnubInstance.InstanceId].LogVerbosity);
 
                         ProcessResponseCallbacks<T>(result, pubnubRequestState);
 
                         if ((pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation || pubnubRequestState.ResponseType == PNOperationType.Presence) && (result != null) && (result.Count > 0))
                         {
                             long jsonTimetoken = GetTimetokenFromMultiplexResult(result);
-                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, jsonTimetoken = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), jsonTimetoken), config.LogVerbosity);
+                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, jsonTimetoken = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), jsonTimetoken), config[PubnubInstance.InstanceId].LogVerbosity);
 
                             if (jsonTimetoken > 0)
                             {
@@ -728,11 +740,11 @@ namespace PubnubApi.EndPoint
                     }
                     else
                     {
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, condition failed for subscribedChannels == currentChannels && subscribedChannelGroups == currentChannelGroups", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, subscribedChannels = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), subscribedChannels), config.LogVerbosity);
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, currentChannels = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), currentChannels), config.LogVerbosity);
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, subscribedChannelGroups = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), subscribedChannelGroups), config.LogVerbosity);
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, currentChannelGroups = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), currentChannelGroups), config.LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, condition failed for subscribedChannels == currentChannels && subscribedChannelGroups == currentChannelGroups", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config[PubnubInstance.InstanceId].LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, subscribedChannels = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), subscribedChannels), config[PubnubInstance.InstanceId].LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, currentChannels = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), currentChannels), config[PubnubInstance.InstanceId].LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, subscribedChannelGroups = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), subscribedChannelGroups), config[PubnubInstance.InstanceId].LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, currentChannelGroups = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), currentChannelGroups), config[PubnubInstance.InstanceId].LogVerbosity);
                     }
 
                 }
@@ -767,10 +779,10 @@ namespace PubnubApi.EndPoint
             }
             catch (Exception ex)
             {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} method:_subscribe \n channel={1} \n timetoken={2} \n Exception Details={3}", DateTime.Now.ToString(CultureInfo.InvariantCulture), string.Join(",", channels.OrderBy(x => x).ToArray()), timetoken, ex), config.LogVerbosity);
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} method:_subscribe \n channel={1} \n timetoken={2} \n Exception Details={3}", DateTime.Now.ToString(CultureInfo.InvariantCulture), string.Join(",", channels.OrderBy(x => x).ToArray()), timetoken, ex), config[PubnubInstance.InstanceId].LogVerbosity);
 
                 PNStatusCategory errorCategory = PNStatusCategoryHelper.GetPNStatusCategory(ex);
-                PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(type, errorCategory, pubnubRequestState, (int)HttpStatusCode.NotFound, new PNException(ex));
+                PNStatus status = new StatusBuilder(config[PubnubInstance.InstanceId], jsonLibrary).CreateStatusResponse<T>(type, errorCategory, pubnubRequestState, (int)HttpStatusCode.NotFound, new PNException(ex));
                 if (channels != null && channels.Length > 0)
                 {
                     status.AffectedChannels.AddRange(channels);
@@ -789,7 +801,7 @@ namespace PubnubApi.EndPoint
 
         private void MultiplexExceptionHandlerTimerCallback<T>(object state)
         {
-            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} MultiplexExceptionHandlerTimerCallback", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} MultiplexExceptionHandlerTimerCallback", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
             RequestState<T> currentState = state as RequestState<T>;
             if (currentState != null)
             {
@@ -807,7 +819,16 @@ namespace PubnubApi.EndPoint
             }
             else
             {
-                result.Add(LastSubscribeTimetoken[PubnubInstance.InstanceId]); //get last timetoken of the current instance
+                long lastTT = LastSubscribeTimetoken[PubnubInstance.InstanceId]; //get last timetoken of the current instance
+                int lastRegionId = (LastSubscribeRegion != null && LastSubscribeRegion.ContainsKey(PubnubInstance.InstanceId)) ? LastSubscribeRegion[PubnubInstance.InstanceId] : 0; //get last region of the current instance
+
+                Dictionary<string, object> dictTimetokenAndRegion = new Dictionary<string, object>();
+                dictTimetokenAndRegion.Add("t", lastTT);
+                dictTimetokenAndRegion.Add("r", lastRegionId);
+
+                Dictionary<string, object> dictEnvelope = new Dictionary<string, object>();
+                dictEnvelope.Add("t", dictTimetokenAndRegion);
+                result.Add(dictEnvelope); 
             }
 
             if (channelGroups != null && channelGroups.Length > 0)
@@ -855,13 +876,13 @@ namespace PubnubApi.EndPoint
                 int region = GetRegionFromMultiplexResult(message);
                 Task.Factory.StartNew(() =>
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} MultiplexInternalCallback timetoken = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), timetoken), config.LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} MultiplexInternalCallback timetoken = {1}; region = {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), timetoken, region), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
                     MultiChannelSubscribeRequest<T>(type, channels, channelGroups, timetoken, region, false, null, this.customQueryParam);
                 }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
             }
             else
             {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Lost Channel Name for resubscribe", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Lost Channel Name for resubscribe", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
             }
         }
 
@@ -875,24 +896,28 @@ namespace PubnubApi.EndPoint
                 netState.ResponseType = type;
                 netState.Timetoken = timetoken;
                 netState.Region = region;
+                if (!config.ContainsKey(PubnubInstance.InstanceId))
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, InstanceId Not Available. So no reconnect", DateTime.Now.ToString(CultureInfo.InvariantCulture)), PNLogVerbosity.BODY);
+                }
 
                 if (SubscribeDisconnected[PubnubInstance.InstanceId])
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Subscribe is still Disconnected. So no reconnect", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Subscribe is still Disconnected. So no reconnect", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config[PubnubInstance.InstanceId].LogVerbosity);
                 }
-                else if (config.ReconnectionPolicy != PNReconnectionPolicy.NONE)
+                else if (config[PubnubInstance.InstanceId].ReconnectionPolicy != PNReconnectionPolicy.NONE)
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Subscribe - No internet connection for channel={1} and channelgroup={2}; networkAvailable={3}", DateTime.Now.ToString(CultureInfo.InvariantCulture), string.Join(",", channels.OrderBy(x => x).ToArray()), channelGroups != null ? string.Join(",", channelGroups) : "", networkAvailable), config.LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Subscribe - No internet connection for channel={1} and channelgroup={2}; networkAvailable={3}", DateTime.Now.ToString(CultureInfo.InvariantCulture), string.Join(",", channels.OrderBy(x => x).ToArray()), channelGroups != null ? string.Join(",", channelGroups) : "", networkAvailable), config[PubnubInstance.InstanceId].LogVerbosity);
                     TerminateReconnectTimer();
                     ReconnectNetwork<T>(netState);
                 }
                 else
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, reconnection policy is DISABLED, please handle reconnection manually.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, reconnection policy is DISABLED, please handle reconnection manually.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config[PubnubInstance.InstanceId].LogVerbosity);
                     if (!networkAvailable)
                     {
                         PNStatusCategory errorCategory =  PNStatusCategory.PNNetworkIssuesCategory;
-                        PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(type, errorCategory, null, (int)HttpStatusCode.NotFound, new PNException("SDK Network related error"));
+                        PNStatus status = new StatusBuilder(config[PubnubInstance.InstanceId], jsonLibrary).CreateStatusResponse<T>(type, errorCategory, null, (int)HttpStatusCode.NotFound, new PNException("SDK Network related error"));
                         if (channels != null && channels.Length > 0)
                         {
                             status.AffectedChannels.AddRange(channels);
@@ -917,7 +942,7 @@ namespace PubnubApi.EndPoint
         {
             if (netState != null && ((netState.Channels != null && netState.Channels.Length > 0) || (netState.ChannelGroups != null && netState.ChannelGroups.Length > 0)))
             {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager ReconnectNetwork interval = {1} sec", DateTime.Now.ToString(CultureInfo.InvariantCulture), PubnubNetworkTcpCheckIntervalInSeconds), config.LogVerbosity);
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager ReconnectNetwork interval = {1} sec", DateTime.Now.ToString(CultureInfo.InvariantCulture), PubnubNetworkTcpCheckIntervalInSeconds), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
 
                 System.Threading.Timer timer;
 
@@ -975,7 +1000,7 @@ namespace PubnubApi.EndPoint
                 }
                 if (networkConnection)
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Network available for SubscribeManager Manual Reconnect", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Network available for SubscribeManager Manual Reconnect", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
                     if (!string.IsNullOrEmpty(channel) && ChannelInternetStatus[PubnubInstance.InstanceId].ContainsKey(channel))
                     {
                         ChannelInternetStatus[PubnubInstance.InstanceId].AddOrUpdate(channel, networkConnection, (key, oldValue) => networkConnection);
@@ -987,10 +1012,10 @@ namespace PubnubApi.EndPoint
                 }
                 else
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, No network for SubscribeManager Manual Reconnect", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, No network for SubscribeManager Manual Reconnect", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
 
                     PNStatusCategory errorCategory = PNStatusCategory.PNNetworkIssuesCategory;
-                    PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNSubscribeOperation, errorCategory, null, (int)HttpStatusCode.NotFound, new PNException("SDK Network related error"));
+                    PNStatus status = new StatusBuilder(config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId] : null, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNSubscribeOperation, errorCategory, null, (int)HttpStatusCode.NotFound, new PNException("SDK Network related error"));
                     if (channels != null && channels.Length > 0)
                     {
                         status.AffectedChannels.AddRange(channels);
@@ -1006,12 +1031,12 @@ namespace PubnubApi.EndPoint
             }
             else
             {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, No channels/channelgroups for SubscribeManager Manual Reconnect", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, No channels/channelgroups for SubscribeManager Manual Reconnect", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
                 return false;
             }
 
 
-            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager Manual Reconnect", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager Manual Reconnect", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
             SubscribeDisconnected[PubnubInstance.InstanceId] = false;
 
             Task.Factory.StartNew(() =>
@@ -1033,7 +1058,7 @@ namespace PubnubApi.EndPoint
             {
                 return false;
             }
-            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager Manual Disconnect", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager Manual Disconnect", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
             SubscribeDisconnected[PubnubInstance.InstanceId] = true;
             TerminateCurrentSubscriberRequest();
             TerminatePresenceHeartbeatTimer();
@@ -1048,7 +1073,12 @@ namespace PubnubApi.EndPoint
             {
                 if (SubscribeDisconnected[PubnubInstance.InstanceId])
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - SubscribeDisconnected. No heartbeat check.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - SubscribeDisconnected. No heartbeat check.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
+                    return;
+                }
+                if (!config.ContainsKey(PubnubInstance.InstanceId))
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, InstanceId Not Available. So No heartbeat check.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
                     return;
                 }
                 if (SubscribeAccessDenied[PubnubInstance.InstanceId])
@@ -1067,13 +1097,13 @@ namespace PubnubApi.EndPoint
                     if (networkConnection && PubnubInstance != null && SubscribeRequestTracker.ContainsKey(PubnubInstance.InstanceId))
                     {
                         DateTime lastSubscribeRequestTime = SubscribeRequestTracker[PubnubInstance.InstanceId];
-                        if ((DateTime.Now - lastSubscribeRequestTime).TotalSeconds < config.SubscribeTimeout)
+                        if ((DateTime.Now - lastSubscribeRequestTime).TotalSeconds < config[PubnubInstance.InstanceId].SubscribeTimeout)
                         {
-                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - ok. expected subscribe within threshold limit of SubscribeTimeout. No action needed", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - ok. expected subscribe within threshold limit of SubscribeTimeout. No action needed", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config[PubnubInstance.InstanceId].LogVerbosity);
                         }
-                        else if ((DateTime.Now - lastSubscribeRequestTime).TotalSeconds > 2 * (config.SubscribeTimeout - config.SubscribeTimeout/2))
+                        else if ((DateTime.Now - lastSubscribeRequestTime).TotalSeconds > 2 * (config[PubnubInstance.InstanceId].SubscribeTimeout - config[PubnubInstance.InstanceId].SubscribeTimeout/2))
                         {
-                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - **No auto subscribe within threshold limit of SubscribeTimeout**. Calling MultiChannelSubscribeRequest", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - **No auto subscribe within threshold limit of SubscribeTimeout**. Calling MultiChannelSubscribeRequest", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config[PubnubInstance.InstanceId].LogVerbosity);
                             Task.Factory.StartNew(() =>
                             {
                                 TerminateCurrentSubscriberRequest();
@@ -1082,7 +1112,7 @@ namespace PubnubApi.EndPoint
                         }
                         else
                         {
-                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - **No auto subscribe within threshold limit of SubscribeTimeout**. Calling TerminateCurrentSubscriberRequest", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - **No auto subscribe within threshold limit of SubscribeTimeout**. Calling TerminateCurrentSubscriberRequest", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config[PubnubInstance.InstanceId].LogVerbosity);
                             Task.Factory.StartNew(() =>
                             {
                                 TerminateCurrentSubscriberRequest();
@@ -1091,10 +1121,10 @@ namespace PubnubApi.EndPoint
                     }
                     else
                     {
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - StartSubscribeHeartbeatCheckCallback - No network or no pubnub instance mapping", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - StartSubscribeHeartbeatCheckCallback - No network or no pubnub instance mapping", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config[PubnubInstance.InstanceId].LogVerbosity);
                         if (PubnubInstance != null && !networkConnection)
                         {
-                            PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNSubscribeOperation, PNStatusCategory.PNNetworkIssuesCategory, null, (int)System.Net.HttpStatusCode.NotFound, new PNException("Internet connection problem during subscribe heartbeat."));
+                            PNStatus status = new StatusBuilder(config[PubnubInstance.InstanceId], jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNSubscribeOperation, PNStatusCategory.PNNetworkIssuesCategory, null, (int)System.Net.HttpStatusCode.NotFound, new PNException("Internet connection problem during subscribe heartbeat."));
                             if (channels != null && channels.Length > 0)
                             {
                                 status.AffectedChannels.AddRange(channels.ToList());
@@ -1115,7 +1145,7 @@ namespace PubnubApi.EndPoint
                 }
                 else
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - StartSubscribeHeartbeatCheckCallback - No channels/cgs avaialable", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - StartSubscribeHeartbeatCheckCallback - No channels/cgs avaialable", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config[PubnubInstance.InstanceId].LogVerbosity);
                     try
                     {
                         SubscribeHeartbeatCheckTimer.Change(Timeout.Infinite, Timeout.Infinite);
@@ -1126,7 +1156,7 @@ namespace PubnubApi.EndPoint
             }
             catch (Exception ex)
             {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - StartSubscribeHeartbeatCheckCallback - EXCEPTION: {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture),ex), config.LogVerbosity);
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, SubscribeManager - StartSubscribeHeartbeatCheckCallback - EXCEPTION: {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture),ex), config[PubnubInstance.InstanceId].LogVerbosity);
             }
         }
 
@@ -1210,11 +1240,11 @@ namespace PubnubApi.EndPoint
                                 ConnectionErrors++;
                                 UpdatePubnubNetworkTcpCheckIntervalInSeconds();
 
-                                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, channel={1} {2} reconnectNetworkCallback. Retry", DateTime.Now.ToString(CultureInfo.InvariantCulture), channel, netState.ResponseType), config.LogVerbosity);
+                                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, channel={1} {2} reconnectNetworkCallback. Retry", DateTime.Now.ToString(CultureInfo.InvariantCulture), channel, netState.ResponseType), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
 
                                 if (netState.Channels != null && netState.Channels.Length > 0)
                                 {
-                                    PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(netState.ResponseType, PNStatusCategory.PNReconnectedCategory, null, (int)System.Net.HttpStatusCode.NotFound, new PNException("Internet connection problem. Retrying connection"));
+                                    PNStatus status = new StatusBuilder(config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId] : null, jsonLibrary).CreateStatusResponse<T>(netState.ResponseType, PNStatusCategory.PNReconnectedCategory, null, (int)System.Net.HttpStatusCode.NotFound, new PNException("Internet connection problem. Retrying connection"));
                                     if (netState.Channels != null && netState.Channels.Length > 0)
                                     {
                                         status.AffectedChannels.AddRange(netState.Channels.ToList());
@@ -1233,11 +1263,11 @@ namespace PubnubApi.EndPoint
                         {
                             if (ChannelReconnectTimer[PubnubInstance.InstanceId].ContainsKey(channel))
                             {
-                                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, {1} {2} terminating ch reconnectimer", DateTime.Now.ToString(CultureInfo.InvariantCulture), channel, netState.ResponseType), config.LogVerbosity);
+                                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, {1} {2} terminating ch reconnectimer", DateTime.Now.ToString(CultureInfo.InvariantCulture), channel, netState.ResponseType), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
                                 TerminateReconnectTimer();
                             }
 
-                            PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(netState.ResponseType, PNStatusCategory.PNReconnectedCategory, null, (int)System.Net.HttpStatusCode.OK, null);
+                            PNStatus status = new StatusBuilder(config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId] : null, jsonLibrary).CreateStatusResponse<T>(netState.ResponseType, PNStatusCategory.PNReconnectedCategory, null, (int)System.Net.HttpStatusCode.OK, null);
                             if (netState.Channels != null && netState.Channels.Length > 0)
                             {
                                 status.AffectedChannels.AddRange(netState.Channels.ToList());
@@ -1248,7 +1278,7 @@ namespace PubnubApi.EndPoint
                             }
                             Announce(status);
 
-                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, channel={1} {2} reconnectNetworkCallback. Internet Available : {3}", DateTime.Now.ToString(CultureInfo.InvariantCulture), channel, netState.ResponseType, channelInternetFlag.ToString()), config.LogVerbosity);
+                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, channel={1} {2} reconnectNetworkCallback. Internet Available : {3}", DateTime.Now.ToString(CultureInfo.InvariantCulture), channel, netState.ResponseType, channelInternetFlag.ToString()), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
                             switch (netState.ResponseType)
                             {
                                 case PNOperationType.PNSubscribeOperation:
@@ -1287,11 +1317,11 @@ namespace PubnubApi.EndPoint
                                     ChannelInternetStatus[PubnubInstance.InstanceId].AddOrUpdate(channel, networkConnection, (key, oldValue) => networkConnection);
                                 }
 
-                                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, channelgroup={1} {2} reconnectNetworkCallback. Retrying", DateTime.Now.ToString(CultureInfo.InvariantCulture), channelGroup, netState.ResponseType), config.LogVerbosity);
+                                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, channelgroup={1} {2} reconnectNetworkCallback. Retrying", DateTime.Now.ToString(CultureInfo.InvariantCulture), channelGroup, netState.ResponseType), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
 
                                 if (netState.ChannelGroups != null && netState.ChannelGroups.Length > 0)
                                 {
-                                    PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(netState.ResponseType, PNStatusCategory.PNReconnectedCategory, null, (int)System.Net.HttpStatusCode.NotFound, new PNException("Internet connection problem. Retrying connection"));
+                                    PNStatus status = new StatusBuilder(config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId] : null, jsonLibrary).CreateStatusResponse<T>(netState.ResponseType, PNStatusCategory.PNReconnectedCategory, null, (int)System.Net.HttpStatusCode.NotFound, new PNException("Internet connection problem. Retrying connection"));
                                     if (netState.Channels != null && netState.Channels.Length > 0)
                                     {
                                         status.AffectedChannels.AddRange(netState.Channels.ToList());
@@ -1309,14 +1339,14 @@ namespace PubnubApi.EndPoint
                         {
                             if (ChannelGroupReconnectTimer[PubnubInstance.InstanceId].ContainsKey(channelGroup))
                             {
-                                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, {1} {2} terminating cg reconnectimer", DateTime.Now.ToString(CultureInfo.InvariantCulture), channelGroup, netState.ResponseType), config.LogVerbosity);
+                                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, {1} {2} terminating cg reconnectimer", DateTime.Now.ToString(CultureInfo.InvariantCulture), channelGroup, netState.ResponseType), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
                                 TerminateReconnectTimer();
                             }
 
                             //Send one ReConnectedCategory message. If Channels NOT available then use this
                             if (netState.Channels.Length == 0 && netState.ChannelGroups != null && netState.ChannelGroups.Length > 0)
                             {
-                                PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(netState.ResponseType, PNStatusCategory.PNReconnectedCategory, null, (int)System.Net.HttpStatusCode.OK, null);
+                                PNStatus status = new StatusBuilder(config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId] : null, jsonLibrary).CreateStatusResponse<T>(netState.ResponseType, PNStatusCategory.PNReconnectedCategory, null, (int)System.Net.HttpStatusCode.OK, null);
                                 if (netState.Channels != null && netState.Channels.Length > 0)
                                 {
                                     status.AffectedChannels.AddRange(netState.Channels.ToList());
@@ -1328,7 +1358,7 @@ namespace PubnubApi.EndPoint
                                 Announce(status);
                             }
 
-                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, channelgroup={1} {2} reconnectNetworkCallback. Internet Available", DateTime.Now.ToString(CultureInfo.InvariantCulture), channelGroup, netState.ResponseType), config.LogVerbosity);
+                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, channelgroup={1} {2} reconnectNetworkCallback. Internet Available", DateTime.Now.ToString(CultureInfo.InvariantCulture), channelGroup, netState.ResponseType), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
                             switch (netState.ResponseType)
                             {
                                 case PNOperationType.PNSubscribeOperation:
@@ -1343,7 +1373,7 @@ namespace PubnubApi.EndPoint
                 }
                 else
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Unknown request state in reconnectNetworkCallback", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Unknown request state in reconnectNetworkCallback", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
                 }
             }
             catch (Exception ex)
@@ -1351,7 +1381,7 @@ namespace PubnubApi.EndPoint
                 if (netState != null)
                 {
                     PNStatusCategory errorCategory = PNStatusCategoryHelper.GetPNStatusCategory(ex);
-                    PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(netState.ResponseType, errorCategory, null, (int)HttpStatusCode.NotFound, new PNException(ex));
+                    PNStatus status = new StatusBuilder(config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId] : null, jsonLibrary).CreateStatusResponse<T>(netState.ResponseType, errorCategory, null, (int)HttpStatusCode.NotFound, new PNException(ex));
                     if (netState.Channels != null && netState.Channels.Length > 0)
                     {
                         status.AffectedChannels.AddRange(netState.Channels.ToList());
@@ -1363,7 +1393,7 @@ namespace PubnubApi.EndPoint
                     Announce(status);
                 }
 
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} method:reconnectNetworkCallback \n Exception Details={1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), config.LogVerbosity);
+                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} method:reconnectNetworkCallback \n Exception Details={1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
             }
         }
 
@@ -1389,9 +1419,9 @@ namespace PubnubApi.EndPoint
                 presenceHeartbeatState.Request = null;
                 presenceHeartbeatState.Response = null;
 
-                if (config.PresenceInterval > 0)
+                if (config.ContainsKey(PubnubInstance.InstanceId) && config[PubnubInstance.InstanceId].PresenceInterval > 0)
                 {
-                    PresenceHeartbeatTimer = new Timer(OnPresenceHeartbeatIntervalTimeout<T>, presenceHeartbeatState, config.PresenceInterval * 1000, config.PresenceInterval * 1000);
+                    PresenceHeartbeatTimer = new Timer(OnPresenceHeartbeatIntervalTimeout<T>, presenceHeartbeatState, config[PubnubInstance.InstanceId].PresenceInterval * 1000, config[PubnubInstance.InstanceId].PresenceInterval * 1000);
                 }
             }
         }
@@ -1413,7 +1443,7 @@ namespace PubnubApi.EndPoint
                     if ((subscriberChannels != null && subscriberChannels.Length > 0) || (subscriberChannelGroups != null && subscriberChannelGroups.Length > 0))
                     {
                         string channelsJsonState = BuildJsonUserState(subscriberChannels, subscriberChannelGroups, false);
-                        IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+                        IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId] : null, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
                         
                         Uri request = urlBuilder.BuildPresenceHeartbeatRequest("GET", "", subscriberChannels, subscriberChannelGroups, channelsJsonState);
 
@@ -1440,7 +1470,7 @@ namespace PubnubApi.EndPoint
                 {
                     if (PubnubInstance != null && !networkConnection)
                     {
-                        PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNSubscribeOperation, PNStatusCategory.PNNetworkIssuesCategory, null, (int)System.Net.HttpStatusCode.NotFound, new PNException("Internet connection problem during presence heartbeat."));
+                        PNStatus status = new StatusBuilder(config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId] : null, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNSubscribeOperation, PNStatusCategory.PNNetworkIssuesCategory, null, (int)System.Net.HttpStatusCode.NotFound, new PNException("Internet connection problem during presence heartbeat."));
                         if (subscriberChannels != null && subscriberChannels.Length > 0)
                         {
                             status.AffectedChannels.AddRange(subscriberChannels.ToList());

@@ -40,13 +40,12 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
                 AuthKey = authKey,
-                Uuid = "mytestuuid",
             };
 
             pubnub = createPubNubInstance(config);
@@ -64,7 +63,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("ttl", "20")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithParameter("w", "1")
                     .WithParameter("signature", "MhmxFFbUb_HlzWqTuvJAMRjAb3fgP9dbykaiPsSZuUc=")
                     .WithResponse(expected)
@@ -104,11 +103,10 @@ namespace PubNubMessaging.Tests
             currentUnitTestCase = "ThenChannel1Timetoken1ShouldReturnSuccess";
             receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Secure = true
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -131,7 +129,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithParameter("signature", "yo21VoxIksrH3Iozeaz5Zw4BX18N3vU9PLa-zVxRXsU=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
@@ -172,11 +170,10 @@ namespace PubNubMessaging.Tests
             currentUnitTestCase = "ThenWithAsyncChannel1Timetoken1ShouldReturnSuccess";
             receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Secure = true
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -199,7 +196,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithParameter("signature", "yo21VoxIksrH3Iozeaz5Zw4BX18N3vU9PLa-zVxRXsU=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
@@ -237,11 +234,10 @@ namespace PubNubMessaging.Tests
             currentUnitTestCase = "ThenChannel1Timetoken1ShouldReturnSuccess";
             receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Secure = true
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -264,7 +260,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithParameter("signature", "yo21VoxIksrH3Iozeaz5Zw4BX18N3vU9PLa-zVxRXsU=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
@@ -305,11 +301,10 @@ namespace PubNubMessaging.Tests
             currentUnitTestCase = "ThenWithAsyncChannel2Timetoken2ShouldReturnSuccess";
             receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Secure = true
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -332,7 +327,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithParameter("signature", "yo21VoxIksrH3Iozeaz5Zw4BX18N3vU9PLa-zVxRXsU=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));

@@ -40,13 +40,12 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
                 AuthKey = authKey,
-                Uuid = "mytestuuid",
                 Secure = false
             };
             server.RunOnHttps(false);
@@ -68,13 +67,13 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("ttl", "20")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithParameter("w", "1")
                     .WithParameter("signature", "JMQKzXgfqNo-HaHuabC0gq0X6IkVMHa9AWBCg6BGN1Q=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).Delete(true).TTL(20).Execute(new UTGrantResult());
+            pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).Delete(true).Manage(true).Update(true).TTL(20).Execute(new UTGrantResult());
 
             Thread.Sleep(1000);
 
@@ -101,11 +100,10 @@ namespace PubNubMessaging.Tests
             currentTestCase = "ThenDeleteMessageShouldReturnSuccessMessage";
             receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Secure = false
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -126,7 +124,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithParameter("signature", "AQjIVGOI59CyaHrRG18XRZmqRjgWdzbbf9icO0Yzxo4=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
@@ -164,11 +162,10 @@ namespace PubNubMessaging.Tests
             currentTestCase = "ThenWithAsyncDeleteMessageShouldReturnSuccessMessage";
             receivedMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Secure = false
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -189,7 +186,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithParameter("signature", "AQjIVGOI59CyaHrRG18XRZmqRjgWdzbbf9icO0Yzxo4=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));

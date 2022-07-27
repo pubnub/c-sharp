@@ -3,7 +3,21 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:stretchColumns="*">
-    <TableRow>
+    <TableRow 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minWidth="30px"
+            android:minHeight="30px"
+            android:id="@+id/textView1" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minWidth="30px"
+            android:minHeight="30px"
+            android:id="@+id/textView2" />
         <Button
             android:layout_column="2"
             android:padding="2dip"
@@ -12,7 +26,9 @@
             android:layout_height="40dp"
             android:text="@string/cancel" />
     </TableRow>
-    <TableRow>
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
         <Button
             android:layout_column="0"
             android:padding="2dip"
@@ -35,7 +51,9 @@
             android:layout_height="40dp"
             android:text="@string/presence" />
     </TableRow>
-    <TableRow>
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
         <Button
             android:layout_column="0"
             android:padding="2dip"
@@ -58,7 +76,9 @@
             android:layout_height="40dp"
             android:text="@string/time" />
     </TableRow>
-    <TableRow>
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
         <Button
             android:layout_column="0"
             android:padding="2dip"
@@ -75,14 +95,19 @@
             android:layout_height="40dp"
             android:text="@string/unsubscribePres" />
     </TableRow>
-    <TableRow>
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
         <View
             android:layout_column="0"
             android:layout_span="3"
             android:layout_height="2dip"
-            android:background="#FF909090" />
+            android:background="#FF909090"
+            android:layout_width="match_parent" />
     </TableRow>
-    <TableRow>
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
         <ScrollView
             android:layout_column="0"
             android:layout_span="3"

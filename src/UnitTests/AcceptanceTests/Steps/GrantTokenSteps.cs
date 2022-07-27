@@ -154,13 +154,12 @@ namespace AcceptanceTests.Steps
         [Given(@"I have a keyset with access manager enabled")]
         public void GivenIHaveAKeysetWithAccessManagerEnabled()
         {
-            config = new PNConfiguration();
+            config = new PNConfiguration("pn-csharp-acceptance-test-uuid");
             config.Origin = acceptance_test_origin;
             config.Secure = false;
             config.PublishKey = System.Environment.GetEnvironmentVariable("PN_PUB_KEY");
             config.SubscribeKey = System.Environment.GetEnvironmentVariable("PN_SUB_KEY");
             config.SecretKey = System.Environment.GetEnvironmentVariable("PN_SEC_KEY");
-            config.Uuid = "pn-csharp-acceptance-test-uuid";
 
             pn = new Pubnub(config);
         }
@@ -371,24 +370,6 @@ namespace AcceptanceTests.Steps
             if (perms != null) { perms.Get = false; }
         }
 
-        [Given(@"I have a known token containing an authorized UUID")]
-        public void GivenIHaveAKnownTokenContainingAnAuthorizedUUID()
-        {
-            tokenInput = "qEF2AkF0GmFR_FBDdHRsGDxDcmVzpURjaGFuoWljaGFubmVsLTEBQ2dycKBDdXNyoENzcGOgRHV1aWSgQ3BhdKVEY2hhbqBDZ3JwoEN1c3KgQ3NwY6BEdXVpZKBEbWV0YaBEdXVpZHR0ZXN0LWF1dGhvcml6ZWQtdXVpZENzaWdYIFWxUdc4iRLk0cIxDsxghOqCZMf9etqTf9AyecSF8USJ";
-        }
-        
-        [Given(@"I have a known token containing UUID resource permissions")]
-        public void GivenIHaveAKnownTokenContainingUUIDResourcePermissions()
-        {
-            tokenInput = "qEF2AkF0GmFR_9NDdHRsGDxDcmVzpURjaGFuoWljaGFubmVsLTEY70NncnChb2NoYW5uZWxfZ3JvdXAtMQVDdXNyoENzcGOgRHV1aWShZnV1aWQtMRhoQ3BhdKVEY2hhbqFtXmNoYW5uZWwtXFMqJBjvQ2dycKF0XjpjaGFubmVsX2dyb3VwLVxTKiQFQ3VzcqBDc3BjoER1dWlkoWpedXVpZC1cUyokGGhEbWV0YaBEdXVpZHR0ZXN0LWF1dGhvcml6ZWQtdXVpZENzaWdYIA4H1-yMh8cJZwYYxJyMO0yfS6AsCzluKeOZ2OuHPT_5";
-        }
-
-        [Given(@"I have a known token containing UUID pattern Permissions")]
-        public void GivenIHaveAKnownTokenContainingUUIDPatternPermissions()
-        {
-            tokenInput = "qEF2AkF0GmFR_9NDdHRsGDxDcmVzpURjaGFuoWljaGFubmVsLTEY70NncnChb2NoYW5uZWxfZ3JvdXAtMQVDdXNyoENzcGOgRHV1aWShZnV1aWQtMRhoQ3BhdKVEY2hhbqFtXmNoYW5uZWwtXFMqJBjvQ2dycKF0XjpjaGFubmVsX2dyb3VwLVxTKiQFQ3VzcqBDc3BjoER1dWlkoWpedXVpZC1cUyokGGhEbWV0YaBEdXVpZHR0ZXN0LWF1dGhvcml6ZWQtdXVpZENzaWdYIA4H1-yMh8cJZwYYxJyMO0yfS6AsCzluKeOZ2OuHPT_5";
-        }
-        
         [When(@"I grant a token specifying those permissions")]
         public async Task WhenIGrantATokenSpecifyingThosePermissions()
         {
@@ -790,19 +771,6 @@ namespace AcceptanceTests.Steps
             if (pnError != null && pnError.error.details.Count > 0)
             {
                 Assert.AreEqual(p0, pnError.error.details[0].locationType);
-            }
-            else
-            {
-                Assert.Fail();
-            }
-        }
-
-        [Then(@"the parsed token output contains the authorized UUID ""(.*)""")]
-        public void ThenTheParsedTokenOutputContainsTheAuthorizedUUID(string p0)
-        {
-            if (tokenContent != null)
-            {
-                Assert.AreEqual(p0, tokenContent.AuthorizedUuid);
             }
             else
             {

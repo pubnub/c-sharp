@@ -13,8 +13,8 @@ namespace PubnubApi.WinFormExample
     public partial class PubnubDemoForm : Form
     {
         static private Pubnub[] pubnub;
-        PNConfiguration config1 = new PNConfiguration();
-        PNConfiguration config2 = new PNConfiguration();
+        PNConfiguration config1 = new PNConfiguration("uuidone");
+        PNConfiguration config2 = new PNConfiguration("uuidtwo");
         string origin = "ps.pndsn.com";
 
         public class MyLog1 : IPubnubLog
@@ -979,7 +979,7 @@ namespace PubnubApi.WinFormExample
             DialogResult result = accessManager.ShowDialog();
             if (result == DialogResult.OK)
             {
-                PNResourcePermission perm = new PNResourcePermission
+                PNTokenAuthValues perm = new PNTokenAuthValues
                 {
                     Read = accessManager.AccessRead,
                     Write = accessManager.AccessWrite,
@@ -988,9 +988,11 @@ namespace PubnubApi.WinFormExample
                     Create = accessManager.AccessCreate
                 };
                 pubnub[0].GrantToken()
-                    .Users(new Dictionary<string, PNResourcePermission>() { { accessManager.UserId, perm } })
-                    .Spaces(new Dictionary<string, PNResourcePermission>() { { accessManager.SpaceId, perm } })
-                    .AuthKey(accessManager.AuthKey)
+                    .Resources(new PNTokenResources() 
+                        { 
+                            Users = new Dictionary<string, PNTokenAuthValues>() { { accessManager.UserId, perm } },
+                            Spaces = new Dictionary<string, PNTokenAuthValues>() { { accessManager.SpaceId, perm } },
+                        })
                     .TTL(accessManager.TTL)
                     .Execute(new PNAccessManagerTokenResultExt(
                         (r, s) =>
@@ -998,6 +1000,10 @@ namespace PubnubApi.WinFormExample
                             Invoke(new Action(() => {
                                 if (r != null)
                                 {
+                                    if (!string.IsNullOrEmpty(r.Token))
+                                    {
+                                        accessManager.AuthKey = r.Token;
+                                    }
                                     lvResults1.Items.Add(pubnub[0].JsonPluggableLibrary.SerializeToJsonString(r));
                                 }
                                 else if (s != null)
@@ -1020,7 +1026,7 @@ namespace PubnubApi.WinFormExample
             DialogResult result = accessManager.ShowDialog();
             if (result == DialogResult.OK)
             {
-                PNResourcePermission perm = new PNResourcePermission
+                PNTokenAuthValues perm = new PNTokenAuthValues
                 {
                     Read = accessManager.AccessRead,
                     Write = accessManager.AccessWrite,
@@ -1029,9 +1035,11 @@ namespace PubnubApi.WinFormExample
                     Create = accessManager.AccessCreate
                 };
                 pubnub[1].GrantToken()
-                    .Users(new Dictionary<string, PNResourcePermission>() { { accessManager.UserId, perm } })
-                    .Spaces(new Dictionary<string, PNResourcePermission>() { { accessManager.SpaceId, perm } })
-                    .AuthKey(accessManager.AuthKey)
+                    .Resources(new PNTokenResources()
+                    {
+                        Users = new Dictionary<string, PNTokenAuthValues>() { { accessManager.UserId, perm } },
+                        Spaces = new Dictionary<string, PNTokenAuthValues>() { { accessManager.SpaceId, perm } },
+                    })
                     .TTL(accessManager.TTL)
                     .Execute(new PNAccessManagerTokenResultExt(
                         (r, s) =>
@@ -1039,6 +1047,10 @@ namespace PubnubApi.WinFormExample
                             Invoke(new Action(() => {
                                 if (r != null)
                                 {
+                                    if (!string.IsNullOrEmpty(r.Token))
+                                    {
+                                        accessManager.AuthKey = r.Token;
+                                    }
                                     lvResults2.Items.Add(pubnub[1].JsonPluggableLibrary.SerializeToJsonString(r));
                                 }
                                 else if (s != null)
@@ -1074,10 +1086,10 @@ namespace PubnubApi.WinFormExample
                 switch (obj.ObjectsRequestType.ToLower())
                 {
                     case "createuser":
-                        pubnub[0].CreateUser()
-                            .Id(obj.UserId)
+                        pubnub[0].SetUuidMetadata()
+                            .Uuid(obj.UserId)
                             .Name(obj.UserName)
-                            .Execute(new PNCreateUserResultExt(
+                            .Execute(new PNSetUuidMetadataResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -1093,10 +1105,10 @@ namespace PubnubApi.WinFormExample
                                 }));
                         break;
                     case "updateuser":
-                        pubnub[0].UpdateUser()
-                            .Id(obj.UserId)
+                        pubnub[0].SetUuidMetadata()
+                            .Uuid(obj.UserId)
                             .Name(obj.UserName)
-                            .Execute(new PNUpdateUserResultExt(
+                            .Execute(new PNSetUuidMetadataResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -1112,9 +1124,9 @@ namespace PubnubApi.WinFormExample
                                 }));
                         break;
                     case "deleteuser":
-                        pubnub[0].DeleteUser()
-                            .Id(obj.UserId)
-                            .Execute(new PNDeleteUserResultExt(
+                        pubnub[0].RemoveUuidMetadata()
+                            .Uuid(obj.UserId)
+                            .Execute(new PNRemoveUuidMetadataResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -1130,9 +1142,9 @@ namespace PubnubApi.WinFormExample
                                 }));
                         break;
                     case "getuser":
-                        pubnub[0].GetUser()
-                            .UserId(obj.UserId)
-                            .Execute(new PNGetUserResultExt(
+                        pubnub[0].GetUuidMetadata()
+                            .Uuid(obj.UserId)
+                            .Execute(new PNGetUuidMetadataResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -1148,10 +1160,10 @@ namespace PubnubApi.WinFormExample
                                 }));
                         break;
                     case "createspace":
-                        pubnub[0].CreateSpace()
-                            .Id(obj.SpaceId)
+                        pubnub[0].SetChannelMetadata()
+                            .Channel(obj.SpaceId)
                             .Name(obj.SpaceName)
-                            .Execute(new PNCreateSpaceResultExt(
+                            .Execute(new PNSetChannelMetadataResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -1167,10 +1179,10 @@ namespace PubnubApi.WinFormExample
                                 }));
                         break;
                     case "updatespace":
-                        pubnub[0].UpdateSpace()
-                            .Id(obj.SpaceId)
+                        pubnub[0].SetChannelMetadata()
+                            .Channel(obj.SpaceId)
                             .Name(obj.SpaceName)
-                            .Execute(new PNUpdateSpaceResultExt(
+                            .Execute(new PNSetChannelMetadataResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -1186,9 +1198,9 @@ namespace PubnubApi.WinFormExample
                                 }));
                         break;
                     case "deletespace":
-                        pubnub[0].DeleteSpace()
-                            .Id(obj.SpaceId)
-                            .Execute(new PNDeleteSpaceResultExt(
+                        pubnub[0].RemoveChannelMetadata()
+                            .Channel(obj.SpaceId)
+                            .Execute(new PNRemoveChannelMetadataResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -1204,9 +1216,9 @@ namespace PubnubApi.WinFormExample
                                 }));
                         break;
                     case "getspace":
-                        pubnub[0].GetSpace()
-                            .SpaceId(obj.SpaceId)
-                            .Execute(new PNGetSpaceResultExt(
+                        pubnub[0].GetChannelMetadata()
+                            .Channel(obj.SpaceId)
+                            .Execute(new PNGetChannelMetadataResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -1222,10 +1234,10 @@ namespace PubnubApi.WinFormExample
                                 }));
                         break;
                     case "memberadd":
-                        pubnub[0].ManageMembers()
-                            .SpaceId(obj.SpaceId)
-                            .Add(new List<PNMember>() { new PNMember { UserId = obj.UserId } })
-                            .Execute(new PNManageMembersResultExt(
+                        pubnub[0].ManageChannelMembers()
+                            .Channel(obj.SpaceId)
+                            .Set(new List<PNChannelMember>() { new PNChannelMember { Uuid = obj.UserId } })
+                            .Execute(new PNChannelMembersResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -1241,10 +1253,10 @@ namespace PubnubApi.WinFormExample
                                 }));
                         break;
                     case "memberremove":
-                        pubnub[0].ManageMembers()
-                            .SpaceId(obj.SpaceId)
+                        pubnub[0].ManageChannelMembers()
+                            .Channel(obj.SpaceId)
                             .Remove(new List<string>() { obj.UserId })
-                            .Execute(new PNManageMembersResultExt(
+                            .Execute(new PNChannelMembersResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -1261,9 +1273,9 @@ namespace PubnubApi.WinFormExample
                         break;
                     case "membershipadd":
                         pubnub[0].ManageMemberships()
-                            .UserId(obj.UserId)
-                            .Add(new List<PNMembership>() { new PNMembership { SpaceId = obj.SpaceId } })
-                            .Execute(new PNManageMembershipsResultExt(
+                            .Uuid(obj.UserId)
+                            .Set(new List<PNMembership>() { new PNMembership { Channel = obj.SpaceId } })
+                            .Execute(new PNMembershipsResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -1280,9 +1292,9 @@ namespace PubnubApi.WinFormExample
                         break;
                     case "membershipremove":
                         pubnub[0].ManageMemberships()
-                            .UserId(obj.UserId)
+                            .Uuid(obj.UserId)
                             .Remove(new List<string>() { obj.SpaceId })
-                            .Execute(new PNManageMembershipsResultExt(
+                            .Execute(new PNMembershipsResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -1312,10 +1324,10 @@ namespace PubnubApi.WinFormExample
                 switch (obj.ObjectsRequestType.ToLower())
                 {
                     case "createuser":
-                        pubnub[1].CreateUser()
-                            .Id(obj.UserId)
+                        pubnub[1].SetUuidMetadata()
+                            .Uuid(obj.UserId)
                             .Name(obj.UserName)
-                            .Execute(new PNCreateUserResultExt(
+                            .Execute(new PNSetUuidMetadataResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -1331,10 +1343,10 @@ namespace PubnubApi.WinFormExample
                                 }));
                         break;
                     case "updateuser":
-                        pubnub[1].UpdateUser()
-                            .Id(obj.UserId)
+                        pubnub[1].SetUuidMetadata()
+                            .Uuid(obj.UserId)
                             .Name(obj.UserName)
-                            .Execute(new PNUpdateUserResultExt(
+                            .Execute(new PNSetUuidMetadataResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -1350,9 +1362,9 @@ namespace PubnubApi.WinFormExample
                                 }));
                         break;
                     case "deleteuser":
-                        pubnub[1].DeleteUser()
-                            .Id(obj.UserId)
-                            .Execute(new PNDeleteUserResultExt(
+                        pubnub[1].RemoveUuidMetadata()
+                            .Uuid(obj.UserId)
+                            .Execute(new PNRemoveUuidMetadataResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -1368,9 +1380,9 @@ namespace PubnubApi.WinFormExample
                                 }));
                         break;
                     case "getuser":
-                        pubnub[1].GetUser()
-                            .UserId(obj.UserId)
-                            .Execute(new PNGetUserResultExt(
+                        pubnub[1].GetUuidMetadata()
+                            .Uuid(obj.UserId)
+                            .Execute(new PNGetUuidMetadataResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -1386,10 +1398,10 @@ namespace PubnubApi.WinFormExample
                                 }));
                         break;
                     case "createspace":
-                        pubnub[1].CreateSpace()
-                            .Id(obj.SpaceId)
+                        pubnub[1].SetChannelMetadata()
+                            .Channel(obj.SpaceId)
                             .Name(obj.SpaceName)
-                            .Execute(new PNCreateSpaceResultExt(
+                            .Execute(new PNSetChannelMetadataResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -1405,10 +1417,10 @@ namespace PubnubApi.WinFormExample
                                 }));
                         break;
                     case "updatespace":
-                        pubnub[1].UpdateSpace()
-                            .Id(obj.SpaceId)
+                        pubnub[1].SetChannelMetadata()
+                            .Channel(obj.SpaceId)
                             .Name(obj.SpaceName)
-                            .Execute(new PNUpdateSpaceResultExt(
+                            .Execute(new PNSetChannelMetadataResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -1424,9 +1436,9 @@ namespace PubnubApi.WinFormExample
                                 }));
                         break;
                     case "deletespace":
-                        pubnub[1].DeleteSpace()
-                            .Id(obj.SpaceId)
-                            .Execute(new PNDeleteSpaceResultExt(
+                        pubnub[1].RemoveChannelMetadata()
+                            .Channel(obj.SpaceId)
+                            .Execute(new PNRemoveChannelMetadataResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -1442,9 +1454,9 @@ namespace PubnubApi.WinFormExample
                                 }));
                         break;
                     case "getspace":
-                        pubnub[1].GetSpace()
-                            .SpaceId(obj.SpaceId)
-                            .Execute(new PNGetSpaceResultExt(
+                        pubnub[1].GetChannelMetadata()
+                            .Channel(obj.SpaceId)
+                            .Execute(new PNGetChannelMetadataResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -1460,10 +1472,10 @@ namespace PubnubApi.WinFormExample
                                 }));
                         break;
                     case "memberadd":
-                        pubnub[1].ManageMembers()
-                            .SpaceId(obj.SpaceId)
-                            .Add(new List<PNMember>() { new PNMember { UserId = obj.UserId } })
-                            .Execute(new PNManageMembersResultExt(
+                        pubnub[1].ManageChannelMembers()
+                            .Channel(obj.SpaceId)
+                            .Set(new List<PNChannelMember>() { new PNChannelMember { Uuid = obj.UserId } })
+                            .Execute(new PNChannelMembersResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -1479,10 +1491,10 @@ namespace PubnubApi.WinFormExample
                                 }));
                         break;
                     case "memberremove":
-                        pubnub[1].ManageMembers()
-                            .SpaceId(obj.SpaceId)
+                        pubnub[1].ManageChannelMembers()
+                            .Channel(obj.SpaceId)
                             .Remove(new List<string>() { obj.UserId })
-                            .Execute(new PNManageMembersResultExt(
+                            .Execute(new PNChannelMembersResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -1499,9 +1511,9 @@ namespace PubnubApi.WinFormExample
                         break;
                     case "membershipadd":
                         pubnub[1].ManageMemberships()
-                            .UserId(obj.UserId)
-                            .Add(new List<PNMembership>() { new PNMembership { SpaceId = obj.SpaceId } })
-                            .Execute(new PNManageMembershipsResultExt(
+                            .Uuid(obj.UserId)
+                            .Set(new List<PNMembership>() { new PNMembership { Channel = obj.SpaceId } })
+                            .Execute(new PNMembershipsResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -1518,9 +1530,9 @@ namespace PubnubApi.WinFormExample
                         break;
                     case "membershipremove":
                         pubnub[1].ManageMemberships()
-                            .UserId(obj.UserId)
+                            .Uuid(obj.UserId)
                             .Remove(new List<string>() { obj.SpaceId })
-                            .Execute(new PNManageMembershipsResultExt(
+                            .Execute(new PNMembershipsResultExt(
                                 (r, s) => {
                                     Invoke(new Action(() => {
                                         if (r != null)
@@ -1543,13 +1555,13 @@ namespace PubnubApi.WinFormExample
 
         private void btnSetToken1_Click(object sender, EventArgs e)
         {
-            pubnub[0].SetToken(txtToken1.Text);
+            pubnub[0].SetAuthToken(txtToken1.Text);
             lvResults1.Items.Add(pubnub[0].JsonPluggableLibrary.SerializeToJsonString(pubnub[0].ParseToken(txtToken1.Text)));
         }
 
         private void btnSetToken2_Click(object sender, EventArgs e)
         {
-            pubnub[1].SetToken(txtToken2.Text);
+            pubnub[1].SetAuthToken(txtToken2.Text);
             lvResults2.Items.Add(pubnub[1].JsonPluggableLibrary.SerializeToJsonString(pubnub[1].ParseToken(txtToken2.Text)));
         }
     }

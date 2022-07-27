@@ -43,12 +43,11 @@ namespace PubNubMessaging.Tests
             bool receivedGrantMessage = false;
             string channel = "hello_my_channel";
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
-                Uuid = "mytestuuid",
                 Secure = false
             };
             server.RunOnHttps(false);
@@ -134,11 +133,10 @@ namespace PubNubMessaging.Tests
 
             bool receivedPresenceMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Secure = false
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -188,7 +186,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("tt", "0")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithParameter("signature", "_JVs4gooSMhdgxRO6FNkk6HwlkyxqcRATHU5j3vkJ9s=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
@@ -229,11 +227,10 @@ namespace PubNubMessaging.Tests
 
             bool receivedPresenceMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Secure = true,
                 LogVerbosity = PNLogVerbosity.BODY,
                 PubnubLog = new TestLog()
@@ -285,7 +282,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("tt", "0")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithParameter("signature", "_JVs4gooSMhdgxRO6FNkk6HwlkyxqcRATHU5j3vkJ9s=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
@@ -319,18 +316,17 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public static void ThenPresenceShouldReturnCustomUUID()
+        public static void ThenPresenceShouldReturnCustomUserId()
         {
             server.ClearRequests();
 
-            string customUUID = "mylocalmachine.mydomain.com";
+            UserId customUserId = new UserId("mylocalmachine.mydomain.com");
             bool receivedCustomUUID = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Secure = false
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -369,7 +365,7 @@ namespace PubNubMessaging.Tests
             string channel = "hello_my_channel";
             manualResetEventWaitTimeout = 310 * 1000;
 
-            pubnub.ChangeUUID(customUUID);
+            pubnub.ChangeUserId(customUserId);
 
             string expected = "{\"t\":{\"t\":\"14833694874957031\",\"r\":7},\"m\":[{\"a\":\"4\",\"f\":512,\"p\":{\"t\":\"14833694873794045\",\"r\":2},\"k\":\"demo-36\",\"c\":\"hello_my_channel-pnpres\",\"d\":{\"action\": \"join\", \"timestamp\": 1483369487, \"uuid\": \"mylocalmachine.mydomain.com\", \"occupancy\": 1},\"b\":\"hello_my_channel-pnpres\"}]}";
 
@@ -381,7 +377,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("tt", "0")
-                    .WithParameter("uuid", customUUID)
+                    .WithParameter("uuid", customUserId.ToString())
                     .WithParameter("signature", "D7lw9Np5UU_xUTUAe0Sc0L0eSP9aTQljeith_M_rXzI=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
@@ -423,11 +419,10 @@ namespace PubNubMessaging.Tests
             bool receivedHereNowMessage = false;
             bool receivedErrorMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Secure = false
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -473,7 +468,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("tt", "0")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -548,11 +543,10 @@ namespace PubNubMessaging.Tests
             bool receivedHereNowMessage = false;
             bool receivedErrorMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Secure = false
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -598,7 +592,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("tt", "0")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -671,12 +665,11 @@ namespace PubNubMessaging.Tests
             bool receivedHereNowMessage = false;
             bool receivedErrorMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 CipherKey = "enigma",
-                Uuid = "mytestuuid",
                 Secure = false
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -724,7 +717,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("tt", "0")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -793,13 +786,12 @@ namespace PubNubMessaging.Tests
 
             bool receivedHereNowMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Secure = false,
                 CipherKey = "enigma",
-                Uuid = "mytestuuid"
             };
             if (PubnubCommon.PAMServerSideRun)
             {
@@ -845,7 +837,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("tt", "0")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithParameter("signature", "o3VANfuhvrxfff1jsBMOc6EQ4LCe8LXHGaDh58QBZFA=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
@@ -913,12 +905,11 @@ namespace PubNubMessaging.Tests
 
             bool receivedHereNowMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 CipherKey = "enigma",
-                Uuid = "mytestuuid",
                 Secure = true
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -965,7 +956,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("tt", "0")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithParameter("signature", "o3VANfuhvrxfff1jsBMOc6EQ4LCe8LXHGaDh58QBZFA=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
@@ -1034,12 +1025,11 @@ namespace PubNubMessaging.Tests
             bool receivedHereNowMessage = false;
             bool receivedErrorMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 CipherKey = "enigma",
-                Uuid = "mytestuuid",
                 Secure = true
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -1086,7 +1076,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("tt", "0")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -1155,11 +1145,10 @@ namespace PubNubMessaging.Tests
 
             bool receivedHereNowMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Secure = false
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -1206,7 +1195,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("tt", "0")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithParameter("signature", "o3VANfuhvrxfff1jsBMOc6EQ4LCe8LXHGaDh58QBZFA=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
@@ -1274,11 +1263,10 @@ namespace PubNubMessaging.Tests
 
             bool receivedHereNowMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Secure = true
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -1325,7 +1313,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("tt", "0")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithParameter("signature", "o3VANfuhvrxfff1jsBMOc6EQ4LCe8LXHGaDh58QBZFA=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
@@ -1394,11 +1382,10 @@ namespace PubNubMessaging.Tests
             bool receivedHereNowMessage = false;
             bool receivedErrorMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Secure = true
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -1445,7 +1432,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("tt", "0")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -1516,11 +1503,10 @@ namespace PubNubMessaging.Tests
             bool receivedHereNowMessage = false;
             bool receivedErrorMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Secure = false
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -1567,7 +1553,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("tt", "0")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -1596,12 +1582,12 @@ namespace PubNubMessaging.Tests
 
                 server.AddRequest(new Request()
                         .WithMethod("GET")
-                        .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/uuid/{2}/data", PubnubCommon.SubscribeKey, channel, config.Uuid))
+                        .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/uuid/{2}/data", PubnubCommon.SubscribeKey, channel, config.UserId))
                         .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                         .WithParameter("requestid", "myRequestId")
                         .WithParameter("state", "%7B%22testkey%22%3A%22testval%22%7D")
                         .WithParameter("timestamp", "1356998400")
-                        .WithParameter("uuid", config.Uuid)
+                        .WithParameter("uuid", config.UserId)
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -1626,7 +1612,7 @@ namespace PubNubMessaging.Tests
                         .WithParameter("requestid", "myRequestId")
                         .WithParameter("state", "1")
                         .WithParameter("timestamp", "1356998400")
-                        .WithParameter("uuid", config.Uuid)
+                        .WithParameter("uuid", config.UserId)
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -1674,11 +1660,10 @@ namespace PubNubMessaging.Tests
 
             bool receivedHereNowMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Secure = false
             };
 
@@ -1724,7 +1709,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("tt", "0")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithParameter("signature", "o3VANfuhvrxfff1jsBMOc6EQ4LCe8LXHGaDh58QBZFA=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
@@ -1736,7 +1721,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("tt", "0")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -1765,7 +1750,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("state", "0")
                     .WithParameter("timestamp", "1356998400")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -1810,11 +1795,10 @@ namespace PubNubMessaging.Tests
 
             bool receivedHereNowMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Secure = false
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -1858,7 +1842,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("tt", "0")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -1884,12 +1868,12 @@ namespace PubNubMessaging.Tests
 
             server.AddRequest(new Request()
                     .WithMethod("GET")
-                    .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/uuid/{2}/data", PubnubCommon.SubscribeKey, channel, config.Uuid))
+                    .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/uuid/{2}/data", PubnubCommon.SubscribeKey, channel, config.UserId))
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("state", "%7B%22testkey%22%3A%22testval%22%7D")
                     .WithParameter("timestamp", "1356998400")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -1915,7 +1899,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("state", "1")
                     .WithParameter("timestamp", "1356998400")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -1962,11 +1946,10 @@ namespace PubNubMessaging.Tests
 
             bool receivedWhereNowMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Secure = false
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -2011,7 +1994,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("tt", "0")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -2034,16 +2017,16 @@ namespace PubNubMessaging.Tests
 
             server.AddRequest(new Request()
                     .WithMethod("GET")
-                    .WithPath(String.Format("/v2/presence/sub_key/{0}/uuid/{1}", PubnubCommon.SubscribeKey, config.Uuid))
+                    .WithPath(String.Format("/v2/presence/sub_key/{0}/uuid/{1}", PubnubCommon.SubscribeKey, config.UserId))
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             ManualResetEvent whereNowManualEvent = new ManualResetEvent(false);
-            pubnub.WhereNow().Uuid(config.Uuid).Execute(new PNWhereNowResultExt(
+            pubnub.WhereNow().Uuid(config.UserId).Execute(new PNWhereNowResultExt(
                                 (r, s) => {
                                     Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
                                     receivedWhereNowMessage = true;
@@ -2085,11 +2068,10 @@ namespace PubNubMessaging.Tests
 
             bool receivedWhereNowMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Secure = false
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -2134,7 +2116,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("tt", "0")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -2157,18 +2139,18 @@ namespace PubNubMessaging.Tests
 
             server.AddRequest(new Request()
                     .WithMethod("GET")
-                    .WithPath(String.Format("/v2/presence/sub_key/{0}/uuid/{1}", PubnubCommon.SubscribeKey, config.Uuid))
+                    .WithPath(String.Format("/v2/presence/sub_key/{0}/uuid/{1}", PubnubCommon.SubscribeKey, config.UserId))
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
 #if NET40
-            PNResult<PNWhereNowResult> r = Task.Factory.StartNew(async () => await pubnub.WhereNow().Uuid(config.Uuid).ExecuteAsync()).Result.Result;
+            PNResult<PNWhereNowResult> r = Task.Factory.StartNew(async () => await pubnub.WhereNow().Uuid(config.UserId).ExecuteAsync()).Result.Result;
 #else
-            PNResult<PNWhereNowResult> r = await pubnub.WhereNow().Uuid(config.Uuid).ExecuteAsync();
+            PNResult<PNWhereNowResult> r = await pubnub.WhereNow().Uuid(config.UserId).ExecuteAsync();
 #endif
             if (r.Result != null)
             {
@@ -2205,14 +2187,13 @@ namespace PubNubMessaging.Tests
         {
             server.ClearRequests();
 
-            string customUUID = "mylocalmachine.mydomain.com";
+            UserId customUserId =  new UserId("mylocalmachine.mydomain.com");
             bool receivedUserStateMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Secure = false
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -2227,7 +2208,7 @@ namespace PubNubMessaging.Tests
             server.RunOnHttps(false);
 
             pubnub = createPubNubInstance(config);
-            pubnub.ChangeUUID(customUUID);
+            pubnub.ChangeUserId(customUserId);
 
             manualResetEventWaitTimeout = 310 * 1000;
             string channel = "hello_my_channel";
@@ -2238,7 +2219,7 @@ namespace PubNubMessaging.Tests
             string expected = "{\"status\": 200, \"message\": \"OK\", \"payload\": {\"testkey\": \"testval\"}, \"service\": \"Presence\"}";
             server.AddRequest(new Request()
                     .WithMethod("GET")
-                    .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/uuid/{2}/data", PubnubCommon.SubscribeKey, channel, customUUID))
+                    .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/uuid/{2}/data", PubnubCommon.SubscribeKey, channel, customUserId.ToString()))
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -2266,7 +2247,7 @@ namespace PubNubMessaging.Tests
                 expected = "{\"status\": 200, \"uuid\": \"mylocalmachine.mydomain.com\", \"service\": \"Presence\", \"message\": \"OK\", \"payload\": {\"testkey\": \"testval\"}, \"channel\": \"hello_my_channel\"}";
                 server.AddRequest(new Request()
                         .WithMethod("GET")
-                        .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/uuid/{2}", PubnubCommon.SubscribeKey, channel, customUUID))
+                        .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/uuid/{2}", PubnubCommon.SubscribeKey, channel, customUserId.ToString()))
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -2294,11 +2275,10 @@ namespace PubNubMessaging.Tests
             Request getRequest = new Request();
             bool receivedUserStateMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Secure = false
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -2324,12 +2304,12 @@ namespace PubNubMessaging.Tests
             string expected = "{\"status\": 200, \"message\": \"OK\", \"payload\": {\"k\": \"v\"}, \"service\": \"Presence\"}";
             server.AddRequest(new Request()
                     .WithMethod("GET")
-                    .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/uuid/{2}/data", PubnubCommon.SubscribeKey, channel, config.Uuid))
+                    .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/uuid/{2}/data", PubnubCommon.SubscribeKey, channel, config.UserId))
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("state", "%7B%22k%22%3A%22v%22%7D")
                     .WithParameter("timestamp", "1356998400")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -2354,11 +2334,11 @@ namespace PubNubMessaging.Tests
                 expected = "{\"status\": 200, \"uuid\": \"mytestuuid\", \"service\": \"Presence\", \"message\": \"OK\", \"payload\": {\"k\": \"v\"}, \"channel\": \"hello_my_channel\"}";
                 getRequest = new Request()
                     .WithMethod("GET")
-                    .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/uuid/{2}", PubnubCommon.SubscribeKey, channel, config.Uuid))
+                    .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/uuid/{2}", PubnubCommon.SubscribeKey, channel, config.UserId))
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK);
                 server.AddRequest(getRequest);
@@ -2391,12 +2371,12 @@ namespace PubNubMessaging.Tests
                 expected = "{\"status\": 200, \"message\": \"OK\", \"payload\": {\"k\": null}, \"service\": \"Presence\"}";
                 server.AddRequest(new Request()
                         .WithMethod("GET")
-                        .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/uuid/{2}/data", PubnubCommon.SubscribeKey, channel, config.Uuid))
+                        .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/uuid/{2}/data", PubnubCommon.SubscribeKey, channel, config.UserId))
                         .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                         .WithParameter("requestid", "myRequestId")
                         .WithParameter("state", "%7B%22k%22%3Anull%7D")
                         .WithParameter("timestamp", "1356998400")
-                        .WithParameter("uuid", config.Uuid)
+                        .WithParameter("uuid", config.UserId)
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -2450,11 +2430,10 @@ namespace PubNubMessaging.Tests
 
             bool receivedPresenceMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Secure = false
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -2503,7 +2482,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("tt", "0")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithParameter("signature", "_JVs4gooSMhdgxRO6FNkk6HwlkyxqcRATHU5j3vkJ9s=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));

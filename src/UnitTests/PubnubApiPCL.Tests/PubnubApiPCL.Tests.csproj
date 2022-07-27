@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <!--<Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />-->
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net6.0</TargetFrameworks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -32,6 +32,10 @@
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <DefineConstants>$(DefineConstants);NETSTANDARD20</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
+    <DefineConstants>$(DefineConstants);NET60</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
@@ -78,6 +82,7 @@
     <Compile Include="..\PubnubApi.Tests\WhenSubscribedToWildcardChannel.cs" Link="WhenSubscribedToWildcardChannel.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenUnsubscribedToAChannel.cs" Link="WhenUnsubscribedToAChannel.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenUnsubscribedToAChannelGroup.cs" Link="WhenUnsubscribedToAChannelGroup.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenUserIdInPNConfig.cs" Link="WhenUserIdInPNConfig.cs" />
   </ItemGroup>
 
   <ItemGroup>

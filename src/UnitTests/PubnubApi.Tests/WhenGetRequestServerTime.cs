@@ -48,11 +48,10 @@ namespace PubNubMessaging.Tests
             timeReceived = false;
             mreTime = new ManualResetEvent(false);
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Secure = false
             };
             server.RunOnHttps(false);
@@ -66,7 +65,7 @@ namespace PubNubMessaging.Tests
                     .WithPath("/time/0")
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -145,11 +144,10 @@ namespace PubNubMessaging.Tests
             timeReceived = false;
             mreTime = new ManualResetEvent(false);
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
             };
 
             server.RunOnHttps(true);
@@ -162,7 +160,7 @@ namespace PubNubMessaging.Tests
                     .WithPath("/time/0")
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -189,11 +187,10 @@ namespace PubNubMessaging.Tests
             timeReceived = false;
             mreTime = new ManualResetEvent(false);
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Proxy = (PubnubCommon.EnableStubTest) ? proxy : null,
                 Secure = false
             };
@@ -209,7 +206,7 @@ namespace PubNubMessaging.Tests
                     .WithPath("/time/0")
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -243,11 +240,10 @@ namespace PubNubMessaging.Tests
             timeReceived = false;
             mreTime = new ManualResetEvent(false);
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Proxy = (PubnubCommon.EnableStubTest) ? proxy : null
             };
             server.RunOnHttps(true);
@@ -261,7 +257,7 @@ namespace PubNubMessaging.Tests
                     .WithPath("/time/0")
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 

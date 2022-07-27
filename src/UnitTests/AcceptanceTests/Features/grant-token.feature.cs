@@ -659,13 +659,19 @@ namespace AcceptanceTests.Features
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Validate that a token containing authorized uuid can be parsed correctly")]
-        public virtual void ValidateThatATokenContainingAuthorizedUuidCanBeParsedCorrectly()
+        [NUnit.Framework.DescriptionAttribute("Attempt to grant an access token when ttl provided exceeds the max ttl configured" +
+            " (use default max 43200 for the test)")]
+        [NUnit.Framework.CategoryAttribute("contract=grantWithTTLExceedMaxTTL")]
+        [NUnit.Framework.CategoryAttribute("beta")]
+        public virtual void AttemptToGrantAnAccessTokenWhenTtlProvidedExceedsTheMaxTtlConfiguredUseDefaultMax43200ForTheTest()
         {
-            string[] tagsOfScenario = ((string[])(null));
+            string[] tagsOfScenario = new string[] {
+                    "contract=grantWithTTLExceedMaxTTL",
+                    "beta"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Validate that a token containing authorized uuid can be parsed correctly", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 145
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Attempt to grant an access token when ttl provided exceeds the max ttl configured" +
+                    " (use default max 43200 for the test)", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 146
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -687,111 +693,39 @@ namespace AcceptanceTests.Features
                 this.ScenarioStart();
 #line 8
   this.FeatureBackground();
-#line hidden
-#line 146
-    testRunner.Given("I have a known token containing an authorized UUID", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 147
-    testRunner.When("I parse the token", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+    testRunner.Given("the TTL 43201", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 148
-    testRunner.Then("the parsed token output contains the authorized UUID \"test-authorized-uuid\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+    testRunner.Given("the \'channel-1\' CHANNEL resource access permissions", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Validate that a token containing uuid resource permissions can be parsed correctl" +
-            "y")]
-        public virtual void ValidateThatATokenContainingUuidResourcePermissionsCanBeParsedCorrectly()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Validate that a token containing uuid resource permissions can be parsed correctl" +
-                    "y", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 149
+    testRunner.And("grant resource permission READ", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "* ");
+#line hidden
 #line 150
-  this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            bool isScenarioIgnored = default(bool);
-            bool isFeatureIgnored = default(bool);
-            if ((tagsOfScenario != null))
-            {
-                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((this._featureTags != null))
-            {
-                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((isScenarioIgnored || isFeatureIgnored))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-#line 8
-  this.FeatureBackground();
+    testRunner.When("I attempt to grant a token specifying those permissions", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 151
-    testRunner.Given("I have a known token containing UUID resource permissions", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+    testRunner.Then("an error is returned", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 152
-    testRunner.When("I parse the token", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+    testRunner.And("the error status code is 400", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "* ");
 #line hidden
 #line 153
-    testRunner.Then("the token has \'uuid-1\' UUID resource access permissions", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+    testRunner.And("the error message is \'Invalid ttl\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "* ");
 #line hidden
 #line 154
-    testRunner.And("token resource permission GET", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "* ");
+    testRunner.And("the error source is \'grant\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "* ");
 #line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Validate that a token containing uuid pattern permissions can be parsed correctly" +
-            "")]
-        public virtual void ValidateThatATokenContainingUuidPatternPermissionsCanBeParsedCorrectly()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Validate that a token containing uuid pattern permissions can be parsed correctly" +
-                    "", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 155
+    testRunner.And("the error detail message is \'Range should be 1 to 43200 minute(s).\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "* ");
+#line hidden
 #line 156
-  this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            bool isScenarioIgnored = default(bool);
-            bool isFeatureIgnored = default(bool);
-            if ((tagsOfScenario != null))
-            {
-                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((this._featureTags != null))
-            {
-                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((isScenarioIgnored || isFeatureIgnored))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-#line 8
-  this.FeatureBackground();
+    testRunner.And("the error detail location is \'ttl\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "* ");
 #line hidden
 #line 157
-    testRunner.Given("I have a known token containing UUID pattern Permissions", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line hidden
-#line 158
-    testRunner.When("I parse the token", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 159
-    testRunner.Then("the token has \'^uuid-\\S*$\' UUID pattern access permissions", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 160
-    testRunner.And("token pattern permission GET", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "* ");
+    testRunner.And("the error detail location type is \'body\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "* ");
 #line hidden
             }
             this.ScenarioCleanup();

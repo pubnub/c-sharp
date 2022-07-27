@@ -28,13 +28,12 @@ namespace PubNubMessaging.Tests
             if (!PubnubCommon.EnableStubTest)
             {
                 receivedAuditMessage = false;
-                PNConfiguration config = new PNConfiguration
+                PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
                 {
                     PublishKey = PubnubCommon.PublishKey,
                     SubscribeKey = PubnubCommon.SubscribeKey,
                     SecretKey = PubnubCommon.SecretKey,
-                    Secure = false,
-                    Uuid = "mytestuuid"
+                    Secure = false
                 };
 
                 pubnub = createPubNubInstance(config);
@@ -124,13 +123,12 @@ namespace PubNubMessaging.Tests
             {
                 receivedAuditMessage = false;
 
-                PNConfiguration config = new PNConfiguration
+                PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
                 {
                     PublishKey = PubnubCommon.PublishKey,
                     SubscribeKey = PubnubCommon.SubscribeKey,
                     SecretKey = PubnubCommon.SecretKey,
                     Secure = false,
-                    Uuid = "mytestuuid"
                 };
 
                 pubnub = createPubNubInstance(config);

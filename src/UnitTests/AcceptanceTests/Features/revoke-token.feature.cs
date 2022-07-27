@@ -242,7 +242,7 @@ namespace AcceptanceTests.Features
     testRunner.Then("an error is returned", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 33
-    testRunner.And("the error status code is 403", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "* ");
+    testRunner.And("the error status code is 400", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "* ");
 #line hidden
 #line 34
     testRunner.And("the error message is \'Feature disabled\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "* ");

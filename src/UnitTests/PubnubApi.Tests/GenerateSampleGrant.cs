@@ -49,13 +49,12 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
                 Secure = false,
-                Uuid = "mytestuuid",
             };
 
             pubnub = createPubNubInstance(config);
@@ -80,7 +79,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("r", "1")
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithParameter("w", "1")
                     .WithParameter("signature", "tCnUUS8KPeTmepj_b2mLoEny3shgtxX1JzhbIIyA0wU=")
                     .WithResponse(expected)
@@ -111,13 +110,12 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
                 Secure = false,
-                Uuid = "mytestuuid",
             };
 
             pubnub = createPubNubInstance(config);
@@ -140,7 +138,7 @@ namespace PubNubMessaging.Tests
                         .WithParameter("r", "1")
                         .WithParameter("requestid", "myRequestId")
                         .WithParameter("timestamp", "1356998400")
-                        .WithParameter("uuid", config.Uuid)
+                        .WithParameter("uuid", config.UserId)
                         .WithParameter("w", "1")
                         .WithParameter("signature", "gumjPtSDtaYGB7Pj-fFUY-ZFD_jKuu7n9sQEBhNbAKg=")
                         .WithResponse(expected)

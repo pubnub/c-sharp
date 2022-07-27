@@ -28,7 +28,7 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
   publish-nuget:
     name: Publish to NuGet
-    runs-on: windows-latest
+    runs-on: windows-2019
     needs: check-release
     if: ${{ needs.check-release.outputs.release == 'true' }}
     steps:
@@ -39,6 +39,18 @@ jobs:
           ref: master
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.0.3
+      - name: Setup .NET 2.1.519
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 2.1.519
+      - name: Setup .NET 5.0.x
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+      - name: Setup .NET 6.0.x
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
       - name: Build packages
         env:
           WORKSPACE_PATH: ${{ github.workspace }}

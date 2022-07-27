@@ -38,18 +38,16 @@ namespace PubNubMessaging.Tests
             server.ClearRequests();
             bool timeReceived1 = false;
 
-            PNConfiguration config1 = new PNConfiguration
+            PNConfiguration config1 = new PNConfiguration(new UserId("mytestuuid1"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid1",
                 Secure = false
             };
-            PNConfiguration config2 = new PNConfiguration
+            PNConfiguration config2 = new PNConfiguration(new UserId("mytestuuid2"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid2",
                 Secure = false
             };
             server.RunOnHttps(false);
@@ -65,7 +63,7 @@ namespace PubNubMessaging.Tests
                     .WithPath("/time/0")
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId1")
-                    .WithParameter("uuid", config1.Uuid)
+                    .WithParameter("uuid", config1.UserId)
                     .WithParameter("instanceid", pubnub1.InstanceId)
                     .WithResponse(expected1)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
@@ -75,7 +73,7 @@ namespace PubNubMessaging.Tests
                     .WithPath("/time/0")
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId2")
-                    .WithParameter("uuid", config2.Uuid)
+                    .WithParameter("uuid", config2.UserId)
                     .WithParameter("instanceid", pubnub2.InstanceId)
                     .WithResponse(expected2)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
@@ -133,11 +131,10 @@ namespace PubNubMessaging.Tests
             server.ClearRequests();
             bool timeReceived1 = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
             };
 
             server.RunOnHttps(true);
@@ -150,7 +147,7 @@ namespace PubNubMessaging.Tests
                     .WithPath("/time/0")
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -189,11 +186,10 @@ namespace PubNubMessaging.Tests
 
             bool timeReceived1 = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Proxy = (PubnubCommon.EnableStubTest) ? proxy : null,
                 Secure = false
             };
@@ -209,7 +205,7 @@ namespace PubNubMessaging.Tests
                     .WithPath("/time/0")
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -257,11 +253,10 @@ namespace PubNubMessaging.Tests
 
             bool timeReceived1 = false;
 
-            PNConfiguration config = new PNConfiguration
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Uuid = "mytestuuid",
                 Proxy = (PubnubCommon.EnableStubTest) ? proxy : null
             };
             server.RunOnHttps(true);
@@ -275,7 +270,7 @@ namespace PubNubMessaging.Tests
                     .WithPath("/time/0")
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
                     .WithParameter("requestid", "myRequestId")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 

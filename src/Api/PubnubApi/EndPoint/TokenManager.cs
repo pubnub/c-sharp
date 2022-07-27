@@ -5,8 +5,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Collections;
 using System.Reflection;
-#if DEBUG && NET461
-#endif
 using Newtonsoft.Json;
 using PeterO.Cbor;
 using System.Globalization;
@@ -187,6 +185,7 @@ namespace PubnubApi.EndPoint
                 && key.Substring(key.Length - 1, 1).CompareTo("\"") == 0)
             {
                 key = key.Remove(key.Length - 1, 1).Remove(0, 1);
+                key = Regex.Unescape(key);
             }
             return key;
         }

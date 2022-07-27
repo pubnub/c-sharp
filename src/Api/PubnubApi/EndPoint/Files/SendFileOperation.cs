@@ -487,7 +487,7 @@ namespace PubnubApi.EndPoint
                 ret = new byte[dataStream.Length];
                 int bytesRead = dataStream.Read(ret, 0, ret.Length);
                 System.Diagnostics.Debug.WriteLine(string.Format("MultipartFormData byte count = {0}", bytesRead));
-#if NET35 || NET40 || NET45 || NET461
+#if NET35 || NET40 || NET45 || NET461 || NET48
                 dataStream.Close();
 #endif
             }

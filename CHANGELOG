@@ -1,3 +1,38 @@
+v6.6.0 - July 18 2022
+-----------------------------
+- Modified: introduced UserId to PNConfiguration and deprecated UUID.
+- Modified: added build target framework support to .Net Framework 4.8 and .Net 6.0.
+
+v6.5.0 - June 14 2022
+-----------------------------
+- Fixed: suppress web request aborted exception message to callback.
+
+v6.4.0 - May 23 2022
+-----------------------------
+- Fixed: handle PNConfiguration for multi Pubnub instances.
+
+v6.3.0 - March 22 2022
+-----------------------------
+- Fixed: refactor Telemetry Task Result to GetAwaiter().GetResult() .
+- Fixed: removed SILVERLIGHT, WINDOWS_PHONE preprocessor directive code.
+
+v6.2.0 - January 27 2022
+-----------------------------
+- Modified: bumped PeterO.Cbor library version to 4.5.2.
+
+v6.1.0 - January 20 2022
+-----------------------------
+- Fixed: capture region when exception occur during subscribe.
+
+v6.0.0 - January 12 2022
+-----------------------------
+- BREAKING CHANGES: UUID is mandatory to use SDK.
+
+v5.4.0 - December 16 2021
+-----------------------------
+- Fixed: replaced BouncyCastle lib with System.Security.Cryptography.Algorithms.
+- Fixed: added try/catch for publish operation to catch exceptions.
+
 v5.3.0 - November 16 2021
 -----------------------------
 - Added: added RevokeToken feature.

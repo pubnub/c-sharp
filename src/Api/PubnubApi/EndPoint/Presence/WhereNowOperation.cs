@@ -97,7 +97,7 @@ namespace PubnubApi.EndPoint
             string currentUuid = "";
             if (string.IsNullOrEmpty(uuid))
             {
-                currentUuid = config.Uuid;
+                currentUuid = config.UserId;
             }
             else
             {
@@ -137,7 +137,7 @@ namespace PubnubApi.EndPoint
             string currentUuid = "";
             if (string.IsNullOrEmpty(uuid))
             {
-                currentUuid = config.Uuid;
+                currentUuid = config.UserId;
             }
             else
             {
