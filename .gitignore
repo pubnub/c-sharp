@@ -48,16 +48,15 @@ src/.vs/Pubnub/v15/sqlite3/storage.ide
 /src/Api/PubnubApiUWP/obj/*
 /src/Api/PubnubApiUWP/*.user
 
+/src/PubnubUnity/.idea/*
 /src/PubnubUnity/.vs/*
-/src/PubnubUnity/Library/metadata/*
 /src/PubnubUnity/Library/*
 /src/PubnubUnity/Temp/*
 /src/PubnubUnity/Logs/*
-/src/PubnubUnity/Assets/netstandard2.0/*.pdb
-/src/PubnubUnity/Assets/netstandard2.0/*.pdb.meta
-/src/PubnubUnity/Assets/netstandard2.0/*.dll
-/src/PubnubUnity/ProjectSettings/*
-/src/PubnubUnity/ProjectSettings/*.*
+/src/PubnubUnity/obj/*
+/src/PubnubUnity/UserSettings/*
+/src/PubnubUnity/*.sln
+/src/PubnubUnity/*.csproj
 
 /src/Api/PubnubApiUnity/obj/Debug/*
 /src/Api/PubnubApiUnity/obj/Release/*
