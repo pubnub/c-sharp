@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Collections;
-using System.Reflection;
-using Newtonsoft.Json;
 using PeterO.Cbor;
 using System.Globalization;
 
@@ -238,8 +234,9 @@ namespace PubnubApi.EndPoint
                     byte[] keyBytes = (byte[])val;
                     pnGrantTokenDecoded.Signature = utf8.GetString(keyBytes, 0, keyBytes.Length);
 #else
+                    UTF8Encoding utf8 = new UTF8Encoding(true, true);
                     byte[] sigBytes = ((CBORObject)val).GetByteString();
-                    string base64String = Convert.ToBase64String(sigBytes);
+                    string base64String = utf8.GetString(sigBytes, 0, sigBytes.Length);
                     pnGrantTokenDecoded.Signature = base64String;
 #endif
                     break;

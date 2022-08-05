@@ -628,7 +628,7 @@
     <PackageReference Include="NETStandard.Library" Version="1.6.1">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1">
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="PeterO.Cbor" Version="4.5.2" />
@@ -652,7 +652,7 @@
     <PackageReference Include="NETStandard.Library" Version="1.6.1">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1">
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="PeterO.Cbor" Version="4.5.2" />
@@ -709,7 +709,7 @@
     <PackageReference Include="NETStandard.Library" Version="1.6.1">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1">
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="PeterO.Cbor" Version="4.5.2" />
@@ -750,11 +750,10 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <Reference Include="System.Runtime" />
-    <PackageReference Include="NETStandard.Library" Version="1.6.1">
+    <PackageReference Include="NETStandard.Library" Version="2.0.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1">
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="PeterO.Cbor" Version="4.5.2" />
@@ -792,11 +791,21 @@
     <PackageReference Include="System.ValueTuple" Version="4.4.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="System.Runtime.Serialization.Json" Version="4.3.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
     <Reference Include="System.Runtime" />
+    <PackageReference Include="NETStandard.Library" Version="2.0.3">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <Reference Include="netstandard" />
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Text.Json" Version="6.0.5">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="PeterO.Cbor" Version="4.5.2" />
@@ -817,6 +826,9 @@
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="System.Linq.Queryable" Version="4.0.1">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="System.Text.Encoding" Version="4.3.0">
@@ -841,6 +853,18 @@
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="System.ValueTuple" Version="4.4.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Runtime.Serialization.Json" Version="4.3.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Runtime.Serialization.Primitives" Version="4.3.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Globalization" Version="4.3.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Diagnostics.Debug" Version="4.3.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
   </ItemGroup>

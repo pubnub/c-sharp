@@ -1,10 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿#if NET60
+using System.Text.Json.Serialization;
+#else
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+#endif
+using System.Runtime.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
 
 namespace PubnubApi
 {
@@ -265,16 +268,28 @@ namespace PubnubApi
     {
         public string topic { get; set; }
         public List<string> exclude_devices { get; set; }
-        
+
+#if NET60
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+#else
         [JsonConverter(typeof(StringEnumConverter))]
+#endif 
         public Environment environment { get; set; }
     }
 
     public enum Environment
     {
+#if NET60
         [EnumMember(Value = "development")]
+#else
+        [EnumMember(Value = "development")]
+#endif 
         Development,
+#if NET60
         [EnumMember(Value = "production")]
+#else
+        [EnumMember(Value = "production")]
+#endif 
         Production
     }
 }

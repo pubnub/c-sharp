@@ -1,5 +1,10 @@
-﻿using Newtonsoft.Json;
+﻿#if NET60
+using System.Text.Json.Serialization;
+using System.Runtime.Serialization;
+#else
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+#endif
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +24,11 @@ namespace PubnubApi
             this.savedEndpointOperation = endpointOperation;
         }
 
+#if NET60
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+#else
         [JsonConverter(typeof(StringEnumConverter))]
+#endif 
         public PNStatusCategory Category { get; internal set; }
 
         public PNErrorData ErrorData { get; internal set; }
@@ -27,7 +36,11 @@ namespace PubnubApi
 
         public int StatusCode { get; internal set; }
 
+#if NET60
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+#else
         [JsonConverter(typeof(StringEnumConverter))]
+#endif 
         public PNOperationType Operation { get; internal set; }
 
         public bool TlsEnabled { get; internal set; }
