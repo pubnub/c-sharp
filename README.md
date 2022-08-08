@@ -21,12 +21,11 @@ You will need the publish and subscribe keys to authenticate your app. Get your 
     ```csharp
     using PubnubApi;
 
-    PNConfiguration pnConfiguration = new PNConfiguration();
-    pnConfiguration.SubscribeKey = "mySubscribeKey";
-    pnConfiguration.PublishKey = "myPublishKey";
-    pnConfiguration.Uuid = "myUniqueUUID";
-
-    Pubnub pubnub = new Pubnub(pnConfiguration);
+   
+   PNConfiguration pnConfiguration = new PNConfiguration(new UserId("myUniqueUserId"));
+   pnConfiguration.SubscribeKey = "mySubscribeKey";
+   pnConfiguration.PublishKey = "myPublishKey";
+   Pubnub pubnub = new Pubnub(pnConfiguration);
     ```
 
     This is the minimum configuration you need to send and receive messages with PubNub.
