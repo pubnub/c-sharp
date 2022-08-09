@@ -2317,9 +2317,48 @@ namespace PubnubApi
                 ChannelGroupUserState[PubnubInstance.InstanceId].Clear();
             }
 
+            if (MultiChannelSubscribe.Count > 0 && MultiChannelSubscribe.Where(t => t.Value.Keys.Count > 0).Count() == 0
+                 && MultiChannelGroupSubscribe.Count > 0 && MultiChannelGroupSubscribe.Where(t => t.Value.Keys.Count > 0).Count() == 0)
+            {
+                RemoveHttpClients();
+            }
             PubnubInstance = null;
         }
 
+        internal static void RemoveHttpClients()
+        {
+            //Conditionalmethod logic
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
+            if (httpClientNetworkStatus != null)
+            {
+                try{
+                    httpClientNetworkStatus.CancelPendingRequests();
+                    httpClientNetworkStatus.Dispose();
+                    httpClientNetworkStatus = null;
+                }
+                catch { /* ignore */ }
+            }
+            if (httpClientSubscribe != null)
+            {
+                try{
+                    httpClientSubscribe.CancelPendingRequests();
+                    httpClientSubscribe.Dispose();
+                    httpClientSubscribe = null;
+                }
+                catch { /* ignore */ }
+            }
+            if (httpClientNonsubscribe != null)
+            {
+                try{
+                    httpClientNonsubscribe.CancelPendingRequests();
+                    httpClientNonsubscribe.Dispose();
+                    httpClientNonsubscribe = null;
+                }
+                catch { /* ignore */ }
+            }
+#endif
+        }
+        
         internal void TerminateCurrentSubscriberRequest()
         {
             string[] channels = GetCurrentSubscriberChannels();
