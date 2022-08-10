@@ -1,3 +1,7 @@
+v6.8.0 - August 10 2022
+-----------------------------
+- Fixed: fixed Destroy() method when multiple Pubnub instances were in use.
+
 v6.7.0 - July 27 2022
 -----------------------------
 - Modified: added support for Users/Spaces to GrantToken.
