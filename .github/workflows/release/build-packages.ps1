@@ -17,6 +17,11 @@ echo "Build PCL package"
 cd "$githubWorkspace\src\Api\PubnubApiPCL"
 dotnet pack -o "$RELEASES_PATH\PCL" -c Release
 
+# Build Unity package.
+Write-Output "Build Unity package"
+Set-Location "$githubWorkspace\src\Api\PubnubApiUnity"
+dotnet build -o "$RELEASES_PATH\Unity" -c Release
+
 # Build UWP package.
 echo "Build UWP package"
 cd "$githubWorkspace\src\Api\PubnubApiUWP"
@@ -33,6 +38,10 @@ cp "$PACKAGE_PATH" "$ARTIFACTS_PATH\$PACKAGE_NAME"
 $PCL_PACKAGE_NAME = Get-ChildItem -Name -Path "$RELEASES_PATH\PCL\*" -Include *.nupkg
 $PCL_PACKAGE_PATH = "$RELEASES_PATH\PCL\$PCL_PACKAGE_NAME"
 cp "$PCL_PACKAGE_PATH" "$ARTIFACTS_PATH\$PCL_PACKAGE_NAME"
+
+$UNITY_PACKAGE_NAME = Get-ChildItem -Name -Path "$RELEASES_PATH\Unity\*" -Include *.dll
+$UNITY_PACKAGE_PATH = "$RELEASES_PATH\Unity\$UNITY_PACKAGE_NAME"
+cp "$UNITY_PACKAGE_PATH" "$ARTIFACTS_PATH\$UNITY_PACKAGE_NAME"
 
 $UWP_PACKAGE_NAME = Get-ChildItem -Name -Path "$RELEASES_PATH\UWP\*" -Include *.nupkg
 $UWP_PACKAGE_PATH = "$RELEASES_PATH\UWP\$UWP_PACKAGE_NAME"
