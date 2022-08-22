@@ -813,6 +813,9 @@
     <PackageReference Include="System.Threading.ThreadPool" Version="4.0.10">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="System.Threading.Timer" Version="4.3.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="System.Threading.Thread" Version="4.0.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
