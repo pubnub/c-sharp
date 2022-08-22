@@ -1,3 +1,7 @@
+v6.9.0 - August 22 2022
+-----------------------------
+- Fixed: fix Timer reference conflict in net6.0.
+
 v6.8.0 - August 10 2022
 -----------------------------
 - Fixed: fixed Destroy() method when multiple Pubnub instances were in use.
