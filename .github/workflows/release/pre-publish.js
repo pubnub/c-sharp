@@ -76,7 +76,8 @@ const localCopyPath = process.argv.pop()
 const projectPaths = [
   'src/Api/PubnubApi/PubnubApi.csproj',
   'src/Api/PubnubApiPCL/PubnubApiPCL.csproj',
-  'src/Api/PubnubApiUWP/PubnubApiUWP.csproj'
+  'src/Api/PubnubApiUWP/PubnubApiUWP.csproj',
+	'src/Api/PubnubApiUnity/PubnubApiUnity.csproj'
 ];
 
 for (var projectIdx = projectPaths.length - 1; projectIdx >= 0; projectIdx--) {
