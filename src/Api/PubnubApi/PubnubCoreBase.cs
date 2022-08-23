@@ -2273,7 +2273,10 @@ namespace PubnubApi
 
         internal void EndPendingRequests()
         {
-            SubscribeCallbackListenerList.Clear();
+            if (SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
+            {
+                SubscribeCallbackListenerList[PubnubInstance.InstanceId].Clear();
+            }
 
             RemoveChannelDictionary();
             TerminatePendingWebRequest();
@@ -2314,8 +2317,11 @@ namespace PubnubApi
                 ChannelGroupUserState[PubnubInstance.InstanceId].Clear();
             }
 
-            RemoveHttpClients();
-
+            if (MultiChannelSubscribe.Count > 0 && MultiChannelSubscribe.Where(t => t.Value.Keys.Count > 0).Count() == 0
+                 && MultiChannelGroupSubscribe.Count > 0 && MultiChannelGroupSubscribe.Where(t => t.Value.Keys.Count > 0).Count() == 0)
+            {
+                RemoveHttpClients();
+            }
             PubnubInstance = null;
         }
 
@@ -2352,7 +2358,7 @@ namespace PubnubApi
             }
 #endif
         }
-
+        
         internal void TerminateCurrentSubscriberRequest()
         {
             string[] channels = GetCurrentSubscriberChannels();

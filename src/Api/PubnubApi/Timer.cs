@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace System.Threading
 {
-#if NETSTANDARD10 || NETSTANDARD11 || NET60
+#if NETSTANDARD10 || NETSTANDARD11
     public delegate void TimerCallback(object state);
 
     public sealed class Timer : CancellationTokenSource, IDisposable
