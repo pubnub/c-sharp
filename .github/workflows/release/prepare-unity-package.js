@@ -13,7 +13,7 @@ const artifactsPath = releasesPath && `${releasesPath}/artifacts`;
 
 const unityDllFilename = 'PubnubApiUnity.dll';
 
-// hard-coded files mandatory in package
+// hard-coded files, mandatory in the package
 const files = [
 	{
 		name: "LICENSE.md",

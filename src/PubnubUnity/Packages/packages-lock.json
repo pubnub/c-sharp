@@ -1,5 +1,14 @@
 {
   "dependencies": {
+    "com.pubnub.sdk": {
+      "version": "https://github.com/MikeDobrzan/c-sharp-unity-upm.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "3.0.2"
+      },
+      "hash": "c6409b6a52b4ac671b01387a03222c991963f521"
+    },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
       "depth": 0,
