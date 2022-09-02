@@ -991,7 +991,7 @@ namespace PubNubMessaging.Tests
 
 #if NET40
 #else
-            PNResult<PNAccessManagerTokenResult> result = await pubnub.GrantToken()
+            PNResult<PNAccessManagerTokenResult> grantResponse = await pubnub.GrantToken()
                     .Resources(new PNTokenResources()
                     {
                         Spaces = new Dictionary<string, PNTokenAuthValues>() {
@@ -1002,7 +1002,12 @@ namespace PubNubMessaging.Tests
                     )
                 .TTL(10)
                 .ExecuteAsync();
+            if (grantResponse.Result != null && !grantResponse.Status.Error)
+            {
+                receivedGrantMessage = true;
+            }
 #endif
+            Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenWithAsyncGrantTokenShouldReturnSuccess failed.");
 
         }
 
