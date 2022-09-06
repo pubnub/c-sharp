@@ -1,3 +1,7 @@
+v6.10.0 - September 06 2022
+-----------------------------
+- Fixed: add Users/Spaces support to PCL versions.
+
 v6.9.0 - August 22 2022
 -----------------------------
 - Fixed: fix Timer reference conflict in net6.0.
