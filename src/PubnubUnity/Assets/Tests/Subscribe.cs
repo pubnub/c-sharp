@@ -5,8 +5,8 @@ using UnityEngine;
 using UnityEngine.TestTools;
 
 public static class ApiKeys {
-	public static string PubKey => System.Environment.GetEnvironmentVariable("PN_PUB_KEY") ?? "pub-c-57776916-073a-4f19-b7e6-70dcce8eaab3";
-	public static string SubKey => System.Environment.GetEnvironmentVariable("PN_SUB_KEY") ?? "sub-c-02cfab22-55db-4ba8-9768-8df98c0b9d60";
+	public static string PubKey => System.Environment.GetEnvironmentVariable("PN_PUB_KEY") ?? "";
+	public static string SubKey => System.Environment.GetEnvironmentVariable("PN_SUB_KEY") ?? "";
 }
 
 public class Subscribe {
