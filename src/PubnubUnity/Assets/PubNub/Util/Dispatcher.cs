@@ -1,0 +1,73 @@
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using UnityEngine;
+
+namespace PubNubAPI.Internal {
+	public sealed class Dispatcher : MonoBehaviour {
+
+		static Dispatcher instance;
+		static object lockObject;
+
+		static volatile Queue<System.Action> dispatchQueue = new Queue<System.Action>();
+
+		void FixedUpdate() {
+			HandleDispatch();
+		}
+
+		static void HandleDispatch() {
+			lock (lockObject) {
+				var c = dispatchQueue.Count;
+				for (int i = 0; i < c; i++) {
+					try {
+						dispatchQueue.Dequeue()();
+					} catch (Exception e) {
+						Debug.LogError($"{e.Message} ::\n{e.StackTrace}");
+					}
+				}
+			}
+		}
+
+		public static void Dispatch(System.Action action) {
+			if (action is null) {
+				Debug.Log("[Dispatcher] NULL");
+				return;
+			}
+
+			lock (lockObject) {
+				dispatchQueue.Enqueue(action);
+			}
+		}
+
+		public static async void DispatchTask<T>(Task<T> task, System.Action<T> callback) {
+			if (callback is null) {
+				return;
+			}
+
+			T res;
+			if (task.IsCompleted) {
+				res = task.Result;
+			} else { 
+				res = await task;
+			}
+			
+			Dispatch(() => callback(res));
+		}
+
+		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+		static void Initialize() {
+			if (!instance) {
+				instance = new GameObject("[PubNub Dispatcher]").AddComponent<Dispatcher>();
+			}
+			instance.gameObject.hideFlags = HideFlags.NotEditable | HideFlags.DontSave;
+			instance.transform.hideFlags = HideFlags.HideInInspector;
+			if (Application.isPlaying) {
+				DontDestroyOnLoad(instance.gameObject);
+			}
+
+			if (lockObject is null) {
+				lockObject = new object();
+			}
+		}
+	}
+}
