@@ -377,6 +377,18 @@ namespace PubnubApi.EndPoint
 
             Dictionary<string, int> chPatternBitmaskPermCollection = null;
             atleastOnePermission = FillPermissionMappingWithMaskValues(this.pubnubPatterns.Channels, atleastOnePermission, out chPatternBitmaskPermCollection);
+            Dictionary<string, int> spBitmaskPermCollection = null;
+            Dictionary<string, int> spPatternBitmaskPermCollection = null;
+            if (pubnubResources.Channels.Count == 0 && pubnubPatterns.Channels.Count == 0)
+            {
+                atleastOnePermission = FillPermissionMappingWithMaskValues(this.pubnubResources.Spaces, atleastOnePermission, out spBitmaskPermCollection);
+                atleastOnePermission = FillPermissionMappingWithMaskValues(this.pubnubPatterns.Spaces, atleastOnePermission, out spPatternBitmaskPermCollection);
+            }
+            else
+            {
+                spBitmaskPermCollection = new Dictionary<string, int>();
+                spPatternBitmaskPermCollection = new Dictionary<string, int>();
+            }
 
             Dictionary<string, int> cgBitmaskPermCollection = null;
             atleastOnePermission = FillPermissionMappingWithMaskValues(this.pubnubResources.ChannelGroups, atleastOnePermission, out cgBitmaskPermCollection);
@@ -389,6 +401,20 @@ namespace PubnubApi.EndPoint
 
             Dictionary<string, int> uuidPatternBitmaskPermCollection = null;
             atleastOnePermission = FillPermissionMappingWithMaskValues(this.pubnubPatterns.Uuids, atleastOnePermission, out uuidPatternBitmaskPermCollection);
+            
+            Dictionary<string, int> userBitmaskPermCollection = null;
+            Dictionary<string, int> userPatternBitmaskPermCollection = null;
+            if (pubnubResources.Uuids.Count == 0 && pubnubPatterns.Uuids.Count == 0)
+            {
+                atleastOnePermission = FillPermissionMappingWithMaskValues(this.pubnubResources.Users, atleastOnePermission, out userBitmaskPermCollection);
+                atleastOnePermission = FillPermissionMappingWithMaskValues(this.pubnubPatterns.Users, atleastOnePermission, out userPatternBitmaskPermCollection);
+            }
+            else
+            {
+                userBitmaskPermCollection = new Dictionary<string, int>();
+                userPatternBitmaskPermCollection = new Dictionary<string, int>();
+
+            }
 
             if (!atleastOnePermission)
             {
@@ -399,8 +425,8 @@ namespace PubnubApi.EndPoint
             resourcesCollection.Add("channels", chBitmaskPermCollection);
             resourcesCollection.Add("groups", cgBitmaskPermCollection);
             resourcesCollection.Add("uuids", uuidBitmaskPermCollection);
-            resourcesCollection.Add("users", new Dictionary<string, int>()); //Empty object for users for json structure
-            resourcesCollection.Add("spaces", new Dictionary<string, int>()); //Empty object for spaces for json structure
+            resourcesCollection.Add("users", userBitmaskPermCollection); 
+            resourcesCollection.Add("spaces", spBitmaskPermCollection); 
 
             Dictionary<string, object> patternsCollection = new Dictionary<string, object>();
             patternsCollection.Add("channels", chPatternBitmaskPermCollection);
