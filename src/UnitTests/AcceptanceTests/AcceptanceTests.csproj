@@ -32,10 +32,26 @@
   <ItemGroup>
     <Folder Include="Drivers\" />
     <Folder Include="Hooks\" />
+    <Folder Include="Data\" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Api\PubnubApiPCL\PubnubApiPCL.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Data\alice.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\bob.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\james.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\lisa.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

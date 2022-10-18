@@ -1,0 +1,15 @@
+{
+    "name": "Lisa",
+    "email": "lisa@example.com",
+    "externalId": "410b802b-7f18-1337-b0b0-f34b7e600cf2",
+    "profileUrl": "http://fWOkYZQfX.com",
+    "id": "lisa-id",
+    "custom": {
+        "uuid_param1": "val1",
+        "uuid_param2": "val2"
+    },
+    "type": "participant",
+    "status": "archived",
+    "updated": "2022-02-22T11:51:53.316718Z",
+    "eTag": "Afrav42WQsmyZA"
+}
