@@ -13,7 +13,7 @@ using System.Text.Json;
 namespace AcceptanceTests.Steps
 {
     [Binding]
-    public class UuidMetadataSteps
+    public partial class FeatureMetadataSteps
     {
         public static string currentFeature = string.Empty;
         public static bool betaVersion = false;
