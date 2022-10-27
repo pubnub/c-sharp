@@ -12,7 +12,7 @@ using System.Text.Json;
 
 namespace AcceptanceTests.Steps
 {
-    public partial class FeatureMetadataSteps
+    public partial class FeatureObjectsV2MetadataSteps
     {
         private ChannelMetadataPersona channelMetadataPersona = null;
         private PNGetChannelMetadataResult getChannelMetadataResult = null;
