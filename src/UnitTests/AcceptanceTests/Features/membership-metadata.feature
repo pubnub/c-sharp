@@ -52,7 +52,16 @@ Feature: Objects V2 Memberships
   @contract=removeAliceMembership
   Scenario: Remove membership for current user
     Given current user is 'Alice' persona
-    And the data for 'ChatMembership' membership
+    And the data for 'ChatMembership' membership that we want to remove
     When I remove the membership for current user
     Then I receive a successful response
 
+  @contract=manageAliceMemberships
+  Scenario: Manage memberships for a UUID
+    Given the id for 'Alice' persona
+    And the data for 'ChatMembership' membership
+    And the data for 'PatientMembership' membership that we want to remove
+    When I manage memberships
+    Then I receive a successful response
+    And the response contains list with 'ChatMembership' membership
+    And the response does not contain list with 'PatientMembership' membership

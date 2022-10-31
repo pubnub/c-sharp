@@ -14,6 +14,7 @@ namespace AcceptanceTests.Steps
     public partial class FeatureAccessSteps
     {
         public static string currentFeature = string.Empty;
+        public static string currentContract = string.Empty;
         public static bool betaVersion = false;
         private string acceptance_test_origin = "localhost:8090";
         private bool bypassMockServer = false;
@@ -112,7 +113,7 @@ namespace AcceptanceTests.Steps
         [BeforeScenario()]
         public void BeforeScenario()
         {
-            string currentContract = "";
+            currentContract = "";
             if (_scenarioContext.ScenarioInfo != null && _scenarioContext.ScenarioInfo.Tags.Length > 0)
             {
                 List<string> tagList = _scenarioContext.ScenarioInfo.Tags.AsEnumerable<string>().ToList();

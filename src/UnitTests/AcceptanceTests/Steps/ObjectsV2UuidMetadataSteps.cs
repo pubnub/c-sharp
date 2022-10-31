@@ -16,6 +16,7 @@ namespace AcceptanceTests.Steps
     public partial class FeatureObjectsV2MetadataSteps
     {
         public static string currentFeature = string.Empty;
+        public static string currentContract = string.Empty;
         public static bool betaVersion = false;
         private string acceptance_test_origin = "localhost:8090";
         private bool bypassMockServer = false;
@@ -70,15 +71,90 @@ namespace AcceptanceTests.Steps
 
         }
 
+        public FeatureObjectsV2MetadataSteps(ScenarioContext scenarioContext)
+        {
+            _scenarioContext = scenarioContext;
+        }
+
+        [BeforeFeature]
+        public static void BeforeFeature(FeatureContext featureContext)
+        {
+            betaVersion = false;
+            if (featureContext.FeatureInfo != null && featureContext.FeatureInfo.Tags.Length > 0)
+            {
+                List<string> tagList = featureContext.FeatureInfo.Tags.AsEnumerable<string>().ToList();
+                foreach (string tag in tagList)
+                {
+                    if (tag.IndexOf("featureSet=") == 0)
+                    {
+                        currentFeature = tag.Replace("featureSet=", "");
+                    }
+
+                    if (tag.IndexOf("beta") == 0)
+                    {
+                        betaVersion = true;
+                    }
+                }
+            }
+
+            System.Diagnostics.Debug.WriteLine("Starting " + featureContext.FeatureInfo.Title);
+        }
+
+        [AfterFeature]
+        public static void AfterFeature(FeatureContext featureContext)
+        {
+            System.Diagnostics.Debug.WriteLine("Finished " + featureContext.FeatureInfo.Title);
+        }
+
+        [BeforeScenario()]
+        public void BeforeScenario()
+        {
+            currentContract = "";
+            if (_scenarioContext.ScenarioInfo != null && _scenarioContext.ScenarioInfo.Tags.Length > 0)
+            {
+                List<string> tagList = _scenarioContext.ScenarioInfo.Tags.AsEnumerable<string>().ToList();
+                foreach (string tag in tagList)
+                {
+                    if (tag.IndexOf("contract=") == 0)
+                    {
+                        currentContract = tag.Replace("contract=", "");
+                        break;
+                    }
+                }
+                if (!string.IsNullOrEmpty(currentContract) && !bypassMockServer)
+                {
+                    string mockInitContract = string.Format("http://{0}/init?__contract__script__={1}", acceptance_test_origin, currentContract);
+                    System.Diagnostics.Debug.WriteLine(mockInitContract);
+                    WebClient webClient = new WebClient();
+                    string mockInitResponse = webClient.DownloadString(mockInitContract);
+                    System.Diagnostics.Debug.WriteLine(mockInitResponse);
+                }
+            }
+
+        }
+
+        [AfterScenario()]
+        public void AfterScenario()
+        {
+            if (!bypassMockServer)
+            {
+                string mockExpectContract = string.Format("http://{0}/expect", acceptance_test_origin);
+                System.Diagnostics.Debug.WriteLine(mockExpectContract);
+                WebClient webClient = new WebClient();
+                string mockExpectResponse = webClient.DownloadString(mockExpectContract);
+                System.Diagnostics.Debug.WriteLine(mockExpectResponse);
+            }
+        }
+
         [Given(@"I have a keyset with Objects V(.*) enabled")]
         public void GivenIHaveAKeysetWithObjectsVEnabled(int p0)
         {
             config = new PNConfiguration(new UserId("pn-csharp-acceptance-test-uuid"));
             config.Origin = acceptance_test_origin;
             config.Secure = false;
-            config.PublishKey = "demo";// System.Environment.GetEnvironmentVariable("PN_PUB_KEY");
-            config.SubscribeKey = "demo";//System.Environment.GetEnvironmentVariable("PN_SUB_KEY");
-            config.SecretKey = "demo";//System.Environment.GetEnvironmentVariable("PN_SEC_KEY");
+            config.PublishKey = System.Environment.GetEnvironmentVariable("PN_PUB_KEY");
+            config.SubscribeKey = System.Environment.GetEnvironmentVariable("PN_SUB_KEY");
+            config.SecretKey = System.Environment.GetEnvironmentVariable("PN_SEC_KEY");
 
             pn = new Pubnub(config);
 
@@ -87,10 +163,11 @@ namespace AcceptanceTests.Steps
         [Given(@"the id for '([^']*)' persona")]
         public void GivenTheIdForPersona(string personaName)
         {
-            if (string.Compare(personaName, "alice", true) == 0)
+            string dirPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            string personaFile = string.Format("{0}.json", personaName.ToLower());
+            var personaFilePath = Path.Combine(dirPath, "Data", personaFile);
+            if (File.Exists(personaFilePath))
             {
-                string dirPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                var personaFilePath = Path.Combine(dirPath, "Data", "alice.json");
                 using (StreamReader r = new StreamReader(personaFilePath))
                 {
                     string json = r.ReadToEnd();
@@ -175,7 +252,7 @@ namespace AcceptanceTests.Steps
         public async Task WhenIGetTheUUIDMetadataWithCustomForCurrentUser()
         {
             PNResult<PNGetUuidMetadataResult> getUuidMetadataResponse = await pn.GetUuidMetadata()
-                .Uuid(uuidMetadataPersona.id)
+                //.Uuid(uuidMetadataPersona.id)
                 .IncludeCustom(true)
                 .ExecuteAsync();
             getUuidMetadataResult = getUuidMetadataResponse.Result;
