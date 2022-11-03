@@ -252,7 +252,6 @@ namespace AcceptanceTests.Steps
         public async Task WhenIGetTheUUIDMetadataWithCustomForCurrentUser()
         {
             PNResult<PNGetUuidMetadataResult> getUuidMetadataResponse = await pn.GetUuidMetadata()
-                //.Uuid(uuidMetadataPersona.id)
                 .IncludeCustom(true)
                 .ExecuteAsync();
             getUuidMetadataResult = getUuidMetadataResponse.Result;
@@ -262,12 +261,6 @@ namespace AcceptanceTests.Steps
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
         }
-
-        //[Then(@"the UUID metadata for '([^']*)' persona")]
-        //public void ThenTheUUIDMetadataForPersona(string bob)
-        //{
-        //    throw new PendingStepException();
-        //}
 
         [Given(@"the data for '([^']*)' persona")]
         public void GivenTheDataForPersona(string personaName)
@@ -332,12 +325,6 @@ namespace AcceptanceTests.Steps
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
         }
-
-        //[Given(@"current user is '([^']*)' persona")]
-        //public void GivenCurrentUserIsPersona(string personaName)
-        //{
-        //    throw new PendingStepException();
-        //}
 
         [When(@"I remove the UUID metadata for current user")]
         public async Task WhenIRemoveTheUUIDMetadataForCurrentUser()
@@ -411,18 +398,5 @@ namespace AcceptanceTests.Steps
             }
         }
 
-
-        //[Then(@"the response contains list with '([^']*)' and '([^']*)' UUID metadata")]
-        //public void ThenTheResponseContainsListWithAndUUIDMetadata(string bob, string lisa)
-        //{
-        //    throw new PendingStepException();
-        //}
-
-
-        //[Then(@"the UUID metadata for '([^']*)' and '([^']*)' persona")]
-        //public void ThenTheUUIDMetadataForAndPersona(string bob, string lisa)
-        //{
-        //    throw new PendingStepException();
-        //}
     }
 }

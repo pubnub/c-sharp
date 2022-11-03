@@ -101,12 +101,6 @@ namespace AcceptanceTests.Steps
             }
         }
 
-        //[Then(@"the response contains list with '([^']*)' and '([^']*)' memberships")]
-        //public void ThenTheResponseContainsListWithAndMemberships(string vipChatMembership, string dMMembership)
-        //{
-        //    throw new PendingStepException();
-        //}
-
         [Given(@"the data for '([^']*)' membership")]
         public void GivenTheDataForMembership(string whatMembership)
         {

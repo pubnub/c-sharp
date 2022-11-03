@@ -82,12 +82,6 @@ namespace AcceptanceTests.Steps
             }
         }
 
-        //[Given(@"the id for '([^']*)' channel")]
-        //public void GivenTheIdForChannel(string dM)
-        //{
-        //    throw new PendingStepException();
-        //}
-
         [When(@"I get the channel metadata with custom")]
         public async Task WhenIGetTheChannelMetadataWithCustom()
         {
@@ -102,12 +96,6 @@ namespace AcceptanceTests.Steps
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
         }
-
-        //[Then(@"the channel metadata for '([^']*)' channel")]
-        //public void ThenTheChannelMetadataForChannel(string dM)
-        //{
-        //    throw new PendingStepException();
-        //}
 
         [Given(@"the data for '([^']*)' channel")]
         public void GivenTheDataForChannel(string personaName)
@@ -155,10 +143,6 @@ namespace AcceptanceTests.Steps
             {
                 Assert.AreEqual(channelMetadataPersona.custom, setChannelMetadataResult.Custom);
             }
-            //else if (string.Compare(personaName, "dm", true) == 0)
-            //{
-            //    Assert.AreEqual(channelMetadataPersona.custom.Count, setChannelMetadataResult.Custom.Count);
-            //}
             else
             {
                 Assert.Fail("TEST MISMATCH", personaName);
@@ -250,10 +234,5 @@ namespace AcceptanceTests.Steps
             }
         }
 
-        //[Then(@"the response contains list with '([^']*)' and '([^']*)' channel metadata")]
-        //public void ThenTheResponseContainsListWithAndChannelMetadata(string dM, string vipChat)
-        //{
-        //    throw new PendingStepException();
-        //}
     }
 }
