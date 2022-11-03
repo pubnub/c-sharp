@@ -24,7 +24,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: pubnub/client-engineering-deployment-tools
-        ref: v1
+        ref: github-actions
         token: ${{ secrets.GH_TOKEN }}
         path: client-engineering-deployment-tools
         
