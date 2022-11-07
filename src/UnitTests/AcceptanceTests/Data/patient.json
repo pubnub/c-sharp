@@ -1,0 +1,9 @@
+{
+    "name": "Patient",
+    "id": "patient-id",
+    "description": "patient-description",
+    "updated": "2022-09-16T11:51:53.316718Z",
+    "eTag": "Afrav42WqsmyZA",
+    "type": "PatientChat",
+    "status": "active"    
+}

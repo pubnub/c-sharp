@@ -148,7 +148,7 @@ namespace PubnubApi
             }
         }
 
-        async Task<string> IPubnubHttp.SendRequestAndGetJsonResponseWithPATCH<T>(Uri requestUri, RequestState<T> pubnubRequestState, HttpWebRequest request, byte[] patchData)
+        async Task<string> IPubnubHttp.SendRequestAndGetJsonResponseWithPATCH<T>(Uri requestUri, RequestState<T> pubnubRequestState, HttpWebRequest request, byte[] patchData, string contentType)
         {
             LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, patchData = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), patchData), pubnubConfig.LogVerbosity);
             if (pubnubConfig.UseClassicHttpWebRequest)
@@ -160,14 +160,14 @@ namespace PubnubApi
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
                 if (pubnubConfig.UseTaskFactoryAsyncInsteadOfHttpClient)
                 {
-                    return await SendRequestAndGetJsonResponseTaskFactoryWithPATCH(pubnubRequestState, request, patchData).ConfigureAwait(false);
+                    return await SendRequestAndGetJsonResponseTaskFactoryWithPATCH(pubnubRequestState, request, patchData, contentType).ConfigureAwait(false);
                 }
                 else
                 {
-                    return await SendRequestAndGetJsonResponseHttpClientWithPATCH(requestUri, pubnubRequestState, patchData).ConfigureAwait(false);
+                    return await SendRequestAndGetJsonResponseHttpClientWithPATCH(requestUri, pubnubRequestState, patchData, contentType).ConfigureAwait(false);
                 }
 #else
-                return await SendRequestAndGetJsonResponseTaskFactoryWithPATCH(pubnubRequestState, request, patchData).ConfigureAwait(false);
+                return await SendRequestAndGetJsonResponseTaskFactoryWithPATCH(pubnubRequestState, request, patchData, contentType).ConfigureAwait(false);
 #endif
             }
         }
@@ -447,7 +447,7 @@ namespace PubnubApi
             return jsonString;
         }
 
-        async Task<string> SendRequestAndGetJsonResponseHttpClientWithPATCH<T>(Uri requestUri, RequestState<T> pubnubRequestState, byte[] patchData)
+        async Task<string> SendRequestAndGetJsonResponseHttpClientWithPATCH<T>(Uri requestUri, RequestState<T> pubnubRequestState, byte[] patchData, string contentType)
         {
             string jsonString = "";
             HttpResponseMessage response = null;
@@ -459,9 +459,20 @@ namespace PubnubApi
                 System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
                 stopWatch.Start();
                 HttpMethod httpMethod = new HttpMethod("PATCH");
+                ByteArrayContent patchDataContent = new ByteArrayContent(patchData);
+                patchDataContent.Headers.Remove("Content-Type");
+                if (string.IsNullOrEmpty(contentType))
+                {
+                    patchDataContent.Headers.TryAddWithoutValidation("Content-Type", "application/json");
+                }
+                else
+                {
+                    patchDataContent.Headers.TryAddWithoutValidation("Content-Type", contentType);
+                }
+
                 HttpRequestMessage requestMsg = new HttpRequestMessage(httpMethod, requestUri)
                 {
-                    Content = new ByteArrayContent(patchData)
+                    Content = patchDataContent
                 };
                 if (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation)
                 {
@@ -795,7 +806,7 @@ namespace PubnubApi
             }
         }
 
-        async Task<string> SendRequestAndGetJsonResponseTaskFactoryWithPATCH<T>(RequestState<T> pubnubRequestState, HttpWebRequest request, byte[] patchData)
+        async Task<string> SendRequestAndGetJsonResponseTaskFactoryWithPATCH<T>(RequestState<T> pubnubRequestState, HttpWebRequest request, byte[] patchData, string contentType)
         {
             System.Diagnostics.Debug.WriteLine(string.Format("DateTime {0}, Before Task.Factory.FromAsync With PATCH", DateTime.Now.ToString(CultureInfo.InvariantCulture)));
             try
@@ -807,6 +818,9 @@ namespace PubnubApi
                 stopWatch.Start();
 
                 request.ContentType = "application/json";
+#if NET35 || NET40 || NET45 || NET461 || NET48
+                request.Headers.Add("Content-Type", string.IsNullOrEmpty(contentType) ? "application/json" : contentType);
+#endif
 
                 using (var requestStream = await Task<Stream>.Factory.FromAsync(request.BeginGetRequestStream, request.EndGetRequestStream, pubnubRequestState).ConfigureAwait(false))
                 {

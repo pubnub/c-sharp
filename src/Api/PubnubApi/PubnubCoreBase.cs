@@ -1112,7 +1112,7 @@ namespace PubnubApi
                 }
                 else if (pubnubRequestState != null && pubnubRequestState.UsePatchMethod)
                 {
-                    jsonString = await pubnubHttp.SendRequestAndGetJsonResponseWithPATCH(requestUri, pubnubRequestState, null, postOrPatchData).ConfigureAwait(false);
+                    jsonString = await pubnubHttp.SendRequestAndGetJsonResponseWithPATCH(requestUri, pubnubRequestState, null, postOrPatchData, contentType).ConfigureAwait(false);
                 }
                 else
                 {
@@ -1125,7 +1125,7 @@ namespace PubnubApi
                 }
                 else if (pubnubRequestState != null && pubnubRequestState.UsePatchMethod)
                 {
-                    jsonString = await pubnubHttp.SendRequestAndGetJsonResponseWithPATCH(requestUri, pubnubRequestState, request, postOrPatchData).ConfigureAwait(false);
+                    jsonString = await pubnubHttp.SendRequestAndGetJsonResponseWithPATCH(requestUri, pubnubRequestState, request, postOrPatchData, contentType).ConfigureAwait(false);
                 }
                 else
                 {

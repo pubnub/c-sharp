@@ -1,0 +1,13 @@
+{
+    "name": "VIP",
+    "id": "vipchat-id",
+    "description": "vipchat-description",
+    "updated": "2022-09-16T11:51:53.316718Z",
+    "eTag": "Afrav42WqsmyZA",
+    "type": "VipChat",
+    "status": "active",
+    "custom": {
+        "uuid_param1": "val1",
+        "uuid_param2": "val2"
+    }
+}

@@ -18,13 +18,13 @@ jobs:
 
     steps:
     - name: Checkout Project
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       
     - name: Checkout mock-server action
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: pubnub/client-engineering-deployment-tools
-        ref: github-actions
+        ref: v1
         token: ${{ secrets.GH_TOKEN }}
         path: client-engineering-deployment-tools
         
@@ -51,7 +51,7 @@ jobs:
         cd ./UnitTests/AcceptanceTests && dotnet test --no-build --verbosity normal --logger trx --results-directory ./results
     - name: Upload acceptance tests reports
       if: always()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: acceptance-test-reports
         path: |
