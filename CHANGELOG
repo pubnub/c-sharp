@@ -1,3 +1,8 @@
+v6.11.0 - November 07 2022
+-----------------------------
+- Modified: added Content-Type to request header to support internal acceptance tests.
+- Modified: added acceptance tests for ObjectsV2 feature.
+
 v6.10.0 - September 06 2022
 -----------------------------
 - Fixed: add Users/Spaces support to PCL versions.
