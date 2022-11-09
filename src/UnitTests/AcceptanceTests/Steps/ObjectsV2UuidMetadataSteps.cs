@@ -245,8 +245,19 @@ namespace AcceptanceTests.Steps
                 {
                     string json = r.ReadToEnd();
                     uuidMetadataPersona = JsonSerializer.Deserialize<UuidMetadataPersona>(json, new JsonSerializerOptions { });
-                    pn.ChangeUserId(uuidMetadataPersona.id);
+                    if (uuidMetadataPersona == null)
+                    {
+                        Assert.Fail($"GivenCurrentUserIsPersona failed for {personaName}. Null value.");
+                    }
+                    else
+                    {
+                        pn.ChangeUserId(uuidMetadataPersona.id);
+                    }
                 }
+            }
+            else
+            {
+                Assert.Fail($"GivenCurrentUserIsPersona failed for {personaName}. Not found.");
             }
         }
 
