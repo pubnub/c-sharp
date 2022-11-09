@@ -273,6 +273,7 @@ namespace AcceptanceTests.Steps
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
+            Assert.IsTrue(getUuidMetadataResult != null, $"WhenIGetTheUUIDMetadataWithCustomForCurrentUser failed. Current user is {pn.GetCurrentUserId}");
         }
 
         [Given(@"the data for '([^']*)' persona")]
