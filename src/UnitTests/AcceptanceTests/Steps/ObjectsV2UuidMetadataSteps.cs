@@ -224,21 +224,12 @@ namespace AcceptanceTests.Steps
         [Given(@"current user is '([^']*)' persona")]
         public void GivenCurrentUserIsPersona(string personaName)
         {
-            if (string.Compare(personaName, "bob", true) == 0)
+            string dirPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            string personaFile = string.Format("{0}.json", personaName.ToLower());
+
+            var personaFilePath = Path.Combine(dirPath, "Data", personaFile);
+            if (File.Exists(personaFilePath))
             {
-                string dirPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                var personaFilePath = Path.Combine(dirPath, "Data", "bob.json");
-                using (StreamReader r = new StreamReader(personaFilePath))
-                {
-                    string json = r.ReadToEnd();
-                    uuidMetadataPersona = JsonSerializer.Deserialize<UuidMetadataPersona>(json, new JsonSerializerOptions { });
-                    pn.ChangeUserId(uuidMetadataPersona.id);
-                }
-            }
-            else if (string.Compare(personaName, "alice", true) == 0)
-            {
-                string dirPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                var personaFilePath = Path.Combine(dirPath, "Data", "alice.json");
                 using (StreamReader r = new StreamReader(personaFilePath))
                 {
                     string json = r.ReadToEnd();
@@ -265,10 +256,12 @@ namespace AcceptanceTests.Steps
         [Given(@"the data for '([^']*)' persona")]
         public void GivenTheDataForPersona(string personaName)
         {
-            if (string.Compare(personaName, "alice", true) == 0)
+            string dirPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            string personaFile = string.Format("{0}.json", personaName.ToLower());
+
+            var personaFilePath = Path.Combine(dirPath, "Data", personaFile);
+            if (File.Exists(personaFilePath))
             {
-                string dirPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                var personaFilePath = Path.Combine(dirPath, "Data", "alice.json");
                 using (StreamReader r = new StreamReader(personaFilePath))
                 {
                     string json = r.ReadToEnd();
@@ -299,17 +292,13 @@ namespace AcceptanceTests.Steps
         [Then(@"the UUID metadata for '([^']*)' persona contains updated")]
         public void ThenTheUUIDMetadataForPersonaContainsUpdated(string personaName)
         {
-            if (string.Compare(personaName, "alice", true) == 0)
-            {
-                Assert.AreEqual(uuidMetadataPersona.name, setUuidMetadataResult.Name);
-                Assert.AreEqual(uuidMetadataPersona.id, setUuidMetadataResult.Uuid);
-                Assert.AreEqual(uuidMetadataPersona.email, setUuidMetadataResult.Email);
-                Assert.AreEqual(uuidMetadataPersona.externalId, setUuidMetadataResult.ExternalId);
-                Assert.AreEqual(uuidMetadataPersona.profileUrl, setUuidMetadataResult.ProfileUrl);
-                Assert.AreEqual(uuidMetadataPersona.updated, setUuidMetadataResult.Updated);
-                Assert.IsNull(setUuidMetadataResult.Custom);
-            }
-
+            Assert.AreEqual(uuidMetadataPersona.name, setUuidMetadataResult.Name);
+            Assert.AreEqual(uuidMetadataPersona.id, setUuidMetadataResult.Uuid);
+            Assert.AreEqual(uuidMetadataPersona.email, setUuidMetadataResult.Email);
+            Assert.AreEqual(uuidMetadataPersona.externalId, setUuidMetadataResult.ExternalId);
+            Assert.AreEqual(uuidMetadataPersona.profileUrl, setUuidMetadataResult.ProfileUrl);
+            Assert.AreEqual(uuidMetadataPersona.updated, setUuidMetadataResult.Updated);
+            Assert.IsNull(setUuidMetadataResult.Custom);
         }
 
         [When(@"I remove the UUID metadata")]
