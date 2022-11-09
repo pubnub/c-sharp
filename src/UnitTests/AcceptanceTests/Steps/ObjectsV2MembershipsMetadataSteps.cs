@@ -121,12 +121,24 @@ namespace AcceptanceTests.Steps
                     if (string.Compare(currentContract, "removeAliceMembership", true) == 0)
                     {
                         removeChannelMembershipMetadata = JsonSerializer.Deserialize<ChannelMembershipMetadataLocal>(json, new JsonSerializerOptions { });
+                        if (removeChannelMembershipMetadata == null)
+                        {
+                            Assert.Fail($"GivenTheDataForMembership failed for {whatMembership}. Null value to remove.");
+                        }
                     }
                     else
                     {
                         channelMembershipMetadata = JsonSerializer.Deserialize<ChannelMembershipMetadataLocal>(json, new JsonSerializerOptions { });
+                        if (channelMembershipMetadata == null)
+                        {
+                            Assert.Fail($"GivenTheDataForMembership failed for {whatMembership}. Null value.");
+                        }
                     }
                 }
+            }
+            else
+            {
+                Assert.Fail($"GivenTheDataForMembership failed for {whatMembership}. Not found.");
             }
         }
 
@@ -192,6 +204,10 @@ namespace AcceptanceTests.Steps
             if (pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
+            }
+            if (setMembershipsResult == null)
+            {
+                Assert.Fail($"WhenISetTheMembershipForCurrentUser failed for current user {pn.GetCurrentUserId}");
             }
         }
 
