@@ -54,6 +54,10 @@ namespace AcceptanceTests.Steps
             void IPubnubLog.WriteToLog(string logText)
             {
                 System.Diagnostics.Debug.WriteLine(logText);
+                string dirPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                string logFilePath = System.IO.Path.Combine(dirPath, "pubnubmessaging.log");
+                System.Diagnostics.Trace.Listeners.Add(new System.Diagnostics.TextWriterTraceListener(logFilePath));
+
             }
         }
         internal class UuidMetadataPersona
