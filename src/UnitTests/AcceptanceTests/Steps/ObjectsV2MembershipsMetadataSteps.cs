@@ -69,8 +69,8 @@ namespace AcceptanceTests.Steps
                 }
             }
             Assert.IsTrue(personaList.Count > 0, "ThenTheResponseContainsListWithAndMemberships failed due to expected data");
-            Assert.IsTrue(getMembershipsMetadataResult!= null, "ThenTheResponseContainsListWithAndMemberships failed due to actual data");
-            if (personaList.Count > 0 && getMembershipsMetadataResult != null)
+            Assert.IsTrue(getMembershipsMetadataResult!= null && getMembershipsMetadataResult.Memberships != null, "ThenTheResponseContainsListWithAndMemberships failed due to actual data");
+            if (personaList.Count > 0 && getMembershipsMetadataResult != null && getMembershipsMetadataResult.Memberships != null)
             {
                 Assert.AreEqual(personaList[0].channel.id, getMembershipsMetadataResult.Memberships[0].ChannelMetadata.Channel);
                 Assert.AreEqual(personaList[1].channel.id, getMembershipsMetadataResult.Memberships[1].ChannelMetadata.Channel);
@@ -80,7 +80,12 @@ namespace AcceptanceTests.Steps
         [When(@"I get the memberships for current user")]
         public async Task WhenIGetTheMembershipsForCurrentUser()
         {
-            PNResult<PNMembershipsResult> getMembershipsResponse = await pn.GetMemberships()
+            var getMembershipsRequestBuilder = pn.GetMemberships();
+            if (uuidMetadataPersona != null && string.Compare(uuidMetadataPersona.id, pn.GetCurrentUserId().ToString(), true) != 0)
+            {
+                getMembershipsRequestBuilder = getMembershipsRequestBuilder.Uuid(uuidMetadataPersona.id);
+            }
+            PNResult<PNMembershipsResult> getMembershipsResponse = await getMembershipsRequestBuilder
                 .ExecuteAsync();
             getMembershipsMetadataResult = getMembershipsResponse.Result;
             pnStatus = getMembershipsResponse.Status;
@@ -88,7 +93,10 @@ namespace AcceptanceTests.Steps
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
-
+            if (getMembershipsMetadataResult == null || getMembershipsMetadataResult.Memberships == null)
+            {
+                Assert.Fail($"WhenIGetTheMembershipsForCurrentUser failed for user = {pn.GetCurrentUserId}");
+            }
         }
 
         [When(@"I get the memberships including custom and channel custom information")]
