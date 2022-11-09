@@ -1034,7 +1034,7 @@ namespace PubnubApi
             {
                 requestQueryStringParams.Add("type", pushType.ToString().ToLower());
             }
-            requestQueryStringParams.Add("add", UriUtil.EncodeUriComponent(channel, currentType, true, false, false));
+            requestQueryStringParams.Add("add", UriUtil.EncodeUriComponent(channel, currentType, false, false, false));
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
             {
@@ -1139,7 +1139,7 @@ namespace PubnubApi
             {
                 requestQueryStringParams.Add("type", pushType.ToString().ToLower());
             }
-            requestQueryStringParams.Add("remove", UriUtil.EncodeUriComponent(channel, currentType, true, false, false));
+            requestQueryStringParams.Add("remove", UriUtil.EncodeUriComponent(channel, currentType, false, false, false));
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
             {
