@@ -180,9 +180,9 @@ namespace AcceptanceTests.Steps
                 }
             }
             Assert.IsTrue(membershipsList.Count > 0, "ThenTheResponseContainsListWithMembership failed due to expected data");
-            Assert.IsTrue(setMembershipsResult != null, "ThenTheResponseContainsListWithMembership failed due to actual data");
+            Assert.IsTrue(setMembershipsResult != null && setMembershipsResult.Memberships != null, "ThenTheResponseContainsListWithMembership failed due to actual data");
 
-            if (membershipsList.Count > 0 && setMembershipsResult != null)
+            if (membershipsList.Count > 0 && setMembershipsResult != null && setMembershipsResult.Memberships != null)
             {
                 Assert.AreEqual(membershipsList[0].channel.id, setMembershipsResult.Memberships[0].ChannelMetadata.Channel);
             }
@@ -195,9 +195,14 @@ namespace AcceptanceTests.Steps
             {
                 Channel = channelMembershipMetadata.channel.id
             };
+            var setMembershipsRequestBuilder = pn.SetMemberships()
+                .Channels(new List<PNMembership>() { membership });
+            if (uuidMetadataPersona != null && string.Compare(uuidMetadataPersona.id, pn.GetCurrentUserId().ToString(), true) != 0)
+            {
+                setMembershipsRequestBuilder = setMembershipsRequestBuilder.Uuid(uuidMetadataPersona.id);
+            }
 
-            PNResult<PNMembershipsResult> setMembershipsResponse = await pn.SetMemberships()
-                .Channels(new List<PNMembership>() { membership })
+            PNResult<PNMembershipsResult> setMembershipsResponse = await setMembershipsRequestBuilder
                 .ExecuteAsync();
             setMembershipsResult = setMembershipsResponse.Result;
             pnStatus = setMembershipsResponse.Status;
@@ -205,7 +210,7 @@ namespace AcceptanceTests.Steps
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
-            if (setMembershipsResult == null)
+            if (setMembershipsResult == null || setMembershipsResult.Memberships == null)
             {
                 Assert.Fail($"WhenISetTheMembershipForCurrentUser failed for current user {pn.GetCurrentUserId}");
             }
