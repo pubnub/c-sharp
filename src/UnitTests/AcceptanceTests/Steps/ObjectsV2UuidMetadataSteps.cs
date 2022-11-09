@@ -205,17 +205,23 @@ namespace AcceptanceTests.Steps
         [Then(@"the UUID metadata for '([^']*)' persona")]
         public void ThenTheUUIDMetadataForPersona(string personaName)
         {
-            if (string.Compare(personaName, "alice", true) == 0)
+            uuidMetadataPersona = null;
+            string dirPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            string personaFile = string.Format("{0}.json", personaName.ToLower());
+
+            var personaFilePath = Path.Combine(dirPath, "Data", personaFile);
+            if (File.Exists(personaFilePath))
             {
-                Assert.AreEqual(uuidMetadataPersona.name, getUuidMetadataResult.Name);
-                Assert.AreEqual(uuidMetadataPersona.id, getUuidMetadataResult.Uuid);
-                Assert.AreEqual(uuidMetadataPersona.email, getUuidMetadataResult.Email);
-                Assert.AreEqual(uuidMetadataPersona.externalId, getUuidMetadataResult.ExternalId);
-                Assert.AreEqual(uuidMetadataPersona.profileUrl, getUuidMetadataResult.ProfileUrl);
-                Assert.AreEqual(uuidMetadataPersona.updated, getUuidMetadataResult.Updated);
-                Assert.IsNull(getUuidMetadataResult.Custom);
+                using (StreamReader r = new StreamReader(personaFilePath))
+                {
+                    string json = r.ReadToEnd();
+                    uuidMetadataPersona = JsonSerializer.Deserialize<UuidMetadataPersona>(json, new JsonSerializerOptions { });
+                }
             }
-            else if (string.Compare(personaName, "bob", true) == 0)
+
+            Assert.IsTrue(uuidMetadataPersona != null, "ThenTheUUIDMetadataForPersona failed due to expected data");
+            Assert.IsTrue(getUuidMetadataResult != null, "ThenTheUUIDMetadataForPersona failed due to actual data");
+            if (uuidMetadataPersona != null && getUuidMetadataResult != null)
             {
                 Assert.AreEqual(uuidMetadataPersona.name, getUuidMetadataResult.Name);
                 Assert.AreEqual(uuidMetadataPersona.id, getUuidMetadataResult.Uuid);
@@ -223,7 +229,6 @@ namespace AcceptanceTests.Steps
                 Assert.AreEqual(uuidMetadataPersona.externalId, getUuidMetadataResult.ExternalId);
                 Assert.AreEqual(uuidMetadataPersona.profileUrl, getUuidMetadataResult.ProfileUrl);
                 Assert.AreEqual(uuidMetadataPersona.updated, getUuidMetadataResult.Updated);
-                Assert.AreEqual(uuidMetadataPersona.custom.Count, getUuidMetadataResult.Custom.Count);
             }
         }
 
