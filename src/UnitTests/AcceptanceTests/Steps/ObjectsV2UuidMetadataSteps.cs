@@ -15,6 +15,7 @@ namespace AcceptanceTests.Steps
     [Binding]
     public partial class FeatureObjectsV2MetadataSteps
     {
+        public static bool enableIntenalPubnubLogging = false;
         public static string currentFeature = string.Empty;
         public static string currentContract = string.Empty;
         public static bool betaVersion = false;
@@ -159,8 +160,15 @@ namespace AcceptanceTests.Steps
             config.PublishKey = System.Environment.GetEnvironmentVariable("PN_PUB_KEY");
             config.SubscribeKey = System.Environment.GetEnvironmentVariable("PN_SUB_KEY");
             config.SecretKey = System.Environment.GetEnvironmentVariable("PN_SEC_KEY");
-            config.LogVerbosity = PNLogVerbosity.BODY;
-            config.PubnubLog = new InternalPubnubLog();
+            if (enableIntenalPubnubLogging)
+            {
+                config.LogVerbosity = PNLogVerbosity.BODY;
+                config.PubnubLog = new InternalPubnubLog();
+            }
+            else
+            {
+                config.LogVerbosity = PNLogVerbosity.NONE;
+            }
 
             pn = new Pubnub(config);
 
@@ -264,8 +272,13 @@ namespace AcceptanceTests.Steps
         [When(@"I get the UUID metadata with custom for current user")]
         public async Task WhenIGetTheUUIDMetadataWithCustomForCurrentUser()
         {
-            PNResult<PNGetUuidMetadataResult> getUuidMetadataResponse = await pn.GetUuidMetadata()
-                .IncludeCustom(true)
+            var getUuidMetadataRequestBuilder = pn.GetUuidMetadata().IncludeCustom(true);
+            if (uuidMetadataPersona != null && string.Compare(uuidMetadataPersona.id, pn.GetCurrentUserId().ToString(), true) != 0)
+            {
+                getUuidMetadataRequestBuilder = getUuidMetadataRequestBuilder.Uuid(uuidMetadataPersona.id);
+            }
+
+            PNResult<PNGetUuidMetadataResult> getUuidMetadataResponse = await getUuidMetadataRequestBuilder
                 .ExecuteAsync();
             getUuidMetadataResult = getUuidMetadataResponse.Result;
             pnStatus = getUuidMetadataResponse.Status;
@@ -273,7 +286,7 @@ namespace AcceptanceTests.Steps
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
-            Assert.IsTrue(getUuidMetadataResult != null, $"WhenIGetTheUUIDMetadataWithCustomForCurrentUser failed. Current user is {pn.GetCurrentUserId}");
+            Assert.IsTrue(getUuidMetadataResult != null, $"WhenIGetTheUUIDMetadataWithCustomForCurrentUser failed. Current user is {pn.GetCurrentUserId()}");
         }
 
         [Given(@"the data for '([^']*)' persona")]

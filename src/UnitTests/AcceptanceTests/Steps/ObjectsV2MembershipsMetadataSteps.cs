@@ -95,7 +95,7 @@ namespace AcceptanceTests.Steps
             }
             if (getMembershipsMetadataResult == null || getMembershipsMetadataResult.Memberships == null)
             {
-                Assert.Fail($"WhenIGetTheMembershipsForCurrentUser failed for user = {pn.GetCurrentUserId}");
+                Assert.Fail($"WhenIGetTheMembershipsForCurrentUser failed for user = {pn.GetCurrentUserId()}");
             }
         }
 
@@ -220,7 +220,7 @@ namespace AcceptanceTests.Steps
             }
             if (setMembershipsResult == null || setMembershipsResult.Memberships == null)
             {
-                Assert.Fail($"WhenISetTheMembershipForCurrentUser failed for current user {pn.GetCurrentUserId}");
+                Assert.Fail($"WhenISetTheMembershipForCurrentUser failed for current user {pn.GetCurrentUserId()}");
             }
         }
 
