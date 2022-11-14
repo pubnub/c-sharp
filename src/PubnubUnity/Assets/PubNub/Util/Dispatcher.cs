@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace PubNubAPI.Internal {
+namespace PubnubApi.Unity.Internal {
 	public sealed class Dispatcher : MonoBehaviour {
 
 		static Dispatcher instance;

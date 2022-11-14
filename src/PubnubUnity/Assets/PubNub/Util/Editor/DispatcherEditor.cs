@@ -1,6 +1,6 @@
 using UnityEditor;
 
-namespace PubNubAPI.Internal.EditorTools {
+namespace PubnubApi.Unity.Internal.EditorTools {
 	[CustomEditor(typeof(Dispatcher))]
 	public class DispatcherEditor : Editor {
 		public override void OnInspectorGUI() {

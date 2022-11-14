@@ -1,6 +1,6 @@
 {
     "name": "PubNubAPI",
-    "rootNamespace": "PubNubAPI",
+    "rootNamespace": "PubnubApi.Unity",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
