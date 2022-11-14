@@ -57,4 +57,3 @@ jobs:
         path: |
           ${{ github.workspace }}/src/UnitTests/AcceptanceTests/Features/
           ${{ github.workspace }}/src/UnitTests/AcceptanceTests/results/
-          ${{ github.workspace }}/src/UnitTests/AcceptanceTests/bin/**/**/*.log
