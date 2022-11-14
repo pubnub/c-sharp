@@ -68,14 +68,24 @@ namespace AcceptanceTests.Steps
                     personaList.Add(channelMembershipMetadata);
                 }
             }
-            Assert.AreEqual(personaList[0].channel.id, getMembershipsMetadataResult.Memberships[0].ChannelMetadata.Channel);
-            Assert.AreEqual(personaList[1].channel.id, getMembershipsMetadataResult.Memberships[1].ChannelMetadata.Channel);
+            Assert.IsTrue(personaList.Count > 0, "ThenTheResponseContainsListWithAndMemberships failed due to expected data");
+            Assert.IsTrue(getMembershipsMetadataResult!= null && getMembershipsMetadataResult.Memberships != null, "ThenTheResponseContainsListWithAndMemberships failed due to actual data");
+            if (personaList.Count > 0 && getMembershipsMetadataResult != null && getMembershipsMetadataResult.Memberships != null)
+            {
+                Assert.AreEqual(personaList[0].channel.id, getMembershipsMetadataResult.Memberships[0].ChannelMetadata.Channel);
+                Assert.AreEqual(personaList[1].channel.id, getMembershipsMetadataResult.Memberships[1].ChannelMetadata.Channel);
+            }
         }
 
         [When(@"I get the memberships for current user")]
         public async Task WhenIGetTheMembershipsForCurrentUser()
         {
-            PNResult<PNMembershipsResult> getMembershipsResponse = await pn.GetMemberships()
+            var getMembershipsRequestBuilder = pn.GetMemberships();
+            if (uuidMetadataPersona != null && string.Compare(uuidMetadataPersona.id, pn.GetCurrentUserId().ToString(), true) != 0)
+            {
+                getMembershipsRequestBuilder = getMembershipsRequestBuilder.Uuid(uuidMetadataPersona.id);
+            }
+            PNResult<PNMembershipsResult> getMembershipsResponse = await getMembershipsRequestBuilder
                 .ExecuteAsync();
             getMembershipsMetadataResult = getMembershipsResponse.Result;
             pnStatus = getMembershipsResponse.Status;
@@ -83,7 +93,10 @@ namespace AcceptanceTests.Steps
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
-
+            if (getMembershipsMetadataResult == null || getMembershipsMetadataResult.Memberships == null)
+            {
+                Assert.Fail($"WhenIGetTheMembershipsForCurrentUser failed for user = {pn.GetCurrentUserId()}");
+            }
         }
 
         [When(@"I get the memberships including custom and channel custom information")]
@@ -116,12 +129,24 @@ namespace AcceptanceTests.Steps
                     if (string.Compare(currentContract, "removeAliceMembership", true) == 0)
                     {
                         removeChannelMembershipMetadata = JsonSerializer.Deserialize<ChannelMembershipMetadataLocal>(json, new JsonSerializerOptions { });
+                        if (removeChannelMembershipMetadata == null)
+                        {
+                            Assert.Fail($"GivenTheDataForMembership failed for {whatMembership}. Null value to remove.");
+                        }
                     }
                     else
                     {
                         channelMembershipMetadata = JsonSerializer.Deserialize<ChannelMembershipMetadataLocal>(json, new JsonSerializerOptions { });
+                        if (channelMembershipMetadata == null)
+                        {
+                            Assert.Fail($"GivenTheDataForMembership failed for {whatMembership}. Null value.");
+                        }
                     }
                 }
+            }
+            else
+            {
+                Assert.Fail($"GivenTheDataForMembership failed for {whatMembership}. Not found.");
             }
         }
 
@@ -162,8 +187,13 @@ namespace AcceptanceTests.Steps
                     membershipsList.Add(channelMembershipMetadata);
                 }
             }
+            Assert.IsTrue(membershipsList.Count > 0, "ThenTheResponseContainsListWithMembership failed due to expected data");
+            Assert.IsTrue(setMembershipsResult != null && setMembershipsResult.Memberships != null, "ThenTheResponseContainsListWithMembership failed due to actual data");
 
-            Assert.AreEqual(membershipsList[0].channel.id, setMembershipsResult.Memberships[0].ChannelMetadata.Channel);
+            if (membershipsList.Count > 0 && setMembershipsResult != null && setMembershipsResult.Memberships != null)
+            {
+                Assert.AreEqual(membershipsList[0].channel.id, setMembershipsResult.Memberships[0].ChannelMetadata.Channel);
+            }
         }
 
         [When(@"I set the membership for current user")]
@@ -173,15 +203,24 @@ namespace AcceptanceTests.Steps
             {
                 Channel = channelMembershipMetadata.channel.id
             };
+            var setMembershipsRequestBuilder = pn.SetMemberships()
+                .Channels(new List<PNMembership>() { membership });
+            if (uuidMetadataPersona != null && string.Compare(uuidMetadataPersona.id, pn.GetCurrentUserId().ToString(), true) != 0)
+            {
+                setMembershipsRequestBuilder = setMembershipsRequestBuilder.Uuid(uuidMetadataPersona.id);
+            }
 
-            PNResult<PNMembershipsResult> setMembershipsResponse = await pn.SetMemberships()
-                .Channels(new List<PNMembership>() { membership })
+            PNResult<PNMembershipsResult> setMembershipsResponse = await setMembershipsRequestBuilder
                 .ExecuteAsync();
             setMembershipsResult = setMembershipsResponse.Result;
             pnStatus = setMembershipsResponse.Status;
             if (pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
+            }
+            if (setMembershipsResult == null || setMembershipsResult.Memberships == null)
+            {
+                Assert.Fail($"WhenISetTheMembershipForCurrentUser failed for current user {pn.GetCurrentUserId()}");
             }
         }
 

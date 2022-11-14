@@ -15,6 +15,7 @@ namespace AcceptanceTests.Steps
     [Binding]
     public partial class FeatureObjectsV2MetadataSteps
     {
+        public static bool enableIntenalPubnubLogging = false;
         public static string currentFeature = string.Empty;
         public static string currentContract = string.Empty;
         public static bool betaVersion = false;
@@ -54,6 +55,10 @@ namespace AcceptanceTests.Steps
             void IPubnubLog.WriteToLog(string logText)
             {
                 System.Diagnostics.Debug.WriteLine(logText);
+                string dirPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                string logFilePath = System.IO.Path.Combine(dirPath, "pubnubmessaging.log");
+                System.Diagnostics.Trace.Listeners.Add(new System.Diagnostics.TextWriterTraceListener(logFilePath));
+
             }
         }
         internal class UuidMetadataPersona
@@ -155,6 +160,15 @@ namespace AcceptanceTests.Steps
             config.PublishKey = System.Environment.GetEnvironmentVariable("PN_PUB_KEY");
             config.SubscribeKey = System.Environment.GetEnvironmentVariable("PN_SUB_KEY");
             config.SecretKey = System.Environment.GetEnvironmentVariable("PN_SEC_KEY");
+            if (enableIntenalPubnubLogging)
+            {
+                config.LogVerbosity = PNLogVerbosity.BODY;
+                config.PubnubLog = new InternalPubnubLog();
+            }
+            else
+            {
+                config.LogVerbosity = PNLogVerbosity.NONE;
+            }
 
             pn = new Pubnub(config);
 
@@ -199,17 +213,23 @@ namespace AcceptanceTests.Steps
         [Then(@"the UUID metadata for '([^']*)' persona")]
         public void ThenTheUUIDMetadataForPersona(string personaName)
         {
-            if (string.Compare(personaName, "alice", true) == 0)
+            uuidMetadataPersona = null;
+            string dirPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            string personaFile = string.Format("{0}.json", personaName.ToLower());
+
+            var personaFilePath = Path.Combine(dirPath, "Data", personaFile);
+            if (File.Exists(personaFilePath))
             {
-                Assert.AreEqual(uuidMetadataPersona.name, getUuidMetadataResult.Name);
-                Assert.AreEqual(uuidMetadataPersona.id, getUuidMetadataResult.Uuid);
-                Assert.AreEqual(uuidMetadataPersona.email, getUuidMetadataResult.Email);
-                Assert.AreEqual(uuidMetadataPersona.externalId, getUuidMetadataResult.ExternalId);
-                Assert.AreEqual(uuidMetadataPersona.profileUrl, getUuidMetadataResult.ProfileUrl);
-                Assert.AreEqual(uuidMetadataPersona.updated, getUuidMetadataResult.Updated);
-                Assert.IsNull(getUuidMetadataResult.Custom);
+                using (StreamReader r = new StreamReader(personaFilePath))
+                {
+                    string json = r.ReadToEnd();
+                    uuidMetadataPersona = JsonSerializer.Deserialize<UuidMetadataPersona>(json, new JsonSerializerOptions { });
+                }
             }
-            else if (string.Compare(personaName, "bob", true) == 0)
+
+            Assert.IsTrue(uuidMetadataPersona != null, "ThenTheUUIDMetadataForPersona failed due to expected data");
+            Assert.IsTrue(getUuidMetadataResult != null, "ThenTheUUIDMetadataForPersona failed due to actual data");
+            if (uuidMetadataPersona != null && getUuidMetadataResult != null)
             {
                 Assert.AreEqual(uuidMetadataPersona.name, getUuidMetadataResult.Name);
                 Assert.AreEqual(uuidMetadataPersona.id, getUuidMetadataResult.Uuid);
@@ -217,42 +237,48 @@ namespace AcceptanceTests.Steps
                 Assert.AreEqual(uuidMetadataPersona.externalId, getUuidMetadataResult.ExternalId);
                 Assert.AreEqual(uuidMetadataPersona.profileUrl, getUuidMetadataResult.ProfileUrl);
                 Assert.AreEqual(uuidMetadataPersona.updated, getUuidMetadataResult.Updated);
-                Assert.AreEqual(uuidMetadataPersona.custom.Count, getUuidMetadataResult.Custom.Count);
             }
         }
 
         [Given(@"current user is '([^']*)' persona")]
         public void GivenCurrentUserIsPersona(string personaName)
         {
-            if (string.Compare(personaName, "bob", true) == 0)
+            string dirPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            string personaFile = string.Format("{0}.json", personaName.ToLower());
+
+            var personaFilePath = Path.Combine(dirPath, "Data", personaFile);
+            if (File.Exists(personaFilePath))
             {
-                string dirPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                var personaFilePath = Path.Combine(dirPath, "Data", "bob.json");
                 using (StreamReader r = new StreamReader(personaFilePath))
                 {
                     string json = r.ReadToEnd();
                     uuidMetadataPersona = JsonSerializer.Deserialize<UuidMetadataPersona>(json, new JsonSerializerOptions { });
-                    pn.ChangeUserId(uuidMetadataPersona.id);
+                    if (uuidMetadataPersona == null)
+                    {
+                        Assert.Fail($"GivenCurrentUserIsPersona failed for {personaName}. Null value.");
+                    }
+                    else
+                    {
+                        pn.ChangeUserId(uuidMetadataPersona.id);
+                    }
                 }
             }
-            else if (string.Compare(personaName, "alice", true) == 0)
+            else
             {
-                string dirPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                var personaFilePath = Path.Combine(dirPath, "Data", "alice.json");
-                using (StreamReader r = new StreamReader(personaFilePath))
-                {
-                    string json = r.ReadToEnd();
-                    uuidMetadataPersona = JsonSerializer.Deserialize<UuidMetadataPersona>(json, new JsonSerializerOptions { });
-                    pn.ChangeUserId(uuidMetadataPersona.id);
-                }
+                Assert.Fail($"GivenCurrentUserIsPersona failed for {personaName}. Not found.");
             }
         }
 
         [When(@"I get the UUID metadata with custom for current user")]
         public async Task WhenIGetTheUUIDMetadataWithCustomForCurrentUser()
         {
-            PNResult<PNGetUuidMetadataResult> getUuidMetadataResponse = await pn.GetUuidMetadata()
-                .IncludeCustom(true)
+            var getUuidMetadataRequestBuilder = pn.GetUuidMetadata().IncludeCustom(true);
+            if (uuidMetadataPersona != null && string.Compare(uuidMetadataPersona.id, pn.GetCurrentUserId().ToString(), true) != 0)
+            {
+                getUuidMetadataRequestBuilder = getUuidMetadataRequestBuilder.Uuid(uuidMetadataPersona.id);
+            }
+
+            PNResult<PNGetUuidMetadataResult> getUuidMetadataResponse = await getUuidMetadataRequestBuilder
                 .ExecuteAsync();
             getUuidMetadataResult = getUuidMetadataResponse.Result;
             pnStatus = getUuidMetadataResponse.Status;
@@ -260,15 +286,18 @@ namespace AcceptanceTests.Steps
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
+            Assert.IsTrue(getUuidMetadataResult != null, $"WhenIGetTheUUIDMetadataWithCustomForCurrentUser failed. Current user is {pn.GetCurrentUserId()}");
         }
 
         [Given(@"the data for '([^']*)' persona")]
         public void GivenTheDataForPersona(string personaName)
         {
-            if (string.Compare(personaName, "alice", true) == 0)
+            string dirPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            string personaFile = string.Format("{0}.json", personaName.ToLower());
+
+            var personaFilePath = Path.Combine(dirPath, "Data", personaFile);
+            if (File.Exists(personaFilePath))
             {
-                string dirPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                var personaFilePath = Path.Combine(dirPath, "Data", "alice.json");
                 using (StreamReader r = new StreamReader(personaFilePath))
                 {
                     string json = r.ReadToEnd();
@@ -299,17 +328,13 @@ namespace AcceptanceTests.Steps
         [Then(@"the UUID metadata for '([^']*)' persona contains updated")]
         public void ThenTheUUIDMetadataForPersonaContainsUpdated(string personaName)
         {
-            if (string.Compare(personaName, "alice", true) == 0)
-            {
-                Assert.AreEqual(uuidMetadataPersona.name, setUuidMetadataResult.Name);
-                Assert.AreEqual(uuidMetadataPersona.id, setUuidMetadataResult.Uuid);
-                Assert.AreEqual(uuidMetadataPersona.email, setUuidMetadataResult.Email);
-                Assert.AreEqual(uuidMetadataPersona.externalId, setUuidMetadataResult.ExternalId);
-                Assert.AreEqual(uuidMetadataPersona.profileUrl, setUuidMetadataResult.ProfileUrl);
-                Assert.AreEqual(uuidMetadataPersona.updated, setUuidMetadataResult.Updated);
-                Assert.IsNull(setUuidMetadataResult.Custom);
-            }
-
+            Assert.AreEqual(uuidMetadataPersona.name, setUuidMetadataResult.Name);
+            Assert.AreEqual(uuidMetadataPersona.id, setUuidMetadataResult.Uuid);
+            Assert.AreEqual(uuidMetadataPersona.email, setUuidMetadataResult.Email);
+            Assert.AreEqual(uuidMetadataPersona.externalId, setUuidMetadataResult.ExternalId);
+            Assert.AreEqual(uuidMetadataPersona.profileUrl, setUuidMetadataResult.ProfileUrl);
+            Assert.AreEqual(uuidMetadataPersona.updated, setUuidMetadataResult.Updated);
+            Assert.IsNull(setUuidMetadataResult.Custom);
         }
 
         [When(@"I remove the UUID metadata")]

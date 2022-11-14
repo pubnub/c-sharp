@@ -1,3 +1,7 @@
+v6.12.0 - November 14 2022
+-----------------------------
+- Fixed: encode comma char for push related multi channels.
+
 v6.11.0 - November 07 2022
 -----------------------------
 - Modified: added Content-Type to request header to support internal acceptance tests.
