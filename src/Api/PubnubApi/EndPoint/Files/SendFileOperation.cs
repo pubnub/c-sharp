@@ -201,7 +201,7 @@ namespace PubnubApi.EndPoint
                         PNResult<PNPublishFileMessageResult> publishFileMessageResponse = PublishFileMessage(publishPayload, queryParam).Result;
                         PNPublishFileMessageResult publishFileMessage = publishFileMessageResponse.Result;
                         PNStatus publishFileMessageStatus = publishFileMessageResponse.Status;
-                        if (!publishFileMessageStatus.Error && publishFileMessage != null)
+                        if (publishFileMessageStatus != null && !publishFileMessageStatus.Error && publishFileMessage != null)
                         {
                             publishFailed = false;
                             PNFileUploadResult result = new PNFileUploadResult();
@@ -302,7 +302,7 @@ namespace PubnubApi.EndPoint
                     PNResult<PNPublishFileMessageResult> publishFileMessageResponse = await PublishFileMessage(publishPayload, queryParam).ConfigureAwait(false);
                     PNPublishFileMessageResult publishFileMessage = publishFileMessageResponse.Result;
                     PNStatus publishFileMessageStatus = publishFileMessageResponse.Status;
-                    if (!publishFileMessageStatus.Error && publishFileMessage != null)
+                    if (publishFileMessageStatus != null && !publishFileMessageStatus.Error && publishFileMessage != null)
                     {
                         publishFailed = false;
                         PNFileUploadResult result = new PNFileUploadResult();
@@ -407,6 +407,18 @@ namespace PubnubApi.EndPoint
                         PNException ex = new PNException("File has been upload but the notification couldn't be sent to the subscribed users");
                         PNStatus status = statusBuilder.CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNUnknownCategory, requestState, (int)HttpStatusCode.BadRequest, ex);
                         status.AdditonalData = new Dictionary<string, string> { {"FileId", currentFileId }, {"FileName", sendFileName } };
+                        ret.Status = status;
+                    }
+                }
+                else
+                {
+                    ret.Status = r.Result.Item2;
+                    if (ret.Status == null)
+                    {
+                        PNException ex = new PNException("PublishFileMessage failed.");
+                        StatusBuilder statusBuilder = new StatusBuilder(config, jsonLibrary);
+                        PNStatus status = statusBuilder.CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNUnknownCategory, requestState, (int)HttpStatusCode.BadRequest, ex);
+                        status.AdditonalData = new Dictionary<string, string> { { "FileId", currentFileId }, { "FileName", sendFileName } };
                         ret.Status = status;
                     }
                 }
