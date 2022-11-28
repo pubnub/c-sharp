@@ -12,16 +12,16 @@ namespace PubnubApi
         private readonly IPubnubLog pubnubLog;
         private readonly IPubnubUnitTest pnUnit;
 
-        public PubnubCrypto(string cipher_key, PNConfiguration pubnubConfig, IPubnubLog log, IPubnubUnitTest pubnubUnit)
-            : base(cipher_key, pubnubConfig)
+        public PubnubCrypto(string cipherKey, PNConfiguration pubnubConfig, IPubnubLog log, IPubnubUnitTest pubnubUnit)
+            : base(cipherKey, pubnubConfig)
         {
             this.config = pubnubConfig;
             this.pubnubLog = log;
             this.pnUnit = pubnubUnit;
         }
 
-        public PubnubCrypto(string cipher_key)
-            : base(cipher_key)
+        public PubnubCrypto(string cipherKey)
+            : base(cipherKey)
         {
         }
 
@@ -116,7 +116,7 @@ namespace PubnubApi
             }
             if (config != null)
             {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} IV = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), GetDisplayableBytes(ivBytes)), config.LogVerbosity);
+                LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} IV = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), GetDisplayableBytes(ivBytes)), config.LogVerbosity);
             }
 
             Aes aesAlg = Aes.Create();
@@ -167,7 +167,7 @@ namespace PubnubApi
                 {
                     if (config != null)
                     {
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} Decrypt Error. {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), config.LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} Decrypt Error. {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), config.LogVerbosity);
                     }
                     throw;
                 }

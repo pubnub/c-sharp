@@ -157,7 +157,7 @@ namespace PubnubApi.EndPoint
                 }
                 return;
             }
-            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} GenerateFileUploadUrl OK.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+            LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} GenerateFileUploadUrl OK.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
 
             RequestState<PNFileUploadResult> requestState = new RequestState<PNFileUploadResult>();
             requestState.ResponseType = PNOperationType.PNFileUploadOperation;
@@ -170,7 +170,7 @@ namespace PubnubApi.EndPoint
             byte[] sendFileByteArray = GetByteArrayFromFilePath(sendFileFullPath);
 
             
-            string dataBoundary = String.Format("----------{0:N}", Guid.NewGuid());
+            string dataBoundary = String.Format(CultureInfo.InvariantCulture, "----------{0:N}", Guid.NewGuid());
             string contentType = "multipart/form-data; boundary=" + dataBoundary;
             string currentCipherKey = !string.IsNullOrEmpty(this.currentFileCipherKey) ? this.currentFileCipherKey : config.CipherKey;
             byte[] postData = GetMultipartFormData(sendFileByteArray,generateFileUploadUrlResult.FileName, generateFileUploadUrlResult.FileUploadRequest.FormFields, dataBoundary, currentCipherKey, config, pubnubLog);
@@ -179,9 +179,9 @@ namespace PubnubApi.EndPoint
             UrlProcessRequest(new Uri(generateFileUploadUrlResult.FileUploadRequest.Url), requestState, false, postData, contentType).ContinueWith(r =>
             {
                 json = r.Result.Item1;
-                if (!string.IsNullOrEmpty(json) && string.Compare(json,"{}", StringComparison.CurrentCultureIgnoreCase) == 0)
+                if (!string.IsNullOrEmpty(json) && string.Equals(json,"{}", StringComparison.OrdinalIgnoreCase))
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} GenerateFileUploadUrl -> file upload OK.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} GenerateFileUploadUrl -> file upload OK.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
                     //do internal publish after successful file upload
 
                     Dictionary<string, object> publishPayload = new Dictionary<string, object>();
@@ -208,7 +208,7 @@ namespace PubnubApi.EndPoint
                             result.Timetoken = publishFileMessage.Timetoken;
                             result.FileId = generateFileUploadUrlResult.FileId;
                             result.FileName = generateFileUploadUrlResult.FileName;
-                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} GenerateFileUploadUrl -> file upload -> PublishFileMessage -> OK.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                            LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} GenerateFileUploadUrl -> file upload -> PublishFileMessage -> OK.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
                             r.Result.Item2.Error = false;
                             callback.OnResponse(result, r.Result.Item2);
                         }
@@ -219,7 +219,7 @@ namespace PubnubApi.EndPoint
                             {
                                 callback.OnResponse(null, publishFileMessageStatus);
                             }
-                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} PublishFileMessage Failed. currentFileRetryCount={1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), currentFileRetryCount), config.LogVerbosity);
+                            LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} PublishFileMessage Failed. currentFileRetryCount={1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), currentFileRetryCount), config.LogVerbosity);
 #if !NET35 && !NET40
                             Task.Delay(1000).Wait();
 #else
@@ -260,7 +260,7 @@ namespace PubnubApi.EndPoint
                 ret.Status = errStatus;
                 return ret;
             }
-            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} GenerateFileUploadUrl OK.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+            LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} GenerateFileUploadUrl OK.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
 
             RequestState<PNFileUploadResult> requestState = new RequestState<PNFileUploadResult>();
             requestState.ResponseType = PNOperationType.PNFileUploadOperation;
@@ -271,7 +271,7 @@ namespace PubnubApi.EndPoint
 
             byte[] sendFileByteArray = GetByteArrayFromFilePath(sendFileFullPath);
 
-            string dataBoundary = String.Format("----------{0:N}", Guid.NewGuid());
+            string dataBoundary = String.Format(CultureInfo.InvariantCulture, "----------{0:N}", Guid.NewGuid());
             string contentType = "multipart/form-data; boundary=" + dataBoundary;
             string currentCipherKey = !string.IsNullOrEmpty(this.currentFileCipherKey) ? this.currentFileCipherKey : config.CipherKey;
             byte[] postData = GetMultipartFormData(sendFileByteArray, generateFileUploadUrlResult.FileName, generateFileUploadUrlResult.FileUploadRequest.FormFields, dataBoundary, currentCipherKey, config, pubnubLog);
@@ -281,7 +281,7 @@ namespace PubnubApi.EndPoint
             string json = JsonAndStatusTuple.Item1;
             if (!string.IsNullOrEmpty(json))
             {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} GenerateFileUploadUrl -> file upload OK.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);                //do internal publish after successful file upload
+                LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} GenerateFileUploadUrl -> file upload OK.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);                //do internal publish after successful file upload
 
                 Dictionary<string, object> publishPayload = new Dictionary<string, object>();
                 if (this.publishMessage != null && !string.IsNullOrEmpty(this.publishMessage.ToString()))
@@ -311,13 +311,13 @@ namespace PubnubApi.EndPoint
                         result.FileName = generateFileUploadUrlResult.FileName;
                         ret.Result = result;
                         ret.Status.Error = false;
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} GenerateFileUploadUrl -> file upload -> PublishFileMessage -> OK.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);                //do internal publish after successful file upload
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} GenerateFileUploadUrl -> file upload -> PublishFileMessage -> OK.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);                //do internal publish after successful file upload
                     }
                     else
                     {
                         publishFailed = true;
                         ret.Status = publishFileMessageStatus;
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} PublishFileMessage Failed. currentFileRetryCount={1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), currentFileRetryCount), config.LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} PublishFileMessage Failed. currentFileRetryCount={1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), currentFileRetryCount), config.LogVerbosity);
 #if !NET35 && !NET40
                         Task.Delay(1000).Wait();
 #else
@@ -454,7 +454,7 @@ namespace PubnubApi.EndPoint
                     {
                         fileContentType = kvp.Value.ToString();
                     }
-                    string postParamData = string.Format("--{0}\r\nContent-Disposition: form-data; name=\"{1}\"\r\n\r\n{2}",
+                    string postParamData = string.Format(CultureInfo.InvariantCulture, "--{0}\r\nContent-Disposition: form-data; name=\"{1}\"\r\n\r\n{2}",
                             dataBoundary,
                             kvp.Key,
                             kvp.Value);
@@ -465,7 +465,7 @@ namespace PubnubApi.EndPoint
                     byte[] emptyData = Encoding.UTF8.GetBytes(emptyLine);
                     dataStream.Write(emptyData, 0, emptyData.Length);
                 }
-                string header = string.Format("--{0}\r\nContent-Disposition: form-data; name=\"{1}\"; filename=\"{2}\"\r\nContent-Type: {3}\r\n\r\n",
+                string header = string.Format(CultureInfo.InvariantCulture, "--{0}\r\nContent-Disposition: form-data; name=\"{1}\"; filename=\"{2}\"\r\nContent-Type: {3}\r\n\r\n",
                             dataBoundary,
                             "file",
                             fileName,
@@ -498,7 +498,7 @@ namespace PubnubApi.EndPoint
                 dataStream.Position = 0;
                 ret = new byte[dataStream.Length];
                 int bytesRead = dataStream.Read(ret, 0, ret.Length);
-                System.Diagnostics.Debug.WriteLine(string.Format("MultipartFormData byte count = {0}", bytesRead));
+                System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "MultipartFormData byte count = {0}", bytesRead));
 #if NET35 || NET40 || NET45 || NET461 || NET48
                 dataStream.Close();
 #endif

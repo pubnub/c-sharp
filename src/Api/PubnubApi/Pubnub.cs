@@ -25,7 +25,7 @@ namespace PubnubApi
             var assemblyName = new AssemblyName(assembly.FullName);
             string assemblyVersion = assemblyName.Version.ToString();
 #endif
-            Version = string.Format("{0}CSharp{1}", PNPlatform.Get(), assemblyVersion);
+            Version = string.Format(CultureInfo.InvariantCulture, "{0}CSharp{1}", PNPlatform.Get(), assemblyVersion);
         }
 
         #region "PubNub API Channel Methods"
@@ -424,7 +424,7 @@ namespace PubnubApi
             {
                 if (pubnubLog != null && pubnubConfig != null)
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, UserId cannot be null/empty.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId].LogVerbosity : PNLogVerbosity.NONE);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, UserId cannot be null/empty.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId].LogVerbosity : PNLogVerbosity.NONE);
                 }
                 throw new MissingMemberException("UserId cannot be null/empty");
             }
@@ -883,7 +883,7 @@ namespace PubnubApi
                 config.PresenceTimeout = 20;
                 if (pubnubLog != null)
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, WARNING: The PresenceTimeout cannot be less than 20, defaulting the value to 20. Please update the settings in your code.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, WARNING: The PresenceTimeout cannot be less than 20, defaulting the value to 20. Please update the settings in your code.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
                 }
             }
             if (config != null)
@@ -892,7 +892,7 @@ namespace PubnubApi
                 {
                     if (pubnubLog != null)
                     {
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, PNConfiguration.Uuid or PNConfiguration.UserId is required to use the SDK.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, PNConfiguration.Uuid or PNConfiguration.UserId is required to use the SDK.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
                     }
                     throw new MissingMemberException("PNConfiguration.UserId is required to use the SDK");
                 }

@@ -85,17 +85,17 @@ namespace PubnubApi
 
             if (!requestQueryStringParams.ContainsKey("tt"))
             {
-                requestQueryStringParams.Add("tt", timetoken.ToString());
+                requestQueryStringParams.Add("tt", timetoken.ToString(CultureInfo.InvariantCulture));
             }
 
             if (!requestQueryStringParams.ContainsKey("tr") && region > 0)
             {
-                requestQueryStringParams.Add("tr", region.ToString());
+                requestQueryStringParams.Add("tr", region.ToString(CultureInfo.InvariantCulture));
             }
 
             if (pubnubConfig.ContainsKey(pubnubInstanceId) && pubnubConfig[pubnubInstanceId].PresenceTimeout != 0)
             {
-                requestQueryStringParams.Add("heartbeat", pubnubConfig[pubnubInstanceId].PresenceTimeout.ToString());
+                requestQueryStringParams.Add("heartbeat", pubnubConfig[pubnubInstanceId].PresenceTimeout.ToString(CultureInfo.InvariantCulture));
             }
 
             if (channelGroups != null && channelGroups.Length > 0 && channelGroups[0] != "")
@@ -141,7 +141,7 @@ namespace PubnubApi
 
             if (pubnubConfig.ContainsKey(pubnubInstanceId) && pubnubConfig[pubnubInstanceId].PresenceTimeout != 0)
             {
-                requestQueryStringParams.Add("heartbeat", pubnubConfig[pubnubInstanceId].PresenceTimeout.ToString());
+                requestQueryStringParams.Add("heartbeat", pubnubConfig[pubnubInstanceId].PresenceTimeout.ToString(CultureInfo.InvariantCulture));
             }
 
             string channelsJsonState = jsonUserState;
@@ -204,7 +204,7 @@ namespace PubnubApi
 
             if (storeInHistory && ttl >= 0)
             {
-                requestQueryStringParams.Add("tt1", ttl.ToString());
+                requestQueryStringParams.Add("tt1", ttl.ToString(CultureInfo.InvariantCulture));
             }
 
             if (!storeInHistory)
@@ -296,8 +296,8 @@ namespace PubnubApi
                 requestQueryStringParams.Add("channel-group", UriUtil.EncodeUriComponent(commaDelimitedchannelGroup, currentType, false, false, false));
             }
 
-            requestQueryStringParams.Add("disable_uuids", disableUUID.ToString());
-            requestQueryStringParams.Add("state", userState.ToString());
+            requestQueryStringParams.Add("disable_uuids", disableUUID.ToString(CultureInfo.InvariantCulture));
+            requestQueryStringParams.Add("state", userState.ToString(CultureInfo.InvariantCulture));
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
             {
@@ -329,7 +329,7 @@ namespace PubnubApi
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
 
-            requestQueryStringParams.Add("count", (count <= -1) ? "100" : count.ToString());
+            requestQueryStringParams.Add("count", (count <= -1) ? "100" : count.ToString(CultureInfo.InvariantCulture));
 
             if (reverse)
             {
@@ -386,7 +386,7 @@ namespace PubnubApi
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
 
-            requestQueryStringParams.Add("max", (count <= -1) ? (includeMessageActions || (channels != null && channels.Length > 1) ? "25" : "100") : count.ToString());
+            requestQueryStringParams.Add("max", (count <= -1) ? (includeMessageActions || (channels != null && channels.Length > 1) ? "25" : "100") : count.ToString(CultureInfo.InvariantCulture));
 
             if (reverse)
             {
@@ -452,7 +452,7 @@ namespace PubnubApi
 
             if (timetokens != null && timetokens.Length > 0)
             {
-                string tt = string.Join(",", timetokens.Select(x => x.ToString()).ToArray());
+                string tt = string.Join(",", timetokens.Select(x => x.ToString(CultureInfo.InvariantCulture)).ToArray());
                 if (timetokens.Length == 1)
                 {
                     requestQueryStringParams.Add("timetoken", tt);
@@ -582,16 +582,16 @@ namespace PubnubApi
 
             if (ttl > -1)
             {
-                requestQueryStringParams.Add("ttl", ttl.ToString());
+                requestQueryStringParams.Add("ttl", ttl.ToString(CultureInfo.InvariantCulture));
             }
 
-            requestQueryStringParams.Add("r", Convert.ToInt32(read).ToString());
-            requestQueryStringParams.Add("w", Convert.ToInt32(write).ToString());
-            requestQueryStringParams.Add("d", Convert.ToInt32(delete).ToString());
-            requestQueryStringParams.Add("m", Convert.ToInt32(manage).ToString());
-            requestQueryStringParams.Add("g", Convert.ToInt32(get).ToString());
-            requestQueryStringParams.Add("u", Convert.ToInt32(update).ToString());
-            requestQueryStringParams.Add("j", Convert.ToInt32(join).ToString());
+            requestQueryStringParams.Add("r", Convert.ToInt32(read).ToString(CultureInfo.InvariantCulture));
+            requestQueryStringParams.Add("w", Convert.ToInt32(write).ToString(CultureInfo.InvariantCulture));
+            requestQueryStringParams.Add("d", Convert.ToInt32(delete).ToString(CultureInfo.InvariantCulture));
+            requestQueryStringParams.Add("m", Convert.ToInt32(manage).ToString(CultureInfo.InvariantCulture));
+            requestQueryStringParams.Add("g", Convert.ToInt32(get).ToString(CultureInfo.InvariantCulture));
+            requestQueryStringParams.Add("u", Convert.ToInt32(update).ToString(CultureInfo.InvariantCulture));
+            requestQueryStringParams.Add("j", Convert.ToInt32(join).ToString(CultureInfo.InvariantCulture));
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
             {
@@ -1027,12 +1027,12 @@ namespace PubnubApi
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
             if (pushType == PNPushType.APNS2)
             {
-                requestQueryStringParams.Add("environment", environment.ToString().ToLower());
+                requestQueryStringParams.Add("environment", environment.ToString().ToLowerInvariant());
                 requestQueryStringParams.Add("topic", UriUtil.EncodeUriComponent(deviceTopic, currentType, false, false, false));
             }
             else
             {
-                requestQueryStringParams.Add("type", pushType.ToString().ToLower());
+                requestQueryStringParams.Add("type", pushType.ToString().ToLowerInvariant());
             }
             requestQueryStringParams.Add("add", UriUtil.EncodeUriComponent(channel, currentType, false, false, false));
 
@@ -1081,12 +1081,12 @@ namespace PubnubApi
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
             if (pushType == PNPushType.APNS2)
             {
-                requestQueryStringParams.Add("environment", environment.ToString().ToLower());
+                requestQueryStringParams.Add("environment", environment.ToString().ToLowerInvariant());
                 requestQueryStringParams.Add("topic", UriUtil.EncodeUriComponent(deviceTopic, currentType, false, false, false));
             }
             else
             {
-                requestQueryStringParams.Add("type", pushType.ToString().ToLower());
+                requestQueryStringParams.Add("type", pushType.ToString().ToLowerInvariant());
             }
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
@@ -1132,12 +1132,12 @@ namespace PubnubApi
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
             if (pushType == PNPushType.APNS2)
             {
-                requestQueryStringParams.Add("environment", environment.ToString().ToLower());
+                requestQueryStringParams.Add("environment", environment.ToString().ToLowerInvariant());
                 requestQueryStringParams.Add("topic", UriUtil.EncodeUriComponent(deviceTopic, currentType, false, false, false));
             }
             else
             {
-                requestQueryStringParams.Add("type", pushType.ToString().ToLower());
+                requestQueryStringParams.Add("type", pushType.ToString().ToLowerInvariant());
             }
             requestQueryStringParams.Add("remove", UriUtil.EncodeUriComponent(channel, currentType, false, false, false));
 
@@ -1185,12 +1185,12 @@ namespace PubnubApi
 
             if (pushType == PNPushType.APNS2)
             {
-                requestQueryStringParams.Add("environment", environment.ToString().ToLower());
+                requestQueryStringParams.Add("environment", environment.ToString().ToLowerInvariant());
                 requestQueryStringParams.Add("topic", UriUtil.EncodeUriComponent(deviceTopic, currentType, false, false, false));
             }
             else
             {
-                requestQueryStringParams.Add("type", pushType.ToString().ToLower());
+                requestQueryStringParams.Add("type", pushType.ToString().ToLowerInvariant());
             }
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
@@ -1239,7 +1239,7 @@ namespace PubnubApi
 
             if (pubnubConfig.ContainsKey(pubnubInstanceId) && pubnubConfig[pubnubInstanceId].PresenceTimeout != 0)
             {
-                requestQueryStringParams.Add("heartbeat", pubnubConfig[pubnubInstanceId].PresenceTimeout.ToString());
+                requestQueryStringParams.Add("heartbeat", pubnubConfig[pubnubInstanceId].PresenceTimeout.ToString(CultureInfo.InvariantCulture));
             }
 
             string queryString = BuildQueryString(currentType, requestQueryStringParams);
@@ -1768,7 +1768,7 @@ namespace PubnubApi
             url.Add("channel");
             url.Add(channel);
             url.Add("message");
-            url.Add(messageTimetoken.ToString());
+            url.Add(messageTimetoken.ToString(CultureInfo.InvariantCulture));
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
 
@@ -1799,9 +1799,9 @@ namespace PubnubApi
             url.Add("channel");
             url.Add(channel);
             url.Add("message");
-            url.Add(messageTimetoken.ToString());
+            url.Add(messageTimetoken.ToString(CultureInfo.InvariantCulture));
             url.Add("action");
-            url.Add(actionTimetoken.ToString());
+            url.Add(actionTimetoken.ToString(CultureInfo.InvariantCulture));
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
             if (messageActionUuid != null)
@@ -1930,7 +1930,7 @@ namespace PubnubApi
 
             if (storeInHistory && ttl >= 0)
             {
-                requestQueryStringParams.Add("tt1", ttl.ToString());
+                requestQueryStringParams.Add("tt1", ttl.ToString(CultureInfo.InvariantCulture));
             }
 
             if (!storeInHistory)
@@ -1999,7 +1999,7 @@ namespace PubnubApi
             url.Add("files");
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
-            requestQueryStringParams.Add("limit", (limit <= -1) ? "100" : limit.ToString());
+            requestQueryStringParams.Add("limit", (limit <= -1) ? "100" : limit.ToString(CultureInfo.InvariantCulture));
             if (!string.IsNullOrEmpty(nextToken))
             {
                 requestQueryStringParams.Add("next", nextToken);
@@ -2080,7 +2080,7 @@ namespace PubnubApi
 
                 if (pubnubConfig.ContainsKey(pubnubInstanceId) && !string.IsNullOrEmpty(pubnubConfig[pubnubInstanceId].SecretKey))
                 {
-                    ret.Add("timestamp", timeStamp.ToString());
+                    ret.Add("timestamp", timeStamp.ToString(CultureInfo.InvariantCulture));
                 }
 
                 if (type != PNOperationType.PNTimeOperation
@@ -2107,8 +2107,8 @@ namespace PubnubApi
             StringBuilder string_to_sign = new StringBuilder();
             if (pubnubConfig.ContainsKey(pubnubInstanceId))
             {
-                string_to_sign.Append(pubnubConfig[pubnubInstanceId].SubscribeKey).Append("\n").Append(pubnubConfig[pubnubInstanceId].PublishKey).Append("\n");
-                string_to_sign.Append(partialUrl).Append("\n");
+                string_to_sign.Append(pubnubConfig[pubnubInstanceId].SubscribeKey).Append('\n').Append(pubnubConfig[pubnubInstanceId].PublishKey).Append('\n');
+                string_to_sign.Append(partialUrl).Append('\n');
                 string_to_sign.Append(queryStringToSign);
 
                 PubnubCrypto pubnubCrypto = new PubnubCrypto((opType != PNOperationType.PNSignalOperation) ? pubnubConfig[pubnubInstanceId].CipherKey : "", pubnubConfig[pubnubInstanceId], this.pubnubLog, null);
@@ -2133,15 +2133,15 @@ namespace PubnubApi
             StringBuilder string_to_sign = new StringBuilder();
             if (pubnubConfig.ContainsKey(pubnubInstanceId))
             {
-                string_to_sign.AppendFormat("{0}\n", method.ToUpperInvariant());
-                string_to_sign.AppendFormat("{0}\n", pubnubConfig[pubnubInstanceId].PublishKey);
-                string_to_sign.AppendFormat("{0}\n", partialUrl);
-                string_to_sign.AppendFormat("{0}\n", queryStringToSign);
+                string_to_sign.AppendFormat(CultureInfo.InvariantCulture, "{0}\n", method.ToUpperInvariant());
+                string_to_sign.AppendFormat(CultureInfo.InvariantCulture, "{0}\n", pubnubConfig[pubnubInstanceId].PublishKey);
+                string_to_sign.AppendFormat(CultureInfo.InvariantCulture, "{0}\n", partialUrl);
+                string_to_sign.AppendFormat(CultureInfo.InvariantCulture, "{0}\n", queryStringToSign);
                 string_to_sign.Append(requestBody);
 
                 PubnubCrypto pubnubCrypto = new PubnubCrypto((opType != PNOperationType.PNSignalOperation) ? pubnubConfig[pubnubInstanceId].CipherKey : "", pubnubConfig[pubnubInstanceId], this.pubnubLog, null);
                 signature = pubnubCrypto.PubnubAccessManagerSign(pubnubConfig[pubnubInstanceId].SecretKey, string_to_sign.ToString());
-                signature = string.Format("v2.{0}", signature.TrimEnd(new[] { '=' }));
+                signature = string.Format(CultureInfo.InvariantCulture, "v2.{0}", signature.TrimEnd(new[] { '=' }));
                 if (this.pubnubLog != null && this.pubnubConfig != null)
                 {
                     LoggingMethod.WriteToLog(pubnubLog, "string_to_sign = " + string_to_sign, pubnubConfig[pubnubInstanceId].LogVerbosity);
@@ -2173,7 +2173,7 @@ namespace PubnubApi
                 Dictionary<string, string> commonQueryStringParams = GenerateCommonQueryParams(type, qsUuid);
                 Dictionary<string, string> queryStringParams = new Dictionary<string, string>(commonQueryStringParams.Concat(internalQueryStringParamDic).GroupBy(item => item.Key).ToDictionary(item => item.Key, item => item.First().Value));
 
-                queryString = string.Join("&", queryStringParams.OrderBy(kvp => kvp.Key, StringComparer.Ordinal).Select(kvp => string.Format("{0}={1}", kvp.Key, kvp.Value)).ToArray());
+                queryString = string.Join("&", queryStringParams.OrderBy(kvp => kvp.Key, StringComparer.Ordinal).Select(kvp => string.Format(CultureInfo.InvariantCulture, "{0}={1}", kvp.Key, kvp.Value)).ToArray());
 
             }
             catch (Exception ex)
@@ -2201,7 +2201,7 @@ namespace PubnubApi
 
             for (int componentIndex = 0; componentIndex < urlComponents.Count; componentIndex++)
             {
-                url.Append("/");
+                url.Append('/');
 
                 if ((type == PNOperationType.PNPublishOperation || type == PNOperationType.PNPublishFileMessageOperation) && componentIndex == urlComponents.Count - 1)
                 {
@@ -2217,7 +2217,7 @@ namespace PubnubApi
                 }
             }
 
-            url.Append("?");
+            url.Append('?');
             url.Append(queryString);
             System.Diagnostics.Debug.WriteLine("sb = " + url);
             Uri requestUri = new Uri(url.ToString());
@@ -2242,7 +2242,7 @@ namespace PubnubApi
                 {
                     signature = GeneratePAMv2Signature(queryString, partialUrl.ToString(), type);
                 }
-                string queryStringWithSignature = string.Format("{0}&signature={1}", queryString, signature);
+                string queryStringWithSignature = string.Format(CultureInfo.InvariantCulture, "{0}&signature={1}", queryString, signature);
                 UriBuilder uriBuilder = new UriBuilder(requestUri);
                 uriBuilder.Query = queryStringWithSignature;
 

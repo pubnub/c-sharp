@@ -33,41 +33,41 @@ namespace PubnubApi
                     int positionOfChar = index;
                     if ((ch == ',' && ignoreComma) || (ch == ':' && ignoreColon))
                     {
-                        o.Append(ch.ToString());
+                        o.Append(ch);
                     }
                     else if (Char.IsSurrogatePair(s, positionOfChar))
                     {
-                        string codepoint = ConvertToUtf32(s, positionOfChar).ToString("X4");
+                        string codepoint = ConvertToUtf32(s, positionOfChar).ToString("X4", CultureInfo.InvariantCulture);
 
-                        int codePointValue = int.Parse(codepoint, NumberStyles.HexNumber);
+                        int codePointValue = int.Parse(codepoint, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
                         if (codePointValue <= 0x7F)
                         {
                             System.Diagnostics.Debug.WriteLine("0x7F");
-                            string utf8HexValue = string.Format("%{0}", codePointValue);
+                            string utf8HexValue = string.Format(CultureInfo.InvariantCulture, "%{0}", codePointValue);
                             o.Append(utf8HexValue);
                         }
                         else if (codePointValue <= 0x7FF)
                         {
-                            string one = (0xC0 | ((codePointValue >> 6) & 0x1F)).ToString("X");
-                            string two = (0x80 | (codePointValue & 0x3F)).ToString("X");
-                            string utf8HexValue = string.Format("%{0}%{1}", one, two);
+                            string one = (0xC0 | ((codePointValue >> 6) & 0x1F)).ToString("X", CultureInfo.InvariantCulture);
+                            string two = (0x80 | (codePointValue & 0x3F)).ToString("X", CultureInfo.InvariantCulture);
+                            string utf8HexValue = string.Format(CultureInfo.InvariantCulture, "%{0}%{1}", one, two);
                             o.Append(utf8HexValue);
                         }
                         else if (codePointValue <= 0xFFFF)
                         {
-                            string one = (0xE0 | ((codePointValue >> 12) & 0x0F)).ToString("X");
-                            string two = (0x80 | ((codePointValue >> 6) & 0x3F)).ToString("X");
-                            string three = (0x80 | (codePointValue & 0x3F)).ToString("X");
-                            string utf8HexValue = string.Format("%{0}%{1}%{2}", one, two, three);
+                            string one = (0xE0 | ((codePointValue >> 12) & 0x0F)).ToString("X", CultureInfo.InvariantCulture);
+                            string two = (0x80 | ((codePointValue >> 6) & 0x3F)).ToString("X", CultureInfo.InvariantCulture);
+                            string three = (0x80 | (codePointValue & 0x3F)).ToString("X", CultureInfo.InvariantCulture);
+                            string utf8HexValue = string.Format(CultureInfo.InvariantCulture, "%{0}%{1}%{2}", one, two, three);
                             o.Append(utf8HexValue);
                         }
                         else if (codePointValue <= 0x10FFFF)
                         {
-                            string one = (0xF0 | ((codePointValue >> 18) & 0x07)).ToString("X");
-                            string two = (0x80 | ((codePointValue >> 12) & 0x3F)).ToString("X");
-                            string three = (0x80 | ((codePointValue >> 6) & 0x3F)).ToString("X");
-                            string four = (0x80 | (codePointValue & 0x3F)).ToString("X");
-                            string utf8HexValue = string.Format("%{0}%{1}%{2}%{3}", one, two, three, four);
+                            string one = (0xF0 | ((codePointValue >> 18) & 0x07)).ToString("X", CultureInfo.InvariantCulture);
+                            string two = (0x80 | ((codePointValue >> 12) & 0x3F)).ToString("X", CultureInfo.InvariantCulture);
+                            string three = (0x80 | ((codePointValue >> 6) & 0x3F)).ToString("X", CultureInfo.InvariantCulture);
+                            string four = (0x80 | (codePointValue & 0x3F)).ToString("X", CultureInfo.InvariantCulture);
+                            string utf8HexValue = string.Format(CultureInfo.InvariantCulture, "%{0}%{1}%{2}%{3}", one, two, three, four);
                             o.Append(utf8HexValue);
                         }
 
@@ -79,7 +79,7 @@ namespace PubnubApi
 #if NET35 || NET40
                         if (escapeChar == ch.ToString() && IsUnsafeToEncode(ch, ignoreComma, ignoreColon))
                         {
-                            escapeChar = string.Format("%{0}{1}", ToHex(ch / 16), ToHex(ch % 16));
+                            escapeChar = string.Format(CultureInfo.InvariantCulture, "%{0}{1}", ToHex(ch / 16), ToHex(ch % 16));
                         }
 #endif
                         o.Append(escapeChar);
@@ -147,16 +147,16 @@ namespace PubnubApi
         internal const int LowSurrogateStart = 0x00dc00;
         internal const int UnicodePlane01Start = 0x10000;
 
-        private static int ConvertToUtf32(String s, int index)
+        private static int ConvertToUtf32(string s, int index)
         {
             if (s == null)
             {
-                throw new ArgumentNullException("s");
+                throw new ArgumentNullException(nameof(s), "invalid.");
             }
 
             if (index < 0 || index >= s.Length)
             {
-                throw new ArgumentOutOfRangeException("index");
+                throw new ArgumentOutOfRangeException(nameof(index), "invalid.");
             }
 
             // Check if the character at index is a high surrogate.
@@ -177,19 +177,19 @@ namespace PubnubApi
                         }
                         else
                         {
-                            throw new ArgumentException("index");
+                            throw new ArgumentException("index value invalid.");
                         }
                     }
                     else
                     {
                         // Found a high surrogate at the end of the string.
-                        throw new ArgumentException("index");
+                        throw new ArgumentException("index value invalid.");
                     }
                 }
                 else
                 {
                     // Find a low surrogate at the character pointed by index.
-                    throw new ArgumentException("index");
+                    throw new ArgumentException("index value invalid.");
                 }
             }
 

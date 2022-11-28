@@ -14,7 +14,7 @@ namespace PubnubApi
             if (removeMsgActionDicObj != null && removeMsgActionDicObj.ContainsKey("status"))
             {
                 int status;
-                int.TryParse(removeMsgActionDicObj["status"].ToString(), out status);
+                var _ = int.TryParse(removeMsgActionDicObj["status"].ToString(), out status);
                 if (status == 200)
                 {
                     result = new PNRemoveMessageActionResult();

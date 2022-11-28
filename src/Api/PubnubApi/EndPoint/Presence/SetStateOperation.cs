@@ -6,6 +6,7 @@ using PubnubApi.Interface;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Net;
+using System.Globalization;
 
 namespace PubnubApi.EndPoint
 {
@@ -501,11 +502,11 @@ namespace PubnubApi.EndPoint
 
                     if (jsonUserState == "")
                     {
-                        jsonUserState = string.Format("\"{0}\":{{{1}}}", currentChannel, jsonChannelUserState);
+                        jsonUserState = string.Format(CultureInfo.InvariantCulture, "\"{0}\":{{{1}}}", currentChannel, jsonChannelUserState);
                     }
                     else
                     {
-                        jsonUserState = string.Format("{0},\"{1}\":{{{2}}}", jsonUserState, currentChannel, jsonChannelUserState);
+                        jsonUserState = string.Format(CultureInfo.InvariantCulture, "{0},\"{1}\":{{{2}}}", jsonUserState, currentChannel, jsonChannelUserState);
                     }
                 }
                 for (int channelGroupIndex = 0; channelGroupIndex < channelGroupList.Count; channelGroupIndex++)
@@ -514,14 +515,14 @@ namespace PubnubApi.EndPoint
 
                     if (jsonUserState == "")
                     {
-                        jsonUserState = string.Format("\"{0}\":{{{1}}}", currentChannelGroup, jsonChannelGroupUserState);
+                        jsonUserState = string.Format(CultureInfo.InvariantCulture, "\"{0}\":{{{1}}}", currentChannelGroup, jsonChannelGroupUserState);
                     }
                     else
                     {
-                        jsonUserState = string.Format("{0},\"{1}\":{{{2}}}", jsonUserState, currentChannelGroup, jsonChannelGroupUserState);
+                        jsonUserState = string.Format(CultureInfo.InvariantCulture, "{0},\"{1}\":{{{2}}}", jsonUserState, currentChannelGroup, jsonChannelGroupUserState);
                     }
                 }
-                jsonUserState = string.Format("{{{0}}}", jsonUserState);
+                jsonUserState = string.Format(CultureInfo.InvariantCulture, "{{{0}}}", jsonUserState);
             }
 
             return jsonUserState;
@@ -545,12 +546,12 @@ namespace PubnubApi.EndPoint
             }
             else if (channelJsonUserState.Trim().Length > 0 && channelGroupJsonUserState.Trim().Length > 0)
             {
-                jsonStateBuilder.AppendFormat("{0}:{1},{2}:{3}", channel, channelJsonUserState, channelGroup, channelGroupJsonUserState);
+                jsonStateBuilder.AppendFormat(CultureInfo.InvariantCulture, "{0}:{1},{2}:{3}", channel, channelJsonUserState, channelGroup, channelGroupJsonUserState);
             }
 
             if (jsonStateBuilder.Length > 0)
             {
-                retJsonUserState = string.Format("{{{0}}}", jsonStateBuilder);
+                retJsonUserState = string.Format(CultureInfo.InvariantCulture, "{{{0}}}", jsonStateBuilder);
             }
 
             return retJsonUserState;

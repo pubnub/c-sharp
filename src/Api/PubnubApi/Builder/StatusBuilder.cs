@@ -57,7 +57,7 @@ namespace PubnubApi
                 {
                     Dictionary<string, object> deserializeStatus = jsonLibrary.DeserializeToDictionaryOfObject(targetException.Message);
                     if (deserializeStatus != null && deserializeStatus.Count >= 1 
-                        && deserializeStatus.ContainsKey("error") && string.Equals(deserializeStatus["error"].ToString(), "true", StringComparison.CurrentCultureIgnoreCase)
+                        && deserializeStatus.ContainsKey("error") && string.Equals(deserializeStatus["error"].ToString(), "true", StringComparison.OrdinalIgnoreCase)
                         && deserializeStatus.ContainsKey("status") && Int32.TryParse(deserializeStatus["status"].ToString(), out serverErrorStatusCode))
                     {
                         serverErrorMessage = true;

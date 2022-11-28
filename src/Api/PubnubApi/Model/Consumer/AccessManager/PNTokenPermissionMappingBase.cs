@@ -18,7 +18,7 @@ namespace PubnubApi
         [Obsolete("Channels is deprecated, please use Spaces instead.")]
         public Dictionary<string, PNTokenAuthValues> Channels { get; set; }
 
-        [Obsolete]
+        [Obsolete("ChannelGroups is deprecated.")]
         public Dictionary<string, PNTokenAuthValues> ChannelGroups { get; set; }
 
         [Obsolete("Uuids is deprecated, please use Users instead.")]

@@ -180,12 +180,12 @@ namespace PubnubApi.EndPoint
                                 dicEndpointLatency.AddOrUpdate(latencyEndPoint, elapsedInfo, (o, n) => elapsedInfo);
                             }
                         }
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - StoreLatency {1} latency = {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), type, latencyMillisec), pubnubConfig.LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, TelemetryManager - StoreLatency {1} latency = {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), type, latencyMillisec), pubnubConfig.LogVerbosity);
                     }
                 }
                 catch (Exception ex)
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - StoreLatency error: {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), pubnubConfig.LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, TelemetryManager - StoreLatency error: {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), pubnubConfig.LogVerbosity);
                 }
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
         }
@@ -214,7 +214,7 @@ namespace PubnubApi.EndPoint
                     }
                     catch (Exception ex)
                     {
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - GetOperationsLatency error: {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), pubnubConfig.LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, TelemetryManager - GetOperationsLatency error: {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), pubnubConfig.LogVerbosity);
                     }
                     return dictionaryOpsLatency;
                 }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default).ConfigureAwait(false);
@@ -243,7 +243,7 @@ namespace PubnubApi.EndPoint
                                     Dictionary<double, long> dicOutdatedLatencies = enumerableOutdatedLatencies.ToDictionary(item => item.Key, item => item.Value);
                                     if (dicOutdatedLatencies != null && dicOutdatedLatencies.Count > 0)
                                     {
-                                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - CleanupTelemetryData => {1} dicOutdatedLatencies count = {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), opKey, dicOutdatedLatencies.Count), pubnubConfig.LogVerbosity);
+                                        LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, TelemetryManager - CleanupTelemetryData => {1} dicOutdatedLatencies count = {2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), opKey, dicOutdatedLatencies.Count), pubnubConfig.LogVerbosity);
                                         double[] outLatencyKeys = dicOutdatedLatencies.Keys.ToArray<double>();
                                         for (int outdateIndex = 0; outdateIndex < outLatencyKeys.Length; outdateIndex++)
                                         {
@@ -255,7 +255,7 @@ namespace PubnubApi.EndPoint
                                                 long removeOutdatedLatency;
                                                 if (!currentEndPointLatency.TryRemove(outKey, out removeOutdatedLatency))
                                                 {
-                                                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - CleanupTelemetryData => removed failed for key = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), outKey), pubnubConfig.LogVerbosity);
+                                                    LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, TelemetryManager - CleanupTelemetryData => removed failed for key = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), outKey), pubnubConfig.LogVerbosity);
                                                 }
                                             }
                                         }
@@ -266,7 +266,7 @@ namespace PubnubApi.EndPoint
                     }
                     catch (Exception ex)
                     {
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TelemetryManager - CleanupTelemetryData => Exception = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), pubnubConfig.LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, TelemetryManager - CleanupTelemetryData => Exception = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), pubnubConfig.LogVerbosity);
                     }
                 }
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);

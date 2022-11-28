@@ -14,7 +14,7 @@ namespace PubnubApi
             if (listObject.Count >= 2)
             {
                 long publishTimetoken;
-                Int64.TryParse(listObject[2].ToString(), out publishTimetoken);
+                var _ = Int64.TryParse(listObject[2].ToString(), out publishTimetoken);
                 result = new PNPublishFileMessageResult
                 {
                     Timetoken = publishTimetoken
