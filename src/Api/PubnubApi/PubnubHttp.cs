@@ -150,7 +150,7 @@ namespace PubnubApi
 
         async Task<string> IPubnubHttp.SendRequestAndGetJsonResponseWithPATCH<T>(Uri requestUri, RequestState<T> pubnubRequestState, HttpWebRequest request, byte[] patchData, string contentType)
         {
-            LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, patchData = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), Encoding.UTF8.GetString(patchData)), pubnubConfig.LogVerbosity);
+            LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, patchData = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), Encoding.UTF8.GetString(patchData, 0, patchData.Length)), pubnubConfig.LogVerbosity);
             if (pubnubConfig.UseClassicHttpWebRequest)
             {
                 return await SendRequestAndGetJsonResponseClassicHttpWithPATCH(pubnubRequestState, request, patchData).ConfigureAwait(false);
