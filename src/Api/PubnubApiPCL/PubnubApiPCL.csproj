@@ -14,7 +14,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubPCL</PackageId>
-    <PackageVersion>6.12.0.0</PackageVersion>
+    <PackageVersion>6.13.0.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -22,7 +22,9 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>Encode comma char for push related multi channels.</PackageReleaseNotes>
+    <PackageReleaseNotes>Added null check for PublishFileMessage PNStatus in SendFileOperation.
+Removed invalid Content-Type in ObjectsV2 request headers targeting .Net Frameworks.
+Added CultureInfo.InvariantCulture to string formatting.</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
