@@ -193,7 +193,7 @@ namespace PubnubApi.EndPoint
                 if (result != null && result.Count >= 3)
                 {
                     int publishStatus;
-                    Int32.TryParse(result[0].ToString(), out publishStatus);
+                    var _ = Int32.TryParse(result[0].ToString(), out publishStatus);
                     if (publishStatus == 1)
                     {
                         ProcessResponseCallbacks(result, requestState);
@@ -258,7 +258,7 @@ namespace PubnubApi.EndPoint
                 if (result != null && result.Count >= 3)
                 {
                     int publishStatus;
-                    Int32.TryParse(result[0].ToString(), out publishStatus);
+                    var _ = Int32.TryParse(result[0].ToString(), out publishStatus);
                     if (publishStatus == 1)
                     {
                         List<object> resultList = ProcessJsonResponse(requestState, json);

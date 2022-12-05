@@ -44,7 +44,7 @@ namespace PubnubApi
             bool updated = false;
             if (object.Equals(key, default(TKey)))
             {
-                throw new ArgumentNullException("key");
+                throw new ArgumentNullException(nameof(key), "invalid.");
             }
 
             lock (syncRoot)
