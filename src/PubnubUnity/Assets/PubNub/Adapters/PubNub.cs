@@ -14,9 +14,21 @@ namespace PubnubApi.Unity {
 		[Obsolete("Use the generic version instead")]
 		public static bool Reconnect(this Pubnub pn) => pn.Reconnect<string>();
 
+		/// <summary>
+		/// Add an event listener that dispatches to the main Unity thread. This allows manipulation of the built-in classes within callbacks.
+		/// </summary>
+		/// <param name="pn">PubNub instance</param>
+		/// <param name="listener">Event listener instance</param>
+		/// <returns>Operation status</returns>
+		public static bool AddListener(this Pubnub pn, SubscribeCallbackListener listener) {
+			return pn.AddListener(listener);
+		}
 
+		
+		// TODO remove (?)
 		public delegate void Listener(object sender, EventArgs args);
 
+		// TODO remove (?)
 		[Obsolete("Use the overload accepting SubscribeCallback instead")]
 		public static bool AddListener(this Pubnub pn, Listener listener) => pn.AddListener(new SubscribeCallbackExt(
 			(s, r) => listener(s, new SubscribeEventEventArgs<object>() { MessageResult = r }),
