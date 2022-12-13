@@ -6,10 +6,10 @@ namespace PubnubApi.Unity {
 	/// <summary>
 	/// Wrapper for the SubscribeCallback class. Allows dispatching events to main game loop, and direct subscription to every PubNub event.
 	/// </summary>
-	public class SubscribeCallbackListener {
-		public event Action<Pubnub, PNMessageResult<object>> onMessage;
+	public class SubscribeCallbackListener<T> {
+		public event Action<Pubnub, PNMessageResult<T>> onMessage;
 		public event Action<Pubnub, PNPresenceEventResult> onPresence;
-		public event Action<Pubnub, PNSignalResult<object>> onSignal;
+		public event Action<Pubnub, PNSignalResult<T>> onSignal;
 		public event Action<Pubnub, PNObjectEventResult> onObject;
 		public event Action<Pubnub, PNMessageActionEventResult> onMessageAction;
 		public event Action<Pubnub, PNFileEventResult> onFile;
@@ -17,9 +17,9 @@ namespace PubnubApi.Unity {
 
 		protected SubscribeCallbackExt listener;
 
-		public SubscribeCallbackListener(Action<Pubnub, PNMessageResult<object>> messageCallback,
+		public SubscribeCallbackListener(Action<Pubnub, PNMessageResult<T>> messageCallback,
 			Action<Pubnub, PNPresenceEventResult> presenceCallback,
-			Action<Pubnub, PNSignalResult<object>> signalCallback,
+			Action<Pubnub, PNSignalResult<T>> signalCallback,
 			Action<Pubnub, PNObjectEventResult> objectEventCallback,
 			Action<Pubnub, PNMessageActionEventResult> messageActionCallback,
 			Action<Pubnub, PNFileEventResult> fileCallback,
@@ -40,7 +40,7 @@ namespace PubnubApi.Unity {
 					#if PN_DEBUG
 					Debug.Log($"[LISTENER] onMessage {pubMsg.Message}");
 					#endif
-					Dispatcher.Dispatch(() => onMessage?.Invoke(pnObj, pubMsg));
+					Dispatcher.Dispatch(() => onMessage?.Invoke(pnObj, pubMsg as PNMessageResult<T>));
 				},
 				// Presence
 				(pnObj, presenceEvnt) => {
@@ -55,7 +55,7 @@ namespace PubnubApi.Unity {
 					#if PN_DEBUG
 					Debug.Log(signalMsg.Channel);
 					#endif
-					Dispatcher.Dispatch(() => onSignal?.Invoke(pnObj, signalMsg));
+					Dispatcher.Dispatch(() => onSignal?.Invoke(pnObj, signalMsg as PNSignalResult<T>));
 				},
 				// Objects
 				(pnObj, objectEventObj) => {
@@ -79,7 +79,7 @@ namespace PubnubApi.Unity {
 					Debug.Log($"[LISTENER] onPresence {pnStatus.Category}");
 					#endif
 					if (pnStatus.Error) {
-						// TODO additional error handling
+						// TODO additional error handling?
 						Dispatcher.Dispatch(() => Debug.LogError(pnStatus.ErrorData.Information));
 					}
 
@@ -88,7 +88,7 @@ namespace PubnubApi.Unity {
 			);
 		}
 
-		public static implicit operator SubscribeCallback(SubscribeCallbackListener listener) {
+		public static implicit operator SubscribeCallback(SubscribeCallbackListener<T> listener) {
 			return listener.listener;
 		}
 	}

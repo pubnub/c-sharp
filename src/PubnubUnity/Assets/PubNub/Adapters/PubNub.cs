@@ -1,7 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using PubnubApi;
 using PubnubApi.EndPoint;
 
 namespace PubnubApi.Unity {
@@ -20,7 +17,17 @@ namespace PubnubApi.Unity {
 		/// <param name="pn">PubNub instance</param>
 		/// <param name="listener">Event listener instance</param>
 		/// <returns>Operation status</returns>
-		public static bool AddListener(this Pubnub pn, SubscribeCallbackListener listener) {
+		public static bool AddListener(this Pubnub pn, SubscribeCallbackListener<object> listener) {
+			return pn.AddListener(listener);
+		}
+		
+		/// <summary>
+		/// Add an event listener that dispatches to the main Unity thread. This allows manipulation of the built-in classes within callbacks.
+		/// </summary>
+		/// <param name="pn">PubNub instance</param>
+		/// <param name="listener">Event listener instance</param>
+		/// <returns>Operation status</returns>
+		public static bool AddListener<T>(this Pubnub pn, SubscribeCallbackListener<T> listener) {
 			return pn.AddListener(listener);
 		}
 
