@@ -28,7 +28,7 @@ namespace PubnubApi
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} PubnubHttpClientHandler {1} SendAsync ", DateTime.Now.ToString(CultureInfo.InvariantCulture), pubnubHandlerName), pubnubConfig.LogVerbosity);
+            LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} PubnubHttpClientHandler {1} SendAsync ", DateTime.Now.ToString(CultureInfo.InvariantCulture), pubnubHandlerName), pubnubConfig.LogVerbosity);
             return await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
         }
     }

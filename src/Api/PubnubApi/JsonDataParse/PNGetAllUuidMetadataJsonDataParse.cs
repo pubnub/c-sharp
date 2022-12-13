@@ -75,7 +75,7 @@ namespace PubnubApi
                     else if (dicObj.ContainsKey("totalCount") && dicObj["totalCount"] != null)
                     {
                         int usersCount;
-                        Int32.TryParse(dicObj["totalCount"].ToString(), out usersCount);
+                        var _ = Int32.TryParse(dicObj["totalCount"].ToString(), out usersCount);
                         result.TotalCount = usersCount;
                     }
                     else if (dicObj.ContainsKey("next") && dicObj["next"] != null)

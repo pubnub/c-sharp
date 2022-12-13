@@ -1,0 +1,22 @@
+{
+  "uuid": {
+    "id": "peter-id",
+    "name": "randomName",
+    "externalId": "randomExternalId",
+    "profileUrl": "randomProfileUrl",
+    "email": "randomEmail",
+    "custom": {
+      "uuid_param1": "val1",
+      "uuid_param2": "val2"
+    },
+    "updated": "2022-10-14T10:19:09.36237Z",
+    "eTag": "Acy78dXh29GnLQ"
+  },
+  "status": null,
+  "custom": {
+    "members_param1": "val1",
+    "members_param2": "val2"
+  },
+  "updated": "2022-10-14T10:29:34.56984Z",
+  "eTag": "AZO/t53al7m8fw"
+}

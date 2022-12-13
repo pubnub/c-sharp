@@ -161,7 +161,7 @@ namespace PubnubApi.EndPoint
                         {
                             PubnubCrypto aes = new PubnubCrypto(currentCipherKey, config, pubnubLog, null);
                             outputBytes = aes.Decrypt(item1Bytes, true);
-                            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Stream length (after Decrypt)= {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), item1Bytes.Length), config.LogVerbosity);
+                            LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, Stream length (after Decrypt)= {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), item1Bytes.Length), config.LogVerbosity);
                         }
                         catch (Exception ex)
                         {
@@ -230,7 +230,7 @@ namespace PubnubApi.EndPoint
                     {
                         PubnubCrypto aes = new PubnubCrypto(currentCipherKey, config, pubnubLog, null);
                         outputBytes = aes.Decrypt(item1Bytes, true);
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Stream length (after Decrypt)= {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), item1Bytes.Length), config.LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, Stream length (after Decrypt)= {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), item1Bytes.Length), config.LogVerbosity);
                     }
                     catch (Exception ex)
                     {

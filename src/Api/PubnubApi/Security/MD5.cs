@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.IO;
 using System.Text;
 
@@ -46,7 +47,7 @@ namespace PubnubApi
                 StringBuilder sb = new StringBuilder();
                 foreach (byte b in hash)
                 {
-                    sb.Append(b.ToString("x2"));
+                    sb.Append(b.ToString("x2", CultureInfo.InvariantCulture));
                 }
                 return sb.ToString();
             }
@@ -501,19 +502,19 @@ namespace PubnubApi
 		{
 			if (inputBuffer == null)
 			{
-				throw new ArgumentNullException("inputBuffer");
+				throw new ArgumentNullException(nameof(inputBuffer));
 			}
 			if (inputOffset < 0)
 			{
-				throw new ArgumentOutOfRangeException("inputOffset");
+				throw new ArgumentOutOfRangeException(nameof(inputOffset));
 			}
 			if ((inputCount < 0) || (inputCount > inputBuffer.Length))
 			{
-				throw new ArgumentException("inputCount");
+				throw new ArgumentException($"{nameof(inputCount)} invalid.");
 			}
 			if ((inputBuffer.Length - inputCount) < inputOffset)
 			{
-				throw new ArgumentOutOfRangeException("inputOffset");
+				throw new ArgumentOutOfRangeException(nameof(inputOffset));
 			}
 			if (this.State == 0)
 			{
@@ -536,19 +537,19 @@ namespace PubnubApi
 		{
 			if (inputBuffer == null)
 			{
-				throw new ArgumentNullException("inputBuffer");
+				throw new ArgumentNullException(nameof(inputBuffer));
 			}
 			if (inputOffset < 0)
 			{
-				throw new ArgumentOutOfRangeException("inputOffset");
+				throw new ArgumentOutOfRangeException(nameof(inputOffset));
 			}
 			if ((inputCount < 0) || (inputCount > inputBuffer.Length))
 			{
-				throw new ArgumentException("inputCount");
+				throw new ArgumentException($"{nameof(inputCount)} invalid.");
 			}
 			if ((inputBuffer.Length - inputCount) < inputOffset)
 			{
-				throw new ArgumentOutOfRangeException("inputOffset");
+				throw new ArgumentOutOfRangeException(nameof(inputOffset));
 			}
 			if (this.State == 0)
 			{

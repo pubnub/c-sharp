@@ -10,7 +10,7 @@ namespace PubnubApi
         private int presenceHeartbeatTimeout;
         private int presenceHeartbeatInterval;
         private UserId _userId;
-        private bool uuidSetFromConstructor = false;
+        private bool uuidSetFromConstructor;
 
         internal void ResetUuidSetFromConstructor()
         {

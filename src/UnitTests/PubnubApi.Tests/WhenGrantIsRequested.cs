@@ -990,6 +990,18 @@ namespace PubNubMessaging.Tests
             server.RunOnHttps(config.Secure);
 
 #if NET40
+            PNResult<PNAccessManagerTokenResult> grantResponse = Task.Factory.StartNew(async () => await pubnub.GrantToken()
+                    .Resources(new PNTokenResources()
+                    {
+                        Spaces = new Dictionary<string, PNTokenAuthValues>() {
+                                            { "spc1", new PNTokenAuthValues() { Read = true, Write = true, Manage= true, Create = true, Delete=true, Get = true, Update = true, Join = true } } },
+                        Users = new Dictionary<string, PNTokenAuthValues>() {
+                                            { "usr1", new PNTokenAuthValues() { Read = true, Write = true, Manage= true, Create = true, Delete=true, Get = true, Update = true, Join = true } } },
+                    }
+                    )
+                .TTL(10)
+                .ExecuteAsync()).Result.Result;
+
 #else
             PNResult<PNAccessManagerTokenResult> grantResponse = await pubnub.GrantToken()
                     .Resources(new PNTokenResources()
@@ -1002,11 +1014,11 @@ namespace PubNubMessaging.Tests
                     )
                 .TTL(10)
                 .ExecuteAsync();
+#endif
             if (grantResponse.Result != null && !grantResponse.Status.Error)
             {
                 receivedGrantMessage = true;
             }
-#endif
             Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenWithAsyncGrantTokenShouldReturnSuccess failed.");
 
         }
