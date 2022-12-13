@@ -40,7 +40,7 @@ namespace PubnubApi.Unity {
 					#if PN_DEBUG
 					Debug.Log($"[LISTENER] onMessage {pubMsg.Message}");
 					#endif
-					Dispatcher.Dispatch(() => onMessage?.Invoke(pnObj, pubMsg as PNMessageResult<T>));
+					onMessage.Dispatch(pnObj, pubMsg as PNMessageResult<T>);
 				},
 				// Presence
 				(pnObj, presenceEvnt) => {
@@ -48,31 +48,36 @@ namespace PubnubApi.Unity {
 					Debug.Log(
 						$"[LISTENER] onPresence {presenceEvnt.Channel}, {presenceEvnt.Uuid != pnObj.PNConfig.Uuid}");
 					#endif
-					Dispatcher.Dispatch(() => onPresence?.Invoke(pnObj, presenceEvnt));
+					onPresence.Dispatch(pnObj, presenceEvnt);
 				},
 				// Signals
 				(pnObj, signalMsg) => {
 					#if PN_DEBUG
 					Debug.Log(signalMsg.Channel);
 					#endif
-					Dispatcher.Dispatch(() => onSignal?.Invoke(pnObj, signalMsg as PNSignalResult<T>));
+					onSignal.Dispatch(pnObj, signalMsg as PNSignalResult<T>);
 				},
 				// Objects
 				(pnObj, objectEventObj) => {
 					#if PN_DEBUG
 					Debug.Log(objectEventObj.Channel);
 					#endif
-					Dispatcher.Dispatch(() => onObject?.Invoke(pnObj, objectEventObj));
+					onObject.Dispatch(pnObj, objectEventObj);
 				},
 				// Message actions
 				(pnObj, msgActionEvent) => {
 					#if PN_DEBUG
 					Debug.Log(msgActionEvent.Channel);
 					#endif
-					Dispatcher.Dispatch(() => onMessageAction?.Invoke(pnObj, msgActionEvent));
+					onMessageAction.Dispatch(pnObj, msgActionEvent);
 				},
 				// Files
-				(pnObj, fileEvent) => { Dispatcher.Dispatch(() => onFile?.Invoke(pnObj, fileEvent)); },
+				(pnObj, fileEvent) => {
+					#if PN_DEBUG
+					Debug.Log($"[LISTENER] onFile {fileEvent.Timetoken}");
+					#endif
+					onFile.Dispatch(pnObj, fileEvent);
+				},
 				// Status
 				(pnObj, pnStatus) => {
 					#if PN_DEBUG
@@ -83,7 +88,7 @@ namespace PubnubApi.Unity {
 						Dispatcher.Dispatch(() => Debug.LogError(pnStatus.ErrorData.Information));
 					}
 
-					Dispatcher.Dispatch(() => onStatus?.Invoke(pnObj, pnStatus));
+					onStatus.Dispatch(pnObj, pnStatus);
 				}
 			);
 		}

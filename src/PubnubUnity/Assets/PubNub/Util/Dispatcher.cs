@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace PubnubApi.Unity.Internal {
 	public sealed class Dispatcher : MonoBehaviour {
-
 		static Dispatcher instance;
 		static object lockObject;
 
@@ -28,7 +27,7 @@ namespace PubnubApi.Unity.Internal {
 			}
 		}
 
-		public static void Dispatch(System.Action action) {
+		public static void Dispatch(Action action) {
 			if (action is null) {
 				Debug.Log("[Dispatcher] NULL");
 				return;
@@ -47,10 +46,10 @@ namespace PubnubApi.Unity.Internal {
 			T res;
 			if (task.IsCompleted) {
 				res = task.Result;
-			} else { 
+			} else {
 				res = await task;
 			}
-			
+
 			Dispatch(() => callback(res));
 		}
 
@@ -59,6 +58,7 @@ namespace PubnubApi.Unity.Internal {
 			if (!instance) {
 				instance = new GameObject("[PubNub Dispatcher]").AddComponent<Dispatcher>();
 			}
+
 			instance.gameObject.hideFlags = HideFlags.NotEditable | HideFlags.DontSave;
 			instance.transform.hideFlags = HideFlags.HideInInspector;
 			if (Application.isPlaying) {
@@ -69,5 +69,10 @@ namespace PubnubApi.Unity.Internal {
 				lockObject = new object();
 			}
 		}
+	}
+
+	public static class ActionExtensions {
+		public static void Dispatch<T1, T2>(this Action<T1, T2> callback, T1 arg1, T2 arg2) =>
+			Dispatcher.Dispatch(() => callback?.Invoke(arg1, arg2));
 	}
 }
