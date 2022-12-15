@@ -14,7 +14,7 @@ using static AcceptanceTests.Steps.FeatureObjectsV2MetadataSteps;
 namespace AcceptanceTests.Steps
 {
     [Binding]
-    public class FeaturePublishAMessageSteps
+    public partial class FeaturePublishMessageSteps
     {
         public static bool enableIntenalPubnubLogging = false;
         public static string currentFeature = string.Empty;
@@ -42,7 +42,7 @@ namespace AcceptanceTests.Steps
 
             }
         }
-        public FeaturePublishAMessageSteps(ScenarioContext scenarioContext) 
+        public FeaturePublishMessageSteps(ScenarioContext scenarioContext) 
         { 
             _scenarioContext = scenarioContext;
         }
