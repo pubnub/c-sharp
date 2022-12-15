@@ -244,7 +244,7 @@ namespace AcceptanceTests.Steps
         [Then(@"I receive error response")]
         public void ThenIReceiveErrorResponse()
         {
-            Assert.IsTrue(pnStatus.Error);
+            Assert.IsTrue(getPublishResult == null && pnStatus.Error);
         }
     }
 }

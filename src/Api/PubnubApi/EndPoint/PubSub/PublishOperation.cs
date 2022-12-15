@@ -366,6 +366,12 @@ namespace PubnubApi.EndPoint
                                 }
                             }
                         }
+                        else
+                        {
+                            PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(400, result[0].ToString());
+                            PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNPublishOperation, category, requestState, 400, new PNException(result[0].ToString()));
+                            ret.Status = status;
+                        }
                     }
                 }
             }

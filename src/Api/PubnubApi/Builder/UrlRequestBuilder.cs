@@ -209,7 +209,7 @@ namespace PubnubApi
 
             if (!string.IsNullOrEmpty(spaceId))
             {
-                requestQueryStringParams.Add("spaceid", UriUtil.EncodeUriComponent(spaceId, currentType, false, false, false));
+                requestQueryStringParams.Add("space-id", UriUtil.EncodeUriComponent(spaceId, currentType, false, false, false));
             }
 
             if (storeInHistory && ttl >= 0)

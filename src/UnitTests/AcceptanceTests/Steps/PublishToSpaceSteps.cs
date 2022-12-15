@@ -31,5 +31,13 @@ namespace AcceptanceTests.Steps
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
         }
+
+        [Scope(Scenario = "Publish message with space id and message type")]
+        [Then(@"I receive a successful response")]
+        public void ThenPublishToSpaceReceiveASuccessfulResponse()
+        {
+            Assert.IsTrue(!pnStatus.Error);
+        }
+
     }
 }

@@ -21,6 +21,7 @@ namespace PubnubApi
 
         public static implicit operator string(MessageType mt)
         {
+            if (mt == null) return null;
             if (mt.userMessageType != null) { return mt.userMessageType; }
 
             string retStr = mt.pnMessageType.ToString("g");
