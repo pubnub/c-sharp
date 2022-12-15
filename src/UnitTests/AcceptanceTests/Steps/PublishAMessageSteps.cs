@@ -9,7 +9,7 @@ using System.Net;
 using System.Globalization;
 using System.IO;
 using System.Text.Json;
-using static AcceptanceTests.Steps.FeatureObjectsV2MetadataSteps;
+
 
 namespace AcceptanceTests.Steps
 {
@@ -30,7 +30,24 @@ namespace AcceptanceTests.Steps
         private PNStatus pnStatus = null;
         private PubnubError pnError = null;
 
-
+        public class PubnubError
+        {
+            public ErrorMsg error;
+            public string service;
+            public int status;
+        }
+        public class MessageDetail
+        {
+            public string message;
+            public string location;
+            public string locationType;
+        }
+        public class ErrorMsg
+        {
+            public string message;
+            public string source;
+            public List<MessageDetail> details;
+        }
         public class InternalPubnubLog : IPubnubLog
         {
             void IPubnubLog.WriteToLog(string logText)

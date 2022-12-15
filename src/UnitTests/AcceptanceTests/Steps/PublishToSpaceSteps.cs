@@ -1,26 +1,35 @@
 using System;
 using TechTalk.SpecFlow;
+using PubnubApi;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using NUnit.Framework;
+using System.Net;
+using System.Globalization;
+using System.IO;
+using System.Text.Json;
 
 namespace AcceptanceTests.Steps
 {
     public partial class FeaturePublishMessageSteps
     {
         [When(@"I publish message with '([^']*)' space id and '([^']*)' message type")]
-        public void WhenIPublishMessageWithSpaceIdAndMessageType(string p0, string p1)
+        public async Task WhenIPublishMessageWithSpaceIdAndMessageType(string p0, string p1)
         {
-            throw new PendingStepException();
+            PNResult<PNPublishResult> getPublishResponse = await pn.Publish()
+                .Channel("my_channel")
+                .Message("test message")
+                .MessageType(new MessageType(p1))
+                .SpaceId(p0)
+                .ExecuteAsync();
+
+            getPublishResult = getPublishResponse.Result;
+            pnStatus = getPublishResponse.Status;
+            if (pnStatus.Error)
+            {
+                pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
+            }
         }
-
-        //[When(@"I publish message with '([^']*)' space id and '([^']*)' message type")]
-        //public void WhenIPublishMessageWithSpaceIdAndMessageType(string p0, string ts)
-        //{
-        //    throw new PendingStepException();
-        //}
-
-        //[When(@"I publish message with '([^']*)' space id and '([^']*)' message type")]
-        //public void WhenIPublishMessageWithSpaceIdAndMessageType(string ts, string p1)
-        //{
-        //    throw new PendingStepException();
-        //}
     }
 }
