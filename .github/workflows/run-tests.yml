@@ -2,33 +2,75 @@ name: Tests
 
 on:
   push:
-    branches-ignore:
-      - 'master'
   workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+defaults:
+  run:
+    shell: powershell
 
 jobs:
   tests:
-    name: NuGet packages build
+    name: Integration and Unit tests
     runs-on: windows-2019
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.0.3
-      - name: Setup .NET 2.1.519
-        uses: actions/setup-dotnet@v1
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: 2.1.519
-      - name: Setup .NET 5.0.x
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 5.0.x
-      - name: Setup .NET 6.0.x
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 6.0.x
+          dotnet-version: | 
+            2.1.519
+            5.0.x
+            6.0.x
       - name: Build packages
         env:
           WORKSPACE_PATH: ${{ github.workspace }}
         run: .\\.github\\workflows\\release\\build-packages.ps1
-        shell: powershell
+  acceptance-tests:
+    name: Acceptance tests
+    runs-on: windows-2019
+    defaults:
+      run:
+        working-directory: ./src
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v3
+    - name: Checkout mock-server action
+      uses: actions/checkout@v3
+      with:
+        repository: pubnub/client-engineering-deployment-tools
+        ref: v1
+        token: ${{ secrets.GH_TOKEN }}
+        path: .github/.release/actions
+    - name: Run mock server action
+      uses: ./.github/.release/actions/actions/mock-server
+      with:
+        token: ${{ secrets.GH_TOKEN }}
+    - name: Setup .NET 6.0.x
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build Projects
+      run: cd ./UnitTests/AcceptanceTests && dotnet build --no-restore
+    - name: Run acceptance tests
+      env: 
+       PN_PUB_KEY: ${{ secrets.PN_PUB_KEY }}
+       PN_SUB_KEY: ${{ secrets.PN_SUB_KEY }}
+       PN_SEC_KEY: ${{ secrets.PN_SEC_KEY }}    
+      run: |
+        Copy-Item -Path "${{ github.workspace }}/sdk-specifications/features/access/*" -Destination "${{ github.workspace }}/src/UnitTests/AcceptanceTests/Features" -Recurse
+        cd ./UnitTests/AcceptanceTests && dotnet test --no-build --verbosity normal --logger trx --results-directory ./results
+    - name: Upload acceptance tests reports
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: acceptance-test-reports
+        path: |
+          ${{ github.workspace }}/src/UnitTests/AcceptanceTests/Features/
+          ${{ github.workspace }}/src/UnitTests/AcceptanceTests/results/
