@@ -17,6 +17,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+      - name: Checkout actions
+        uses: actions/checkout@v3
+        with:
+          repository: pubnub/client-engineering-deployment-tools
+          ref: v1
+          token: ${{ secrets.GH_TOKEN }}
+          path: .github/.release/actions
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.0.3
       - name: Setup .NET
@@ -30,6 +37,9 @@ jobs:
         env:
           WORKSPACE_PATH: ${{ github.workspace }}
         run: .\\.github\\workflows\\release\\build-packages.ps1
+      - name: Cancel workflow runs for commit on error
+        if: ${{ failure() }}
+        uses: ./.github/.release/actions/actions/utils/fast-jobs-failure
   acceptance-tests:
     name: Acceptance tests
     runs-on: windows-2019
@@ -74,3 +84,6 @@ jobs:
         path: |
           ${{ github.workspace }}/src/UnitTests/AcceptanceTests/Features/
           ${{ github.workspace }}/src/UnitTests/AcceptanceTests/results/
+    - name: Cancel workflow runs for commit on error
+      if: ${{ failure() }}
+      uses: ./.github/.release/actions/actions/utils/fast-jobs-failure
