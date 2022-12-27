@@ -84,6 +84,7 @@ jobs:
         path: |
           ${{ github.workspace }}/src/UnitTests/AcceptanceTests/Features/
           ${{ github.workspace }}/src/UnitTests/AcceptanceTests/results/
+        retention-days: 7
     - name: Cancel workflow runs for commit on error
       if: ${{ failure() }}
       uses: ./.github/.release/actions/actions/utils/fast-jobs-failure
