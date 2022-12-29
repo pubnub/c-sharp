@@ -25,7 +25,7 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
           path: .github/.release/actions
       - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v1.0.3
+        uses: microsoft/setup-msbuild@v1
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
@@ -68,7 +68,9 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
       - name: Build Projects
-        run: cd ./UnitTests/AcceptanceTests && dotnet build --no-restore
+        run: |
+          cd ./UnitTests/AcceptanceTests 
+          dotnet build --no-restore
       - name: Run acceptance tests
         env: 
           PN_PUB_KEY: ${{ secrets.PN_PUB_KEY }}
