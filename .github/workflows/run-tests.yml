@@ -6,14 +6,14 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-defaults:
-  run:
-    shell: powershell
 
 jobs:
   tests:
     name: Integration and Unit tests
     runs-on: windows-2019
+    defaults:
+      run:
+        shell: powershell
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -45,6 +45,7 @@ jobs:
     runs-on: windows-2019
     defaults:
       run:
+        shell: powershell
         working-directory: ./src
     steps:
       - name: Checkout Project
