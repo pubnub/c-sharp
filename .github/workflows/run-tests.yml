@@ -78,7 +78,8 @@ jobs:
           PN_SEC_KEY: ${{ secrets.PN_SEC_KEY }}    
         run: |
           Copy-Item -Path "${{ github.workspace }}/sdk-specifications/features/access/*" -Destination "${{ github.workspace }}/src/UnitTests/AcceptanceTests/Features" -Recurse
-          cd ./UnitTests/AcceptanceTests && dotnet test --no-build --verbosity normal --logger trx --results-directory ./results
+          cd ./UnitTests/AcceptanceTests 
+          dotnet test --no-build --verbosity normal --logger trx --results-directory ./results
       - name: Upload acceptance tests reports
         if: always()
         uses: actions/upload-artifact@v3
