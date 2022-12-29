@@ -43,7 +43,7 @@ jobs:
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.0.3
       - name: Setup .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: | 
             2.1.519
@@ -68,10 +68,9 @@ jobs:
     name: Publish package
     runs-on: ubuntu-latest
     needs: publish-nuget
-    if: needs.check-release.outputs.release == 'true'
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           # This should be the same as the one specified for on.pull_request.branches
           ref: master
@@ -83,7 +82,7 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
           path: .github/.release/actions
       - name: Download artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: nuget-packages
           path: ${{ github.workspace }}/.github/.release/artifacts
@@ -93,3 +92,8 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
           jira-api-key: ${{ secrets.JIRA_API_KEY }}
           last-service: true
+      - name: Upload test reports
+        uses: ./.github/.release/actions/actions/test-reports/upload
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          acceptance-tests-workflow: Tests
