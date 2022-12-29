@@ -4,8 +4,12 @@ $githubWorkspace = $env:WORKSPACE_PATH
 # Create required directory structure.
 $RELEASES_PATH = "$githubWorkspace\.github\.release"
 $ARTIFACTS_PATH = "$RELEASES_PATH\artifacts"
-! [[ -d "$RELEASES_PATH" ]] && mkdir "$RELEASES_PATH"
-! [[ -d "$ARTIFACTS_PATH" ]] &&mkdir "$ARTIFACTS_PATH"
+if (!(Test-Path "$RELEASES_PATH")) {
+    mkdir "$RELEASES_PATH"
+}
+if (!(Test-Path "$ARTIFACTS_PATH")) {
+    mkdir "$ARTIFACTS_PATH"
+}
 
 # Build Api package.
 echo "Build Api package"
