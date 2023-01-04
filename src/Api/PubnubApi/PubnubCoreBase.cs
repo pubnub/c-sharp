@@ -428,7 +428,13 @@ namespace PubnubApi
                                 case "e":
                                     int subscriptionTypeIndicator;
                                     var _ = Int32.TryParse(dicItem[key].ToString(), out subscriptionTypeIndicator);
-                                    msg.MessageType = subscriptionTypeIndicator;
+                                    msg.MessageType = new MessageType((PNMessageType)subscriptionTypeIndicator, null);
+                                    break;
+                                case "mt":
+                                     if (dicItem[key] != null && !string.IsNullOrEmpty(dicItem[key].ToString()))
+                                    {
+                                        msg.MessageType = new MessageType(dicItem[key].ToString());
+                                    }
                                     break;
                                 case "f":
                                     msg.Flags = dicItem[key].ToString();
@@ -492,6 +498,12 @@ namespace PubnubApi
                                     break;
                                 case "u":
                                     msg.UserMetadata = dicItem[key];
+                                    break;
+                                case "si":
+                                    if (dicItem[key] != null)
+                                    {
+                                        msg.SpaceId = dicItem[key].ToString();
+                                    }
                                     break;
                                 default:
                                     break;
@@ -667,7 +679,7 @@ namespace PubnubApi
                                     {
                                         payloadContainer.Add(payload);
                                     }
-                                    else if (currentMessage.MessageType == 2) //Objects Simplification events
+                                    else if (currentMessage.MessageType != null && string.Compare(currentMessage.MessageType.ToString(), "object", StringComparison.OrdinalIgnoreCase) == 0) //Objects Simplification events
                                     {
                                         double objectsVersion = -1;
                                         Dictionary<string, object> objectsDic = payload as Dictionary<string, object>;
@@ -693,7 +705,7 @@ namespace PubnubApi
                                     }
                                     else
                                     {
-                                        if (currentConfig.CipherKey.Length > 0 && currentMessage.MessageType != 1) //decrypt the subscriber message if cipherkey is available
+                                        if (currentConfig.CipherKey.Length > 0 && currentMessage.MessageType != null && string.Compare(currentMessage.MessageType.ToString(), "signal", StringComparison.OrdinalIgnoreCase) != 0) //decrypt the subscriber message if cipherkey is available
                                         {
                                             string decryptMessage = "";
                                             PubnubCrypto aes = new PubnubCrypto(currentConfig.CipherKey, currentConfig, currentLog, null);
@@ -757,7 +769,7 @@ namespace PubnubApi
                                         payloadContainer.Add(currentMessageChannel);
                                     }
 
-                                    if (currentMessage.MessageType == 1)
+                                    if (currentMessage.MessageType != null && string.Compare(currentMessage.MessageType.ToString(), "signal", StringComparison.OrdinalIgnoreCase) == 0)
                                     {
                                         ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
                                         PNMessageResult<T> pnMessageResult = responseBuilder.JsonToObject<PNMessageResult<T>>(payloadContainer, true);
@@ -770,12 +782,12 @@ namespace PubnubApi
                                                 Subscription = pnMessageResult.Subscription,
                                                 Timetoken = pnMessageResult.Timetoken,
                                                 UserMetadata = pnMessageResult.UserMetadata,
-                                                Publisher = pnMessageResult.Publisher
+                                                Publisher = pnMessageResult.Publisher,
                                             };
                                             Announce(signalMessage);
                                         }
                                     }
-                                    else if (currentMessage.MessageType == 2)
+                                    else if (currentMessage.MessageType != null && string.Compare(currentMessage.MessageType.ToString(), "object", StringComparison.OrdinalIgnoreCase) == 0)
                                     {
                                         ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
                                         PNObjectEventResult objectApiEvent = responseBuilder.JsonToObject<PNObjectEventResult>(payloadContainer, true);
@@ -784,7 +796,7 @@ namespace PubnubApi
                                             Announce(objectApiEvent);
                                         }
                                     }
-                                    else if (currentMessage.MessageType == 3)
+                                    else if (currentMessage.MessageType != null && string.Compare(currentMessage.MessageType.ToString(), "messageAction", StringComparison.OrdinalIgnoreCase) == 0)
                                     {
                                         ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
                                         PNMessageActionEventResult msgActionEventEvent = responseBuilder.JsonToObject<PNMessageActionEventResult>(payloadContainer, true);
@@ -793,7 +805,7 @@ namespace PubnubApi
                                             Announce(msgActionEventEvent);
                                         }
                                     }
-                                    else if (currentMessage.MessageType == 4)
+                                    else if (currentMessage.MessageType != null && string.Compare(currentMessage.MessageType.ToString(), "file", StringComparison.OrdinalIgnoreCase) == 0)
                                     {
                                         ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
                                         PNMessageResult<object> pnFileResult = responseBuilder.JsonToObject<PNMessageResult<object>>(payloadContainer, true);

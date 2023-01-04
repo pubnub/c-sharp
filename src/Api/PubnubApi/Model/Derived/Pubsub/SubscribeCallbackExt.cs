@@ -134,6 +134,8 @@ namespace PubnubApi
             message1.Timetoken = message.Timetoken;
             message1.UserMetadata = message.UserMetadata;
             message1.Publisher = message.Publisher;
+            message1.MessageType = message.MessageType;
+            message1.SpaceId = message.SpaceId;
 
             subscribeAction?.Invoke(pubnub, message1);
         }
@@ -157,6 +159,8 @@ namespace PubnubApi
             message1.Timetoken = signalMessage.Timetoken;
             message1.UserMetadata = signalMessage.UserMetadata;
             message1.Publisher = signalMessage.Publisher;
+            message1.MessageType = signalMessage.MessageType;
+            message1.SpaceId = signalMessage.SpaceId;
 
             signalAction?.Invoke(pubnub, message1);
         }
