@@ -1,0 +1,18 @@
+{
+    "name": "PubNubAPIEditor",
+    "rootNamespace": "PubnubApi.Unity.Internal.EditorTools",
+    "references": [
+        "GUID:4937c1a1844d6444f950143d9aa9c50b"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
