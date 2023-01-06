@@ -269,17 +269,39 @@ namespace PubnubApi
                 string publisherValue = (listObject[3] != null) ? listObject[3].ToString() : "";
                 publisherProp.SetValue(message, publisherValue, null);
 
+                //Set MessageType
+                PropertyInfo messageTypeProp = specific.GetProperty("MessageType");
+                string messageTypeValue = (listObject[4] != null) ? listObject[4].ToString() : "";
+                string messageTypeStr = messageTypeValue.Insert(0, messageTypeValue[0].ToString().ToUpperInvariant()).Remove(1, 1);
+                MessageType msgType;
+                if (Enum.IsDefined(typeof(PNMessageType), messageTypeStr))
+                {
+                   PNMessageType currentMessageType = (PNMessageType)Enum.Parse(typeof(PNMessageType), messageTypeStr);
+
+                    msgType =new MessageType(currentMessageType, null);
+                }
+                else
+                {
+                    msgType = new MessageType(messageTypeValue);
+                }
+                messageTypeProp.SetValue(message, msgType.ToString(), null);
+
+                //Set SpaceId
+                PropertyInfo spaceIdProp = specific.GetProperty("SpaceId");
+                string spaceIdValue = (listObject[5] != null) ? listObject[5].ToString() : "";
+                spaceIdProp.SetValue(message, spaceIdValue, null);
+
                 // Set ChannelName
                 PropertyInfo channelNameProp = specific.GetProperty("Channel");
-                channelNameProp.SetValue(message, (listObject.Count == 6) ? listObject[5].ToString() : listObject[4].ToString(), null);
+                channelNameProp.SetValue(message, (listObject.Count == 8) ? listObject[7].ToString() : listObject[6].ToString(), null);
 
                 // Set ChannelGroup
-                if (listObject.Count == 6)
+                if (listObject.Count == 8)
                 {
                     PropertyInfo subsciptionProp = specific.GetProperty("Subscription");
-                    subsciptionProp.SetValue(message, listObject[4].ToString(), null);
+                    subsciptionProp.SetValue(message, listObject[6].ToString(), null);
                 }
-                
+
                 //Set Metadata list second position, index=1
                 if (listObject[1] != null)
                 {
@@ -341,6 +363,28 @@ namespace PubnubApi
                 PropertyInfo publisherProp = specific.GetRuntimeProperty("Publisher");
                 string publisherValue = (listObject[3] != null) ? listObject[3].ToString() : "";
                 publisherProp.SetValue(message, publisherValue, null);
+
+                //Set MessageType
+                PropertyInfo messageTypeProp = specific.GetProperty("MessageType");
+                string messageTypeValue = (listObject[4] != null) ? listObject[4].ToString() : "";
+                string messageTypeStr = messageTypeValue.Insert(0, messageTypeValue[0].ToString().ToUpperInvariant()).Remove(1, 1);
+                MessageType msgType;
+                if (Enum.IsDefined(typeof(PNMessageType), messageTypeStr))
+                {
+                   PNMessageType currentMessageType = (PNMessageType)Enum.Parse(typeof(PNMessageType), messageTypeStr);
+
+                    msgType =new MessageType(currentMessageType, null);
+                }
+                else
+                {
+                    msgType = new MessageType(messageTypeValue);
+                }
+                messageTypeProp.SetValue(message, msgType.ToString(), null);
+
+                //Set SpaceId
+                PropertyInfo spaceIdProp = specific.GetProperty("SpaceId");
+                string spaceIdValue = (listObject[5] != null) ? listObject[5].ToString() : "";
+                spaceIdProp.SetValue(message, spaceIdValue, null);
 
                 // Set ChannelName
                 PropertyInfo channelNameProp = specific.GetRuntimeProperty("Channel");

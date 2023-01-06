@@ -510,6 +510,10 @@ namespace PubnubApi
                             }
                         }
 
+                        if (msg.MessageType == null)
+                        {
+                            msg.MessageType = new MessageType(PNMessageType.Message, null);
+                        }
                         msgList.Add(msg);
                     }
                 }
@@ -759,6 +763,12 @@ namespace PubnubApi
 
                                     payloadContainer.Add(currentMessage.IssuingClientId); //Fourth one always Publisher
 
+                                    payloadContainer.Add(currentMessage.MessageType.ToString()); //Fifth one always MessageType
+
+                                    string currentSpaceId = currentMessage.SpaceId;
+
+                                    payloadContainer.Add(string.IsNullOrEmpty(currentSpaceId) ? "" : currentSpaceId); //Six one always SpaceId
+
                                     if (!string.IsNullOrEmpty(currentMessageChannelGroup)) //Add cg first before channel
                                     {
                                         payloadContainer.Add(currentMessageChannelGroup);
@@ -783,6 +793,8 @@ namespace PubnubApi
                                                 Timetoken = pnMessageResult.Timetoken,
                                                 UserMetadata = pnMessageResult.UserMetadata,
                                                 Publisher = pnMessageResult.Publisher,
+                                                MessageType = pnMessageResult.MessageType,
+                                                SpaceId = pnMessageResult.SpaceId
                                             };
                                             Announce(signalMessage);
                                         }

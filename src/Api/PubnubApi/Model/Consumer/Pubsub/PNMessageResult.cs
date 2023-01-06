@@ -10,7 +10,7 @@ namespace PubnubApi
         public long Timetoken { get; internal set; }
         public object UserMetadata { get; internal set; }
         public string Publisher { get; internal set; }
-        public MessageType MessageType { get; internal set;}
+        public string MessageType { get; internal set;}
         public string SpaceId { get; internal set; }
     }
 }
