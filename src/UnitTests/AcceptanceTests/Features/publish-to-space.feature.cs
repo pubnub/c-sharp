@@ -28,7 +28,7 @@ namespace AcceptanceTests.Features
         
         private TechTalk.SpecFlow.ITestRunner testRunner;
         
-        private string[] _featureTags = new string[] {
+        private static string[] featureTags = new string[] {
                 "featureSet=publishToSpace",
                 "beta"};
         
@@ -40,9 +40,7 @@ namespace AcceptanceTests.Features
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
             TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "Publish to Space", "  As a PubNub user I want to publish messages to Space with message type.\r\n  Clie" +
-                    "nt should be able to pass optional spaceId and messageType to publish endpoint.", ProgrammingLanguage.CSharp, new string[] {
-                        "featureSet=publishToSpace",
-                        "beta"});
+                    "nt should be able to pass optional spaceId and messageType to publish endpoint.", ProgrammingLanguage.CSharp, featureTags);
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -54,28 +52,28 @@ namespace AcceptanceTests.Features
         }
         
         [NUnit.Framework.SetUpAttribute()]
-        public virtual void TestInitialize()
+        public void TestInitialize()
         {
         }
         
         [NUnit.Framework.TearDownAttribute()]
-        public virtual void TestTearDown()
+        public void TestTearDown()
         {
             testRunner.OnScenarioEnd();
         }
         
-        public virtual void ScenarioInitialize(TechTalk.SpecFlow.ScenarioInfo scenarioInfo)
+        public void ScenarioInitialize(TechTalk.SpecFlow.ScenarioInfo scenarioInfo)
         {
             testRunner.OnScenarioInitialize(scenarioInfo);
             testRunner.ScenarioContext.ScenarioContainer.RegisterInstanceAs<NUnit.Framework.TestContext>(NUnit.Framework.TestContext.CurrentContext);
         }
         
-        public virtual void ScenarioStart()
+        public void ScenarioStart()
         {
             testRunner.OnScenarioStart();
         }
         
-        public virtual void ScenarioCleanup()
+        public void ScenarioCleanup()
         {
             testRunner.CollectScenarioErrors();
         }
@@ -90,28 +88,18 @@ namespace AcceptanceTests.Features
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Publish message with space id and message type")]
+        [NUnit.Framework.DescriptionAttribute("Publish message to space success")]
         [NUnit.Framework.CategoryAttribute("contract=publishWithSpaceIdAndMessageType")]
-        public virtual void PublishMessageWithSpaceIdAndMessageType()
+        public void PublishMessageToSpaceSuccess()
         {
             string[] tagsOfScenario = new string[] {
                     "contract=publishWithSpaceIdAndMessageType"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message with space id and message type", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message to space success", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 10
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
-            bool isScenarioIgnored = default(bool);
-            bool isFeatureIgnored = default(bool);
-            if ((tagsOfScenario != null))
-            {
-                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((this._featureTags != null))
-            {
-                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((isScenarioIgnored || isFeatureIgnored))
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
             {
                 testRunner.SkipScenario();
             }
@@ -132,28 +120,18 @@ namespace AcceptanceTests.Features
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Publish message with space id and too short message type")]
-        [NUnit.Framework.CategoryAttribute("contract=publishWithInvalidSpaceIdAndMessageType")]
-        public virtual void PublishMessageWithSpaceIdAndTooShortMessageType()
+        [NUnit.Framework.DescriptionAttribute("Publish message to space fails when message type is too short")]
+        [NUnit.Framework.CategoryAttribute("contract=publishWithTooShortMessageType")]
+        public void PublishMessageToSpaceFailsWhenMessageTypeIsTooShort()
         {
             string[] tagsOfScenario = new string[] {
-                    "contract=publishWithInvalidSpaceIdAndMessageType"};
+                    "contract=publishWithTooShortMessageType"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message with space id and too short message type", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message to space fails when message type is too short", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 15
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
-            bool isScenarioIgnored = default(bool);
-            bool isFeatureIgnored = default(bool);
-            if ((tagsOfScenario != null))
-            {
-                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((this._featureTags != null))
-            {
-                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((isScenarioIgnored || isFeatureIgnored))
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
             {
                 testRunner.SkipScenario();
             }
@@ -174,28 +152,18 @@ namespace AcceptanceTests.Features
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Publish message with space id and too long message type")]
-        [NUnit.Framework.CategoryAttribute("contract=publishWithInvalidSpaceIdAndMessageType")]
-        public virtual void PublishMessageWithSpaceIdAndTooLongMessageType()
+        [NUnit.Framework.DescriptionAttribute("Publish message to space fails when message type is too long")]
+        [NUnit.Framework.CategoryAttribute("contract=publishWithTooLongMessageType")]
+        public void PublishMessageToSpaceFailsWhenMessageTypeIsTooLong()
         {
             string[] tagsOfScenario = new string[] {
-                    "contract=publishWithInvalidSpaceIdAndMessageType"};
+                    "contract=publishWithTooLongMessageType"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message with space id and too long message type", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message to space fails when message type is too long", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 20
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
-            bool isScenarioIgnored = default(bool);
-            bool isFeatureIgnored = default(bool);
-            if ((tagsOfScenario != null))
-            {
-                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((this._featureTags != null))
-            {
-                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((isScenarioIgnored || isFeatureIgnored))
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
             {
                 testRunner.SkipScenario();
             }
@@ -217,28 +185,18 @@ namespace AcceptanceTests.Features
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Publish message with short too space id and message type")]
-        [NUnit.Framework.CategoryAttribute("contract=publishWithInvalidSpaceIdAndMessageType")]
-        public virtual void PublishMessageWithShortTooSpaceIdAndMessageType()
+        [NUnit.Framework.DescriptionAttribute("Publish message to space fails when space id is too short")]
+        [NUnit.Framework.CategoryAttribute("contract=publishWithTooShortSpaceId")]
+        public void PublishMessageToSpaceFailsWhenSpaceIdIsTooShort()
         {
             string[] tagsOfScenario = new string[] {
-                    "contract=publishWithInvalidSpaceIdAndMessageType"};
+                    "contract=publishWithTooShortSpaceId"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message with short too space id and message type", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message to space fails when space id is too short", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 25
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
-            bool isScenarioIgnored = default(bool);
-            bool isFeatureIgnored = default(bool);
-            if ((tagsOfScenario != null))
-            {
-                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((this._featureTags != null))
-            {
-                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((isScenarioIgnored || isFeatureIgnored))
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
             {
                 testRunner.SkipScenario();
             }
@@ -259,28 +217,18 @@ namespace AcceptanceTests.Features
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Publish message with too long space id and message type")]
-        [NUnit.Framework.CategoryAttribute("contract=publishWithInvalidSpaceIdAndMessageType")]
-        public virtual void PublishMessageWithTooLongSpaceIdAndMessageType()
+        [NUnit.Framework.DescriptionAttribute("Publish message to space fails when space id is too long")]
+        [NUnit.Framework.CategoryAttribute("contract=publishWithTooLongSpaceId")]
+        public void PublishMessageToSpaceFailsWhenSpaceIdIsTooLong()
         {
             string[] tagsOfScenario = new string[] {
-                    "contract=publishWithInvalidSpaceIdAndMessageType"};
+                    "contract=publishWithTooLongSpaceId"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message with too long space id and message type", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message to space fails when space id is too long", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 30
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
-            bool isScenarioIgnored = default(bool);
-            bool isFeatureIgnored = default(bool);
-            if ((tagsOfScenario != null))
-            {
-                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((this._featureTags != null))
-            {
-                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((isScenarioIgnored || isFeatureIgnored))
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
             {
                 testRunner.SkipScenario();
             }
@@ -302,28 +250,20 @@ namespace AcceptanceTests.Features
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Publish message with space id containing unexpected chars")]
-        [NUnit.Framework.CategoryAttribute("contract=publishWithInvalidSpaceIdAndMessageType")]
-        public virtual void PublishMessageWithSpaceIdContainingUnexpectedChars()
+        [NUnit.Framework.DescriptionAttribute("Publish message to space fails when space id starts with reserved \'pn-\' (hyphen) " +
+            "string")]
+        [NUnit.Framework.CategoryAttribute("contract=publishWithSpaceIdStartingWithReservedStrings")]
+        public void PublishMessageToSpaceFailsWhenSpaceIdStartsWithReservedPn_HyphenString()
         {
             string[] tagsOfScenario = new string[] {
-                    "contract=publishWithInvalidSpaceIdAndMessageType"};
+                    "contract=publishWithSpaceIdStartingWithReservedStrings"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message with space id containing unexpected chars", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message to space fails when space id starts with reserved \'pn-\' (hyphen) " +
+                    "string", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 35
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
-            bool isScenarioIgnored = default(bool);
-            bool isFeatureIgnored = default(bool);
-            if ((tagsOfScenario != null))
-            {
-                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((this._featureTags != null))
-            {
-                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((isScenarioIgnored || isFeatureIgnored))
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
             {
                 testRunner.SkipScenario();
             }
@@ -334,7 +274,7 @@ namespace AcceptanceTests.Features
   this.FeatureBackground();
 #line hidden
 #line 36
-    testRunner.When("I publish message with \'test@space.com\' space id and \'test-step\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+    testRunner.When("I publish message with \'pn-test-space\' space id and \'test-step\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 37
     testRunner.Then("I receive error response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -344,28 +284,20 @@ namespace AcceptanceTests.Features
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Publish message with space id containing reserved \'pn\' prefix")]
-        [NUnit.Framework.CategoryAttribute("contract=publishWithInvalidSpaceIdAndMessageType")]
-        public virtual void PublishMessageWithSpaceIdContainingReservedPnPrefix()
+        [NUnit.Framework.DescriptionAttribute("Publish message to space fails when space id starts with reserved \'pn_\' (undersco" +
+            "re) string")]
+        [NUnit.Framework.CategoryAttribute("contract=publishWithSpaceIdStartingWithReservedStrings")]
+        public void PublishMessageToSpaceFailsWhenSpaceIdStartsWithReservedPn_UnderscoreString()
         {
             string[] tagsOfScenario = new string[] {
-                    "contract=publishWithInvalidSpaceIdAndMessageType"};
+                    "contract=publishWithSpaceIdStartingWithReservedStrings"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message with space id containing reserved \'pn\' prefix", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message to space fails when space id starts with reserved \'pn_\' (undersco" +
+                    "re) string", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 40
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
-            bool isScenarioIgnored = default(bool);
-            bool isFeatureIgnored = default(bool);
-            if ((tagsOfScenario != null))
-            {
-                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((this._featureTags != null))
-            {
-                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((isScenarioIgnored || isFeatureIgnored))
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
             {
                 testRunner.SkipScenario();
             }
@@ -376,7 +308,7 @@ namespace AcceptanceTests.Features
   this.FeatureBackground();
 #line hidden
 #line 41
-    testRunner.When("I publish message with \'pntest-space\' space id and \'test-step\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+    testRunner.When("I publish message with \'pn_test-space\' space id and \'test-step\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 42
     testRunner.Then("I receive error response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -386,28 +318,20 @@ namespace AcceptanceTests.Features
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Publish message with message type containing unexpected chars")]
-        [NUnit.Framework.CategoryAttribute("contract=publishWithInvalidSpaceIdAndMessageType")]
-        public virtual void PublishMessageWithMessageTypeContainingUnexpectedChars()
+        [NUnit.Framework.DescriptionAttribute("Publish message to space fails when space id starts with not allowed \'-\' (hyphen)" +
+            " character")]
+        [NUnit.Framework.CategoryAttribute("contract=publishWithSpaceIdStartingWithNotAllowedCharacter")]
+        public void PublishMessageToSpaceFailsWhenSpaceIdStartsWithNotAllowed_HyphenCharacter()
         {
             string[] tagsOfScenario = new string[] {
-                    "contract=publishWithInvalidSpaceIdAndMessageType"};
+                    "contract=publishWithSpaceIdStartingWithNotAllowedCharacter"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message with message type containing unexpected chars", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message to space fails when space id starts with not allowed \'-\' (hyphen)" +
+                    " character", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 45
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
-            bool isScenarioIgnored = default(bool);
-            bool isFeatureIgnored = default(bool);
-            if ((tagsOfScenario != null))
-            {
-                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((this._featureTags != null))
-            {
-                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((isScenarioIgnored || isFeatureIgnored))
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
             {
                 testRunner.SkipScenario();
             }
@@ -418,7 +342,7 @@ namespace AcceptanceTests.Features
   this.FeatureBackground();
 #line hidden
 #line 46
-    testRunner.When("I publish message with \'test-space\' space id and \'test:step\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+    testRunner.When("I publish message with \'-test-space\' space id and \'test-step\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 47
     testRunner.Then("I receive error response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -428,28 +352,20 @@ namespace AcceptanceTests.Features
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Publish message with message type containing reserved \'pn\' prefix")]
-        [NUnit.Framework.CategoryAttribute("contract=publishWithInvalidSpaceIdAndMessageType")]
-        public virtual void PublishMessageWithMessageTypeContainingReservedPnPrefix()
+        [NUnit.Framework.DescriptionAttribute("Publish message to space fails when space id starts with not allowed \'_\' (undersc" +
+            "ore) character")]
+        [NUnit.Framework.CategoryAttribute("contract=publishWithSpaceIdStartingWithNotAllowedCharacter")]
+        public void PublishMessageToSpaceFailsWhenSpaceIdStartsWithNotAllowed_UnderscoreCharacter()
         {
             string[] tagsOfScenario = new string[] {
-                    "contract=publishWithInvalidSpaceIdAndMessageType"};
+                    "contract=publishWithSpaceIdStartingWithNotAllowedCharacter"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message with message type containing reserved \'pn\' prefix", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message to space fails when space id starts with not allowed \'_\' (undersc" +
+                    "ore) character", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 50
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
-            bool isScenarioIgnored = default(bool);
-            bool isFeatureIgnored = default(bool);
-            if ((tagsOfScenario != null))
-            {
-                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((this._featureTags != null))
-            {
-                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((isScenarioIgnored || isFeatureIgnored))
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
             {
                 testRunner.SkipScenario();
             }
@@ -460,9 +376,209 @@ namespace AcceptanceTests.Features
   this.FeatureBackground();
 #line hidden
 #line 51
-    testRunner.When("I publish message with \'test-space\' space id and \'pntest-step\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+    testRunner.When("I publish message with \'_test-space\' space id and \'test-step\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 52
+    testRunner.Then("I receive error response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Publish message to space fails when space id contains not allowed characters")]
+        [NUnit.Framework.CategoryAttribute("contract=publishWithSpaceIdContainingNotAllowedCharacter")]
+        public void PublishMessageToSpaceFailsWhenSpaceIdContainsNotAllowedCharacters()
+        {
+            string[] tagsOfScenario = new string[] {
+                    "contract=publishWithSpaceIdContainingNotAllowedCharacter"};
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message to space fails when space id contains not allowed characters", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 55
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 6
+  this.FeatureBackground();
+#line hidden
+#line 56
+    testRunner.When("I publish message with \'test@space.com\' space id and \'test-step\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 57
+    testRunner.Then("I receive error response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Publish message to space fails when message type starts with reserved \'pn-\' (hyph" +
+            "en) string")]
+        [NUnit.Framework.CategoryAttribute("contract=publishWithMessageTypeStartingWithReservedStrings")]
+        public void PublishMessageToSpaceFailsWhenMessageTypeStartsWithReservedPn_HyphenString()
+        {
+            string[] tagsOfScenario = new string[] {
+                    "contract=publishWithMessageTypeStartingWithReservedStrings"};
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message to space fails when message type starts with reserved \'pn-\' (hyph" +
+                    "en) string", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 60
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 6
+  this.FeatureBackground();
+#line hidden
+#line 61
+    testRunner.When("I publish message with \'test-space\' space id and \'pn-test-step\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 62
+    testRunner.Then("I receive error response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Publish message to space fails when message type starts with reserved \'pn_\' (unde" +
+            "rscore) string")]
+        [NUnit.Framework.CategoryAttribute("contract=publishWithMessageTypeStartingWithReservedStrings")]
+        public void PublishMessageToSpaceFailsWhenMessageTypeStartsWithReservedPn_UnderscoreString()
+        {
+            string[] tagsOfScenario = new string[] {
+                    "contract=publishWithMessageTypeStartingWithReservedStrings"};
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message to space fails when message type starts with reserved \'pn_\' (unde" +
+                    "rscore) string", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 65
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 6
+  this.FeatureBackground();
+#line hidden
+#line 66
+    testRunner.When("I publish message with \'test-space\' space id and \'pn_test-step\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 67
+    testRunner.Then("I receive error response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Publish message to space fails when message type starts with not allowed \'-\' (hyp" +
+            "hen) character")]
+        [NUnit.Framework.CategoryAttribute("contract=publishWithMessageTypeStartingWithNotAllowedCharacter")]
+        public void PublishMessageToSpaceFailsWhenMessageTypeStartsWithNotAllowed_HyphenCharacter()
+        {
+            string[] tagsOfScenario = new string[] {
+                    "contract=publishWithMessageTypeStartingWithNotAllowedCharacter"};
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message to space fails when message type starts with not allowed \'-\' (hyp" +
+                    "hen) character", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 70
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 6
+  this.FeatureBackground();
+#line hidden
+#line 71
+    testRunner.When("I publish message with \'test-space\' space id and \'-test-step\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 72
+    testRunner.Then("I receive error response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Publish message to space fails when message type starts with not allowed \'_\' (und" +
+            "erscore) character")]
+        [NUnit.Framework.CategoryAttribute("contract=publishWithMessageTypeStartingWithNotAllowedCharacter")]
+        public void PublishMessageToSpaceFailsWhenMessageTypeStartsWithNotAllowed_UnderscoreCharacter()
+        {
+            string[] tagsOfScenario = new string[] {
+                    "contract=publishWithMessageTypeStartingWithNotAllowedCharacter"};
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message to space fails when message type starts with not allowed \'_\' (und" +
+                    "erscore) character", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 75
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 6
+  this.FeatureBackground();
+#line hidden
+#line 76
+    testRunner.When("I publish message with \'test-space\' space id and \'_test-step\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 77
+    testRunner.Then("I receive error response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Publish message to space fails when message type contains not allowed characters")]
+        [NUnit.Framework.CategoryAttribute("contract=publishWithMessageTypeContainingNotAllowedCharacter")]
+        public void PublishMessageToSpaceFailsWhenMessageTypeContainsNotAllowedCharacters()
+        {
+            string[] tagsOfScenario = new string[] {
+                    "contract=publishWithMessageTypeContainingNotAllowedCharacter"};
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message to space fails when message type contains not allowed characters", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 80
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 6
+  this.FeatureBackground();
+#line hidden
+#line 81
+    testRunner.When("I publish message with \'test-space\' space id and \'test:step\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 82
     testRunner.Then("I receive error response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }

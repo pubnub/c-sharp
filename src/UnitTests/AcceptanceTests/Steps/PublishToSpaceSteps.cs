@@ -32,12 +32,11 @@ namespace AcceptanceTests.Steps
             }
         }
 
-        [Scope(Scenario = "Publish message with space id and message type")]
+        [Scope(Scenario = "Publish message to space success")]
         [Then(@"I receive a successful response")]
         public void ThenPublishToSpaceReceiveASuccessfulResponse()
         {
             Assert.IsTrue(!pnStatus.Error);
         }
-
     }
 }
