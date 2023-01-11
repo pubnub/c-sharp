@@ -239,7 +239,7 @@ namespace PubnubApi
             return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, allowPAMv3Sign);
         }
 
-        Uri IUrlRequestBuilder.BuildSignalRequest(string requestMethod, string requestBody, string channel, object originalMessage, Dictionary<string, object> userMetaData, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildSignalRequest(string requestMethod, string requestBody, string channel, object originalMessage, Dictionary<string, object> userMetaData, string type, string spaceId, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PNSignalOperation;
 
@@ -261,6 +261,16 @@ namespace PubnubApi
             {
                 string jsonMetaData = jsonLib.SerializeToJsonString(userMetaData);
                 requestQueryStringParams.Add("meta", UriUtil.EncodeUriComponent(jsonMetaData, currentType, false, false, false));
+            }
+
+            if (!string.IsNullOrEmpty(type))
+            {
+                requestQueryStringParams.Add("type", UriUtil.EncodeUriComponent(type, currentType, false, false, false));
+            }
+
+            if (!string.IsNullOrEmpty(spaceId))
+            {
+                requestQueryStringParams.Add("space-id", UriUtil.EncodeUriComponent(spaceId, currentType, false, false, false));
             }
 
             if (externalQueryParam != null && externalQueryParam.Count > 0)
