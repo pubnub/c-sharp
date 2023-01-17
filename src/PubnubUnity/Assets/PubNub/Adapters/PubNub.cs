@@ -47,6 +47,7 @@ namespace PubnubApi.Unity {
 			(s, r) => listener(s, new SubscribeEventEventArgs<object>() { Status = r })
 		));
 
+		// TODO return value? Async?
 		public static UnsubscribeAllOperation<string> UnsubscribeAll(this Pubnub pn) {
 			return pn.UnsubscribeAll<string>();
 		}
