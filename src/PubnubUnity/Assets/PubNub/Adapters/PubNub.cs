@@ -46,5 +46,9 @@ namespace PubnubApi.Unity {
 			(s, r) => listener(s, new SubscribeEventEventArgs<object>() { FileEventResult = r }),
 			(s, r) => listener(s, new SubscribeEventEventArgs<object>() { Status = r })
 		));
+
+		public static UnsubscribeAllOperation<string> UnsubscribeAll(this Pubnub pn) {
+			return pn.UnsubscribeAll<string>();
+		}
 	}
 }
