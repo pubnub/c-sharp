@@ -193,10 +193,10 @@ namespace PubNubMessaging.Tests
                     .Execute(new PNFetchHistoryResultExt((r, s) => {
                         if (r != null && s.StatusCode == 200 && !s.Error && r.Messages != null && r.Messages.ContainsKey(channel) && r.Messages[channel].Count > 0)
                         {
-                            foreach (KeyValuePair<string, List<PNHistoryItemResult>> channelItem in r.Messages)
+                            foreach (KeyValuePair<string, List<PNFetchHistoryItemResult>> channelItem in r.Messages)
                             {
-                                List<PNHistoryItemResult> itemList = channelItem.Value;
-                                foreach(PNHistoryItemResult item in itemList)
+                                List<PNFetchHistoryItemResult> itemList = channelItem.Value;
+                                foreach(PNFetchHistoryItemResult item in itemList)
                                 {
                                     if (item.Entry != null && item.Entry.ToString() == messageForNoStorePublish && item.Timetoken == publishTimetoken)
                                     {
@@ -313,10 +313,10 @@ namespace PubNubMessaging.Tests
                     .Execute(new PNFetchHistoryResultExt((r, s) => {
                         if (r != null && s.StatusCode == 200 && !s.Error && r.Messages != null && r.Messages.ContainsKey(channel) && r.Messages[channel].Count > 0)
                         {
-                            foreach (KeyValuePair<string, List<PNHistoryItemResult>> channelItem in r.Messages)
+                            foreach (KeyValuePair<string, List<PNFetchHistoryItemResult>> channelItem in r.Messages)
                             {
-                                List<PNHistoryItemResult> itemList = channelItem.Value;
-                                foreach (PNHistoryItemResult item in itemList)
+                                List<PNFetchHistoryItemResult> itemList = channelItem.Value;
+                                foreach (PNFetchHistoryItemResult item in itemList)
                                 {
                                     if (item.Entry != null && item.Entry.ToString() == messageForPublish && item.Timetoken == publishTimetoken)
                                     {
@@ -447,10 +447,10 @@ namespace PubNubMessaging.Tests
                     && fetchHistResult.Result.Messages != null && fetchHistResult.Result.Messages.ContainsKey(channel) 
                     && fetchHistResult.Result.Messages[channel].Count > 0)
                 {
-                    foreach (KeyValuePair<string, List<PNHistoryItemResult>> channelItem in fetchHistResult.Result.Messages)
+                    foreach (KeyValuePair<string, List<PNFetchHistoryItemResult>> channelItem in fetchHistResult.Result.Messages)
                     {
-                        List<PNHistoryItemResult> itemList = channelItem.Value;
-                        foreach (PNHistoryItemResult item in itemList)
+                        List<PNFetchHistoryItemResult> itemList = channelItem.Value;
+                        foreach (PNFetchHistoryItemResult item in itemList)
                         {
                             if (item.Entry != null && item.Entry.ToString() == messageForPublish && item.Timetoken == publishTimetoken)
                             {
@@ -1557,10 +1557,10 @@ namespace PubNubMessaging.Tests
                     if (r != null && s.StatusCode == 200 && !s.Error && r.Messages != null && r.Messages.ContainsKey(channel) && r.Messages[channel].Count > 0)
                     {
                         System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
-                        foreach (KeyValuePair<string, List<PNHistoryItemResult>> channelItem in r.Messages)
+                        foreach (KeyValuePair<string, List<PNFetchHistoryItemResult>> channelItem in r.Messages)
                         {
-                            List<PNHistoryItemResult> itemList = channelItem.Value;
-                            foreach (PNHistoryItemResult item in itemList)
+                            List<PNFetchHistoryItemResult> itemList = channelItem.Value;
+                            foreach (PNFetchHistoryItemResult item in itemList)
                             {
                                 if (item.Entry != null)
                                 {
@@ -1612,10 +1612,10 @@ namespace PubNubMessaging.Tests
                         if (r != null && s.StatusCode == 200 && !s.Error && r.Messages != null && r.Messages.ContainsKey(channel) && r.Messages[channel].Count > 0)
                         {
                             System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
-                            foreach (KeyValuePair<string, List<PNHistoryItemResult>> channelItem in r.Messages)
+                            foreach (KeyValuePair<string, List<PNFetchHistoryItemResult>> channelItem in r.Messages)
                             {
-                                List<PNHistoryItemResult> itemList = channelItem.Value;
-                                foreach (PNHistoryItemResult item in itemList)
+                                List<PNFetchHistoryItemResult> itemList = channelItem.Value;
+                                foreach (PNFetchHistoryItemResult item in itemList)
                                 {
                                     if (item.Entry != null)
                                     {
@@ -1663,10 +1663,10 @@ namespace PubNubMessaging.Tests
                             historyMessageList = new List<object>();
                             if (r != null && s.StatusCode == 200 && !s.Error && r.Messages != null && r.Messages.ContainsKey(channel) && r.Messages[channel].Count > 0)
                             {
-                                foreach (KeyValuePair<string, List<PNHistoryItemResult>> channelItem in r.Messages)
+                                foreach (KeyValuePair<string, List<PNFetchHistoryItemResult>> channelItem in r.Messages)
                                 {
-                                    List<PNHistoryItemResult> itemList = channelItem.Value;
-                                    foreach (PNHistoryItemResult item in itemList)
+                                    List<PNFetchHistoryItemResult> itemList = channelItem.Value;
+                                    foreach (PNFetchHistoryItemResult item in itemList)
                                     {
                                         if (item.Entry != null)
                                         {
@@ -1881,10 +1881,10 @@ namespace PubNubMessaging.Tests
                 && fetchHistResult.Result.Messages[channel].Count > 0)
             {
                 System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(fetchHistResult.Result));
-                foreach (KeyValuePair<string, List<PNHistoryItemResult>> channelItem in fetchHistResult.Result.Messages)
+                foreach (KeyValuePair<string, List<PNFetchHistoryItemResult>> channelItem in fetchHistResult.Result.Messages)
                 {
-                    List<PNHistoryItemResult> itemList = channelItem.Value;
-                    foreach (PNHistoryItemResult item in itemList)
+                    List<PNFetchHistoryItemResult> itemList = channelItem.Value;
+                    foreach (PNFetchHistoryItemResult item in itemList)
                     {
                         if (item.Entry != null)
                         {
@@ -1934,10 +1934,10 @@ namespace PubNubMessaging.Tests
                     && fetchHistResult.Result.Messages[channel].Count > 0)
                 {
                     System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(fetchHistResult.Result));
-                    foreach (KeyValuePair<string, List<PNHistoryItemResult>> channelItem in fetchHistResult.Result.Messages)
+                    foreach (KeyValuePair<string, List<PNFetchHistoryItemResult>> channelItem in fetchHistResult.Result.Messages)
                     {
-                        List<PNHistoryItemResult> itemList = channelItem.Value;
-                        foreach (PNHistoryItemResult item in itemList)
+                        List<PNFetchHistoryItemResult> itemList = channelItem.Value;
+                        foreach (PNFetchHistoryItemResult item in itemList)
                         {
                             if (item.Entry != null)
                             {
@@ -1983,10 +1983,10 @@ namespace PubNubMessaging.Tests
                         && fetchHistResult.Result.Messages != null && fetchHistResult.Result.Messages.ContainsKey(channel)
                         && fetchHistResult.Result.Messages[channel].Count > 0)
                     {
-                        foreach (KeyValuePair<string, List<PNHistoryItemResult>> channelItem in fetchHistResult.Result.Messages)
+                        foreach (KeyValuePair<string, List<PNFetchHistoryItemResult>> channelItem in fetchHistResult.Result.Messages)
                         {
-                            List<PNHistoryItemResult> itemList = channelItem.Value;
-                            foreach (PNHistoryItemResult item in itemList)
+                            List<PNFetchHistoryItemResult> itemList = channelItem.Value;
+                            foreach (PNFetchHistoryItemResult item in itemList)
                             {
                                 if (item.Entry != null)
                                 {
@@ -2222,10 +2222,10 @@ namespace PubNubMessaging.Tests
                     historyMessageList = new List<object>();
                     if (r != null && s.StatusCode == 200 && !s.Error && r.Messages != null && r.Messages.ContainsKey(channel) && r.Messages[channel].Count > 0)
                     {
-                        foreach (KeyValuePair<string, List<PNHistoryItemResult>> channelItem in r.Messages)
+                        foreach (KeyValuePair<string, List<PNFetchHistoryItemResult>> channelItem in r.Messages)
                         {
-                            List<PNHistoryItemResult> itemList = channelItem.Value;
-                            foreach (PNHistoryItemResult item in itemList)
+                            List<PNFetchHistoryItemResult> itemList = channelItem.Value;
+                            foreach (PNFetchHistoryItemResult item in itemList)
                             {
                                 if (item.Entry != null)
                                 {
@@ -2280,10 +2280,10 @@ namespace PubNubMessaging.Tests
                         historyMessageList = new List<object>();
                         if (r != null && s.StatusCode == 200 && !s.Error && r.Messages != null && r.Messages.ContainsKey(channel) && r.Messages[channel].Count > 0)
                         {
-                            foreach (KeyValuePair<string, List<PNHistoryItemResult>> channelItem in r.Messages)
+                            foreach (KeyValuePair<string, List<PNFetchHistoryItemResult>> channelItem in r.Messages)
                             {
-                                List<PNHistoryItemResult> itemList = channelItem.Value;
-                                foreach (PNHistoryItemResult item in itemList)
+                                List<PNFetchHistoryItemResult> itemList = channelItem.Value;
+                                foreach (PNFetchHistoryItemResult item in itemList)
                                 {
                                     if (item.Entry != null)
                                     {
@@ -2335,10 +2335,10 @@ namespace PubNubMessaging.Tests
                             historyMessageList = new List<object>();
                             if (r != null && s.StatusCode == 200 && !s.Error && r.Messages != null && r.Messages.ContainsKey(channel) && r.Messages[channel].Count > 0)
                             {
-                                foreach (KeyValuePair<string, List<PNHistoryItemResult>> channelItem in r.Messages)
+                                foreach (KeyValuePair<string, List<PNFetchHistoryItemResult>> channelItem in r.Messages)
                                 {
-                                    List<PNHistoryItemResult> itemList = channelItem.Value;
-                                    foreach (PNHistoryItemResult item in itemList)
+                                    List<PNFetchHistoryItemResult> itemList = channelItem.Value;
+                                    foreach (PNFetchHistoryItemResult item in itemList)
                                     {
                                         if (item.Entry != null)
                                         {
@@ -2555,10 +2555,10 @@ namespace PubNubMessaging.Tests
                 && fetchHistResult.Result.Messages != null && fetchHistResult.Result.Messages.ContainsKey(channel) 
                 && fetchHistResult.Result.Messages[channel].Count > 0)
             {
-                foreach (KeyValuePair<string, List<PNHistoryItemResult>> channelItem in fetchHistResult.Result.Messages)
+                foreach (KeyValuePair<string, List<PNFetchHistoryItemResult>> channelItem in fetchHistResult.Result.Messages)
                 {
-                    List<PNHistoryItemResult> itemList = channelItem.Value;
-                    foreach (PNHistoryItemResult item in itemList)
+                    List<PNFetchHistoryItemResult> itemList = channelItem.Value;
+                    foreach (PNFetchHistoryItemResult item in itemList)
                     {
                         if (item.Entry != null)
                         {
@@ -2611,10 +2611,10 @@ namespace PubNubMessaging.Tests
                     && fetchHistResult.Result.Messages != null && fetchHistResult.Result.Messages.ContainsKey(channel) 
                     && fetchHistResult.Result.Messages[channel].Count > 0)
                 {
-                    foreach (KeyValuePair<string, List<PNHistoryItemResult>> channelItem in fetchHistResult.Result.Messages)
+                    foreach (KeyValuePair<string, List<PNFetchHistoryItemResult>> channelItem in fetchHistResult.Result.Messages)
                     {
-                        List<PNHistoryItemResult> itemList = channelItem.Value;
-                        foreach (PNHistoryItemResult item in itemList)
+                        List<PNFetchHistoryItemResult> itemList = channelItem.Value;
+                        foreach (PNFetchHistoryItemResult item in itemList)
                         {
                             if (item.Entry != null)
                             {
@@ -2664,10 +2664,10 @@ namespace PubNubMessaging.Tests
                         && fetchHistResult.Result.Messages != null && fetchHistResult.Result.Messages.ContainsKey(channel) 
                         && fetchHistResult.Result.Messages[channel].Count > 0)
                     {
-                        foreach (KeyValuePair<string, List<PNHistoryItemResult>> channelItem in fetchHistResult.Result.Messages)
+                        foreach (KeyValuePair<string, List<PNFetchHistoryItemResult>> channelItem in fetchHistResult.Result.Messages)
                         {
-                            List<PNHistoryItemResult> itemList = channelItem.Value;
-                            foreach (PNHistoryItemResult item in itemList)
+                            List<PNFetchHistoryItemResult> itemList = channelItem.Value;
+                            foreach (PNFetchHistoryItemResult item in itemList)
                             {
                                 if (item.Entry != null)
                                 {

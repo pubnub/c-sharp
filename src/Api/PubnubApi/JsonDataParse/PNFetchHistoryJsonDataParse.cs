@@ -23,18 +23,18 @@ namespace PubnubApi
                     }
                     if (channelMessagesContainer != null)
                     {
-                        ack.Messages = new Dictionary<string, List<PNHistoryItemResult>>();
+                        ack.Messages = new Dictionary<string, List<PNFetchHistoryItemResult>>();
                         foreach (var channelKVP in channelMessagesContainer)
                         {
                             string channel = channelKVP.Key;
-                            List<PNHistoryItemResult> resultList = new List<PNHistoryItemResult>();
+                            List<PNFetchHistoryItemResult> resultList = new List<PNFetchHistoryItemResult>();
                             object[] channelValArray = channelKVP.Value != null ? JsonDataParseInternalUtil.ConvertToObjectArray(channelKVP.Value) : new object[0];
                             foreach (object msgContainerObj in channelValArray)
                             {
                                 Dictionary<string, object> messagesContainer = JsonDataParseInternalUtil.ConvertToDictionaryObject(msgContainerObj);
                                 if (messagesContainer != null)
                                 {
-                                    PNHistoryItemResult result = new PNHistoryItemResult();
+                                    PNFetchHistoryItemResult result = new PNFetchHistoryItemResult();
                                     if (messagesContainer.ContainsKey("message") &&
                                         (messagesContainer.ContainsKey("timetoken") || messagesContainer.ContainsKey("meta") || messagesContainer.ContainsKey("actions")))
                                     {

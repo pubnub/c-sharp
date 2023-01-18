@@ -22,6 +22,7 @@ namespace PubnubApi.EndPoint
         private bool withMessageActionsOption;
         private bool includeMessageType = true; //default to  true
         private bool withUuidOption = true; //default to  true
+        private bool withSpaceIdOption = false;
         private long startTimetoken = -1;
         private long endTimetoken = -1;
         private int perChannelCount = -1;
@@ -82,6 +83,12 @@ namespace PubnubApi.EndPoint
         public FetchHistoryOperation IncludeUuid(bool withUuid)
         {
             withUuidOption = withUuid;
+            return this;
+        }
+
+        public FetchHistoryOperation IncludeSpaceId(bool withSpaceId)
+        {
+            withSpaceIdOption = withSpaceId;
             return this;
         }
 
