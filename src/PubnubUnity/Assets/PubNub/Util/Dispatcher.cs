@@ -6,9 +6,9 @@ using UnityEngine;
 namespace PubnubApi.Unity.Internal {
 	public sealed class Dispatcher : MonoBehaviour {
 		static Dispatcher instance;
-		static object lockObject;
-
-		static volatile Queue<System.Action> dispatchQueue = new Queue<System.Action>();
+		
+		static object lockObject = new();
+		static volatile Queue<System.Action> dispatchQueue = new();
 
 		void FixedUpdate() {
 			HandleDispatch();
