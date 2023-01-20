@@ -17,21 +17,11 @@ namespace PubnubApi.Unity {
 		/// <param name="pn">PubNub instance</param>
 		/// <param name="listener">Event listener instance</param>
 		/// <returns>Operation status</returns>
-		public static bool AddListener(this Pubnub pn, SubscribeCallbackListener<object> listener) {
-			return pn.AddListener(listener);
-		}
-		
-		/// <summary>
-		/// Add an event listener that dispatches to the main Unity thread. This allows manipulation of the built-in classes within callbacks.
-		/// </summary>
-		/// <param name="pn">PubNub instance</param>
-		/// <param name="listener">Event listener instance</param>
-		/// <returns>Operation status</returns>
-		public static bool AddListener<T>(this Pubnub pn, SubscribeCallbackListener<T> listener) {
+		public static bool AddListener(this Pubnub pn, SubscribeCallbackListener listener) {
 			return pn.AddListener(listener);
 		}
 
-		
+
 		// TODO remove (?)
 		public delegate void Listener(object sender, EventArgs args);
 
