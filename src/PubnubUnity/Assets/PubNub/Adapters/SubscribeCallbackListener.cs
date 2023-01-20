@@ -17,7 +17,8 @@ namespace PubnubApi.Unity {
 
 		protected SubscribeCallbackExt listener;
 
-		public SubscribeCallbackListener(Action<Pubnub, PNMessageResult<T>> messageCallback,
+		public SubscribeCallbackListener(
+			Action<Pubnub, PNMessageResult<T>> messageCallback,
 			Action<Pubnub, PNPresenceEventResult> presenceCallback,
 			Action<Pubnub, PNSignalResult<T>> signalCallback,
 			Action<Pubnub, PNObjectEventResult> objectEventCallback,

@@ -21,7 +21,7 @@ namespace PubnubApi.Unity.Internal {
 					try {
 						dispatchQueue.Dequeue()();
 					} catch (Exception e) {
-						Debug.LogError($"{e.Message} ::\n{e.StackTrace}");
+						Debug.LogError($"Dispatched callback error:\n{e.Message} ::\n{e.StackTrace}");
 					}
 				}
 			}
