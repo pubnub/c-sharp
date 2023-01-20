@@ -6,10 +6,10 @@ namespace PubnubApi.Unity {
 	/// <summary>
 	/// Wrapper for the SubscribeCallback class. Allows dispatching events to main game loop, and direct subscription to every PubNub event.
 	/// </summary>
-	public class SubscribeCallbackListener<T> {
-		public event Action<Pubnub, PNMessageResult<T>> onMessage;
+	public class SubscribeCallbackListener {
+		public event Action<Pubnub, PNMessageResult<object>> onMessage;
 		public event Action<Pubnub, PNPresenceEventResult> onPresence;
-		public event Action<Pubnub, PNSignalResult<T>> onSignal;
+		public event Action<Pubnub, PNSignalResult<object>> onSignal;
 		public event Action<Pubnub, PNObjectEventResult> onObject;
 		public event Action<Pubnub, PNMessageActionEventResult> onMessageAction;
 		public event Action<Pubnub, PNFileEventResult> onFile;
@@ -18,9 +18,9 @@ namespace PubnubApi.Unity {
 		protected SubscribeCallbackExt listener;
 
 		public SubscribeCallbackListener(
-			Action<Pubnub, PNMessageResult<T>> messageCallback,
+			Action<Pubnub, PNMessageResult<object>> messageCallback,
 			Action<Pubnub, PNPresenceEventResult> presenceCallback,
-			Action<Pubnub, PNSignalResult<T>> signalCallback,
+			Action<Pubnub, PNSignalResult<object>> signalCallback,
 			Action<Pubnub, PNObjectEventResult> objectEventCallback,
 			Action<Pubnub, PNMessageActionEventResult> messageActionCallback,
 			Action<Pubnub, PNFileEventResult> fileCallback,
@@ -41,7 +41,7 @@ namespace PubnubApi.Unity {
 					#if PN_DEBUG
 					Debug.Log($"[LISTENER] onMessage {pubMsg.Message}");
 					#endif
-					onMessage.Dispatch(pnObj, pubMsg as PNMessageResult<T>);
+					onMessage.Dispatch(pnObj, pubMsg);
 				},
 				// Presence
 				(pnObj, presenceEvnt) => {
@@ -56,7 +56,7 @@ namespace PubnubApi.Unity {
 					#if PN_DEBUG
 					Debug.Log(signalMsg.Channel);
 					#endif
-					onSignal.Dispatch(pnObj, signalMsg as PNSignalResult<T>);
+					onSignal.Dispatch(pnObj, signalMsg);
 				},
 				// Objects
 				(pnObj, objectEventObj) => {
@@ -94,7 +94,7 @@ namespace PubnubApi.Unity {
 			);
 		}
 
-		public static implicit operator SubscribeCallback(SubscribeCallbackListener<T> listener) {
+		public static implicit operator SubscribeCallback(SubscribeCallbackListener listener) {
 			return listener.listener;
 		}
 	}
