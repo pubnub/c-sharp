@@ -201,7 +201,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
             
-            Uri request = urlBuilder.BuildFetchRequest("GET", "", this.channelNames, this.startTimetoken, this.endTimetoken, this.perChannelCount, this.reverseOption, this.withMetaOption, this.withMessageActionsOption, this.withUuidOption, this.includeMessageType, this.queryParam);
+            Uri request = urlBuilder.BuildFetchRequest("GET", "", this.channelNames, this.startTimetoken, this.endTimetoken, this.perChannelCount, this.reverseOption, this.withMetaOption, this.withMessageActionsOption, this.withUuidOption, this.includeMessageType, this.withSpaceIdOption, this.queryParam);
 
             RequestState<PNFetchHistoryResult> requestState = new RequestState<PNFetchHistoryResult>();
             requestState.Channels = new[] { channel };
@@ -232,7 +232,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
             
-            Uri request = urlBuilder.BuildFetchRequest("GET", "", this.channelNames, this.startTimetoken, this.endTimetoken, this.perChannelCount, this.reverseOption, this.withMetaOption, this.withMessageActionsOption, this.withUuidOption, this.includeMessageType, this.queryParam);
+            Uri request = urlBuilder.BuildFetchRequest("GET", "", this.channelNames, this.startTimetoken, this.endTimetoken, this.perChannelCount, this.reverseOption, this.withMetaOption, this.withMessageActionsOption, this.withUuidOption, this.includeMessageType, this.withSpaceIdOption, this.queryParam);
 
             RequestState<PNFetchHistoryResult> requestState = new RequestState<PNFetchHistoryResult>();
             requestState.Channels = new[] { channel };
