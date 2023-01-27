@@ -14,7 +14,7 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 namespace AcceptanceTests.Steps
 {
     [Binding]
-    public class FeatureFetchHistoryForVSPStepDefinitions
+    public class FeatureFetchHistoryForVSPSteps
     {
         public static bool enableIntenalPubnubLogging = true;
         public static string currentFeature = string.Empty;
@@ -59,7 +59,7 @@ namespace AcceptanceTests.Steps
 
             }
         }
-        public FeatureFetchHistoryForVSPStepDefinitions(ScenarioContext scenarioContext) 
+        public FeatureFetchHistoryForVSPSteps(ScenarioContext scenarioContext) 
         { 
             _scenarioContext = scenarioContext;
         }

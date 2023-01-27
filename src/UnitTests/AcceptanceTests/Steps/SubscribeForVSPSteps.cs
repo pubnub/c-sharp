@@ -9,14 +9,15 @@ using System.Net;
 using System.Globalization;
 using System.IO;
 using System.Text.Json;
-
+using System.Threading.Channels;
+using System.Threading;
 
 namespace AcceptanceTests.Steps
 {
     [Binding]
-    public partial class FeaturePublishMessageSteps
+    public class SubscribeForVSPSteps
     {
-        public static bool enableIntenalPubnubLogging = false;
+        public static bool enableIntenalPubnubLogging = true;
         public static string currentFeature = string.Empty;
         public static string currentContract = string.Empty;
         public static bool betaVersion = false;
@@ -26,9 +27,16 @@ namespace AcceptanceTests.Steps
         private Pubnub pn;
         private PNConfiguration config = null;
 
-        private PNPublishResult getPublishResult = null;
+        //private PNFetchHistoryResult fetchHistoryResult = null;
         private PNStatus pnStatus = null;
         private PubnubError pnError = null;
+        private SubscribeCallbackExt subscribeCallback = null;
+        private ManualResetEvent subscribeResetEvent = null;
+        private int numberOfSubscribeMessages = 0;
+        private bool messageReceived = false;
+        private bool signalReceived = false;
+        private bool userMessageTypeReceived = false;
+        private bool spaceIdReceived = false;
 
         public class PubnubError
         {
@@ -59,7 +67,7 @@ namespace AcceptanceTests.Steps
 
             }
         }
-        public FeaturePublishMessageSteps(ScenarioContext scenarioContext) 
+        public SubscribeForVSPSteps(ScenarioContext scenarioContext) 
         { 
             _scenarioContext = scenarioContext;
         }
@@ -97,6 +105,7 @@ namespace AcceptanceTests.Steps
         [BeforeScenario()]
         public void BeforeScenario()
         {
+            subscribeResetEvent = new ManualResetEvent(false);
             currentContract = "";
             if (_scenarioContext.ScenarioInfo != null && _scenarioContext.ScenarioInfo.Tags.Length > 0)
             {
@@ -134,7 +143,7 @@ namespace AcceptanceTests.Steps
             }
         }
 
-        [Scope(Feature = "Publish to Space")]
+        [Scope(Feature = "Subscribe for VSP")]
         [Given(@"the demo keyset")]
         public void GivenTheDemoKeyset()
         {
@@ -153,99 +162,106 @@ namespace AcceptanceTests.Steps
             {
                 config.LogVerbosity = PNLogVerbosity.NONE;
             }
+            config.BypassInternetConnectionCheck = true;
 
             pn = new Pubnub(config);
+            subscribeCallback = new SubscribeCallbackExt(
+                delegate (Pubnub pnObj, PNMessageResult<object> pubMsg)
+                {
+                    messageReceived = true;
+                    if (pubMsg.MessageType != null)
+                    {
+                        if (pubMsg.MessageType.IsPNMessageType())
+                        {
+                            messageReceived = true;
+                        }
+                        else
+                        {
+                            userMessageTypeReceived = true;
+                        }
+                    }
+                    if (!string.IsNullOrEmpty(pubMsg.SpaceId))
+                    {
+                        spaceIdReceived = true;
+                    }
+                    numberOfSubscribeMessages++;
+                },
+                delegate (Pubnub pnObj, PNPresenceEventResult presenceEvnt)
+                {
+                },
+                delegate (Pubnub pnObj, PNSignalResult<object> signalMsg)
+                {
+                    signalReceived= true;
+                    numberOfSubscribeMessages++;
+                },
+                delegate (Pubnub pnObj, PNObjectEventResult objectEventObj)
+                {
+                },
+                delegate (Pubnub pnObj, PNMessageActionEventResult msgActionEvent)
+                {
+                    //handle message action
+                },
+                delegate (Pubnub pnObj, PNFileEventResult fileEvent)
+                {
+                    //handle file message event
+                },
+                delegate (Pubnub pnObj, PNStatus pnStatus)
+                {
+                    Console.WriteLine("{0} {1} {2}", pnStatus.Operation, pnStatus.Category, pnStatus.StatusCode);
+                    var affectedChannelGroups = pnStatus.AffectedChannelGroups; // The channel groups affected in the operation, of type array.
+                    var affectedChannels = pnStatus.AffectedChannels; // The channels affected in the operation, of type array.
+                    var category = pnStatus.Category; //Returns PNConnectedCategory
+                    var operation = pnStatus.Operation; //Returns PNSubscribeOperation
+                }
+                );
+            pn.AddListener(subscribeCallback);
+
         }
 
-        [When(@"I publish a message")]
-        public async Task WhenIPublishAMessage()
+        [When(@"I subscribe to '([^']*)' channel")]
+        public void WhenISubscribeToChannel(string p0)
         {
-            PNResult<PNPublishResult> getPublishResponse = await pn.Publish()
-                .Channel("my_channel")
-                .Message("test message")
-                .ExecuteAsync();
+            subscribeResetEvent = new ManualResetEvent(false);
+            pn.Subscribe<object>()
+            .Channels(new string[] { p0 })
+            .Execute();
+            subscribeResetEvent.WaitOne(2000);
+        }
 
-            getPublishResult = getPublishResponse.Result;
-            pnStatus = getPublishResponse.Status;
-            if (pnStatus.Error)
+        [Then(@"I receive (.*) messages in my subscribe response")]
+        public void ThenIReceiveMessagesInMySubscribeResponse(int p0)
+        {
+            Assert.IsTrue(numberOfSubscribeMessages == p0);
+        }
+
+        [Then(@"response contains messages with '([^']*)' and '([^']*)' message types")]
+        public void ThenResponseContainsMessagesWithAndMessageTypes(string message, string someType)
+        {
+            if (string.Compare("message",message,true) == 0 && string.Compare("signal",someType,true) == 0)
             {
-                pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
+                Assert.IsTrue(messageReceived && signalReceived);
             }
-        }
-
-        [Then(@"I receive successful response")]
-        public void ThenIReceiveSuccessfulResponse()
-        {
-            Assert.IsTrue(!pnStatus.Error);
-        }
-
-        [When(@"I publish a message with JSON metadata")]
-        public async Task WhenIPublishAMessageWithJSONMetadata()
-        {
-            Dictionary<string, object> dictMeta = new Dictionary<string, object>();
-            dictMeta.Add("color","green");
-            dictMeta.Add("empid", 123);
-
-            PNResult<PNPublishResult> getPublishResponse = await pn.Publish()
-                .Channel("my_channel")
-                .Message("test message")
-                .Meta(dictMeta)
-                .ExecuteAsync();
-
-            getPublishResult = getPublishResponse.Result;
-            pnStatus = getPublishResponse.Status;
-            if (pnStatus.Error)
+            else if (string.Compare("message",message,true) == 0 && string.Compare("vc-message",someType,true) == 0)
             {
-                pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
-            }
-        }
-
-        [When(@"I publish a message with string metadata")]
-        public async Task WhenIPublishAMessageWithStringMetadata()
-        {
-            Dictionary<string, object> dictMeta = new Dictionary<string, object>();
-            dictMeta.Add("color","green");
-
-            PNResult<PNPublishResult> getPublishResponse = await pn.Publish()
-                .Channel("my_channel")
-                .Message("test message")
-                .Meta(dictMeta)
-                .ExecuteAsync();
-
-            getPublishResult = getPublishResponse.Result;
-            pnStatus = getPublishResponse.Status;
-            if (pnStatus.Error)
-            {
-                pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
-            }
-        }
-
-        [Given(@"the invalid keyset")]
-        public void GivenTheInvalidKeyset()
-        {
-            config = new PNConfiguration(new UserId("pn-csharp-acceptance-test-uuid"));
-            config.Origin = acceptance_test_origin;
-            config.Secure = false;
-            config.PublishKey = "wrong_pub_key";
-            config.SubscribeKey = "wrong_sub_key";
-            config.SecretKey = "wrong_secret_key";
-            if (enableIntenalPubnubLogging)
-            {
-                config.LogVerbosity = PNLogVerbosity.BODY;
-                config.PubnubLog = new InternalPubnubLog();
+                Assert.IsTrue(messageReceived && userMessageTypeReceived);
             }
             else
             {
-                config.LogVerbosity = PNLogVerbosity.NONE;
+                Assert.Fail();
             }
-
-            pn = new Pubnub(config);
+            
         }
 
-        [Then(@"I receive error response")]
-        public void ThenIReceiveErrorResponse()
+        [Then(@"response contains messages without space ids")]
+        public void ThenResponseContainsMessagesWithoutSpaceIds()
         {
-            Assert.IsTrue(getPublishResult == null && pnStatus.Error);
+            Assert.IsFalse(spaceIdReceived);
+        }
+
+        [Then(@"response contains messages with space ids")]
+        public void ThenResponseContainsMessagesWithSpaceIds()
+        {
+            Assert.IsTrue(spaceIdReceived);
         }
     }
 }

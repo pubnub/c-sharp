@@ -37,5 +37,17 @@ namespace PubnubApi
             string outStr = retStr.Insert(0, retStr[0].ToString().ToLowerInvariant()).Remove(1, 1); //First char to lower for camelCase
             return outStr;
         }
+
+        public bool IsPNMessageType()
+        {
+            if (userMessageType != null && userMessageType.Trim().Length > 0)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
     }
 }
