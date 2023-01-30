@@ -10,13 +10,11 @@ using System.Globalization;
 using System.IO;
 using System.Text.Json;
 
-
 namespace AcceptanceTests.Steps
 {
     [Binding]
-    [Scope(Feature = "Publish a message")]
-    [Scope(Feature = "Publish to Space")]
-    public partial class FeaturePublishMessageSteps
+    [Scope(Feature = "Send a signal to Space")]
+    public class FeatureSignalToSpaceSteps
     {
         public static bool enableIntenalPubnubLogging = false;
         public static string currentFeature = string.Empty;
@@ -28,7 +26,7 @@ namespace AcceptanceTests.Steps
         private Pubnub pn;
         private PNConfiguration config = null;
 
-        private PNPublishResult getPublishResult = null;
+        private PNPublishResult getSignalResult = null;
         private PNStatus pnStatus = null;
         private PubnubError pnError = null;
 
@@ -61,7 +59,7 @@ namespace AcceptanceTests.Steps
 
             }
         }
-        public FeaturePublishMessageSteps(ScenarioContext scenarioContext) 
+        public FeatureSignalToSpaceSteps(ScenarioContext scenarioContext) 
         { 
             _scenarioContext = scenarioContext;
         }
@@ -136,7 +134,6 @@ namespace AcceptanceTests.Steps
             }
         }
 
-        [Scope(Feature = "Publish to Space")]
         [Given(@"the demo keyset")]
         public void GivenTheDemoKeyset()
         {
@@ -159,95 +156,36 @@ namespace AcceptanceTests.Steps
             pn = new Pubnub(config);
         }
 
-        [When(@"I publish a message")]
-        public async Task WhenIPublishAMessage()
+        [When(@"I send a signal with '([^']*)' space id and '([^']*)' message type")]
+        public async Task WhenISendASignalWithSpaceIdAndMessageType(string p0, string p1)
         {
-            PNResult<PNPublishResult> getPublishResponse = await pn.Publish()
+            PNResult<PNPublishResult> getSignalResponse = await pn.Signal()
                 .Channel("my_channel")
                 .Message("test message")
+                .MessageType(new MessageType(p1))
+                .SpaceId(p0)
                 .ExecuteAsync();
 
-            getPublishResult = getPublishResponse.Result;
-            pnStatus = getPublishResponse.Status;
+            getSignalResult = getSignalResponse.Result;
+            pnStatus = getSignalResponse.Status;
             if (pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
         }
 
-        [Then(@"I receive successful response")]
-        public void ThenIReceiveSuccessfulResponse()
+        [Then(@"I receive a successful response")]
+        public void ThenIReceiveASuccessfulResponse()
         {
             Assert.IsTrue(!pnStatus.Error);
         }
 
-        [When(@"I publish a message with JSON metadata")]
-        public async Task WhenIPublishAMessageWithJSONMetadata()
+        
+        [Then(@"I receive an error response")]
+        public void ThenIReceiveAnErrorResponse()
         {
-            Dictionary<string, object> dictMeta = new Dictionary<string, object>();
-            dictMeta.Add("color","green");
-            dictMeta.Add("empid", 123);
-
-            PNResult<PNPublishResult> getPublishResponse = await pn.Publish()
-                .Channel("my_channel")
-                .Message("test message")
-                .Meta(dictMeta)
-                .ExecuteAsync();
-
-            getPublishResult = getPublishResponse.Result;
-            pnStatus = getPublishResponse.Status;
-            if (pnStatus.Error)
-            {
-                pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
-            }
+            Assert.IsTrue(getSignalResult == null && pnStatus.Error);
         }
 
-        [When(@"I publish a message with string metadata")]
-        public async Task WhenIPublishAMessageWithStringMetadata()
-        {
-            Dictionary<string, object> dictMeta = new Dictionary<string, object>();
-            dictMeta.Add("color","green");
-
-            PNResult<PNPublishResult> getPublishResponse = await pn.Publish()
-                .Channel("my_channel")
-                .Message("test message")
-                .Meta(dictMeta)
-                .ExecuteAsync();
-
-            getPublishResult = getPublishResponse.Result;
-            pnStatus = getPublishResponse.Status;
-            if (pnStatus.Error)
-            {
-                pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
-            }
-        }
-
-        [Given(@"the invalid keyset")]
-        public void GivenTheInvalidKeyset()
-        {
-            config = new PNConfiguration(new UserId("pn-csharp-acceptance-test-uuid"));
-            config.Origin = acceptance_test_origin;
-            config.Secure = false;
-            config.PublishKey = "wrong_pub_key";
-            config.SubscribeKey = "wrong_sub_key";
-            config.SecretKey = "wrong_secret_key";
-            if (enableIntenalPubnubLogging)
-            {
-                config.LogVerbosity = PNLogVerbosity.BODY;
-                config.PubnubLog = new InternalPubnubLog();
-            }
-            else
-            {
-                config.LogVerbosity = PNLogVerbosity.NONE;
-            }
-
-            pn = new Pubnub(config);
-        }
-
-        [Then(@"I receive error response")]
-        public void ThenIReceiveErrorResponse()
-        {
-            Assert.IsTrue(getPublishResult == null && pnStatus.Error);
-        }
     }
 }

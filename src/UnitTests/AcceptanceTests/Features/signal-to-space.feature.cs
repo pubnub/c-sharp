@@ -20,27 +20,28 @@ namespace AcceptanceTests.Features
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [NUnit.Framework.TestFixtureAttribute()]
-    [NUnit.Framework.DescriptionAttribute("Publish to Space")]
-    [NUnit.Framework.CategoryAttribute("featureSet=publishToSpace")]
+    [NUnit.Framework.DescriptionAttribute("Send a signal to Space")]
+    [NUnit.Framework.CategoryAttribute("featureSet=signalToSpace")]
     [NUnit.Framework.CategoryAttribute("beta")]
-    public partial class PublishToSpaceFeature
+    public partial class SendASignalToSpaceFeature
     {
         
         private TechTalk.SpecFlow.ITestRunner testRunner;
         
         private static string[] featureTags = new string[] {
-                "featureSet=publishToSpace",
+                "featureSet=signalToSpace",
                 "beta"};
         
-#line 1 "publish-to-space.feature"
+#line 1 "signal-to-space.feature"
 #line hidden
         
         [NUnit.Framework.OneTimeSetUpAttribute()]
         public virtual void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "Publish to Space", "  As a PubNub user I want to publish messages to Space with message type.\r\n  Clie" +
-                    "nt should be able to pass optional spaceId and messageType to publish endpoint.", ProgrammingLanguage.CSharp, featureTags);
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "Send a signal to Space", "  As a PubNub user I want to send some signals to Space with message type.\r\n  Cli" +
+                    "ent should be able to pass optional spaceId and messageType to the signal endpoi" +
+                    "nt.", ProgrammingLanguage.CSharp, featureTags);
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -88,14 +89,14 @@ namespace AcceptanceTests.Features
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Publish message to space success")]
-        [NUnit.Framework.CategoryAttribute("contract=publishWithSpaceIdAndMessageType")]
-        public void PublishMessageToSpaceSuccess()
+        [NUnit.Framework.DescriptionAttribute("Send a signal to space success")]
+        [NUnit.Framework.CategoryAttribute("contract=signalWithSpaceIdAndMessageType")]
+        public void SendASignalToSpaceSuccess()
         {
             string[] tagsOfScenario = new string[] {
-                    "contract=publishWithSpaceIdAndMessageType"};
+                    "contract=signalWithSpaceIdAndMessageType"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message to space success", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send a signal to space success", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 10
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -110,7 +111,7 @@ namespace AcceptanceTests.Features
   this.FeatureBackground();
 #line hidden
 #line 11
-    testRunner.When("I publish message with \'space-id\' space id and \'test_step\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+    testRunner.When("I send a signal with \'space-id\' space id and \'test_message_type\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 12
     testRunner.Then("I receive a successful response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -120,14 +121,14 @@ namespace AcceptanceTests.Features
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Publish message to space fails when message type is too short")]
-        [NUnit.Framework.CategoryAttribute("contract=publishWithTooShortMessageType")]
-        public void PublishMessageToSpaceFailsWhenMessageTypeIsTooShort()
+        [NUnit.Framework.DescriptionAttribute("Send a signal to space fails when message type is too short")]
+        [NUnit.Framework.CategoryAttribute("contract=signalWithTooShortMessageType")]
+        public void SendASignalToSpaceFailsWhenMessageTypeIsTooShort()
         {
             string[] tagsOfScenario = new string[] {
-                    "contract=publishWithTooShortMessageType"};
+                    "contract=signalWithTooShortMessageType"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message to space fails when message type is too short", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send a signal to space fails when message type is too short", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 15
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -142,7 +143,7 @@ namespace AcceptanceTests.Features
   this.FeatureBackground();
 #line hidden
 #line 16
-    testRunner.When("I publish message with \'test-space\' space id and \'ts\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+    testRunner.When("I send a signal with \'test-space\' space id and \'ts\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 17
     testRunner.Then("I receive an error response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -152,14 +153,14 @@ namespace AcceptanceTests.Features
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Publish message to space fails when message type is too long")]
-        [NUnit.Framework.CategoryAttribute("contract=publishWithTooLongMessageType")]
-        public void PublishMessageToSpaceFailsWhenMessageTypeIsTooLong()
+        [NUnit.Framework.DescriptionAttribute("Send a signal to space fails when message type is too long")]
+        [NUnit.Framework.CategoryAttribute("contract=signalWithTooLongMessageType")]
+        public void SendASignalToSpaceFailsWhenMessageTypeIsTooLong()
         {
             string[] tagsOfScenario = new string[] {
-                    "contract=publishWithTooLongMessageType"};
+                    "contract=signalWithTooLongMessageType"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message to space fails when message type is too long", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send a signal to space fails when message type is too long", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 20
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -174,8 +175,8 @@ namespace AcceptanceTests.Features
   this.FeatureBackground();
 #line hidden
 #line 21
-    testRunner.When("I publish message with \'test-space\' space id and \'this-is-really-long-message-typ" +
-                        "e-to-be-used-with-publish\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+    testRunner.When("I send a signal with \'test-space\' space id and \'this-is-really-long-message-type-" +
+                        "to-be-used-with-publish\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 22
     testRunner.Then("I receive an error response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -185,14 +186,14 @@ namespace AcceptanceTests.Features
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Publish message to space fails when space id is too short")]
-        [NUnit.Framework.CategoryAttribute("contract=publishWithTooShortSpaceId")]
-        public void PublishMessageToSpaceFailsWhenSpaceIdIsTooShort()
+        [NUnit.Framework.DescriptionAttribute("Send a signal to space fails when space id is too short")]
+        [NUnit.Framework.CategoryAttribute("contract=signalWithTooShortSpaceId")]
+        public void SendASignalToSpaceFailsWhenSpaceIdIsTooShort()
         {
             string[] tagsOfScenario = new string[] {
-                    "contract=publishWithTooShortSpaceId"};
+                    "contract=signalWithTooShortSpaceId"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message to space fails when space id is too short", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send a signal to space fails when space id is too short", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 25
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -207,7 +208,7 @@ namespace AcceptanceTests.Features
   this.FeatureBackground();
 #line hidden
 #line 26
-    testRunner.When("I publish message with \'ts\' space id and \'test-step\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+    testRunner.When("I send a signal with \'ts\' space id and \'test_message_type\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 27
     testRunner.Then("I receive an error response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -217,14 +218,14 @@ namespace AcceptanceTests.Features
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Publish message to space fails when space id is too long")]
-        [NUnit.Framework.CategoryAttribute("contract=publishWithTooLongSpaceId")]
-        public void PublishMessageToSpaceFailsWhenSpaceIdIsTooLong()
+        [NUnit.Framework.DescriptionAttribute("Send a signal to space fails when space id is too long")]
+        [NUnit.Framework.CategoryAttribute("contract=signalWithTooLongSpaceId")]
+        public void SendASignalToSpaceFailsWhenSpaceIdIsTooLong()
         {
             string[] tagsOfScenario = new string[] {
-                    "contract=publishWithTooLongSpaceId"};
+                    "contract=signalWithTooLongSpaceId"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message to space fails when space id is too long", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send a signal to space fails when space id is too long", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 30
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -239,8 +240,8 @@ namespace AcceptanceTests.Features
   this.FeatureBackground();
 #line hidden
 #line 31
-    testRunner.When("I publish message with \'this-is-really-long-identifier-for-space-id-to-be-used-wi" +
-                        "th-publish\' space id and \'test-step\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+    testRunner.When("I send a signal with \'this-is-really-long-identifier-for-space-id-to-be-used-with" +
+                        "-publish\' space id and \'test-step\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 32
     testRunner.Then("I receive an error response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -250,16 +251,16 @@ namespace AcceptanceTests.Features
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Publish message to space fails when space id starts with reserved \'pn-\' (hyphen) " +
-            "string")]
-        [NUnit.Framework.CategoryAttribute("contract=publishWithSpaceIdStartingWithReservedStrings")]
-        public void PublishMessageToSpaceFailsWhenSpaceIdStartsWithReservedPn_HyphenString()
+        [NUnit.Framework.DescriptionAttribute("Send a signal to space fails when space id starts with reserved \'pn-\' (hyphen) st" +
+            "ring")]
+        [NUnit.Framework.CategoryAttribute("contract=signalWithSpaceIdStartingWithReservedStrings")]
+        public void SendASignalToSpaceFailsWhenSpaceIdStartsWithReservedPn_HyphenString()
         {
             string[] tagsOfScenario = new string[] {
-                    "contract=publishWithSpaceIdStartingWithReservedStrings"};
+                    "contract=signalWithSpaceIdStartingWithReservedStrings"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message to space fails when space id starts with reserved \'pn-\' (hyphen) " +
-                    "string", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send a signal to space fails when space id starts with reserved \'pn-\' (hyphen) st" +
+                    "ring", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 35
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -274,7 +275,8 @@ namespace AcceptanceTests.Features
   this.FeatureBackground();
 #line hidden
 #line 36
-    testRunner.When("I publish message with \'pn-test-space\' space id and \'test-step\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+    testRunner.When("I send a signal with \'pn-test-space\' space id and \'test_message_type\' message typ" +
+                        "e", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 37
     testRunner.Then("I receive an error response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -284,16 +286,16 @@ namespace AcceptanceTests.Features
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Publish message to space fails when space id starts with reserved \'pn_\' (undersco" +
-            "re) string")]
-        [NUnit.Framework.CategoryAttribute("contract=publishWithSpaceIdStartingWithReservedStrings")]
-        public void PublishMessageToSpaceFailsWhenSpaceIdStartsWithReservedPn_UnderscoreString()
+        [NUnit.Framework.DescriptionAttribute("Send a signal to space fails when space id starts with reserved \'pn_\' (underscore" +
+            ") string")]
+        [NUnit.Framework.CategoryAttribute("contract=signalWithSpaceIdStartingWithReservedStrings")]
+        public void SendASignalToSpaceFailsWhenSpaceIdStartsWithReservedPn_UnderscoreString()
         {
             string[] tagsOfScenario = new string[] {
-                    "contract=publishWithSpaceIdStartingWithReservedStrings"};
+                    "contract=signalWithSpaceIdStartingWithReservedStrings"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message to space fails when space id starts with reserved \'pn_\' (undersco" +
-                    "re) string", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send a signal to space fails when space id starts with reserved \'pn_\' (underscore" +
+                    ") string", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 40
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -308,7 +310,8 @@ namespace AcceptanceTests.Features
   this.FeatureBackground();
 #line hidden
 #line 41
-    testRunner.When("I publish message with \'pn_test-space\' space id and \'test-step\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+    testRunner.When("I send a signal with \'pn_test-space\' space id and \'test_message_type\' message typ" +
+                        "e", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 42
     testRunner.Then("I receive an error response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -318,16 +321,16 @@ namespace AcceptanceTests.Features
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Publish message to space fails when space id starts with not allowed \'-\' (hyphen)" +
-            " character")]
-        [NUnit.Framework.CategoryAttribute("contract=publishWithSpaceIdStartingWithNotAllowedCharacter")]
-        public void PublishMessageToSpaceFailsWhenSpaceIdStartsWithNotAllowed_HyphenCharacter()
+        [NUnit.Framework.DescriptionAttribute("Send a signal to space fails when space id starts with not allowed \'-\' (hyphen) c" +
+            "haracter")]
+        [NUnit.Framework.CategoryAttribute("contract=signalWithSpaceIdStartingWithNotAllowedCharacter")]
+        public void SendASignalToSpaceFailsWhenSpaceIdStartsWithNotAllowed_HyphenCharacter()
         {
             string[] tagsOfScenario = new string[] {
-                    "contract=publishWithSpaceIdStartingWithNotAllowedCharacter"};
+                    "contract=signalWithSpaceIdStartingWithNotAllowedCharacter"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message to space fails when space id starts with not allowed \'-\' (hyphen)" +
-                    " character", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send a signal to space fails when space id starts with not allowed \'-\' (hyphen) c" +
+                    "haracter", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 45
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -342,7 +345,7 @@ namespace AcceptanceTests.Features
   this.FeatureBackground();
 #line hidden
 #line 46
-    testRunner.When("I publish message with \'-test-space\' space id and \'test-step\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+    testRunner.When("I send a signal with \'-test-space\' space id and \'test_message_type\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 47
     testRunner.Then("I receive an error response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -352,16 +355,16 @@ namespace AcceptanceTests.Features
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Publish message to space fails when space id starts with not allowed \'_\' (undersc" +
-            "ore) character")]
-        [NUnit.Framework.CategoryAttribute("contract=publishWithSpaceIdStartingWithNotAllowedCharacter")]
-        public void PublishMessageToSpaceFailsWhenSpaceIdStartsWithNotAllowed_UnderscoreCharacter()
+        [NUnit.Framework.DescriptionAttribute("Send a signal to space fails when space id starts with not allowed \'_\' (underscor" +
+            "e) character")]
+        [NUnit.Framework.CategoryAttribute("contract=signalWithSpaceIdStartingWithNotAllowedCharacter")]
+        public void SendASignalToSpaceFailsWhenSpaceIdStartsWithNotAllowed_UnderscoreCharacter()
         {
             string[] tagsOfScenario = new string[] {
-                    "contract=publishWithSpaceIdStartingWithNotAllowedCharacter"};
+                    "contract=signalWithSpaceIdStartingWithNotAllowedCharacter"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message to space fails when space id starts with not allowed \'_\' (undersc" +
-                    "ore) character", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send a signal to space fails when space id starts with not allowed \'_\' (underscor" +
+                    "e) character", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 50
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -376,7 +379,7 @@ namespace AcceptanceTests.Features
   this.FeatureBackground();
 #line hidden
 #line 51
-    testRunner.When("I publish message with \'_test-space\' space id and \'test-step\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+    testRunner.When("I send a signal with \'_test-space\' space id and \'test_message_type\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 52
     testRunner.Then("I receive an error response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -386,14 +389,14 @@ namespace AcceptanceTests.Features
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Publish message to space fails when space id contains not allowed characters")]
-        [NUnit.Framework.CategoryAttribute("contract=publishWithSpaceIdContainingNotAllowedCharacter")]
-        public void PublishMessageToSpaceFailsWhenSpaceIdContainsNotAllowedCharacters()
+        [NUnit.Framework.DescriptionAttribute("Send a signal to space fails when space id contains not allowed characters")]
+        [NUnit.Framework.CategoryAttribute("contract=signalWithSpaceIdContainingNotAllowedCharacter")]
+        public void SendASignalToSpaceFailsWhenSpaceIdContainsNotAllowedCharacters()
         {
             string[] tagsOfScenario = new string[] {
-                    "contract=publishWithSpaceIdContainingNotAllowedCharacter"};
+                    "contract=signalWithSpaceIdContainingNotAllowedCharacter"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message to space fails when space id contains not allowed characters", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send a signal to space fails when space id contains not allowed characters", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 55
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -408,7 +411,8 @@ namespace AcceptanceTests.Features
   this.FeatureBackground();
 #line hidden
 #line 56
-    testRunner.When("I publish message with \'test@space.com\' space id and \'test-step\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+    testRunner.When("I send a signal with \'test@space.com\' space id and \'test_message_type\' message ty" +
+                        "pe", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 57
     testRunner.Then("I receive an error response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -418,16 +422,16 @@ namespace AcceptanceTests.Features
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Publish message to space fails when message type starts with reserved \'pn-\' (hyph" +
-            "en) string")]
-        [NUnit.Framework.CategoryAttribute("contract=publishWithMessageTypeStartingWithReservedStrings")]
-        public void PublishMessageToSpaceFailsWhenMessageTypeStartsWithReservedPn_HyphenString()
+        [NUnit.Framework.DescriptionAttribute("Send a signal to space fails when message type starts with reserved \'pn-\' (hyphen" +
+            ") string")]
+        [NUnit.Framework.CategoryAttribute("contract=signalWithMessageTypeStartingWithReservedStrings")]
+        public void SendASignalToSpaceFailsWhenMessageTypeStartsWithReservedPn_HyphenString()
         {
             string[] tagsOfScenario = new string[] {
-                    "contract=publishWithMessageTypeStartingWithReservedStrings"};
+                    "contract=signalWithMessageTypeStartingWithReservedStrings"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message to space fails when message type starts with reserved \'pn-\' (hyph" +
-                    "en) string", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send a signal to space fails when message type starts with reserved \'pn-\' (hyphen" +
+                    ") string", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 60
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -442,7 +446,8 @@ namespace AcceptanceTests.Features
   this.FeatureBackground();
 #line hidden
 #line 61
-    testRunner.When("I publish message with \'test-space\' space id and \'pn-test-step\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+    testRunner.When("I send a signal with \'test-space\' space id and \'pn-test_message_type\' message typ" +
+                        "e", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 62
     testRunner.Then("I receive an error response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -452,16 +457,16 @@ namespace AcceptanceTests.Features
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Publish message to space fails when message type starts with reserved \'pn_\' (unde" +
-            "rscore) string")]
-        [NUnit.Framework.CategoryAttribute("contract=publishWithMessageTypeStartingWithReservedStrings")]
-        public void PublishMessageToSpaceFailsWhenMessageTypeStartsWithReservedPn_UnderscoreString()
+        [NUnit.Framework.DescriptionAttribute("Send a signal to space fails when message type starts with reserved \'pn_\' (unders" +
+            "core) string")]
+        [NUnit.Framework.CategoryAttribute("contract=signalWithMessageTypeStartingWithReservedStrings")]
+        public void SendASignalToSpaceFailsWhenMessageTypeStartsWithReservedPn_UnderscoreString()
         {
             string[] tagsOfScenario = new string[] {
-                    "contract=publishWithMessageTypeStartingWithReservedStrings"};
+                    "contract=signalWithMessageTypeStartingWithReservedStrings"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message to space fails when message type starts with reserved \'pn_\' (unde" +
-                    "rscore) string", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send a signal to space fails when message type starts with reserved \'pn_\' (unders" +
+                    "core) string", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 65
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -476,7 +481,8 @@ namespace AcceptanceTests.Features
   this.FeatureBackground();
 #line hidden
 #line 66
-    testRunner.When("I publish message with \'test-space\' space id and \'pn_test-step\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+    testRunner.When("I send a signal with \'test-space\' space id and \'pn_test_message_type\' message typ" +
+                        "e", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 67
     testRunner.Then("I receive an error response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -486,16 +492,16 @@ namespace AcceptanceTests.Features
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Publish message to space fails when message type starts with not allowed \'-\' (hyp" +
-            "hen) character")]
-        [NUnit.Framework.CategoryAttribute("contract=publishWithMessageTypeStartingWithNotAllowedCharacter")]
-        public void PublishMessageToSpaceFailsWhenMessageTypeStartsWithNotAllowed_HyphenCharacter()
+        [NUnit.Framework.DescriptionAttribute("Send a signal to space fails when message type starts with not allowed \'-\' (hyphe" +
+            "n) character")]
+        [NUnit.Framework.CategoryAttribute("contract=signalWithMessageTypeStartingWithNotAllowedCharacter")]
+        public void SendASignalToSpaceFailsWhenMessageTypeStartsWithNotAllowed_HyphenCharacter()
         {
             string[] tagsOfScenario = new string[] {
-                    "contract=publishWithMessageTypeStartingWithNotAllowedCharacter"};
+                    "contract=signalWithMessageTypeStartingWithNotAllowedCharacter"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message to space fails when message type starts with not allowed \'-\' (hyp" +
-                    "hen) character", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send a signal to space fails when message type starts with not allowed \'-\' (hyphe" +
+                    "n) character", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 70
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -510,7 +516,7 @@ namespace AcceptanceTests.Features
   this.FeatureBackground();
 #line hidden
 #line 71
-    testRunner.When("I publish message with \'test-space\' space id and \'-test-step\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+    testRunner.When("I send a signal with \'test-space\' space id and \'-test_message_type\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 72
     testRunner.Then("I receive an error response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -520,16 +526,16 @@ namespace AcceptanceTests.Features
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Publish message to space fails when message type starts with not allowed \'_\' (und" +
-            "erscore) character")]
-        [NUnit.Framework.CategoryAttribute("contract=publishWithMessageTypeStartingWithNotAllowedCharacter")]
-        public void PublishMessageToSpaceFailsWhenMessageTypeStartsWithNotAllowed_UnderscoreCharacter()
+        [NUnit.Framework.DescriptionAttribute("Send a signal to space fails when message type starts with not allowed \'_\' (under" +
+            "score) character")]
+        [NUnit.Framework.CategoryAttribute("contract=signalWithMessageTypeStartingWithNotAllowedCharacter")]
+        public void SendASignalToSpaceFailsWhenMessageTypeStartsWithNotAllowed_UnderscoreCharacter()
         {
             string[] tagsOfScenario = new string[] {
-                    "contract=publishWithMessageTypeStartingWithNotAllowedCharacter"};
+                    "contract=signalWithMessageTypeStartingWithNotAllowedCharacter"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message to space fails when message type starts with not allowed \'_\' (und" +
-                    "erscore) character", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send a signal to space fails when message type starts with not allowed \'_\' (under" +
+                    "score) character", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 75
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -544,7 +550,7 @@ namespace AcceptanceTests.Features
   this.FeatureBackground();
 #line hidden
 #line 76
-    testRunner.When("I publish message with \'test-space\' space id and \'_test-step\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+    testRunner.When("I send a signal with \'test-space\' space id and \'_test_message_type\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 77
     testRunner.Then("I receive an error response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -554,14 +560,14 @@ namespace AcceptanceTests.Features
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Publish message to space fails when message type contains not allowed characters")]
-        [NUnit.Framework.CategoryAttribute("contract=publishWithMessageTypeContainingNotAllowedCharacter")]
-        public void PublishMessageToSpaceFailsWhenMessageTypeContainsNotAllowedCharacters()
+        [NUnit.Framework.DescriptionAttribute("Send a signal to space fails when message type contains not allowed characters")]
+        [NUnit.Framework.CategoryAttribute("contract=signalWithMessageTypeContainingNotAllowedCharacter")]
+        public void SendASignalToSpaceFailsWhenMessageTypeContainsNotAllowedCharacters()
         {
             string[] tagsOfScenario = new string[] {
-                    "contract=publishWithMessageTypeContainingNotAllowedCharacter"};
+                    "contract=signalWithMessageTypeContainingNotAllowedCharacter"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Publish message to space fails when message type contains not allowed characters", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send a signal to space fails when message type contains not allowed characters", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 80
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -576,7 +582,7 @@ namespace AcceptanceTests.Features
   this.FeatureBackground();
 #line hidden
 #line 81
-    testRunner.When("I publish message with \'test-space\' space id and \'test:step\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+    testRunner.When("I send a signal with \'test-space\' space id and \'test:message_type\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 82
     testRunner.Then("I receive an error response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");

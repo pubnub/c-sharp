@@ -14,6 +14,7 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 namespace AcceptanceTests.Steps
 {
     [Binding]
+    [Scope(Feature = "History for VSP")]
     public class FeatureFetchHistoryForVSPSteps
     {
         public static bool enableIntenalPubnubLogging = true;
