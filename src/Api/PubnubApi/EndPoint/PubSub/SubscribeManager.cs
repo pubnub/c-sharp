@@ -595,28 +595,25 @@ namespace PubnubApi.EndPoint
             string multiChannel = (channels != null && channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : ",";
             string multiChannelGroup = (channelGroups != null && channelGroups.Length > 0) ? string.Join(",", channelGroups.OrderBy(x => x).ToArray()) : "";
 
-            if (!config[PubnubInstance.InstanceId].BypassInternetConnectionCheck)
+            bool networkConnection = CheckInternetConnectionStatus<T>(PubnetSystemActive, type, null, channels, channelGroups);
+
+            if (!networkConnection)
             {
-                bool networkConnection = CheckInternetConnectionStatus<T>(PubnetSystemActive, type, null, channels, channelGroups);
+                ConnectionErrors++;
+                UpdatePubnubNetworkTcpCheckIntervalInSeconds();
+                ChannelInternetStatus[PubnubInstance.InstanceId].AddOrUpdate(multiChannel, networkConnection, (key, oldValue) => networkConnection);
+                ChannelGroupInternetStatus[PubnubInstance.InstanceId].AddOrUpdate(multiChannelGroup, networkConnection, (key, oldValue) => networkConnection);
+            }
 
-                if (!networkConnection)
+            bool channelInternetFlag;
+            bool channelGroupInternetFlag;
+            if (((ChannelInternetStatus[PubnubInstance.InstanceId].ContainsKey(multiChannel) && ChannelInternetStatus[PubnubInstance.InstanceId].TryGetValue(multiChannel, out channelInternetFlag) && !channelInternetFlag)
+                || (multiChannelGroup != "" && ChannelGroupInternetStatus[PubnubInstance.InstanceId].ContainsKey(multiChannelGroup) && ChannelGroupInternetStatus[PubnubInstance.InstanceId].TryGetValue(multiChannelGroup, out channelGroupInternetFlag) && !channelGroupInternetFlag))
+                && PubnetSystemActive)
+            {
+                if (ReconnectNetworkIfOverrideTcpKeepAlive<T>(type, channels, channelGroups, timetoken, region, networkConnection))
                 {
-                    ConnectionErrors++;
-                    UpdatePubnubNetworkTcpCheckIntervalInSeconds();
-                    ChannelInternetStatus[PubnubInstance.InstanceId].AddOrUpdate(multiChannel, networkConnection, (key, oldValue) => networkConnection);
-                    ChannelGroupInternetStatus[PubnubInstance.InstanceId].AddOrUpdate(multiChannelGroup, networkConnection, (key, oldValue) => networkConnection);
-                }
-
-                bool channelInternetFlag;
-                bool channelGroupInternetFlag;
-                if (((ChannelInternetStatus[PubnubInstance.InstanceId].ContainsKey(multiChannel) && ChannelInternetStatus[PubnubInstance.InstanceId].TryGetValue(multiChannel, out channelInternetFlag) && !channelInternetFlag)
-                    || (multiChannelGroup != "" && ChannelGroupInternetStatus[PubnubInstance.InstanceId].ContainsKey(multiChannelGroup) && ChannelGroupInternetStatus[PubnubInstance.InstanceId].TryGetValue(multiChannelGroup, out channelGroupInternetFlag) && !channelGroupInternetFlag))
-                    && PubnetSystemActive)
-                {
-                    if (ReconnectNetworkIfOverrideTcpKeepAlive<T>(type, channels, channelGroups, timetoken, region, networkConnection))
-                    {
-                        return;
-                    }
+                    return;
                 }
             }
 

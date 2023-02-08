@@ -138,7 +138,6 @@ namespace PubnubApi
 
         public bool UseRandomInitializationVector { get; set; }
         public int FileMessagePublishRetryLimit { get; set; }
-        public bool BypassInternetConnectionCheck { get; set; }
 
         [Obsolete("PNConfiguration(string uuid) is deprecated, please use PNConfiguration(UserId userId) instead.")]
         public PNConfiguration(string uuid)
@@ -183,7 +182,6 @@ namespace PubnubApi
             UseRandomInitializationVector = true;
             FileMessagePublishRetryLimit = 5;
             _userId = currentUserId;
-            BypassInternetConnectionCheck = false;
         }
         public PNConfiguration SetPresenceTimeoutWithCustomInterval(int timeout, int interval)
         {
