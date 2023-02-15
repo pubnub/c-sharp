@@ -27,6 +27,8 @@ namespace PubnubApi.EndPoint
         private bool storeInHistory = true;
         private Dictionary<string, object> userMetadata;
         private int ttl = -1;
+        private MessageType messageType;
+        private string spaceId = string.Empty;
 
         public PublishFileMessageOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
         {
@@ -92,6 +94,17 @@ namespace PubnubApi.EndPoint
         public PublishFileMessageOperation FileName(string name)
         {
             this.currentFileName = name;
+            return this;
+        }
+
+        public PublishFileMessageOperation MessageType(MessageType messageType)
+        {
+            this.messageType = messageType;
+            return this;
+        }
+        public PublishFileMessageOperation SpaceId(string spaceId)
+        {
+            this.spaceId = spaceId;
             return this;
         }
 
@@ -178,7 +191,7 @@ namespace PubnubApi.EndPoint
 
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
-            Uri request = urlBuilder.BuildPublishFileMessageRequest("GET", "", this.channelName, publishPayload, this.storeInHistory, this.ttl, this.userMetadata, null, externalQueryParam);
+            Uri request = urlBuilder.BuildPublishFileMessageRequest("GET", "", this.channelName, publishPayload, this.storeInHistory, this.ttl, this.userMetadata, this.messageType, this.spaceId, null, externalQueryParam);
 
             string json = "";
             UrlProcessRequest(request, requestState, false).ContinueWith(r =>
@@ -246,7 +259,7 @@ namespace PubnubApi.EndPoint
             requestState.EndPointOperation = this;
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
-            Uri request = urlBuilder.BuildPublishFileMessageRequest("GET", "", this.channelName, publishPayload, this.storeInHistory, this.ttl, this.userMetadata, null, externalQueryParam);
+            Uri request = urlBuilder.BuildPublishFileMessageRequest("GET", "", this.channelName, publishPayload, this.storeInHistory, this.ttl, this.userMetadata, this.messageType, this.spaceId, null, externalQueryParam);
 
             Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false).ConfigureAwait(false);
             ret.Status = JsonAndStatusTuple.Item2;

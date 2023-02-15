@@ -91,7 +91,7 @@ namespace PubnubApi.Interface
 
         Uri BuildGenerateFileUploadUrlRequest(string requestMethod, string requestBody, string channel, Dictionary<string, object> externalQueryParam);
 
-        Uri BuildPublishFileMessageRequest(string requestMethod, string requestBody, string channel, object originalMessage, bool storeInHistory, int ttl, Dictionary<string, object> userMetaData, Dictionary<string, string> additionalUrlParams, Dictionary<string, object> externalQueryParam);
+        Uri BuildPublishFileMessageRequest(string requestMethod, string requestBody, string channel, object originalMessage, bool storeInHistory, int ttl, Dictionary<string, object> userMetaData, string type, string spaceId, Dictionary<string, string> additionalUrlParams, Dictionary<string, object> externalQueryParam);
 
         Uri BuildGetFileUrlOrDeleteReqest(string requestMethod, string requestBody, string channel, string fileId, string fileName, Dictionary<string, object> externalQueryParam, PNOperationType operationType);
 

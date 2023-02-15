@@ -30,6 +30,8 @@ namespace PubnubApi.EndPoint
         private bool storeInHistory = true;
         private Dictionary<string, object> userMetadata;
         private int ttl = -1;
+        private MessageType messageType;
+        private string spaceId = string.Empty;
 
         public SendFileOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
         {
@@ -83,6 +85,17 @@ namespace PubnubApi.EndPoint
         public SendFileOperation Ttl(int ttl)
         {
             this.ttl = ttl;
+            return this;
+        }
+
+        public SendFileOperation MessageType(MessageType messageType)
+        {
+            this.messageType = messageType;
+            return this;
+        }
+        public SendFileOperation SpaceId(string spaceId)
+        {
+            this.spaceId = spaceId;
             return this;
         }
 
@@ -376,7 +389,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
 
-            Uri request = urlBuilder.BuildPublishFileMessageRequest("GET", "", this.channelName, message, this.storeInHistory, this.ttl, this.userMetadata, null, externalQueryParam);
+            Uri request = urlBuilder.BuildPublishFileMessageRequest("GET", "", this.channelName, message, this.storeInHistory, this.ttl, this.userMetadata, this.messageType, this.spaceId, null, externalQueryParam);
 
             RequestState<PNPublishFileMessageResult> requestState = new RequestState<PNPublishFileMessageResult>();
             requestState.Channels = new[] { this.channelName };
