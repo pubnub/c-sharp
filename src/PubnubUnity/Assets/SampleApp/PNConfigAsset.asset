@@ -18,4 +18,4 @@ MonoBehaviour:
   CipherKey: 
   EnableTelemetry: 0
   Secure: 0
-  LogVerbosity: 0
+  LogVerbosity: 1
