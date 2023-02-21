@@ -195,14 +195,14 @@ namespace AcceptanceTests.Steps
                 {
                     foreach(PNFetchHistoryItemResult item in itemList)
                     {
-                        if (item.MessageType != null && string.Compare(file, item.MessageType.ToString(), true) == 0)
+                        if (item.MessageType != null && string.Compare(file, item.MessageType.ToString().Replace("pn_",""), true) == 0)
                         {
                             gotExpectedResult = true;
                             break;
                         }
                         if (item.Entry is Dictionary<string, object>)
                         {
-                            if (string.Compare("file", file, true) == 0 && string.Compare("file", item.MessageType.ToString(), true) == 0)
+                            if (string.Compare("file", file, true) == 0 && string.Compare("file", item.MessageType.ToString().Replace("pn_",""), true) == 0)
                             {
                                 Dictionary<string, object> itemDict = item.Entry as Dictionary<string, object>;
                                 if (itemDict != null && itemDict.ContainsKey(message) && itemDict.ContainsKey(file))

@@ -271,7 +271,7 @@ namespace PubnubApi
 
                 //Set MessageType
                 PropertyInfo messageTypeProp = specific.GetProperty("MessageType");
-                string messageTypeValue = (listObject[4] != null) ? listObject[4].ToString() : "";
+                string messageTypeValue = (listObject[4] != null) ? listObject[4].ToString().Replace("pn_","") : "";
                 string messageTypeStr = messageTypeValue.Insert(0, messageTypeValue[0].ToString().ToUpperInvariant()).Remove(1, 1);
                 MessageType msgType;
                 if (Enum.IsDefined(typeof(PNMessageType), messageTypeStr))
@@ -366,7 +366,7 @@ namespace PubnubApi
 
                 //Set MessageType
                 PropertyInfo messageTypeProp = specific.GetProperty("MessageType");
-                string messageTypeValue = (listObject[4] != null) ? listObject[4].ToString() : "";
+                string messageTypeValue = (listObject[4] != null) ? listObject[4].ToString().Replace("pn_","") : "";
                 string messageTypeStr = messageTypeValue.Insert(0, messageTypeValue[0].ToString().ToUpperInvariant()).Remove(1, 1);
                 MessageType msgType;
                 if (Enum.IsDefined(typeof(PNMessageType), messageTypeStr))

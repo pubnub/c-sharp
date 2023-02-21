@@ -25,7 +25,7 @@ namespace PubnubApi
             if (mt.userMessageType != null) { return mt.userMessageType; }
 
             string retStr = mt.pnMessageType.ToString("g");
-            string outStr = retStr.Insert(0, retStr[0].ToString().ToLowerInvariant()).Remove(1, 1); //First char to lower for camelCase
+            string outStr = retStr.Insert(0, retStr[0].ToString().ToLowerInvariant()).Remove(1, 1).Insert(0, "pn_"); //First char to lower for camelCase
             return outStr;
         }
 
@@ -34,7 +34,7 @@ namespace PubnubApi
             if (this.userMessageType != null) { return this.userMessageType; }
 
             string retStr = pnMessageType.ToString("g");
-            string outStr = retStr.Insert(0, retStr[0].ToString().ToLowerInvariant()).Remove(1, 1); //First char to lower for camelCase
+            string outStr = retStr.Insert(0, retStr[0].ToString().ToLowerInvariant()).Remove(1, 1).Insert(0, "pn_"); //First char to lower for camelCase
             return outStr;
         }
 

@@ -683,7 +683,7 @@ namespace PubnubApi
                                     {
                                         payloadContainer.Add(payload);
                                     }
-                                    else if (currentMessage.MessageType != null && string.Compare(currentMessage.MessageType.ToString(), "object", StringComparison.OrdinalIgnoreCase) == 0) //Objects Simplification events
+                                    else if (currentMessage.MessageType != null && string.Compare(currentMessage.MessageType.ToString(), "pn_object", StringComparison.OrdinalIgnoreCase) == 0) //Objects Simplification events
                                     {
                                         double objectsVersion = -1;
                                         Dictionary<string, object> objectsDic = payload as Dictionary<string, object>;
@@ -709,7 +709,7 @@ namespace PubnubApi
                                     }
                                     else
                                     {
-                                        if (currentConfig.CipherKey.Length > 0 && currentMessage.MessageType != null && string.Compare(currentMessage.MessageType.ToString(), "signal", StringComparison.OrdinalIgnoreCase) != 0) //decrypt the subscriber message if cipherkey is available
+                                        if (currentConfig.CipherKey.Length > 0 && currentMessage.MessageType != null && string.Compare(currentMessage.MessageType.ToString(), "pn_signal", StringComparison.OrdinalIgnoreCase) != 0) //decrypt the subscriber message if cipherkey is available
                                         {
                                             string decryptMessage = "";
                                             PubnubCrypto aes = new PubnubCrypto(currentConfig.CipherKey, currentConfig, currentLog, null);
@@ -779,7 +779,7 @@ namespace PubnubApi
                                         payloadContainer.Add(currentMessageChannel);
                                     }
 
-                                    if (currentMessage.MessageType != null && string.Compare(currentMessage.MessageType.ToString(), "signal", StringComparison.OrdinalIgnoreCase) == 0)
+                                    if (currentMessage.MessageType != null && string.Compare(currentMessage.MessageType.ToString(), "pn_signal", StringComparison.OrdinalIgnoreCase) == 0)
                                     {
                                         ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
                                         PNMessageResult<T> pnMessageResult = responseBuilder.JsonToObject<PNMessageResult<T>>(payloadContainer, true);
@@ -799,7 +799,7 @@ namespace PubnubApi
                                             Announce(signalMessage);
                                         }
                                     }
-                                    else if (currentMessage.MessageType != null && string.Compare(currentMessage.MessageType.ToString(), "object", StringComparison.OrdinalIgnoreCase) == 0)
+                                    else if (currentMessage.MessageType != null && string.Compare(currentMessage.MessageType.ToString(), "pn_object", StringComparison.OrdinalIgnoreCase) == 0)
                                     {
                                         ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
                                         PNObjectEventResult objectApiEvent = responseBuilder.JsonToObject<PNObjectEventResult>(payloadContainer, true);
@@ -808,7 +808,7 @@ namespace PubnubApi
                                             Announce(objectApiEvent);
                                         }
                                     }
-                                    else if (currentMessage.MessageType != null && string.Compare(currentMessage.MessageType.ToString(), "messageAction", StringComparison.OrdinalIgnoreCase) == 0)
+                                    else if (currentMessage.MessageType != null && string.Compare(currentMessage.MessageType.ToString(), "pn_messageAction", StringComparison.OrdinalIgnoreCase) == 0)
                                     {
                                         ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
                                         PNMessageActionEventResult msgActionEventEvent = responseBuilder.JsonToObject<PNMessageActionEventResult>(payloadContainer, true);
@@ -817,7 +817,7 @@ namespace PubnubApi
                                             Announce(msgActionEventEvent);
                                         }
                                     }
-                                    else if (currentMessage.MessageType != null && string.Compare(currentMessage.MessageType.ToString(), "file", StringComparison.OrdinalIgnoreCase) == 0)
+                                    else if (currentMessage.MessageType != null && string.Compare(currentMessage.MessageType.ToString(), "pn_file", StringComparison.OrdinalIgnoreCase) == 0)
                                     {
                                         ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
                                         PNMessageResult<object> pnFileResult = responseBuilder.JsonToObject<PNMessageResult<object>>(payloadContainer, true);
