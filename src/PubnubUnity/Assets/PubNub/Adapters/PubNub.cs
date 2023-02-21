@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using PubnubApi.EndPoint;
 
 namespace PubnubApi.Unity {
@@ -40,6 +41,19 @@ namespace PubnubApi.Unity {
 		// TODO return value? Async?
 		public static UnsubscribeAllOperation<string> UnsubscribeAll(this Pubnub pn) {
 			return pn.UnsubscribeAll<string>();
+		}
+
+		// TODO remove ugly hack after adding retval to parent sdk
+		public static Task<bool> UnsibscribeAll(this Pubnub pn) {
+			pn.UnsubscribeAll<string>();
+			var tcs = new TaskCompletionSource<bool>();
+			tcs.SetResult(true);
+			return tcs.Task;
+		}
+
+		// TODO create an async variant
+		public static UnsubscribeOperation<T> Unsubscribe<T>(this Pubnub pn) {
+			return pn.Unsubscribe<T>();
 		}
 	}
 }

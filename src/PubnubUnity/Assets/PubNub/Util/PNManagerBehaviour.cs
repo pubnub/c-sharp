@@ -43,7 +43,7 @@ namespace PubnubApi.Unity {
 			return pubnub;
 		}
 
-		private void OnDestroy() {
+		protected virtual void OnDestroy() {
 			pubnub.UnsubscribeAll<string>();
 		}
 	}

@@ -13,6 +13,9 @@ namespace PubnubApi.Unity {
 		public bool EnableTelemetry;
 		public bool Secure;
 		public PNLogVerbosity LogVerbosity;
+		
+		[SerializeField] private bool externalJsonEnabled = false;
+		[SerializeField] private UnityEngine.TextAsset externalJsonFile;
 
 		[System.NonSerialized] public string UserId;
 
