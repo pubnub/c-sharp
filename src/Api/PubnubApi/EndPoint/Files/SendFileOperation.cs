@@ -287,9 +287,11 @@ namespace PubnubApi.EndPoint
             string dataBoundary = String.Format(CultureInfo.InvariantCulture, "----------{0:N}", Guid.NewGuid());
             string contentType = "multipart/form-data; boundary=" + dataBoundary;
             string currentCipherKey = !string.IsNullOrEmpty(this.currentFileCipherKey) ? this.currentFileCipherKey : config.CipherKey;
-            byte[] postData = GetMultipartFormData(sendFileByteArray, generateFileUploadUrlResult.FileName, generateFileUploadUrlResult.FileUploadRequest.FormFields, dataBoundary, currentCipherKey, config, pubnubLog);
+            Dictionary<string, object> currentFileFormFields = generateFileUploadUrlResult.FileUploadRequest != null ? generateFileUploadUrlResult.FileUploadRequest.FormFields : new Dictionary<string, object>();
+            byte[] postData = GetMultipartFormData(sendFileByteArray, generateFileUploadUrlResult.FileName, currentFileFormFields, dataBoundary, currentCipherKey, config, pubnubLog);
 
-            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(new Uri(generateFileUploadUrlResult.FileUploadRequest.Url), requestState, false, postData, contentType).ConfigureAwait(false);
+            string currentFileUrl = generateFileUploadUrlResult.FileUploadRequest != null ? generateFileUploadUrlResult.FileUploadRequest.Url : "http://";
+            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(new Uri(currentFileUrl), requestState, false, postData, contentType).ConfigureAwait(false);
             ret.Status = JsonAndStatusTuple.Item2;
             string json = JsonAndStatusTuple.Item1;
             if (!string.IsNullOrEmpty(json))
@@ -409,7 +411,9 @@ namespace PubnubApi.EndPoint
                     ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
                     PNPublishFileMessageResult publishResult = responseBuilder.JsonToObject<PNPublishFileMessageResult>(result, true);
                     StatusBuilder statusBuilder = new StatusBuilder(config, jsonLibrary);
-                    if (publishResult != null)
+                    if (result != null && 
+                        string.Compare(result[0].ToString(), "1", StringComparison.OrdinalIgnoreCase) == 0 && 
+                        publishResult != null)
                     {
                         ret.Result = publishResult;
                         PNStatus status = statusBuilder.CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, (int)HttpStatusCode.OK, null);

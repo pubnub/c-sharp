@@ -116,6 +116,75 @@ namespace AcceptanceTests.Features
             }
             this.ScenarioCleanup();
         }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Send a file to space fails when message type is too short, shorten than 3 charact" +
+            "ers")]
+        [NUnit.Framework.CategoryAttribute("contract=sendFileWithTooShortMessageType")]
+        public void SendAFileToSpaceFailsWhenMessageTypeIsTooShortShortenThan3Characters()
+        {
+            string[] tagsOfScenario = new string[] {
+                    "contract=sendFileWithTooShortMessageType"};
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send a file to space fails when message type is too short, shorten than 3 charact" +
+                    "ers", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 15
+    this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 6
+    this.FeatureBackground();
+#line hidden
+#line 16
+      testRunner.When("I send a file with \'space-id\' space id and \'ts\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 17
+      testRunner.Then("I receive an error response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Send a file to space fails when message type is too long, longer than 50 characte" +
+            "rs")]
+        [NUnit.Framework.CategoryAttribute("contract=sendFileWithTooLongMessageType")]
+        public void SendAFileToSpaceFailsWhenMessageTypeIsTooLongLongerThan50Characters()
+        {
+            string[] tagsOfScenario = new string[] {
+                    "contract=sendFileWithTooLongMessageType"};
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send a file to space fails when message type is too long, longer than 50 characte" +
+                    "rs", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 20
+    this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 6
+    this.FeatureBackground();
+#line hidden
+#line 21
+      testRunner.When("I send a file with \'space-id\' space id and \'this-is-really-long-message-type-to-b" +
+                        "e-used-with-publish\' message type", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 22
+      testRunner.Then("I receive an error response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
     }
 }
 #pragma warning restore

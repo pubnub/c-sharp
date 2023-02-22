@@ -181,5 +181,12 @@ namespace AcceptanceTests.Steps
         {
             Assert.IsTrue(!pnStatus.Error);
         }
+
+        [Then(@"I receive an error response")]
+        public void ThenIReceiveAnErrorResponse()
+        {
+            Assert.IsTrue(fileUploadResult == null && pnStatus.Error);
+        }
+
     }
 }
