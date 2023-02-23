@@ -22,10 +22,15 @@ public class MessagePopupController : MonoBehaviour {
 
 	private async void OnPnMessage(Pubnub pn, PNMessageResult<object> msg) {
 		var spawned = Instantiate(textContainer, transform);
+		
+		var pos = (spawned.transform as RectTransform).anchoredPosition;
+		pos.y = -50;
+		(spawned.transform as RectTransform).anchoredPosition = pos;
+		
 		spawned.GetComponentInChildren<TextMeshProUGUI>().text = msg.Message as string;
 		spawned.gameObject.SetActive(true);
 		spawned.GetComponent<AnimatedTextPopup>().PlayForward();
-		await Task.Delay(1500);
+		await Task.Delay(2000);
 		spawned.GetComponent<AnimatedTextPopup>().PlayBackwards(true);
 	}
 
