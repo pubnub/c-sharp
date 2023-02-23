@@ -1,7 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using PubnubApi;
 using PubnubApi.Unity;
 using UnityEngine;
@@ -9,7 +5,8 @@ using UnityEngine;
 public class DemoManager : PNManagerBehaviour {
 	public string defaultUserId;
 	public string defaultChannel;
-
+	
+	// trivial singleton - not guaranteed
 	public static DemoManager instance {
 		get;
 		private set;
