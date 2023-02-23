@@ -52,7 +52,6 @@ namespace PubnubApi
         public string AuthKey { get; set; }
 
         [Obsolete("Uuid is deprecated, please use UserId instead.")]
-
         public string Uuid
         {
             get
