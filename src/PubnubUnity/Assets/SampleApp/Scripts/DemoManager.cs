@@ -37,9 +37,8 @@ public class DemoManager : PNManagerBehaviour {
 		pubnub.Signal().Channel(defaultChannel).Message("SampleSignal").Execute((a, b) => Debug.Log("Signalled"));
 
 		// list files
-		await pubnub.ListFiles().Channel(defaultChannel).ExecuteAsync();
+		Debug.Log((await pubnub.ListFiles().Channel(defaultChannel).ExecuteAsync()).Result.Count);
 
-		await pubnub.GetFileUrl().Channel(defaultChannel).FileId("lol").ExecuteAsync();
 		
 		if (!result.Status.Error) {
 			Debug.Log("Message sent successfully");
