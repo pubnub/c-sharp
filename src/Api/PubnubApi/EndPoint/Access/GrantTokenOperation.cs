@@ -54,7 +54,6 @@ namespace PubnubApi.EndPoint
             InitializeDefaultVariableObjectStates();
         }
 
-        [Obsolete("AuthorizedUuid is deprecated, please use AuthorizedUserId instead.")]
         public GrantTokenOperation AuthorizedUuid(string uuid)
         {
             if (!string.IsNullOrEmpty(pubnubAuthorizedUserId))

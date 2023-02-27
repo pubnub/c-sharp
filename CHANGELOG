@@ -1,3 +1,7 @@
+v6.14.0 - February 27 2023
+-----------------------------
+- Modified: undeprecated GrantToken methods/properties.
+
 v6.13.0 - December 05 2022
 -----------------------------
 - Fixed: added null check for PublishFileMessage PNStatus in SendFileOperation.
