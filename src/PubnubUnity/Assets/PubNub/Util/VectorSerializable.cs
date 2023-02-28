@@ -62,23 +62,23 @@ namespace PubnubApi.Unity {
 
 		// TODO investigate if it's worth adding other json libraries
 		[JsonIgnore]
-		public Vector2 Vector2 => this;
+		public Vector2 vector2 => this;
 		[JsonIgnore]
-		public Vector3 Vector3 => this;
+		public Vector3 vector3 => this;
 		[JsonIgnore]
-		public Quaternion Quaternion => this;
+		public Quaternion quaternion => this;
 	}
    
-	public static class VectorExtensions {
-		public static VectorSerializable Serializable(this Vector3 v) {
+	public static class PNVectorExtensions {
+		public static VectorSerializable GetSerializable(this Vector3 v) {
 			return v;
 		}
 
-		public static VectorSerializable Serializable(this Vector2 v) {
+		public static VectorSerializable GetSerializable(this Vector2 v) {
 			return v;
 		}
 		
-		public static VectorSerializable Serializable(this Quaternion v) {
+		public static VectorSerializable GetSerializable(this Quaternion v) {
 			return v;
 		}
 	}

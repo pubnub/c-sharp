@@ -37,7 +37,7 @@ public class MessagePopupController : MonoBehaviour {
 	private async void Update() {
 		if (Input.GetKeyDown(KeyCode.Space)) {
 			// AAAAAAAAAAAAAAAAAARRRGHHHhhh
-			var res = await DemoManager.instance.pubnub.Publish().Channel("test").Message(Vector3.zero.Serializable()).ExecuteAsync();
+			var res = await DemoManager.instance.pubnub.Publish().Channel("test").Message(Vector3.zero.GetSerializable()).ExecuteAsync();
 			Debug.Log(res.Status.ErrorData?.Information);
 		}
 	}
