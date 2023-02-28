@@ -13,7 +13,7 @@ public class AnimatedVerticalLayout : MonoBehaviour {
 		var children = transform.Cast<RectTransform>().Reverse();
 		foreach (RectTransform t  in children) {
 			var pos = t.anchoredPosition;
-			pos.y = Mathf.Lerp( pos.y ,offset * i, Time.deltaTime * Mathf.Max(16 - i * 2, 8f));
+			pos.y = Mathf.Lerp( pos.y ,offset * i, Time.deltaTime * Mathf.Max(16 - i * 4, 8f));
 			t.anchoredPosition = pos;
 			i++;
 		}
