@@ -17,7 +17,8 @@ public class MessagePopupController : MonoBehaviour {
 		textGo = textContainer!.gameObject;
 		textGo.SetActive(false);
 		
-		DemoManager.instance.listener.onMessage += OnPnMessage;
+		// DemoManager.instance.listener.onMessage += OnPnMessage;
+		PnDemoManager.instance.listener.onPresence += OnPnPresence;
 	}
 
 	private async void OnPnMessage(Pubnub pn, PNMessageResult<object> msg) {
@@ -33,12 +34,32 @@ public class MessagePopupController : MonoBehaviour {
 		await Task.Delay(2000);
 		spawned.GetComponent<AnimatedTextPopup>().PlayBackwards(true);
 	}
+	
+	// copy-pasted, refactor
+	private async void OnPnPresence(Pubnub pn, PNPresenceEventResult msg) {
+		var spawned = Instantiate(textContainer, transform);
+		
+		var pos = (spawned.transform as RectTransform).anchoredPosition;
+		pos.y = -50;
+		(spawned.transform as RectTransform).anchoredPosition = pos;
+		
+		spawned.GetComponentInChildren<TextMeshProUGUI>().text = msg?.Uuid as string;
+		spawned.gameObject.SetActive(true);
+		spawned.GetComponent<AnimatedTextPopup>().PlayForward();
+		await Task.Delay(2000);
+		spawned.GetComponent<AnimatedTextPopup>().PlayBackwards(true);
+	}
 
 	private async void Update() {
 		if (Input.GetKeyDown(KeyCode.Space)) {
 			// AAAAAAAAAAAAAAAAAARRRGHHHhhh
-			var res = await DemoManager.instance.pubnub.Publish().Channel("test").Message(Vector3.zero.GetSerializable()).ExecuteAsync();
+			var res = await PnDemoManager.instance.pubnub.Publish().Channel("test").Message(Vector3.zero.GetSerializable()).ExecuteAsync();
 			Debug.Log(res.Status.ErrorData?.Information);
 		}
+	}
+
+	private void OnDestroy() {
+		PnDemoManager.instance.listener.onMessage -= OnPnMessage;
+		PnDemoManager.instance.listener.onPresence -= OnPnPresence;
 	}
 }

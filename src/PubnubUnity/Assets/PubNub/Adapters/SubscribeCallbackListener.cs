@@ -47,7 +47,7 @@ namespace PubnubApi.Unity {
 				(pnObj, presenceEvnt) => {
 					#if PN_DEBUG
 					Debug.Log(
-						$"[LISTENER] onPresence {presenceEvnt.Channel}, {presenceEvnt.Uuid != pnObj.PNConfig.Uuid}");
+						$"[LISTENER] onPresence {presenceEvnt.Channel}, Different UserId: {presenceEvnt.Uuid != pnObj.PNConfig.UserId}");
 					#endif
 					onPresence.Dispatch(pnObj, presenceEvnt);
 				},
