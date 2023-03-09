@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
 
@@ -33,6 +34,18 @@ namespace PubnubApi.Unity {
 			y = sourceQuaternion.y;
 			z = sourceQuaternion.z;
 			w = sourceQuaternion.w;
+		}
+
+		public VectorSerializable(Dictionary<string, object> jsonResponse) {
+			jsonResponse.TryGetValue("x", out var ox);
+			jsonResponse.TryGetValue("y", out var oy);
+			jsonResponse.TryGetValue("z", out var oz);
+			jsonResponse.TryGetValue("w", out var ow);
+
+			x = ox is not null ? (float)(double)ox : 0;
+			y = oy is not null ? (float)(double)oy : 0;
+			z = oz is not null ? (float)(double)oz : 0;
+			w = ow is not null ? (float)(double)ow : 0;
 		}
 
 		public static implicit operator Vector3(VectorSerializable v) {

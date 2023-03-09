@@ -304,7 +304,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pnConfiguration: {fileID: 11400000, guid: 9223feb005f68d840aa8885bf1dd16c2, type: 2}
   defaultUserId: test
-  defaultChannel: webhook
+  defaultChannel: test
 --- !u!1 &671690236
 GameObject:
   m_ObjectHideFlags: 0

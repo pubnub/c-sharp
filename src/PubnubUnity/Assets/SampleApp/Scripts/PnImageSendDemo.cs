@@ -1,9 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using PubnubApi;
 using PubnubApi.Unity;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering;
 using UnityEngine.UI;
 
 public class PnImageSendDemo : MonoBehaviour {
@@ -22,8 +24,10 @@ public class PnImageSendDemo : MonoBehaviour {
 	}
 
 	private async void PnOnFile(Pubnub pn, PNFileEventResult file) {
-		var f = await pnManager.pubnub.DownloadFile().Channel(pnManager.defaultChannel).FileId(file.File.Id).ExecuteAsync();
-		var tex = new Texture2D(1, 1);
+		var size = new VectorSerializable(file.Message as Dictionary<string, object>);
+		var f = await pnManager.pubnub.DownloadFile().FileId(file.File.Id).FileName(file.File.Name).Channel("test").ExecuteAsync();
+		
+		var tex = new Texture2D((int)size.x, (int)size.y, GraphicsFormat.RGBA_DXT1_UNorm, 0);
 		tex.LoadRawTextureData(f.Result.FileBytes);
 		tex.Apply();
 		targetImageComponent.texture = tex;
@@ -35,10 +39,10 @@ public class PnImageSendDemo : MonoBehaviour {
 			onTextureChange?.Invoke(sourceImageComponent.texture);
 			previousTexture = sourceImageComponent.texture;
 
-			Debug.Log($"Sending image, len {(previousTexture as Texture2D).GetRawTextureData().Length}");
-			
-			var res = await pnManager.pubnub.SendFile().FileName("demoTexture").File((previousTexture as Texture2D).GetRawTextureData()).Channel(pnManager.defaultChannel).Message("tex").ExecuteAsync();
-			Debug.Log(res);
+			var bytes = (previousTexture as Texture2D).GetRawTextureData();
+
+			var res = await pnManager.pubnub.SendFile().File(bytes).Channel("test").Message(new VectorSerializable(previousTexture.width, previousTexture.height)).FileName("dekzdura.tex").ExecuteAsync();
+			Debug.Log(res.Status.Error);
 		}
 	}
 
