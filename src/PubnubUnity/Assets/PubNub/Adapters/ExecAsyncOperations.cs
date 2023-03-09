@@ -55,6 +55,13 @@ namespace PubnubApi.Unity {
 			var res = await o.ExecuteAsync();
 			callback?.Invoke(res.Result, res.Status);
 		}
+		
+		// PublishFileMessage
+		// TODO document change - Async -> Execute
+		public static async void Execute(this PublishFileMessageOperation o, System.Action<PNPublishFileMessageResult, PNStatus> callback) {
+			var res = await o.ExecuteAsync();
+			callback?.Invoke(res.Result, res.Status);
+		}
 	}
 	
 }
