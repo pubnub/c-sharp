@@ -40,6 +40,21 @@ namespace PubnubApi.Unity {
 			var res = await o.ExecuteAsync();
 			callback?.Invoke(res.Result, res.Status);
 		}
+		
+		
+		// SendFile
+		// TODO document change - Async -> Execute
+		public static async void Execute(this SendFileOperation o, System.Action<PNFileUploadResult, PNStatus> callback) {
+			var res = await o.ExecuteAsync();
+			callback?.Invoke(res.Result, res.Status);
+		}
+		
+		// DownloadFile
+		// TODO document change - Async -> Execute
+		public static async void Execute(this DownloadFileOperation o, System.Action<PNDownloadFileResult, PNStatus> callback) {
+			var res = await o.ExecuteAsync();
+			callback?.Invoke(res.Result, res.Status);
+		}
 	}
 	
 }
