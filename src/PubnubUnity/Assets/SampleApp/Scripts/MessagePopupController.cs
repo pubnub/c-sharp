@@ -17,7 +17,7 @@ public class MessagePopupController : MonoBehaviour {
 		textGo = textContainer!.gameObject;
 		textGo.SetActive(false);
 		
-		// DemoManager.instance.listener.onMessage += OnPnMessage;
+		PnDemoManager.instance.listener.onMessage += OnPnMessage;
 		PnDemoManager.instance.listener.onPresence += OnPnPresence;
 	}
 
