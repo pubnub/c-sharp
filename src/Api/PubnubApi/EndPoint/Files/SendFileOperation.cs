@@ -293,7 +293,7 @@ namespace PubnubApi.EndPoint
 
             requestState.UsePostMethod = true;
 
-            byte[] sendFileByteArray = GetByteArrayFromFilePath(sendFileFullPath);
+            byte[] sendFileByteArray = sendFileBytes ?? GetByteArrayFromFilePath(sendFileFullPath);
 
             string dataBoundary = String.Format(CultureInfo.InvariantCulture, "----------{0:N}", Guid.NewGuid());
             string contentType = "multipart/form-data; boundary=" + dataBoundary;
