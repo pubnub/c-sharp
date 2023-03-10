@@ -69,10 +69,37 @@ namespace PubnubApi
             return request;
         }
 
-
-        HttpWebRequest IPubnubHttp.SetServicePointSetTcpKeepAlive(HttpWebRequest request)
+        HttpWebRequest IPubnubHttp.SetServicePointConnectionLimit<T>(RequestState<T> pubnubRequestState, HttpWebRequest request)
         {
-            //do nothing
+#if NET35 || NET40 || NET45 || NET461 || NET48
+            if (pubnubRequestState.ResponseType == PNOperationType.PNHeartbeatOperation)
+            {
+                int estimateConnectionLimit = pubnubConfig.SubscribeTimeout/pubnubConfig.PresenceInterval;
+                if (estimateConnectionLimit > request.ServicePoint.ConnectionLimit)
+                {
+                    request.ServicePoint.ConnectionLimit = estimateConnectionLimit;
+                }
+            }
+#endif
+            return request;
+        }
+
+        HttpWebRequest IPubnubHttp.SetServicePointSetTcpKeepAlive<T>(RequestState<T> pubnubRequestState, HttpWebRequest request)
+        {
+#if NET35 || NET40 || NET45 || NET461 || NET48
+            if (pubnubConfig.PresenceInterval > 0)
+            {
+                request.ServicePoint.SetTcpKeepAlive(true, pubnubConfig.PresenceInterval * 1000, 1000);
+            }
+#endif
+            return request;
+        }
+
+         HttpWebRequest IPubnubHttp.SetTcpKeepAlive(HttpWebRequest request)
+        {
+#if NET35 || NET40 || NET45 || NET461 || NET48
+            request.KeepAlive = true;
+#endif
             return request;
         }
 
@@ -559,40 +586,63 @@ namespace PubnubApi
             try
             {
                 request.Method = FindHttpGetOrDeleteMethod(pubnubRequestState);
-                var _ = new Timer(OnPubnubWebRequestTimeout<T>, pubnubRequestState, GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType) * 1000, Timeout.Infinite);
                 System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
                 stopWatch.Start();
+                #if !NET35 && !NET40
+                Task timeoutTask = Task.Delay(GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType) * 1000);
+                Task<HttpWebResponse> responseTask = Task.Factory.FromAsync<HttpWebResponse>(request.BeginGetResponse, asyncPubnubResult => (HttpWebResponse)request.EndGetResponse(asyncPubnubResult), pubnubRequestState, TaskCreationOptions.None);
+                Task completedTask = await Task.WhenAny(timeoutTask, responseTask).ConfigureAwait(false);
+                if (completedTask == timeoutTask)
+                {
+                    OnPubnubWebRequestTimeout<T>(pubnubRequestState);
+                    stopWatch.Stop();
+                    return "";
+                }
+                else
+                {
+                    response = await responseTask;
+                }
+                #else
+                var _ = new Timer(OnPubnubWebRequestTimeout<T>, pubnubRequestState, GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType) * 1000, Timeout.Infinite);
                 response = await Task.Factory.FromAsync<HttpWebResponse>(request.BeginGetResponse, asyncPubnubResult => (HttpWebResponse)request.EndGetResponse(asyncPubnubResult), pubnubRequestState).ConfigureAwait(false);
+                #endif
                 stopWatch.Stop();
                 if (pubnubConfig.EnableTelemetry && pubnubTelemetryMgr != null)
                 {
                     await pubnubTelemetryMgr.StoreLatency(stopWatch.ElapsedMilliseconds, pubnubRequestState.ResponseType).ConfigureAwait(false);
                 }
-                pubnubRequestState.Response = response;
-                System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "DateTime {0}, Got PubnubWebResponse for {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), request.RequestUri.ToString()));
-                using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
-                {
-                    //Need to return this response 
-#if NET35 || NET40
-                    string jsonString = streamReader.ReadToEnd();
-#else
-                    string jsonString = await streamReader.ReadToEndAsync().ConfigureAwait(false);
-#endif
-                    System.Diagnostics.Debug.WriteLine(jsonString);
-                    pubnubRequestState.GotJsonResponse = true;
-                    System.Diagnostics.Debug.WriteLine("");
-                    System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "DateTime {0}, Retrieved JSON", DateTime.Now.ToString(CultureInfo.InvariantCulture)));
-
-                    if (pubnubRequestState.Response != null)
+                if (response != null) 
+                { 
+                    pubnubRequestState.Response = response;
+                    System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "DateTime {0}, Got PubnubWebResponse for {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), request.RequestUri.ToString()));
+                    using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
                     {
-#if NET35 || NET40 || NET45 || NET461 || NET48
-                        pubnubRequestState.Response.Close();
-#endif
-                        pubnubRequestState.Response = null;
-                        pubnubRequestState.Request = null;
-                    }
+                        //Need to return this response 
+    #if NET35 || NET40
+                        string jsonString = streamReader.ReadToEnd();
+    #else
+                        string jsonString = await streamReader.ReadToEndAsync().ConfigureAwait(false);
+    #endif
+                        System.Diagnostics.Debug.WriteLine(jsonString);
+                        pubnubRequestState.GotJsonResponse = true;
+                        System.Diagnostics.Debug.WriteLine("");
+                        System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "DateTime {0}, Retrieved JSON", DateTime.Now.ToString(CultureInfo.InvariantCulture)));
 
-                    return jsonString;
+                        if (pubnubRequestState.Response != null)
+                        {
+    #if NET35 || NET40 || NET45 || NET461 || NET48
+                            pubnubRequestState.Response.Close();
+    #endif
+                            pubnubRequestState.Response = null;
+                            pubnubRequestState.Request = null;
+                        }
+
+                        return jsonString;
+                    }
+                }
+                else
+                {
+                    return "";
                 }
             }
             catch (WebException ex)
@@ -1311,13 +1361,13 @@ namespace PubnubApi
             if (currentState != null && currentState.Response == null && currentState.Request != null)
             {
                 currentState.Timeout = true;
+                LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, **WP7 OnPubnubWebRequestTimeout** Initiated at {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), currentState.TimeQueued.GetValueOrDefault().ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+
                 try
                 {
                     currentState.Request.Abort();
                 }
                 catch {  /* ignore */ }
-
-                LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, **WP7 OnPubnubWebRequestTimeout**", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
 
                 if (currentState.ResponseType != PNOperationType.PNSubscribeOperation 
                     && currentState.ResponseType != PNOperationType.Presence
