@@ -1,4 +1,4 @@
-﻿#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+﻿#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -28,7 +28,7 @@ namespace PubnubApi
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} PubnubHttpClientHandler {1} SendAsync ", DateTime.Now.ToString(CultureInfo.InvariantCulture), pubnubHandlerName), pubnubConfig.LogVerbosity);
+            LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} PubnubHttpClientHandler {1} SendAsync ", DateTime.Now.ToString(CultureInfo.InvariantCulture), pubnubHandlerName), pubnubConfig.LogVerbosity);
             return await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
         }
     }

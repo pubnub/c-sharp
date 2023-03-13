@@ -26,10 +26,9 @@ namespace PubnubApi.EndPoint
             pubnubTelemetryMgr = telemetryManager;
         }
 
-
-        public void ChangeUUID(string newUUID)
+        public void ChangeUserId(UserId newUserId)
         {
-            if (string.IsNullOrEmpty(newUUID) || config.Uuid == newUUID)
+            if (newUserId == null || string.IsNullOrEmpty(newUserId.ToString().Trim()) || config.UserId.ToString() == newUserId.ToString())
             {
                 return;
             }
@@ -38,10 +37,10 @@ namespace PubnubApi.EndPoint
             {
                 try
                 {
-                    UuidChanged = true;
+                    config.UserId = newUserId;
+                    CurrentUserId.AddOrUpdate(PubnubInstance.InstanceId, newUserId, (k, o) => newUserId);
+                    UserIdChanged.AddOrUpdate(PubnubInstance.InstanceId, true, (k, o) => true);
 
-                    config.Uuid = newUUID;
-                    CurrentUuid = newUUID;
 
                     string[] channels = GetCurrentSubscriberChannels();
                     string[] channelGroups = GetCurrentSubscriberChannelGroups();
@@ -53,7 +52,7 @@ namespace PubnubApi.EndPoint
                     {
                         string channelsJsonState = BuildJsonUserState(channels.ToArray(), channelGroups.ToArray(), false);
                         IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
-                        
+
                         Uri request = urlBuilder.BuildMultiChannelLeaveRequest("GET", "", channels, channelGroups, channelsJsonState, null);
 
                         RequestState<string> requestState = new RequestState<string>();
@@ -62,7 +61,7 @@ namespace PubnubApi.EndPoint
                         requestState.ResponseType = PNOperationType.Leave;
                         requestState.Reconnect = false;
 
-                        UrlProcessRequest(request, requestState, false).ContinueWith(r=> { }, TaskContinuationOptions.ExecuteSynchronously).Wait(); // connectCallback = null
+                        UrlProcessRequest(request, requestState, false).ContinueWith(r => { }, TaskContinuationOptions.ExecuteSynchronously).Wait(); // connectCallback = null
                     }
 
                     TerminateCurrentSubscriberRequest();
@@ -71,6 +70,15 @@ namespace PubnubApi.EndPoint
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
         }
 
+        public UserId GetCurrentUserId()
+        {
+            UserId ret;
+            if (CurrentUserId.TryGetValue(PubnubInstance.InstanceId, out ret))
+            {
+                return ret;
+            }
+            return ret;
+        }
         public static long TranslateDateTimeToSeconds(DateTime dotNetUTCDateTime)
         {
             TimeSpan timeSpan = dotNetUTCDateTime - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);

@@ -122,7 +122,7 @@ namespace PubnubApi
                             }
                             jsonTxtreader.Close();
                         }
-#if (NET35 || NET40 || NET45 || NET461)
+#if (NET35 || NET40 || NET45 || NET461 || NET48)
                         strReader.Close();
 #endif
                     }
@@ -190,25 +190,25 @@ namespace PubnubApi
             bool ret = false;
             PNPlatform.Print(config, pubnubLog);
 
-#if (NET35 || NET40 || NET45 || NET461)
+#if (NET35 || NET40 || NET45 || NET461 || NET48)
             if (typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(PNMessageResult<>))
             {
                 ret = true;
             }
-            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, NET35/40 IsGenericTypeForMessage = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ret.ToString()), config.LogVerbosity);
-#elif (NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12 || NETSTANDARD13 || NETSTANDARD14 || NETSTANDARD20 || UAP || NETFX_CORE || WINDOWS_UWP)
+            LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, NET35/40 IsGenericTypeForMessage = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ret.ToString()), config.LogVerbosity);
+#elif (NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12 || NETSTANDARD13 || NETSTANDARD14 || NETSTANDARD20 || NET60 || UAP || NETFX_CORE || WINDOWS_UWP)
             if (typeof(T).GetTypeInfo().IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(PNMessageResult<>))
             {
                 ret = true;
             }
-            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, typeof(T).GetTypeInfo().IsGenericType = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), typeof(T).GetTypeInfo().IsGenericType.ToString()), config.LogVerbosity);
+            LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, typeof(T).GetTypeInfo().IsGenericType = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), typeof(T).GetTypeInfo().IsGenericType.ToString()), config.LogVerbosity);
             if (typeof(T).GetTypeInfo().IsGenericType)
             {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, typeof(T).GetGenericTypeDefinition() = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), typeof(T).GetGenericTypeDefinition().ToString()), config.LogVerbosity);
+                LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, typeof(T).GetGenericTypeDefinition() = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), typeof(T).GetGenericTypeDefinition().ToString()), config.LogVerbosity);
             }
-            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, PCL/CORE IsGenericTypeForMessage = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ret.ToString()), config.LogVerbosity);
+            LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, PCL/CORE IsGenericTypeForMessage = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ret.ToString()), config.LogVerbosity);
 #endif
-            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, IsGenericTypeForMessage = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ret.ToString()), config.LogVerbosity);
+            LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, IsGenericTypeForMessage = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ret.ToString()), config.LogVerbosity);
             return ret;
         }
 
@@ -216,7 +216,7 @@ namespace PubnubApi
         {
             T ret = default(T);
 
-#if NET35 || NET40 || NET45 || NET461
+#if NET35 || NET40 || NET45 || NET461 || NET48
             Type dataType = typeof(T).GetGenericArguments()[0];
             Type generic = typeof(PNMessageResult<>);
             Type specific = generic.MakeGenericType(dataType);
@@ -261,7 +261,7 @@ namespace PubnubApi
                 //Set Time
                 PropertyInfo timeProp = specific.GetProperty("Timetoken");
                 long timetoken;
-                Int64.TryParse(listObject[2].ToString(), out timetoken);
+                var _ = Int64.TryParse(listObject[2].ToString(), out timetoken);
                 timeProp.SetValue(message, timetoken, null);
 
                 //Set Publisher
@@ -289,7 +289,7 @@ namespace PubnubApi
 
                 ret = (T)Convert.ChangeType(message, specific, CultureInfo.InvariantCulture);
             }
-#elif NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12 || NETSTANDARD13 || NETSTANDARD14 || NETSTANDARD20 || UAP || NETFX_CORE || WINDOWS_UWP
+#elif NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12 || NETSTANDARD13 || NETSTANDARD14 || NETSTANDARD20 || NET60 || UAP || NETFX_CORE || WINDOWS_UWP
             Type dataType = typeof(T).GetTypeInfo().GenericTypeArguments[0];
             Type generic = typeof(PNMessageResult<>);
             Type specific = generic.MakeGenericType(dataType);
@@ -477,7 +477,7 @@ namespace PubnubApi
                 if (listObject.Count >= 2)
                 {
                     long publishTimetoken;
-                    Int64.TryParse(listObject[2].ToString(), out publishTimetoken);
+                    var _ = Int64.TryParse(listObject[2].ToString(), out publishTimetoken);
                     result = new PNPublishResult
                     {
                         Timetoken = publishTimetoken
@@ -540,7 +540,7 @@ namespace PubnubApi
                         ack.UserMetadata = listObject[1];
                     }
 
-                    if (ack.Event != null && ack.Event.ToLower() == "interval")
+                    if (ack.Event != null && ack.Event.ToLowerInvariant() == "interval")
                     {
                         if (presenceDicObj.ContainsKey("join"))
                         {
@@ -970,7 +970,7 @@ namespace PubnubApi
                     ack.Message = removeChFromCgDicObj["message"].ToString();
                     ack.Service = removeChFromCgDicObj["service"].ToString();
 
-                    ack.Error = Convert.ToBoolean(removeChFromCgDicObj["error"].ToString());
+                    ack.Error = Convert.ToBoolean(removeChFromCgDicObj["error"].ToString(), CultureInfo.InvariantCulture);
 
                     ack.ChannelGroup = listObject[1].ToString();
                 }
@@ -999,7 +999,7 @@ namespace PubnubApi
                     ack.Service = removeCgDicObj["service"].ToString();
                     ack.Message = removeCgDicObj["message"].ToString();
 
-                    ack.Error = Convert.ToBoolean(removeCgDicObj["error"].ToString());
+                    ack.Error = Convert.ToBoolean(removeCgDicObj["error"].ToString(), CultureInfo.InvariantCulture);
                 }
 
                 ret = (T)Convert.ChangeType(ack, typeof(PNChannelGroupsDeleteGroupResult), CultureInfo.InvariantCulture);
@@ -1011,7 +1011,7 @@ namespace PubnubApi
 
                 Int64 timetoken = 0;
 
-                Int64.TryParse(listObject[0].ToString(), out timetoken);
+                var _ = Int64.TryParse(listObject[0].ToString(), out timetoken);
 
                 PNTimeResult result = new PNTimeResult
                 {

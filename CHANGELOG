@@ -1,3 +1,57 @@
+v6.14.0 - February 27 2023
+-----------------------------
+- Modified: undeprecated GrantToken methods/properties.
+
+v6.13.0 - December 05 2022
+-----------------------------
+- Fixed: added null check for PublishFileMessage PNStatus in SendFileOperation.
+- Fixed: removed invalid Content-Type in ObjectsV2 request headers targeting .Net Frameworks.
+
+- Modified: added CultureInfo.InvariantCulture to string formatting.
+
+v6.12.0 - November 14 2022
+-----------------------------
+- Fixed: encode comma char for push related multi channels.
+
+v6.11.0 - November 07 2022
+-----------------------------
+- Modified: added Content-Type to request header to support internal acceptance tests.
+- Modified: added acceptance tests for ObjectsV2 feature.
+
+v6.10.0 - September 06 2022
+-----------------------------
+- Fixed: add Users/Spaces support to PCL versions.
+
+v6.9.0 - August 22 2022
+-----------------------------
+- Fixed: fix Timer reference conflict in net6.0.
+
+v6.8.0 - August 10 2022
+-----------------------------
+- Fixed: fixed Destroy() method when multiple Pubnub instances were in use.
+
+v6.7.0 - July 27 2022
+-----------------------------
+- Modified: added support for Users/Spaces to GrantToken.
+
+v6.6.0 - July 18 2022
+-----------------------------
+- Modified: introduced UserId to PNConfiguration and deprecated UUID.
+- Modified: added build target framework support to .Net Framework 4.8 and .Net 6.0.
+
+v6.5.0 - June 14 2022
+-----------------------------
+- Fixed: suppress web request aborted exception message to callback.
+
+v6.4.0 - May 23 2022
+-----------------------------
+- Fixed: handle PNConfiguration for multi Pubnub instances.
+
+v6.3.0 - March 22 2022
+-----------------------------
+- Fixed: refactor Telemetry Task Result to GetAwaiter().GetResult() .
+- Fixed: removed SILVERLIGHT, WINDOWS_PHONE preprocessor directive code.
+
 v6.2.0 - January 27 2022
 -----------------------------
 - Modified: bumped PeterO.Cbor library version to 4.5.2.

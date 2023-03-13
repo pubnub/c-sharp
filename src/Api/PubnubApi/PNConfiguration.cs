@@ -9,8 +9,13 @@ namespace PubnubApi
     {
         private int presenceHeartbeatTimeout;
         private int presenceHeartbeatInterval;
-        private string uuid = "";
+        private UserId _userId;
+        private bool uuidSetFromConstructor;
 
+        internal void ResetUuidSetFromConstructor()
+        {
+            uuidSetFromConstructor = false;
+        }
         public string Origin { get; set; }
 
         public int PresenceTimeout
@@ -46,21 +51,52 @@ namespace PubnubApi
 
         public string AuthKey { get; set; }
 
+        [Obsolete("Uuid is deprecated, please use UserId instead.")]
         public string Uuid
         {
             get
             {
-                return uuid;
+                return _userId.ToString();
             }
             set
             {
+                if (_userId != null && !uuidSetFromConstructor)
+                {
+                    throw new ArgumentException("Either UserId or Uuid can be used. Not both.");
+                }
+
                 if (value != null && value.Trim().Length > 0)
                 {
-                    uuid = value;
+                    _userId = new UserId(value);
                 }
                 else
                 {
                     throw new ArgumentException("Missing or Incorrect Uuid value");
+                }
+            }
+        }
+
+        public UserId UserId
+        {
+            get
+            {
+                return _userId;
+            }
+            set
+            {
+                if (uuidSetFromConstructor)
+                {
+                    throw new ArgumentException("Either UserId or Uuid can be used. Not both.");
+                }
+
+                if (value != null && !string.IsNullOrEmpty(value.ToString()))
+                {
+                    uuidSetFromConstructor = false;
+                    _userId = value;
+                }
+                else
+                {
+                    throw new ArgumentException("Missing or Incorrect UserId");
                 }
             }
         }
@@ -102,37 +138,50 @@ namespace PubnubApi
         public bool UseRandomInitializationVector { get; set; }
         public int FileMessagePublishRetryLimit { get; set; }
 
-        public bool EnableSubscribeBeta { get; set; }
-
+        [Obsolete("PNConfiguration(string uuid) is deprecated, please use PNConfiguration(UserId userId) instead.")]
         public PNConfiguration(string uuid)
         {
             if (string.IsNullOrEmpty(uuid) || string.IsNullOrEmpty(uuid.Trim()))
             {
                 throw new ArgumentException("Missing or Incorrect uuid value");
             }
-
-            this.Origin = "ps.pndsn.com";
-            this.presenceHeartbeatTimeout = 300;
-            this.NonSubscribeRequestTimeout = 10;
-            this.SubscribeTimeout = 310;
-            this.LogVerbosity = PNLogVerbosity.NONE;
-            this.CipherKey = "";
-            this.PublishKey = "";
-            this.SubscribeKey = "";
-            this.SecretKey = "";
-            this.Secure = true;
-            this.ReconnectionPolicy = PNReconnectionPolicy.NONE;
-            this.HeartbeatNotificationOption = PNHeartbeatNotificationOption.Failures;
-            this.IncludeRequestIdentifier = true;
-            this.IncludeInstanceIdentifier = false;
-            this.DedupOnSubscribe = false;
-            this.MaximumMessagesCacheSize = 100;
-            this.SuppressLeaveEvents = false;
-            this.UseRandomInitializationVector = true;
-            this.FileMessagePublishRetryLimit = 5;
-            this.Uuid = uuid;
+            uuidSetFromConstructor = true;
+            ConstructorInit(new UserId(uuid));
         }
 
+        public PNConfiguration(UserId userId)
+        {
+            if (userId == null || string.IsNullOrEmpty(userId.ToString()))
+            {
+                throw new ArgumentException("Missing or Incorrect UserId");
+            }
+            uuidSetFromConstructor = false;
+            ConstructorInit(userId);
+        }
+
+        private void ConstructorInit(UserId currentUserId) 
+        {
+            Origin = "ps.pndsn.com";
+            presenceHeartbeatTimeout = 300;
+            NonSubscribeRequestTimeout = 10;
+            SubscribeTimeout = 310;
+            LogVerbosity = PNLogVerbosity.NONE;
+            CipherKey = "";
+            PublishKey = "";
+            SubscribeKey = "";
+            SecretKey = "";
+            Secure = true;
+            ReconnectionPolicy = PNReconnectionPolicy.NONE;
+            HeartbeatNotificationOption = PNHeartbeatNotificationOption.Failures;
+            IncludeRequestIdentifier = true;
+            IncludeInstanceIdentifier = false;
+            DedupOnSubscribe = false;
+            MaximumMessagesCacheSize = 100;
+            SuppressLeaveEvents = false;
+            UseRandomInitializationVector = true;
+            FileMessagePublishRetryLimit = 5;
+            _userId = currentUserId;
+        }
         public PNConfiguration SetPresenceTimeoutWithCustomInterval(int timeout, int interval)
         {
             this.presenceHeartbeatTimeout = timeout;

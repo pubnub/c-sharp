@@ -194,15 +194,20 @@ namespace PubnubMessagingExample
             
 
             if (errorFree) {
-                config = new PNConfiguration ();
+                if (!String.IsNullOrWhiteSpace(customUuid.Trim()))
+                {
+                    config.Uuid = customUuid.Trim();
+                }
+                else
+                {
+                    config.Uuid = "myuuid";
+                }
+                config = new PNConfiguration (config.Uuid);
                 config.PublishKey = publishKey;
                 config.SubscribeKey = subscribeKey;
                 config.SecretKey = secretKey;
                 config.CipherKey = cipher;
                 config.Secure = ssl;
-                if (!String.IsNullOrWhiteSpace (customUuid.Trim ())) {
-                    config.Uuid = customUuid.Trim ();
-                }
                 config.AuthKey = authKey;
             } 
             

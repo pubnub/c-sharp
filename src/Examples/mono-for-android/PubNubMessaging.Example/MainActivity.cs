@@ -831,6 +831,12 @@ namespace PubNubMessaging.Example
         {
             this.callback = displayCallback;
         }
+
+        public override void File(Pubnub pubnub, PNFileEventResult fileEvent)
+        {
+            throw new NotImplementedException();
+        }
+
         public override void Message<T> (Pubnub pubnub, PNMessageResult<T> messageResult)
         {
             if (messageResult != null) {
@@ -838,11 +844,26 @@ namespace PubNubMessaging.Example
             }
         }
 
+        public override void MessageAction(Pubnub pubnub, PNMessageActionEventResult messageAction)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void ObjectEvent(Pubnub pubnub, PNObjectEventResult objectEvent)
+        {
+            throw new NotImplementedException();
+        }
+
         public override void Presence (Pubnub pubnub, PNPresenceEventResult presenceResult)
         {
             if (presenceResult != null) {
                 this.callback (pubnub.JsonPluggableLibrary.SerializeToJsonString (presenceResult));
             }
+        }
+
+        public override void Signal<T>(Pubnub pubnub, PNSignalResult<T> signal)
+        {
+            throw new NotImplementedException();
         }
 
         public override void Status (Pubnub pubnub, PNStatus statusObj)

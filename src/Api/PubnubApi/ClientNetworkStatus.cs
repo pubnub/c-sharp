@@ -4,7 +4,7 @@ using System.Net;
 using System.Threading.Tasks;
 using System.IO;
 using System.Globalization;
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
 using System.Net.Http;
 using System.Net.Http.Headers;
 #endif
@@ -20,7 +20,7 @@ namespace PubnubApi
         private static IPubnubLog pubnubLog;
 
         private static bool networkStatus = true;
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
         private static HttpClient httpClient;
 #endif
 
@@ -72,7 +72,7 @@ namespace PubnubApi
             }
         }
 
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
         public static HttpClient RefHttpClient
         {
             set
@@ -140,12 +140,12 @@ namespace PubnubApi
                 catch (AggregateException ae) {
                     foreach (var ie in ae.InnerExceptions)
                     {
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} AggregateException CheckInternetStatus Error: {1} {2} ", DateTime.Now.ToString(CultureInfo.InvariantCulture), ie.GetType().Name, ie.Message), pubnubConfig.LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} AggregateException CheckInternetStatus Error: {1} {2} ", DateTime.Now.ToString(CultureInfo.InvariantCulture), ie.GetType().Name, ie.Message), pubnubConfig.LogVerbosity);
                     }
                 }
                 catch(Exception ex)
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} Exception CheckInternetStatus Error: {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex.Message), pubnubConfig.LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} Exception CheckInternetStatus Error: {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex.Message), pubnubConfig.LogVerbosity);
                 }
 
                 return networkStatus;
@@ -171,7 +171,7 @@ namespace PubnubApi
             {
                 if (isInternetCheckRunning)
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} InternetCheckRunning Already running", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} InternetCheckRunning Already running", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
                     return networkStatus;
                 }
             }
@@ -193,7 +193,7 @@ namespace PubnubApi
             {
                 isInternetCheckRunning = true;
             }
-            LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} CheckSocketConnect Entered", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+            LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} CheckSocketConnect Entered", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
 
             Action<bool> internalCallback = null;
             PNCallback<T> pubnubCallback = null;
@@ -221,7 +221,7 @@ namespace PubnubApi
                 }
                 else
                 {
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
                     if (pubnubConfig.UseTaskFactoryAsyncInsteadOfHttpClient)
                     {
                         gotTimeResp = await GetTimeWithTaskFactoryAsync(requestUri).ConfigureAwait(false);
@@ -240,7 +240,7 @@ namespace PubnubApi
             catch (Exception ex)
             {
                 networkStatus = false;
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} CheckSocketConnect (HttpClient Or Task.Factory) Failed {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex.Message), pubnubConfig.LogVerbosity);
+                LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} CheckSocketConnect (HttpClient Or Task.Factory) Failed {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex.Message), pubnubConfig.LogVerbosity);
                 if (!networkStatus)
                 {
                     t.TrySetResult(false);
@@ -267,11 +267,11 @@ namespace PubnubApi
                 callback.OnResponse(default(T), status);
             }
 
-			LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} ParseCheckSocketConnectException Error. {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex.Message), pubnubConfig.LogVerbosity);
+			LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} ParseCheckSocketConnectException Error. {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex.Message), pubnubConfig.LogVerbosity);
 			internalcallback(false);
 		}
 
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NETSTANDARD10
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
         private static async Task<bool> GetTimeWithHttpClient(Uri requestUri)
         {
             bool successFlag = false;
@@ -281,11 +281,11 @@ namespace PubnubApi
                 successFlag = response.IsSuccessStatusCode;
                 if (successFlag)
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} GetTimeWithHttpClient Resp OK", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} GetTimeWithHttpClient Resp OK", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
                 }
                 else
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} GetTimeWithHttpClient FAILED", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} GetTimeWithHttpClient FAILED", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
                 }
             }
             finally
@@ -307,12 +307,12 @@ namespace PubnubApi
                 {
                     if (response != null)
                     {
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} GetTimeWithTaskFactoryAsync Resp {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), response.StatusCode.ToString()), pubnubConfig.LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} GetTimeWithTaskFactoryAsync Resp {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), response.StatusCode.ToString()), pubnubConfig.LogVerbosity);
                         successFlag = response.StatusCode == HttpStatusCode.OK;
                     }
                     else
                     {
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} GetTimeWithTaskFactoryAsync FAILED.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} GetTimeWithTaskFactoryAsync FAILED.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
                     }
                 }
             }
@@ -347,7 +347,7 @@ namespace PubnubApi
                                 }
                                 if (asyncRequestState.Response != null)
                                 {
-#if NET35 || NET40 || NET45 || NET461
+#if NET35 || NET40 || NET45 || NET461 || NET48
                                     pubnubRequestState.Response.Close();
 #endif
                                     asyncRequestState.Response = null;
@@ -357,7 +357,7 @@ namespace PubnubApi
                         }
                         ), pubnubRequestState);
 
-                new Timer(OnPubnubWebRequestTimeout<T>, pubnubRequestState, pubnubConfig.NonSubscribeRequestTimeout * 1000, Timeout.Infinite);
+                var _ = new Timer(OnPubnubWebRequestTimeout<T>, pubnubRequestState, pubnubConfig.NonSubscribeRequestTimeout * 1000, Timeout.Infinite);
             }
             finally
             {
@@ -383,7 +383,7 @@ namespace PubnubApi
                 }
                 catch {  /* ignore */ }
 
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime: {0}, GetTimeWithClassicHttp timedout", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+                LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, GetTimeWithClassicHttp timedout", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
             }
         }
     }

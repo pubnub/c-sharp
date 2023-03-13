@@ -10,14 +10,14 @@ namespace PubnubApi
     {
         private readonly string cipherKey;
         private readonly PNConfiguration config;
-        protected PubnubCryptoBase(string cipher_key, PNConfiguration pubnubConfig)
+        protected PubnubCryptoBase(string cipherKey, PNConfiguration pubnubConfig)
         {
-            this.cipherKey = cipher_key;
+            this.cipherKey = cipherKey;
             this.config = pubnubConfig;
         }
-        protected PubnubCryptoBase(string cipher_key)
+        protected PubnubCryptoBase(string cipherKey)
         {
-            this.cipherKey = cipher_key;
+            this.cipherKey = cipherKey;
             this.config = null;
         }
 
@@ -62,21 +62,21 @@ namespace PubnubApi
         // encrypt string
         public string Encrypt(string plainText)
         {
-            if (plainText == null || plainText.Length <= 0) { throw new ArgumentNullException("plainText"); }
+            if (plainText == null || plainText.Length <= 0) { throw new ArgumentNullException(nameof(plainText)); }
             bool dynamicIV = (config != null && config.UseRandomInitializationVector);
             return EncryptOrDecrypt(true, plainText, dynamicIV);
         }
 
         public byte[] Encrypt(byte[] plainBytes)
         {
-            if (plainBytes == null || plainBytes.Length <= 0) { throw new ArgumentNullException("plainBytes"); }
+            if (plainBytes == null || plainBytes.Length <= 0) { throw new ArgumentNullException(nameof(plainBytes)); }
             bool dynamicIV = (config != null && config.UseRandomInitializationVector);
             return EncryptOrDecrypt(true, plainBytes, dynamicIV);
         }
 
         public byte[] Encrypt(byte[] plainBytes, bool file)
         {
-            if (plainBytes == null || plainBytes.Length <= 0) { throw new ArgumentNullException("plainBytes"); }
+            if (plainBytes == null || plainBytes.Length <= 0) { throw new ArgumentNullException(nameof(plainBytes)); }
             bool dynamicIV = file || (config != null && config.UseRandomInitializationVector);
             return EncryptOrDecrypt(true, plainBytes, dynamicIV);
         }
@@ -84,21 +84,21 @@ namespace PubnubApi
         // decrypt string
         public string Decrypt(string cipherText)
         {
-            if (cipherText == null) { throw new ArgumentNullException("cipherText"); }
+            if (cipherText == null) { throw new ArgumentNullException(nameof(cipherText)); }
             bool dynamicIV = (config != null && config.UseRandomInitializationVector);
             return EncryptOrDecrypt(false, cipherText, dynamicIV);
         }
 
         public byte[] Decrypt(byte[] cipherBytes)
         {
-            if (cipherBytes == null) { throw new ArgumentNullException("cipherBytes"); }
+            if (cipherBytes == null) { throw new ArgumentNullException(nameof(cipherBytes)); }
             bool dynamicIV = (config != null && config.UseRandomInitializationVector);
             return EncryptOrDecrypt(false, cipherBytes, dynamicIV);
         }
 
         public byte[] Decrypt(byte[] cipherBytes, bool file)
         {
-            if (cipherBytes == null) { throw new ArgumentNullException("cipherBytes"); }
+            if (cipherBytes == null) { throw new ArgumentNullException(nameof(cipherBytes)); }
             bool dynamicIV = file || (config != null && config.UseRandomInitializationVector);
             return EncryptOrDecrypt(false, cipherBytes, dynamicIV);
         }
@@ -114,7 +114,7 @@ namespace PubnubApi
                 value,
                 @"\\u(?<Value>[a-zA-Z0-9]{4})",
                 m => {
-                    return ((char)int.Parse(m.Groups["Value"].Value, NumberStyles.HexNumber)).ToString();
+                    return ((char)int.Parse(m.Groups["Value"].Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture)).ToString();
                 }
             );
         }
@@ -136,7 +136,7 @@ namespace PubnubApi
                 if (c > 127)
                 {
                     // This character is too big for ASCII
-                    string encodedValue = "\\u" + ((int)c).ToString("x4");
+                    string encodedValue = "\\u" + ((int)c).ToString("x4", CultureInfo.InvariantCulture);
                     sb.Append(encodedValue);
                 }
                 else

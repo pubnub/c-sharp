@@ -73,7 +73,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -96,7 +96,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("ttl", "5")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithParameter("w", "1")
                     .WithParameter("signature", "V6C3eRs_YSP7njOW1f9xAFpmCx5do_7D3oUGXxDClXw=")
                     .WithResponse(expected)
@@ -134,7 +134,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -157,7 +157,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("ttl", "5")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithParameter("w", "1")
                     .WithParameter("signature", "V6C3eRs_YSP7njOW1f9xAFpmCx5do_7D3oUGXxDClXw=")
                     .WithResponse(expected)
@@ -201,7 +201,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -224,7 +224,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("ttl", "5")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithParameter("w", "0")
                     .WithParameter("signature", "ViiLvN22MUr36vgEINkwrLTa2kMOH9ztmM4Dg-bqoaE=")
                     .WithResponse(expected)
@@ -262,7 +262,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -285,7 +285,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("ttl", "5")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithParameter("w", "0")
                     .WithParameter("signature", "ViiLvN22MUr36vgEINkwrLTa2kMOH9ztmM4Dg-bqoaE=")
                     .WithResponse(expected)
@@ -329,7 +329,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -352,7 +352,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("ttl", "5")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithParameter("w", "1")
                     .WithParameter("signature", "qIMvcoTYVOIhZ4oaVJtv_jcb4n_1YGtRwmxotAVI2eQ=")
                     .WithResponse(expected)
@@ -387,7 +387,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -417,7 +417,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("ttl", "5")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithParameter("w", "1")
                     .WithParameter("signature", "aRUz_KM2JmPWMoblHezJsSJCrIjZcjhTy0UYTi_Nru0=")
                     .WithResponse(expected)
@@ -451,7 +451,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -483,7 +483,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("ttl", "5")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithParameter("w", "1")
                     .WithParameter("signature", "9_2ZxQiQeXroQqt3x728ebRN6f4hMPk7QtebCKSZl7Q=")
                     .WithResponse(expected)
@@ -518,7 +518,7 @@ namespace PubNubMessaging.Tests
             receivedGrantMessage = false;
             receivedRevokeMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -542,7 +542,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("ttl", "5")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithParameter("w", "1")
                     .WithParameter("signature", "V6C3eRs_YSP7njOW1f9xAFpmCx5do_7D3oUGXxDClXw=")
                     .WithResponse(expectedGrant)
@@ -558,7 +558,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("ttl", "0")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithParameter("w", "0")
                     .WithParameter("signature", "MJVPMrBFTV7jo8jMp_DSn9OhIi8aikd7wru8x0sz3io=")
                     .WithResponse(expectedRevoke)
@@ -603,7 +603,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -626,7 +626,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("ttl", "5")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithParameter("w", "1")
                     .WithParameter("signature", "9TH9YpQydj1FaCJVoHqaL9YbPOEOhpVVv17FMrrz89U=")
                     .WithResponse(expected)
@@ -660,7 +660,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -683,7 +683,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("ttl", "5")
-                    .WithParameter("uuid", config.Uuid)
+                    .WithParameter("uuid", config.UserId)
                     .WithParameter("w", "0")
                     .WithParameter("signature", "wrMx4t1Zh-2h_gIXQFJsKbTKsSHAIr8dK0Rn9KNrqp0=")
                     .WithResponse(expected)
@@ -717,7 +717,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -763,7 +763,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -814,7 +814,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -865,7 +865,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -916,7 +916,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -933,12 +933,10 @@ namespace PubNubMessaging.Tests
                 pubnub.GrantToken()
                     .Resources(new PNTokenResources() 
                         { 
-                            Channels=new Dictionary<string, PNTokenAuthValues>() {
-                                            { "ch1", new PNTokenAuthValues() { Read = true, Write = true, Manage= true, Create = true, Delete=true, Get = true, Update = true, Join = true } } },
-                            ChannelGroups = new Dictionary<string, PNTokenAuthValues>() {
-                                            { "cg1", new PNTokenAuthValues() { Read = true, Write = true, Manage= true, Create = true, Delete=true, Get = true, Update = true, Join = true } } },
-                            Uuids = new Dictionary<string, PNTokenAuthValues>() {
-                                            { "uuid1", new PNTokenAuthValues() { Read = true, Write = true, Manage= true, Create = true, Delete=true, Get = true, Update = true, Join = true } } },
+                            Spaces=new Dictionary<string, PNTokenAuthValues>() {
+                                            { "spc1", new PNTokenAuthValues() { Read = true, Write = true, Manage= true, Create = true, Delete=true, Get = true, Update = true, Join = true } } },
+                            Users = new Dictionary<string, PNTokenAuthValues>() {
+                                            { "usr1", new PNTokenAuthValues() { Read = true, Write = true, Manage= true, Create = true, Delete=true, Get = true, Update = true, Join = true } } },
                     }
                     )
                     .TTL(10)
@@ -981,7 +979,7 @@ namespace PubNubMessaging.Tests
 
             receivedGrantMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -992,21 +990,36 @@ namespace PubNubMessaging.Tests
             server.RunOnHttps(config.Secure);
 
 #if NET40
-#else
-            PNResult<PNAccessManagerTokenResult> result = await pubnub.GrantToken()
+            PNResult<PNAccessManagerTokenResult> grantResponse = Task.Factory.StartNew(async () => await pubnub.GrantToken()
                     .Resources(new PNTokenResources()
                     {
-                        Channels = new Dictionary<string, PNTokenAuthValues>() {
-                                            { "ch1", new PNTokenAuthValues() { Read = true, Write = true, Manage= true, Create = true, Delete=true, Get = true, Update = true, Join = true } } },
-                        ChannelGroups = new Dictionary<string, PNTokenAuthValues>() {
-                                            { "cg1", new PNTokenAuthValues() { Read = true, Write = true, Manage= true, Create = true, Delete=true, Get = true, Update = true, Join = true } } },
-                        Uuids = new Dictionary<string, PNTokenAuthValues>() {
-                                            { "uuid1", new PNTokenAuthValues() { Read = true, Write = true, Manage= true, Create = true, Delete=true, Get = true, Update = true, Join = true } } },
+                        Spaces = new Dictionary<string, PNTokenAuthValues>() {
+                                            { "spc1", new PNTokenAuthValues() { Read = true, Write = true, Manage= true, Create = true, Delete=true, Get = true, Update = true, Join = true } } },
+                        Users = new Dictionary<string, PNTokenAuthValues>() {
+                                            { "usr1", new PNTokenAuthValues() { Read = true, Write = true, Manage= true, Create = true, Delete=true, Get = true, Update = true, Join = true } } },
+                    }
+                    )
+                .TTL(10)
+                .ExecuteAsync()).Result.Result;
+
+#else
+            PNResult<PNAccessManagerTokenResult> grantResponse = await pubnub.GrantToken()
+                    .Resources(new PNTokenResources()
+                    {
+                        Spaces = new Dictionary<string, PNTokenAuthValues>() {
+                                            { "spc1", new PNTokenAuthValues() { Read = true, Write = true, Manage= true, Create = true, Delete=true, Get = true, Update = true, Join = true } } },
+                        Users = new Dictionary<string, PNTokenAuthValues>() {
+                                            { "usr1", new PNTokenAuthValues() { Read = true, Write = true, Manage= true, Create = true, Delete=true, Get = true, Update = true, Join = true } } },
                     }
                     )
                 .TTL(10)
                 .ExecuteAsync();
 #endif
+            if (grantResponse.Result != null && !grantResponse.Status.Error)
+            {
+                receivedGrantMessage = true;
+            }
+            Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenWithAsyncGrantTokenShouldReturnSuccess failed.");
 
         }
 
@@ -1019,7 +1032,7 @@ namespace PubNubMessaging.Tests
 
             receivedRevokeMessage = false;
 
-            PNConfiguration config = new PNConfiguration("mytestuuid")
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -1032,7 +1045,7 @@ namespace PubNubMessaging.Tests
 
             try
             {
-                PNResult<PNAccessManagerTokenResult> grantResult = pubnub.GrantToken().TTL(5).Resources(new PNTokenResources() { Channels = new Dictionary<string, PNTokenAuthValues>() { { "ch1", new PNTokenAuthValues() { Read = true } } } }).ExecuteAsync().Result;
+                PNResult<PNAccessManagerTokenResult> grantResult = pubnub.GrantToken().TTL(5).Resources(new PNTokenResources() { Spaces = new Dictionary<string, PNTokenAuthValues>() { { "spc1", new PNTokenAuthValues() { Read = true } } } }).ExecuteAsync().Result;
                 if (grantResult.Result != null && !string.IsNullOrEmpty(grantResult.Result.Token))
                 {
                     revokeManualEvent = new ManualResetEvent(false);
@@ -1065,6 +1078,116 @@ namespace PubNubMessaging.Tests
 
         }
 
+        [Test]
+        public static void ThenSetAuthorizedUserFailsWhenAuthorizedUuidIsUsed()
+        {
+            server.ClearRequests();
+
+            PNConfiguration config = new PNConfiguration(new UserId("newuserid"))
+            {
+                SubscribeKey = "somesubkey",
+                PublishKey = "somepubkey",
+                SecretKey = "someseckey",
+                Secure = false
+            };
+            pubnub = createPubNubInstance(config);
+            server.RunOnHttps(config.Secure);
+
+            Assert.Throws<ArgumentException>(() =>
+            {
+                PNResult<PNAccessManagerTokenResult> grantResult = pubnub.GrantToken()
+                .AuthorizedUuid("someuuid")
+                .AuthorizedUserId(new UserId("someuser"))
+                .ExecuteAsync().Result;
+            });
+        }
+
+        [Test]
+        public static void ThenSetAuthorizedUuidFailsWhenAuthorizedUserIsUsed()
+        {
+            server.ClearRequests();
+
+            PNConfiguration config = new PNConfiguration(new UserId("newuserid"))
+            {
+                SubscribeKey = "somesubkey",
+                PublishKey = "somepubkey",
+                SecretKey = "someseckey",
+                Secure = false
+            };
+            pubnub = createPubNubInstance(config);
+            server.RunOnHttps(config.Secure);
+
+            Assert.Throws<ArgumentException>(() =>
+            {
+                PNResult<PNAccessManagerTokenResult> grantResult = pubnub.GrantToken()
+                .AuthorizedUserId(new UserId("someuser"))
+                .AuthorizedUuid("someuuid")
+                .ExecuteAsync().Result;
+            });
+        }
+
+        [Test]
+        public static void ThenSetChannelPermsFailsWhenSpacePermsIsUsed()
+        {
+            server.ClearRequests();
+
+            PNConfiguration config = new PNConfiguration(new UserId("newuserid"))
+            {
+                SubscribeKey = "somesubkey",
+                PublishKey = "somepubkey",
+                SecretKey = "someseckey",
+                Secure = false
+            };
+            pubnub = createPubNubInstance(config);
+            server.RunOnHttps(config.Secure);
+
+            Assert.Throws<ArgumentException>(() =>
+            {
+                PNResult<PNAccessManagerTokenResult> grantResult = 
+                pubnub.GrantToken()
+                .TTL(5)
+                .Resources(new PNTokenResources() { 
+                            Spaces = new Dictionary<string, PNTokenAuthValues>() { 
+                                { "sp1", new PNTokenAuthValues() { Read = true } } 
+                            },
+                            Channels = new Dictionary<string, PNTokenAuthValues>() {
+                                { "ch1", new PNTokenAuthValues() { Read = true } }
+                            }
+                }).ExecuteAsync().Result;
+            });
+        }
+
+        [Test]
+        public static void ThenSetSpacePermsFailsWhenChannelPermsIsUsed()
+        {
+            server.ClearRequests();
+
+            PNConfiguration config = new PNConfiguration(new UserId("newuserid"))
+            {
+                SubscribeKey = "somesubkey",
+                PublishKey = "somepubkey",
+                SecretKey = "someseckey",
+                Secure = false
+            };
+            pubnub = createPubNubInstance(config);
+            server.RunOnHttps(config.Secure);
+
+            Assert.Throws<ArgumentException>(() =>
+            {
+                PNResult<PNAccessManagerTokenResult> grantResult =
+                pubnub.GrantToken()
+                .TTL(5)
+                .Resources(new PNTokenResources()
+                {
+                    Channels = new Dictionary<string, PNTokenAuthValues>() {
+                                { "ch1", new PNTokenAuthValues() { Read = true } }
+                            },
+                    Spaces = new Dictionary<string, PNTokenAuthValues>() {
+                                { "sp1", new PNTokenAuthValues() { Read = true } }
+                            }
+                }).ExecuteAsync().Result;
+            });
+        }
 
         public static byte[] HexStringToByteArray(string hex)
         {

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.0;netstandard1.3;netstandard1.4;netstandard1.1;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard1.0;netstandard1.3;netstandard1.4;netstandard1.1;netstandard2.0;net6.0</TargetFrameworks>
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>pubnub.snk</AssemblyOriginatorKeyFile>
@@ -14,7 +14,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubPCL</PackageId>
-    <PackageVersion>6.2.0.0</PackageVersion>
+    <PackageVersion>6.14.0.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -22,7 +22,7 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>Bumped PeterO.Cbor library version to 4.5.2.</PackageReleaseNotes>
+    <PackageReleaseNotes>Undeprecated GrantToken methods/properties.</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
@@ -145,8 +145,6 @@
     </Compile>
     <Compile Include="..\PubnubApi\EndPoint\PubSub\RemoveMessageActionOperation.cs" Link="EndPoint\PubSub\RemoveMessageActionOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\PubSub\SignalOperation.cs" Link="EndPoint\PubSub\SignalOperation.cs" />
-    <Compile Include="..\PubnubApi\EndPoint\PubSub\StatelessSubscribe.cs" Link="EndPoint\PubSub\StatelessSubscribe.cs" />
-    <Compile Include="..\PubnubApi\EndPoint\PubSub\StatelessSubscribeManager.cs" Link="EndPoint\PubSub\StatelessSubscribeManager.cs" />
     <Compile Include="..\PubnubApi\EndPoint\PubSub\SubscribeManager.cs">
       <Link>EndPoint\PubSub\SubscribeManager.cs</Link>
     </Compile>
@@ -234,7 +232,6 @@
     <Compile Include="..\PubnubApi\Interface\IPubnubUnitTest.cs">
       <Link>Interface\IPubnubUnitTest.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\Interface\IStatelessPubnubHttp.cs" Link="Interface\IStatelessPubnubHttp.cs" />
     <Compile Include="..\PubnubApi\Interface\IUrlRequestBuilder.cs">
       <Link>Interface\IUrlRequestBuilder.cs</Link>
     </Compile>
@@ -392,6 +389,7 @@
     <Compile Include="..\PubnubApi\Model\Consumer\Push\PNPushRemoveChannelResult.cs">
       <Link>Model\Consumer\Push\PNPushRemoveChannelResult.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\UserId.cs" Link="Model\Consumer\UserId.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\AccessManager\PNAccessManagerAuditResultExt.cs">
       <Link>Model\Derived\AccessManager\PNAccessManagerAuditResultExt.cs</Link>
     </Compile>
@@ -545,8 +543,6 @@
     <Compile Include="..\PubnubApi\Security\SecureMessage.cs">
       <Link>Security\SecureMessage.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\Stateless_PubnubCoreBase.cs" Link="Stateless_PubnubCoreBase.cs" />
-    <Compile Include="..\PubnubApi\Stateless_PubnubHttp.cs" Link="Stateless_PubnubHttp.cs" />
     <Compile Include="..\PubnubApi\Timer.cs">
       <Link>Timer.cs</Link>
     </Compile>
@@ -572,6 +568,10 @@
     <DefineConstants>$(DefineConstants);NETSTANDARD20</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
+    <DefineConstants>$(DefineConstants);NET60</DefineConstants>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard1.0|AnyCPU'">
     <NoWarn>1701;1702;</NoWarn>
   </PropertyGroup>
@@ -584,23 +584,16 @@
     <None Include="..\PubnubApi\LICENSE.txt" Link="LICENSE.txt" Pack="true" PackagePath="" />
   </ItemGroup>
 
-
-  <ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
+    <Reference Include="System.Runtime" />
     <PackageReference Include="NETStandard.Library" Version="1.6.1">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.1">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="PeterO.Cbor" Version="4.5.2" />
     <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.0" />
-    <Reference Include="System.Runtime" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-  </ItemGroup>
-  
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
     <PackageReference Include="System.Net.Requests" Version="4.0.11">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
@@ -631,6 +624,15 @@
   </ItemGroup>
   
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
+    <Reference Include="System.Runtime" />
+    <PackageReference Include="NETStandard.Library" Version="1.6.1">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.1">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="PeterO.Cbor" Version="4.5.2" />
+    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.0" />
     <PackageReference Include="System.Net.Requests" Version="4.0.11">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
@@ -646,6 +648,15 @@
   </ItemGroup>
   
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
+    <Reference Include="System.Runtime" />
+    <PackageReference Include="NETStandard.Library" Version="1.6.1">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.1">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="PeterO.Cbor" Version="4.5.2" />
+    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.0" />
     <PackageReference Include="System.Net.Requests" Version="4.0.11">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
@@ -694,6 +705,15 @@
   </ItemGroup>-->
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.4' ">
+    <Reference Include="System.Runtime" />
+    <PackageReference Include="NETStandard.Library" Version="1.6.1">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.1">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="PeterO.Cbor" Version="4.5.2" />
+    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.0" />
     <PackageReference Include="System.Net.Requests" Version="4.0.11">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
@@ -730,9 +750,15 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <PackageReference Include="NetStandard.Library" Version="2.0.0.0">
+    <Reference Include="System.Runtime" />
+    <PackageReference Include="NETStandard.Library" Version="1.6.1">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.1">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="PeterO.Cbor" Version="4.5.2" />
+    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.0" />
     <PackageReference Include="System.Net.Requests" Version="4.0.11">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
@@ -767,6 +793,61 @@
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
   </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
+    <Reference Include="System.Runtime" />
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.1">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="PeterO.Cbor" Version="4.5.2" />
+    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.0" />
+    <PackageReference Include="System.Net.Requests" Version="4.0.11">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Reflection.Primitives" Version="4.3.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.3.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Threading.ThreadPool" Version="4.0.10">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Threading.Timer" Version="4.3.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Threading.Thread" Version="4.0.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Linq.Queryable" Version="4.0.1">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Text.Encoding" Version="4.3.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Text.Encoding.Extensions" Version="4.3.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Net.Http" Version="4.3.4">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Net.Primitives" Version="4.3.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.IO" Version="4.3.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.IO.FileSystem" Version="4.3.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.IO.FileSystem.Primitives" Version="4.3.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.ValueTuple" Version="4.4.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
   <ItemGroup>
     <Folder Include="Builder\" />
     <Folder Include="Callbacks\" />

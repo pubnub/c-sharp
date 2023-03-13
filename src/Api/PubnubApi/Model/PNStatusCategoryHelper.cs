@@ -23,8 +23,8 @@ namespace PubnubApi
                     ret = PNStatusCategory.PNNetworkIssuesCategory;
                     break;
                 default:
-                    if (string.Compare(webExceptionStatus.ToString(), "SecureChannelFailure", StringComparison.CurrentCultureIgnoreCase) == 0 
-                        || string.Compare(webExceptionStatus.ToString(),"NameResolutionFailure", StringComparison.CurrentCultureIgnoreCase) == 0)
+                    if (string.Equals(webExceptionStatus.ToString(), "SecureChannelFailure", StringComparison.OrdinalIgnoreCase) 
+                        || string.Equals(webExceptionStatus.ToString(),"NameResolutionFailure", StringComparison.OrdinalIgnoreCase))
                     {
                         ret = PNStatusCategory.PNNetworkIssuesCategory;
                     }

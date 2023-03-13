@@ -5,8 +5,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Collections;
 using System.Reflection;
-#if DEBUG && NET461
-#endif
 using Newtonsoft.Json;
 using PeterO.Cbor;
 using System.Globalization;
@@ -72,11 +70,11 @@ namespace PubnubApi.EndPoint
                 {
                     string refinedToken = token.Replace('_', '/').Replace('-', '+');
                     byte[] tokenByteArray = Convert.FromBase64String(refinedToken);
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0} Token Bytes = {1}", DateTime.Now.ToString(System.Globalization.CultureInfo.InvariantCulture), GetDisplayableBytes(tokenByteArray)), PNLogVerbosity.BODY);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} Token Bytes = {1}", DateTime.Now.ToString(System.Globalization.CultureInfo.InvariantCulture), GetDisplayableBytes(tokenByteArray)), PNLogVerbosity.BODY);
                     using (System.IO.MemoryStream ms = new System.IO.MemoryStream(tokenByteArray))
                     {
                         CBORObject cborObj = CBORObject.DecodeFromBytes(tokenByteArray);
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, RAW CBOR {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), cborObj.ToJSONString()), (pubnubConfig != null) ? pubnubConfig.LogVerbosity : PNLogVerbosity.NONE);
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, RAW CBOR {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), cborObj.ToJSONString()), (pubnubConfig != null) ? pubnubConfig.LogVerbosity : PNLogVerbosity.NONE);
 
                         if (cborObj != null)
                         {
@@ -120,7 +118,7 @@ namespace PubnubApi.EndPoint
         {
             foreach (KeyValuePair<CBORObject, CBORObject> kvp in cbor.Entries)
             {
-                if (kvp.Key.Type.ToString().Equals("ByteString"))
+                if (kvp.Key.Type.ToString().Equals("ByteString", StringComparison.OrdinalIgnoreCase))
                 {
 #if NETSTANDARD10 || NETSTANDARD11
                     UTF8Encoding utf8 = new UTF8Encoding(true, true);
@@ -131,14 +129,14 @@ namespace PubnubApi.EndPoint
 #endif
                     ParseCBORValue(key, parent, kvp, ref pnGrantTokenDecoded);
                 }
-                else if (kvp.Key.Type.ToString().Equals("TextString"))
+                else if (kvp.Key.Type.ToString().Equals("TextString", StringComparison.OrdinalIgnoreCase))
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TextString Key {1}-{2}-{3}", DateTime.Now.ToString(CultureInfo.InvariantCulture), kvp.Key.ToString(), kvp.Value.ToString(), kvp.Value.Type), (pubnubConfig != null) ? pubnubConfig.LogVerbosity : PNLogVerbosity.NONE);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, TextString Key {1}-{2}-{3}", DateTime.Now.ToString(CultureInfo.InvariantCulture), kvp.Key.ToString(), kvp.Value.ToString(), kvp.Value.Type), (pubnubConfig != null) ? pubnubConfig.LogVerbosity : PNLogVerbosity.NONE);
                     ParseCBORValue(kvp.Key.ToString(), parent, kvp, ref pnGrantTokenDecoded);
                 }
                 else
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Others Key {1}-{2}-{3}-{4}", DateTime.Now.ToString(CultureInfo.InvariantCulture), kvp.Key, kvp.Key.Type, kvp.Value, kvp.Value.Type), (pubnubConfig != null) ? pubnubConfig.LogVerbosity : PNLogVerbosity.NONE);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, Others Key {1}-{2}-{3}-{4}", DateTime.Now.ToString(CultureInfo.InvariantCulture), kvp.Key, kvp.Key.Type, kvp.Value, kvp.Value.Type), (pubnubConfig != null) ? pubnubConfig.LogVerbosity : PNLogVerbosity.NONE);
                 }
 
             }
@@ -146,13 +144,13 @@ namespace PubnubApi.EndPoint
 
         private void ParseCBORValue(string key, string parent, KeyValuePair<CBORObject, CBORObject> kvp, ref PNTokenContent pnGrantTokenDecoded)
         {
-            if (kvp.Value.Type.ToString().Equals("Map"))
+            if (kvp.Value.Type.ToString().Equals("Map", StringComparison.OrdinalIgnoreCase))
             {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Map Key {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), key), (pubnubConfig != null) ? pubnubConfig.LogVerbosity : PNLogVerbosity.NONE);
-                var p = string.Format("{0}{1}{2}", parent, string.IsNullOrEmpty(parent) ? "" : ":", key);
+                LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, Map Key {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), key), (pubnubConfig != null) ? pubnubConfig.LogVerbosity : PNLogVerbosity.NONE);
+                var p = string.Format(CultureInfo.InvariantCulture, "{0}{1}{2}", parent, string.IsNullOrEmpty(parent) ? "" : ":", key);
                 ParseCBOR(kvp.Value, p, ref pnGrantTokenDecoded);
             }
-            else if (kvp.Value.Type.ToString().Equals("ByteString"))
+            else if (kvp.Value.Type.ToString().Equals("ByteString", StringComparison.OrdinalIgnoreCase))
             {
 #if NETSTANDARD10 || NETSTANDARD11
                     UTF8Encoding utf8 = new UTF8Encoding(true, true);
@@ -161,30 +159,30 @@ namespace PubnubApi.EndPoint
 #else
                 string val = System.Text.Encoding.ASCII.GetString(kvp.Value.GetByteString());
 #endif
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, ByteString Value {1}-{2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), key, val), (pubnubConfig != null) ? pubnubConfig.LogVerbosity : PNLogVerbosity.NONE);
+                LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, ByteString Value {1}-{2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), key, val), (pubnubConfig != null) ? pubnubConfig.LogVerbosity : PNLogVerbosity.NONE);
                 FillGrantToken(parent, key, kvp.Value, typeof(string), ref pnGrantTokenDecoded);
             }
-            else if (kvp.Value.Type.ToString().Equals("Integer"))
+            else if (kvp.Value.Type.ToString().Equals("Integer", StringComparison.OrdinalIgnoreCase))
             {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Integer Value {1}-{2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), key, kvp.Value), (pubnubConfig != null) ? pubnubConfig.LogVerbosity : PNLogVerbosity.NONE);
+                LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, Integer Value {1}-{2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), key, kvp.Value), (pubnubConfig != null) ? pubnubConfig.LogVerbosity : PNLogVerbosity.NONE);
                 FillGrantToken(parent, key, kvp.Value, typeof(int), ref pnGrantTokenDecoded);
             }
-            else if (kvp.Value.Type.ToString().Equals("TextString"))
+            else if (kvp.Value.Type.ToString().Equals("TextString", StringComparison.OrdinalIgnoreCase))
             {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, TextString Value {1}-{2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), key, kvp.Value), (pubnubConfig != null) ? pubnubConfig.LogVerbosity : PNLogVerbosity.NONE);
+                LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, TextString Value {1}-{2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), key, kvp.Value), (pubnubConfig != null) ? pubnubConfig.LogVerbosity : PNLogVerbosity.NONE);
                 FillGrantToken(parent, key, kvp.Value, typeof(string), ref pnGrantTokenDecoded);
             }
             else
             {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format("DateTime {0}, Others Key Value {1}-{2}-{3}-{4}", DateTime.Now.ToString(CultureInfo.InvariantCulture), kvp.Key.Type, kvp.Value.Type, key, kvp.Value), (pubnubConfig != null) ? pubnubConfig.LogVerbosity : PNLogVerbosity.NONE);
+                LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, Others Key Value {1}-{2}-{3}-{4}", DateTime.Now.ToString(CultureInfo.InvariantCulture), kvp.Key.Type, kvp.Value.Type, key, kvp.Value), (pubnubConfig != null) ? pubnubConfig.LogVerbosity : PNLogVerbosity.NONE);
             }
         }
 
         private string ReplaceBoundaryQuotes(string key)
         {
             if (key != null && !string.IsNullOrEmpty(key) && key.Length >= 2 
-                && key.Substring(0, 1).CompareTo("\"") == 0
-                && key.Substring(key.Length - 1, 1).CompareTo("\"") == 0)
+                && string.Equals(key.Substring(0, 1), "\"", StringComparison.OrdinalIgnoreCase)
+                && string.Equals(key.Substring(key.Length - 1, 1), "\"", StringComparison.OrdinalIgnoreCase))
             {
                 key = key.Remove(key.Length - 1, 1).Remove(0, 1);
                 key = Regex.Unescape(key);

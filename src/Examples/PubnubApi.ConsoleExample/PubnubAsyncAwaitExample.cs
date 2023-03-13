@@ -384,7 +384,7 @@ namespace PubnubApiAsyncAwaitDemo
                     menuOptionsStringBuilder.AppendLine("Enter 14 TO Set User State by Deleting existing Key-Pair");
                     menuOptionsStringBuilder.AppendLine("Enter 15 TO Get User State");
                     menuOptionsStringBuilder.AppendLine("Enter 16 FOR WhereNow");
-                    menuOptionsStringBuilder.AppendLine(string.Format("Enter 17 TO change UUID. (Current value = {0})", config.Uuid));
+                    menuOptionsStringBuilder.AppendLine(string.Format("Enter 17 TO change UUID. (Current value = {0})", pubnub.GetCurrentUserId().ToString()));
                     menuOptionsStringBuilder.AppendLine("Enter 18 FOR Disconnect");
                     menuOptionsStringBuilder.AppendLine("Enter 19 FOR Reconnect");
                     menuOptionsStringBuilder.AppendLine("Enter 20 FOR UnsubscribeAll");
@@ -1180,7 +1180,8 @@ namespace PubnubApiAsyncAwaitDemo
                         {
                             pubnub.ChangeUUID(newsessionUUID);
                             Console.ForegroundColor = ConsoleColor.Blue;
-                            Console.WriteLine("UUID = {0}", config.Uuid);
+                            await Task.Delay(1000);
+                            Console.WriteLine("UUID = {0}", pubnub.GetCurrentUserId().ToString());
                             Console.ResetColor();
                         }
                         catch (Exception ex)
@@ -2112,17 +2113,14 @@ namespace PubnubApiAsyncAwaitDemo
                         }
                         break;
                     case "65":
-                        Console.WriteLine("Enter Channel Name for PAM GrantToken.");
-                        string grantChannelName = Console.ReadLine();
+                        Console.WriteLine("Enter Space Name for PAM GrantToken.");
+                        string grantSpaceName = Console.ReadLine();
 
-                        Console.WriteLine("Enter ChannelGroup Name for PAM GrantToken.");
-                        string grantChannelGroupName = Console.ReadLine();
+                        Console.WriteLine("Enter UserId for PAM GrantToken.");
+                        string grantUserIdEntry = Console.ReadLine();
 
-                        Console.WriteLine("Enter UUID for PAM GrantToken.");
-                        string grantUuiIdEntry = Console.ReadLine();
-
-                        Console.WriteLine("Enter Authorized UUID for PAM GrantToken.");
-                        string grantAuthorizedUuiIdEntry = Console.ReadLine();
+                        Console.WriteLine("Enter Authorized User for PAM GrantToken.");
+                        string grantAuthorizedUserIdEntry = Console.ReadLine();
 
                         Console.WriteLine("Read Access? Enter Y for Yes (default), N for No.");
                         string grantReadAccess = Console.ReadLine();
@@ -2171,10 +2169,9 @@ namespace PubnubApiAsyncAwaitDemo
 
                         Console.ForegroundColor = ConsoleColor.Blue;
                         StringBuilder pamTokenGrantStringBuilder = new StringBuilder();
-                        pamTokenGrantStringBuilder.AppendLine(string.Format("Channel = {0}", grantChannelName));
-                        pamTokenGrantStringBuilder.AppendLine(string.Format("ChannelGroup = {0}", grantChannelGroupName));
-                        pamTokenGrantStringBuilder.AppendLine(string.Format("UUID = {0}", grantUuiIdEntry));
-                        pamTokenGrantStringBuilder.AppendLine(string.Format("AuthorizedUUID = {0}", grantAuthorizedUuiIdEntry));
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("Space = {0}", grantSpaceName));
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("User = {0}", grantUserIdEntry));
+                        pamTokenGrantStringBuilder.AppendLine(string.Format("AuthorizedserId = {0}", grantAuthorizedUserIdEntry));
                         pamTokenGrantStringBuilder.AppendLine(string.Format("Read Access = {0}", grantRead.ToString()));
                         pamTokenGrantStringBuilder.AppendLine(string.Format("Write Access = {0}", grantWrite.ToString()));
                         pamTokenGrantStringBuilder.AppendLine(string.Format("Delete Access = {0}", grantDelete.ToString()));
@@ -2192,15 +2189,13 @@ namespace PubnubApiAsyncAwaitDemo
                         PNResult<PNAccessManagerTokenResult> grantTokenResponse = await pubnub.GrantToken()
                             .TTL(grantTokenTTL)
                             .Meta(new Dictionary<string, object>() { { "score", 100 }, { "color", "red" }, { "author", "pandu" } })
-                            .AuthorizedUuid(grantAuthorizedUuiIdEntry)
+                            .AuthorizedUserId(grantAuthorizedUserIdEntry)
                             .Resources(new PNTokenResources()
                             {
-                                Channels = new Dictionary<string, PNTokenAuthValues>() {
-                                                    { grantChannelName, new PNTokenAuthValues() { Read = grantRead, Write = grantWrite, Manage= grantManage, Create = grantCreate, Delete=grantDelete, Get = grantGet, Update = grantUpdate, Join = grantJoin } } },
-                                ChannelGroups = new Dictionary<string, PNTokenAuthValues>() {
-                                                    {grantChannelGroupName, new PNTokenAuthValues() { Read = grantRead, Write = grantWrite, Manage= grantManage, Create = grantCreate, Delete=grantDelete, Get = grantGet, Update = grantUpdate, Join = grantJoin } } },
-                                Uuids = new Dictionary<string, PNTokenAuthValues>() {
-                                                    { grantUuiIdEntry, new PNTokenAuthValues() { Read = grantRead, Write = grantWrite, Manage= grantManage, Create = grantCreate, Delete=grantDelete, Get = grantGet, Update = grantUpdate, Join = grantJoin } } },
+                                Spaces = new Dictionary<string, PNTokenAuthValues>() {
+                                                    { grantSpaceName, new PNTokenAuthValues() { Read = grantRead, Write = grantWrite, Manage= grantManage, Create = grantCreate, Delete=grantDelete, Get = grantGet, Update = grantUpdate, Join = grantJoin } } },
+                                Users = new Dictionary<string, PNTokenAuthValues>() {
+                                                    { grantUserIdEntry, new PNTokenAuthValues() { Read = grantRead, Write = grantWrite, Manage= grantManage, Create = grantCreate, Delete=grantDelete, Get = grantGet, Update = grantUpdate, Join = grantJoin } } },
                             })
                             .ExecuteAsync();
                         PNAccessManagerTokenResult grantTokenResult = grantTokenResponse.Result;

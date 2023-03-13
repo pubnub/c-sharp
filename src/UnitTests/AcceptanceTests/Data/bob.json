@@ -1,0 +1,15 @@
+{
+    "name": "Bob",
+    "email": "bob@example.com",
+    "externalId": "410b802b-7f18-1337-b788-f34b7e600cf2",
+    "profileUrl": "http://fWOkYZQfX.com",
+    "id": "bob-id",
+    "custom": {
+        "uuid_param1": "val1",
+        "uuid_param2": "val2"
+    },
+    "type": "participant",
+    "status": "active",
+    "updated": "2022-02-22T11:51:53.316718Z",
+    "eTag": "Afrav42WQsmyZA"
+}

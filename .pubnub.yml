@@ -1,8 +1,78 @@
 name: c-sharp
-version: "6.2.0"
+version: "6.14.0"
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog:
+  - date: 2023-02-27
+    version: v6.14.0
+    changes:
+      - type: improvement
+        text: "Undeprecated GrantToken methods/properties."
+  - date: 2022-12-05
+    version: v6.13.0
+    changes:
+      - type: bug
+        text: "Added null check for PublishFileMessage PNStatus in SendFileOperation."
+      - type: bug
+        text: "Removed invalid Content-Type in ObjectsV2 request headers targeting .Net Frameworks."
+      - type: improvement
+        text: "Added CultureInfo.InvariantCulture to string formatting."
+  - date: 2022-11-14
+    version: v6.12.0
+    changes:
+      - type: bug
+        text: "Encode comma char for push related multi channels."
+  - date: 2022-11-07
+    version: v6.11.0
+    changes:
+      - type: improvement
+        text: "Added Content-Type to request header to support internal acceptance tests."
+      - type: improvement
+        text: "Added acceptance tests for ObjectsV2 feature."
+  - date: 2022-09-06
+    version: v6.10.0
+    changes:
+      - type: bug
+        text: "Add Users/Spaces support to PCL versions."
+  - date: 2022-08-22
+    version: v6.9.0
+    changes:
+      - type: bug
+        text: "Fix Timer reference conflict in net6.0."
+  - date: 2022-08-10
+    version: v6.8.0
+    changes:
+      - type: bug
+        text: "Fixed Destroy() method when multiple Pubnub instances were in use."
+  - date: 2022-07-27
+    version: v6.7.0
+    changes:
+      - type: improvement
+        text: "Added support for Users/Spaces to GrantToken."
+  - date: 2022-07-18
+    version: v6.6.0
+    changes:
+      - type: improvement
+        text: "Introduced UserId to PNConfiguration and deprecated UUID."
+      - type: improvement
+        text: "Added build target framework support to .Net Framework 4.8 and .Net 6.0."
+  - date: 2022-06-14
+    version: v6.5.0
+    changes:
+      - type: bug
+        text: "Suppress web request aborted exception message to callback."
+  - date: 2022-05-23
+    version: v6.4.0
+    changes:
+      - type: bug
+        text: "Handle PNConfiguration for multi Pubnub instances."
+  - date: 2022-03-22
+    version: v6.3.0
+    changes:
+      - type: bug
+        text: "Refactor Telemetry Task Result to GetAwaiter().GetResult() ."
+      - type: bug
+        text: "Removed SILVERLIGHT, WINDOWS_PHONE preprocessor directive code."
   - date: 2022-01-27
     version: v6.2.0
     changes:
@@ -636,7 +706,7 @@ features:
     - QUERY-PARAM
 supported-platforms:
   -
-    version: Pubnub 'C#' 6.2.0
+    version: Pubnub 'C#' 6.14.0
     platforms:
       - Windows 10 and up
       - Windows Server 2008 and up
@@ -646,7 +716,7 @@ supported-platforms:
       - .Net Framework 4.5
       - .Net Framework 4.6.1+
   -
-    version: PubnubPCL 'C#' 6.2.0
+    version: PubnubPCL 'C#' 6.14.0
     platforms:
       - Xamarin.Android
       - Xamarin.iOS
@@ -664,8 +734,9 @@ supported-platforms:
       - .Net Standard 2.0
       - .Net Standard 2.1
       - .Net Core
+      - .Net 6.0
   -
-    version: PubnubUWP 'C#' 6.2.0
+    version: PubnubUWP 'C#' 6.14.0
     platforms:
       - Windows Phone 10
       - Universal Windows Apps
@@ -689,7 +760,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: Pubnub
-            location: https://github.com/pubnub/c-sharp/releases/tag/v6.2.0.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v6.14.0.0
             requires:
               -
                 name: ".Net"
@@ -706,17 +777,10 @@ sdks:
                 location: "External"
                 is-required: "Required"
               -
-                name: "Portable.BouncyCastle"
-                min-version: "1.8.1.2"
-                license: "MIT,X11"
-                license-url: "https://www.nuget.org/packages/Portable.BouncyCastle/1.8.1.2"
-                location: "External"
-                is-required: "Required"
-              -
                 name: "PeterO.Cbor"
-                min-version: "4.4.4"
+                min-version: "4.5.2"
                 license: "CC0-1.0"
-                license-url: "https://www.nuget.org/packages/PeterO.Cbor/4.4.4"
+                license-url: "https://www.nuget.org/packages/PeterO.Cbor/4.5.2"
                 location: "External"
                 is-required: "Required"
               -
@@ -852,17 +916,10 @@ sdks:
                 location: "External"
                 is-required: "Required"
               -
-                name: "Portable.BouncyCastle"
-                min-version: "1.8.1.2"
-                license: "MIT,X11"
-                license-url: "https://www.nuget.org/packages/Portable.BouncyCastle/1.8.1.2"
-                location: "External"
-                is-required: "Required"
-              -
                 name: "PeterO.Cbor"
-                min-version: "4.4.4"
+                min-version: "4.5.2"
                 license: "CC0-1.0"
-                license-url: "https://www.nuget.org/packages/PeterO.Cbor/4.4.4"
+                license-url: "https://www.nuget.org/packages/PeterO.Cbor/4.5.2"
                 location: "External"
                 is-required: "Required"
               -
@@ -986,7 +1043,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: PubNubPCL
-            location: https://github.com/pubnub/c-sharp/releases/tag/v6.2.0.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v6.14.0.0
             requires:
               -
                 name: ".Net Core"
@@ -1003,17 +1060,10 @@ sdks:
                 location: "External"
                 is-required: "Required"
               -
-                name: "Portable.BouncyCastle"
-                min-version: "1.8.1.2"
-                license: "MIT,X11"
-                license-url: "https://www.nuget.org/packages/Portable.BouncyCastle/1.8.1.2"
-                location: "External"
-                is-required: "Required"
-              -
                 name: "PeterO.Cbor"
-                min-version: "4.4.4"
+                min-version: "4.5.2"
                 license: "CC0-1.0"
-                license-url: "https://www.nuget.org/packages/PeterO.Cbor/4.4.4"
+                license-url: "https://www.nuget.org/packages/PeterO.Cbor/4.5.2"
                 location: "External"
                 is-required: "Required"
             supported-platforms:
@@ -1188,17 +1238,10 @@ sdks:
                 location: "External"
                 is-required: "Required"
               -
-                name: "Portable.BouncyCastle"
-                min-version: "1.8.1.2"
-                license: "MIT,X11"
-                license-url: "https://www.nuget.org/packages/Portable.BouncyCastle/1.8.1.2"
-                location: "External"
-                is-required: "Required"
-              -
                 name: "PeterO.Cbor"
-                min-version: "4.4.4"
+                min-version: "4.5.2"
                 license: "CC0-1.0"
-                license-url: "https://www.nuget.org/packages/PeterO.Cbor/4.4.4"
+                license-url: "https://www.nuget.org/packages/PeterO.Cbor/4.5.2"
                 location: "External"
                 is-required: "Required"
             supported-platforms:
@@ -1359,7 +1402,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: PubnubUWP
-            location: https://github.com/pubnub/c-sharp/releases/tag/v6.2.0.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v6.14.0.0
             requires:
               -
                 name: "Universal Windows Platform Development"
@@ -1383,17 +1426,10 @@ sdks:
                 location: "External"
                 is-required: "Required"
               -
-                name: "Portable.BouncyCastle"
-                min-version: "1.8.1.2"
-                license: "MIT,X11"
-                license-url: "https://www.nuget.org/packages/Portable.BouncyCastle/1.8.1.2"
-                location: "External"
-                is-required: "Required"
-              -
                 name: "PeterO.Cbor"
-                min-version: "4.4.4"
+                min-version: "4.5.2"
                 license: "CC0-1.0"
-                license-url: "https://www.nuget.org/packages/PeterO.Cbor/4.4.4"
+                license-url: "https://www.nuget.org/packages/PeterO.Cbor/4.5.2"
                 location: "External"
                 is-required: "Required"
             supported-platforms:
@@ -1477,17 +1513,10 @@ sdks:
                 location: "External"
                 is-required: "Required"
               -
-                name: "Portable.BouncyCastle"
-                min-version: "1.8.1.2"
-                license: "MIT,X11"
-                license-url: "https://www.nuget.org/packages/Portable.BouncyCastle/1.8.1.2"
-                location: "External"
-                is-required: "Required"
-              -
                 name: "PeterO.Cbor"
-                min-version: "4.4.4"
+                min-version: "4.5.2"
                 license: "CC0-1.0"
-                license-url: "https://www.nuget.org/packages/PeterO.Cbor/4.4.4"
+                license-url: "https://www.nuget.org/packages/PeterO.Cbor/4.5.2"
                 location: "External"
                 is-required: "Required"
             supported-platforms:

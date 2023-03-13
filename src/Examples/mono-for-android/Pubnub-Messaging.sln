@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32510.428
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PubNubMessaging.Example", "PubNubMessaging.Example\PubNubMessaging.Example.csproj", "{F1BE10BB-84AE-42A0-895A-8A7918F87A28}"
 EndProject
@@ -34,6 +34,7 @@ Global
 		{F1BE10BB-84AE-42A0-895A-8A7918F87A28}.AppStore|iPhoneSimulator.ActiveCfg = Release|Any CPU
 		{F1BE10BB-84AE-42A0-895A-8A7918F87A28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F1BE10BB-84AE-42A0-895A-8A7918F87A28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1BE10BB-84AE-42A0-895A-8A7918F87A28}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{F1BE10BB-84AE-42A0-895A-8A7918F87A28}.Debug|iPhone.ActiveCfg = Debug|Any CPU
 		{F1BE10BB-84AE-42A0-895A-8A7918F87A28}.Debug|iPhone.Build.0 = Debug|Any CPU
 		{F1BE10BB-84AE-42A0-895A-8A7918F87A28}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
@@ -51,6 +52,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FE5DD147-0C38-4EF9-84D2-F272616260CD}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
