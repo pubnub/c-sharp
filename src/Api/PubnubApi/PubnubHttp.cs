@@ -588,24 +588,8 @@ namespace PubnubApi
                 request.Method = FindHttpGetOrDeleteMethod(pubnubRequestState);
                 System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
                 stopWatch.Start();
-                #if !NET35 && !NET40
-                Task timeoutTask = Task.Delay(GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType) * 1000);
-                Task<HttpWebResponse> responseTask = Task.Factory.FromAsync<HttpWebResponse>(request.BeginGetResponse, asyncPubnubResult => (HttpWebResponse)request.EndGetResponse(asyncPubnubResult), pubnubRequestState, TaskCreationOptions.None);
-                Task completedTask = await Task.WhenAny(timeoutTask, responseTask).ConfigureAwait(false);
-                if (completedTask == timeoutTask)
-                {
-                    OnPubnubWebRequestTimeout<T>(pubnubRequestState);
-                    stopWatch.Stop();
-                    return "";
-                }
-                else
-                {
-                    response = await responseTask;
-                }
-                #else
                 var _ = new Timer(OnPubnubWebRequestTimeout<T>, pubnubRequestState, GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType) * 1000, Timeout.Infinite);
                 response = await Task.Factory.FromAsync<HttpWebResponse>(request.BeginGetResponse, asyncPubnubResult => (HttpWebResponse)request.EndGetResponse(asyncPubnubResult), pubnubRequestState).ConfigureAwait(false);
-                #endif
                 stopWatch.Stop();
                 if (pubnubConfig.EnableTelemetry && pubnubTelemetryMgr != null)
                 {
