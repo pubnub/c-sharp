@@ -53,9 +53,6 @@ namespace PubNubMessaging.Tests
 
             pubnub = createPubNubInstance(config);
 
-            string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group\",\"subscribe_key\":\"demo-36\",\"ttl\":20,\"channel-groups\":{\"hello_my_group\":{\"r\":1,\"w\":0,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
-
-
             pubnub.Grant().Channels(new[] { channelName }).AuthKeys(new[] { authKey }).Read(true).Write(true).Manage(true).Delete(true).Update(true).Get(true).TTL(20)
                 .Execute(new PNAccessManagerGrantResultExt((r,s)=> 
                 { 
@@ -122,8 +119,6 @@ namespace PubNubMessaging.Tests
             mre = new ManualResetEvent(false);
             pubnub.Subscribe<string>().Channels(new string[] { channelName }).Execute();
             mre.WaitOne(2000);
-
-            string expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}";
 
             mre = new ManualResetEvent(false);
 
@@ -255,8 +250,6 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new string[] { channelName }).Execute();
             mre.WaitOne(2000);
 
-            string expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}";
-
             mre = new ManualResetEvent(false);
 
             string fileId = "";
@@ -360,8 +353,6 @@ namespace PubNubMessaging.Tests
             }
             pubnub = createPubNubInstance(config);
 
-            string expected = "";
-
             mre = new ManualResetEvent(false);
             string fileId = "b0a5c0df-7523-432e-8ea9-01567c93da7d";
             string fileName = "pandu_test.gif";
@@ -410,8 +401,6 @@ namespace PubNubMessaging.Tests
                 config.AuthKey = authKey;
             }
             pubnub = createPubNubInstance(config);
-
-            string expected = "";
 
             mre = new ManualResetEvent(false);
             string fileId = "bc03db55-6345-4a0f-aa58-beac970b2c5b";
@@ -462,8 +451,6 @@ namespace PubNubMessaging.Tests
             }
             pubnub = createPubNubInstance(config);
 
-            string expected = "";
-
             receivedMessage = false;
             mre = new ManualResetEvent(false);
             pubnub.ListFiles().Channel(channelName)
@@ -510,8 +497,6 @@ namespace PubNubMessaging.Tests
                 config.AuthKey = authKey;
             }
             pubnub = createPubNubInstance(config);
-
-            string expected = "";
 
             receivedMessage = false;
             PNResult<PNListFilesResult> listFilesResponse = pubnub.ListFiles().Channel(channelName).ExecuteAsync().Result;
@@ -590,8 +575,6 @@ namespace PubNubMessaging.Tests
                 config.AuthKey = authKey;
             }
             pubnub = createPubNubInstance(config);
-
-            string expected = "";
 
             receivedMessage = false;
 #if NET40

@@ -5,6 +5,7 @@ namespace PubnubApi
 {
     public sealed class RequestState<T>
     {
+        public DateTime? TimeQueued { get; internal set; }
         public HttpWebRequest Request { get; internal set; }
         public HttpWebResponse Response { get; internal set; }
         public bool GotJsonResponse { get; internal set; }

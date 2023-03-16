@@ -25,6 +25,7 @@ namespace PubnubApi.EndPoint
         private object publishMessage;
         private string sendFileFullPath;
         private string sendFileName = "";
+        private byte[] sendFileBytes = null;
         private string currentFileCipherKey;
         private string currentFileId;
         private bool storeInHistory = true;
@@ -90,7 +91,8 @@ namespace PubnubApi.EndPoint
         {
             this.sendFileFullPath = fileNameWithFullPath;
 #if !NETSTANDARD10 && !NETSTANDARD11
-            if (System.IO.File.Exists(fileNameWithFullPath))
+            // manually set filename should take precedence
+            if (System.IO.File.Exists(fileNameWithFullPath) && string.IsNullOrEmpty(sendFileName))
             {
                 sendFileName = System.IO.Path.GetFileName(fileNameWithFullPath);
             }
@@ -98,6 +100,28 @@ namespace PubnubApi.EndPoint
 #else
             throw new NotSupportedException("FileSystem not supported in NetStandard 1.0/1.1. Consider higher version of .NetStandard.");
 #endif      
+        }
+
+        public SendFileOperation File(byte[] byteArray)
+        {
+            this.sendFileBytes = byteArray ?? throw new ArgumentException("File byte array not provided.");
+            return this;
+        }
+
+        public SendFileOperation FileName(string fileName)
+        {
+            if (string.IsNullOrEmpty(fileName))
+            {
+                throw new ArgumentException("File name is missing");
+            }
+
+            if (fileName.Trim() != fileName)
+            {
+                throw new ArgumentException("File name should not contain leading or trailing whitespace");
+            }
+            
+            this.sendFileName = fileName;
+            return this;
         }
 
         public SendFileOperation CipherKey(string cipherKeyForFile)
@@ -167,7 +191,7 @@ namespace PubnubApi.EndPoint
 
             requestState.UsePostMethod = true;
 
-            byte[] sendFileByteArray = GetByteArrayFromFilePath(sendFileFullPath);
+            byte[] sendFileByteArray = sendFileBytes ?? GetByteArrayFromFilePath(sendFileFullPath);
 
             
             string dataBoundary = String.Format(CultureInfo.InvariantCulture, "----------{0:N}", Guid.NewGuid());
@@ -269,7 +293,7 @@ namespace PubnubApi.EndPoint
 
             requestState.UsePostMethod = true;
 
-            byte[] sendFileByteArray = GetByteArrayFromFilePath(sendFileFullPath);
+            byte[] sendFileByteArray = sendFileBytes ?? GetByteArrayFromFilePath(sendFileFullPath);
 
             string dataBoundary = String.Format(CultureInfo.InvariantCulture, "----------{0:N}", Guid.NewGuid());
             string contentType = "multipart/form-data; boundary=" + dataBoundary;

@@ -1076,10 +1076,12 @@ namespace PubnubApi
 #else
                 // Create Request
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(requestUri);
-
+                request = pubnubHttp.SetServicePointConnectionLimit(pubnubRequestState, request);
                 request = pubnubHttp.SetNoCache<T>(request);
                 request = pubnubHttp.SetProxy<T>(request);
                 request = pubnubHttp.SetTimeout<T>(pubnubRequestState, request);
+                request = pubnubHttp.SetServicePointSetTcpKeepAlive(pubnubRequestState, request);
+                request = pubnubHttp.SetTcpKeepAlive(request);
                 if (string.IsNullOrEmpty(contentType))
                 {
                     contentType = "application/json";
