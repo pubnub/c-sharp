@@ -63,7 +63,7 @@ Added TcpKeepAlive and ConnectionLimit to improve performance.</PackageReleaseNo
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1">
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="PeterO.Cbor" Version="4.5.2" />
