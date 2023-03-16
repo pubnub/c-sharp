@@ -303,6 +303,9 @@ namespace PubnubApi
                 HttpWebRequest myRequest = null;
                 myRequest = (HttpWebRequest)System.Net.WebRequest.Create(requestUri);
                 myRequest.Method = "GET";
+                #if NET35 || NET40 || NET45 || NET61 || NET48
+                myRequest.KeepAlive = true;
+                #endif
                 using (HttpWebResponse response = await Task.Factory.FromAsync<HttpWebResponse>(myRequest.BeginGetResponse, asyncPubnubResult => (HttpWebResponse)myRequest.EndGetResponse(asyncPubnubResult), null).ConfigureAwait(false))
                 {
                     if (response != null)
