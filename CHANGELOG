@@ -1,3 +1,9 @@
+v6.15.0 - March 16 2023
+-----------------------------
+- Added: sending files as raw byte arrays.
+
+- Modified: added TcpKeepAlive and ConnectionLimit to improve performance.
+
 v6.14.0 - February 27 2023
 -----------------------------
 - Modified: undeprecated GrantToken methods/properties.
