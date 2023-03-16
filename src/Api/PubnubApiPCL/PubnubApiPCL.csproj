@@ -590,7 +590,7 @@ Added TcpKeepAlive and ConnectionLimit to improve performance.</PackageReleaseNo
     <PackageReference Include="NETStandard.Library" Version="1.6.1">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1">
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="PeterO.Cbor" Version="4.5.2" />
@@ -629,7 +629,7 @@ Added TcpKeepAlive and ConnectionLimit to improve performance.</PackageReleaseNo
     <PackageReference Include="NETStandard.Library" Version="1.6.1">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1">
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="PeterO.Cbor" Version="4.5.2" />
@@ -653,7 +653,7 @@ Added TcpKeepAlive and ConnectionLimit to improve performance.</PackageReleaseNo
     <PackageReference Include="NETStandard.Library" Version="1.6.1">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1">
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="PeterO.Cbor" Version="4.5.2" />
@@ -710,7 +710,7 @@ Added TcpKeepAlive and ConnectionLimit to improve performance.</PackageReleaseNo
     <PackageReference Include="NETStandard.Library" Version="1.6.1">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1">
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="PeterO.Cbor" Version="4.5.2" />
@@ -755,7 +755,7 @@ Added TcpKeepAlive and ConnectionLimit to improve performance.</PackageReleaseNo
     <PackageReference Include="NETStandard.Library" Version="1.6.1">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1">
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="PeterO.Cbor" Version="4.5.2" />
@@ -797,7 +797,7 @@ Added TcpKeepAlive and ConnectionLimit to improve performance.</PackageReleaseNo
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
     <Reference Include="System.Runtime" />
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1">
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="PeterO.Cbor" Version="4.5.2" />
