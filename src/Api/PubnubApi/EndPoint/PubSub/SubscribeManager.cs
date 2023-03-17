@@ -672,6 +672,7 @@ namespace PubnubApi.EndPoint
                 pubnubRequestState.Reconnect = reconnect;
                 pubnubRequestState.Timetoken = Convert.ToInt64(timetoken.ToString(), CultureInfo.InvariantCulture);
                 pubnubRequestState.Region = region;
+                pubnubRequestState.TimeQueued = DateTime.Now;
 
                 // Wait for message
                 string json = "";
@@ -1417,6 +1418,7 @@ namespace PubnubApi.EndPoint
                         requestState.PubnubCallback = null;
                         requestState.Reconnect = false;
                         requestState.Response = null;
+                        requestState.TimeQueued = DateTime.Now;
 
                         UrlProcessRequest(request, requestState, false).ContinueWith(r =>
                         {
