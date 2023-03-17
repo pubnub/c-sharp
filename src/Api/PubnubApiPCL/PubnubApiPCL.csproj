@@ -890,6 +890,10 @@ Added TcpKeepAlive and ConnectionLimit to improve performance.</PackageReleaseNo
     <Folder Include="Security\" />
     <Folder Include="Proxy\" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\PNEventEngine\PNEventEngine.csproj" />
+  </ItemGroup>
   
   <!--<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.4' ">
     <PackageReference Include="System.Net.Requests" Version="4.0.11" />

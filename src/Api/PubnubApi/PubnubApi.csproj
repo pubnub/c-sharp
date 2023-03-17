@@ -130,4 +130,8 @@ Added TcpKeepAlive and ConnectionLimit to improve performance.</PackageReleaseNo
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\PNEventEngine\PNEventEngine.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -7,6 +7,7 @@ using PubnubApi.Interface;
 using System.Threading.Tasks;
 using System.Net;
 using System.Globalization;
+using PNEventEngine;
 
 namespace PubnubApi.EndPoint
 {
@@ -25,6 +26,7 @@ namespace PubnubApi.EndPoint
         private bool presenceSubscribeEnabled;
         private SubscribeManager manager;
         private Dictionary<string, object> queryParam;
+        private EventEngine pnEventEngine;
 
         public SubscribeOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
         {
@@ -34,6 +36,12 @@ namespace PubnubApi.EndPoint
             pubnubLog = log;
             pubnubTelemetryMgr = telemetryManager;
             pubnubTokenMgr = tokenManager;
+
+            //var effectDispatcher = new EffectDispatcher();
+            //var eventEmitter = new EventEmitter();
+            //var handshakeEffect = new HandshakeEffectHandler<string>(null, eventEmitter);
+            //var receivingEffect = new ReceivingEffectHandler<string>(null, eventEmitter);
+            //var reconnectionEffect = new ReconnectingEffectHandler<string>(null, eventEmitter);
         }
 
         public SubscribeOperation<T> Channels(string[] channels)
@@ -142,6 +150,7 @@ namespace PubnubApi.EndPoint
 #else
             new Thread(() =>
             {
+                //pnEventEngine = new EventEngine(null, null);
                 manager = new SubscribeManager(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, PubnubInstance);
                 manager.CurrentPubnubInstance(PubnubInstance);
                 manager.MultiChannelSubscribeInit<T>(PNOperationType.PNSubscribeOperation, channels, channelGroups, initialSubscribeUrlParams, externalQueryParam);

@@ -669,7 +669,7 @@ Added TcpKeepAlive and ConnectionLimit to improve performance.</PackageReleaseNo
   </ItemGroup>-->
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
-      <Version>6.2.9</Version>
+      <Version>6.2.14</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>9.0.1</Version>
@@ -692,6 +692,9 @@ Added TcpKeepAlive and ConnectionLimit to improve performance.</PackageReleaseNo
     <Folder Include="Model\Derived\Objects\" />
     <Folder Include="JsonDataParse\" />
     <Folder Include="Helper\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\PNEventEngineUWP\PNEventEngineUWP.csproj" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

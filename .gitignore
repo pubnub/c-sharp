@@ -162,7 +162,10 @@ src/Examples/PubnubApiPCL.XamariniMacExample/obj/*
 *.suo
 src/UnitTests/MockServer/bin/*
 src/UnitTests/MockServer/obj/*
-
+src/PNEventEngine/bin/*
+src/PNEventEngine/obj/*
+src/PNEventEngineUWP/bin/*
+src/PNEventEngineUWP/obj/*
 
 # GitHub Actions #
 ##################
