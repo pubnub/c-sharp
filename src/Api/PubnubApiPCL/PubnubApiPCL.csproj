@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard1.0;netstandard1.3;netstandard1.4;netstandard1.1;netstandard2.0;net6.0</TargetFrameworks>
+    <LangVersion>8.0</LangVersion>
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>pubnub.snk</AssemblyOriginatorKeyFile>
@@ -149,9 +150,11 @@ Added TcpKeepAlive and ConnectionLimit to improve performance.</PackageReleaseNo
     <Compile Include="..\PubnubApi\EndPoint\PubSub\SubscribeManager.cs">
       <Link>EndPoint\PubSub\SubscribeManager.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\PubSub\SubscribeManager2.cs" Link="EndPoint\PubSub\SubscribeManager2.cs" />
     <Compile Include="..\PubnubApi\EndPoint\PubSub\SubscribeOperation.cs">
       <Link>EndPoint\PubSub\SubscribeOperation.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\PubSub\SubscribeOperation2.cs" Link="EndPoint\PubSub\SubscribeOperation2.cs" />
     <Compile Include="..\PubnubApi\EndPoint\PubSub\UnsubscribeAllOperation.cs">
       <Link>EndPoint\PubSub\UnsubscribeAllOperation.cs</Link>
     </Compile>
@@ -211,6 +214,14 @@ Added TcpKeepAlive and ConnectionLimit to improve performance.</PackageReleaseNo
     <Compile Include="..\PubnubApi\Enum\ResponseType.cs">
       <Link>Enum\ResponseType.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\EventEngine\EffectDispatcher.cs" Link="EventEngine\EffectDispatcher.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\EventEmitter.cs" Link="EventEngine\EventEmitter.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\EventEngine.cs" Link="EventEngine\EventEngine.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\HandshakeEffectHandler.cs" Link="EventEngine\HandshakeEffectHandler.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\IEffectHandler.cs" Link="EventEngine\IEffectHandler.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\ReceivingEffectHandler.cs" Link="EventEngine\ReceivingEffectHandler.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\ReconnectingEffectHandler.cs" Link="EventEngine\ReconnectingEffectHandler.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\State.cs" Link="EventEngine\State.cs" />
     <Compile Include="..\PubnubApi\Helper\MobilePushHelper.cs" Link="Helper\MobilePushHelper.cs" />
     <Compile Include="..\PubnubApi\HttpUtility\HttpUtility.cs">
       <Link>HttpUtility\HttpUtility.cs</Link>
@@ -513,6 +524,7 @@ Added TcpKeepAlive and ConnectionLimit to improve performance.</PackageReleaseNo
     <Compile Include="..\PubnubApi\PubnubCoreBase.cs">
       <Link>PubnubCoreBase.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\PubnubCoreBase2.cs" Link="PubnubCoreBase2.cs" />
     <Compile Include="..\PubnubApi\PubnubHttp.cs">
       <Link>PubnubHttp.cs</Link>
     </Compile>
@@ -885,14 +897,11 @@ Added TcpKeepAlive and ConnectionLimit to improve performance.</PackageReleaseNo
     <Folder Include="Model\Server\" />
     <Folder Include="Helper\" />
     <Folder Include="JsonDataParse\" />
+    <Folder Include="EventEngine\" />
     <Folder Include="Properties\" />
     <Folder Include="Push\Mpns\" />
     <Folder Include="Security\" />
     <Folder Include="Proxy\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\PNEventEngine\PNEventEngine.csproj" />
   </ItemGroup>
   
   <!--<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.4' ">

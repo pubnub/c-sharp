@@ -136,6 +136,8 @@ namespace PubnubApi
         public bool SuppressLeaveEvents { get; set; }
 
         public bool UseRandomInitializationVector { get; set; }
+
+        public bool EnableEventEngine { get; set; }
         public int FileMessagePublishRetryLimit { get; set; }
 
         [Obsolete("PNConfiguration(string uuid) is deprecated, please use PNConfiguration(UserId userId) instead.")]
@@ -181,6 +183,7 @@ namespace PubnubApi
             UseRandomInitializationVector = true;
             FileMessagePublishRetryLimit = 5;
             _userId = currentUserId;
+            EnableEventEngine = true;
         }
         public PNConfiguration SetPresenceTimeoutWithCustomInterval(int timeout, int interval)
         {

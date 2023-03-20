@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 
-namespace PNEventEngine
+namespace PubnubApi.PubnubEventEngine
 {
 	public class HandshakeResponse
 	{
@@ -27,15 +27,15 @@ namespace PNEventEngine
 	public class HandshakeRequestEventArgs : EventArgs 
 	{
 		public ExtendedState ExtendedState { get; set; }
-		public Action<string> HandshakeRequestCallback { get; set; }
+		public Action<string> HandshakeResponseCallback { get; set; }
 	}
+
 	public class HandshakeEffectHandler : IEffectHandler
 	{
 		EventEmitter emitter;
-		//HttpClient httpClient;
+		public Action<string> LogCallback { get; set; }
 
 		public event EventHandler<HandshakeRequestEventArgs>? HandshakeRequested;
-
 		protected virtual void OnHandshakeRequested(HandshakeRequestEventArgs e)
         {
             EventHandler<HandshakeRequestEventArgs>? handler = HandshakeRequested;
@@ -45,30 +45,26 @@ namespace PNEventEngine
             }
         }
 
-
-
         public HandshakeEffectHandler(EventEmitter emitter)
 		{
 			this.emitter = emitter;
 		}
 		public async void Start(ExtendedState context)
 		{
-			await Task.Factory.StartNew(() => 
-			{
-			});
+			await Task.Factory.StartNew(() => {	});
 			HandshakeRequestEventArgs args = new HandshakeRequestEventArgs();
 			args.ExtendedState = context;
-			args.HandshakeRequestCallback = OnHandshakeEffectResponded;
+			args.HandshakeResponseCallback = OnHandshakeEffectResponseReceived;
 			OnHandshakeRequested(args);				
 			// TODO: Replace with Stateless Utility Methods
 			// TODO: Fetch Configuration from PubNub instance
 		}
 		
-		public void OnHandshakeEffectResponded(string json)
+		public void OnHandshakeEffectResponseReceived(string json)
 		{
 			var evnt = new Event();
 			try {
-				//callbackHttpRequestHandler("test");
+				LogCallback?.Invoke($"Handshake Json Response { json }");    
 				var handshakeResponse = JsonConvert.DeserializeObject<HandshakeResponse>(json);
 				if (handshakeResponse != null)
 				{
@@ -77,7 +73,7 @@ namespace PNEventEngine
 					evnt.Type = EventType.HandshakeSuccess;
 				}
 			} catch (Exception ex) {
-				//LoggingMethod.WriteToLog(string.Format("HandshakeEffectHandler EXCEPTION - {0}",ex));
+				LogCallback?.Invoke($"HandshakeEffectHandler EXCEPTION - {ex}");
 				evnt.Type = EventType.HandshakeFailed;
 				evnt.EventPayload.exception = ex;
 			}
@@ -87,6 +83,7 @@ namespace PNEventEngine
 		{
 			//Console.WriteLine("Handshake can not be cancelled. Something is not right here!");
 			//LoggingMethod.WriteToLog("HandshakeEffectHandler - Handshake can not be cancelled. Something is not right here!");
+			LogCallback?.Invoke($"HandshakeEffectHandler - Handshake can not be cancelled. Something is not right here!");
 		}
 
     }

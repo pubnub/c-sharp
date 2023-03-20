@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace PNEventEngine
+namespace PubnubApi.PubnubEventEngine
 {
 	public class EffectDispatcher
 	{

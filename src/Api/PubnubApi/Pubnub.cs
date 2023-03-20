@@ -37,6 +37,13 @@ namespace PubnubApi
             savedSubscribeOperation = subscribeOperation;
             return subscribeOperation;
         }
+        public EndPoint.SubscribeOperation2<T> Subscribe2<T>()
+		{
+            EndPoint.SubscribeOperation2<T> subscribeOperation = new EndPoint.SubscribeOperation2<T>(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, this);
+            subscribeOperation.CurrentPubnubInstance(this);
+            savedSubscribeOperation = subscribeOperation;
+            return subscribeOperation;
+        }
 
         public EndPoint.UnsubscribeOperation<T> Unsubscribe<T>()
         {

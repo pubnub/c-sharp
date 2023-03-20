@@ -7,10 +7,11 @@ using PubnubApi.Interface;
 using System.Threading.Tasks;
 using System.Net;
 using System.Globalization;
+using PubnubApi.PubnubEventEngine;
 
 namespace PubnubApi.EndPoint
 {
-    public class SubscribeOperation<T> : PubnubCoreBase
+    public class SubscribeOperation2<T> : PubnubCoreBase2
     {
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
@@ -23,10 +24,11 @@ namespace PubnubApi.EndPoint
         private List<string> subscribeChannelGroupNames = new List<string>();
         private long subscribeTimetoken = -1;
         private bool presenceSubscribeEnabled;
-        private SubscribeManager manager;
+        private SubscribeManager2 manager;
         private Dictionary<string, object> queryParam;
+        private EventEngine pnEventEngine;
 
-        public SubscribeOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
+        public SubscribeOperation2(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
@@ -34,9 +36,90 @@ namespace PubnubApi.EndPoint
             pubnubLog = log;
             pubnubTelemetryMgr = telemetryManager;
             pubnubTokenMgr = tokenManager;
+
+			var effectDispatcher = new EffectDispatcher();
+			var eventEmitter = new EventEmitter();
+			var handshakeEffect = new HandshakeEffectHandler(eventEmitter);
+            handshakeEffect.LogCallback = LogCallback;
+            handshakeEffect.HandshakeRequested += HandshakeEffect_HandshakeRequested;
+			
+            var receivingEffect = new ReceivingEffectHandler<string>(eventEmitter);
+            receivingEffect.LogCallback = LogCallback;
+            receivingEffect.ReceiveRequested += ReceivingEffect_ReceiveRequested;
+
+			var reconnectionEffect = new ReconnectingEffectHandler<string>(eventEmitter);
+			
+            effectDispatcher.Register(EffectType.SendHandshakeRequest, handshakeEffect);
+			effectDispatcher.Register(EffectType.ReceiveEventRequest, receivingEffect);
+			effectDispatcher.Register(EffectType.ReconnectionAttempt, reconnectionEffect);
+
+			pnEventEngine = new EventEngine(effectDispatcher, eventEmitter);
+
+			var initState = pnEventEngine.CreateState(StateType.Unsubscribed)
+				.OnEntry(() => { System.Diagnostics.Debug.WriteLine("Unsubscribed: OnEntry()"); return true; })
+				.OnExit(() => { System.Diagnostics.Debug.WriteLine("Unsubscribed: OnExit()"); return true; })
+				.On(EventType.SubscriptionChange, StateType.Handshaking);
+
+			pnEventEngine.CreateState(StateType.Handshaking)
+				.OnEntry(() => { System.Diagnostics.Debug.WriteLine("Handshaking: OnEntry()"); return true; })
+				.OnExit(() => { System.Diagnostics.Debug.WriteLine("Handshaking: OnExit()"); return true; })
+				.On(EventType.SubscriptionChange, StateType.Handshaking)
+				.On(EventType.HandshakeSuccess, StateType.Receiving)
+				.On(EventType.HandshakeFailed, StateType.Reconnecting)
+				.Effect(EffectType.SendHandshakeRequest);
+
+			pnEventEngine.CreateState(StateType.Receiving)
+				.OnEntry(() => { System.Diagnostics.Debug.WriteLine("Receiving: OnEntry()"); return true; })
+				.OnExit(() => { System.Diagnostics.Debug.WriteLine("Receiving: OnExit()"); return true; })
+				.On(EventType.SubscriptionChange, StateType.Handshaking)
+				.On(EventType.ReceiveSuccess, StateType.Receiving)
+				.On(EventType.ReceiveFailed, StateType.Reconnecting)
+				.Effect(EffectType.ReceiveEventRequest);
+
+			pnEventEngine.CreateState(StateType.HandshakingFailed)
+				.OnEntry(() => { System.Diagnostics.Debug.WriteLine("HandshakingFailed: OnEntry()"); return true; })
+				.OnExit(() => { System.Diagnostics.Debug.WriteLine("HandshakingFailed: OnExit()"); return true; })
+				.On(EventType.SubscriptionChange, StateType.Handshaking)
+				.On(EventType.HandshakeSuccess, StateType.Receiving)
+				.On(EventType.HandshakeFailed, StateType.Reconnecting);
+
+			pnEventEngine.CreateState(StateType.Reconnecting)
+				.OnEntry(() => { System.Diagnostics.Debug.WriteLine("Reconnecting: OnEntry()"); return true; })
+				.OnExit(() => { System.Diagnostics.Debug.WriteLine("Reconnecting: OnExit()"); return true; })
+				.On(EventType.SubscriptionChange, StateType.Handshaking)
+				.On(EventType.HandshakeSuccess, StateType.Receiving)
+				.On(EventType.HandshakeFailed, StateType.Reconnecting);
+
+			pnEventEngine.InitialState(initState);
+
         }
 
-        public SubscribeOperation<T> Channels(string[] channels)
+        private void ReceivingEffect_ReceiveRequested(object sender, ReceiveRequestEventArgs e)
+        {
+            manager = new SubscribeManager2(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, PubnubInstance);
+            manager.CurrentPubnubInstance(PubnubInstance);
+            
+            string jsonResp = manager.HandshakeRequest<T>(PNOperationType.PNSubscribeOperation, e.ExtendedState.Channels.ToArray(), e.ExtendedState.ChannelGroups.ToArray(), e.ExtendedState.Timetoken, e.ExtendedState.Region, null, null).Result;
+
+            e.ReceiveResponseCallback?.Invoke(jsonResp);
+        }
+
+        private void HandshakeEffect_HandshakeRequested(object sender, HandshakeRequestEventArgs e)
+        {
+            manager = new SubscribeManager2(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, PubnubInstance);
+            manager.CurrentPubnubInstance(PubnubInstance);
+            
+            string jsonResp = manager.HandshakeRequest<T>(PNOperationType.PNSubscribeOperation, e.ExtendedState.Channels.ToArray(), e.ExtendedState.ChannelGroups.ToArray(), e.ExtendedState.Timetoken, e.ExtendedState.Region, null, null).Result;
+
+            e.HandshakeResponseCallback?.Invoke(jsonResp);
+        }
+
+        private void LogCallback(string log)
+        {
+            LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), log), config.LogVerbosity);
+        }
+
+        public SubscribeOperation2<T> Channels(string[] channels)
         {
             if (channels != null && channels.Length > 0 && !string.IsNullOrEmpty(channels[0]))
             {
@@ -45,7 +128,7 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
-        public SubscribeOperation<T> ChannelGroups(string[] channelGroups)
+        public SubscribeOperation2<T> ChannelGroups(string[] channelGroups)
         {
             if (channelGroups != null && channelGroups.Length > 0 && !string.IsNullOrEmpty(channelGroups[0]))
             {
@@ -54,19 +137,19 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
-        public SubscribeOperation<T> WithTimetoken(long timetoken)
+        public SubscribeOperation2<T> WithTimetoken(long timetoken)
         {
             this.subscribeTimetoken = timetoken;
             return this;
         }
 
-        public SubscribeOperation<T> WithPresence()
+        public SubscribeOperation2<T> WithPresence()
         {
             this.presenceSubscribeEnabled = true;
             return this;
         }
 
-        public SubscribeOperation<T> QueryParam(Dictionary<string, object> customQueryParam)
+        public SubscribeOperation2<T> QueryParam(Dictionary<string, object> customQueryParam)
         {
             this.queryParam = customQueryParam;
             return this;
@@ -135,16 +218,18 @@ namespace PubnubApi.EndPoint
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
-                manager = new SubscribeManager(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, PubnubInstance);
-                manager.CurrentPubnubInstance(PubnubInstance);
-                manager.MultiChannelSubscribeInit<T>(PNOperationType.PNSubscribeOperation, channels, channelGroups, initialSubscribeUrlParams, externalQueryParam);
+                pnEventEngine.Subscribe(channels.ToList<string>(), channelGroups.ToList<string>());
+                //manager = new SubscribeManager2(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, PubnubInstance);
+                //manager.CurrentPubnubInstance(PubnubInstance);
+                //manager.MultiChannelSubscribeInit<T>(PNOperationType.PNSubscribeOperation, channels, channelGroups, initialSubscribeUrlParams, externalQueryParam);
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
             new Thread(() =>
             {
-                manager = new SubscribeManager(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, PubnubInstance);
-                manager.CurrentPubnubInstance(PubnubInstance);
-                manager.MultiChannelSubscribeInit<T>(PNOperationType.PNSubscribeOperation, channels, channelGroups, initialSubscribeUrlParams, externalQueryParam);
+                pnEventEngine.Subscribe(channels.ToList<string>(), channelGroups.ToList<string>());
+                //manager = new SubscribeManager2(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, PubnubInstance);
+                //manager.CurrentPubnubInstance(PubnubInstance);
+                //manager.MultiChannelSubscribeInit<T>(PNOperationType.PNSubscribeOperation, channels, channelGroups, initialSubscribeUrlParams, externalQueryParam);
             })
             { IsBackground = true }.Start();
 #endif

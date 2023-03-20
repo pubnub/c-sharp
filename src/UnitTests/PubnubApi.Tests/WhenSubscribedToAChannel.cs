@@ -387,7 +387,8 @@ namespace PubNubMessaging.Tests
                 Secure = false,
                 LogVerbosity = PNLogVerbosity.BODY,
                 PubnubLog = new TestLog(),
-                NonSubscribeRequestTimeout = 120
+                NonSubscribeRequestTimeout = 120,
+                EnableEventEngine = true
             };
             if (PubnubCommon.PAMServerSideRun)
             {
@@ -439,7 +440,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Subscribe<string>().Channels(new [] { channel }).Execute();
+            pubnub.Subscribe2<string>().Channels(new [] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for Connect Status
 
             Thread.Sleep(1000);
@@ -694,7 +695,8 @@ namespace PubNubMessaging.Tests
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Secure = false
+                Secure = false,
+                EnableEventEngine = true,
             };
             if (PubnubCommon.PAMServerSideRun)
             {
@@ -745,7 +747,7 @@ namespace PubNubMessaging.Tests
 
             manualResetEventWaitTimeout = 310 * 1000;
 
-            string channel = "hello_my_channel";
+            string channel = "hello_my_channel1";
             numberOfReceivedMessages = 0;
 
             string expected = "{\"t\":{\"t\":\"14839022442039237\",\"r\":7},\"m\":[]}";
@@ -769,7 +771,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Subscribe<string>().Channels(new [] { channel }).Execute();
+            pubnub.Subscribe2<string>().Channels(new [] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for Connect Status
 
             if (!receivedErrorMessage){
