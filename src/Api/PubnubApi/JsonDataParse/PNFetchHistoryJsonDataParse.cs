@@ -60,13 +60,13 @@ namespace PubnubApi
                                             result.Uuid = messagesContainer["uuid"].ToString();
                                         }
                                         int messageType;
-                                        if (messagesContainer.ContainsKey("type") && messagesContainer["type"] != null && !string.IsNullOrEmpty(messagesContainer["type"].ToString()))
+                                        if (messagesContainer.ContainsKey("message_type") && messagesContainer["message_type"] != null && Int32.TryParse(messagesContainer["message_type"].ToString(), out messageType))
                                         {
-                                            result.MessageType = new MessageType(messagesContainer["type"].ToString());
+                                            result.MessageType = messageType;
                                         }
-                                        else if (messagesContainer.ContainsKey("message_type") && messagesContainer["message_type"] != null && Int32.TryParse(messagesContainer["message_type"].ToString(), out messageType))
+                                        if (messagesContainer.ContainsKey("type") && messagesContainer["type"] != null)
                                         {
-                                            result.MessageType = new MessageType((PNMessageType)messageType, null);
+                                            result.Type = messagesContainer["type"].ToString();
                                         }
                                         if (messagesContainer.ContainsKey("space_id") && messagesContainer["space_id"] != null)
                                         {

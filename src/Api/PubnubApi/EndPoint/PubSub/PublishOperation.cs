@@ -23,7 +23,7 @@ namespace PubnubApi.EndPoint
         private bool httpPost;
         private Dictionary<string, object> userMetadata;
         private int ttl = -1;
-        private MessageType messageType;
+        private string type = string.Empty;
         private string spaceId = string.Empty;
         private PNCallback<PNPublishResult> savedCallback;
         private bool syncRequest;
@@ -79,9 +79,9 @@ namespace PubnubApi.EndPoint
             this.ttl = ttl;
             return this;
         }
-        public PublishOperation MessageType(MessageType messageType)
+        public PublishOperation Type(string type)
         {
-            this.messageType = messageType;
+            this.type = type;
             return this;
         }
         public PublishOperation SpaceId(string spaceId)
@@ -124,14 +124,14 @@ namespace PubnubApi.EndPoint
             {
                 syncRequest = false;
                 this.savedCallback = callback;
-                Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, this.messageType, this.spaceId, this.queryParam, callback);
+                Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, this.type, this.spaceId, this.queryParam, callback);
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
             new Thread(() =>
             {
                 syncRequest = false;
                 this.savedCallback = callback;
-                Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, this.messageType, this.spaceId, this.queryParam, callback);
+                Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, this.type, this.spaceId, this.queryParam, callback);
             })
             { IsBackground = true }.Start();
 #endif
@@ -140,7 +140,7 @@ namespace PubnubApi.EndPoint
         public async Task<PNResult<PNPublishResult>> ExecuteAsync()
         {
             syncRequest = false;
-            return await Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, this.messageType, this.spaceId, this.queryParam).ConfigureAwait(false);
+            return await Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, this.type, this.spaceId, this.queryParam).ConfigureAwait(false);
         }
 
         public PNPublishResult Sync()
@@ -160,7 +160,7 @@ namespace PubnubApi.EndPoint
                 {
                     syncRequest = true;
                     syncEvent = new System.Threading.ManualResetEvent(false);
-                    Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, this.messageType, this.spaceId, this.queryParam, new PNPublishResultExt((r, s) => { SyncResult = r; syncEvent.Set(); }));
+                    Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, this.type, this.spaceId, this.queryParam, new PNPublishResultExt((r, s) => { SyncResult = r; syncEvent.Set(); }));
                     syncEvent.WaitOne(config.NonSubscribeRequestTimeout * 1000);
 
                     return SyncResult;
@@ -177,7 +177,7 @@ namespace PubnubApi.EndPoint
             {
                 if (!syncRequest)
                 {
-                    Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, this.messageType, this.spaceId, this.queryParam, savedCallback);
+                    Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, this.type, this.spaceId, this.queryParam, savedCallback);
                 }
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
@@ -185,7 +185,7 @@ namespace PubnubApi.EndPoint
             {
                 if (!syncRequest)
                 {
-                    Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, this.messageType, this.spaceId, this.queryParam, savedCallback);
+                    Publish(this.channelName, this.msg, this.storeInHistory, this.ttl, this.userMetadata, this.type, this.spaceId, this.queryParam, savedCallback);
                 }
             })
             { IsBackground = true }.Start();

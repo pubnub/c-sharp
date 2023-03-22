@@ -19,7 +19,7 @@ namespace PubnubApi.EndPoint
 
         private object msg;
         private string channelName = "";
-        private MessageType messageType;
+        private string type = string.Empty;
         private string spaceId = string.Empty;
         private PNCallback<PNPublishResult> savedCallback;
         private Dictionary<string, object> queryParam;
@@ -61,9 +61,9 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
-        public SignalOperation MessageType(MessageType messageType)
+        public SignalOperation Type(string type)
         {
-            this.messageType = messageType;
+            this.type = type;
             return this;
         }
         public SignalOperation SpaceId(string spaceId)
@@ -106,7 +106,7 @@ namespace PubnubApi.EndPoint
                 this.savedCallback = callback;
                 try
                 {
-                    Signal(this.channelName, this.msg, null, this.messageType, this.spaceId, this.queryParam, callback);
+                    Signal(this.channelName, this.msg, null, this.type, this.spaceId, this.queryParam, callback);
                 }
                 catch(Exception ex)
                 {
@@ -120,7 +120,7 @@ namespace PubnubApi.EndPoint
                 this.savedCallback = callback;
                 try
                 {
-                    Signal(this.channelName, this.msg, null, this.messageType, this.spaceId, this.queryParam, callback);
+                    Signal(this.channelName, this.msg, null, this.type, this.spaceId, this.queryParam, callback);
                 }
                 catch(Exception ex)
                 {
@@ -134,7 +134,7 @@ namespace PubnubApi.EndPoint
 
         public async Task<PNResult<PNPublishResult>> ExecuteAsync()
         {
-            return await Signal(this.channelName, this.msg, null, this.messageType, this.spaceId,  this.queryParam).ConfigureAwait(false);
+            return await Signal(this.channelName, this.msg, null, this.type, this.spaceId,  this.queryParam).ConfigureAwait(false);
         }
 
         internal void Retry()
@@ -142,12 +142,12 @@ namespace PubnubApi.EndPoint
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
-                Signal(this.channelName, this.msg, null, this.messageType, this.spaceId, this.queryParam, savedCallback);
+                Signal(this.channelName, this.msg, null, this.type, this.spaceId, this.queryParam, savedCallback);
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
             new Thread(() =>
             {
-                Signal(this.channelName, this.msg, null, this.messageType, this.spaceId, this.queryParam, savedCallback);
+                Signal(this.channelName, this.msg, null, this.type, this.spaceId, this.queryParam, savedCallback);
             })
             { IsBackground = true }.Start();
 #endif

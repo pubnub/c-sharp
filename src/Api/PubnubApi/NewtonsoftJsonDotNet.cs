@@ -269,22 +269,10 @@ namespace PubnubApi
                 string publisherValue = (listObject[3] != null) ? listObject[3].ToString() : "";
                 publisherProp.SetValue(message, publisherValue, null);
 
-                //Set MessageType
-                PropertyInfo messageTypeProp = specific.GetProperty("MessageType");
-                string messageTypeValue = (listObject[4] != null) ? listObject[4].ToString().Replace("pn_","") : "";
-                string messageTypeStr = messageTypeValue.Insert(0, messageTypeValue[0].ToString().ToUpperInvariant()).Remove(1, 1);
-                MessageType msgType;
-                if (Enum.IsDefined(typeof(PNMessageType), messageTypeStr))
-                {
-                   PNMessageType currentMessageType = (PNMessageType)Enum.Parse(typeof(PNMessageType), messageTypeStr);
-
-                    msgType =new MessageType(currentMessageType, null);
-                }
-                else
-                {
-                    msgType = new MessageType(messageTypeValue);
-                }
-                messageTypeProp.SetValue(message, msgType, null);
+                //Set Type
+                PropertyInfo typeProp = specific.GetProperty("Type");
+                string typeValue = (listObject[4] != null) ? listObject[4].ToString() : "";
+                typeProp.SetValue(message, typeValue, null);
 
                 //Set SpaceId
                 PropertyInfo spaceIdProp = specific.GetProperty("SpaceId");
@@ -364,22 +352,10 @@ namespace PubnubApi
                 string publisherValue = (listObject[3] != null) ? listObject[3].ToString() : "";
                 publisherProp.SetValue(message, publisherValue, null);
 
-                //Set MessageType
-                PropertyInfo messageTypeProp = specific.GetProperty("MessageType");
-                string messageTypeValue = (listObject[4] != null) ? listObject[4].ToString().Replace("pn_","") : "";
-                string messageTypeStr = messageTypeValue.Insert(0, messageTypeValue[0].ToString().ToUpperInvariant()).Remove(1, 1);
-                MessageType msgType;
-                if (Enum.IsDefined(typeof(PNMessageType), messageTypeStr))
-                {
-                   PNMessageType currentMessageType = (PNMessageType)Enum.Parse(typeof(PNMessageType), messageTypeStr);
-
-                    msgType =new MessageType(currentMessageType, null);
-                }
-                else
-                {
-                    msgType = new MessageType(messageTypeValue);
-                }
-                messageTypeProp.SetValue(message, msgType, null);
+                //Set Type
+                PropertyInfo typeProp = specific.GetProperty("Type");
+                string typeValue = (listObject[4] != null) ? listObject[4].ToString() : "";
+                typeProp.SetValue(message, typeValue, null);
 
                 //Set SpaceId
                 PropertyInfo spaceIdProp = specific.GetProperty("SpaceId");

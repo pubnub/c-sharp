@@ -434,7 +434,6 @@ Added CultureInfo.InvariantCulture to string formatting.</PackageReleaseNotes>
       <Link>Model\Consumer\History\PNHistoryResult.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\Model\Consumer\History\PNMessageCountResult.cs" Link="Model\Consumer\History\PNMessageCountResult.cs" />
-    <Compile Include="..\PubnubApi\Model\Consumer\MessageType.cs" Link="Model\Consumer\MessageType.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNChannelMember.cs" Link="Model\Consumer\Objects\PNChannelMember.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNChannelMembersItemResult.cs" Link="Model\Consumer\Objects\PNChannelMembersItemResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNChannelMembersResult.cs" Link="Model\Consumer\Objects\PNChannelMembersResult.cs" />

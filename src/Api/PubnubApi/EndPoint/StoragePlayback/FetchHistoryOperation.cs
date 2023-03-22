@@ -21,6 +21,7 @@ namespace PubnubApi.EndPoint
         private bool withMetaOption;
         private bool withMessageActionsOption;
         private bool includeMessageType = true; //default to  true
+        private bool includeType = true; //default to  true
         private bool withUuidOption = true; //default to  true
         private bool withSpaceIdOption = false;
         private long startTimetoken = -1;
@@ -77,6 +78,12 @@ namespace PubnubApi.EndPoint
         public FetchHistoryOperation IncludeMessageType(bool withMessageType)
         {
             includeMessageType = withMessageType;
+            return this;
+        }
+
+        public FetchHistoryOperation IncludeType(bool withType)
+        {
+            includeType = withType;
             return this;
         }
 
@@ -201,7 +208,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
             
-            Uri request = urlBuilder.BuildFetchRequest("GET", "", this.channelNames, this.startTimetoken, this.endTimetoken, this.perChannelCount, this.reverseOption, this.withMetaOption, this.withMessageActionsOption, this.withUuidOption, this.includeMessageType, this.withSpaceIdOption, this.queryParam);
+            Uri request = urlBuilder.BuildFetchRequest("GET", "", this.channelNames, this.startTimetoken, this.endTimetoken, this.perChannelCount, this.reverseOption, this.withMetaOption, this.withMessageActionsOption, this.withUuidOption, this.includeMessageType, this.includeType, this.withSpaceIdOption, this.queryParam);
 
             RequestState<PNFetchHistoryResult> requestState = new RequestState<PNFetchHistoryResult>();
             requestState.Channels = new[] { channel };
@@ -232,7 +239,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
             
-            Uri request = urlBuilder.BuildFetchRequest("GET", "", this.channelNames, this.startTimetoken, this.endTimetoken, this.perChannelCount, this.reverseOption, this.withMetaOption, this.withMessageActionsOption, this.withUuidOption, this.includeMessageType, this.withSpaceIdOption, this.queryParam);
+            Uri request = urlBuilder.BuildFetchRequest("GET", "", this.channelNames, this.startTimetoken, this.endTimetoken, this.perChannelCount, this.reverseOption, this.withMetaOption, this.withMessageActionsOption, this.withUuidOption, this.includeMessageType, this.includeType, this.withSpaceIdOption, this.queryParam);
 
             RequestState<PNFetchHistoryResult> requestState = new RequestState<PNFetchHistoryResult>();
             requestState.Channels = new[] { channel };

@@ -20,7 +20,7 @@ namespace AcceptanceTests.Steps
             PNResult<PNPublishResult> getPublishResponse = await pn.Publish()
                 .Channel("my_channel")
                 .Message("test message")
-                .MessageType(new MessageType(p1))
+                .Type(p1)
                 .SpaceId(p0)
                 .ExecuteAsync();
 

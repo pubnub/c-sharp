@@ -193,16 +193,16 @@ namespace AcceptanceTests.Steps
                 List<PNFetchHistoryItemResult> itemList = fetchHistoryResult.Messages.ElementAt(0).Value;
                 if (itemList != null && itemList.Count > 0)
                 {
-                    foreach(PNFetchHistoryItemResult item in itemList)
+                    foreach (PNFetchHistoryItemResult item in itemList)
                     {
-                        if (item.MessageType != null && string.Compare(file, item.MessageType.ToString().Replace("pn_",""), true) == 0)
+                        if (item.Type != null && string.Compare(file, item.Type.ToString(), true) == 0)
                         {
                             gotExpectedResult = true;
                             break;
                         }
                         if (item.Entry is Dictionary<string, object>)
                         {
-                            if (string.Compare("file", file, true) == 0 && string.Compare("file", item.MessageType.ToString().Replace("pn_",""), true) == 0)
+                            if (string.Compare("file", file, true) == 0 && string.Compare("file", item.Type.ToString(), true) == 0)
                             {
                                 Dictionary<string, object> itemDict = item.Entry as Dictionary<string, object>;
                                 if (itemDict != null && itemDict.ContainsKey(message) && itemDict.ContainsKey(file))
@@ -303,7 +303,7 @@ namespace AcceptanceTests.Steps
                 {
                     foreach(PNFetchHistoryItemResult item in itemList)
                     {
-                        if (item.MessageType == null)
+                        if (item.Type == null)
                         {
                             gotExpectedResult = true;
                         }
@@ -337,7 +337,7 @@ namespace AcceptanceTests.Steps
                 {
                     foreach(PNFetchHistoryItemResult item in itemList)
                     {
-                        if (item.MessageType != null)
+                        if (item.Type != null)
                         {
                             gotExpectedResult = true;
                             break;
