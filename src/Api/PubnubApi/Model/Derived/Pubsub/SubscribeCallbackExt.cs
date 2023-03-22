@@ -127,17 +127,15 @@ namespace PubnubApi
 
         public override void Message<T>(Pubnub pubnub, PNMessageResult<T> message)
         {
-            PNMessageResult<object> message1 = new PNMessageResult<object>
-            {
-                Channel = message.Channel,
-                Message = (T)(object)message.Message,
-                Subscription = message.Subscription,
-                Timetoken = message.Timetoken,
-                UserMetadata = message.UserMetadata,
-                Publisher = message.Publisher,
-                Type = message.Type,
-                SpaceId = message.SpaceId
-            };
+            PNMessageResult<object> message1 = new PNMessageResult<object>();
+            message1.Channel = message.Channel;
+            message1.Message = (T)(object)message.Message;
+            message1.Subscription = message.Subscription;
+            message1.Timetoken = message.Timetoken;
+            message1.UserMetadata = message.UserMetadata;
+            message1.Publisher = message.Publisher;
+            message1.MessageType = message.MessageType;
+            message1.SpaceId = message.SpaceId;
 
             subscribeAction?.Invoke(pubnub, message1);
         }
@@ -161,7 +159,7 @@ namespace PubnubApi
             message1.Timetoken = signalMessage.Timetoken;
             message1.UserMetadata = signalMessage.UserMetadata;
             message1.Publisher = signalMessage.Publisher;
-            message1.Type = signalMessage.Type;
+            message1.MessageType = signalMessage.MessageType;
             message1.SpaceId = signalMessage.SpaceId;
 
             signalAction?.Invoke(pubnub, message1);

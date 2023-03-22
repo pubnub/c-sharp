@@ -30,12 +30,7 @@ namespace PubnubApi
         /// <summary>
         /// message type indicator
         /// </summary>
-        private int e { get; set; }
-
-        /// <summary>
-        /// custom message type
-        /// </summary>
-        private string mt { get; set; }
+        private MessageType mt { get; set; }
 
         /// <summary>
         /// flags
@@ -101,19 +96,7 @@ namespace PubnubApi
             }
         }
 
-        public int MessageType
-        {
-            get
-            {
-                return e;
-            }
-            internal set
-            {
-                e = value;
-            }
-        }
-
-        public string Type
+        public MessageType MessageType
         {
             get
             {

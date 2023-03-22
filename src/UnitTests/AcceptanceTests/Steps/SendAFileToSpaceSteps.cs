@@ -164,7 +164,7 @@ namespace AcceptanceTests.Steps
                 .Channel("my_channel")
                 .File(targetFileUpload)
                 .Message("test message")
-                .Type(p1)
+                .MessageType(new MessageType(p1))
                 .SpaceId(p0)
                 .ExecuteAsync();
 

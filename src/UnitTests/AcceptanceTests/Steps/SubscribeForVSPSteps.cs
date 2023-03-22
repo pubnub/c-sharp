@@ -168,9 +168,16 @@ namespace AcceptanceTests.Steps
                 delegate (Pubnub pnObj, PNMessageResult<object> pubMsg)
                 {
                     messageReceived = true;
-                    if (pubMsg.Type != null)
+                    if (pubMsg.MessageType != null)
                     {
-                        userMessageTypeReceived = true;
+                        if (pubMsg.MessageType.IsPNMessageType())
+                        {
+                            messageReceived = true;
+                        }
+                        else
+                        {
+                            userMessageTypeReceived = true;
+                        }
                     }
                     if (!string.IsNullOrEmpty(pubMsg.SpaceId))
                     {

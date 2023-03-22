@@ -390,7 +390,7 @@ namespace PubnubApi
             return BuildRestApiRequest(requestMethod, requestBody, url, currentType, queryString, true);
         }
 
-        Uri IUrlRequestBuilder.BuildFetchRequest(string requestMethod, string requestBody, string[] channels, long start, long end, int count, bool reverse, bool includeMeta, bool includeMessageActions, bool includeUuid, bool includeMessageType, bool includeType, bool includeSpaceId, Dictionary<string, object> externalQueryParam)
+        Uri IUrlRequestBuilder.BuildFetchRequest(string requestMethod, string requestBody, string[] channels, long start, long end, int count, bool reverse, bool includeMeta, bool includeMessageActions, bool includeUuid, bool includeMessageType, bool includeSpaceId, Dictionary<string, object> externalQueryParam)
         {
             string channel = (channels != null && channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : "";
 
@@ -434,18 +434,11 @@ namespace PubnubApi
             if (includeMessageType)
             {
                 requestQueryStringParams.Add("include_message_type", "true");
-            }
-            else
-            {
-                requestQueryStringParams.Add("include_message_type", "false");
-            }
-
-            if (includeType)
-            {
                 requestQueryStringParams.Add("include_type", "true");
             }
             else
             {
+                requestQueryStringParams.Add("include_message_type", "false");
                 requestQueryStringParams.Add("include_type", "false");
             }
 
