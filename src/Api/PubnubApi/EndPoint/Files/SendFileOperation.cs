@@ -31,6 +31,8 @@ namespace PubnubApi.EndPoint
         private bool storeInHistory = true;
         private Dictionary<string, object> userMetadata;
         private int ttl = -1;
+        private string type = string.Empty;
+        private string spaceId = string.Empty;
 
         public SendFileOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
         {
@@ -84,6 +86,17 @@ namespace PubnubApi.EndPoint
         public SendFileOperation Ttl(int ttl)
         {
             this.ttl = ttl;
+            return this;
+        }
+
+        public SendFileOperation Type(string type)
+        {
+            this.type = type;
+            return this;
+        }
+        public SendFileOperation SpaceId(string spaceId)
+        {
+            this.spaceId = spaceId;
             return this;
         }
 
@@ -400,7 +413,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
 
-            Uri request = urlBuilder.BuildPublishFileMessageRequest("GET", "", this.channelName, message, this.storeInHistory, this.ttl, this.userMetadata, null, externalQueryParam);
+            Uri request = urlBuilder.BuildPublishFileMessageRequest("GET", "", this.channelName, message, this.storeInHistory, this.ttl, this.userMetadata, this.type, this.spaceId, null, externalQueryParam);
 
             RequestState<PNPublishFileMessageResult> requestState = new RequestState<PNPublishFileMessageResult>();
             requestState.Channels = new[] { this.channelName };
@@ -420,7 +433,9 @@ namespace PubnubApi.EndPoint
                     ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
                     PNPublishFileMessageResult publishResult = responseBuilder.JsonToObject<PNPublishFileMessageResult>(result, true);
                     StatusBuilder statusBuilder = new StatusBuilder(config, jsonLibrary);
-                    if (publishResult != null)
+                    if (result != null && 
+                        string.Compare(result[0].ToString(), "1", StringComparison.OrdinalIgnoreCase) == 0 && 
+                        publishResult != null)
                     {
                         ret.Result = publishResult;
                         PNStatus status = statusBuilder.CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, (int)HttpStatusCode.OK, null);
