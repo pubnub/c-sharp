@@ -422,6 +422,9 @@ Added TcpKeepAlive and ConnectionLimit to improve performance.</PackageReleaseNo
     <Compile Include="..\PubnubApi\Model\Consumer\Files\PNListFilesResult.cs" Link="Model\Consumer\Files\PNListFilesResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Files\PNPublishFileMessageResult.cs" Link="Model\Consumer\Files\PNPublishFileMessageResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\History\PNFetchHistoryResult.cs" Link="Model\Consumer\History\PNFetchHistoryResult.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\History\PNFetchHistoryItemResult.cs">
+      <Link>Model\Consumer\History\PNFetchHistoryItemResult.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\Model\Consumer\History\PNHistoryItemResult.cs">
       <Link>Model\Consumer\History\PNHistoryItemResult.cs</Link>
     </Compile>
