@@ -13,15 +13,15 @@ namespace PubnubApi.Interface
 
         Uri BuildMultiChannelLeaveRequest(string requestMethod, string requestBody, string[] channels, string[] channelGroups, string jsonUserState, Dictionary<string, object> externalQueryParam);
 
-        Uri BuildPublishRequest(string requestMethod, string requestBody, string channel, object originalMessage, bool storeInHistory, int ttl, Dictionary<string, object> userMetaData, Dictionary<string, string> additionalUrlParams, Dictionary<string, object> externalQueryParam);
+        Uri BuildPublishRequest(string requestMethod, string requestBody, string channel, object originalMessage, bool storeInHistory, int ttl, Dictionary<string, object> userMetaData, string type, string spaceId, Dictionary<string, string> additionalUrlParams, Dictionary<string, object> externalQueryParam);
 
-        Uri BuildSignalRequest(string requestMethod, string requestBody, string channel, object originalMessage, Dictionary<string, object> userMetaData, Dictionary<string, object> externalQueryParam);
+        Uri BuildSignalRequest(string requestMethod, string requestBody, string channel, object originalMessage, Dictionary<string, object> userMetaData, string type, string spaceId, Dictionary<string, object> externalQueryParam);
 
         Uri BuildHereNowRequest(string requestMethod, string requestBody, string[] channels, string[] channelGroups, bool showUUIDList, bool includeUserState, Dictionary<string, object> externalQueryParam);
 
         Uri BuildHistoryRequest(string requestMethod, string requestBody, string channel, long start, long end, int count, bool reverse, bool includeToken, bool includeMeta, Dictionary<string, object> externalQueryParam);
 
-        Uri BuildFetchRequest(string requestMethod, string requestBody, string[] channels, long start, long end, int count, bool reverse, bool includeMeta, bool includeMessageActions, bool includeUuid, bool includeMessageType, Dictionary<string, object> externalQueryParam);
+        Uri BuildFetchRequest(string requestMethod, string requestBody, string[] channels, long start, long end, int count, bool reverse, bool includeMeta, bool includeMessageActions, bool includeUuid, bool includeMessageType, bool includeType, bool includeSpaceId, Dictionary<string, object> externalQueryParam);
 
         Uri BuildDeleteMessageRequest(string requestMethod, string requestBody, string channel, long start, long end, Dictionary<string, object> externalQueryParam);
 
@@ -91,7 +91,7 @@ namespace PubnubApi.Interface
 
         Uri BuildGenerateFileUploadUrlRequest(string requestMethod, string requestBody, string channel, Dictionary<string, object> externalQueryParam);
 
-        Uri BuildPublishFileMessageRequest(string requestMethod, string requestBody, string channel, object originalMessage, bool storeInHistory, int ttl, Dictionary<string, object> userMetaData, Dictionary<string, string> additionalUrlParams, Dictionary<string, object> externalQueryParam);
+        Uri BuildPublishFileMessageRequest(string requestMethod, string requestBody, string channel, object originalMessage, bool storeInHistory, int ttl, Dictionary<string, object> userMetaData, string type, string spaceId, Dictionary<string, string> additionalUrlParams, Dictionary<string, object> externalQueryParam);
 
         Uri BuildGetFileUrlOrDeleteReqest(string requestMethod, string requestBody, string channel, string fileId, string fileName, Dictionary<string, object> externalQueryParam, PNOperationType operationType);
 

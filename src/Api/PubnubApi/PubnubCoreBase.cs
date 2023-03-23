@@ -430,6 +430,12 @@ namespace PubnubApi
                                     var _ = Int32.TryParse(dicItem[key].ToString(), out subscriptionTypeIndicator);
                                     msg.MessageType = subscriptionTypeIndicator;
                                     break;
+                                case "mt":
+                                     if (dicItem[key] != null && !string.IsNullOrEmpty(dicItem[key].ToString()))
+                                    {
+                                        msg.Type = dicItem[key].ToString();
+                                    }
+                                    break;
                                 case "f":
                                     msg.Flags = dicItem[key].ToString();
                                     break;
@@ -493,11 +499,16 @@ namespace PubnubApi
                                 case "u":
                                     msg.UserMetadata = dicItem[key];
                                     break;
+                                case "si":
+                                    if (dicItem[key] != null)
+                                    {
+                                        msg.SpaceId = dicItem[key].ToString();
+                                    }
+                                    break;
                                 default:
                                     break;
                             }
                         }
-
                         msgList.Add(msg);
                     }
                 }
@@ -747,6 +758,12 @@ namespace PubnubApi
 
                                     payloadContainer.Add(currentMessage.IssuingClientId); //Fourth one always Publisher
 
+                                    payloadContainer.Add(currentMessage.Type); //Fifth one always Type
+
+                                    string currentSpaceId = currentMessage.SpaceId;
+
+                                    payloadContainer.Add(string.IsNullOrEmpty(currentSpaceId) ? "" : currentSpaceId); //Six one always SpaceId
+
                                     if (!string.IsNullOrEmpty(currentMessageChannelGroup)) //Add cg first before channel
                                     {
                                         payloadContainer.Add(currentMessageChannelGroup);
@@ -770,7 +787,9 @@ namespace PubnubApi
                                                 Subscription = pnMessageResult.Subscription,
                                                 Timetoken = pnMessageResult.Timetoken,
                                                 UserMetadata = pnMessageResult.UserMetadata,
-                                                Publisher = pnMessageResult.Publisher
+                                                Publisher = pnMessageResult.Publisher,
+                                                Type = pnMessageResult.Type,
+                                                SpaceId = pnMessageResult.SpaceId
                                             };
                                             Announce(signalMessage);
                                         }
