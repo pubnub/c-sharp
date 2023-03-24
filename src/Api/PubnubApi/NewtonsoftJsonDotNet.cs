@@ -546,12 +546,12 @@ namespace PubnubApi
                     {
                         ack.Timetoken = presenceTimetoken;
                     }
-                    ack.Channel = (listObject.Count == 6) ? listObject[5].ToString() : listObject[4].ToString();
+                    ack.Channel = (listObject.Count == 8) ? listObject[7].ToString() : listObject[6].ToString();
                     ack.Channel = ack.Channel.Replace("-pnpres", "");
 
-                    if (listObject.Count == 6)
+                    if (listObject.Count == 8)
                     {
-                        ack.Subscription = listObject[4].ToString();
+                        ack.Subscription = listObject[6].ToString();
                         ack.Subscription = ack.Subscription.Replace("-pnpres", "");
                     }
 
