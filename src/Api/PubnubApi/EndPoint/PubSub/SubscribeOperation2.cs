@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using PubnubApi.Interface;
 using System.Threading.Tasks;
 using System.Net;
 using System.Globalization;
@@ -12,7 +11,7 @@ using PubnubApi.PubnubEventEngine;
 
 namespace PubnubApi.EndPoint
 {
-    public class SubscribeOperation2<T>
+    public class SubscribeOperation2<T>: ISubscribeOperation<T>
     {
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
@@ -29,7 +28,7 @@ namespace PubnubApi.EndPoint
         private Dictionary<string, object> queryParam;
         private EventEngine pnEventEngine;
         private Pubnub PubnubInstance;
-        internal List<SubscribeCallback> SubscribeCallbackListenerList
+        public List<SubscribeCallback> SubscribeListenerList
         {
             get;
             set;
@@ -145,7 +144,7 @@ namespace PubnubApi.EndPoint
         protected void ProcessListenerCallback<T>(List<object> result, bool zeroTimeTokenRequest, string[] channels, string[] channelGroups)
         {
             bool callbackAvailable = false;
-            if (result != null && result.Count >= 1 && SubscribeCallbackListenerList.Count >= 1)
+            if (result != null && result.Count >= 1 && SubscribeListenerList.Count >= 1)
             {
                 callbackAvailable = true;
             }
@@ -172,7 +171,7 @@ namespace PubnubApi.EndPoint
 
         internal void Announce(PNStatus status)
         {
-            List<SubscribeCallback> callbackList = SubscribeCallbackListenerList;
+            List<SubscribeCallback> callbackList = SubscribeListenerList;
             for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
             {
                 callbackList[listenerIndex].Status(PubnubInstance, status);
@@ -181,7 +180,7 @@ namespace PubnubApi.EndPoint
 
         internal void Announce<T>(PNMessageResult<T> message)
         {
-            List<SubscribeCallback> callbackList = SubscribeCallbackListenerList;
+            List<SubscribeCallback> callbackList = SubscribeListenerList;
             for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
             {
                 callbackList[listenerIndex].Message(PubnubInstance, message);
@@ -190,7 +189,7 @@ namespace PubnubApi.EndPoint
 
         internal void Announce<T>(PNSignalResult<T> message)
         {
-            List<SubscribeCallback> callbackList = SubscribeCallbackListenerList;
+            List<SubscribeCallback> callbackList = SubscribeListenerList;
             for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
             {
                 callbackList[listenerIndex].Signal(PubnubInstance, message);
@@ -199,7 +198,7 @@ namespace PubnubApi.EndPoint
 
         internal void Announce(PNFileEventResult message)
         {
-            List<SubscribeCallback> callbackList = SubscribeCallbackListenerList;
+            List<SubscribeCallback> callbackList = SubscribeListenerList;
             for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
             {
                 callbackList[listenerIndex].File(PubnubInstance, message);
@@ -208,7 +207,7 @@ namespace PubnubApi.EndPoint
 
         internal void Announce(PNPresenceEventResult presence)
         {
-            List<SubscribeCallback> callbackList = SubscribeCallbackListenerList;
+            List<SubscribeCallback> callbackList = SubscribeListenerList;
             for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
             {
                 callbackList[listenerIndex].Presence(PubnubInstance, presence);
@@ -217,7 +216,7 @@ namespace PubnubApi.EndPoint
 
         internal void Announce(PNObjectEventResult objectApiEvent)
         {
-            List<SubscribeCallback> callbackList = SubscribeCallbackListenerList;
+            List<SubscribeCallback> callbackList = SubscribeListenerList;
             for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
             {
                 callbackList[listenerIndex].ObjectEvent(PubnubInstance, objectApiEvent);
@@ -226,7 +225,7 @@ namespace PubnubApi.EndPoint
 
         internal void Announce(PNMessageActionEventResult messageActionEvent)
         {
-            List<SubscribeCallback> callbackList = SubscribeCallbackListenerList;
+            List<SubscribeCallback> callbackList = SubscribeListenerList;
             for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
             {
                 callbackList[listenerIndex].MessageAction(PubnubInstance, messageActionEvent);
@@ -434,7 +433,7 @@ namespace PubnubApi.EndPoint
                                                     if (fileObjDic != null && fileObjDic.ContainsKey("id") && fileObjDic.ContainsKey("name"))
                                                     {
                                                         fileMessage.File = new PNFile { Id = fileObjDic["id"].ToString(), Name = fileObjDic["name"].ToString() };
-                                                        PubnubApi.Interface.IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, currentLog, pubnubTelemetryMgr, pubnubTokenMgr, PubnubInstance.InstanceId);
+                                                        IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, currentLog, pubnubTelemetryMgr, pubnubTokenMgr, PubnubInstance.InstanceId);
                                                         Uri fileUrlRequest = urlBuilder.BuildGetFileUrlOrDeleteReqest("GET", "", fileMessage.Channel, fileMessage.File.Id, fileMessage.File.Name, null, type);
                                                         fileMessage.File.Url = fileUrlRequest.ToString();
                                                     }
@@ -663,7 +662,7 @@ namespace PubnubApi.EndPoint
             LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), log), config.LogVerbosity);
         }
 
-        public SubscribeOperation2<T> Channels(string[] channels)
+        public ISubscribeOperation<T> Channels(string[] channels)
         {
             if (channels != null && channels.Length > 0 && !string.IsNullOrEmpty(channels[0]))
             {
@@ -672,7 +671,7 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
-        public SubscribeOperation2<T> ChannelGroups(string[] channelGroups)
+        public ISubscribeOperation<T> ChannelGroups(string[] channelGroups)
         {
             if (channelGroups != null && channelGroups.Length > 0 && !string.IsNullOrEmpty(channelGroups[0]))
             {
@@ -681,19 +680,19 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
-        public SubscribeOperation2<T> WithTimetoken(long timetoken)
+        public ISubscribeOperation<T> WithTimetoken(long timetoken)
         {
             this.subscribeTimetoken = timetoken;
             return this;
         }
 
-        public SubscribeOperation2<T> WithPresence()
+        public ISubscribeOperation<T> WithPresence()
         {
             this.presenceSubscribeEnabled = true;
             return this;
         }
 
-        public SubscribeOperation2<T> QueryParam(Dictionary<string, object> customQueryParam)
+        public ISubscribeOperation<T> QueryParam(Dictionary<string, object> customQueryParam)
         {
             this.queryParam = customQueryParam;
             return this;

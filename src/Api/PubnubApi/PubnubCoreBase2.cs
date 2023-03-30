@@ -66,7 +66,7 @@ namespace PubnubApi
         protected static int PubnubNetworkTcpCheckIntervalInSeconds { get; set; } = 3;
         private static int PubnubLocalHeartbeatCheckIntervalInSeconds { get; set; } = 30;
 
-        //protected static ConcurrentDictionary<string, List<SubscribeCallback>> SubscribeCallbackListenerList
+        //protected static ConcurrentDictionary<string, List<SubscribeCallback>> SubscribeListenerList
         //{
         //    get;
         //    set;
@@ -818,7 +818,7 @@ namespace PubnubApi
                                                     if (fileObjDic != null && fileObjDic.ContainsKey("id") && fileObjDic.ContainsKey("name"))
                                                     {
                                                         fileMessage.File = new PNFile { Id = fileObjDic["id"].ToString(), Name = fileObjDic["name"].ToString() };
-                                                        PubnubApi.Interface.IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(currentConfig, jsonLib, unitTest, currentLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+                                                        IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(currentConfig, jsonLib, unitTest, currentLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
                                                         Uri fileUrlRequest = urlBuilder.BuildGetFileUrlOrDeleteReqest("GET", "", fileMessage.Channel, fileMessage.File.Id, fileMessage.File.Name, null, type);
                                                         fileMessage.File.Url = fileUrlRequest.ToString();
                                                     }
@@ -1461,7 +1461,7 @@ namespace PubnubApi
         protected void ProcessResponseCallbacks<T>(List<object> result, string[] channels, string[] channelGroups)
         {
             //bool callbackAvailable = false;
-            //if (result != null && result.Count >= 1 && SubscribeCallbackListenerList.Count >= 1)
+            //if (result != null && result.Count >= 1 && SubscribeListenerList.Count >= 1)
             //{
             //    callbackAvailable = true;
             //}
@@ -2040,9 +2040,9 @@ namespace PubnubApi
 
         internal void EndPendingRequests()
         {
-            //if (SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
+            //if (SubscribeListenerList.ContainsKey(PubnubInstance.InstanceId))
             //{
-            //    SubscribeCallbackListenerList[PubnubInstance.InstanceId].Clear();
+            //    SubscribeListenerList[PubnubInstance.InstanceId].Clear();
             //}
 
             RemoveChannelDictionary();
@@ -2164,9 +2164,9 @@ namespace PubnubApi
 
         internal void Announce(PNStatus status)
         {
-            //if (PubnubInstance != null && SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
+            //if (PubnubInstance != null && SubscribeListenerList.ContainsKey(PubnubInstance.InstanceId))
             //{
-            //    List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
+            //    List<SubscribeCallback> callbackList = SubscribeListenerList[PubnubInstance.InstanceId];
             //    for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
             //    {
             //        callbackList[listenerIndex].Status(PubnubInstance, status);
@@ -2177,9 +2177,9 @@ namespace PubnubApi
 
         internal void Announce<T>(PNMessageResult<T> message)
         {
-            //if (PubnubInstance != null && SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
+            //if (PubnubInstance != null && SubscribeListenerList.ContainsKey(PubnubInstance.InstanceId))
             //{
-            //    List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
+            //    List<SubscribeCallback> callbackList = SubscribeListenerList[PubnubInstance.InstanceId];
             //    for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
             //    {
             //        callbackList[listenerIndex].Message(PubnubInstance, message);
@@ -2189,9 +2189,9 @@ namespace PubnubApi
 
         internal void Announce<T>(PNSignalResult<T> message)
         {
-            //if (PubnubInstance != null && SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
+            //if (PubnubInstance != null && SubscribeListenerList.ContainsKey(PubnubInstance.InstanceId))
             //{
-            //    List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
+            //    List<SubscribeCallback> callbackList = SubscribeListenerList[PubnubInstance.InstanceId];
             //    for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
             //    {
             //        callbackList[listenerIndex].Signal(PubnubInstance, message);
@@ -2201,9 +2201,9 @@ namespace PubnubApi
 
         internal void Announce(PNFileEventResult message)
         {
-            //if (PubnubInstance != null && SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
+            //if (PubnubInstance != null && SubscribeListenerList.ContainsKey(PubnubInstance.InstanceId))
             //{
-            //    List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
+            //    List<SubscribeCallback> callbackList = SubscribeListenerList[PubnubInstance.InstanceId];
             //    for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
             //    {
             //        callbackList[listenerIndex].File(PubnubInstance, message);
@@ -2213,9 +2213,9 @@ namespace PubnubApi
 
         internal void Announce(PNPresenceEventResult presence)
         {
-            //if (PubnubInstance != null && SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
+            //if (PubnubInstance != null && SubscribeListenerList.ContainsKey(PubnubInstance.InstanceId))
             //{
-            //    List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
+            //    List<SubscribeCallback> callbackList = SubscribeListenerList[PubnubInstance.InstanceId];
             //    for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
             //    {
             //        callbackList[listenerIndex].Presence(PubnubInstance, presence);
@@ -2225,9 +2225,9 @@ namespace PubnubApi
 
         internal void Announce(PNObjectEventResult objectApiEvent)
         {
-            //if (PubnubInstance != null && SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
+            //if (PubnubInstance != null && SubscribeListenerList.ContainsKey(PubnubInstance.InstanceId))
             //{
-            //    List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
+            //    List<SubscribeCallback> callbackList = SubscribeListenerList[PubnubInstance.InstanceId];
             //    for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
             //    {
             //        callbackList[listenerIndex].ObjectEvent(PubnubInstance, objectApiEvent);
@@ -2237,9 +2237,9 @@ namespace PubnubApi
 
         internal void Announce(PNMessageActionEventResult messageActionEvent)
         {
-            //if (PubnubInstance != null && SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
+            //if (PubnubInstance != null && SubscribeListenerList.ContainsKey(PubnubInstance.InstanceId))
             //{
-            //    List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
+            //    List<SubscribeCallback> callbackList = SubscribeListenerList[PubnubInstance.InstanceId];
             //    for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
             //    {
             //        callbackList[listenerIndex].MessageAction(PubnubInstance, messageActionEvent);

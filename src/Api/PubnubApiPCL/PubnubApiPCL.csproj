@@ -244,6 +244,7 @@ Added TcpKeepAlive and ConnectionLimit to improve performance.</PackageReleaseNo
     <Compile Include="..\PubnubApi\Interface\IPubnubUnitTest.cs">
       <Link>Interface\IPubnubUnitTest.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Interface\ISubscribeOperation.cs" Link="Interface\ISubscribeOperation.cs" />
     <Compile Include="..\PubnubApi\Interface\IUrlRequestBuilder.cs">
       <Link>Interface\IUrlRequestBuilder.cs</Link>
     </Compile>

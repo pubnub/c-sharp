@@ -209,7 +209,7 @@ namespace PubnubApi
                 pubnubCallback = state.PubnubCallbacck;
             }
 
-            PubnubApi.Interface.IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(pubnubConfig, jsonLib, unit, pubnubLog, null, null, "");
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(pubnubConfig, jsonLib, unit, pubnubLog, null, null, "");
             Uri requestUri = urlBuilder.BuildTimeRequest("GET", "", null);
             try
             {

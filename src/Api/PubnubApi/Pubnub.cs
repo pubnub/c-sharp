@@ -35,22 +35,24 @@ namespace PubnubApi
 
         #region "PubNub API Channel Methods"
 
-        public EndPoint.SubscribeOperation<T> Subscribe<T>()
+        public ISubscribeOperation<T> Subscribe<T>()
 		{
-            EndPoint.SubscribeOperation<T> subscribeOperation = new EndPoint.SubscribeOperation<T>(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, this);
-            subscribeOperation.CurrentPubnubInstance(this);
-            savedSubscribeOperation = subscribeOperation;
-            return subscribeOperation;
+            if (pubnubConfig[InstanceId].EnableEventEngine)
+            {
+                EndPoint.SubscribeOperation2<T> subscribeOperation = new EndPoint.SubscribeOperation2<T>(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, this);
+                subscribeOperation.SubscribeListenerList = subscribeCallbackListenerList;
+                //subscribeOperation.CurrentPubnubInstance(this);
+                savedSubscribeOperation = subscribeOperation;
+                return subscribeOperation;
+            }
+            else
+            {
+                EndPoint.SubscribeOperation<T> subscribeOperation = new EndPoint.SubscribeOperation<T>(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, this);
+                //subscribeOperation.CurrentPubnubInstance(this);
+                savedSubscribeOperation = subscribeOperation;
+                return subscribeOperation;
+            }
         }
-        public EndPoint.SubscribeOperation2<T> Subscribe2<T>()
-		{
-            EndPoint.SubscribeOperation2<T> subscribeOperation = new EndPoint.SubscribeOperation2<T>(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, this);
-            subscribeOperation.SubscribeCallbackListenerList = subscribeCallbackListenerList;
-            subscribeOperation.CurrentPubnubInstance(this);
-            savedSubscribeOperation = subscribeOperation;
-            return subscribeOperation;
-        }
-
         public EndPoint.UnsubscribeOperation<T> Unsubscribe<T>()
         {
             EndPoint.UnsubscribeOperation<T>  unsubscribeOperation = new EndPoint.UnsubscribeOperation<T>(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
@@ -348,8 +350,19 @@ namespace PubnubApi
 
         public bool AddListener(SubscribeCallback listener)
         {
-            subscribeCallbackListenerList.Add(listener);
-            return true;
+            if (pubnubConfig[InstanceId].EnableEventEngine)
+            {
+                subscribeCallbackListenerList.Add(listener);
+                return true;
+            }
+            else
+            {
+                if (listenerManager == null)
+                {
+                    listenerManager = new EndPoint.ListenerManager(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, this);
+                }
+                return listenerManager.AddListener(listener);
+            }
         }
 
         public bool RemoveListener(SubscribeCallback listener)
