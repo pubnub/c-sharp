@@ -15,6 +15,11 @@ namespace PubnubApi
         private readonly EndPoint.TokenManager tokenManager;
         private object savedSubscribeOperation;
         private readonly string savedSdkVerion;
+        private List<SubscribeCallback> subscribeCallbackListenerList
+        {
+            get;
+            set;
+        } = new List<SubscribeCallback>();
 
         static Pubnub() 
         {
@@ -40,6 +45,7 @@ namespace PubnubApi
         public EndPoint.SubscribeOperation2<T> Subscribe2<T>()
 		{
             EndPoint.SubscribeOperation2<T> subscribeOperation = new EndPoint.SubscribeOperation2<T>(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, this);
+            subscribeOperation.SubscribeCallbackListenerList = subscribeCallbackListenerList;
             subscribeOperation.CurrentPubnubInstance(this);
             savedSubscribeOperation = subscribeOperation;
             return subscribeOperation;
@@ -342,19 +348,16 @@ namespace PubnubApi
 
         public bool AddListener(SubscribeCallback listener)
         {
-            if (listenerManager == null)
-            {
-                listenerManager = new EndPoint.ListenerManager(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, this);
-            }
-            return listenerManager.AddListener(listener);
+            subscribeCallbackListenerList.Add(listener);
+            return true;
         }
 
         public bool RemoveListener(SubscribeCallback listener)
         {
             bool ret = false;
-            if (listenerManager != null)
+            if (subscribeCallbackListenerList != null)
             {
-                ret = listenerManager.RemoveListener(listener);
+                ret = subscribeCallbackListenerList.Remove(listener);
             }
             return ret;
         }

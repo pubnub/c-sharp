@@ -105,6 +105,7 @@ namespace PubnubApi.PubnubEventEngine
 		public void OnReceivingEffectResponseReceived(string json)
 		{
 			var evnt = new Event();
+			bool zeroTT = true;
 			try {
 				var receivedResponse = JsonConvert.DeserializeObject<ReceiveingResponse>(json);
 				if (receivedResponse != null)
@@ -115,6 +116,7 @@ namespace PubnubApi.PubnubEventEngine
 
 					if (receivedResponse.Messages != null && receivedResponse.Messages.Length > 0)
 					{
+						zeroTT = false;
 						//WIP: Define "DELIVERING" Effect. and transition
 						for(int index = 0; index < receivedResponse.Messages.Length; index++)
 						{
@@ -135,14 +137,24 @@ namespace PubnubApi.PubnubEventEngine
 						}
 						//LogCallback?.Invoke($"Received Messages {JsonConvert.SerializeObject(receivedResponse.Messages)}");    
 					}
+					else
+					{
+						zeroTT = true;
+					}
 				}
 			} catch (Exception ex) {
 				LogCallback?.Invoke($"ReceivingEffectHandler EXCEPTION - {ex}");
 
 				evnt.Type = EventType.ReceiveFailed;
 				evnt.EventPayload.exception = ex;
+				zeroTT = false;
 			}
 			emitter.emit(evnt);
+
+			if (!zeroTT)
+			{
+				emitter.emit(json, zeroTT);
+			}
 		}
 
 		public void Cancel()

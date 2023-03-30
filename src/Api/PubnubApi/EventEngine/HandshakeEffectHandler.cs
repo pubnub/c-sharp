@@ -78,6 +78,7 @@ namespace PubnubApi.PubnubEventEngine
 				evnt.EventPayload.exception = ex;
 			}
 			emitter.emit(evnt);
+			emitter.emit(json, true);
 		}
 		public void Cancel()
 		{

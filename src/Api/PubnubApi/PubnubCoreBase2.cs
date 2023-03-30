@@ -66,11 +66,11 @@ namespace PubnubApi
         protected static int PubnubNetworkTcpCheckIntervalInSeconds { get; set; } = 3;
         private static int PubnubLocalHeartbeatCheckIntervalInSeconds { get; set; } = 30;
 
-        protected static ConcurrentDictionary<string, List<SubscribeCallback>> SubscribeCallbackListenerList
-        {
-            get;
-            set;
-        } = new ConcurrentDictionary<string, List<SubscribeCallback>>();
+        //protected static ConcurrentDictionary<string, List<SubscribeCallback>> SubscribeCallbackListenerList
+        //{
+        //    get;
+        //    set;
+        //} = new ConcurrentDictionary<string, List<SubscribeCallback>>();
 
         protected static ConcurrentDictionary<string, ConcurrentDictionary<string, long>> MultiChannelSubscribe
         {
@@ -541,7 +541,7 @@ namespace PubnubApi
             return isTargetOfDedup;
         }
 
-        private bool IsZeroTimeTokenRequest<T>(RequestState<T> asyncRequestState, List<object> result)
+        private bool IsZeroTimeTokenRequest<T>(List<object> result)
         {
             bool ret = false;
             PNConfiguration currentConfig = null;
@@ -551,7 +551,7 @@ namespace PubnubApi
                 pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig);
                 pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog);
 
-                if (asyncRequestState != null && asyncRequestState.ResponseType == PNOperationType.PNSubscribeOperation && result != null && result.Count > 0)
+                if (result != null && result.Count > 0)
                 {
                     List<SubscribeMessage> message = GetMessageFromMultiplexResult(result);
                     if (message != null && message.Count == 0)
@@ -579,12 +579,12 @@ namespace PubnubApi
             return ret;
         }
 
-        private void ResponseToConnectCallback<T>(PNOperationType type, string[] channels, string[] channelGroups, RequestState<T> asyncRequestState)
+        private void ResponseToConnectCallback<T>(PNOperationType type, string[] channels, string[] channelGroups)
         {
             PNConfiguration currentConfig;
             pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig);
             StatusBuilder statusBuilder = new StatusBuilder(currentConfig, jsonLib);
-            PNStatus status = statusBuilder.CreateStatusResponse(type, PNStatusCategory.PNConnectedCategory, asyncRequestState, (int)HttpStatusCode.OK, null);
+            PNStatus status = statusBuilder.CreateStatusResponse<T>(type, PNStatusCategory.PNConnectedCategory, null, (int)HttpStatusCode.OK, null);
 
             //Check callback exists and make sure previous timetoken = 0
             if (channels != null && channels.Length > 0)
@@ -613,7 +613,7 @@ namespace PubnubApi
             Announce(status);
         }
 
-        private void ResponseToUserCallback<T>(List<object> result, PNOperationType type, RequestState<T> asyncRequestState)
+        private void ResponseToUserCallback<T>(List<object> result, PNOperationType type)
         {
             PNConfiguration currentConfig = null;
             IPubnubLog currentLog = null;
@@ -622,7 +622,6 @@ namespace PubnubApi
                 pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig);
                 pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog);
 
-                var userCallback = (asyncRequestState != null) ? asyncRequestState.PubnubCallback : null;
                 switch (type)
                 {
                     case PNOperationType.PNSubscribeOperation:
@@ -633,7 +632,7 @@ namespace PubnubApi
                             if (messageList.Count >= currentConfig.RequestMessageCountThreshold)
                             {
                                 StatusBuilder statusBuilder = new StatusBuilder(currentConfig, jsonLib);
-                                PNStatus status = statusBuilder.CreateStatusResponse(type, PNStatusCategory.PNRequestMessageCountExceededCategory, asyncRequestState, (int)HttpStatusCode.OK, null);
+                                PNStatus status = statusBuilder.CreateStatusResponse<T>(type, PNStatusCategory.PNRequestMessageCountExceededCategory, null, (int)HttpStatusCode.OK, null);
                                 Announce(status);
                             }
 
@@ -870,72 +869,6 @@ namespace PubnubApi
 
                         }
                         break;
-                    case PNOperationType.PNTimeOperation:
-                    case PNOperationType.PNPublishOperation:
-                    case PNOperationType.PNFireOperation:
-                    case PNOperationType.PNSignalOperation:
-                    case PNOperationType.PNHistoryOperation:
-                    case PNOperationType.PNFetchHistoryOperation:
-                    case PNOperationType.PNDeleteMessageOperation:
-                    case PNOperationType.PNMessageCountsOperation:
-                    case PNOperationType.PNHereNowOperation:
-                    case PNOperationType.PNWhereNowOperation:
-                    case PNOperationType.PNAccessManagerGrantToken:
-                    case PNOperationType.PNAccessManagerGrant:
-                    case PNOperationType.PNAccessManagerRevokeToken:
-                    case PNOperationType.PNAccessManagerAudit:
-                    case PNOperationType.RevokeAccess:
-                    case PNOperationType.ChannelGroupGrantAccess:
-                    case PNOperationType.ChannelGroupAuditAccess:
-                    case PNOperationType.ChannelGroupRevokeAccess:
-                    case PNOperationType.PNGetStateOperation:
-                    case PNOperationType.PNSetStateOperation:
-                    case PNOperationType.PushRegister:
-                    case PNOperationType.PushRemove:
-                    case PNOperationType.PushGet:
-                    case PNOperationType.PushUnregister:
-                    case PNOperationType.PNAddChannelsToGroupOperation:
-                    case PNOperationType.PNRemoveChannelsFromGroupOperation:
-                    case PNOperationType.PNRemoveGroupOperation:
-                    case PNOperationType.ChannelGroupGet:
-                    case PNOperationType.ChannelGroupAllGet:
-                    case PNOperationType.PNSetUuidMetadataOperation:
-                    case PNOperationType.PNDeleteUuidMetadataOperation:
-                    case PNOperationType.PNGetAllUuidMetadataOperation:
-                    case PNOperationType.PNGetUuidMetadataOperation:
-                    case PNOperationType.PNSetChannelMetadataOperation:
-                    case PNOperationType.PNDeleteChannelMetadataOperation:
-                    case PNOperationType.PNGetAllChannelMetadataOperation:
-                    case PNOperationType.PNGetChannelMetadataOperation:
-                    case PNOperationType.PNGetMembershipsOperation:
-                    case PNOperationType.PNManageMembershipsOperation:
-                    case PNOperationType.PNSetMembershipsOperation:
-                    case PNOperationType.PNRemoveMembershipsOperation:
-                    case PNOperationType.PNGetChannelMembersOperation:
-                    case PNOperationType.PNManageChannelMembersOperation:
-                    case PNOperationType.PNSetChannelMembersOperation:
-                    case PNOperationType.PNRemoveChannelMembersOperation:
-                    case PNOperationType.PNAddMessageActionOperation:
-                    case PNOperationType.PNRemoveMessageActionOperation:
-                    case PNOperationType.PNGetMessageActionsOperation:
-                    case PNOperationType.PNGenerateFileUploadUrlOperation:
-                    case PNOperationType.PNPublishFileMessageOperation:
-                    case PNOperationType.PNListFilesOperation:
-                    case PNOperationType.PNDeleteFileOperation:
-                        if (result != null && result.Count > 0)
-                        {
-                            ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
-                            T userResult = responseBuilder.JsonToObject<T>(result, true);
-
-                            StatusBuilder statusBuilder = new StatusBuilder(currentConfig, jsonLib);
-                            PNStatus status = statusBuilder.CreateStatusResponse(type, PNStatusCategory.PNAcknowledgmentCategory, asyncRequestState, (int)HttpStatusCode.OK, null);
-
-                            if (userCallback != null)
-                            {
-                                userCallback.OnResponse(userResult, status);
-                            }
-                        }
-                        break;
                     case PNOperationType.PNHeartbeatOperation:
                         if (result != null && result.Count > 0)
                         {
@@ -952,12 +885,12 @@ namespace PubnubApi
                                     PNException ex = null;
                                     if (userResult != null && userResult.Status == 200)
                                     {
-                                        status = statusBuilder.CreateStatusResponse(type, PNStatusCategory.PNAcknowledgmentCategory, asyncRequestState, (int)HttpStatusCode.OK, null);
+                                        status = statusBuilder.CreateStatusResponse<T>(type, PNStatusCategory.PNAcknowledgmentCategory, null, (int)HttpStatusCode.OK, null);
                                     }
                                     else
                                     {
                                         ex = new PNException(userResult.Message);
-                                        status = statusBuilder.CreateStatusResponse(type, PNStatusCategory.PNAcknowledgmentCategory, asyncRequestState, userResult.Status, ex);
+                                        status = statusBuilder.CreateStatusResponse<T>(type, PNStatusCategory.PNAcknowledgmentCategory, null, userResult.Status, ex);
                                     }
 
                                     Announce(status);
@@ -965,7 +898,7 @@ namespace PubnubApi
                                 else if (currentConfig.HeartbeatNotificationOption == PNHeartbeatNotificationOption.Failures && userResult.Status != 200)
                                 {
                                     StatusBuilder statusBuilder = new StatusBuilder(currentConfig, jsonLib);
-                                    PNStatus status = statusBuilder.CreateStatusResponse(type, PNStatusCategory.PNAcknowledgmentCategory, asyncRequestState, userResult.Status, new PNException(userResult.Message));
+                                    PNStatus status = statusBuilder.CreateStatusResponse<T>(type, PNStatusCategory.PNAcknowledgmentCategory, null, userResult.Status, new PNException(userResult.Message));
                                     Announce(status);
                                 }
                             }
@@ -1380,7 +1313,7 @@ namespace PubnubApi
             }
             if (!errorCallbackRaised && asyncRequestState != null)
             {
-                result = WrapResultBasedOnResponseType<T>(asyncRequestState.ResponseType, jsonString, asyncRequestState.Channels, asyncRequestState.ChannelGroups, asyncRequestState.Reconnect, asyncRequestState.Timetoken, asyncRequestState.PubnubCallback);
+                result = WrapResultBasedOnResponseType<T>(asyncRequestState.ResponseType, jsonString, asyncRequestState.Channels, asyncRequestState.ChannelGroups);
             }
 
             return result;
@@ -1474,12 +1407,9 @@ namespace PubnubApi
 
             return status;
         }
-        protected List<object> WrapResultBasedOnResponseType<T>(PNOperationType type, string jsonString, string[] channels, string[] channelGroups, bool reconnect, long lastTimetoken, PNCallback<T> callback)
+        public List<object> WrapResultBasedOnResponseType<T>(PNOperationType type, string jsonString, string[] channels, string[] channelGroups)
         {
             List<object> result = new List<object>();
-            PNConfiguration currentConfig;
-            IPubnubLog currentLog;
-
             try
             {
                 string multiChannel = (channels != null) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : "";
@@ -1510,177 +1440,12 @@ namespace PubnubApi
                             result.Add(multiChannelGroup);
                             result.Add(multiChannel);
 
-                            int receivedRegion = GetRegionFromMultiplexResult(result);
-                            LastSubscribeRegion[PubnubInstance.InstanceId] = receivedRegion;
-
-                            long receivedTimetoken = GetTimetokenFromMultiplexResult(result);
-
-                            long minimumTimetoken1 = (MultiChannelSubscribe[PubnubInstance.InstanceId].Count > 0) ? MultiChannelSubscribe[PubnubInstance.InstanceId].Min(token => token.Value) : 0;
-                            long minimumTimetoken2 = (MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Count > 0) ? MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Min(token => token.Value) : 0;
-                            long minimumTimetoken = Math.Max(minimumTimetoken1, minimumTimetoken2);
-
-                            long maximumTimetoken1 = (MultiChannelSubscribe[PubnubInstance.InstanceId].Count > 0) ? MultiChannelSubscribe[PubnubInstance.InstanceId].Max(token => token.Value) : 0;
-                            long maximumTimetoken2 = (MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Count > 0) ? MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Max(token => token.Value) : 0;
-                            long maximumTimetoken = Math.Max(maximumTimetoken1, maximumTimetoken2);
-
-                            if (minimumTimetoken == 0 || lastTimetoken == 0)
-                            {
-                                if (maximumTimetoken == 0)
-                                {
-                                    LastSubscribeTimetoken[PubnubInstance.InstanceId] = receivedTimetoken;
-                                }
-                                else
-                                {
-                                    if (!enableResumeOnReconnect)
-                                    {
-                                        LastSubscribeTimetoken[PubnubInstance.InstanceId] = receivedTimetoken;
-                                    }
-                                    else
-                                    {
-                                        //do nothing. keep last subscribe token
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                if (reconnect)
-                                {
-                                    if (enableResumeOnReconnect)
-                                    {
-                                        //do nothing. keep last subscribe token
-                                    }
-                                    else
-                                    {
-                                        LastSubscribeTimetoken[PubnubInstance.InstanceId] = receivedTimetoken;
-                                    }
-                                }
-                                else
-                                {
-                                    LastSubscribeTimetoken[PubnubInstance.InstanceId] = receivedTimetoken;
-                                }
-                            }
                             break;
                         case PNOperationType.PNHeartbeatOperation:
                             Dictionary<string, object> heartbeatadictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
                             result = new List<object>();
                             result.Add(heartbeatadictionary);
                             result.Add(multiChannel);
-                            break;
-                        case PNOperationType.PNTimeOperation:
-                            break;
-                        case PNOperationType.PNHistoryOperation:
-                        case PNOperationType.PNFetchHistoryOperation:
-                            if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig) && pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog))
-                            {
-                                if (type == PNOperationType.PNFetchHistoryOperation)
-                                {
-                                    for (int index = 0; index < result.Count; index++)
-                                    {
-                                        Dictionary<string, object> messageContainer = jsonLib.ConvertToDictionaryObject(result[index]);
-                                        if (messageContainer != null && messageContainer.Count > 0)
-                                        {
-                                            if (messageContainer.ContainsKey("channels"))
-                                            {
-                                                object channelMessageContainer = messageContainer["channels"];
-                                                Dictionary<string, object> channelDic = jsonLib.ConvertToDictionaryObject(channelMessageContainer);
-                                                if (channelDic != null && channelDic.Count > 0)
-                                                {
-                                                    result[index] = SecureMessage.Instance(currentConfig, jsonLib, currentLog).FetchHistoryDecodeDecryptLoop(type, channelDic, channels, channelGroups, callback);
-                                                }
-                                            }
-                                            else
-                                            {
-                                                result[index] = messageContainer;
-                                            }
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    result = SecureMessage.Instance(currentConfig, jsonLib, currentLog).HistoryDecodeDecryptLoop(type, result, channels, channelGroups, callback);
-                                }
-                            }
-                            result.Add(multiChannel);
-                            break;
-                        case PNOperationType.PNMessageCountsOperation:
-                            Dictionary<string, object> msgCountDictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
-                            result = new List<object>();
-                            result.Add(msgCountDictionary);
-                            result.Add(multiChannel);
-                            break;
-                        case PNOperationType.PNHereNowOperation:
-                            Dictionary<string, object> dictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
-                            result = new List<object>();
-                            result.Add(dictionary);
-                            result.Add(multiChannel);
-                            break;
-                        case PNOperationType.PNWhereNowOperation:
-                            Dictionary<string, object> whereNowDictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
-                            result = new List<object>();
-                            result.Add(whereNowDictionary);
-                            result.Add(multiChannel);
-                            break;
-                        case PNOperationType.PNAccessManagerGrantToken:
-                        case PNOperationType.PNAccessManagerGrant:
-                        case PNOperationType.PNAccessManagerRevokeToken:
-                        case PNOperationType.PNAccessManagerAudit:
-                        case PNOperationType.RevokeAccess:
-                            Dictionary<string, object> grantDictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
-                            result = new List<object>();
-                            result.Add(grantDictionary);
-                            result.Add(multiChannel);
-                            break;
-                        case PNOperationType.ChannelGroupGrantAccess:
-                        case PNOperationType.ChannelGroupAuditAccess:
-                        case PNOperationType.ChannelGroupRevokeAccess:
-                            Dictionary<string, object> channelGroupPAMDictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
-                            result = new List<object>();
-                            result.Add(channelGroupPAMDictionary);
-                            result.Add(multiChannelGroup);
-                            break;
-                        case PNOperationType.PNGetStateOperation:
-                        case PNOperationType.PNSetStateOperation:
-                            Dictionary<string, object> userStateDictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
-                            result = new List<object>();
-                            result.Add(userStateDictionary);
-                            result.Add(multiChannelGroup);
-                            result.Add(multiChannel);
-                            break;
-                        case PNOperationType.PNPublishOperation:
-                        case PNOperationType.PNFireOperation:
-                        case PNOperationType.PNSignalOperation:
-                        case PNOperationType.PushRegister:
-                        case PNOperationType.PushRemove:
-                        case PNOperationType.PushGet:
-                        case PNOperationType.PushUnregister:
-                        case PNOperationType.Leave:
-                        case PNOperationType.PNSetUuidMetadataOperation:
-                        case PNOperationType.PNSetChannelMetadataOperation:
-                        case PNOperationType.PNAddMessageActionOperation:
-                        case PNOperationType.PNRemoveMessageActionOperation:
-                        case PNOperationType.PNGetMessageActionsOperation:
-                        case PNOperationType.PNGenerateFileUploadUrlOperation:
-                        case PNOperationType.PNPublishFileMessageOperation:
-                        case PNOperationType.PNListFilesOperation:
-                        case PNOperationType.PNDeleteFileOperation:
-                            result.Add(multiChannel);
-                            break;
-                        case PNOperationType.PNAddChannelsToGroupOperation:
-                        case PNOperationType.PNRemoveChannelsFromGroupOperation:
-                        case PNOperationType.PNRemoveGroupOperation:
-                        case PNOperationType.ChannelGroupGet:
-                        case PNOperationType.ChannelGroupAllGet:
-                            Dictionary<string, object> channelGroupDictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
-                            result = new List<object>();
-                            result.Add(channelGroupDictionary);
-                            if (multiChannelGroup != "")
-                            {
-                                result.Add(multiChannelGroup);
-                            }
-                            if (multiChannel != "")
-                            {
-                                result.Add(multiChannel);
-                            }
                             break;
                         default:
                             break;
@@ -1693,25 +1458,25 @@ namespace PubnubApi
             return result;
         }
 
-        protected void ProcessResponseCallbacks<T>(List<object> result, RequestState<T> asyncRequestState)
+        protected void ProcessResponseCallbacks<T>(List<object> result, string[] channels, string[] channelGroups)
         {
-            bool callbackAvailable = false;
-            if (result != null && result.Count >= 1 && (asyncRequestState.PubnubCallback != null || SubscribeCallbackListenerList.Count >= 1))
-            {
-                callbackAvailable = true;
-            }
-            if (callbackAvailable)
-            {
-                bool zeroTimeTokenRequest = IsZeroTimeTokenRequest(asyncRequestState, result);
-                if (zeroTimeTokenRequest)
-                {
-                    ResponseToConnectCallback<T>(asyncRequestState.ResponseType, asyncRequestState.Channels, asyncRequestState.ChannelGroups, asyncRequestState);
-                }
-                else
-                {
-                    ResponseToUserCallback<T>(result, asyncRequestState.ResponseType, asyncRequestState);
-                }
-            }
+            //bool callbackAvailable = false;
+            //if (result != null && result.Count >= 1 && SubscribeCallbackListenerList.Count >= 1)
+            //{
+            //    callbackAvailable = true;
+            //}
+            //if (callbackAvailable)
+            //{
+            //    bool zeroTimeTokenRequest = IsZeroTimeTokenRequest<T>(result);
+            //    if (zeroTimeTokenRequest)
+            //    {
+            //        ResponseToConnectCallback<T>(PNOperationType.PNSubscribeOperation, channels, channelGroups);
+            //    }
+            //    else
+            //    {
+            //        ResponseToUserCallback<T>(result, PNOperationType.PNSubscribeOperation);
+            //    }
+            //}
         }
 
 #endregion
@@ -2275,10 +2040,10 @@ namespace PubnubApi
 
         internal void EndPendingRequests()
         {
-            if (SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
-            {
-                SubscribeCallbackListenerList[PubnubInstance.InstanceId].Clear();
-            }
+            //if (SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
+            //{
+            //    SubscribeCallbackListenerList[PubnubInstance.InstanceId].Clear();
+            //}
 
             RemoveChannelDictionary();
             TerminatePendingWebRequest();
@@ -2399,87 +2164,87 @@ namespace PubnubApi
 
         internal void Announce(PNStatus status)
         {
-            if (PubnubInstance != null && SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
-            {
-                List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
-                for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
-                {
-                    callbackList[listenerIndex].Status(PubnubInstance, status);
-                }
-            }
+            //if (PubnubInstance != null && SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
+            //{
+            //    List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
+            //    for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
+            //    {
+            //        callbackList[listenerIndex].Status(PubnubInstance, status);
+            //    }
+            //}
             
         }
 
         internal void Announce<T>(PNMessageResult<T> message)
         {
-            if (PubnubInstance != null && SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
-            {
-                List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
-                for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
-                {
-                    callbackList[listenerIndex].Message(PubnubInstance, message);
-                }
-            }
+            //if (PubnubInstance != null && SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
+            //{
+            //    List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
+            //    for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
+            //    {
+            //        callbackList[listenerIndex].Message(PubnubInstance, message);
+            //    }
+            //}
         }
 
         internal void Announce<T>(PNSignalResult<T> message)
         {
-            if (PubnubInstance != null && SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
-            {
-                List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
-                for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
-                {
-                    callbackList[listenerIndex].Signal(PubnubInstance, message);
-                }
-            }
+            //if (PubnubInstance != null && SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
+            //{
+            //    List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
+            //    for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
+            //    {
+            //        callbackList[listenerIndex].Signal(PubnubInstance, message);
+            //    }
+            //}
         }
 
         internal void Announce(PNFileEventResult message)
         {
-            if (PubnubInstance != null && SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
-            {
-                List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
-                for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
-                {
-                    callbackList[listenerIndex].File(PubnubInstance, message);
-                }
-            }
+            //if (PubnubInstance != null && SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
+            //{
+            //    List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
+            //    for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
+            //    {
+            //        callbackList[listenerIndex].File(PubnubInstance, message);
+            //    }
+            //}
         }
 
         internal void Announce(PNPresenceEventResult presence)
         {
-            if (PubnubInstance != null && SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
-            {
-                List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
-                for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
-                {
-                    callbackList[listenerIndex].Presence(PubnubInstance, presence);
-                }
-            }
+            //if (PubnubInstance != null && SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
+            //{
+            //    List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
+            //    for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
+            //    {
+            //        callbackList[listenerIndex].Presence(PubnubInstance, presence);
+            //    }
+            //}
         }
 
         internal void Announce(PNObjectEventResult objectApiEvent)
         {
-            if (PubnubInstance != null && SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
-            {
-                List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
-                for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
-                {
-                    callbackList[listenerIndex].ObjectEvent(PubnubInstance, objectApiEvent);
-                }
-            }
+            //if (PubnubInstance != null && SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
+            //{
+            //    List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
+            //    for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
+            //    {
+            //        callbackList[listenerIndex].ObjectEvent(PubnubInstance, objectApiEvent);
+            //    }
+            //}
         }
 
         internal void Announce(PNMessageActionEventResult messageActionEvent)
         {
-            if (PubnubInstance != null && SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
-            {
-                List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
-                for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
-                {
-                    callbackList[listenerIndex].MessageAction(PubnubInstance, messageActionEvent);
-                }
-            }
+            //if (PubnubInstance != null && SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
+            //{
+            //    List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
+            //    for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
+            //    {
+            //        callbackList[listenerIndex].MessageAction(PubnubInstance, messageActionEvent);
+            //    }
+            //}
         }
 
         internal void InitializeDefaultVariableObjectStates()
