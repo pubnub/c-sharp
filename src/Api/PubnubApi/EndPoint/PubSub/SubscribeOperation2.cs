@@ -763,7 +763,7 @@ namespace PubnubApi.EndPoint
             Task.Factory.StartNew(() =>
             {
                 manager = new SubscribeManager2(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, PubnubInstance);
-                manager.CurrentPubnubInstance(PubnubInstance);
+                //manager.CurrentPubnubInstance(PubnubInstance);
                 pnEventEngine.Subscribe(channels.ToList<string>(), channelGroups.ToList<string>());
                 //manager = new SubscribeManager2(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, PubnubInstance);
                 //manager.CurrentPubnubInstance(PubnubInstance);
@@ -773,7 +773,7 @@ namespace PubnubApi.EndPoint
             new Thread(() =>
             {
                 manager = new SubscribeManager2(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, PubnubInstance);
-                manager.CurrentPubnubInstance(PubnubInstance);
+                //manager.CurrentPubnubInstance(PubnubInstance);
                 pnEventEngine.Subscribe(channels.ToList<string>(), channelGroups.ToList<string>());
                 //manager = new SubscribeManager2(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, PubnubInstance);
                 //manager.CurrentPubnubInstance(PubnubInstance);

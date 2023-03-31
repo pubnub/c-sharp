@@ -165,7 +165,8 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 CipherKey = cipherKey,
-                Secure = ssl
+                Secure = ssl,
+                EnableEventEngine = true,
             };
             if (PubnubCommon.PAMServerSideRun)
             {
@@ -440,7 +441,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Subscribe2<string>().Channels(new [] { channel }).Execute();
+            pubnub.Subscribe<string>().Channels(new [] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for Connect Status
 
             Thread.Sleep(1000);
@@ -771,7 +772,7 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Subscribe2<string>().Channels(new [] { channel }).Execute();
+            pubnub.Subscribe<string>().Channels(new [] { channel }).Execute();
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for Connect Status
 
             if (!receivedErrorMessage){
