@@ -53,12 +53,13 @@ public class MessagePopupController : MonoBehaviour {
 	private async void Update() {
 		if (Input.GetKeyDown(KeyCode.Space)) {
 			// AAAAAAAAAAAAAAAAAARRRGHHHhhh
-			var res = await PnDemoManager.instance.pubnub.Publish().Channel("test").Message(Vector3.zero.GetSerializable()).ExecuteAsync();
-			Debug.Log(res.Status.ErrorData?.Information);
+			var res = await PnDemoManager.instance.pubnub.Publish().Channel(PnDemoManager.instance.defaultChannel).Message(Vector3.zero.GetSerializable()).ExecuteAsync();
+			Debug.Log($"Publish to {PnDemoManager.instance.defaultChannel}: {res.Status.ErrorData?.Information}");
 		}
 	}
 
 	private void OnDestroy() {
+		Debug.Log("Message popup controller cleanup");
 		PnDemoManager.instance.listener.onMessage -= OnPnMessage;
 		PnDemoManager.instance.listener.onPresence -= OnPnPresence;
 	}
