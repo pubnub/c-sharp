@@ -402,105 +402,22 @@ namespace PubnubApi
                 }
             }
 
-            if (jsonMessageList != null && jsonMessageList.Count > 0)
+            if (jsonMessageList == null || jsonMessageList.Count <= 0) return msgList;
+            foreach (Dictionary<string, object> dicItem in jsonMessageList)
             {
-                foreach (Dictionary<string, object> dicItem in jsonMessageList)
-                {
-                    if (dicItem.Count > 0)
-                    {
-                        SubscribeMessage msg = new SubscribeMessage();
-                        foreach (string key in dicItem.Keys)
-                        {
-                            switch (key.ToLowerInvariant())
-                            {
-                                case "a":
-                                    msg.Shard = dicItem[key].ToString();
-                                    break;
-                                case "b":
-                                    msg.SubscriptionMatch = dicItem[key].ToString();
-                                    break;
-                                case "c":
-                                    msg.Channel = dicItem[key].ToString();
-                                    break;
-                                case "d":
-                                    msg.Payload = dicItem[key];
-                                    break;
-                                case "e":
-                                    int subscriptionTypeIndicator;
-                                    var _ = Int32.TryParse(dicItem[key].ToString(), out subscriptionTypeIndicator);
-                                    msg.MessageType = subscriptionTypeIndicator;
-                                    break;
-                                case "f":
-                                    msg.Flags = dicItem[key].ToString();
-                                    break;
-                                case "i":
-                                    msg.IssuingClientId = dicItem[key].ToString();
-                                    break;
-                                case "k":
-                                    msg.SubscribeKey = dicItem[key].ToString();
-                                    break;
-                                case "s":
-                                    int seqNum;
-                                    _ = Int32.TryParse(dicItem[key].ToString(), out seqNum);
-                                    msg.SequenceNumber = seqNum;
-                                    break;
-                                case "o":
-                                    Dictionary<string, object> ttOriginMetaData = jsonLib.ConvertToDictionaryObject(dicItem[key]);
-                                    if (ttOriginMetaData != null && ttOriginMetaData.Count > 0)
-                                    {
-                                        TimetokenMetadata ttMeta = new TimetokenMetadata();
-
-                                        foreach (string metaKey in ttOriginMetaData.Keys)
-                                        {
-                                            if (metaKey.ToLowerInvariant().Equals("t", StringComparison.OrdinalIgnoreCase))
-                                            {
-                                                long timetoken;
-                                                _ = Int64.TryParse(ttOriginMetaData[metaKey].ToString(), out timetoken);
-                                                ttMeta.Timetoken = timetoken;
-                                            }
-                                            else if (metaKey.ToLowerInvariant().Equals("r", StringComparison.OrdinalIgnoreCase))
-                                            {
-                                                ttMeta.Region = ttOriginMetaData[metaKey].ToString();
-                                            }
-                                        }
-                                        msg.OriginatingTimetoken = ttMeta;
-                                    }
-                                    break;
-                                case "p":
-                                    Dictionary<string, object> ttPublishMetaData = jsonLib.ConvertToDictionaryObject(dicItem[key]);
-                                    if (ttPublishMetaData != null && ttPublishMetaData.Count > 0)
-                                    {
-                                        TimetokenMetadata ttMeta = new TimetokenMetadata();
-
-                                        foreach (string metaKey in ttPublishMetaData.Keys)
-                                        {
-                                            string currentMetaKey = metaKey.ToLowerInvariant();
-                                            
-                                            if (currentMetaKey.Equals("t", StringComparison.OrdinalIgnoreCase))
-                                            {
-                                                long timetoken;
-                                                _ = Int64.TryParse(ttPublishMetaData[metaKey].ToString(), out timetoken);
-                                                ttMeta.Timetoken = timetoken;
-                                            }
-                                            else if (currentMetaKey.Equals("r", StringComparison.OrdinalIgnoreCase))
-                                            {
-                                                ttMeta.Region = ttPublishMetaData[metaKey].ToString();
-                                            }
-                                        }
-                                        msg.PublishTimetokenMetadata = ttMeta;
-                                    }
-                                    break;
-                                case "u":
-                                    msg.UserMetadata = dicItem[key];
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
-
-                        msgList.Add(msg);
+                if (dicItem.Count == 0) continue;
+                SubscribeMessage msg = new SubscribeMessage();
+                foreach (string key in dicItem.Keys) {
+                    object currentItem;
+                    if (key == "o" || key == "p") {
+                        currentItem = jsonLib.ConvertToDictionaryObject(dicItem[key]);
+                    } else {
+                        currentItem = dicItem[key];
                     }
+                    msg[key] = currentItem;
                 }
+
+                msgList.Add(msg);
             }
             return msgList;
         }

@@ -67,6 +67,71 @@ namespace PubnubApi
         /// </summary>
         private object u { get; set; }
 
+        internal object this[string key] {
+            get {
+                switch (key) {
+                    case "a": return a;
+                    case "b": return b;
+                    case "c": return c;
+                    case "d": return d;
+                    case "e": return e;
+                    case "f": return f;
+                    case "i": return i;
+                    case "k": return k;
+                    case "s": return s;
+                    case "u": return u;
+                    case "o": return o;
+                    case "p": return p;
+                }
+
+                return null;
+            }
+            set {
+                switch (key) {
+                    case "a": a = value.ToString(); break;
+                    case "b": b = value.ToString(); break;
+                    case "c": c = value.ToString(); break;
+                    case "d": d = value; break;
+                    case "e": 
+                        int _;
+                        if (Int32.TryParse(value.ToString(), out _)) {
+                            e = _;
+                        }
+                        break;
+                    case "f": f = value.ToString(); break;
+                    case "i": i = value.ToString(); break;
+                    case "k": k = value.ToString(); break;
+                    case "s":
+                        long __;
+                        if (long.TryParse(value.ToString(), out __)) {
+                            s = __;
+                        }
+                        break;
+                    case "u": u = value; break;
+                    case "o": ParseTimetoken(value as Dictionary<string, object>, ___ => o = ___); break;
+                    case "p": ParseTimetoken(value as Dictionary<string, object>, ___ => p = ___); break;
+                }
+            }
+        }
+
+        private void ParseTimetoken(Dictionary<string, object> ttMetaData, System.Action<TimetokenMetadata> assign) {
+            if (ttMetaData != null && ttMetaData.Count > 0) {
+                TimetokenMetadata ttMeta = new TimetokenMetadata();
+
+                foreach (string metaKey in ttMetaData.Keys) {
+                    if (metaKey.ToLowerInvariant().Equals("t", StringComparison.OrdinalIgnoreCase)) {
+                        long timetoken;
+                        _ = Int64.TryParse(ttMetaData[metaKey].ToString(), out timetoken);
+                        ttMeta.Timetoken = timetoken;
+                    } else if (metaKey.ToLowerInvariant().Equals("r", StringComparison.OrdinalIgnoreCase)) {
+                        ttMeta.Region = ttMetaData[metaKey].ToString();
+                    }
+                }
+
+                assign?.Invoke(ttMeta);
+            }
+        }
+
         public string Shard
         {
             get
