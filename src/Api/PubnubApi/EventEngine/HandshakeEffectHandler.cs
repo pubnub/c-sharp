@@ -71,9 +71,10 @@ namespace PubnubApi.PubnubEventEngine
 					evnt.EventPayload.Timetoken = handshakeResponse.Timetoken?.Timestamp;
 					evnt.EventPayload.Region = handshakeResponse.Timetoken?.Region;
 					evnt.Type = EventType.HandshakeSuccess;
+					LogCallback?.Invoke("OnHandshakeEffectResponseReceived - EventType.HandshakeSuccess");  
 				}
 			} catch (Exception ex) {
-				LogCallback?.Invoke($"HandshakeEffectHandler EXCEPTION - {ex}");
+				LogCallback?.Invoke($"OnHandshakeEffectResponseReceived EXCEPTION - {ex}");
 				evnt.Type = EventType.HandshakeFailed;
 				evnt.EventPayload.exception = ex;
 			}

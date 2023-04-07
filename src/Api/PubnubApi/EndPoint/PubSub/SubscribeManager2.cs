@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 using System.Globalization;
 using System.Collections;
 using System.Text;
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
+using System.Net.Http;
+using System.Net.Http.Headers;
+#endif
 
 namespace PubnubApi.EndPoint
 {
@@ -20,6 +24,12 @@ namespace PubnubApi.EndPoint
         private IPubnubHttp pubnubHttp;
 
         private Timer SubscribeHeartbeatCheckTimer;
+#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
+        private static HttpClient httpClientSubscribe { get; set; }
+        private static HttpClient httpClientNonsubscribe { get; set; }
+        private static HttpClient httpClientNetworkStatus { get; set; }
+        private static PubnubHttpClientHandler pubnubHttpClientHandler { get; set; }
+#endif
         public SubscribeManager2(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance)
         {
             config = pubnubConfig;
@@ -32,15 +42,15 @@ namespace PubnubApi.EndPoint
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
             if (httpClientSubscribe == null)
             {
-                if (pubnubConfiguation.Proxy != null)
+                if (config.Proxy != null)
                 {
                     HttpClientHandler httpClientHandler = new HttpClientHandler();
                     if (httpClientHandler.SupportsProxy)
                     {
-                        httpClientHandler.Proxy = pubnubConfiguation.Proxy;
+                        httpClientHandler.Proxy = config.Proxy;
                         httpClientHandler.UseProxy = true;
                     }
-                    pubnubHttpClientHandler = new PubnubHttpClientHandler("PubnubHttpClientHandler", httpClientHandler, pubnubConfiguation, jsonLib, unitTest, log);
+                    pubnubHttpClientHandler = new PubnubHttpClientHandler("PubnubHttpClientHandler", httpClientHandler, config, jsonLibrary, unit, log);
                     httpClientSubscribe = new HttpClient(pubnubHttpClientHandler);
                 }
                 else
@@ -49,19 +59,19 @@ namespace PubnubApi.EndPoint
                 }
                 httpClientSubscribe.DefaultRequestHeaders.Accept.Clear();
                 httpClientSubscribe.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                httpClientSubscribe.Timeout = TimeSpan.FromSeconds(pubnubConfiguation.SubscribeTimeout);
+                httpClientSubscribe.Timeout = TimeSpan.FromSeconds(config.SubscribeTimeout);
             }
             if (httpClientNonsubscribe == null)
             {
-                if (pubnubConfiguation.Proxy != null)
+                if (config.Proxy != null)
                 {
                     HttpClientHandler httpClientHandler = new HttpClientHandler();
                     if (httpClientHandler.SupportsProxy)
                     {
-                        httpClientHandler.Proxy = pubnubConfiguation.Proxy;
+                        httpClientHandler.Proxy = config.Proxy;
                         httpClientHandler.UseProxy = true;
                     }
-                    pubnubHttpClientHandler = new PubnubHttpClientHandler("PubnubHttpClientHandler", httpClientHandler, pubnubConfiguation, jsonLib, unitTest, log);
+                    pubnubHttpClientHandler = new PubnubHttpClientHandler("PubnubHttpClientHandler", httpClientHandler, config, jsonLibrary, unit, log);
                     httpClientNonsubscribe = new HttpClient(pubnubHttpClientHandler);
                 }
                 else
@@ -70,9 +80,9 @@ namespace PubnubApi.EndPoint
                 }
                 httpClientNonsubscribe.DefaultRequestHeaders.Accept.Clear();
                 httpClientNonsubscribe.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                httpClientNonsubscribe.Timeout = TimeSpan.FromSeconds(pubnubConfiguation.NonSubscribeRequestTimeout);
+                httpClientNonsubscribe.Timeout = TimeSpan.FromSeconds(config.NonSubscribeRequestTimeout);
             }
-            pubnubHttp = new PubnubHttp(pubnubConfiguation, jsonLib, log, pubnubTelemetryMgr, httpClientSubscribe, httpClientNonsubscribe);
+            pubnubHttp = new PubnubHttp(config, jsonLibrary, log, pubnubTelemetryMgr, httpClientSubscribe, httpClientNonsubscribe);
 #else
             pubnubHttp = new PubnubHttp(config, jsonLibrary, log, pubnubTelemetryMgr);
 #endif
@@ -284,7 +294,7 @@ namespace PubnubApi.EndPoint
                     PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(webEx == null ? innerEx : webEx);
                     //if (PubnubInstance != null && pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig))
                     //{
-                    //    status = new StatusBuilder(currentConfig, jsonLib).CreateStatusResponse<T>(pubnubRequestState.ResponseType, category, pubnubRequestState, (int)HttpStatusCode.NotFound, new PNException(ex));
+                    //    status = new StatusBuilder(currentConfig, jsonLibrary).CreateStatusResponse<T>(pubnubRequestState.ResponseType, category, pubnubRequestState, (int)HttpStatusCode.NotFound, new PNException(ex));
                     //    if (pubnubRequestState != null && pubnubRequestState.PubnubCallback != null)
                     //    {
                     //        pubnubRequestState.PubnubCallback.OnResponse(default(T), status);
@@ -553,7 +563,7 @@ namespace PubnubApi.EndPoint
 
                             break;
                         case PNOperationType.PNHeartbeatOperation:
-                            //Dictionary<string, object> heartbeatadictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
+                            //Dictionary<string, object> heartbeatadictionary = jsonLibrary.DeserializeToDictionaryOfObject(jsonString);
                             //result = new List<object>();
                             //result.Add(heartbeatadictionary);
                             //result.Add(multiChannel);

@@ -645,9 +645,6 @@ Added TcpKeepAlive and ConnectionLimit to improve performance.</PackageReleaseNo
     <Compile Include="..\PubnubApi\PubnubCoreBase.cs">
       <Link>PubnubCoreBase.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\PubnubCoreBase2.cs">
-      <Link>PubnubCoreBase2.cs</Link>
-    </Compile>
     <Compile Include="..\PubnubApi\PubnubHttp.cs">
       <Link>PubnubHttp.cs</Link>
     </Compile>
