@@ -79,33 +79,12 @@ namespace PubnubApi.PubnubEventEngine
 			args.ExtendedState = context;
 			args.ReceiveResponseCallback = OnReceivingEffectResponseReceived;
 			OnReceiveRequested(args);				
-
-			//var evnt = new Event();
-			//// TODO: Replace with stateless Utility method...
-			//try {
-			//	//var res = await httpClient.GetAsync($"https://ps.pndsn.com/v2/subscribe/sub-c-c9710928-1b7a-11e3-a0c8-02ee2ddab7fe/{String.Join(",", context.Channels.ToArray())}/0?uuid=cSharpTest&channel-group={String.Join(",", context.ChannelGroups.ToArray())}&tt={context.Timetoken}&tr={context.Region}", cancellationTokenSource.Token);
-			//	//string jsonResp = await res.Content.ReadAsStringAsync();
-			//	////LoggingMethod.WriteToLog(string.Format("ReceivingEffectHandler - {0}",jsonResp));
-			//	//var receivedResponse = JsonConvert.DeserializeObject<ReceiveingResponse>(jsonResp);
-			//	//evnt.EventPayload.Timetoken = receivedResponse.Timetoken.Timestamp;
-			//	//evnt.EventPayload.Region = receivedResponse.Timetoken.Region;
-			//	//evnt.Type = EventType.ReceiveSuccess;
-
-			//	//if (receivedResponse.Messages != null)
-			//	//	Console.WriteLine($"Received Messages {JsonConvert.SerializeObject(receivedResponse.Messages)}");    //WIP: Define "DELIVERING" Effect. and transition
-
-			//} catch (Exception ex) {
-			//	evnt.Type = EventType.ReceiveFailed;
-			//	//LoggingMethod.WriteToLog(string.Format("ReceivingEffectHandler EXCEPTION - {0}",ex));
-			//	evnt.EventPayload.exception = ex;
-			//}
-			//emitter.emit(evnt);
 		}
 
 		public void OnReceivingEffectResponseReceived(string json)
 		{
 			var evnt = new Event();
-			bool zeroTT = true;
+			int messageCount = 0;
 			try {
 				var receivedResponse = JsonConvert.DeserializeObject<ReceiveingResponse>(json);
 				if (receivedResponse != null)
@@ -116,30 +95,19 @@ namespace PubnubApi.PubnubEventEngine
 
 					if (receivedResponse.Messages != null && receivedResponse.Messages.Length > 0)
 					{
-						zeroTT = false;
-						//WIP: Define "DELIVERING" Effect. and transition
+						messageCount = receivedResponse.Messages.Length;
 						for(int index = 0; index < receivedResponse.Messages.Length; index++)
 						{
 							LogCallback?.Invoke($"Received Message ({index+1} of {receivedResponse.Messages.Length}) : {JsonConvert.SerializeObject(receivedResponse.Messages[index])}");
 							if (receivedResponse.Messages[index].Channel.IndexOf("-pnpres") > 0)
 							{
-								
 								var presenceData = JsonConvert.DeserializeObject<PresenceEvent>(receivedResponse.Messages[index].Payload.ToString());
-								LogCallback?.Invoke($"Presence Action : {presenceData?.Action}");
-								LogCallback?.Invoke($"Presence Uuid : {presenceData?.Uuid}");
-								LogCallback?.Invoke($"Presence Timestamp : {presenceData?.Timestamp}");
-								LogCallback?.Invoke($"Presence Occupancy : {presenceData?.Occupancy}");
 							}
 							else
 							{
 								LogCallback?.Invoke($"Message : {JsonConvert.SerializeObject(receivedResponse.Messages[index].Payload)}");
 							}
 						}
-						//LogCallback?.Invoke($"Received Messages {JsonConvert.SerializeObject(receivedResponse.Messages)}");    
-					}
-					else
-					{
-						zeroTT = true;
 					}
 				}
 			} catch (Exception ex) {
@@ -147,14 +115,9 @@ namespace PubnubApi.PubnubEventEngine
 
 				evnt.Type = EventType.ReceiveFailed;
 				evnt.EventPayload.exception = ex;
-				zeroTT = false;
 			}
 			emitter.emit(evnt);
-
-			if (!zeroTT)
-			{
-				emitter.emit(json, zeroTT);
-			}
+			emitter.emit(json, false, messageCount);
 		}
 
 		public void Cancel()

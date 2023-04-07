@@ -69,21 +69,21 @@ namespace PubnubApi.EndPoint
 				.OnExit(() => { System.Diagnostics.Debug.WriteLine("Unsubscribed: OnExit()"); return true; })
 				.On(EventType.SubscriptionChange, StateType.Handshaking);
 
-			pnEventEngine.CreateState(StateType.Handshaking)
-				.OnEntry(() => { System.Diagnostics.Debug.WriteLine("Handshaking: OnEntry()"); return true; })
-				.OnExit(() => { System.Diagnostics.Debug.WriteLine("Handshaking: OnExit()"); return true; })
-				.On(EventType.SubscriptionChange, StateType.Handshaking)
-				.On(EventType.HandshakeSuccess, StateType.Receiving)
-				.On(EventType.HandshakeFailed, StateType.Reconnecting)
-				.Effect(EffectType.SendHandshakeRequest);
+            pnEventEngine.CreateState(StateType.Handshaking)
+                .OnEntry(() => { System.Diagnostics.Debug.WriteLine("Handshaking: OnEntry()"); return true; })
+                .OnExit(() => { System.Diagnostics.Debug.WriteLine("Handshaking: OnExit()"); manager.HandshakeRequestCancellation(); return true; })
+                .On(EventType.SubscriptionChange, StateType.Handshaking)
+                .On(EventType.HandshakeSuccess, StateType.Receiving)
+                .On(EventType.HandshakeFailed, StateType.Reconnecting)
+                .Effect(EffectType.SendHandshakeRequest);
 
-			pnEventEngine.CreateState(StateType.Receiving)
-				.OnEntry(() => { System.Diagnostics.Debug.WriteLine("Receiving: OnEntry()"); return true; })
-				.OnExit(() => { System.Diagnostics.Debug.WriteLine("Receiving: OnExit()"); return true; })
-				.On(EventType.SubscriptionChange, StateType.Handshaking)
-				.On(EventType.ReceiveSuccess, StateType.Receiving)
-				.On(EventType.ReceiveFailed, StateType.Reconnecting)
-				.Effect(EffectType.ReceiveEventRequest);
+            pnEventEngine.CreateState(StateType.Receiving)
+                .OnEntry(() => { System.Diagnostics.Debug.WriteLine("Receiving: OnEntry()"); return true; })
+                .OnExit(() => { System.Diagnostics.Debug.WriteLine("Receiving: OnExit()"); manager.ReceiveRequestCancellation(); return true; })
+                .On(EventType.SubscriptionChange, StateType.Handshaking)
+                .On(EventType.ReceiveSuccess, StateType.Receiving)
+                .On(EventType.ReceiveFailed, StateType.Reconnecting)
+                .Effect(EffectType.ReceiveEventRequest);
 
 			pnEventEngine.CreateState(StateType.HandshakingFailed)
 				.OnEntry(() => { System.Diagnostics.Debug.WriteLine("HandshakingFailed: OnEntry()"); return true; })
@@ -105,43 +105,49 @@ namespace PubnubApi.EndPoint
 
         private void ReceivingEffect_ReceiveRequested(object sender, ReceiveRequestEventArgs e)
         {
-            Tuple<string, PNStatus> resp = manager.HandshakeRequest<T>(PNOperationType.PNSubscribeOperation, e.ExtendedState.Channels.ToArray(), e.ExtendedState.ChannelGroups.ToArray(), e.ExtendedState.Timetoken, e.ExtendedState.Region, null, null).Result;
+            Tuple<string, PNStatus> resp = manager.ReceiveRequest<T>(PNOperationType.PNSubscribeOperation, e.ExtendedState.Channels.ToArray(), e.ExtendedState.ChannelGroups.ToArray(), e.ExtendedState.Timetoken, e.ExtendedState.Region, null, null).Result;
 
             string jsonResp = resp.Item1;
             e.ReceiveResponseCallback?.Invoke(jsonResp);
 
             PNStatus status = resp.Item2;
-            status.AffectedChannels.AddRange(e.ExtendedState.Channels);
-            status.AffectedChannels.AddRange(e.ExtendedState.ChannelGroups);
-            Announce(status);
+            if (status.Error && status.StatusCode != 200)
+            {
+                status.AffectedChannels.AddRange(e.ExtendedState.Channels);
+                status.AffectedChannels.AddRange(e.ExtendedState.ChannelGroups);
+                Announce(status);
+            }
         }
 
         private void HandshakeEffect_HandshakeRequested(object sender, HandshakeRequestEventArgs e)
         {
-            Tuple<string, PNStatus> resp = manager.HandshakeRequest<T>(PNOperationType.PNSubscribeOperation, e.ExtendedState.Channels.ToArray(), e.ExtendedState.ChannelGroups.ToArray(), e.ExtendedState.Timetoken, e.ExtendedState.Region, null, null).Result;
+            Tuple<string, PNStatus> resp = manager.HandshakeRequest<T>(PNOperationType.PNSubscribeOperation, e.ExtendedState.Channels.ToArray(), e.ExtendedState.ChannelGroups.ToArray(), 0, e.ExtendedState.Region, null, null).Result;
 
             string jsonResp = resp.Item1;
             e.HandshakeResponseCallback?.Invoke(jsonResp);
 
             PNStatus status = resp.Item2;
-            status.AffectedChannels.AddRange(e.ExtendedState.Channels);
-            status.AffectedChannels.AddRange(e.ExtendedState.ChannelGroups);
-            Announce(status);
+            if (status.Error && status.StatusCode != 200)
+            {
+                status.AffectedChannels.AddRange(e.ExtendedState.Channels);
+                status.AffectedChannels.AddRange(e.ExtendedState.ChannelGroups);
+                Announce(status);
+            }
         }
 
-        private void JsonCallback(string json, bool zeroTT)
+        private void JsonCallback(string json, bool zeroTimeTokenRequest, int messageCount)
         {
             if (!string.IsNullOrEmpty(json))
             {
                 List<object> respObject = manager.WrapResultBasedOnResponseType<string>(PNOperationType.PNSubscribeOperation, json, pnEventEngine.Context.Channels.ToArray(), pnEventEngine.Context.ChannelGroups.ToArray());
                 if (respObject != null && respObject.Count > 0)
                 {
-                    ProcessListenerCallback<string>(respObject, zeroTT, pnEventEngine.Context.Channels.ToArray(), pnEventEngine.Context.ChannelGroups.ToArray());
+                    ProcessListenerCallback<string>(respObject, zeroTimeTokenRequest, messageCount, pnEventEngine.Context.Channels.ToArray(), pnEventEngine.Context.ChannelGroups.ToArray());
                 }
             }
         }
 
-        protected void ProcessListenerCallback<T>(List<object> result, bool zeroTimeTokenRequest, string[] channels, string[] channelGroups)
+        protected void ProcessListenerCallback<T>(List<object> result, bool zeroTimeTokenRequest, int messageCount, string[] channels, string[] channelGroups)
         {
             bool callbackAvailable = false;
             if (result != null && result.Count >= 1 && SubscribeListenerList.Count >= 1)
@@ -154,7 +160,7 @@ namespace PubnubApi.EndPoint
                 {
                     ResponseToConnectCallback<T>(PNOperationType.PNSubscribeOperation, channels, channelGroups);
                 }
-                else
+                else if (messageCount > 0)
                 {
                     ResponseToUserCallback<T>(result, PNOperationType.PNSubscribeOperation);
                 }

@@ -5,14 +5,14 @@ namespace PubnubApi.PubnubEventEngine
 	public class EventEmitter
 	{
 		private Action<Event>? handler;
-		private Action<string, bool>? jsonListener;
+		private Action<string, bool, int>? jsonListener;
 
 		public void RegisterHandler(Action<Event> eventHandler)
 		{
 			this.handler = eventHandler;
 		}
 
-		public void RegisterJsonListener(Action<string, bool> listenerHandler)
+		public void RegisterJsonListener(Action<string, bool, int> listenerHandler)
 		{
 			this.jsonListener = listenerHandler;
 		}
@@ -26,11 +26,11 @@ namespace PubnubApi.PubnubEventEngine
 			this.handler(e);
 		}
 
-		public void emit(string json, bool zeroTT)
+		public void emit(string json, bool zeroTimetokenRequest, int messageCount)
 		{
 			if (jsonListener != null)
 			{
-				jsonListener(json, zeroTT);
+				jsonListener(json, zeroTimetokenRequest, messageCount);
 			}
 		}
 	}

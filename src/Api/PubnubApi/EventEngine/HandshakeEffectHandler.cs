@@ -56,8 +56,6 @@ namespace PubnubApi.PubnubEventEngine
 			args.ExtendedState = context;
 			args.HandshakeResponseCallback = OnHandshakeEffectResponseReceived;
 			OnHandshakeRequested(args);				
-			// TODO: Replace with Stateless Utility Methods
-			// TODO: Fetch Configuration from PubNub instance
 		}
 		
 		public void OnHandshakeEffectResponseReceived(string json)
@@ -79,7 +77,7 @@ namespace PubnubApi.PubnubEventEngine
 				evnt.EventPayload.exception = ex;
 			}
 			emitter.emit(evnt);
-			emitter.emit(json, true);
+			emitter.emit(json, true, 0);
 		}
 		public void Cancel()
 		{

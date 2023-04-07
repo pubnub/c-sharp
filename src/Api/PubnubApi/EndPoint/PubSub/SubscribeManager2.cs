@@ -25,10 +25,12 @@ namespace PubnubApi.EndPoint
 
         private Timer SubscribeHeartbeatCheckTimer;
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
-        private static HttpClient httpClientSubscribe { get; set; }
-        private static HttpClient httpClientNonsubscribe { get; set; }
-        private static HttpClient httpClientNetworkStatus { get; set; }
-        private static PubnubHttpClientHandler pubnubHttpClientHandler { get; set; }
+        private HttpClient httpSubscribe { get; set; }
+        private HttpClient httpNonsubscribe { get; set; }
+        private HttpClient httpNetworkStatus { get; set; }
+        private PubnubHttpClientHandler pubnubHttpClientHandler { get; set; }
+#else
+        private HttpWebRequest httpSubscribe { get; set; }
 #endif
         public SubscribeManager2(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance)
         {
@@ -40,7 +42,7 @@ namespace PubnubApi.EndPoint
             //PubnubInstance = instance;
 
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
-            if (httpClientSubscribe == null)
+            if (httpSubscribe == null)
             {
                 if (config.Proxy != null)
                 {
@@ -51,17 +53,17 @@ namespace PubnubApi.EndPoint
                         httpClientHandler.UseProxy = true;
                     }
                     pubnubHttpClientHandler = new PubnubHttpClientHandler("PubnubHttpClientHandler", httpClientHandler, config, jsonLibrary, unit, log);
-                    httpClientSubscribe = new HttpClient(pubnubHttpClientHandler);
+                    httpSubscribe = new HttpClient(pubnubHttpClientHandler);
                 }
                 else
                 {
-                    httpClientSubscribe = new HttpClient();
+                    httpSubscribe = new HttpClient();
                 }
-                httpClientSubscribe.DefaultRequestHeaders.Accept.Clear();
-                httpClientSubscribe.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                httpClientSubscribe.Timeout = TimeSpan.FromSeconds(config.SubscribeTimeout);
+                httpSubscribe.DefaultRequestHeaders.Accept.Clear();
+                httpSubscribe.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                httpSubscribe.Timeout = TimeSpan.FromSeconds(config.SubscribeTimeout);
             }
-            if (httpClientNonsubscribe == null)
+            if (httpNonsubscribe == null)
             {
                 if (config.Proxy != null)
                 {
@@ -72,17 +74,17 @@ namespace PubnubApi.EndPoint
                         httpClientHandler.UseProxy = true;
                     }
                     pubnubHttpClientHandler = new PubnubHttpClientHandler("PubnubHttpClientHandler", httpClientHandler, config, jsonLibrary, unit, log);
-                    httpClientNonsubscribe = new HttpClient(pubnubHttpClientHandler);
+                    httpNonsubscribe = new HttpClient(pubnubHttpClientHandler);
                 }
                 else
                 {
-                    httpClientNonsubscribe = new HttpClient();
+                    httpNonsubscribe = new HttpClient();
                 }
-                httpClientNonsubscribe.DefaultRequestHeaders.Accept.Clear();
-                httpClientNonsubscribe.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                httpClientNonsubscribe.Timeout = TimeSpan.FromSeconds(config.NonSubscribeRequestTimeout);
+                httpNonsubscribe.DefaultRequestHeaders.Accept.Clear();
+                httpNonsubscribe.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                httpNonsubscribe.Timeout = TimeSpan.FromSeconds(config.NonSubscribeRequestTimeout);
             }
-            pubnubHttp = new PubnubHttp(config, jsonLibrary, log, pubnubTelemetryMgr, httpClientSubscribe, httpClientNonsubscribe);
+            pubnubHttp = new PubnubHttp(config, jsonLibrary, log, pubnubTelemetryMgr, httpSubscribe, httpNonsubscribe);
 #else
             pubnubHttp = new PubnubHttp(config, jsonLibrary, log, pubnubTelemetryMgr);
 #endif
@@ -122,6 +124,89 @@ namespace PubnubApi.EndPoint
                 LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} SubscribeManager=> MultiChannelSubscribeInit \n channel(s)={1} \n cg(s)={2} \n Exception Details={3}", DateTime.Now.ToString(CultureInfo.InvariantCulture), string.Join(",", channels.OrderBy(x => x).ToArray()), string.Join(",", channelGroups.OrderBy(x => x).ToArray()), ex), config.LogVerbosity);
             }
             return resp;
+        }
+
+        internal void HandshakeRequestCancellation()
+        {
+            if (httpSubscribe != null)
+            {
+                try
+                {
+                    #if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
+                    httpSubscribe.CancelPendingRequests();
+                    #else
+                    httpSubscribe.Abort();
+                    #endif     
+                    httpSubscribe = null;
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} SubscribeManager => HandshakeRequestCancellation. Done.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                }
+                catch(Exception ex)
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} SubscribeManager => HandshakeRequestCancellation Exception: {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), config.LogVerbosity);
+                }
+            }
+            else
+            {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} SubscribeManager => HandshakeRequestCancellation. No request to cancel.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+            }
+        }
+        internal async Task<Tuple<string, PNStatus>> ReceiveRequest<T>(PNOperationType responseType, string[] channels, string[] channelGroups, long? timetoken, int? region, Dictionary<string, string> initialSubscribeUrlParams, Dictionary<string, object> externalQueryParam)
+        {
+            Tuple<string, PNStatus> resp = new Tuple<string, PNStatus> ("", null);
+
+            try
+            {
+                string channelsJsonState = BuildJsonUserState(channels, channelGroups, false);
+
+                IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, null, "");
+                Uri request = urlBuilder.BuildMultiChannelSubscribeRequest("GET", "", channels, channelGroups, timetoken.GetValueOrDefault(), region.GetValueOrDefault(), channelsJsonState, initialSubscribeUrlParams, externalQueryParam);
+
+                RequestState<T> pubnubRequestState = new RequestState<T>();
+                pubnubRequestState.Channels = channels;
+                pubnubRequestState.ChannelGroups = channelGroups;
+                pubnubRequestState.ResponseType = responseType;
+                //pubnubRequestState.Reconnect = reconnect;
+                pubnubRequestState.Timetoken = timetoken.GetValueOrDefault();
+                pubnubRequestState.Region = region.GetValueOrDefault();
+                pubnubRequestState.TimeQueued = DateTime.Now;
+
+                // Wait for message
+                
+                await UrlProcessRequest<T>(request, pubnubRequestState, false).ContinueWith(r =>
+                {
+                    resp = r.Result;
+                }, TaskContinuationOptions.ExecuteSynchronously).ConfigureAwait(false);
+            }
+            catch(Exception ex)
+            {
+                LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} SubscribeManager=> MultiChannelSubscribeInit \n channel(s)={1} \n cg(s)={2} \n Exception Details={3}", DateTime.Now.ToString(CultureInfo.InvariantCulture), string.Join(",", channels.OrderBy(x => x).ToArray()), string.Join(",", channelGroups.OrderBy(x => x).ToArray()), ex), config.LogVerbosity);
+            }
+            return resp;
+        }
+
+        internal void ReceiveRequestCancellation()
+        {
+            if (httpSubscribe != null)
+            {
+                try
+                {
+                    #if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
+                    httpSubscribe.CancelPendingRequests();
+                    #else
+                    httpSubscribe.Abort();
+                    #endif   
+                    httpSubscribe = null;
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} SubscribeManager => ReceiveRequestCancellation. Done.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                }
+                catch(Exception ex)
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} SubscribeManager => ReceiveRequestCancellation Exception: {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), config.LogVerbosity);
+                }
+            }
+            else
+            {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} SubscribeManager => ReceiveRequestCancellation. No request to cancel.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+            }
         }
 
         internal protected async Task<Tuple<string, PNStatus>> UrlProcessRequest<T>(Uri requestUri, RequestState<T> pubnubRequestState, bool terminateCurrentSubRequest)
@@ -187,6 +272,7 @@ namespace PubnubApi.EndPoint
                 request.ContentType = contentType;
 
                 pubnubRequestState.Request = request;
+                httpSubscribe = request;
 
                 //if (ChannelRequest.ContainsKey(PubnubInstance.InstanceId) && (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation || pubnubRequestState.ResponseType == PNOperationType.Presence))
                 //{

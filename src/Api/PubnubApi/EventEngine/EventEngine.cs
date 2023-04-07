@@ -89,11 +89,13 @@ namespace PubnubApi.PubnubEventEngine
 			if (CurrentState != null && CurrentState.transitions.TryGetValue(e.Type, out nextStateType)) {
 				CurrentState.Exit();
 				CurrentState = this.States.Find((s) => s.Type == nextStateType);
-				UpdateContext(e.EventPayload);
+				System.Diagnostics.Debug.WriteLine($"Transition = {e.Type}");
+				UpdateContext(e.Type, e.EventPayload);
 				if (CurrentState != null)
 				{
 					CurrentState.Entry();
-					UpdateContext(e.EventPayload);
+					System.Diagnostics.Debug.WriteLine($"Transition = {e.Type}");
+					UpdateContext(e.Type, e.EventPayload);
 					if (CurrentState.Effects.Count > 0) {
 						foreach (var effect in CurrentState.Effects) {
 							System.Diagnostics.Debug.WriteLine("Found effect "+ effect);
@@ -113,11 +115,26 @@ namespace PubnubApi.PubnubEventEngine
 			this.Transition(evnt);
 		}
 
-		private void UpdateContext(EventPayload eventData)
+		private void UpdateContext(EventType eventType, EventPayload eventData)
 		{
 			if (eventData.Channels != null) Context.Channels = eventData.Channels;
 			if (eventData.ChannelGroups != null) Context.ChannelGroups = eventData.ChannelGroups;
-			if (eventData.Timetoken != null) Context.Timetoken = eventData.Timetoken;
+			if (eventData.Timetoken != null) 
+			{
+				System.Diagnostics.Debug.WriteLine($"eventData.Timetoken = {eventData.Timetoken.Value}");
+				System.Diagnostics.Debug.WriteLine($"Context.Timetoken = {Context.Timetoken.Value}");
+				if (Context.Timetoken > 0 && 
+					eventType == EventType.HandshakeSuccess && 
+					Context.Timetoken < eventData.Timetoken)
+				{
+					System.Diagnostics.Debug.WriteLine("Keeping last Context.Timetoken");
+					// do not change context timetoken. We want last timetoken.
+				}
+				else
+				{
+					Context.Timetoken = eventData.Timetoken; 
+				}
+			}
 			if (eventData.Region != null) Context.Region = eventData.Region;
 		}
 

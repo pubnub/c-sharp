@@ -6,11 +6,9 @@ namespace PubnubApi.PubnubEventEngine
 	{
 		EventEmitter eventEmitter;
 
-		//PNConfiguration pnConfig;
         public ReconnectingEffectHandler(EventEmitter emitter)
 		{
 			this.eventEmitter = emitter;
-			//pnConfig = config;
 		}
 
 		public void Start(ExtendedState context)    // TODO: Implementation of retry  getDelay() as per policy
