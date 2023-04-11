@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using PubnubApi;
+using PubnubApi.EndPoint;
 using PubnubApi.Unity;
 using UnityEngine;
 
@@ -87,6 +88,11 @@ public class PnDemoManager : PNManagerBehaviour {
 		await Task.Delay(500);
 		pubnub.GetMessageActions().Channel(defaultChannel).Execute((a, b) => Debug.Log(a.MessageActions[0].Action.Value));
 		pubnub.RemoveMessageAction().Channel(defaultChannel).MessageTimetoken(sentMessageTimetoken).ActionTimetoken(sentActionTimetoken).Execute((a, b) => Debug.Log($"Removed message action {(b.Error ? b.ErrorData.Information : "true")}"));
+		
+		
+		// memberships:
+		await Task.Delay(500);
+		pubnub.SetMemberships().Channels(new List<PNMembership>() {new PNMembership() {Channel = defaultChannel }}).Execute((a, b) => Debug.Log($"SetMembership: {!b.Error}"));
 
 		// list files
 		Debug.Log((await pubnub.ListFiles().Channel(defaultChannel).ExecuteAsync()).Result.Count);

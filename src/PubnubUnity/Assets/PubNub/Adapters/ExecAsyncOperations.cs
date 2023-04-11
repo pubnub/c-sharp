@@ -119,6 +119,14 @@ namespace PubnubApi.Unity {
 			var res = await o.ExecuteAsync();
 			callback?.Invoke(res.Result, res.Status);
 		}
+		
+		// SetMembership
+		// TODO document change - Async -> Execute
+		public static async void Execute(this SetMembershipsOperation o, System.Action<PNMembershipsResult, PNStatus> callback) {
+			var res = await o.ExecuteAsync();
+			callback?.Invoke(res.Result, res.Status);
+		}
+
 	}
 	
 }
