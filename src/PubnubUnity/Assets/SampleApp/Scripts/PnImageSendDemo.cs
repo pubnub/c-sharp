@@ -25,14 +25,7 @@ public class PnImageSendDemo : MonoBehaviour {
 	}
 
 	private async void PnOnFile(Pubnub pn, PNFileEventResult file) {
-		// var size = new VectorSerializable(file.Message as Dictionary<string, object>);
-		// var f = await pnManager.pubnub.DownloadFile().FileId(file.File.Id).FileName(file.File.Name).Channel("test").ExecuteAsync();
-		//
-		// var tex = new Texture2D((int)size.x, (int)size.y, GraphicsFormat.RGBA_DXT1_UNorm, 0);
-		// tex.LoadRawTextureData(f.Result.FileBytes);
-		// tex.Apply();
-		// targetImageComponent.texture = tex;
-		targetImageComponent.texture = await pn.DownloadTexture(file, "test", TextureCreationFlags.None);
+		targetImageComponent.texture = await pn.DownloadTexture(file, TextureCreationFlags.None);
 	}
 
 	async void Update() {
@@ -41,10 +34,7 @@ public class PnImageSendDemo : MonoBehaviour {
 			onTextureChange?.Invoke(sourceImageComponent.texture);
 			previousTexture = sourceImageComponent.texture;
 
-			// var bytes = (previousTexture as Texture2D).GetRawTextureData();
-			//
-			// var res = await pnManager.pubnub.SendFile().File(bytes).Channel("test").Message(new VectorSerializable(previousTexture.width, previousTexture.height, (int)previousTexture.graphicsFormat)).FileName("dekzdura.tex").ExecuteAsync();
-			var res = await pnManager.pubnub.SendFile().Texture(previousTexture).Channel("test")
+			var res = await pnManager.pubnub.SendFile().Texture((RenderTexture)previousTexture).Channel("test")
 				.FileName("degzdura.tex").ExecuteAsync();
 			Debug.Log(res.Status.Error);
 		}
