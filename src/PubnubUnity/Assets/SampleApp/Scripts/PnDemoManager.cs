@@ -20,7 +20,7 @@ public class PnDemoManager : PNManagerBehaviour {
 
 	void Awake() {
 		instance = this;
-		Inintialize(defaultUserId);
+		Initialize(defaultUserId);
 		pubnub.Subscribe<string>().Channels(new[] { defaultChannel }).WithPresence().Execute();
 		
 		listener.onMessage += OnPnMessage;

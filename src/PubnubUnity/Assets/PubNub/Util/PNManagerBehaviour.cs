@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace PubnubApi.Unity {
@@ -21,7 +18,7 @@ namespace PubnubApi.Unity {
 		/// </summary>
 		/// <param name="userId">You can use one User ID to represent a user on all their devices, or use one User ID per client. If you allow a user to connect from multiple devices simultaneously, use the same User ID for each device, as PubNub features such as Presence, which determine's a user's online status, rely on User IDs.<br/><a href="https://www.pubnub.com/docs/general/setup/application-setup#user-ids">See documentation</a></param>
 		/// <returns></returns>
-		public Pubnub Inintialize(string userId) {
+		public Pubnub Initialize(string userId) {
 			if (Application.isPlaying) {
 				DontDestroyOnLoad(gameObject);
 			}
@@ -44,6 +41,10 @@ namespace PubnubApi.Unity {
 
 		protected virtual void OnDestroy() {
 			pubnub.UnsubscribeAll<string>();
+		}
+
+		public static implicit operator Pubnub(PNManagerBehaviour pn) {
+			return pn.pubnub;
 		}
 	}
 }
