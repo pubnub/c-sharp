@@ -378,18 +378,15 @@ namespace PubnubApi.EndPoint
                 && errorMessage.IndexOf("The operation was canceled", StringComparison.CurrentCultureIgnoreCase) == -1)
                 {
                     PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(webEx == null ? innerEx : webEx);
-                    //if (PubnubInstance != null && pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig))
-                    //{
-                    //    status = new StatusBuilder(currentConfig, jsonLibrary).CreateStatusResponse<T>(pubnubRequestState.ResponseType, category, pubnubRequestState, (int)HttpStatusCode.NotFound, new PNException(ex));
-                    //    if (pubnubRequestState != null && pubnubRequestState.PubnubCallback != null)
-                    //    {
-                    //        pubnubRequestState.PubnubCallback.OnResponse(default(T), status);
-                    //    }
-                    //    else
-                    //    {
-                    //        Announce(status);
-                    //    }
-                    //}
+                    status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(pubnubRequestState.ResponseType, category, pubnubRequestState, (int)HttpStatusCode.NotFound, new PNException(ex));
+                        //if (pubnubRequestState != null && pubnubRequestState.PubnubCallback != null)
+                        //{
+                        //    pubnubRequestState.PubnubCallback.OnResponse(default(T), status);
+                        //}
+                        //else
+                        //{
+                        //    Announce(status);
+                        //}
 
                     //if (PubnubInstance != null && pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig) && pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog))
                     //{

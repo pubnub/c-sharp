@@ -122,12 +122,11 @@ namespace PubnubApi.PubnubEventEngine
 
 		public void Cancel()
 		{
-			//Console.WriteLine("Attempting cancellation");
-			//LoggingMethod.WriteToLog("ReceivingEffectHandler - Attempting cancellation");
 			if (cancellationTokenSource != null)
 			{
 				cancellationTokenSource.Cancel();
 			}
+			LogCallback?.Invoke($"ReceivingEffectHandler - Receiving request cancellion attempted.");
 		}
 	}
 }

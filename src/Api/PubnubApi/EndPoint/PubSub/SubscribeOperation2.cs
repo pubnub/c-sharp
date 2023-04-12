@@ -71,7 +71,13 @@ namespace PubnubApi.EndPoint
 
             pnEventEngine.CreateState(StateType.Handshaking)
                 .OnEntry(() => { System.Diagnostics.Debug.WriteLine("Handshaking: OnEntry()"); return true; })
-                .OnExit(() => { System.Diagnostics.Debug.WriteLine("Handshaking: OnExit()"); manager.HandshakeRequestCancellation(); return true; })
+                .OnExit(() => 
+                { 
+                    System.Diagnostics.Debug.WriteLine("Handshaking: OnExit()"); 
+                    manager.HandshakeRequestCancellation(); 
+                    System.Diagnostics.Debug.WriteLine(pnEventEngine.CurrentState.Type); 
+                    return true; 
+                })
                 .On(EventType.SubscriptionChange, StateType.Handshaking)
                 .On(EventType.HandshakeSuccess, StateType.Receiving)
                 .On(EventType.HandshakeFailed, StateType.Reconnecting)
@@ -111,7 +117,7 @@ namespace PubnubApi.EndPoint
             e.ReceiveResponseCallback?.Invoke(jsonResp);
 
             PNStatus status = resp.Item2;
-            if (status.Error && status.StatusCode != 200)
+            if (status != null && status.Error && status.StatusCode != 200)
             {
                 status.AffectedChannels.AddRange(e.ExtendedState.Channels);
                 status.AffectedChannels.AddRange(e.ExtendedState.ChannelGroups);
@@ -127,7 +133,7 @@ namespace PubnubApi.EndPoint
             e.HandshakeResponseCallback?.Invoke(jsonResp);
 
             PNStatus status = resp.Item2;
-            if (status.Error && status.StatusCode != 200)
+            if (status != null && status.Error && status.StatusCode != 200)
             {
                 status.AffectedChannels.AddRange(e.ExtendedState.Channels);
                 status.AffectedChannels.AddRange(e.ExtendedState.ChannelGroups);

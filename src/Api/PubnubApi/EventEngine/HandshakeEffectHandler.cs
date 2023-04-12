@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
@@ -45,13 +46,18 @@ namespace PubnubApi.PubnubEventEngine
             }
         }
 
+		CancellationTokenSource? cancellationTokenSource;
         public HandshakeEffectHandler(EventEmitter emitter)
 		{
 			this.emitter = emitter;
+			cancellationTokenSource = new CancellationTokenSource();
 		}
 		public async void Start(ExtendedState context)
 		{
 			await Task.Factory.StartNew(() => {	});
+			if (cancellationTokenSource != null && cancellationTokenSource.Token.CanBeCanceled) {
+				Cancel();
+			}
 			HandshakeRequestEventArgs args = new HandshakeRequestEventArgs();
 			args.ExtendedState = context;
 			args.HandshakeResponseCallback = OnHandshakeEffectResponseReceived;
@@ -71,6 +77,11 @@ namespace PubnubApi.PubnubEventEngine
 					evnt.Type = EventType.HandshakeSuccess;
 					LogCallback?.Invoke("OnHandshakeEffectResponseReceived - EventType.HandshakeSuccess");  
 				}
+				else
+				{
+					evnt.Type = EventType.HandshakeFailed;
+					LogCallback?.Invoke("OnHandshakeEffectResponseReceived - EventType.HandshakeFailed");  
+				}
 			} catch (Exception ex) {
 				LogCallback?.Invoke($"OnHandshakeEffectResponseReceived EXCEPTION - {ex}");
 				evnt.Type = EventType.HandshakeFailed;
@@ -81,9 +92,11 @@ namespace PubnubApi.PubnubEventEngine
 		}
 		public void Cancel()
 		{
-			//Console.WriteLine("Handshake can not be cancelled. Something is not right here!");
-			//LoggingMethod.WriteToLog("HandshakeEffectHandler - Handshake can not be cancelled. Something is not right here!");
-			LogCallback?.Invoke($"HandshakeEffectHandler - Handshake can not be cancelled. Something is not right here!");
+			if (cancellationTokenSource != null)
+			{
+				cancellationTokenSource.Cancel();
+			}
+			LogCallback?.Invoke($"HandshakeEffectHandler - Handshake cancellion attempted.");
 		}
 
     }
