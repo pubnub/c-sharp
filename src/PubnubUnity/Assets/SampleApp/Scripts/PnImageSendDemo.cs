@@ -26,6 +26,7 @@ public class PnImageSendDemo : MonoBehaviour {
 
 	private async void PnOnFile(Pubnub pn, PNFileEventResult file) {
 		targetImageComponent.texture = await pn.DownloadTexture(file, TextureCreationFlags.None);
+		Debug.Log($"TEXTURE FORMAT: {GraphicsFormatUtility.GetFormatString(targetImageComponent.texture.graphicsFormat)}");
 	}
 
 	async void Update() {
@@ -37,6 +38,11 @@ public class PnImageSendDemo : MonoBehaviour {
 			var res = await pnManager.pubnub.SendFile().Texture((RenderTexture)previousTexture).Channel("test")
 				.FileName("degzdura.tex").ExecuteAsync();
 			Debug.Log(res.Status.Error);
+		}
+
+		if (Input.GetKeyDown(KeyCode.A)) {
+			var res = await pnManager.pubnub.SendFile().Texture(ScreenCapture.CaptureScreenshotAsTexture()).Channel("test")
+				.FileName("degzdura.tex").ExecuteAsync();
 		}
 	}
 
