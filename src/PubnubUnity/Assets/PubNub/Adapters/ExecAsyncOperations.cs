@@ -140,6 +140,97 @@ namespace PubnubApi.Unity {
 			var res = await o.ExecuteAsync();
 			callback?.Invoke(res.Result, res.Status);
 		}
+		
+		// SetChannelMetadata
+		// TODO document change - Async -> Execute
+		public static async void Execute(this SetChannelMetadataOperation o, System.Action<PNSetChannelMetadataResult, PNStatus> callback) {
+			var res = await o.ExecuteAsync();
+			callback?.Invoke(res.Result, res.Status);
+		}
+		
+		// GetChannelMetadata
+		// TODO document change - Async -> Execute
+		public static async void Execute(this GetChannelMetadataOperation o, System.Action<PNGetChannelMetadataResult, PNStatus> callback) {
+			var res = await o.ExecuteAsync();
+			callback?.Invoke(res.Result, res.Status);
+		}
+		
+		// RemoveChannelMetadata
+		// TODO document change - Async -> Execute
+		public static async void Execute(this RemoveChannelMetadataOperation o, System.Action<PNRemoveChannelMetadataResult, PNStatus> callback) {
+			var res = await o.ExecuteAsync();
+			callback?.Invoke(res.Result, res.Status);
+		}
+		
+		// RemoveChannelMetadata
+		// TODO document change - Async -> Execute
+		public static async void Execute(this AuditPushChannelOperation o, System.Action<PNPushListProvisionsResult, PNStatus> callback) {
+			var res = await o.ExecuteAsync();
+			callback?.Invoke(res.Result, res.Status);
+		}
+		
+		// GetAllChannelMetadata
+		// TODO document change - Async -> Execute
+		public static async void Execute(this GetAllChannelMetadataOperation o, System.Action<PNGetAllChannelMetadataResult, PNStatus> callback) {
+			var res = await o.ExecuteAsync();
+			callback?.Invoke(res.Result, res.Status);
+		}
+		
+		// RemoveChannelMembers
+		// TODO document change - Async -> Execute
+		public static async void Execute(this RemoveChannelMembersOperation o, System.Action<PNChannelMembersResult, PNStatus> callback) {
+			var res = await o.ExecuteAsync();
+			callback?.Invoke(res.Result, res.Status);
+		}
+		
+		// RemoveUUIDMetadata
+		// TODO document change - Async -> Execute
+		public static async void Execute(this RemoveUuidMetadataOperation o, System.Action<PNRemoveUuidMetadataResult, PNStatus> callback) {
+			var res = await o.ExecuteAsync();
+			callback?.Invoke(res.Result, res.Status);
+		}
+		
+		// SetUUIDMetadata
+		// TODO document change - Async -> Execute
+		public static async void Execute(this SetUuidMetadataOperation o, System.Action<PNSetUuidMetadataResult, PNStatus> callback) {
+			var res = await o.ExecuteAsync();
+			callback?.Invoke(res.Result, res.Status);
+		}
+		
+		// GetUUIDMetadata
+		// TODO document change - Async -> Execute
+		public static async void Execute(this GetUuidMetadataOperation o, System.Action<PNGetUuidMetadataResult, PNStatus> callback) {
+			var res = await o.ExecuteAsync();
+			callback?.Invoke(res.Result, res.Status);
+		}
+		
+		// GetAllUUIDMetadata
+		// TODO document change - Async -> Execute
+		public static async void Execute(this GetAllUuidMetadataOperation o, System.Action<PNGetAllUuidMetadataResult, PNStatus> callback) {
+			var res = await o.ExecuteAsync();
+			callback?.Invoke(res.Result, res.Status);
+		}
+		
+		// RemoveAllPushNotificationsFromDeviceWithPushToken
+		// TODO document change - Async -> Execute
+		public static async void Execute(this RemoveAllPushChannelsOperation o, System.Action<PNPushRemoveAllChannelsResult, PNStatus> callback) {
+			var res = await o.ExecuteAsync();
+			callback?.Invoke(res.Result, res.Status);
+		}
+		
+		// RemovePushNotificationsFromChannels
+		// TODO document change - Async -> Execute
+		public static async void Execute(this RemovePushChannelOperation o, System.Action<PNPushRemoveChannelResult, PNStatus> callback) {
+			var res = await o.ExecuteAsync();
+			callback?.Invoke(res.Result, res.Status);
+		}
+		
+		// AddPushNotificationsOnChannels
+		// TODO document change - Async -> Execute
+		public static async void Execute(this AddPushChannelOperation o, System.Action<PNPushAddChannelResult, PNStatus> callback) {
+			var res = await o.ExecuteAsync();
+			callback?.Invoke(res.Result, res.Status);
+		}
 	}
 	
 }

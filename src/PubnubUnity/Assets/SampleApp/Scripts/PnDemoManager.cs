@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using PubnubApi;
 using PubnubApi.EndPoint;
 using PubnubApi.Unity;
@@ -27,6 +28,14 @@ public class PnDemoManager : PNManagerBehaviour {
 		listener.onSignal += OnPnSignal;
 		listener.onPresence += OnPnPresence;
 		listener.onFile += OnPnFile;
+	}
+
+	void ResultCallback<T>(T response, PNStatus status) {
+		if (status.Error) {
+			Debug.LogError($"{status.Operation}\n{JsonConvert.SerializeObject(status.ErrorData.Information, Formatting.Indented)}");
+		} else {
+			Debug.Log($"{status.Operation}:\n {JsonConvert.SerializeObject(response, Formatting.Indented)}");
+		}
 	}
 	
 	private void OnPnPresence(Pubnub pn, PNPresenceEventResult p) {
@@ -87,12 +96,33 @@ public class PnDemoManager : PNManagerBehaviour {
 		});
 		await Task.Delay(500);
 		pubnub.GetMessageActions().Channel(defaultChannel).Execute((a, b) => Debug.Log(a.MessageActions[0].Action.Value));
-		pubnub.RemoveMessageAction().Channel(defaultChannel).MessageTimetoken(sentMessageTimetoken).ActionTimetoken(sentActionTimetoken).Execute((a, b) => Debug.Log($"Removed message action {(b.Error ? b.ErrorData.Information : "true")}"));
+		pubnub.RemoveMessageAction().Channel(defaultChannel).MessageTimetoken(sentMessageTimetoken).ActionTimetoken(sentActionTimetoken).Execute(ResultCallback);
 		
 		
 		// memberships:
 		await Task.Delay(500);
-		pubnub.SetMemberships().Channels(new List<PNMembership>() {new PNMembership() {Channel = defaultChannel }}).Execute((a, b) => Debug.Log($"SetMembership: {!b.Error}"));
+		pubnub.SetMemberships().Channels(new List<PNMembership>() {new PNMembership() {Channel = defaultChannel }}).Execute(ResultCallback);
+		
+		// channel metadata
+		pubnub.SetChannelMetadata().Channel(defaultChannel).Description("asdf").Name("customMetadata").Execute(ResultCallback);
+		pubnub.GetAllChannelMetadata().Execute(ResultCallback);
+		
+		await Task.Delay(500);
+		
+		pubnub.RemoveChannelMetadata().Channel(defaultChannel).Execute(ResultCallback);
+		
+		await Task.Delay(500);
+		// remove channel members
+		pubnub.RemoveChannelMembers().Channel(defaultChannel).Uuids(new List<string>() {defaultUserId}).Execute(ResultCallback);
+		
+		// uuidmetadata
+		pubnub.SetUuidMetadata().Uuid(defaultUserId).Name("customMetadata").Execute(ResultCallback);
+		await Task.Delay(500);
+		pubnub.GetUuidMetadata().Uuid(defaultUserId).Execute(ResultCallback);
+		pubnub.GetAllUuidMetadata().Execute(ResultCallback);
+		await Task.Delay(500);
+		pubnub.RemoveUuidMetadata().Uuid(defaultUserId).Execute(ResultCallback);
+		
 
 		// list files
 		Debug.Log((await pubnub.ListFiles().Channel(defaultChannel).ExecuteAsync()).Result.Count);
