@@ -126,7 +126,20 @@ namespace PubnubApi.Unity {
 			var res = await o.ExecuteAsync();
 			callback?.Invoke(res.Result, res.Status);
 		}
+		
+		// GetMembership
+		// TODO document change - Async -> Execute
+		public static async void Execute(this GetMembershipsOperation o, System.Action<PNMembershipsResult, PNStatus> callback) {
+			var res = await o.ExecuteAsync();
+			callback?.Invoke(res.Result, res.Status);
+		}
 
+		// RemoveMembership
+		// TODO document change - Async -> Execute
+		public static async void Execute(this RemoveMembershipsOperation o, System.Action<PNMembershipsResult, PNStatus> callback) {
+			var res = await o.ExecuteAsync();
+			callback?.Invoke(res.Result, res.Status);
+		}
 	}
 	
 }
