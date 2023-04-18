@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="..\PubnubApi.Tests\CleanupGrant.cs" Link="CleanupGrant.cs" />
     <Compile Include="..\PubnubApi.Tests\EncryptionTests.cs" Link="EncryptionTests.cs" />
+    <Compile Include="..\PubnubApi.Tests\EventEngineTests.cs" Link="EventEngineTests.cs" />
     <Compile Include="..\PubnubApi.Tests\GenerateSampleGrant.cs" Link="GenerateSampleGrant.cs" />
     <Compile Include="..\PubnubApi.Tests\PubnubCommon.cs" Link="PubnubCommon.cs" />
     <Compile Include="..\PubnubApi.Tests\PubnubUnitTest.cs" Link="PubnubUnitTest.cs" />
