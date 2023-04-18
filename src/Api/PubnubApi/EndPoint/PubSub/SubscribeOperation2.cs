@@ -67,7 +67,8 @@ namespace PubnubApi.EndPoint
 			var initState = pnEventEngine.CreateState(StateType.Unsubscribed)
 				.OnEntry(() => { System.Diagnostics.Debug.WriteLine("Unsubscribed: OnEntry()"); return true; })
 				.OnExit(() => { System.Diagnostics.Debug.WriteLine("Unsubscribed: OnExit()"); return true; })
-				.On(EventType.SubscriptionChange, StateType.Handshaking);
+				.On(EventType.SubscriptionChanged, StateType.Handshaking)
+                .On(EventType.SubscriptionRestored, StateType.Receiving);
 
             pnEventEngine.CreateState(StateType.Handshaking)
                 .OnEntry(() => { System.Diagnostics.Debug.WriteLine("Handshaking: OnEntry()"); return true; })
@@ -75,35 +76,35 @@ namespace PubnubApi.EndPoint
                 { 
                     System.Diagnostics.Debug.WriteLine("Handshaking: OnExit()"); 
                     manager.HandshakeRequestCancellation(); 
-                    System.Diagnostics.Debug.WriteLine(pnEventEngine.CurrentState.Type); 
+                    System.Diagnostics.Debug.WriteLine(pnEventEngine.CurrentState.StateType); 
                     return true; 
                 })
-                .On(EventType.SubscriptionChange, StateType.Handshaking)
+                .On(EventType.SubscriptionChanged, StateType.Handshaking)
                 .On(EventType.HandshakeSuccess, StateType.Receiving)
-                .On(EventType.HandshakeFailed, StateType.Reconnecting)
+                .On(EventType.HandshakeFailure, StateType.HandshakeReconnecting)
                 .Effect(EffectType.SendHandshakeRequest);
 
             pnEventEngine.CreateState(StateType.Receiving)
                 .OnEntry(() => { System.Diagnostics.Debug.WriteLine("Receiving: OnEntry()"); return true; })
                 .OnExit(() => { System.Diagnostics.Debug.WriteLine("Receiving: OnExit()"); manager.ReceiveRequestCancellation(); return true; })
-                .On(EventType.SubscriptionChange, StateType.Handshaking)
+                .On(EventType.SubscriptionChanged, StateType.Handshaking)
                 .On(EventType.ReceiveSuccess, StateType.Receiving)
-                .On(EventType.ReceiveFailed, StateType.Reconnecting)
+                .On(EventType.ReceiveFailure, StateType.HandshakeReconnecting)
                 .Effect(EffectType.ReceiveEventRequest);
 
 			pnEventEngine.CreateState(StateType.HandshakingFailed)
 				.OnEntry(() => { System.Diagnostics.Debug.WriteLine("HandshakingFailed: OnEntry()"); return true; })
 				.OnExit(() => { System.Diagnostics.Debug.WriteLine("HandshakingFailed: OnExit()"); return true; })
-				.On(EventType.SubscriptionChange, StateType.Handshaking)
+				.On(EventType.SubscriptionChanged, StateType.Handshaking)
 				.On(EventType.HandshakeSuccess, StateType.Receiving)
-				.On(EventType.HandshakeFailed, StateType.Reconnecting);
+				.On(EventType.HandshakeFailure, StateType.HandshakeReconnecting);
 
-			pnEventEngine.CreateState(StateType.Reconnecting)
-				.OnEntry(() => { System.Diagnostics.Debug.WriteLine("Reconnecting: OnEntry()"); return true; })
-				.OnExit(() => { System.Diagnostics.Debug.WriteLine("Reconnecting: OnExit()"); return true; })
-				.On(EventType.SubscriptionChange, StateType.Handshaking)
+			pnEventEngine.CreateState(StateType.HandshakeReconnecting)
+				.OnEntry(() => { System.Diagnostics.Debug.WriteLine("HandshakeReconnecting: OnEntry()"); return true; })
+				.OnExit(() => { System.Diagnostics.Debug.WriteLine("HandshakeReconnecting: OnExit()"); return true; })
+				.On(EventType.SubscriptionChanged, StateType.Handshaking)
 				.On(EventType.HandshakeSuccess, StateType.Receiving)
-				.On(EventType.HandshakeFailed, StateType.Reconnecting);
+				.On(EventType.HandshakeFailure, StateType.HandshakeReconnecting);
 
 			pnEventEngine.InitialState(initState);
 

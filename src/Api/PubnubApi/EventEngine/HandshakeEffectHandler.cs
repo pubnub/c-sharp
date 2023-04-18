@@ -74,17 +74,17 @@ namespace PubnubApi.PubnubEventEngine
 				{
 					evnt.EventPayload.Timetoken = handshakeResponse.Timetoken?.Timestamp;
 					evnt.EventPayload.Region = handshakeResponse.Timetoken?.Region;
-					evnt.Type = EventType.HandshakeSuccess;
+					evnt.EventType = EventType.HandshakeSuccess;
 					LogCallback?.Invoke("OnHandshakeEffectResponseReceived - EventType.HandshakeSuccess");  
 				}
 				else
 				{
-					evnt.Type = EventType.HandshakeFailed;
-					LogCallback?.Invoke("OnHandshakeEffectResponseReceived - EventType.HandshakeFailed");  
+					evnt.EventType = EventType.HandshakeFailure;
+					LogCallback?.Invoke("OnHandshakeEffectResponseReceived - EventType.HandshakeFailure");  
 				}
 			} catch (Exception ex) {
 				LogCallback?.Invoke($"OnHandshakeEffectResponseReceived EXCEPTION - {ex}");
-				evnt.Type = EventType.HandshakeFailed;
+				evnt.EventType = EventType.HandshakeFailure;
 				evnt.EventPayload.exception = ex;
 			}
 			emitter.emit(evnt);

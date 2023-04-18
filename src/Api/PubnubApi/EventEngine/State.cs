@@ -4,11 +4,12 @@ using System.Collections.Generic;
 namespace PubnubApi.PubnubEventEngine
 {
 
-	public enum StateType { Unsubscribed, Handshaking, Receiving, HandshakingFailed, ReconnectingFailed, Reconnecting };
+	public enum StateType { Unsubscribed, Handshaking, Receiving, ReceiveReconnecting, ReceiveStopped, ReceiveFailed, HandshakeFailed, ReconnectingFailed, HandshakeReconnecting, HandshakeStopped };
 
 	public class State
 	{
-		public StateType Type { get; set; }
+		public EventType EventType {  get; set; }
+		public StateType StateType { get; set; }
 		public Dictionary<EventType, StateType> transitions;
 		public List<EffectType> Effects { get; set; }
 		public Func<bool> Entry { get; set; } = () => {
@@ -21,7 +22,7 @@ namespace PubnubApi.PubnubEventEngine
 
 		public State(StateType type)
 		{
-			this.Type = type;
+			this.StateType = type;
 			this.transitions = new Dictionary<EventType, StateType>();
 			Effects = new List<EffectType>();
 		}

@@ -8,7 +8,7 @@ namespace PubnubApi.PubnubEventEngine
 {
 	public class Event
 	{
-		public EventType Type { get; set; }
+		public EventType EventType { get; set; }
 		public EventPayload EventPayload { get; set; }
 
 		public Event()
@@ -30,12 +30,22 @@ namespace PubnubApi.PubnubEventEngine
 
 	public enum EventType
 	{
-		SubscriptionChange,
+		SubscriptionChanged,
+		SubscriptionRestored,
 		HandshakeSuccess,
 		ReceiveSuccess,
-		HandshakeFailed,
-		ReceiveFailed,
-		ReconnectionFailed
+		HandshakeFailure,
+		ReceiveFailure,
+		ReceiveReconnectFailure,
+		ReceiveReconnectSuccess,
+		ReceiveReconnectGiveUp
+		HandshakeReconnectFailure,
+		HandshakeReconnectGiveUp,
+		HandshakeReconnectRetry,
+		HandshakeReconnectSuccess,
+		ReconnectionFailed,
+		Disconnect,
+		Reconnect
 	}
 
 	public class ExtendedState
@@ -66,6 +76,7 @@ namespace PubnubApi.PubnubEventEngine
 		public EffectDispatcher Dispatcher;
 
 		public EventEmitter Emitter;
+		public IPubnubUnitTest PubnubUnitTest { get; set; }
 
 		public EventEngine(EffectDispatcher dispatcher, EventEmitter emitter)
 		{
@@ -86,16 +97,16 @@ namespace PubnubApi.PubnubEventEngine
 		public void Transition(Event e)
 		{
 			StateType nextStateType;
-			if (CurrentState != null && CurrentState.transitions.TryGetValue(e.Type, out nextStateType)) {
+			if (CurrentState != null && CurrentState.transitions.TryGetValue(e.EventType, out nextStateType)) {
+				System.Diagnostics.Debug.WriteLine($"Current State = {CurrentState.StateType}; Transition = {e.EventType}");
 				CurrentState.Exit();
-				CurrentState = this.States.Find((s) => s.Type == nextStateType);
-				System.Diagnostics.Debug.WriteLine($"Transition = {e.Type}");
-				UpdateContext(e.Type, e.EventPayload);
+				CurrentState = this.States.Find((s) => s.StateType == nextStateType);
+				UpdateContext(e.EventType, e.EventPayload);
 				if (CurrentState != null)
 				{
 					CurrentState.Entry();
-					System.Diagnostics.Debug.WriteLine($"Transition = {e.Type}");
-					UpdateContext(e.Type, e.EventPayload);
+					System.Diagnostics.Debug.WriteLine($"Transition = {e.EventType}");
+					UpdateContext(e.EventType, e.EventPayload);
 					if (CurrentState.Effects.Count > 0) {
 						foreach (var effect in CurrentState.Effects) {
 							System.Diagnostics.Debug.WriteLine("Found effect "+ effect);
@@ -109,7 +120,7 @@ namespace PubnubApi.PubnubEventEngine
 		public void Subscribe(List<string> channels, List<string>? channelGroups)
 		{
 			var evnt = new Event();
-			evnt.Type = EventType.SubscriptionChange;
+			evnt.EventType = EventType.SubscriptionChanged;
 			evnt.EventPayload.Channels = channels;
 			if (channelGroups != null) evnt.EventPayload.ChannelGroups = channelGroups;
 			this.Transition(evnt);
@@ -117,6 +128,7 @@ namespace PubnubApi.PubnubEventEngine
 
 		private void UpdateContext(EventType eventType, EventPayload eventData)
 		{
+			CurrentState.EventType = eventType;
 			if (eventData.Channels != null) Context.Channels = eventData.Channels;
 			if (eventData.ChannelGroups != null) Context.ChannelGroups = eventData.ChannelGroups;
 			if (eventData.Timetoken != null) 

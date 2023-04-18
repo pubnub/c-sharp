@@ -91,7 +91,7 @@ namespace PubnubApi.PubnubEventEngine
 				{
 					evnt.EventPayload.Timetoken = receivedResponse.Timetoken.Timestamp;
 					evnt.EventPayload.Region = receivedResponse.Timetoken.Region;
-					evnt.Type = EventType.ReceiveSuccess;
+					evnt.EventType = EventType.ReceiveSuccess;
 
 					if (receivedResponse.Messages != null && receivedResponse.Messages.Length > 0)
 					{
@@ -113,7 +113,7 @@ namespace PubnubApi.PubnubEventEngine
 			} catch (Exception ex) {
 				LogCallback?.Invoke($"ReceivingEffectHandler EXCEPTION - {ex}");
 
-				evnt.Type = EventType.ReceiveFailed;
+				evnt.EventType = EventType.ReceiveFailure;
 				evnt.EventPayload.exception = ex;
 			}
 			emitter.emit(evnt);

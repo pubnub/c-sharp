@@ -16,13 +16,13 @@ namespace PubnubApi.PubnubEventEngine
 			var evnt = new Event();
 			evnt.EventPayload.Timetoken = context.Timetoken;
 			evnt.EventPayload.Region = context.Region;
-			evnt.Type = EventType.ReceiveSuccess;
+			evnt.EventType = EventType.ReceiveSuccess;
 			this.eventEmitter.emit(evnt);
 		}
 
 		public void Cancel()
 		{
-			System.Diagnostics.Debug.WriteLine("Reconnecting Cancelled!!!");
+			System.Diagnostics.Debug.WriteLine("HandshakeReconnecting Cancelled!!!");
 		}
 	}
 }
