@@ -4,27 +4,24 @@ using System.Collections.Generic;
 namespace PubnubApi.PubnubEventEngine
 {
 
-	public enum StateType { Unsubscribed, Handshaking, Receiving, ReceiveReconnecting, ReceiveStopped, ReceiveFailed, HandshakeFailed, ReconnectingFailed, HandshakeReconnecting, HandshakeStopped };
+	public enum StateType { Unsubscribed, Handshaking, HandshakingFailed, Receiving, ReceiveReconnecting, ReceiveStopped, ReceiveFailed, HandshakeFailed, ReconnectingFailed, HandshakeReconnecting, HandshakeStopped };
 
 	public class State
 	{
 		public EventType EventType {  get; set; }
 		public StateType StateType { get; set; }
-		public Dictionary<EventType, StateType> transitions;
-		public List<EffectType> Effects { get; set; }
-		public Func<bool> Entry { get; set; } = () => {
-			return true;
-		};
 
-		public Func<bool> Exit { get; set; } = () => {
-			return true;
-		};
+		public Dictionary<EventType, StateType> transitions;
+		public List<EffectInvocationType> EffectInvocationsList { get; private set; }
+		public List<IEffectInvocationHandler> EntryList { get; private set; }
+
+		public List<IEffectInvocationHandler> ExitList { get; private set; }
 
 		public State(StateType type)
 		{
 			this.StateType = type;
 			this.transitions = new Dictionary<EventType, StateType>();
-			Effects = new List<EffectType>();
+			EffectInvocationsList = new List<EffectInvocationType>();
 		}
 
 		public State On(EventType e, StateType nextState)
@@ -33,21 +30,21 @@ namespace PubnubApi.PubnubEventEngine
 			return this;
 		}
 
-		public State OnEntry(Func<bool> entry)
+		public State OnEntry(List<IEffectInvocationHandler> entryInvocationList)
 		{
-			this.Entry = entry;
+			this.EntryList = entryInvocationList;
 			return this;
 		}
 
-		public State OnExit(Func<bool> exit)
+		public State OnExit(List<IEffectInvocationHandler> exitInvocationList)
 		{
-			this.Exit = exit;
+			this.ExitList = exitInvocationList;
 			return this;
 		}
 
-		public State Effect(EffectType effect)
+		public State EffectInvocation(EffectInvocationType trigger, IEffectInvocationHandler effectInvocationHandler)
 		{
-			this.Effects.Add(effect);
+			this.EffectInvocationsList.Add(trigger);
 			return this;
 		}
 	}

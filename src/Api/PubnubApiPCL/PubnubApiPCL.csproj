@@ -218,7 +218,7 @@ Added TcpKeepAlive and ConnectionLimit to improve performance.</PackageReleaseNo
     <Compile Include="..\PubnubApi\EventEngine\EventEmitter.cs" Link="EventEngine\EventEmitter.cs" />
     <Compile Include="..\PubnubApi\EventEngine\EventEngine.cs" Link="EventEngine\EventEngine.cs" />
     <Compile Include="..\PubnubApi\EventEngine\HandshakeEffectHandler.cs" Link="EventEngine\HandshakeEffectHandler.cs" />
-    <Compile Include="..\PubnubApi\EventEngine\IEffectHandler.cs" Link="EventEngine\IEffectHandler.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\IEffectInvocationHandler.cs" Link="EventEngine\IEffectInvocationHandler.cs" />
     <Compile Include="..\PubnubApi\EventEngine\ReceivingEffectHandler.cs" Link="EventEngine\ReceivingEffectHandler.cs" />
     <Compile Include="..\PubnubApi\EventEngine\ReconnectingEffectHandler.cs" Link="EventEngine\ReconnectingEffectHandler.cs" />
     <Compile Include="..\PubnubApi\EventEngine\State.cs" Link="EventEngine\State.cs" />

@@ -44,7 +44,7 @@ namespace PubnubApi.PubnubEventEngine
 		public ExtendedState ExtendedState { get; set; }
 		public Action<string> ReceiveResponseCallback { get; set; }
 	}
-	public class ReceivingEffectHandler<T> : IEffectHandler
+	public class ReceivingEffectHandler<T> : IEffectInvocationHandler
 	{
 		EventEmitter emitter;
 		public Action<string> LogCallback { get; set; }

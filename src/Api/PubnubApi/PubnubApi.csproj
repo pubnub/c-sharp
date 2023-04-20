@@ -131,8 +131,4 @@ Added TcpKeepAlive and ConnectionLimit to improve performance.</PackageReleaseNo
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="EventEngine\" />
-  </ItemGroup>
-
 </Project>

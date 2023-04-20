@@ -31,9 +31,10 @@ namespace PubnubApi.PubnubEventEngine
 		public Action<string> HandshakeResponseCallback { get; set; }
 	}
 
-	public class HandshakeEffectHandler : IEffectHandler
+	public class HandshakeEffectHandler : IEffectInvocationHandler
 	{
 		EventEmitter emitter;
+		//public EffectInvocationType InvocationType { get; set; }
 		public Action<string> LogCallback { get; set; }
 
 		public event EventHandler<HandshakeRequestEventArgs>? HandshakeRequested;
@@ -68,7 +69,7 @@ namespace PubnubApi.PubnubEventEngine
 		{
 			var evnt = new Event();
 			try {
-				LogCallback?.Invoke($"Handshake Json Response { json }");    
+				LogCallback?.Invoke($"HandshakeSuccess Json Response { json }");    
 				var handshakeResponse = JsonConvert.DeserializeObject<HandshakeResponse>(json);
 				if (handshakeResponse != null)
 				{
@@ -96,7 +97,7 @@ namespace PubnubApi.PubnubEventEngine
 			{
 				cancellationTokenSource.Cancel();
 			}
-			LogCallback?.Invoke($"HandshakeEffectHandler - Handshake cancellion attempted.");
+			LogCallback?.Invoke($"HandshakeEffectHandler - HandshakeSuccess cancellion attempted.");
 		}
 
     }

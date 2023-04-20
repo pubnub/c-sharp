@@ -38,7 +38,7 @@ namespace PubnubApi.PubnubEventEngine
 		ReceiveFailure,
 		ReceiveReconnectFailure,
 		ReceiveReconnectSuccess,
-		ReceiveReconnectGiveUp
+		ReceiveReconnectGiveUp,
 		HandshakeReconnectFailure,
 		HandshakeReconnectGiveUp,
 		HandshakeReconnectRetry,
@@ -99,16 +99,28 @@ namespace PubnubApi.PubnubEventEngine
 			StateType nextStateType;
 			if (CurrentState != null && CurrentState.transitions.TryGetValue(e.EventType, out nextStateType)) {
 				System.Diagnostics.Debug.WriteLine($"Current State = {CurrentState.StateType}; Transition = {e.EventType}");
-				CurrentState.Exit();
+				if (CurrentState.ExitList.Count > 0)
+				{
+					foreach(var entry in CurrentState.ExitList)
+					{
+						entry.Cancel();
+					}
+				}
 				CurrentState = this.States.Find((s) => s.StateType == nextStateType);
 				UpdateContext(e.EventType, e.EventPayload);
 				if (CurrentState != null)
 				{
-					CurrentState.Entry();
+					if (CurrentState.EntryList.Count > 0)
+					{
+						foreach(var entry in CurrentState.EntryList)
+						{
+							entry.Start(Context);
+						}
+					}
 					System.Diagnostics.Debug.WriteLine($"Transition = {e.EventType}");
 					UpdateContext(e.EventType, e.EventPayload);
-					if (CurrentState.Effects.Count > 0) {
-						foreach (var effect in CurrentState.Effects) {
+					if (CurrentState.EffectInvocationsList.Count > 0) {
+						foreach (var effect in CurrentState.EffectInvocationsList) {
 							System.Diagnostics.Debug.WriteLine("Found effect "+ effect);
 							Dispatcher.dispatch(effect, this.Context);
 						}

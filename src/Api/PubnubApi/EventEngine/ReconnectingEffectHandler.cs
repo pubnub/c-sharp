@@ -2,7 +2,7 @@
 
 namespace PubnubApi.PubnubEventEngine
 {
-	public class ReconnectingEffectHandler<T> : IEffectHandler
+	public class ReconnectingEffectHandler<T> : IEffectInvocationHandler
 	{
 		EventEmitter eventEmitter;
 
