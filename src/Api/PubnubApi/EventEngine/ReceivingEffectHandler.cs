@@ -83,41 +83,41 @@ namespace PubnubApi.PubnubEventEngine
 
 		public void OnReceivingEffectResponseReceived(string json)
 		{
-			var evnt = new Event();
-			int messageCount = 0;
-			try {
-				var receivedResponse = JsonConvert.DeserializeObject<ReceiveingResponse>(json);
-				if (receivedResponse != null)
-				{
-					evnt.EventPayload.Timetoken = receivedResponse.Timetoken.Timestamp;
-					evnt.EventPayload.Region = receivedResponse.Timetoken.Region;
-					evnt.EventType = EventType.ReceiveSuccess;
+			//var evnt = new Event();
+			//int messageCount = 0;
+			//try {
+			//	var receivedResponse = JsonConvert.DeserializeObject<ReceiveingResponse>(json);
+			//	if (receivedResponse != null)
+			//	{
+			//		evnt.EventPayload.Timetoken = receivedResponse.Timetoken.Timestamp;
+			//		evnt.EventPayload.Region = receivedResponse.Timetoken.Region;
+			//		evnt.EventType = EventType.ReceiveSuccess;
 
-					if (receivedResponse.Messages != null && receivedResponse.Messages.Length > 0)
-					{
-						messageCount = receivedResponse.Messages.Length;
-						for(int index = 0; index < receivedResponse.Messages.Length; index++)
-						{
-							LogCallback?.Invoke($"Received Message ({index+1} of {receivedResponse.Messages.Length}) : {JsonConvert.SerializeObject(receivedResponse.Messages[index])}");
-							if (receivedResponse.Messages[index].Channel.IndexOf("-pnpres") > 0)
-							{
-								var presenceData = JsonConvert.DeserializeObject<PresenceEvent>(receivedResponse.Messages[index].Payload.ToString());
-							}
-							else
-							{
-								LogCallback?.Invoke($"Message : {JsonConvert.SerializeObject(receivedResponse.Messages[index].Payload)}");
-							}
-						}
-					}
-				}
-			} catch (Exception ex) {
-				LogCallback?.Invoke($"ReceivingEffectHandler EXCEPTION - {ex}");
+			//		if (receivedResponse.Messages != null && receivedResponse.Messages.Length > 0)
+			//		{
+			//			messageCount = receivedResponse.Messages.Length;
+			//			for(int index = 0; index < receivedResponse.Messages.Length; index++)
+			//			{
+			//				LogCallback?.Invoke($"Received Message ({index+1} of {receivedResponse.Messages.Length}) : {JsonConvert.SerializeObject(receivedResponse.Messages[index])}");
+			//				if (receivedResponse.Messages[index].Channel.IndexOf("-pnpres") > 0)
+			//				{
+			//					var presenceData = JsonConvert.DeserializeObject<PresenceEvent>(receivedResponse.Messages[index].Payload.ToString());
+			//				}
+			//				else
+			//				{
+			//					LogCallback?.Invoke($"Message : {JsonConvert.SerializeObject(receivedResponse.Messages[index].Payload)}");
+			//				}
+			//			}
+			//		}
+			//	}
+			//} catch (Exception ex) {
+			//	LogCallback?.Invoke($"ReceivingEffectHandler EXCEPTION - {ex}");
 
-				evnt.EventType = EventType.ReceiveFailure;
-				evnt.EventPayload.exception = ex;
-			}
-			emitter.emit(evnt);
-			emitter.emit(json, false, messageCount);
+			//	evnt.EventType = EventType.ReceiveFailure;
+			//	evnt.EventPayload.exception = ex;
+			//}
+			//emitter.emit(evnt);
+			//emitter.emit(json, false, messageCount);
 		}
 
 		public void Cancel()

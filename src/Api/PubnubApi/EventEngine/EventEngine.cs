@@ -6,18 +6,104 @@ using System.Threading.Tasks;
 
 namespace PubnubApi.PubnubEventEngine
 {
-	public class Event
+	public class PubnubError : Exception
 	{
-		public EventType EventType { get; set; }
-		public EventPayload EventPayload { get; set; }
+
+	}
+
+    #region Event
+    public abstract class Event
+	{
+		public virtual EventType EventType { get; set; }
+		public virtual EventPayload EventPayload { get; set; }
 
 		public Event()
 		{
 			EventPayload = new EventPayload();
 		}
 	}
+    
+	public class SubscriptionChanged : Event
+	{
+		public List<string> Channels { get; set; }
+		public List<string> ChannelGroups { get; set; }
+	}
+	public class Disconnect : Event
+	{
 
-	public class EventPayload
+	}
+	public class Reconnect : Event
+	{
+
+	}
+	public class HandshakeSuccess : Event
+	{
+		public SubscriptionCursor SubscriptionCursor { get; set; }
+	}
+	public class SubscriptionRestored : Event
+	{
+		public List<string> Channels { get; set; }
+		public List<string> ChannelGroups { get; set; }
+		public SubscriptionCursor SubscriptionCursor { get; set; }
+	}
+	public class HandshakeFailure : Event
+	{
+		public PubnubError Reason { get; set; }
+	}
+	public class HandshakeReconnectGiveUp : Event
+	{
+		public PubnubError Reason { get; set;}
+	} 
+	public class HandshakeReconnectSuccess : Event
+	{
+		public List<string> Channels { get; set; }
+		public List<string> ChannelGroups { get; set; }
+		public SubscriptionCursor SubscriptionCursor { get; set; }
+	}
+	public class HandshakeReconnectFailure : Event
+	{
+		public PubnubError Reason { get; set;}
+	}
+	public class HandshakeReconnectRetry : Event
+	{
+
+	}
+	public class ReceiveSuccess : Event
+	{
+		public List<EventType> Messages { get; set; }
+		public SubscriptionCursor SubscriptionCursor { get; set; }
+	}
+	public class ReceiveFailure : Event
+	{
+		public PubnubError Reason { get; set;}
+	}
+	public class ReceiveReconnectFailure : Event
+	{
+		public PubnubError Reason { get; set;}
+	}
+	public class ReceiveReconnectGiveUp : Event
+	{
+		public PubnubError Reason { get; set;}
+	}
+	public class ReceiveReconnectSuccess : Event
+	{
+		public List<EventType> Messages { get; set; }
+		public SubscriptionCursor SubscriptionCursor { get; set; }
+	}
+	public class ReceiveReconnectRetry : Event
+	{
+
+	}
+	public class Fail : Event
+	{
+
+	}
+	public class Success : Event
+	{
+
+	}
+	#endregion
+    public class EventPayload
 	{
 		public List<string>? Channels { get; set; }
 		public List<string>? ChannelGroups { get; set; }
@@ -27,12 +113,78 @@ namespace PubnubApi.PubnubEventEngine
 		public Exception? exception { get; set; }
 	}
 
-	public class EffectInvocation
+
+	public class SubscriptionCursor
 	{
-		public EventType Effectype { get; set; }
-		public IEffectInvocationHandler Handler { get; set; }
+		public long? Timetoken { get; set; }
+		public int? Region { get; set; }
 	}
-	public enum EventType
+
+    #region EffectInvocation
+	public abstract class EffectInvocation
+	{
+		public virtual EventType Effectype { get; set; }
+		public virtual IEffectInvocationHandler Handler { get; set; }
+	}
+    public class ReceiveMessages: EffectInvocation
+	{
+		public List<string> Channels { get; set; }
+		public List<string> ChannelGroups { get; set; }
+		public SubscriptionCursor SubscriptionCursor { get; set; }
+	}
+	public class CancelReceiveMessages : EffectInvocation
+	{
+
+	}
+	public class ReceiveReconnect: EffectInvocation
+	{
+		public List<string> Channels { get; set; }
+		public List<string> ChannelGroups { get; set; }
+		public SubscriptionCursor SubscriptionCursor { get; set; }
+		public int Attempts { get; set; }
+		public PubnubError Reason { get; set; }
+	}
+	public class CancelReceiveReconnect : EffectInvocation
+	{
+
+	}
+	public class Handshake : EffectInvocation
+	{
+		public List<string> Channels { get; set; }
+		public List<string> ChannelGroups { get; set; }
+	}
+	public class CancelHandshake : EffectInvocation
+	{
+
+	}
+	public class HandshakeReconnect : EffectInvocation
+	{
+		public List<string> Channels { get; set; }
+		public List<string> ChannelGroups { get; set; }
+		public SubscriptionCursor SubscriptionCursor { get; set; }
+		public int Attempts { get; set; }
+		public PubnubError Reason { get; set; }
+	}
+	public class CancelHandshakeReconnect : EffectInvocation
+	{
+
+	}
+	public class EmitStatus : EffectInvocation
+	{
+		public EmitStatus(PNStatusCategory status)
+		{
+
+		}
+	}
+	public class EmitMessages : EffectInvocation
+	{
+		public EmitMessages(List<EventType> messages)
+		{
+
+		}
+	}
+    #endregion
+    public enum EventType
 	{
 		SubscriptionChanged,
 		SubscriptionRestored,
@@ -146,7 +298,7 @@ namespace PubnubApi.PubnubEventEngine
 
 		public void Subscribe(List<string> channels, List<string>? channelGroups)
 		{
-			var evnt = new Event();
+			var evnt = new SubscriptionChanged();
 			evnt.EventType = EventType.SubscriptionChanged;
 			evnt.EventPayload.Channels = channels;
 			if (channelGroups != null) evnt.EventPayload.ChannelGroups = channelGroups;

@@ -67,29 +67,29 @@ namespace PubnubApi.PubnubEventEngine
 		
 		public void OnHandshakeEffectResponseReceived(string json)
 		{
-			var evnt = new Event();
-			try {
-				LogCallback?.Invoke($"HandshakeSuccess Json Response { json }");    
-				var handshakeResponse = JsonConvert.DeserializeObject<HandshakeResponse>(json);
-				if (handshakeResponse != null)
-				{
-					evnt.EventPayload.Timetoken = handshakeResponse.Timetoken?.Timestamp;
-					evnt.EventPayload.Region = handshakeResponse.Timetoken?.Region;
-					evnt.EventType = EventType.HandshakeSuccess;
-					LogCallback?.Invoke("OnHandshakeEffectResponseReceived - EventType.HandshakeSuccess");  
-				}
-				else
-				{
-					evnt.EventType = EventType.HandshakeFailure;
-					LogCallback?.Invoke("OnHandshakeEffectResponseReceived - EventType.HandshakeFailure");  
-				}
-			} catch (Exception ex) {
-				LogCallback?.Invoke($"OnHandshakeEffectResponseReceived EXCEPTION - {ex}");
-				evnt.EventType = EventType.HandshakeFailure;
-				evnt.EventPayload.exception = ex;
-			}
-			emitter.emit(evnt);
-			emitter.emit(json, true, 0);
+			//var evnt = new Event();
+			//try {
+			//	LogCallback?.Invoke($"HandshakeSuccess Json Response { json }");    
+			//	var handshakeResponse = JsonConvert.DeserializeObject<HandshakeResponse>(json);
+			//	if (handshakeResponse != null)
+			//	{
+			//		evnt.EventPayload.Timetoken = handshakeResponse.Timetoken?.Timestamp;
+			//		evnt.EventPayload.Region = handshakeResponse.Timetoken?.Region;
+			//		evnt.EventType = EventType.HandshakeSuccess;
+			//		LogCallback?.Invoke("OnHandshakeEffectResponseReceived - EventType.HandshakeSuccess");  
+			//	}
+			//	else
+			//	{
+			//		evnt.EventType = EventType.HandshakeFailure;
+			//		LogCallback?.Invoke("OnHandshakeEffectResponseReceived - EventType.HandshakeFailure");  
+			//	}
+			//} catch (Exception ex) {
+			//	LogCallback?.Invoke($"OnHandshakeEffectResponseReceived EXCEPTION - {ex}");
+			//	evnt.EventType = EventType.HandshakeFailure;
+			//	evnt.EventPayload.exception = ex;
+			//}
+			//emitter.emit(evnt);
+			//emitter.emit(json, true, 0);
 		}
 		public void Cancel()
 		{
