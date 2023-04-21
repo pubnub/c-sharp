@@ -63,64 +63,115 @@ namespace PubNubMessaging.Tests
 
             handshakingState = pnEventEngine.CreateState(StateType.Handshaking)
                 .On(EventType.SubscriptionChanged, StateType.Handshaking)
-                .On(EventType.HandshakeSuccess, StateType.Receiving)
+                .On(EventType.HandshakeSuccess, StateType.Receiving, new List<EffectInvocation>()
+                            { 
+                            new EffectInvocation() { Effectype = EffectInvocationType.HandshakeSuccess, Handler=null}
+                            }
+                )
                 .On(EventType.HandshakeFailure, StateType.HandshakeReconnecting)
                 .On(EventType.Disconnect, StateType.HandshakeStopped)
                 .On(EventType.SubscriptionRestored, StateType.Receiving)
-                .OnEntry(entryInvocationList: new List<IEffectInvocationHandler>(){ handshakeEffect })
-                .OnExit(exitInvocationList: new List<IEffectInvocationHandler>() { handshakeEffect })
-                .EffectInvocation(EffectInvocationType.HandshakeSuccess, effectInvocationHandler: null);
-            //handshakingState.EffectInvocationsEffectInvocationsList = new List<EffectInvocationType>() { EffectInvocationType.HandshakeSuccess };
-            //handshakingState.OnEntry(Func<bool>);
+                .OnEntry(entryInvocationList: new List<EffectInvocation>()
+                            { 
+                            new EffectInvocation(){  Effectype = EffectInvocationType.Handshake, Handler = null } 
+                            }
+                )
+                .OnExit(exitInvocationList: new List<EffectInvocation>()
+                            { 
+                            new EffectInvocation(){  Effectype = EffectInvocationType.CancelHandshake, Handler = null } 
+                            }
+                );
 
             handshakeReconnectingState = pnEventEngine.CreateState(StateType.HandshakeReconnecting)
-                //.OnEntry(() => { System.Diagnostics.Debug.WriteLine("handshakeReconnectingState: OnEntry()"); return true; })
-                //.OnExit(() =>  { System.Diagnostics.Debug.WriteLine("handshakeReconnectingState: OnExit()"); return true; })
                 .On(EventType.SubscriptionChanged, StateType.HandshakeReconnecting)
                 .On(EventType.HandshakeReconnectFailure, StateType.HandshakeReconnecting)
                 .On(EventType.Disconnect, StateType.HandshakeStopped)
                 .On(EventType.HandshakeReconnectGiveUp, StateType.HandshakeFailed)
-                .On(EventType.HandshakeReconnectSuccess, StateType.Receiving)
-                .On(EventType.SubscriptionRestored, StateType.Receiving);
-
-            handshakeStoppedState = pnEventEngine.CreateState(StateType.HandshakeStopped)
-                //.OnEntry(() => { System.Diagnostics.Debug.WriteLine("handshakeStoppedState: OnEntry()"); return true; })
-                //.OnExit(() =>  { System.Diagnostics.Debug.WriteLine("handshakeStoppedState: OnExit()"); return true; })
-                .On(EventType.Reconnect, StateType.HandshakeReconnecting)
-                .On(EventType.SubscriptionChanged, StateType.Handshaking)
-                .On(EventType.HandshakeSuccess, StateType.Receiving)
-                .On(EventType.HandshakeFailure, StateType.HandshakeReconnecting)
+                .On(EventType.HandshakeReconnectSuccess, StateType.Receiving, new List<EffectInvocation>()
+                            { 
+                            new EffectInvocation() { Effectype = EffectInvocationType.HandshakeReconnectSuccess, Handler=null}
+                            }
+                )
                 .On(EventType.SubscriptionRestored, StateType.Receiving)
-                .EffectInvocation(EffectInvocationType.HandshakeSuccess, effectInvocationHandler: null);
+                .OnEntry(entryInvocationList: new List<EffectInvocation>()
+                            { 
+                            new EffectInvocation(){  Effectype = EffectInvocationType.HandshakeReconnect, Handler = null } 
+                            }
+                )
+                .OnExit(exitInvocationList: new List<EffectInvocation>()
+                            { 
+                            new EffectInvocation(){  Effectype = EffectInvocationType.CancelHandshakeReconnect, Handler = null } 
+                            }
+                );
 
             handshakeFailedState = pnEventEngine.CreateState(StateType.HandshakeFailed)
-                //.OnEntry(() => { System.Diagnostics.Debug.WriteLine("handshakeFailedState: OnEntry()"); return true; })
-                //.OnExit(() =>  { System.Diagnostics.Debug.WriteLine("handshakeFailedState: OnExit()"); return true; })
                 .On(EventType.HandshakeReconnectRetry, StateType.HandshakeReconnecting)
                 .On(EventType.SubscriptionChanged, StateType.HandshakeReconnecting)
                 .On(EventType.SubscriptionRestored, StateType.ReceiveReconnecting)
                 .On(EventType.Reconnect, StateType.HandshakeReconnecting);
 
+            handshakeStoppedState = pnEventEngine.CreateState(StateType.HandshakeStopped)
+                .On(EventType.Reconnect, StateType.HandshakeReconnecting)
+                .On(EventType.SubscriptionChanged, StateType.Handshaking)
+                .On(EventType.HandshakeSuccess, StateType.Receiving)
+                .On(EventType.HandshakeFailure, StateType.HandshakeReconnecting)
+                .On(EventType.SubscriptionRestored, StateType.Receiving);
+
             receivingState = pnEventEngine.CreateState(StateType.Receiving)
-                //.OnEntry(() => { System.Diagnostics.Debug.WriteLine("receivingState: OnEntry()"); return true; })
-                //.OnExit(() => { System.Diagnostics.Debug.WriteLine("receivingState: OnExit()"); return true; })
                 .On(EventType.SubscriptionChanged, StateType.Receiving)
                 .On(EventType.SubscriptionRestored, StateType.Receiving)
-                .On(EventType.ReceiveSuccess, StateType.Receiving)
-                .On(EventType.Disconnect, StateType.ReceiveStopped)
+                .On(EventType.ReceiveSuccess, StateType.Receiving, new List<EffectInvocation>()
+                            { 
+                            new EffectInvocation() { Effectype = EffectInvocationType.ReceiveSuccess, Handler=null}, //emit messages
+                            new EffectInvocation() { Effectype = EffectInvocationType.ReceiveSuccess, Handler=null} //emit status
+                            }
+                )
+                .On(EventType.Disconnect, StateType.ReceiveStopped, new List<EffectInvocation>()
+                            { 
+                            new EffectInvocation() { Effectype = EffectInvocationType.Disconnect, Handler=null},
+                            }
+                )
                 .On(EventType.ReceiveFailure, StateType.ReceiveReconnecting)
-                .EffectInvocation(EffectInvocationType.ReceiveSuccess, effectInvocationHandler: null)
-                .EffectInvocation(EffectInvocationType.Disconnect, effectInvocationHandler: null);
+                .OnEntry(entryInvocationList: new List<EffectInvocation>()
+                            { 
+                            new EffectInvocation(){  Effectype = EffectInvocationType.ReceiveMessages, Handler = null } 
+                            }
+                )
+                .OnExit(exitInvocationList: new List<EffectInvocation>()
+                            { 
+                            new EffectInvocation(){  Effectype = EffectInvocationType.CancelReceiveMessages, Handler = null } 
+                            }
+                );
 
             receiveReconnectingState = pnEventEngine.CreateState(StateType.ReceiveReconnecting)
-                //.OnEntry(() => { System.Diagnostics.Debug.WriteLine("receiveReconnectingState: OnEntry()"); return true; })
-                //.OnExit(() => { System.Diagnostics.Debug.WriteLine("receiveReconnectingState: OnExit()"); return true; })
                 .On(EventType.SubscriptionChanged, StateType.ReceiveReconnecting)
                 .On(EventType.ReceiveReconnectFailure, StateType.ReceiveReconnecting)
                 .On(EventType.SubscriptionRestored, StateType.ReceiveReconnecting)
-                .On(EventType.ReceiveReconnectSuccess, StateType.Receiving)
-                .On(EventType.Disconnect, StateType.ReceiveStopped)
-                .On(EventType.ReceiveReconnectGiveUp, StateType.ReceiveFailed);
+                .On(EventType.ReceiveReconnectSuccess, StateType.Receiving, new List<EffectInvocation>()
+                            { 
+                            new EffectInvocation() { Effectype = EffectInvocationType.ReceiveReconnectSuccess, Handler=null},
+                            }
+                )
+                .On(EventType.Disconnect, StateType.ReceiveStopped, new List<EffectInvocation>()
+                            { 
+                            new EffectInvocation() { Effectype = EffectInvocationType.Disconnect, Handler=null},
+                            }
+                )
+                .On(EventType.ReceiveReconnectGiveUp, StateType.ReceiveFailed, new List<EffectInvocation>()
+                            { 
+                            new EffectInvocation() { Effectype = EffectInvocationType.ReceiveReconnectGiveUp, Handler=null},
+                            }
+                )
+                .OnEntry(entryInvocationList: new List<EffectInvocation>()
+                            { 
+                            new EffectInvocation(){  Effectype = EffectInvocationType.ReceiveReconnect, Handler = null } 
+                            }
+                )
+                .OnExit(exitInvocationList: new List<EffectInvocation>()
+                            { 
+                            new EffectInvocation(){  Effectype = EffectInvocationType.CancelReceiveReconnect, Handler = null } 
+                            }
+                );
         }
 
         [Test]

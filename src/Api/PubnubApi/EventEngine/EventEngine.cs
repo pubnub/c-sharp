@@ -27,7 +27,11 @@ namespace PubnubApi.PubnubEventEngine
 		public Exception? exception { get; set; }
 	}
 
-
+	public class EffectInvocation
+	{
+		public EffectInvocationType Effectype { get; set; }
+		public IEffectInvocationHandler Handler { get; set; }
+	}
 	public enum EventType
 	{
 		SubscriptionChanged,
@@ -99,30 +103,30 @@ namespace PubnubApi.PubnubEventEngine
 			StateType nextStateType;
 			if (CurrentState != null && CurrentState.transitions.TryGetValue(e.EventType, out nextStateType)) {
 				System.Diagnostics.Debug.WriteLine($"Current State = {CurrentState.StateType}; Transition = {e.EventType}");
-				if (CurrentState.ExitList.Count > 0)
+				if (CurrentState != null && CurrentState.ExitList != null && CurrentState.ExitList.Count > 0)
 				{
 					foreach(var entry in CurrentState.ExitList)
 					{
-						entry.Cancel();
+						entry.Handler?.Cancel();
 					}
 				}
 				CurrentState = this.States.Find((s) => s.StateType == nextStateType);
 				UpdateContext(e.EventType, e.EventPayload);
 				if (CurrentState != null)
 				{
-					if (CurrentState.EntryList.Count > 0)
+					if (CurrentState.EntryList != null && CurrentState.EntryList.Count > 0)
 					{
 						foreach(var entry in CurrentState.EntryList)
 						{
-							entry.Start(Context);
+							entry.Handler?.Start(Context);
 						}
 					}
 					System.Diagnostics.Debug.WriteLine($"Transition = {e.EventType}");
 					UpdateContext(e.EventType, e.EventPayload);
 					if (CurrentState.EffectInvocationsList.Count > 0) {
 						foreach (var effect in CurrentState.EffectInvocationsList) {
-							System.Diagnostics.Debug.WriteLine("Found effect "+ effect);
-							Dispatcher.dispatch(effect, this.Context);
+							System.Diagnostics.Debug.WriteLine("Found effect "+ effect.Effectype);
+							Dispatcher.dispatch(effect.Effectype, this.Context);
 						}
 					}
 				}
