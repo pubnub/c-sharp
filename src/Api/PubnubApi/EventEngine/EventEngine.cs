@@ -29,24 +29,32 @@ namespace PubnubApi.PubnubEventEngine
 
 	public class EffectInvocation
 	{
-		public EffectInvocationType Effectype { get; set; }
+		public EventType Effectype { get; set; }
 		public IEffectInvocationHandler Handler { get; set; }
 	}
 	public enum EventType
 	{
 		SubscriptionChanged,
 		SubscriptionRestored,
+		Handshake,
+		CancelHandshake,
 		HandshakeSuccess,
+		ReceiveMessages,
+		CancelReceiveMessages,
 		ReceiveSuccess,
 		HandshakeFailure,
 		ReceiveFailure,
+		ReceiveReconnect,
+		CancelReceiveReconnect,
 		ReceiveReconnectFailure,
 		ReceiveReconnectSuccess,
 		ReceiveReconnectGiveUp,
+		HandshakeReconnect,
+		CancelHandshakeReconnect,
+		HandshakeReconnectSuccess,
 		HandshakeReconnectFailure,
 		HandshakeReconnectGiveUp,
 		HandshakeReconnectRetry,
-		HandshakeReconnectSuccess,
 		ReconnectionFailed,
 		Disconnect,
 		Reconnect
@@ -125,8 +133,11 @@ namespace PubnubApi.PubnubEventEngine
 					UpdateContext(e.EventType, e.EventPayload);
 					if (CurrentState.EffectInvocationsList.Count > 0) {
 						foreach (var effect in CurrentState.EffectInvocationsList) {
-							System.Diagnostics.Debug.WriteLine("Found effect "+ effect.Effectype);
-							Dispatcher.dispatch(effect.Effectype, this.Context);
+							if (e.EventType == effect.Effectype)
+							{
+								System.Diagnostics.Debug.WriteLine("Found effect "+ effect.Effectype);
+								Dispatcher.dispatch(effect.Effectype, this.Context);
+							}
 						}
 					}
 				}

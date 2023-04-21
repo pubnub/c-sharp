@@ -58,7 +58,7 @@ namespace PubnubApi.EndPoint
 
 			var reconnectionEffect = new ReconnectingEffectHandler<string>(eventEmitter);
 			
-            effectDispatcher.Register(EffectInvocationType.HandshakeSuccess, handshakeEffectInvocation);
+            //effectDispatcher.Register(EffectInvocationType.HandshakeSuccess, handshakeEffectInvocation);
 			//effectDispatcher.Register(EffectInvocationType.ReceiveSuccess, receivingEffectInvocation);
 			//effectDispatcher.Register(EffectInvocationType.ReconnectionAttempt, reconnectionEffect);
 
@@ -72,7 +72,7 @@ namespace PubnubApi.EndPoint
                 .On(EventType.SubscriptionChanged, StateType.Handshaking)
                 .On(EventType.HandshakeSuccess, StateType.Receiving, new List<EffectInvocation>()
                             { 
-                            new EffectInvocation() { Effectype = EffectInvocationType.HandshakeSuccess, Handler = handshakeEffectInvocation }
+                            new EffectInvocation() { Effectype = EventType.HandshakeSuccess, Handler = handshakeEffectInvocation }
                             }
                 )
                 .On(EventType.HandshakeFailure, StateType.HandshakeReconnecting)
@@ -80,12 +80,12 @@ namespace PubnubApi.EndPoint
                 .On(EventType.SubscriptionRestored, StateType.Receiving)
                 .OnEntry(entryInvocationList: new List<EffectInvocation>()
                             { 
-                            new EffectInvocation(){  Effectype = EffectInvocationType.Handshake, Handler = handshakeEffectInvocation } 
+                            new EffectInvocation(){  Effectype = EventType.Handshake, Handler = handshakeEffectInvocation } 
                             }
                 )
                 .OnExit(exitInvocationList: new List<EffectInvocation>()
                             { 
-                            new EffectInvocation(){  Effectype = EffectInvocationType.CancelHandshake, Handler = handshakeEffectInvocation } 
+                            new EffectInvocation(){  Effectype = EventType.CancelHandshake, Handler = handshakeEffectInvocation } 
                             }
                 );
 
@@ -96,18 +96,18 @@ namespace PubnubApi.EndPoint
                 .On(EventType.HandshakeReconnectGiveUp, StateType.HandshakeFailed)
                 .On(EventType.HandshakeReconnectSuccess, StateType.Receiving, new List<EffectInvocation>()
                             { 
-                            new EffectInvocation() { Effectype = EffectInvocationType.HandshakeReconnectSuccess, Handler=null}
+                            new EffectInvocation() { Effectype = EventType.HandshakeReconnectSuccess, Handler=null}
                             }
                 )
                 .On(EventType.SubscriptionRestored, StateType.Receiving)
                 .OnEntry(entryInvocationList: new List<EffectInvocation>()
                             { 
-                            new EffectInvocation(){  Effectype = EffectInvocationType.HandshakeReconnect, Handler = null } 
+                            new EffectInvocation(){  Effectype = EventType.HandshakeReconnect, Handler = null } 
                             }
                 )
                 .OnExit(exitInvocationList: new List<EffectInvocation>()
                             { 
-                            new EffectInvocation(){  Effectype = EffectInvocationType.CancelHandshakeReconnect, Handler = null } 
+                            new EffectInvocation(){  Effectype = EventType.CancelHandshakeReconnect, Handler = null } 
                             }
                 );
 
@@ -129,24 +129,24 @@ namespace PubnubApi.EndPoint
                 .On(EventType.SubscriptionRestored, StateType.Receiving)
                 .On(EventType.ReceiveSuccess, StateType.Receiving, new List<EffectInvocation>()
                             { 
-                            new EffectInvocation() { Effectype = EffectInvocationType.ReceiveSuccess, Handler = receivingEffectInvocation}, //emit messages
-                            new EffectInvocation() { Effectype = EffectInvocationType.ReceiveSuccess, Handler = null} //emit status
+                            new EffectInvocation() { Effectype = EventType.ReceiveSuccess, Handler = receivingEffectInvocation}, //emit messages
+                            new EffectInvocation() { Effectype = EventType.ReceiveSuccess, Handler = null} //emit status
                             }
                 )
                 .On(EventType.Disconnect, StateType.ReceiveStopped, new List<EffectInvocation>()
                             { 
-                            new EffectInvocation() { Effectype = EffectInvocationType.Disconnect, Handler=null},
+                            new EffectInvocation() { Effectype = EventType.Disconnect, Handler=null},
                             }
                 )
                 .On(EventType.ReceiveFailure, StateType.ReceiveReconnecting)
                 .OnEntry(entryInvocationList: new List<EffectInvocation>()
                             { 
-                            new EffectInvocation(){  Effectype = EffectInvocationType.ReceiveMessages, Handler = receivingEffectInvocation } 
+                            new EffectInvocation(){  Effectype = EventType.ReceiveMessages, Handler = receivingEffectInvocation } 
                             }
                 )
                 .OnExit(exitInvocationList: new List<EffectInvocation>()
                             { 
-                            new EffectInvocation(){  Effectype = EffectInvocationType.CancelReceiveMessages, Handler = receivingEffectInvocation } 
+                            new EffectInvocation(){  Effectype = EventType.CancelReceiveMessages, Handler = receivingEffectInvocation } 
                             }
                 );
 
@@ -156,27 +156,27 @@ namespace PubnubApi.EndPoint
                 .On(EventType.SubscriptionRestored, StateType.ReceiveReconnecting)
                 .On(EventType.ReceiveReconnectSuccess, StateType.Receiving, new List<EffectInvocation>()
                             { 
-                            new EffectInvocation() { Effectype = EffectInvocationType.ReceiveReconnectSuccess, Handler=null},
+                            new EffectInvocation() { Effectype = EventType.ReceiveReconnectSuccess, Handler=null},
                             }
                 )
                 .On(EventType.Disconnect, StateType.ReceiveStopped, new List<EffectInvocation>()
                             { 
-                            new EffectInvocation() { Effectype = EffectInvocationType.Disconnect, Handler=null},
+                            new EffectInvocation() { Effectype = EventType.Disconnect, Handler=null},
                             }
                 )
                 .On(EventType.ReceiveReconnectGiveUp, StateType.ReceiveFailed, new List<EffectInvocation>()
                             { 
-                            new EffectInvocation() { Effectype = EffectInvocationType.ReceiveReconnectGiveUp, Handler=null},
+                            new EffectInvocation() { Effectype = EventType.ReceiveReconnectGiveUp, Handler=null},
                             }
                 )
                 .OnEntry(entryInvocationList: new List<EffectInvocation>()
                             { 
-                            new EffectInvocation(){  Effectype = EffectInvocationType.ReceiveReconnect, Handler = null } 
+                            new EffectInvocation(){  Effectype = EventType.ReceiveReconnect, Handler = null } 
                             }
                 )
                 .OnExit(exitInvocationList: new List<EffectInvocation>()
                             { 
-                            new EffectInvocation(){  Effectype = EffectInvocationType.CancelReceiveReconnect, Handler = null } 
+                            new EffectInvocation(){  Effectype = EventType.CancelReceiveReconnect, Handler = null } 
                             }
                 );
 

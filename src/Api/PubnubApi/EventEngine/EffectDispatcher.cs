@@ -6,13 +6,13 @@ namespace PubnubApi.PubnubEventEngine
 {
 	public class EffectDispatcher
 	{
-		public Dictionary<EffectInvocationType, IEffectInvocationHandler> effectActionMap;
+		public Dictionary<EventType, IEffectInvocationHandler> effectActionMap;
 		public EffectDispatcher()
 		{
-			effectActionMap = new Dictionary<EffectInvocationType, IEffectInvocationHandler>();
+			effectActionMap = new Dictionary<EventType, IEffectInvocationHandler>();
 		}
 
-		public async void dispatch(EffectInvocationType effect, ExtendedState stateContext)
+		public async void dispatch(EventType effect, ExtendedState stateContext)
 		{
 			IEffectInvocationHandler? handler;
 			if (effectActionMap.TryGetValue(effect, out handler)) {
@@ -23,7 +23,7 @@ namespace PubnubApi.PubnubEventEngine
 			}
 		}
 
-		public void Register(EffectInvocationType type, IEffectInvocationHandler handler)
+		public void Register(EventType type, IEffectInvocationHandler handler)
 		{
 			effectActionMap.Add(type, handler);
 		}
