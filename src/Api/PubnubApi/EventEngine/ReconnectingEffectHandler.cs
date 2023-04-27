@@ -5,7 +5,7 @@ namespace PubnubApi.PubnubEventEngine
 	public class ReconnectingEffectHandler<T> : IEffectInvocationHandler
 	{
 		EventEmitter eventEmitter;
-
+		private PNStatus pnStatus { get; set; }
         public ReconnectingEffectHandler(EventEmitter emitter)
 		{
 			this.eventEmitter = emitter;
@@ -24,5 +24,9 @@ namespace PubnubApi.PubnubEventEngine
 		{
 			System.Diagnostics.Debug.WriteLine("HandshakeReconnecting Cancelled!!!");
 		}
+		public PNStatus GetPNStatus()
+        {
+            return pnStatus;
+        }
 	}
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -171,16 +172,64 @@ namespace PubnubApi.PubnubEventEngine
 	}
 	public class EmitStatus : EffectInvocation
 	{
+		private readonly PNStatusCategory statusCategory;
+		public Action<PNStatus> AnnounceStatus { get; set; }
+		public EmitStatus()
+		{
+		}
 		public EmitStatus(PNStatusCategory status)
 		{
+			statusCategory = status;
+		}
 
+		public void Announce()
+		{
+			if (Handler != null)
+			{
+				PNStatus status = Handler.GetPNStatus();
+				//status.Category = statusCategory;
+				if (AnnounceStatus != null && status != null)
+				{
+					System.Diagnostics.Debug.WriteLine($"Status = {status.Category} to be announced");
+					AnnounceStatus(status);
+				}
+			}
 		}
 	}
-	public class EmitMessages : EffectInvocation
+	public class EmitMessages<T> : EffectInvocation
 	{
+		public Action<string> LogCallback { get; set; }
+		public Action<PNMessageResult<T>> AnnounceMessage { get; set; }
 		public EmitMessages(List<EventType> messages)
 		{
 
+		}
+		public void Announce<T>()
+		{
+			Message[] receiveMessages = ((ReceivingEffectHandler<T>)Handler).GetMessages();
+			int messageCount = receiveMessages.Length;
+			if (receiveMessages != null && receiveMessages.Length > 0)
+			{
+				for (int index = 0; index < receiveMessages.Length; index++)
+				{
+					LogCallback?.Invoke($"Received Message ({index + 1} of {receiveMessages.Length}) : {JsonConvert.SerializeObject(receiveMessages[index])}");
+					if (receiveMessages[index].Channel.IndexOf("-pnpres") > 0)
+					{
+						var presenceData = JsonConvert.DeserializeObject<PresenceEvent>(receiveMessages[index].Payload.ToString());
+					}
+					else
+					{
+						LogCallback?.Invoke($"Message : {JsonConvert.SerializeObject(receiveMessages[index].Payload)}");
+					}
+				}
+			}
+			//PNStatus status = Handler.GetPNStatus();
+			//status.Category = statusCategory;
+			if (AnnounceMessage != null)
+			{
+				//System.Diagnostics.Debug.WriteLine($"Status = {status.Category} to be announced");
+				//AnnounceMessages(status);
+			}
 		}
 	}
     #endregion
@@ -263,6 +312,19 @@ namespace PubnubApi.PubnubEventEngine
 			StateType nextStateType;
 			if (CurrentState != null && CurrentState.transitions.TryGetValue(e.EventType, out nextStateType)) {
 				System.Diagnostics.Debug.WriteLine($"Current State = {CurrentState.StateType}; Transition = {e.EventType}");
+				if (CurrentState.EffectInvocationsList != null && CurrentState.EffectInvocationsList.Count > 0) {
+						foreach (var effect in CurrentState.EffectInvocationsList) {
+							if (e.EventType == effect.Effectype)
+							{
+								if (effect is EmitStatus)
+								{
+									((EmitStatus)effect).Announce();
+								}
+								System.Diagnostics.Debug.WriteLine("Found effect " + effect.Effectype);
+								Dispatcher.dispatch(effect.Effectype, this.Context);
+							}
+						}
+					}
 				if (CurrentState != null && CurrentState.ExitList != null && CurrentState.ExitList.Count > 0)
 				{
 					foreach(var entry in CurrentState.ExitList)

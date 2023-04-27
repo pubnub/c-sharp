@@ -44,10 +44,14 @@ namespace PubnubApi.PubnubEventEngine
 		public ExtendedState ExtendedState { get; set; }
 		public Action<string> ReceiveResponseCallback { get; set; }
 	}
-	public class ReceivingEffectHandler<T> : IEffectInvocationHandler
+	public class ReceivingEffectHandler<T> : IEffectInvocationHandler, IReceiveMessageHandler
 	{
 		EventEmitter emitter;
+		private ExtendedState extendedState { get; set;}
+		private PNStatus pnStatus { get; set; }
+		private Message[] receiveMessages { get; set; }
 		public Action<string> LogCallback { get; set; }
+		//public Action<PNStatus> StatusCallback { get; set; }
 		public event EventHandler<ReceiveRequestEventArgs>? ReceiveRequested;
 		protected virtual void OnReceiveRequested(ReceiveRequestEventArgs e)
         {
@@ -68,6 +72,7 @@ namespace PubnubApi.PubnubEventEngine
 
 		public async void Start(ExtendedState context)
 		{
+			extendedState = context;
 			await Task.Factory.StartNew(() => { });
 			if (cancellationTokenSource != null && cancellationTokenSource.Token.CanBeCanceled) {
 				Cancel();
@@ -83,39 +88,60 @@ namespace PubnubApi.PubnubEventEngine
 
 		public void OnReceivingEffectResponseReceived(string json)
 		{
-			//var evnt = new Event();
-			//int messageCount = 0;
-			//try {
-			//	var receivedResponse = JsonConvert.DeserializeObject<ReceiveingResponse>(json);
-			//	if (receivedResponse != null)
-			//	{
-			//		evnt.EventPayload.Timetoken = receivedResponse.Timetoken.Timestamp;
-			//		evnt.EventPayload.Region = receivedResponse.Timetoken.Region;
-			//		evnt.EventType = EventType.ReceiveSuccess;
+			try
+			{
+				var receivedResponse = JsonConvert.DeserializeObject<ReceiveingResponse>(json);
+				if (receivedResponse != null)
+				{
+					receiveMessages = receivedResponse.Messages;
 
-			//		if (receivedResponse.Messages != null && receivedResponse.Messages.Length > 0)
-			//		{
-			//			messageCount = receivedResponse.Messages.Length;
-			//			for(int index = 0; index < receivedResponse.Messages.Length; index++)
-			//			{
-			//				LogCallback?.Invoke($"Received Message ({index+1} of {receivedResponse.Messages.Length}) : {JsonConvert.SerializeObject(receivedResponse.Messages[index])}");
-			//				if (receivedResponse.Messages[index].Channel.IndexOf("-pnpres") > 0)
-			//				{
-			//					var presenceData = JsonConvert.DeserializeObject<PresenceEvent>(receivedResponse.Messages[index].Payload.ToString());
-			//				}
-			//				else
-			//				{
-			//					LogCallback?.Invoke($"Message : {JsonConvert.SerializeObject(receivedResponse.Messages[index].Payload)}");
-			//				}
-			//			}
-			//		}
-			//	}
-			//} catch (Exception ex) {
-			//	LogCallback?.Invoke($"ReceivingEffectHandler EXCEPTION - {ex}");
+					ReceiveSuccess receiveSuccessEvent = new ReceiveSuccess();
+					receiveSuccessEvent.SubscriptionCursor = new SubscriptionCursor();
+					receiveSuccessEvent.SubscriptionCursor.Timetoken = receivedResponse.Timetoken.Timestamp;
+					receiveSuccessEvent.SubscriptionCursor.Region = receivedResponse.Timetoken.Region;
+					receiveSuccessEvent.EventPayload.Timetoken = receivedResponse.Timetoken.Timestamp;
+					receiveSuccessEvent.EventPayload.Region = receivedResponse.Timetoken.Region;
+					receiveSuccessEvent.EventType = EventType.ReceiveSuccess;
 
-			//	evnt.EventType = EventType.ReceiveFailure;
-			//	evnt.EventPayload.exception = ex;
-			//}
+					pnStatus = new PNStatus();
+					pnStatus.StatusCode = 200;
+					pnStatus.AffectedChannels = extendedState.Channels;
+					pnStatus.AffectedChannelGroups = extendedState.ChannelGroups;
+					pnStatus.Category = PNStatusCategory.PNConnectedCategory;
+					pnStatus.Error = false;
+
+					emitter.emit(receiveSuccessEvent);
+				}
+				else
+				{
+					ReceiveFailure receiveFailureEvent = new ReceiveFailure();
+					receiveFailureEvent.EventType = EventType.ReceiveFailure;
+					LogCallback?.Invoke("OnReceivingEffectResponseReceived - EventType.ReceiveFailure");
+
+					pnStatus = new PNStatus();
+					pnStatus.AffectedChannels = extendedState.Channels;
+					pnStatus.AffectedChannelGroups = extendedState.ChannelGroups;
+					pnStatus.Error = true;
+
+					emitter.emit(receiveFailureEvent);
+				}
+			}
+			catch (Exception ex)
+			{
+				LogCallback?.Invoke($"ReceivingEffectHandler EXCEPTION - {ex}");
+
+				ReceiveFailure receiveFailureEvent = new ReceiveFailure();
+				receiveFailureEvent.EventType = EventType.ReceiveFailure;
+				receiveFailureEvent.EventPayload.exception = ex;
+				LogCallback?.Invoke("OnReceivingEffectResponseReceived - EventType.ReceiveFailure");
+
+				pnStatus = new PNStatus();
+				pnStatus.AffectedChannels = extendedState.Channels;
+				pnStatus.AffectedChannelGroups = extendedState.ChannelGroups;
+				pnStatus.Error = true;
+
+				emitter.emit(receiveFailureEvent);
+			}
 			//emitter.emit(evnt);
 			//emitter.emit(json, false, messageCount);
 		}
@@ -128,5 +154,15 @@ namespace PubnubApi.PubnubEventEngine
 			}
 			LogCallback?.Invoke($"ReceivingEffectHandler - Receiving request cancellion attempted.");
 		}
-	}
+
+        public PNStatus GetPNStatus()
+        {
+            return pnStatus;
+        }
+
+        public Message[] GetMessages()
+        {
+			return receiveMessages;
+        }
+    }
 }

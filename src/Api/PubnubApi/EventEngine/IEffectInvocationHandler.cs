@@ -26,5 +26,11 @@ namespace PubnubApi.PubnubEventEngine
 	{
 		void Start(ExtendedState context);
 		void Cancel();
+		PNStatus GetPNStatus();
+	}
+
+	public interface IReceiveMessageHandler
+	{
+		Message[] GetMessages();
 	}
 }

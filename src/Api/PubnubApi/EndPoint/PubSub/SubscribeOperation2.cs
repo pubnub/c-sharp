@@ -48,16 +48,96 @@ namespace PubnubApi.EndPoint
 			var eventEmitter = new EventEmitter();
             eventEmitter.RegisterJsonListener(JsonCallback);
 
-			var handshakeEffectInvocation = new HandshakeEffectHandler(eventEmitter);
-            handshakeEffectInvocation.LogCallback = LogCallback;
-            handshakeEffectInvocation.HandshakeRequested += HandshakeEffect_HandshakeRequested;
+			var handshakeEffectHandler = new HandshakeEffectHandler(eventEmitter);
+            handshakeEffectHandler.LogCallback = LogCallback;
+            handshakeEffectHandler.HandshakeRequested += HandshakeEffect_HandshakeRequested;
+            
+            EffectInvocation handshakeInvocation = new Handshake();
+            handshakeInvocation.Effectype = EventType.Handshake;
+            handshakeInvocation.Handler = handshakeEffectHandler;
+
+            EffectInvocation handshakeReconnectInvocation = new HandshakeReconnect();
+            handshakeReconnectInvocation.Effectype = EventType.HandshakeReconnect;
+            handshakeReconnectInvocation.Handler = handshakeEffectHandler;
+
+            EffectInvocation cancelHandshakeInvocation = new CancelHandshake();
+            cancelHandshakeInvocation.Effectype = EventType.CancelHandshake;
+            cancelHandshakeInvocation.Handler = handshakeEffectHandler;
+
+            EffectInvocation cancelHandshakeReconnectInvocation = new CancelHandshakeReconnect();
+            cancelHandshakeReconnectInvocation.Effectype = EventType.CancelHandshakeReconnect;
+            cancelHandshakeReconnectInvocation.Handler = handshakeEffectHandler;
+
+            EmitStatus handshakeSuccessEmitStatus = new EmitStatus();
+            handshakeSuccessEmitStatus.AnnounceStatus = Announce;
+            handshakeSuccessEmitStatus.Effectype = EventType.HandshakeSuccess;
+            handshakeSuccessEmitStatus.Handler = handshakeEffectHandler;
+
+            EmitStatus handshakeReconnectSuccessEmitStatus = new EmitStatus();
+            handshakeReconnectSuccessEmitStatus.AnnounceStatus = Announce;
+            handshakeReconnectSuccessEmitStatus.Effectype = EventType.HandshakeReconnectSuccess;
+            handshakeReconnectSuccessEmitStatus.Handler = handshakeEffectHandler;
 			
-            var receivingEffectInvocation = new ReceivingEffectHandler<string>(eventEmitter);
-            receivingEffectInvocation.LogCallback = LogCallback;
-            receivingEffectInvocation.ReceiveRequested += ReceivingEffect_ReceiveRequested;
+            var receivingEffectHandler = new ReceivingEffectHandler<string>(eventEmitter);
+            receivingEffectHandler.LogCallback = LogCallback;
+            receivingEffectHandler.ReceiveRequested += ReceivingEffect_ReceiveRequested;
+
+            EffectInvocation receiveMessagesInvocation = new ReceiveMessages();
+            receiveMessagesInvocation.Effectype = EventType.ReceiveMessages;
+            receiveMessagesInvocation.Handler = receivingEffectHandler;
+
+            EffectInvocation cancelReceiveMessages = new CancelReceiveMessages();
+            cancelReceiveMessages.Effectype = EventType.CancelReceiveMessages;
+            cancelReceiveMessages.Handler = receivingEffectHandler;
+
+            EmitMessages<T> receiveEmitMessages = new EmitMessages<T>(null);
+            receiveEmitMessages.LogCallback = LogCallback;
+            receiveEmitMessages.AnnounceMessage = Announce;
+            receiveEmitMessages.Effectype = EventType.ReceiveSuccess;
+            receiveEmitMessages.Handler = receivingEffectHandler;
+
+            EmitStatus receiveEmitStatus = new EmitStatus();
+            receiveEmitStatus.AnnounceStatus = Announce;
+            receiveEmitStatus.Effectype = EventType.ReceiveSuccess;
+            receiveEmitStatus.Handler = receivingEffectHandler;
+
+            EmitStatus receiveDisconnectEmitStatus = new EmitStatus();
+            receiveDisconnectEmitStatus.AnnounceStatus = Announce;
+            receiveDisconnectEmitStatus.Effectype = EventType.Disconnect;
+            receiveDisconnectEmitStatus.Handler = receivingEffectHandler;
+
 
 			var reconnectionEffect = new ReconnectingEffectHandler<string>(eventEmitter);
+
+            EffectInvocation receiveReconnectInvocation = new ReceiveReconnect();
+            receiveReconnectInvocation.Effectype = EventType.ReceiveReconnect;
+            receiveReconnectInvocation.Handler = receivingEffectHandler;
+
+            EffectInvocation cancelReceiveReconnect = new CancelReceiveReconnect();
+            cancelReceiveReconnect.Effectype = EventType.CancelReceiveMessages;
+            cancelReceiveReconnect.Handler = receivingEffectHandler;
+
+            EmitMessages<T> receiveReconnectEmitMessages = new EmitMessages<T>(null);
+            receiveReconnectEmitMessages.LogCallback = LogCallback;
+            receiveReconnectEmitMessages.AnnounceMessage = Announce;
+            receiveReconnectEmitMessages.Effectype = EventType.ReceiveReconnectSuccess;
+            receiveReconnectEmitMessages.Handler = receivingEffectHandler;
+
+
+            EmitStatus receiveReconnectEmitStatus = new EmitStatus();
+            receiveEmitStatus.AnnounceStatus = Announce;
+            receiveEmitStatus.Effectype = EventType.ReceiveReconnectSuccess;
+            receiveEmitStatus.Handler = receivingEffectHandler;
+
+            EmitStatus receiveReconnectDisconnectEmitStatus = new EmitStatus();
+            receiveReconnectDisconnectEmitStatus.AnnounceStatus = Announce;
+            receiveReconnectDisconnectEmitStatus.Effectype = EventType.Disconnect;
+            receiveReconnectDisconnectEmitStatus.Handler = receivingEffectHandler;
 			
+            EmitStatus receiveReconnectGiveupEmitStatus = new EmitStatus();
+            receiveReconnectGiveupEmitStatus.AnnounceStatus = Announce;
+            receiveReconnectGiveupEmitStatus.Effectype = EventType.ReceiveReconnectGiveUp;
+            receiveReconnectGiveupEmitStatus.Handler = receivingEffectHandler;
             //effectDispatcher.Register(EffectInvocationType.HandshakeSuccess, handshakeEffectInvocation);
 			//effectDispatcher.Register(EffectInvocationType.ReceiveSuccess, receivingEffectInvocation);
 			//effectDispatcher.Register(EffectInvocationType.ReconnectionAttempt, reconnectionEffect);
@@ -72,7 +152,7 @@ namespace PubnubApi.EndPoint
                 .On(EventType.SubscriptionChanged, StateType.Handshaking)
                 .On(EventType.HandshakeSuccess, StateType.Receiving, new List<EffectInvocation>()
                             { 
-                                new EmitStatus(PNStatusCategory.PNConnectedCategory)
+                                handshakeSuccessEmitStatus
                             }
                 )
                 .On(EventType.HandshakeFailure, StateType.HandshakeReconnecting)
@@ -80,12 +160,12 @@ namespace PubnubApi.EndPoint
                 .On(EventType.SubscriptionRestored, StateType.Receiving)
                 .OnEntry(entryInvocationList: new List<EffectInvocation>()
                             { 
-                                new Handshake () 
+                                handshakeInvocation 
                             }
                 )
                 .OnExit(exitInvocationList: new List<EffectInvocation>()
                             { 
-                                new CancelHandshake () 
+                                cancelHandshakeInvocation 
                             }
                 );
 
@@ -96,18 +176,18 @@ namespace PubnubApi.EndPoint
                 .On(EventType.HandshakeReconnectGiveUp, StateType.HandshakeFailed)
                 .On(EventType.HandshakeReconnectSuccess, StateType.Receiving, new List<EffectInvocation>()
                             { 
-                                new EmitStatus(PNStatusCategory.PNConnectedCategory)
+                                handshakeReconnectSuccessEmitStatus
                             }
                 )
                 .On(EventType.SubscriptionRestored, StateType.Receiving)
                 .OnEntry(entryInvocationList: new List<EffectInvocation>()
                             { 
-                                new HandshakeReconnect()
+                                handshakeReconnectInvocation
                             }
                 )
                 .OnExit(exitInvocationList: new List<EffectInvocation>()
                             { 
-                                new CancelHandshakeReconnect () 
+                                cancelHandshakeReconnectInvocation 
                             }
                 );
 
@@ -129,24 +209,24 @@ namespace PubnubApi.EndPoint
                 .On(EventType.SubscriptionRestored, StateType.Receiving)
                 .On(EventType.ReceiveSuccess, StateType.Receiving, new List<EffectInvocation>()
                             { 
-                                new EmitMessages(null),
-                                new EmitStatus(PNStatusCategory.PNConnectedCategory)
+                                receiveEmitMessages,
+                                receiveEmitStatus
                             }
                 )
                 .On(EventType.Disconnect, StateType.ReceiveStopped, new List<EffectInvocation>()
                             { 
-                                 new EmitStatus(PNStatusCategory.PNDisconnectedCategory)
+                                 receiveDisconnectEmitStatus
                             }
                 )
                 .On(EventType.ReceiveFailure, StateType.ReceiveReconnecting)
                 .OnEntry(entryInvocationList: new List<EffectInvocation>()
                             { 
-                                new ReceiveMessages()
+                                receiveMessagesInvocation
                             }
                 )
                 .OnExit(exitInvocationList: new List<EffectInvocation>()
                             { 
-                                new CancelReceiveMessages()
+                                cancelReceiveMessages
                             }
                 );
 
@@ -156,28 +236,28 @@ namespace PubnubApi.EndPoint
                 .On(EventType.SubscriptionRestored, StateType.ReceiveReconnecting)
                 .On(EventType.ReceiveReconnectSuccess, StateType.Receiving, new List<EffectInvocation>()
                             { 
-                                new EmitMessages(null),
-                                new EmitStatus(PNStatusCategory.PNConnectedCategory)
+                                receiveReconnectEmitMessages,
+                                receiveReconnectEmitStatus
                             }
                 )
                 .On(EventType.Disconnect, StateType.ReceiveStopped, new List<EffectInvocation>()
                             { 
-                                new EmitStatus(PNStatusCategory.PNDisconnectedCategory)
+                                receiveReconnectDisconnectEmitStatus
                             }
                 )
                 .On(EventType.ReceiveReconnectGiveUp, StateType.ReceiveFailed, new List<EffectInvocation>()
                             { 
-                                new EmitStatus(PNStatusCategory.PNDisconnectedCategory)
+                                receiveReconnectGiveupEmitStatus
                             }
                 )
                 .OnEntry(entryInvocationList: new List<EffectInvocation>()
                             { 
-                                new ReceiveReconnect()
+                                receiveReconnectInvocation
                             }
                 )
                 .OnExit(exitInvocationList: new List<EffectInvocation>()
                             { 
-                                new CancelReceiveReconnect()
+                                cancelReceiveReconnect
                             }
                 );
 
@@ -192,13 +272,13 @@ namespace PubnubApi.EndPoint
             string jsonResp = resp.Item1;
             e.ReceiveResponseCallback?.Invoke(jsonResp);
 
-            PNStatus status = resp.Item2;
-            if (status != null && status.Error && status.StatusCode != 200)
-            {
-                status.AffectedChannels.AddRange(e.ExtendedState.Channels);
-                status.AffectedChannels.AddRange(e.ExtendedState.ChannelGroups);
-                Announce(status);
-            }
+            //PNStatus status = resp.Item2;
+            //if (status != null && status.Error && status.StatusCode != 200)
+            //{
+            //    status.AffectedChannels.AddRange(e.ExtendedState.Channels);
+            //    status.AffectedChannels.AddRange(e.ExtendedState.ChannelGroups);
+            //    Announce(status);
+            //}
         }
 
         private void HandshakeEffect_HandshakeRequested(object sender, HandshakeRequestEventArgs e)
@@ -208,13 +288,13 @@ namespace PubnubApi.EndPoint
             string jsonResp = resp.Item1;
             e.HandshakeResponseCallback?.Invoke(jsonResp);
 
-            PNStatus status = resp.Item2;
-            if (status != null && status.Error && status.StatusCode != 200)
-            {
-                status.AffectedChannels.AddRange(e.ExtendedState.Channels);
-                status.AffectedChannels.AddRange(e.ExtendedState.ChannelGroups);
-                Announce(status);
-            }
+            //PNStatus status = resp.Item2;
+            //if (status != null && status.Error && status.StatusCode != 200)
+            //{
+            //    status.AffectedChannels.AddRange(e.ExtendedState.Channels);
+            //    status.AffectedChannels.AddRange(e.ExtendedState.ChannelGroups);
+            //    Announce(status);
+            //}
         }
 
         private void JsonCallback(string json, bool zeroTimeTokenRequest, int messageCount)

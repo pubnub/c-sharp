@@ -31,22 +31,39 @@ namespace PubNubMessaging.Tests
 			var eventEmitter = new EventEmitter();
             //eventEmitter.RegisterJsonListener(JsonCallback);
 
-            var handshakeEffect = new HandshakeEffectHandler(eventEmitter);
-            //handshakeEffect.InvocationType = EffectInvocationType.Entry;
-            handshakeEffect.LogCallback = delegate (string log)
-            {
-            };
-            handshakeEffect.HandshakeRequested += delegate (object sender, HandshakeRequestEventArgs e)
-            {
-            };
 
-            //var receivingEffect = new ReceivingEffectHandler<string>(eventEmitter);
-            //receivingEffect.LogCallback = delegate(string log)
-            //{ 
-            //};
-            //receivingEffect.ReceiveRequested += delegate(object sender, ReceiveRequestEventArgs e)
-            //{ 
-            //};
+            var handshakeEffectHandler = new HandshakeEffectHandler(eventEmitter);
+            handshakeEffectHandler.LogCallback = delegate (string log)
+            {
+            };
+            handshakeEffectHandler.HandshakeRequested += delegate (object sender, HandshakeRequestEventArgs e)
+            {
+            };
+            EffectInvocation handshakeInvocation = new Handshake();
+            handshakeInvocation.Effectype = EventType.Handshake;
+            handshakeInvocation.Handler = handshakeEffectHandler;
+
+            EffectInvocation cancelHandshakeInvocation = new CancelHandshake();
+            cancelHandshakeInvocation.Effectype = EventType.CancelHandshake;
+            cancelHandshakeInvocation.Handler = handshakeEffectHandler;
+
+            var receivingEffectHandler = new ReceivingEffectHandler<string>(eventEmitter);
+            receivingEffectHandler.LogCallback = delegate (string log)
+            {
+            };
+            receivingEffectHandler.ReceiveRequested += delegate (object sender, ReceiveRequestEventArgs e)
+            {
+            };
+            EffectInvocation receiveMessagesInvocation = new ReceiveMessages();
+            receiveMessagesInvocation.Effectype = EventType.ReceiveMessages;
+            receiveMessagesInvocation.Handler = receivingEffectHandler;
+
+            EffectInvocation cancelReceiveMessages = new CancelReceiveMessages();
+            cancelReceiveMessages.Effectype = EventType.CancelReceiveMessages;
+            cancelReceiveMessages.Handler = receivingEffectHandler;
+
+            EmitStatus emitStatus = new EmitStatus(PNStatusCategory.PNUnknownCategory);
+            //emitStatus.Effectype = EventType.HandshakeSuccess;
 
             //var reconnectionEffect = new ReconnectingEffectHandler<string>(eventEmitter);
 
@@ -65,7 +82,7 @@ namespace PubNubMessaging.Tests
                 .On(EventType.SubscriptionChanged, StateType.Handshaking)
                 .On(EventType.HandshakeSuccess, StateType.Receiving, new List<EffectInvocation>()
                             { 
-                                new EmitStatus(PNStatusCategory.PNConnectedCategory)
+                                emitStatus
                             }
                 )
                 .On(EventType.HandshakeFailure, StateType.HandshakeReconnecting)
@@ -73,12 +90,12 @@ namespace PubNubMessaging.Tests
                 .On(EventType.SubscriptionRestored, StateType.Receiving)
                 .OnEntry(entryInvocationList: new List<EffectInvocation>()
                             { 
-                                new Handshake() 
+                                handshakeInvocation 
                             }
                 )
                 .OnExit(exitInvocationList: new List<EffectInvocation>()
                             { 
-                                new CancelHandshake() 
+                                cancelHandshakeInvocation 
                             }
                 );
 
@@ -122,7 +139,7 @@ namespace PubNubMessaging.Tests
                 .On(EventType.SubscriptionRestored, StateType.Receiving)
                 .On(EventType.ReceiveSuccess, StateType.Receiving, new List<EffectInvocation>()
                             { 
-                                new EmitMessages(null),
+                                //new EmitMessages(null),
                                 new EmitStatus(PNStatusCategory.PNConnectedCategory)
                             }
                 )
@@ -134,12 +151,12 @@ namespace PubNubMessaging.Tests
                 .On(EventType.ReceiveFailure, StateType.ReceiveReconnecting)
                 .OnEntry(entryInvocationList: new List<EffectInvocation>()
                             { 
-                                new ReceiveMessages() 
+                                receiveMessagesInvocation 
                             }
                 )
                 .OnExit(exitInvocationList: new List<EffectInvocation>()
                             { 
-                                new CancelReceiveMessages() 
+                                cancelReceiveMessages 
                             }
                 );
 
@@ -149,7 +166,7 @@ namespace PubNubMessaging.Tests
                 .On(EventType.SubscriptionRestored, StateType.ReceiveReconnecting)
                 .On(EventType.ReceiveReconnectSuccess, StateType.Receiving, new List<EffectInvocation>()
                             { 
-                                new EmitMessages(null),
+                                //new EmitMessages(null),
                                 new EmitStatus(PNStatusCategory.PNConnectedCategory)
                             }
                 )
