@@ -29,8 +29,8 @@ namespace PubnubApi.PubnubEventEngine
 		PNStatus GetPNStatus();
 	}
 
-	public interface IReceiveMessageHandler
+	public interface IReceiveMessageHandler<T>
 	{
-		Message[] GetMessages();
+		Message<T>[] GetMessages();
 	}
 }

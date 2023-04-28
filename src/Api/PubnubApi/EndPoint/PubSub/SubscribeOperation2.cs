@@ -143,6 +143,8 @@ namespace PubnubApi.EndPoint
 			//effectDispatcher.Register(EffectInvocationType.ReconnectionAttempt, reconnectionEffect);
 
 			pnEventEngine = new EventEngine(effectDispatcher, eventEmitter);
+            pnEventEngine.PubnubUnitTest = unit;
+            pnEventEngine.PubnubUnitTest.EventTypeList = new List<EventType>();
 
 			var initState = pnEventEngine.CreateState(StateType.Unsubscribed)
 				.On(EventType.SubscriptionChanged, StateType.Handshaking)

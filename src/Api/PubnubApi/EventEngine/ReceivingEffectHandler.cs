@@ -5,22 +5,22 @@ using Newtonsoft.Json;
 
 namespace PubnubApi.PubnubEventEngine
 {
-	public class ReceiveingResponse
+	public class ReceiveingResponse<T>
 	{
 		[JsonProperty("t")]
 		public Timetoken? Timetoken { get; set; }
 
 		[JsonProperty("m")]
-		public Message[]? Messages { get; set; }
+		public Message<T>[] Messages { get; set; }
 	}
 
-	public class Message
+	public class Message<T>
 	{
 		[JsonProperty("c")]
 		public string Channel { get; set; }
 
 		[JsonProperty("d")]
-		public object? Payload { get; set; }
+		public T Payload { get; set; }
 	}
 	public class PresenceEvent
 	{
@@ -44,12 +44,12 @@ namespace PubnubApi.PubnubEventEngine
 		public ExtendedState ExtendedState { get; set; }
 		public Action<string> ReceiveResponseCallback { get; set; }
 	}
-	public class ReceivingEffectHandler<T> : IEffectInvocationHandler, IReceiveMessageHandler
+	public class ReceivingEffectHandler<T> : IEffectInvocationHandler, IReceiveMessageHandler<T>
 	{
 		EventEmitter emitter;
 		private ExtendedState extendedState { get; set;}
 		private PNStatus pnStatus { get; set; }
-		private Message[] receiveMessages { get; set; }
+		private Message<T>[] receiveMessages { get; set; }
 		public Action<string> LogCallback { get; set; }
 		//public Action<PNStatus> StatusCallback { get; set; }
 		public event EventHandler<ReceiveRequestEventArgs>? ReceiveRequested;
@@ -90,7 +90,7 @@ namespace PubnubApi.PubnubEventEngine
 		{
 			try
 			{
-				var receivedResponse = JsonConvert.DeserializeObject<ReceiveingResponse>(json);
+				var receivedResponse = JsonConvert.DeserializeObject<ReceiveingResponse<T>>(json);
 				if (receivedResponse != null)
 				{
 					receiveMessages = receivedResponse.Messages;
@@ -160,7 +160,7 @@ namespace PubnubApi.PubnubEventEngine
             return pnStatus;
         }
 
-        public Message[] GetMessages()
+        public Message<T>[] GetMessages()
         {
 			return receiveMessages;
         }

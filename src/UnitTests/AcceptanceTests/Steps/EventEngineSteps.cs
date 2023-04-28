@@ -11,6 +11,7 @@ using System.IO;
 using System.Text.Json;
 using System.Threading.Channels;
 using System.Threading;
+using PubnubApi.PubnubEventEngine;
 
 namespace AcceptanceTests.Steps
 {
@@ -82,6 +83,11 @@ namespace AcceptanceTests.Steps
             bool IPubnubUnitTest.IncludeUuid
             {
                 get;
+                set;
+            }
+            List<EventType> IPubnubUnitTest.EventTypeList 
+            { 
+                get; 
                 set;
             }
         }
@@ -220,10 +226,14 @@ namespace AcceptanceTests.Steps
             pn = new Pubnub(config);
             pn.PubnubUnitTest = unitTest;
 
+            messageReceivedEvent = new ManualResetEvent(false);
+            statusReceivedEvent = new ManualResetEvent(false);
+
             subscribeCallback = new SubscribeCallbackExt(
                 delegate (Pubnub pnObj, PNMessageResult<object> pubMsg)
                 {
-                    Console.WriteLine(pn.JsonPluggableLibrary.SerializeToJsonString(pubMsg));
+                    Console.WriteLine($"Message received in listener. {pn.JsonPluggableLibrary.SerializeToJsonString(pubMsg)}");
+                    messageResult = pubMsg;
                     messageReceivedEvent.Set();
                 },
                 delegate (Pubnub pnObj, PNPresenceEventResult presenceEvnt)
@@ -270,7 +280,13 @@ namespace AcceptanceTests.Steps
             statusReceivedEvent.WaitOne ();
             if (pnStatus != null && pnStatus.Category == PNStatusCategory.PNConnectedCategory)
             {
-
+                //statusReceivedEvent = new ManualResetEvent(false);
+                //string subscription_change_channels = string.Format($"{channel},second_channel");
+                //pn.Subscribe<object>()
+                //    .Channels(subscription_change_channels.Split(','))
+                //    .ChannelGroups(channelGroup.Split(','))
+                //    .WithTimetoken(16826933260573700)
+                //    .Execute();
             }
         }
 
@@ -296,7 +312,18 @@ namespace AcceptanceTests.Steps
         [Then(@"I observe the following:")]
         public void ThenIObserveTheFollowing(Table table)
         {
-            throw new PendingStepException();
+            foreach(TechTalk.SpecFlow.TableRow tr in table.Rows)
+            {
+                TableRow row = tr;
+                //row.getv
+                //tr.co
+                System.Diagnostics.Debug.WriteLine(tr);
+                //if (tr.Values[1]  != null)
+                //{
+
+                //}
+            }
+            //throw new PendingStepException();
         }
 
         [Given(@"a linear reconnection policy with (.*) retries")]

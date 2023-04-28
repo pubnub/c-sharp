@@ -199,14 +199,14 @@ namespace PubnubApi.PubnubEventEngine
 	public class EmitMessages<T> : EffectInvocation
 	{
 		public Action<string> LogCallback { get; set; }
-		public Action<PNMessageResult<T>> AnnounceMessage { get; set; }
+		public Action<PNMessageResult<object>> AnnounceMessage { get; set; }
 		public EmitMessages(List<EventType> messages)
 		{
 
 		}
 		public void Announce<T>()
 		{
-			Message[] receiveMessages = ((ReceivingEffectHandler<T>)Handler).GetMessages();
+			Message<T>[] receiveMessages = ((ReceivingEffectHandler<T>)Handler).GetMessages();
 			int messageCount = receiveMessages.Length;
 			if (receiveMessages != null && receiveMessages.Length > 0)
 			{
@@ -220,16 +220,20 @@ namespace PubnubApi.PubnubEventEngine
 					else
 					{
 						LogCallback?.Invoke($"Message : {JsonConvert.SerializeObject(receiveMessages[index].Payload)}");
+						PNMessageResult<object> messageResult = new PNMessageResult<object>();
+						messageResult.Channel = receiveMessages[index].Channel;
+						messageResult.Message = receiveMessages[index].Payload;
+						AnnounceMessage?.Invoke(messageResult);
+						//if (AnnounceMessage != null && messagePayload != null)
+						//{
+						//	//System.Diagnostics.Debug.WriteLine($"Status = {status.Category} to be announced");
+						//	AnnounceMessage(messagePayload);
+						//}
 					}
 				}
 			}
 			//PNStatus status = Handler.GetPNStatus();
 			//status.Category = statusCategory;
-			if (AnnounceMessage != null)
-			{
-				//System.Diagnostics.Debug.WriteLine($"Status = {status.Category} to be announced");
-				//AnnounceMessages(status);
-			}
 		}
 	}
     #endregion
@@ -293,6 +297,10 @@ namespace PubnubApi.PubnubEventEngine
 
 		public EventEngine(EffectDispatcher dispatcher, EventEmitter emitter)
 		{
+			if (PubnubUnitTest != null )
+			{
+				PubnubUnitTest.EventTypeList?.Clear();
+			}
 			this.Dispatcher = dispatcher;
 			States = new List<State>();
 			Context = new ExtendedState();
@@ -312,13 +320,25 @@ namespace PubnubApi.PubnubEventEngine
 			StateType nextStateType;
 			if (CurrentState != null && CurrentState.transitions.TryGetValue(e.EventType, out nextStateType)) {
 				System.Diagnostics.Debug.WriteLine($"Current State = {CurrentState.StateType}; Transition = {e.EventType}");
+				if (PubnubUnitTest != null )
+				{
+					PubnubUnitTest.EventTypeList.Add(e.EventType);
+				}
 				if (CurrentState.EffectInvocationsList != null && CurrentState.EffectInvocationsList.Count > 0) {
 						foreach (var effect in CurrentState.EffectInvocationsList) {
 							if (e.EventType == effect.Effectype)
 							{
+								if (PubnubUnitTest != null )
+								{
+									PubnubUnitTest.EventTypeList.Add(e.EventType);
+								}
 								if (effect is EmitStatus)
 								{
 									((EmitStatus)effect).Announce();
+								}
+								else if (effect is EmitMessages<object>)
+								{
+									((EmitMessages<object>)effect).Announce<string>();
 								}
 								System.Diagnostics.Debug.WriteLine("Found effect " + effect.Effectype);
 								Dispatcher.dispatch(effect.Effectype, this.Context);
