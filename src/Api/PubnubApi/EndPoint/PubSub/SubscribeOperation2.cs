@@ -136,7 +136,6 @@ namespace PubnubApi.EndPoint
             receiveReconnectEmitMessages.Effectype = EventType.ReceiveReconnectSuccess;
             receiveReconnectEmitMessages.Handler = receivingEffectHandler;
 
-
             EmitStatus receiveReconnectEmitStatus = new EmitStatus();
             receiveReconnectEmitStatus.Name = "RECONNECT_EMIT_STATUS";
             receiveEmitStatus.AnnounceStatus = Announce;
@@ -154,13 +153,13 @@ namespace PubnubApi.EndPoint
             receiveReconnectGiveupEmitStatus.AnnounceStatus = Announce;
             receiveReconnectGiveupEmitStatus.Effectype = EventType.ReceiveReconnectGiveUp;
             receiveReconnectGiveupEmitStatus.Handler = receivingEffectHandler;
-            //effectDispatcher.Register(EffectInvocationType.HandshakeSuccess, handshakeEffectInvocation);
-			//effectDispatcher.Register(EffectInvocationType.ReceiveSuccess, receivingEffectInvocation);
-			//effectDispatcher.Register(EffectInvocationType.ReconnectionAttempt, reconnectionEffect);
 
 			pnEventEngine = new EventEngine(effectDispatcher, eventEmitter);
             pnEventEngine.PubnubUnitTest = unit;
-            pnEventEngine.PubnubUnitTest.EventTypeList = new List<Tuple<string, string>>();
+            if (pnEventEngine.PubnubUnitTest != null)
+            {
+                pnEventEngine.PubnubUnitTest.EventTypeList = new List<KeyValuePair<string, string>>();
+            }
 
 			var initState = pnEventEngine.CreateState(StateType.Unsubscribed)
 				.On(EventType.SubscriptionChanged, StateType.Handshaking)

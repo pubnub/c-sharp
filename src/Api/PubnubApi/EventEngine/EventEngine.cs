@@ -324,13 +324,13 @@ namespace PubnubApi.PubnubEventEngine
 				System.Diagnostics.Debug.WriteLine($"Current State = {CurrentState.StateType}; Transition = {e.EventType}");
 				if (PubnubUnitTest != null )
 				{
-					PubnubUnitTest.EventTypeList.Add(new Tuple<string, string>("event", e.Name));
+					PubnubUnitTest.EventTypeList.Add(new KeyValuePair<string, string>("event", e.Name));
 				}
 				if (CurrentState != null && CurrentState.ExitList != null && CurrentState.ExitList.Count > 0)
 				{
 					foreach(var entry in CurrentState.ExitList)
 					{
-						PubnubUnitTest?.EventTypeList?.Add(new Tuple<string, string>("invocation", entry.Name));
+						PubnubUnitTest?.EventTypeList?.Add(new KeyValuePair<string, string>("invocation", entry.Name));
 						entry.Handler?.Cancel();
 					}
 				}
@@ -340,7 +340,7 @@ namespace PubnubApi.PubnubEventEngine
 				{
 					List<EffectInvocation> effectInvocationList = CurrentState.EffectInvocationsList[e.EventType];
 					foreach (var effect in effectInvocationList) {
-						PubnubUnitTest?.EventTypeList?.Add(new Tuple<string, string>("invocation", effect.Name));
+						PubnubUnitTest?.EventTypeList?.Add(new KeyValuePair<string, string>("invocation", effect.Name));
 						if (effect is EmitStatus)
 						{
 							((EmitStatus)effect).Announce();
@@ -364,7 +364,7 @@ namespace PubnubApi.PubnubEventEngine
 					{
 						foreach(var entry in CurrentState.EntryList)
 						{
-							PubnubUnitTest?.EventTypeList?.Add(new Tuple<string, string>("invocation", entry.Name));
+							PubnubUnitTest?.EventTypeList?.Add(new KeyValuePair<string, string>("invocation", entry.Name));
 							entry.Handler?.Start(Context);
 						}
 					}

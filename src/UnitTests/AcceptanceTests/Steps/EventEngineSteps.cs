@@ -86,7 +86,7 @@ namespace AcceptanceTests.Steps
                 get;
                 set;
             }
-            List<Tuple<string,string>> IPubnubUnitTest.EventTypeList 
+            List<KeyValuePair<string,string>> IPubnubUnitTest.EventTypeList 
             { 
                 get; 
                 set;
@@ -327,8 +327,8 @@ namespace AcceptanceTests.Steps
             {
                 SubscribeResponseRow row = expectedRowSet.ElementAt(rowIndex);
                 System.Diagnostics.Debug.WriteLine($"{row.type} - {row.name} ");
-                if (row.type == pn.PubnubUnitTest.EventTypeList[rowIndex].Item1
-                    && row.name == pn.PubnubUnitTest.EventTypeList[rowIndex].Item2)
+                if (row.type == pn.PubnubUnitTest.EventTypeList[rowIndex].Key
+                    && row.name == pn.PubnubUnitTest.EventTypeList[rowIndex].Value)
                 {
                     match = true;
                 }
