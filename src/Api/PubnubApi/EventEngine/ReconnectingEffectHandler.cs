@@ -17,6 +17,7 @@ namespace PubnubApi.PubnubEventEngine
 			evnt.EventPayload.Timetoken = context.Timetoken;
 			evnt.EventPayload.Region = context.Region;
 			evnt.EventType = EventType.ReceiveSuccess;
+			evnt.Name = "RECEIVE_SUCCESS";
 			this.eventEmitter.emit(evnt);
 		}
 

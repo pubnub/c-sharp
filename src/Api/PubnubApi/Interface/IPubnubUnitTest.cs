@@ -51,6 +51,6 @@ namespace PubnubApi
             set;
         }
 
-        List<EventType> EventTypeList { get; set; }
+        List<Tuple<string,string>> EventTypeList { get; set; }
     }
 }

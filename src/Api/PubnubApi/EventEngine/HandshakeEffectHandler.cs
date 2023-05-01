@@ -85,6 +85,7 @@ namespace PubnubApi.PubnubEventEngine
 					handshakeSuccessEvent.EventPayload.Timetoken = handshakeResponse.Timetoken?.Timestamp;
 					handshakeSuccessEvent.EventPayload.Region = handshakeResponse.Timetoken?.Region;
 					handshakeSuccessEvent.EventType = EventType.HandshakeSuccess;
+					handshakeSuccessEvent.Name = "HANDSHAKE_SUCCESS";
 					LogCallback?.Invoke("OnHandshakeEffectResponseReceived - EventType.HandshakeSuccess");
 					
 					pnStatus = new PNStatus();
@@ -99,6 +100,7 @@ namespace PubnubApi.PubnubEventEngine
 				else
 				{
 					HandshakeFailure handshakeFailureEvent = new HandshakeFailure();
+					handshakeFailureEvent.Name = "HANDSHAKE_FAILURE";
 					handshakeFailureEvent.EventType = EventType.HandshakeFailure;
 					LogCallback?.Invoke("OnHandshakeEffectResponseReceived - EventType.HandshakeFailure");
 
@@ -114,6 +116,7 @@ namespace PubnubApi.PubnubEventEngine
 			{
 				LogCallback?.Invoke($"OnHandshakeEffectResponseReceived EXCEPTION - {ex}");
 				HandshakeFailure handshakeFailureEvent = new HandshakeFailure();
+				handshakeFailureEvent.Name = "HANDSHAKE_FAILURE";
 				handshakeFailureEvent.EventType = EventType.HandshakeFailure;
 				handshakeFailureEvent.EventPayload.exception = ex;
 

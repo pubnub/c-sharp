@@ -12,7 +12,7 @@ namespace PubnubApi.PubnubEventEngine
 		public StateType StateType { get; set; }
 
 		public Dictionary<EventType, StateType> transitions;
-		public List<EffectInvocation> EffectInvocationsList { get; private set; }
+		public Dictionary<EventType, List<EffectInvocation>> EffectInvocationsList { get; private set; }
 		public List<EffectInvocation> EntryList { get; private set; }
 
 		public List<EffectInvocation> ExitList { get; private set; }
@@ -21,7 +21,8 @@ namespace PubnubApi.PubnubEventEngine
 		{
 			this.StateType = type;
 			this.transitions = new Dictionary<EventType, StateType>();
-			EffectInvocationsList = new List<EffectInvocation>();
+			//EffectInvocationsList =  new List<EffectInvocation>();
+			EffectInvocationsList = new Dictionary<EventType, List<EffectInvocation>>();
 		}
 
 		public State On(EventType e, StateType nextState)
@@ -32,7 +33,7 @@ namespace PubnubApi.PubnubEventEngine
 		public State On(EventType e, StateType nextState, List<EffectInvocation> effectInvocation)
 		{
 			transitions.Add(e, nextState);
-			EffectInvocationsList.AddRange(effectInvocation);
+			EffectInvocationsList.Add(e, effectInvocation);
 			return this;
 		}
 

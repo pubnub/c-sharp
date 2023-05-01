@@ -12,6 +12,7 @@ using System.Text.Json;
 using System.Threading.Channels;
 using System.Threading;
 using PubnubApi.PubnubEventEngine;
+using TechTalk.SpecFlow.Assist;
 
 namespace AcceptanceTests.Steps
 {
@@ -85,7 +86,7 @@ namespace AcceptanceTests.Steps
                 get;
                 set;
             }
-            List<EventType> IPubnubUnitTest.EventTypeList 
+            List<Tuple<string,string>> IPubnubUnitTest.EventTypeList 
             { 
                 get; 
                 set;
@@ -120,6 +121,11 @@ namespace AcceptanceTests.Steps
                 System.Diagnostics.Trace.Listeners.Add(new System.Diagnostics.TextWriterTraceListener(logFilePath));
 
             }
+        }
+        public class SubscribeResponseRow
+        {
+            public string type { get; set; }
+            public string name { get; set; }
         }
         public EventEngineSteps(ScenarioContext scenarioContext)
         {
@@ -280,13 +286,11 @@ namespace AcceptanceTests.Steps
             statusReceivedEvent.WaitOne ();
             if (pnStatus != null && pnStatus.Category == PNStatusCategory.PNConnectedCategory)
             {
-                //statusReceivedEvent = new ManualResetEvent(false);
-                //string subscription_change_channels = string.Format($"{channel},second_channel");
-                //pn.Subscribe<object>()
-                //    .Channels(subscription_change_channels.Split(','))
-                //    .ChannelGroups(channelGroup.Split(','))
-                //    .WithTimetoken(16826933260573700)
-                //    .Execute();
+                //All good.
+            }
+            else
+            {
+                Assert.Fail("WhenISubscribe failed.");
             }
         }
 
@@ -312,18 +316,29 @@ namespace AcceptanceTests.Steps
         [Then(@"I observe the following:")]
         public void ThenIObserveTheFollowing(Table table)
         {
-            foreach(TechTalk.SpecFlow.TableRow tr in table.Rows)
+            if (pn.PubnubUnitTest == null)
             {
-                TableRow row = tr;
-                //row.getv
-                //tr.co
-                System.Diagnostics.Debug.WriteLine(tr);
-                //if (tr.Values[1]  != null)
-                //{
-
-                //}
+                Assert.Fail();
             }
-            //throw new PendingStepException();
+            IEnumerable<SubscribeResponseRow> expectedRowSet =  table.CreateSet<SubscribeResponseRow>();
+            Assert.True(pn.PubnubUnitTest.EventTypeList.Count() >= expectedRowSet?.Count());
+            bool match = false;
+            for (int rowIndex = 0; rowIndex < expectedRowSet.Count(); rowIndex++)
+            {
+                SubscribeResponseRow row = expectedRowSet.ElementAt(rowIndex);
+                System.Diagnostics.Debug.WriteLine($"{row.type} - {row.name} ");
+                if (row.type == pn.PubnubUnitTest.EventTypeList[rowIndex].Item1
+                    && row.name == pn.PubnubUnitTest.EventTypeList[rowIndex].Item2)
+                {
+                    match = true;
+                }
+                else
+                {
+                    match = false;
+                    break;
+                }
+            }
+            Assert.True(match == true);
         }
 
         [Given(@"a linear reconnection policy with (.*) retries")]

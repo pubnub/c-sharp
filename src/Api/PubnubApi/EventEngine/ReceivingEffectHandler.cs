@@ -102,6 +102,7 @@ namespace PubnubApi.PubnubEventEngine
 					receiveSuccessEvent.EventPayload.Timetoken = receivedResponse.Timetoken.Timestamp;
 					receiveSuccessEvent.EventPayload.Region = receivedResponse.Timetoken.Region;
 					receiveSuccessEvent.EventType = EventType.ReceiveSuccess;
+					receiveSuccessEvent.Name = "RECEIVE_SUCCESS";
 
 					pnStatus = new PNStatus();
 					pnStatus.StatusCode = 200;
@@ -115,6 +116,7 @@ namespace PubnubApi.PubnubEventEngine
 				else
 				{
 					ReceiveFailure receiveFailureEvent = new ReceiveFailure();
+					receiveFailureEvent.Name = "RECEIVE_FAILURE";
 					receiveFailureEvent.EventType = EventType.ReceiveFailure;
 					LogCallback?.Invoke("OnReceivingEffectResponseReceived - EventType.ReceiveFailure");
 
@@ -131,6 +133,7 @@ namespace PubnubApi.PubnubEventEngine
 				LogCallback?.Invoke($"ReceivingEffectHandler EXCEPTION - {ex}");
 
 				ReceiveFailure receiveFailureEvent = new ReceiveFailure();
+				receiveFailureEvent.Name = "RECEIVE_FAILURE";
 				receiveFailureEvent.EventType = EventType.ReceiveFailure;
 				receiveFailureEvent.EventPayload.exception = ex;
 				LogCallback?.Invoke("OnReceivingEffectResponseReceived - EventType.ReceiveFailure");

@@ -53,27 +53,33 @@ namespace PubnubApi.EndPoint
             handshakeEffectHandler.HandshakeRequested += HandshakeEffect_HandshakeRequested;
             
             EffectInvocation handshakeInvocation = new Handshake();
+            handshakeInvocation.Name = "HANDSHAKE";
             handshakeInvocation.Effectype = EventType.Handshake;
             handshakeInvocation.Handler = handshakeEffectHandler;
 
             EffectInvocation handshakeReconnectInvocation = new HandshakeReconnect();
+            handshakeReconnectInvocation.Name = "HANDSHAKE_RECONNECT";
             handshakeReconnectInvocation.Effectype = EventType.HandshakeReconnect;
             handshakeReconnectInvocation.Handler = handshakeEffectHandler;
 
             EffectInvocation cancelHandshakeInvocation = new CancelHandshake();
+            cancelHandshakeInvocation.Name = "CANCEL_HANDSHAKE";
             cancelHandshakeInvocation.Effectype = EventType.CancelHandshake;
             cancelHandshakeInvocation.Handler = handshakeEffectHandler;
 
             EffectInvocation cancelHandshakeReconnectInvocation = new CancelHandshakeReconnect();
+            cancelHandshakeReconnectInvocation.Name = "CANCEL_HANDSHAKE_RECONNECT";
             cancelHandshakeReconnectInvocation.Effectype = EventType.CancelHandshakeReconnect;
             cancelHandshakeReconnectInvocation.Handler = handshakeEffectHandler;
 
             EmitStatus handshakeSuccessEmitStatus = new EmitStatus();
+            handshakeSuccessEmitStatus.Name = "EMIT_STATUS";
             handshakeSuccessEmitStatus.AnnounceStatus = Announce;
             handshakeSuccessEmitStatus.Effectype = EventType.HandshakeSuccess;
             handshakeSuccessEmitStatus.Handler = handshakeEffectHandler;
 
             EmitStatus handshakeReconnectSuccessEmitStatus = new EmitStatus();
+            handshakeReconnectSuccessEmitStatus.Name = "EMIT_STATUS";
             handshakeReconnectSuccessEmitStatus.AnnounceStatus = Announce;
             handshakeReconnectSuccessEmitStatus.Effectype = EventType.HandshakeReconnectSuccess;
             handshakeReconnectSuccessEmitStatus.Handler = handshakeEffectHandler;
@@ -83,25 +89,30 @@ namespace PubnubApi.EndPoint
             receivingEffectHandler.ReceiveRequested += ReceivingEffect_ReceiveRequested;
 
             EffectInvocation receiveMessagesInvocation = new ReceiveMessages();
+            receiveMessagesInvocation.Name = "RECEIVE_EVENTS";
             receiveMessagesInvocation.Effectype = EventType.ReceiveMessages;
             receiveMessagesInvocation.Handler = receivingEffectHandler;
 
             EffectInvocation cancelReceiveMessages = new CancelReceiveMessages();
+            cancelReceiveMessages.Name = "CANCEL_RECEIVE_EVENTS";
             cancelReceiveMessages.Effectype = EventType.CancelReceiveMessages;
             cancelReceiveMessages.Handler = receivingEffectHandler;
 
             EmitMessages<T> receiveEmitMessages = new EmitMessages<T>(null);
+            receiveEmitMessages.Name = "EMIT_EVENTS";
             receiveEmitMessages.LogCallback = LogCallback;
             receiveEmitMessages.AnnounceMessage = Announce;
             receiveEmitMessages.Effectype = EventType.ReceiveSuccess;
             receiveEmitMessages.Handler = receivingEffectHandler;
 
             EmitStatus receiveEmitStatus = new EmitStatus();
+            receiveEmitStatus.Name = "EMIT_STATUS";
             receiveEmitStatus.AnnounceStatus = Announce;
             receiveEmitStatus.Effectype = EventType.ReceiveSuccess;
             receiveEmitStatus.Handler = receivingEffectHandler;
 
             EmitStatus receiveDisconnectEmitStatus = new EmitStatus();
+            receiveDisconnectEmitStatus.Name = "EMIT_STATUS";
             receiveDisconnectEmitStatus.AnnounceStatus = Announce;
             receiveDisconnectEmitStatus.Effectype = EventType.Disconnect;
             receiveDisconnectEmitStatus.Handler = receivingEffectHandler;
@@ -110,6 +121,7 @@ namespace PubnubApi.EndPoint
 			var reconnectionEffect = new ReconnectingEffectHandler<string>(eventEmitter);
 
             EffectInvocation receiveReconnectInvocation = new ReceiveReconnect();
+            receiveReconnectInvocation.Name = "RECEIVE_RECONNECT";
             receiveReconnectInvocation.Effectype = EventType.ReceiveReconnect;
             receiveReconnectInvocation.Handler = receivingEffectHandler;
 
@@ -118,6 +130,7 @@ namespace PubnubApi.EndPoint
             cancelReceiveReconnect.Handler = receivingEffectHandler;
 
             EmitMessages<T> receiveReconnectEmitMessages = new EmitMessages<T>(null);
+            receiveReconnectEmitMessages.Name = "RECEIVE_RECONNECT_EVENTS";
             receiveReconnectEmitMessages.LogCallback = LogCallback;
             receiveReconnectEmitMessages.AnnounceMessage = Announce;
             receiveReconnectEmitMessages.Effectype = EventType.ReceiveReconnectSuccess;
@@ -125,16 +138,19 @@ namespace PubnubApi.EndPoint
 
 
             EmitStatus receiveReconnectEmitStatus = new EmitStatus();
+            receiveReconnectEmitStatus.Name = "RECONNECT_EMIT_STATUS";
             receiveEmitStatus.AnnounceStatus = Announce;
             receiveEmitStatus.Effectype = EventType.ReceiveReconnectSuccess;
             receiveEmitStatus.Handler = receivingEffectHandler;
 
             EmitStatus receiveReconnectDisconnectEmitStatus = new EmitStatus();
+            receiveReconnectDisconnectEmitStatus.Name = "RECONNECT_DISCONNECT_STATUS";
             receiveReconnectDisconnectEmitStatus.AnnounceStatus = Announce;
             receiveReconnectDisconnectEmitStatus.Effectype = EventType.Disconnect;
             receiveReconnectDisconnectEmitStatus.Handler = receivingEffectHandler;
 			
             EmitStatus receiveReconnectGiveupEmitStatus = new EmitStatus();
+            receiveReconnectGiveupEmitStatus.Name = "RECONNECT_GIVEUP_STATUS";
             receiveReconnectGiveupEmitStatus.AnnounceStatus = Announce;
             receiveReconnectGiveupEmitStatus.Effectype = EventType.ReceiveReconnectGiveUp;
             receiveReconnectGiveupEmitStatus.Handler = receivingEffectHandler;
@@ -144,7 +160,7 @@ namespace PubnubApi.EndPoint
 
 			pnEventEngine = new EventEngine(effectDispatcher, eventEmitter);
             pnEventEngine.PubnubUnitTest = unit;
-            pnEventEngine.PubnubUnitTest.EventTypeList = new List<EventType>();
+            pnEventEngine.PubnubUnitTest.EventTypeList = new List<Tuple<string, string>>();
 
 			var initState = pnEventEngine.CreateState(StateType.Unsubscribed)
 				.On(EventType.SubscriptionChanged, StateType.Handshaking)
@@ -211,8 +227,8 @@ namespace PubnubApi.EndPoint
                 .On(EventType.SubscriptionRestored, StateType.Receiving)
                 .On(EventType.ReceiveSuccess, StateType.Receiving, new List<EffectInvocation>()
                             { 
-                                receiveEmitMessages,
-                                receiveEmitStatus
+                                receiveEmitStatus,
+                                receiveEmitMessages
                             }
                 )
                 .On(EventType.Disconnect, StateType.ReceiveStopped, new List<EffectInvocation>()
@@ -238,8 +254,8 @@ namespace PubnubApi.EndPoint
                 .On(EventType.SubscriptionRestored, StateType.ReceiveReconnecting)
                 .On(EventType.ReceiveReconnectSuccess, StateType.Receiving, new List<EffectInvocation>()
                             { 
-                                receiveReconnectEmitMessages,
-                                receiveReconnectEmitStatus
+                                receiveReconnectEmitStatus,
+                                receiveReconnectEmitMessages
                             }
                 )
                 .On(EventType.Disconnect, StateType.ReceiveStopped, new List<EffectInvocation>()

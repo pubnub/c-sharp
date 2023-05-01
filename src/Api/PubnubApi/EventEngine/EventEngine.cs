@@ -15,6 +15,7 @@ namespace PubnubApi.PubnubEventEngine
     #region Event
     public abstract class Event
 	{
+		public virtual string Name { get; set; }
 		public virtual EventType EventType { get; set; }
 		public virtual EventPayload EventPayload { get; set; }
 
@@ -124,6 +125,7 @@ namespace PubnubApi.PubnubEventEngine
     #region EffectInvocation
 	public abstract class EffectInvocation
 	{
+		public virtual string Name { get; set; }
 		public virtual EventType Effectype { get; set; }
 		public virtual IEffectInvocationHandler Handler { get; set; }
 	}
@@ -322,34 +324,36 @@ namespace PubnubApi.PubnubEventEngine
 				System.Diagnostics.Debug.WriteLine($"Current State = {CurrentState.StateType}; Transition = {e.EventType}");
 				if (PubnubUnitTest != null )
 				{
-					PubnubUnitTest.EventTypeList.Add(e.EventType);
+					PubnubUnitTest.EventTypeList.Add(new Tuple<string, string>("event", e.Name));
 				}
-				if (CurrentState.EffectInvocationsList != null && CurrentState.EffectInvocationsList.Count > 0) {
-						foreach (var effect in CurrentState.EffectInvocationsList) {
-							if (e.EventType == effect.Effectype)
-							{
-								if (PubnubUnitTest != null )
-								{
-									PubnubUnitTest.EventTypeList.Add(e.EventType);
-								}
-								if (effect is EmitStatus)
-								{
-									((EmitStatus)effect).Announce();
-								}
-								else if (effect is EmitMessages<object>)
-								{
-									((EmitMessages<object>)effect).Announce<string>();
-								}
-								System.Diagnostics.Debug.WriteLine("Found effect " + effect.Effectype);
-								Dispatcher.dispatch(effect.Effectype, this.Context);
-							}
-						}
-					}
 				if (CurrentState != null && CurrentState.ExitList != null && CurrentState.ExitList.Count > 0)
 				{
 					foreach(var entry in CurrentState.ExitList)
 					{
+						PubnubUnitTest?.EventTypeList?.Add(new Tuple<string, string>("invocation", entry.Name));
 						entry.Handler?.Cancel();
+					}
+				}
+				if (CurrentState.EffectInvocationsList != null 
+					&& CurrentState.EffectInvocationsList.ContainsKey(e.EventType)
+					&& CurrentState.EffectInvocationsList[e.EventType].Count > 0) 
+				{
+					List<EffectInvocation> effectInvocationList = CurrentState.EffectInvocationsList[e.EventType];
+					foreach (var effect in effectInvocationList) {
+						PubnubUnitTest?.EventTypeList?.Add(new Tuple<string, string>("invocation", effect.Name));
+						if (effect is EmitStatus)
+						{
+							((EmitStatus)effect).Announce();
+						}
+						else if (effect is EmitMessages<object>)
+						{
+							((EmitMessages<object>)effect).Announce<string>();
+						}
+						System.Diagnostics.Debug.WriteLine("Found effect " + effect.Effectype);
+						Dispatcher.dispatch(effect.Effectype, this.Context);
+						//if (e.EventType == effect.Effectype)
+						//{
+						//}
 					}
 				}
 				CurrentState = this.States.Find((s) => s.StateType == nextStateType);
@@ -360,20 +364,21 @@ namespace PubnubApi.PubnubEventEngine
 					{
 						foreach(var entry in CurrentState.EntryList)
 						{
+							PubnubUnitTest?.EventTypeList?.Add(new Tuple<string, string>("invocation", entry.Name));
 							entry.Handler?.Start(Context);
 						}
 					}
 					System.Diagnostics.Debug.WriteLine($"Transition = {e.EventType}");
 					UpdateContext(e.EventType, e.EventPayload);
-					if (CurrentState.EffectInvocationsList.Count > 0) {
-						foreach (var effect in CurrentState.EffectInvocationsList) {
-							if (e.EventType == effect.Effectype)
-							{
-								System.Diagnostics.Debug.WriteLine("Found effect "+ effect.Effectype);
-								Dispatcher.dispatch(effect.Effectype, this.Context);
-							}
-						}
-					}
+					//if (CurrentState.EffectInvocationsList[e.EventType].Count > 0) {
+					//	foreach (var effect in CurrentState.EffectInvocationsList) {
+					//		if (e.EventType == effect.Effectype)
+					//		{
+					//			System.Diagnostics.Debug.WriteLine("Found effect "+ effect.Effectype);
+					//			Dispatcher.dispatch(effect.Effectype, this.Context);
+					//		}
+					//	}
+					//}
 				}
 			}
 		}
@@ -381,6 +386,7 @@ namespace PubnubApi.PubnubEventEngine
 		public void Subscribe(List<string> channels, List<string>? channelGroups)
 		{
 			var evnt = new SubscriptionChanged();
+			evnt.Name = "SUBSCRIPTION_CHANGED";
 			evnt.EventType = EventType.SubscriptionChanged;
 			evnt.EventPayload.Channels = channels;
 			if (channelGroups != null) evnt.EventPayload.ChannelGroups = channelGroups;
