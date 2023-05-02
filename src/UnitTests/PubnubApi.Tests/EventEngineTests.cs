@@ -47,7 +47,7 @@ namespace PubNubMessaging.Tests
             cancelHandshakeInvocation.Effectype = EventType.CancelHandshake;
             cancelHandshakeInvocation.Handler = handshakeEffectHandler;
 
-            var receivingEffectHandler = new ReceivingEffectHandler<string>(eventEmitter);
+            var receivingEffectHandler = new ReceivingEffectHandler<object>(eventEmitter);
             receivingEffectHandler.LogCallback = delegate (string log)
             {
             };

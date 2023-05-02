@@ -189,10 +189,14 @@ namespace PubnubApi.PubnubEventEngine
 			if (Handler != null)
 			{
 				PNStatus status = Handler.GetPNStatus();
-				//status.Category = statusCategory;
 				if (AnnounceStatus != null && status != null)
 				{
-					System.Diagnostics.Debug.WriteLine($"Status = {status.Category} to be announced");
+					if (Handler is ReceivingEffectHandler<object> && status.StatusCode == 200)
+					{
+						//Ignore Announce for 200
+						return;
+					}
+					System.Diagnostics.Debug.WriteLine($"Status Category = {status.Category} to be announced");
 					AnnounceStatus(status);
 				}
 			}
@@ -208,7 +212,7 @@ namespace PubnubApi.PubnubEventEngine
 		}
 		public void Announce<T>()
 		{
-			Message<T>[] receiveMessages = ((ReceivingEffectHandler<T>)Handler).GetMessages();
+			Message<object>[] receiveMessages = ((ReceivingEffectHandler<object>)Handler).GetMessages();
 			int messageCount = receiveMessages.Length;
 			if (receiveMessages != null && receiveMessages.Length > 0)
 			{
@@ -226,16 +230,9 @@ namespace PubnubApi.PubnubEventEngine
 						messageResult.Channel = receiveMessages[index].Channel;
 						messageResult.Message = receiveMessages[index].Payload;
 						AnnounceMessage?.Invoke(messageResult);
-						//if (AnnounceMessage != null && messagePayload != null)
-						//{
-						//	//System.Diagnostics.Debug.WriteLine($"Status = {status.Category} to be announced");
-						//	AnnounceMessage(messagePayload);
-						//}
 					}
 				}
 			}
-			//PNStatus status = Handler.GetPNStatus();
-			//status.Category = statusCategory;
 		}
 	}
     #endregion
@@ -273,7 +270,7 @@ namespace PubnubApi.PubnubEventEngine
 		public List<string> ChannelGroups { get; set; }
 		public long? Timetoken { get; set; }
 		public int? Region { get; set; }
-		public int AttemptedReconnection { get; set; }
+		public int Attempts { get; set; }
 
 		public ExtendedState()
 		{
@@ -281,7 +278,7 @@ namespace PubnubApi.PubnubEventEngine
 			ChannelGroups = new List<string>();
 			Timetoken = 0;
 			Region = 0;
-			AttemptedReconnection = 0;
+			Attempts = 0;
 		}
 
 	}

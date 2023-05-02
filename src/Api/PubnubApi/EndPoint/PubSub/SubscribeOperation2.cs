@@ -49,6 +49,7 @@ namespace PubnubApi.EndPoint
             eventEmitter.RegisterJsonListener(JsonCallback);
 
 			var handshakeEffectHandler = new HandshakeEffectHandler(eventEmitter);
+            handshakeEffectHandler.ReconnectionPolicy = config.ReconnectionPolicy;
             handshakeEffectHandler.LogCallback = LogCallback;
             handshakeEffectHandler.HandshakeRequested += HandshakeEffect_HandshakeRequested;
             
@@ -57,20 +58,26 @@ namespace PubnubApi.EndPoint
             handshakeInvocation.Effectype = EventType.Handshake;
             handshakeInvocation.Handler = handshakeEffectHandler;
 
-            EffectInvocation handshakeReconnectInvocation = new HandshakeReconnect();
-            handshakeReconnectInvocation.Name = "HANDSHAKE_RECONNECT";
-            handshakeReconnectInvocation.Effectype = EventType.HandshakeReconnect;
-            handshakeReconnectInvocation.Handler = handshakeEffectHandler;
-
             EffectInvocation cancelHandshakeInvocation = new CancelHandshake();
             cancelHandshakeInvocation.Name = "CANCEL_HANDSHAKE";
             cancelHandshakeInvocation.Effectype = EventType.CancelHandshake;
             cancelHandshakeInvocation.Handler = handshakeEffectHandler;
 
+			var handshakeReconnectEffectHandler = new HandshakeReconnectEffectHandler(eventEmitter);
+            handshakeReconnectEffectHandler.ReconnectionPolicy = config.ReconnectionPolicy;
+            handshakeReconnectEffectHandler.LogCallback = LogCallback;
+            handshakeReconnectEffectHandler.HandshakeReconnectRequested += HandshakeReconnectEffect_HandshakeRequested;
+
+            EffectInvocation handshakeReconnectInvocation = new HandshakeReconnect();
+            //((HandshakeReconnect)handshakeReconnectInvocation).ReconnectionPolicy = config.ReconnectionPolicy;
+            handshakeReconnectInvocation.Name = "HANDSHAKE_RECONNECT";
+            handshakeReconnectInvocation.Effectype = EventType.HandshakeReconnect;
+            handshakeReconnectInvocation.Handler = handshakeReconnectEffectHandler;
+
             EffectInvocation cancelHandshakeReconnectInvocation = new CancelHandshakeReconnect();
             cancelHandshakeReconnectInvocation.Name = "CANCEL_HANDSHAKE_RECONNECT";
             cancelHandshakeReconnectInvocation.Effectype = EventType.CancelHandshakeReconnect;
-            cancelHandshakeReconnectInvocation.Handler = handshakeEffectHandler;
+            cancelHandshakeReconnectInvocation.Handler = handshakeReconnectEffectHandler;
 
             EmitStatus handshakeSuccessEmitStatus = new EmitStatus();
             handshakeSuccessEmitStatus.Name = "EMIT_STATUS";
@@ -84,7 +91,8 @@ namespace PubnubApi.EndPoint
             handshakeReconnectSuccessEmitStatus.Effectype = EventType.HandshakeReconnectSuccess;
             handshakeReconnectSuccessEmitStatus.Handler = handshakeEffectHandler;
 			
-            var receivingEffectHandler = new ReceivingEffectHandler<string>(eventEmitter);
+            var receivingEffectHandler = new ReceivingEffectHandler<object>(eventEmitter);
+            receivingEffectHandler.ReconnectionPolicy = config.ReconnectionPolicy;
             receivingEffectHandler.LogCallback = LogCallback;
             receivingEffectHandler.ReceiveRequested += ReceivingEffect_ReceiveRequested;
 
@@ -288,14 +296,6 @@ namespace PubnubApi.EndPoint
 
             string jsonResp = resp.Item1;
             e.ReceiveResponseCallback?.Invoke(jsonResp);
-
-            //PNStatus status = resp.Item2;
-            //if (status != null && status.Error && status.StatusCode != 200)
-            //{
-            //    status.AffectedChannels.AddRange(e.ExtendedState.Channels);
-            //    status.AffectedChannels.AddRange(e.ExtendedState.ChannelGroups);
-            //    Announce(status);
-            //}
         }
 
         private void HandshakeEffect_HandshakeRequested(object sender, HandshakeRequestEventArgs e)
@@ -304,14 +304,14 @@ namespace PubnubApi.EndPoint
 
             string jsonResp = resp.Item1;
             e.HandshakeResponseCallback?.Invoke(jsonResp);
+        }
 
-            //PNStatus status = resp.Item2;
-            //if (status != null && status.Error && status.StatusCode != 200)
-            //{
-            //    status.AffectedChannels.AddRange(e.ExtendedState.Channels);
-            //    status.AffectedChannels.AddRange(e.ExtendedState.ChannelGroups);
-            //    Announce(status);
-            //}
+        private void HandshakeReconnectEffect_HandshakeRequested(object sender, HandshakeReconnectRequestEventArgs e)
+        {
+            Tuple<string, PNStatus> resp = manager.HandshakeRequest<T>(PNOperationType.PNSubscribeOperation, e.ExtendedState.Channels.ToArray(), e.ExtendedState.ChannelGroups.ToArray(), 0, e.ExtendedState.Region, null, null).Result;
+
+            string jsonResp = resp.Item1;
+            e.HandshakeReconnectResponseCallback?.Invoke(jsonResp);
         }
 
         private void JsonCallback(string json, bool zeroTimeTokenRequest, int messageCount)

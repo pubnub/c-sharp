@@ -49,9 +49,10 @@ namespace PubnubApi.PubnubEventEngine
 		EventEmitter emitter;
 		private ExtendedState extendedState { get; set;}
 		private PNStatus pnStatus { get; set; }
-		private Message<T>[] receiveMessages { get; set; }
+		private Message<object>[] receiveMessages { get; set; }
 		public Action<string> LogCallback { get; set; }
-		//public Action<PNStatus> StatusCallback { get; set; }
+		public PNReconnectionPolicy ReconnectionPolicy { get; set; }
+
 		public event EventHandler<ReceiveRequestEventArgs>? ReceiveRequested;
 		protected virtual void OnReceiveRequested(ReceiveRequestEventArgs e)
         {
@@ -90,7 +91,7 @@ namespace PubnubApi.PubnubEventEngine
 		{
 			try
 			{
-				var receivedResponse = JsonConvert.DeserializeObject<ReceiveingResponse<T>>(json);
+				var receivedResponse = JsonConvert.DeserializeObject<ReceiveingResponse<object>>(json);
 				if (receivedResponse != null)
 				{
 					receiveMessages = receivedResponse.Messages;
@@ -103,9 +104,11 @@ namespace PubnubApi.PubnubEventEngine
 					receiveSuccessEvent.EventPayload.Region = receivedResponse.Timetoken.Region;
 					receiveSuccessEvent.EventType = EventType.ReceiveSuccess;
 					receiveSuccessEvent.Name = "RECEIVE_SUCCESS";
+					LogCallback?.Invoke("OnReceivingEffectResponseReceived - EventType.ReceiveSuccess");
 
 					pnStatus = new PNStatus();
 					pnStatus.StatusCode = 200;
+					pnStatus.Operation = PNOperationType.PNSubscribeOperation;
 					pnStatus.AffectedChannels = extendedState.Channels;
 					pnStatus.AffectedChannelGroups = extendedState.ChannelGroups;
 					pnStatus.Category = PNStatusCategory.PNConnectedCategory;
@@ -121,6 +124,7 @@ namespace PubnubApi.PubnubEventEngine
 					LogCallback?.Invoke("OnReceivingEffectResponseReceived - EventType.ReceiveFailure");
 
 					pnStatus = new PNStatus();
+					pnStatus.Operation = PNOperationType.PNSubscribeOperation;
 					pnStatus.AffectedChannels = extendedState.Channels;
 					pnStatus.AffectedChannelGroups = extendedState.ChannelGroups;
 					pnStatus.Error = true;
@@ -139,6 +143,7 @@ namespace PubnubApi.PubnubEventEngine
 				LogCallback?.Invoke("OnReceivingEffectResponseReceived - EventType.ReceiveFailure");
 
 				pnStatus = new PNStatus();
+				pnStatus.Operation = PNOperationType.PNSubscribeOperation;
 				pnStatus.AffectedChannels = extendedState.Channels;
 				pnStatus.AffectedChannelGroups = extendedState.ChannelGroups;
 				pnStatus.Error = true;
@@ -153,9 +158,9 @@ namespace PubnubApi.PubnubEventEngine
 		{
 			if (cancellationTokenSource != null)
 			{
+				LogCallback?.Invoke($"ReceivingEffectHandler - Receiving request cancellion attempted.");
 				cancellationTokenSource.Cancel();
 			}
-			LogCallback?.Invoke($"ReceivingEffectHandler - Receiving request cancellion attempted.");
 		}
 
         public PNStatus GetPNStatus()
@@ -163,7 +168,7 @@ namespace PubnubApi.PubnubEventEngine
             return pnStatus;
         }
 
-        public Message<T>[] GetMessages()
+        public Message<object>[] GetMessages()
         {
 			return receiveMessages;
         }

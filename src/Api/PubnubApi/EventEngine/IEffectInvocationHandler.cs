@@ -31,6 +31,6 @@ namespace PubnubApi.PubnubEventEngine
 
 	public interface IReceiveMessageHandler<T>
 	{
-		Message<T>[] GetMessages();
+		Message<object>[] GetMessages();
 	}
 }

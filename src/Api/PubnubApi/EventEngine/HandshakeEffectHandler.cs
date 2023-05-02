@@ -37,7 +37,7 @@ namespace PubnubApi.PubnubEventEngine
 		//public EffectInvocationType InvocationType { get; set; }
 		private ExtendedState extendedState { get; set;}
 		public Action<string> LogCallback { get; set; }
-		//public Action<PNStatus> StatusCallback { get; set; }
+		public PNReconnectionPolicy ReconnectionPolicy { get; set; }
 		private PNStatus pnStatus { get; set; }
 
 		public event EventHandler<HandshakeRequestEventArgs>? HandshakeRequested;
@@ -73,7 +73,7 @@ namespace PubnubApi.PubnubEventEngine
 		{
 			try
 			{
-				LogCallback?.Invoke($"HandshakeSuccess Json Response {json}");
+				LogCallback?.Invoke($"OnHandshakeEffectResponseReceived Json Response = {json}");
 				var handshakeResponse = JsonConvert.DeserializeObject<HandshakeResponse>(json);
 				if (handshakeResponse != null)
 				{
@@ -90,6 +90,7 @@ namespace PubnubApi.PubnubEventEngine
 					
 					pnStatus = new PNStatus();
 					pnStatus.StatusCode = 200;
+					pnStatus.Operation = PNOperationType.PNSubscribeOperation;
 					pnStatus.AffectedChannels = extendedState.Channels;
 					pnStatus.AffectedChannelGroups = extendedState.ChannelGroups;
 					pnStatus.Category = PNStatusCategory.PNConnectedCategory;
@@ -105,8 +106,10 @@ namespace PubnubApi.PubnubEventEngine
 					LogCallback?.Invoke("OnHandshakeEffectResponseReceived - EventType.HandshakeFailure");
 
 					pnStatus = new PNStatus();
+					pnStatus.Operation = PNOperationType.PNSubscribeOperation;
 					pnStatus.AffectedChannels = extendedState.Channels;
 					pnStatus.AffectedChannelGroups = extendedState.ChannelGroups;
+					pnStatus.Category = PNStatusCategory.PNNetworkIssuesCategory;
 					pnStatus.Error = true;
 
 					emitter.emit(handshakeFailureEvent);
@@ -121,8 +124,10 @@ namespace PubnubApi.PubnubEventEngine
 				handshakeFailureEvent.EventPayload.exception = ex;
 
 				pnStatus = new PNStatus();
+				pnStatus.Operation = PNOperationType.PNSubscribeOperation;
 				pnStatus.AffectedChannels = extendedState.Channels;
 				pnStatus.AffectedChannelGroups = extendedState.ChannelGroups;
+				pnStatus.Category = PNStatusCategory.PNNetworkIssuesCategory;
 				pnStatus.Error = true;
 
 				emitter.emit(handshakeFailureEvent);
@@ -134,9 +139,9 @@ namespace PubnubApi.PubnubEventEngine
 		{
 			if (cancellationTokenSource != null)
 			{
+				LogCallback?.Invoke($"HandshakeEffectHandler - cancellationTokenSource - cancellion attempted.");
 				cancellationTokenSource.Cancel();
 			}
-			LogCallback?.Invoke($"HandshakeEffectHandler - HandshakeSuccess cancellion attempted.");
 		}
 
         public PNStatus GetPNStatus()
