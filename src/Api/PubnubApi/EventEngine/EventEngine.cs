@@ -18,6 +18,7 @@ namespace PubnubApi.PubnubEventEngine
 		public virtual string Name { get; set; }
 		public virtual EventType EventType { get; set; }
 		public virtual EventPayload EventPayload { get; set; }
+		public virtual int Attempts { get; set; }
 
 		public Event()
 		{
@@ -235,6 +236,16 @@ namespace PubnubApi.PubnubEventEngine
 			}
 		}
 	}
+
+	public class HandshakeFailed : EffectInvocation
+	{
+		public List<string> Channels { get; set; }
+		public List<string> ChannelGroups { get; set; }
+	}
+	public class CancelHandshakeFailed : EffectInvocation
+	{
+
+	}
     #endregion
     public enum EventType
 	{
@@ -247,6 +258,7 @@ namespace PubnubApi.PubnubEventEngine
 		CancelReceiveMessages,
 		ReceiveSuccess,
 		HandshakeFailure,
+		CancelHandshakeFailure,
 		ReceiveFailure,
 		ReceiveReconnect,
 		CancelReceiveReconnect,
@@ -322,6 +334,7 @@ namespace PubnubApi.PubnubEventEngine
 				if (PubnubUnitTest != null )
 				{
 					PubnubUnitTest.EventTypeList.Add(new KeyValuePair<string, string>("event", e.Name));
+					PubnubUnitTest.Attempts = e.Attempts;
 				}
 				if (CurrentState != null && CurrentState.ExitList != null && CurrentState.ExitList.Count > 0)
 				{
@@ -365,7 +378,7 @@ namespace PubnubApi.PubnubEventEngine
 							entry.Handler?.Start(Context);
 						}
 					}
-					System.Diagnostics.Debug.WriteLine($"Transition = {e.EventType}");
+					System.Diagnostics.Debug.WriteLine($"Next State = {CurrentState.StateType}; Transition = {e.EventType}");
 					UpdateContext(e.EventType, e.EventPayload);
 					//if (CurrentState.EffectInvocationsList[e.EventType].Count > 0) {
 					//	foreach (var effect in CurrentState.EffectInvocationsList) {

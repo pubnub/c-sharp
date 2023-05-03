@@ -91,6 +91,11 @@ namespace AcceptanceTests.Steps
                 get; 
                 set;
             }
+            int IPubnubUnitTest.Attempts
+            {
+                get;
+                set;
+            }
         }
         public class PubnubError
         {
@@ -218,6 +223,7 @@ namespace AcceptanceTests.Steps
             config.PublishKey = System.Environment.GetEnvironmentVariable("PN_PUB_KEY");
             config.SubscribeKey = System.Environment.GetEnvironmentVariable("PN_SUB_KEY");
             config.SecretKey = System.Environment.GetEnvironmentVariable("PN_SEC_KEY");
+            config.ReconnectionPolicy = PNReconnectionPolicy.LINEAR;
             if (enableIntenalPubnubLogging)
             {
                 config.LogVerbosity = PNLogVerbosity.BODY;
@@ -342,7 +348,7 @@ namespace AcceptanceTests.Steps
         }
 
         [Given(@"a linear reconnection policy with (.*) retries")]
-        public void GivenALinearReconnectionPolicyWithRetries(int p0)
+        public void GivenALinearReconnectionPolicyWithRetries(int retryCount)
         {
             throw new PendingStepException();
         }

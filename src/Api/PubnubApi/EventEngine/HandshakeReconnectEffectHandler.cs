@@ -23,6 +23,7 @@ namespace PubnubApi.PubnubEventEngine
 		private ExtendedState extendedState { get; set;}
 		public Action<string> LogCallback { get; set; }
 		public PNReconnectionPolicy ReconnectionPolicy { get; set; }
+		public int MaxRetries { get; set; }
 		private PNStatus pnStatus { get; set; }
 		private int timerInterval;
 		const int MINEXPONENTIALBACKOFF = 1;
@@ -82,9 +83,16 @@ namespace PubnubApi.PubnubEventEngine
 			{
 				timer.Change(Timeout.Infinite, Timeout.Infinite);
 			}
-            timer = new Timer(new TimerCallback(HandshakeReconnectTimerCallback), null, 
-                                                    (-1 == timerInterval) ? Timeout.Infinite : timerInterval * 1000, Timeout.Infinite);
-
+			if (timerInterval != -1)
+			{
+				timer = new Timer(new TimerCallback(HandshakeReconnectTimerCallback), null, 
+														(-1 == timerInterval) ? Timeout.Infinite : timerInterval * 1000, Timeout.Infinite);
+			}
+			else
+			{
+				PrepareFailurePNStatus();
+				PrepareAndEmitHandshakeReconnectGiveupEvent(null);
+			}
 		}
 
 		private void HandshakeReconnectTimerCallback(object state)
@@ -130,38 +138,34 @@ namespace PubnubApi.PubnubEventEngine
 				else
 				{
 					extendedState.Attempts++;
-					HandshakeReconnectFailure handshakeReconnectFailureEvent = new HandshakeReconnectFailure();
-					handshakeReconnectFailureEvent.Name = "HANDSHAKE_RECONNECT_FAILURE";
-					handshakeReconnectFailureEvent.EventType = EventType.HandshakeReconnectFailure;
-					LogCallback?.Invoke($"Attempt: {extendedState.Attempts}; OnHandshakeReconnectEffectResponseReceived - EventType.HandshakeReconnectFailure");
+					PrepareFailurePNStatus();
 
-					pnStatus = new PNStatus();
-					pnStatus.Operation = PNOperationType.PNSubscribeOperation;
-					pnStatus.AffectedChannels = extendedState.Channels;
-					pnStatus.AffectedChannelGroups = extendedState.ChannelGroups;
-					pnStatus.Category = PNStatusCategory.PNNetworkIssuesCategory;
-					pnStatus.Error = true;
-
-					emitter.emit(handshakeReconnectFailureEvent);
+					if (MaxRetries != -1 && extendedState.Attempts >= MaxRetries)
+					{
+						LogCallback?.Invoke($"Attempt: {extendedState.Attempts}; OnHandshakeReconnectEffectResponseReceived - EventType.HandshakeReconnectGiveUp");
+						PrepareAndEmitHandshakeReconnectGiveupEvent(null);
+					}
+					else
+					{
+						LogCallback?.Invoke($"Attempt: {extendedState.Attempts}; OnHandshakeReconnectEffectResponseReceived - EventType.HandshakeReconnectFailure");
+						PrepareAndEmitHandshakeReconnectFailureEvent(null);
+					}
 				}
 			}
 			catch (Exception ex)
 			{
 				extendedState.Attempts++;
-				LogCallback?.Invoke($"Attempt: {extendedState.Attempts} - OnHandshakeReconnectEffectResponseReceived EXCEPTION - {ex}");
-				HandshakeReconnectFailure handshakeReconnectFailureEvent = new HandshakeReconnectFailure();
-				handshakeReconnectFailureEvent.Name = "HANDSHAKE_RECONNECT_FAILURE";
-				handshakeReconnectFailureEvent.EventType = EventType.HandshakeReconnectFailure;
-				handshakeReconnectFailureEvent.EventPayload.exception = ex;
-
-				pnStatus = new PNStatus();
-				pnStatus.Operation = PNOperationType.PNSubscribeOperation;
-				pnStatus.AffectedChannels = extendedState.Channels;
-				pnStatus.AffectedChannelGroups = extendedState.ChannelGroups;
-				pnStatus.Category = PNStatusCategory.PNNetworkIssuesCategory;
-				pnStatus.Error = true;
-
-				emitter.emit(handshakeReconnectFailureEvent);
+				if (MaxRetries != -1 && extendedState.Attempts >= MaxRetries)
+				{
+					LogCallback?.Invoke($"Attempt: {extendedState.Attempts}; OnHandshakeReconnectEffectResponseReceived - EventType.HandshakeReconnectGiveUp");
+					PrepareAndEmitHandshakeReconnectGiveupEvent(null);
+				}
+				else
+				{
+					PrepareFailurePNStatus();
+					LogCallback?.Invoke($"Attempt: {extendedState.Attempts}; OnHandshakeReconnectEffectResponseReceived - EventType.HandshakeReconnectFailure");
+					PrepareAndEmitHandshakeReconnectFailureEvent(ex);
+				}
 			}
 			finally
 			{
@@ -174,9 +178,58 @@ namespace PubnubApi.PubnubEventEngine
 					catch { }
 				}
 			}
-			
-			//emitter.emit(json, true, 0);
 		}
+
+		private void PrepareFailurePNStatus()
+		{
+			pnStatus = new PNStatus();
+			pnStatus.Operation = PNOperationType.PNSubscribeOperation;
+			pnStatus.AffectedChannels = extendedState.Channels;
+			pnStatus.AffectedChannelGroups = extendedState.ChannelGroups;
+			pnStatus.Category = PNStatusCategory.PNNetworkIssuesCategory;
+			pnStatus.Error = true;
+		}
+
+		private void PrepareAndEmitHandshakeReconnectFailureEvent(Exception ex)
+		{
+			HandshakeReconnectFailure handshakeReconnectFailureEvent = new HandshakeReconnectFailure();
+			handshakeReconnectFailureEvent.Name = "HANDSHAKE_RECONNECT_FAILURE";
+			handshakeReconnectFailureEvent.EventType = EventType.HandshakeReconnectFailure;
+			handshakeReconnectFailureEvent.Attempts = extendedState.Attempts;
+			if (ex != null)
+			{
+				handshakeReconnectFailureEvent.EventPayload.exception = ex;
+			}
+
+			emitter.emit(handshakeReconnectFailureEvent);
+		}
+
+		private void PrepareAndEmitHandshakeReconnectGiveupEvent(Exception ex)
+		{
+			HandshakeReconnectGiveUp handshakeReconnectGiveupEvent = new HandshakeReconnectGiveUp();
+			handshakeReconnectGiveupEvent.Name = "HANDSHAKE_RECONNECT_GIVEUP";
+			handshakeReconnectGiveupEvent.EventType = EventType.HandshakeReconnectGiveUp;
+			handshakeReconnectGiveupEvent.Attempts = extendedState.Attempts;
+			if (ex != null)
+			{
+				handshakeReconnectGiveupEvent.EventPayload.exception = ex;
+			}
+
+			emitter.emit(handshakeReconnectGiveupEvent);
+		}
+		//private void PrepareAndEmitHandshakeFailedEvent(Exception ex)
+		//{
+		//	HandshakeFailure handshakeFailureEvent = new HandshakeFailure();
+		//	handshakeFailureEvent.Name = "HANDSHAKE_FAILURE";
+		//	handshakeFailureEvent.EventType = EventType.HandshakeReconnectGiveUp;
+		//	handshakeFailureEvent.Attempts = extendedState.Attempts;
+		//	if (ex != null)
+		//	{
+		//		handshakeFailureEvent.EventPayload.exception = ex;
+		//	}
+
+		//	emitter.emit(handshakeFailureEvent);
+		//}
 		public void Cancel()
 		{
 			if (cancellationTokenSource != null)

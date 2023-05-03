@@ -49,7 +49,6 @@ namespace PubnubApi.EndPoint
             eventEmitter.RegisterJsonListener(JsonCallback);
 
 			var handshakeEffectHandler = new HandshakeEffectHandler(eventEmitter);
-            handshakeEffectHandler.ReconnectionPolicy = config.ReconnectionPolicy;
             handshakeEffectHandler.LogCallback = LogCallback;
             handshakeEffectHandler.HandshakeRequested += HandshakeEffect_HandshakeRequested;
             
@@ -65,11 +64,11 @@ namespace PubnubApi.EndPoint
 
 			var handshakeReconnectEffectHandler = new HandshakeReconnectEffectHandler(eventEmitter);
             handshakeReconnectEffectHandler.ReconnectionPolicy = config.ReconnectionPolicy;
+            handshakeReconnectEffectHandler.MaxRetries = config.ConnectionMaxRetries;
             handshakeReconnectEffectHandler.LogCallback = LogCallback;
             handshakeReconnectEffectHandler.HandshakeReconnectRequested += HandshakeReconnectEffect_HandshakeRequested;
 
             EffectInvocation handshakeReconnectInvocation = new HandshakeReconnect();
-            //((HandshakeReconnect)handshakeReconnectInvocation).ReconnectionPolicy = config.ReconnectionPolicy;
             handshakeReconnectInvocation.Name = "HANDSHAKE_RECONNECT";
             handshakeReconnectInvocation.Effectype = EventType.HandshakeReconnect;
             handshakeReconnectInvocation.Handler = handshakeReconnectEffectHandler;
@@ -90,7 +89,22 @@ namespace PubnubApi.EndPoint
             handshakeReconnectSuccessEmitStatus.AnnounceStatus = Announce;
             handshakeReconnectSuccessEmitStatus.Effectype = EventType.HandshakeReconnectSuccess;
             handshakeReconnectSuccessEmitStatus.Handler = handshakeEffectHandler;
-			
+
+
+
+            var handshakeFailedEffectHandler = new HandshakeFailedEffectHandler(eventEmitter);
+            handshakeFailedEffectHandler.LogCallback = LogCallback;
+
+            EffectInvocation handshakeFailedInvocation = new HandshakeFailed();
+            handshakeFailedInvocation.Name = "HANDSHAKE_FAILED";
+            handshakeFailedInvocation.Effectype = EventType.HandshakeFailure;
+            handshakeFailedInvocation.Handler = handshakeFailedEffectHandler;
+
+            EffectInvocation cancelHandshakeFailedInvocation = new CancelHandshakeFailed();
+            cancelHandshakeReconnectInvocation.Name = "CANCEL_HANDSHAKE_FAILED";
+            cancelHandshakeReconnectInvocation.Effectype = EventType.CancelHandshakeFailure;
+            cancelHandshakeReconnectInvocation.Handler = handshakeFailedEffectHandler;
+
             var receivingEffectHandler = new ReceivingEffectHandler<object>(eventEmitter);
             receivingEffectHandler.ReconnectionPolicy = config.ReconnectionPolicy;
             receivingEffectHandler.LogCallback = LogCallback;
@@ -218,9 +232,19 @@ namespace PubnubApi.EndPoint
 
             pnEventEngine.CreateState(StateType.HandshakeFailed)
                 .On(EventType.HandshakeReconnectRetry, StateType.HandshakeReconnecting)
-                .On(EventType.SubscriptionChanged, StateType.HandshakeReconnecting)
-                .On(EventType.SubscriptionRestored, StateType.ReceiveReconnecting)
-                .On(EventType.Reconnect, StateType.HandshakeReconnecting);
+                .On(EventType.SubscriptionChanged, StateType.Handshaking)
+                .On(EventType.Reconnect, StateType.Handshaking)
+                .On(EventType.SubscriptionRestored, StateType.Receiving)
+                .OnEntry(entryInvocationList: new List<EffectInvocation>()
+                            { 
+                                handshakeFailedInvocation
+                            }
+                )
+                .OnExit(exitInvocationList: new List<EffectInvocation>()
+                            { 
+                                cancelHandshakeFailedInvocation 
+                            }
+                );
 
             pnEventEngine.CreateState(StateType.HandshakeStopped)
                 .On(EventType.Reconnect, StateType.HandshakeReconnecting)

@@ -37,7 +37,6 @@ namespace PubnubApi.PubnubEventEngine
 		//public EffectInvocationType InvocationType { get; set; }
 		private ExtendedState extendedState { get; set;}
 		public Action<string> LogCallback { get; set; }
-		public PNReconnectionPolicy ReconnectionPolicy { get; set; }
 		private PNStatus pnStatus { get; set; }
 
 		public event EventHandler<HandshakeRequestEventArgs>? HandshakeRequested;
@@ -147,6 +146,52 @@ namespace PubnubApi.PubnubEventEngine
         public PNStatus GetPNStatus()
         {
             return pnStatus;
+        }
+    }
+
+	public class HandshakeFailedEffectHandler : IEffectInvocationHandler
+	{
+		EventEmitter emitter;
+		//public EffectInvocationType InvocationType { get; set; }
+		private ExtendedState extendedState { get; set;}
+		public Action<string> LogCallback { get; set; }
+
+		CancellationTokenSource? cancellationTokenSource;
+
+		public HandshakeFailedEffectHandler(EventEmitter emitter)
+		{
+			this.emitter = emitter;
+			cancellationTokenSource = new CancellationTokenSource();
+		}
+
+		public async void Start(ExtendedState context)
+		{
+			extendedState = context;
+			await Task.Factory.StartNew(() => {	});
+			if (cancellationTokenSource != null && cancellationTokenSource.Token.CanBeCanceled) {
+				Cancel();
+			}
+
+			LogCallback?.Invoke("HandshakeFailedEffectHandler - EventType.Handshake");
+			Reconnect reconnectEvent = new Reconnect();
+			reconnectEvent.Name = "RECONNECT";
+			reconnectEvent.EventType = EventType.Reconnect;
+			
+			emitter.emit(reconnectEvent);
+		}
+
+		public void Cancel()
+		{
+			if (cancellationTokenSource != null)
+			{
+				LogCallback?.Invoke($"HandshakeFailedEffectHandler - cancellationTokenSource - cancellion attempted.");
+				cancellationTokenSource.Cancel();
+			}
+		}
+
+        public PNStatus GetPNStatus()
+        {
+            throw new NotImplementedException();
         }
     }
 }

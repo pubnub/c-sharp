@@ -56,5 +56,12 @@ namespace PubnubApi
             get;
             set;
         }
+
+        int Attempts
+        {
+            get;
+            set;
+        }
+
     }
 }

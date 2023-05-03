@@ -52,5 +52,10 @@ namespace PubNubMessaging.Tests
             get;
             set;
         }
+        int IPubnubUnitTest.Attempts
+        {
+            get;
+            set;
+        }
     }
 }
