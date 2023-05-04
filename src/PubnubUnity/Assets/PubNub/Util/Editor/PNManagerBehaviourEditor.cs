@@ -20,7 +20,7 @@ namespace PubnubApi.Unity.Internal.EditorTools {
 			serializedObject.Update();
 
 			if (target.GetType() == typeof(PNManagerBehaviour)) {
-				EditorGUILayout.HelpBox("To fully utilize PubNub's functionality, you need to extend or reference this component.", MessageType.Info);
+				EditorGUILayout.HelpBox("To utilize PubNub's functionality, you need to extend this component.", MessageType.Info);
 				EditorGUILayout.Space();
 			}
 
@@ -35,9 +35,12 @@ namespace PubnubApi.Unity.Internal.EditorTools {
 				EditorGUILayout.PropertyField(serializedObject.FindProperty(field));
 			}
 			
-			EditorGUILayout.Space();
-			EditorGUILayout.HelpBox("This component will automatically set the DontDestroyOnLoad flag on Initialize", MessageType.Info);
-			EditorGUILayout.Space();
+			if (!EditorApplication.isPlayingOrWillChangePlaymode) {
+				EditorGUILayout.Space();
+				EditorGUILayout.HelpBox("This component will set the DontDestroyOnLoad flag on Initialize",
+					MessageType.Info);
+				EditorGUILayout.Space();
+			}
 
 			serializedObject.ApplyModifiedProperties();
 		}

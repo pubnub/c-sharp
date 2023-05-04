@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace PubnubApi.Unity {
-	[CreateAssetMenu(fileName = "PNConfigAsset", menuName = "PubNub/PNConfigAsset")]
+	[CreateAssetMenu(fileName = "PNConfigAsset", menuName = "PubNub/PubNub Config Asset")]
 	public class PNConfigAsset : ScriptableObject {
 		public string PublishKey;
 		public string SubscribeKey;

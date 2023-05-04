@@ -23,7 +23,8 @@ public class PnDemoManager : PNManagerBehaviour {
 		instance = this;
 		Initialize(defaultUserId);
 		pubnub.Subscribe<string>().Channels(new[] { defaultChannel }).WithPresence().Execute();
-		
+
+		listener.onPresence += (pn, result) => Debug.Log(result.Event); 
 		listener.onMessage += OnPnMessage;
 		listener.onSignal += OnPnSignal;
 		listener.onPresence += OnPnPresence;
