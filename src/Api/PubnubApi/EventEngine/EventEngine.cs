@@ -297,6 +297,8 @@ namespace PubnubApi.PubnubEventEngine
 
 	public class EventEngine
 	{
+		private EventEngine pnEventEngine = null;
+
 		public ExtendedState Context;
 		public State? CurrentState { get; set; }
 		public List<State> States { get; set; }
@@ -322,6 +324,10 @@ namespace PubnubApi.PubnubEventEngine
 		public State CreateState(StateType type)
 		{
 			var newState = new State(type);
+			if (States.Find(s=> s.StateType == type) != null) 
+			{
+				throw new InvalidOperationException($"StateType = {type} already exist.");
+			}
 			States.Add(newState);
 			return newState;
 		}
@@ -329,14 +335,15 @@ namespace PubnubApi.PubnubEventEngine
 		public void Transition(Event e)
 		{
 			StateType nextStateType;
-			if (CurrentState != null && CurrentState.transitions.TryGetValue(e.EventType, out nextStateType)) {
+			if (CurrentState != null) {
+				State findState = States.Find((s) => s.StateType == CurrentState.StateType);
 				System.Diagnostics.Debug.WriteLine($"Current State = {CurrentState.StateType}; Transition = {e.EventType}");
 				if (PubnubUnitTest != null )
 				{
 					PubnubUnitTest.EventTypeList.Add(new KeyValuePair<string, string>("event", e.Name));
 					PubnubUnitTest.Attempts = e.Attempts;
 				}
-				if (CurrentState != null && CurrentState.ExitList != null && CurrentState.ExitList.Count > 0)
+				if (findState != null && findState.ExitList != null && findState.ExitList.Count > 0)
 				{
 					foreach(var entry in CurrentState.ExitList)
 					{
@@ -344,11 +351,11 @@ namespace PubnubApi.PubnubEventEngine
 						entry.Handler?.Cancel();
 					}
 				}
-				if (CurrentState.EffectInvocationsList != null 
-					&& CurrentState.EffectInvocationsList.ContainsKey(e.EventType)
-					&& CurrentState.EffectInvocationsList[e.EventType].Count > 0) 
+				if (findState.EffectInvocationsList != null 
+					&& findState.EffectInvocationsList.ContainsKey(e.EventType)
+					&& findState.EffectInvocationsList[e.EventType].Count > 0) 
 				{
-					List<EffectInvocation> effectInvocationList = CurrentState.EffectInvocationsList[e.EventType];
+					List<EffectInvocation> effectInvocationList = findState.EffectInvocationsList[e.EventType];
 					foreach (var effect in effectInvocationList) {
 						PubnubUnitTest?.EventTypeList?.Add(new KeyValuePair<string, string>("invocation", effect.Name));
 						if (effect is EmitStatus)
@@ -366,18 +373,20 @@ namespace PubnubApi.PubnubEventEngine
 						//}
 					}
 				}
-				CurrentState = this.States.Find((s) => s.StateType == nextStateType);
+				findState.EventType = e.EventType;
+				CurrentState = findState;
 				UpdateContext(e.EventType, e.EventPayload);
-				if (CurrentState != null)
+				if (findState != null)
 				{
-					if (CurrentState.EntryList != null && CurrentState.EntryList.Count > 0)
+					if (findState.EntryList != null && findState.EntryList.Count > 0)
 					{
-						foreach(var entry in CurrentState.EntryList)
+						foreach(var entry in findState.EntryList)
 						{
 							PubnubUnitTest?.EventTypeList?.Add(new KeyValuePair<string, string>("invocation", entry.Name));
 							entry.Handler?.Start(Context);
 						}
 					}
+					CurrentState = NextState();
 					System.Diagnostics.Debug.WriteLine($"Next State = {CurrentState.StateType}; Transition = {e.EventType}");
 					UpdateContext(e.EventType, e.EventPayload);
 					//if (CurrentState.EffectInvocationsList[e.EventType].Count > 0) {
@@ -431,5 +440,248 @@ namespace PubnubApi.PubnubEventEngine
 		{
 			this.CurrentState = state;
 		}
+
+		public State NextState() 
+		{
+			State nextState = null;
+			if (CurrentState != null)
+			{
+				StateType nextStateType;
+				State findState = States.Find((s) => s.StateType == CurrentState.StateType);
+				if (findState != null && findState.transitions != null && findState.transitions.ContainsKey(CurrentState.EventType))
+				{
+					nextStateType = findState.transitions[CurrentState.EventType];
+					nextState = States.Find((s) => s.StateType == nextStateType);
+				}
+			}
+			return nextState;
+		}
+
+		public void Setup<T>(PNConfiguration config)
+		{
+			CreateState(StateType.Unsubscribed)
+				.On(EventType.SubscriptionChanged, StateType.Handshaking)
+                .On(EventType.SubscriptionRestored, StateType.Receiving);
+
+            #region Handshake Effect Invocations and Emit Status
+            EmitStatus handshakeSuccessEmitStatus = new EmitStatus();
+            handshakeSuccessEmitStatus.Name = "EMIT_STATUS";
+            handshakeSuccessEmitStatus.Effectype = EventType.HandshakeSuccess;
+
+            EffectInvocation handshakeInvocation = new Handshake();
+            handshakeInvocation.Name = "HANDSHAKE";
+            handshakeInvocation.Effectype = EventType.Handshake;
+
+            EffectInvocation cancelHandshakeInvocation = new CancelHandshake();
+            cancelHandshakeInvocation.Name = "CANCEL_HANDSHAKE";
+            cancelHandshakeInvocation.Effectype = EventType.CancelHandshake;
+            #endregion
+            CreateState(StateType.Handshaking)
+                .On(EventType.SubscriptionChanged, StateType.Handshaking)
+                .On(EventType.HandshakeSuccess, StateType.Receiving, new List<EffectInvocation>()
+                            { 
+                                handshakeSuccessEmitStatus
+                            }
+                )
+                .On(EventType.HandshakeFailure, StateType.HandshakeReconnecting)
+                .On(EventType.Disconnect, StateType.HandshakeStopped)
+                .On(EventType.SubscriptionRestored, StateType.Receiving)
+                .OnEntry(entryInvocationList: new List<EffectInvocation>()
+                            { 
+                                handshakeInvocation 
+                            }
+                )
+                .OnExit(exitInvocationList: new List<EffectInvocation>()
+                            { 
+                                cancelHandshakeInvocation 
+                            }
+                );
+
+            #region HandshakeReconnecting Effect Invocations and Emit Status
+            EmitStatus handshakeReconnectSuccessEmitStatus = new EmitStatus();
+            handshakeReconnectSuccessEmitStatus.Name = "EMIT_STATUS";
+            handshakeReconnectSuccessEmitStatus.Effectype = EventType.HandshakeReconnectSuccess;
+
+            EffectInvocation handshakeReconnectInvocation = new HandshakeReconnect();
+            handshakeReconnectInvocation.Name = "HANDSHAKE_RECONNECT";
+            handshakeReconnectInvocation.Effectype = EventType.HandshakeReconnect;
+
+            EffectInvocation cancelHandshakeReconnectInvocation = new CancelHandshakeReconnect();
+            cancelHandshakeReconnectInvocation.Name = "CANCEL_HANDSHAKE_RECONNECT";
+            cancelHandshakeReconnectInvocation.Effectype = EventType.CancelHandshakeReconnect;
+            #endregion
+            CreateState(StateType.HandshakeReconnecting)
+                .On(EventType.SubscriptionChanged, StateType.HandshakeReconnecting)
+                .On(EventType.HandshakeReconnectFailure, StateType.HandshakeReconnecting)
+                .On(EventType.Disconnect, StateType.HandshakeStopped)
+                .On(EventType.HandshakeReconnectGiveUp, StateType.HandshakeFailed)
+                .On(EventType.HandshakeReconnectSuccess, StateType.Receiving, new List<EffectInvocation>()
+                            { 
+                                handshakeReconnectSuccessEmitStatus
+                            }
+                )
+                .On(EventType.SubscriptionRestored, StateType.Receiving)
+                .OnEntry(entryInvocationList: new List<EffectInvocation>()
+                            { 
+                                handshakeReconnectInvocation
+                            }
+                )
+                .OnExit(exitInvocationList: new List<EffectInvocation>()
+                            { 
+                                cancelHandshakeReconnectInvocation 
+                            }
+                );
+
+            #region HandshakeFailed Effect Invocations and Emit Status
+            EffectInvocation handshakeFailedInvocation = new HandshakeFailed();
+            handshakeFailedInvocation.Name = "HANDSHAKE_FAILED";
+            handshakeFailedInvocation.Effectype = EventType.HandshakeFailure;
+
+            EffectInvocation cancelHandshakeFailedInvocation = new CancelHandshakeFailed();
+            cancelHandshakeReconnectInvocation.Name = "CANCEL_HANDSHAKE_FAILED";
+            cancelHandshakeReconnectInvocation.Effectype = EventType.CancelHandshakeFailure;
+            #endregion
+            CreateState(StateType.HandshakeFailed)
+                .On(EventType.HandshakeReconnectRetry, StateType.HandshakeReconnecting)
+                .On(EventType.SubscriptionChanged, StateType.Handshaking)
+                .On(EventType.Reconnect, StateType.Handshaking)
+                .On(EventType.SubscriptionRestored, StateType.Receiving)
+                .OnEntry(entryInvocationList: new List<EffectInvocation>()
+                            { 
+                                handshakeFailedInvocation
+                            }
+                )
+                .OnExit(exitInvocationList: new List<EffectInvocation>()
+                            { 
+                                cancelHandshakeFailedInvocation 
+                            }
+                );
+
+            #region HandshakeStopped Effect Invocations and Emit Status
+            #endregion
+            CreateState(StateType.HandshakeStopped)
+                .On(EventType.Reconnect, StateType.HandshakeReconnecting)
+                .On(EventType.SubscriptionChanged, StateType.Handshaking)
+                .On(EventType.HandshakeSuccess, StateType.Receiving)
+                .On(EventType.HandshakeFailure, StateType.HandshakeReconnecting)
+                .On(EventType.SubscriptionRestored, StateType.Receiving);
+
+            #region Receiving Effect Invocations and Emit Status
+            EmitStatus receiveEmitStatus = new EmitStatus();
+            receiveEmitStatus.Name = "EMIT_STATUS";
+            receiveEmitStatus.Effectype = EventType.ReceiveSuccess;
+
+            EmitMessages<T> receiveEmitMessages = new EmitMessages<T>(null);
+            receiveEmitMessages.Name = "EMIT_EVENTS";
+            receiveEmitMessages.Effectype = EventType.ReceiveSuccess;
+
+            EmitStatus receiveDisconnectEmitStatus = new EmitStatus();
+            receiveDisconnectEmitStatus.Name = "EMIT_STATUS";
+            receiveDisconnectEmitStatus.Effectype = EventType.Disconnect;
+
+            EffectInvocation receiveMessagesInvocation = new ReceiveMessages();
+            receiveMessagesInvocation.Name = "RECEIVE_EVENTS";
+            receiveMessagesInvocation.Effectype = EventType.ReceiveMessages;
+
+            EffectInvocation cancelReceiveMessages = new CancelReceiveMessages();
+            cancelReceiveMessages.Name = "CANCEL_RECEIVE_EVENTS";
+            cancelReceiveMessages.Effectype = EventType.CancelReceiveMessages;
+            #endregion
+            CreateState(StateType.Receiving)
+                .On(EventType.SubscriptionChanged, StateType.Receiving)
+                .On(EventType.SubscriptionRestored, StateType.Receiving)
+                .On(EventType.ReceiveSuccess, StateType.Receiving, new List<EffectInvocation>()
+                            { 
+                                receiveEmitStatus,
+                                receiveEmitMessages
+                            }
+                )
+                .On(EventType.Disconnect, StateType.ReceiveStopped, new List<EffectInvocation>()
+                            { 
+                                 receiveDisconnectEmitStatus
+                            }
+                )
+                .On(EventType.ReceiveFailure, StateType.ReceiveReconnecting)
+                .OnEntry(entryInvocationList: new List<EffectInvocation>()
+                            { 
+                                receiveMessagesInvocation
+                            }
+                )
+                .OnExit(exitInvocationList: new List<EffectInvocation>()
+                            { 
+                                cancelReceiveMessages
+                            }
+                );
+
+            #region ReceiveReconnecting Effect Invocations and Emit Status
+            EmitStatus receiveReconnectEmitStatus = new EmitStatus();
+            receiveReconnectEmitStatus.Name = "RECONNECT_EMIT_STATUS";
+            receiveEmitStatus.Effectype = EventType.ReceiveReconnectSuccess;
+
+            EmitMessages<T> receiveReconnectEmitMessages = new EmitMessages<T>(null);
+            receiveReconnectEmitMessages.Name = "RECEIVE_RECONNECT_EVENTS";
+            receiveReconnectEmitMessages.Effectype = EventType.ReceiveReconnectSuccess;
+
+            EmitStatus receiveReconnectDisconnectEmitStatus = new EmitStatus();
+            receiveReconnectDisconnectEmitStatus.Name = "RECONNECT_DISCONNECT_STATUS";
+            receiveReconnectDisconnectEmitStatus.Effectype = EventType.Disconnect;
+
+            EmitStatus receiveReconnectGiveupEmitStatus = new EmitStatus();
+            receiveReconnectGiveupEmitStatus.Name = "RECONNECT_GIVEUP_STATUS";
+            receiveReconnectGiveupEmitStatus.Effectype = EventType.ReceiveReconnectGiveUp;
+
+            EffectInvocation receiveReconnectInvocation = new ReceiveReconnect();
+            receiveReconnectInvocation.Name = "RECEIVE_RECONNECT";
+            receiveReconnectInvocation.Effectype = EventType.ReceiveReconnect;
+
+            EffectInvocation cancelReceiveReconnect = new CancelReceiveReconnect();
+            cancelReceiveReconnect.Effectype = EventType.CancelReceiveMessages;
+            #endregion
+            CreateState(StateType.ReceiveReconnecting)
+                .On(EventType.SubscriptionChanged, StateType.ReceiveReconnecting)
+                .On(EventType.ReceiveReconnectFailure, StateType.ReceiveReconnecting)
+                .On(EventType.SubscriptionRestored, StateType.ReceiveReconnecting)
+                .On(EventType.ReceiveReconnectSuccess, StateType.Receiving, new List<EffectInvocation>()
+                            { 
+                                receiveReconnectEmitStatus,
+                                receiveReconnectEmitMessages
+                            }
+                )
+                .On(EventType.Disconnect, StateType.ReceiveStopped, new List<EffectInvocation>()
+                            { 
+                                receiveReconnectDisconnectEmitStatus
+                            }
+                )
+                .On(EventType.ReceiveReconnectGiveUp, StateType.ReceiveFailed, new List<EffectInvocation>()
+                            { 
+                                receiveReconnectGiveupEmitStatus
+                            }
+                )
+                .OnEntry(entryInvocationList: new List<EffectInvocation>()
+                            { 
+                                receiveReconnectInvocation
+                            }
+                )
+                .OnExit(exitInvocationList: new List<EffectInvocation>()
+                            { 
+                                cancelReceiveReconnect
+                            }
+                );
+			System.Diagnostics.Debug.WriteLine("EventEngine Setup done.");
+		}
+
+		//public void SetCurrentStateType(StateType stateType, EventType eventType)
+		//{
+		//	State nextState = null;
+		//	StateType nextStateType;
+		//	IEnumerable<State> eventTypeStates = States.Where(s => s.StateType == stateType && s.EventType == eventType);
+		//	foreach (State state in eventTypeStates)
+		//	{
+		//		if (state.transitions.ContainsKey(eventType))
+		//		{
+		//			nextStateType = state.transitions[eventType];
+		//		}
+		//	}
+		//}
 	}
 }

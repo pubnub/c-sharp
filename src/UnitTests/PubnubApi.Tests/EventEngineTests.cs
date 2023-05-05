@@ -29,207 +29,36 @@ namespace PubNubMessaging.Tests
             IPubnubUnitTest pubnubUnitTest = new PubnubUnitTest();
 			var effectDispatcher = new EffectDispatcher();
 			var eventEmitter = new EventEmitter();
-            //eventEmitter.RegisterJsonListener(JsonCallback);
-
-
-            var handshakeEffectHandler = new HandshakeEffectHandler(eventEmitter);
-            handshakeEffectHandler.LogCallback = delegate (string log)
-            {
-            };
-            handshakeEffectHandler.HandshakeRequested += delegate (object sender, HandshakeRequestEventArgs e)
-            {
-            };
-            EffectInvocation handshakeInvocation = new Handshake();
-            handshakeInvocation.Effectype = EventType.Handshake;
-            handshakeInvocation.Handler = handshakeEffectHandler;
-
-            EffectInvocation cancelHandshakeInvocation = new CancelHandshake();
-            cancelHandshakeInvocation.Effectype = EventType.CancelHandshake;
-            cancelHandshakeInvocation.Handler = handshakeEffectHandler;
-
-            var receivingEffectHandler = new ReceivingEffectHandler<object>(eventEmitter);
-            receivingEffectHandler.LogCallback = delegate (string log)
-            {
-            };
-            receivingEffectHandler.ReceiveRequested += delegate (object sender, ReceiveRequestEventArgs e)
-            {
-            };
-            EffectInvocation receiveMessagesInvocation = new ReceiveMessages();
-            receiveMessagesInvocation.Effectype = EventType.ReceiveMessages;
-            receiveMessagesInvocation.Handler = receivingEffectHandler;
-
-            EffectInvocation cancelReceiveMessages = new CancelReceiveMessages();
-            cancelReceiveMessages.Effectype = EventType.CancelReceiveMessages;
-            cancelReceiveMessages.Handler = receivingEffectHandler;
-
-            EmitStatus emitStatus = new EmitStatus(PNStatusCategory.PNUnknownCategory);
-            //emitStatus.Effectype = EventType.HandshakeSuccess;
-
-            //var reconnectionEffect = new ReconnectingEffectHandler<string>(eventEmitter);
-
-            //effectDispatcher.Register(EffectInvocationType.HandshakeSuccess, handshakeEffect);
-            //effectDispatcher.Register(EffectInvocationType.ReceiveSuccess, receivingEffect);
-            //effectDispatcher.Register(EffectInvocationType.ReconnectionAttempt, reconnectionEffect);
-
             pnEventEngine = new EventEngine(effectDispatcher, eventEmitter);
             pnEventEngine.PubnubUnitTest = pubnubUnitTest;
-
-			unsubscribeState = pnEventEngine.CreateState(StateType.Unsubscribed)
-				.On(EventType.SubscriptionChanged, StateType.Handshaking)
-                .On(EventType.SubscriptionRestored, StateType.Receiving);
-
-            handshakingState = pnEventEngine.CreateState(StateType.Handshaking)
-                .On(EventType.SubscriptionChanged, StateType.Handshaking)
-                .On(EventType.HandshakeSuccess, StateType.Receiving, new List<EffectInvocation>()
-                            { 
-                                emitStatus
-                            }
-                )
-                .On(EventType.HandshakeFailure, StateType.HandshakeReconnecting)
-                .On(EventType.Disconnect, StateType.HandshakeStopped)
-                .On(EventType.SubscriptionRestored, StateType.Receiving)
-                .OnEntry(entryInvocationList: new List<EffectInvocation>()
-                            { 
-                                handshakeInvocation 
-                            }
-                )
-                .OnExit(exitInvocationList: new List<EffectInvocation>()
-                            { 
-                                cancelHandshakeInvocation 
-                            }
-                );
-
-            handshakeReconnectingState = pnEventEngine.CreateState(StateType.HandshakeReconnecting)
-                .On(EventType.SubscriptionChanged, StateType.HandshakeReconnecting)
-                .On(EventType.HandshakeReconnectFailure, StateType.HandshakeReconnecting)
-                .On(EventType.Disconnect, StateType.HandshakeStopped)
-                .On(EventType.HandshakeReconnectGiveUp, StateType.HandshakeFailed)
-                .On(EventType.HandshakeReconnectSuccess, StateType.Receiving, new List<EffectInvocation>()
-                            { 
-                                new EmitStatus(PNStatusCategory.PNConnectedCategory)
-                            }
-                )
-                .On(EventType.SubscriptionRestored, StateType.Receiving)
-                .OnEntry(entryInvocationList: new List<EffectInvocation>()
-                            { 
-                                new HandshakeReconnect() 
-                            }
-                )
-                .OnExit(exitInvocationList: new List<EffectInvocation>()
-                            { 
-                                new CancelHandshakeReconnect() 
-                            }
-                );
-
-            handshakeFailedState = pnEventEngine.CreateState(StateType.HandshakeFailed)
-                .On(EventType.HandshakeReconnectRetry, StateType.HandshakeReconnecting)
-                .On(EventType.SubscriptionChanged, StateType.HandshakeReconnecting)
-                .On(EventType.SubscriptionRestored, StateType.ReceiveReconnecting)
-                .On(EventType.Reconnect, StateType.HandshakeReconnecting);
-
-            handshakeStoppedState = pnEventEngine.CreateState(StateType.HandshakeStopped)
-                .On(EventType.Reconnect, StateType.HandshakeReconnecting)
-                .On(EventType.SubscriptionChanged, StateType.Handshaking)
-                .On(EventType.HandshakeSuccess, StateType.Receiving)
-                .On(EventType.HandshakeFailure, StateType.HandshakeReconnecting)
-                .On(EventType.SubscriptionRestored, StateType.Receiving);
-
-            receivingState = pnEventEngine.CreateState(StateType.Receiving)
-                .On(EventType.SubscriptionChanged, StateType.Receiving)
-                .On(EventType.SubscriptionRestored, StateType.Receiving)
-                .On(EventType.ReceiveSuccess, StateType.Receiving, new List<EffectInvocation>()
-                            { 
-                                //new EmitMessages(null),
-                                new EmitStatus(PNStatusCategory.PNConnectedCategory)
-                            }
-                )
-                .On(EventType.Disconnect, StateType.ReceiveStopped, new List<EffectInvocation>()
-                            { 
-                                new EmitStatus(PNStatusCategory.PNDisconnectedCategory)
-                            }
-                )
-                .On(EventType.ReceiveFailure, StateType.ReceiveReconnecting)
-                .OnEntry(entryInvocationList: new List<EffectInvocation>()
-                            { 
-                                receiveMessagesInvocation 
-                            }
-                )
-                .OnExit(exitInvocationList: new List<EffectInvocation>()
-                            { 
-                                cancelReceiveMessages 
-                            }
-                );
-
-            receiveReconnectingState = pnEventEngine.CreateState(StateType.ReceiveReconnecting)
-                .On(EventType.SubscriptionChanged, StateType.ReceiveReconnecting)
-                .On(EventType.ReceiveReconnectFailure, StateType.ReceiveReconnecting)
-                .On(EventType.SubscriptionRestored, StateType.ReceiveReconnecting)
-                .On(EventType.ReceiveReconnectSuccess, StateType.Receiving, new List<EffectInvocation>()
-                            { 
-                                //new EmitMessages(null),
-                                new EmitStatus(PNStatusCategory.PNConnectedCategory)
-                            }
-                )
-                .On(EventType.Disconnect, StateType.ReceiveStopped, new List<EffectInvocation>()
-                            { 
-                                new EmitStatus(PNStatusCategory.PNDisconnectedCategory)
-                            }
-                )
-                .On(EventType.ReceiveReconnectGiveUp, StateType.ReceiveFailed, new List<EffectInvocation>()
-                            { 
-                                new EmitStatus(PNStatusCategory.PNDisconnectedCategory)
-                            }
-                )
-                .OnEntry(entryInvocationList: new List<EffectInvocation>()
-                            { 
-                                new ReceiveReconnect()
-                            }
-                )
-                .OnExit(exitInvocationList: new List<EffectInvocation>()
-                            { 
-                                new CancelReceiveReconnect()
-                            }
-                );
+            pnEventEngine.Setup<object>(new PNConfiguration(new UserId("testuserid")));
         }
 
         [Test]
         public void TestWhenStateTypeUnsubscribed()
         {
-            //Unsubscribed => Subscription_Changed  => Handshaking
-            pnEventEngine.InitialState(unsubscribeState);
-            pnEventEngine.Transition(new SubscriptionChanged() 
-                                        { 
-                                            EventType = EventType.SubscriptionChanged, 
-                                            EventPayload = new EventPayload(){ }
-                                        });
-            State currentHandshakingState = pnEventEngine.CurrentState;
-            if (currentHandshakingState.EventType == EventType.SubscriptionChanged &&
-                currentHandshakingState.StateType == StateType.Handshaking) 
+            pnEventEngine.CurrentState = new State(StateType.Unsubscribed) { EventType = EventType.SubscriptionChanged };
+            State currentHandshakingState = pnEventEngine.NextState();
+            if (currentHandshakingState.StateType == StateType.Handshaking) 
             {
                 //Expected result.
             }
             else
             {
-                Assert.Fail("unsubscribeState SubscriptionChanged => Handshaking FAILED");
+                Assert.Fail("Unsubscribed + SubscriptionChanged => Handshaking FAILED");
                 return;
             }
 
             //Unsubscribed => Subscription_Restored  => Receiving
-            pnEventEngine.InitialState(unsubscribeState);
-            pnEventEngine.Transition(new SubscriptionChanged() 
-                                        { 
-                                            EventType = EventType.SubscriptionRestored, 
-                                            EventPayload = new EventPayload(){ }
-                                        });
-            State currentReceiveState = pnEventEngine.CurrentState;
-            if (currentReceiveState.EventType == EventType.SubscriptionRestored &&
-                currentReceiveState.StateType == StateType.Receiving) 
+            pnEventEngine.CurrentState = new State(StateType.Unsubscribed) { EventType = EventType.SubscriptionRestored };
+            State currentReceiveState = pnEventEngine.NextState();
+            if (currentReceiveState.StateType == StateType.Receiving) 
             {
                 //Expected result.
             }
             else
             {
-                Assert.Fail("unsubscribeState SubscriptionRestored => Receiving FAILED");
+                Assert.Fail("Unsubscribed + SubscriptionRestored => Receiving FAILED");
                 return;
             }
 
@@ -239,99 +68,153 @@ namespace PubNubMessaging.Tests
         public void TestWhenStateTypeHandshaking()
         {
             //Handshaking => Subscription_Changed  => Handshaking
-            pnEventEngine.InitialState(handshakingState);
-            pnEventEngine.Transition(new SubscriptionChanged() 
-                                        { 
-                                            EventType = EventType.SubscriptionChanged, 
-                                            EventPayload = new EventPayload(){ }
-                                        });
-            State currentHandshakingState = pnEventEngine.CurrentState;
-            if (currentHandshakingState.EventType == EventType.SubscriptionChanged &&
-                currentHandshakingState.StateType == StateType.Handshaking) 
+            pnEventEngine.CurrentState = new State(StateType.Handshaking) { EventType = EventType.SubscriptionChanged };
+            State currentHandshakingState = pnEventEngine.NextState();
+            if (currentHandshakingState.StateType == StateType.Handshaking) 
             {
                 //Continue for further tests on transition
             }
             else
             {
-                Assert.Fail("handshakingState SubscriptionChanged => Handshaking");
+                Assert.Fail("Handshaking + SubscriptionChanged => Handshaking");
                 return;
             }
 
             //Handshaking => Handshake_Failure  => HandshakeReconnecting
-            pnEventEngine.InitialState(handshakingState);
-            pnEventEngine.Transition(new HandshakeFailure() 
-                                        { 
-                                            EventType = EventType.HandshakeFailure, 
-                                            EventPayload = new EventPayload(){ }
-                                        });
-            State currentHandshakeReconnectingState = pnEventEngine.CurrentState;
-            if (currentHandshakeReconnectingState.EventType == EventType.HandshakeFailure &&
-                currentHandshakeReconnectingState.StateType == StateType.HandshakeReconnecting) 
+            pnEventEngine.CurrentState = new State(StateType.Handshaking) { EventType = EventType.HandshakeFailure };
+            State currentHandshakeReconnectingState = pnEventEngine.NextState();
+            if (currentHandshakeReconnectingState.StateType == StateType.HandshakeReconnecting) 
             {
                 //empty
             }
             else
             {
-                Assert.Fail("handshakingState HandshakeFailure => HandshakeReconnecting FAILED");
+                Assert.Fail("Handshaking + HandshakeFailure => HandshakeReconnecting FAILED");
                 return;
             }
 
             //Handshaking => Disconnect  => HandshakeStopped
-            pnEventEngine.InitialState(handshakingState);
-            pnEventEngine.Transition(new Disconnect() 
-                                        { 
-                                            EventType = EventType.Disconnect, 
-                                            EventPayload = new EventPayload(){ }
-                                        });
-            State currentHandshakeStoppedState = pnEventEngine.CurrentState;
-            if (currentHandshakeStoppedState.EventType == EventType.Disconnect &&
-                currentHandshakeStoppedState.StateType == StateType.HandshakeStopped) 
+            pnEventEngine.CurrentState = new State(StateType.Handshaking) { EventType = EventType.Disconnect };
+            State currentHandshakeStoppedState = pnEventEngine.NextState();
+            if (currentHandshakeStoppedState.StateType == StateType.HandshakeStopped) 
             {
                 //empty
             }
             else
             {
-                Assert.Fail("handshakingState Disconnect => HandshakeStopped FAILED");
+                Assert.Fail("Handshaking + Disconnect => HandshakeStopped FAILED");
                 return;
             }
 
             //Handshaking => Handshake_Success  => Receiving
-            pnEventEngine.InitialState(handshakingState);
-            pnEventEngine.Transition(new HandshakeSuccess() 
-                                        { 
-                                            EventType = EventType.HandshakeSuccess, 
-                                            EventPayload = new EventPayload(){ }
-                                        });
-            State currentReceivingState = pnEventEngine.CurrentState;
-            if (currentReceivingState.EventType == EventType.HandshakeSuccess &&
-                currentReceivingState.StateType == StateType.Receiving) 
+            pnEventEngine.CurrentState = new State(StateType.Handshaking) { EventType = EventType.HandshakeSuccess };
+            State currentReceivingState = pnEventEngine.NextState();
+            if (currentReceivingState.StateType == StateType.Receiving) 
             {
                 //empty
             }
             else
             {
-                Assert.Fail("Handshaking HandshakeSuccess => Receiving FAILED");
+                Assert.Fail("Handshaking + HandshakeSuccess => Receiving FAILED");
                 return;
             }
 
             //Handshaking => Subscription_Restored  => Receiving
-            pnEventEngine.InitialState(handshakingState);
-            pnEventEngine.Transition(new SubscriptionRestored() 
-                                        { 
-                                            EventType = EventType.SubscriptionRestored, 
-                                            EventPayload = new EventPayload(){ }
-                                        });
-            currentReceivingState = pnEventEngine.CurrentState;
-            if (currentReceivingState.EventType == EventType.SubscriptionRestored &&
-                currentReceivingState.StateType == StateType.Receiving) 
+            pnEventEngine.CurrentState = new State(StateType.Handshaking) { EventType = EventType.SubscriptionRestored };
+            currentReceivingState = pnEventEngine.NextState();
+            if (currentReceivingState.StateType == StateType.Receiving) 
             {
                 //empty
             }
             else
             {
-                Assert.Fail("Handshaking SubscriptionRestored => Receiving FAILED");
+                Assert.Fail("Handshaking + SubscriptionRestored => Receiving FAILED");
                 return;
             }
+        }
+
+        [Test]
+        public void TestWhenStateTypeHandshakeReconnecting()
+        {
+            //HandshakeReconnecting => Subscription_Changed  => HandshakeReconnecting
+            pnEventEngine.CurrentState = new State(StateType.HandshakeReconnecting) { EventType = EventType.SubscriptionChanged };
+            State currentNewState = pnEventEngine.NextState();
+            if (currentNewState.StateType == StateType.HandshakeReconnecting) 
+            {
+                //Continue for further tests on transition
+            }
+            else
+            {
+                Assert.Fail("HandshakeReconnecting + SubscriptionChanged => HandshakeReconnecting");
+                return;
+            }
+
+            //HandshakeReconnecting => HandshakeReconnectFailure  => HandshakeReconnecting
+            pnEventEngine.CurrentState = new State(StateType.HandshakeReconnecting) { EventType = EventType.HandshakeReconnectFailure };
+            currentNewState = pnEventEngine.NextState();
+            if (currentNewState.StateType == StateType.HandshakeReconnecting) 
+            {
+                //Continue for further tests on transition
+            }
+            else
+            {
+                Assert.Fail("HandshakeReconnecting + HandshakeReconnectFailure => HandshakeReconnecting");
+                return;
+            }
+
+            //HandshakeReconnecting => Disconnect  => HandshakeStopped
+            pnEventEngine.CurrentState = new State(StateType.HandshakeReconnecting) { EventType = EventType.Disconnect };
+            currentNewState = pnEventEngine.NextState();
+            if (currentNewState.StateType == StateType.HandshakeStopped) 
+            {
+                //Continue for further tests on transition
+            }
+            else
+            {
+                Assert.Fail("HandshakeReconnecting + Disconnect => HandshakeStopped");
+                return;
+            }
+
+            //HandshakeReconnecting => HandshakeReconnectGiveUp  => HandshakeFailed
+            pnEventEngine.CurrentState = new State(StateType.HandshakeReconnecting) { EventType = EventType.HandshakeReconnectGiveUp };
+            currentNewState = pnEventEngine.NextState();
+            if (currentNewState.StateType == StateType.HandshakeFailed) 
+            {
+                //Continue for further tests on transition
+            }
+            else
+            {
+                Assert.Fail("HandshakeReconnecting + HandshakeReconnectGiveUp => HandshakeFailed");
+                return;
+            }
+
+            //
+            //HandshakeReconnecting => HandshakeReconnectSuccess  => Receiving
+            pnEventEngine.CurrentState = new State(StateType.HandshakeReconnecting) { EventType = EventType.HandshakeReconnectSuccess };
+            currentNewState = pnEventEngine.NextState();
+            if (currentNewState.StateType == StateType.Receiving) 
+            {
+                //Continue for further tests on transition
+            }
+            else
+            {
+                Assert.Fail("HandshakeReconnecting + HandshakeReconnectSuccess => Receiving");
+                return;
+            }
+
+            //HandshakeReconnecting => SubscriptionRestored  => Receiving
+            pnEventEngine.CurrentState = new State(StateType.HandshakeReconnecting) { EventType = EventType.SubscriptionRestored };
+            currentNewState = pnEventEngine.NextState();
+            if (currentNewState.StateType == StateType.Receiving) 
+            {
+                //Continue for further tests on transition
+            }
+            else
+            {
+                Assert.Fail("HandshakeReconnecting + SubscriptionRestored => Receiving");
+                return;
+            }
+
         }
     }
 }

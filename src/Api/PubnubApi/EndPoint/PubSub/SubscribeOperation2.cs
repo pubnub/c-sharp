@@ -43,55 +43,106 @@ namespace PubnubApi.EndPoint
             pubnubLog = log;
             pubnubTelemetryMgr = telemetryManager;
             pubnubTokenMgr = tokenManager;
+            
 
 			var effectDispatcher = new EffectDispatcher();
 			var eventEmitter = new EventEmitter();
             eventEmitter.RegisterJsonListener(JsonCallback);
 
+            pnEventEngine = new EventEngine(effectDispatcher, eventEmitter);
+            pnEventEngine.PubnubUnitTest = unit;
+            pnEventEngine.Setup<T>(config);
+
+
 			var handshakeEffectHandler = new HandshakeEffectHandler(eventEmitter);
             handshakeEffectHandler.LogCallback = LogCallback;
             handshakeEffectHandler.HandshakeRequested += HandshakeEffect_HandshakeRequested;
-            
-            EffectInvocation handshakeInvocation = new Handshake();
-            handshakeInvocation.Name = "HANDSHAKE";
-            handshakeInvocation.Effectype = EventType.Handshake;
-            handshakeInvocation.Handler = handshakeEffectHandler;
 
-            EffectInvocation cancelHandshakeInvocation = new CancelHandshake();
-            cancelHandshakeInvocation.Name = "CANCEL_HANDSHAKE";
-            cancelHandshakeInvocation.Effectype = EventType.CancelHandshake;
-            cancelHandshakeInvocation.Handler = handshakeEffectHandler;
+            #region Handshake state invocation and emit status
+            State handshakingState = pnEventEngine.States
+                .First(s => s.StateType == StateType.Handshaking);
+            foreach(var effectInvocation in handshakingState.EffectInvocationsList[EventType.HandshakeSuccess])
+            {
+                if (effectInvocation is EmitStatus)
+                {
+                    ((EmitStatus)effectInvocation).AnnounceStatus = Announce;
+                    ((EmitStatus)effectInvocation).Handler = handshakeEffectHandler;
+                }
+            }
+            foreach(var effectInvocation in handshakingState.EntryList)
+            {
+                if (effectInvocation is Handshake)
+                {
+                    ((Handshake)effectInvocation).Handler = handshakeEffectHandler;
+                }
+            }
+            foreach(var effectInvocation in handshakingState.ExitList)
+            {
+                if (effectInvocation is CancelHandshake)
+                {
+                    ((CancelHandshake)effectInvocation).Handler = handshakeEffectHandler;
+                }
+            }
+            #endregion
 
+            /*
 			var handshakeReconnectEffectHandler = new HandshakeReconnectEffectHandler(eventEmitter);
             handshakeReconnectEffectHandler.ReconnectionPolicy = config.ReconnectionPolicy;
             handshakeReconnectEffectHandler.MaxRetries = config.ConnectionMaxRetries;
             handshakeReconnectEffectHandler.LogCallback = LogCallback;
             handshakeReconnectEffectHandler.HandshakeReconnectRequested += HandshakeReconnectEffect_HandshakeRequested;
 
-            EffectInvocation handshakeReconnectInvocation = new HandshakeReconnect();
-            handshakeReconnectInvocation.Name = "HANDSHAKE_RECONNECT";
-            handshakeReconnectInvocation.Effectype = EventType.HandshakeReconnect;
-            handshakeReconnectInvocation.Handler = handshakeReconnectEffectHandler;
+            List<EffectInvocation> handshakeReconnectEffectInvocationList = pnEventEngine.States
+                .First(s => s.EventType == EventType.HandshakeReconnectSuccess)
+                .EffectInvocationsList[EventType.HandshakeReconnectSuccess];
+            foreach(EffectInvocation effectInvocation in handshakeReconnectEffectInvocationList)
+            {
+                if (effectInvocation is EmitStatus)
+                {
+                    ((EmitStatus)effectInvocation).AnnounceStatus = Announce;
+                    ((EmitStatus)effectInvocation).Handler = handshakeReconnectEffectHandler;
+                }
+                else if (effectInvocation is HandshakeReconnect)
+                {
+                    ((HandshakeReconnect)effectInvocation).Handler = handshakeReconnectEffectHandler;
+                }
+                else if (effectInvocation is CancelHandshakeReconnect)
+                {
+                    ((CancelHandshakeReconnect)effectInvocation).Handler = handshakeReconnectEffectHandler;
+                }
+            }
 
-            EffectInvocation cancelHandshakeReconnectInvocation = new CancelHandshakeReconnect();
-            cancelHandshakeReconnectInvocation.Name = "CANCEL_HANDSHAKE_RECONNECT";
-            cancelHandshakeReconnectInvocation.Effectype = EventType.CancelHandshakeReconnect;
-            cancelHandshakeReconnectInvocation.Handler = handshakeReconnectEffectHandler;
+            var receivingEffectHandler = new ReceivingEffectHandler<object>(eventEmitter);
+            receivingEffectHandler.ReconnectionPolicy = config.ReconnectionPolicy;
+            receivingEffectHandler.LogCallback = LogCallback;
+            receivingEffectHandler.ReceiveRequested += ReceivingEffect_ReceiveRequested;
 
-            EmitStatus handshakeSuccessEmitStatus = new EmitStatus();
-            handshakeSuccessEmitStatus.Name = "EMIT_STATUS";
-            handshakeSuccessEmitStatus.AnnounceStatus = Announce;
-            handshakeSuccessEmitStatus.Effectype = EventType.HandshakeSuccess;
-            handshakeSuccessEmitStatus.Handler = handshakeEffectHandler;
+            List<EffectInvocation> receivingEffectInvocationList = pnEventEngine.States
+                .First(s => s.EventType == EventType.ReceiveSuccess)
+                .EffectInvocationsList[EventType.ReceiveSuccess];
+            foreach(EffectInvocation effectInvocation in receivingEffectInvocationList)
+            {
+                if (effectInvocation is EmitStatus)
+                {
+                    ((EmitStatus)effectInvocation).AnnounceStatus = Announce;
+                    ((EmitStatus)effectInvocation).Handler = receivingEffectHandler;
+                }
+                else if (effectInvocation is EmitMessages<T>)
+                {
+                    ((EmitMessages<T>)effectInvocation).Handler = receivingEffectHandler;
+                }
+                else if (effectInvocation is ReceiveMessages)
+                {
+                    ((ReceiveMessages)effectInvocation).Handler = receivingEffectHandler;
+                }
+                else if (effectInvocation is CancelReceiveMessages)
+                {
+                    ((CancelReceiveMessages)effectInvocation).Handler = receivingEffectHandler;
+                }
+            }
+            */
 
-            EmitStatus handshakeReconnectSuccessEmitStatus = new EmitStatus();
-            handshakeReconnectSuccessEmitStatus.Name = "EMIT_STATUS";
-            handshakeReconnectSuccessEmitStatus.AnnounceStatus = Announce;
-            handshakeReconnectSuccessEmitStatus.Effectype = EventType.HandshakeReconnectSuccess;
-            handshakeReconnectSuccessEmitStatus.Handler = handshakeEffectHandler;
-
-
-
+            /*
             var handshakeFailedEffectHandler = new HandshakeFailedEffectHandler(eventEmitter);
             handshakeFailedEffectHandler.LogCallback = LogCallback;
 
@@ -175,18 +226,9 @@ namespace PubnubApi.EndPoint
             receiveReconnectGiveupEmitStatus.AnnounceStatus = Announce;
             receiveReconnectGiveupEmitStatus.Effectype = EventType.ReceiveReconnectGiveUp;
             receiveReconnectGiveupEmitStatus.Handler = receivingEffectHandler;
+            */
 
-			pnEventEngine = new EventEngine(effectDispatcher, eventEmitter);
-            pnEventEngine.PubnubUnitTest = unit;
-            if (pnEventEngine.PubnubUnitTest != null)
-            {
-                pnEventEngine.PubnubUnitTest.EventTypeList = new List<KeyValuePair<string, string>>();
-            }
-
-			var initState = pnEventEngine.CreateState(StateType.Unsubscribed)
-				.On(EventType.SubscriptionChanged, StateType.Handshaking)
-                .On(EventType.SubscriptionRestored, StateType.Receiving);
-
+            /*
             pnEventEngine.CreateState(StateType.Handshaking)
                 .On(EventType.SubscriptionChanged, StateType.Handshaking)
                 .On(EventType.HandshakeSuccess, StateType.Receiving, new List<EffectInvocation>()
@@ -208,50 +250,6 @@ namespace PubnubApi.EndPoint
                             }
                 );
 
-            pnEventEngine.CreateState(StateType.HandshakeReconnecting)
-                .On(EventType.SubscriptionChanged, StateType.HandshakeReconnecting)
-                .On(EventType.HandshakeReconnectFailure, StateType.HandshakeReconnecting)
-                .On(EventType.Disconnect, StateType.HandshakeStopped)
-                .On(EventType.HandshakeReconnectGiveUp, StateType.HandshakeFailed)
-                .On(EventType.HandshakeReconnectSuccess, StateType.Receiving, new List<EffectInvocation>()
-                            { 
-                                handshakeReconnectSuccessEmitStatus
-                            }
-                )
-                .On(EventType.SubscriptionRestored, StateType.Receiving)
-                .OnEntry(entryInvocationList: new List<EffectInvocation>()
-                            { 
-                                handshakeReconnectInvocation
-                            }
-                )
-                .OnExit(exitInvocationList: new List<EffectInvocation>()
-                            { 
-                                cancelHandshakeReconnectInvocation 
-                            }
-                );
-
-            pnEventEngine.CreateState(StateType.HandshakeFailed)
-                .On(EventType.HandshakeReconnectRetry, StateType.HandshakeReconnecting)
-                .On(EventType.SubscriptionChanged, StateType.Handshaking)
-                .On(EventType.Reconnect, StateType.Handshaking)
-                .On(EventType.SubscriptionRestored, StateType.Receiving)
-                .OnEntry(entryInvocationList: new List<EffectInvocation>()
-                            { 
-                                handshakeFailedInvocation
-                            }
-                )
-                .OnExit(exitInvocationList: new List<EffectInvocation>()
-                            { 
-                                cancelHandshakeFailedInvocation 
-                            }
-                );
-
-            pnEventEngine.CreateState(StateType.HandshakeStopped)
-                .On(EventType.Reconnect, StateType.HandshakeReconnecting)
-                .On(EventType.SubscriptionChanged, StateType.Handshaking)
-                .On(EventType.HandshakeSuccess, StateType.Receiving)
-                .On(EventType.HandshakeFailure, StateType.HandshakeReconnecting)
-                .On(EventType.SubscriptionRestored, StateType.Receiving);
 
             pnEventEngine.CreateState(StateType.Receiving)
                 .On(EventType.SubscriptionChanged, StateType.Receiving)
@@ -309,9 +307,15 @@ namespace PubnubApi.EndPoint
                                 cancelReceiveReconnect
                             }
                 );
-
-			pnEventEngine.InitialState(initState);
-
+            */
+            if (pnEventEngine.PubnubUnitTest != null)
+            {
+                pnEventEngine.PubnubUnitTest.EventTypeList = new List<KeyValuePair<string, string>>();
+            }
+            else
+            {
+			    pnEventEngine.InitialState(new State(StateType.Unsubscribed));
+            }
         }
 
         private void ReceivingEffect_ReceiveRequested(object sender, ReceiveRequestEventArgs e)
