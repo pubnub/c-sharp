@@ -314,7 +314,7 @@ namespace PubnubApi.EndPoint
             }
             else
             {
-			    pnEventEngine.InitialState(new State(StateType.Unsubscribed));
+			    pnEventEngine.InitialState(new State(StateType.Unsubscribed) { EventType = EventType.SubscriptionChanged });
             }
         }
 

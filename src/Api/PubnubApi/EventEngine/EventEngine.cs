@@ -262,9 +262,10 @@ namespace PubnubApi.PubnubEventEngine
 		ReceiveFailure,
 		ReceiveReconnect,
 		CancelReceiveReconnect,
-		ReceiveReconnectFailure,
 		ReceiveReconnectSuccess,
+		ReceiveReconnectFailure,
 		ReceiveReconnectGiveUp,
+		ReceiveReconnectRetry,
 		HandshakeReconnect,
 		CancelHandshakeReconnect,
 		HandshakeReconnectSuccess,
@@ -334,71 +335,91 @@ namespace PubnubApi.PubnubEventEngine
 
 		public void Transition(Event e)
 		{
-			StateType nextStateType;
 			if (CurrentState != null) {
 				State findState = States.Find((s) => s.StateType == CurrentState.StateType);
-				System.Diagnostics.Debug.WriteLine($"Current State = {CurrentState.StateType}; Transition = {e.EventType}");
-				if (PubnubUnitTest != null )
+				//State nextState;
+				StateType nextStateType;
+				if (findState != null && findState.transitions != null && findState.transitions.TryGetValue(CurrentState.EventType, out nextStateType))
 				{
-					PubnubUnitTest.EventTypeList.Add(new KeyValuePair<string, string>("event", e.Name));
-					PubnubUnitTest.Attempts = e.Attempts;
-				}
-				if (findState != null && findState.ExitList != null && findState.ExitList.Count > 0)
-				{
-					foreach(var entry in CurrentState.ExitList)
+					//StateType nextStateType = findState.transitions[CurrentState.EventType];
+					//
+					System.Diagnostics.Debug.WriteLine($"Current State = {CurrentState.StateType}; Transition = {e.EventType}");
+					if (PubnubUnitTest != null )
 					{
-						PubnubUnitTest?.EventTypeList?.Add(new KeyValuePair<string, string>("invocation", entry.Name));
-						entry.Handler?.Cancel();
+						PubnubUnitTest.EventTypeList.Add(new KeyValuePair<string, string>("event", e.Name));
+						PubnubUnitTest.Attempts = e.Attempts;
 					}
-				}
-				if (findState.EffectInvocationsList != null 
-					&& findState.EffectInvocationsList.ContainsKey(e.EventType)
-					&& findState.EffectInvocationsList[e.EventType].Count > 0) 
-				{
-					List<EffectInvocation> effectInvocationList = findState.EffectInvocationsList[e.EventType];
-					foreach (var effect in effectInvocationList) {
-						PubnubUnitTest?.EventTypeList?.Add(new KeyValuePair<string, string>("invocation", effect.Name));
-						if (effect is EmitStatus)
+					if (findState != null )
+					{
+						if (findState.ExitList != null && findState.ExitList.Count > 0)
 						{
-							((EmitStatus)effect).Announce();
+							foreach(var entry in findState.ExitList)
+							{
+								PubnubUnitTest?.EventTypeList?.Add(new KeyValuePair<string, string>("invocation", entry.Name));
+								entry.Handler?.Cancel();
+							}
 						}
-						else if (effect is EmitMessages<object>)
+						if (findState.EffectInvocationsList != null 
+							&& findState.EffectInvocationsList.ContainsKey(e.EventType)
+							&& findState.EffectInvocationsList[e.EventType].Count > 0) 
 						{
-							((EmitMessages<object>)effect).Announce<string>();
+							List<EffectInvocation> effectInvocationList = findState.EffectInvocationsList[e.EventType];
+							foreach (var effect in effectInvocationList) {
+								PubnubUnitTest?.EventTypeList?.Add(new KeyValuePair<string, string>("invocation", effect.Name));
+								if (effect is EmitStatus)
+								{
+									((EmitStatus)effect).Announce();
+								}
+								else if (effect is EmitMessages<object>)
+								{
+									((EmitMessages<object>)effect).Announce<string>();
+								}
+								System.Diagnostics.Debug.WriteLine("Found effect " + effect.Effectype);
+								Dispatcher.dispatch(effect.Effectype, this.Context);
+								//if (e.EventType == effect.Effectype)
+								//{
+								//}
+							}
 						}
-						System.Diagnostics.Debug.WriteLine("Found effect " + effect.Effectype);
-						Dispatcher.dispatch(effect.Effectype, this.Context);
-						//if (e.EventType == effect.Effectype)
+						
+						CurrentState = States.Find((s) => s.StateType == nextStateType);
+						UpdateContext(e.EventType, e.EventPayload);
+						if (CurrentState.EntryList != null && CurrentState.EntryList.Count > 0)
+						{
+							foreach(var entry in CurrentState.EntryList)
+							{
+								PubnubUnitTest?.EventTypeList?.Add(new KeyValuePair<string, string>("invocation", entry.Name));
+								entry.Handler?.Start(Context);
+							}
+						}
+
+						//findState.EventType = e.EventType;
+						//CurrentState = findState;
+						UpdateContext(e.EventType, e.EventPayload);
+						//CurrentState = NextState();
+						//if (CurrentState != null)
 						//{
+						//	System.Diagnostics.Debug.WriteLine($"Next State = {CurrentState.StateType}; Transition = {e.EventType}");
+						//	UpdateContext(e.EventType, e.EventPayload);
+						//	//System.Diagnostics.Debug.WriteLine($"Emitting event { e.EventType }");
+						//	//Emitter.emit(e);
 						//}
-					}
-				}
-				findState.EventType = e.EventType;
-				CurrentState = findState;
-				UpdateContext(e.EventType, e.EventPayload);
-				if (findState != null)
-				{
-					if (findState.EntryList != null && findState.EntryList.Count > 0)
-					{
-						foreach(var entry in findState.EntryList)
+						if (findState != null)
 						{
-							PubnubUnitTest?.EventTypeList?.Add(new KeyValuePair<string, string>("invocation", entry.Name));
-							entry.Handler?.Start(Context);
+							//if (CurrentState.EffectInvocationsList[e.EventType].Count > 0) {
+							//	foreach (var effect in CurrentState.EffectInvocationsList) {
+							//		if (e.EventType == effect.Effectype)
+							//		{
+							//			System.Diagnostics.Debug.WriteLine("Found effect "+ effect.Effectype);
+							//			Dispatcher.dispatch(effect.Effectype, this.Context);
+							//		}
+							//	}
+							//}
 						}
 					}
-					CurrentState = NextState();
-					System.Diagnostics.Debug.WriteLine($"Next State = {CurrentState.StateType}; Transition = {e.EventType}");
-					UpdateContext(e.EventType, e.EventPayload);
-					//if (CurrentState.EffectInvocationsList[e.EventType].Count > 0) {
-					//	foreach (var effect in CurrentState.EffectInvocationsList) {
-					//		if (e.EventType == effect.Effectype)
-					//		{
-					//			System.Diagnostics.Debug.WriteLine("Found effect "+ effect.Effectype);
-					//			Dispatcher.dispatch(effect.Effectype, this.Context);
-					//		}
-					//	}
-					//}
+
 				}
+
 			}
 		}
 
@@ -414,7 +435,10 @@ namespace PubnubApi.PubnubEventEngine
 
 		private void UpdateContext(EventType eventType, EventPayload eventData)
 		{
-			CurrentState.EventType = eventType;
+			if (CurrentState != null)
+			{
+				CurrentState.EventType = eventType;
+			}
 			if (eventData.Channels != null) Context.Channels = eventData.Channels;
 			if (eventData.ChannelGroups != null) Context.ChannelGroups = eventData.ChannelGroups;
 			if (eventData.Timetoken != null) 
@@ -476,6 +500,7 @@ namespace PubnubApi.PubnubEventEngine
             cancelHandshakeInvocation.Name = "CANCEL_HANDSHAKE";
             cancelHandshakeInvocation.Effectype = EventType.CancelHandshake;
             #endregion
+            #region StateType.Handshaking
             CreateState(StateType.Handshaking)
                 .On(EventType.SubscriptionChanged, StateType.Handshaking)
                 .On(EventType.HandshakeSuccess, StateType.Receiving, new List<EffectInvocation>()
@@ -496,6 +521,7 @@ namespace PubnubApi.PubnubEventEngine
                                 cancelHandshakeInvocation 
                             }
                 );
+			#endregion
 
             #region HandshakeReconnecting Effect Invocations and Emit Status
             EmitStatus handshakeReconnectSuccessEmitStatus = new EmitStatus();
@@ -510,6 +536,7 @@ namespace PubnubApi.PubnubEventEngine
             cancelHandshakeReconnectInvocation.Name = "CANCEL_HANDSHAKE_RECONNECT";
             cancelHandshakeReconnectInvocation.Effectype = EventType.CancelHandshakeReconnect;
             #endregion
+            #region StateType.HandshakeReconnecting
             CreateState(StateType.HandshakeReconnecting)
                 .On(EventType.SubscriptionChanged, StateType.HandshakeReconnecting)
                 .On(EventType.HandshakeReconnectFailure, StateType.HandshakeReconnecting)
@@ -531,6 +558,7 @@ namespace PubnubApi.PubnubEventEngine
                                 cancelHandshakeReconnectInvocation 
                             }
                 );
+			#endregion
 
             #region HandshakeFailed Effect Invocations and Emit Status
             EffectInvocation handshakeFailedInvocation = new HandshakeFailed();
@@ -541,6 +569,7 @@ namespace PubnubApi.PubnubEventEngine
             cancelHandshakeReconnectInvocation.Name = "CANCEL_HANDSHAKE_FAILED";
             cancelHandshakeReconnectInvocation.Effectype = EventType.CancelHandshakeFailure;
             #endregion
+            #region StateType.HandshakeFailed
             CreateState(StateType.HandshakeFailed)
                 .On(EventType.HandshakeReconnectRetry, StateType.HandshakeReconnecting)
                 .On(EventType.SubscriptionChanged, StateType.Handshaking)
@@ -556,15 +585,18 @@ namespace PubnubApi.PubnubEventEngine
                                 cancelHandshakeFailedInvocation 
                             }
                 );
+            #endregion
 
             #region HandshakeStopped Effect Invocations and Emit Status
             #endregion
+            #region StateType.HandshakeStopped
             CreateState(StateType.HandshakeStopped)
                 .On(EventType.Reconnect, StateType.HandshakeReconnecting)
                 .On(EventType.SubscriptionChanged, StateType.Handshaking)
                 .On(EventType.HandshakeSuccess, StateType.Receiving)
                 .On(EventType.HandshakeFailure, StateType.HandshakeReconnecting)
                 .On(EventType.SubscriptionRestored, StateType.Receiving);
+			#endregion
 
             #region Receiving Effect Invocations and Emit Status
             EmitStatus receiveEmitStatus = new EmitStatus();
@@ -587,6 +619,7 @@ namespace PubnubApi.PubnubEventEngine
             cancelReceiveMessages.Name = "CANCEL_RECEIVE_EVENTS";
             cancelReceiveMessages.Effectype = EventType.CancelReceiveMessages;
             #endregion
+            #region StateType.Receiving
             CreateState(StateType.Receiving)
                 .On(EventType.SubscriptionChanged, StateType.Receiving)
                 .On(EventType.SubscriptionRestored, StateType.Receiving)
@@ -612,6 +645,17 @@ namespace PubnubApi.PubnubEventEngine
                                 cancelReceiveMessages
                             }
                 );
+            #endregion
+
+            #region ReceiveFailed Effect Invocations and Emit Status
+            #endregion
+            #region StateType.ReceiveFailed
+            CreateState(StateType.ReceiveFailed)
+                .On(EventType.SubscriptionChanged, StateType.ReceiveReconnecting)
+                .On(EventType.SubscriptionRestored, StateType.ReceiveReconnecting)
+                .On(EventType.ReceiveReconnectRetry, StateType.ReceiveReconnecting)
+                .On(EventType.Reconnect, StateType.ReceiveReconnecting);
+            #endregion
 
             #region ReceiveReconnecting Effect Invocations and Emit Status
             EmitStatus receiveReconnectEmitStatus = new EmitStatus();
@@ -637,6 +681,7 @@ namespace PubnubApi.PubnubEventEngine
             EffectInvocation cancelReceiveReconnect = new CancelReceiveReconnect();
             cancelReceiveReconnect.Effectype = EventType.CancelReceiveMessages;
             #endregion
+            #region StateType.ReceiveReconnecting
             CreateState(StateType.ReceiveReconnecting)
                 .On(EventType.SubscriptionChanged, StateType.ReceiveReconnecting)
                 .On(EventType.ReceiveReconnectFailure, StateType.ReceiveReconnecting)
@@ -667,7 +712,16 @@ namespace PubnubApi.PubnubEventEngine
                                 cancelReceiveReconnect
                             }
                 );
-			System.Diagnostics.Debug.WriteLine("EventEngine Setup done.");
+            #endregion
+
+            #region ReceiveStopped Effect Invocations and Emit Status
+            #endregion
+            #region StateType.ReceiveStopped
+            CreateState(StateType.ReceiveStopped)
+                .On(EventType.Reconnect, StateType.ReceiveReconnecting);
+            #endregion
+
+            System.Diagnostics.Debug.WriteLine("EventEngine Setup done.");
 		}
 
 		//public void SetCurrentStateType(StateType stateType, EventType eventType)

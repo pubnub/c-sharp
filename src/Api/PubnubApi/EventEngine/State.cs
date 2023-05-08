@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace PubnubApi.PubnubEventEngine
 {
 
-	public enum StateType { Unsubscribed, Handshaking, HandshakingFailed, Receiving, ReceiveReconnecting, ReceiveStopped, ReceiveFailed, HandshakeFailed, ReconnectingFailed, HandshakeReconnecting, HandshakeStopped };
+	public enum StateType { Unsubscribed, Handshaking, HandshakingFailed, Receiving, ReceiveReconnecting, ReceiveStopped, ReceiveFailed, HandshakeFailed, HandshakeReconnecting, HandshakeStopped };
 
 	public class State
 	{

@@ -156,6 +156,7 @@ namespace PubNubMessaging.Tests
             {
                 Assert.Ignore("Ignored for Server side run");
             }
+            bool receivedSubscribedMessage = false;
             bool internalReceivedMessage = false;
             bool receivedErrorMessage = false;
             CustomClass publishedMessage = new CustomClass();
@@ -190,7 +191,7 @@ namespace PubNubMessaging.Tests
                         Debug.WriteLine("SubscribeCallback: PNMessageResult: {0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(m.Message));
                         if (pubnub.JsonPluggableLibrary.SerializeToJsonString(publishedMessage) == m.Message.ToString())
                         {
-                            internalReceivedMessage = true;
+                            receivedSubscribedMessage = true;
                         }
                         subscribeManualEvent.Set();
                     }
@@ -296,7 +297,7 @@ namespace PubNubMessaging.Tests
                 Thread.Sleep(1000);
             }
 
-            receivedMessage = internalReceivedMessage;
+            receivedMessage = receivedSubscribedMessage;
             pubnub.RemoveListener(listenerSubCallack);
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
