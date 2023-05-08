@@ -17,6 +17,11 @@ public class #SCRIPTNAME# : PNManagerBehaviour {
 		// Listener example.
 		listener.onStatus += OnPnStatus;
 		listener.onMessage += OnPnMessage;
+		listener.onPresence += OnPnPresence;
+		listener.onFile += OnPnFile;
+		listener.onObject += OnPnObject;
+		listener.onSignal += OnPnSignal;
+		listener.onMessageAction += OnPnMessageAction;
 
 		// Initialize will create a PubNub instance, pass the configuration object, and prepare the listener. 
 		Initialize(userId);
@@ -28,11 +33,31 @@ public class #SCRIPTNAME# : PNManagerBehaviour {
 		await pubnub.Publish().Channel("TestChannel").Message("Hello World from Unity!").ExecuteAsync();
 	}
 
-	void OnPnStatus(Pubnub pn, PNStatus status) {
+	private void OnPnMessageAction(Pubnub pn, PNMessageActionEventResult result) {
+		Debug.Log(result.Channel);
+	}
+
+	private void OnPnSignal(Pubnub pn, PNSignalResult<object> result) {
+		Debug.Log(result.Channel);
+	}
+
+	private void OnPnObject(Pubnub pn, PNObjectEventResult result) {
+		Debug.Log(result.Channel);
+	}
+
+	private void OnPnFile(Pubnub pn, PNFileEventResult result) {
+		Debug.Log(result.Channel);
+	}
+
+	private void OnPnPresence(Pubnub pn, PNPresenceEventResult result) {
+		Debug.Log(result.Event);
+	}
+
+	private void OnPnStatus(Pubnub pn, PNStatus status) {
 		Debug.Log(status.Category == PNStatusCategory.PNConnectedCategory ? "Connected" : "Not connected");
 	}
 
-	void OnPnMessage(Pubnub pn, PNMessageResult<object> result) {
+	private void OnPnMessage(Pubnub pn, PNMessageResult<object> result) {
 		Debug.Log($"Message received: {result.Message}");
 	}
 	 
@@ -40,6 +65,11 @@ public class #SCRIPTNAME# : PNManagerBehaviour {
 		// Use OnDestroy to clean up, e.g. unsubscribe from listeners.
 		listener.onStatus -= OnPnStatus;
 		listener.onMessage -= OnPnMessage;
+		listener.onPresence -= OnPnPresence;
+		listener.onFile -= OnPnFile;
+		listener.onObject -= OnPnObject;
+		listener.onSignal -= OnPnSignal;
+		listener.onMessageAction -= OnPnMessageAction;
 		
 		base.OnDestroy();
 	}
