@@ -42,6 +42,7 @@ namespace AcceptanceTests.Steps
         ManualResetEvent statusReceivedEvent = new ManualResetEvent(false);
         PNStatus pnStatus = null;
         PubnubError pnError = null;
+        IPubnubUnitTest unitTest;
 
         public class PubnubUnitTest : IPubnubUnitTest
         {
@@ -209,7 +210,7 @@ namespace AcceptanceTests.Steps
         [Given(@"the demo keyset with event engine enabled")]
         public void GivenTheDemoKeysetWithEventEngineEnabled()
         {
-            IPubnubUnitTest unitTest = new PubnubUnitTest();
+            unitTest = new PubnubUnitTest();
             unitTest.Timetoken = 16820876821905844; //Hardcoded timetoken
             unitTest.RequestId = "myRequestId";
             unitTest.InternetAvailable = true;
@@ -223,7 +224,6 @@ namespace AcceptanceTests.Steps
             config.PublishKey = System.Environment.GetEnvironmentVariable("PN_PUB_KEY");
             config.SubscribeKey = System.Environment.GetEnvironmentVariable("PN_SUB_KEY");
             config.SecretKey = System.Environment.GetEnvironmentVariable("PN_SEC_KEY");
-            config.ReconnectionPolicy = PNReconnectionPolicy.LINEAR;
             if (enableIntenalPubnubLogging)
             {
                 config.LogVerbosity = PNLogVerbosity.BODY;
@@ -235,8 +235,6 @@ namespace AcceptanceTests.Steps
             }
             config.EnableEventEngine = true;
 
-            pn = new Pubnub(config);
-            pn.PubnubUnitTest = unitTest;
 
             messageReceivedEvent = new ManualResetEvent(false);
             statusReceivedEvent = new ManualResetEvent(false);
@@ -281,6 +279,9 @@ namespace AcceptanceTests.Steps
         [When(@"I subscribe")]
         public void WhenISubscribe()
         {
+            pn = new Pubnub(config);
+            pn.PubnubUnitTest = unitTest;
+
             messageReceivedEvent = new ManualResetEvent(false);
             statusReceivedEvent = new ManualResetEvent(false);
 
@@ -289,7 +290,7 @@ namespace AcceptanceTests.Steps
                 .Channels(channel.Split(','))
                 .ChannelGroups(channelGroup.Split(','))
                 .Execute();
-            statusReceivedEvent.WaitOne ();
+            statusReceivedEvent.WaitOne (20*1000);
             if (pnStatus != null && pnStatus.Category == PNStatusCategory.PNConnectedCategory)
             {
                 //All good.
@@ -350,7 +351,8 @@ namespace AcceptanceTests.Steps
         [Given(@"a linear reconnection policy with (.*) retries")]
         public void GivenALinearReconnectionPolicyWithRetries(int retryCount)
         {
-            throw new PendingStepException();
+            config.ReconnectionPolicy = PNReconnectionPolicy.LINEAR;
+            config.ConnectionMaxRetries = retryCount;
         }
 
         [Then(@"I receive an error")]

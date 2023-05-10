@@ -92,7 +92,7 @@ namespace PubnubApi.PubnubEventEngine
 			try
 			{
 				var receivedResponse = JsonConvert.DeserializeObject<ReceiveingResponse<object>>(json);
-				if (receivedResponse != null)
+				if (receivedResponse != null && receivedResponse.Timetoken != null)
 				{
 					receiveMessages = receivedResponse.Messages;
 

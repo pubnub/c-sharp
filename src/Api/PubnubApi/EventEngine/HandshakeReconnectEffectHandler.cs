@@ -110,7 +110,7 @@ namespace PubnubApi.PubnubEventEngine
 			{
 				LogCallback?.Invoke($"OnHandshakeReconnectEffectResponseReceived Json Response = {json}");
 				var handshakeResponse = JsonConvert.DeserializeObject<HandshakeResponse>(json);
-				if (handshakeResponse != null)
+				if (handshakeResponse != null && handshakeResponse.Timetoken != null)
 				{
 					HandshakeReconnectSuccess handshakeReconnectSuccessEvent = new HandshakeReconnectSuccess();
 					handshakeReconnectSuccessEvent.SubscriptionCursor = new SubscriptionCursor();
