@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using PubnubApi.EndPoint;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -206,6 +207,7 @@ namespace PubnubApi.PubnubEventEngine
 	public class EmitMessages<T> : EffectInvocation
 	{
 		public Action<string> LogCallback { get; set; }
+		//public SubscribeOperation2<T> SubscribeOperation { get; set; }
 		public Action<PNMessageResult<object>> AnnounceMessage { get; set; }
 		public EmitMessages(List<EventType> messages)
 		{
@@ -339,7 +341,7 @@ namespace PubnubApi.PubnubEventEngine
 				State findState = States.Find((s) => s.StateType == CurrentState.StateType);
 				//State nextState;
 				StateType nextStateType;
-				if (findState != null && findState.transitions != null && findState.transitions.TryGetValue(CurrentState.EventType, out nextStateType))
+				if (findState != null && findState.transitions != null && findState.transitions.TryGetValue(e.EventType, out nextStateType))
 				{
 					//StateType nextStateType = findState.transitions[CurrentState.EventType];
 					//
@@ -373,6 +375,10 @@ namespace PubnubApi.PubnubEventEngine
 								else if (effect is EmitMessages<object>)
 								{
 									((EmitMessages<object>)effect).Announce<string>();
+								}
+								else if (effect is EmitMessages<string>)
+								{
+									((EmitMessages<string>)effect).Announce<string>();
 								}
 								System.Diagnostics.Debug.WriteLine("Found effect " + effect.Effectype);
 								Dispatcher.dispatch(effect.Effectype, this.Context);

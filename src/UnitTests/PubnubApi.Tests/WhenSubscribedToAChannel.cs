@@ -181,6 +181,7 @@ namespace PubNubMessaging.Tests
             server.RunOnHttps(ssl);
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
+            ManualResetEvent subscribeMessageManualEvent = new ManualResetEvent(false);
 
             SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
                 (o, m) => 
@@ -189,11 +190,11 @@ namespace PubNubMessaging.Tests
                     if (m != null)
                     {
                         Debug.WriteLine("SubscribeCallback: PNMessageResult: {0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(m.Message));
-                        if (pubnub.JsonPluggableLibrary.SerializeToJsonString(publishedMessage) == m.Message.ToString())
+                        if (pubnub.JsonPluggableLibrary.SerializeToJsonString(publishedMessage) == pubnub.JsonPluggableLibrary.SerializeToJsonString(m.Message))
                         {
-                            receivedSubscribedMessage = true;
+                            internalReceivedMessage = true;
                         }
-                        subscribeManualEvent.Set();
+                        subscribeMessageManualEvent.Set();
                     }
                 },
                 (o, p) => {
@@ -279,6 +280,7 @@ namespace PubNubMessaging.Tests
 
             if (!receivedErrorMessage)
             {
+                internalReceivedMessage = false;
                 ManualResetEvent publishManualEvent = new ManualResetEvent(false);
                 pubnub.Publish().Channel(channel).Message(publishedMessage)
                         .Execute(new PNPublishResultExt((r, s) =>
@@ -291,13 +293,18 @@ namespace PubNubMessaging.Tests
                         }));
 
                 publishManualEvent.WaitOne(manualResetEventWaitTimeout);
+                receivedMessage = internalReceivedMessage;
+
+                subscribeMessageManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+                Thread.Sleep(1000);
 
                 pubnub.Unsubscribe<string>().Channels(new[] { channel }).Execute();
 
                 Thread.Sleep(1000);
             }
 
-            receivedMessage = receivedSubscribedMessage;
+            receivedMessage = internalReceivedMessage;
             pubnub.RemoveListener(listenerSubCallack);
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
