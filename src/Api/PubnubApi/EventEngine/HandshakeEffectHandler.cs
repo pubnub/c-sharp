@@ -14,6 +14,14 @@ namespace PubnubApi.PubnubEventEngine
 		[JsonProperty("m")]
 		public object[]? Messages { get; set; }
 	}
+	public class HandshakeError
+	{
+		[JsonProperty("status")]
+		public int Status { get; set; }
+
+		[JsonProperty("error")]
+		public string ErrorMessage { get; set; }
+	}
 
 	public class Timetoken
 	{
@@ -55,7 +63,7 @@ namespace PubnubApi.PubnubEventEngine
 			this.emitter = emitter;
 			cancellationTokenSource = new CancellationTokenSource();
 		}
-		public async void Start(ExtendedState context)
+		public async void Start(ExtendedState context, EventType eventType)
 		{
 			extendedState = context;
 			await Task.Factory.StartNew(() => {	});
@@ -149,49 +157,5 @@ namespace PubnubApi.PubnubEventEngine
         }
     }
 
-	public class HandshakeFailedEffectHandler : IEffectInvocationHandler
-	{
-		EventEmitter emitter;
-		//public EffectInvocationType InvocationType { get; set; }
-		private ExtendedState extendedState { get; set;}
-		public Action<string> LogCallback { get; set; }
-
-		CancellationTokenSource? cancellationTokenSource;
-
-		public HandshakeFailedEffectHandler(EventEmitter emitter)
-		{
-			this.emitter = emitter;
-			cancellationTokenSource = new CancellationTokenSource();
-		}
-
-		public async void Start(ExtendedState context)
-		{
-			extendedState = context;
-			await Task.Factory.StartNew(() => {	});
-			if (cancellationTokenSource != null && cancellationTokenSource.Token.CanBeCanceled) {
-				Cancel();
-			}
-
-			LogCallback?.Invoke("HandshakeFailedEffectHandler - EventType.Handshake");
-			Reconnect reconnectEvent = new Reconnect();
-			reconnectEvent.Name = "RECONNECT";
-			reconnectEvent.EventType = EventType.Reconnect;
-			
-			emitter.emit(reconnectEvent);
-		}
-
-		public void Cancel()
-		{
-			if (cancellationTokenSource != null)
-			{
-				LogCallback?.Invoke($"HandshakeFailedEffectHandler - cancellationTokenSource - cancellion attempted.");
-				cancellationTokenSource.Cancel();
-			}
-		}
-
-        public PNStatus GetPNStatus()
-        {
-            throw new NotImplementedException();
-        }
-    }
+	
 }

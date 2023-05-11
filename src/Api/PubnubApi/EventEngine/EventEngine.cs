@@ -395,7 +395,7 @@ namespace PubnubApi.PubnubEventEngine
 							foreach(var entry in CurrentState.EntryList)
 							{
 								PubnubUnitTest?.EventTypeList?.Add(new KeyValuePair<string, string>("invocation", entry.Name));
-								entry.Handler?.Start(Context);
+								entry.Handler?.Start(Context, e.EventType);
 							}
 						}
 
@@ -534,6 +534,10 @@ namespace PubnubApi.PubnubEventEngine
             handshakeReconnectSuccessEmitStatus.Name = "EMIT_STATUS";
             handshakeReconnectSuccessEmitStatus.Effectype = EventType.HandshakeReconnectSuccess;
 
+			EmitStatus handshakeReconnectFailureEmitStatus = new EmitStatus();
+            handshakeReconnectFailureEmitStatus.Name = "EMIT_STATUS";
+            handshakeReconnectFailureEmitStatus.Effectype = EventType.HandshakeReconnectFailure;
+
             EffectInvocation handshakeReconnectInvocation = new HandshakeReconnect();
             handshakeReconnectInvocation.Name = "HANDSHAKE_RECONNECT";
             handshakeReconnectInvocation.Effectype = EventType.HandshakeReconnect;
@@ -545,7 +549,11 @@ namespace PubnubApi.PubnubEventEngine
             #region StateType.HandshakeReconnecting
             CreateState(StateType.HandshakeReconnecting)
                 .On(EventType.SubscriptionChanged, StateType.HandshakeReconnecting)
-                .On(EventType.HandshakeReconnectFailure, StateType.HandshakeReconnecting)
+                .On(EventType.HandshakeReconnectFailure, StateType.HandshakeReconnecting, new List<EffectInvocation>()
+                            { 
+                                handshakeReconnectFailureEmitStatus
+                            }
+				)
                 .On(EventType.Disconnect, StateType.HandshakeStopped)
                 .On(EventType.HandshakeReconnectGiveUp, StateType.HandshakeFailed)
                 .On(EventType.HandshakeReconnectSuccess, StateType.Receiving, new List<EffectInvocation>()

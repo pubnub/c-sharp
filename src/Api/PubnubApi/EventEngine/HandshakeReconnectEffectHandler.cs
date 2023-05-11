@@ -48,7 +48,7 @@ namespace PubnubApi.PubnubEventEngine
 			cancellationTokenSource = new CancellationTokenSource();
 		}
 
-        public async void Start(ExtendedState context)
+        public async void Start(ExtendedState context, EventType eventType)
 		{
 			extendedState = context;
 			await Task.Factory.StartNew(() => {	});
@@ -90,7 +90,7 @@ namespace PubnubApi.PubnubEventEngine
 			}
 			else
 			{
-				PrepareFailurePNStatus();
+				PrepareFailurePNStatus(new HandshakeError() { Status = 400 });
 				PrepareAndEmitHandshakeReconnectGiveupEvent(null);
 			}
 		}
@@ -137,10 +137,11 @@ namespace PubnubApi.PubnubEventEngine
 				}
 				else
 				{
+					var handshakeError = JsonConvert.DeserializeObject<HandshakeError>(json);
 					extendedState.Attempts++;
-					PrepareFailurePNStatus();
+					PrepareFailurePNStatus(handshakeError);
 
-					if (MaxRetries != -1 && extendedState.Attempts >= MaxRetries)
+					if (MaxRetries != -1 && extendedState.Attempts > MaxRetries)
 					{
 						LogCallback?.Invoke($"Attempt: {extendedState.Attempts}; OnHandshakeReconnectEffectResponseReceived - EventType.HandshakeReconnectGiveUp");
 						PrepareAndEmitHandshakeReconnectGiveupEvent(null);
@@ -155,14 +156,16 @@ namespace PubnubApi.PubnubEventEngine
 			catch (Exception ex)
 			{
 				extendedState.Attempts++;
+				PrepareFailurePNStatus(new HandshakeError() { Status = 400 });
+
 				if (MaxRetries != -1 && extendedState.Attempts >= MaxRetries)
 				{
 					LogCallback?.Invoke($"Attempt: {extendedState.Attempts}; OnHandshakeReconnectEffectResponseReceived - EventType.HandshakeReconnectGiveUp");
 					PrepareAndEmitHandshakeReconnectGiveupEvent(null);
+					
 				}
 				else
 				{
-					PrepareFailurePNStatus();
 					LogCallback?.Invoke($"Attempt: {extendedState.Attempts}; OnHandshakeReconnectEffectResponseReceived - EventType.HandshakeReconnectFailure");
 					PrepareAndEmitHandshakeReconnectFailureEvent(ex);
 				}
@@ -180,9 +183,10 @@ namespace PubnubApi.PubnubEventEngine
 			}
 		}
 
-		private void PrepareFailurePNStatus()
-		{
+		private void PrepareFailurePNStatus(HandshakeError error)
+        {
 			pnStatus = new PNStatus();
+			pnStatus.StatusCode = (error.Status != 0) ? error.Status : 504;
 			pnStatus.Operation = PNOperationType.PNSubscribeOperation;
 			pnStatus.AffectedChannels = extendedState.Channels;
 			pnStatus.AffectedChannelGroups = extendedState.ChannelGroups;

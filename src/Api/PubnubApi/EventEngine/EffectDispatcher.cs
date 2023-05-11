@@ -18,7 +18,7 @@ namespace PubnubApi.PubnubEventEngine
 			if (effectActionMap.TryGetValue(effect, out handler)) {
 				if (handler != null)
 				{
-					await Task.Factory.StartNew(()=> handler.Start(stateContext)).ConfigureAwait(false);;
+					await Task.Factory.StartNew(()=> handler.Start(stateContext, effect)).ConfigureAwait(false);;
 				}
 			}
 		}

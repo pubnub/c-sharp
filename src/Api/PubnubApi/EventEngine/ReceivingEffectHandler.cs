@@ -71,7 +71,7 @@ namespace PubnubApi.PubnubEventEngine
 			cancellationTokenSource = new CancellationTokenSource();
 		}
 
-		public async void Start(ExtendedState context)
+		public async void Start(ExtendedState context, EventType eventType)
 		{
 			extendedState = context;
 			await Task.Factory.StartNew(() => { });

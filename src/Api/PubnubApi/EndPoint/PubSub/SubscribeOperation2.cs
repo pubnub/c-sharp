@@ -57,7 +57,6 @@ namespace PubnubApi.EndPoint
 			var handshakeEffectHandler = new HandshakeEffectHandler(eventEmitter);
             handshakeEffectHandler.LogCallback = LogCallback;
             handshakeEffectHandler.HandshakeRequested += HandshakeEffect_HandshakeRequested;
-
             #region Handshake state invocation and emit status
             State handshakingState = pnEventEngine.States
                 .First(s => s.StateType == StateType.Handshaking);
@@ -90,11 +89,18 @@ namespace PubnubApi.EndPoint
             handshakeReconnectEffectHandler.MaxRetries = config.ConnectionMaxRetries;
             handshakeReconnectEffectHandler.LogCallback = LogCallback;
             handshakeReconnectEffectHandler.HandshakeReconnectRequested += HandshakeReconnectEffect_HandshakeRequested;
-
             #region HandshakeReconnecting state invocation and emit status
             State handshakeReconnectingState = pnEventEngine.States
                 .First(s => s.StateType == StateType.HandshakeReconnecting);
             foreach(var effectInvocation in handshakeReconnectingState.EffectInvocationsList[EventType.HandshakeReconnectSuccess])
+            {
+                if (effectInvocation is EmitStatus)
+                {
+                    ((EmitStatus)effectInvocation).AnnounceStatus = Announce;
+                    ((EmitStatus)effectInvocation).Handler = handshakeReconnectEffectHandler;
+                }
+            }
+            foreach(var effectInvocation in handshakeReconnectingState.EffectInvocationsList[EventType.HandshakeReconnectFailure])
             {
                 if (effectInvocation is EmitStatus)
                 {
@@ -118,11 +124,31 @@ namespace PubnubApi.EndPoint
             }
             #endregion
             
+            var handshakeFailedEffectHandler = new HandshakeFailedEffectHandler(eventEmitter);
+            handshakeFailedEffectHandler.LogCallback = LogCallback;
+            #region HandshakeFailed state invocation and emit status
+            State handshakeFailedState = pnEventEngine.States
+                .First(s => s.StateType == StateType.HandshakeFailed);
+            foreach(var effectInvocation in handshakeFailedState.EntryList)
+            {
+                if (effectInvocation is HandshakeFailed)
+                {
+                    ((HandshakeFailed)effectInvocation).Handler = handshakeFailedEffectHandler;
+                }
+            }
+            foreach(var effectInvocation in handshakeFailedState.ExitList)
+            {
+                if (effectInvocation is CancelHandshakeFailed)
+                {
+                    ((CancelHandshakeFailed)effectInvocation).Handler = handshakeFailedEffectHandler;
+                }
+            }
+            #endregion
+
             var receivingEffectHandler = new ReceivingEffectHandler<object>(eventEmitter);
             receivingEffectHandler.ReconnectionPolicy = config.ReconnectionPolicy;
             receivingEffectHandler.LogCallback = LogCallback;
             receivingEffectHandler.ReceiveRequested += ReceivingEffect_ReceiveRequested;
-
             #region Receiving state invocation and emit status
             State receivingState = pnEventEngine.States
                 .First(s => s.StateType == StateType.Receiving);

@@ -24,7 +24,7 @@ namespace PubnubApi.PubnubEventEngine
 
 	public interface IEffectInvocationHandler
 	{
-		void Start(ExtendedState context);
+		void Start(ExtendedState context, EventType eventType);
 		void Cancel();
 		PNStatus GetPNStatus();
 	}

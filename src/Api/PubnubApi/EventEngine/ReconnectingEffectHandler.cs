@@ -11,7 +11,7 @@ namespace PubnubApi.PubnubEventEngine
 			this.eventEmitter = emitter;
 		}
 
-		public void Start(ExtendedState context)    // TODO: Implementation of retry  getDelay() as per policy
+		public void Start(ExtendedState context, EventType eventType)    // TODO: Implementation of retry  getDelay() as per policy
 		{
 			var evnt = new Reconnect();
 			evnt.EventPayload.Timetoken = context.Timetoken;

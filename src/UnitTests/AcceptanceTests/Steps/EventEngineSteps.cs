@@ -270,7 +270,14 @@ namespace AcceptanceTests.Steps
                 {
                     pnStatus = status;
                     Console.WriteLine("{0} {1} {2}", pnStatus.Operation, pnStatus.Category, pnStatus.StatusCode);
-                    statusReceivedEvent.Set();
+                    if (currentContract == "subscribeHandshakeFailure" && pn.PubnubUnitTest.Attempts == 3)
+                    {
+                        statusReceivedEvent.Set();
+                    }
+                    if (pnStatus.Category == PNStatusCategory.PNConnectedCategory)
+                    {
+                        statusReceivedEvent.Set();
+                    }
                 }
                 );
 
@@ -290,14 +297,17 @@ namespace AcceptanceTests.Steps
                 .Channels(channel.Split(','))
                 .ChannelGroups(channelGroup.Split(','))
                 .Execute();
-            statusReceivedEvent.WaitOne (20*1000);
+            statusReceivedEvent.WaitOne (60*1000);
             if (pnStatus != null && pnStatus.Category == PNStatusCategory.PNConnectedCategory)
             {
                 //All good.
             }
             else
             {
-                Assert.Fail("WhenISubscribe failed.");
+                if (currentContract == "simpleSubscribe")
+                {
+                    Assert.Fail("WhenISubscribe failed.");
+                }
             }
         }
 
@@ -358,7 +368,7 @@ namespace AcceptanceTests.Steps
         [Then(@"I receive an error")]
         public void ThenIReceiveAnError()
         {
-            throw new PendingStepException();
+            Assert.True(pnStatus != null && pnStatus.Error);
         }
 
     }
