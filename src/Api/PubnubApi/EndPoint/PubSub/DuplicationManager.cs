@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+#if !NET35 && !NET40
+using System.Collections.Concurrent;
+#endif
 
 namespace PubnubApi.EndPoint
 {
@@ -34,9 +38,13 @@ namespace PubnubApi.EndPoint
         {
             if (HashHistory.Count >= pubnubConfig.MaximumMessagesCacheSize)
             {
-                HashHistory.Remove(HashHistory.Aggregate((l,r)=> l.Value < r.Value ? l : r).Key);
+                long keyValue;
+                if (!HashHistory.TryRemove(HashHistory.Aggregate((l,r)=> l.Value < r.Value ? l : r).Key, out keyValue))
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} DuplicationManager => AddEntry => TryRemove is false", DateTime.Now.ToString(System.Globalization.CultureInfo.InvariantCulture)), PNLogVerbosity.BODY);
+                }
             }
-            HashHistory.Add(this.GetSubscribeMessageHashKey(message),Pubnub.TranslateDateTimeToPubnubUnixNanoSeconds(DateTime.UtcNow));
+            HashHistory.TryAdd(this.GetSubscribeMessageHashKey(message),Pubnub.TranslateDateTimeToPubnubUnixNanoSeconds(DateTime.UtcNow));
         }
 
         public void ClearHistory()

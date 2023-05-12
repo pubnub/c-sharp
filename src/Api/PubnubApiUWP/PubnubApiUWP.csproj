@@ -676,6 +676,10 @@ Added TcpKeepAlive and ConnectionLimit to improve performance.</PackageReleaseNo
     </PackageReference>
     <PackageReference Include="PeterO.Cbor" Version="4.5.2" />
     <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.0" />
+    <PackageReference Include="System.Collections.Concurrent">
+      <Version>4.3.0</Version>
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="pubnub.snk" />

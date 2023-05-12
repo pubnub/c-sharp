@@ -5,6 +5,9 @@ using PubnubApi.Interface;
 using System.Net;
 using System.Threading.Tasks;
 using System.Threading;
+#if !NET35 && !NET40
+using System.Collections.Concurrent;
+#endif
 
 namespace PubnubApi.EndPoint
 {

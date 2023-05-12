@@ -105,6 +105,10 @@ Added TcpKeepAlive and ConnectionLimit to improve performance.</PackageReleaseNo
     <PackageReference Include="System.ValueTuple" Version="4.4.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="System.Collections.Concurrent">
+      <Version>4.3.0</Version>
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
@@ -116,6 +120,10 @@ Added TcpKeepAlive and ConnectionLimit to improve performance.</PackageReleaseNo
     <PackageReference Include="System.ValueTuple" Version="4.4.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="System.Collections.Concurrent">
+      <Version>4.3.0</Version>
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
@@ -125,6 +133,10 @@ Added TcpKeepAlive and ConnectionLimit to improve performance.</PackageReleaseNo
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
     <PackageReference Include="System.ValueTuple" Version="4.4.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Collections.Concurrent">
+      <Version>4.3.0</Version>
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
   </ItemGroup>

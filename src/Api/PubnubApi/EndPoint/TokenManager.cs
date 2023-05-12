@@ -8,6 +8,9 @@ using System.Reflection;
 using Newtonsoft.Json;
 using PeterO.Cbor;
 using System.Globalization;
+#if !NET35 && !NET40
+using System.Collections.Concurrent;
+#endif
 
 namespace PubnubApi.EndPoint
 {
@@ -31,7 +34,7 @@ namespace PubnubApi.EndPoint
             this.pubnubInstanceId = instanceId;
             if (!dToken.ContainsKey(instanceId))
             {
-                dToken.GetOrAdd(instanceId, null);
+                dToken.TryAdd(instanceId, null);
             }
             
         }

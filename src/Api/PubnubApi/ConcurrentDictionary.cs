@@ -5,6 +5,7 @@ using System.Text;
 
 namespace PubnubApi
 {
+#if NET35 || NET40
     public sealed class ConcurrentDictionary<TKey, TValue> : IDictionary<TKey, TValue>
     {
         private readonly object syncRoot = new object();
@@ -17,6 +18,30 @@ namespace PubnubApi
             lock (syncRoot)
             {
                 d.Add(key, value);
+            }
+        }
+
+        public bool TryAdd(TKey key, TValue value)
+        {
+            if (object.Equals(key, default(TKey)))
+            {
+                throw new ArgumentNullException(nameof(key), "invalid.");
+            }
+
+            lock (syncRoot)
+            {
+                TValue findValue;
+
+                if (d.TryGetValue(key, out findValue))
+                {
+                    return false;
+                }
+                else
+                {
+                    d.Add(key, value);
+                }
+
+                return true;
             }
         }
 
@@ -233,4 +258,5 @@ namespace PubnubApi
 
         #endregion
     }
+#endif
 }
