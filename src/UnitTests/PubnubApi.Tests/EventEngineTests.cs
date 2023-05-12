@@ -37,6 +37,7 @@ namespace PubNubMessaging.Tests
         [Test]
         public void TestWhenStateTypeUnsubscribed()
         {
+            //Unsubscribed => SubscriptionChanged  => Handshaking
             pnEventEngine.CurrentState = new State(StateType.Unsubscribed) { EventType = EventType.SubscriptionChanged };
             State currentHandshakingState = pnEventEngine.NextState();
             if (currentHandshakingState.StateType == StateType.Handshaking) 
@@ -49,7 +50,7 @@ namespace PubNubMessaging.Tests
                 return;
             }
 
-            //Unsubscribed => Subscription_Restored  => Receiving
+            //Unsubscribed => SubscriptionRestored  => Receiving
             pnEventEngine.CurrentState = new State(StateType.Unsubscribed) { EventType = EventType.SubscriptionRestored };
             State currentReceiveState = pnEventEngine.NextState();
             if (currentReceiveState.StateType == StateType.Receiving) 
@@ -67,7 +68,7 @@ namespace PubNubMessaging.Tests
         [Test]
         public void TestWhenStateTypeHandshaking()
         {
-            //Handshaking => Subscription_Changed  => Handshaking
+            //Handshaking => SubscriptionChanged  => Handshaking
             pnEventEngine.CurrentState = new State(StateType.Handshaking) { EventType = EventType.SubscriptionChanged };
             State currentHandshakingState = pnEventEngine.NextState();
             if (currentHandshakingState.StateType == StateType.Handshaking) 
@@ -80,7 +81,7 @@ namespace PubNubMessaging.Tests
                 return;
             }
 
-            //Handshaking => Handshake_Failure  => HandshakeReconnecting
+            //Handshaking => HandshakeFailure  => HandshakeReconnecting
             pnEventEngine.CurrentState = new State(StateType.Handshaking) { EventType = EventType.HandshakeFailure };
             State currentHandshakeReconnectingState = pnEventEngine.NextState();
             if (currentHandshakeReconnectingState.StateType == StateType.HandshakeReconnecting) 
@@ -106,7 +107,7 @@ namespace PubNubMessaging.Tests
                 return;
             }
 
-            //Handshaking => Handshake_Success  => Receiving
+            //Handshaking => HandshakeSuccess  => Receiving
             pnEventEngine.CurrentState = new State(StateType.Handshaking) { EventType = EventType.HandshakeSuccess };
             State currentReceivingState = pnEventEngine.NextState();
             if (currentReceivingState.StateType == StateType.Receiving) 
@@ -119,7 +120,7 @@ namespace PubNubMessaging.Tests
                 return;
             }
 
-            //Handshaking => Subscription_Restored  => Receiving
+            //Handshaking => SubscriptionRestored  => Receiving
             pnEventEngine.CurrentState = new State(StateType.Handshaking) { EventType = EventType.SubscriptionRestored };
             currentReceivingState = pnEventEngine.NextState();
             if (currentReceivingState.StateType == StateType.Receiving) 
@@ -136,16 +137,16 @@ namespace PubNubMessaging.Tests
         [Test]
         public void TestWhenStateTypeHandshakeReconnecting()
         {
-            //HandshakeReconnecting => Subscription_Changed  => HandshakeReconnecting
+            //HandshakeReconnecting => SubscriptionChanged  => Handshaking
             pnEventEngine.CurrentState = new State(StateType.HandshakeReconnecting) { EventType = EventType.SubscriptionChanged };
             State currentNewState = pnEventEngine.NextState();
-            if (currentNewState.StateType == StateType.HandshakeReconnecting) 
+            if (currentNewState.StateType == StateType.Handshaking) 
             {
                 //Continue for further tests on transition
             }
             else
             {
-                Assert.Fail("HandshakeReconnecting + SubscriptionChanged => HandshakeReconnecting");
+                Assert.Fail("HandshakeReconnecting + SubscriptionChanged => Handshaking");
                 return;
             }
 
@@ -259,34 +260,21 @@ namespace PubNubMessaging.Tests
                 Assert.Fail("HandshakeFailed + Reconnect => Handshaking");
                 return;
             }
-
-            //HandshakeFailed => HandshakeReconnectRetry  => Handshaking
-            pnEventEngine.CurrentState = new State(StateType.HandshakeFailed) { EventType = EventType.HandshakeReconnectRetry };
-            currentNewState = pnEventEngine.NextState();
-            if (currentNewState.StateType == StateType.HandshakeReconnecting) 
-            {
-                //Continue for further tests on transition
-            }
-            else
-            {
-                Assert.Fail("HandshakeFailed + HandshakeReconnectRetry => HandshakeReconnecting");
-                return;
-            }
         }
 
         [Test]
         public void TestWhenStateTypeHandshakeStopped()
         {
-            //HandshakeStopped => Reconnect  => HandshakeReconnecting
+            //HandshakeStopped => Reconnect  => Handshaking
             pnEventEngine.CurrentState = new State(StateType.HandshakeStopped) { EventType = EventType.Reconnect };
             State currentNewState = pnEventEngine.NextState();
-            if (currentNewState.StateType == StateType.HandshakeReconnecting) 
+            if (currentNewState.StateType == StateType.Handshaking) 
             {
                 //Continue for further tests on transition
             }
             else
             {
-                Assert.Fail("HandshakeStopped + Reconnect => HandshakeReconnecting");
+                Assert.Fail("HandshakeStopped + Reconnect => Handshaking");
                 return;
             }
         }
@@ -364,29 +352,29 @@ namespace PubNubMessaging.Tests
         [Test]
         public void TestWhenStateTypeReceiveReconnecting()
         {
-            //ReceiveReconnecting => SubscriptionChanged  => ReceiveReconnecting
+            //ReceiveReconnecting => SubscriptionChanged  => Receiving
             pnEventEngine.CurrentState = new State(StateType.ReceiveReconnecting) { EventType = EventType.SubscriptionChanged };
             State currentNewState = pnEventEngine.NextState();
-            if (currentNewState.StateType == StateType.ReceiveReconnecting) 
+            if (currentNewState.StateType == StateType.Receiving) 
             {
                 //Continue for further tests on transition
             }
             else
             {
-                Assert.Fail("ReceiveReconnecting + SubscriptionChanged => ReceiveReconnecting");
+                Assert.Fail("ReceiveReconnecting + SubscriptionChanged => Receiving");
                 return;
             }
 
-            //ReceiveReconnecting => SubscriptionRestored  => ReceiveReconnecting
+            //ReceiveReconnecting => SubscriptionRestored  => Receiving
             pnEventEngine.CurrentState = new State(StateType.ReceiveReconnecting) { EventType = EventType.SubscriptionRestored };
             currentNewState = pnEventEngine.NextState();
-            if (currentNewState.StateType == StateType.ReceiveReconnecting) 
+            if (currentNewState.StateType == StateType.Receiving) 
             {
                 //Continue for further tests on transition
             }
             else
             {
-                Assert.Fail("ReceiveReconnecting + SubscriptionRestored => ReceiveReconnecting");
+                Assert.Fail("ReceiveReconnecting + SubscriptionRestored => Receiving");
                 return;
             }
 
@@ -434,55 +422,42 @@ namespace PubNubMessaging.Tests
         [Test]
         public void TestWhenStateTypeReceiveFailed()
         {
-            //ReceiveFailed => SubscriptionChanged  => ReceiveReconnecting
+            //ReceiveFailed => SubscriptionChanged  => Receiving
             pnEventEngine.CurrentState = new State(StateType.ReceiveFailed) { EventType = EventType.SubscriptionChanged };
             State currentNewState = pnEventEngine.NextState();
-            if (currentNewState.StateType == StateType.ReceiveReconnecting) 
+            if (currentNewState.StateType == StateType.Receiving) 
             {
                 //Continue for further tests on transition
             }
             else
             {
-                Assert.Fail("ReceiveFailed + SubscriptionChanged => ReceiveReconnecting");
+                Assert.Fail("ReceiveFailed + SubscriptionChanged => Receiving");
                 return;
             }
 
-            //ReceiveFailed => SubscriptionRestored  => ReceiveReconnecting
+            //ReceiveFailed => SubscriptionRestored  => Receiving
             pnEventEngine.CurrentState = new State(StateType.ReceiveFailed) { EventType = EventType.SubscriptionRestored };
             currentNewState = pnEventEngine.NextState();
-            if (currentNewState.StateType == StateType.ReceiveReconnecting) 
+            if (currentNewState.StateType == StateType.Receiving) 
             {
                 //Continue for further tests on transition
             }
             else
             {
-                Assert.Fail("ReceiveFailed + SubscriptionRestored => ReceiveReconnecting");
+                Assert.Fail("ReceiveFailed + SubscriptionRestored => Receiving");
                 return;
             }
 
-            //ReceiveFailed => ReceiveReconnectRetry  => ReceiveReconnecting
-            pnEventEngine.CurrentState = new State(StateType.ReceiveFailed) { EventType = EventType.ReceiveReconnectRetry };
-            currentNewState = pnEventEngine.NextState();
-            if (currentNewState.StateType == StateType.ReceiveReconnecting) 
-            {
-                //Continue for further tests on transition
-            }
-            else
-            {
-                Assert.Fail("ReceiveFailed + ReceiveReconnectRetry => ReceiveReconnecting");
-                return;
-            }
-
-            //ReceiveFailed => Reconnect  => ReceiveReconnecting
+            //ReceiveFailed => Reconnect  => Receiving
             pnEventEngine.CurrentState = new State(StateType.ReceiveFailed) { EventType = EventType.Reconnect };
             currentNewState = pnEventEngine.NextState();
-            if (currentNewState.StateType == StateType.ReceiveReconnecting) 
+            if (currentNewState.StateType == StateType.Receiving) 
             {
                 //Continue for further tests on transition
             }
             else
             {
-                Assert.Fail("ReceiveFailed + Reconnect => ReceiveReconnecting");
+                Assert.Fail("ReceiveFailed + Reconnect => Receiving");
                 return;
             }
         }
@@ -490,16 +465,16 @@ namespace PubNubMessaging.Tests
         [Test]
         public void TestWhenStateTypeReceiveStopped()
         {
-            //ReceiveStopped => Reconnect  => ReceiveReconnecting
+            //ReceiveStopped => Reconnect  => Receiving
             pnEventEngine.CurrentState = new State(StateType.ReceiveStopped) { EventType = EventType.Reconnect };
             State currentNewState = pnEventEngine.NextState();
-            if (currentNewState.StateType == StateType.ReceiveReconnecting) 
+            if (currentNewState.StateType == StateType.Receiving) 
             {
                 //Continue for further tests on transition
             }
             else
             {
-                Assert.Fail("ReceiveStopped + Reconnect => ReceiveReconnecting");
+                Assert.Fail("ReceiveStopped + Reconnect => Receiving");
                 return;
             }
 

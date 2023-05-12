@@ -68,10 +68,6 @@ namespace PubnubApi.PubnubEventEngine
 	{
 		public PubnubError Reason { get; set;}
 	}
-	public class HandshakeReconnectRetry : Event
-	{
-
-	}
 	public class ReceiveSuccess : Event
 	{
 		public List<EventType> Messages { get; set; }
@@ -93,10 +89,6 @@ namespace PubnubApi.PubnubEventEngine
 	{
 		public List<EventType> Messages { get; set; }
 		public SubscriptionCursor SubscriptionCursor { get; set; }
-	}
-	public class ReceiveReconnectRetry : Event
-	{
-
 	}
 	public class Fail : Event
 	{
@@ -267,13 +259,11 @@ namespace PubnubApi.PubnubEventEngine
 		ReceiveReconnectSuccess,
 		ReceiveReconnectFailure,
 		ReceiveReconnectGiveUp,
-		ReceiveReconnectRetry,
 		HandshakeReconnect,
 		CancelHandshakeReconnect,
 		HandshakeReconnectSuccess,
 		HandshakeReconnectFailure,
 		HandshakeReconnectGiveUp,
-		HandshakeReconnectRetry,
 		ReconnectionFailed,
 		Disconnect,
 		Reconnect
@@ -548,7 +538,7 @@ namespace PubnubApi.PubnubEventEngine
             #endregion
             #region StateType.HandshakeReconnecting
             CreateState(StateType.HandshakeReconnecting)
-                .On(EventType.SubscriptionChanged, StateType.HandshakeReconnecting)
+                .On(EventType.SubscriptionChanged, StateType.Handshaking)
                 .On(EventType.HandshakeReconnectFailure, StateType.HandshakeReconnecting, new List<EffectInvocation>()
                             { 
                                 handshakeReconnectFailureEmitStatus
@@ -585,7 +575,6 @@ namespace PubnubApi.PubnubEventEngine
             #endregion
             #region StateType.HandshakeFailed
             CreateState(StateType.HandshakeFailed)
-                .On(EventType.HandshakeReconnectRetry, StateType.HandshakeReconnecting)
                 .On(EventType.SubscriptionChanged, StateType.Handshaking)
                 .On(EventType.Reconnect, StateType.Handshaking)
                 .On(EventType.SubscriptionRestored, StateType.Receiving)
@@ -605,11 +594,7 @@ namespace PubnubApi.PubnubEventEngine
             #endregion
             #region StateType.HandshakeStopped
             CreateState(StateType.HandshakeStopped)
-                .On(EventType.Reconnect, StateType.HandshakeReconnecting)
-                .On(EventType.SubscriptionChanged, StateType.Handshaking)
-                .On(EventType.HandshakeSuccess, StateType.Receiving)
-                .On(EventType.HandshakeFailure, StateType.HandshakeReconnecting)
-                .On(EventType.SubscriptionRestored, StateType.Receiving);
+                .On(EventType.Reconnect, StateType.Handshaking);
 			#endregion
 
             #region Receiving Effect Invocations and Emit Status
@@ -665,10 +650,9 @@ namespace PubnubApi.PubnubEventEngine
             #endregion
             #region StateType.ReceiveFailed
             CreateState(StateType.ReceiveFailed)
-                .On(EventType.SubscriptionChanged, StateType.ReceiveReconnecting)
-                .On(EventType.SubscriptionRestored, StateType.ReceiveReconnecting)
-                .On(EventType.ReceiveReconnectRetry, StateType.ReceiveReconnecting)
-                .On(EventType.Reconnect, StateType.ReceiveReconnecting);
+				.On(EventType.SubscriptionChanged, StateType.Receiving)
+				.On(EventType.SubscriptionRestored, StateType.Receiving)
+                .On(EventType.Reconnect, StateType.Receiving);
             #endregion
 
             #region ReceiveReconnecting Effect Invocations and Emit Status
@@ -697,9 +681,9 @@ namespace PubnubApi.PubnubEventEngine
             #endregion
             #region StateType.ReceiveReconnecting
             CreateState(StateType.ReceiveReconnecting)
-                .On(EventType.SubscriptionChanged, StateType.ReceiveReconnecting)
+                .On(EventType.SubscriptionChanged, StateType.Receiving)
                 .On(EventType.ReceiveReconnectFailure, StateType.ReceiveReconnecting)
-                .On(EventType.SubscriptionRestored, StateType.ReceiveReconnecting)
+                .On(EventType.SubscriptionRestored, StateType.Receiving)
                 .On(EventType.ReceiveReconnectSuccess, StateType.Receiving, new List<EffectInvocation>()
                             { 
                                 receiveReconnectEmitStatus,
@@ -732,7 +716,7 @@ namespace PubnubApi.PubnubEventEngine
             #endregion
             #region StateType.ReceiveStopped
             CreateState(StateType.ReceiveStopped)
-                .On(EventType.Reconnect, StateType.ReceiveReconnecting);
+                .On(EventType.Reconnect, StateType.Receiving);
             #endregion
 
             System.Diagnostics.Debug.WriteLine("EventEngine Setup done.");
