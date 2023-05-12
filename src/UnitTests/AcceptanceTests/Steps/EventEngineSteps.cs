@@ -288,6 +288,7 @@ namespace AcceptanceTests.Steps
         {
             pn = new Pubnub(config);
             pn.PubnubUnitTest = unitTest;
+            pn.PubnubUnitTest.EventTypeList?.Clear();
 
             messageReceivedEvent = new ManualResetEvent(false);
             statusReceivedEvent = new ManualResetEvent(false);
@@ -336,6 +337,11 @@ namespace AcceptanceTests.Steps
             if (pn.PubnubUnitTest == null)
             {
                 Assert.Fail();
+            }
+            System.Diagnostics.Debug.WriteLine($"COUNT = {pn.PubnubUnitTest.EventTypeList.Count} ");
+            for (int i = 0; i < pn.PubnubUnitTest.EventTypeList.Count(); i++)
+            {
+                System.Diagnostics.Debug.WriteLine($"{pn.PubnubUnitTest.EventTypeList[i].Key} - {pn.PubnubUnitTest.EventTypeList[i].Value} ");
             }
             IEnumerable<SubscribeResponseRow> expectedRowSet =  table.CreateSet<SubscribeResponseRow>();
             Assert.True(pn.PubnubUnitTest.EventTypeList.Count() >= expectedRowSet?.Count());

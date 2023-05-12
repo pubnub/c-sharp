@@ -100,7 +100,16 @@ namespace PubnubApi.EndPoint
                     ((EmitStatus)effectInvocation).Handler = handshakeReconnectEffectHandler;
                 }
             }
-            foreach(var effectInvocation in handshakeReconnectingState.EffectInvocationsList[EventType.HandshakeReconnectFailure])
+            //TBD - Do we need to emit status/error on HandshakeReconnectFailure
+            //foreach(var effectInvocation in handshakeReconnectingState.EffectInvocationsList[EventType.HandshakeReconnectFailure])
+            //{
+                //if (effectInvocation is EmitStatus)
+                //{
+                //    ((EmitStatus)effectInvocation).AnnounceStatus = Announce;
+                //    ((EmitStatus)effectInvocation).Handler = handshakeReconnectEffectHandler;
+                //}
+            //}
+            foreach(var effectInvocation in handshakeReconnectingState.EffectInvocationsList[EventType.HandshakeReconnectGiveUp])
             {
                 if (effectInvocation is EmitStatus)
                 {
@@ -184,137 +193,6 @@ namespace PubnubApi.EndPoint
             #endregion
 
 
-            /*
-            var handshakeFailedEffectHandler = new HandshakeFailedEffectHandler(eventEmitter);
-            handshakeFailedEffectHandler.LogCallback = LogCallback;
-
-            EffectInvocation handshakeFailedInvocation = new HandshakeFailed();
-            handshakeFailedInvocation.Name = "HANDSHAKE_FAILED";
-            handshakeFailedInvocation.Effectype = EventType.HandshakeFailure;
-            handshakeFailedInvocation.Handler = handshakeFailedEffectHandler;
-
-            EffectInvocation cancelHandshakeFailedInvocation = new CancelHandshakeFailed();
-            cancelHandshakeReconnectInvocation.Name = "CANCEL_HANDSHAKE_FAILED";
-            cancelHandshakeReconnectInvocation.Effectype = EventType.CancelHandshakeFailure;
-            cancelHandshakeReconnectInvocation.Handler = handshakeFailedEffectHandler;
-
-			var reconnectionEffect = new ReconnectingEffectHandler<string>(eventEmitter);
-
-            EffectInvocation receiveReconnectInvocation = new ReceiveReconnect();
-            receiveReconnectInvocation.Name = "RECEIVE_RECONNECT";
-            receiveReconnectInvocation.Effectype = EventType.ReceiveReconnect;
-            receiveReconnectInvocation.Handler = receivingEffectHandler;
-
-            EffectInvocation cancelReceiveReconnect = new CancelReceiveReconnect();
-            cancelReceiveReconnect.Effectype = EventType.CancelReceiveMessages;
-            cancelReceiveReconnect.Handler = receivingEffectHandler;
-
-            EmitMessages<T> receiveReconnectEmitMessages = new EmitMessages<T>(null);
-            receiveReconnectEmitMessages.Name = "RECEIVE_RECONNECT_EVENTS";
-            receiveReconnectEmitMessages.LogCallback = LogCallback;
-            receiveReconnectEmitMessages.AnnounceMessage = Announce;
-            receiveReconnectEmitMessages.Effectype = EventType.ReceiveReconnectSuccess;
-            receiveReconnectEmitMessages.Handler = receivingEffectHandler;
-
-            EmitStatus receiveReconnectEmitStatus = new EmitStatus();
-            receiveReconnectEmitStatus.Name = "RECONNECT_EMIT_STATUS";
-            receiveEmitStatus.AnnounceStatus = Announce;
-            receiveEmitStatus.Effectype = EventType.ReceiveReconnectSuccess;
-            receiveEmitStatus.Handler = receivingEffectHandler;
-
-            EmitStatus receiveReconnectDisconnectEmitStatus = new EmitStatus();
-            receiveReconnectDisconnectEmitStatus.Name = "RECONNECT_DISCONNECT_STATUS";
-            receiveReconnectDisconnectEmitStatus.AnnounceStatus = Announce;
-            receiveReconnectDisconnectEmitStatus.Effectype = EventType.Disconnect;
-            receiveReconnectDisconnectEmitStatus.Handler = receivingEffectHandler;
-			
-            EmitStatus receiveReconnectGiveupEmitStatus = new EmitStatus();
-            receiveReconnectGiveupEmitStatus.Name = "RECONNECT_GIVEUP_STATUS";
-            receiveReconnectGiveupEmitStatus.AnnounceStatus = Announce;
-            receiveReconnectGiveupEmitStatus.Effectype = EventType.ReceiveReconnectGiveUp;
-            receiveReconnectGiveupEmitStatus.Handler = receivingEffectHandler;
-            */
-
-            /*
-            pnEventEngine.CreateState(StateType.Handshaking)
-                .On(EventType.SubscriptionChanged, StateType.Handshaking)
-                .On(EventType.HandshakeSuccess, StateType.Receiving, new List<EffectInvocation>()
-                            { 
-                                handshakeSuccessEmitStatus
-                            }
-                )
-                .On(EventType.HandshakeFailure, StateType.HandshakeReconnecting)
-                .On(EventType.Disconnect, StateType.HandshakeStopped)
-                .On(EventType.SubscriptionRestored, StateType.Receiving)
-                .OnEntry(entryInvocationList: new List<EffectInvocation>()
-                            { 
-                                handshakeInvocation 
-                            }
-                )
-                .OnExit(exitInvocationList: new List<EffectInvocation>()
-                            { 
-                                cancelHandshakeInvocation 
-                            }
-                );
-
-
-            pnEventEngine.CreateState(StateType.Receiving)
-                .On(EventType.SubscriptionChanged, StateType.Receiving)
-                .On(EventType.SubscriptionRestored, StateType.Receiving)
-                .On(EventType.ReceiveSuccess, StateType.Receiving, new List<EffectInvocation>()
-                            { 
-                                receiveEmitStatus,
-                                receiveEmitMessages
-                            }
-                )
-                .On(EventType.Disconnect, StateType.ReceiveStopped, new List<EffectInvocation>()
-                            { 
-                                 receiveDisconnectEmitStatus
-                            }
-                )
-                .On(EventType.ReceiveFailure, StateType.ReceiveReconnecting)
-                .OnEntry(entryInvocationList: new List<EffectInvocation>()
-                            { 
-                                receiveMessagesInvocation
-                            }
-                )
-                .OnExit(exitInvocationList: new List<EffectInvocation>()
-                            { 
-                                cancelReceiveMessages
-                            }
-                );
-
-            pnEventEngine.CreateState(StateType.ReceiveReconnecting)
-                .On(EventType.SubscriptionChanged, StateType.ReceiveReconnecting)
-                .On(EventType.ReceiveReconnectFailure, StateType.ReceiveReconnecting)
-                .On(EventType.SubscriptionRestored, StateType.ReceiveReconnecting)
-                .On(EventType.ReceiveReconnectSuccess, StateType.Receiving, new List<EffectInvocation>()
-                            { 
-                                receiveReconnectEmitStatus,
-                                receiveReconnectEmitMessages
-                            }
-                )
-                .On(EventType.Disconnect, StateType.ReceiveStopped, new List<EffectInvocation>()
-                            { 
-                                receiveReconnectDisconnectEmitStatus
-                            }
-                )
-                .On(EventType.ReceiveReconnectGiveUp, StateType.ReceiveFailed, new List<EffectInvocation>()
-                            { 
-                                receiveReconnectGiveupEmitStatus
-                            }
-                )
-                .OnEntry(entryInvocationList: new List<EffectInvocation>()
-                            { 
-                                receiveReconnectInvocation
-                            }
-                )
-                .OnExit(exitInvocationList: new List<EffectInvocation>()
-                            { 
-                                cancelReceiveReconnect
-                            }
-                );
-            */
             if (pnEventEngine.PubnubUnitTest != null)
             {
                 pnEventEngine.PubnubUnitTest.EventTypeList = new List<KeyValuePair<string, string>>();

@@ -158,7 +158,7 @@ namespace PubnubApi.PubnubEventEngine
 				extendedState.Attempts++;
 				PrepareFailurePNStatus(new HandshakeError() { Status = 400 });
 
-				if (MaxRetries != -1 && extendedState.Attempts >= MaxRetries)
+				if (MaxRetries != -1 && extendedState.Attempts > MaxRetries)
 				{
 					LogCallback?.Invoke($"Attempt: {extendedState.Attempts}; OnHandshakeReconnectEffectResponseReceived - EventType.HandshakeReconnectGiveUp");
 					PrepareAndEmitHandshakeReconnectGiveupEvent(null);
