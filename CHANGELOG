@@ -1,3 +1,8 @@
+v6.16.0 - May 18 2023
+-----------------------------
+- Modified: replaced ConcurrentDictionary class file with System.Collections.Concurrent package for all target frameworks except .net 3.5/4.0.
+- Modified: addressed threading issue on reading ConcurrentDictionary keys.
+
 v6.15.0 - March 16 2023
 -----------------------------
 - Added: sending files as raw byte arrays.
