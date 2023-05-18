@@ -6,6 +6,9 @@ using PubnubApi.Interface;
 using System.Net;
 using System.Threading.Tasks;
 using System.Globalization;
+#if !NET35 && !NET40
+using System.Collections.Concurrent;
+#endif
 
 namespace PubnubApi.EndPoint
 {
@@ -35,8 +38,8 @@ namespace PubnubApi.EndPoint
 #pragma warning restore
         {
             //Retrieve the current channels already subscribed previously and terminate them
-            string[] currentChannels = (MultiChannelSubscribe.ContainsKey(PubnubInstance.InstanceId) && MultiChannelSubscribe[PubnubInstance.InstanceId] != null) ? MultiChannelSubscribe[PubnubInstance.InstanceId].Keys.ToArray<string>() : null;
-            string[] currentChannelGroups = (MultiChannelGroupSubscribe.ContainsKey(PubnubInstance.InstanceId) && MultiChannelGroupSubscribe[PubnubInstance.InstanceId] != null) ? MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Keys.ToArray<string>() : null;
+            string[] currentChannels = (MultiChannelSubscribe.ContainsKey(PubnubInstance.InstanceId) && MultiChannelSubscribe[PubnubInstance.InstanceId] != null) ? new List<string>(MultiChannelSubscribe[PubnubInstance.InstanceId].Keys).ToArray<string>() : null;
+            string[] currentChannelGroups = (MultiChannelGroupSubscribe.ContainsKey(PubnubInstance.InstanceId) && MultiChannelGroupSubscribe[PubnubInstance.InstanceId] != null) ? new List<string>(MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Keys).ToArray<string>() : null;
 
             if (currentChannels != null && currentChannels.Length >= 0)
             {
@@ -196,8 +199,8 @@ namespace PubnubApi.EndPoint
                 if (validChannels.Count > 0 || validChannelGroups.Count > 0)
                 {
                     //Retrieve the current channels already subscribed previously and terminate them
-                    string[] currentChannels = MultiChannelSubscribe[PubnubInstance.InstanceId].Keys.ToArray<string>();
-                    string[] currentChannelGroups = MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Keys.ToArray<string>();
+                    string[] currentChannels = new List<string>(MultiChannelSubscribe[PubnubInstance.InstanceId].Keys).ToArray<string>();
+                    string[] currentChannelGroups = new List<string>(MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Keys).ToArray<string>();
 
                     if (currentChannels != null && currentChannels.Length >= 0)
                     {
@@ -468,15 +471,17 @@ namespace PubnubApi.EndPoint
                 if (validChannels.Count > 0 || validChannelGroups.Count > 0 && config.ContainsKey(PubnubInstance.InstanceId))
                 {
                     //Retrieve the current channels already subscribed previously and terminate them
-                    string[] currentChannels = MultiChannelSubscribe[PubnubInstance.InstanceId].Keys.ToArray<string>();
-                    string[] currentChannelGroups = MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Keys.ToArray<string>();
+                    List<string> currentChannelsList = new List<string>(MultiChannelSubscribe[PubnubInstance.InstanceId].Keys);
+                    List<string> currentChannelGroupsList = new List<string>(MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Keys);
+                    string[] currentChannels = new List<string>(currentChannelsList).ToArray<string>();
+                    string[] currentChannelGroups = new List<string>(currentChannelGroupsList).ToArray<string>();
 
                     if (currentChannels != null && currentChannels.Length >= 0)
                     {
                         string multiChannelGroupName = (currentChannelGroups.Length > 0) ? string.Join(",", currentChannelGroups.OrderBy(x => x).ToArray()) : "";
                         if (ChannelRequest.ContainsKey(PubnubInstance.InstanceId))
                         {
-                            List<string> keysList = ChannelRequest[PubnubInstance.InstanceId].Keys.ToList();
+                            List<string> keysList = new List<string>(ChannelRequest[PubnubInstance.InstanceId].Keys);
                             for (int keyIndex = 0; keyIndex < keysList.Count; keyIndex++)
                             {
                                 string multiChannelName = keysList[keyIndex];
@@ -531,8 +536,8 @@ namespace PubnubApi.EndPoint
                     }
 
                     //Get all the channels
-                    string[] channels = MultiChannelSubscribe[PubnubInstance.InstanceId].Keys.ToArray<string>();
-                    string[] channelGroups = MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Keys.ToArray<string>();
+                    string[] channels = new List<string>(MultiChannelSubscribe[PubnubInstance.InstanceId].Keys).ToArray<string>();
+                    string[] channelGroups = new List<string>(MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Keys).ToArray<string>();
 
                     if (channelGroups != null && channelGroups.Length > 0 && (channels == null || channels.Length == 0))
                     {
@@ -1135,7 +1140,7 @@ namespace PubnubApi.EndPoint
             {
                 string subscribedChannels = (MultiChannelSubscribe[PubnubInstance.InstanceId].Count > 0) ? MultiChannelSubscribe[PubnubInstance.InstanceId].Keys.OrderBy(x => x).Aggregate((x, y) => x + "," + y) : "";
                 string subscribedChannelGroups = (MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Count > 0) ? MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Keys.OrderBy(x => x).Aggregate((x, y) => x + "," + y) : "";
-                List<string> channelRequestKeyList = ChannelRequest[PubnubInstance.InstanceId].Keys.ToList();
+                List<string> channelRequestKeyList = new List<string>(ChannelRequest[PubnubInstance.InstanceId].Keys);
                 for(int keyIndex= 0; keyIndex < channelRequestKeyList.Count; keyIndex++)
                 {
                     string keyChannel = channelRequestKeyList[keyIndex];

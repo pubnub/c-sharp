@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Net;
 using Newtonsoft.Json;
+#if !NET35 && !NET40
+using System.Collections.Concurrent;
+#endif
 
 namespace PubnubApi.EndPoint
 {

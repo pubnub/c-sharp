@@ -5,6 +5,9 @@ using System.Text;
 using System.Threading;
 using PubnubApi.Interface;
 using System.Globalization;
+#if !NET35 && !NET40
+using System.Collections.Concurrent;
+#endif
 
 namespace PubnubApi.EndPoint
 {
