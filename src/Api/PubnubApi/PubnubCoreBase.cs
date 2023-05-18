@@ -17,6 +17,9 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net.Http.Headers;
 #endif
+#if !NET35 && !NET40
+using System.Collections.Concurrent;
+#endif
 #endregion
 
 namespace PubnubApi
@@ -1881,7 +1884,7 @@ namespace PubnubApi
             else
             {
                 ICollection<string> keyCollection = ChannelRequest[PubnubInstance.InstanceId].Keys;
-                foreach (string key in keyCollection)
+                foreach (string key in keyCollection.ToList())
                 {
                     HttpWebRequest currentRequest;
                     if (ChannelRequest[PubnubInstance.InstanceId].TryGetValue(key, out currentRequest) && currentRequest != null)

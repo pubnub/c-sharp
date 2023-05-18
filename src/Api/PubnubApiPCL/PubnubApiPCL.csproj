@@ -15,7 +15,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubPCL</PackageId>
-    <PackageVersion>6.15.0.0</PackageVersion>
+    <PackageVersion>6.16.0.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -23,8 +23,8 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>Sending files as raw byte arrays.
-Added TcpKeepAlive and ConnectionLimit to improve performance.</PackageReleaseNotes>
+    <PackageReleaseNotes>Replaced ConcurrentDictionary class file with System.Collections.Concurrent package for all target frameworks except .net 3.5/4.0.
+Addressed threading issue on reading ConcurrentDictionary keys.</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
@@ -636,6 +636,10 @@ Added TcpKeepAlive and ConnectionLimit to improve performance.</PackageReleaseNo
     <PackageReference Include="System.ValueTuple" Version="4.4.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="System.Collections.Concurrent">
+      <Version>4.3.0</Version>
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
   
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
@@ -658,6 +662,10 @@ Added TcpKeepAlive and ConnectionLimit to improve performance.</PackageReleaseNo
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="System.ValueTuple" Version="4.4.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Collections.Concurrent">
+      <Version>4.3.0</Version>
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
   </ItemGroup>
@@ -703,6 +711,10 @@ Added TcpKeepAlive and ConnectionLimit to improve performance.</PackageReleaseNo
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="System.ValueTuple" Version="4.4.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Collections.Concurrent">
+      <Version>4.3.0</Version>
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
   </ItemGroup>
@@ -762,6 +774,10 @@ Added TcpKeepAlive and ConnectionLimit to improve performance.</PackageReleaseNo
     <PackageReference Include="System.ValueTuple" Version="4.4.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="System.Collections.Concurrent">
+      <Version>4.3.0</Version>
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
@@ -805,6 +821,10 @@ Added TcpKeepAlive and ConnectionLimit to improve performance.</PackageReleaseNo
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="System.ValueTuple" Version="4.4.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Collections.Concurrent">
+      <Version>4.3.0</Version>
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
   </ItemGroup>
@@ -859,6 +879,10 @@ Added TcpKeepAlive and ConnectionLimit to improve performance.</PackageReleaseNo
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="System.ValueTuple" Version="4.4.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Collections.Concurrent">
+      <Version>4.3.0</Version>
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
   </ItemGroup>

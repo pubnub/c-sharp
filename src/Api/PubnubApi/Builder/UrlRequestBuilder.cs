@@ -8,6 +8,9 @@ using System.Threading;
 #if !NETSTANDARD10 && !NETSTANDARD11 && !NETSTANDARD12 && !WP81
 using System.Reflection;
 #endif
+#if !NET35 && !NET40
+using System.Collections.Concurrent;
+#endif
 
 namespace PubnubApi
 {
