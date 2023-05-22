@@ -359,7 +359,7 @@ namespace PubnubApi.PubnubEventEngine
 						UpdateContext(e.EventType, e.EventPayload);
 						if (CurrentState.EntryList != null && CurrentState.EntryList.Count > 0)
 						{
-							Dispatcher.dispatch(EffectDispatcher.DispatcherType.Entry, e.EventType, findState.EntryList, this.Context);
+							Dispatcher.dispatch(EffectDispatcher.DispatcherType.Entry, e.EventType, CurrentState.EntryList, this.Context);
 						}
 
 						UpdateContext(e.EventType, e.EventPayload);

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Runtime.Remoting.Contexts;
 using System.Threading.Tasks;
 
 namespace PubnubApi.PubnubEventEngine
@@ -35,6 +33,7 @@ namespace PubnubApi.PubnubEventEngine
 
 		public async void dispatch(DispatcherType dispatchType, EventType eventType,List<EffectInvocation> effectInvocations, ExtendedState stateContext)
 		{
+			if (effectInvocations == null || effectInvocations.Count == 0) { return; }
 			foreach (var effect in effectInvocations) {
 				PubnubUnitTest?.EventTypeList?.Add(new KeyValuePair<string, string>("invocation", effect.Name));
 				System.Diagnostics.Debug.WriteLine("Found effect " + effect.Effectype);
