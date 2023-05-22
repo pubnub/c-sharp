@@ -1,14 +1,5 @@
 {
   "dependencies": {
-    "com.pubnub.sdk": {
-      "version": "https://github.com/MikeDobrzan/c-sharp-unity-upm.git",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {
-        "com.unity.nuget.newtonsoft-json": "3.0.2"
-      },
-      "hash": "1c25545eb0b1fc4b486b7ebcaf00c2c71d964f0d"
-    },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
       "depth": 0,
@@ -38,6 +29,12 @@
         "com.unity.ugui": "1.0.0"
       },
       "url": "https://packages.unity.com"
+    },
+    "com.unity.asset-store-tools": {
+      "version": "file:com.unity.asset-store-tools",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
     },
     "com.unity.collab-proxy": {
       "version": "1.17.1",

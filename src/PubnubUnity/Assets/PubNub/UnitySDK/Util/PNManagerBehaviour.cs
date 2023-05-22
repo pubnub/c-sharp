@@ -1,6 +1,7 @@
 using UnityEngine;
 
 namespace PubnubApi.Unity {
+	[AddComponentMenu("PubNub/PubNub Manager")]
 	[HelpURL("https://www.pubnub.com/docs/sdks/unity")]
 	public class PNManagerBehaviour : MonoBehaviour {
 		public PNConfigAsset pnConfiguration;

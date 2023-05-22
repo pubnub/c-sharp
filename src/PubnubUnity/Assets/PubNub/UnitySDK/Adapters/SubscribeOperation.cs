@@ -11,6 +11,12 @@ namespace PubnubApi.Unity {
 		
 		public static SubscribeOperation<string> Channels(this SubscribeOperation<string> so, List<string> channels) =>
 			so.Channels<string>(channels);
+		
+		public static SubscribeOperation<T> ChannelGroups<T>(this SubscribeOperation<T> so, List<string> channels) =>
+			so.ChannelGroups(channels.ToArray());
+		
+		public static SubscribeOperation<string> ChannelGroups(this SubscribeOperation<string> so, List<string> channels) =>
+			so.ChannelGroups<string>(channels);
 
 		
 		// TODO This copies the dictionary, need to reconsider

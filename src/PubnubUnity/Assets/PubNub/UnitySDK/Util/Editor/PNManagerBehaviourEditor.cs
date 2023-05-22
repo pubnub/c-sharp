@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
@@ -11,9 +12,17 @@ namespace PubnubApi.Unity.Internal.EditorTools {
 		private IEnumerable<string> baseFields = new[] { "pnConfiguration" };
 		private IEnumerable<string> fields;
 
+		private IEnumerable<System.Type> implementations = new List<Type>();
+
 		void OnEnable() {
 			// support for inheritance
 			fields = target.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public).Select(f => f.Name).Except(baseFields);
+
+			var assemblies = System.AppDomain.CurrentDomain.GetAssemblies();
+			foreach (var assembly in assemblies) {
+				implementations = implementations.Concat(assembly.GetTypes()
+					.Where(t => t.BaseType == typeof(PNManagerBehaviour)));
+			}
 		}
 		
 		public override void OnInspectorGUI() {
@@ -22,6 +31,25 @@ namespace PubnubApi.Unity.Internal.EditorTools {
 			if (target.GetType() == typeof(PNManagerBehaviour)) {
 				EditorGUILayout.HelpBox("To utilize PubNub's functionality, you need to extend this component.", MessageType.Info);
 				EditorGUILayout.Space();
+
+				if (implementations.Any()) {
+					GUILayout.BeginVertical("box");
+					
+					EditorGUILayout.LabelField("Replace with an implementation:");
+					
+					foreach (var impl in implementations) {
+						if (GUILayout.Button(impl.Name)) {
+							EditorApplication.delayCall += () => {
+								var go = (target as PNManagerBehaviour).gameObject;
+								go.AddComponent(impl);
+								DestroyImmediate(target);
+								EditorUtility.SetDirty(go);
+							};
+						}
+					}
+					
+					GUILayout.EndVertical();
+				}
 			}
 
 			EditorGUILayout.PropertyField(serializedObject.FindProperty("pnConfiguration"), new GUIContent("PubNub Configuration"));

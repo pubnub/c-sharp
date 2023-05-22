@@ -1,24 +1,28 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
+using PubnubApi;
+using PubnubApi.EndPoint;
+using PubnubApi.Unity;
 
-public static class ApiKeys {
-	public static string PubKey => System.Environment.GetEnvironmentVariable("PN_PUB_KEY") ?? "";
-	public static string SubKey => System.Environment.GetEnvironmentVariable("PN_SUB_KEY") ?? "";
-}
 
-public class Subscribe {
-	[Test]
-	public void SubscribeSimplePasses() {
-		// Use the Assert class to test conditions
-	}
+namespace Tests {
+	public class Subscribe : PNTestBase {
+		[SetUp]
+		public void SetUp() {
+			listener.onStatus += OnStatus;
+		}
 
-	[UnityTest]
-	public IEnumerator SubscribeWithEnumeratorPasses() {
-		// Use the Assert class to test conditions.
-		// Use yield to skip a frame.
-		yield return null;
+		private void OnStatus(Pubnub arg1, PNStatus arg2) {
+			Assert.IsFalse(arg2.Error, $"Error in status: {arg2.ErrorData?.Information}");
+		}
+
+		[TearDown]
+		public void TearDown() {
+			listener.onStatus -= OnStatus;
+		}
 	}
 }
