@@ -13,6 +13,7 @@ using System.Threading.Channels;
 using System.Threading;
 using PubnubApi.PubnubEventEngine;
 using TechTalk.SpecFlow.Assist;
+using System.Net.Http;
 
 namespace AcceptanceTests.Steps
 {
@@ -187,8 +188,8 @@ namespace AcceptanceTests.Steps
                 {
                     string mockInitContract = string.Format("http://{0}/init?__contract__script__={1}", acceptance_test_origin, currentContract);
                     System.Diagnostics.Debug.WriteLine(mockInitContract);
-                    WebClient webClient = new WebClient();
-                    string mockInitResponse = webClient.DownloadString(mockInitContract);
+                    HttpClient httpclient = new HttpClient();
+                    string mockInitResponse = httpclient.GetStringAsync(new Uri(mockInitContract)).Result;
                     System.Diagnostics.Debug.WriteLine(mockInitResponse);
                 }
             }
