@@ -46,6 +46,8 @@ namespace PubnubApi.EndPoint
             
 
 			var effectDispatcher = new EffectDispatcher();
+            effectDispatcher.PubnubUnitTest = unit;
+
 			var eventEmitter = new EventEmitter();
             eventEmitter.RegisterJsonListener(JsonCallback);
 

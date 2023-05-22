@@ -329,12 +329,9 @@ namespace PubnubApi.PubnubEventEngine
 		{
 			if (CurrentState != null) {
 				State findState = States.Find((s) => s.StateType == CurrentState.StateType);
-				//State nextState;
 				StateType nextStateType;
 				if (findState != null && findState.transitions != null && findState.transitions.TryGetValue(e.EventType, out nextStateType))
 				{
-					//StateType nextStateType = findState.transitions[CurrentState.EventType];
-					//
 					System.Diagnostics.Debug.WriteLine($"Current State = {CurrentState.StateType}; Transition = {e.EventType}");
 					if (PubnubUnitTest != null )
 					{
@@ -345,36 +342,16 @@ namespace PubnubApi.PubnubEventEngine
 					{
 						if (findState.ExitList != null && findState.ExitList.Count > 0)
 						{
-							foreach(var entry in findState.ExitList)
-							{
-								PubnubUnitTest?.EventTypeList?.Add(new KeyValuePair<string, string>("invocation", entry.Name));
-								entry.Handler?.Cancel();
-							}
+							Dispatcher.dispatch(EffectDispatcher.DispatcherType.Exit, e.EventType, findState.ExitList, this.Context);
 						}
 						if (findState.EffectInvocationsList != null 
 							&& findState.EffectInvocationsList.ContainsKey(e.EventType)
 							&& findState.EffectInvocationsList[e.EventType].Count > 0) 
 						{
 							List<EffectInvocation> effectInvocationList = findState.EffectInvocationsList[e.EventType];
-							foreach (var effect in effectInvocationList) {
-								PubnubUnitTest?.EventTypeList?.Add(new KeyValuePair<string, string>("invocation", effect.Name));
-								if (effect is EmitStatus)
-								{
-									((EmitStatus)effect).Announce();
-								}
-								else if (effect is EmitMessages<object>)
-								{
-									((EmitMessages<object>)effect).Announce<string>();
-								}
-								else if (effect is EmitMessages<string>)
-								{
-									((EmitMessages<string>)effect).Announce<string>();
-								}
-								System.Diagnostics.Debug.WriteLine("Found effect " + effect.Effectype);
-								Dispatcher.dispatch(effect.Effectype, this.Context);
-								//if (e.EventType == effect.Effectype)
-								//{
-								//}
+							if (effectInvocationList != null && effectInvocationList.Count > 0)
+							{
+								Dispatcher.dispatch(EffectDispatcher.DispatcherType.Managed, e.EventType, effectInvocationList, this.Context);
 							}
 						}
 						
@@ -382,36 +359,10 @@ namespace PubnubApi.PubnubEventEngine
 						UpdateContext(e.EventType, e.EventPayload);
 						if (CurrentState.EntryList != null && CurrentState.EntryList.Count > 0)
 						{
-							foreach(var entry in CurrentState.EntryList)
-							{
-								PubnubUnitTest?.EventTypeList?.Add(new KeyValuePair<string, string>("invocation", entry.Name));
-								entry.Handler?.Start(Context, e.EventType);
-							}
+							Dispatcher.dispatch(EffectDispatcher.DispatcherType.Entry, e.EventType, findState.EntryList, this.Context);
 						}
 
-						//findState.EventType = e.EventType;
-						//CurrentState = findState;
 						UpdateContext(e.EventType, e.EventPayload);
-						//CurrentState = NextState();
-						//if (CurrentState != null)
-						//{
-						//	System.Diagnostics.Debug.WriteLine($"Next State = {CurrentState.StateType}; Transition = {e.EventType}");
-						//	UpdateContext(e.EventType, e.EventPayload);
-						//	//System.Diagnostics.Debug.WriteLine($"Emitting event { e.EventType }");
-						//	//Emitter.emit(e);
-						//}
-						if (findState != null)
-						{
-							//if (CurrentState.EffectInvocationsList[e.EventType].Count > 0) {
-							//	foreach (var effect in CurrentState.EffectInvocationsList) {
-							//		if (e.EventType == effect.Effectype)
-							//		{
-							//			System.Diagnostics.Debug.WriteLine("Found effect "+ effect.Effectype);
-							//			Dispatcher.dispatch(effect.Effectype, this.Context);
-							//		}
-							//	}
-							//}
-						}
 					}
 
 				}
