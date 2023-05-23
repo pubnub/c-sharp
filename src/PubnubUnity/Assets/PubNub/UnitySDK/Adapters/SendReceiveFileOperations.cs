@@ -20,7 +20,7 @@ namespace PubnubApi.Unity.FileOperations {
 		/// <param name="texture">A Texture compatible with <c>GetRawTextureData</c></param>
 		/// <returns></returns>
 		public static SendFileOperation Texture(this SendFileOperation o, Texture2D texture) {
-			return o.File(texture.GetRawTextureData()).Message(new VectorSerializable(texture.width, texture.height, (int)texture.graphicsFormat));
+			return o.File(texture.GetRawTextureData()).Message(new JsonSafeVector(texture.width, texture.height, (int)texture.graphicsFormat));
 		}
 
 		public static SendFileOperation Texture(this SendFileOperation o, RenderTexture texture) {
@@ -34,11 +34,11 @@ namespace PubnubApi.Unity.FileOperations {
 			RenderTexture.active = active;
 			Object.Destroy(tex);
 
-			return o.File(bytes).Message(new VectorSerializable(texture.width, texture.height, (int)texture.graphicsFormat));
+			return o.File(bytes).Message(new JsonSafeVector(texture.width, texture.height, (int)texture.graphicsFormat));
 		}
 
 		public static async Task<Texture> DownloadTexture(this Pubnub pubnub, PNFileEventResult fileEventResult, TextureCreationFlags textureCreationFlags = TextureCreationFlags.None) {
-			var size = new VectorSerializable(fileEventResult.Message as Dictionary<string, object>);
+			var size = new JsonSafeVector(fileEventResult.Message as Dictionary<string, object>);
 			var f = await pubnub.DownloadFile().FileId(fileEventResult.File.Id).FileName(fileEventResult.File.Name).Channel(fileEventResult.Channel).ExecuteAsync();
 
 			Texture2D tex;
