@@ -44,156 +44,50 @@ namespace PubnubApi.EndPoint
             pubnubTelemetryMgr = telemetryManager;
             pubnubTokenMgr = tokenManager;
             
-
-			var effectDispatcher = new EffectDispatcher();
-            effectDispatcher.PubnubUnitTest = unit;
-
 			var eventEmitter = new EventEmitter();
             eventEmitter.RegisterJsonListener(JsonCallback);
-
-            pnEventEngine = new EventEngine(effectDispatcher, eventEmitter);
-            pnEventEngine.PubnubUnitTest = unit;
-            pnEventEngine.Setup<T>(config);
-
 
 			var handshakeEffectHandler = new HandshakeEffectHandler(eventEmitter);
             handshakeEffectHandler.LogCallback = LogCallback;
             handshakeEffectHandler.HandshakeRequested += HandshakeEffect_HandshakeRequested;
-            #region Handshake state invocation and emit status
-            State handshakingState = pnEventEngine.States
-                .First(s => s.StateType == StateType.Handshaking);
-            foreach(var effectInvocation in handshakingState.EffectInvocationsList[EventType.HandshakeSuccess])
-            {
-                if (effectInvocation is EmitStatus)
-                {
-                    ((EmitStatus)effectInvocation).AnnounceStatus = Announce;
-                    ((EmitStatus)effectInvocation).Handler = handshakeEffectHandler;
-                }
-            }
-            foreach(var effectInvocation in handshakingState.EntryList)
-            {
-                if (effectInvocation is Handshake)
-                {
-                    ((Handshake)effectInvocation).Handler = handshakeEffectHandler;
-                }
-            }
-            foreach(var effectInvocation in handshakingState.ExitList)
-            {
-                if (effectInvocation is CancelHandshake)
-                {
-                    ((CancelHandshake)effectInvocation).Handler = handshakeEffectHandler;
-                }
-            }
-            #endregion
+            handshakeEffectHandler.AnnounceStatus = Announce;
 
 			var handshakeReconnectEffectHandler = new HandshakeReconnectEffectHandler(eventEmitter);
             handshakeReconnectEffectHandler.ReconnectionPolicy = config.ReconnectionPolicy;
             handshakeReconnectEffectHandler.MaxRetries = config.ConnectionMaxRetries;
             handshakeReconnectEffectHandler.LogCallback = LogCallback;
             handshakeReconnectEffectHandler.HandshakeReconnectRequested += HandshakeReconnectEffect_HandshakeRequested;
-            #region HandshakeReconnecting state invocation and emit status
-            State handshakeReconnectingState = pnEventEngine.States
-                .First(s => s.StateType == StateType.HandshakeReconnecting);
-            foreach(var effectInvocation in handshakeReconnectingState.EffectInvocationsList[EventType.HandshakeReconnectSuccess])
-            {
-                if (effectInvocation is EmitStatus)
-                {
-                    ((EmitStatus)effectInvocation).AnnounceStatus = Announce;
-                    ((EmitStatus)effectInvocation).Handler = handshakeReconnectEffectHandler;
-                }
-            }
-            //TBD - Do we need to emit status/error on HandshakeReconnectFailure
-            //foreach(var effectInvocation in handshakeReconnectingState.EffectInvocationsList[EventType.HandshakeReconnectFailure])
-            //{
-                //if (effectInvocation is EmitStatus)
-                //{
-                //    ((EmitStatus)effectInvocation).AnnounceStatus = Announce;
-                //    ((EmitStatus)effectInvocation).Handler = handshakeReconnectEffectHandler;
-                //}
-            //}
-            foreach(var effectInvocation in handshakeReconnectingState.EffectInvocationsList[EventType.HandshakeReconnectGiveUp])
-            {
-                if (effectInvocation is EmitStatus)
-                {
-                    ((EmitStatus)effectInvocation).AnnounceStatus = Announce;
-                    ((EmitStatus)effectInvocation).Handler = handshakeReconnectEffectHandler;
-                }
-            }
-            foreach(var effectInvocation in handshakeReconnectingState.EntryList)
-            {
-                if (effectInvocation is HandshakeReconnect)
-                {
-                    ((HandshakeReconnect)effectInvocation).Handler = handshakeReconnectEffectHandler;
-                }
-            }
-            foreach(var effectInvocation in handshakeReconnectingState.ExitList)
-            {
-                if (effectInvocation is CancelHandshakeReconnect)
-                {
-                    ((CancelHandshakeReconnect)effectInvocation).Handler = handshakeReconnectEffectHandler;
-                }
-            }
-            #endregion
+            handshakeReconnectEffectHandler.AnnounceStatus = Announce;
             
             var handshakeFailedEffectHandler = new HandshakeFailedEffectHandler(eventEmitter);
             handshakeFailedEffectHandler.LogCallback = LogCallback;
-            #region HandshakeFailed state invocation and emit status
-            State handshakeFailedState = pnEventEngine.States
-                .First(s => s.StateType == StateType.HandshakeFailed);
-            foreach(var effectInvocation in handshakeFailedState.EntryList)
-            {
-                if (effectInvocation is HandshakeFailed)
-                {
-                    ((HandshakeFailed)effectInvocation).Handler = handshakeFailedEffectHandler;
-                }
-            }
-            foreach(var effectInvocation in handshakeFailedState.ExitList)
-            {
-                if (effectInvocation is CancelHandshakeFailed)
-                {
-                    ((CancelHandshakeFailed)effectInvocation).Handler = handshakeFailedEffectHandler;
-                }
-            }
-            #endregion
 
             var receivingEffectHandler = new ReceivingEffectHandler<object>(eventEmitter);
             receivingEffectHandler.ReconnectionPolicy = config.ReconnectionPolicy;
             receivingEffectHandler.LogCallback = LogCallback;
             receivingEffectHandler.ReceiveRequested += ReceivingEffect_ReceiveRequested;
-            #region Receiving state invocation and emit status
-            State receivingState = pnEventEngine.States
-                .First(s => s.StateType == StateType.Receiving);
-            foreach(var effectInvocation in receivingState.EffectInvocationsList[EventType.ReceiveSuccess])
-            {
-                if (effectInvocation is EmitStatus)
-                {
-                    ((EmitStatus)effectInvocation).AnnounceStatus = Announce;
-                    ((EmitStatus)effectInvocation).Handler = receivingEffectHandler;
-                }
-                if (effectInvocation is EmitMessages<T>)
-                {
-                    //((EmitMessages<T>)effectInvocation).SubscribeOperation = this;
-                    ((EmitMessages<T>)effectInvocation).AnnounceMessage = Announce;
-                    ((EmitMessages<T>)effectInvocation).LogCallback = LogCallback;
-                    ((EmitMessages<T>)effectInvocation).Handler = receivingEffectHandler;
-                }
-            }
-            foreach(var effectInvocation in receivingState.EntryList)
-            {
-                if (effectInvocation is ReceiveMessages)
-                {
-                    ((ReceiveMessages)effectInvocation).Handler = receivingEffectHandler;
-                }
-            }
-            foreach(var effectInvocation in receivingState.ExitList)
-            {
-                if (effectInvocation is CancelReceiveMessages)
-                {
-                    ((CancelReceiveMessages)effectInvocation).Handler = receivingEffectHandler;
-                }
-            }
-            #endregion
+            receivingEffectHandler.AnnounceStatus = Announce;
+            receivingEffectHandler.AnnounceMessage = Announce;
 
+			var effectDispatcher = new EffectDispatcher();
+            effectDispatcher.PubnubUnitTest = unit;
+            effectDispatcher.Register(EventType.Handshake,handshakeEffectHandler);
+            effectDispatcher.Register(EventType.CancelHandshake,handshakeEffectHandler);
+            effectDispatcher.Register(EventType.HandshakeSuccess, handshakeEffectHandler);
+
+            effectDispatcher.Register(EventType.HandshakeFailure, handshakeFailedEffectHandler);
+            effectDispatcher.Register(EventType.CancelHandshakeFailure, handshakeFailedEffectHandler);
+
+            effectDispatcher.Register(EventType.HandshakeReconnectSuccess, handshakeReconnectEffectHandler);
+            effectDispatcher.Register(EventType.HandshakeReconnectGiveUp, handshakeReconnectEffectHandler);
+
+            effectDispatcher.Register(EventType.ReceiveMessages, receivingEffectHandler);
+            effectDispatcher.Register(EventType.CancelReceiveMessages, receivingEffectHandler);
+            effectDispatcher.Register(EventType.ReceiveSuccess, receivingEffectHandler);
+
+            pnEventEngine = new EventEngine(effectDispatcher, eventEmitter);
+            pnEventEngine.PubnubUnitTest = unit;
+            pnEventEngine.Setup<T>(config);
 
             if (pnEventEngine.PubnubUnitTest != null)
             {

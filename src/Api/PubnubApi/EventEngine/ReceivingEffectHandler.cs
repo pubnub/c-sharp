@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -51,6 +52,8 @@ namespace PubnubApi.PubnubEventEngine
 		private PNStatus pnStatus { get; set; }
 		private Message<object>[] receiveMessages { get; set; }
 		public Action<string> LogCallback { get; set; }
+		public Action<PNStatus> AnnounceStatus { get; set; }
+		public Action<PNMessageResult<object>> AnnounceMessage { get; set; }
 		public PNReconnectionPolicy ReconnectionPolicy { get; set; }
 
 		public event EventHandler<ReceiveRequestEventArgs>? ReceiveRequested;
@@ -162,6 +165,37 @@ namespace PubnubApi.PubnubEventEngine
 				cancellationTokenSource.Cancel();
 			}
 		}
+        public void Run(ExtendedState context)
+        {
+            if (AnnounceStatus != null)
+			{
+				AnnounceStatus(pnStatus);
+			}
+            if (AnnounceMessage != null)
+            {
+				Message<object>[] receiveMessages = GetMessages();
+				int messageCount = receiveMessages.Length;
+				if (receiveMessages != null && receiveMessages.Length > 0)
+				{
+					for (int index = 0; index < receiveMessages.Length; index++)
+					{
+						LogCallback?.Invoke($"Received Message ({index + 1} of {receiveMessages.Length}) : {JsonConvert.SerializeObject(receiveMessages[index])}");
+						if (receiveMessages[index].Channel.IndexOf("-pnpres") > 0)
+						{
+							var presenceData = JsonConvert.DeserializeObject<PresenceEvent>(receiveMessages[index].Payload.ToString());
+						}
+						else
+						{
+							LogCallback?.Invoke($"Message : {JsonConvert.SerializeObject(receiveMessages[index].Payload)}");
+							PNMessageResult<object> messageResult = new PNMessageResult<object>();
+							messageResult.Channel = receiveMessages[index].Channel;
+							messageResult.Message = receiveMessages[index].Payload;
+							AnnounceMessage?.Invoke(messageResult);
+						}
+					}
+				}
+			}
+        }
 
         public PNStatus GetPNStatus()
         {

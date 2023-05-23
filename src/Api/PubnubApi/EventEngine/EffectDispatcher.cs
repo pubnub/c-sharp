@@ -14,16 +14,16 @@ namespace PubnubApi.PubnubEventEngine
 		}
 		public IPubnubUnitTest PubnubUnitTest { get; set; }
 
-		public Dictionary<EventType, IEffectInvocationHandler> effectActionMap;
+		private Dictionary<EventType, IEffectInvocationHandler> effectInvocationActionMap;
 		public EffectDispatcher()
 		{
-			effectActionMap = new Dictionary<EventType, IEffectInvocationHandler>();
+			effectInvocationActionMap = new Dictionary<EventType, IEffectInvocationHandler>();
 		}
 
 		public async void dispatch(EventType effect, ExtendedState stateContext)
 		{
 			IEffectInvocationHandler? handler;
-			if (effectActionMap.TryGetValue(effect, out handler)) {
+			if (effectInvocationActionMap.TryGetValue(effect, out handler)) {
 				if (handler != null)
 				{
 					await Task.Factory.StartNew(()=> handler.Start(stateContext, effect)).ConfigureAwait(false);
@@ -31,33 +31,26 @@ namespace PubnubApi.PubnubEventEngine
 			}
 		}
 
-		public async void dispatch(DispatcherType dispatchType, EventType eventType,List<EffectInvocation> effectInvocations, ExtendedState stateContext)
+		public async void dispatch(EventType eventType,List<EffectInvocation> effectInvocations, ExtendedState stateContext)
 		{
 			if (effectInvocations == null || effectInvocations.Count == 0) { return; }
-			foreach (var effect in effectInvocations) {
-				PubnubUnitTest?.EventTypeList?.Add(new KeyValuePair<string, string>("invocation", effect.Name));
-				System.Diagnostics.Debug.WriteLine("Found effect " + effect.Effectype);
-				if (dispatchType == DispatcherType.Exit)
-                {
-					await Task.Factory.StartNew(()=> effect.Handler?.Cancel()).ConfigureAwait(false);
-				}
-				else if (dispatchType == DispatcherType.Entry)
+			foreach (var invocation in effectInvocations) {
+				PubnubUnitTest?.EventTypeList?.Add(new KeyValuePair<string, string>("invocation", invocation.Name));
+				System.Diagnostics.Debug.WriteLine("Found effect " + invocation.Effectype);
+				IEffectInvocationHandler currentEffectInvocationhandler;
+				if (effectInvocationActionMap.TryGetValue(invocation.Effectype, out currentEffectInvocationhandler))
 				{
-					await Task.Factory.StartNew(()=> effect.Handler?.Start(stateContext, eventType)).ConfigureAwait(false);
-				}
-				else if (dispatchType == DispatcherType.Managed)
-				{
-					if (effect is EmitStatus)
+					if (invocation.IsManaged())
 					{
-						((EmitStatus)effect).Announce();
+						await Task.Factory.StartNew(()=> currentEffectInvocationhandler?.Start(stateContext, eventType)).ConfigureAwait(false);
 					}
-					else if (effect is EmitMessages<object>)
+					else if (invocation.IsCancelling())
 					{
-						((EmitMessages<object>)effect).Announce<string>();
+						await Task.Factory.StartNew(()=> currentEffectInvocationhandler?.Cancel()).ConfigureAwait(false);
 					}
-					else if (effect is EmitMessages<string>)
+					else
 					{
-						((EmitMessages<string>)effect).Announce<string>();
+						currentEffectInvocationhandler.Run(stateContext);
 					}
 				}
 			}
@@ -66,7 +59,11 @@ namespace PubnubApi.PubnubEventEngine
 
 		public void Register(EventType type, IEffectInvocationHandler handler)
 		{
-			effectActionMap.Add(type, handler);
+			if (effectInvocationActionMap.ContainsKey(type))
+			{
+				throw new ArgumentException("EventType already exist");
+			}
+			effectInvocationActionMap.Add(type, handler);
 		}
 	}
 }

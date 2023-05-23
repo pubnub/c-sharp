@@ -121,17 +121,37 @@ namespace PubnubApi.PubnubEventEngine
 	{
 		public virtual string Name { get; set; }
 		public virtual EventType Effectype { get; set; }
+		public virtual EffectInvocationType InvocationType { get; set; }
 		public virtual IEffectInvocationHandler Handler { get; set; }
+		public abstract bool IsManaged();
+		public abstract bool IsCancelling();
 	}
     public class ReceiveMessages: EffectInvocation
 	{
 		public List<string> Channels { get; set; }
 		public List<string> ChannelGroups { get; set; }
 		public SubscriptionCursor SubscriptionCursor { get; set; }
-	}
+
+        public override bool IsManaged()
+        {
+            return true;
+        }
+        public override bool IsCancelling()
+        {
+            return false;
+        }
+
+    }
 	public class CancelReceiveMessages : EffectInvocation
 	{
-
+		public override bool IsManaged()
+        {
+            return false;
+        }
+        public override bool IsCancelling()
+        {
+            return true;
+        }
 	}
 	public class ReceiveReconnect: EffectInvocation
 	{
@@ -140,19 +160,49 @@ namespace PubnubApi.PubnubEventEngine
 		public SubscriptionCursor SubscriptionCursor { get; set; }
 		public int Attempts { get; set; }
 		public PubnubError Reason { get; set; }
+		public override bool IsManaged()
+        {
+            return true;
+        }
+        public override bool IsCancelling()
+        {
+            return false;
+        }
 	}
 	public class CancelReceiveReconnect : EffectInvocation
 	{
-
+		public override bool IsManaged()
+        {
+            return false;
+        }
+        public override bool IsCancelling()
+        {
+            return true;
+        }
 	}
 	public class Handshake : EffectInvocation
 	{
 		public List<string> Channels { get; set; }
 		public List<string> ChannelGroups { get; set; }
+		public override bool IsManaged()
+        {
+            return true;
+        }
+        public override bool IsCancelling()
+        {
+            return false;
+        }
 	}
 	public class CancelHandshake : EffectInvocation
 	{
-
+		public override bool IsManaged()
+        {
+            return false;
+        }
+        public override bool IsCancelling()
+        {
+            return true;
+        }
 	}
 	public class HandshakeReconnect : EffectInvocation
 	{
@@ -161,10 +211,25 @@ namespace PubnubApi.PubnubEventEngine
 		public SubscriptionCursor SubscriptionCursor { get; set; }
 		public int Attempts { get; set; }
 		public PubnubError Reason { get; set; }
+		public override bool IsManaged()
+        {
+            return false;
+        }
+        public override bool IsCancelling()
+        {
+            return true;
+        }
 	}
 	public class CancelHandshakeReconnect : EffectInvocation
 	{
-
+		public override bool IsManaged()
+        {
+            return false;
+        }
+        public override bool IsCancelling()
+        {
+            return true;
+        }
 	}
 	public class EmitStatus : EffectInvocation
 	{
@@ -195,6 +260,15 @@ namespace PubnubApi.PubnubEventEngine
 				}
 			}
 		}
+
+		public override bool IsManaged()
+        {
+            return false;
+        }
+        public override bool IsCancelling()
+        {
+            return false;
+        }
 	}
 	public class EmitMessages<T> : EffectInvocation
 	{
@@ -207,38 +281,41 @@ namespace PubnubApi.PubnubEventEngine
 		}
 		public void Announce<T>()
 		{
-			Message<object>[] receiveMessages = ((ReceivingEffectHandler<object>)Handler).GetMessages();
-			int messageCount = receiveMessages.Length;
-			if (receiveMessages != null && receiveMessages.Length > 0)
-			{
-				for (int index = 0; index < receiveMessages.Length; index++)
-				{
-					LogCallback?.Invoke($"Received Message ({index + 1} of {receiveMessages.Length}) : {JsonConvert.SerializeObject(receiveMessages[index])}");
-					if (receiveMessages[index].Channel.IndexOf("-pnpres") > 0)
-					{
-						var presenceData = JsonConvert.DeserializeObject<PresenceEvent>(receiveMessages[index].Payload.ToString());
-					}
-					else
-					{
-						LogCallback?.Invoke($"Message : {JsonConvert.SerializeObject(receiveMessages[index].Payload)}");
-						PNMessageResult<object> messageResult = new PNMessageResult<object>();
-						messageResult.Channel = receiveMessages[index].Channel;
-						messageResult.Message = receiveMessages[index].Payload;
-						AnnounceMessage?.Invoke(messageResult);
-					}
-				}
-			}
 		}
+
+		public override bool IsManaged()
+        {
+            return false;
+        }
+        public override bool IsCancelling()
+        {
+            return false;
+        }
 	}
 
 	public class HandshakeFailed : EffectInvocation
 	{
 		public List<string> Channels { get; set; }
 		public List<string> ChannelGroups { get; set; }
+		public override bool IsManaged()
+        {
+            return true;
+        }
+        public override bool IsCancelling()
+        {
+            return false;
+        }
 	}
 	public class CancelHandshakeFailed : EffectInvocation
 	{
-
+		public override bool IsManaged()
+        {
+            return false;
+        }
+        public override bool IsCancelling()
+        {
+            return true;
+        }
 	}
     #endregion
     public enum EventType
@@ -338,11 +415,11 @@ namespace PubnubApi.PubnubEventEngine
 						PubnubUnitTest.EventTypeList.Add(new KeyValuePair<string, string>("event", e.Name));
 						PubnubUnitTest.Attempts = e.Attempts;
 					}
-					if (findState != null )
+					if (findState != null)
 					{
 						if (findState.ExitList != null && findState.ExitList.Count > 0)
 						{
-							Dispatcher.dispatch(EffectDispatcher.DispatcherType.Exit, e.EventType, findState.ExitList, this.Context);
+							Dispatcher.dispatch(e.EventType, findState.ExitList, this.Context);
 						}
 						if (findState.EffectInvocationsList != null 
 							&& findState.EffectInvocationsList.ContainsKey(e.EventType)
@@ -351,7 +428,7 @@ namespace PubnubApi.PubnubEventEngine
 							List<EffectInvocation> effectInvocationList = findState.EffectInvocationsList[e.EventType];
 							if (effectInvocationList != null && effectInvocationList.Count > 0)
 							{
-								Dispatcher.dispatch(EffectDispatcher.DispatcherType.Managed, e.EventType, effectInvocationList, this.Context);
+								Dispatcher.dispatch(e.EventType, effectInvocationList, this.Context);
 							}
 						}
 						
@@ -359,7 +436,7 @@ namespace PubnubApi.PubnubEventEngine
 						UpdateContext(e.EventType, e.EventPayload);
 						if (CurrentState.EntryList != null && CurrentState.EntryList.Count > 0)
 						{
-							Dispatcher.dispatch(EffectDispatcher.DispatcherType.Entry, e.EventType, CurrentState.EntryList, this.Context);
+							Dispatcher.dispatch(e.EventType, CurrentState.EntryList, this.Context);
 						}
 
 						UpdateContext(e.EventType, e.EventPayload);

@@ -6,6 +6,7 @@ namespace PubnubApi.PubnubEventEngine
 	{
 		EventEmitter eventEmitter;
 		private PNStatus pnStatus { get; set; }
+		public Action<PNStatus> AnnounceStatus { get; set; }
         public ReconnectingEffectHandler(EventEmitter emitter)
 		{
 			this.eventEmitter = emitter;
@@ -25,6 +26,13 @@ namespace PubnubApi.PubnubEventEngine
 		{
 			System.Diagnostics.Debug.WriteLine("ReconnectingEffectHandler Cancelled!!!");
 		}
+        public void Run(ExtendedState context)
+        {
+            if (AnnounceStatus != null)
+			{
+				AnnounceStatus(pnStatus);
+			}
+        }
 		public PNStatus GetPNStatus()
         {
             return pnStatus;

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Net.NetworkInformation;
 
 namespace PubnubApi.PubnubEventEngine
 {
@@ -12,7 +13,9 @@ namespace PubnubApi.PubnubEventEngine
 		EventEmitter emitter;
 		//public EffectInvocationType InvocationType { get; set; }
 		private ExtendedState extendedState { get; set;}
+		private PNStatus pnStatus { get; set; }
 		public Action<string> LogCallback { get; set; }
+		public Action<PNStatus> AnnounceStatus { get; set; }
 
 		CancellationTokenSource? cancellationTokenSource;
 
@@ -50,10 +53,17 @@ namespace PubnubApi.PubnubEventEngine
 				cancellationTokenSource.Cancel();
 			}
 		}
+        public void Run(ExtendedState context)
+        {
+            if (AnnounceStatus != null)
+			{
+				AnnounceStatus(pnStatus);
+			}
+        }
 
         public PNStatus GetPNStatus()
         {
-            throw new NotImplementedException();
+            return pnStatus;
         }
     }
 }

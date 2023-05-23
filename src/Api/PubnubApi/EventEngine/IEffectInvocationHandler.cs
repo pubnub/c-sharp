@@ -26,6 +26,7 @@ namespace PubnubApi.PubnubEventEngine
 	{
 		void Start(ExtendedState context, EventType eventType);
 		void Cancel();
+		void Run(ExtendedState context);
 		PNStatus GetPNStatus();
 	}
 

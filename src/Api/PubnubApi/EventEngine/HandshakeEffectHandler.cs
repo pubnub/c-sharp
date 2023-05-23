@@ -45,6 +45,7 @@ namespace PubnubApi.PubnubEventEngine
 		//public EffectInvocationType InvocationType { get; set; }
 		private ExtendedState extendedState { get; set;}
 		public Action<string> LogCallback { get; set; }
+		public Action<PNStatus> AnnounceStatus { get; set; }
 		private PNStatus pnStatus { get; set; }
 
 		public event EventHandler<HandshakeRequestEventArgs>? HandshakeRequested;
@@ -150,11 +151,19 @@ namespace PubnubApi.PubnubEventEngine
 				cancellationTokenSource.Cancel();
 			}
 		}
+        public void Run(ExtendedState context)
+        {
+            if (AnnounceStatus != null)
+			{
+				AnnounceStatus(pnStatus);
+			}
+        }
 
         public PNStatus GetPNStatus()
         {
             return pnStatus;
         }
+
     }
 
 	
