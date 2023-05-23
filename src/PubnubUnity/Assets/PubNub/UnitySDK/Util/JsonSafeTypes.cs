@@ -98,7 +98,7 @@ namespace PubnubApi.Unity {
 			JsonConvert.PopulateObject(json, this);
 		}
 
-		public virtual Transform Assign(Transform t) {
+		public Transform Assign(Transform t) {
 			t.localRotation = localRotation;
 			t.localPosition = localPosition;
 			t.localScale = localScale;

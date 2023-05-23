@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 using PubnubApi;
 using PubnubApi.Unity;
 using UnityEditor.SceneManagement;
+using Object = System.Object;
 
 
 public class PNTestBase {
@@ -25,7 +28,6 @@ public class PNTestBase {
 		pn.Subscribe<string>().Channels(new[] { "test" }).WithPresence().Execute();
 		pn.Subscribe<string>().ChannelGroups(new[] { "testgroup" }).WithPresence().Execute();
 	}
-
 
 	[OneTimeTearDown]
 	public void OneTimeTearDown() {
