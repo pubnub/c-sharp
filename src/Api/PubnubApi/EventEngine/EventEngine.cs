@@ -213,11 +213,11 @@ namespace PubnubApi.PubnubEventEngine
 		public PubnubError Reason { get; set; }
 		public override bool IsManaged()
         {
-            return false;
+            return true;
         }
         public override bool IsCancelling()
         {
-            return true;
+            return false;
         }
 	}
 	public class CancelHandshakeReconnect : EffectInvocation

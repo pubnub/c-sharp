@@ -78,6 +78,8 @@ namespace PubnubApi.EndPoint
             effectDispatcher.Register(EventType.HandshakeFailure, handshakeFailedEffectHandler);
             effectDispatcher.Register(EventType.CancelHandshakeFailure, handshakeFailedEffectHandler);
 
+            effectDispatcher.Register(EventType.HandshakeReconnect, handshakeReconnectEffectHandler);
+            effectDispatcher.Register(EventType.CancelHandshakeReconnect, handshakeReconnectEffectHandler);
             effectDispatcher.Register(EventType.HandshakeReconnectSuccess, handshakeReconnectEffectHandler);
             effectDispatcher.Register(EventType.HandshakeReconnectGiveUp, handshakeReconnectEffectHandler);
 
