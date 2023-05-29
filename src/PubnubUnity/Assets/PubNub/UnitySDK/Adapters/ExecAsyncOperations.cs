@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using PubnubApi.EndPoint;
 
@@ -134,7 +135,7 @@ namespace PubnubApi.Unity {
 			var res = await o.ExecuteAsync();
 			callback?.Invoke(res.Result, res.Status);
 		}
-		
+
 		// GetMembership
 		// TODO document change - Async -> Execute
 		public static async void Execute(this GetMembershipsOperation o, System.Action<PNMembershipsResult, PNStatus> callback) {
@@ -257,6 +258,34 @@ namespace PubnubApi.Unity {
 		// SetPresenceState
 		// TODO document change - Async -> Execute
 		public static async void Execute(this SetStateOperation o, System.Action<PNSetStateResult, PNStatus> callback) {
+			var res = await o.ExecuteAsync();
+			callback?.Invoke(res.Result, res.Status);
+		}
+		
+		// DeleteChannelGroup
+		// TODO document change - Async -> Execute
+		public static async void Execute(this DeleteChannelGroupOperation o, System.Action<PNChannelGroupsDeleteGroupResult, PNStatus> callback) {
+			var res = await o.ExecuteAsync();
+			callback?.Invoke(res.Result, res.Status);
+		}
+		
+		// AddChannelGroup
+		// TODO document change - Async -> Execute
+		public static async void Execute(this AddChannelsToChannelGroupOperation o, System.Action<PNChannelGroupsAddChannelResult, PNStatus> callback) {
+			var res = await o.ExecuteAsync();
+			callback?.Invoke(res.Result, res.Status);
+		}
+		
+		// ListAllChannelGroup
+		// TODO document change - Async -> Execute
+		public static async void Execute(this ListAllChannelGroupOperation o, System.Action<PNChannelGroupsListAllResult, PNStatus> callback) {
+			var res = await o.ExecuteAsync();
+			callback?.Invoke(res.Result, res.Status);
+		}
+		
+		// RemoveChannelsFromChannelGroup
+		// TODO document change - Async -> Execute
+		public static async void Execute(this RemoveChannelsFromChannelGroupOperation o, System.Action<PNChannelGroupsRemoveChannelResult, PNStatus> callback) {
 			var res = await o.ExecuteAsync();
 			callback?.Invoke(res.Result, res.Status);
 		}

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using PubnubApi;
 using UnityEngine;
 
 public sealed class AwaiterResult<T> where T : class {
@@ -11,6 +12,7 @@ public sealed class AwaiterResult<T> where T : class {
         return t;
     }
 }
+
 
 public sealed class Awaiter<T> : CustomYieldInstruction {
     private T taskResult;
@@ -43,4 +45,10 @@ public static class TaskExtension {
         resultAssigner = () => result;
         return new Awaiter<T>(t, (res) => result.result = res);
     }
+}
+
+
+public sealed class CallbackResult<T> {
+    public T result = default(T);
+    public PNStatus status = null;
 }

@@ -18,8 +18,9 @@ public class PNTestBase {
 	[OneTimeSetUp]
 	public void OneTimeSetUp() {
 		PNConfiguration pnConfiguration = new PNConfiguration("unit-test") {
-			PublishKey = "pub-c-0f7e09a8-d82d-42e9-972c-f1f5040673df",
-			SubscribeKey = "sub-c-004c90c7-f844-4aeb-8f5c-8e2738d1a91e"
+			PublishKey = "",
+			SubscribeKey = "",
+			SecretKey = ""
 		};
 		pn = new Pubnub(pnConfiguration);
 
@@ -30,7 +31,27 @@ public class PNTestBase {
 	}
 
 	[OneTimeTearDown]
-	public void OneTimeTearDown() {
+	public async void OneTimeTearDown() {
 		pn.UnsubscribeAll<string>();
+
+		// wat
+		await Task.Delay(1000);
+		
+		pn.Destroy();
+	}
+
+	protected Action<object, PNStatus> Callback(out IEnumerator awaiter, out Func<CallbackResult<object>> assigner) {
+		CallbackResult<object> wrappedResult = new();
+		assigner = () => wrappedResult;
+
+		float startTime = Time.time;
+
+		awaiter = new WaitUntil(() => wrappedResult.status != null || Time.time > startTime + 10f);
+		return (res, status) => {
+			wrappedResult.result = res;
+			wrappedResult.status = status;
+			
+			if (status.Error) Debug.Log(status.ErrorData.Information);
+		};
 	}
 }

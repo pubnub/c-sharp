@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
@@ -21,11 +22,10 @@ public class Publish : PNTestBase {
 
 	[UnityTest]
 	public IEnumerator PublishTestMessage() {
-		PNStatus s = null;
-
-		pn.Publish().Channel("test").Message("test").Execute((result, status) => s = status);
-
-		yield return new WaitUntil(() => s != null);
+		pn.Publish().Channel("test").Message("test")
+			.Execute(Callback(out var awaiter, out var assigner));
+		yield return awaiter;
+		var s = assigner().status;
 
 		Assert.IsFalse(s.Error);
 	}
