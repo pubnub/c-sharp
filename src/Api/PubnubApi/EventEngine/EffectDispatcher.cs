@@ -14,17 +14,6 @@ namespace PubnubApi.PubnubEventEngine
 			effectInvocationActionMap = new Dictionary<EventType, IEffectInvocationHandler>();
 		}
 
-		public async void dispatch(EventType effect, ExtendedState stateContext)
-		{
-			IEffectInvocationHandler? handler;
-			if (effectInvocationActionMap.TryGetValue(effect, out handler)) {
-				if (handler != null)
-				{
-					await Task.Factory.StartNew(()=> handler.Start(stateContext, effect)).ConfigureAwait(false);
-				}
-			}
-		}
-
 		public async void dispatch(EventType eventType,List<EffectInvocation> effectInvocations, ExtendedState stateContext)
 		{
 			if (effectInvocations == null || effectInvocations.Count == 0) { return; }
