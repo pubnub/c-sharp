@@ -6,12 +6,6 @@ namespace PubnubApi.PubnubEventEngine
 {
 	public class EffectDispatcher
 	{
-		public enum DispatcherType
-		{
-			Entry,
-			Exit,
-			Managed
-		}
 		public IPubnubUnitTest PubnubUnitTest { get; set; }
 
 		private Dictionary<EventType, IEffectInvocationHandler> effectInvocationActionMap;
