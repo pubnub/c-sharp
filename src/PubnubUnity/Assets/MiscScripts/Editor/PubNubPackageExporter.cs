@@ -15,9 +15,18 @@ namespace PubnubUtils {
 				.GetType("AssetStoreTools.Uploader.PackageExporter")
 				.GetMethod("ExportPackage", BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy);
 			
-			var task = exportMethod.Invoke(null,
+			var task = exportMethod.Invoke(
+				null,
 				new object[]
-					{ assets, "PubNub.unitypackage", true, false, false, new[] { "com.unity.nuget.newtonsoft-json" } }) as Task;
+					{ 
+						assets, 
+						"PubNub.unitypackage", 
+						true, 
+						false, 
+						false, 
+						new[] { "com.unity.nuget.newtonsoft-json" } 
+					}
+				) as Task;
 
 			await task;
 			var o = task
