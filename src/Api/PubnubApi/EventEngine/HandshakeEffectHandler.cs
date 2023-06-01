@@ -9,10 +9,10 @@ namespace PubnubApi.PubnubEventEngine
 	public class HandshakeResponse
 	{
 		[JsonProperty("t")]
-		public Timetoken? Timetoken { get; set; }
+		public Timetoken Timetoken { get; set; }
 
 		[JsonProperty("m")]
-		public object[]? Messages { get; set; }
+		public object[] Messages { get; set; }
 	}
 	public class HandshakeError
 	{
@@ -38,27 +38,38 @@ namespace PubnubApi.PubnubEventEngine
 		public ExtendedState ExtendedState { get; set; }
 		public Action<string> HandshakeResponseCallback { get; set; }
 	}
+	public class CancelHandshakeRequestEventArgs : EventArgs 
+	{
+	}
 
 	public class HandshakeEffectHandler : IEffectInvocationHandler
 	{
 		EventEmitter emitter;
-		//public EffectInvocationType InvocationType { get; set; }
 		private ExtendedState extendedState { get; set;}
 		public Action<string> LogCallback { get; set; }
 		public Action<PNStatus> AnnounceStatus { get; set; }
 		private PNStatus pnStatus { get; set; }
 
 		public event EventHandler<HandshakeRequestEventArgs>? HandshakeRequested;
+		public event EventHandler<CancelHandshakeRequestEventArgs>? CancelHandshakeRequested;
 		protected virtual void OnHandshakeRequested(HandshakeRequestEventArgs e)
         {
-            EventHandler<HandshakeRequestEventArgs>? handler = HandshakeRequested;
+            EventHandler<HandshakeRequestEventArgs> handler = HandshakeRequested;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
+		protected virtual void OnCancelHandshakeRequested(CancelHandshakeRequestEventArgs e)
+        {
+            EventHandler<CancelHandshakeRequestEventArgs> handler = CancelHandshakeRequested;
             if (handler != null)
             {
                 handler(this, e);
             }
         }
 
-		CancellationTokenSource? cancellationTokenSource;
+		CancellationTokenSource cancellationTokenSource;
         public HandshakeEffectHandler(EventEmitter emitter)
 		{
 			this.emitter = emitter;
@@ -150,6 +161,11 @@ namespace PubnubApi.PubnubEventEngine
 				LogCallback?.Invoke($"HandshakeEffectHandler - cancellationTokenSource - cancellion attempted.");
 				cancellationTokenSource.Cancel();
 			}
+
+			LogCallback?.Invoke($"HandshakeEffectHandler - invoking OnCancelHandshakeRequested.");
+			CancelHandshakeRequestEventArgs args = new CancelHandshakeRequestEventArgs();
+			OnCancelHandshakeRequested(args);				
+
 		}
         public void Run(ExtendedState context)
         {

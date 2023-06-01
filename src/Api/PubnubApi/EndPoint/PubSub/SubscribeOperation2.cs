@@ -50,6 +50,7 @@ namespace PubnubApi.EndPoint
 			var handshakeEffectHandler = new HandshakeEffectHandler(eventEmitter);
             handshakeEffectHandler.LogCallback = LogCallback;
             handshakeEffectHandler.HandshakeRequested += HandshakeEffect_HandshakeRequested;
+            handshakeEffectHandler.CancelHandshakeRequested += HandshakeEffect_CancelHandshakeRequested;
             handshakeEffectHandler.AnnounceStatus = Announce;
 
 			var handshakeReconnectEffectHandler = new HandshakeReconnectEffectHandler(eventEmitter);
@@ -123,6 +124,10 @@ namespace PubnubApi.EndPoint
 
             string jsonResp = resp.Item1;
             e.HandshakeReconnectResponseCallback?.Invoke(jsonResp);
+        }
+        private void HandshakeEffect_CancelHandshakeRequested(object sender, CancelHandshakeRequestEventArgs e)
+        {
+            manager.HandshakeRequestCancellation();
         }
 
         private void JsonCallback(string json, bool zeroTimeTokenRequest, int messageCount)
