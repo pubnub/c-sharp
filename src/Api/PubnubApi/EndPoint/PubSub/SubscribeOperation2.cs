@@ -58,6 +58,7 @@ namespace PubnubApi.EndPoint
             handshakeReconnectEffectHandler.MaxRetries = config.ConnectionMaxRetries;
             handshakeReconnectEffectHandler.LogCallback = LogCallback;
             handshakeReconnectEffectHandler.HandshakeReconnectRequested += HandshakeReconnectEffect_HandshakeRequested;
+            handshakeReconnectEffectHandler.CancelHandshakeReconnectRequested += HandshakeReconnectEffect_CancelHandshakeRequested;
             handshakeReconnectEffectHandler.AnnounceStatus = Announce;
             
             var handshakeFailedEffectHandler = new HandshakeFailedEffectHandler(eventEmitter);
@@ -67,6 +68,7 @@ namespace PubnubApi.EndPoint
             receivingEffectHandler.ReconnectionPolicy = config.ReconnectionPolicy;
             receivingEffectHandler.LogCallback = LogCallback;
             receivingEffectHandler.ReceiveRequested += ReceivingEffect_ReceiveRequested;
+            receivingEffectHandler.CancelReceiveRequested += ReceivingEffect_CancelReceiveRequested;
             receivingEffectHandler.AnnounceStatus = Announce;
             receivingEffectHandler.AnnounceMessage = Announce;
 
@@ -128,6 +130,14 @@ namespace PubnubApi.EndPoint
         private void HandshakeEffect_CancelHandshakeRequested(object sender, CancelHandshakeRequestEventArgs e)
         {
             manager.HandshakeRequestCancellation();
+        }
+        private void HandshakeReconnectEffect_CancelHandshakeRequested(object sender, CancelHandshakeReconnectRequestEventArgs e)
+        {
+            manager.HandshakeRequestCancellation();
+        }
+        private void ReceivingEffect_CancelReceiveRequested(object sender, CancelReceiveRequestEventArgs e)
+        {
+            manager.ReceiveRequestCancellation();
         }
 
         private void JsonCallback(string json, bool zeroTimeTokenRequest, int messageCount)

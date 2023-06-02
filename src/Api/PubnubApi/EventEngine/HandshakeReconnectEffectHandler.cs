@@ -16,10 +16,12 @@ namespace PubnubApi.PubnubEventEngine
 		public ExtendedState ExtendedState { get; set; }
 		public Action<string> HandshakeReconnectResponseCallback { get; set; }
 	}
+	public class CancelHandshakeReconnectRequestEventArgs : EventArgs 
+	{ 
+	}
     public class HandshakeReconnectEffectHandler : IEffectInvocationHandler
     {
         EventEmitter emitter;
-		//public EffectInvocationType InvocationType { get; set; }
 		private ExtendedState extendedState { get; set;}
 		public Action<string> LogCallback { get; set; }
 		public Action<PNStatus> AnnounceStatus { get; set; }
@@ -31,18 +33,27 @@ namespace PubnubApi.PubnubEventEngine
 		const int MAXEXPONENTIALBACKOFF = 25;
 		const int INTERVAL = 3;
 
-		public event EventHandler<HandshakeReconnectRequestEventArgs>? HandshakeReconnectRequested;
+		public event EventHandler<HandshakeReconnectRequestEventArgs> HandshakeReconnectRequested;
+		public event EventHandler<CancelHandshakeReconnectRequestEventArgs> CancelHandshakeReconnectRequested;
 		System.Threading.Timer timer;
 		protected virtual void OnHandshakeReconnectRequested(HandshakeReconnectRequestEventArgs e)
         {
-            EventHandler<HandshakeReconnectRequestEventArgs>? handler = HandshakeReconnectRequested;
+            EventHandler<HandshakeReconnectRequestEventArgs> handler = HandshakeReconnectRequested;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
+		protected virtual void OnCancelHandshakeReconnectRequested(CancelHandshakeReconnectRequestEventArgs e)
+        {
+            EventHandler<CancelHandshakeReconnectRequestEventArgs> handler = CancelHandshakeReconnectRequested;
             if (handler != null)
             {
                 handler(this, e);
             }
         }
 
-        CancellationTokenSource? cancellationTokenSource;
+        CancellationTokenSource cancellationTokenSource;
         public HandshakeReconnectEffectHandler(EventEmitter emitter)
 		{
 			this.emitter = emitter;
@@ -242,6 +253,9 @@ namespace PubnubApi.PubnubEventEngine
 				LogCallback?.Invoke($"HandshakeReconnectEffectHandler - cancellationTokenSource - cancellion attempted.");
 				cancellationTokenSource.Cancel();
 			}
+			LogCallback?.Invoke($"HandshakeReconnectEffectHandler - invoking OnCancelHandshakeReconnectRequested.");
+			CancelHandshakeReconnectRequestEventArgs args = new CancelHandshakeReconnectRequestEventArgs();
+			OnCancelHandshakeReconnectRequested(args);				
 		}
         public void Run(ExtendedState context)
         {

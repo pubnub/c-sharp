@@ -9,7 +9,7 @@ namespace PubnubApi.PubnubEventEngine
 	public class ReceiveingResponse<T>
 	{
 		[JsonProperty("t")]
-		public Timetoken? Timetoken { get; set; }
+		public Timetoken Timetoken { get; set; }
 
 		[JsonProperty("m")]
 		public Message<T>[] Messages { get; set; }
@@ -45,6 +45,12 @@ namespace PubnubApi.PubnubEventEngine
 		public ExtendedState ExtendedState { get; set; }
 		public Action<string> ReceiveResponseCallback { get; set; }
 	}
+
+	public class CancelReceiveRequestEventArgs : EventArgs
+	{
+
+	}
+
 	public class ReceivingEffectHandler<T> : IEffectInvocationHandler, IReceiveMessageHandler<T>
 	{
 		EventEmitter emitter;
@@ -56,17 +62,27 @@ namespace PubnubApi.PubnubEventEngine
 		public Action<PNMessageResult<object>> AnnounceMessage { get; set; }
 		public PNReconnectionPolicy ReconnectionPolicy { get; set; }
 
-		public event EventHandler<ReceiveRequestEventArgs>? ReceiveRequested;
+		public event EventHandler<ReceiveRequestEventArgs> ReceiveRequested;
+		public event EventHandler<CancelReceiveRequestEventArgs> CancelReceiveRequested;
 		protected virtual void OnReceiveRequested(ReceiveRequestEventArgs e)
         {
-            EventHandler<ReceiveRequestEventArgs>? handler = ReceiveRequested;
+            EventHandler<ReceiveRequestEventArgs> handler = ReceiveRequested;
             if (handler != null)
             {
                 handler(this, e);
             }
         }
 
-		CancellationTokenSource? cancellationTokenSource;
+		protected virtual void OnCancelReceiveRequested(CancelReceiveRequestEventArgs e)
+        {
+            EventHandler<CancelReceiveRequestEventArgs> handler = CancelReceiveRequested;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
+
+		CancellationTokenSource cancellationTokenSource;
 
         public ReceivingEffectHandler(EventEmitter emitter)
 		{
@@ -164,6 +180,9 @@ namespace PubnubApi.PubnubEventEngine
 				LogCallback?.Invoke($"ReceivingEffectHandler - Receiving request cancellion attempted.");
 				cancellationTokenSource.Cancel();
 			}
+			LogCallback?.Invoke($"ReceivingEffectHandler - invoking OnCancelReceiveRequested.");
+			CancelReceiveRequestEventArgs args = new CancelReceiveRequestEventArgs();
+			OnCancelReceiveRequested(args);				
 		}
         public void Run(ExtendedState context)
         {

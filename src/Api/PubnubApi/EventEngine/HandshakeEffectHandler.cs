@@ -50,8 +50,8 @@ namespace PubnubApi.PubnubEventEngine
 		public Action<PNStatus> AnnounceStatus { get; set; }
 		private PNStatus pnStatus { get; set; }
 
-		public event EventHandler<HandshakeRequestEventArgs>? HandshakeRequested;
-		public event EventHandler<CancelHandshakeRequestEventArgs>? CancelHandshakeRequested;
+		public event EventHandler<HandshakeRequestEventArgs> HandshakeRequested;
+		public event EventHandler<CancelHandshakeRequestEventArgs> CancelHandshakeRequested;
 		protected virtual void OnHandshakeRequested(HandshakeRequestEventArgs e)
         {
             EventHandler<HandshakeRequestEventArgs> handler = HandshakeRequested;
@@ -165,7 +165,6 @@ namespace PubnubApi.PubnubEventEngine
 			LogCallback?.Invoke($"HandshakeEffectHandler - invoking OnCancelHandshakeRequested.");
 			CancelHandshakeRequestEventArgs args = new CancelHandshakeRequestEventArgs();
 			OnCancelHandshakeRequested(args);				
-
 		}
         public void Run(ExtendedState context)
         {
