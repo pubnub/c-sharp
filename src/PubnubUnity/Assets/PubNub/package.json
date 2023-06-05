@@ -1,0 +1,26 @@
+﻿{
+  "name": "com.pubnub.sdk",
+  "version": "7.0.0",
+  "displayName": "PubNub SDK",
+  "description": "PubNub Real-time Cloud-Hosted Push API and Push Notification Client Frameworks",
+  "unity": "2021.3",
+  "documentationUrl": "https://www.pubnub.com/docs/sdks/c-sharp",
+  "changelogUrl": "https://example.com/changelog.html",
+  "licensesUrl": "https://github.com/pubnub/c-sharp/blob/master/LICENSE",
+  "dependencies": {
+    "com.unity.nuget.newtonsoft-json": "3.0.2"
+  },
+  "keywords": [
+    "pubnub",
+    "sdk"
+  ],
+  "author": {
+    "name": "PubNub",
+    "email": "michal.dobrzanski@pubnub.com",
+    "url": "https://pubnub.com"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": "https://github.com/pubnub/c-sharp"
+}

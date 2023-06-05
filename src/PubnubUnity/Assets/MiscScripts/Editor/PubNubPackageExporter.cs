@@ -2,12 +2,25 @@ using UnityEngine;
 using UnityEditor;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace PubnubUtils {
 	public class PubNubPackageExporter : MonoBehaviour {
+		private static readonly string sourcePath = "Assets/PubNub";
+		private static readonly string targetPath = "Packages/com.pubnub.sdk";
+
+		static void CleanUp() {
+			if (System.IO.Directory.Exists(targetPath)) {
+				System.IO.Directory.Delete(targetPath, true);
+			}
+		}
+		
 		[MenuItem("Assets/Export PubNub Package")]
 		public static async void ExportPNPackage() {
-			var assets = new[] { "Assets/PubNub/UnitySDK" };
+			CleanUp();
+			CopyFilesRecursively(sourcePath, targetPath);
+
+			var assets = new[] { "Packages/com.pubnub.sdk" };
 
 			Debug.Log("Assets to be exported:\n" + string.Join(", ", assets));
 
@@ -20,10 +33,10 @@ namespace PubnubUtils {
 				new object[] {
 					assets,
 					"PubNub.unitypackage",
-					true,
 					false,
 					false,
-					new[] { "com.unity.nuget.newtonsoft-json" }
+					false,
+					null
 				}
 			) as Task;
 
@@ -37,6 +50,23 @@ namespace PubnubUtils {
 				.GetValue(o) as bool?;
 
 			Debug.Assert(r.Value, "Export broke.");
+			
+			CleanUp();
+		}
+		
+		private static void CopyFilesRecursively(string sourcePath, string targetPath)
+		{
+			//Now Create all of the directories
+			foreach (string dirPath in Directory.GetDirectories(sourcePath, "*", SearchOption.AllDirectories))
+			{
+				Directory.CreateDirectory(dirPath.Replace(sourcePath, targetPath));
+			}
+
+			//Copy all the files & Replaces any files with the same name
+			foreach (string newPath in Directory.GetFiles(sourcePath, "*.*",SearchOption.AllDirectories))
+			{
+				File.Copy(newPath, newPath.Replace(sourcePath, targetPath), true);
+			}
 		}
 	}
 }

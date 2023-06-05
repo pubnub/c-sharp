@@ -50,6 +50,8 @@ namespace PubnubApi.Unity.Internal.EditorTools {
 					
 					GUILayout.EndVertical();
 				}
+			} else {
+				EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Script"));
 			}
 
 			EditorGUILayout.PropertyField(serializedObject.FindProperty("pnConfiguration"), new GUIContent("PubNub Configuration"));
