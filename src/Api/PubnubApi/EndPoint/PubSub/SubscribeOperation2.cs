@@ -72,6 +72,14 @@ namespace PubnubApi.EndPoint
             receivingEffectHandler.AnnounceStatus = Announce;
             receivingEffectHandler.AnnounceMessage = Announce;
 
+			var receiveReconnectEffectHandler = new ReceiveReconnectingEffectHandler<object>(eventEmitter);
+            receiveReconnectEffectHandler.ReconnectionPolicy = config.ReconnectionPolicy;
+            receiveReconnectEffectHandler.MaxRetries = config.ConnectionMaxRetries;
+            receiveReconnectEffectHandler.LogCallback = LogCallback;
+            receiveReconnectEffectHandler.ReceiveReconnectRequested += ReceiveReconnectEffect_ReceiveRequested;
+            receiveReconnectEffectHandler.CancelReceiveReconnectRequested += ReceiveReconnectEffect_CancelReceiveRequested;
+            receiveReconnectEffectHandler.AnnounceStatus = Announce;
+
 			var effectDispatcher = new EffectDispatcher();
             effectDispatcher.PubnubUnitTest = unit;
             effectDispatcher.Register(EventType.Handshake,handshakeEffectHandler);
@@ -89,6 +97,11 @@ namespace PubnubApi.EndPoint
             effectDispatcher.Register(EventType.ReceiveMessages, receivingEffectHandler);
             effectDispatcher.Register(EventType.CancelReceiveMessages, receivingEffectHandler);
             effectDispatcher.Register(EventType.ReceiveSuccess, receivingEffectHandler);
+
+            effectDispatcher.Register(EventType.ReceiveReconnect, receiveReconnectEffectHandler);
+            effectDispatcher.Register(EventType.CancelReceiveReconnect, receiveReconnectEffectHandler);
+            effectDispatcher.Register(EventType.ReceiveReconnectSuccess, receiveReconnectEffectHandler);
+            effectDispatcher.Register(EventType.ReceiveReconnectGiveUp, receiveReconnectEffectHandler);
 
             pnEventEngine = new EventEngine(effectDispatcher, eventEmitter);
             pnEventEngine.PubnubUnitTest = unit;
@@ -136,6 +149,17 @@ namespace PubnubApi.EndPoint
             manager.HandshakeRequestCancellation();
         }
         private void ReceivingEffect_CancelReceiveRequested(object sender, CancelReceiveRequestEventArgs e)
+        {
+            manager.ReceiveRequestCancellation();
+        }
+        private void ReceiveReconnectEffect_ReceiveRequested(object sender, ReceiveReconnectRequestEventArgs e)
+        {
+            Tuple<string, PNStatus> resp = manager.ReceiveRequest<T>(PNOperationType.PNSubscribeOperation, e.ExtendedState.Channels.ToArray(), e.ExtendedState.ChannelGroups.ToArray(), e.ExtendedState.Timetoken, e.ExtendedState.Region, null, null).Result;
+
+            string jsonResp = resp.Item1;
+            e.ReceiveReconnectResponseCallback?.Invoke(jsonResp);
+        }
+        private void ReceiveReconnectEffect_CancelReceiveRequested(object sender, CancelReceiveReconnectRequestEventArgs e)
         {
             manager.ReceiveRequestCancellation();
         }

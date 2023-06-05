@@ -23,6 +23,7 @@ namespace PubnubApi.PubnubEventEngine
 		[JsonProperty("d")]
 		public T Payload { get; set; }
 	}
+	
 	public class PresenceEvent
 	{
 		[JsonProperty("action")]
@@ -39,6 +40,14 @@ namespace PubnubApi.PubnubEventEngine
 
 	}
 
+	public class ReceiveError
+	{
+		[JsonProperty("status")]
+		public int Status { get; set; }
+
+		[JsonProperty("error")]
+		public string ErrorMessage { get; set; }
+	}
 
 	public class ReceiveRequestEventArgs : EventArgs 
 	{
@@ -125,13 +134,13 @@ namespace PubnubApi.PubnubEventEngine
 					receiveSuccessEvent.Name = "RECEIVE_SUCCESS";
 					LogCallback?.Invoke("OnReceivingEffectResponseReceived - EventType.ReceiveSuccess");
 
-					pnStatus = new PNStatus();
-					pnStatus.StatusCode = 200;
-					pnStatus.Operation = PNOperationType.PNSubscribeOperation;
-					pnStatus.AffectedChannels = extendedState.Channels;
-					pnStatus.AffectedChannelGroups = extendedState.ChannelGroups;
-					pnStatus.Category = PNStatusCategory.PNConnectedCategory;
-					pnStatus.Error = false;
+					//pnStatus = new PNStatus();
+					//pnStatus.StatusCode = 200;
+					//pnStatus.Operation = PNOperationType.PNSubscribeOperation;
+					//pnStatus.AffectedChannels = extendedState.Channels;
+					//pnStatus.AffectedChannelGroups = extendedState.ChannelGroups;
+					//pnStatus.Category = PNStatusCategory.PNConnectedCategory;
+					//pnStatus.Error = false;
 
 					emitter.emit(receiveSuccessEvent);
 				}
@@ -186,7 +195,7 @@ namespace PubnubApi.PubnubEventEngine
 		}
         public void Run(ExtendedState context)
         {
-            if (AnnounceStatus != null)
+            if (AnnounceStatus != null && pnStatus != null)
 			{
 				AnnounceStatus(pnStatus);
 			}

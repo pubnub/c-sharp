@@ -233,6 +233,7 @@ namespace PubnubApi.PubnubEventEngine
 
 			emitter.emit(handshakeReconnectGiveupEvent);
 		}
+
 		//private void PrepareAndEmitHandshakeFailedEvent(Exception ex)
 		//{
 		//	HandshakeFailure handshakeFailureEvent = new HandshakeFailure();

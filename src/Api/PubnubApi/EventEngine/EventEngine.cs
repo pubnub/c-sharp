@@ -255,6 +255,11 @@ namespace PubnubApi.PubnubEventEngine
 						//Ignore Announce for 200
 						return;
 					}
+					else if (Handler is ReceiveReconnectingEffectHandler<object> && status.StatusCode == 200)
+					{
+						//Ignore Announce for 200
+						return;
+					}
 					System.Diagnostics.Debug.WriteLine($"Status Category = {status.Category} to be announced");
 					AnnounceStatus(status);
 				}
@@ -642,7 +647,7 @@ namespace PubnubApi.PubnubEventEngine
 
             EmitMessages<T> receiveEmitMessages = new EmitMessages<T>(null);
             receiveEmitMessages.Name = "EMIT_EVENTS";
-            receiveEmitMessages.Effectype = EventType.ReceiveSuccess;
+            receiveEmitMessages.Effectype = EventType.ReceiveMessages;
 
             EmitStatus receiveDisconnectEmitStatus = new EmitStatus();
             receiveDisconnectEmitStatus.Name = "EMIT_STATUS";
@@ -662,7 +667,7 @@ namespace PubnubApi.PubnubEventEngine
                 .On(EventType.SubscriptionRestored, StateType.Receiving)
                 .On(EventType.ReceiveSuccess, StateType.Receiving, new List<EffectInvocation>()
                             { 
-                                receiveEmitStatus,
+                                //receiveEmitStatus,
                                 receiveEmitMessages
                             }
                 )
@@ -696,11 +701,11 @@ namespace PubnubApi.PubnubEventEngine
             #region ReceiveReconnecting Effect Invocations and Emit Status
             EmitStatus receiveReconnectEmitStatus = new EmitStatus();
             receiveReconnectEmitStatus.Name = "RECONNECT_EMIT_STATUS";
-            receiveEmitStatus.Effectype = EventType.ReceiveReconnectSuccess;
+            receiveReconnectEmitStatus.Effectype = EventType.ReceiveReconnectSuccess;
 
             EmitMessages<T> receiveReconnectEmitMessages = new EmitMessages<T>(null);
             receiveReconnectEmitMessages.Name = "RECEIVE_RECONNECT_EVENTS";
-            receiveReconnectEmitMessages.Effectype = EventType.ReceiveReconnectSuccess;
+            receiveReconnectEmitMessages.Effectype = EventType.ReceiveMessages;
 
             EmitStatus receiveReconnectDisconnectEmitStatus = new EmitStatus();
             receiveReconnectDisconnectEmitStatus.Name = "RECONNECT_DISCONNECT_STATUS";
@@ -724,15 +729,11 @@ namespace PubnubApi.PubnubEventEngine
                 .On(EventType.SubscriptionRestored, StateType.Receiving)
                 .On(EventType.ReceiveReconnectSuccess, StateType.Receiving, new List<EffectInvocation>()
                             { 
-                                receiveReconnectEmitStatus,
+                                //receiveReconnectEmitStatus,
                                 receiveReconnectEmitMessages
                             }
                 )
-                .On(EventType.Disconnect, StateType.ReceiveStopped, new List<EffectInvocation>()
-                            { 
-                                receiveReconnectDisconnectEmitStatus
-                            }
-                )
+                .On(EventType.Disconnect, StateType.ReceiveStopped)
                 .On(EventType.ReceiveReconnectGiveUp, StateType.ReceiveFailed, new List<EffectInvocation>()
                             { 
                                 receiveReconnectGiveupEmitStatus

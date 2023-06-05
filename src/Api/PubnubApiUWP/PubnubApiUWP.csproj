@@ -338,8 +338,8 @@ Addressed threading issue on reading ConcurrentDictionary keys.</PackageReleaseN
     <Compile Include="..\PubnubApi\EventEngine\HandshakeFailedEffectHandler.cs" Link="EventEngine\HandshakeFailedEffectHandler.cs" />
     <Compile Include="..\PubnubApi\EventEngine\HandshakeReconnectEffectHandler.cs" Link="EventEngine\HandshakeReconnectEffectHandler.cs" />
     <Compile Include="..\PubnubApi\EventEngine\IEffectInvocationHandler.cs" Link="EventEngine\IEffectInvocationHandler.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\ReceiveReconnectingEffectHandler.cs" Link="EventEngine\ReceiveReconnectingEffectHandler.cs" />
     <Compile Include="..\PubnubApi\EventEngine\ReceivingEffectHandler.cs" Link="EventEngine\ReceivingEffectHandler.cs" />
-    <Compile Include="..\PubnubApi\EventEngine\ReconnectingEffectHandler.cs" Link="EventEngine\ReconnectingEffectHandler.cs" />
     <Compile Include="..\PubnubApi\EventEngine\State.cs" Link="EventEngine\State.cs" />
     <Compile Include="..\PubnubApi\Helper\MobilePushHelper.cs" Link="Helper\MobilePushHelper.cs" />
     <Compile Include="..\PubnubApi\HttpUtility\HttpUtility.cs">
