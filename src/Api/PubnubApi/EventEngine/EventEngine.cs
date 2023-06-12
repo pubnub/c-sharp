@@ -720,7 +720,8 @@ namespace PubnubApi.PubnubEventEngine
             receiveReconnectInvocation.Effectype = EventType.ReceiveReconnect;
 
             EffectInvocation cancelReceiveReconnect = new CancelReceiveReconnect();
-            cancelReceiveReconnect.Effectype = EventType.CancelReceiveMessages;
+			cancelReceiveReconnect.Name = "CANCEL_RECEIVE_RECONNECT";
+            cancelReceiveReconnect.Effectype = EventType.CancelReceiveReconnect;
             #endregion
             #region StateType.ReceiveReconnecting
             CreateState(StateType.ReceiveReconnecting)

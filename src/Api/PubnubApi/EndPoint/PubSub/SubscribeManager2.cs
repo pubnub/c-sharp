@@ -205,7 +205,32 @@ namespace PubnubApi.EndPoint
             }
             else
             {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} SubscribeManager => ReceiveRequestCancellation. No request to cancel.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} SubscribeManager => RequestCancellation. No request to cancel.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+            }
+        }
+
+        internal void ReceiveReconnectRequestCancellation()
+        {
+            if (httpSubscribe != null)
+            {
+                try
+                {
+                    #if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
+                    httpSubscribe.CancelPendingRequests();
+                    #else
+                    httpSubscribe.Abort();
+                    #endif   
+                    httpSubscribe = null;
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} SubscribeManager => ReceiveReconnectRequestCancellation. Done.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                }
+                catch(Exception ex)
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} SubscribeManager => ReceiveReconnectRequestCancellation Exception: {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), config.LogVerbosity);
+                }
+            }
+            else
+            {
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} SubscribeManager => ReceiveReconnectRequestCancellation. No request to cancel.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
             }
         }
 

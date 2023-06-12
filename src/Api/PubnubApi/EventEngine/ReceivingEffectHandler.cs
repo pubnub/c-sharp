@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -119,6 +118,7 @@ namespace PubnubApi.PubnubEventEngine
 		{
 			try
 			{
+				pnStatus = null;
 				var receivedResponse = JsonConvert.DeserializeObject<ReceiveingResponse<object>>(json);
 				if (receivedResponse != null && receivedResponse.Timetoken != null)
 				{

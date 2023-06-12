@@ -161,7 +161,7 @@ namespace PubnubApi.EndPoint
         }
         private void ReceiveReconnectEffect_CancelReceiveRequested(object sender, CancelReceiveReconnectRequestEventArgs e)
         {
-            manager.ReceiveRequestCancellation();
+            manager.ReceiveReconnectRequestCancellation();
         }
 
         private void JsonCallback(string json, bool zeroTimeTokenRequest, int messageCount)

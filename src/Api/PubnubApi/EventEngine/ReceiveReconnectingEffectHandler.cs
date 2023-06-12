@@ -115,6 +115,7 @@ namespace PubnubApi.PubnubEventEngine
 		{
 			try
 			{
+				pnStatus = null;
 				LogCallback?.Invoke($"OnReceiveReconnectEffectResponseReceived Json Response = {json}");
 				var receivedResponse = JsonConvert.DeserializeObject<ReceiveingResponse<object>>(json);
 				if (receivedResponse != null && receivedResponse.Timetoken != null)
@@ -248,6 +249,10 @@ namespace PubnubApi.PubnubEventEngine
 			{
 				LogCallback?.Invoke($"ReceiveReconnectEffectHandler - cancellationTokenSource - cancellion attempted.");
 				cancellationTokenSource.Cancel();
+			}
+			if (timer != null)
+			{
+				timer.Change(Timeout.Infinite, Timeout.Infinite);
 			}
 			LogCallback?.Invoke($"ReceiveReconnectEffectHandler - invoking OnCancelReceiveReconnectRequested.");
 			CancelReceiveReconnectRequestEventArgs args = new CancelReceiveReconnectRequestEventArgs();
