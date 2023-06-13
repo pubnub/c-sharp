@@ -667,7 +667,7 @@ namespace PubnubApi.PubnubEventEngine
                 .On(EventType.SubscriptionRestored, StateType.Receiving)
                 .On(EventType.ReceiveSuccess, StateType.Receiving, new List<EffectInvocation>()
                             { 
-                                //receiveEmitStatus,
+                                receiveEmitStatus,
                                 receiveEmitMessages
                             }
                 )
