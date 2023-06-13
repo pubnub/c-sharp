@@ -4,8 +4,8 @@ namespace PubnubApi.PubnubEventEngine.Core {
 	public abstract class Engine {
 		public EventQueue eventQueue = new EventQueue();
 		
-		private EffectDispatcher dispatcher = new EffectDispatcher();
-		private State currentState;
+		protected EffectDispatcher dispatcher = new EffectDispatcher();
+		protected State currentState;
 
 		private Task<State> currentTransition;
 

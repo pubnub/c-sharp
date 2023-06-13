@@ -512,6 +512,8 @@ namespace PubnubApi.PubnubEventEngine
 
 		public void Setup<T>(PNConfiguration config)
 		{
+
+
 			CreateState(StateType.Unsubscribed)
 				.On(EventType.SubscriptionChanged, StateType.Handshaking)
                 .On(EventType.SubscriptionRestored, StateType.Receiving);
