@@ -4,12 +4,7 @@ namespace PubnubApi.PubnubEventEngine.Core {
 	public abstract class Engine {
 		private EffectDispatcher dispatcher;
 		private State currentState;
-
-		public async Task<State> Transition(Event e) {
-			var newState = currentState.Transition(e);
-			await ExecuteStateChange(currentState, newState);
-			return newState;
-		}
+		public abstract Task<State> Transition(Event e);
 
 		private async Task ExecuteStateChange(State s1, State s2, params IEffectInvocation[] invocations) {
 			foreach (var effectInvocation in s1.onExit) {

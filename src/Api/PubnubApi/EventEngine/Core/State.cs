@@ -6,6 +6,5 @@ namespace PubnubApi.PubnubEventEngine.Core {
 	public abstract class State {
 		public abstract IEffectInvocation[] onEntry { get; }
 		public abstract IEffectInvocation[] onExit { get; }
-		public abstract State Transition(Event e);
 	}
 }
