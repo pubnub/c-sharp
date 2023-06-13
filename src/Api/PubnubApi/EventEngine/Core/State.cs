@@ -3,12 +3,12 @@ using System.Threading.Tasks;
 
 namespace PubnubApi.PubnubEventEngine.Core {
 	internal abstract class State {
-		public abstract IEffectInvocation[] onEntry { get; }
-		public abstract IEffectInvocation[] onExit { get; }
+		public abstract IEnumerable<IEffectInvocation> onEntry { get; }
+		public abstract IEnumerable<IEffectInvocation> onExit { get; }
 
 		/// <summary>
 		/// Implement event handling here.
 		/// </summary>
-		public abstract System.Tuple<State, IEffectInvocation[]> Transition(Event e);
+		public abstract System.Tuple<State, IEnumerable<IEffectInvocation>> Transition(Event e);
 	}
 }

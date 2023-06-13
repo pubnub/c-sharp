@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace PubnubApi.PubnubEventEngine.Core {
 	internal abstract class Engine {
@@ -35,7 +36,7 @@ namespace PubnubApi.PubnubEventEngine.Core {
 		/// <summary>
 		/// Launch the invocations associated with transitioning between states
 		/// </summary>
-		private async Task ExecuteStateChange(State s1, State s2, params IEffectInvocation[] invocations) {
+		private async Task ExecuteStateChange(State s1, State s2, IEnumerable<IEffectInvocation> invocations) {
 			foreach (var effectInvocation in s1.onExit) {
 				await dispatcher.Dispatch(effectInvocation);
 			}
