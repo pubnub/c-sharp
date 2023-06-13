@@ -7,6 +7,8 @@ namespace PubnubApi.PubnubEventEngine.Core {
 		private EffectDispatcher dispatcher = new EffectDispatcher();
 		private State currentState;
 
+		private Task<State> currentTransition;
+
 		public Engine() {
 			eventQueue.onEventQueued += OnEvent;
 		}
@@ -16,13 +18,17 @@ namespace PubnubApi.PubnubEventEngine.Core {
 		}
 
 		private async void OnEvent(EventQueue q) {
-			currentState = await Transition(q.Dequeue());
+			await currentTransition;
+			currentTransition = Transition(q.Dequeue()).ContinueWith((res) => currentState = res.Result);
 		}
+		
+		private async Task<State> Transition(Event e) {
+			var ret = currentState.Transition(e);
 
-		/// <summary>
-		/// Implement event handling here.
-		/// </summary>
-		protected abstract Task<State> Transition(Event e);
+			await ExecuteStateChange(currentState, ret.Item1, ret.Item2);
+
+			return ret.Item1;
+		}
 
 		/// <summary>
 		/// Launch the invocations associated with transitioning between states
