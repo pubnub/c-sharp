@@ -71,6 +71,7 @@ namespace PubnubApi.EndPoint
             receivingEffectHandler.CancelReceiveRequested += ReceivingEffect_CancelReceiveRequested;
             receivingEffectHandler.AnnounceStatus = Announce;
             receivingEffectHandler.AnnounceMessage = Announce;
+            receivingEffectHandler.AnnouncePresenceEvent = Announce;
 
 			var receiveReconnectEffectHandler = new ReceiveReconnectingEffectHandler<object>(eventEmitter);
             receiveReconnectEffectHandler.ReconnectionPolicy = config.ReconnectionPolicy;

@@ -16,11 +16,38 @@ namespace PubnubApi.PubnubEventEngine
 
 	public class Message<T>
 	{
+		[JsonProperty ("a")]
+		public string Shard { get; set;}
+
+		[JsonProperty ("b")]
+		public string SubscriptionMatch { get; set;}
+
 		[JsonProperty("c")]
 		public string Channel { get; set; }
 
 		[JsonProperty("d")]
 		public T Payload { get; set; }
+
+		[JsonProperty("e")]
+		public int MessageType { get; set; }
+
+		[JsonProperty("f")]
+		public string Flags { get; set; }
+
+		//[JsonProperty("i")]
+		//public string IssuingClientId { get; set; }
+
+		[JsonProperty("k")]
+		public string SubscribeKey { get; set; }
+
+		[JsonProperty("o")]
+		public object OriginatingTimetoken { get; set; }
+
+		[JsonProperty("p")]
+		public object PublishMetadata { get; set; }
+
+		[JsonProperty("s")]
+		public long SequenceNumber { get; set; }
 	}
 	
 	public class PresenceEvent
@@ -68,6 +95,7 @@ namespace PubnubApi.PubnubEventEngine
 		public Action<string> LogCallback { get; set; }
 		public Action<PNStatus> AnnounceStatus { get; set; }
 		public Action<PNMessageResult<object>> AnnounceMessage { get; set; }
+		public Action<PNPresenceEventResult> AnnouncePresenceEvent { get; set; }
 		public PNReconnectionPolicy ReconnectionPolicy { get; set; }
 
 		public event EventHandler<ReceiveRequestEventArgs> ReceiveRequested;
@@ -134,14 +162,6 @@ namespace PubnubApi.PubnubEventEngine
 					receiveSuccessEvent.Name = "RECEIVE_SUCCESS";
 					LogCallback?.Invoke("OnReceivingEffectResponseReceived - EventType.ReceiveSuccess");
 
-					//pnStatus = new PNStatus();
-					//pnStatus.StatusCode = 200;
-					//pnStatus.Operation = PNOperationType.PNSubscribeOperation;
-					//pnStatus.AffectedChannels = extendedState.Channels;
-					//pnStatus.AffectedChannelGroups = extendedState.ChannelGroups;
-					//pnStatus.Category = PNStatusCategory.PNConnectedCategory;
-					//pnStatus.Error = false;
-
 					emitter.emit(receiveSuccessEvent);
 				}
 				else
@@ -178,8 +198,6 @@ namespace PubnubApi.PubnubEventEngine
 
 				emitter.emit(receiveFailureEvent);
 			}
-			//emitter.emit(evnt);
-			//emitter.emit(json, false, messageCount);
 		}
 
 		public void Cancel()
@@ -199,26 +217,64 @@ namespace PubnubApi.PubnubEventEngine
 			{
 				AnnounceStatus(pnStatus);
 			}
-            if (AnnounceMessage != null)
-            {
-				Message<object>[] receiveMessages = GetMessages();
-				int messageCount = receiveMessages.Length;
-				if (receiveMessages != null && receiveMessages.Length > 0)
+			Message<object>[] receiveMessages = GetMessages();
+			int messageCount = (receiveMessages != null) ? receiveMessages.Length : 0;
+			if (messageCount > 0)
+			{
+				for (int index = 0; index < receiveMessages.Length; index++)
 				{
-					for (int index = 0; index < receiveMessages.Length; index++)
+					LogCallback?.Invoke($"Received Message ({index + 1} of {receiveMessages.Length}) : {JsonConvert.SerializeObject(receiveMessages[index])}");
+					if (receiveMessages[index].Channel.IndexOf("-pnpres") > 0)
 					{
-						LogCallback?.Invoke($"Received Message ({index + 1} of {receiveMessages.Length}) : {JsonConvert.SerializeObject(receiveMessages[index])}");
-						if (receiveMessages[index].Channel.IndexOf("-pnpres") > 0)
+						if (AnnouncePresenceEvent != null)
 						{
-							var presenceData = JsonConvert.DeserializeObject<PresenceEvent>(receiveMessages[index].Payload.ToString());
+							var presenceEvent = JsonConvert.DeserializeObject<PresenceEvent>(receiveMessages[index].Payload.ToString());
+							PNPresenceEventResult presenceEventResult = new PNPresenceEventResult();
+							presenceEventResult.Channel = receiveMessages[index].Channel;
+							presenceEventResult.Event = presenceEvent.Action;
+							presenceEventResult.Occupancy = presenceEvent.Occupancy;
+							presenceEventResult.Uuid = presenceEvent.Uuid;
+							presenceEventResult.Timestamp = presenceEvent.Timestamp;
+							presenceEventResult.UserMetadata = receiveMessages[index].PublishMetadata;
+
+							AnnouncePresenceEvent?.Invoke(presenceEventResult);
+						}
+					}
+					else
+					{
+						if (receiveMessages[index].MessageType == 1)
+						{
+							//TODO: Callback for Signal message
+                            PNSignalResult<object> signalMessage = new PNSignalResult<object>
+                            {
+                                Channel = receiveMessages[index].Channel,
+                                Message = receiveMessages[index].Payload,
+                            };
+							AnnounceMessage?.Invoke(signalMessage);
+						}
+						else if (receiveMessages[index].MessageType == 2)
+						{
+							//TODO: Callback for Object message
+						}
+						else if (receiveMessages[index].MessageType == 3)
+						{
+							//TODO: Callback for Message Action message
+						}
+						else if (receiveMessages[index].MessageType == 4)
+						{
+							//TODO: Callback for File message
 						}
 						else
 						{
-							LogCallback?.Invoke($"Message : {JsonConvert.SerializeObject(receiveMessages[index].Payload)}");
-							PNMessageResult<object> messageResult = new PNMessageResult<object>();
-							messageResult.Channel = receiveMessages[index].Channel;
-							messageResult.Message = receiveMessages[index].Payload;
-							AnnounceMessage?.Invoke(messageResult);
+							//Callback for regular message
+							if (AnnounceMessage != null)
+							{
+								LogCallback?.Invoke($"Message : {JsonConvert.SerializeObject(receiveMessages[index].Payload)}");
+								PNMessageResult<object> messageResult = new PNMessageResult<object>();
+								messageResult.Channel = receiveMessages[index].Channel;
+								messageResult.Message = receiveMessages[index].Payload;
+								AnnounceMessage?.Invoke(messageResult);
+							}
 						}
 					}
 				}
