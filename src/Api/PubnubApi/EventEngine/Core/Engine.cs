@@ -22,7 +22,7 @@ namespace PubnubApi.PubnubEventEngine.Core {
 		/// <summary>
 		/// Implement event handling here.
 		/// </summary>
-		public abstract Task<State> Transition(Event e);
+		protected abstract Task<State> Transition(Event e);
 
 		/// <summary>
 		/// Launch the invocations associated with transitioning between states
