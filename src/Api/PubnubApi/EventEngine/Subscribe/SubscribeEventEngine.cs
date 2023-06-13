@@ -4,11 +4,11 @@ using PubnubApi.PubnubEventEngine.Subscribe.Invocations;
 using PubnubApi.PubnubEventEngine.Subscribe.States;
 
 namespace PubnubApi.PubnubEventEngine.Subscribe {
-	public class SubscribeEventEngine : PubnubEventEngine.Core.Engine {
-		private SubscribeOperation2<object> subscribeOperation2;
+	internal class SubscribeEventEngine : PubnubEventEngine.Core.Engine {
+		private SubscribeManager2 subscribeManager;
 		
-		public SubscribeEventEngine(SubscribeOperation2<object> subscribeOperation2) {
-			this.subscribeOperation2 = subscribeOperation2;
+		public SubscribeEventEngine(SubscribeManager2 subscribeManager) {
+			this.subscribeManager = subscribeManager;
 
 			dispatcher.Register<EmitMessagesInvocation, EmitMessagesEffect>(new EmitMessagesEffect());
 

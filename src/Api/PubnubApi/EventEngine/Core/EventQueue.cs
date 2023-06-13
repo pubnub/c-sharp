@@ -2,7 +2,7 @@
 using System.Linq;
 
 namespace PubnubApi.PubnubEventEngine.Core {
-	public class EventQueue {
+	internal class EventQueue {
 		private volatile Queue<Event> eventQueue = new Queue<Event>();
 		private object lockObj = new object();
 

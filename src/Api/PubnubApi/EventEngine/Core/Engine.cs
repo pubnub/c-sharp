@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 
 namespace PubnubApi.PubnubEventEngine.Core {
-	public abstract class Engine {
+	internal abstract class Engine {
 		public EventQueue eventQueue = new EventQueue();
 		
 		protected EffectDispatcher dispatcher = new EffectDispatcher();
