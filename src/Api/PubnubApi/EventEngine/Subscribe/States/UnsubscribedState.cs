@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using PubnubApi.PubnubEventEngine.Core;
 
 namespace PubnubApi.PubnubEventEngine.Subscribe.States {
-	public class UnsubscribedState : Core.State {
-		public override IEffectInvocation[] onEntry { get; }
-		public override IEffectInvocation[] onExit { get; }
-		public override Tuple<Core.State, IEffectInvocation[]> Transition(Event e) {
+	internal class UnsubscribedState : Core.State {
+		public override IEnumerable<IEffectInvocation> onEntry { get; }
+		public override IEnumerable<IEffectInvocation> onExit { get; }
+		public override Tuple<Core.State, IEnumerable<IEffectInvocation>> Transition(Event e) {
 			throw new NotImplementedException();
 		}
 	}
