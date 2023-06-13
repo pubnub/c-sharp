@@ -143,4 +143,8 @@ Addressed threading issue on reading ConcurrentDictionary keys.</PackageReleaseN
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="EventEngine\Core" />
+  </ItemGroup>
+
 </Project>
