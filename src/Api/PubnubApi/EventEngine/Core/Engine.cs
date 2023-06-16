@@ -25,8 +25,12 @@ namespace PubnubApi.PubnubEventEngine.Core {
 			currentTransition = Transition(q.Dequeue()).ContinueWith((res) => currentState = res.Result);
 		}
 		
-		private async Task<State> Transition(Event e) {
+		private async Task<State> Transition(IEvent e) {
 			var ret = currentState.Transition(e);
+
+			if (ret is null) {
+				return currentState;
+			}
 
 			await ExecuteStateChange(currentState, ret.Item1, ret.Item2);
 

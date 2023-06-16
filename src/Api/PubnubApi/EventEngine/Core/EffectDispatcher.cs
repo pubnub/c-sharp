@@ -26,9 +26,8 @@ namespace PubnubApi.PubnubEventEngine.Core {
 		/// <summary>
 		/// Assign a handler implementation to an invocation.
 		/// </summary>
-		public EffectDispatcher Register<TEffectInvocation, TEffectHandler>(TEffectHandler handler)
-			where TEffectInvocation : IEffectInvocation
-			where TEffectHandler : IEffectHandler<TEffectInvocation> {
+		public EffectDispatcher Register<TEffectInvocation>(IEffectHandler handler)
+			where TEffectInvocation : IEffectInvocation {
 			// TODO log
 			// if (effectInvocationHandlerMap.ContainsKey(typeof(TEffectInvocation)))
 			

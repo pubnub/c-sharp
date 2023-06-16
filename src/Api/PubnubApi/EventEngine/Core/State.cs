@@ -9,6 +9,6 @@ namespace PubnubApi.PubnubEventEngine.Core {
 		/// <summary>
 		/// Implement event handling here.
 		/// </summary>
-		public abstract System.Tuple<State, IEnumerable<IEffectInvocation>> Transition(Event e);
+		public abstract System.Tuple<State, IEnumerable<IEffectInvocation>> Transition(IEvent e);
 	}
 }

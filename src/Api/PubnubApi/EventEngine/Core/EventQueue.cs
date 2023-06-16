@@ -3,12 +3,12 @@ using System.Linq;
 
 namespace PubnubApi.PubnubEventEngine.Core {
 	internal class EventQueue {
-		private volatile Queue<Event> eventQueue = new Queue<Event>();
+		private volatile Queue<IEvent> eventQueue = new Queue<IEvent>();
 		private object lockObj = new object();
 
 		public event System.Action<EventQueue> onEventQueued;
 
-		public void Enqueue(Event e) {
+		public void Enqueue(IEvent e) {
 			lock (lockObj) {
 				// TODO de-dupe? Throttle?
 				eventQueue.Enqueue(e);
@@ -16,7 +16,7 @@ namespace PubnubApi.PubnubEventEngine.Core {
 			}
 		}
 
-		public Event Dequeue() {
+		public IEvent Dequeue() {
 			lock (lockObj) {
 				return eventQueue.Any() ? eventQueue.Dequeue() : null;
 			}

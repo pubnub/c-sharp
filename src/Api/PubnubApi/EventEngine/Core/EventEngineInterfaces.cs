@@ -5,7 +5,7 @@ namespace PubnubApi.PubnubEventEngine.Core {
 		Task Cancel();
 	}
 	
-	internal interface IEffectHandler<T> : IEffectHandler where T : IEffectInvocation {
+	internal interface IEffectHandler<in T> : IEffectHandler where T : IEffectInvocation {
 		Task Run(T invocation);
 	}
 	
