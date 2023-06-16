@@ -8,17 +8,17 @@ using PubnubApi.PubnubEventEngine.Core;
 using PubnubApi.PubnubEventEngine.Subscribe.Invocations;
 
 namespace PubnubApi.PubnubEventEngine.Subscribe.Effects {
-	internal class HandshakeEffect : Core.IEffectHandler<HandshakeInvocation> {
+	internal class HandshakeEffectHandler : Core.IEffectHandler<HandshakeInvocation> {
 		private SubscribeManager2 manager;
 		private EventQueue eventQueue;
 
-		public HandshakeEffect(SubscribeManager2 manager, EventQueue eventQueue) {
+		public HandshakeEffectHandler(SubscribeManager2 manager, EventQueue eventQueue) {
 			this.manager = manager;
 			this.eventQueue = eventQueue;
 		}
 		
 		public async Task Run(HandshakeInvocation invocation) {
-			// TODO fix this :)
+			// TODO fix this, probably wrong :)
 			var resp = await manager.HandshakeRequest<string>(
 				PNOperationType.PNSubscribeOperation, 
 				invocation.channels.ToArray(), 
@@ -34,8 +34,8 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Effects {
 			}
 		}
 
-		public Task Cancel() {
-			throw new System.NotImplementedException();
+		public async Task Cancel() {
+			manager.HandshakeRequestCancellation();
 		}
 	}
 }

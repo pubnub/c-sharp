@@ -10,7 +10,7 @@ namespace PubnubApi.PubnubEventEngine.Subscribe {
 		public SubscribeEventEngine(SubscribeManager2 subscribeManager) {
 			this.subscribeManager = subscribeManager;
 
-			var handshakeHandler = new HandshakeEffect(subscribeManager, eventQueue);
+			var handshakeHandler = new Effects.HandshakeEffectHandler(subscribeManager, eventQueue);
 			dispatcher.Register<HandshakeInvocation>(handshakeHandler);
 			dispatcher.Register<HandshakeCancelInvocation>(handshakeHandler);
 

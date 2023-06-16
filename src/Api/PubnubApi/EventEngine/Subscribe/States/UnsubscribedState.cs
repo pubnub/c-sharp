@@ -7,6 +7,7 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States {
 	internal class UnsubscribedState : SubscribeCommonState {
 		public override IEnumerable<IEffectInvocation> onEntry { get; }
 		public override IEnumerable<IEffectInvocation> onExit { get; }
+
 		public override Tuple<Core.State, IEnumerable<IEffectInvocation>> Transition(Core.IEvent e) {
 			switch (e) {
 				case Events.SubscriptionChangedEvent subscriptionChanged:
@@ -21,11 +22,11 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States {
 								channels = subscriptionChanged.channels,
 								channelGroups = subscriptionChanged.channelGroups,
 								cursor = cursor
-							}
+							},
 						}
 					);
-											
-					default: return null;
+
+				default: return null;
 			}
 		}
 	}
