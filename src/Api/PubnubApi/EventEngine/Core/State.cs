@@ -7,8 +7,10 @@ namespace PubnubApi.PubnubEventEngine.Core {
 		public abstract IEnumerable<IEffectInvocation> onExit { get; }
 
 		/// <summary>
-		/// Implement event handling here.
+		/// The EE transition pure function.
 		/// </summary>
+		/// <param name="e">Input event</param>
+		/// <returns>Target state and invocation list, or null for no-transition</returns>
 		public abstract System.Tuple<State, IEnumerable<IEffectInvocation>> Transition(IEvent e);
 	}
 }
