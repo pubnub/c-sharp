@@ -14,7 +14,17 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Invocations {
 		public IEnumerable<string> channels;
 		public IEnumerable<string> channelGroups;
 		public SubscriptionCursor cursor;
+		public Dictionary<string, string> initialSubscribeQueryParams = new Dictionary<string, string>();
+		public Dictionary<string, object> externalQueryParams = new Dictionary<string, object>();
 	}
+	
+	internal class ReceiveMessagesInvocation : Core.IEffectInvocation { }
+	
+	internal class CancelReceiveMessagesInvocation : Core.IEffectCancelInvocation { }
 
 	internal class HandshakeCancelInvocation : Core.IEffectCancelInvocation { }
+
+	internal class ReconnectInvocation : Core.IEffectInvocation { }
+	
+	internal class CancelReconnectInvocation : Core.IEffectCancelInvocation { }
 }
