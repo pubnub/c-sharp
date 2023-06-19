@@ -22,14 +22,9 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Events {
 		public PNStatus status;
 	}
 
-	public class HandshakeReconnectSuccessEvent : Core.IEvent {
-		public SubscriptionCursor cursor;
-	}
+	public class HandshakeReconnectSuccessEvent : HandshakeSuccessEvent { }
 
-	public class HandshakeReconnectFailureEvent : Core.IEvent {
-		// TODO status or reason?
-		public PNStatus status;
-	}
+	public class HandshakeReconnectFailureEvent : HandshakeFailureEvent { }
 
 	public class HandshakeReconnectRetryEvent : Core.IEvent { }
 
