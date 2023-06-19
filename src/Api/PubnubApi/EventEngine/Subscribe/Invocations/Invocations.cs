@@ -20,11 +20,11 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Invocations {
 	
 	internal class ReceiveMessagesInvocation : Core.IEffectInvocation { }
 	
-	internal class CancelReceiveMessagesInvocation : Core.IEffectCancelInvocation { }
+	internal class CancelReceiveMessagesInvocation : ReceiveMessagesInvocation, Core.IEffectCancelInvocation { }
 
-	internal class HandshakeCancelInvocation : Core.IEffectCancelInvocation { }
+	internal class HandshakeCancelInvocation : HandshakeInvocation, Core.IEffectCancelInvocation { }
 
 	internal class ReconnectInvocation : Core.IEffectInvocation { }
 	
-	internal class CancelReconnectInvocation : Core.IEffectCancelInvocation { }
+	internal class CancelReconnectInvocation : ReconnectInvocation, Core.IEffectCancelInvocation { }
 }

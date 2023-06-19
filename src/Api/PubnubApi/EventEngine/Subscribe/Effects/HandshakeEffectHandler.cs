@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using PubnubApi.EndPoint;
 using PubnubApi.PubnubEventEngine.Core;
 using PubnubApi.PubnubEventEngine.Subscribe.Invocations;
@@ -28,7 +29,15 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Effects {
 			);
 
 			if (!resp.Item2.Error) {
-				// eventQueue.Enqueue(new HandshakeSuccessEvent(...));
+				// TODO move deserialization outside
+				// TODO does this need more error checking?
+				var handshakeResponse = JsonConvert.DeserializeObject<HandshakeResponse>(resp.Item1);
+				var c = new SubscriptionCursor() {
+					Region = handshakeResponse.Timetoken.Region,
+					Timetoken = handshakeResponse.Timetoken.Timestamp
+				};
+				
+				eventQueue.Enqueue(new Events.HandshakeSuccessEvent() {cursor = c});
 			}
 		}
 

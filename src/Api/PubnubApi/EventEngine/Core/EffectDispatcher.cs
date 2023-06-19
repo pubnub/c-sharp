@@ -22,15 +22,16 @@ namespace PubnubApi.PubnubEventEngine.Core {
 				await ((IEffectHandler<T>)effectInvocationHandlerMap[invocation.GetType()]).Run(invocation);
 			}
 		}
-		
+
 		/// <summary>
 		/// Assign a handler implementation to an invocation.
 		/// </summary>
-		public EffectDispatcher Register<TEffectInvocation>(IEffectHandler handler)
-			where TEffectInvocation : IEffectInvocation {
+		public EffectDispatcher Register<TEffectInvocation, TEffectHandler>(TEffectHandler handler)
+			where TEffectInvocation : IEffectInvocation
+			where TEffectHandler : IEffectHandler<TEffectInvocation> {
 			// TODO log
 			// if (effectInvocationHandlerMap.ContainsKey(typeof(TEffectInvocation)))
-			
+
 			effectInvocationHandlerMap[typeof(TEffectInvocation)] = handler;
 			return this;
 		}
