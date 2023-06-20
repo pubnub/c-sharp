@@ -26,28 +26,28 @@ namespace PubnubApi.PubnubEventEngine.Core {
 		}
 		
 		private async Task<State> Transition(IEvent e) {
-			var ret = currentState.Transition(e);
+			var stateInvocationPair = currentState.Transition(e);
 
-			if (ret is null) {
+			if (stateInvocationPair is null) {
 				return currentState;
 			}
 
-			await ExecuteStateChange(currentState, ret.Item1, ret.Item2);
+			await ExecuteStateChange(currentState, stateInvocationPair.Item1, stateInvocationPair.Item2);
 
-			return ret.Item1;
+			return stateInvocationPair.Item1;
 		}
 
 		/// <summary>
 		/// Launch the invocations associated with transitioning between states
 		/// </summary>
-		private async Task ExecuteStateChange(State s1, State s2, IEnumerable<IEffectInvocation> invocations) {
-			foreach (var effectInvocation in s1.onExit) {
+		private async Task ExecuteStateChange(State sourceState, State targetState, IEnumerable<IEffectInvocation> invocations) {
+			foreach (var effectInvocation in sourceState.onExit) {
 				await dispatcher.Dispatch(effectInvocation);
 			}
 			foreach (var effectInvocation in invocations) {
 				await dispatcher.Dispatch(effectInvocation);
 			}
-			foreach (var effectInvocation in s2.onEntry) {
+			foreach (var effectInvocation in targetState.onEntry) {
 				await dispatcher.Dispatch(effectInvocation);
 			}
 		}

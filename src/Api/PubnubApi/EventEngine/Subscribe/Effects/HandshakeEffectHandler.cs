@@ -22,8 +22,8 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Effects {
 				PNOperationType.PNSubscribeOperation,
 				invocation.channels.ToArray(),
 				invocation.channelGroups.ToArray(),
-				invocation.cursor?.Timetoken,
-				invocation.cursor?.Region,
+				null,
+				null,
 				invocation.initialSubscribeQueryParams,
 				invocation.externalQueryParams
 			);

@@ -13,7 +13,6 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Invocations {
 	internal class HandshakeInvocation : Core.IEffectInvocation {
 		public IEnumerable<string> channels;
 		public IEnumerable<string> channelGroups;
-		public SubscriptionCursor cursor;
 		public Dictionary<string, string> initialSubscribeQueryParams = new Dictionary<string, string>();
 		public Dictionary<string, object> externalQueryParams = new Dictionary<string, object>();
 	}
