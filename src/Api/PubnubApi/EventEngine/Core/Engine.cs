@@ -6,9 +6,9 @@ namespace PubnubApi.PubnubEventEngine.Core {
 		public EventQueue eventQueue = new EventQueue();
 		
 		protected EffectDispatcher dispatcher = new EffectDispatcher();
-		protected State currentState;
+		protected IState currentState;
 
-		private Task<State> currentTransition;
+		private Task<IState> currentTransition;
 
 		public Engine() {
 			eventQueue.onEventQueued += OnEvent;
@@ -25,7 +25,7 @@ namespace PubnubApi.PubnubEventEngine.Core {
 			currentTransition = Transition(q.Dequeue()).ContinueWith((res) => currentState = res.Result);
 		}
 		
-		private async Task<State> Transition(IEvent e) {
+		private async Task<IState> Transition(IEvent e) {
 			var stateInvocationPair = currentState.Transition(e);
 
 			if (stateInvocationPair is null) {
@@ -40,7 +40,7 @@ namespace PubnubApi.PubnubEventEngine.Core {
 		/// <summary>
 		/// Launch the invocations associated with transitioning between states
 		/// </summary>
-		private async Task ExecuteStateChange(State sourceState, State targetState, IEnumerable<IEffectInvocation> invocations) {
+		private async Task ExecuteStateChange(IState sourceState, IState targetState, IEnumerable<IEffectInvocation> invocations) {
 			foreach (var effectInvocation in sourceState.onExit) {
 				await dispatcher.Dispatch(effectInvocation);
 			}
