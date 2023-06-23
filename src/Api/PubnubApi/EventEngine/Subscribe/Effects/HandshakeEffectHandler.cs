@@ -20,12 +20,12 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Effects {
 			// TODO fix this, probably wrong :)
 			var resp = await manager.HandshakeRequest<string>(
 				PNOperationType.PNSubscribeOperation,
-				invocation.channels.ToArray(),
-				invocation.channelGroups.ToArray(),
+				invocation.Channels.ToArray(),
+				invocation.ChannelGroups.ToArray(),
 				null,
 				null,
-				invocation.initialSubscribeQueryParams,
-				invocation.externalQueryParams
+				invocation.InitialSubscribeQueryParams,
+				invocation.ExternalQueryParams
 			);
 
 			if (!resp.Item2.Error) {

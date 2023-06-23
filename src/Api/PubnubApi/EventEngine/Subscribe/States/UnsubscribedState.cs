@@ -12,13 +12,13 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States {
 				case Events.SubscriptionChangedEvent subscriptionChanged:
 					return new Tuple<Core.IState, IEnumerable<IEffectInvocation>>(
 						new HandshakingState() {
-							channels = subscriptionChanged.channels,
-							channelGroups = subscriptionChanged.channelGroups,
+							Channels = subscriptionChanged.Channels,
+							ChannelGroups = subscriptionChanged.ChannelGroups,
 						},
 						new[] {
 							new HandshakeInvocation() {
-								channels = subscriptionChanged.channels,
-								channelGroups = subscriptionChanged.channelGroups,
+								Channels = subscriptionChanged.Channels,
+								ChannelGroups = subscriptionChanged.ChannelGroups,
 							},
 						}
 					);
