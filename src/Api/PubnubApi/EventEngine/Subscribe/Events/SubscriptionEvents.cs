@@ -69,5 +69,7 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Events {
 	}
 
 	public class ReconnectEvent : Core.IEvent {
+		public IEnumerable<string> Channels;
+		public IEnumerable<string> ChannelGroups;
 	}
 }
