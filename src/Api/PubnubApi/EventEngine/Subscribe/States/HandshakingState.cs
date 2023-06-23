@@ -5,8 +5,8 @@ using PubnubApi.PubnubEventEngine.Core;
 namespace PubnubApi.PubnubEventEngine.Subscribe.States {
 	internal class HandshakingState : Core.IState {
 
-		public IEnumerable<string> channels;
-		public IEnumerable<string> channelGroups;
+		public IEnumerable<string> Channels;
+		public IEnumerable<string> ChannelGroups;
 
 		public IEnumerable<IEffectInvocation> OnEntry { get; }
 		public IEnumerable<IEffectInvocation> OnExit { get; }

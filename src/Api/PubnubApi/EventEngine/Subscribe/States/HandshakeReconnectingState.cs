@@ -16,27 +16,51 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States {
 				case Events.SubscriptionChangedEvent subscriptionChanged:
 					return new Tuple<Core.IState, IEnumerable<IEffectInvocation>>(
 						new HandshakingState() {
-							channels = subscriptionChanged.channels,
-							channelGroups = subscriptionChanged.channelGroups,
+							Channels = subscriptionChanged.Channels,
+							ChannelGroups = subscriptionChanged.ChannelGroups,
 						},
 						new[] {
 							new HandshakeInvocation() {
-								channels = subscriptionChanged.channels,
-								channelGroups = subscriptionChanged.channelGroups,
+								Channels = subscriptionChanged.Channels,
+								ChannelGroups = subscriptionChanged.ChannelGroups,
 							},
 						}
 					);
-				case Events.DisconnectEvent disconnectEvent:
+				case Events.DisconnectEvent disconnect:
 					return new Tuple<Core.IState, IEnumerable<IEffectInvocation>>(
 						new HandshakeStoppedState() {
-							Channels = disconnectEvent.Channels,
-							ChannelGroups = disconnectEvent.ChannelGroups
+							Channels = disconnect.Channels,
+							ChannelGroups = disconnect.ChannelGroups
 						},
 						null
 					);
-				case Events.HandshakeReconnectGiveUpEvent handshakeReconnectGiveUpEvent:
+				case Events.HandshakeReconnectGiveUpEvent handshakeReconnectGiveUp:
 					return new Tuple<IState, IEnumerable<IEffectInvocation>>(
-						new HandshakeFailedState() { },
+						new HandshakeFailedState() { 
+							Channels = handshakeReconnectGiveUp.Channels,
+							ChannelGroups = handshakeReconnectGiveUp.ChannelGroups
+						},
+						null
+					);
+				case Events.HandshakeReconnectSuccessEvent handshakeReconnectSuccess:
+					return new Tuple<IState, IEnumerable<IEffectInvocation>>(
+						new ReceivingState() { 
+							Channels = handshakeReconnectSuccess.Channels,
+							ChannelGroups = handshakeReconnectSuccess.ChannelGroups
+						},
+						new[] {
+							new EmitStatusInvocation() {
+								Channels = handshakeReconnectSuccess.Channels,
+								ChannelGroups = handshakeReconnectSuccess.ChannelGroups,
+							},
+						}
+					);
+				case Events.SubscriptionRestoredEvent subscriptionRestored:
+					return new Tuple<IState, IEnumerable<IEffectInvocation>>(
+						new HandshakeFailedState() { 
+							Channels = subscriptionRestored.Channels,
+							ChannelGroups = subscriptionRestored.ChannelGroups
+						},
 						null
 					);
 

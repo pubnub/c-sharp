@@ -2,14 +2,14 @@
 
 namespace PubnubApi.PubnubEventEngine.Subscribe.Events {
 	public class SubscriptionChangedEvent : Core.IEvent {
-		public IEnumerable<string> channels;
-		public IEnumerable<string> channelGroups;
+		public IEnumerable<string> Channels;
+		public IEnumerable<string> ChannelGroups;
 	}
 
 	public class SubscriptionRestoredEvent : Core.IEvent {
-		public IEnumerable<string> channels;
-		public IEnumerable<string> channelGroups;
-		public SubscriptionCursor cursor;
+		public IEnumerable<string> Channels;
+		public IEnumerable<string> ChannelGroups;
+		public SubscriptionCursor Cursor;
 	}
 
 	public class HandshakeSuccessEvent : Core.IEvent {
@@ -22,6 +22,8 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Events {
 	}
 
 	public class HandshakeReconnectSuccessEvent : HandshakeSuccessEvent {
+		public IEnumerable<string> Channels;
+		public IEnumerable<string> ChannelGroups;
 	}
 
 	public class HandshakeReconnectFailureEvent : HandshakeFailureEvent {
@@ -31,6 +33,8 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Events {
 	}
 
 	public class HandshakeReconnectGiveUpEvent : Core.IEvent {
+		public IEnumerable<string> Channels;
+		public IEnumerable<string> ChannelGroups;
 		// TODO status or reason?
 		public PNStatus status;
 	}
@@ -65,5 +69,7 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Events {
 	}
 
 	public class ReconnectEvent : Core.IEvent {
+		public IEnumerable<string> Channels;
+		public IEnumerable<string> ChannelGroups;
 	}
 }
