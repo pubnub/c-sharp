@@ -17,8 +17,8 @@ namespace PubnubApi.PubnubEventEngine.Core {
 	internal interface IEvent { };
 	
 	internal interface IState {
-		public abstract IEnumerable<IEffectInvocation> onEntry { get; }
-		public abstract IEnumerable<IEffectInvocation> onExit { get; }
+		public abstract IEnumerable<IEffectInvocation> OnEntry { get; }
+		public abstract IEnumerable<IEffectInvocation> OnExit { get; }
 
 		/// <summary>
 		/// The EE transition pure function.

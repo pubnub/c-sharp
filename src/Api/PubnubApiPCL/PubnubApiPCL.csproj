@@ -214,6 +214,10 @@ Addressed threading issue on reading ConcurrentDictionary keys.</PackageReleaseN
     <Compile Include="..\PubnubApi\Enum\ResponseType.cs">
       <Link>Enum\ResponseType.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\EventEngine\Core\EffectDispatcher.cs" Link="EventEngine\Core\EffectDispatcher.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Core\Engine.cs" Link="EventEngine\Core\Engine.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Core\EventEngineInterfaces.cs" Link="EventEngine\Core\EventEngineInterfaces.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Core\EventQueue.cs" Link="EventEngine\Core\EventQueue.cs" />
     <Compile Include="..\PubnubApi\EventEngine\EffectDispatcher.cs" Link="EventEngine\EffectDispatcher.cs" />
     <Compile Include="..\PubnubApi\EventEngine\EventEmitter.cs" Link="EventEngine\EventEmitter.cs" />
     <Compile Include="..\PubnubApi\EventEngine\EventEngine.cs" Link="EventEngine\EventEngine.cs" />
@@ -224,6 +228,20 @@ Addressed threading issue on reading ConcurrentDictionary keys.</PackageReleaseN
     <Compile Include="..\PubnubApi\EventEngine\ReceiveReconnectingEffectHandler.cs" Link="EventEngine\ReceiveReconnectingEffectHandler.cs" />
     <Compile Include="..\PubnubApi\EventEngine\ReceivingEffectHandler.cs" Link="EventEngine\ReceivingEffectHandler.cs" />
     <Compile Include="..\PubnubApi\EventEngine\State.cs" Link="EventEngine\State.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Subscribe\Effects\HandshakeEffectHandler.cs" Link="EventEngine\Subscribe\Effects\HandshakeEffectHandler.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Subscribe\Events\SubscriptionEvents.cs" Link="EventEngine\Subscribe\Events\SubscriptionEvents.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Subscribe\Invocations\SubscriptionInvocations.cs" Link="EventEngine\Subscribe\Invocations\SubscriptionInvocations.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Subscribe\States\HandshakeFailedState.cs" Link="EventEngine\Subscribe\States\HandshakeFailedState.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Subscribe\States\HandshakeReconnectingState.cs" Link="EventEngine\Subscribe\States\HandshakeReconnectingState.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Subscribe\States\HandshakeStoppedState.cs" Link="EventEngine\Subscribe\States\HandshakeStoppedState.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Subscribe\States\HandshakingState.cs" Link="EventEngine\Subscribe\States\HandshakingState.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Subscribe\States\ReceiveFailedState.cs" Link="EventEngine\Subscribe\States\ReceiveFailedState.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Subscribe\States\ReceiveReconnectingState.cs" Link="EventEngine\Subscribe\States\ReceiveReconnectingState.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Subscribe\States\ReceiveStoppedState.cs" Link="EventEngine\Subscribe\States\ReceiveStoppedState.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Subscribe\States\ReceivingState.cs" Link="EventEngine\Subscribe\States\ReceivingState.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Subscribe\States\SubscribedState.cs" Link="EventEngine\Subscribe\States\SubscribedState.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Subscribe\States\UnsubscribedState.cs" Link="EventEngine\Subscribe\States\UnsubscribedState.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Subscribe\SubscribeEventEngine.cs" Link="EventEngine\Subscribe\SubscribeEventEngine.cs" />
     <Compile Include="..\PubnubApi\Helper\MobilePushHelper.cs" Link="Helper\MobilePushHelper.cs" />
     <Compile Include="..\PubnubApi\HttpUtility\HttpUtility.cs">
       <Link>HttpUtility\HttpUtility.cs</Link>
@@ -899,6 +917,11 @@ Addressed threading issue on reading ConcurrentDictionary keys.</PackageReleaseN
     <Folder Include="EndPoint\PubSub\" />
     <Folder Include="EndPoint\Presence\" />
     <Folder Include="Enum\" />
+    <Folder Include="EventEngine\Core\" />
+    <Folder Include="EventEngine\Subscribe\Effects\" />
+    <Folder Include="EventEngine\Subscribe\Events\" />
+    <Folder Include="EventEngine\Subscribe\Invocations\" />
+    <Folder Include="EventEngine\Subscribe\States\" />
     <Folder Include="HttpUtility\" />
     <Folder Include="Interface\" />
     <Folder Include="Log\" />
@@ -923,7 +946,6 @@ Addressed threading issue on reading ConcurrentDictionary keys.</PackageReleaseN
     <Folder Include="Model\Server\" />
     <Folder Include="Helper\" />
     <Folder Include="JsonDataParse\" />
-    <Folder Include="EventEngine\" />
     <Folder Include="Properties\" />
     <Folder Include="Push\Mpns\" />
     <Folder Include="Security\" />

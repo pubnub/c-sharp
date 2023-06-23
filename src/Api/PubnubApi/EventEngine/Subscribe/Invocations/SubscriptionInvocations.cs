@@ -23,7 +23,11 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Invocations {
 
 	internal class HandshakeCancelInvocation : HandshakeInvocation, Core.IEffectCancelInvocation { }
 
-	internal class ReconnectInvocation : Core.IEffectInvocation { }
+	//internal class ReconnectInvocation : Core.IEffectInvocation { }
+	internal class HandshakeReconnectInvocation: Core.IEffectInvocation { }
+	internal class CancelHandshakeReconnectInvocation: HandshakeReconnectInvocation, Core.IEffectCancelInvocation { }
 	
-	internal class CancelReconnectInvocation : ReconnectInvocation, Core.IEffectCancelInvocation { }
+	internal class ReceiveReconnectInvocation: Core.IEffectInvocation { }
+	internal class CancelReceiveReconnectInvocation: ReceiveReconnectInvocation, Core.IEffectCancelInvocation { }
+	//internal class CancelReconnectInvocation : ReconnectInvocation, Core.IEffectCancelInvocation { }
 }

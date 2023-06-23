@@ -41,13 +41,13 @@ namespace PubnubApi.PubnubEventEngine.Core {
 		/// Launch the invocations associated with transitioning between states
 		/// </summary>
 		private async Task ExecuteStateChange(IState sourceState, IState targetState, IEnumerable<IEffectInvocation> invocations) {
-			foreach (var effectInvocation in sourceState.onExit) {
+			foreach (var effectInvocation in sourceState.OnExit) {
 				await dispatcher.Dispatch(effectInvocation);
 			}
 			foreach (var effectInvocation in invocations) {
 				await dispatcher.Dispatch(effectInvocation);
 			}
-			foreach (var effectInvocation in targetState.onEntry) {
+			foreach (var effectInvocation in targetState.OnEntry) {
 				await dispatcher.Dispatch(effectInvocation);
 			}
 		}

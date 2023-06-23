@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using PubnubApi.PubnubEventEngine.Core;
+using PubnubApi.PubnubEventEngine.Subscribe.Invocations;
 
 namespace PubnubApi.PubnubEventEngine.Subscribe.States {
-	internal class HandshakingState : Core.IState {
+	internal class ReceiveFailedState : Core.IState {
 
-		public IEnumerable<string> channels;
-		public IEnumerable<string> channelGroups;
+		public IEnumerable<string> Channels;
+		public IEnumerable<string> ChannelGroups;
 
 		public IEnumerable<IEffectInvocation> OnEntry { get; }
 		public IEnumerable<IEffectInvocation> OnExit { get; }
@@ -15,3 +16,4 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States {
 		}
 	}
 }
+
