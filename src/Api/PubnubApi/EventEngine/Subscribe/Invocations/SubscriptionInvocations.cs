@@ -7,7 +7,8 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Invocations {
 	}
 
 	internal class EmitStatusInvocation : Core.IEffectInvocation {
-		
+		public IEnumerable<string> Channels;
+		public IEnumerable<string> ChannelGroups;
 	}
 
 	internal class HandshakeInvocation : Core.IEffectInvocation {
@@ -17,7 +18,11 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Invocations {
 		public Dictionary<string, object> ExternalQueryParams = new Dictionary<string, object>();
 	}
 	
-	internal class ReceiveMessagesInvocation : Core.IEffectInvocation { }
+	internal class ReceiveMessagesInvocation : Core.IEffectInvocation 
+	{ 
+		public IEnumerable<string> Channels;
+		public IEnumerable<string> ChannelGroups;
+	}
 	
 	internal class CancelReceiveMessagesInvocation : ReceiveMessagesInvocation, Core.IEffectCancelInvocation { }
 

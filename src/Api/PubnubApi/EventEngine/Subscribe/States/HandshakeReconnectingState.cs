@@ -49,7 +49,7 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States {
 							ChannelGroups = handshakeReconnectSuccess.ChannelGroups
 						},
 						new[] {
-							new HandshakeReconnectInvocation() {
+							new EmitStatusInvocation() {
 								Channels = handshakeReconnectSuccess.Channels,
 								ChannelGroups = handshakeReconnectSuccess.ChannelGroups,
 							},
