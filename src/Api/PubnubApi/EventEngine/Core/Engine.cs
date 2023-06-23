@@ -10,6 +10,8 @@ namespace PubnubApi.PubnubEventEngine.Core {
 
 		private Task<IState> currentTransition;
 
+		private readonly IEffectInvocation[] emptyInvocationList = new IEffectInvocation[0];
+
 		public Engine() {
 			eventQueue.onEventQueued += OnEvent;
 		}
@@ -41,13 +43,13 @@ namespace PubnubApi.PubnubEventEngine.Core {
 		/// Launch the invocations associated with transitioning between states
 		/// </summary>
 		private async Task ExecuteStateChange(IState sourceState, IState targetState, IEnumerable<IEffectInvocation> invocations) {
-			foreach (var effectInvocation in sourceState.OnExit) {
+			foreach (var effectInvocation in sourceState.OnExit ?? emptyInvocationList) {
 				await dispatcher.Dispatch(effectInvocation);
 			}
-			foreach (var effectInvocation in invocations) {
+			foreach (var effectInvocation in invocations ?? emptyInvocationList) {
 				await dispatcher.Dispatch(effectInvocation);
 			}
-			foreach (var effectInvocation in targetState.OnEntry) {
+			foreach (var effectInvocation in targetState.OnEntry ?? emptyInvocationList) {
 				await dispatcher.Dispatch(effectInvocation);
 			}
 		}
