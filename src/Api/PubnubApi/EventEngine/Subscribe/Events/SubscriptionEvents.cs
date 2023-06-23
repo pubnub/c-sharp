@@ -40,11 +40,15 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Events {
 	}
 
 	public class ReceiveSuccessEvent : Core.IEvent {
-		public List<PNMessageResult<object>> messages;
-		public SubscriptionCursor cursor;
+		public IEnumerable<string> Channels;
+		public IEnumerable<string> ChannelGroups;
+		public List<PNMessageResult<object>> Messages;
+		public SubscriptionCursor Cursor;
 	}
 
 	public class ReceiveFailureEvent : Core.IEvent {
+		public IEnumerable<string> Channels;
+		public IEnumerable<string> ChannelGroups;
 		// TODO status or reason?
 		public PNStatus status;
 	}
