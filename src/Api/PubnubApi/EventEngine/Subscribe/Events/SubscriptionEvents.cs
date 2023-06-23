@@ -63,6 +63,8 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Events {
 	}
 
 	public class ReceiveReconnectGiveUpEvent : Core.IEvent {
+		public IEnumerable<string> Channels;
+		public IEnumerable<string> ChannelGroups;
 		// TODO status or reason?
 		public PNStatus status;
 	}
