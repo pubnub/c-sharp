@@ -22,6 +22,7 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Invocations {
 	{ 
 		public IEnumerable<string> Channels;
 		public IEnumerable<string> ChannelGroups;
+		public SubscriptionCursor  Cursor;
 	}
 	
 	internal class CancelReceiveMessagesInvocation : ReceiveMessagesInvocation, Core.IEffectCancelInvocation { }
@@ -41,6 +42,7 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Invocations {
 	{ 
 		public IEnumerable<string> Channels;
 		public IEnumerable<string> ChannelGroups;
+		public SubscriptionCursor Cursor;
 	}
 
 	internal class CancelReceiveReconnectInvocation: ReceiveReconnectInvocation, Core.IEffectCancelInvocation { }

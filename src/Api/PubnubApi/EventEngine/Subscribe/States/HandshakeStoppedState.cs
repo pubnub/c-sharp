@@ -43,7 +43,8 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States {
 					return new Tuple<IState, IEnumerable<IEffectInvocation>>(
 						new ReceivingState() { 
 							Channels = subscriptionRestored.Channels,
-							ChannelGroups = subscriptionRestored.ChannelGroups
+							ChannelGroups = subscriptionRestored.ChannelGroups,
+							Cursor = subscriptionRestored.Cursor
 						},
 						new[] {
 							new ReceiveMessagesInvocation() {

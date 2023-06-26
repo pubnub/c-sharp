@@ -8,6 +8,7 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States {
 
 		public IEnumerable<string> Channels;
 		public IEnumerable<string> ChannelGroups;
+		public SubscriptionCursor  Cursor;
 
 		public IEnumerable<IEffectInvocation> OnEntry { get; }
 		public IEnumerable<IEffectInvocation> OnExit { get; }
@@ -17,12 +18,14 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States {
 					return new Tuple<Core.IState, IEnumerable<IEffectInvocation>>(
 						new ReceivingState() {
 							Channels = receiveSuccess.Channels,
-							ChannelGroups = receiveSuccess.ChannelGroups
+							ChannelGroups = receiveSuccess.ChannelGroups,
+							Cursor = receiveSuccess.Cursor
 						},
 						new[] {
 							new ReceiveMessagesInvocation() {
 								Channels = receiveSuccess.Channels,
 								ChannelGroups = receiveSuccess.ChannelGroups,
+								Cursor = receiveSuccess.Cursor
 							},
 						}
 					);
@@ -31,11 +34,13 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States {
 						new ReceivingState() {
 							Channels = subscriptionChanged.Channels,
 							ChannelGroups = subscriptionChanged.ChannelGroups,
+							Cursor = subscriptionChanged.Cursor
 						},
 						new[] {
 							new ReceiveMessagesInvocation() {
 								Channels = subscriptionChanged.Channels,
 								ChannelGroups = subscriptionChanged.ChannelGroups,
+								Cursor = subscriptionChanged.Cursor
 							},
 						}
 					);
@@ -43,12 +48,14 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States {
 					return new Tuple<IState, IEnumerable<IEffectInvocation>>(
 						new HandshakeFailedState() { 
 							Channels = subscriptionRestored.Channels,
-							ChannelGroups = subscriptionRestored.ChannelGroups
+							ChannelGroups = subscriptionRestored.ChannelGroups,
+							Cursor = subscriptionRestored.Cursor
 						},
 						new[] {
 							new ReceiveMessagesInvocation() {
 								Channels = subscriptionRestored.Channels,
 								ChannelGroups = subscriptionRestored.ChannelGroups,
+								Cursor = subscriptionRestored.Cursor
 							},
 						}
 					);
@@ -56,7 +63,8 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States {
 					return new Tuple<Core.IState, IEnumerable<IEffectInvocation>>(
 						new ReceiveStoppedState() {
 							Channels = disconnect.Channels,
-							ChannelGroups = disconnect.ChannelGroups
+							ChannelGroups = disconnect.ChannelGroups,
+							Cursor = disconnect.Cursor
 						},
 						new[] {
 							new EmitStatusInvocation() {
@@ -69,7 +77,8 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States {
 					return new Tuple<Core.IState, IEnumerable<IEffectInvocation>>(
 						new ReceiveReconnectingState() {
 							Channels = receiveFailure.Channels,
-							ChannelGroups = receiveFailure.ChannelGroups
+							ChannelGroups = receiveFailure.ChannelGroups,
+							Cursor = receiveFailure.Cursor
 						},
 						null
 					);
