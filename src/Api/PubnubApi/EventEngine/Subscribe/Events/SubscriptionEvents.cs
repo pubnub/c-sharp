@@ -4,7 +4,6 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Events {
 	public class SubscriptionChangedEvent : Core.IEvent {
 		public IEnumerable<string> Channels;
 		public IEnumerable<string> ChannelGroups;
-		public SubscriptionCursor Cursor;
 	}
 
 	public class SubscriptionRestoredEvent : Core.IEvent {
@@ -19,7 +18,7 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Events {
 
 	public class HandshakeFailureEvent : Core.IEvent {
 		// TODO status or reason?
-		public PNStatus status;
+		public PNStatus Status;
 	}
 
 	public class HandshakeReconnectSuccessEvent : HandshakeSuccessEvent {
@@ -70,7 +69,7 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Events {
 		public IEnumerable<string> ChannelGroups;
 		public SubscriptionCursor Cursor;
 		// TODO status or reason?
-		public PNStatus status;
+		public PNStatus Status;
 	}
 
 	public class DisconnectEvent : Core.IEvent {

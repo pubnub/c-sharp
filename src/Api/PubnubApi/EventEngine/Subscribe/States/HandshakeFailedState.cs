@@ -3,61 +3,41 @@ using System.Collections.Generic;
 using PubnubApi.PubnubEventEngine.Core;
 using PubnubApi.PubnubEventEngine.Subscribe.Invocations;
 
-namespace PubnubApi.PubnubEventEngine.Subscribe.States {
-	internal class HandshakeFailedState : Core.IState {
+namespace PubnubApi.PubnubEventEngine.Subscribe.States
+{
+    internal class HandshakeFailedState : Core.IState
+    {
+        public IEnumerable<string> Channels;
+        public IEnumerable<string> ChannelGroups;
 
-		public IEnumerable<string> Channels;
-		public IEnumerable<string> ChannelGroups;
-		public SubscriptionCursor Cursor;
+        public IEnumerable<IEffectInvocation> OnEntry { get; }
+        public IEnumerable<IEffectInvocation> OnExit { get; }
 
-		public IEnumerable<IEffectInvocation> OnEntry { get; }
-		public IEnumerable<IEffectInvocation> OnExit { get; }
-		public Tuple<Core.IState, IEnumerable<IEffectInvocation>> Transition(IEvent e) {
-			switch (e) {
-				case Events.SubscriptionChangedEvent subscriptionChanged:
-					return new Tuple<Core.IState, IEnumerable<IEffectInvocation>>(
-						new HandshakingState() {
-							Channels = subscriptionChanged.Channels,
-							ChannelGroups = subscriptionChanged.ChannelGroups,
-						},
-						new[] {
-							new HandshakeInvocation() {
-								Channels = subscriptionChanged.Channels,
-								ChannelGroups = subscriptionChanged.ChannelGroups,
-							},
-						}
-					);
-				case Events.ReconnectEvent reconnect:
-					return new Tuple<Core.IState, IEnumerable<IEffectInvocation>>(
-						new HandshakingState() {
-							Channels = reconnect.Channels,
-							ChannelGroups = reconnect.ChannelGroups,
-						},
-						new[] {
-							new HandshakeInvocation() {
-								Channels = reconnect.Channels,
-								ChannelGroups = reconnect.ChannelGroups,
-							},
-						}
-					);
-				case Events.SubscriptionRestoredEvent subscriptionRestored:
-					return new Tuple<IState, IEnumerable<IEffectInvocation>>(
-						new ReceivingState() { 
-							Channels = subscriptionRestored.Channels,
-							ChannelGroups = subscriptionRestored.ChannelGroups,
-							Cursor = subscriptionRestored.Cursor
-						},
-						new[] {
-							new ReceiveMessagesInvocation() {
-								Channels = subscriptionRestored.Channels,
-								ChannelGroups = subscriptionRestored.ChannelGroups,
-								Cursor = subscriptionRestored.Cursor
-							},
-						}
-					);
-
-				default: return null;
-			}
-		}
-	}
+        public Tuple<Core.IState, IEnumerable<IEffectInvocation>> Transition(IEvent e)
+        {
+            switch (e)
+            {
+                case Events.SubscriptionChangedEvent subscriptionChanged:
+                    return new HandshakingState()
+                    {
+                        Channels = subscriptionChanged.Channels,
+                        ChannelGroups = subscriptionChanged.ChannelGroups,
+                    }.With();
+                case Events.ReconnectEvent reconnect:
+                    return new HandshakingState()
+                    {
+                        Channels = reconnect.Channels,
+                        ChannelGroups = reconnect.ChannelGroups,
+                    }.With();
+                case Events.SubscriptionRestoredEvent subscriptionRestored:
+                    return new ReceivingState()
+                    {
+                        Channels = subscriptionRestored.Channels,
+                        ChannelGroups = subscriptionRestored.ChannelGroups,
+                        Cursor = subscriptionRestored.Cursor
+                    }.With();
+                default: return null;
+            }
+        }
+    }
 }

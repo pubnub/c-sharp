@@ -10,5 +10,10 @@ namespace PubnubApi.PubnubEventEngine.Core
         {
             return new Tuple<IState, IEnumerable<IEffectInvocation>>(state, invocations); 
         }
+
+        internal static IEffectInvocation[] AsArray(this IEffectInvocation invocation)
+        {
+            return new IEffectInvocation[] { invocation };
+        }
     }
 }
