@@ -17,55 +17,37 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States
 
         public Tuple<Core.IState, IEnumerable<IEffectInvocation>> Transition(IEvent e)
         {
-            switch (e)
+            return e switch
             {
-                case Events.SubscriptionChangedEvent subscriptionChanged:
-                    return new States.HandshakingState()
-                    {
-                        Channels = subscriptionChanged.Channels,
-                        ChannelGroups = subscriptionChanged.ChannelGroups
-                    }.With();
-                case Events.SubscriptionRestoredEvent subscriptionRestored:
-                    return new States.ReceivingState()
-                    {
-                        Channels = subscriptionRestored.Channels,
-                        ChannelGroups = subscriptionRestored.ChannelGroups,
-                        Cursor = subscriptionRestored.Cursor
-                    }.With();
-                case Events.HandshakeFailureEvent handshakeFailure:
-                    return new States.HandshakeFailedState()
-                    {
-                        Channels = this.Channels,
-                        ChannelGroups = this.ChannelGroups
-                    }.With(
-                        new EmitStatusInvocation()
-                        {
-                            Status = handshakeFailure.Status
-                        }
-                    );
-                case Events.DisconnectEvent disconnect:
-                    return new States.HandshakeStoppedState()
-                    {
-                        Channels = disconnect.Channels,
-                        ChannelGroups = disconnect.ChannelGroups,
-                    }.With(
-                        new EmitStatusInvocation()
-                        {
-                            StatusCategory = PNStatusCategory.PNDisconnectedCategory
-                        }
-                    );
-                case Events.HandshakeSuccessEvent success:
-                    return new ReceivingState()
-                    {
-                        Channels = this.Channels,
-                        ChannelGroups = this.ChannelGroups,
-                        Cursor = success.cursor
-                    }.With(new EmitStatusInvocation()
-                    {
-                        StatusCategory = PNStatusCategory.PNConnectedCategory
-                    });
-                default: return null;
-            }
+                Events.SubscriptionChangedEvent subscriptionChanged => new States.HandshakingState()
+                {
+                    Channels = subscriptionChanged.Channels, ChannelGroups = subscriptionChanged.ChannelGroups
+                }.With(),
+
+                Events.SubscriptionRestoredEvent subscriptionRestored => new States.ReceivingState()
+                {
+                    Channels = subscriptionRestored.Channels,
+                    ChannelGroups = subscriptionRestored.ChannelGroups,
+                    Cursor = subscriptionRestored.Cursor
+                }.With(),
+
+                Events.HandshakeFailureEvent handshakeFailure => new States.HandshakeFailedState()
+                {
+                    Channels = this.Channels, ChannelGroups = this.ChannelGroups
+                }.With(new EmitStatusInvocation() { Status = handshakeFailure.Status }),
+
+                Events.DisconnectEvent disconnect => new States.HandshakeStoppedState()
+                {
+                    Channels = disconnect.Channels, ChannelGroups = disconnect.ChannelGroups,
+                }.With(new EmitStatusInvocation() { StatusCategory = PNStatusCategory.PNDisconnectedCategory }),
+
+                Events.HandshakeSuccessEvent success => new ReceivingState()
+                {
+                    Channels = this.Channels, ChannelGroups = this.ChannelGroups, Cursor = success.cursor
+                }.With(new EmitStatusInvocation() { StatusCategory = PNStatusCategory.PNConnectedCategory }),
+
+                _ => null
+            };
         }
     }
 }

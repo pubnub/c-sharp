@@ -15,29 +15,27 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States
 
         public Tuple<Core.IState, IEnumerable<IEffectInvocation>> Transition(IEvent e)
         {
-            switch (e)
+            return e switch
             {
-                case Events.SubscriptionChangedEvent subscriptionChanged:
-                    return new HandshakingState()
-                    {
-                        Channels = subscriptionChanged.Channels,
-                        ChannelGroups = subscriptionChanged.ChannelGroups,
-                    }.With();
-                case Events.ReconnectEvent reconnect:
-                    return new HandshakingState()
-                    {
-                        Channels = reconnect.Channels,
-                        ChannelGroups = reconnect.ChannelGroups,
-                    }.With();
-                case Events.SubscriptionRestoredEvent subscriptionRestored:
-                    return new ReceivingState()
-                    {
-                        Channels = subscriptionRestored.Channels,
-                        ChannelGroups = subscriptionRestored.ChannelGroups,
-                        Cursor = subscriptionRestored.Cursor
-                    }.With();
-                default: return null;
-            }
+                Events.SubscriptionChangedEvent subscriptionChanged => new HandshakingState()
+                {
+                    Channels = subscriptionChanged.Channels, ChannelGroups = subscriptionChanged.ChannelGroups,
+                }.With(),
+
+                Events.ReconnectEvent reconnect => new HandshakingState()
+                {
+                    Channels = reconnect.Channels, ChannelGroups = reconnect.ChannelGroups,
+                }.With(),
+
+                Events.SubscriptionRestoredEvent subscriptionRestored => new ReceivingState()
+                {
+                    Channels = subscriptionRestored.Channels,
+                    ChannelGroups = subscriptionRestored.ChannelGroups,
+                    Cursor = subscriptionRestored.Cursor
+                }.With(),
+                
+                _ => null
+            };
         }
     }
 }

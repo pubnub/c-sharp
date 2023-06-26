@@ -15,48 +15,43 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States
 
         public Tuple<Core.IState, IEnumerable<IEffectInvocation>> Transition(IEvent e)
         {
-            switch (e)
+            return e switch
             {
-                case Events.SubscriptionChangedEvent subscriptionChanged:
-                    return new HandshakingState()
-                    {
-                        Channels = subscriptionChanged.Channels,
-                        ChannelGroups = subscriptionChanged.ChannelGroups,
-                    }.With(null);
-                case Events.DisconnectEvent disconnect:
-                    return new HandshakeStoppedState()
-                    {
-                        Channels = disconnect.Channels,
-                        ChannelGroups = disconnect.ChannelGroups
-                    }.With(null);
-                case Events.HandshakeReconnectGiveUpEvent handshakeReconnectGiveUp:
-                    return new HandshakeFailedState()
-                    {
-                        Channels = handshakeReconnectGiveUp.Channels,
-                        ChannelGroups = handshakeReconnectGiveUp.ChannelGroups
-                    }.With();
-                case Events.HandshakeReconnectSuccessEvent handshakeReconnectSuccess:
-                    return new ReceivingState()
-                    {
-                        Channels = handshakeReconnectSuccess.Channels,
-                        ChannelGroups = handshakeReconnectSuccess.ChannelGroups,
-                        Cursor = handshakeReconnectSuccess.Cursor
-                    }.With(
-                        new EmitStatusInvocation()
-                        {
-                            Channels = handshakeReconnectSuccess.Channels,
-                            ChannelGroups = handshakeReconnectSuccess.ChannelGroups,
-                            StatusCategory = PNStatusCategory.PNReconnectedCategory
-                        }
-                    );
-                case Events.SubscriptionRestoredEvent subscriptionRestored:
-                    return new HandshakeFailedState()
-                    {
-                        Channels = subscriptionRestored.Channels,
-                        ChannelGroups = subscriptionRestored.ChannelGroups
-                    }.With();
-                default: return null;
-            }
+                Events.SubscriptionChangedEvent subscriptionChanged => new HandshakingState()
+                {
+                    Channels = subscriptionChanged.Channels, ChannelGroups = subscriptionChanged.ChannelGroups,
+                }.With(null),
+
+                Events.DisconnectEvent disconnect => new HandshakeStoppedState()
+                {
+                    Channels = disconnect.Channels, ChannelGroups = disconnect.ChannelGroups
+                }.With(null),
+
+                Events.HandshakeReconnectGiveUpEvent handshakeReconnectGiveUp => new HandshakeFailedState()
+                {
+                    Channels = handshakeReconnectGiveUp.Channels,
+                    ChannelGroups = handshakeReconnectGiveUp.ChannelGroups
+                }.With(),
+
+                Events.HandshakeReconnectSuccessEvent handshakeReconnectSuccess => new ReceivingState()
+                {
+                    Channels = handshakeReconnectSuccess.Channels,
+                    ChannelGroups = handshakeReconnectSuccess.ChannelGroups,
+                    Cursor = handshakeReconnectSuccess.Cursor
+                }.With(new EmitStatusInvocation()
+                {
+                    Channels = handshakeReconnectSuccess.Channels,
+                    ChannelGroups = handshakeReconnectSuccess.ChannelGroups,
+                    StatusCategory = PNStatusCategory.PNReconnectedCategory
+                }),
+
+                Events.SubscriptionRestoredEvent subscriptionRestored => new HandshakeFailedState()
+                {
+                    Channels = subscriptionRestored.Channels, ChannelGroups = subscriptionRestored.ChannelGroups
+                }.With(),
+
+                _ => null
+            };
         }
     }
 }

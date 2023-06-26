@@ -12,23 +12,22 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States
 
         public Tuple<Core.IState, IEnumerable<IEffectInvocation>> Transition(Core.IEvent e)
         {
-            switch (e)
+            return e switch
             {
-                case Events.SubscriptionChangedEvent subscriptionChanged:
-                    return new HandshakingState()
-                    {
-                        Channels = subscriptionChanged.Channels,
-                        ChannelGroups = subscriptionChanged.ChannelGroups,
-                    }.With();
-                case Events.SubscriptionRestoredEvent subscriptionRestored:
-                    return new States.ReceivingState()
-                    {
-                        Channels = subscriptionRestored.Channels,
-                        ChannelGroups = subscriptionRestored.ChannelGroups,
-                        Cursor = subscriptionRestored.Cursor
-                    }.With();
-                default: return null;
-            }
+                Events.SubscriptionChangedEvent subscriptionChanged => new HandshakingState()
+                {
+                    Channels = subscriptionChanged.Channels, ChannelGroups = subscriptionChanged.ChannelGroups,
+                }.With(),
+
+                Events.SubscriptionRestoredEvent subscriptionRestored => new States.ReceivingState()
+                {
+                    Channels = subscriptionRestored.Channels,
+                    ChannelGroups = subscriptionRestored.ChannelGroups,
+                    Cursor = subscriptionRestored.Cursor
+                }.With(),
+
+                _ => null
+            };
         }
     }
 }

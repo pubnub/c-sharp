@@ -17,31 +17,31 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States
 
         public Tuple<Core.IState, IEnumerable<IEffectInvocation>> Transition(IEvent e)
         {
-            switch (e)
+            return e switch
             {
-                case Events.SubscriptionChangedEvent subscriptionChanged:
-                    return new ReceivingState()
-                    {
-                        Channels = subscriptionChanged.Channels,
-                        ChannelGroups = subscriptionChanged.ChannelGroups,
-                        Cursor = this.Cursor,
-                    }.With();
-                case Events.ReconnectEvent reconnect:
-                    return new ReceivingState()
-                    {
-                        Channels = reconnect.Channels,
-                        ChannelGroups = reconnect.ChannelGroups,
-                        Cursor = reconnect.Cursor
-                    }.With();
-                case Events.SubscriptionRestoredEvent subscriptionRestored:
-                    return new ReceivingState()
-                    {
-                        Channels = subscriptionRestored.Channels,
-                        ChannelGroups = subscriptionRestored.ChannelGroups,
-                        Cursor = subscriptionRestored.Cursor
-                    }.With();
-                default: return null;
-            }
+                Events.SubscriptionChangedEvent subscriptionChanged => new ReceivingState()
+                {
+                    Channels = subscriptionChanged.Channels,
+                    ChannelGroups = subscriptionChanged.ChannelGroups,
+                    Cursor = this.Cursor,
+                }.With(),
+                
+                Events.ReconnectEvent reconnect => new ReceivingState()
+                {
+                    Channels = reconnect.Channels,
+                    ChannelGroups = reconnect.ChannelGroups,
+                    Cursor = reconnect.Cursor
+                }.With(),
+                
+                Events.SubscriptionRestoredEvent subscriptionRestored => new ReceivingState()
+                {
+                    Channels = subscriptionRestored.Channels,
+                    ChannelGroups = subscriptionRestored.ChannelGroups,
+                    Cursor = subscriptionRestored.Cursor
+                }.With(),
+                
+                _ => null
+            };
         }
     }
 }

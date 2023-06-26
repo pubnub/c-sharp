@@ -18,52 +18,50 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States
 
         public Tuple<Core.IState, IEnumerable<IEffectInvocation>> Transition(IEvent e)
         {
-            switch (e)
+            return e switch
             {
-                case Events.ReceiveSuccessEvent receiveSuccess:
-                    return new ReceivingState()
-                    {
-                        Channels = receiveSuccess.Channels,
-                        ChannelGroups = receiveSuccess.ChannelGroups,
-                        Cursor = receiveSuccess.Cursor
-                    }.With(null);
-                case Events.SubscriptionChangedEvent subscriptionChanged:
-                    return new ReceivingState()
-                    {
-                        Channels = subscriptionChanged.Channels,
-                        ChannelGroups = subscriptionChanged.ChannelGroups,
-                        Cursor = this.Cursor
-                    }.With();
-                case Events.SubscriptionRestoredEvent subscriptionRestored:
-                    return new ReceivingState()
-                    {
-                        Channels = subscriptionRestored.Channels,
-                        ChannelGroups = subscriptionRestored.ChannelGroups,
-                        Cursor = subscriptionRestored.Cursor
-                    }.With();
-                case Events.DisconnectEvent disconnect:
-                    return new ReceiveStoppedState()
-                    {
-                        Channels = disconnect.Channels,
-                        ChannelGroups = disconnect.ChannelGroups,
-                        Cursor = disconnect.Cursor
-                    }.With(
-                        new EmitStatusInvocation()
-                        {
-                            Channels = disconnect.Channels,
-                            ChannelGroups = disconnect.ChannelGroups,
-                            StatusCategory = PNStatusCategory.PNDisconnectedCategory
-                        }
-                    );
-                case Events.ReceiveFailureEvent receiveFailure:
-                    return new ReceiveReconnectingState()
-                    {
-                        Channels = receiveFailure.Channels,
-                        ChannelGroups = receiveFailure.ChannelGroups,
-                        Cursor = receiveFailure.Cursor
-                    }.With();
-                default: return null;
-            }
+                Events.ReceiveSuccessEvent receiveSuccess => new ReceivingState()
+                {
+                    Channels = receiveSuccess.Channels,
+                    ChannelGroups = receiveSuccess.ChannelGroups,
+                    Cursor = receiveSuccess.Cursor
+                }.With(null),
+
+                Events.SubscriptionChangedEvent subscriptionChanged => new ReceivingState()
+                {
+                    Channels = subscriptionChanged.Channels,
+                    ChannelGroups = subscriptionChanged.ChannelGroups,
+                    Cursor = this.Cursor
+                }.With(),
+
+                Events.SubscriptionRestoredEvent subscriptionRestored => new ReceivingState()
+                {
+                    Channels = subscriptionRestored.Channels,
+                    ChannelGroups = subscriptionRestored.ChannelGroups,
+                    Cursor = subscriptionRestored.Cursor
+                }.With(),
+
+                Events.DisconnectEvent disconnect => new ReceiveStoppedState()
+                {
+                    Channels = disconnect.Channels,
+                    ChannelGroups = disconnect.ChannelGroups,
+                    Cursor = disconnect.Cursor
+                }.With(new EmitStatusInvocation()
+                {
+                    Channels = disconnect.Channels,
+                    ChannelGroups = disconnect.ChannelGroups,
+                    StatusCategory = PNStatusCategory.PNDisconnectedCategory
+                }),
+
+                Events.ReceiveFailureEvent receiveFailure => new ReceiveReconnectingState()
+                {
+                    Channels = receiveFailure.Channels,
+                    ChannelGroups = receiveFailure.ChannelGroups,
+                    Cursor = receiveFailure.Cursor
+                }.With(),
+
+                _ => null
+            };
         }
     }
 }
