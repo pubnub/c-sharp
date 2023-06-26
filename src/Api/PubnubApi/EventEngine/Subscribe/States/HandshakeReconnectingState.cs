@@ -46,7 +46,8 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States {
 					return new Tuple<IState, IEnumerable<IEffectInvocation>>(
 						new ReceivingState() { 
 							Channels = handshakeReconnectSuccess.Channels,
-							ChannelGroups = handshakeReconnectSuccess.ChannelGroups
+							ChannelGroups = handshakeReconnectSuccess.ChannelGroups,
+							Cursor = handshakeReconnectSuccess.Cursor
 						},
 						new[] {
 							new EmitStatusInvocation() {
@@ -59,7 +60,8 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States {
 					return new Tuple<IState, IEnumerable<IEffectInvocation>>(
 						new HandshakeFailedState() { 
 							Channels = subscriptionRestored.Channels,
-							ChannelGroups = subscriptionRestored.ChannelGroups
+							ChannelGroups = subscriptionRestored.ChannelGroups,
+							Cursor = subscriptionRestored.Cursor
 						},
 						null
 					);

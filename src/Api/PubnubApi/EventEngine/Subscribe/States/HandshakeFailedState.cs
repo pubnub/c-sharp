@@ -8,6 +8,7 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States {
 
 		public IEnumerable<string> Channels;
 		public IEnumerable<string> ChannelGroups;
+		public SubscriptionCursor Cursor;
 
 		public IEnumerable<IEffectInvocation> OnEntry { get; }
 		public IEnumerable<IEffectInvocation> OnExit { get; }
@@ -43,12 +44,14 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States {
 					return new Tuple<IState, IEnumerable<IEffectInvocation>>(
 						new ReceivingState() { 
 							Channels = subscriptionRestored.Channels,
-							ChannelGroups = subscriptionRestored.ChannelGroups
+							ChannelGroups = subscriptionRestored.ChannelGroups,
+							Cursor = subscriptionRestored.Cursor
 						},
 						new[] {
 							new ReceiveMessagesInvocation() {
 								Channels = subscriptionRestored.Channels,
 								ChannelGroups = subscriptionRestored.ChannelGroups,
+								Cursor = subscriptionRestored.Cursor
 							},
 						}
 					);
