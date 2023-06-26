@@ -13,7 +13,7 @@ namespace PubnubApi.PubnubEventEngine.Subscribe {
 			// initialize the handler, pass dependencies
 			var handshakeHandler = new Effects.HandshakeEffectHandler(subscribeManager, eventQueue);
 			dispatcher.Register<Invocations.HandshakeInvocation, Effects.HandshakeEffectHandler>(handshakeHandler);
-			dispatcher.Register<Invocations.HandshakeCancelInvocation, Effects.HandshakeEffectHandler>(handshakeHandler);
+			dispatcher.Register<Invocations.CancelHandshakeInvocation, Effects.HandshakeEffectHandler>(handshakeHandler);
 
 			currentState = new UnsubscribedState();
 		}
