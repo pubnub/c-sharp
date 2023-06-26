@@ -46,7 +46,7 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States {
 					);
 				case Events.SubscriptionRestoredEvent subscriptionRestored:
 					return new Tuple<IState, IEnumerable<IEffectInvocation>>(
-						new HandshakeFailedState() { 
+						new ReceivingState() { 
 							Channels = subscriptionRestored.Channels,
 							ChannelGroups = subscriptionRestored.ChannelGroups,
 							Cursor = subscriptionRestored.Cursor
