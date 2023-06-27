@@ -37,7 +37,7 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Effects {
 					Timetoken = handshakeResponse.Timetoken.Timestamp
 				};
 				
-				eventQueue.Enqueue(new Events.HandshakeSuccessEvent() {cursor = c});
+				eventQueue.Enqueue(new Events.HandshakeSuccessEvent() {Cursor = c});
 			}
 		}
 

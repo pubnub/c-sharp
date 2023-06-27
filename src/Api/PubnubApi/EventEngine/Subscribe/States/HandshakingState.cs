@@ -43,7 +43,7 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States
 
                 Events.HandshakeSuccessEvent success => new ReceivingState()
                 {
-                    Channels = this.Channels, ChannelGroups = this.ChannelGroups, Cursor = success.cursor
+                    Channels = this.Channels, ChannelGroups = this.ChannelGroups, Cursor = success.Cursor
                 }.With(new EmitStatusInvocation(success.Status)),
 
                 _ => null

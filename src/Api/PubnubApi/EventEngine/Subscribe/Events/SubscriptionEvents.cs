@@ -13,7 +13,7 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Events {
 	}
 
 	public class HandshakeSuccessEvent : Core.IEvent {
-		public SubscriptionCursor cursor;
+		public SubscriptionCursor Cursor;
 		public PNStatus Status;
 	}
 
