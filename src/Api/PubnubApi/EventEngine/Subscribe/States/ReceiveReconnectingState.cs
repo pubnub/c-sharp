@@ -26,57 +26,42 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States
                     Channels = subscriptionChanged.Channels,
                     ChannelGroups = subscriptionChanged.ChannelGroups,
                     Cursor = this.Cursor
-                }.With(new ReceiveMessagesInvocation()
-                {
-                    Channels = subscriptionChanged.Channels,
-                    ChannelGroups = subscriptionChanged.ChannelGroups,
-                    Cursor = this.Cursor
-                }),
+                }.With(),
 
                 Events.DisconnectEvent disconnect => new ReceiveStoppedState()
                 {
                     Channels = disconnect.Channels,
                     ChannelGroups = disconnect.ChannelGroups,
                     Cursor = disconnect.Cursor
-                }.With(new EmitStatusInvocation()
-                {
-                    Channels = disconnect.Channels,
-                    ChannelGroups = disconnect.ChannelGroups,
-                    StatusCategory = PNStatusCategory.PNDisconnectedCategory
-                }),
+                }.With(new EmitStatusInvocation(PNStatusCategory.PNDisconnectedCategory)),
 
                 Events.SubscriptionRestoredEvent subscriptionRestored => new ReceivingState()
                 {
                     Channels = subscriptionRestored.Channels,
                     ChannelGroups = subscriptionRestored.ChannelGroups,
                     Cursor = subscriptionRestored.Cursor
-                }.With(null),
+                }.With(),
 
                 Events.ReceiveReconnectSuccessEvent receiveReconnectSuccess => new ReceivingState()
                 {
                     Channels = receiveReconnectSuccess.Channels,
                     ChannelGroups = receiveReconnectSuccess.ChannelGroups,
                     Cursor = receiveReconnectSuccess.Cursor
-                }.With(new EmitStatusInvocation()
-                {
-                    Channels = receiveReconnectSuccess.Channels,
-                    ChannelGroups = receiveReconnectSuccess.ChannelGroups,
-                    StatusCategory = PNStatusCategory.PNReconnectedCategory
-                }),
+                }.With(new EmitStatusInvocation(receiveReconnectSuccess.Status)),
 
                 Events.ReceiveReconnectFailureEvent receiveReconnectFailure => new ReceiveReconnectingState()
                 {
-                    Channels = receiveReconnectFailure.Channels,
-                    ChannelGroups = receiveReconnectFailure.ChannelGroups,
-                    Cursor = receiveReconnectFailure.Cursor
-                }.With(null),
+                    Channels = this.Channels,
+                    ChannelGroups = this.ChannelGroups,
+                    Cursor = this.Cursor
+                }.With(new EmitStatusInvocation(receiveReconnectFailure.Status)),
 
                 Events.ReceiveReconnectGiveUpEvent receiveReconnectGiveUp => new ReceiveFailedState()
                 {
                     Channels = receiveReconnectGiveUp.Channels,
                     ChannelGroups = receiveReconnectGiveUp.ChannelGroups,
                     Cursor = receiveReconnectGiveUp.Cursor
-                }.With(new EmitStatusInvocation() { Status = receiveReconnectGiveUp.Status }),
+                }.With(new EmitStatusInvocation(receiveReconnectGiveUp.Status)),
 
                 _ => null
             };

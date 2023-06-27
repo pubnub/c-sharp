@@ -34,21 +34,6 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States
                     Cursor = subscriptionRestored.Cursor
                 }.With(),
 
-                Events.HandshakeFailureEvent handshakeFailure => new HandshakeReconnectingState()
-                {
-                    Channels = this.Channels, ChannelGroups = this.ChannelGroups,
-                }.With(new EmitStatusInvocation() { Status = handshakeFailure.Status }),
-
-                Events.DisconnectEvent disconnect => new HandshakeStoppedState()
-                {
-                    Channels = disconnect.Channels, ChannelGroups = disconnect.ChannelGroups,
-                }.With(new EmitStatusInvocation() { StatusCategory = PNStatusCategory.PNDisconnectedCategory }),
-
-                Events.HandshakeSuccessEvent handshakeSuccess => new ReceivingState()
-                {
-                    Channels = this.Channels, ChannelGroups = this.ChannelGroups, Cursor = handshakeSuccess.cursor
-                }.With(new EmitStatusInvocation() { StatusCategory = PNStatusCategory.PNConnectedCategory }),
-
                 _ => null
             };
         }

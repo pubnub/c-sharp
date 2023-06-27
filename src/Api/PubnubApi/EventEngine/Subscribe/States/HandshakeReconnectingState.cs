@@ -10,7 +10,8 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States
         public IEnumerable<string> Channels;
         public IEnumerable<string> ChannelGroups;
 
-        public IEnumerable<IEffectInvocation> OnEntry { get; }
+        public IEnumerable<IEffectInvocation> OnEntry => new HandshakeReconnectInvocation()
+            { Channels = this.Channels, ChannelGroups = this.ChannelGroups }.AsArray();
         public IEnumerable<IEffectInvocation> OnExit { get; } = new CancelHandshakeReconnectInvocation().AsArray();
 
         public Tuple<Core.IState, IEnumerable<IEffectInvocation>> Transition(IEvent e)
@@ -29,25 +30,24 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States
 
                 Events.HandshakeReconnectGiveUpEvent handshakeReconnectGiveUp => new HandshakeFailedState()
                 {
-                    Channels = handshakeReconnectGiveUp.Channels,
-                    ChannelGroups = handshakeReconnectGiveUp.ChannelGroups
-                }.With(),
+                    Channels = this.Channels,
+                    ChannelGroups = this.ChannelGroups
+                }.With(
+                    new EmitStatusInvocation(handshakeReconnectGiveUp.Status)
+                ),
 
                 Events.HandshakeReconnectSuccessEvent handshakeReconnectSuccess => new ReceivingState()
                 {
-                    Channels = handshakeReconnectSuccess.Channels,
-                    ChannelGroups = handshakeReconnectSuccess.ChannelGroups,
+                    Channels = this.Channels,
+                    ChannelGroups = this.ChannelGroups,
                     Cursor = handshakeReconnectSuccess.Cursor
-                }.With(new EmitStatusInvocation()
-                {
-                    Channels = handshakeReconnectSuccess.Channels,
-                    ChannelGroups = handshakeReconnectSuccess.ChannelGroups,
-                    StatusCategory = PNStatusCategory.PNReconnectedCategory
-                }),
+                }.With(new EmitStatusInvocation(handshakeReconnectSuccess.Status)),
 
-                Events.SubscriptionRestoredEvent subscriptionRestored => new HandshakeFailedState()
+                Events.SubscriptionRestoredEvent subscriptionRestored => new ReceivingState()
                 {
-                    Channels = subscriptionRestored.Channels, ChannelGroups = subscriptionRestored.ChannelGroups
+                    Channels = subscriptionRestored.Channels,
+                    ChannelGroups = subscriptionRestored.ChannelGroups,
+                    Cursor = subscriptionRestored.Cursor
                 }.With(),
 
                 _ => null

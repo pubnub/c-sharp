@@ -25,7 +25,10 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States
                     Channels = receiveSuccess.Channels,
                     ChannelGroups = receiveSuccess.ChannelGroups,
                     Cursor = receiveSuccess.Cursor
-                }.With(),
+                }.With(
+                    new EmitMessagesInvocation(receiveSuccess.Messages),
+                    new EmitStatusInvocation(receiveSuccess.Status)
+                ),
 
                 Events.SubscriptionChangedEvent subscriptionChanged => new ReceivingState()
                 {
@@ -43,21 +46,16 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States
 
                 Events.DisconnectEvent disconnect => new ReceiveStoppedState()
                 {
-                    Channels = disconnect.Channels,
-                    ChannelGroups = disconnect.ChannelGroups,
-                    Cursor = disconnect.Cursor
-                }.With(new EmitStatusInvocation()
-                {
-                    Channels = disconnect.Channels,
-                    ChannelGroups = disconnect.ChannelGroups,
-                    StatusCategory = PNStatusCategory.PNDisconnectedCategory
-                }),
+                    Channels = this.Channels,
+                    ChannelGroups = this.ChannelGroups,
+                    Cursor = this.Cursor
+                }.With(new EmitStatusInvocation(PNStatusCategory.PNDisconnectedCategory)),
 
                 Events.ReceiveFailureEvent receiveFailure => new ReceiveReconnectingState()
                 {
-                    Channels = receiveFailure.Channels,
-                    ChannelGroups = receiveFailure.ChannelGroups,
-                    Cursor = receiveFailure.Cursor
+                    Channels = this.Channels,
+                    ChannelGroups = this.ChannelGroups,
+                    Cursor = this.Cursor
                 }.With(),
 
                 _ => null

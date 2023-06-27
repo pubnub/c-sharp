@@ -34,17 +34,17 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States
                 Events.HandshakeFailureEvent handshakeFailure => new States.HandshakeFailedState()
                 {
                     Channels = this.Channels, ChannelGroups = this.ChannelGroups
-                }.With(new EmitStatusInvocation() { Status = handshakeFailure.Status }),
+                }.With(new EmitStatusInvocation(handshakeFailure.Status)),
 
                 Events.DisconnectEvent disconnect => new States.HandshakeStoppedState()
                 {
                     Channels = disconnect.Channels, ChannelGroups = disconnect.ChannelGroups,
-                }.With(new EmitStatusInvocation() { StatusCategory = PNStatusCategory.PNDisconnectedCategory }),
+                }.With(new EmitStatusInvocation(PNStatusCategory.PNDisconnectedCategory)),
 
                 Events.HandshakeSuccessEvent success => new ReceivingState()
                 {
                     Channels = this.Channels, ChannelGroups = this.ChannelGroups, Cursor = success.cursor
-                }.With(new EmitStatusInvocation() { StatusCategory = PNStatusCategory.PNConnectedCategory }),
+                }.With(new EmitStatusInvocation(success.Status)),
 
                 _ => null
             };

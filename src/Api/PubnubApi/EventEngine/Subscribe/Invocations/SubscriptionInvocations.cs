@@ -3,15 +3,32 @@ using PubnubApi.PubnubEventEngine.Core;
 
 namespace PubnubApi.PubnubEventEngine.Subscribe.Invocations {
 	internal class EmitMessagesInvocation : Core.IEffectInvocation {
-		public List<object> messages;
+		public IEnumerable<PNMessageResult<object>> Messages;
+
+		public EmitMessagesInvocation(IEnumerable<PNMessageResult<object>> messages)
+		{
+			this.Messages = messages;
+		}
 	}
 
 	internal class EmitStatusInvocation : Core.IEffectInvocation {
-		public IEnumerable<string> Channels;
-		public IEnumerable<string> ChannelGroups;
-		// TODO merge status variables into one
+		// TODO merge status variables into one?
 		public PNStatusCategory StatusCategory;
 		public PNStatus Status;
+
+		public EmitStatusInvocation(PNStatus status)
+		{
+			this.Status = status;
+		}
+
+		public EmitStatusInvocation(PNStatusCategory category)
+		{
+			this.StatusCategory = category;
+			this.Status = new PNStatus()
+			{
+				Category = category,
+			};
+		}
 	}
 
 	internal class HandshakeInvocation : Core.IEffectInvocation {

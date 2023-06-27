@@ -14,30 +14,27 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Events {
 
 	public class HandshakeSuccessEvent : Core.IEvent {
 		public SubscriptionCursor cursor;
+		public PNStatus Status;
 	}
 
 	public class HandshakeFailureEvent : Core.IEvent {
-		// TODO status or reason?
 		public PNStatus Status;
 	}
 
 	public class HandshakeReconnectSuccessEvent : HandshakeSuccessEvent {
-		public IEnumerable<string> Channels;
-		public IEnumerable<string> ChannelGroups;
 		public SubscriptionCursor Cursor;
 	}
 
-	public class HandshakeReconnectFailureEvent : HandshakeFailureEvent {
+	public class HandshakeReconnectFailureEvent : HandshakeFailureEvent
+	{
+		public PNStatus Status;
 	}
 
 	public class HandshakeReconnectRetryEvent : Core.IEvent {
 	}
 
 	public class HandshakeReconnectGiveUpEvent : Core.IEvent {
-		public IEnumerable<string> Channels;
-		public IEnumerable<string> ChannelGroups;
-		// TODO status or reason?
-		public PNStatus status;
+		public PNStatus Status;
 	}
 
 	public class ReceiveSuccessEvent : Core.IEvent {
@@ -45,14 +42,11 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Events {
 		public IEnumerable<string> ChannelGroups;
 		public List<PNMessageResult<object>> Messages;
 		public SubscriptionCursor Cursor;
+		public PNStatus Status;
 	}
 
 	public class ReceiveFailureEvent : Core.IEvent {
-		public IEnumerable<string> Channels;
-		public IEnumerable<string> ChannelGroups;
-		public SubscriptionCursor Cursor;
-		// TODO status or reason?
-		public PNStatus status;
+		public PNStatus Status;
 	}
 
 	public class ReceiveReconnectRetry : Core.IEvent {
@@ -68,7 +62,6 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Events {
 		public IEnumerable<string> Channels;
 		public IEnumerable<string> ChannelGroups;
 		public SubscriptionCursor Cursor;
-		// TODO status or reason?
 		public PNStatus Status;
 	}
 
