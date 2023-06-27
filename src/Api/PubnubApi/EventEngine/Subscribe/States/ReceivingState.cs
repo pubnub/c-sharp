@@ -25,7 +25,7 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States
                     Channels = receiveSuccess.Channels,
                     ChannelGroups = receiveSuccess.ChannelGroups,
                     Cursor = receiveSuccess.Cursor
-                }.With(null),
+                }.With(),
 
                 Events.SubscriptionChangedEvent subscriptionChanged => new ReceivingState()
                 {
