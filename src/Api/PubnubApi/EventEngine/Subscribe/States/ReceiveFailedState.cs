@@ -23,21 +23,21 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States
                     Channels = subscriptionChanged.Channels,
                     ChannelGroups = subscriptionChanged.ChannelGroups,
                     Cursor = this.Cursor
-                }.With(null),
+                }.With(),
 
                 Events.ReconnectEvent reconnect => new ReceivingState()
                 {
                     Channels = reconnect.Channels,
                     ChannelGroups = reconnect.ChannelGroups,
                     Cursor = reconnect.Cursor
-                }.With(null),
+                }.With(),
 
                 Events.SubscriptionRestoredEvent subscriptionRestored => new ReceivingState()
                 {
                     Channels = subscriptionRestored.Channels,
                     ChannelGroups = subscriptionRestored.ChannelGroups,
                     Cursor = subscriptionRestored.Cursor
-                }.With(null),
+                }.With(),
 
                 _ => null
             };
