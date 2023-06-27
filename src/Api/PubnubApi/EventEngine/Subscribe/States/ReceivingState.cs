@@ -3,89 +3,63 @@ using System.Collections.Generic;
 using PubnubApi.PubnubEventEngine.Core;
 using PubnubApi.PubnubEventEngine.Subscribe.Invocations;
 
-namespace PubnubApi.PubnubEventEngine.Subscribe.States {
-	internal class ReceivingState : Core.IState {
+namespace PubnubApi.PubnubEventEngine.Subscribe.States
+{
+    internal class ReceivingState : Core.IState
+    {
+        public IEnumerable<string> Channels;
+        public IEnumerable<string> ChannelGroups;
+        public SubscriptionCursor Cursor;
 
-		public IEnumerable<string> Channels;
-		public IEnumerable<string> ChannelGroups;
-		public SubscriptionCursor  Cursor;
+        public IEnumerable<IEffectInvocation> OnEntry => new ReceiveMessagesInvocation()
+            { Channels = this.Channels, ChannelGroups = this.ChannelGroups, Cursor = this.Cursor }.AsArray();
 
-		public IEnumerable<IEffectInvocation> OnEntry { get; }
-		public IEnumerable<IEffectInvocation> OnExit { get; }
-		public Tuple<Core.IState, IEnumerable<IEffectInvocation>> Transition(IEvent e) {
-			switch (e) {
-				case Events.ReceiveSuccessEvent receiveSuccess:
-					return new Tuple<Core.IState, IEnumerable<IEffectInvocation>>(
-						new ReceivingState() {
-							Channels = receiveSuccess.Channels,
-							ChannelGroups = receiveSuccess.ChannelGroups,
-							Cursor = receiveSuccess.Cursor
-						},
-						new[] {
-							new ReceiveMessagesInvocation() {
-								Channels = receiveSuccess.Channels,
-								ChannelGroups = receiveSuccess.ChannelGroups,
-								Cursor = receiveSuccess.Cursor
-							},
-						}
-					);
-				case Events.SubscriptionChangedEvent subscriptionChanged:
-					return new Tuple<Core.IState, IEnumerable<IEffectInvocation>>(
-						new ReceivingState() {
-							Channels = subscriptionChanged.Channels,
-							ChannelGroups = subscriptionChanged.ChannelGroups,
-							Cursor = subscriptionChanged.Cursor
-						},
-						new[] {
-							new ReceiveMessagesInvocation() {
-								Channels = subscriptionChanged.Channels,
-								ChannelGroups = subscriptionChanged.ChannelGroups,
-								Cursor = subscriptionChanged.Cursor
-							},
-						}
-					);
-				case Events.SubscriptionRestoredEvent subscriptionRestored:
-					return new Tuple<IState, IEnumerable<IEffectInvocation>>(
-						new ReceivingState() { 
-							Channels = subscriptionRestored.Channels,
-							ChannelGroups = subscriptionRestored.ChannelGroups,
-							Cursor = subscriptionRestored.Cursor
-						},
-						new[] {
-							new ReceiveMessagesInvocation() {
-								Channels = subscriptionRestored.Channels,
-								ChannelGroups = subscriptionRestored.ChannelGroups,
-								Cursor = subscriptionRestored.Cursor
-							},
-						}
-					);
-				case Events.DisconnectEvent disconnect:
-					return new Tuple<Core.IState, IEnumerable<IEffectInvocation>>(
-						new ReceiveStoppedState() {
-							Channels = disconnect.Channels,
-							ChannelGroups = disconnect.ChannelGroups,
-							Cursor = disconnect.Cursor
-						},
-						new[] {
-							new EmitStatusInvocation() {
-								Channels = disconnect.Channels,
-								ChannelGroups = disconnect.ChannelGroups,
-							},
-						}
-					);
-				case Events.ReceiveFailureEvent receiveFailure:
-					return new Tuple<Core.IState, IEnumerable<IEffectInvocation>>(
-						new ReceiveReconnectingState() {
-							Channels = receiveFailure.Channels,
-							ChannelGroups = receiveFailure.ChannelGroups,
-							Cursor = receiveFailure.Cursor
-						},
-						null
-					);
+        public IEnumerable<IEffectInvocation> OnExit { get; } = new CancelReceiveMessagesInvocation().AsArray();
 
-				default: return null;
-			}
-		}
-	}
+        public Tuple<Core.IState, IEnumerable<IEffectInvocation>> Transition(IEvent e)
+        {
+            return e switch
+            {
+                Events.ReceiveSuccessEvent receiveSuccess => new ReceivingState()
+                {
+                    Channels = receiveSuccess.Channels,
+                    ChannelGroups = receiveSuccess.ChannelGroups,
+                    Cursor = receiveSuccess.Cursor
+                }.With(
+                    new EmitMessagesInvocation(receiveSuccess.Messages),
+                    new EmitStatusInvocation(receiveSuccess.Status)
+                ),
+
+                Events.SubscriptionChangedEvent subscriptionChanged => new ReceivingState()
+                {
+                    Channels = subscriptionChanged.Channels,
+                    ChannelGroups = subscriptionChanged.ChannelGroups,
+                    Cursor = this.Cursor
+                }.With(),
+
+                Events.SubscriptionRestoredEvent subscriptionRestored => new ReceivingState()
+                {
+                    Channels = subscriptionRestored.Channels,
+                    ChannelGroups = subscriptionRestored.ChannelGroups,
+                    Cursor = subscriptionRestored.Cursor
+                }.With(),
+
+                Events.DisconnectEvent disconnect => new ReceiveStoppedState()
+                {
+                    Channels = this.Channels,
+                    ChannelGroups = this.ChannelGroups,
+                    Cursor = this.Cursor
+                }.With(new EmitStatusInvocation(PNStatusCategory.PNDisconnectedCategory)),
+
+                Events.ReceiveFailureEvent receiveFailure => new ReceiveReconnectingState()
+                {
+                    Channels = this.Channels,
+                    ChannelGroups = this.ChannelGroups,
+                    Cursor = this.Cursor
+                }.With(),
+
+                _ => null
+            };
+        }
+    }
 }
-

@@ -3,71 +3,55 @@ using System.Collections.Generic;
 using PubnubApi.PubnubEventEngine.Core;
 using PubnubApi.PubnubEventEngine.Subscribe.Invocations;
 
-namespace PubnubApi.PubnubEventEngine.Subscribe.States {
-	internal class HandshakeReconnectingState : Core.IState {
+namespace PubnubApi.PubnubEventEngine.Subscribe.States
+{
+    internal class HandshakeReconnectingState : Core.IState
+    {
+        public IEnumerable<string> Channels;
+        public IEnumerable<string> ChannelGroups;
 
-		public IEnumerable<string> Channels;
-		public IEnumerable<string> ChannelGroups;
+        public IEnumerable<IEffectInvocation> OnEntry => new HandshakeReconnectInvocation()
+            { Channels = this.Channels, ChannelGroups = this.ChannelGroups }.AsArray();
+        public IEnumerable<IEffectInvocation> OnExit { get; } = new CancelHandshakeReconnectInvocation().AsArray();
 
-		public IEnumerable<IEffectInvocation> OnEntry { get; }
-		public IEnumerable<IEffectInvocation> OnExit { get; }
-		public Tuple<Core.IState, IEnumerable<IEffectInvocation>> Transition(IEvent e) {
-			switch (e) {
-				case Events.SubscriptionChangedEvent subscriptionChanged:
-					return new Tuple<Core.IState, IEnumerable<IEffectInvocation>>(
-						new HandshakingState() {
-							Channels = subscriptionChanged.Channels,
-							ChannelGroups = subscriptionChanged.ChannelGroups,
-						},
-						new[] {
-							new HandshakeInvocation() {
-								Channels = subscriptionChanged.Channels,
-								ChannelGroups = subscriptionChanged.ChannelGroups,
-							},
-						}
-					);
-				case Events.DisconnectEvent disconnect:
-					return new Tuple<Core.IState, IEnumerable<IEffectInvocation>>(
-						new HandshakeStoppedState() {
-							Channels = disconnect.Channels,
-							ChannelGroups = disconnect.ChannelGroups
-						},
-						null
-					);
-				case Events.HandshakeReconnectGiveUpEvent handshakeReconnectGiveUp:
-					return new Tuple<IState, IEnumerable<IEffectInvocation>>(
-						new HandshakeFailedState() { 
-							Channels = handshakeReconnectGiveUp.Channels,
-							ChannelGroups = handshakeReconnectGiveUp.ChannelGroups
-						},
-						null
-					);
-				case Events.HandshakeReconnectSuccessEvent handshakeReconnectSuccess:
-					return new Tuple<IState, IEnumerable<IEffectInvocation>>(
-						new ReceivingState() { 
-							Channels = handshakeReconnectSuccess.Channels,
-							ChannelGroups = handshakeReconnectSuccess.ChannelGroups,
-							Cursor = handshakeReconnectSuccess.Cursor
-						},
-						new[] {
-							new EmitStatusInvocation() {
-								Channels = handshakeReconnectSuccess.Channels,
-								ChannelGroups = handshakeReconnectSuccess.ChannelGroups,
-							},
-						}
-					);
-				case Events.SubscriptionRestoredEvent subscriptionRestored:
-					return new Tuple<IState, IEnumerable<IEffectInvocation>>(
-						new HandshakeFailedState() { 
-							Channels = subscriptionRestored.Channels,
-							ChannelGroups = subscriptionRestored.ChannelGroups,
-							Cursor = subscriptionRestored.Cursor
-						},
-						null
-					);
+        public Tuple<Core.IState, IEnumerable<IEffectInvocation>> Transition(IEvent e)
+        {
+            return e switch
+            {
+                Events.SubscriptionChangedEvent subscriptionChanged => new HandshakingState()
+                {
+                    Channels = subscriptionChanged.Channels, ChannelGroups = subscriptionChanged.ChannelGroups,
+                }.With(),
 
-				default: return null;
-			}
-		}
-	}
+                Events.DisconnectEvent disconnect => new HandshakeStoppedState()
+                {
+                    Channels = disconnect.Channels, ChannelGroups = disconnect.ChannelGroups
+                }.With(),
+
+                Events.HandshakeReconnectGiveUpEvent handshakeReconnectGiveUp => new HandshakeFailedState()
+                {
+                    Channels = this.Channels,
+                    ChannelGroups = this.ChannelGroups
+                }.With(
+                    new EmitStatusInvocation(handshakeReconnectGiveUp.Status)
+                ),
+
+                Events.HandshakeReconnectSuccessEvent handshakeReconnectSuccess => new ReceivingState()
+                {
+                    Channels = this.Channels,
+                    ChannelGroups = this.ChannelGroups,
+                    Cursor = handshakeReconnectSuccess.Cursor
+                }.With(new EmitStatusInvocation(handshakeReconnectSuccess.Status)),
+
+                Events.SubscriptionRestoredEvent subscriptionRestored => new ReceivingState()
+                {
+                    Channels = subscriptionRestored.Channels,
+                    ChannelGroups = subscriptionRestored.ChannelGroups,
+                    Cursor = subscriptionRestored.Cursor
+                }.With(),
+
+                _ => null
+            };
+        }
+    }
 }
