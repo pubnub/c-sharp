@@ -20,12 +20,12 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States
                 Events.SubscriptionChangedEvent subscriptionChanged => new HandshakingState()
                 {
                     Channels = subscriptionChanged.Channels, ChannelGroups = subscriptionChanged.ChannelGroups,
-                }.With(null),
+                }.With(),
 
                 Events.DisconnectEvent disconnect => new HandshakeStoppedState()
                 {
                     Channels = disconnect.Channels, ChannelGroups = disconnect.ChannelGroups
-                }.With(null),
+                }.With(),
 
                 Events.HandshakeReconnectGiveUpEvent handshakeReconnectGiveUp => new HandshakeFailedState()
                 {
