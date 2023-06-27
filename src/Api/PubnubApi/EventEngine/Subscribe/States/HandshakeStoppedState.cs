@@ -20,19 +20,19 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States
                 Events.SubscriptionChangedEvent subscriptionChanged => new HandshakingState()
                 {
                     Channels = subscriptionChanged.Channels, ChannelGroups = subscriptionChanged.ChannelGroups,
-                }.With(null),
+                }.With(),
 
                 Events.ReconnectEvent reconnect => new HandshakingState()
                 {
                     Channels = reconnect.Channels, ChannelGroups = reconnect.ChannelGroups,
-                }.With(null),
+                }.With(),
 
                 Events.SubscriptionRestoredEvent subscriptionRestored => new ReceivingState()
                 {
                     Channels = subscriptionRestored.Channels,
                     ChannelGroups = subscriptionRestored.ChannelGroups,
                     Cursor = subscriptionRestored.Cursor
-                }.With(null),
+                }.With(),
 
                 Events.HandshakeFailureEvent handshakeFailure => new HandshakeReconnectingState()
                 {
