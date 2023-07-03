@@ -1,0 +1,73 @@
+const os = require("os");
+const { exec } = require("child_process");
+const fs = require("fs");
+const path = require("path");
+
+const core = require('@actions/core');
+const github = require('@actions/github');
+
+// const changelogPath = path.join(process.env['GITHUB_WORKSPACE'], '.github/.release', 'changelog.json');
+
+const releasesPath = process.env['GITHUB_WORKSPACE'] && `${process.env['GITHUB_WORKSPACE']}/.github/.release/Unity`;
+const artifactsPath = releasesPath && `${releasesPath}/artifacts`;
+
+const unityDllFilename = 'PubnubApiUnity.dll';
+
+// hard-coded files, mandatory in the package
+const files = [
+	{
+		name: "LICENSE.md",
+		base: "UHViTnViIFJlYWwtdGltZSBDbG91ZC1Ib3N0ZWQgUHVzaCBBUEkgYW5kIFB1c2ggTm90aWZpY2F0aW9uIENsaWVudCBGcmFtZXdvcmtzCkNvcHlyaWdodCAoYykgMjAxMyBQdWJOdWIgSW5jLgpodHRwOi8vd3d3LnB1Ym51Yi5jb20vCmh0dHA6Ly93d3cucHVibnViLmNvbS90ZXJtcwoKUGVybWlzc2lvbiBpcyBoZXJlYnkgZ3JhbnRlZCwgZnJlZSBvZiBjaGFyZ2UsIHRvIGFueSBwZXJzb24gb2J0YWluaW5nIGEgY29weQpvZiB0aGlzIHNvZnR3YXJlIGFuZCBhc3NvY2lhdGVkIGRvY3VtZW50YXRpb24gZmlsZXMgKHRoZSAiU29mdHdhcmUiKSwgdG8gZGVhbAppbiB0aGUgU29mdHdhcmUgd2l0aG91dCByZXN0cmljdGlvbiwgaW5jbHVkaW5nIHdpdGhvdXQgbGltaXRhdGlvbiB0aGUgcmlnaHRzCnRvIHVzZSwgY29weSwgbW9kaWZ5LCBtZXJnZSwgcHVibGlzaCwgZGlzdHJpYnV0ZSwgc3VibGljZW5zZSwgYW5kL29yIHNlbGwKY29waWVzIG9mIHRoZSBTb2Z0d2FyZSwgYW5kIHRvIHBlcm1pdCBwZXJzb25zIHRvIHdob20gdGhlIFNvZnR3YXJlIGlzCmZ1cm5pc2hlZCB0byBkbyBzbywgc3ViamVjdCB0byB0aGUgZm9sbG93aW5nIGNvbmRpdGlvbnM6CgpUaGUgYWJvdmUgY29weXJpZ2h0IG5vdGljZSBhbmQgdGhpcyBwZXJtaXNzaW9uIG5vdGljZSBzaGFsbCBiZSBpbmNsdWRlZCBpbgphbGwgY29waWVzIG9yIHN1YnN0YW50aWFsIHBvcnRpb25zIG9mIHRoZSBTb2Z0d2FyZS4KClRIRSBTT0ZUV0FSRSBJUyBQUk9WSURFRCAiQVMgSVMiLCBXSVRIT1VUIFdBUlJBTlRZIE9GIEFOWSBLSU5ELCBFWFBSRVNTIE9SCklNUExJRUQsIElOQ0xVRElORyBCVVQgTk9UIExJTUlURUQgVE8gVEhFIFdBUlJBTlRJRVMgT0YgTUVSQ0hBTlRBQklMSVRZLApGSVRORVNTIEZPUiBBIFBBUlRJQ1VMQVIgUFVSUE9TRSBBTkQgTk9OSU5GUklOR0VNRU5ULiBJTiBOTyBFVkVOVCBTSEFMTCBUSEUKQVVUSE9SUyBPUiBDT1BZUklHSFQgSE9MREVSUyBCRSBMSUFCTEUgRk9SIEFOWSBDTEFJTSwgREFNQUdFUyBPUiBPVEhFUgpMSUFCSUxJVFksIFdIRVRIRVIgSU4gQU4gQUNUSU9OIE9GIENPTlRSQUNULCBUT1JUIE9SIE9USEVSV0lTRSwgQVJJU0lORyBGUk9NLApPVVQgT0YgT1IgSU4gQ09OTkVDVElPTiBXSVRIIFRIRSBTT0ZUV0FSRSBPUiBUSEUgVVNFIE9SIE9USEVSIERFQUxJTkdTIElOClRIRSBTT0ZUV0FSRS4KClB1Yk51YiBSZWFsLXRpbWUgQ2xvdWQtSG9zdGVkIFB1c2ggQVBJIGFuZCBQdXNoIE5vdGlmaWNhdGlvbiBDbGllbnQgRnJhbWV3b3JrcwpDb3B5cmlnaHQgKGMpIDIwMTMgUHViTnViIEluYy4KaHR0cDovL3d3dy5wdWJudWIuY29tLwpodHRwOi8vd3d3LnB1Ym51Yi5jb20vdGVybXM="
+	},
+	{
+		name: "LICENSE.md.meta",
+		base: "ZmlsZUZvcm1hdFZlcnNpb246IDIKZ3VpZDogNjU0M2QzYzEyNTYzZTY2OTA4ZThkNjk3NGVjYWU2NTgKVGV4dFNjcmlwdEltcG9ydGVyOgogIGV4dGVybmFsT2JqZWN0czoge30KICB1c2VyRGF0YTogCiAgYXNzZXRCdW5kbGVOYW1lOiAKICBhc3NldEJ1bmRsZVZhcmlhbnQ6IAo="
+	},
+	{
+		name: "package.json",
+		base: "ewogICJuYW1lIjogImNvbS5wdWJudWIuc2RrIiwKICAidmVyc2lvbiI6ICI2LjguMCIsCiAgImRpc3BsYXlOYW1lIjogIlB1Yk51YiBTREsiLAogICJkZXNjcmlwdGlvbiI6ICJQdWJOdWIgUmVhbC10aW1lIENsb3VkLUhvc3RlZCBQdXNoIEFQSSBhbmQgUHVzaCBOb3RpZmljYXRpb24gQ2xpZW50IEZyYW1ld29ya3MiLAogICJ1bml0eSI6ICIyMDE5LjEiLAogICJkb2N1bWVudGF0aW9uVXJsIjogImh0dHBzOi8vd3d3LnB1Ym51Yi5jb20vZG9jcy9zZGtzL2Mtc2hhcnAiLAogICJjaGFuZ2Vsb2dVcmwiOiAiaHR0cHM6Ly9leGFtcGxlLmNvbS9jaGFuZ2Vsb2cuaHRtbCIsCiAgImxpY2Vuc2VzVXJsIjogImh0dHBzOi8vZ2l0aHViLmNvbS9wdWJudWIvYy1zaGFycC9ibG9iL21hc3Rlci9MSUNFTlNFIiwKICAiZGVwZW5kZW5jaWVzIjogewogICAgImNvbS51bml0eS5udWdldC5uZXd0b25zb2Z0LWpzb24iOiAiMy4wLjIiCiAgfSwKICAia2V5d29yZHMiOiBbCiAgICAicHVibnViIiwKICAgICJzZGsiCiAgXSwKICAiYXV0aG9yIjogewogICAgIm5hbWUiOiAiUHViTnViIiwKICAgICJlbWFpbCI6ICJtaWNoYWwuZG9icnphbnNraUBwdWJudWIuY29tIiwKICAgICJ1cmwiOiAiaHR0cHM6Ly9wdWJudWIuY29tIgogIH0sCiAgInB1Ymxpc2hDb25maWciOiB7CiAgICAicmVnaXN0cnkiOiAiaHR0cHM6Ly9ucG0ucGtnLmdpdGh1Yi5jb20iCiAgfSwKICAicmVwb3NpdG9yeSI6ICJodHRwczovL2dpdGh1Yi5jb20vcHVibnViL2Mtc2hhcnAiCn0="
+	},
+	{
+		name: "package.json.meta",
+		base: "ZmlsZUZvcm1hdFZlcnNpb246IDIKZ3VpZDogYWJhOTFjNTExNDE2NzdhN2ViMzNkMTAyZjhkOGYxMjUKUGFja2FnZU1hbmlmZXN0SW1wb3J0ZXI6CiAgZXh0ZXJuYWxPYmplY3RzOiB7fQogIHVzZXJEYXRhOiAKICBhc3NldEJ1bmRsZU5hbWU6IAogIGFzc2V0QnVuZGxlVmFyaWFudDogCg=="
+	},
+	{
+		name: "Runtime.meta",
+		base: "ZmlsZUZvcm1hdFZlcnNpb246IDIKZ3VpZDogOTlhZmEzNmIwZWU0NzRjMzI5ZDdhZTljY2FiODQ0YzIKZm9sZGVyQXNzZXQ6IHllcwpEZWZhdWx0SW1wb3J0ZXI6CiAgZXh0ZXJuYWxPYmplY3RzOiB7fQogIHVzZXJEYXRhOiAKICBhc3NldEJ1bmRsZU5hbWU6IAogIGFzc2V0QnVuZGxlVmFyaWFudDogCg=="
+	},
+	{
+		name: "Runtime/PubnubApiUnity.dll.meta",
+		base: "ZmlsZUZvcm1hdFZlcnNpb246IDIKZ3VpZDogZjgyNWJjZDQ4OTUyZGZiNDg5MWM3NjFkMzM5MjY3OWQKUGx1Z2luSW1wb3J0ZXI6CiAgZXh0ZXJuYWxPYmplY3RzOiB7fQogIHNlcmlhbGl6ZWRWZXJzaW9uOiAyCiAgaWNvbk1hcDoge30KICBleGVjdXRpb25PcmRlcjoge30KICBkZWZpbmVDb25zdHJhaW50czogW10KICBpc1ByZWxvYWRlZDogMAogIGlzT3ZlcnJpZGFibGU6IDEKICBpc0V4cGxpY2l0bHlSZWZlcmVuY2VkOiAwCiAgdmFsaWRhdGVSZWZlcmVuY2VzOiAwCiAgcGxhdGZvcm1EYXRhOgogIC0gZmlyc3Q6CiAgICAgIDogQW55CiAgICBzZWNvbmQ6CiAgICAgIGVuYWJsZWQ6IDAKICAgICAgc2V0dGluZ3M6CiAgICAgICAgRXhjbHVkZSBFZGl0b3I6IDAKICAgICAgICBFeGNsdWRlIExpbnV4NjQ6IDAKICAgICAgICBFeGNsdWRlIE9TWFVuaXZlcnNhbDogMAogICAgICAgIEV4Y2x1ZGUgV2ViR0w6IDAKICAgICAgICBFeGNsdWRlIFdpbjogMAogICAgICAgIEV4Y2x1ZGUgV2luNjQ6IDAKICAtIGZpcnN0OgogICAgICBBbnk6IAogICAgc2Vjb25kOgogICAgICBlbmFibGVkOiAxCiAgICAgIHNldHRpbmdzOiB7fQogIC0gZmlyc3Q6CiAgICAgIEVkaXRvcjogRWRpdG9yCiAgICBzZWNvbmQ6CiAgICAgIGVuYWJsZWQ6IDEKICAgICAgc2V0dGluZ3M6CiAgICAgICAgQ1BVOiBBbnlDUFUKICAgICAgICBEZWZhdWx0VmFsdWVJbml0aWFsaXplZDogdHJ1ZQogICAgICAgIE9TOiBBbnlPUwogIC0gZmlyc3Q6CiAgICAgIFN0YW5kYWxvbmU6IExpbnV4NjQKICAgIHNlY29uZDoKICAgICAgZW5hYmxlZDogMQogICAgICBzZXR0aW5nczoKICAgICAgICBDUFU6IEFueUNQVQogIC0gZmlyc3Q6CiAgICAgIFN0YW5kYWxvbmU6IE9TWFVuaXZlcnNhbAogICAgc2Vjb25kOgogICAgICBlbmFibGVkOiAxCiAgICAgIHNldHRpbmdzOgogICAgICAgIENQVTogTm9uZQogIC0gZmlyc3Q6CiAgICAgIFN0YW5kYWxvbmU6IFdpbgogICAgc2Vjb25kOgogICAgICBlbmFibGVkOiAxCiAgICAgIHNldHRpbmdzOgogICAgICAgIENQVTogeDg2CiAgLSBmaXJzdDoKICAgICAgU3RhbmRhbG9uZTogV2luNjQKICAgIHNlY29uZDoKICAgICAgZW5hYmxlZDogMQogICAgICBzZXR0aW5nczoKICAgICAgICBDUFU6IHg4Nl82NAogIC0gZmlyc3Q6CiAgICAgIFdlYkdMOiBXZWJHTAogICAgc2Vjb25kOgogICAgICBlbmFibGVkOiAxCiAgICAgIHNldHRpbmdzOiB7fQogIC0gZmlyc3Q6CiAgICAgIFdpbmRvd3MgU3RvcmUgQXBwczogV2luZG93c1N0b3JlQXBwcwogICAgc2Vjb25kOgogICAgICBlbmFibGVkOiAwCiAgICAgIHNldHRpbmdzOgogICAgICAgIENQVTogQW55Q1BVCiAgdXNlckRhdGE6IAogIGFzc2V0QnVuZGxlTmFtZTogCiAgYXNzZXRCdW5kbGVWYXJpYW50OiAK"
+	}
+]
+
+const fn = async () => {
+	const destinationDir = artifactsPath || path.join(os.tmpdir(), 'unitypkg');
+
+	if (!fs.existsSync(destinationDir)) {
+		fs.mkdirSync(destinationDir);
+	}
+	if (!fs.existsSync(path.join(destinationDir, "Runtime"))) {
+		fs.mkdirSync(path.join(destinationDir, "Runtime"))
+	}
+
+	try {
+		await fs.promises.rename(path.join(tempdir, unityDllFilename), path.join(tempdir, 'Runtime', unityDllFilename));
+	} catch {
+		console.error('Error copying Unity DLL');
+	}
+
+	const tasks = files.map(f => fs.promises.writeFile(path.join(destinationDir, f.name), Buffer.from(f.base, 'base64').toString()));
+	await Promise.all(tasks);
+
+	// TODO replace version
+	//const pkgJson = JSON.parse(await fs.promises.readFile(path.join(tempdir, 'package.json')));
+	//pkgJson.version = "?";
+	//await fs.promises.writeFile(path.join(tempdir, 'package.json'), JSON.stringify(pkgJson, null, 4));
+
+	process.chdir(destinationDir);
+	exec(`tar -cvzf ${path.join(destinationDir, "PubnubApiUnity.tgz")} *`);
+	const dir = fs.readdirSync('.');
+	dir.forEach(f => !f.endsWith('.tgz') && exec(`rm -rf ${f}`));
+};
+fn();

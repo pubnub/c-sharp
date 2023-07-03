@@ -48,6 +48,22 @@ src/.vs/Pubnub/v15/sqlite3/storage.ide
 /src/Api/PubnubApiUWP/obj/*
 /src/Api/PubnubApiUWP/*.user
 
+/src/PubnubUnity/.idea/*
+/src/PubnubUnity/.vs/*
+/src/PubnubUnity/Library/*
+/src/PubnubUnity/Temp/*
+/src/PubnubUnity/Logs/*
+/src/PubnubUnity/obj/*
+/src/PubnubUnity/UserSettings/*
+/src/PubnubUnity/*.sln
+/src/PubnubUnity/*.csproj
+
+/src/Api/PubnubApiUnity/obj/Debug/*
+/src/Api/PubnubApiUnity/obj/Release/*
+/src/Api/PubnubApiUnity/bin/Debug/*
+/src/Api/PubnubApiUnity/bin/Release/*
+/src/Api/PubnubApiUnity/obj/*
+
 /src/packages/*
 
 /src/UnitTests/PubnubApi.Tests/bin/Debug/*
