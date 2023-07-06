@@ -8,6 +8,10 @@ namespace PubnubApi.PubnubEventEngine.Core {
 
 		public event System.Action<EventQueue> onEventQueued;
 
+		/// <summary>
+		/// Enqueue (fire) an event to the Event Engine. Handling that event is covered by the Engine itself.
+		/// </summary>
+		/// <param name="e">Event to be fired</param>
 		public void Enqueue(IEvent e) {
 			lock (lockObj) {
 				// TODO de-dupe? Throttle?
