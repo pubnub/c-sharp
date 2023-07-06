@@ -8,7 +8,7 @@ namespace PubnubApi.PubnubEventEngine.Core {
 		protected EffectDispatcher dispatcher = new EffectDispatcher();
 		protected IState currentState;
 
-		private Task<IState> currentTransition = Utils.EmptyTask;
+		private bool transitioning = false;
 
 		private readonly IEffectInvocation[] emptyInvocationList = new IEffectInvocation[0];
 
@@ -20,10 +20,11 @@ namespace PubnubApi.PubnubEventEngine.Core {
 			eventQueue.onEventQueued -= OnEvent;
 		}
 
-		private async void OnEvent(EventQueue q) {
-			// await the current running transition - non blocking
-			await currentTransition;
-			currentTransition = Transition(q.Dequeue()).ContinueWith((res) => currentState = res.Result);
+		private async void OnEvent(EventQueue q)
+		{
+			if (eventQueue.IsLooping) return;
+			
+			await eventQueue.Loop(async e => currentState = await Transition(e));
 		}
 		
 		private async Task<IState> Transition(IEvent e) {
