@@ -5,31 +5,31 @@ using PubnubApi.PubnubEventEngine.Subscribe.Invocations;
 
 namespace PubnubApi.PubnubEventEngine.Subscribe.States
 {
-    internal class HandshakingState : Core.IState
+    internal class HandshakingState : Core.State
     {
         public IEnumerable<string> Channels;
         public IEnumerable<string> ChannelGroups;
 
-        public IEnumerable<IEffectInvocation> OnEntry => new HandshakeInvocation()
+        public override IEnumerable<IEffectInvocation> OnEntry => new HandshakeInvocation()
             { Channels = this.Channels, ChannelGroups = this.ChannelGroups }.AsArray();
 
-        public IEnumerable<IEffectInvocation> OnExit { get; } = new CancelHandshakeInvocation().AsArray();
+        public override IEnumerable<IEffectInvocation> OnExit { get; } = new CancelHandshakeInvocation().AsArray();
 
-        public Tuple<Core.IState, IEnumerable<IEffectInvocation>> Transition(IEvent e)
+        public override TransitionResult Transition(IEvent e)
         {
             return e switch
             {
                 Events.SubscriptionChangedEvent subscriptionChanged => new States.HandshakingState()
                 {
                     Channels = subscriptionChanged.Channels, ChannelGroups = subscriptionChanged.ChannelGroups
-                }.With(),
+                },
 
                 Events.SubscriptionRestoredEvent subscriptionRestored => new States.ReceivingState()
                 {
                     Channels = subscriptionRestored.Channels,
                     ChannelGroups = subscriptionRestored.ChannelGroups,
                     Cursor = subscriptionRestored.Cursor
-                }.With(),
+                },
 
                 Events.HandshakeFailureEvent handshakeFailure => new States.HandshakeFailedState()
                 {
