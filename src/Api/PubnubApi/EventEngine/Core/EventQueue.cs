@@ -11,7 +11,7 @@ namespace PubnubApi.PubnubEventEngine.Core
         
         public bool IsLooping { get; private set; }
 
-        public event System.Action<EventQueue> onEventQueued;
+        public event System.Action<EventQueue> OnEventQueued;
 
         /// <summary>
         /// Enqueue (fire) an event to the Event Engine. Handling that event is covered by the Engine itself.
@@ -23,7 +23,7 @@ namespace PubnubApi.PubnubEventEngine.Core
             {
                 // TODO de-dupe? Throttle?
                 eventQueue.Enqueue(e);
-                onEventQueued?.Invoke(this);
+                OnEventQueued?.Invoke(this);
             }
         }
 

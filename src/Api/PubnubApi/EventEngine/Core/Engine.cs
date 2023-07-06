@@ -8,23 +8,22 @@ namespace PubnubApi.PubnubEventEngine.Core {
 		protected EffectDispatcher dispatcher = new EffectDispatcher();
 		protected IState currentState;
 
-		private bool transitioning = false;
+		private Task currentTransitionLoop = Utils.EmptyTask;
 
 		private readonly IEffectInvocation[] emptyInvocationList = new IEffectInvocation[0];
 
 		public Engine() {
-			eventQueue.onEventQueued += OnEvent;
+			eventQueue.OnEventQueued += OnEvent;
 		}
 
 		~Engine() {
-			eventQueue.onEventQueued -= OnEvent;
+			eventQueue.OnEventQueued -= OnEvent;
 		}
 
 		private async void OnEvent(EventQueue q)
 		{
-			if (eventQueue.IsLooping) return;
-			
-			await eventQueue.Loop(async e => currentState = await Transition(e));
+			await currentTransitionLoop;
+			currentTransitionLoop = eventQueue.Loop(async e => currentState = await Transition(e));
 		}
 		
 		private async Task<IState> Transition(IEvent e) {
