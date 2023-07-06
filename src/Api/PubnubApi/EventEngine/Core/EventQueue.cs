@@ -33,7 +33,7 @@ namespace PubnubApi.PubnubEventEngine.Core
             }
         }
 
-        public async Task Loop(System.Func<IEvent, Task> function)
+        public async Task Loop<T>(System.Func<IEvent, Task<T>> function)
         {
             while (Count > 0)
             {
