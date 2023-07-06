@@ -8,8 +8,6 @@ namespace PubnubApi.PubnubEventEngine.Core
     {
         private volatile Queue<IEvent> eventQueue = new Queue<IEvent>();
         private object lockObj = new object();
-        
-        public bool IsLooping { get; private set; }
 
         public event System.Action<EventQueue> OnEventQueued;
 
@@ -37,12 +35,10 @@ namespace PubnubApi.PubnubEventEngine.Core
 
         public async Task Loop(System.Func<IEvent, Task> function)
         {
-            IsLooping = true;
             while (Count > 0)
             {
                 await function(Dequeue());
             }
-            IsLooping = false;
         }
 
         public int Count
