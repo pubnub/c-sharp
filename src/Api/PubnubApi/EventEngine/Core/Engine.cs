@@ -21,6 +21,7 @@ namespace PubnubApi.PubnubEventEngine.Core {
 		}
 
 		private async void OnEvent(EventQueue q) {
+			// await the current running transition - non blocking
 			await currentTransition;
 			currentTransition = Transition(q.Dequeue()).ContinueWith((res) => currentState = res.Result);
 		}
