@@ -10,7 +10,9 @@ concurrency:
 jobs:
   tests:
     name: Integration and Unit tests
-    runs-on: windows-2019
+    runs-on:
+      group: Default Larger Runners
+      labels: windows-latest
     defaults:
       run:
         shell: powershell
@@ -42,7 +44,9 @@ jobs:
         uses: ./.github/.release/actions/actions/utils/fast-jobs-failure
   acceptance-tests:
     name: Acceptance tests
-    runs-on: windows-2019
+    runs-on:
+      group: Default Larger Runners
+      labels: windows-latest
     defaults:
       run:
         shell: powershell
@@ -93,7 +97,9 @@ jobs:
         uses: ./.github/.release/actions/actions/utils/fast-jobs-failure
   all-tests:
     name: Tests
-    runs-on: ubuntu-latest
+    runs-on:
+      group: Default Larger Runners
+      labels: ubuntu-latest-m
     needs: [tests, acceptance-tests]
     steps:
       - name: Tests summary
