@@ -5,28 +5,28 @@ using PubnubApi.PubnubEventEngine.Subscribe.Invocations;
 
 namespace PubnubApi.PubnubEventEngine.Subscribe.States
 {
-    internal class HandshakeReconnectingState : Core.IState
+    internal class HandshakeReconnectingState : Core.State
     {
         public IEnumerable<string> Channels;
         public IEnumerable<string> ChannelGroups;
 
-        public IEnumerable<IEffectInvocation> OnEntry => new HandshakeReconnectInvocation()
+        public override IEnumerable<IEffectInvocation> OnEntry => new HandshakeReconnectInvocation()
             { Channels = this.Channels, ChannelGroups = this.ChannelGroups }.AsArray();
-        public IEnumerable<IEffectInvocation> OnExit { get; } = new CancelHandshakeReconnectInvocation().AsArray();
+        public override IEnumerable<IEffectInvocation> OnExit { get; } = new CancelHandshakeReconnectInvocation().AsArray();
 
-        public Tuple<Core.IState, IEnumerable<IEffectInvocation>> Transition(IEvent e)
+        public override TransitionResult Transition(IEvent e)
         {
             return e switch
             {
                 Events.SubscriptionChangedEvent subscriptionChanged => new HandshakingState()
                 {
                     Channels = subscriptionChanged.Channels, ChannelGroups = subscriptionChanged.ChannelGroups,
-                }.With(),
+                },
 
                 Events.DisconnectEvent disconnect => new HandshakeStoppedState()
                 {
                     Channels = disconnect.Channels, ChannelGroups = disconnect.ChannelGroups
-                }.With(),
+                },
 
                 Events.HandshakeReconnectGiveUpEvent handshakeReconnectGiveUp => new HandshakeFailedState()
                 {
@@ -48,7 +48,7 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States
                     Channels = subscriptionRestored.Channels,
                     ChannelGroups = subscriptionRestored.ChannelGroups,
                     Cursor = subscriptionRestored.Cursor
-                }.With(),
+                },
 
                 _ => null
             };

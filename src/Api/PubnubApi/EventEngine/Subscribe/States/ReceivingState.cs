@@ -5,18 +5,18 @@ using PubnubApi.PubnubEventEngine.Subscribe.Invocations;
 
 namespace PubnubApi.PubnubEventEngine.Subscribe.States
 {
-    internal class ReceivingState : Core.IState
+    internal class ReceivingState : Core.State
     {
         public IEnumerable<string> Channels;
         public IEnumerable<string> ChannelGroups;
         public SubscriptionCursor Cursor;
 
-        public IEnumerable<IEffectInvocation> OnEntry => new ReceiveMessagesInvocation()
+        public override IEnumerable<IEffectInvocation> OnEntry => new ReceiveMessagesInvocation()
             { Channels = this.Channels, ChannelGroups = this.ChannelGroups, Cursor = this.Cursor }.AsArray();
 
-        public IEnumerable<IEffectInvocation> OnExit { get; } = new CancelReceiveMessagesInvocation().AsArray();
+        public override IEnumerable<IEffectInvocation> OnExit { get; } = new CancelReceiveMessagesInvocation().AsArray();
 
-        public Tuple<Core.IState, IEnumerable<IEffectInvocation>> Transition(IEvent e)
+        public override TransitionResult Transition(IEvent e)
         {
             return e switch
             {
@@ -35,14 +35,14 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States
                     Channels = subscriptionChanged.Channels,
                     ChannelGroups = subscriptionChanged.ChannelGroups,
                     Cursor = this.Cursor
-                }.With(),
+                },
 
                 Events.SubscriptionRestoredEvent subscriptionRestored => new ReceivingState()
                 {
                     Channels = subscriptionRestored.Channels,
                     ChannelGroups = subscriptionRestored.ChannelGroups,
                     Cursor = subscriptionRestored.Cursor
-                }.With(),
+                },
 
                 Events.DisconnectEvent disconnect => new ReceiveStoppedState()
                 {
@@ -56,7 +56,7 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States
                     Channels = this.Channels,
                     ChannelGroups = this.ChannelGroups,
                     Cursor = this.Cursor
-                }.With(),
+                },
 
                 _ => null
             };

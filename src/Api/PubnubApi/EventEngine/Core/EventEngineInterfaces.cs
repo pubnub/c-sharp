@@ -31,15 +31,26 @@ namespace PubnubApi.PubnubEventEngine.Core {
 
 	internal interface IEvent { };
 	
-	internal interface IState {
-		public IEnumerable<IEffectInvocation> OnEntry { get; }
-		public IEnumerable<IEffectInvocation> OnExit { get; }
+	internal abstract class State
+	{
+		public virtual IEnumerable<IEffectInvocation> OnEntry { get; } = null;
+		public virtual IEnumerable<IEffectInvocation> OnExit { get; } = null;
 
 		/// <summary>
 		/// The EE transition pure function.
 		/// </summary>
 		/// <param name="e">Input event</param>
 		/// <returns>Target state and invocation list, or null for no-transition</returns>
-		public System.Tuple<IState, IEnumerable<IEffectInvocation>> Transition(IEvent e);
+		public abstract TransitionResult Transition(IEvent e);
+
+		public TransitionResult With(params IEffectInvocation[] invocations)
+		{
+			return new TransitionResult(this, invocations);
+		}
+		
+		public static implicit operator TransitionResult(State s)
+		{
+			return new TransitionResult(s);
+		}
 	}
 }
