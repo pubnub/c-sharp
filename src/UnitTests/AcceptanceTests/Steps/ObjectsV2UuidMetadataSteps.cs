@@ -13,6 +13,10 @@ using System.Text.Json;
 namespace AcceptanceTests.Steps
 {
     [Binding]
+    [Scope(Feature = "Objects V2 UUID metadata")]
+    [Scope(Feature = "Objects V2 Channel metadata")]
+    [Scope(Feature = "Objects V2 Members")]
+    [Scope(Feature = "Objects V2 Memberships")]
     public partial class FeatureObjectsV2MetadataSteps
     {
         public static bool enableIntenalPubnubLogging = false;
