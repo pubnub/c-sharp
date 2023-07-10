@@ -1414,7 +1414,11 @@ namespace PubnubApi
                 else if (deserializeStatus.Count >= 1 && deserializeStatus.ContainsKey("error") && deserializeStatus.ContainsKey("status") && Int32.TryParse(deserializeStatus["status"].ToString(), out statusCode) && statusCode > 0)
                 {
                     string errorMessageJson = deserializeStatus["error"].ToString();
-                    Dictionary<string, object> errorDic = jsonLib.DeserializeToDictionaryOfObject(errorMessageJson);
+                    Dictionary<string, object> errorDic = null;
+                    if (jsonLib.IsDictionaryCompatible(errorMessageJson, type))
+                    {
+                        errorDic = jsonLib.DeserializeToDictionaryOfObject(errorMessageJson);
+                    }
                     if (errorDic != null && errorDic.Count > 0 && errorDic.ContainsKey("message")
                         && statusCode != 200 && pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig))
                     {
@@ -1425,8 +1429,12 @@ namespace PubnubApi
                 }
                 else if (deserializeStatus.Count >= 1 && deserializeStatus.ContainsKey("status") && string.Equals(deserializeStatus["status"].ToString(), "error", StringComparison.OrdinalIgnoreCase) && deserializeStatus.ContainsKey("error"))
                 {
+                    Dictionary<string, object> errorDic = null;
                     string errorMessageJson = deserializeStatus["error"].ToString();
-                    Dictionary<string, object> errorDic = jsonLib.DeserializeToDictionaryOfObject(errorMessageJson);
+                    if (jsonLib.IsDictionaryCompatible(errorMessageJson, type))
+                    {
+                        errorDic = jsonLib.DeserializeToDictionaryOfObject(errorMessageJson);
+                    }
                     if (errorDic != null && errorDic.Count > 0 && errorDic.ContainsKey("code") && errorDic.ContainsKey("message"))
                     {
                         statusCode = PNStatusCodeHelper.GetHttpStatusCode(errorDic["code"].ToString());
