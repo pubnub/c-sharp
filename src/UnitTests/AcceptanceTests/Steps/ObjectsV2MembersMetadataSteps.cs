@@ -36,7 +36,7 @@ namespace AcceptanceTests.Steps
                 .ExecuteAsync();
             getChannelMembersMetadataResult = getMembersResponse.Result;
             pnStatus = getMembersResponse.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
@@ -86,7 +86,7 @@ namespace AcceptanceTests.Steps
                 .ExecuteAsync();
             getChannelMembersMetadataResult = getMembersResponse.Result;
             pnStatus = getMembersResponse.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
@@ -125,7 +125,7 @@ namespace AcceptanceTests.Steps
                 .ExecuteAsync();
             setChannelMembersResult = setChannelMembersResponse.Result;
             pnStatus = setChannelMembersResponse.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
@@ -173,7 +173,7 @@ namespace AcceptanceTests.Steps
                 .ExecuteAsync();
             setChannelMembersResult = setChannelMembersResponse.Result;
             pnStatus = setChannelMembersResponse.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
@@ -208,7 +208,7 @@ namespace AcceptanceTests.Steps
                 .Uuids(channelMemberList)
                 .ExecuteAsync();
             pnStatus = removeMemberResponse.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
@@ -232,7 +232,7 @@ namespace AcceptanceTests.Steps
                 .ExecuteAsync();
             setChannelMembersResult = manageMemberResponse.Result;
             pnStatus = manageMemberResponse.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }

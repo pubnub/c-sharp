@@ -36,7 +36,7 @@ namespace AcceptanceTests.Steps
                 .ExecuteAsync();
             getMembershipsMetadataResult = getMembershipsResponse.Result;
             pnStatus = getMembershipsResponse.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
@@ -90,7 +90,7 @@ namespace AcceptanceTests.Steps
                 .ExecuteAsync();
             getMembershipsMetadataResult = getMembershipsResponse.Result;
             pnStatus = getMembershipsResponse.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
@@ -109,7 +109,7 @@ namespace AcceptanceTests.Steps
                 .ExecuteAsync();
             getMembershipsMetadataResult = getMembershipsResponse.Result;
             pnStatus = getMembershipsResponse.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
@@ -166,7 +166,7 @@ namespace AcceptanceTests.Steps
                 .ExecuteAsync();
             setMembershipsResult = setMembershipsResponse.Result;
             pnStatus = setMembershipsResponse.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
@@ -217,7 +217,7 @@ namespace AcceptanceTests.Steps
                 .ExecuteAsync();
             setMembershipsResult = setMembershipsResponse.Result;
             pnStatus = setMembershipsResponse.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
@@ -238,7 +238,7 @@ namespace AcceptanceTests.Steps
                 .Channels(membershipList)
                 .ExecuteAsync();
             pnStatus = removeMembershipsResponse.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
@@ -254,7 +254,7 @@ namespace AcceptanceTests.Steps
                 .Channels(membershipList)
                 .ExecuteAsync();
             pnStatus = removeMembershipsResponse.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
@@ -296,7 +296,7 @@ namespace AcceptanceTests.Steps
                 .ExecuteAsync();
             setMembershipsResult = manageMembershipResponse.Result;
             pnStatus = manageMembershipResponse.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }

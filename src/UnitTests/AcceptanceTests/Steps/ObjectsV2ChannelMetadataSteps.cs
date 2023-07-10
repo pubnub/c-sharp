@@ -55,7 +55,7 @@ namespace AcceptanceTests.Steps
                 .ExecuteAsync();
             getChannelMetadataResult = getChannelMetadataResponse.Result;
             pnStatus = getChannelMetadataResponse.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
@@ -92,7 +92,7 @@ namespace AcceptanceTests.Steps
                 .ExecuteAsync();
             getChannelMetadataResult = getChannelMetadataResponse.Result;
             pnStatus = getChannelMetadataResponse.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
@@ -126,7 +126,7 @@ namespace AcceptanceTests.Steps
                 .ExecuteAsync();
             setChannelMetadataResult = setChannelMetadataResponse.Result;
             pnStatus = setChannelMetadataResponse.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
@@ -158,7 +158,7 @@ namespace AcceptanceTests.Steps
                 .Channel(channelMetadataPersona.id)
                 .ExecuteAsync();
             pnStatus = removeChannelMetadataResponse.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
@@ -173,7 +173,7 @@ namespace AcceptanceTests.Steps
                 .ExecuteAsync();
             getAllChannelMetadataResult = getAllChannelMetadataResponse.Result;
             pnStatus = getAllChannelMetadataResponse.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
@@ -231,7 +231,7 @@ namespace AcceptanceTests.Steps
                 .ExecuteAsync();
             getAllChannelMetadataResult = getAllChannelMetadataResponse.Result;
             pnStatus = getAllChannelMetadataResponse.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }

@@ -203,7 +203,7 @@ namespace AcceptanceTests.Steps
                 .ExecuteAsync();
             getUuidMetadataResult = getUuidMetadataResponse.Result;
             pnStatus = getUuidMetadataResponse.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
@@ -289,7 +289,7 @@ namespace AcceptanceTests.Steps
                 .ExecuteAsync();
             getUuidMetadataResult = getUuidMetadataResponse.Result;
             pnStatus = getUuidMetadataResponse.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
@@ -327,7 +327,7 @@ namespace AcceptanceTests.Steps
 
             setUuidMetadataResult = setUuidMetadataResponse.Result;
             pnStatus = setUuidMetadataResponse.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
@@ -353,7 +353,7 @@ namespace AcceptanceTests.Steps
                 .ExecuteAsync();
 
             pnStatus = removeUuidMetadataResponse.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
@@ -366,7 +366,7 @@ namespace AcceptanceTests.Steps
                 .ExecuteAsync();
 
             pnStatus = removeUuidMetadataResponse.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
@@ -380,7 +380,7 @@ namespace AcceptanceTests.Steps
 
             getAllUuidMetadataResult = getAllUuidMetadataResponse.Result;
             pnStatus = getAllUuidMetadataResponse.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
@@ -426,7 +426,7 @@ namespace AcceptanceTests.Steps
 
             getAllUuidMetadataResult = getAllUuidMetadataResponse.Result;
             pnStatus = getAllUuidMetadataResponse.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
