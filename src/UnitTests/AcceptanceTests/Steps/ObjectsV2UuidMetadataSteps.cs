@@ -247,10 +247,11 @@ namespace AcceptanceTests.Steps
         [Given(@"current user is '([^']*)' persona")]
         public void GivenCurrentUserIsPersona(string personaName)
         {
+            if (personaName == null) return;
             string dirPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            string personaFile = string.Format("{0}.json", personaName.ToLower());
+            string personaFile = string.Format("{0}.json", personaName.Trim().ToLower());
 
-            var personaFilePath = Path.Combine(dirPath, "Data", personaFile);
+            var personaFilePath = Path.Combine(dirPath ?? "", "Data", personaFile);
             if (File.Exists(personaFilePath))
             {
                 using (StreamReader r = new StreamReader(personaFilePath))
