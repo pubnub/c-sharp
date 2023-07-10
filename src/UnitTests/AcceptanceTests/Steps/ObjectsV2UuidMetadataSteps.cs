@@ -181,9 +181,10 @@ namespace AcceptanceTests.Steps
         [Given(@"the id for '([^']*)' persona")]
         public void GivenTheIdForPersona(string personaName)
         {
+            if (personaName == null) { return; }
             string dirPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            string personaFile = string.Format("{0}.json", personaName.ToLower());
-            var personaFilePath = Path.Combine(dirPath, "Data", personaFile);
+            string personaFile = string.Format("{0}.json", personaName.Trim().ToLower());
+            var personaFilePath = Path.Combine(dirPath ?? "", "Data", personaFile);
             if (File.Exists(personaFilePath))
             {
                 using (StreamReader r = new StreamReader(personaFilePath))
@@ -217,11 +218,12 @@ namespace AcceptanceTests.Steps
         [Then(@"the UUID metadata for '([^']*)' persona")]
         public void ThenTheUUIDMetadataForPersona(string personaName)
         {
+            if (personaName == null) return;
             uuidMetadataPersona = null;
             string dirPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            string personaFile = string.Format("{0}.json", personaName.ToLower());
+            string personaFile = string.Format("{0}.json", personaName.Trim().ToLower());
 
-            var personaFilePath = Path.Combine(dirPath, "Data", personaFile);
+            var personaFilePath = Path.Combine(dirPath ?? "", "Data", personaFile);
             if (File.Exists(personaFilePath))
             {
                 using (StreamReader r = new StreamReader(personaFilePath))
@@ -297,10 +299,11 @@ namespace AcceptanceTests.Steps
         [Given(@"the data for '([^']*)' persona")]
         public void GivenTheDataForPersona(string personaName)
         {
+            if (personaName == null) return;
             string dirPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            string personaFile = string.Format("{0}.json", personaName.ToLower());
+            string personaFile = string.Format("{0}.json", personaName.Trim().ToLower());
 
-            var personaFilePath = Path.Combine(dirPath, "Data", personaFile);
+            var personaFilePath = Path.Combine(dirPath ?? "", "Data", personaFile);
             if (File.Exists(personaFilePath))
             {
                 using (StreamReader r = new StreamReader(personaFilePath))
@@ -386,12 +389,13 @@ namespace AcceptanceTests.Steps
         [Then(@"the response contains list with '([^']*)' and '([^']*)' UUID metadata")]
         public void ThenTheResponseContainsListWithAndUUIDMetadata(string personaName1, string personaName2)
         {
+            if (personaName1 == null || personaName2 == null) { return; }
             string dirPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            string personaFile1 = string.Format("{0}.json", personaName1.ToLower());
-            string personaFile2 = string.Format("{0}.json", personaName2.ToLower());
+            string personaFile1 = string.Format("{0}.json", personaName1.Trim().ToLower());
+            string personaFile2 = string.Format("{0}.json", personaName2.Trim().ToLower());
 
-            var personaFile1Path = Path.Combine(dirPath, "Data", personaFile1);
-            var personaFile2Path = Path.Combine(dirPath, "Data", personaFile2);
+            var personaFile1Path = Path.Combine(dirPath ?? "", "Data", personaFile1);
+            var personaFile2Path = Path.Combine(dirPath ?? "", "Data", personaFile2);
             List<UuidMetadataPersona> personaList = new List<UuidMetadataPersona>();
             if (File.Exists(personaFile1Path) && File.Exists(personaFile2Path))
             {

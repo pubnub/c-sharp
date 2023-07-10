@@ -46,12 +46,13 @@ namespace AcceptanceTests.Steps
         [Then(@"the response contains list with '([^']*)' and '([^']*)' memberships")]
         public void ThenTheResponseContainsListWithAndMemberships(string membership1, string membership2)
         {
+            if (membership1 == null || membership2 == null) {  return; }
             string dirPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            string membershipFile1 = string.Format("{0}.json", membership1.ToLower());
-            string membershipFile2 = string.Format("{0}.json", membership2.ToLower());
+            string membershipFile1 = string.Format("{0}.json", membership1.Trim().ToLower());
+            string membershipFile2 = string.Format("{0}.json", membership2.Trim().ToLower());
 
-            var personaFile1Path = Path.Combine(dirPath, "Data", membershipFile1);
-            var personaFile2Path = Path.Combine(dirPath, "Data", membershipFile2);
+            var personaFile1Path = Path.Combine(dirPath ?? "", "Data", membershipFile1);
+            var personaFile2Path = Path.Combine(dirPath ?? "", "Data", membershipFile2);
             List<ChannelMembershipMetadataLocal> personaList = new List<ChannelMembershipMetadataLocal>();
             if (File.Exists(personaFile1Path) && File.Exists(personaFile2Path))
             {
@@ -117,10 +118,11 @@ namespace AcceptanceTests.Steps
         [Given(@"the data for '([^']*)' membership")]
         public void GivenTheDataForMembership(string whatMembership)
         {
+            if (whatMembership == null) { return; }
             string dirPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            string membershipFile = string.Format("{0}.json", whatMembership.ToLower());
+            string membershipFile = string.Format("{0}.json", whatMembership.Trim().ToLower());
 
-            var personaFile1Path = Path.Combine(dirPath, "Data", membershipFile);
+            var personaFile1Path = Path.Combine(dirPath ?? "", "Data", membershipFile);
             if (File.Exists(personaFile1Path))
             {
                 using (StreamReader r = new StreamReader(personaFile1Path))
@@ -173,10 +175,11 @@ namespace AcceptanceTests.Steps
         [Then(@"the response contains list with '([^']*)' membership")]
         public void ThenTheResponseContainsListWithMembership(string whatMembership)
         {
+            if (whatMembership == null) return;
             string dirPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            string membershipFile = string.Format("{0}.json", whatMembership.ToLower());
+            string membershipFile = string.Format("{0}.json", whatMembership.Trim().ToLower());
 
-            var personaFile1Path = Path.Combine(dirPath, "Data", membershipFile);
+            var personaFile1Path = Path.Combine(dirPath ?? "", "Data", membershipFile);
             List<ChannelMembershipMetadataLocal> membershipsList = new List<ChannelMembershipMetadataLocal>();
             if (File.Exists(personaFile1Path))
             {
@@ -260,10 +263,11 @@ namespace AcceptanceTests.Steps
         [Given(@"the data for '([^']*)' membership that we want to remove")]
         public void GivenTheDataForMembershipThatWeWantToRemove(string whatMembership)
         {
+            if (whatMembership == null) return;
             string dirPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            string membershipFile = string.Format("{0}.json", whatMembership.ToLower());
+            string membershipFile = string.Format("{0}.json", whatMembership.Trim().ToLower());
 
-            var personaFile1Path = Path.Combine(dirPath, "Data", membershipFile);
+            var personaFile1Path = Path.Combine(dirPath ?? "", "Data", membershipFile);
             if (File.Exists(personaFile1Path))
             {
                 using (StreamReader r = new StreamReader(personaFile1Path))
@@ -302,10 +306,11 @@ namespace AcceptanceTests.Steps
         [Then(@"the response does not contain list with '([^']*)' membership")]
         public void ThenTheResponseDoesNotContainListWithMembership(string whatMembership)
         {
+            if (whatMembership == null) return;
             string dirPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            string membershipFile = string.Format("{0}.json", whatMembership.ToLower());
+            string membershipFile = string.Format("{0}.json", whatMembership.Trim().ToLower());
 
-            var personaFile1Path = Path.Combine(dirPath, "Data", membershipFile);
+            var personaFile1Path = Path.Combine(dirPath ?? "", "Data", membershipFile);
             List<ChannelMembershipMetadataLocal> membershipsList = new List<ChannelMembershipMetadataLocal>();
             if (File.Exists(personaFile1Path))
             {
