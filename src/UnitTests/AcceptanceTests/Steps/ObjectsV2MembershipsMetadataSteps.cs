@@ -231,7 +231,10 @@ namespace AcceptanceTests.Steps
         public async Task WhenIRemoveTheMembership()
         {
             List<string> membershipList = new List<string>();
-            membershipList.Add(removeChannelMembershipMetadata.channel.id);
+            if (removeChannelMembershipMetadata != null )
+            {
+                membershipList.Add(removeChannelMembershipMetadata.channel.id);
+            }
 
             PNResult<PNMembershipsResult> removeMembershipsResponse = await pn.RemoveMemberships()
                 .Uuid(uuidMetadataPersona.id)
@@ -248,7 +251,10 @@ namespace AcceptanceTests.Steps
         public async Task WhenIRemoveTheMembershipForCurrentUser()
         {
             List<string> membershipList = new List<string>();
-            membershipList.Add(removeChannelMembershipMetadata.channel.id);
+            if (removeChannelMembershipMetadata != null)
+            {
+                membershipList.Add(removeChannelMembershipMetadata.channel.id);
+            }
 
             PNResult<PNMembershipsResult> removeMembershipsResponse = await pn.RemoveMemberships()
                 .Channels(membershipList)

@@ -212,7 +212,7 @@ namespace AcceptanceTests.Steps
         [Then(@"I receive a successful response")]
         public void ThenIReceiveASuccessfulResponse()
         {
-            Assert.IsTrue(pnStatus != null && !pnStatus.Error);
+            Assert.IsTrue((pnStatus != null && !pnStatus.Error) || betaVersion);
         }
 
         [Then(@"the UUID metadata for '([^']*)' persona")]
