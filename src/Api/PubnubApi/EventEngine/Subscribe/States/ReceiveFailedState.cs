@@ -5,7 +5,7 @@ using PubnubApi.PubnubEventEngine.Subscribe.Invocations;
 
 namespace PubnubApi.PubnubEventEngine.Subscribe.States
 {
-    internal class ReceiveFailedState : Core.IState
+    internal class ReceiveFailedState : Core.State
     {
         public IEnumerable<string> Channels;
         public IEnumerable<string> ChannelGroups;
@@ -14,7 +14,7 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States
         public IEnumerable<IEffectInvocation> OnEntry { get; }
         public IEnumerable<IEffectInvocation> OnExit { get; }
 
-        public Tuple<Core.IState, IEnumerable<IEffectInvocation>> Transition(IEvent e)
+        public override TransitionResult Transition(IEvent e)
         {
             return e switch
             {
@@ -28,21 +28,21 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States
                     Channels = subscriptionChanged.Channels,
                     ChannelGroups = subscriptionChanged.ChannelGroups,
                     Cursor = this.Cursor
-                }.With(),
+                },
 
                 Events.ReconnectEvent reconnect => new ReceivingState()
                 {
                     Channels = reconnect.Channels,
                     ChannelGroups = reconnect.ChannelGroups,
                     Cursor = reconnect.Cursor
-                }.With(),
+                },
 
                 Events.SubscriptionRestoredEvent subscriptionRestored => new ReceivingState()
                 {
                     Channels = subscriptionRestored.Channels,
                     ChannelGroups = subscriptionRestored.ChannelGroups,
                     Cursor = subscriptionRestored.Cursor
-                }.With(),
+                },
 
                 _ => null
             };

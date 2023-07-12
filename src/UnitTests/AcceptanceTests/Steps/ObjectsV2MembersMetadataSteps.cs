@@ -36,7 +36,7 @@ namespace AcceptanceTests.Steps
                 .ExecuteAsync();
             getChannelMembersMetadataResult = getMembersResponse.Result;
             pnStatus = getMembersResponse.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
@@ -46,12 +46,13 @@ namespace AcceptanceTests.Steps
         [Then(@"the response contains list with '([^']*)' and '([^']*)' members")]
         public void ThenTheResponseContainsListWithAndMembers(string channelMember1, string channelMember2)
         {
+            if (channelMember1 == null || channelMember2 == null) {  return; }
             string dirPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            string channelMemberFile1 = string.Format("{0}.json", channelMember1.ToLower());
-            string channelMemberFile2 = string.Format("{0}.json", channelMember2.ToLower());
+            string channelMemberFile1 = string.Format("{0}.json", channelMember1.Trim().ToLower());
+            string channelMemberFile2 = string.Format("{0}.json", channelMember2.Trim().ToLower());
 
-            var memberFile1Path = Path.Combine(dirPath, "Data", channelMemberFile1);
-            var memberFile2Path = Path.Combine(dirPath, "Data", channelMemberFile2);
+            var memberFile1Path = Path.Combine(dirPath ?? "", "Data", channelMemberFile1);
+            var memberFile2Path = Path.Combine(dirPath ?? "", "Data", channelMemberFile2);
             List<ChannelMemberMetadataLocal> personaList = new List<ChannelMemberMetadataLocal>();
             if (File.Exists(memberFile1Path) && File.Exists(memberFile2Path))
             {
@@ -85,7 +86,7 @@ namespace AcceptanceTests.Steps
                 .ExecuteAsync();
             getChannelMembersMetadataResult = getMembersResponse.Result;
             pnStatus = getMembersResponse.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
@@ -94,10 +95,11 @@ namespace AcceptanceTests.Steps
         [Given(@"the data for '([^']*)' member")]
         public void GivenTheDataForMember(string whatChannelMember)
         {
+            if (whatChannelMember == null) return;
             string dirPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            string memberFile = string.Format("{0}.json", whatChannelMember.ToLower());
+            string memberFile = string.Format("{0}.json", whatChannelMember.Trim().ToLower());
 
-            var memberFile1Path = Path.Combine(dirPath, "Data", memberFile);
+            var memberFile1Path = Path.Combine(dirPath ?? "", "Data", memberFile);
             if (File.Exists(memberFile1Path))
             {
                 using (StreamReader r = new StreamReader(memberFile1Path))
@@ -123,7 +125,7 @@ namespace AcceptanceTests.Steps
                 .ExecuteAsync();
             setChannelMembersResult = setChannelMembersResponse.Result;
             pnStatus = setChannelMembersResponse.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
@@ -132,10 +134,11 @@ namespace AcceptanceTests.Steps
         [Then(@"the response contains list with '([^']*)' member")]
         public void ThenTheResponseContainsListWithMember(string whatChannelMember)
         {
+            if (whatChannelMember == null) { return; }
             string dirPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            string memberFile = string.Format("{0}.json", whatChannelMember.ToLower());
+            string memberFile = string.Format("{0}.json", whatChannelMember.Trim().ToLower());
 
-            var memberFile1Path = Path.Combine(dirPath, "Data", memberFile);
+            var memberFile1Path = Path.Combine(dirPath ?? "", "Data", memberFile);
             List<ChannelMemberMetadataLocal> membersList = new List<ChannelMemberMetadataLocal>();
             if (File.Exists(memberFile1Path))
             {
@@ -170,7 +173,7 @@ namespace AcceptanceTests.Steps
                 .ExecuteAsync();
             setChannelMembersResult = setChannelMembersResponse.Result;
             pnStatus = setChannelMembersResponse.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
@@ -179,10 +182,11 @@ namespace AcceptanceTests.Steps
         [Given(@"the data for '([^']*)' member that we want to remove")]
         public void GivenTheDataForMemberThatWeWantToRemove(string whatChannelMember)
         {
+            if (whatChannelMember == null) { return; }
             string dirPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            string memberFile = string.Format("{0}.json", whatChannelMember.ToLower());
+            string memberFile = string.Format("{0}.json", whatChannelMember.Trim().ToLower());
 
-            var memberFile1Path = Path.Combine(dirPath, "Data", memberFile);
+            var memberFile1Path = Path.Combine(dirPath ?? "", "Data", memberFile);
             if (File.Exists(memberFile1Path))
             {
                 using (StreamReader r = new StreamReader(memberFile1Path))
@@ -204,7 +208,7 @@ namespace AcceptanceTests.Steps
                 .Uuids(channelMemberList)
                 .ExecuteAsync();
             pnStatus = removeMemberResponse.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
@@ -228,7 +232,7 @@ namespace AcceptanceTests.Steps
                 .ExecuteAsync();
             setChannelMembersResult = manageMemberResponse.Result;
             pnStatus = manageMemberResponse.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
@@ -237,10 +241,11 @@ namespace AcceptanceTests.Steps
         [Then(@"the response does not contain list with '([^']*)' member")]
         public void ThenTheResponseDoesNotContainListWithMember(string whatChannelMember)
         {
+            if (whatChannelMember == null) return;
             string dirPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            string memberFile = string.Format("{0}.json", whatChannelMember.ToLower());
+            string memberFile = string.Format("{0}.json", whatChannelMember.Trim().ToLower());
 
-            var memberFile1Path = Path.Combine(dirPath, "Data", memberFile);
+            var memberFile1Path = Path.Combine(dirPath ?? "", "Data", memberFile);
             List<ChannelMemberMetadataLocal> membersList = new List<ChannelMemberMetadataLocal>();
             if (File.Exists(memberFile1Path))
             {

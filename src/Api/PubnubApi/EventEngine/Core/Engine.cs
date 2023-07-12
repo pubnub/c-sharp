@@ -6,43 +6,42 @@ namespace PubnubApi.PubnubEventEngine.Core {
 		public EventQueue eventQueue = new EventQueue();
 		
 		protected EffectDispatcher dispatcher = new EffectDispatcher();
-		protected IState currentState;
+		protected State currentState;
 
-		private Task<IState> currentTransition;
+		private Task currentTransitionLoop = Utils.EmptyTask;
 
 		private readonly IEffectInvocation[] emptyInvocationList = new IEffectInvocation[0];
 
 		public Engine() {
-			eventQueue.onEventQueued += OnEvent;
+			eventQueue.OnEventQueued += OnEvent;
 		}
 
 		~Engine() {
-			eventQueue.onEventQueued -= OnEvent;
+			eventQueue.OnEventQueued -= OnEvent;
 		}
 
-		private async void OnEvent(EventQueue q) {
-			if (!(currentTransition is null)) {
-				await currentTransition;
-			}
-			currentTransition = Transition(q.Dequeue()).ContinueWith((res) => currentState = res.Result);
+		private async void OnEvent(EventQueue q)
+		{
+			await currentTransitionLoop;
+			currentTransitionLoop = eventQueue.Loop(async e => currentState = await Transition(e));
 		}
 		
-		private async Task<IState> Transition(IEvent e) {
+		private async Task<State> Transition(IEvent e) {
 			var stateInvocationPair = currentState.Transition(e);
 
 			if (stateInvocationPair is null) {
 				return currentState;
 			}
 
-			await ExecuteStateChange(currentState, stateInvocationPair.Item1, stateInvocationPair.Item2);
+			await ExecuteStateChange(currentState, stateInvocationPair.State, stateInvocationPair.Invocations);
 
-			return stateInvocationPair.Item1;
+			return stateInvocationPair.State;
 		}
 
 		/// <summary>
 		/// Launch the invocations associated with transitioning between states
 		/// </summary>
-		private async Task ExecuteStateChange(IState sourceState, IState targetState, IEnumerable<IEffectInvocation> invocations) {
+		private async Task ExecuteStateChange(State sourceState, State targetState, IEnumerable<IEffectInvocation> invocations) {
 			foreach (var effectInvocation in sourceState.OnExit ?? emptyInvocationList) {
 				await dispatcher.Dispatch(effectInvocation);
 			}

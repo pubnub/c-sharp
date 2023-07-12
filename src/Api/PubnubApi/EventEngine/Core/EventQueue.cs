@@ -1,25 +1,55 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
-namespace PubnubApi.PubnubEventEngine.Core {
-	internal class EventQueue {
-		private volatile Queue<IEvent> eventQueue = new Queue<IEvent>();
-		private object lockObj = new object();
+namespace PubnubApi.PubnubEventEngine.Core
+{
+    internal class EventQueue
+    {
+        private volatile Queue<IEvent> eventQueue = new Queue<IEvent>();
+        private object lockObj = new object();
 
-		public event System.Action<EventQueue> onEventQueued;
+        public event System.Action<EventQueue> OnEventQueued;
 
-		public void Enqueue(IEvent e) {
-			lock (lockObj) {
-				// TODO de-dupe? Throttle?
-				eventQueue.Enqueue(e);
-				onEventQueued?.Invoke(this);
-			}
-		}
+        /// <summary>
+        /// Enqueue (fire) an event to the Event Engine. Handling that event is covered by the Engine itself.
+        /// </summary>
+        /// <param name="e">Event to be fired</param>
+        public void Enqueue(IEvent e)
+        {
+            lock (lockObj)
+            {
+                // TODO de-dupe? Throttle?
+                eventQueue.Enqueue(e);
+                OnEventQueued?.Invoke(this);
+            }
+        }
 
-		public IEvent Dequeue() {
-			lock (lockObj) {
-				return eventQueue.Any() ? eventQueue.Dequeue() : null;
-			}
-		}
-	}
+        private IEvent Dequeue()
+        {
+            lock (lockObj)
+            {
+                return eventQueue.Any() ? eventQueue.Dequeue() : null;
+            }
+        }
+
+        public async Task Loop<T>(System.Func<IEvent, Task<T>> function)
+        {
+            while (Count > 0)
+            {
+                await function(Dequeue());
+            }
+        }
+
+        public int Count
+        {
+            get
+            {
+                lock (lockObj)
+                {
+                    return eventQueue.Count;
+                }
+            }
+        }
+    }
 }
