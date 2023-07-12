@@ -393,7 +393,7 @@ namespace AcceptanceTests.Steps
                 .ExecuteAsync();
             grantResult = pamGrantResult.Result;
             pnStatus = pamGrantResult.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
@@ -421,7 +421,7 @@ namespace AcceptanceTests.Steps
                 .ExecuteAsync();
             grantResult = pamGrantResult.Result;
             pnStatus = pamGrantResult.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }

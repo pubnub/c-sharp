@@ -100,7 +100,7 @@ namespace PubnubApi
         public bool IsDictionaryCompatible(string jsonString, PNOperationType operationType)
         {
             bool ret = false;
-            if (IsValidJson(jsonString, operationType))
+            if (JsonFastCheck(jsonString) && IsValidJson(jsonString, operationType))
             {
                 try
                 {
@@ -1234,14 +1234,19 @@ namespace PubnubApi
 
         public Dictionary<string, object> DeserializeToDictionaryOfObject(string jsonString)
         {
+            Dictionary<string, object> result = null;
             try
             {
-                return JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+                if (JsonFastCheck(jsonString))
+                {
+                    result = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+                }
             }
             catch
             {
-                return null;
+                //ignore
             }
+            return result;
         }
 
         public Dictionary<string, object> ConvertToDictionaryObject(object localContainer)
@@ -1369,6 +1374,10 @@ namespace PubnubApi
             return ret;
         }
 
+        public static bool JsonFastCheck(string rawJson) {
+	        var c = rawJson.TrimStart()[0];
+	        return c == '[' || c == '{';
+        }
         private static object ConvertJTokenToObject(JToken token)
         {
             if (token == null)
