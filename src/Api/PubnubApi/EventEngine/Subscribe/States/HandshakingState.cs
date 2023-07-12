@@ -22,7 +22,7 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States
                 Events.UnsubscribeAllEvent unsubscribeAll => new UnsubscribedState() 
                 {
                     Channels = unsubscribeAll.Channels, ChannelGroups = unsubscribeAll.ChannelGroups,
-                }.With(),
+                },
 
                 Events.SubscriptionChangedEvent subscriptionChanged => new States.HandshakingState()
                 {
