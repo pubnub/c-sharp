@@ -66,4 +66,11 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Invocations {
 	}
 
 	internal class CancelReceiveReconnectInvocation: ReceiveReconnectInvocation, Core.IEffectCancelInvocation { }
+
+	internal class LeaveInvocation: Core.IEffectInvocation 
+	{ 
+		public IEnumerable<string> Channels;
+		public IEnumerable<string> ChannelGroups;
+	}
+	internal class CancelLeaveInvocation : LeaveInvocation, Core.IEffectCancelInvocation { }
 }
