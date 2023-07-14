@@ -9,8 +9,7 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States
     {
         public IEnumerable<string> Channels;
         public IEnumerable<string> ChannelGroups;
-        public override IEnumerable<IEffectInvocation> OnEntry => new LeaveInvocation()
-            { Channels = this.Channels, ChannelGroups = this.ChannelGroups }.AsArray();
+        public override IEnumerable<IEffectInvocation> OnEntry { get; } = null;
         public override IEnumerable<IEffectInvocation> OnExit { get; } = null;
 
         public override TransitionResult Transition(Core.IEvent e)

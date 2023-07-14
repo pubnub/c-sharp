@@ -346,7 +346,6 @@
     <Compile Include="..\PubnubApi\EventEngine\ReceivingEffectHandler.cs" Link="EventEngine\ReceivingEffectHandler.cs" />
     <Compile Include="..\PubnubApi\EventEngine\State.cs" Link="EventEngine\State.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\Effects\HandshakeEffectHandler.cs" Link="EventEngine\Subscribe\Effects\HandshakeEffectHandler.cs" />
-    <Compile Include="..\PubnubApi\EventEngine\Subscribe\Effects\LeaveEffectHandler.cs" Link="EventEngine\Subscribe\Effects\LeaveEffectHandler.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\Events\SubscriptionEvents.cs" Link="EventEngine\Subscribe\Events\SubscriptionEvents.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\Invocations\SubscriptionInvocations.cs" Link="EventEngine\Subscribe\Invocations\SubscriptionInvocations.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\States\HandshakeFailedState.cs" Link="EventEngine\Subscribe\States\HandshakeFailedState.cs" />

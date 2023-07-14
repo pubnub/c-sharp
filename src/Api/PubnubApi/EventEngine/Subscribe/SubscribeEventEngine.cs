@@ -15,10 +15,6 @@ namespace PubnubApi.PubnubEventEngine.Subscribe {
 			dispatcher.Register<Invocations.HandshakeInvocation, Effects.HandshakeEffectHandler>(handshakeHandler);
 			dispatcher.Register<Invocations.CancelHandshakeInvocation, Effects.HandshakeEffectHandler>(handshakeHandler);
 
-			var leaveHandler = new Effects.LeaveEffectHandler(subscribeManager, eventQueue);
-			dispatcher.Register<Invocations.LeaveInvocation, Effects.LeaveEffectHandler>(leaveHandler);
-			dispatcher.Register<Invocations.CancelLeaveInvocation, Effects.LeaveEffectHandler>(leaveHandler);
-
 			currentState = new UnsubscribedState();
 		}
 	}
