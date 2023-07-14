@@ -2,8 +2,6 @@
 
 namespace PubnubApi.PubnubEventEngine.Subscribe.Events {
     public class UnsubscribeAllEvent : Core.IEvent {
-		public IEnumerable<string> Channels;
-		public IEnumerable<string> ChannelGroups;
     }
     public class SubscriptionChangedEvent : Core.IEvent {
 		public IEnumerable<string> Channels;

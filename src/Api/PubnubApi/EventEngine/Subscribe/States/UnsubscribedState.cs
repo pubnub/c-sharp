@@ -7,8 +7,6 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States
 {
     internal class UnsubscribedState : Core.State
     {
-        public IEnumerable<string> Channels;
-        public IEnumerable<string> ChannelGroups;
         public override IEnumerable<IEffectInvocation> OnEntry { get; } = null;
         public override IEnumerable<IEffectInvocation> OnExit { get; } = null;
 
