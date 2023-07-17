@@ -44,6 +44,7 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Invocations {
 		public IEnumerable<string> Channels;
 		public IEnumerable<string> ChannelGroups;
 		public SubscriptionCursor  Cursor;
+		public Dictionary<string, object> ExternalQueryParams = new Dictionary<string, object>();
 	}
 	
 	internal class CancelReceiveMessagesInvocation : ReceiveMessagesInvocation, Core.IEffectCancelInvocation { }

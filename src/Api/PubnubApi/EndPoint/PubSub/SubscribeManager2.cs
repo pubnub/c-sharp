@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Globalization;
 using System.Collections;
 using System.Text;
+using PubnubApi.PubnubEventEngine;
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -150,9 +151,9 @@ namespace PubnubApi.EndPoint
                     LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} SubscribeManager => HandshakeRequestCancellation. No request to cancel.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
             }
         }
-        internal async Task<Tuple<string, PNStatus>> ReceiveRequest<T>(PNOperationType responseType, string[] channels, string[] channelGroups, long? timetoken, int? region, Dictionary<string, string> initialSubscribeUrlParams, Dictionary<string, object> externalQueryParam)
+        internal async Task<Tuple<ReceivingResponse<object>, PNStatus>> ReceiveRequest<T>(PNOperationType responseType, string[] channels, string[] channelGroups, long? timetoken, int? region, Dictionary<string, string> initialSubscribeUrlParams, Dictionary<string, object> externalQueryParam)
         {
-            Tuple<string, PNStatus> resp = new Tuple<string, PNStatus> ("", null);
+            Tuple<ReceivingResponse<object>, PNStatus> resp = new Tuple<ReceivingResponse<object>, PNStatus> (null, null);
 
             try
             {
@@ -174,7 +175,7 @@ namespace PubnubApi.EndPoint
                 
                 await UrlProcessRequest<T>(request, pubnubRequestState, false).ContinueWith(r =>
                 {
-                    resp = r.Result;
+                    //TODO: capture response and determine how can we can use generic Json parser and assign to response object
                 }, TaskContinuationOptions.ExecuteSynchronously).ConfigureAwait(false);
             }
             catch(Exception ex)

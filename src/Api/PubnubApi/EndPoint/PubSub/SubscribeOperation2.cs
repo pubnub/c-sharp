@@ -120,10 +120,11 @@ namespace PubnubApi.EndPoint
 
         private void ReceivingEffect_ReceiveRequested(object sender, ReceiveRequestEventArgs e)
         {
-            Tuple<string, PNStatus> resp = manager.ReceiveRequest<T>(PNOperationType.PNSubscribeOperation, e.ExtendedState.Channels.ToArray(), e.ExtendedState.ChannelGroups.ToArray(), e.ExtendedState.Timetoken, e.ExtendedState.Region, null, null).Result;
+            // TODO: most likely this method will be removed.
+            //Tuple<string, PNStatus> resp = manager.ReceiveRequest<T>(PNOperationType.PNSubscribeOperation, e.ExtendedState.Channels.ToArray(), e.ExtendedState.ChannelGroups.ToArray(), e.ExtendedState.Timetoken, e.ExtendedState.Region, null, null).Result;
 
-            string jsonResp = resp.Item1;
-            e.ReceiveResponseCallback?.Invoke(jsonResp);
+            //string jsonResp = resp.Item1;
+            //e.ReceiveResponseCallback?.Invoke(jsonResp);
         }
 
         private void HandshakeEffect_HandshakeRequested(object sender, HandshakeRequestEventArgs e)
@@ -155,10 +156,11 @@ namespace PubnubApi.EndPoint
         }
         private void ReceiveReconnectEffect_ReceiveRequested(object sender, ReceiveReconnectRequestEventArgs e)
         {
-            Tuple<string, PNStatus> resp = manager.ReceiveRequest<T>(PNOperationType.PNSubscribeOperation, e.ExtendedState.Channels.ToArray(), e.ExtendedState.ChannelGroups.ToArray(), e.ExtendedState.Timetoken, e.ExtendedState.Region, null, null).Result;
+            // TODO: most likely this method will be removed.
+            //Tuple<string, PNStatus> resp = manager.ReceiveRequest<T>(PNOperationType.PNSubscribeOperation, e.ExtendedState.Channels.ToArray(), e.ExtendedState.ChannelGroups.ToArray(), e.ExtendedState.Timetoken, e.ExtendedState.Region, null, null).Result;
 
-            string jsonResp = resp.Item1;
-            e.ReceiveReconnectResponseCallback?.Invoke(jsonResp);
+            //string jsonResp = resp.Item1;
+            //e.ReceiveReconnectResponseCallback?.Invoke(jsonResp);
         }
         private void ReceiveReconnectEffect_CancelReceiveRequested(object sender, CancelReceiveReconnectRequestEventArgs e)
         {

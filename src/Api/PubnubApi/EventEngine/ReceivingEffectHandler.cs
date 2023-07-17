@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace PubnubApi.PubnubEventEngine
 {
-	public class ReceiveingResponse<T>
+	public class ReceivingResponse<T>
 	{
 		[JsonProperty("t")]
 		public Timetoken Timetoken { get; set; }
@@ -144,60 +144,61 @@ namespace PubnubApi.PubnubEventEngine
 
 		public void OnReceivingEffectResponseReceived(string json)
 		{
-			try
-			{
-				pnStatus = null;
-				var receivedResponse = JsonConvert.DeserializeObject<ReceiveingResponse<object>>(json);
-				if (receivedResponse != null && receivedResponse.Timetoken != null)
-				{
-					receiveMessages = receivedResponse.Messages;
+			// TODO: most likely this method will be removed.
+			//try
+			//{
+			//	pnStatus = null;
+			//	var receivedResponse = JsonConvert.DeserializeObject<ReceiveingResponse<object>>(json);
+			//	if (receivedResponse != null && receivedResponse.Timetoken != null)
+			//	{
+			//		receiveMessages = receivedResponse.Messages;
 
-					ReceiveSuccess receiveSuccessEvent = new ReceiveSuccess();
-					receiveSuccessEvent.SubscriptionCursor = new SubscriptionCursor();
-					receiveSuccessEvent.SubscriptionCursor.Timetoken = receivedResponse.Timetoken.Timestamp;
-					receiveSuccessEvent.SubscriptionCursor.Region = receivedResponse.Timetoken.Region;
-					receiveSuccessEvent.EventPayload.Timetoken = receivedResponse.Timetoken.Timestamp;
-					receiveSuccessEvent.EventPayload.Region = receivedResponse.Timetoken.Region;
-					receiveSuccessEvent.EventType = EventType.ReceiveSuccess;
-					receiveSuccessEvent.Name = "RECEIVE_SUCCESS";
-					LogCallback?.Invoke("OnReceivingEffectResponseReceived - EventType.ReceiveSuccess");
+			//		ReceiveSuccess receiveSuccessEvent = new ReceiveSuccess();
+			//		receiveSuccessEvent.SubscriptionCursor = new SubscriptionCursor();
+			//		receiveSuccessEvent.SubscriptionCursor.Timetoken = receivedResponse.Timetoken.Timestamp;
+			//		receiveSuccessEvent.SubscriptionCursor.Region = receivedResponse.Timetoken.Region;
+			//		receiveSuccessEvent.EventPayload.Timetoken = receivedResponse.Timetoken.Timestamp;
+			//		receiveSuccessEvent.EventPayload.Region = receivedResponse.Timetoken.Region;
+			//		receiveSuccessEvent.EventType = EventType.ReceiveSuccess;
+			//		receiveSuccessEvent.Name = "RECEIVE_SUCCESS";
+			//		LogCallback?.Invoke("OnReceivingEffectResponseReceived - EventType.ReceiveSuccess");
 
-					emitter.emit(receiveSuccessEvent);
-				}
-				else
-				{
-					ReceiveFailure receiveFailureEvent = new ReceiveFailure();
-					receiveFailureEvent.Name = "RECEIVE_FAILURE";
-					receiveFailureEvent.EventType = EventType.ReceiveFailure;
-					LogCallback?.Invoke("OnReceivingEffectResponseReceived - EventType.ReceiveFailure");
+			//		emitter.emit(receiveSuccessEvent);
+			//	}
+			//	else
+			//	{
+			//		ReceiveFailure receiveFailureEvent = new ReceiveFailure();
+			//		receiveFailureEvent.Name = "RECEIVE_FAILURE";
+			//		receiveFailureEvent.EventType = EventType.ReceiveFailure;
+			//		LogCallback?.Invoke("OnReceivingEffectResponseReceived - EventType.ReceiveFailure");
 
-					pnStatus = new PNStatus();
-					pnStatus.Operation = PNOperationType.PNSubscribeOperation;
-					pnStatus.AffectedChannels = extendedState.Channels;
-					pnStatus.AffectedChannelGroups = extendedState.ChannelGroups;
-					pnStatus.Error = true;
+			//		pnStatus = new PNStatus();
+			//		pnStatus.Operation = PNOperationType.PNSubscribeOperation;
+			//		pnStatus.AffectedChannels = extendedState.Channels;
+			//		pnStatus.AffectedChannelGroups = extendedState.ChannelGroups;
+			//		pnStatus.Error = true;
 
-					emitter.emit(receiveFailureEvent);
-				}
-			}
-			catch (Exception ex)
-			{
-				LogCallback?.Invoke($"ReceivingEffectHandler EXCEPTION - {ex}");
+			//		emitter.emit(receiveFailureEvent);
+			//	}
+			//}
+			//catch (Exception ex)
+			//{
+			//	LogCallback?.Invoke($"ReceivingEffectHandler EXCEPTION - {ex}");
 
-				ReceiveFailure receiveFailureEvent = new ReceiveFailure();
-				receiveFailureEvent.Name = "RECEIVE_FAILURE";
-				receiveFailureEvent.EventType = EventType.ReceiveFailure;
-				receiveFailureEvent.EventPayload.exception = ex;
-				LogCallback?.Invoke("OnReceivingEffectResponseReceived - EventType.ReceiveFailure");
+			//	ReceiveFailure receiveFailureEvent = new ReceiveFailure();
+			//	receiveFailureEvent.Name = "RECEIVE_FAILURE";
+			//	receiveFailureEvent.EventType = EventType.ReceiveFailure;
+			//	receiveFailureEvent.EventPayload.exception = ex;
+			//	LogCallback?.Invoke("OnReceivingEffectResponseReceived - EventType.ReceiveFailure");
 
-				pnStatus = new PNStatus();
-				pnStatus.Operation = PNOperationType.PNSubscribeOperation;
-				pnStatus.AffectedChannels = extendedState.Channels;
-				pnStatus.AffectedChannelGroups = extendedState.ChannelGroups;
-				pnStatus.Error = true;
+			//	pnStatus = new PNStatus();
+			//	pnStatus.Operation = PNOperationType.PNSubscribeOperation;
+			//	pnStatus.AffectedChannels = extendedState.Channels;
+			//	pnStatus.AffectedChannelGroups = extendedState.ChannelGroups;
+			//	pnStatus.Error = true;
 
-				emitter.emit(receiveFailureEvent);
-			}
+			//	emitter.emit(receiveFailureEvent);
+			//}
 		}
 
 		public void Cancel()

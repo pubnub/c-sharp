@@ -117,7 +117,7 @@ namespace PubnubApi.PubnubEventEngine
 			{
 				pnStatus = null;
 				LogCallback?.Invoke($"OnReceiveReconnectEffectResponseReceived Json Response = {json}");
-				var receivedResponse = JsonConvert.DeserializeObject<ReceiveingResponse<object>>(json);
+				var receivedResponse = JsonConvert.DeserializeObject<ReceivingResponse<object>>(json);
 				if (receivedResponse != null && receivedResponse.Timetoken != null)
 				{
 					receiveMessages = receivedResponse.Messages;
