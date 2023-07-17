@@ -30,8 +30,8 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Effects
 				invocation.ExternalQueryParams
 			);
 
-			if (!resp.Item2.Error) {
-				// TODO does this need more error checking?
+
+			if (resp.Item2 != null && !resp.Item2.Error && resp.Item1 != null) {
 				// TODO how do we wire the messages to queue
 				var c = new SubscriptionCursor() {
 					Region = resp.Item1.Timetoken.Region,
@@ -40,6 +40,27 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Effects
 				
 				eventQueue.Enqueue(new Events.ReceiveSuccessEvent() {Cursor = c});
 			}
+			else
+			{
+				PNStatus status;
+				if (resp.Item2 is null)
+				{
+					status = new PNStatus()
+					{
+						Error = true,
+						ErrorData = new PNErrorData("Unknown error.", new System.Exception("Unknown error")),
+						Category = PNStatusCategory.PNUnknownCategory,
+						AffectedChannels = invocation.Channels.ToList(),
+						AffectedChannelGroups = invocation.ChannelGroups.ToList(),
+					};
+				}
+				else
+				{
+                    status = resp.Item2;
+				}
+				eventQueue.Enqueue(new Events.ReceiveFailureEvent() { Status = status });
+			}
+
 		}
 
 		public async Task Cancel() {
