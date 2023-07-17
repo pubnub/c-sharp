@@ -7,6 +7,9 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States
 {
     internal class UnsubscribedState : Core.State
     {
+        public override IEnumerable<IEffectInvocation> OnEntry { get; } = null;
+        public override IEnumerable<IEffectInvocation> OnExit { get; } = null;
+
         public override TransitionResult Transition(Core.IEvent e)
         {
             return e switch

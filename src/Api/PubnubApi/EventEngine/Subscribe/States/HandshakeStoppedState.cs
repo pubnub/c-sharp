@@ -14,6 +14,10 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States
         {
             return e switch
             {
+                Events.UnsubscribeAllEvent unsubscribeAll => new UnsubscribedState() 
+                {
+                },
+
                 Events.SubscriptionChangedEvent subscriptionChanged => new HandshakingState()
                 {
                     Channels = subscriptionChanged.Channels, ChannelGroups = subscriptionChanged.ChannelGroups,

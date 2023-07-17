@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 
 namespace PubnubApi.PubnubEventEngine.Subscribe.Events {
-	public class SubscriptionChangedEvent : Core.IEvent {
+    public class UnsubscribeAllEvent : Core.IEvent {
+    }
+    public class SubscriptionChangedEvent : Core.IEvent {
 		public IEnumerable<string> Channels;
 		public IEnumerable<string> ChannelGroups;
 	}

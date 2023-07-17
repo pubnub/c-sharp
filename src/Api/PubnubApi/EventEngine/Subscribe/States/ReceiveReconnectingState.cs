@@ -21,6 +21,10 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States
         {
             return e switch
             {
+                Events.UnsubscribeAllEvent unsubscribeAll => new UnsubscribedState() 
+                {
+                },
+
                 Events.SubscriptionChangedEvent subscriptionChanged => new ReceivingState()
                 {
                     Channels = subscriptionChanged.Channels,
