@@ -31,9 +31,10 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States
                     Cursor = subscriptionRestored.Cursor
                 },
 
-                Events.HandshakeFailureEvent handshakeFailure => new States.HandshakeFailedState()
+                Events.HandshakeFailureEvent handshakeFailure => new States.HandshakeReconnectingState()
                 {
-                    Channels = this.Channels, ChannelGroups = this.ChannelGroups
+                    // TODO replace retryCount with value from policy
+                    Channels = this.Channels, ChannelGroups = this.ChannelGroups, RetryCount = 3
                 }.With(new EmitStatusInvocation(handshakeFailure.Status)),
 
                 Events.DisconnectEvent disconnect => new States.HandshakeStoppedState()

@@ -28,6 +28,7 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Events {
 	public class HandshakeReconnectFailureEvent : HandshakeFailureEvent
 	{
 		public PNStatus Status;
+		public int RemainingRetries;
 	}
 
 	public class HandshakeReconnectRetryEvent : Core.IEvent {
