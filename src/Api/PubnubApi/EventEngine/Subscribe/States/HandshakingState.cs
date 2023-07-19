@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using PubnubApi.PubnubEventEngine.Core;
-using PubnubApi.PubnubEventEngine.Subscribe.Invocations;
+using PubnubApi.EventEngine.Core;
+using PubnubApi.EventEngine.Subscribe.Invocations;
 
-namespace PubnubApi.PubnubEventEngine.Subscribe.States
+namespace PubnubApi.EventEngine.Subscribe.States
 {
     internal class HandshakingState : Core.State
     {
@@ -33,8 +33,7 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States
 
                 Events.HandshakeFailureEvent handshakeFailure => new States.HandshakeReconnectingState()
                 {
-                    // TODO replace retryCount with value from policy
-                    Channels = this.Channels, ChannelGroups = this.ChannelGroups, RetryCount = 3
+                    Channels = this.Channels, ChannelGroups = this.ChannelGroups
                 }.With(new EmitStatusInvocation(handshakeFailure.Status)),
 
                 Events.DisconnectEvent disconnect => new States.HandshakeStoppedState()

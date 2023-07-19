@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-namespace PubnubApi.PubnubEventEngine.Core {
+namespace PubnubApi.EventEngine.Core {
 	
 	/// <summary>
 	/// Generic effect handler.

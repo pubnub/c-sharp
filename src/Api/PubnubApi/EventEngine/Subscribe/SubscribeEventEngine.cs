@@ -1,10 +1,11 @@
 ﻿using PubnubApi.EndPoint;
-using PubnubApi.PubnubEventEngine.Subscribe.Effects;
-using PubnubApi.PubnubEventEngine.Subscribe.Invocations;
-using PubnubApi.PubnubEventEngine.Subscribe.States;
+using PubnubApi.EventEngine.Core;
+using PubnubApi.EventEngine.Subscribe.States;
+using PubnubApi.EventEngine.Subscribe.Effects;
+using PubnubApi.EventEngine.Subscribe.Invocations;
 
-namespace PubnubApi.PubnubEventEngine.Subscribe {
-	internal class SubscribeEventEngine : PubnubEventEngine.Core.Engine {
+namespace PubnubApi.EventEngine.Subscribe {
+	internal class SubscribeEventEngine : Engine {
 		private SubscribeManager2 subscribeManager;
 		
 		public SubscribeEventEngine(SubscribeManager2 subscribeManager) {

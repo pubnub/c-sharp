@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using PubnubApi.EventEngine.Subscribe.Common;
 
-namespace PubnubApi.PubnubEventEngine.Subscribe.Events {
+namespace PubnubApi.EventEngine.Subscribe.Events {
 	public class SubscriptionChangedEvent : Core.IEvent {
 		public IEnumerable<string> Channels;
 		public IEnumerable<string> ChannelGroups;
@@ -19,6 +20,7 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Events {
 
 	public class HandshakeFailureEvent : Core.IEvent {
 		public PNStatus Status;
+		public int AttemptedRetries;
 	}
 
 	public class HandshakeReconnectSuccessEvent : HandshakeSuccessEvent {
@@ -27,8 +29,6 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Events {
 
 	public class HandshakeReconnectFailureEvent : HandshakeFailureEvent
 	{
-		public PNStatus Status;
-		public int AttemptedRetries;
 	}
 
 	// Do we have this in system description ?

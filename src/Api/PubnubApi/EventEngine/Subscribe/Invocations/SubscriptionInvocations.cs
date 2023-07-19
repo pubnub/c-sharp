@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
-using PubnubApi.PubnubEventEngine.Core;
+using PubnubApi.EventEngine.Core;
+using PubnubApi.EventEngine.Subscribe.Common;
 
-namespace PubnubApi.PubnubEventEngine.Subscribe.Invocations {
+namespace PubnubApi.EventEngine.Subscribe.Invocations {
 	internal class EmitMessagesInvocation : Core.IEffectInvocation {
 		public IEnumerable<PNMessageResult<object>> Messages;
 

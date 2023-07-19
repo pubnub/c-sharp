@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using System.Collections.Generic;
 
-namespace PubnubApi.PubnubEventEngine.Core {
+namespace PubnubApi.EventEngine.Core {
 	internal abstract class Engine {
 		public EventQueue eventQueue = new EventQueue();
 		

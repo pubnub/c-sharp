@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace PubnubApi.PubnubEventEngine.Core
+namespace PubnubApi.EventEngine.Core
 {
     internal class EventQueue
     {

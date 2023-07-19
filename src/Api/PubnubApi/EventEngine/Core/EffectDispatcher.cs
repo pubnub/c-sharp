@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace PubnubApi.PubnubEventEngine.Core {
+namespace PubnubApi.EventEngine.Core {
 	internal class EffectDispatcher {
 		// assumes 1 instance of handler - capable of managing itself
 		private readonly Dictionary<System.Type, IEffectHandler> effectInvocationHandlerMap =
