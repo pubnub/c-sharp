@@ -26,7 +26,7 @@ namespace PubnubApi.EndPoint
         private bool presenceSubscribeEnabled;
         private SubscribeManager2 manager;
         private Dictionary<string, object> queryParam;
-        private EventEngine pnEventEngine;
+        //private EventEngine pnEventEngine;
         private Pubnub PubnubInstance;
         public List<SubscribeCallback> SubscribeListenerList
         {
@@ -104,18 +104,19 @@ namespace PubnubApi.EndPoint
             effectDispatcher.Register(EventType.ReceiveReconnectSuccess, receiveReconnectEffectHandler);
             effectDispatcher.Register(EventType.ReceiveReconnectGiveUp, receiveReconnectEffectHandler);
 
-            pnEventEngine = new EventEngine(effectDispatcher, eventEmitter);
-            pnEventEngine.PubnubUnitTest = unit;
-            pnEventEngine.Setup<T>(config);
+            //TODO: Need refactor
+       //     pnEventEngine = new EventEngine(effectDispatcher, eventEmitter);
+       //     pnEventEngine.PubnubUnitTest = unit;
+       //     pnEventEngine.Setup<T>(config);
 
-            if (pnEventEngine.PubnubUnitTest != null)
-            {
-                pnEventEngine.PubnubUnitTest.EventTypeList = new List<KeyValuePair<string, string>>();
-            }
-            else
-            {
-			    pnEventEngine.InitialState(new State(StateType.Unsubscribed) { EventType = EventType.SubscriptionChanged });
-            }
+       //     if (pnEventEngine.PubnubUnitTest != null)
+       //     {
+       //         pnEventEngine.PubnubUnitTest.EventTypeList = new List<KeyValuePair<string, string>>();
+       //     }
+       //     else
+       //     {
+			    //pnEventEngine.InitialState(new State(StateType.Unsubscribed) { EventType = EventType.SubscriptionChanged });
+       //     }
         }
 
         private void ReceivingEffect_ReceiveRequested(object sender, ReceiveRequestEventArgs e)
@@ -167,14 +168,15 @@ namespace PubnubApi.EndPoint
 
         private void JsonCallback(string json, bool zeroTimeTokenRequest, int messageCount)
         {
-            if (!string.IsNullOrEmpty(json))
-            {
-                List<object> respObject = manager.WrapResultBasedOnResponseType<string>(PNOperationType.PNSubscribeOperation, json, pnEventEngine.Context.Channels.ToArray(), pnEventEngine.Context.ChannelGroups.ToArray());
-                if (respObject != null && respObject.Count > 0)
-                {
-                    ProcessListenerCallback<string>(respObject, zeroTimeTokenRequest, messageCount, pnEventEngine.Context.Channels.ToArray(), pnEventEngine.Context.ChannelGroups.ToArray());
-                }
-            }
+            //TODO: Need refactor
+            //if (!string.IsNullOrEmpty(json))
+            //{
+            //    List<object> respObject = manager.WrapResultBasedOnResponseType<string>(PNOperationType.PNSubscribeOperation, json, pnEventEngine.Context.Channels.ToArray(), pnEventEngine.Context.ChannelGroups.ToArray());
+            //    if (respObject != null && respObject.Count > 0)
+            //    {
+            //        ProcessListenerCallback<string>(respObject, zeroTimeTokenRequest, messageCount, pnEventEngine.Context.Channels.ToArray(), pnEventEngine.Context.ChannelGroups.ToArray());
+            //    }
+            //}
         }
 
         protected void ProcessListenerCallback<T>(List<object> result, bool zeroTimeTokenRequest, int messageCount, string[] channels, string[] channelGroups)
@@ -794,7 +796,8 @@ namespace PubnubApi.EndPoint
                 initialSubscribeUrlParams.Add("filter-expr", UriUtil.EncodeUriComponent(config.FilterExpression, PNOperationType.PNSubscribeOperation, false, false, false));
             }
 
-
+            //TODO: Need refactor
+            /*
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
@@ -821,6 +824,7 @@ namespace PubnubApi.EndPoint
             })
             { IsBackground = true }.Start();
 #endif
+            */
         }
 
         internal bool Retry(bool reconnect)
