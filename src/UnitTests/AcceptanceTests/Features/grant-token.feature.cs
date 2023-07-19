@@ -37,9 +37,9 @@ namespace AcceptanceTests.Features
         public virtual void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "Grant an access token", "  As a PubNub customer I want to restrict and allow access to\r\n  specific PubNub " +
-                    "resources (channels, channel groups, uuids)\r\n  by my user base (both people and " +
-                    "devices) which are each\r\n  identified by a unique UUID.", ProgrammingLanguage.CSharp, featureTags);
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "Grant an access token", "  As a PubNub customer I want to restrict and allow access to\n  specific PubNub r" +
+                    "esources (channels, channel groups, uuids)\n  by my user base (both people and de" +
+                    "vices) which are each\n  identified by a unique UUID.", ProgrammingLanguage.CSharp, featureTags);
             testRunner.OnFeatureStart(featureInfo);
         }
         

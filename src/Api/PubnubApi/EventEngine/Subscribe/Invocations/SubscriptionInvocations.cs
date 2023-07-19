@@ -50,10 +50,11 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Invocations {
 
 	internal class CancelHandshakeInvocation : HandshakeInvocation, Core.IEffectCancelInvocation { }
 
-	internal class HandshakeReconnectInvocation: Core.IEffectInvocation 
-	{ 
-		public IEnumerable<string> Channels;
-		public IEnumerable<string> ChannelGroups;
+	internal class HandshakeReconnectInvocation: HandshakeInvocation
+	{
+		public int AttemptedRetries;
+		public int MaxConnectionRetry;
+		public PNReconnectionPolicy Policy;
 	}
 
 	internal class CancelHandshakeReconnectInvocation: HandshakeReconnectInvocation, Core.IEffectCancelInvocation { }
