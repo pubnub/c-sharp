@@ -28,9 +28,10 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Events {
 	public class HandshakeReconnectFailureEvent : HandshakeFailureEvent
 	{
 		public PNStatus Status;
-		public int RemainingRetries;
+		public int AttemptedRetries;
 	}
 
+	// Do we have this in system description ?
 	public class HandshakeReconnectRetryEvent : Core.IEvent {
 	}
 
