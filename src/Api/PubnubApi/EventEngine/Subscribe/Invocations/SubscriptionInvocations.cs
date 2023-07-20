@@ -56,8 +56,8 @@ namespace PubnubApi.EventEngine.Subscribe.Invocations {
 	internal class HandshakeReconnectInvocation: HandshakeInvocation
 	{
 		public int AttemptedRetries;
-		public int MaxConnectionRetry;
-		public PNReconnectionPolicy Policy;
+		public int MaximumReconnectionRetries;
+		public PNReconnectionPolicy ReconnectionPolicy;
 	}
 
 	internal class CancelHandshakeReconnectInvocation: HandshakeReconnectInvocation, Core.IEffectCancelInvocation { }
@@ -65,8 +65,8 @@ namespace PubnubApi.EventEngine.Subscribe.Invocations {
 	internal class ReceiveReconnectInvocation: ReceiveMessagesInvocation 
 	{ 
 		public int AttemptedRetries;
-		public int MaxConnectionRetry;
-		public PNReconnectionPolicy Policy;
+		public int MaximumReconnectionRetries;
+		public PNReconnectionPolicy ReconnectionPolicy;
 	}
 
 	internal class CancelReceiveReconnectInvocation: ReceiveReconnectInvocation, Core.IEffectCancelInvocation { }

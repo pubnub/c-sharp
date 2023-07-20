@@ -10,7 +10,9 @@ namespace PubnubApi.EventEngine.Subscribe.States
     {
         public IEnumerable<string> Channels;
         public IEnumerable<string> ChannelGroups;
-        public SubscriptionCursor Cursor;
+		public PNReconnectionPolicy ReconnectionPolicy;
+		public int MaximumReconnectionRetries;
+		public SubscriptionCursor Cursor;
 
         public override IEnumerable<IEffectInvocation> OnEntry => new ReceiveMessagesInvocation()
             { Channels = this.Channels, ChannelGroups = this.ChannelGroups, Cursor = this.Cursor }.AsArray();
@@ -56,7 +58,10 @@ namespace PubnubApi.EventEngine.Subscribe.States
                 {
                     Channels = this.Channels,
                     ChannelGroups = this.ChannelGroups,
-                    Cursor = this.Cursor
+					AttemptedRetries = 0,
+					MaximumReconnectionRetries = this.MaximumReconnectionRetries,
+					ReconnectionPolicy = this.ReconnectionPolicy,
+					Cursor = this.Cursor
                 },
 
                 _ => null

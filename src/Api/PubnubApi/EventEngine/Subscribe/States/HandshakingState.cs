@@ -9,8 +9,10 @@ namespace PubnubApi.EventEngine.Subscribe.States
     {
         public IEnumerable<string> Channels;
         public IEnumerable<string> ChannelGroups;
+		public PNReconnectionPolicy ReconnectionPolicy;
+		public int MaximumReconnectionRetries;
 
-        public override IEnumerable<IEffectInvocation> OnEntry => new HandshakeInvocation()
+		public override IEnumerable<IEffectInvocation> OnEntry => new HandshakeInvocation()
             { Channels = this.Channels, ChannelGroups = this.ChannelGroups }.AsArray();
 
         public override IEnumerable<IEffectInvocation> OnExit { get; } = new CancelHandshakeInvocation().AsArray();
@@ -33,8 +35,12 @@ namespace PubnubApi.EventEngine.Subscribe.States
 
                 Events.HandshakeFailureEvent handshakeFailure => new States.HandshakeReconnectingState()
                 {
-                    Channels = this.Channels, ChannelGroups = this.ChannelGroups
-                }.With(new EmitStatusInvocation(handshakeFailure.Status)),
+                    Channels = this.Channels,
+                    ChannelGroups = this.ChannelGroups,
+                    AttemptedRetries = 0,
+					MaximumReconnectionRetries = this.MaximumReconnectionRetries,
+					ReconnectionPolicy = this.ReconnectionPolicy
+				}.With(new EmitStatusInvocation(handshakeFailure.Status)),
 
                 Events.DisconnectEvent disconnect => new States.HandshakeStoppedState()
                 {
