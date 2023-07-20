@@ -17,6 +17,7 @@ namespace PubnubApi.EventEngine.Core {
 	/// <typeparam name="T">Associated invocation</typeparam>
 	internal interface IEffectHandler<in T> : IEffectHandler where T : IEffectInvocation {
 		Task Run(T invocation);
+		bool IsBackground(T invocation);
 	}
 	
 	/// <summary>

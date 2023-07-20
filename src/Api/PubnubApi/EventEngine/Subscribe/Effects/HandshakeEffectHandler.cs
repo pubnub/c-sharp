@@ -29,7 +29,7 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
             this.eventQueue = eventQueue;
         }
 
-        public Task Run(HandshakeReconnectInvocation invocation)
+        public async Task Run(HandshakeReconnectInvocation invocation)
         {
             if (!ReconnectionDelayUtil.shouldRetry(invocation.Policy, invocation.AttemptedRetries, invocation.MaxConnectionRetry))
             {
@@ -38,11 +38,15 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
             else
             {
                 retryDelay = new Delay(ReconnectionDelayUtil.CalculateDelay(invocation.Policy, invocation.AttemptedRetries));
-                // Run in the background
-                retryDelay.Start().ContinueWith((_) => this.Run((HandshakeInvocation)invocation));
+                await retryDelay.Start();
+                if (!retryDelay.Cancelled)
+                    await Run((HandshakeInvocation)invocation);
             }
+        }
 
-            return Utils.EmptyTask;
+        public bool IsBackground(HandshakeReconnectInvocation invocation)
+        {
+            return true;
         }
 
         public async Task Run(HandshakeInvocation invocation)
@@ -66,8 +70,13 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
                 
             }
         }
-        
-        
+
+        public bool IsBackground(HandshakeInvocation invocation)
+        {
+            return false;
+        }
+
+
         private async Task<System.Tuple<SubscriptionCursor, PNStatus>> MakeHandshakeRequest(HandshakeInvocation invocation)
         {
             var resp = await manager.HandshakeRequest<string>(

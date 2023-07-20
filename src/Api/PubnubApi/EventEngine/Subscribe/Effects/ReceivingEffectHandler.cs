@@ -45,6 +45,11 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
             return Utils.EmptyTask;
         }
 
+        public bool IsBackground(ReceiveReconnectInvocation invocation)
+        {
+            return true;
+        }
+
         public async Task Run(ReceiveMessagesInvocation invocation)
         {
             var response = await MakeReceiveMessagesRequest(invocation);
@@ -65,8 +70,12 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
                     List<PNMessageResult<object>> listOfMessages = null;
                     eventQueue.Enqueue(new Events.ReceiveSuccessEvent() { Cursor = response.Item1, Messages= listOfMessages, Status = response.Item2 });
                     break;
-                
             }
+        }
+
+        public bool IsBackground(ReceiveMessagesInvocation invocation)
+        {
+            return true;
         }
 
         private async Task<System.Tuple<SubscriptionCursor, PNStatus>> MakeReceiveMessagesRequest(ReceiveMessagesInvocation invocation)

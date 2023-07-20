@@ -18,8 +18,13 @@ namespace PubnubApi.EventEngine.Core {
 
 			if (invocation is IEffectCancelInvocation) {
 				await effectInvocationHandlerMap[invocation.GetType()].Cancel();
-			} else {
-				await ((IEffectHandler<T>)effectInvocationHandlerMap[invocation.GetType()]).Run(invocation);
+			} else
+			{
+				var handler = ((IEffectHandler<T>)effectInvocationHandlerMap[invocation.GetType()]);
+				if (handler.IsBackground(invocation))
+					handler.Run(invocation).Start();
+				else
+					await handler.Run(invocation);
 			}
 		}
 
