@@ -49,6 +49,8 @@ namespace PubnubApi.EventEngine.Subscribe.Events {
 
 	public class ReceiveFailureEvent : Core.IEvent {
 		public PNStatus Status;
+		public int AttemptedRetries;
+		public SubscriptionCursor Cursor;
 	}
 
 	public class ReceiveReconnectRetry : Core.IEvent {

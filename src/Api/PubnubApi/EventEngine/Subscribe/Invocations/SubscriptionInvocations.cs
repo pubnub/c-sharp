@@ -45,6 +45,8 @@ namespace PubnubApi.EventEngine.Subscribe.Invocations {
 		public IEnumerable<string> Channels;
 		public IEnumerable<string> ChannelGroups;
 		public SubscriptionCursor  Cursor;
+		public Dictionary<string, string> InitialSubscribeQueryParams = new Dictionary<string, string>();
+		public Dictionary<string, object> ExternalQueryParams = new Dictionary<string, object>();
 	}
 	
 	internal class CancelReceiveMessagesInvocation : ReceiveMessagesInvocation, Core.IEffectCancelInvocation { }
@@ -60,11 +62,11 @@ namespace PubnubApi.EventEngine.Subscribe.Invocations {
 
 	internal class CancelHandshakeReconnectInvocation: HandshakeReconnectInvocation, Core.IEffectCancelInvocation { }
 	
-	internal class ReceiveReconnectInvocation: Core.IEffectInvocation 
+	internal class ReceiveReconnectInvocation: ReceiveMessagesInvocation 
 	{ 
-		public IEnumerable<string> Channels;
-		public IEnumerable<string> ChannelGroups;
-		public SubscriptionCursor Cursor;
+		public int AttemptedRetries;
+		public int MaxConnectionRetry;
+		public PNReconnectionPolicy Policy;
 	}
 
 	internal class CancelReceiveReconnectInvocation: ReceiveReconnectInvocation, Core.IEffectCancelInvocation { }

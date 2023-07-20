@@ -6,7 +6,6 @@ namespace PubnubApi.EventEngine.Common
     public class Delay
     {
         public bool Cancelled { get; private set; } = false;
-        private readonly Thread awaiterThread;
         private readonly TaskCompletionSource<object> taskCompletionSource  = new TaskCompletionSource<object>();
         private readonly object monitor = new object();
         private readonly int milliseconds;
@@ -14,14 +13,18 @@ namespace PubnubApi.EventEngine.Common
         public Delay(int milliseconds)
         {
             this.milliseconds = milliseconds;
-            awaiterThread = new Thread(AwaiterLoop);
         }
 
         public Task Start()
         {
+            #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+            Task taskAwaiter = Task.Factory.StartNew(AwaiterLoop);
+            taskAwaiter.Wait();
+            #else
+            Thread awaiterThread = new Thread(AwaiterLoop);
             awaiterThread.Start();
-            return taskCompletionSource.Task;
-        }
+            #endif
+            return taskCompletionSource.Task;        }
 
         public void Cancel()
         {

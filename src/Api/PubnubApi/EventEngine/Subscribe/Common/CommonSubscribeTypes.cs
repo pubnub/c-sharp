@@ -34,4 +34,49 @@ namespace PubnubApi.EventEngine.Subscribe.Common
         public int? Region { get; set; }
 
     }
+
+	public class ReceivingResponse<T>
+	{
+		[JsonProperty("t")]
+		public Timetoken Timetoken { get; set; }
+
+		[JsonProperty("m")]
+		public Message<T>[] Messages { get; set; }
+	}
+
+	public class Message<T>
+	{
+		[JsonProperty ("a")]
+		public string Shard { get; set;}
+
+		[JsonProperty ("b")]
+		public string SubscriptionMatch { get; set;}
+
+		[JsonProperty("c")]
+		public string Channel { get; set; }
+
+		[JsonProperty("d")]
+		public T Payload { get; set; }
+
+		[JsonProperty("e")]
+		public int MessageType { get; set; }
+
+		[JsonProperty("f")]
+		public string Flags { get; set; }
+
+		//[JsonProperty("i")]
+		//public string IssuingClientId { get; set; }
+
+		[JsonProperty("k")]
+		public string SubscribeKey { get; set; }
+
+		[JsonProperty("o")]
+		public object OriginatingTimetoken { get; set; }
+
+		[JsonProperty("p")]
+		public object PublishMetadata { get; set; }
+
+		[JsonProperty("s")]
+		public long SequenceNumber { get; set; }
+	}
 }
