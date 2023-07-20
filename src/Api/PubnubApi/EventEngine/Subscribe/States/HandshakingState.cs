@@ -23,15 +23,20 @@ namespace PubnubApi.EventEngine.Subscribe.States
             {
                 Events.SubscriptionChangedEvent subscriptionChanged => new States.HandshakingState()
                 {
-                    Channels = subscriptionChanged.Channels, ChannelGroups = subscriptionChanged.ChannelGroups
-                },
+                    Channels = subscriptionChanged.Channels,
+                    ChannelGroups = subscriptionChanged.ChannelGroups,
+					MaximumReconnectionRetries = this.MaximumReconnectionRetries,
+					ReconnectionPolicy = this.ReconnectionPolicy
+				},
 
                 Events.SubscriptionRestoredEvent subscriptionRestored => new States.ReceivingState()
                 {
                     Channels = subscriptionRestored.Channels,
                     ChannelGroups = subscriptionRestored.ChannelGroups,
-                    Cursor = subscriptionRestored.Cursor
-                },
+                    Cursor = subscriptionRestored.Cursor,
+					MaximumReconnectionRetries = this.MaximumReconnectionRetries,
+					ReconnectionPolicy = this.ReconnectionPolicy
+				},
 
                 Events.HandshakeFailureEvent handshakeFailure => new States.HandshakeReconnectingState()
                 {
@@ -44,13 +49,20 @@ namespace PubnubApi.EventEngine.Subscribe.States
 
                 Events.DisconnectEvent disconnect => new States.HandshakeStoppedState()
                 {
-                    Channels = disconnect.Channels, ChannelGroups = disconnect.ChannelGroups,
-                }.With(new EmitStatusInvocation(PNStatusCategory.PNDisconnectedCategory)),
+                    Channels = disconnect.Channels,
+                    ChannelGroups = disconnect.ChannelGroups,
+					MaximumReconnectionRetries = this.MaximumReconnectionRetries,
+					ReconnectionPolicy = this.ReconnectionPolicy
+				}.With(new EmitStatusInvocation(PNStatusCategory.PNDisconnectedCategory)),
 
                 Events.HandshakeSuccessEvent success => new ReceivingState()
                 {
-                    Channels = this.Channels, ChannelGroups = this.ChannelGroups, Cursor = success.Cursor
-                }.With(new EmitStatusInvocation(success.Status)),
+                    Channels = this.Channels,
+                    ChannelGroups = this.ChannelGroups,
+                    Cursor = success.Cursor,
+					MaximumReconnectionRetries = this.MaximumReconnectionRetries,
+					ReconnectionPolicy = this.ReconnectionPolicy
+				}.With(new EmitStatusInvocation(success.Status)),
 
                 _ => null
             };
