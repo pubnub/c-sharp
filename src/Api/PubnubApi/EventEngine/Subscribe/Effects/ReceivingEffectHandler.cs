@@ -61,7 +61,9 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
                     eventQueue.Enqueue(new Events.ReceiveFailureEvent() { Cursor = response.Item1, Status = response.Item2});
                     break;
                 case { }:
-                    eventQueue.Enqueue(new Events.ReceiveSuccessEvent() { Cursor = response.Item1, Status = response.Item2 });
+                    //TODO: get messages
+                    List<PNMessageResult<object>> listOfMessages = null;
+                    eventQueue.Enqueue(new Events.ReceiveSuccessEvent() { Cursor = response.Item1, Messages= listOfMessages, Status = response.Item2 });
                     break;
                 
             }
