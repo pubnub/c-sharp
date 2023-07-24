@@ -4,9 +4,9 @@ using PubnubApi.EventEngine.Subscribe.Common;
 
 namespace PubnubApi.EventEngine.Subscribe.Invocations {
 	internal class EmitMessagesInvocation : Core.IEffectInvocation {
-		public IEnumerable<PNMessageResult<object>> Messages;
+		public ReceivingResponse<string> Messages;
 
-		public EmitMessagesInvocation(IEnumerable<PNMessageResult<object>> messages)
+		public EmitMessagesInvocation(ReceivingResponse<string> messages)
 		{
 			this.Messages = messages;
 		}
