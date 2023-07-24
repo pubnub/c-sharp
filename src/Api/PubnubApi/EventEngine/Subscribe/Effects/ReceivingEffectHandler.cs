@@ -55,8 +55,8 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
             var response = await MakeReceiveMessagesRequest(invocation);
             var cursor = new SubscriptionCursor()
             {
-                Region = response.Item1.Timetoken.Region,
-                Timetoken = response.Item1.Timetoken.Timestamp
+                Region = response.Item1?.Timetoken.Region,
+                Timetoken = response.Item1?.Timetoken.Timestamp
             };
 
             switch (invocation)
