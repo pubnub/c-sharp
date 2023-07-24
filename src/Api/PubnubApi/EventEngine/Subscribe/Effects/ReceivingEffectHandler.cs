@@ -31,13 +31,13 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
 
         public Task Run(ReceiveReconnectInvocation invocation)
         {
-            if (!ReconnectionDelayUtil.shouldRetry(invocation.ReconnectionPolicy, invocation.AttemptedRetries, invocation.MaximumReconnectionRetries))
+            if (!ReconnectionDelayUtil.shouldRetry(invocation.Policy, invocation.AttemptedRetries, invocation.MaxConnectionRetry))
             {
                 eventQueue.Enqueue(new ReceiveReconnectGiveUpEvent() { Status = new PNStatus(PNStatusCategory.PNCancelledCategory) });
             }
             else
             {
-                retryDelay = new Delay(ReconnectionDelayUtil.CalculateDelay(invocation.ReconnectionPolicy, invocation.AttemptedRetries));
+                retryDelay = new Delay(ReconnectionDelayUtil.CalculateDelay(invocation.Policy, invocation.AttemptedRetries));
                 // Run in the background
                 retryDelay.Start().ContinueWith((_) => this.Run((ReceiveMessagesInvocation)invocation));
             }

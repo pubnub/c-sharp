@@ -7,8 +7,7 @@ using PubnubApi.EventEngine.Subscribe.Invocations;
 namespace PubnubApi.EventEngine.Subscribe {
 	internal class SubscribeEventEngine : Engine {
 		private SubscribeManager2 subscribeManager;
-
-		// TODO: Initialise reconnection related info here in ctor
+		
 		public SubscribeEventEngine(SubscribeManager2 subscribeManager) {
 			this.subscribeManager = subscribeManager;
 

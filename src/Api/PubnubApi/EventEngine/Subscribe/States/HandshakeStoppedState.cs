@@ -9,36 +9,26 @@ namespace PubnubApi.EventEngine.Subscribe.States
     {
         public IEnumerable<string> Channels;
         public IEnumerable<string> ChannelGroups;
-		public PNReconnectionPolicy ReconnectionPolicy;
-		public int MaximumReconnectionRetries;
-
-		public override TransitionResult Transition(IEvent e)
+        
+        public override TransitionResult Transition(IEvent e)
         {
             return e switch
             {
                 Events.SubscriptionChangedEvent subscriptionChanged => new HandshakingState()
                 {
-                    Channels = subscriptionChanged.Channels,
-                    ChannelGroups = subscriptionChanged.ChannelGroups,
-					MaximumReconnectionRetries = this.MaximumReconnectionRetries,
-					ReconnectionPolicy = this.ReconnectionPolicy
-				},
+                    Channels = subscriptionChanged.Channels, ChannelGroups = subscriptionChanged.ChannelGroups,
+                },
 
                 Events.ReconnectEvent reconnect => new HandshakingState()
                 {
-                    Channels = reconnect.Channels,
-                    ChannelGroups = reconnect.ChannelGroups,
-					MaximumReconnectionRetries = this.MaximumReconnectionRetries,
-					ReconnectionPolicy = this.ReconnectionPolicy
-				},
+                    Channels = reconnect.Channels, ChannelGroups = reconnect.ChannelGroups,
+                },
 
                 Events.SubscriptionRestoredEvent subscriptionRestored => new ReceivingState()
                 {
                     Channels = subscriptionRestored.Channels,
                     ChannelGroups = subscriptionRestored.ChannelGroups,
-					MaximumReconnectionRetries = this.MaximumReconnectionRetries,
-					ReconnectionPolicy = this.ReconnectionPolicy,
-					Cursor = subscriptionRestored.Cursor
+                    Cursor = subscriptionRestored.Cursor
                 },
 
                 _ => null
