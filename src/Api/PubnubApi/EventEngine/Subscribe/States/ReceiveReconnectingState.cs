@@ -64,7 +64,10 @@ namespace PubnubApi.EventEngine.Subscribe.States
                 {
                     Channels = this.Channels,
                     ChannelGroups = this.ChannelGroups,
-                    Cursor = this.Cursor
+                    Cursor = this.Cursor,
+                    AttemptedRetries = this.AttemptedRetries,
+                    MaximumReconnectionRetries = this.MaximumReconnectionRetries,
+                    ReconnectionPolicy = this.ReconnectionPolicy
                 }.With(new EmitStatusInvocation(receiveReconnectFailure.Status)),
 
                 Events.ReceiveReconnectGiveUpEvent receiveReconnectGiveUp => new ReceiveFailedState()
