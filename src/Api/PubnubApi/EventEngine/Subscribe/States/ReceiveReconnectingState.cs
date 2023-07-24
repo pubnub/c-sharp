@@ -10,10 +10,20 @@ namespace PubnubApi.EventEngine.Subscribe.States
     {
         public IEnumerable<string> Channels;
         public IEnumerable<string> ChannelGroups;
-        public SubscriptionCursor Cursor;
+		public PNReconnectionPolicy ReconnectionPolicy;
+		public int MaximumReconnectionRetries;
+		public int AttemptedRetries;
+		public SubscriptionCursor Cursor;
 
         public override IEnumerable<IEffectInvocation> OnEntry => new ReceiveReconnectInvocation()
-            { Channels = this.Channels, ChannelGroups = this.ChannelGroups, Cursor = this.Cursor }.AsArray();
+            {
+                Channels = this.Channels,
+                ChannelGroups = this.ChannelGroups,
+                Cursor = this.Cursor,
+                ReconnectionPolicy = this.ReconnectionPolicy,
+                MaximumReconnectionRetries = this.MaximumReconnectionRetries,
+                AttemptedRetries = this.AttemptedRetries
+            }.AsArray();
 
         public override IEnumerable<IEffectInvocation> OnExit { get; } =
             new CancelReceiveReconnectInvocation().AsArray();
@@ -54,7 +64,10 @@ namespace PubnubApi.EventEngine.Subscribe.States
                 {
                     Channels = this.Channels,
                     ChannelGroups = this.ChannelGroups,
-                    Cursor = this.Cursor
+                    Cursor = this.Cursor,
+                    AttemptedRetries = this.AttemptedRetries,
+                    MaximumReconnectionRetries = this.MaximumReconnectionRetries,
+                    ReconnectionPolicy = this.ReconnectionPolicy
                 }.With(new EmitStatusInvocation(receiveReconnectFailure.Status)),
 
                 Events.ReceiveReconnectGiveUpEvent receiveReconnectGiveUp => new ReceiveFailedState()

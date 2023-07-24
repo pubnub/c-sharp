@@ -9,8 +9,10 @@ namespace PubnubApi.EventEngine.Subscribe.States
     {
         public IEnumerable<string> Channels;
         public IEnumerable<string> ChannelGroups;
+		public PNReconnectionPolicy ReconnectionPolicy;
+		public int MaximumReconnectionRetries;
 
-        public override IEnumerable<IEffectInvocation> OnEntry => new HandshakeInvocation()
+		public override IEnumerable<IEffectInvocation> OnEntry => new HandshakeInvocation()
             { Channels = this.Channels, ChannelGroups = this.ChannelGroups }.AsArray();
 
         public override IEnumerable<IEffectInvocation> OnExit { get; } = new CancelHandshakeInvocation().AsArray();
@@ -21,30 +23,46 @@ namespace PubnubApi.EventEngine.Subscribe.States
             {
                 Events.SubscriptionChangedEvent subscriptionChanged => new States.HandshakingState()
                 {
-                    Channels = subscriptionChanged.Channels, ChannelGroups = subscriptionChanged.ChannelGroups
-                },
+                    Channels = subscriptionChanged.Channels,
+                    ChannelGroups = subscriptionChanged.ChannelGroups,
+					MaximumReconnectionRetries = this.MaximumReconnectionRetries,
+					ReconnectionPolicy = this.ReconnectionPolicy
+				},
 
                 Events.SubscriptionRestoredEvent subscriptionRestored => new States.ReceivingState()
                 {
                     Channels = subscriptionRestored.Channels,
                     ChannelGroups = subscriptionRestored.ChannelGroups,
-                    Cursor = subscriptionRestored.Cursor
-                },
+                    Cursor = subscriptionRestored.Cursor,
+					MaximumReconnectionRetries = this.MaximumReconnectionRetries,
+					ReconnectionPolicy = this.ReconnectionPolicy
+				},
 
                 Events.HandshakeFailureEvent handshakeFailure => new States.HandshakeReconnectingState()
                 {
-                    Channels = this.Channels, ChannelGroups = this.ChannelGroups
-                }.With(new EmitStatusInvocation(handshakeFailure.Status)),
+                    Channels = this.Channels,
+                    ChannelGroups = this.ChannelGroups,
+                    AttemptedRetries = 0,
+					MaximumReconnectionRetries = this.MaximumReconnectionRetries,
+					ReconnectionPolicy = this.ReconnectionPolicy
+				}.With(new EmitStatusInvocation(handshakeFailure.Status)),
 
                 Events.DisconnectEvent disconnect => new States.HandshakeStoppedState()
                 {
-                    Channels = disconnect.Channels, ChannelGroups = disconnect.ChannelGroups,
-                }.With(new EmitStatusInvocation(PNStatusCategory.PNDisconnectedCategory)),
+                    Channels = disconnect.Channels,
+                    ChannelGroups = disconnect.ChannelGroups,
+					MaximumReconnectionRetries = this.MaximumReconnectionRetries,
+					ReconnectionPolicy = this.ReconnectionPolicy
+				}.With(new EmitStatusInvocation(PNStatusCategory.PNDisconnectedCategory)),
 
                 Events.HandshakeSuccessEvent success => new ReceivingState()
                 {
-                    Channels = this.Channels, ChannelGroups = this.ChannelGroups, Cursor = success.Cursor
-                }.With(new EmitStatusInvocation(success.Status)),
+                    Channels = this.Channels,
+                    ChannelGroups = this.ChannelGroups,
+                    Cursor = success.Cursor,
+					MaximumReconnectionRetries = this.MaximumReconnectionRetries,
+					ReconnectionPolicy = this.ReconnectionPolicy
+				}.With(new EmitStatusInvocation(success.Status)),
 
                 _ => null
             };
