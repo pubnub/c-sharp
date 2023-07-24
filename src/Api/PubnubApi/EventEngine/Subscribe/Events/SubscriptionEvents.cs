@@ -2,6 +2,9 @@
 using PubnubApi.EventEngine.Subscribe.Common;
 
 namespace PubnubApi.EventEngine.Subscribe.Events {
+	public class UnsubscribeAllEvent : Core.IEvent {
+	}
+	
 	public class SubscriptionChangedEvent : Core.IEvent {
 		public IEnumerable<string> Channels;
 		public IEnumerable<string> ChannelGroups;

@@ -13,7 +13,6 @@ namespace PubnubApi.EventEngine.Subscribe.States
         public int MaxConnectionRetry;
         public int AttemptedRetries;
 
-
         public override IEnumerable<IEffectInvocation> OnEntry => new HandshakeReconnectInvocation()
             { Channels = this.Channels, ChannelGroups = this.ChannelGroups, Policy = this.RetryPolicy, MaxConnectionRetry = this.MaxConnectionRetry, AttemptedRetries = this.AttemptedRetries }.AsArray();
         public override IEnumerable<IEffectInvocation> OnExit { get; } = new CancelHandshakeReconnectInvocation().AsArray();
@@ -22,6 +21,10 @@ namespace PubnubApi.EventEngine.Subscribe.States
         {
             return e switch
             {
+                Events.UnsubscribeAllEvent unsubscribeAll => new UnsubscribedState() 
+                {
+                },
+
                 Events.SubscriptionChangedEvent subscriptionChanged => new HandshakingState()
                 {
                     Channels = subscriptionChanged.Channels, ChannelGroups = subscriptionChanged.ChannelGroups,
