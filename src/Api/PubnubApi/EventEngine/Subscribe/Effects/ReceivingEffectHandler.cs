@@ -53,6 +53,11 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
         public async Task Run(ReceiveMessagesInvocation invocation)
         {
             var response = await MakeReceiveMessagesRequest(invocation);
+            var cursor = new SubscriptionCursor()
+            {
+                Region = response.Item1.Timetoken.Region,
+                Timetoken = response.Item1.Timetoken.Timestamp
+            };
 
             switch (invocation)
             {
@@ -60,15 +65,13 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
                     eventQueue.Enqueue(new Events.ReceiveReconnectFailureEvent() { AttemptedRetries = reconnectInvocation.AttemptedRetries + 1, Status = response.Item2});
                     break;
                 case Invocations.ReceiveReconnectInvocation reconnectInvocation:
-                    eventQueue.Enqueue(new Events.ReceiveReconnectSuccessEvent() { Cursor = response.Item1, Status = response.Item2 });
+                    eventQueue.Enqueue(new Events.ReceiveReconnectSuccessEvent() { Cursor = cursor, Status = response.Item2 });
                     break;
                 case { } when response.Item2.Error:
-                    eventQueue.Enqueue(new Events.ReceiveFailureEvent() { Cursor = response.Item1, Status = response.Item2});
+                    eventQueue.Enqueue(new Events.ReceiveFailureEvent() { Cursor = cursor, Status = response.Item2});
                     break;
                 case { }:
-                    //TODO: get messages
-                    ReceivingResponse<string> listOfMessages = null;
-                    eventQueue.Enqueue(new Events.ReceiveSuccessEvent() { Cursor = response.Item1, Messages= listOfMessages, Status = response.Item2 });
+                    eventQueue.Enqueue(new Events.ReceiveSuccessEvent() { Cursor = cursor, Messages= response.Item1, Status = response.Item2 });
                     break;
             }
         }
@@ -78,7 +81,7 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
             return true;
         }
 
-        private async Task<System.Tuple<SubscriptionCursor, PNStatus>> MakeReceiveMessagesRequest(ReceiveMessagesInvocation invocation)
+        private async Task<System.Tuple<ReceivingResponse<string>, PNStatus>> MakeReceiveMessagesRequest(ReceiveMessagesInvocation invocation)
         {
             var resp = await manager.ReceiveRequest<string>(
                 PNOperationType.PNSubscribeOperation,
@@ -94,16 +97,11 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
             {
                 //TODO: get ReceivingResponse from manager.ReceiveRequest
                 var receiveResponse = JsonConvert.DeserializeObject<ReceivingResponse<string>>(resp.Item1);
-                var c = new SubscriptionCursor()
-                {
-                    Region = receiveResponse.Timetoken.Region,
-                    Timetoken = receiveResponse.Timetoken.Timestamp
-                };
-                return new System.Tuple<SubscriptionCursor, PNStatus>(c, resp.Item2);
+                return new System.Tuple<ReceivingResponse<string>, PNStatus>(receiveResponse, resp.Item2);
             }
             catch (Exception e)
             {
-                return new Tuple<SubscriptionCursor, PNStatus>(null, new PNStatus(e, PNOperationType.PNSubscribeOperation, PNStatusCategory.PNUnknownCategory, invocation.Channels, invocation.ChannelGroups));
+                return new Tuple<ReceivingResponse<string>, PNStatus>(null, new PNStatus(e, PNOperationType.PNSubscribeOperation, PNStatusCategory.PNUnknownCategory, invocation.Channels, invocation.ChannelGroups));
             }
         }
 
