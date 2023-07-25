@@ -26,10 +26,10 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
                 // TODO is this ok? :)
                 Channel = m.Channel,
                 Message = JsonConvert.DeserializeObject(m.Payload),
-                Subscription = m.SubscriptionMatch, // ??
+                Subscription = m.SubscriptionMatch, // This is channel group
                 Timetoken = m.Timetoken.Timestamp,
                 UserMetadata = m.PublishMetadata,
-                // Publisher = ??
+                Publisher = m.IssuingClientId
             });
 
             foreach (var message in processedMessages)

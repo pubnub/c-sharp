@@ -64,8 +64,8 @@ namespace PubnubApi.EventEngine.Subscribe.Common
 		[JsonProperty("f")]
 		public string Flags { get; set; }
 
-		//[JsonProperty("i")]
-		//public string IssuingClientId { get; set; }
+		[JsonProperty("i")]
+		public string IssuingClientId { get; set; }
 
 		[JsonProperty("k")]
 		public string SubscribeKey { get; set; }
