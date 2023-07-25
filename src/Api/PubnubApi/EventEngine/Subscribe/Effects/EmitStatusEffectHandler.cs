@@ -10,12 +10,10 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
 		private readonly Action<Pubnub, PNStatus> statusEmitterFunction;
 		private readonly Pubnub pubnubInstance;
 
-		public Pubnub PnReference;
-
 		public EmitStatusEffectHandler(Pubnub pn, Action<Pubnub, PNStatus> statusEmitter)
 		{
 			this.statusEmitterFunction = statusEmitter;
-			this.PnReference = pn;
+			this.pubnubInstance = pn;
 		}
 
 		public Task Cancel() => Utils.EmptyTask;
@@ -24,7 +22,7 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
 
 		Task IEffectHandler<EmitStatusInvocation>.Run(EmitStatusInvocation invocation)
 		{
-			this.statusEmitterFunction(this.PnReference, invocation.Status);
+			this.statusEmitterFunction(this.pubnubInstance, invocation.Status);
 			return Utils.EmptyTask;
 		}
 	}
