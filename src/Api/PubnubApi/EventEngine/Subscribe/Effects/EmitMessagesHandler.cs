@@ -23,10 +23,9 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
         {
             var processedMessages = invocation.Messages.Messages.Select(m => new PNMessageResult<object>()
             {
-                // TODO is this ok? :)
                 Channel = m.Channel,
                 Message = JsonConvert.DeserializeObject(m.Payload),
-                Subscription = m.SubscriptionMatch, // This is channel group
+                Subscription = m.SubscriptionMatch,
                 Timetoken = m.Timetoken.Timestamp,
                 UserMetadata = m.PublishMetadata,
                 Publisher = m.IssuingClientId
