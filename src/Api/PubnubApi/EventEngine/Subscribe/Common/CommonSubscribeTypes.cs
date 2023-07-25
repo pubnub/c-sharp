@@ -28,10 +28,10 @@ namespace PubnubApi.EventEngine.Subscribe.Common
     public class Timetoken
     {
         [JsonProperty("t")]
-        public long? Timestamp { get; set; }
+        public long Timestamp { get; set; }
 
         [JsonProperty("r")]
-        public int? Region { get; set; }
+        public int Region { get; set; }
 
     }
 
@@ -78,5 +78,8 @@ namespace PubnubApi.EventEngine.Subscribe.Common
 
 		[JsonProperty("s")]
 		public long SequenceNumber { get; set; }
+		
+		[JsonProperty("p")]
+		public Timetoken Timetoken { get; set; }
 	}
 }
