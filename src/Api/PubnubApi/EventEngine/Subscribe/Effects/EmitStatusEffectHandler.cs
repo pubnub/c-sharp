@@ -5,7 +5,7 @@ using PubnubApi.EventEngine.Subscribe.Invocations;
 
 namespace PubnubApi.EventEngine.Subscribe.Effects
 {
-	public class EmitStatusEffectHandler: Core.IEffectHandler<EmitStatusInvocation>
+	internal class EmitStatusEffectHandler: IEffectHandler<EmitStatusInvocation>
 	{
 		private readonly Action<Pubnub, PNStatus> statusEmitterFunction;
 		private readonly Pubnub pubnubInstance;
@@ -18,13 +18,11 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
 
 		public Task Cancel() => Utils.EmptyTask;
 
-		bool IEffectHandler<EmitStatusInvocation>.IsBackground(EmitStatusInvocation invocation) => false;
+		public bool IsBackground(EmitStatusInvocation invocation) => false;
 
-		Task IEffectHandler<EmitStatusInvocation>.Run(EmitStatusInvocation invocation)
+		public async Task Run(EmitStatusInvocation invocation)
 		{
 			this.statusEmitterFunction(this.pubnubInstance, invocation.Status);
-			return Utils.EmptyTask;
 		}
 	}
 }
-
