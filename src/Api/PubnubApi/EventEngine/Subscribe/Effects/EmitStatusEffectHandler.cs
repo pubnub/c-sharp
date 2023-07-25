@@ -7,31 +7,24 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
 {
 	public class EmitStatusEffectHandler: Core.IEffectHandler<EmitStatusInvocation>
 	{
-		public delegate void EmitStatusFunction(Pubnub PnReference, PNStatus status);
-
-		public EmitStatusFunction StatusEmitter;
+		private readonly Action<Pubnub, PNStatus> statusEmitterFunction;
+		private readonly Pubnub pubnubInstance;
 
 		public Pubnub PnReference;
 
-		public EmitStatusEffectHandler(Pubnub pn, Action<Pubnub, PNStatus> statusAction)
+		public EmitStatusEffectHandler(Pubnub pn, Action<Pubnub, PNStatus> statusEmitter)
 		{
-			this.StatusEmitter = new EmitStatusFunction(statusAction);
+			this.statusEmitterFunction = statusEmitter;
 			this.PnReference = pn;
 		}
 
-		public Task Cancel()
-		{
-			return Utils.EmptyTask;
-		}
+		public Task Cancel() => Utils.EmptyTask;
 
-		bool IEffectHandler<EmitStatusInvocation>.IsBackground(EmitStatusInvocation invocation)
-		{
-			return false;
-		}
+		bool IEffectHandler<EmitStatusInvocation>.IsBackground(EmitStatusInvocation invocation) => false;
 
 		Task IEffectHandler<EmitStatusInvocation>.Run(EmitStatusInvocation invocation)
 		{
-			this.StatusEmitter(this.PnReference, invocation.Status);
+			this.statusEmitterFunction(this.PnReference, invocation.Status);
 			return Utils.EmptyTask;
 		}
 	}
