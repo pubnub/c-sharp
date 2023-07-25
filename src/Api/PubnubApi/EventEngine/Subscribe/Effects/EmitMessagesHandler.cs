@@ -1,25 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using PubnubApi.EndPoint;
-using PubnubApi.EventEngine.Common;
 using PubnubApi.EventEngine.Core;
-using PubnubApi.EventEngine.Subscribe.Context;
-using PubnubApi.EventEngine.Subscribe.Events;
 using PubnubApi.EventEngine.Subscribe.Invocations;
-using PubnubApi.EventEngine.Subscribe.Common;
 
 namespace PubnubApi.EventEngine.Subscribe.Effects
 {
     internal class EmitMessagesHandler : IEffectHandler<Invocations.EmitMessagesInvocation>
     {
-        private System.Action<Pubnub, PNMessageResult<object>> messageEmitterFunction;
-        private Pubnub pubnubInstance;
-
-        //Message<T>(Pubnub pubnub, PNMessageResult<T> message)
+        private readonly System.Action<Pubnub, PNMessageResult<object>> messageEmitterFunction;
+        private readonly Pubnub pubnubInstance;
+        
         public EmitMessagesHandler(Pubnub pubnubInstance,
             System.Action<Pubnub, PNMessageResult<object>> messageEmitterFunction)
         {
