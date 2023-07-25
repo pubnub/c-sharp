@@ -21,7 +21,7 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
 
 		public Task Cancel()
 		{
-			return Task.FromResult(0);
+			return Utils.EmptyTask;
 		}
 
 		bool IEffectHandler<EmitStatusInvocation>.IsBackground(EmitStatusInvocation invocation)
@@ -32,7 +32,7 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
 		Task IEffectHandler<EmitStatusInvocation>.Run(EmitStatusInvocation invocation)
 		{
 			this.StatusEmitter(this.PnReference, invocation.Status);
-			return Task.FromResult(0);
+			return Utils.EmptyTask;
 		}
 	}
 }
