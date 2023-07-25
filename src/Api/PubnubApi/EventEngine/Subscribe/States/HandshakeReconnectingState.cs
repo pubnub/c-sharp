@@ -1,17 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using PubnubApi.PubnubEventEngine.Core;
-using PubnubApi.PubnubEventEngine.Subscribe.Invocations;
+using PubnubApi.EventEngine.Core;
+using PubnubApi.EventEngine.Subscribe.Invocations;
 
-namespace PubnubApi.PubnubEventEngine.Subscribe.States
+namespace PubnubApi.EventEngine.Subscribe.States
 {
     internal class HandshakeReconnectingState : Core.State
     {
         public IEnumerable<string> Channels;
         public IEnumerable<string> ChannelGroups;
+        public PNReconnectionPolicy RetryPolicy;
+        public int MaxConnectionRetry;
+        public int AttemptedRetries;
 
         public override IEnumerable<IEffectInvocation> OnEntry => new HandshakeReconnectInvocation()
-            { Channels = this.Channels, ChannelGroups = this.ChannelGroups }.AsArray();
+            { Channels = this.Channels, ChannelGroups = this.ChannelGroups, Policy = this.RetryPolicy, MaxConnectionRetry = this.MaxConnectionRetry, AttemptedRetries = this.AttemptedRetries }.AsArray();
         public override IEnumerable<IEffectInvocation> OnExit { get; } = new CancelHandshakeReconnectInvocation().AsArray();
 
         public override TransitionResult Transition(IEvent e)

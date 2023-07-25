@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using PubnubApi.PubnubEventEngine.Core;
-using PubnubApi.PubnubEventEngine.Subscribe.Invocations;
+using PubnubApi.EventEngine.Core;
+using PubnubApi.EventEngine.Subscribe.Invocations;
 
-namespace PubnubApi.PubnubEventEngine.Subscribe.States
+namespace PubnubApi.EventEngine.Subscribe.States
 {
     internal class HandshakingState : Core.State
     {
@@ -35,7 +35,7 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.States
                     Cursor = subscriptionRestored.Cursor
                 },
 
-                Events.HandshakeFailureEvent handshakeFailure => new States.HandshakeFailedState()
+                Events.HandshakeFailureEvent handshakeFailure => new States.HandshakeReconnectingState()
                 {
                     Channels = this.Channels, ChannelGroups = this.ChannelGroups
                 }.With(new EmitStatusInvocation(handshakeFailure.Status)),

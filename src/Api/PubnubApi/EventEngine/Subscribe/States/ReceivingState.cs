@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using PubnubApi.PubnubEventEngine.Core;
-using PubnubApi.PubnubEventEngine.Subscribe.Invocations;
+using PubnubApi.EventEngine.Core;
+using PubnubApi.EventEngine.Subscribe.Invocations;
+using PubnubApi.EventEngine.Subscribe.Common;
 
-namespace PubnubApi.PubnubEventEngine.Subscribe.States
+namespace PubnubApi.EventEngine.Subscribe.States
 {
     internal class ReceivingState : Core.State
     {

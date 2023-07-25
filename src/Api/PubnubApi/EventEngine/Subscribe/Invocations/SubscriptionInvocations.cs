@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
-using PubnubApi.PubnubEventEngine.Core;
+using PubnubApi.EventEngine.Core;
+using PubnubApi.EventEngine.Subscribe.Common;
 
-namespace PubnubApi.PubnubEventEngine.Subscribe.Invocations {
+namespace PubnubApi.EventEngine.Subscribe.Invocations {
 	internal class EmitMessagesInvocation : Core.IEffectInvocation {
-		public IEnumerable<PNMessageResult<object>> Messages;
+		public ReceivingResponse<string> Messages;
 
-		public EmitMessagesInvocation(IEnumerable<PNMessageResult<object>> messages)
+		public EmitMessagesInvocation(ReceivingResponse<string> messages)
 		{
 			this.Messages = messages;
 		}
@@ -44,25 +45,28 @@ namespace PubnubApi.PubnubEventEngine.Subscribe.Invocations {
 		public IEnumerable<string> Channels;
 		public IEnumerable<string> ChannelGroups;
 		public SubscriptionCursor  Cursor;
+		public Dictionary<string, string> InitialSubscribeQueryParams = new Dictionary<string, string>();
+		public Dictionary<string, object> ExternalQueryParams = new Dictionary<string, object>();
 	}
 	
 	internal class CancelReceiveMessagesInvocation : ReceiveMessagesInvocation, Core.IEffectCancelInvocation { }
 
 	internal class CancelHandshakeInvocation : HandshakeInvocation, Core.IEffectCancelInvocation { }
 
-	internal class HandshakeReconnectInvocation: Core.IEffectInvocation 
-	{ 
-		public IEnumerable<string> Channels;
-		public IEnumerable<string> ChannelGroups;
+	internal class HandshakeReconnectInvocation: HandshakeInvocation
+	{
+		public int AttemptedRetries;
+		public int MaxConnectionRetry;
+		public PNReconnectionPolicy Policy;
 	}
 
 	internal class CancelHandshakeReconnectInvocation: HandshakeReconnectInvocation, Core.IEffectCancelInvocation { }
 	
-	internal class ReceiveReconnectInvocation: Core.IEffectInvocation 
+	internal class ReceiveReconnectInvocation: ReceiveMessagesInvocation 
 	{ 
-		public IEnumerable<string> Channels;
-		public IEnumerable<string> ChannelGroups;
-		public SubscriptionCursor Cursor;
+		public int AttemptedRetries;
+		public int MaxConnectionRetry;
+		public PNReconnectionPolicy Policy;
 	}
 
 	internal class CancelReceiveReconnectInvocation: ReceiveReconnectInvocation, Core.IEffectCancelInvocation { }

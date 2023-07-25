@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using PubnubApi.PubnubEventEngine.Core;
-using PubnubApi.PubnubEventEngine.Subscribe.Invocations;
+using PubnubApi.EventEngine.Core;
+using PubnubApi.EventEngine.Subscribe.Invocations;
 
-namespace PubnubApi.PubnubEventEngine.Subscribe.States
+namespace PubnubApi.EventEngine.Subscribe.States
 {
     internal class UnsubscribedState : Core.State
     {
-        public override IEnumerable<IEffectInvocation> OnEntry { get; } = null;
-        public override IEnumerable<IEffectInvocation> OnExit { get; } = null;
-
         public override TransitionResult Transition(Core.IEvent e)
         {
             return e switch

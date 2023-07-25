@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-namespace PubnubApi.PubnubEventEngine.Core {
+namespace PubnubApi.EventEngine.Core {
 	
 	/// <summary>
 	/// Generic effect handler.
@@ -17,6 +17,7 @@ namespace PubnubApi.PubnubEventEngine.Core {
 	/// <typeparam name="T">Associated invocation</typeparam>
 	internal interface IEffectHandler<in T> : IEffectHandler where T : IEffectInvocation {
 		Task Run(T invocation);
+		bool IsBackground(T invocation);
 	}
 	
 	/// <summary>

@@ -39,8 +39,8 @@ namespace AcceptanceTests.Features
         public virtual void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "Revoke an access token", "  As a PubNub customer I want to withdraw existing permission for\r\n  specific Pub" +
-                    "Nub resources by revoking corresponding tokens.", ProgrammingLanguage.CSharp, featureTags);
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "Revoke an access token", "  As a PubNub customer I want to withdraw existing permission for\n  specific PubN" +
+                    "ub resources by revoking corresponding tokens.", ProgrammingLanguage.CSharp, featureTags);
             testRunner.OnFeatureStart(featureInfo);
         }
         

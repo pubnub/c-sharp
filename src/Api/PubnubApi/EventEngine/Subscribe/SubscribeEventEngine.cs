@@ -1,10 +1,11 @@
 ﻿using PubnubApi.EndPoint;
-using PubnubApi.PubnubEventEngine.Subscribe.Effects;
-using PubnubApi.PubnubEventEngine.Subscribe.Invocations;
-using PubnubApi.PubnubEventEngine.Subscribe.States;
+using PubnubApi.EventEngine.Core;
+using PubnubApi.EventEngine.Subscribe.States;
+using PubnubApi.EventEngine.Subscribe.Effects;
+using PubnubApi.EventEngine.Subscribe.Invocations;
 
-namespace PubnubApi.PubnubEventEngine.Subscribe {
-	internal class SubscribeEventEngine : PubnubEventEngine.Core.Engine {
+namespace PubnubApi.EventEngine.Subscribe {
+	internal class SubscribeEventEngine : Engine {
 		private SubscribeManager2 subscribeManager;
 		
 		public SubscribeEventEngine(SubscribeManager2 subscribeManager) {
@@ -13,7 +14,13 @@ namespace PubnubApi.PubnubEventEngine.Subscribe {
 			// initialize the handler, pass dependencies
 			var handshakeHandler = new Effects.HandshakeEffectHandler(subscribeManager, eventQueue);
 			dispatcher.Register<Invocations.HandshakeInvocation, Effects.HandshakeEffectHandler>(handshakeHandler);
+			dispatcher.Register<Invocations.HandshakeReconnectInvocation, Effects.HandshakeEffectHandler>(handshakeHandler);
 			dispatcher.Register<Invocations.CancelHandshakeInvocation, Effects.HandshakeEffectHandler>(handshakeHandler);
+
+			var receiveHandler = new Effects.ReceivingEffectHandler(subscribeManager, eventQueue);
+			dispatcher.Register<Invocations.ReceiveMessagesInvocation, Effects.ReceivingEffectHandler>(receiveHandler);
+			dispatcher.Register<Invocations.ReceiveReconnectInvocation, Effects.ReceivingEffectHandler>(receiveHandler);
+			dispatcher.Register<Invocations.CancelReceiveMessagesInvocation, Effects.ReceivingEffectHandler>(receiveHandler);
 
 			currentState = new UnsubscribedState();
 		}

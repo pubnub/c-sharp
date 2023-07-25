@@ -26,7 +26,7 @@ namespace PubnubApi.EndPoint
         private bool presenceSubscribeEnabled;
         private SubscribeManager2 manager;
         private Dictionary<string, object> queryParam;
-        private EventEngine pnEventEngine;
+        private PubnubEventEngine.EventEngine pnEventEngine;
         private Pubnub PubnubInstance;
         public List<SubscribeCallback> SubscribeListenerList
         {
@@ -104,18 +104,18 @@ namespace PubnubApi.EndPoint
             effectDispatcher.Register(EventType.ReceiveReconnectSuccess, receiveReconnectEffectHandler);
             effectDispatcher.Register(EventType.ReceiveReconnectGiveUp, receiveReconnectEffectHandler);
 
-            pnEventEngine = new EventEngine(effectDispatcher, eventEmitter);
-            pnEventEngine.PubnubUnitTest = unit;
-            pnEventEngine.Setup<T>(config);
+       //     pnEventEngine = new EventEngine(effectDispatcher, eventEmitter);
+       //     pnEventEngine.PubnubUnitTest = unit;
+       //     pnEventEngine.Setup<T>(config);
 
-            if (pnEventEngine.PubnubUnitTest != null)
-            {
-                pnEventEngine.PubnubUnitTest.EventTypeList = new List<KeyValuePair<string, string>>();
-            }
-            else
-            {
-			    pnEventEngine.InitialState(new State(StateType.Unsubscribed) { EventType = EventType.SubscriptionChanged });
-            }
+       //     if (pnEventEngine.PubnubUnitTest != null)
+       //     {
+       //         pnEventEngine.PubnubUnitTest.EventTypeList = new List<KeyValuePair<string, string>>();
+       //     }
+       //     else
+       //     {
+			    //pnEventEngine.InitialState(new State(StateType.Unsubscribed) { EventType = EventType.SubscriptionChanged });
+       //     }
         }
 
         private void ReceivingEffect_ReceiveRequested(object sender, ReceiveRequestEventArgs e)

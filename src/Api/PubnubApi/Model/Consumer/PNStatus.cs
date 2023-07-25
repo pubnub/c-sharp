@@ -14,6 +14,16 @@ namespace PubnubApi
 
         public PNStatus() { }
 
+        public PNStatus(Exception e, PNOperationType operationType, PNStatusCategory category, IEnumerable<string> affectedChannels = null, IEnumerable<string> affectedChannelGroups = null)
+        {
+            this.Error = true;
+            this.Operation = operationType;
+            this.ErrorData = new PNErrorData(e.Message, e);
+            this.AffectedChannels = affectedChannels?.ToList(); 
+            this.AffectedChannelGroups = affectedChannelGroups?.ToList();
+            this.Category = category;
+        }
+
         internal PNStatus(object endpointOperation)
         {
             this.savedEndpointOperation = endpointOperation;
