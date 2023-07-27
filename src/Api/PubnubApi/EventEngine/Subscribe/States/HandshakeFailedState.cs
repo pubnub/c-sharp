@@ -5,7 +5,7 @@ using PubnubApi.EventEngine.Subscribe.Invocations;
 
 namespace PubnubApi.EventEngine.Subscribe.States
 {
-    internal class HandshakeFailedState : Core.State
+    public class HandshakeFailedState : Core.State
     {
         public IEnumerable<string> Channels;
         public IEnumerable<string> ChannelGroups;

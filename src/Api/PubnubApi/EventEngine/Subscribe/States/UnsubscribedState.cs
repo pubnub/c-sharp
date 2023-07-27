@@ -5,7 +5,7 @@ using PubnubApi.EventEngine.Subscribe.Invocations;
 
 namespace PubnubApi.EventEngine.Subscribe.States
 {
-    internal class UnsubscribedState : Core.State
+    public class UnsubscribedState : Core.State
     {
         public override TransitionResult Transition(Core.IEvent e)
         {

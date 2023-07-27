@@ -7,7 +7,7 @@ namespace PubnubApi.EventEngine.Core {
 	/// <summary>
 	/// Generic effect handler.
 	/// </summary>
-	internal interface IEffectHandler {
+	public interface IEffectHandler {
 		Task Cancel();
 	}
 	
@@ -15,7 +15,7 @@ namespace PubnubApi.EventEngine.Core {
 	/// Handler (implementation) for a given invocation. The invocation represents the input arguments of a handler.
 	/// </summary>
 	/// <typeparam name="T">Associated invocation</typeparam>
-	internal interface IEffectHandler<in T> : IEffectHandler where T : IEffectInvocation {
+	public interface IEffectHandler<in T> : IEffectHandler where T : IEffectInvocation {
 		Task Run(T invocation);
 		bool IsBackground(T invocation);
 	}
@@ -23,16 +23,16 @@ namespace PubnubApi.EventEngine.Core {
 	/// <summary>
 	/// An effect invocation. It represents calling <c>Run()</c> on a registered effect handler - calling it is orchestrated by the dispatcher.
 	/// </summary>
-	internal interface IEffectInvocation { }
+	public interface IEffectInvocation { }
 
 	/// <summary>
 	/// A cancel effect invocation. It represents calling <c>Cancel()</c> on a registered effect handler - calling it is orchestrated by the dispatcher.
 	/// </summary>
-	internal interface IEffectCancelInvocation : IEffectInvocation { }
+	public interface IEffectCancelInvocation : IEffectInvocation { }
 
-	internal interface IEvent { };
+	public interface IEvent { };
 	
-	internal abstract class State
+	public abstract class State
 	{
 		public virtual IEnumerable<IEffectInvocation> OnEntry { get; } = null;
 		public virtual IEnumerable<IEffectInvocation> OnExit { get; } = null;

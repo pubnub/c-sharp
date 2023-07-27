@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace PubnubApi.EventEngine.Core
 {
-    internal class EventQueue
+    public class EventQueue
     {
         private volatile Queue<IEvent> eventQueue = new Queue<IEvent>();
         private object lockObj = new object();

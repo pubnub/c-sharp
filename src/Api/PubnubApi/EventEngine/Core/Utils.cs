@@ -19,7 +19,7 @@ namespace PubnubApi.EventEngine.Core
         }
     }
 
-    internal class TransitionResult
+    public class TransitionResult
     {
         public State State => tuple.Item1;
         public IEnumerable<IEffectInvocation> Invocations => tuple.Item2;

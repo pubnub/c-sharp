@@ -14,7 +14,7 @@ using PubnubApi.EventEngine.Subscribe.Common;
 
 namespace PubnubApi.EventEngine.Subscribe.Effects
 {
-    internal class ReceivingEffectHandler:
+    public class ReceivingEffectHandler:
         Core.IEffectHandler<ReceiveMessagesInvocation>,
         Core.IEffectHandler<ReceiveReconnectInvocation>
     {
@@ -23,7 +23,7 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
         
         private Delay retryDelay = new Delay(0);
 
-        public ReceivingEffectHandler(SubscribeManager2 manager, EventQueue eventQueue)
+        internal ReceivingEffectHandler(SubscribeManager2 manager, EventQueue eventQueue)
         {
             this.manager = manager;
             this.eventQueue = eventQueue;

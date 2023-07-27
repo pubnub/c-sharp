@@ -6,7 +6,7 @@ using PubnubApi.EventEngine.Subscribe.Common;
 
 namespace PubnubApi.EventEngine.Subscribe.States
 {
-    internal class ReceiveFailedState : Core.State
+    public class ReceiveFailedState : Core.State
     {
         public IEnumerable<string> Channels;
         public IEnumerable<string> ChannelGroups;

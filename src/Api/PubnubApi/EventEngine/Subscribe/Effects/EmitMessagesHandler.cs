@@ -7,7 +7,7 @@ using PubnubApi.EventEngine.Subscribe.Invocations;
 
 namespace PubnubApi.EventEngine.Subscribe.Effects
 {
-    internal class EmitMessagesHandler : IEffectHandler<Invocations.EmitMessagesInvocation>
+    public class EmitMessagesHandler : IEffectHandler<Invocations.EmitMessagesInvocation>
     {
         private readonly System.Action<Pubnub, PNMessageResult<object>> messageEmitterFunction;
         private readonly Pubnub pubnubInstance;

@@ -5,7 +5,7 @@ using PubnubApi.EventEngine.Subscribe.Invocations;
 
 namespace PubnubApi.EventEngine.Subscribe.Effects
 {
-	internal class EmitStatusEffectHandler: IEffectHandler<EmitStatusInvocation>
+	public class EmitStatusEffectHandler: IEffectHandler<EmitStatusInvocation>
 	{
 		private readonly Action<Pubnub, PNStatus> statusEmitterFunction;
 		private readonly Pubnub pubnubInstance;

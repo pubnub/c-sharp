@@ -14,7 +14,7 @@ using PubnubApi.EventEngine.Subscribe.Common;
 
 namespace PubnubApi.EventEngine.Subscribe.Effects
 {
-    internal class HandshakeEffectHandler : 
+    public class HandshakeEffectHandler : 
         Core.IEffectHandler<HandshakeInvocation>,
         Core.IEffectHandler<HandshakeReconnectInvocation>
     {
@@ -23,7 +23,7 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
         
         private Delay retryDelay = new Delay(0);
 
-        public HandshakeEffectHandler(SubscribeManager2 manager, EventQueue eventQueue)
+        internal HandshakeEffectHandler(SubscribeManager2 manager, EventQueue eventQueue)
         {
             this.manager = manager;
             this.eventQueue = eventQueue;

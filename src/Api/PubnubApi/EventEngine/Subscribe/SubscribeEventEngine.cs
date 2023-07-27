@@ -5,10 +5,10 @@ using PubnubApi.EventEngine.Subscribe.Effects;
 using PubnubApi.EventEngine.Subscribe.Invocations;
 
 namespace PubnubApi.EventEngine.Subscribe {
-	internal class SubscribeEventEngine : Engine {
+	public class SubscribeEventEngine : Engine {
 		private SubscribeManager2 subscribeManager;
 		
-		public SubscribeEventEngine(SubscribeManager2 subscribeManager) {
+		internal SubscribeEventEngine(SubscribeManager2 subscribeManager) {
 			this.subscribeManager = subscribeManager;
 
 			// initialize the handler, pass dependencies

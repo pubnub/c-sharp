@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 namespace PubnubApi.EventEngine.Core {
-	internal abstract class Engine {
+	public abstract class Engine {
 		public EventQueue eventQueue = new EventQueue();
 		
 		protected EffectDispatcher dispatcher = new EffectDispatcher();
