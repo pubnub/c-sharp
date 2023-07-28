@@ -32,6 +32,8 @@ namespace PubnubApi.EventEngine.Subscribe.Events {
 
 	public class HandshakeReconnectFailureEvent : HandshakeFailureEvent
 	{
+		public IEnumerable<string> Channels;
+		public IEnumerable<string> ChannelGroups;
 	}
 
 	// Do we have this in system description ?

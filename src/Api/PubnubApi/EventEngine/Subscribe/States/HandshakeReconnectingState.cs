@@ -57,6 +57,11 @@ namespace PubnubApi.EventEngine.Subscribe.States
                     Cursor = subscriptionRestored.Cursor
                 },
 
+                Events.HandshakeReconnectFailureEvent handshakeReconnectFailed => new HandshakeReconnectingState()
+                {
+                    Channels = handshakeReconnectFailed.Channels, ChannelGroups = handshakeReconnectFailed.ChannelGroups
+                },
+
                 _ => null
             };
         }

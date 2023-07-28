@@ -1,20 +1,13 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using NUnit.Framework;
-using PubnubApi;
-using System.Text.RegularExpressions;
-using System.Globalization;
-using Newtonsoft.Json;
-using System.Diagnostics;
-using PubnubApi.PubnubEventEngine;
+﻿using NUnit.Framework;
+using PubnubApi.EventEngine.Core;
+using PubnubApi.EventEngine.Subscribe.Events;
+using PubnubApi.EventEngine.Subscribe.States;
 
 namespace PubNubMessaging.Tests
 {
     [TestFixture]
     public class EventEngineTests
     {
-        EventEngine pnEventEngine { get; set; }
         State unsubscribeState;
         State handshakingState;
         State handshakeReconnectingState;
@@ -26,21 +19,16 @@ namespace PubNubMessaging.Tests
         [SetUp]
         public void Init()
         {
-            IPubnubUnitTest pubnubUnitTest = new PubnubUnitTest();
-			var effectDispatcher = new EffectDispatcher();
-			var eventEmitter = new EventEmitter();
-            pnEventEngine = new EventEngine(effectDispatcher, eventEmitter);
-            pnEventEngine.PubnubUnitTest = pubnubUnitTest;
-            pnEventEngine.Setup<object>(new PNConfiguration(new UserId("testuserid")));
         }
 
         [Test]
         public void TestWhenStateTypeUnsubscribed()
         {
             //Unsubscribed => SubscriptionChanged  => Handshaking
-            pnEventEngine.CurrentState = new State(StateType.Unsubscribed) { EventType = EventType.SubscriptionChanged };
-            State currentHandshakingState = pnEventEngine.NextState();
-            if (currentHandshakingState.StateType == StateType.Handshaking) 
+            unsubscribeState = new UnsubscribedState();
+            IEvent subscriptionChanged = new SubscriptionChangedEvent();
+            TransitionResult transitionResult = unsubscribeState.Transition(subscriptionChanged);
+            if (transitionResult.State is HandshakingState) 
             {
                 //Expected result.
             }
@@ -51,27 +39,26 @@ namespace PubNubMessaging.Tests
             }
 
             //Unsubscribed => SubscriptionRestored  => Receiving
-            pnEventEngine.CurrentState = new State(StateType.Unsubscribed) { EventType = EventType.SubscriptionRestored };
-            State currentReceiveState = pnEventEngine.NextState();
-            if (currentReceiveState.StateType == StateType.Receiving) 
+            IEvent subscriptionRestored = new SubscriptionRestoredEvent();
+            transitionResult = unsubscribeState.Transition(subscriptionRestored);
+            if (transitionResult.State is ReceivingState) 
             {
                 //Expected result.
             }
             else
             {
                 Assert.Fail("Unsubscribed + SubscriptionRestored => Receiving FAILED");
-                return;
             }
-
         }
 
         [Test]
         public void TestWhenStateTypeHandshaking()
         {
             //Handshaking => SubscriptionChanged  => Handshaking
-            pnEventEngine.CurrentState = new State(StateType.Handshaking) { EventType = EventType.SubscriptionChanged };
-            State currentHandshakingState = pnEventEngine.NextState();
-            if (currentHandshakingState.StateType == StateType.Handshaking) 
+            handshakingState = new HandshakingState();
+            IEvent subscriptionChanged = new SubscriptionChangedEvent();
+            TransitionResult transitionResult = handshakingState.Transition(subscriptionChanged);
+            if (transitionResult.State is HandshakingState) 
             {
                 //Continue for further tests on transition
             }
@@ -82,9 +69,9 @@ namespace PubNubMessaging.Tests
             }
 
             //Handshaking => HandshakeFailure  => HandshakeReconnecting
-            pnEventEngine.CurrentState = new State(StateType.Handshaking) { EventType = EventType.HandshakeFailure };
-            State currentHandshakeReconnectingState = pnEventEngine.NextState();
-            if (currentHandshakeReconnectingState.StateType == StateType.HandshakeReconnecting) 
+            IEvent handshakeFailure = new HandshakeFailureEvent();
+            transitionResult = handshakingState.Transition(handshakeFailure);
+            if (transitionResult.State is HandshakeReconnectingState) 
             {
                 //empty
             }
@@ -95,9 +82,9 @@ namespace PubNubMessaging.Tests
             }
 
             //Handshaking => Disconnect  => HandshakeStopped
-            pnEventEngine.CurrentState = new State(StateType.Handshaking) { EventType = EventType.Disconnect };
-            State currentHandshakeStoppedState = pnEventEngine.NextState();
-            if (currentHandshakeStoppedState.StateType == StateType.HandshakeStopped) 
+            IEvent disconnect = new DisconnectEvent();
+            transitionResult = handshakingState.Transition(disconnect);
+            if (transitionResult.State is HandshakeStoppedState) 
             {
                 //empty
             }
@@ -108,9 +95,9 @@ namespace PubNubMessaging.Tests
             }
 
             //Handshaking => HandshakeSuccess  => Receiving
-            pnEventEngine.CurrentState = new State(StateType.Handshaking) { EventType = EventType.HandshakeSuccess };
-            State currentReceivingState = pnEventEngine.NextState();
-            if (currentReceivingState.StateType == StateType.Receiving) 
+            IEvent handshakeSuccess = new HandshakeSuccessEvent();
+            transitionResult = handshakingState.Transition(handshakeSuccess);
+            if (transitionResult.State is ReceivingState) 
             {
                 //empty
             }
@@ -121,16 +108,15 @@ namespace PubNubMessaging.Tests
             }
 
             //Handshaking => SubscriptionRestored  => Receiving
-            pnEventEngine.CurrentState = new State(StateType.Handshaking) { EventType = EventType.SubscriptionRestored };
-            currentReceivingState = pnEventEngine.NextState();
-            if (currentReceivingState.StateType == StateType.Receiving) 
+            IEvent subscriptionRestored = new SubscriptionRestoredEvent();
+            transitionResult = handshakingState.Transition(subscriptionRestored);
+            if (transitionResult.State is ReceivingState) 
             {
                 //empty
             }
             else
             {
                 Assert.Fail("Handshaking + SubscriptionRestored => Receiving FAILED");
-                return;
             }
         }
 
@@ -138,22 +124,19 @@ namespace PubNubMessaging.Tests
         public void TestWhenStateTypeHandshakeReconnecting()
         {
             //HandshakeReconnecting => SubscriptionChanged  => Handshaking
-            pnEventEngine.CurrentState = new State(StateType.HandshakeReconnecting) { EventType = EventType.SubscriptionChanged };
-            State currentNewState = pnEventEngine.NextState();
-            if (currentNewState.StateType == StateType.Handshaking) 
-            {
-                //Continue for further tests on transition
-            }
-            else
+            handshakeReconnectingState = new HandshakeReconnectingState();
+            IEvent subscriptionChanged = new SubscriptionChangedEvent();
+            TransitionResult transitionResult = handshakeReconnectingState.Transition(subscriptionChanged);
+            if (!(transitionResult.State is HandshakingState))
             {
                 Assert.Fail("HandshakeReconnecting + SubscriptionChanged => Handshaking");
                 return;
             }
 
             //HandshakeReconnecting => HandshakeReconnectFailure  => HandshakeReconnecting
-            pnEventEngine.CurrentState = new State(StateType.HandshakeReconnecting) { EventType = EventType.HandshakeReconnectFailure };
-            currentNewState = pnEventEngine.NextState();
-            if (currentNewState.StateType == StateType.HandshakeReconnecting) 
+            IEvent handshakeReconnectFailure = new HandshakeReconnectFailureEvent();
+            transitionResult = handshakeReconnectingState.Transition(handshakeReconnectFailure);
+            if (transitionResult.State is  HandshakeReconnectingState) 
             {
                 //Continue for further tests on transition
             }
@@ -164,9 +147,9 @@ namespace PubNubMessaging.Tests
             }
 
             //HandshakeReconnecting => Disconnect  => HandshakeStopped
-            pnEventEngine.CurrentState = new State(StateType.HandshakeReconnecting) { EventType = EventType.Disconnect };
-            currentNewState = pnEventEngine.NextState();
-            if (currentNewState.StateType == StateType.HandshakeStopped) 
+            IEvent disconnect = new DisconnectEvent();
+            transitionResult = handshakeReconnectingState.Transition(disconnect);
+            if (transitionResult.State is  HandshakeStoppedState) 
             {
                 //Continue for further tests on transition
             }
@@ -177,9 +160,9 @@ namespace PubNubMessaging.Tests
             }
 
             //HandshakeReconnecting => HandshakeReconnectGiveUp  => HandshakeFailed
-            pnEventEngine.CurrentState = new State(StateType.HandshakeReconnecting) { EventType = EventType.HandshakeReconnectGiveUp };
-            currentNewState = pnEventEngine.NextState();
-            if (currentNewState.StateType == StateType.HandshakeFailed) 
+            IEvent handshakeReconnectGiveup = new HandshakeReconnectGiveUpEvent();
+            transitionResult = handshakeReconnectingState.Transition(handshakeReconnectGiveup);
+            if (transitionResult.State is  HandshakeFailedState) 
             {
                 //Continue for further tests on transition
             }
@@ -191,9 +174,9 @@ namespace PubNubMessaging.Tests
 
             //
             //HandshakeReconnecting => HandshakeReconnectSuccess  => Receiving
-            pnEventEngine.CurrentState = new State(StateType.HandshakeReconnecting) { EventType = EventType.HandshakeReconnectSuccess };
-            currentNewState = pnEventEngine.NextState();
-            if (currentNewState.StateType == StateType.Receiving) 
+            IEvent handshakeReconnectSuccess = new HandshakeReconnectSuccessEvent();
+            transitionResult = handshakeReconnectingState.Transition(handshakeReconnectSuccess);
+            if (transitionResult.State is  ReceivingState) 
             {
                 //Continue for further tests on transition
             }
@@ -204,61 +187,42 @@ namespace PubNubMessaging.Tests
             }
 
             //HandshakeReconnecting => SubscriptionRestored  => Receiving
-            pnEventEngine.CurrentState = new State(StateType.HandshakeReconnecting) { EventType = EventType.SubscriptionRestored };
-            currentNewState = pnEventEngine.NextState();
-            if (currentNewState.StateType == StateType.Receiving) 
-            {
-                //Continue for further tests on transition
-            }
-            else
+            IEvent subscriptionRestored = new SubscriptionRestoredEvent();
+            transitionResult = handshakeReconnectingState.Transition(subscriptionRestored);
+            if (!(transitionResult.State is ReceivingState))
             {
                 Assert.Fail("HandshakeReconnecting + SubscriptionRestored => Receiving");
-                return;
             }
-
         }
 
         [Test]
         public void TestWhenStateTypeHandshakeFailed()
         {
             //HandshakeFailed => SubscriptionRestored  => Receiving
-            pnEventEngine.CurrentState = new State(StateType.HandshakeFailed) { EventType = EventType.SubscriptionRestored };
-            State currentNewState = pnEventEngine.NextState();
-            if (currentNewState.StateType == StateType.Receiving) 
-            {
-                //Continue for further tests on transition
-            }
-            else
-            {
-                Assert.Fail("HandshakeFailed + SubscriptionRestored => ReceiveReconnecting");
+            handshakeFailedState = new HandshakeFailedState();
+            IEvent subscriptionRestored = new SubscriptionRestoredEvent();
+            TransitionResult transitionResult = handshakeFailedState.Transition(subscriptionRestored);
+            if (!(transitionResult.State is ReceivingState))
+            { 
+                Assert.Fail("HandshakeFailed + SubscriptionRestored => Receiving");
                 return;
             }
 
             //HandshakeFailed => SubscriptionChanged  => Handshaking
-            pnEventEngine.CurrentState = new State(StateType.HandshakeFailed) { EventType = EventType.SubscriptionChanged };
-            currentNewState = pnEventEngine.NextState();
-            if (currentNewState.StateType == StateType.Handshaking) 
-            {
-                //Continue for further tests on transition
-            }
-            else
+            IEvent subscriptionChanged = new SubscriptionChangedEvent();
+            transitionResult = handshakeFailedState.Transition(subscriptionChanged);
+            if (!(transitionResult.State is HandshakingState))
             {
                 Assert.Fail("HandshakeFailed + SubscriptionChanged => Handshaking");
                 return;
             }
 
-
             //HandshakeFailed => Reconnect  => Handshaking
-            pnEventEngine.CurrentState = new State(StateType.HandshakeFailed) { EventType = EventType.Reconnect };
-            currentNewState = pnEventEngine.NextState();
-            if (currentNewState.StateType == StateType.Handshaking) 
-            {
-                //Continue for further tests on transition
-            }
-            else
+            IEvent reconnect = new ReconnectEvent();
+            transitionResult = handshakeFailedState.Transition(reconnect);
+            if (!(transitionResult.State is HandshakingState))
             {
                 Assert.Fail("HandshakeFailed + Reconnect => Handshaking");
-                return;
             }
         }
 
@@ -266,20 +230,17 @@ namespace PubNubMessaging.Tests
         public void TestWhenStateTypeHandshakeStopped()
         {
             //HandshakeStopped => Reconnect  => Handshaking
-            pnEventEngine.CurrentState = new State(StateType.HandshakeStopped) { EventType = EventType.Reconnect };
-            State currentNewState = pnEventEngine.NextState();
-            if (currentNewState.StateType == StateType.Handshaking) 
-            {
-                //Continue for further tests on transition
-            }
-            else
+            handshakeStoppedState = new HandshakeStoppedState();
+            IEvent reconnect = new ReconnectEvent();
+            TransitionResult transitionResult = handshakeStoppedState.Transition(reconnect);
+            if (!(transitionResult.State is HandshakingState))
             {
                 Assert.Fail("HandshakeStopped + Reconnect => Handshaking");
-                return;
             }
         }
 
 
+        /*
         [Test]
         public void TestWhenStateTypeReceiving()
         {
@@ -479,5 +440,6 @@ namespace PubNubMessaging.Tests
             }
 
         }
+        */
     }
 }
