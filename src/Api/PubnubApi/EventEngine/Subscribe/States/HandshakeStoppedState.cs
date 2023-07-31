@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using PubnubApi.EventEngine.Core;
+using PubnubApi.EventEngine.Subscribe.Common;
 using PubnubApi.EventEngine.Subscribe.Context;
 using PubnubApi.EventEngine.Subscribe.Invocations;
 
 namespace PubnubApi.EventEngine.Subscribe.States
 {
-    public class HandshakeStoppedState : Core.State
+    public class HandshakeStoppedState : SubscriptionState
     {
-        public IEnumerable<string> Channels;
-        public IEnumerable<string> ChannelGroups;
-		public ReconnectionConfiguration ReconnectionConfiguration;
-
-		public override TransitionResult Transition(IEvent e)
+        public override TransitionResult Transition(IEvent e)
         {
             return e switch
             {

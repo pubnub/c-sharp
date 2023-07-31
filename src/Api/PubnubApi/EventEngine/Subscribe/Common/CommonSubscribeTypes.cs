@@ -1,4 +1,6 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Generic;
+using PubnubApi.EventEngine.Subscribe.Context;
 
 namespace PubnubApi.EventEngine.Subscribe.Common
 {
@@ -81,5 +83,12 @@ namespace PubnubApi.EventEngine.Subscribe.Common
 		
 		[JsonProperty("p")]
 		public Timetoken Timetoken { get; set; }
+	}
+	
+	public abstract class SubscriptionState : Core.State
+	{
+		public IEnumerable<string> Channels;
+		public IEnumerable<string> ChannelGroups;
+		public ReconnectionConfiguration ReconnectionConfiguration;
 	}
 }

@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using PubnubApi.EventEngine.Core;
+using PubnubApi.EventEngine.Subscribe.Common;
 using PubnubApi.EventEngine.Subscribe.Context;
 using PubnubApi.EventEngine.Subscribe.Invocations;
 
 namespace PubnubApi.EventEngine.Subscribe.States
 {
-    public class UnsubscribedState : Core.State
+    public class UnsubscribedState : SubscriptionState
     {
-        public ReconnectionConfiguration ReconnectionConfiguration;
-
         public override TransitionResult Transition(Core.IEvent e)
         {
             return e switch

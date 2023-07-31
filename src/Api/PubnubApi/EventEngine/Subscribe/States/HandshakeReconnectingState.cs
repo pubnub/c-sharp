@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using PubnubApi.EventEngine.Core;
+using PubnubApi.EventEngine.Subscribe.Common;
 using PubnubApi.EventEngine.Subscribe.Context;
 using PubnubApi.EventEngine.Subscribe.Invocations;
 
 namespace PubnubApi.EventEngine.Subscribe.States
 {
-	public class HandshakeReconnectingState : Core.State
+	public class HandshakeReconnectingState : SubscriptionState
 	{
-		public IEnumerable<string> Channels;
-		public IEnumerable<string> ChannelGroups;
-		public ReconnectionConfiguration ReconnectionConfiguration;
 		public int AttemptedRetries;
 
 		public override IEnumerable<IEffectInvocation> OnEntry => new HandshakeReconnectInvocation()
