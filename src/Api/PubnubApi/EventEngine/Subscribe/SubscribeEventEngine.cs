@@ -22,6 +22,7 @@ namespace PubnubApi.EventEngine.Subscribe {
 			dispatcher.Register<Invocations.ReceiveReconnectInvocation, Effects.ReceivingEffectHandler>(receiveHandler);
 			dispatcher.Register<Invocations.CancelReceiveMessagesInvocation, Effects.ReceivingEffectHandler>(receiveHandler);
 
+			// TODO: ReconnectionConfiguration
 			currentState = new UnsubscribedState();
 		}
 	}
