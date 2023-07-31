@@ -31,13 +31,13 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
 
         public async Task Run(HandshakeReconnectInvocation invocation)
         {
-            if (!ReconnectionDelayUtil.shouldRetry(invocation.Policy, invocation.AttemptedRetries, invocation.MaxConnectionRetry))
+            if (!ReconnectionDelayUtil.shouldRetry(invocation.ReconnectionConfiguration, invocation.AttemptedRetries))
             {
                 eventQueue.Enqueue(new HandshakeReconnectGiveUpEvent() { Status = new PNStatus(PNStatusCategory.PNCancelledCategory) });
             }
             else
             {
-                retryDelay = new Delay(ReconnectionDelayUtil.CalculateDelay(invocation.Policy, invocation.AttemptedRetries));
+                retryDelay = new Delay(ReconnectionDelayUtil.CalculateDelay(invocation.ReconnectionConfiguration.ReconnectionPolicy, invocation.AttemptedRetries));
                 await retryDelay.Start();
                 if (!retryDelay.Cancelled)
                     await Run((HandshakeInvocation)invocation);

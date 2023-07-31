@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using PubnubApi.EventEngine.Core;
+using PubnubApi.EventEngine.Subscribe.Context;
 using PubnubApi.EventEngine.Subscribe.Invocations;
 
 namespace PubnubApi.EventEngine.Subscribe.States
@@ -9,30 +10,37 @@ namespace PubnubApi.EventEngine.Subscribe.States
     {
         public IEnumerable<string> Channels;
         public IEnumerable<string> ChannelGroups;
-        
-        public override TransitionResult Transition(IEvent e)
+		public ReconnectionConfiguration ReconnectionConfiguration;
+
+		public override TransitionResult Transition(IEvent e)
         {
             return e switch
             {
                 Events.UnsubscribeAllEvent unsubscribeAll => new UnsubscribedState() 
                 {
+                    ReconnectionConfiguration = this.ReconnectionConfiguration
                 },
 
                 Events.SubscriptionChangedEvent subscriptionChanged => new HandshakingState()
                 {
-                    Channels = subscriptionChanged.Channels, ChannelGroups = subscriptionChanged.ChannelGroups,
+                    Channels = subscriptionChanged.Channels,
+                    ChannelGroups = subscriptionChanged.ChannelGroups,
+                    ReconnectionConfiguration = this.ReconnectionConfiguration
                 },
 
                 Events.ReconnectEvent reconnect => new HandshakingState()
                 {
-                    Channels = reconnect.Channels, ChannelGroups = reconnect.ChannelGroups,
+                    Channels = reconnect.Channels,
+                    ChannelGroups = reconnect.ChannelGroups,
+                    ReconnectionConfiguration = this.ReconnectionConfiguration
                 },
 
                 Events.SubscriptionRestoredEvent subscriptionRestored => new ReceivingState()
                 {
                     Channels = subscriptionRestored.Channels,
                     ChannelGroups = subscriptionRestored.ChannelGroups,
-                    Cursor = subscriptionRestored.Cursor
+                    Cursor = subscriptionRestored.Cursor,
+                    ReconnectionConfiguration = this.ReconnectionConfiguration
                 },
 
                 _ => null

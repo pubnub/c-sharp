@@ -20,10 +20,10 @@ namespace PubnubApi.EventEngine.Subscribe.Context
 
 		}
 
-		public static bool shouldRetry(PNReconnectionPolicy policy, int attempts, int maxAttempts)
+		public static bool shouldRetry(ReconnectionConfiguration reconnectionConfiguration, int attemptedRetries)
 		{
-			if (policy == PNReconnectionPolicy.NONE) return false;
-			return maxAttempts < attempts;
+			if (reconnectionConfiguration.ReconnectionPolicy == PNReconnectionPolicy.NONE) return false;
+			return reconnectionConfiguration.MaximumReconnectionRetries < attemptedRetries;
 		}
 	}
 }
