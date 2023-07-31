@@ -7,7 +7,7 @@ using PubnubApi.EventEngine.Subscribe.Context;
 
 namespace PubnubApi.EventEngine.Subscribe.States
 {
-    public class ReceiveReconnectingState : Core.State
+    public class ReceiveReconnectingState : SubscriptionState
     {
         public IEnumerable<string> Channels;
         public IEnumerable<string> ChannelGroups;

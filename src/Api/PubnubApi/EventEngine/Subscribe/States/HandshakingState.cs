@@ -1,19 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using PubnubApi.EventEngine.Core;
+using PubnubApi.EventEngine.Subscribe.Common;
 using PubnubApi.EventEngine.Subscribe.Context;
 using PubnubApi.EventEngine.Subscribe.Invocations;
 
 namespace PubnubApi.EventEngine.Subscribe.States
 {
-    public class HandshakingState : Core.State
+    public class HandshakingState : SubscriptionState
     {
-        public IEnumerable<string> Channels;
-        public IEnumerable<string> ChannelGroups;
-		public ReconnectionConfiguration ReconnectionConfiguration;
-
-
-		public override IEnumerable<IEffectInvocation> OnEntry => new HandshakeInvocation()
+        public override IEnumerable<IEffectInvocation> OnEntry => new HandshakeInvocation()
             { Channels = this.Channels,
             ChannelGroups = this.ChannelGroups }.AsArray();
 

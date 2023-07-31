@@ -7,15 +7,12 @@ using PubnubApi.EventEngine.Subscribe.Context;
 
 namespace PubnubApi.EventEngine.Subscribe.States
 {
-    public class ReceiveFailedState : Core.State
+    public class ReceiveFailedState : SubscriptionState
     {
-        public IEnumerable<string> Channels;
-        public IEnumerable<string> ChannelGroups;
         public SubscriptionCursor Cursor;
-		public ReconnectionConfiguration ReconnectionConfiguration;
 
-		public IEnumerable<IEffectInvocation> OnEntry { get; }
-        public IEnumerable<IEffectInvocation> OnExit { get; }
+        public override IEnumerable<IEffectInvocation> OnEntry { get; }
+        public override IEnumerable<IEffectInvocation> OnExit { get; }
 
         public override TransitionResult Transition(IEvent e)
         {

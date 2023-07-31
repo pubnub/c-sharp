@@ -7,14 +7,11 @@ using PubnubApi.EventEngine.Subscribe.Context;
 
 namespace PubnubApi.EventEngine.Subscribe.States
 {
-    public class ReceivingState : Core.State
+    public class ReceivingState : SubscriptionState
     {
-        public IEnumerable<string> Channels;
-        public IEnumerable<string> ChannelGroups;
         public SubscriptionCursor Cursor;
-		public ReconnectionConfiguration ReconnectionConfiguration;
 
-		public override IEnumerable<IEffectInvocation> OnEntry => new ReceiveMessagesInvocation()
+        public override IEnumerable<IEffectInvocation> OnEntry => new ReceiveMessagesInvocation()
             { Channels = this.Channels,ChannelGroups = this.ChannelGroups, Cursor = this.Cursor }.AsArray();
 
         public override IEnumerable<IEffectInvocation> OnExit { get; } = new CancelReceiveMessagesInvocation().AsArray();
