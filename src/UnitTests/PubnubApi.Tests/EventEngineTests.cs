@@ -66,7 +66,7 @@ namespace PubNubMessaging.Tests
             Assert.AreEqual(PNReconnectionPolicy.LINEAR, ((ReceivingState)(result.State)).ReconnectionConfiguration.ReconnectionPolicy);
             Assert.AreEqual(50, ((ReceivingState)(result.State)).ReconnectionConfiguration.MaximumReconnectionRetries);
         }
-        
+
         [Test]
         public void TestHandshakingStateTransitionWithSubscriptionRestoredEvent()
         {
@@ -176,6 +176,18 @@ namespace PubNubMessaging.Tests
             Assert.AreEqual("cg2", ((ReceivingState)(result.State)).ChannelGroups.ElementAt(1));
             Assert.AreEqual(PNReconnectionPolicy.LINEAR, ((ReceivingState)(result.State)).ReconnectionConfiguration.ReconnectionPolicy);
             Assert.AreEqual(50, ((ReceivingState)(result.State)).ReconnectionConfiguration.MaximumReconnectionRetries);
+        }
+
+        [Test]
+        public void TestHandshakingStateTransitionWithUnsubscribeEvent()
+        {
+            //Arrange
+            State handshakingState = new HandshakingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
+            State unsubscribedState = new UnsubscribedState();
+            //Act
+            TransitionResult result = handshakingState.Transition(new UnsubscribeAllEvent() { });
+            //Assert
+            Assert.IsTrue(result.State.GetType().Equals(unsubscribedState.GetType()));
         }
 
         [Test]
@@ -293,6 +305,18 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+        public void TestHandshakeReconnectingStateTransitionWithUnsubscribeEvent()
+        {
+            //Arrange
+            State handshakeReconnectingState = new HandshakeReconnectingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
+            State unsubscribedState = new UnsubscribedState();
+            //Act
+            TransitionResult result = handshakeReconnectingState.Transition(new UnsubscribeAllEvent() { });
+            //Assert
+            Assert.IsTrue(result.State.GetType().Equals(unsubscribedState.GetType()));
+        }
+
+        [Test]
         public void TestHandshakeFailedStateTransitionWithSubscriptionChangedEvent()
         {
             //Arrange
@@ -358,6 +382,18 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+        public void TestHandshakeFailedStateTransitionWithUnsubscribeEvent()
+        {
+            //Arrange
+            State handshakeFailedState = new HandshakeFailedState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" } };
+            State unsubscribedState = new UnsubscribedState();
+            //Act
+            TransitionResult result = handshakeFailedState.Transition(new UnsubscribeAllEvent() { });
+            //Assert
+            Assert.IsTrue(result.State.GetType().Equals(unsubscribedState.GetType()));
+        }
+
+        [Test]
         public void TestHandshakeStoppedStateTransitionWithSubscriptionChangedEvent()
         {
             //Arrange
@@ -420,6 +456,18 @@ namespace PubNubMessaging.Tests
             Assert.AreEqual("cg2", ((HandshakingState)(result.State)).ChannelGroups.ElementAt(1));
             Assert.AreEqual(1, ((HandshakingState)(result.State)).Cursor.Region);
             Assert.AreEqual(1234567890, ((HandshakingState)(result.State)).Cursor.Timetoken);
+        }
+
+        [Test]
+        public void TestHandshakeStoppedStateWithUnsubscribeEvent()
+        {
+            //Arrange
+            State handshakeStoppedState = new HandshakeStoppedState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" } };
+            State unsubscribedState = new UnsubscribedState();
+            //Act
+            TransitionResult result = handshakeStoppedState.Transition(new UnsubscribeAllEvent() { });
+            //Assert
+            Assert.IsTrue(result.State.GetType().Equals(unsubscribedState.GetType()));
         }
 
         [Test]
@@ -533,6 +581,18 @@ namespace PubNubMessaging.Tests
             Assert.AreEqual("cg2", ((ReceivingState)(result.State)).ChannelGroups.ElementAt(1));
             Assert.AreEqual(1, ((ReceivingState)(result.State)).Cursor.Region);
             Assert.AreEqual(1234567890, ((ReceivingState)(result.State)).Cursor.Timetoken);
+        }
+
+        [Test]
+        public void TestReceivingStateTransitionWithUnsubscribeEvent()
+        {
+            //Arrange
+            State receivingState = new ReceivingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
+            State unsubscribedState = new UnsubscribedState();
+            //Act
+            TransitionResult result = receivingState.Transition(new UnsubscribeAllEvent() { });
+            //Assert
+            Assert.IsTrue(result.State.GetType().Equals(unsubscribedState.GetType()));
         }
 
         [Test]
@@ -670,6 +730,18 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+        public void TestReceiveReconnectingStateTransitionWithUnsubscribeEvent()
+        {
+            //Arrange
+            State receiveReconnectingState = new ReceiveReconnectingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
+            State unsubscribedState = new UnsubscribedState();
+            //Act
+            TransitionResult result = receiveReconnectingState.Transition(new UnsubscribeAllEvent() { });
+            //Assert
+            Assert.IsTrue(result.State.GetType().Equals(unsubscribedState.GetType()));
+        }
+
+        [Test]
         public void TestReceiveFailedStateTransitionWithSubscriptionChangedEvent()
         {
             //Arrange
@@ -737,6 +809,18 @@ namespace PubNubMessaging.Tests
             Assert.AreEqual("cg2", ((HandshakingState)(result.State)).ChannelGroups.ElementAt(1));
             Assert.AreEqual(1, ((HandshakingState)(result.State)).Cursor.Region);
             Assert.AreEqual(1234567890, ((HandshakingState)(result.State)).Cursor.Timetoken);
+        }
+
+        [Test]
+        public void TestReceiveFailedStateTransitionWithUnsubscribeEvent()
+        {
+            //Arrange
+            State receiveFailedState = new ReceiveFailedState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
+            State unsubscribedState = new UnsubscribedState();
+            //Act
+            TransitionResult result = receiveFailedState.Transition(new UnsubscribeAllEvent() { });
+            //Assert
+            Assert.IsTrue(result.State.GetType().Equals(unsubscribedState.GetType()));
         }
 
         [Test]
@@ -809,6 +893,18 @@ namespace PubNubMessaging.Tests
             Assert.AreEqual("cg2", ((ReceiveStoppedState)(result.State)).ChannelGroups.ElementAt(1));
             Assert.AreEqual(1, ((ReceiveStoppedState)(result.State)).Cursor.Region);
             Assert.AreEqual(1234567890, ((ReceiveStoppedState)(result.State)).Cursor.Timetoken);
+        }
+
+        [Test]
+        public void TestReceiveStoppedStateTransitionWithUnsubscribeEvent()
+        {
+            //Arrange
+            State receiveStoppedState = new ReceiveStoppedState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 } };
+            State unsubscribedState = new UnsubscribedState();
+            //Act
+            TransitionResult result = receiveStoppedState.Transition(new UnsubscribeAllEvent() { });
+            //Assert
+            Assert.IsTrue(result.State.GetType().Equals(unsubscribedState.GetType()));
         }
 
     }
