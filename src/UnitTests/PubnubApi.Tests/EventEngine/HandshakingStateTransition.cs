@@ -3,6 +3,7 @@ using PubnubApi.EventEngine.Core;
 using PubnubApi.EventEngine.Subscribe.Common;
 using PubnubApi.EventEngine.Subscribe.Context;
 using PubnubApi.EventEngine.Subscribe.Events;
+using PubnubApi.EventEngine.Subscribe.Invocations;
 using PubnubApi.EventEngine.Subscribe.States;
 using System.Linq;
 
@@ -14,8 +15,8 @@ namespace PubnubApi.Tests.EventEngine
         public void TestHandshakingStateTransitionWithSubscriptionRestoredEvent()
         {
             //Arrange
-            State handshakingState = new HandshakingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
-            State handshakingState2 = new HandshakingState();
+            var handshakingState = new HandshakingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
+            var handshakingState2 = new HandshakingState();
             //Act
             TransitionResult result = handshakingState.Transition(new SubscriptionRestoredEvent()
             {
@@ -39,8 +40,8 @@ namespace PubnubApi.Tests.EventEngine
         public void TestHandshakingStateTransitionWithWithSubscriptionChangedEvent()
         {
             //Arrange
-            State handshakingState = new HandshakingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
-            State handshakingState2 = new HandshakingState();
+            var handshakingState = new HandshakingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
+            var handshakingState2 = new HandshakingState();
             //Act
             TransitionResult result = handshakingState.Transition(new SubscriptionChangedEvent()
             {
@@ -63,8 +64,9 @@ namespace PubnubApi.Tests.EventEngine
         public void TestHandshakingStateTransitionWithHandshakeFailureEvent()
         {
             //Arrange
-            State handshakingState = new HandshakingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
-            State handshakeReconnectingState = new HandshakeReconnectingState();
+            var handshakingState = new HandshakingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
+            var handshakeReconnectingState = new HandshakeReconnectingState();
+            EmitStatusInvocation emitStatusInvocation = new EmitStatusInvocation(new PNStatus());
             //Act
             TransitionResult result = handshakingState.Transition(new HandshakeFailureEvent() { });
             //Assert
@@ -75,14 +77,17 @@ namespace PubnubApi.Tests.EventEngine
             Assert.AreEqual("cg2", ((HandshakeReconnectingState)(result.State)).ChannelGroups.ElementAt(1));
             Assert.AreEqual(PNReconnectionPolicy.LINEAR, ((HandshakeReconnectingState)(result.State)).ReconnectionConfiguration.ReconnectionPolicy);
             Assert.AreEqual(50, ((HandshakeReconnectingState)(result.State)).ReconnectionConfiguration.MaximumReconnectionRetries);
+            Assert.IsTrue(result.Invocations.ElementAt(0).GetType().Equals(emitStatusInvocation.GetType()));
+            Assert.AreEqual(PNStatusCategory.PNUnknownCategory, ((EmitStatusInvocation)result.Invocations.ElementAt(0)).StatusCategory);
         }
 
         [Test]
         public void TestHandshakingStateTransitionWithDisconnectEvent() 
         {
             //Arrange
-            State handshakingState = new HandshakingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
-            State handshakeStoppedState = new HandshakeStoppedState();
+            var handshakingState = new HandshakingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
+            var handshakeStoppedState = new HandshakeStoppedState();
+            EmitStatusInvocation emitStatusInvocation = new EmitStatusInvocation(new PNStatus());
             //Act
             TransitionResult result = handshakingState.Transition(new DisconnectEvent() 
             { 
@@ -98,18 +103,22 @@ namespace PubnubApi.Tests.EventEngine
             Assert.AreEqual("cg2", ((HandshakeStoppedState)(result.State)).ChannelGroups.ElementAt(1));
             Assert.AreEqual(PNReconnectionPolicy.LINEAR, ((HandshakeStoppedState)(result.State)).ReconnectionConfiguration.ReconnectionPolicy);
             Assert.AreEqual(50, ((HandshakeStoppedState)(result.State)).ReconnectionConfiguration.MaximumReconnectionRetries);
+            Assert.IsTrue(result.Invocations.ElementAt(0).GetType().Equals(emitStatusInvocation.GetType()));
+            Assert.AreEqual(PNStatusCategory.PNDisconnectedCategory, ((EmitStatusInvocation)result.Invocations.ElementAt(0)).StatusCategory);
         }
 
         [Test]
         public void TestHandshakingStateTransitionWithHandshakeSuccessEvent()
         {
             //Arrange
-            State handshakingState = new HandshakingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
-            State receivingState = new ReceivingState();
+            var handshakingState = new HandshakingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
+            var receivingState = new ReceivingState();
+            EmitStatusInvocation emitStatusInvocation = new EmitStatusInvocation(new PNStatus());
             //Act
             TransitionResult result = handshakingState.Transition(new HandshakeSuccessEvent() 
             { 
-                Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 }
+                Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 },
+                Status = new PNStatus(null,PNOperationType.PNSubscribeOperation, PNStatusCategory.PNConnectedCategory, handshakingState.Channels, handshakingState.ChannelGroups)
             });
             //Assert
             Assert.IsTrue(result.State.GetType().Equals(receivingState.GetType()));
@@ -119,14 +128,16 @@ namespace PubnubApi.Tests.EventEngine
             Assert.AreEqual("cg2", ((ReceivingState)(result.State)).ChannelGroups.ElementAt(1));
             Assert.AreEqual(PNReconnectionPolicy.LINEAR, ((ReceivingState)(result.State)).ReconnectionConfiguration.ReconnectionPolicy);
             Assert.AreEqual(50, ((ReceivingState)(result.State)).ReconnectionConfiguration.MaximumReconnectionRetries);
+            Assert.IsTrue(result.Invocations.ElementAt(0).GetType().Equals(emitStatusInvocation.GetType()));
+            Assert.AreEqual(PNStatusCategory.PNConnectedCategory, ((EmitStatusInvocation)result.Invocations.ElementAt(0)).StatusCategory);
         }
 
         [Test]
         public void TestHandshakingStateTransitionWithUnsubscribeEvent()
         {
             //Arrange
-            State handshakingState = new HandshakingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
-            State unsubscribedState = new UnsubscribedState();
+            var handshakingState = new HandshakingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
+            var unsubscribedState = new UnsubscribedState();
             //Act
             TransitionResult result = handshakingState.Transition(new UnsubscribeAllEvent() { });
             //Assert
