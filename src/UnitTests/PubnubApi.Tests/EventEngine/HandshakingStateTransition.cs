@@ -18,7 +18,7 @@ namespace PubnubApi.Tests.EventEngine
             var handshakingState = new HandshakingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
             var handshakingState2 = new HandshakingState();
             //Act
-            TransitionResult result = handshakingState.Transition(new SubscriptionRestoredEvent()
+            var result = handshakingState.Transition(new SubscriptionRestoredEvent()
             {
                 Channels = new string[] { "ch1", "ch2" },
                 ChannelGroups = new string[] { "cg1", "cg2" },
@@ -43,7 +43,7 @@ namespace PubnubApi.Tests.EventEngine
             var handshakingState = new HandshakingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
             var handshakingState2 = new HandshakingState();
             //Act
-            TransitionResult result = handshakingState.Transition(new SubscriptionChangedEvent()
+            var result = handshakingState.Transition(new SubscriptionChangedEvent()
             {
                 Channels = new string[] { "ch1", "ch2", "ch3" },
                 ChannelGroups = new string[] { "cg1", "cg2", "cg3" }
@@ -66,9 +66,9 @@ namespace PubnubApi.Tests.EventEngine
             //Arrange
             var handshakingState = new HandshakingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
             var handshakeReconnectingState = new HandshakeReconnectingState();
-            EmitStatusInvocation emitStatusInvocation = new EmitStatusInvocation(new PNStatus());
+            var emitStatusInvocation = new EmitStatusInvocation(new PNStatus());
             //Act
-            TransitionResult result = handshakingState.Transition(new HandshakeFailureEvent() { });
+            var result = handshakingState.Transition(new HandshakeFailureEvent() { });
             //Assert
             Assert.IsTrue(result.State.GetType().Equals(handshakeReconnectingState.GetType()));
             Assert.AreEqual("ch1", ((HandshakeReconnectingState)(result.State)).Channels.ElementAt(0));
@@ -87,9 +87,9 @@ namespace PubnubApi.Tests.EventEngine
             //Arrange
             var handshakingState = new HandshakingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
             var handshakeStoppedState = new HandshakeStoppedState();
-            EmitStatusInvocation emitStatusInvocation = new EmitStatusInvocation(new PNStatus());
+            var emitStatusInvocation = new EmitStatusInvocation(new PNStatus());
             //Act
-            TransitionResult result = handshakingState.Transition(new DisconnectEvent() 
+            var result = handshakingState.Transition(new DisconnectEvent() 
             { 
                 Channels = new string[] { "ch1", "ch2" },
                 ChannelGroups = new string[] { "cg1", "cg2" },
@@ -113,9 +113,9 @@ namespace PubnubApi.Tests.EventEngine
             //Arrange
             var handshakingState = new HandshakingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
             var receivingState = new ReceivingState();
-            EmitStatusInvocation emitStatusInvocation = new EmitStatusInvocation(new PNStatus());
+            var emitStatusInvocation = new EmitStatusInvocation(new PNStatus());
             //Act
-            TransitionResult result = handshakingState.Transition(new HandshakeSuccessEvent() 
+            var result = handshakingState.Transition(new HandshakeSuccessEvent() 
             { 
                 Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 },
                 Status = new PNStatus(null,PNOperationType.PNSubscribeOperation, PNStatusCategory.PNConnectedCategory, handshakingState.Channels, handshakingState.ChannelGroups)
@@ -139,7 +139,7 @@ namespace PubnubApi.Tests.EventEngine
             var handshakingState = new HandshakingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
             var unsubscribedState = new UnsubscribedState();
             //Act
-            TransitionResult result = handshakingState.Transition(new UnsubscribeAllEvent() { });
+            var result = handshakingState.Transition(new UnsubscribeAllEvent() { });
             //Assert
             Assert.IsTrue(result.State.GetType().Equals(unsubscribedState.GetType()));
         }

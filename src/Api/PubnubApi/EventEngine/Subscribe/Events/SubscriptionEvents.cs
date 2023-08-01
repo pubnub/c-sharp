@@ -27,6 +27,7 @@ namespace PubnubApi.EventEngine.Subscribe.Events {
 	}
 
 	public class HandshakeReconnectSuccessEvent : HandshakeSuccessEvent {
+		public PNStatus Status;
 		public SubscriptionCursor Cursor;
 	}
 

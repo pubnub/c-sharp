@@ -3,6 +3,7 @@ using PubnubApi.EventEngine.Core;
 using PubnubApi.EventEngine.Subscribe.Common;
 using PubnubApi.EventEngine.Subscribe.Context;
 using PubnubApi.EventEngine.Subscribe.Events;
+using PubnubApi.EventEngine.Subscribe.Invocations;
 using PubnubApi.EventEngine.Subscribe.States;
 using System.Linq;
 
@@ -14,10 +15,10 @@ namespace PubnubApi.Tests.EventEngine
         public void TestReceivingStateTransitionWithSubscriptionChangedEvent()
         {
             //Arrange
-            State receivingState = new ReceivingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
-            State receivingState2 = new ReceivingState();
+            var receivingState = new ReceivingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
+            var receivingState2 = new ReceivingState();
             //Act
-            TransitionResult result = receivingState.Transition(new SubscriptionChangedEvent()
+            var result = receivingState.Transition(new SubscriptionChangedEvent()
             {
                 Channels = new string[] { "ch1", "ch2", "ch3" },
                 ChannelGroups = new string[] { "cg1", "cg2", "cg3" }
@@ -40,10 +41,10 @@ namespace PubnubApi.Tests.EventEngine
         public void TestReceivingStateTransitionWithSubscriptionRestoredEvent()
         {
             //Arrange
-            State receivingState = new ReceivingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
-            State receivingState2 = new ReceivingState();
+            var receivingState = new ReceivingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
+            var receivingState2 = new ReceivingState();
             //Act
-            TransitionResult result = receivingState.Transition(new SubscriptionChangedEvent()
+            var result = receivingState.Transition(new SubscriptionChangedEvent()
             {
                 Channels = new string[] { "ch1", "ch2" },
                 ChannelGroups = new string[] { "cg1", "cg2" }
@@ -64,10 +65,11 @@ namespace PubnubApi.Tests.EventEngine
         public void TestReceivingStateTransitionWithDisconnectEvent()
         {
             //Arrange
-            State receivingState = new ReceivingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
-            State receiveStoppedState = new ReceiveStoppedState();
+            var receivingState = new ReceivingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
+            var receiveStoppedState = new ReceiveStoppedState();
+            var emitStatusInvocation = new EmitStatusInvocation(new PNStatus());
             //Act
-            TransitionResult result = receivingState.Transition(new DisconnectEvent()
+            var result = receivingState.Transition(new DisconnectEvent()
             {
                 Channels = new string[] { "ch1", "ch2" },
                 ChannelGroups = new string[] { "cg1", "cg2" }
@@ -80,16 +82,18 @@ namespace PubnubApi.Tests.EventEngine
             Assert.AreEqual("cg2", ((ReceiveStoppedState)(result.State)).ChannelGroups.ElementAt(1));
             Assert.AreEqual(1, ((ReceiveStoppedState)(result.State)).Cursor.Region);
             Assert.AreEqual(1234567890, ((ReceiveStoppedState)(result.State)).Cursor.Timetoken);
+            Assert.IsTrue(result.Invocations.ElementAt(0).GetType().Equals(emitStatusInvocation.GetType()));
+            Assert.AreEqual(PNStatusCategory.PNDisconnectedCategory, ((EmitStatusInvocation)result.Invocations.ElementAt(0)).StatusCategory);
         }
 
         [Test]
         public void TestReceivingStateTransitionWithReceiveFailureEvent()
         {
             //Arrange
-            State receivingState = new ReceivingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
-            State receiveReconnectingState = new ReceiveReconnectingState();
+            var receivingState = new ReceivingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
+            var receiveReconnectingState = new ReceiveReconnectingState();
             //Act
-            TransitionResult result = receivingState.Transition(new ReceiveFailureEvent() { });
+            var result = receivingState.Transition(new ReceiveFailureEvent() { });
             //Assert
             Assert.IsTrue(result.State.GetType().Equals(receiveReconnectingState.GetType()));
             Assert.AreEqual("ch1", ((ReceiveReconnectingState)(result.State)).Channels.ElementAt(0));
@@ -104,14 +108,18 @@ namespace PubnubApi.Tests.EventEngine
         public void TestReceivingStateTransitionWithReceiveSuccessEvent()
         {
             //Arrange
-            State receivingState = new ReceivingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
-            State receivingState2 = new ReceivingState();
+            var receivingState = new ReceivingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
+            var receivingState2 = new ReceivingState();
+            var emitStatusInvocation = new EmitStatusInvocation(new PNStatus());
+            var emitMessagesInvocation = new EmitMessagesInvocation(null);
             //Act
-            TransitionResult result = receivingState.Transition(new ReceiveSuccessEvent()
+            var result = receivingState.Transition(new ReceiveSuccessEvent()
             {
                 Channels = new string[] { "ch1", "ch2" },
                 ChannelGroups = new string[] { "cg1", "cg2" },
-                Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 }
+                Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 },
+                Status = new PNStatus(null, PNOperationType.PNSubscribeOperation, PNStatusCategory.PNConnectedCategory, receivingState.Channels, receivingState.ChannelGroups),
+                Messages = new ReceivingResponse<string>() {  Messages = new Message<string>[]{ }, Timetoken = new Timetoken(){ Region = 1, Timestamp = 1234567890 } }
             });
             //Assert
             Assert.IsTrue(result.State.GetType().Equals(receivingState2.GetType()));
@@ -121,16 +129,19 @@ namespace PubnubApi.Tests.EventEngine
             Assert.AreEqual("cg2", ((ReceivingState)(result.State)).ChannelGroups.ElementAt(1));
             Assert.AreEqual(1, ((ReceivingState)(result.State)).Cursor.Region);
             Assert.AreEqual(1234567890, ((ReceivingState)(result.State)).Cursor.Timetoken);
+            Assert.IsTrue(result.Invocations.ElementAt(0).GetType().Equals(emitMessagesInvocation.GetType()));
+            Assert.IsTrue(result.Invocations.ElementAt(1).GetType().Equals(emitStatusInvocation.GetType()));
+            Assert.AreEqual(PNStatusCategory.PNConnectedCategory, ((EmitStatusInvocation)result.Invocations.ElementAt(1)).StatusCategory);
         }
 
         [Test]
         public void TestReceivingStateTransitionWithUnsubscribeEvent()
         {
             //Arrange
-            State receivingState = new ReceivingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
-            State unsubscribedState = new UnsubscribedState();
+            var receivingState = new ReceivingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
+            var unsubscribedState = new UnsubscribedState();
             //Act
-            TransitionResult result = receivingState.Transition(new UnsubscribeAllEvent() { });
+            var result = receivingState.Transition(new UnsubscribeAllEvent() { });
             //Assert
             Assert.IsTrue(result.State.GetType().Equals(unsubscribedState.GetType()));
         }

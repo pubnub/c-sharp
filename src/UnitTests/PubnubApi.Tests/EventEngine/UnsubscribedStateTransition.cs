@@ -14,10 +14,10 @@ namespace PubnubApi.Tests.EventEngine
         public void TestUnsubscribedStateTransitionWithSubscriptionChangedEvent()
         {
             //Arrange
-            State unsubscribeState = new UnsubscribedState() { Channels = new string[] { "ch1", "ch2" }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };   
-            State handshakingState = new HandshakingState();
+            var unsubscribeState = new UnsubscribedState() { Channels = new string[] { "ch1", "ch2" }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };   
+            var handshakingState = new HandshakingState();
             //Act
-            TransitionResult result = unsubscribeState.Transition(new SubscriptionChangedEvent()
+            var result = unsubscribeState.Transition(new SubscriptionChangedEvent()
             {
                 Channels = new string[] { "ch1", "ch2" },
                 ChannelGroups = new string[] { "cg1", "cg2" }
@@ -36,10 +36,10 @@ namespace PubnubApi.Tests.EventEngine
         public void TestUnsubscribedStateTransitionWithSubscriptionRestoreEvent()
         {
             //Arrange
-            State unsubscribeState = new UnsubscribedState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
-            State receivingState = new ReceivingState();
+            var unsubscribeState = new UnsubscribedState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
+            var receivingState = new ReceivingState();
             //Act
-            TransitionResult result = unsubscribeState.Transition(new SubscriptionRestoredEvent()
+            var result = unsubscribeState.Transition(new SubscriptionRestoredEvent()
             {
                 Channels = new string[] { "ch1", "ch2" },
                 ChannelGroups = new string[] { "cg1", "cg2" },

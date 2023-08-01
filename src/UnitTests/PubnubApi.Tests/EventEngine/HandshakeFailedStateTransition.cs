@@ -14,10 +14,10 @@ namespace PubnubApi.Tests.EventEngine
         public void TestHandshakeFailedStateTransitionWithSubscriptionChangedEvent()
         {
             //Arrange
-            State handshakeFailedState = new HandshakeFailedState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" } };
-            State handshakingState = new HandshakingState();
+            var handshakeFailedState = new HandshakeFailedState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" } };
+            var handshakingState = new HandshakingState();
             //Act
-            TransitionResult result = handshakeFailedState.Transition(new SubscriptionChangedEvent()
+            var result = handshakeFailedState.Transition(new SubscriptionChangedEvent()
             {
                 Channels = new string[] { "ch1", "ch2", "ch3" },
                 ChannelGroups = new string[] { "cg1", "cg2", "cg3" }
@@ -36,10 +36,10 @@ namespace PubnubApi.Tests.EventEngine
         public void TestHandshakeFailedStateTransitionWithSubscriptionRestoredEvent()
         {
             //Arrange
-            State handshakeFailedState = new HandshakeFailedState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" } };
-            State handshakingState = new HandshakingState();
+            var handshakeFailedState = new HandshakeFailedState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" } };
+            var handshakingState = new HandshakingState();
             //Act
-            TransitionResult result = handshakeFailedState.Transition(new SubscriptionRestoredEvent()
+            var result = handshakeFailedState.Transition(new SubscriptionRestoredEvent()
             {
                 Channels = new string[] { "ch1", "ch2" },
                 ChannelGroups = new string[] { "cg1", "cg2" }
@@ -56,10 +56,10 @@ namespace PubnubApi.Tests.EventEngine
         public void TestHandshakeFailedStateTransitionWithReconnectEvent()
         {
             //Arrange
-            State handshakeFailedState = new HandshakeFailedState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" } };
-            State handshakingState = new HandshakingState();
+            var handshakeFailedState = new HandshakeFailedState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" } };
+            var handshakingState = new HandshakingState();
             //Act
-            TransitionResult result = handshakeFailedState.Transition(new ReconnectEvent()
+            var result = handshakeFailedState.Transition(new ReconnectEvent()
             {
                 Channels = new string[] { "ch1", "ch2" },
                 ChannelGroups = new string[] { "cg1", "cg2" },
@@ -79,10 +79,10 @@ namespace PubnubApi.Tests.EventEngine
         public void TestHandshakeFailedStateTransitionWithUnsubscribeEvent()
         {
             //Arrange
-            State handshakeFailedState = new HandshakeFailedState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" } };
-            State unsubscribedState = new UnsubscribedState();
+            var handshakeFailedState = new HandshakeFailedState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" } };
+            var unsubscribedState = new UnsubscribedState();
             //Act
-            TransitionResult result = handshakeFailedState.Transition(new UnsubscribeAllEvent() { });
+            var result = handshakeFailedState.Transition(new UnsubscribeAllEvent() { });
             //Assert
             Assert.IsTrue(result.State.GetType().Equals(unsubscribedState.GetType()));
         }
