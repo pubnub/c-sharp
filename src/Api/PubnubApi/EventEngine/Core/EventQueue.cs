@@ -33,6 +33,14 @@ namespace PubnubApi.EventEngine.Core
             }
         }
 
+        public IEvent Peek()
+        {
+            lock (lockObj)
+            {
+                return eventQueue.Peek();
+            }
+        }
+
         public async Task Loop<T>(System.Func<IEvent, Task<T>> function)
         {
             while (Count > 0)
