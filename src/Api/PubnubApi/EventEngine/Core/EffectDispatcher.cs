@@ -13,7 +13,7 @@ namespace PubnubApi.EventEngine.Core {
 		/// <summary>
 		/// Dispatch an invocation i.e. call a registered effect handler.
 		/// </summary>
-		public async Task Dispatch<T>(T invocation) where T : IEffectInvocation {
+		public async Task Dispatch(IEffectInvocation invocation) {
 			if (!effectInvocationHandlerMap.ContainsKey(invocation.GetType())) {
 				throw new ArgumentException($"No handler for {invocation.GetType().Name} found.");
 			}
@@ -24,7 +24,7 @@ namespace PubnubApi.EventEngine.Core {
 				await effectInvocationHandlerMap[invocation.GetType()].Cancel();
 			} else
 			{
-				var handler = ((IEffectHandler<T>)effectInvocationHandlerMap[invocation.GetType()]);
+				var handler = effectInvocationHandlerMap[invocation.GetType()];
 				if (handler.IsBackground(invocation))
 					handler.Run(invocation).Start();
 				else

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace PubnubApi.EventEngine.Core
 {
@@ -16,6 +17,20 @@ namespace PubnubApi.EventEngine.Core
         internal static IEffectInvocation[] AsArray(this IEffectInvocation invocation)
         {
             return new IEffectInvocation[] { invocation };
+        }
+
+        internal static bool IsBackground(this IEffectHandler handler, IEffectInvocation invocation)
+        {
+            return (bool)handler.GetType()
+                .GetMethod("IsBackground")
+                .Invoke(handler, new object[] { invocation });
+        }
+        
+        internal static Task Run(this IEffectHandler handler, IEffectInvocation invocation)
+        {
+            return (Task)handler.GetType()
+                .GetMethod("Run")
+                .Invoke(handler, new object[] { invocation });
         }
     }
 
