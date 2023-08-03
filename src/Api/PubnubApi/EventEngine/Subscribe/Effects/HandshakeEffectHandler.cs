@@ -15,8 +15,7 @@ using PubnubApi.EventEngine.Subscribe.Common;
 namespace PubnubApi.EventEngine.Subscribe.Effects
 {
     public class HandshakeEffectHandler : 
-        Core.IEffectHandler<HandshakeInvocation>,
-        Core.IEffectHandler<HandshakeReconnectInvocation>
+        EffectDoubleCancellableHandler<HandshakeInvocation, HandshakeReconnectInvocation, CancelHandshakeInvocation>
     {
         private SubscribeManager2 manager;
         private EventQueue eventQueue;
@@ -29,7 +28,7 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
             this.eventQueue = eventQueue;
         }
 
-        public async Task Run(HandshakeReconnectInvocation invocation)
+        public override async Task Run(HandshakeReconnectInvocation invocation)
         {
             if (!ReconnectionDelayUtil.shouldRetry(invocation.ReconnectionConfiguration, invocation.AttemptedRetries))
             {
@@ -44,12 +43,12 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
             }
         }
 
-        public bool IsBackground(HandshakeReconnectInvocation invocation)
+        public override bool IsBackground(HandshakeReconnectInvocation invocation)
         {
             return true;
         }
 
-        public async Task Run(HandshakeInvocation invocation)
+        public override async Task Run(HandshakeInvocation invocation)
         {
             var response = await MakeHandshakeRequest(invocation);
 
@@ -71,7 +70,7 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
             }
         }
 
-        public bool IsBackground(HandshakeInvocation invocation)
+        public override bool IsBackground(HandshakeInvocation invocation)
         {
             return false;
         }
@@ -105,7 +104,7 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
             }
         }
 
-        public async Task Cancel()
+        public override async Task Cancel()
         {
             if (!retryDelay.Cancelled)
             {

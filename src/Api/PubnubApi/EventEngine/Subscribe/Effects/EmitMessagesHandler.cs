@@ -7,7 +7,7 @@ using PubnubApi.EventEngine.Subscribe.Invocations;
 
 namespace PubnubApi.EventEngine.Subscribe.Effects
 {
-    public class EmitMessagesHandler : IEffectHandler<Invocations.EmitMessagesInvocation>
+    public class EmitMessagesHandler : EffectHandler<Invocations.EmitMessagesInvocation>
     {
         private readonly System.Action<Pubnub, PNMessageResult<object>> messageEmitterFunction;
         private readonly Pubnub pubnubInstance;
@@ -19,7 +19,7 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
             this.pubnubInstance = pubnubInstance;
         }
 
-        public async Task Run(EmitMessagesInvocation invocation)
+        public async override Task Run(EmitMessagesInvocation invocation)
         {
             var processedMessages = invocation.Messages.Messages.Select(m => new PNMessageResult<object>()
             {
@@ -37,9 +37,9 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
             }
         }
 
-        public bool IsBackground(EmitMessagesInvocation invocation) => false;
+        public override bool IsBackground(EmitMessagesInvocation invocation) => false;
 
-        public Task Cancel()
+        public override Task Cancel()
         {
             throw new NotImplementedException();
         }
