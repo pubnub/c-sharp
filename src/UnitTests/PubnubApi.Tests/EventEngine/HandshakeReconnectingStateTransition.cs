@@ -46,12 +46,21 @@ namespace PubnubApi.Tests.EventEngine
             Assert.AreEqual(expectedState.ChannelGroups, ((HandshakingState)result.State).ChannelGroups);
         }
 
+        private HandshakeReconnectingState CreateHandshakeReconnectingState()
+        {
+            return new HandshakeReconnectingState() 
+            { 
+                Channels = new string[] { "ch1", "ch2" }, 
+                ChannelGroups = new string[] { "cg1", "cg2" } ,
+                ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50)
+            };
+        }
 
         [Test]
         public void HandshakeReconnectingState_OnHandshakeReconnectFailureEvent_TransitionToHandshakeReconnectingState()
         {
             //Arrange
-            var currentState = new HandshakeReconnectingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" } };
+            var currentState = CreateHandshakeReconnectingState();
             var eventToTriggerTransition = new HandshakeReconnectFailureEvent();
             
             //Act
@@ -70,11 +79,7 @@ namespace PubnubApi.Tests.EventEngine
         public void HandshakeReconnectingState_OnDisconnectEvent_TransitionToHandshakeStoppedState()
         {
             //Arrange
-            var currentState = new HandshakeReconnectingState() 
-            { 
-                Channels = new string[] { "ch1", "ch2" }, 
-                ChannelGroups = new string[] { "cg1", "cg2" } 
-            };
+            var currentState = CreateHandshakeReconnectingState();
             var eventToTriggerTransition = new DisconnectEvent() 
             { 
                 Channels = new string[] { "ch1", "ch2" }, 
@@ -99,11 +104,7 @@ namespace PubnubApi.Tests.EventEngine
         public void HandshakeReconnectingState_OnHandshakeReconnectGiveupEvent_TransitionToHandshakeFailedState() 
         {
             //Arrange
-            var currentState = new HandshakeReconnectingState() 
-            { 
-                Channels = new string[] { "ch1", "ch2" }, 
-                ChannelGroups = new string[] { "cg1", "cg2" } 
-            };
+            var currentState = CreateHandshakeReconnectingState();
             var eventToTriggerTransition = new HandshakeReconnectGiveUpEvent() { };
             var expectedState = new HandshakeFailedState()
             {
@@ -127,12 +128,7 @@ namespace PubnubApi.Tests.EventEngine
         public void HandshakeReconnectingState_OnHandshakeReconnectSuccessEvent_TransitionToReceivingState()
         {
             //Arrange
-            var currentState = new HandshakeReconnectingState() 
-            { 
-                Channels = new string[] { "ch1", "ch2" },
-                ChannelGroups = new string[] { "cg1", "cg2" },
-                ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50)
-            };
+            var currentState = CreateHandshakeReconnectingState();
             var eventToTriggerTransition = new HandshakeReconnectSuccessEvent()
             {
                 Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 },
@@ -166,19 +162,15 @@ namespace PubnubApi.Tests.EventEngine
         public void HandshakeReconnectingState_OnUnsubscribeAllEvent_TransitionToUnsubscribedState()
         {
             // Arrange
-            var currentState = new HandshakeReconnectingState()
-            {
-                Channels = new string[] { "ch1", "ch2" },
-                ChannelGroups = new string[] { "cg1", "cg2" },
-                ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50)
-            };
+            var currentState = CreateHandshakeReconnectingState();
             var eventToTriggerTransition = new UnsubscribeAllEvent();
 
             // Act
             var result = currentState.Transition(eventToTriggerTransition);
 
             // Assert
-            Assert.IsInstanceOf<UnsubscribedState>(result.State);        }
+            Assert.IsInstanceOf<UnsubscribedState>(result.State);        
+        }
 
     }
 }
