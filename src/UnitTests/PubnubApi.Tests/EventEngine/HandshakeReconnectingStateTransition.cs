@@ -11,141 +11,174 @@ namespace PubnubApi.Tests.EventEngine
 {
     internal class HandshakeReconnectingStateTransition
     {
+        private static object[] handshakeReconnectingEventCases = {
+            new object[] {
+                new HandshakeReconnectingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" } },
+                new SubscriptionChangedEvent()
+                {
+                    Channels = new string[] { "ch1", "ch2", "ch3" },
+                    ChannelGroups = new string[] { "cg1", "cg2", "cg3" }
+                },
+                new HandshakingState(){ Channels = new string[] { "ch1", "ch2", "ch3" }, ChannelGroups = new string[] { "cg1", "cg2", "cg3" } }
+            },
+            new object[]
+            {
+                new HandshakeReconnectingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" } },
+                new SubscriptionRestoredEvent()
+                {
+                    Channels = new string[] { "ch1", "ch2" },
+                    ChannelGroups = new string[] { "cg1", "cg2" }
+                },
+                new HandshakingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" } }
+            }
+        };
+
+        [TestCaseSource(nameof(handshakeReconnectingEventCases))]
+        public void HandshakeReconnectingState_OnEvent_TransitionToHandshakingState(
+            HandshakeReconnectingState handshakeReconnectingState, IEvent @event, HandshakingState expectedState) 
+        {
+            //Act
+            var result = handshakeReconnectingState.Transition(@event);
+
+            //Assert
+            Assert.IsInstanceOf<HandshakingState>(result.State);
+            Assert.AreEqual(expectedState.Channels, ((HandshakingState)result.State).Channels);
+            Assert.AreEqual(expectedState.ChannelGroups, ((HandshakingState)result.State).ChannelGroups);
+        }
+
+
         [Test]
-        public void TestHandshakeReconnectingStateTransitionWithSubscriptionChangedEvent() 
+        public void HandshakeReconnectingState_OnHandshakeReconnectFailureEvent_TransitionToHandshakeReconnectingState()
         {
             //Arrange
-            var handshakeReconnectingState = new HandshakeReconnectingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" } };
-            var handshakingState = new HandshakingState();
+            var currentState = new HandshakeReconnectingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" } };
+            var eventToTriggerTransition = new HandshakeReconnectFailureEvent();
+            
             //Act
-            var result = handshakeReconnectingState.Transition(new SubscriptionChangedEvent() 
-            { 
-                Channels = new string[] { "ch1", "ch2", "ch3" },
-                ChannelGroups = new string[] { "cg1", "cg2", "cg3" }
-            });
+            var result = currentState.Transition(eventToTriggerTransition);
+
             //Assert
-            Assert.IsTrue(result.State.GetType().Equals(handshakingState.GetType()));
-            Assert.AreEqual("ch1", ((HandshakingState)(result.State)).Channels.ElementAt(0));
-            Assert.AreEqual("ch2", ((HandshakingState)(result.State)).Channels.ElementAt(1));
-            Assert.AreEqual("ch3", ((HandshakingState)(result.State)).Channels.ElementAt(2));
-            Assert.AreEqual("cg1", ((HandshakingState)(result.State)).ChannelGroups.ElementAt(0));
-            Assert.AreEqual("cg2", ((HandshakingState)(result.State)).ChannelGroups.ElementAt(1));
-            Assert.AreEqual("cg3", ((HandshakingState)(result.State)).ChannelGroups.ElementAt(2));
+            Assert.IsInstanceOf<HandshakeReconnectingState>(result.State);
+            CollectionAssert.AreEqual(currentState.Channels, ((HandshakeReconnectingState)result.State).Channels);
+            CollectionAssert.AreEqual(currentState.ChannelGroups, ((HandshakeReconnectingState)result.State).ChannelGroups);
+
+            Assert.IsInstanceOf<EmitStatusInvocation>(result.Invocations.ElementAt(0));
+            Assert.AreEqual(PNStatusCategory.PNUnknownCategory, ((EmitStatusInvocation)result.Invocations.ElementAt(0)).StatusCategory);
         }
 
         [Test]
-        public void TestHandshakeReconnectingStateTransitionWithSubscriptionRestoredEvent() 
+        public void HandshakeReconnectingState_OnDisconnectEvent_TransitionToHandshakeStoppedState()
         {
             //Arrange
-            var handshakeReconnectingState = new HandshakeReconnectingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" } };
-            var handshakingState = new HandshakingState();
-            //Act
-            var result = handshakeReconnectingState.Transition(new SubscriptionRestoredEvent() 
+            var currentState = new HandshakeReconnectingState() 
             { 
+                Channels = new string[] { "ch1", "ch2" }, 
+                ChannelGroups = new string[] { "cg1", "cg2" } 
+            };
+            var eventToTriggerTransition = new DisconnectEvent() 
+            { 
+                Channels = new string[] { "ch1", "ch2" }, 
+                ChannelGroups = new string[] { "cg1", "cg2" } 
+            };
+            var expectedState = new HandshakeStoppedState()
+            {
                 Channels = new string[] { "ch1", "ch2" },
                 ChannelGroups = new string[] { "cg1", "cg2" }
-            });
+            };
+
+            //Act
+            var result = currentState.Transition(eventToTriggerTransition);
+
             //Assert
-            Assert.IsTrue(result.State.GetType().Equals(handshakingState.GetType()));
-            Assert.AreEqual("ch1", ((HandshakingState)(result.State)).Channels.ElementAt(0));
-            Assert.AreEqual("ch2", ((HandshakingState)(result.State)).Channels.ElementAt(1));
-            Assert.AreEqual("cg1", ((HandshakingState)(result.State)).ChannelGroups.ElementAt(0));
-            Assert.AreEqual("cg2", ((HandshakingState)(result.State)).ChannelGroups.ElementAt(1));
+            Assert.IsInstanceOf<HandshakeStoppedState>(result.State);
+            CollectionAssert.AreEqual(expectedState.Channels, ((HandshakeStoppedState)result.State).Channels);
+            CollectionAssert.AreEqual(expectedState.ChannelGroups, ((HandshakeStoppedState)result.State).ChannelGroups);
         }
 
         [Test]
-        public void TestHandshakeReconnectingStateTransitionWithHandshakeReconnectFailureEvent()
+        public void HandshakeReconnectingState_OnHandshakeReconnectGiveupEvent_TransitionToHandshakeFailedState() 
         {
             //Arrange
-            var handshakeReconnectingState = new HandshakeReconnectingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" } };
-            var handshakeReconnectingState2 = new HandshakeReconnectingState();
-            var emitStatusInvocation = new EmitStatusInvocation(new PNStatus());
+            var currentState = new HandshakeReconnectingState() 
+            { 
+                Channels = new string[] { "ch1", "ch2" }, 
+                ChannelGroups = new string[] { "cg1", "cg2" } 
+            };
+            var eventToTriggerTransition = new HandshakeReconnectGiveUpEvent() { };
+            var expectedState = new HandshakeFailedState()
+            {
+                Channels = new string[] { "ch1", "ch2" },
+                ChannelGroups = new string[] { "cg1", "cg2" }
+            };
+
             //Act
-            var result = handshakeReconnectingState.Transition(new HandshakeReconnectFailureEvent() { });
+            var result = currentState.Transition(@eventToTriggerTransition);
+            
             //Assert
-            Assert.IsTrue(result.State.GetType().Equals(handshakeReconnectingState2.GetType()));
-            Assert.AreEqual("ch1", ((HandshakeReconnectingState)(result.State)).Channels.ElementAt(0));
-            Assert.AreEqual("ch2", ((HandshakeReconnectingState)(result.State)).Channels.ElementAt(1));
-            Assert.AreEqual("cg1", ((HandshakeReconnectingState)(result.State)).ChannelGroups.ElementAt(0));
-            Assert.AreEqual("cg2", ((HandshakeReconnectingState)(result.State)).ChannelGroups.ElementAt(1));
-            Assert.IsTrue(result.Invocations.ElementAt(0).GetType().Equals(emitStatusInvocation.GetType()));
+            Assert.IsInstanceOf<HandshakeFailedState>(result.State);
+            CollectionAssert.AreEqual(expectedState.Channels, ((HandshakeFailedState)result.State).Channels);
+            CollectionAssert.AreEqual(expectedState.ChannelGroups, ((HandshakeFailedState)result.State).ChannelGroups);
+
+            Assert.IsInstanceOf<EmitStatusInvocation>(result.Invocations.ElementAt(0));
             Assert.AreEqual(PNStatusCategory.PNUnknownCategory, ((EmitStatusInvocation)result.Invocations.ElementAt(0)).StatusCategory);
         }
 
         [Test]
-        public void TestHandshakeReconnectingStateTransitionWithDisconnectEvent()
+        public void HandshakeReconnectingState_OnHandshakeReconnectSuccessEvent_TransitionToReceivingState()
         {
             //Arrange
-            var handshakeReconnectingState = new HandshakeReconnectingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" } };
-            var handshakeStoppedState = new HandshakeStoppedState();
-            //Act
-            var result = handshakeReconnectingState.Transition(new DisconnectEvent() 
-            { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" } } );
-            //Assert
-            Assert.IsTrue(result.State.GetType().Equals(handshakeStoppedState.GetType()));
-            Assert.AreEqual("ch1", ((HandshakeStoppedState)(result.State)).Channels.ElementAt(0));
-            Assert.AreEqual("ch2", ((HandshakeStoppedState)(result.State)).Channels.ElementAt(1));
-            Assert.AreEqual("cg1", ((HandshakeStoppedState)(result.State)).ChannelGroups.ElementAt(0));
-            Assert.AreEqual("cg2", ((HandshakeStoppedState)(result.State)).ChannelGroups.ElementAt(1));
-        }
-
-        [Test]
-        public void TestHandshakeReconnectingStateTransitionWithHandshakeReconnectGiveupEvent() 
-        {
-            //Arrange
-            var handshakeReconnectingState = new HandshakeReconnectingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" } };
-            var handshakeFailedState = new HandshakeFailedState();
-            var emitStatusInvocation = new EmitStatusInvocation(new PNStatus());
-            //Act
-            var result = handshakeReconnectingState.Transition(new HandshakeReconnectGiveUpEvent() { } );
-            //Assert
-            Assert.IsTrue(result.State.GetType().Equals(handshakeFailedState.GetType()));
-            Assert.AreEqual("ch1", ((HandshakeFailedState)(result.State)).Channels.ElementAt(0));
-            Assert.AreEqual("ch2", ((HandshakeFailedState)(result.State)).Channels.ElementAt(1));
-            Assert.AreEqual("cg1", ((HandshakeFailedState)(result.State)).ChannelGroups.ElementAt(0));
-            Assert.AreEqual("cg2", ((HandshakeFailedState)(result.State)).ChannelGroups.ElementAt(1));
-            Assert.IsTrue(result.Invocations.ElementAt(0).GetType().Equals(emitStatusInvocation.GetType()));
-            Assert.AreEqual(PNStatusCategory.PNUnknownCategory, ((EmitStatusInvocation)result.Invocations.ElementAt(0)).StatusCategory);
-        }
-
-        [Test]
-        public void TestHandshakeReconnectingStateTransitionWithHandshakeReconnectSuccessEvent()
-        {
-            //Arrange
-            var handshakeReconnectingState = new HandshakeReconnectingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
-            var receivingState = new ReceivingState();
-            var emitStatusInvocation = new EmitStatusInvocation(new PNStatus());
-            //Act
-            var result = handshakeReconnectingState.Transition(new HandshakeReconnectSuccessEvent() 
+            var currentState = new HandshakeReconnectingState() 
+            { 
+                Channels = new string[] { "ch1", "ch2" },
+                ChannelGroups = new string[] { "cg1", "cg2" },
+                ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50)
+            };
+            var eventToTriggerTransition = new HandshakeReconnectSuccessEvent()
             {
                 Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 },
-                Status = new PNStatus(null,PNOperationType.PNSubscribeOperation, PNStatusCategory.PNConnectedCategory, handshakeReconnectingState.Channels, handshakeReconnectingState.ChannelGroups)
-            } );
+                Status = new PNStatus(null, PNOperationType.PNSubscribeOperation, PNStatusCategory.PNConnectedCategory, currentState.Channels, currentState.ChannelGroups)
+            };
+            var expectedState = new ReceivingState()
+            {
+                Channels = new string[] { "ch1", "ch2" },
+                ChannelGroups = new string[] { "cg1", "cg2" },
+                Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 },
+                ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50)
+            };
+
+            //Act
+            var result = currentState.Transition(@eventToTriggerTransition);
+            
             //Assert
-            Assert.IsTrue(result.State.GetType().Equals(receivingState.GetType()));
-            Assert.AreEqual("ch1", ((ReceivingState)(result.State)).Channels.ElementAt(0));
-            Assert.AreEqual("ch2", ((ReceivingState)(result.State)).Channels.ElementAt(1));
-            Assert.AreEqual("cg1", ((ReceivingState)(result.State)).ChannelGroups.ElementAt(0));
-            Assert.AreEqual("cg2", ((ReceivingState)(result.State)).ChannelGroups.ElementAt(1));
-            Assert.AreEqual(1, ((ReceivingState)(result.State)).Cursor.Region);
-            Assert.AreEqual(1234567890, ((ReceivingState)(result.State)).Cursor.Timetoken);
-            Assert.AreEqual(PNReconnectionPolicy.LINEAR, ((ReceivingState)(result.State)).ReconnectionConfiguration.ReconnectionPolicy);
-            Assert.AreEqual(50, ((ReceivingState)(result.State)).ReconnectionConfiguration.MaximumReconnectionRetries);
-            Assert.IsTrue(result.Invocations.ElementAt(0).GetType().Equals(emitStatusInvocation.GetType()));
+            Assert.IsInstanceOf<ReceivingState>(result.State);
+
+            CollectionAssert.AreEqual(expectedState.Channels, ((ReceivingState)result.State).Channels);
+            CollectionAssert.AreEqual(expectedState.ChannelGroups, ((ReceivingState)result.State).ChannelGroups);
+            Assert.AreEqual(expectedState.Cursor.Region, ((ReceivingState)result.State).Cursor.Region);
+            Assert.AreEqual(expectedState.Cursor.Timetoken, ((ReceivingState)result.State).Cursor.Timetoken);
+            Assert.AreEqual(expectedState.ReconnectionConfiguration.ReconnectionPolicy, ((ReceivingState)result.State).ReconnectionConfiguration.ReconnectionPolicy);
+            Assert.AreEqual(expectedState.ReconnectionConfiguration.MaximumReconnectionRetries, ((ReceivingState)result.State).ReconnectionConfiguration.MaximumReconnectionRetries);
+            Assert.IsInstanceOf<EmitStatusInvocation>(result.Invocations.ElementAt(0));
             Assert.AreEqual(PNStatusCategory.PNConnectedCategory, ((EmitStatusInvocation)result.Invocations.ElementAt(0)).StatusCategory);
         }
 
         [Test]
-        public void TestHandshakeReconnectingStateTransitionWithUnsubscribeEvent()
+        public void HandshakeReconnectingState_OnUnsubscribeAllEvent_TransitionToUnsubscribedState()
         {
-            //Arrange
-            var handshakeReconnectingState = new HandshakeReconnectingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
-            var unsubscribedState = new UnsubscribedState();
-            //Act
-            var result = handshakeReconnectingState.Transition(new UnsubscribeAllEvent() { });
-            //Assert
-            Assert.IsTrue(result.State.GetType().Equals(unsubscribedState.GetType()));
-        }
+            // Arrange
+            var currentState = new HandshakeReconnectingState()
+            {
+                Channels = new string[] { "ch1", "ch2" },
+                ChannelGroups = new string[] { "cg1", "cg2" },
+                ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50)
+            };
+            var eventToTriggerTransition = new UnsubscribeAllEvent();
+
+            // Act
+            var result = currentState.Transition(eventToTriggerTransition);
+
+            // Assert
+            Assert.IsInstanceOf<UnsubscribedState>(result.State);        }
 
     }
 }
