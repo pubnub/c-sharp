@@ -3,12 +3,18 @@ using PubnubApi.EventEngine.Core;
 using PubnubApi.EventEngine.Subscribe.States;
 using PubnubApi.EventEngine.Subscribe.Effects;
 using PubnubApi.EventEngine.Subscribe.Invocations;
+using System;
 
 namespace PubnubApi.EventEngine.Subscribe {
 	public class SubscribeEventEngine : Engine {
 		private SubscribeManager2 subscribeManager;
-		
-		internal SubscribeEventEngine(SubscribeManager2 subscribeManager) {
+
+		internal SubscribeEventEngine(Pubnub pubnubInstance,
+			PNConfiguration pubnubConfiguration,
+			SubscribeManager2 subscribeManager,
+			Action<Pubnub, PNStatus> statusListener = null,
+			Action<Pubnub, PNMessageResult<object>> messageListener = null)
+		{
 			this.subscribeManager = subscribeManager;
 
 			// initialize the handler, pass dependencies
@@ -22,8 +28,13 @@ namespace PubnubApi.EventEngine.Subscribe {
 			dispatcher.Register<Invocations.ReceiveReconnectInvocation, Effects.ReceivingEffectHandler>(receiveHandler);
 			dispatcher.Register<Invocations.CancelReceiveMessagesInvocation, Effects.ReceivingEffectHandler>(receiveHandler);
 
-			// TODO: ReconnectionConfiguration
-			currentState = new UnsubscribedState();
+			var emitMessageHandler = new Effects.EmitMessagesHandler(pubnubInstance, messageListener);
+			dispatcher.Register<Invocations.EmitMessagesInvocation, Effects.EmitMessagesHandler>(emitMessageHandler);
+
+			var emitStatusHandler = new Effects.EmitStatusEffectHandler(pubnubInstance, statusListener);
+			dispatcher.Register<Invocations.EmitStatusInvocation, Effects.EmitStatusEffectHandler>(emitStatusHandler);
+
+			currentState = new UnsubscribedState() { ReconnectionConfiguration = new Context.ReconnectionConfiguration(pubnubConfiguration.ReconnectionPolicy, pubnubConfiguration.ConnectionMaxRetries) };
 		}
 	}
 }
