@@ -38,10 +38,16 @@ namespace PubnubApi.EventEngine.Core
         public abstract bool IsBackground(T invocation);
     }
 
+    /// <summary>
+    /// Implement a handler a cancellable invocation.
+    /// </summary>
+    /// <typeparam name="T1">Connect type invocation</typeparam>
+    /// <typeparam name="T2">Cancel running invocation</typeparam>
     public abstract class EffectCancellableHandler<T1, T2> : EffectHandler<T1>, IEffectHandler<T2>
         where T1 : class, IEffectInvocation
         where T2 : class, IEffectCancelInvocation
     {
+        // run is not implemented in cancel.
         public Task Run(T2 invocation)
         {
             throw new NotImplementedException();
@@ -51,27 +57,40 @@ namespace PubnubApi.EventEngine.Core
     }
    
 
+    /// <summary>
+    /// Implement a handler for two invocations (meant for connect-reconnect pairs). Use EffectDoubleCancellableHandler to implement cancellable handler.
+    /// </summary>
+    /// <typeparam name="T1">Run type invocation</typeparam>
+    /// <typeparam name="T2">Retry type invocation</typeparam>
     public abstract class EffectDoubleHandler<T1, T2> : EffectHandler<T1>, IEffectHandler<T2>
         where T1 : class, IEffectInvocation
         where T2 : class, IEffectInvocation
     {
 
         public new Task Run(IEffectInvocation invocation) =>
-            invocation is T1 effectInvocation ? Run(effectInvocation) : Run(invocation as T2);
+            invocation is T1 ? (this as EffectHandler<T1>).Run(invocation) : Run(invocation as T2);
 
         public new bool IsBackground(IEffectInvocation invocation) => 
-            invocation is T1 effectInvocation ? IsBackground(effectInvocation) : IsBackground(invocation as T2);
+            invocation is T1 ? (this as EffectHandler<T1>).IsBackground(invocation) : IsBackground(invocation as T2);
 
         public abstract Task Run(T2 invocation);
 
         public abstract bool IsBackground(T2 invocation);
     }
 
+    
+    /// <summary>
+    /// Implement a handler for two invocations (meant for connect-reconnect pairs) with a cancel invocation
+    /// </summary>
+    /// <typeparam name="T1">Run type invocation</typeparam>
+    /// <typeparam name="T2">Retry type invocation</typeparam>
+    /// <typeparam name="T3">Cancel connecting invocation</typeparam>
     public abstract class EffectDoubleCancellableHandler<T1, T2, T3> : EffectDoubleHandler<T1, T2>, IEffectHandler<T3>
         where T1 : class, IEffectInvocation
         where T2 : class, IEffectInvocation
         where T3 : class, IEffectCancelInvocation
     {
+        // Run is not implemented in cancel.
         public Task Run(T3 invocation)
         {
             throw new NotImplementedException();
