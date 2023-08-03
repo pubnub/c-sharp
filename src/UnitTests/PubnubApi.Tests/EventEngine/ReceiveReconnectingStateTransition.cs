@@ -99,7 +99,7 @@ namespace PubnubApi.Tests.EventEngine
         }
 
         [Test]
-        public void TestReceiveReconnectingStateTransitionWithDisconnectEvent()
+        public void ReceiveReconnectingState_OnDisconnectEvent_TransitionToReceiveStoppedState()
         {
             //Arrange
             var currentState = CreateReceiveReconnectingState();
@@ -130,33 +130,38 @@ namespace PubnubApi.Tests.EventEngine
         }
 
         [Test]
-        public void TestReceiveReconnectingStateTransitionWithReceiveReconnectGiveup()
+        public void ReceiveReconnectingState_OnReceiveReconnectGiveupEvent_TransitionToReceiveFailedState()
         {
             //Arrange
             var currentState = CreateReceiveReconnectingState();
-            var receiveFailedState = new ReceiveFailedState();
-            var emitStatusInvocation = new EmitStatusInvocation(new PNStatus());
-            //Act
-            var result = currentState.Transition(new ReceiveReconnectGiveUpEvent()
+            var eventToTriggerTransition = new ReceiveReconnectGiveUpEvent()
             {
                 Channels = new string[] { "ch1", "ch2" },
                 ChannelGroups = new string[] { "cg1", "cg2" },
                 Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 }
-            });
+            };
+            var expectedState = new ReceiveFailedState()
+            {
+                Channels = new string[] { "ch1", "ch2" },
+                ChannelGroups = new string[] { "cg1", "cg2" },
+                Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 }
+            };
+
+            //Act
+            var result = currentState.Transition(eventToTriggerTransition);
+
             //Assert
-            Assert.IsTrue(result.State.GetType().Equals(receiveFailedState.GetType()));
-            Assert.AreEqual("ch1", ((ReceiveFailedState)(result.State)).Channels.ElementAt(0));
-            Assert.AreEqual("ch2", ((ReceiveFailedState)(result.State)).Channels.ElementAt(1));
-            Assert.AreEqual("cg1", ((ReceiveFailedState)(result.State)).ChannelGroups.ElementAt(0));
-            Assert.AreEqual("cg2", ((ReceiveFailedState)(result.State)).ChannelGroups.ElementAt(1));
-            Assert.AreEqual(1, ((ReceiveFailedState)(result.State)).Cursor.Region);
-            Assert.AreEqual(1234567890, ((ReceiveFailedState)(result.State)).Cursor.Timetoken);
-            Assert.IsTrue(result.Invocations.ElementAt(0).GetType().Equals(emitStatusInvocation.GetType()));
+            Assert.IsInstanceOf<ReceiveFailedState>(result.State);
+            CollectionAssert.AreEqual(expectedState.Channels, ((ReceiveFailedState)result.State).Channels);
+            CollectionAssert.AreEqual(expectedState.ChannelGroups, ((ReceiveFailedState)result.State).ChannelGroups);
+            Assert.AreEqual(expectedState.Cursor.Region, ((ReceiveFailedState)result.State).Cursor.Region);
+            Assert.AreEqual(expectedState.Cursor.Timetoken, ((ReceiveFailedState)result.State).Cursor.Timetoken);
+            Assert.IsInstanceOf<EmitStatusInvocation>(result.Invocations.ElementAt(0));
             Assert.AreEqual(PNStatusCategory.PNUnknownCategory, ((EmitStatusInvocation)result.Invocations.ElementAt(0)).StatusCategory);
         }
 
         [Test]
-        public void TestReceiveReconnectingStateTransitionWithUnsubscribeEvent()
+        public void ReceiveReconnectingState_OnUnsubscribeAllEvent_TransitionToUnsubscribedState()
         {
             //Arrange
             var currentState = CreateReceiveReconnectingState();

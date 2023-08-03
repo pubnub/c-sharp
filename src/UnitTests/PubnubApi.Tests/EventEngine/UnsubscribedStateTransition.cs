@@ -11,51 +11,64 @@ namespace PubnubApi.Tests.EventEngine
     internal class UnsubscribedStateTransition
     {
         [Test]
-        public void TestUnsubscribedStateTransitionWithSubscriptionChangedEvent()
+        public void UnsubscribedState_OnSubscriptionChangedEvent_TransitionToHandshakingState()
         {
             //Arrange
-            var unsubscribeState = new UnsubscribedState() { Channels = new string[] { "ch1", "ch2" }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };   
-            var handshakingState = new HandshakingState();
-            //Act
-            var result = unsubscribeState.Transition(new SubscriptionChangedEvent()
+            var currentState = new UnsubscribedState() { Channels = new string[] { "ch1", "ch2" }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };   
+            var eventToTriggerTransition = new SubscriptionChangedEvent()
             {
                 Channels = new string[] { "ch1", "ch2" },
                 ChannelGroups = new string[] { "cg1", "cg2" }
-            });
+            };
+            var expectedState = new HandshakingState()
+            {
+                Channels = new string[] { "ch1", "ch2" },
+                ChannelGroups = new string[] { "cg1", "cg2" },
+                Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 },
+                ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50)
+            };
+
+            //Act
+            var result = currentState.Transition(eventToTriggerTransition);
+            
             //Assert
-            Assert.IsTrue(result.State.GetType().Equals(handshakingState.GetType()));
-            Assert.AreEqual("ch1", ((HandshakingState)(result.State)).Channels.ElementAt(0));
-            Assert.AreEqual("ch2", ((HandshakingState)(result.State)).Channels.ElementAt(1));
-            Assert.AreEqual("cg1", ((HandshakingState)(result.State)).ChannelGroups.ElementAt(0));
-            Assert.AreEqual("cg2", ((HandshakingState)(result.State)).ChannelGroups.ElementAt(1));
-            Assert.AreEqual(PNReconnectionPolicy.LINEAR, ((HandshakingState)(result.State)).ReconnectionConfiguration.ReconnectionPolicy);
-            Assert.AreEqual(50, ((HandshakingState)(result.State)).ReconnectionConfiguration.MaximumReconnectionRetries);
+            Assert.IsInstanceOf<HandshakingState>(result.State);
+            CollectionAssert.AreEqual(expectedState.Channels, ((HandshakingState)result.State).Channels);
+            CollectionAssert.AreEqual(expectedState.ChannelGroups, ((HandshakingState)result.State).ChannelGroups);
+            Assert.AreEqual(expectedState.ReconnectionConfiguration.ReconnectionPolicy, ((HandshakingState)result.State).ReconnectionConfiguration.ReconnectionPolicy);
+            Assert.AreEqual(expectedState.ReconnectionConfiguration.MaximumReconnectionRetries, ((HandshakingState)result.State).ReconnectionConfiguration.MaximumReconnectionRetries);
         }
         
         [Test]
-        public void TestUnsubscribedStateTransitionWithSubscriptionRestoreEvent()
+        public void UnsubscribedState_OnSubscriptionRestoreEvent_TransitionToReceivingState()
         {
             //Arrange
-            var unsubscribeState = new UnsubscribedState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
-            var receivingState = new ReceivingState();
-            //Act
-            var result = unsubscribeState.Transition(new SubscriptionRestoredEvent()
+            var currentState = new UnsubscribedState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
+            var eventToTriggerTransition = new SubscriptionRestoredEvent()
             {
                 Channels = new string[] { "ch1", "ch2" },
                 ChannelGroups = new string[] { "cg1", "cg2" },
                 Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 }
-            });
-            //Assert
-            Assert.IsTrue(result.State.GetType().Equals(receivingState.GetType()));
-            Assert.AreEqual("ch1", ((ReceivingState)(result.State)).Channels.ElementAt(0));
-            Assert.AreEqual("ch2", ((ReceivingState)(result.State)).Channels.ElementAt(1));
-            Assert.AreEqual("cg1", ((ReceivingState)(result.State)).ChannelGroups.ElementAt(0));
-            Assert.AreEqual("cg2", ((ReceivingState)(result.State)).ChannelGroups.ElementAt(1));
-            Assert.AreEqual(1, ((ReceivingState)(result.State)).Cursor.Region);
-            Assert.AreEqual(1234567890, ((ReceivingState)(result.State)).Cursor.Timetoken);
-            Assert.AreEqual(PNReconnectionPolicy.LINEAR, ((ReceivingState)(result.State)).ReconnectionConfiguration.ReconnectionPolicy);
-            Assert.AreEqual(50, ((ReceivingState)(result.State)).ReconnectionConfiguration.MaximumReconnectionRetries);
-        }
+            };
+            var expectedState = new ReceivingState()
+            {
+                Channels = new string[] { "ch1", "ch2" },
+                ChannelGroups = new string[] { "cg1", "cg2" },
+                Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 },
+                ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50)
+            };
+            
+            //Act
+            var result = currentState.Transition(eventToTriggerTransition);
 
+            //Assert
+            Assert.IsInstanceOf<ReceivingState>(result.State);
+            CollectionAssert.AreEqual(expectedState.Channels, ((ReceivingState)result.State).Channels);
+            CollectionAssert.AreEqual(expectedState.ChannelGroups, ((ReceivingState)result.State).ChannelGroups);
+            Assert.AreEqual(expectedState.Cursor.Region, ((ReceivingState)result.State).Cursor.Region);
+            Assert.AreEqual(expectedState.Cursor.Timetoken, ((ReceivingState)result.State).Cursor.Timetoken);
+            Assert.AreEqual(expectedState.ReconnectionConfiguration.ReconnectionPolicy, ((ReceivingState)result.State).ReconnectionConfiguration.ReconnectionPolicy);
+            Assert.AreEqual(expectedState.ReconnectionConfiguration.MaximumReconnectionRetries, ((ReceivingState)result.State).ReconnectionConfiguration.MaximumReconnectionRetries);
+        }
     }
 }

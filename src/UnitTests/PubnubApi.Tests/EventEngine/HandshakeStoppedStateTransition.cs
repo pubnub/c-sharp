@@ -51,8 +51,8 @@ namespace PubnubApi.Tests.EventEngine
 
             //Assert
             Assert.IsInstanceOf<HandshakingState>(result.State);
-            Assert.AreEqual(expectedState.Channels, ((HandshakingState)result.State).Channels);
-            Assert.AreEqual(expectedState.ChannelGroups, ((HandshakingState)result.State).ChannelGroups);
+            CollectionAssert.AreEqual(expectedState.Channels, ((HandshakingState)result.State).Channels);
+            CollectionAssert.AreEqual(expectedState.ChannelGroups, ((HandshakingState)result.State).ChannelGroups);
             if (@event is ReconnectEvent reconnectEvent)
             {
                 Assert.AreEqual(reconnectEvent.Cursor, ((HandshakingState)result.State).Cursor);
