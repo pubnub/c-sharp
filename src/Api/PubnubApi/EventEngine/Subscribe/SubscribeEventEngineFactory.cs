@@ -22,12 +22,12 @@ namespace PubnubApi.EventEngine.Subscribe
 			return subscribeEventEngine;
 		}
 
-		internal SubscribeEventEngine initializeEventEngine(string instanceId,
+		internal SubscribeEventEngine initializeEventEngine<T>(string instanceId,
 			Pubnub pubnubInstance,
 			PNConfiguration pubnubConfiguration,
 			SubscribeManager2 subscribeManager,
 			Action<Pubnub, PNStatus> statusListener = null,
-			Action<Pubnub, PNMessageResult<object>> messageListener= null)
+			Action<Pubnub, PNMessageResult<T>> messageListener= null)
 		{
 			var subscribeEventEngine = new SubscribeEventEngine(pubnubInstance, pubnubConfiguration: pubnubConfiguration, subscribeManager);
 			if (engineinstances.TryAdd(instanceId, subscribeEventEngine)) {

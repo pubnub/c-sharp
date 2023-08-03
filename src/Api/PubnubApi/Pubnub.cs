@@ -47,16 +47,23 @@ namespace PubnubApi
             if (pubnubConfig[InstanceId].EnableEventEngine)
             {
                 SubscribeEventEngine subscribeEventEngine;
-                if (this.subscribeEventEngineFactory.hasEventEngine(InstanceId)) {
+				Action<Pubnub, PNStatus> statusListener = null;
+				Action<Pubnub, PNMessageResult<T>> messageListener = null;
+				if (this.subscribeEventEngineFactory.hasEventEngine(InstanceId)) {
                     subscribeEventEngine = subscribeEventEngineFactory.getEventEngine(InstanceId); }
                 else {
 					var subscribeManager = new SubscribeManager2(pubnubConfig[InstanceId], JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
-                    subscribeEventEngine = subscribeEventEngineFactory.initializeEventEngine(InstanceId, this, pubnubConfig[InstanceId], subscribeManager);
+                    if (subscribeCallbackListenerList!= null && subscribeCallbackListenerList.Count > 0) {
+						messageListener = subscribeCallbackListenerList[0].Message;
+                        statusListener = subscribeCallbackListenerList[0].Status;
+					}
+                    subscribeEventEngine = subscribeEventEngineFactory.initializeEventEngine(InstanceId, this, pubnubConfig[InstanceId], subscribeManager, statusListener, messageListener);
 				}
 				EndPoint.SubscribeOperation2<T> subscribeOperation = new EndPoint.SubscribeOperation2<T>(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, this);
                 subscribeOperation.SubscribeListenerList = subscribeCallbackListenerList;
-				
-                subscribeEventEngine.eventQueue.Enqueue(new SubscriptionChangedEvent() { Channels = this.GetSubscribedChannels().ToArray(), ChannelGroups = this.GetSubscribedChannelGroups().ToArray() });
+                
+
+				subscribeEventEngine.eventQueue.Enqueue(new SubscriptionChangedEvent() { Channels = this.GetSubscribedChannels().ToArray(), ChannelGroups = this.GetSubscribedChannelGroups().ToArray() });
 				//subscribeOperation.CurrentPubnubInstance(this);
 				savedSubscribeOperation = subscribeOperation;
                 return subscribeOperation;
