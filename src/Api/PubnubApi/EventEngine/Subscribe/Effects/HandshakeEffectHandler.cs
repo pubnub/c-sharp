@@ -90,17 +90,13 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
 
             try
             {
-                if (!string.IsNullOrEmpty(resp.Item1))
+                var handshakeResponse = JsonConvert.DeserializeObject<HandshakeResponse>(resp.Item1);
+                var c = new SubscriptionCursor()
                 {
-                    var handshakeResponse = JsonConvert.DeserializeObject<HandshakeResponse>(resp.Item1);
-                    var c = new SubscriptionCursor()
-                    {
-                        Region = handshakeResponse.Timetoken.Region,
-                        Timetoken = handshakeResponse.Timetoken.Timestamp
-                    };
-                    return new System.Tuple<SubscriptionCursor, PNStatus>(c, resp.Item2);
-                }
-                return new System.Tuple<SubscriptionCursor, PNStatus>(null, resp.Item2);
+                    Region = handshakeResponse.Timetoken.Region,
+                    Timetoken = handshakeResponse.Timetoken.Timestamp
+                };
+                return new System.Tuple<SubscriptionCursor, PNStatus>(c, resp.Item2);
             }
             catch (Exception e)
             {

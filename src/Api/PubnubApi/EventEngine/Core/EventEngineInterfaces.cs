@@ -57,10 +57,10 @@ namespace PubnubApi.EventEngine.Core
     {
 
         public new Task Run(IEffectInvocation invocation) =>
-            invocation is T1 effectInvocation ? (this as EffectHandler<T1>).Run(effectInvocation) : Run(invocation as T2);
+            invocation is T1 effectInvocation ? Run(effectInvocation) : Run(invocation as T2);
 
         public new bool IsBackground(IEffectInvocation invocation) => 
-            invocation is T1 effectInvocation ? (this as EffectHandler<T1>).IsBackground(effectInvocation) : IsBackground(invocation as T2);
+            invocation is T1 effectInvocation ? IsBackground(effectInvocation) : IsBackground(invocation as T2);
 
         public abstract Task Run(T2 invocation);
 
