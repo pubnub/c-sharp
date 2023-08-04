@@ -54,15 +54,14 @@ namespace PubnubApi
                 else {
 					var subscribeManager = new SubscribeManager2(pubnubConfig[InstanceId], JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
                     if (subscribeCallbackListenerList!= null && subscribeCallbackListenerList.Count > 0) {
-						messageListener = subscribeCallbackListenerList[0].Message;
-                        statusListener = subscribeCallbackListenerList[0].Status;
+						messageListener = MessageEmitter;
+                        statusListener = StatusEmitter;
 					}
                     subscribeEventEngine = subscribeEventEngineFactory.initializeEventEngine(InstanceId, this, pubnubConfig[InstanceId], subscribeManager, statusListener, messageListener);
 				}
 				EndPoint.SubscribeOperation2<T> subscribeOperation = new EndPoint.SubscribeOperation2<T>(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, this);
                 subscribeOperation.SubscribeListenerList = subscribeCallbackListenerList;
                 
-
 				subscribeEventEngine.eventQueue.Enqueue(new SubscriptionChangedEvent() { Channels = this.GetSubscribedChannels().ToArray(), ChannelGroups = this.GetSubscribedChannelGroups().ToArray() });
 				//subscribeOperation.CurrentPubnubInstance(this);
 				savedSubscribeOperation = subscribeOperation;
@@ -76,6 +75,7 @@ namespace PubnubApi
                 return subscribeOperation;
             }
         }
+
         public EndPoint.UnsubscribeOperation<T> Unsubscribe<T>()
         {
             EndPoint.UnsubscribeOperation<T>  unsubscribeOperation = new EndPoint.UnsubscribeOperation<T>(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
@@ -976,6 +976,22 @@ namespace PubnubApi
             }
         }
 
-#endregion
+		#endregion
+
+		#region "Private Methods"
+		private void MessageEmitter<T>(Pubnub pubnubInstance, PNMessageResult<T> messageResult)
+		{
+			foreach (var listener in subscribeCallbackListenerList) {
+				listener.Message(pubnubInstance, messageResult);
+			}
+		}
+
+		private void StatusEmitter(Pubnub pubnubInstance, PNStatus status)
+		{
+			foreach (var listener in subscribeCallbackListenerList) {
+				listener.Status(pubnubInstance, status);
+			}
+		}
+		#endregion
 	}
 }
