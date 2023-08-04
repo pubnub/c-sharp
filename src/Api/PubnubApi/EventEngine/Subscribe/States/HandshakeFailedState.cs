@@ -29,10 +29,11 @@ namespace PubnubApi.EventEngine.Subscribe.States
                 {
                     Channels = reconnect.Channels,
                     ChannelGroups = reconnect.ChannelGroups,
+                    Cursor = reconnect.Cursor,
                     ReconnectionConfiguration = this.ReconnectionConfiguration
                 },
 
-                Events.SubscriptionRestoredEvent subscriptionRestored => new ReceivingState()
+                Events.SubscriptionRestoredEvent subscriptionRestored => new HandshakingState()
                 {
                     Channels = subscriptionRestored.Channels,
                     ChannelGroups = subscriptionRestored.ChannelGroups,

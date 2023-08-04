@@ -20,7 +20,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
                     ReconnectionConfiguration = this.ReconnectionConfiguration
                 },
 
-                Events.SubscriptionChangedEvent subscriptionChanged => new ReceivingState()
+                Events.SubscriptionChangedEvent subscriptionChanged => new ReceiveStoppedState()
                 {
                     Channels = subscriptionChanged.Channels,
                     ChannelGroups = subscriptionChanged.ChannelGroups,
@@ -28,7 +28,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
                     ReconnectionConfiguration = this.ReconnectionConfiguration
                 },
                 
-                Events.ReconnectEvent reconnect => new ReceivingState()
+                Events.ReconnectEvent reconnect => new HandshakingState()
                 {
                     Channels = reconnect.Channels,
                     ChannelGroups = reconnect.ChannelGroups,
@@ -36,7 +36,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
                     ReconnectionConfiguration = this.ReconnectionConfiguration
                 },
                 
-                Events.SubscriptionRestoredEvent subscriptionRestored => new ReceivingState()
+                Events.SubscriptionRestoredEvent subscriptionRestored => new ReceiveStoppedState()
                 {
                     Channels = subscriptionRestored.Channels,
                     ChannelGroups = subscriptionRestored.ChannelGroups,

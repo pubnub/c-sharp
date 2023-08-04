@@ -21,6 +21,10 @@ namespace PubnubApi.EventEngine.Subscribe.Invocations {
 		public EmitStatusInvocation(PNStatus status)
 		{
 			this.Status = status;
+			if (status != null)
+			{
+				this.StatusCategory = status.Category;
+			}
 		}
 
 		public EmitStatusInvocation(PNStatusCategory category)

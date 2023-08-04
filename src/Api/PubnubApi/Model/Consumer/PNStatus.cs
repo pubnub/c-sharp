@@ -18,7 +18,7 @@ namespace PubnubApi
         {
             this.Error = true;
             this.Operation = operationType;
-            this.ErrorData = new PNErrorData(e.Message, e);
+            this.ErrorData = new PNErrorData(e?.Message, e);
             this.AffectedChannels = affectedChannels?.ToList(); 
             this.AffectedChannelGroups = affectedChannelGroups?.ToList();
             this.Category = category;

@@ -9,6 +9,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
 {
     public class HandshakingState : SubscriptionState
     {
+        public SubscriptionCursor Cursor { get; set; }
         public override IEnumerable<IEffectInvocation> OnEntry => new HandshakeInvocation()
             { Channels = this.Channels,
             ChannelGroups = this.ChannelGroups }.AsArray();
@@ -31,7 +32,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
                     ReconnectionConfiguration = this.ReconnectionConfiguration
                 },
 
-                Events.SubscriptionRestoredEvent subscriptionRestored => new States.ReceivingState()
+                Events.SubscriptionRestoredEvent subscriptionRestored => new States.HandshakingState()
                 {
                     Channels = subscriptionRestored.Channels,
                     ChannelGroups = subscriptionRestored.ChannelGroups,
