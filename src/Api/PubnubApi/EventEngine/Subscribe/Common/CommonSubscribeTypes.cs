@@ -80,9 +80,6 @@ namespace PubnubApi.EventEngine.Subscribe.Common
 
 		[JsonProperty("s")]
 		public long SequenceNumber { get; set; }
-		
-		[JsonProperty("p")]
-		public Timetoken Timetoken { get; set; }
 	}
 	
 	public abstract class SubscriptionState : Core.State

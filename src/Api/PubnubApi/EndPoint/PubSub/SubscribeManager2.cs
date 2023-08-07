@@ -8,6 +8,7 @@ using System.Globalization;
 using System.Collections;
 using System.Text;
 using PubnubApi.EventEngine.Subscribe.Common;
+using Newtonsoft.Json;
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -112,7 +113,7 @@ namespace PubnubApi.EndPoint
             if (!string.IsNullOrEmpty(responseTuple.Item1) && responseTuple.Item2 == null)
             {
                 PNStatus status = new PNStatus(null, PNOperationType.PNSubscribeOperation, PNStatusCategory.PNConnectedCategory, channels, channelGroups);
-                HandshakeResponse handshakeResponse = jsonLibrary.DeserializeToObject<HandshakeResponse>(responseTuple.Item1);
+                HandshakeResponse handshakeResponse = JsonConvert.DeserializeObject<HandshakeResponse>(responseTuple.Item1);
                 return new Tuple<HandshakeResponse, PNStatus>(handshakeResponse, status);
             }   
 
@@ -168,7 +169,7 @@ namespace PubnubApi.EndPoint
                 if (!string.IsNullOrEmpty(responseTuple.Item1) && responseTuple.Item2 == null)
                 {
                     PNStatus status = new PNStatus(null, PNOperationType.PNSubscribeOperation, PNStatusCategory.PNConnectedCategory, channels, channelGroups);
-                    ReceivingResponse<string> receiveResponse = jsonLibrary.DeserializeToObject<ReceivingResponse<string>>(responseTuple.Item1);
+                    ReceivingResponse<string> receiveResponse = JsonConvert.DeserializeObject<ReceivingResponse<string>>(responseTuple.Item1);
                     return new Tuple<ReceivingResponse<string>, PNStatus>(receiveResponse, status);
                 }   
                 return new Tuple<ReceivingResponse<string>, PNStatus>(null, responseTuple.Item2);

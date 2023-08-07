@@ -32,7 +32,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
                     Cursor = receiveSuccess.Cursor,
                     ReconnectionConfiguration = this.ReconnectionConfiguration
                 }.With(
-                    new EmitMessagesInvocation(receiveSuccess.Messages),
+                    new EmitMessagesInvocation(receiveSuccess.Cursor, receiveSuccess.Messages),
                     new EmitStatusInvocation(receiveSuccess.Status)
                 ),
 

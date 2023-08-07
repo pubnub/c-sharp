@@ -26,7 +26,7 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
                 Channel = m.Channel,
                 Message = JsonConvert.DeserializeObject(m.Payload),
                 Subscription = m.SubscriptionMatch,
-                Timetoken = m.Timetoken.Timestamp,
+                Timetoken = invocation.Cursor.Timetoken.Value,
                 UserMetadata = m.PublishMetadata,
                 Publisher = m.IssuingClientId
             });
