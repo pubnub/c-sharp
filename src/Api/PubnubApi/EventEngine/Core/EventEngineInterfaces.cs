@@ -98,6 +98,28 @@ namespace PubnubApi.EventEngine.Core
 
         public bool IsBackground(T3 invocation) => false;
     }
+    
+    /// <summary>
+    /// Implement a handler for two invocations (meant for connect-reconnect pairs) with a cancel invocation
+    /// </summary>
+    /// <typeparam name="T1">Run type invocation</typeparam>
+    /// <typeparam name="T2">Retry type invocation</typeparam>
+    /// <typeparam name="T3">Cancel run invocation</typeparam>
+    /// <typeparam name="T4">Cancel retry invocation</typeparam>
+    public abstract class EffectDoubleCancellableHandler<T1, T2, T3, T4> : EffectDoubleCancellableHandler<T1, T2, T3>,
+        IEffectHandler<T4>
+        where T1 : class, IEffectInvocation
+        where T2 : class, IEffectInvocation
+        where T3 : class, IEffectCancelInvocation
+        where T4 : class, IEffectCancelInvocation
+    {
+        public Task Run(T4 invocation)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsBackground(T4 invocation) => false;
+    }
 
 
     /// <summary>
