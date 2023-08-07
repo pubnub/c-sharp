@@ -49,8 +49,8 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
 
                 try
                 {
-                    DeserializeMessage(channelTypeMap, m.Channel, msgResult, m.Payload as JObject);
-                    DeserializeMessage(channelGroupTypeMap, m.Channel, msgResult, m.Payload as JObject);
+                    DeserializeMessage(channelTypeMap, m.Channel, msgResult, m.Payload);
+                    DeserializeMessage(channelGroupTypeMap, m.Channel, msgResult, m.Payload);
                 }
                 catch (Exception e)
                 {
@@ -62,18 +62,28 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
             });
 
             if (processedMessages is null) return;
-            
+
             foreach (var message in processedMessages)
             {
                 messageEmitterFunction(pubnubInstance, message);
             }
         }
 
-        private void DeserializeMessage(Dictionary<string, Type> dict, string key, PNMessageResult<object> msg, JObject rawMessage)
+        private void DeserializeMessage(Dictionary<string, Type> dict, string key, PNMessageResult<object> msg,
+            object rawMessage)
         {
             if (dict is null) return;
-            Type t;
-            msg.Message = dict.TryGetValue(key, out t) && t != typeof(string) ? rawMessage.ToObject(t, serializer) : rawMessage.ToString(Formatting.None);
+            if (rawMessage is JObject message)
+            {
+                Type t;
+                msg.Message = dict.TryGetValue(key, out t) && t != typeof(string)
+                    ? message.ToObject(t, serializer)
+                    : message.ToString(Formatting.None);
+            }
+            else
+            {
+                msg.Message = rawMessage;
+            }
         }
 
         public override bool IsBackground(EmitMessagesInvocation invocation) => false;
