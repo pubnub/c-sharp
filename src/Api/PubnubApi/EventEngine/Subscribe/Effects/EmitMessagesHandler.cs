@@ -35,13 +35,14 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
                     UserMetadata = m.PublishMetadata,
                     Publisher = m.IssuingClientId
                 };
-                
-                if (!(channelTypeMap is null) && channelTypeMap.TryGetValue(m.Channel, out var msgType))
+
+                Type msgType, groupType;
+                if (!(channelTypeMap is null) && channelTypeMap.TryGetValue(m.Channel, out msgType))
                 {
                     msgResult.Message = JsonConvert.DeserializeObject(m.Payload, msgType);
-                } else if (!(channelGroupTypeMap is null) && channelGroupTypeMap.TryGetValue(m.SubscriptionMatch, out var T))
+                } else if (!(channelGroupTypeMap is null) && channelGroupTypeMap.TryGetValue(m.SubscriptionMatch, out groupType))
                 {
-                    msgResult.Message = JsonConvert.DeserializeObject(m.Payload, T);
+                    msgResult.Message = JsonConvert.DeserializeObject(m.Payload, groupType);
                 }
                 else
                 {
