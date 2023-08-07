@@ -703,7 +703,7 @@ namespace PubnubApi.EndPoint
 				subscribeEventEngine = subscribeEventEngineFactory.initializeEventEngine(instanceId, PubnubInstance, config, subscribeManager, statusListener, messageListener);
 
 			}
-			subscribeEventEngine.Subscribe(channels, channelGroups);
+			subscribeEventEngine.Subscribe<T>(channels, channelGroups);
 		}
 
         internal bool Retry(bool reconnect)
