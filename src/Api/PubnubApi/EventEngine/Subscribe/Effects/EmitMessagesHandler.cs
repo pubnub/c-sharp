@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PubnubApi.EventEngine.Core;
+using PubnubApi.EventEngine.Subscribe.Common;
 using PubnubApi.EventEngine.Subscribe.Invocations;
 
 namespace PubnubApi.EventEngine.Subscribe.Effects
@@ -36,8 +37,8 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
                     Channel = m.Channel,
                     Subscription = m.SubscriptionMatch,
                     Timetoken = invocation.Cursor.Timetoken.Value,
-                    UserMetadata = m.PublishMetadata,
-                    Publisher = m.IssuingClientId
+                    UserMetadata = (m.PublishMetadata as JObject)?.ToObject<Timetoken>(),
+                    Publisher = m.IssuingClientId,
                 };
 
                 try
