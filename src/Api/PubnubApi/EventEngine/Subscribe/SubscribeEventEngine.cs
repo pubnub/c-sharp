@@ -18,15 +18,17 @@ namespace PubnubApi.EventEngine.Subscribe {
 			this.subscribeManager = subscribeManager;
 
 			// initialize the handler, pass dependencies
-			var handshakeHandler = new Effects.HandshakeEffectHandler(subscribeManager, eventQueue);
+			var handshakeHandler = new Effects.HandshakeEffectHandler(subscribeManager, EventQueue);
 			dispatcher.Register<Invocations.HandshakeInvocation, Effects.HandshakeEffectHandler>(handshakeHandler);
-			dispatcher.Register<Invocations.HandshakeReconnectInvocation, Effects.HandshakeEffectHandler>(handshakeHandler);
 			dispatcher.Register<Invocations.CancelHandshakeInvocation, Effects.HandshakeEffectHandler>(handshakeHandler);
+			dispatcher.Register<Invocations.HandshakeReconnectInvocation, Effects.HandshakeEffectHandler>(handshakeHandler);
+			dispatcher.Register<Invocations.CancelHandshakeReconnectInvocation, Effects.HandshakeEffectHandler>(handshakeHandler);
 
-			var receiveHandler = new Effects.ReceivingEffectHandler(subscribeManager, eventQueue);
+			var receiveHandler = new Effects.ReceivingEffectHandler(subscribeManager, EventQueue);
 			dispatcher.Register<Invocations.ReceiveMessagesInvocation, Effects.ReceivingEffectHandler>(receiveHandler);
-			dispatcher.Register<Invocations.ReceiveReconnectInvocation, Effects.ReceivingEffectHandler>(receiveHandler);
 			dispatcher.Register<Invocations.CancelReceiveMessagesInvocation, Effects.ReceivingEffectHandler>(receiveHandler);
+			dispatcher.Register<Invocations.ReceiveReconnectInvocation, Effects.ReceivingEffectHandler>(receiveHandler);
+			dispatcher.Register<Invocations.CancelReceiveReconnectInvocation, Effects.ReceivingEffectHandler>(receiveHandler);
 
 			var emitMessageHandler = new Effects.EmitMessagesHandler(pubnubInstance, messageListener);
 			dispatcher.Register<Invocations.EmitMessagesInvocation, Effects.EmitMessagesHandler>(emitMessageHandler);

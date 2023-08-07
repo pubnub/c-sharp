@@ -3,8 +3,8 @@ namespace PubnubApi.EventEngine.Subscribe.Context
 {
 	public class ReconnectionConfiguration
 	{
-		public PNReconnectionPolicy ReconnectionPolicy { get; set; } = PNReconnectionPolicy.NONE;
-		public int MaximumReconnectionRetries;
+        public PNReconnectionPolicy ReconnectionPolicy { get; set; }
+        public int MaximumReconnectionRetries { get; set; }
 
 		public ReconnectionConfiguration(PNReconnectionPolicy policy, int maximumReconnectionRetries)
 		{

@@ -248,6 +248,7 @@
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\States\ReceivingState.cs" Link="EventEngine\Subscribe\States\ReceivingState.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\States\UnsubscribedState.cs" Link="EventEngine\Subscribe\States\UnsubscribedState.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\SubscribeEventEngine.cs" Link="EventEngine\Subscribe\SubscribeEventEngine.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Subscribe\SubscribeEventEngineFactory.cs" Link="EventEngine\Subscribe\SubscribeEventEngineFactory.cs" />
     <Compile Include="..\PubnubApi\Helper\MobilePushHelper.cs" Link="Helper\MobilePushHelper.cs" />
     <Compile Include="..\PubnubApi\HttpUtility\HttpUtility.cs">
       <Link>HttpUtility\HttpUtility.cs</Link>

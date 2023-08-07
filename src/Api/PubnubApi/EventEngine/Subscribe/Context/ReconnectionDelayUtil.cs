@@ -23,6 +23,7 @@ namespace PubnubApi.EventEngine.Subscribe.Context
 		public static bool shouldRetry(ReconnectionConfiguration reconnectionConfiguration, int attemptedRetries)
 		{
 			if (reconnectionConfiguration.ReconnectionPolicy == PNReconnectionPolicy.NONE) return false;
+			if (reconnectionConfiguration.MaximumReconnectionRetries < 0) return true;
 			return reconnectionConfiguration.MaximumReconnectionRetries < attemptedRetries;
 		}
 	}

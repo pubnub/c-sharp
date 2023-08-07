@@ -29,7 +29,7 @@ namespace PubnubApi.EventEngine.Subscribe
 			Action<Pubnub, PNStatus> statusListener = null,
 			Action<Pubnub, PNMessageResult<T>> messageListener= null)
 		{
-			var subscribeEventEngine = new SubscribeEventEngine(pubnubInstance, pubnubConfiguration: pubnubConfiguration, subscribeManager);
+			var subscribeEventEngine = new SubscribeEventEngine(pubnubInstance, pubnubConfiguration: pubnubConfiguration, subscribeManager,statusListener, null); //TODO: replace with message listener
 			if (engineinstances.TryAdd(instanceId, subscribeEventEngine)) {
 				return subscribeEventEngine;
 			}
