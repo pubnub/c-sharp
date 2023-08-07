@@ -5,9 +5,9 @@ using PubnubApi.EventEngine.Subscribe.Context;
 
 namespace PubnubApi.EventEngine.Subscribe.Invocations {
 	public class EmitMessagesInvocation : Core.IEffectInvocation {
-		public ReceivingResponse<string> Messages;
+		public ReceivingResponse<object> Messages;
 		public SubscriptionCursor  Cursor;
-		public EmitMessagesInvocation(SubscriptionCursor  cursor, ReceivingResponse<string> messages)
+		public EmitMessagesInvocation(SubscriptionCursor  cursor, ReceivingResponse<object> messages)
 		{
 			this.Cursor = cursor;
 			this.Messages = messages;

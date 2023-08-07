@@ -48,7 +48,7 @@ namespace PubnubApi.EventEngine.Subscribe.Events {
 	public class ReceiveSuccessEvent : Core.IEvent {
 		public IEnumerable<string> Channels;
 		public IEnumerable<string> ChannelGroups;
-		public ReceivingResponse<string> Messages;
+		public ReceivingResponse<object> Messages;
 		public SubscriptionCursor Cursor;
 		public PNStatus Status;
 	}

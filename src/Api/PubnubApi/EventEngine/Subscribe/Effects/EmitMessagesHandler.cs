@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using PubnubApi.EventEngine.Core;
 using PubnubApi.EventEngine.Subscribe.Invocations;
 
@@ -15,12 +16,15 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
         private readonly Pubnub pubnubInstance;
         private readonly Dictionary<string, Type> channelTypeMap;
         private readonly Dictionary<string, Type> channelGroupTypeMap;
-        
+
         public EmitMessagesHandler(Pubnub pubnubInstance,
             System.Action<Pubnub, PNMessageResult<object>> messageEmitterFunction, Dictionary<string, Type> channelTypeMap = null, Dictionary<string, Type> channelGroupTypeMap = null)
         {
             this.messageEmitterFunction = messageEmitterFunction;
             this.pubnubInstance = pubnubInstance;
+
+            this.channelTypeMap = channelTypeMap;
+            this.channelGroupTypeMap = channelGroupTypeMap;
         }
 
         public async override Task Run(EmitMessagesInvocation invocation)
@@ -38,8 +42,8 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
 
                 try
                 {
-                    DeserializeMessage(channelTypeMap, m.Channel, msgResult, m.Payload);
-                    DeserializeMessage(channelGroupTypeMap, m.Channel, msgResult, m.Payload);
+                    DeserializeMessage(channelTypeMap, m.Channel, msgResult, m.Payload as JObject);
+                    DeserializeMessage(channelGroupTypeMap, m.Channel, msgResult, m.Payload as JObject);
                 }
                 catch (Exception e)
                 {
@@ -58,11 +62,11 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
             }
         }
 
-        private void DeserializeMessage(Dictionary<string, Type> dict, string key, PNMessageResult<object> msg, string rawMessage)
+        private void DeserializeMessage(Dictionary<string, Type> dict, string key, PNMessageResult<object> msg, JObject rawMessage)
         {
             if (dict is null) return;
             Type t;
-            msg.Message = dict.TryGetValue(key, out t) ? JsonConvert.DeserializeObject(rawMessage, t) : rawMessage;
+            msg.Message = dict.TryGetValue(key, out t) ? rawMessage.ToObject(t) : rawMessage.ToString();
         }
 
         public override bool IsBackground(EmitMessagesInvocation invocation) => false;

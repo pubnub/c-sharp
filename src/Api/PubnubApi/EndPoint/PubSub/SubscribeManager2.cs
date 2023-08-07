@@ -144,9 +144,9 @@ namespace PubnubApi.EndPoint
                     LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} SubscribeManager => HandshakeRequestCancellation. No request to cancel.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
             }
         }
-        internal async Task<Tuple<ReceivingResponse<string>, PNStatus>> ReceiveRequest<T>(PNOperationType responseType, string[] channels, string[] channelGroups, long? timetoken, int? region, Dictionary<string, string> initialSubscribeUrlParams, Dictionary<string, object> externalQueryParam)
+        internal async Task<Tuple<ReceivingResponse<object>, PNStatus>> ReceiveRequest<T>(PNOperationType responseType, string[] channels, string[] channelGroups, long? timetoken, int? region, Dictionary<string, string> initialSubscribeUrlParams, Dictionary<string, object> externalQueryParam)
         {
-            Tuple<ReceivingResponse<string>, PNStatus> resp = new Tuple<ReceivingResponse<string>, PNStatus>(null, null);
+            Tuple<ReceivingResponse<object>, PNStatus> resp = new Tuple<ReceivingResponse<object>, PNStatus>(null, null);
 
             try
             {
@@ -155,7 +155,7 @@ namespace PubnubApi.EndPoint
                 IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, null, "");
                 Uri request = urlBuilder.BuildMultiChannelSubscribeRequest("GET", "", channels, channelGroups, timetoken.GetValueOrDefault(), region.GetValueOrDefault(), channelsJsonState, initialSubscribeUrlParams, externalQueryParam);
 
-                RequestState<ReceivingResponse<string>> pubnubRequestState = new RequestState<ReceivingResponse<string>>();
+                RequestState<ReceivingResponse<object>> pubnubRequestState = new RequestState<ReceivingResponse<object>>();
                 pubnubRequestState.Channels = channels;
                 pubnubRequestState.ChannelGroups = channelGroups;
                 pubnubRequestState.ResponseType = responseType;
@@ -169,10 +169,10 @@ namespace PubnubApi.EndPoint
                 if (!string.IsNullOrEmpty(responseTuple.Item1) && responseTuple.Item2 == null)
                 {
                     PNStatus status = new PNStatus(null, PNOperationType.PNSubscribeOperation, PNStatusCategory.PNConnectedCategory, channels, channelGroups);
-                    ReceivingResponse<string> receiveResponse = JsonConvert.DeserializeObject<ReceivingResponse<string>>(responseTuple.Item1);
-                    return new Tuple<ReceivingResponse<string>, PNStatus>(receiveResponse, status);
+                    ReceivingResponse<object> receiveResponse = JsonConvert.DeserializeObject<ReceivingResponse<object>>(responseTuple.Item1);
+                    return new Tuple<ReceivingResponse<object>, PNStatus>(receiveResponse, status);
                 }   
-                return new Tuple<ReceivingResponse<string>, PNStatus>(null, responseTuple.Item2);
+                return new Tuple<ReceivingResponse<object>, PNStatus>(null, responseTuple.Item2);
             }
             catch(Exception ex)
             {

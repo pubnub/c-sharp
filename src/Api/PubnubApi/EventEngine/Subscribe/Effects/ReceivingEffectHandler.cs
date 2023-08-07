@@ -80,9 +80,9 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
             return true;
         }
 
-        private async Task<System.Tuple<ReceivingResponse<string>, PNStatus>> MakeReceiveMessagesRequest(ReceiveMessagesInvocation invocation)
+        private async Task<System.Tuple<ReceivingResponse<object>, PNStatus>> MakeReceiveMessagesRequest(ReceiveMessagesInvocation invocation)
         {
-            return await manager.ReceiveRequest<ReceivingResponse<string>>(
+            return await manager.ReceiveRequest<ReceivingResponse<object>>(
                 PNOperationType.PNSubscribeOperation,
                 invocation.Channels?.ToArray(),
                 invocation.ChannelGroups?.ToArray(),
