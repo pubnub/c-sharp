@@ -4,7 +4,7 @@ using PubnubApi.EndPoint;
 
 namespace PubnubApi.EventEngine.Subscribe
 {
-	internal class SubscribeEventEngineFactory
+	public class SubscribeEventEngineFactory
 	{
 		private ConcurrentDictionary<string, SubscribeEventEngine> engineinstances;
 		internal SubscribeEventEngineFactory()

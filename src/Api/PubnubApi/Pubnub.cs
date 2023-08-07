@@ -16,7 +16,6 @@ namespace PubnubApi
         private ConcurrentDictionary<string, PNConfiguration> pubnubConfig { get; } = new ConcurrentDictionary<string, PNConfiguration>();
         private IPubnubUnitTest pubnubUnitTest;
         private IPubnubLog pubnubLog;
-        private SubscribeEventEngineFactory subscribeEventEngineFactory;
         private EndPoint.ListenerManager listenerManager;
         private readonly EndPoint.TelemetryManager telemetryManager;
         private readonly EndPoint.TokenManager tokenManager;
@@ -46,23 +45,9 @@ namespace PubnubApi
 		{
             if (pubnubConfig[InstanceId].EnableEventEngine)
             {
-                SubscribeEventEngine subscribeEventEngine;
-				Action<Pubnub, PNStatus> statusListener = null;
-				Action<Pubnub, PNMessageResult<T>> messageListener = null;
-				if (this.subscribeEventEngineFactory.hasEventEngine(InstanceId)) {
-                    subscribeEventEngine = subscribeEventEngineFactory.getEventEngine(InstanceId); }
-                else {
-					var subscribeManager = new SubscribeManager2(pubnubConfig[InstanceId], JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
-                    if (subscribeCallbackListenerList!= null && subscribeCallbackListenerList.Count > 0) {
-						messageListener = MessageEmitter;
-                        statusListener = StatusEmitter;
-					}
-                    subscribeEventEngine = subscribeEventEngineFactory.initializeEventEngine(InstanceId, this, pubnubConfig[InstanceId], subscribeManager, statusListener, messageListener);
-				}
-				EndPoint.SubscribeOperation2<T> subscribeOperation = new EndPoint.SubscribeOperation2<T>(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, this);
+				EndPoint.SubscribeOperation2<T> subscribeOperation = new EndPoint.SubscribeOperation2<T>(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, new SubscribeEventEngineFactory(),InstanceId ,this);
                 subscribeOperation.SubscribeListenerList = subscribeCallbackListenerList;
-                
-				subscribeEventEngine.eventQueue.Enqueue(new SubscriptionChangedEvent() { Channels = this.GetSubscribedChannels().ToArray(), ChannelGroups = this.GetSubscribedChannelGroups().ToArray() });
+                                
 				//subscribeOperation.CurrentPubnubInstance(this);
 				savedSubscribeOperation = subscribeOperation;
                 return subscribeOperation;
@@ -905,7 +890,6 @@ namespace PubnubApi
         {
             savedSdkVerion = Version;
             InstanceId = Guid.NewGuid().ToString();
-            subscribeEventEngineFactory = new SubscribeEventEngineFactory();
             pubnubConfig.AddOrUpdate(InstanceId, config, (k, o) => config);
 
             if (config != null)
@@ -976,22 +960,6 @@ namespace PubnubApi
             }
         }
 
-		#endregion
-
-		#region "Private Methods"
-		private void MessageEmitter<T>(Pubnub pubnubInstance, PNMessageResult<T> messageResult)
-		{
-			foreach (var listener in subscribeCallbackListenerList) {
-				listener.Message(pubnubInstance, messageResult);
-			}
-		}
-
-		private void StatusEmitter(Pubnub pubnubInstance, PNStatus status)
-		{
-			foreach (var listener in subscribeCallbackListenerList) {
-				listener.Status(pubnubInstance, status);
-			}
-		}
 		#endregion
 	}
 }

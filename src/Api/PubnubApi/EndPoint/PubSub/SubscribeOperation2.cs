@@ -7,7 +7,9 @@ using System.Threading.Tasks;
 using System.Net;
 using System.Globalization;
 using PubnubApi.PubnubEventEngine;
-
+using PubnubApi.EventEngine.Subscribe;
+using PubnubApi.EventEngine.Subscribe.Events;
+using PubnubApi;
 
 namespace PubnubApi.EndPoint
 {
@@ -28,13 +30,16 @@ namespace PubnubApi.EndPoint
         private Dictionary<string, object> queryParam;
         private PubnubEventEngine.EventEngine pnEventEngine;
         private Pubnub PubnubInstance;
-        public List<SubscribeCallback> SubscribeListenerList
+        private SubscribeEventEngine subscribeEventEngine;
+        public SubscribeEventEngineFactory subscribeEventEngineFactory;
+        public string instanceId;
+		public List<SubscribeCallback> SubscribeListenerList
         {
             get;
             set;
         } = new List<SubscribeCallback>();
 
-        public SubscribeOperation2(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance)
+        public SubscribeOperation2(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager,SubscribeEventEngineFactory subscribeEventEngineFactory, string instanceId, Pubnub instance) 
         {
             PubnubInstance = instance;
             config = pubnubConfig;
@@ -43,6 +48,8 @@ namespace PubnubApi.EndPoint
             pubnubLog = log;
             pubnubTelemetryMgr = telemetryManager;
             pubnubTokenMgr = tokenManager;
+            this.subscribeEventEngineFactory = subscribeEventEngineFactory;
+            this.instanceId = instanceId;
             
 			var eventEmitter = new EventEmitter();
             eventEmitter.RegisterJsonListener(JsonCallback);
@@ -772,56 +779,29 @@ namespace PubnubApi.EndPoint
 
         private void Subscribe(string[] channels, string[] channelGroups, Dictionary<string, object> externalQueryParam)
         {
-            if ((channels == null || channels.Length == 0) && (channelGroups == null || channelGroups.Length  == 0))
+			Action<Pubnub, PNStatus> statusListener = null;
+			Action<Pubnub, PNMessageResult<T>> messageListener = null;
+			if ((channels == null || channels.Length == 0) && (channelGroups == null || channelGroups.Length == 0))
             {
-                throw new ArgumentException("Either Channel Or Channel Group or Both should be provided.");
-            }
+				throw new ArgumentException("Either Channel Or Channel Group or Both should be provided.");
+			}
 
-            string channel = (channels != null) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : "";
-            string channelGroup = (channelGroups != null) ? string.Join(",", channelGroups.OrderBy(x => x).ToArray()) : "";
-
-            PNPlatform.Print(config, pubnubLog);
-
-            LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, requested subscribe for channel(s)={1} and channel group(s)={2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), channel, channelGroup), config.LogVerbosity);
-
-            Dictionary<string, string> initialSubscribeUrlParams = new Dictionary<string, string>();
-            if (this.subscribeTimetoken >= 0)
+			if (this.subscribeEventEngineFactory.hasEventEngine(instanceId))
             {
-                initialSubscribeUrlParams.Add("tt", this.subscribeTimetoken.ToString(CultureInfo.InvariantCulture));
-            }
-            if (!string.IsNullOrEmpty(config.FilterExpression) && config.FilterExpression.Trim().Length > 0)
+                subscribeEventEngine = subscribeEventEngineFactory.getEventEngine(instanceId);
+			}
+            else
             {
-                initialSubscribeUrlParams.Add("filter-expr", UriUtil.EncodeUriComponent(config.FilterExpression, PNOperationType.PNSubscribeOperation, false, false, false));
-            }
+				if (SubscribeListenerList != null && SubscribeListenerList.Count > 0) {
+					messageListener = MessageEmitter;
+					statusListener = StatusEmitter;
+				}
+				var subscribeManager = new SubscribeManager2(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, PubnubInstance);
+				subscribeEventEngine = subscribeEventEngineFactory.initializeEventEngine(instanceId, PubnubInstance, config, subscribeManager, statusListener, messageListener);
 
-
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
-            Task.Factory.StartNew(() =>
-            {
-                manager = new SubscribeManager2(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, PubnubInstance);
-                //manager.CurrentPubnubInstance(PubnubInstance);
-                pnEventEngine.Subscribe(channels.ToList<string>(), channelGroups.ToList<string>());
-                //manager = new SubscribeManager2(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, PubnubInstance);
-                //manager.CurrentPubnubInstance(PubnubInstance);
-                //manager.MultiChannelSubscribeInit<T>(PNOperationType.PNSubscribeOperation, channels, channelGroups, initialSubscribeUrlParams, externalQueryParam);
-            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
-#else
-            new Thread(() =>
-            {
-                manager = new SubscribeManager2(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, PubnubInstance);
-                //manager.CurrentPubnubInstance(PubnubInstance);
-                if (pnEventEngine.CurrentState == null)
-                {
-                    pnEventEngine.InitialState(new State(StateType.Unsubscribed) { EventType = EventType.SubscriptionChanged});
-                }
-                pnEventEngine.Subscribe(channels.ToList<string>(), channelGroups.ToList<string>());
-                //manager = new SubscribeManager2(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, PubnubInstance);
-                //manager.CurrentPubnubInstance(PubnubInstance);
-                //manager.MultiChannelSubscribeInit<T>(PNOperationType.PNSubscribeOperation, channels, channelGroups, initialSubscribeUrlParams, externalQueryParam);
-            })
-            { IsBackground = true }.Start();
-#endif
-        }
+			}
+			subscribeEventEngine.eventQueue.Enqueue(new SubscriptionChangedEvent() { Channels = channels, ChannelGroups = channelGroups });
+		}
 
         internal bool Retry(bool reconnect)
         {
@@ -863,5 +843,19 @@ namespace PubnubApi.EndPoint
         {
             PubnubInstance = instance;
         }
-    }
+		private void MessageEmitter<T>(Pubnub pubnubInstance, PNMessageResult<T> messageResult)
+		{
+			foreach (var listener in SubscribeListenerList) {
+				listener.Message(pubnubInstance, messageResult);
+			}
+		}
+
+		private void StatusEmitter(Pubnub pubnubInstance, PNStatus status)
+		{
+			foreach (var listener in SubscribeListenerList) {
+				listener.Status(pubnubInstance, status);
+			}
+		}
+
+	}
 }
