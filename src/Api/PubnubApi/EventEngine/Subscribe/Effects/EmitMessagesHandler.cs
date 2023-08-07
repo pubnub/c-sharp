@@ -36,17 +36,15 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
                     Publisher = m.IssuingClientId
                 };
 
-                Type msgType, groupType;
-                if (!(channelTypeMap is null) && channelTypeMap.TryGetValue(m.Channel, out msgType))
+                try
                 {
-                    msgResult.Message = JsonConvert.DeserializeObject(m.Payload, msgType);
-                } else if (!(channelGroupTypeMap is null) && channelGroupTypeMap.TryGetValue(m.SubscriptionMatch, out groupType))
-                {
-                    msgResult.Message = JsonConvert.DeserializeObject(m.Payload, groupType);
+                    DeserializeMessage(channelTypeMap, m.Channel, msgResult, m.Payload);
+                    DeserializeMessage(channelGroupTypeMap, m.Channel, msgResult, m.Payload);
                 }
-                else
+                catch (Exception e)
                 {
-                    msgResult.Message = m.Payload;
+                    // TODO pass the exception
+                    throw e;
                 }
 
                 return msgResult;
@@ -58,6 +56,13 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
             {
                 messageEmitterFunction(pubnubInstance, message);
             }
+        }
+
+        private void DeserializeMessage(Dictionary<string, Type> dict, string key, PNMessageResult<object> msg, string rawMessage)
+        {
+            if (dict is null) return;
+            Type t;
+            msg.Message = dict.TryGetValue(key, out t) ? JsonConvert.DeserializeObject(rawMessage, t) : rawMessage;
         }
 
         public override bool IsBackground(EmitMessagesInvocation invocation) => false;
