@@ -1,6 +1,7 @@
 ﻿using PubnubApi.EndPoint;
 using PubnubApi.EventEngine.Core;
 using PubnubApi.EventEngine.Subscribe.States;
+using PubnubApi.EventEngine.Subscribe.Events;
 using PubnubApi.EventEngine.Subscribe.Effects;
 using PubnubApi.EventEngine.Subscribe.Invocations;
 using System;
@@ -37,6 +38,10 @@ namespace PubnubApi.EventEngine.Subscribe {
 			dispatcher.Register<Invocations.EmitStatusInvocation, Effects.EmitStatusEffectHandler>(emitStatusHandler);
 
 			currentState = new UnsubscribedState() { ReconnectionConfiguration = new Context.ReconnectionConfiguration(pubnubConfiguration.ReconnectionPolicy, pubnubConfiguration.ConnectionMaxRetries) };
+		}
+		public void Subscribe(string[] channels, string[] channelGroups)
+		{
+			this.EventQueue.Enqueue(new SubscriptionChangedEvent() { Channels = channels, ChannelGroups = channelGroups });
 		}
 	}
 }

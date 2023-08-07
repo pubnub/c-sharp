@@ -8,7 +8,6 @@ using System.Net;
 using System.Globalization;
 using PubnubApi.PubnubEventEngine;
 using PubnubApi.EventEngine.Subscribe;
-using PubnubApi.EventEngine.Subscribe.Events;
 using PubnubApi;
 
 namespace PubnubApi.EndPoint
@@ -704,7 +703,7 @@ namespace PubnubApi.EndPoint
 				subscribeEventEngine = subscribeEventEngineFactory.initializeEventEngine(instanceId, PubnubInstance, config, subscribeManager, statusListener, messageListener);
 
 			}
-			subscribeEventEngine.EventQueue.Enqueue(new SubscriptionChangedEvent() { Channels = channels, ChannelGroups = channelGroups });
+			subscribeEventEngine.Subscribe(channels, channelGroups);
 		}
 
         internal bool Retry(bool reconnect)
