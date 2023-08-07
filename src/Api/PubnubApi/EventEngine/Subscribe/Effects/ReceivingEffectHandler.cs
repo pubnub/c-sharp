@@ -70,7 +70,7 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
                     eventQueue.Enqueue(new Events.ReceiveFailureEvent() { Cursor = cursor, Status = response.Item2});
                     break;
                 case { }:
-                    eventQueue.Enqueue(new Events.ReceiveSuccessEvent() { Cursor = cursor, Messages= response.Item1, Status = response.Item2 });
+                    eventQueue.Enqueue(new Events.ReceiveSuccessEvent() { Channels = invocation?.Channels, ChannelGroups = invocation?.ChannelGroups, Cursor = cursor, Messages= response.Item1, Status = response.Item2 });
                     break;
             }
         }
