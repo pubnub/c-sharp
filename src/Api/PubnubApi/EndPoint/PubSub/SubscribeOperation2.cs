@@ -683,7 +683,7 @@ namespace PubnubApi.EndPoint
         private void Subscribe(string[] channels, string[] channelGroups, Dictionary<string, object> externalQueryParam)
         {
 			Action<Pubnub, PNStatus> statusListener = null;
-			Action<Pubnub, PNMessageResult<T>> messageListener = null;
+			Action<Pubnub, PNMessageResult<object>> messageListener = null;
 			if ((channels == null || channels.Length == 0) && (channelGroups == null || channelGroups.Length == 0))
             {
 				throw new ArgumentException("Either Channel Or Channel Group or Both should be provided.");
