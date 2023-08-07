@@ -43,5 +43,9 @@ namespace PubnubApi.EventEngine.Subscribe {
 		{
 			this.EventQueue.Enqueue(new SubscriptionChangedEvent() { Channels = channels, ChannelGroups = channelGroups });
 		}
+		public void UnsubscribeAll()
+		{
+			this.EventQueue.Enqueue(new UnsubscribeAllEvent());
+		}
 	}
 }
