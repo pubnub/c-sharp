@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 using System.Net;
 using System.Globalization;
 using PubnubApi.PubnubEventEngine;
-
+using PubnubApi.EventEngine.Subscribe;
+using PubnubApi;
 
 namespace PubnubApi.EndPoint
 {
@@ -26,15 +27,17 @@ namespace PubnubApi.EndPoint
         private bool presenceSubscribeEnabled;
         private SubscribeManager2 manager;
         private Dictionary<string, object> queryParam;
-        private PubnubEventEngine.EventEngine pnEventEngine;
         private Pubnub PubnubInstance;
-        public List<SubscribeCallback> SubscribeListenerList
+        private SubscribeEventEngine subscribeEventEngine;
+        public SubscribeEventEngineFactory subscribeEventEngineFactory;
+        public string instanceId;
+		public List<SubscribeCallback> SubscribeListenerList
         {
             get;
             set;
         } = new List<SubscribeCallback>();
 
-        public SubscribeOperation2(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance)
+        public SubscribeOperation2(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager,SubscribeEventEngineFactory subscribeEventEngineFactory, string instanceId, Pubnub instance) 
         {
             PubnubInstance = instance;
             config = pubnubConfig;
@@ -43,66 +46,11 @@ namespace PubnubApi.EndPoint
             pubnubLog = log;
             pubnubTelemetryMgr = telemetryManager;
             pubnubTokenMgr = tokenManager;
+            this.subscribeEventEngineFactory = subscribeEventEngineFactory;
+            this.instanceId = instanceId;
             
 			var eventEmitter = new EventEmitter();
             eventEmitter.RegisterJsonListener(JsonCallback);
-
-			var handshakeEffectHandler = new HandshakeEffectHandler(eventEmitter);
-            handshakeEffectHandler.LogCallback = LogCallback;
-            handshakeEffectHandler.HandshakeRequested += HandshakeEffect_HandshakeRequested;
-            handshakeEffectHandler.CancelHandshakeRequested += HandshakeEffect_CancelHandshakeRequested;
-            handshakeEffectHandler.AnnounceStatus = Announce;
-
-			var handshakeReconnectEffectHandler = new HandshakeReconnectEffectHandler(eventEmitter);
-            handshakeReconnectEffectHandler.ReconnectionPolicy = config.ReconnectionPolicy;
-            handshakeReconnectEffectHandler.MaxRetries = config.ConnectionMaxRetries;
-            handshakeReconnectEffectHandler.LogCallback = LogCallback;
-            handshakeReconnectEffectHandler.HandshakeReconnectRequested += HandshakeReconnectEffect_HandshakeRequested;
-            handshakeReconnectEffectHandler.CancelHandshakeReconnectRequested += HandshakeReconnectEffect_CancelHandshakeRequested;
-            handshakeReconnectEffectHandler.AnnounceStatus = Announce;
-            
-            var handshakeFailedEffectHandler = new HandshakeFailedEffectHandler(eventEmitter);
-            handshakeFailedEffectHandler.LogCallback = LogCallback;
-
-            var receivingEffectHandler = new ReceivingEffectHandler<object>(eventEmitter);
-            receivingEffectHandler.ReconnectionPolicy = config.ReconnectionPolicy;
-            receivingEffectHandler.LogCallback = LogCallback;
-            receivingEffectHandler.ReceiveRequested += ReceivingEffect_ReceiveRequested;
-            receivingEffectHandler.CancelReceiveRequested += ReceivingEffect_CancelReceiveRequested;
-            receivingEffectHandler.AnnounceStatus = Announce;
-            receivingEffectHandler.AnnounceMessage = Announce;
-            receivingEffectHandler.AnnouncePresenceEvent = Announce;
-
-			var receiveReconnectEffectHandler = new ReceiveReconnectingEffectHandler<object>(eventEmitter);
-            receiveReconnectEffectHandler.ReconnectionPolicy = config.ReconnectionPolicy;
-            receiveReconnectEffectHandler.MaxRetries = config.ConnectionMaxRetries;
-            receiveReconnectEffectHandler.LogCallback = LogCallback;
-            receiveReconnectEffectHandler.ReceiveReconnectRequested += ReceiveReconnectEffect_ReceiveRequested;
-            receiveReconnectEffectHandler.CancelReceiveReconnectRequested += ReceiveReconnectEffect_CancelReceiveRequested;
-            receiveReconnectEffectHandler.AnnounceStatus = Announce;
-
-			var effectDispatcher = new EffectDispatcher();
-            effectDispatcher.PubnubUnitTest = unit;
-            effectDispatcher.Register(EventType.Handshake,handshakeEffectHandler);
-            effectDispatcher.Register(EventType.CancelHandshake,handshakeEffectHandler);
-            effectDispatcher.Register(EventType.HandshakeSuccess, handshakeEffectHandler);
-
-            effectDispatcher.Register(EventType.HandshakeFailure, handshakeFailedEffectHandler);
-            effectDispatcher.Register(EventType.CancelHandshakeFailure, handshakeFailedEffectHandler);
-
-            effectDispatcher.Register(EventType.HandshakeReconnect, handshakeReconnectEffectHandler);
-            effectDispatcher.Register(EventType.CancelHandshakeReconnect, handshakeReconnectEffectHandler);
-            effectDispatcher.Register(EventType.HandshakeReconnectSuccess, handshakeReconnectEffectHandler);
-            effectDispatcher.Register(EventType.HandshakeReconnectGiveUp, handshakeReconnectEffectHandler);
-
-            effectDispatcher.Register(EventType.ReceiveMessages, receivingEffectHandler);
-            effectDispatcher.Register(EventType.CancelReceiveMessages, receivingEffectHandler);
-            effectDispatcher.Register(EventType.ReceiveSuccess, receivingEffectHandler);
-
-            effectDispatcher.Register(EventType.ReceiveReconnect, receiveReconnectEffectHandler);
-            effectDispatcher.Register(EventType.CancelReceiveReconnect, receiveReconnectEffectHandler);
-            effectDispatcher.Register(EventType.ReceiveReconnectSuccess, receiveReconnectEffectHandler);
-            effectDispatcher.Register(EventType.ReceiveReconnectGiveUp, receiveReconnectEffectHandler);
 
        //     pnEventEngine = new EventEngine(effectDispatcher, eventEmitter);
        //     pnEventEngine.PubnubUnitTest = unit;
@@ -118,29 +66,6 @@ namespace PubnubApi.EndPoint
        //     }
         }
 
-        private void ReceivingEffect_ReceiveRequested(object sender, ReceiveRequestEventArgs e)
-        {
-            Tuple<string, PNStatus> resp = manager.ReceiveRequest<T>(PNOperationType.PNSubscribeOperation, e.ExtendedState.Channels.ToArray(), e.ExtendedState.ChannelGroups.ToArray(), e.ExtendedState.Timetoken, e.ExtendedState.Region, null, null).Result;
-
-            string jsonResp = resp.Item1;
-            e.ReceiveResponseCallback?.Invoke(jsonResp);
-        }
-
-        private void HandshakeEffect_HandshakeRequested(object sender, HandshakeRequestEventArgs e)
-        {
-            Tuple<string, PNStatus> resp = manager.HandshakeRequest<T>(PNOperationType.PNSubscribeOperation, e.ExtendedState.Channels.ToArray(), e.ExtendedState.ChannelGroups.ToArray(), 0, e.ExtendedState.Region, null, null).Result;
-
-            string jsonResp = resp.Item1;
-            e.HandshakeResponseCallback?.Invoke(jsonResp);
-        }
-
-        private void HandshakeReconnectEffect_HandshakeRequested(object sender, HandshakeReconnectRequestEventArgs e)
-        {
-            Tuple<string, PNStatus> resp = manager.HandshakeRequest<T>(PNOperationType.PNSubscribeOperation, e.ExtendedState.Channels.ToArray(), e.ExtendedState.ChannelGroups.ToArray(), 0, e.ExtendedState.Region, null, null).Result;
-
-            string jsonResp = resp.Item1;
-            e.HandshakeReconnectResponseCallback?.Invoke(jsonResp);
-        }
         private void HandshakeEffect_CancelHandshakeRequested(object sender, CancelHandshakeRequestEventArgs e)
         {
             manager.HandshakeRequestCancellation();
@@ -153,13 +78,6 @@ namespace PubnubApi.EndPoint
         {
             manager.ReceiveRequestCancellation();
         }
-        private void ReceiveReconnectEffect_ReceiveRequested(object sender, ReceiveReconnectRequestEventArgs e)
-        {
-            Tuple<string, PNStatus> resp = manager.ReceiveRequest<T>(PNOperationType.PNSubscribeOperation, e.ExtendedState.Channels.ToArray(), e.ExtendedState.ChannelGroups.ToArray(), e.ExtendedState.Timetoken, e.ExtendedState.Region, null, null).Result;
-
-            string jsonResp = resp.Item1;
-            e.ReceiveReconnectResponseCallback?.Invoke(jsonResp);
-        }
         private void ReceiveReconnectEffect_CancelReceiveRequested(object sender, CancelReceiveReconnectRequestEventArgs e)
         {
             manager.ReceiveReconnectRequestCancellation();
@@ -167,14 +85,6 @@ namespace PubnubApi.EndPoint
 
         private void JsonCallback(string json, bool zeroTimeTokenRequest, int messageCount)
         {
-            if (!string.IsNullOrEmpty(json))
-            {
-                List<object> respObject = manager.WrapResultBasedOnResponseType<string>(PNOperationType.PNSubscribeOperation, json, pnEventEngine.Context.Channels.ToArray(), pnEventEngine.Context.ChannelGroups.ToArray());
-                if (respObject != null && respObject.Count > 0)
-                {
-                    ProcessListenerCallback<string>(respObject, zeroTimeTokenRequest, messageCount, pnEventEngine.Context.Channels.ToArray(), pnEventEngine.Context.ChannelGroups.ToArray());
-                }
-            }
         }
 
         protected void ProcessListenerCallback<T>(List<object> result, bool zeroTimeTokenRequest, int messageCount, string[] channels, string[] channelGroups)
@@ -772,56 +682,29 @@ namespace PubnubApi.EndPoint
 
         private void Subscribe(string[] channels, string[] channelGroups, Dictionary<string, object> externalQueryParam)
         {
-            if ((channels == null || channels.Length == 0) && (channelGroups == null || channelGroups.Length  == 0))
+			Action<Pubnub, PNStatus> statusListener = null;
+			Action<Pubnub, PNMessageResult<T>> messageListener = null;
+			if ((channels == null || channels.Length == 0) && (channelGroups == null || channelGroups.Length == 0))
             {
-                throw new ArgumentException("Either Channel Or Channel Group or Both should be provided.");
-            }
+				throw new ArgumentException("Either Channel Or Channel Group or Both should be provided.");
+			}
 
-            string channel = (channels != null) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : "";
-            string channelGroup = (channelGroups != null) ? string.Join(",", channelGroups.OrderBy(x => x).ToArray()) : "";
-
-            PNPlatform.Print(config, pubnubLog);
-
-            LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, requested subscribe for channel(s)={1} and channel group(s)={2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), channel, channelGroup), config.LogVerbosity);
-
-            Dictionary<string, string> initialSubscribeUrlParams = new Dictionary<string, string>();
-            if (this.subscribeTimetoken >= 0)
+			if (this.subscribeEventEngineFactory.hasEventEngine(instanceId))
             {
-                initialSubscribeUrlParams.Add("tt", this.subscribeTimetoken.ToString(CultureInfo.InvariantCulture));
-            }
-            if (!string.IsNullOrEmpty(config.FilterExpression) && config.FilterExpression.Trim().Length > 0)
+                subscribeEventEngine = subscribeEventEngineFactory.getEventEngine(instanceId);
+			}
+            else
             {
-                initialSubscribeUrlParams.Add("filter-expr", UriUtil.EncodeUriComponent(config.FilterExpression, PNOperationType.PNSubscribeOperation, false, false, false));
-            }
+				if (SubscribeListenerList != null && SubscribeListenerList.Count > 0) {
+					messageListener = MessageEmitter;
+					statusListener = StatusEmitter;
+				}
+				var subscribeManager = new SubscribeManager2(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, PubnubInstance);
+				subscribeEventEngine = subscribeEventEngineFactory.initializeEventEngine(instanceId, PubnubInstance, config, subscribeManager, statusListener, messageListener);
 
-
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
-            Task.Factory.StartNew(() =>
-            {
-                manager = new SubscribeManager2(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, PubnubInstance);
-                //manager.CurrentPubnubInstance(PubnubInstance);
-                pnEventEngine.Subscribe(channels.ToList<string>(), channelGroups.ToList<string>());
-                //manager = new SubscribeManager2(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, PubnubInstance);
-                //manager.CurrentPubnubInstance(PubnubInstance);
-                //manager.MultiChannelSubscribeInit<T>(PNOperationType.PNSubscribeOperation, channels, channelGroups, initialSubscribeUrlParams, externalQueryParam);
-            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
-#else
-            new Thread(() =>
-            {
-                manager = new SubscribeManager2(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, PubnubInstance);
-                //manager.CurrentPubnubInstance(PubnubInstance);
-                if (pnEventEngine.CurrentState == null)
-                {
-                    pnEventEngine.InitialState(new State(StateType.Unsubscribed) { EventType = EventType.SubscriptionChanged});
-                }
-                pnEventEngine.Subscribe(channels.ToList<string>(), channelGroups.ToList<string>());
-                //manager = new SubscribeManager2(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, PubnubInstance);
-                //manager.CurrentPubnubInstance(PubnubInstance);
-                //manager.MultiChannelSubscribeInit<T>(PNOperationType.PNSubscribeOperation, channels, channelGroups, initialSubscribeUrlParams, externalQueryParam);
-            })
-            { IsBackground = true }.Start();
-#endif
-        }
+			}
+			subscribeEventEngine.Subscribe(channels, channelGroups);
+		}
 
         internal bool Retry(bool reconnect)
         {
@@ -863,5 +746,24 @@ namespace PubnubApi.EndPoint
         {
             PubnubInstance = instance;
         }
-    }
+		private void MessageEmitter<T>(Pubnub pubnubInstance, PNMessageResult<T> messageResult)
+		{
+			foreach (var listener in SubscribeListenerList) {
+				listener.Message(pubnubInstance, messageResult);
+			}
+		}
+
+		private void StatusEmitter(Pubnub pubnubInstance, PNStatus status)
+		{
+            for(int i=0; i < SubscribeListenerList.Count; i++)
+            {
+                SubscribeCallback listener = SubscribeListenerList[i];
+                if (listener != null)
+                {
+                    listener.Status(pubnubInstance, status);
+                }
+            }
+		}
+
+	}
 }

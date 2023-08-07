@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace PubnubApi.EventEngine.Core {
 	public abstract class Engine {
-		public EventQueue eventQueue = new EventQueue();
+		public EventQueue EventQueue = new EventQueue();
 		
 		protected EffectDispatcher dispatcher = new EffectDispatcher();
 		protected State currentState;
@@ -32,18 +32,18 @@ namespace PubnubApi.EventEngine.Core {
 		public event System.Action<IEvent> OnEventQueued;
 
 		public Engine() {
-			eventQueue.OnEventQueued += OnEvent;
+			EventQueue.OnEventQueued += OnEvent;
 		}
 
 		~Engine() {
-			eventQueue.OnEventQueued -= OnEvent;
+			EventQueue.OnEventQueued -= OnEvent;
 		}
 
 		private async void OnEvent(EventQueue q)
 		{
 			OnEventQueued?.Invoke(q.Peek());
 			await currentTransitionLoop;
-			currentTransitionLoop = eventQueue.Loop(async e => currentState = await Transition(e));
+			currentTransitionLoop = EventQueue.Loop(async e => currentState = await Transition(e));
 		}
 		
 		private async Task<State> Transition(IEvent e) {

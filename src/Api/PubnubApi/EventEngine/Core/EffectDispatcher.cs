@@ -26,7 +26,7 @@ namespace PubnubApi.EventEngine.Core {
 			{
 				var handler = effectInvocationHandlerMap[invocation.GetType()];
 				if (handler.IsBackground(invocation))
-					handler.Run(invocation).Start();
+					await handler.Run(invocation);
 				else
 					await handler.Run(invocation);
 			}

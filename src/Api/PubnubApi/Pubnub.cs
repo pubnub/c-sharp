@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
+using PubnubApi.EventEngine.Subscribe;
+using PubnubApi.EndPoint;
+using PubnubApi.EventEngine.Subscribe.Events;
 #if !NET35 && !NET40
 using System.Collections.Concurrent;
 #endif
@@ -18,7 +21,8 @@ namespace PubnubApi
         private readonly EndPoint.TokenManager tokenManager;
         private object savedSubscribeOperation;
         private readonly string savedSdkVerion;
-        private List<SubscribeCallback> subscribeCallbackListenerList
+        private SubscribeEventEngineFactory subscribeEventEngineFactory;
+		private List<SubscribeCallback> subscribeCallbackListenerList
         {
             get;
             set;
@@ -42,10 +46,11 @@ namespace PubnubApi
 		{
             if (pubnubConfig[InstanceId].EnableEventEngine)
             {
-                EndPoint.SubscribeOperation2<T> subscribeOperation = new EndPoint.SubscribeOperation2<T>(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, this);
+				EndPoint.SubscribeOperation2<T> subscribeOperation = new EndPoint.SubscribeOperation2<T>(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, this.subscribeEventEngineFactory,InstanceId ,this);
                 subscribeOperation.SubscribeListenerList = subscribeCallbackListenerList;
-                //subscribeOperation.CurrentPubnubInstance(this);
-                savedSubscribeOperation = subscribeOperation;
+                                
+				//subscribeOperation.CurrentPubnubInstance(this);
+				savedSubscribeOperation = subscribeOperation;
                 return subscribeOperation;
             }
             else
@@ -56,6 +61,7 @@ namespace PubnubApi
                 return subscribeOperation;
             }
         }
+
         public EndPoint.UnsubscribeOperation<T> Unsubscribe<T>()
         {
             EndPoint.UnsubscribeOperation<T>  unsubscribeOperation = new EndPoint.UnsubscribeOperation<T>(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
@@ -885,7 +891,9 @@ namespace PubnubApi
         {
             savedSdkVerion = Version;
             InstanceId = Guid.NewGuid().ToString();
+			subscribeEventEngineFactory = new SubscribeEventEngineFactory();
             pubnubConfig.AddOrUpdate(InstanceId, config, (k, o) => config);
+
             if (config != null)
             {
                 pubnubLog = config.PubnubLog;
@@ -954,6 +962,6 @@ namespace PubnubApi
             }
         }
 
-#endregion
+		#endregion
 	}
 }

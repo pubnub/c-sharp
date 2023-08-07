@@ -82,26 +82,15 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
 
         private async Task<System.Tuple<ReceivingResponse<string>, PNStatus>> MakeReceiveMessagesRequest(ReceiveMessagesInvocation invocation)
         {
-            var resp = await manager.ReceiveRequest<string>(
+            return await manager.ReceiveRequest<ReceivingResponse<string>>(
                 PNOperationType.PNSubscribeOperation,
-                invocation.Channels.ToArray(),
-                invocation.ChannelGroups.ToArray(),
+                invocation.Channels?.ToArray(),
+                invocation.ChannelGroups?.ToArray(),
                 invocation.Cursor.Timetoken.Value,
                 invocation.Cursor.Region.Value,
                 invocation.InitialSubscribeQueryParams,
                 invocation.ExternalQueryParams
             );
-
-            try
-            {
-                //TODO: get ReceivingResponse from manager.ReceiveRequest
-                var receiveResponse = JsonConvert.DeserializeObject<ReceivingResponse<string>>(resp.Item1);
-                return new System.Tuple<ReceivingResponse<string>, PNStatus>(receiveResponse, resp.Item2);
-            }
-            catch (Exception e)
-            {
-                return new Tuple<ReceivingResponse<string>, PNStatus>(null, new PNStatus(e, PNOperationType.PNSubscribeOperation, PNStatusCategory.PNUnknownCategory, invocation.Channels, invocation.ChannelGroups));
-            }
         }
 
         public override async Task Cancel()
