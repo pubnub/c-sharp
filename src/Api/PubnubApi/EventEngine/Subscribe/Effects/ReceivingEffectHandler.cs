@@ -15,8 +15,7 @@ using PubnubApi.EventEngine.Subscribe.Common;
 namespace PubnubApi.EventEngine.Subscribe.Effects
 {
     public class ReceivingEffectHandler:
-        Core.IEffectHandler<ReceiveMessagesInvocation>,
-        Core.IEffectHandler<ReceiveReconnectInvocation>
+        EffectDoubleCancellableHandler<ReceiveMessagesInvocation, ReceiveReconnectInvocation, CancelReceiveMessagesInvocation, CancelReceiveReconnectInvocation>
     {
         private SubscribeManager2 manager;
         private EventQueue eventQueue;
@@ -29,7 +28,7 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
             this.eventQueue = eventQueue;
         }
 
-        public Task Run(ReceiveReconnectInvocation invocation)
+        public override Task Run(ReceiveReconnectInvocation invocation)
         {
             if (!ReconnectionDelayUtil.shouldRetry(invocation.ReconnectionConfiguration, invocation.AttemptedRetries))
             {
@@ -45,12 +44,12 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
             return Utils.EmptyTask;
         }
 
-        public bool IsBackground(ReceiveReconnectInvocation invocation)
+        public override bool IsBackground(ReceiveReconnectInvocation invocation)
         {
             return true;
         }
 
-        public async Task Run(ReceiveMessagesInvocation invocation)
+        public override async Task Run(ReceiveMessagesInvocation invocation)
         {
             var response = await MakeReceiveMessagesRequest(invocation);
             var cursor = new SubscriptionCursor()
@@ -76,7 +75,7 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
             }
         }
 
-        public bool IsBackground(ReceiveMessagesInvocation invocation)
+        public override bool IsBackground(ReceiveMessagesInvocation invocation)
         {
             return true;
         }
@@ -105,7 +104,7 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
             }
         }
 
-        public async Task Cancel()
+        public override async Task Cancel()
         {
             if (!retryDelay.Cancelled)
             {
