@@ -109,9 +109,14 @@ namespace PubnubApi.EndPoint
             pubnubRequestState.TimeQueued = DateTime.Now;
 
             Tuple<string, PNStatus> responseTuple = await UrlProcessRequest(request, pubnubRequestState, false).ConfigureAwait(false);
-            HandshakeResponse handshakeResponse = jsonLibrary.DeserializeToObject<HandshakeResponse>(responseTuple.Item1);
+            if (!string.IsNullOrEmpty(responseTuple.Item1) && responseTuple.Item2 == null)
+            {
+                PNStatus status = new PNStatus(null, PNOperationType.PNSubscribeOperation, PNStatusCategory.PNConnectedCategory, channels, channelGroups);
+                HandshakeResponse handshakeResponse = jsonLibrary.DeserializeToObject<HandshakeResponse>(responseTuple.Item1);
+                return new Tuple<HandshakeResponse, PNStatus>(handshakeResponse, status);
+            }   
 
-            return new Tuple<HandshakeResponse, PNStatus>(handshakeResponse, responseTuple.Item2);
+            return new Tuple<HandshakeResponse, PNStatus>(null, responseTuple.Item2);
         }
 
         internal void HandshakeRequestCancellation()
@@ -159,9 +164,14 @@ namespace PubnubApi.EndPoint
                 pubnubRequestState.TimeQueued = DateTime.Now;
 
                 // Wait for message
-                var response = await UrlProcessRequest(request, pubnubRequestState, false).ConfigureAwait(false);
-                var receiveResp = jsonLibrary.DeserializeToObject<ReceivingResponse<string>>(response.Item1);
-                resp = new Tuple<ReceivingResponse<string>, PNStatus>(receiveResp, resp.Item2);
+                var responseTuple = await UrlProcessRequest(request, pubnubRequestState, false).ConfigureAwait(false);
+                if (!string.IsNullOrEmpty(responseTuple.Item1) && responseTuple.Item2 == null)
+                {
+                    PNStatus status = new PNStatus(null, PNOperationType.PNSubscribeOperation, PNStatusCategory.PNConnectedCategory, channels, channelGroups);
+                    ReceivingResponse<string> receiveResponse = jsonLibrary.DeserializeToObject<ReceivingResponse<string>>(responseTuple.Item1);
+                    return new Tuple<ReceivingResponse<string>, PNStatus>(receiveResponse, status);
+                }   
+                return new Tuple<ReceivingResponse<string>, PNStatus>(null, responseTuple.Item2);
             }
             catch(Exception ex)
             {
@@ -240,29 +250,10 @@ namespace PubnubApi.EndPoint
 
             try
             {
-                if (terminateCurrentSubRequest)
-                {
-                    //TerminateCurrentSubscriberRequest();
-                }
-
-                //if (PubnubInstance == null)
-                //{
-                //    System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "DateTime {0}, PubnubInstance is null. Exiting UrlProcessRequest", DateTime.Now.ToString(CultureInfo.InvariantCulture)));
-                //    return new Tuple<string, PNStatus>("", null);
-                //}
-
                 if (pubnubRequestState != null)
                 {
                     channel = (pubnubRequestState.Channels != null && pubnubRequestState.Channels.Length > 0) ? string.Join(",", pubnubRequestState.Channels.OrderBy(x => x).ToArray()) : ",";
 
-                    //if (ChannelRequest.ContainsKey(PubnubInstance.InstanceId) && !channel.Equals(",", StringComparison.OrdinalIgnoreCase) && !ChannelRequest[PubnubInstance.InstanceId].ContainsKey(channel) && (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation || pubnubRequestState.ResponseType == PNOperationType.Presence))
-                    //{
-                    //    if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig) && pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog))
-                    //    {
-                    //        LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, UrlProcessRequest ChannelRequest PubnubInstance.InstanceId Channel NOT matching", DateTime.Now.ToString(CultureInfo.InvariantCulture)), currentConfig.LogVerbosity);
-                    //    }
-                    //    return new Tuple<string, PNStatus>("", null);
-                    //}
                 }
 
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
@@ -284,22 +275,7 @@ namespace PubnubApi.EndPoint
 
                 pubnubRequestState.Request = request;
                 httpSubscribe = request;
-
-                //if (ChannelRequest.ContainsKey(PubnubInstance.InstanceId) && (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation || pubnubRequestState.ResponseType == PNOperationType.Presence))
-                //{
-                //    ChannelRequest[PubnubInstance.InstanceId].AddOrUpdate(channel, pubnubRequestState.Request, (key, oldState) => pubnubRequestState.Request);
-                //}
 #endif
-
-                //if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig) && pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog))
-                //{
-                //    LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, Request={1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), requestUri.ToString()), currentConfig.LogVerbosity);
-                //}
-
-                //if (pubnubRequestState != null && pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation)
-                //{
-                //    SubscribeRequestTracker.AddOrUpdate(PubnubInstance.InstanceId, DateTime.Now, (key, oldState) => DateTime.Now);
-                //}
 
                 string jsonString = "";
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
@@ -330,30 +306,8 @@ namespace PubnubApi.EndPoint
                 }
 #endif
 
-                //if (SubscribeDisconnected.ContainsKey(PubnubInstance.InstanceId) && SubscribeDisconnected[PubnubInstance.InstanceId])
-                //{
-                //    if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig) && pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog))
-                //    {
-                //        LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0},Received JSON but SubscribeDisconnected = {1} for request={2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), jsonString, requestUri), currentConfig.LogVerbosity);
-                //    }
-                //    throw new OperationCanceledException("Disconnected");
-                //}
-
-                //if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig) && pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog))
-                //{
-                //    LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, JSON= {1} for request={2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), jsonString, requestUri), currentConfig.LogVerbosity);
-                //}
                 PNStatus errStatus = GetStatusIfError<T>(pubnubRequestState, jsonString);
-                if (errStatus == null && pubnubRequestState != null)
-                {
-                    PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(pubnubRequestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, pubnubRequestState, (int)HttpStatusCode.OK, null);
-                    return new Tuple<string, PNStatus>(jsonString, status);
-                }
-                else
-                {
-                    jsonString = "";
-                    return new Tuple<string, PNStatus>(jsonString, errStatus);
-                }
+                return new Tuple<string, PNStatus>((errStatus == null) ? jsonString : "", errStatus);
             }
             catch (Exception ex)
             {

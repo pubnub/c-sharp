@@ -21,7 +21,7 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
 
         public async override Task Run(EmitMessagesInvocation invocation)
         {
-            var processedMessages = invocation.Messages.Messages.Select(m => new PNMessageResult<object>()
+            var processedMessages = invocation.Messages?.Messages.Select(m => new PNMessageResult<object>()
             {
                 Channel = m.Channel,
                 Message = JsonConvert.DeserializeObject(m.Payload),
@@ -31,10 +31,8 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
                 Publisher = m.IssuingClientId
             });
 
-            foreach (var message in processedMessages)
-            {
-                messageEmitterFunction(pubnubInstance, message);
-            }
+            processedMessages?.ToList().ForEach(message => messageEmitterFunction(pubnubInstance, message));
+
         }
 
         public override bool IsBackground(EmitMessagesInvocation invocation) => false;

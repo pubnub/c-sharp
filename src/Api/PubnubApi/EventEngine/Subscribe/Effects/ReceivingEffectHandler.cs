@@ -84,8 +84,8 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
         {
             return await manager.ReceiveRequest<ReceivingResponse<string>>(
                 PNOperationType.PNSubscribeOperation,
-                invocation.Channels.ToArray(),
-                invocation.ChannelGroups.ToArray(),
+                invocation.Channels?.ToArray(),
+                invocation.ChannelGroups?.ToArray(),
                 invocation.Cursor.Timetoken.Value,
                 invocation.Cursor.Region.Value,
                 invocation.InitialSubscribeQueryParams,
