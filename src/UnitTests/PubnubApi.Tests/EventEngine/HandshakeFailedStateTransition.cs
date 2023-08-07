@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using PubnubApi.EventEngine.Core;
 using PubnubApi.EventEngine.Subscribe.Common;
 using PubnubApi.EventEngine.Subscribe.Events;
@@ -42,7 +42,8 @@ namespace PubnubApi.Tests.EventEngine
         };
 
         [TestCaseSource(nameof(handshakeFailedEventCases))]
-        public void When_EventOccurs_HandshakeFailedStateTransitionsToHandshakingState(
+
+        public void HandshakeFailedState_OnEvent_TransitionsToHandshakingState(
             HandshakeFailedState handshakeFailedState, IEvent @event, HandshakingState expectedState)
         {
             //Act
@@ -59,7 +60,7 @@ namespace PubnubApi.Tests.EventEngine
         }
 
         [TestCase]
-        public void When_UnsubscribeAllEventOccurs_HandshakeFailedStateTransitionsToUnsubscribedState()
+        public void HandshakeFailedState_OnUnsubscribeAllEvent_TransitionToUnsubscribedState()
         {
             // Arrange
             var handshakeFailedState = new HandshakeFailedState()
