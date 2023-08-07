@@ -682,9 +682,7 @@ namespace PubnubApi.EndPoint
 
         private void Subscribe(string[] channels, string[] channelGroups, Dictionary<string, object> externalQueryParam)
         {
-			Action<Pubnub, PNStatus> statusListener = null;
-			Action<Pubnub, PNMessageResult<object>> messageListener = null;
-			if ((channels == null || channels.Length == 0) && (channelGroups == null || channelGroups.Length == 0))
+            if ((channels == null || channels.Length == 0) && (channelGroups == null || channelGroups.Length == 0))
             {
 				throw new ArgumentException("Either Channel Or Channel Group or Both should be provided.");
 			}
@@ -695,12 +693,8 @@ namespace PubnubApi.EndPoint
 			}
             else
             {
-				if (SubscribeListenerList != null && SubscribeListenerList.Count > 0) {
-					messageListener = MessageEmitter;
-					statusListener = StatusEmitter;
-				}
 				var subscribeManager = new SubscribeManager2(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, PubnubInstance);
-				subscribeEventEngine = subscribeEventEngineFactory.initializeEventEngine(instanceId, PubnubInstance, config, subscribeManager, statusListener, messageListener);
+				subscribeEventEngine = subscribeEventEngineFactory.initializeEventEngine(instanceId, PubnubInstance, config, subscribeManager, StatusEmitter, MessageEmitter);
 
 			}
 			subscribeEventEngine.Subscribe<T>(channels, channelGroups);
@@ -748,22 +742,19 @@ namespace PubnubApi.EndPoint
         }
 		private void MessageEmitter<T>(Pubnub pubnubInstance, PNMessageResult<T> messageResult)
 		{
-			foreach (var listener in SubscribeListenerList) {
-				listener.Message(pubnubInstance, messageResult);
+			foreach (var listener in SubscribeListenerList)
+            {
+				listener?.Message(pubnubInstance, messageResult);
 			}
 		}
 
 		private void StatusEmitter(Pubnub pubnubInstance, PNStatus status)
-		{
-            for(int i=0; i < SubscribeListenerList.Count; i++)
+        {
+            foreach (var listener in SubscribeListenerList)
             {
-                SubscribeCallback listener = SubscribeListenerList[i];
-                if (listener != null)
-                {
-                    listener.Status(pubnubInstance, status);
-                }
+                listener?.Status(pubnubInstance, status);
             }
-		}
+        }
 
 	}
 }
