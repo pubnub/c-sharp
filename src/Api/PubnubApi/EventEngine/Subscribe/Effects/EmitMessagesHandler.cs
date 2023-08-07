@@ -66,7 +66,7 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
         {
             if (dict is null) return;
             Type t;
-            msg.Message = dict.TryGetValue(key, out t) ? rawMessage.ToObject(t) : rawMessage.ToString();
+            msg.Message = dict.TryGetValue(key, out t) && t != typeof(string) ? rawMessage.ToObject(t) : rawMessage.ToString();
         }
 
         public override bool IsBackground(EmitMessagesInvocation invocation) => false;
