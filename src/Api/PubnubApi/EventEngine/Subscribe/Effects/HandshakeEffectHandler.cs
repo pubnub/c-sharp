@@ -51,6 +51,15 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
         public override async Task Run(HandshakeInvocation invocation)
         {
             var response = await MakeHandshakeRequest(invocation);
+            SubscriptionCursor cursor = null;
+            if (response.Item1 != null)
+            {
+                cursor = new SubscriptionCursor()
+                {
+                    Region = response.Item1.Timetoken.Region,
+                    Timetoken = response.Item1.Timetoken.Timestamp
+                };
+            }
 
             switch (invocation)
             {
@@ -58,13 +67,13 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
                     eventQueue.Enqueue(new Events.HandshakeReconnectFailureEvent() { AttemptedRetries = reconnectInvocation.AttemptedRetries + 1, Status = response.Item2});
                     break;
                 case Invocations.HandshakeReconnectInvocation reconnectInvocation:
-                    eventQueue.Enqueue(new Events.HandshakeReconnectSuccessEvent() { Cursor = response.Item1, Status = response.Item2 });
+                    eventQueue.Enqueue(new Events.HandshakeReconnectSuccessEvent() { Cursor = cursor, Status = response.Item2 });
                     break;
                 case { } when response.Item2.Error:
                     eventQueue.Enqueue(new Events.HandshakeFailureEvent() { Status = response.Item2});
                     break;
                 case { }:
-                    eventQueue.Enqueue(new Events.HandshakeSuccessEvent() { Cursor = response.Item1, Status = response.Item2 });
+                    eventQueue.Enqueue(new Events.HandshakeSuccessEvent() { Cursor = cursor, Status = response.Item2 });
                     break;
                 
             }
@@ -76,9 +85,9 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
         }
 
 
-        private async Task<System.Tuple<SubscriptionCursor, PNStatus>> MakeHandshakeRequest(HandshakeInvocation invocation)
+        private async Task<System.Tuple<HandshakeResponse, PNStatus>> MakeHandshakeRequest(HandshakeInvocation invocation)
         {
-            var resp = await manager.HandshakeRequest<string>(
+            return await manager.HandshakeRequest(
                 PNOperationType.PNSubscribeOperation,
                 invocation.Channels.ToArray(),
                 invocation.ChannelGroups.ToArray(),
@@ -87,21 +96,6 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
                 invocation.InitialSubscribeQueryParams,
                 invocation.ExternalQueryParams
             );
-
-            try
-            {
-                var handshakeResponse = JsonConvert.DeserializeObject<HandshakeResponse>(resp.Item1);
-                var c = new SubscriptionCursor()
-                {
-                    Region = handshakeResponse.Timetoken.Region,
-                    Timetoken = handshakeResponse.Timetoken.Timestamp
-                };
-                return new System.Tuple<SubscriptionCursor, PNStatus>(c, resp.Item2);
-            }
-            catch (Exception e)
-            {
-                return new Tuple<SubscriptionCursor, PNStatus>(null, new PNStatus(e, PNOperationType.PNSubscribeOperation, PNStatusCategory.PNUnknownCategory, invocation.Channels, invocation.ChannelGroups));
-            }
         }
 
         public override async Task Cancel()
