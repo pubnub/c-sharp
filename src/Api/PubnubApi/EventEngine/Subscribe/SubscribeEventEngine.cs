@@ -35,7 +35,7 @@ namespace PubnubApi.EventEngine.Subscribe {
 			dispatcher.Register<Invocations.ReceiveReconnectInvocation, Effects.ReceivingEffectHandler>(receiveHandler);
 			dispatcher.Register<Invocations.CancelReceiveReconnectInvocation, Effects.ReceivingEffectHandler>(receiveHandler);
 
-			var emitMessageHandler = new Effects.EmitMessagesHandler(pubnubInstance, messageListener);
+			var emitMessageHandler = new Effects.EmitMessagesHandler(pubnubInstance, messageListener, channelTypeMap, channelGroupTypeMap);
 			dispatcher.Register<Invocations.EmitMessagesInvocation, Effects.EmitMessagesHandler>(emitMessageHandler);
 
 			var emitStatusHandler = new Effects.EmitStatusEffectHandler(pubnubInstance, statusListener);
