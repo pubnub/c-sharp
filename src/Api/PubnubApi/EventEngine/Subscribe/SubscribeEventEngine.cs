@@ -5,10 +5,14 @@ using PubnubApi.EventEngine.Subscribe.Events;
 using PubnubApi.EventEngine.Subscribe.Effects;
 using PubnubApi.EventEngine.Subscribe.Invocations;
 using System;
+using System.Collections.Generic;
 
 namespace PubnubApi.EventEngine.Subscribe {
 	public class SubscribeEventEngine : Engine {
 		private SubscribeManager2 subscribeManager;
+
+		private readonly Dictionary<string, Type> channelTypeMap = new Dictionary<string, Type>();
+		private readonly Dictionary<string, Type> channelGroupTypeMap = new Dictionary<string, Type>();
 
 		internal SubscribeEventEngine(Pubnub pubnubInstance,
 			PNConfiguration pubnubConfiguration,
@@ -39,10 +43,24 @@ namespace PubnubApi.EventEngine.Subscribe {
 
 			currentState = new UnsubscribedState() { ReconnectionConfiguration = new Context.ReconnectionConfiguration(pubnubConfiguration.ReconnectionPolicy, pubnubConfiguration.ConnectionMaxRetries) };
 		}
-		public void Subscribe(string[] channels, string[] channelGroups)
+		public void Subscribe<T>(string[] channels, string[] channelGroups)
 		{
+			foreach (var c in channels)
+			{
+				channelTypeMap[c] = typeof(T);
+			}
+			foreach (var c in channelGroups)
+			{
+				channelGroupTypeMap[c] = typeof(T);
+			}
 			this.EventQueue.Enqueue(new SubscriptionChangedEvent() { Channels = channels, ChannelGroups = channelGroups });
 		}
+
+		public void Subscribe(string[] channels, string[] channelGroups)
+		{
+			Subscribe<string>(channels, channelGroups);
+		}
+		
 		public void UnsubscribeAll()
 		{
 			this.EventQueue.Enqueue(new UnsubscribeAllEvent());
