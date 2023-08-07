@@ -17,15 +17,21 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
         private readonly Pubnub pubnubInstance;
         private readonly Dictionary<string, Type> channelTypeMap;
         private readonly Dictionary<string, Type> channelGroupTypeMap;
+        private readonly JsonSerializer serializer;
 
         public EmitMessagesHandler(Pubnub pubnubInstance,
-            System.Action<Pubnub, PNMessageResult<object>> messageEmitterFunction, Dictionary<string, Type> channelTypeMap = null, Dictionary<string, Type> channelGroupTypeMap = null)
+            System.Action<Pubnub, PNMessageResult<object>> messageEmitterFunction,
+            JsonSerializer serializer,
+            Dictionary<string, Type> channelTypeMap = null,
+            Dictionary<string, Type> channelGroupTypeMap = null)
         {
             this.messageEmitterFunction = messageEmitterFunction;
             this.pubnubInstance = pubnubInstance;
 
             this.channelTypeMap = channelTypeMap;
             this.channelGroupTypeMap = channelGroupTypeMap;
+
+            this.serializer = serializer;
         }
 
         public async override Task Run(EmitMessagesInvocation invocation)
@@ -67,7 +73,7 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
         {
             if (dict is null) return;
             Type t;
-            msg.Message = dict.TryGetValue(key, out t) && t != typeof(string) ? rawMessage.ToObject(t) : rawMessage.ToString();
+            msg.Message = dict.TryGetValue(key, out t) && t != typeof(string) ? rawMessage.ToObject(t, serializer) : rawMessage.ToString(Formatting.None);
         }
 
         public override bool IsBackground(EmitMessagesInvocation invocation) => false;

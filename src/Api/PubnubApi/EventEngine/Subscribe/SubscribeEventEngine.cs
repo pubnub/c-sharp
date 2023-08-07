@@ -4,6 +4,8 @@ using PubnubApi.EventEngine.Subscribe.States;
 using PubnubApi.EventEngine.Subscribe.Events;
 using PubnubApi.EventEngine.Subscribe.Effects;
 using PubnubApi.EventEngine.Subscribe.Invocations;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 
@@ -13,6 +15,10 @@ namespace PubnubApi.EventEngine.Subscribe {
 
 		private readonly Dictionary<string, Type> channelTypeMap = new Dictionary<string, Type>();
 		private readonly Dictionary<string, Type> channelGroupTypeMap = new Dictionary<string, Type>();
+		
+		private static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings()
+			{ Formatting = Formatting.None, DateParseHandling = DateParseHandling.None };
+		private static readonly JsonSerializer Serializer = JsonSerializer.Create(SerializerSettings); 
 
 		internal SubscribeEventEngine(Pubnub pubnubInstance,
 			PNConfiguration pubnubConfiguration,
@@ -35,7 +41,7 @@ namespace PubnubApi.EventEngine.Subscribe {
 			dispatcher.Register<Invocations.ReceiveReconnectInvocation, Effects.ReceivingEffectHandler>(receiveHandler);
 			dispatcher.Register<Invocations.CancelReceiveReconnectInvocation, Effects.ReceivingEffectHandler>(receiveHandler);
 
-			var emitMessageHandler = new Effects.EmitMessagesHandler(pubnubInstance, messageListener, channelTypeMap, channelGroupTypeMap);
+			var emitMessageHandler = new Effects.EmitMessagesHandler(pubnubInstance, messageListener, Serializer, channelTypeMap, channelGroupTypeMap);
 			dispatcher.Register<Invocations.EmitMessagesInvocation, Effects.EmitMessagesHandler>(emitMessageHandler);
 
 			var emitStatusHandler = new Effects.EmitStatusEffectHandler(pubnubInstance, statusListener);
