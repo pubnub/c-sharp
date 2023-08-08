@@ -66,6 +66,10 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
                 case Invocations.ReceiveReconnectInvocation reconnectInvocation:
                     eventQueue.Enqueue(new Events.ReceiveReconnectSuccessEvent() { Cursor = cursor, Status = response.Item2 });
                     break;
+                // TODO find a case when status (Item2) is null
+                case { } when response.Item2 is null:
+                    eventQueue.Enqueue(new Events.ReceiveFailureEvent() { Cursor = cursor, Status = new PNStatus() {Category = PNStatusCategory.PNUnexpectedDisconnectCategory, Error = true, ErrorData = new PNErrorData("Status was null", new System.NullReferenceException())}});
+                    break;
                 case { } when response.Item2.Error:
                     eventQueue.Enqueue(new Events.ReceiveFailureEvent() { Cursor = cursor, Status = response.Item2});
                     break;
