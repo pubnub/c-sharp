@@ -58,6 +58,10 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
                 Timetoken = response.Item1?.Timetoken.Timestamp
             };
 
+            // Assume that if status is null, the effect was cancelled.
+            if (response.Item2 is null)
+                return;
+
             switch (invocation)
             {
                 case Invocations.ReceiveReconnectInvocation reconnectInvocation when response.Item2.Error:
@@ -65,10 +69,6 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
                     break;
                 case Invocations.ReceiveReconnectInvocation reconnectInvocation:
                     eventQueue.Enqueue(new Events.ReceiveReconnectSuccessEvent() { Cursor = cursor, Status = response.Item2 });
-                    break;
-                // TODO find a case when status (Item2) is null
-                case { } when response.Item2 is null:
-                    eventQueue.Enqueue(new Events.ReceiveFailureEvent() { Cursor = cursor, Status = new PNStatus() {Category = PNStatusCategory.PNUnexpectedDisconnectCategory, Error = true, ErrorData = new PNErrorData("Status was null", new System.NullReferenceException())}});
                     break;
                 case { } when response.Item2.Error:
                     eventQueue.Enqueue(new Events.ReceiveFailureEvent() { Cursor = cursor, Status = response.Item2});
