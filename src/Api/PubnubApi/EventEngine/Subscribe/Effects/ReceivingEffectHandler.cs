@@ -71,7 +71,7 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
                     eventQueue.Enqueue(new Events.ReceiveReconnectSuccessEvent() { Cursor = cursor, Status = response.Item2 });
                     break;
                 case { } when response.Item2.Error:
-                    eventQueue.Enqueue(new Events.ReceiveFailureEvent() { Cursor = cursor, Status = response.Item2});
+                    eventQueue.Enqueue(new Events.ReceiveFailureEvent() { Cursor = invocation.Cursor, Status = response.Item2});
                     break;
                 case { }:
                     eventQueue.Enqueue(new Events.ReceiveSuccessEvent() { Channels = invocation?.Channels, ChannelGroups = invocation?.ChannelGroups, Cursor = cursor, Messages= response.Item1, Status = response.Item2 });

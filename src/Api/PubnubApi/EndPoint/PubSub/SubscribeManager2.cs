@@ -171,8 +171,12 @@ namespace PubnubApi.EndPoint
                     PNStatus status = new PNStatus(null, PNOperationType.PNSubscribeOperation, PNStatusCategory.PNConnectedCategory, channels, channelGroups);
                     ReceivingResponse<object> receiveResponse = JsonConvert.DeserializeObject<ReceivingResponse<object>>(responseTuple.Item1);
                     return new Tuple<ReceivingResponse<object>, PNStatus>(receiveResponse, status);
-                }   
-                return new Tuple<ReceivingResponse<object>, PNStatus>(null, responseTuple.Item2);
+                }
+                else if (responseTuple.Item2 != null)
+                {
+                    return new Tuple<ReceivingResponse<object>, PNStatus>(null, responseTuple.Item2);
+                }
+                return new Tuple<ReceivingResponse<object>, PNStatus>(null, new PNStatus(new Exception("ReceiveRequest failed."), PNOperationType.PNSubscribeOperation, PNStatusCategory.PNUnknownCategory, channels, channelGroups));
             }
             catch(Exception ex)
             {
