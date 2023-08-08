@@ -8,6 +8,9 @@ using System.Net;
 using System.Globalization;
 using PubnubApi.EventEngine.Subscribe;
 using PubnubApi;
+using PubnubApi.EventEngine.Core;
+using PubnubApi.EventEngine.Subscribe.Events;
+using PubnubApi.EventEngine.Subscribe.States;
 
 namespace PubnubApi.EndPoint
 {
@@ -658,10 +661,36 @@ namespace PubnubApi.EndPoint
             {
 				var subscribeManager = new SubscribeManager2(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, PubnubInstance);
 				subscribeEventEngine = subscribeEventEngineFactory.initializeEventEngine(instanceId, PubnubInstance, config, subscribeManager, StatusEmitter, MessageEmitter);
-
+                subscribeEventEngine.OnStateTransition += SubscribeEventEngine_OnStateTransition;
+                subscribeEventEngine.OnEventQueued += SubscribeEventEngine_OnEventQueued;
+                subscribeEventEngine.OnEffectDispatch += SubscribeEventEngine_OnEffectDispatch;
 			}
 			subscribeEventEngine.Subscribe<T>(channels, channelGroups);
 		}
+
+        private void SubscribeEventEngine_OnEffectDispatch(IEffectInvocation obj)
+        {
+            LoggingMethod.WriteToLog(pubnubLog, $"DateTime {DateTime.Now.ToString(CultureInfo.InvariantCulture)}, EE OnEffectDispatch : CurrentState = {subscribeEventEngine.CurrentState} => Invocation = {obj}", config.LogVerbosity);
+        }
+
+        private void SubscribeEventEngine_OnEventQueued(IEvent @event)
+        {
+            int attempts = 0;
+            if (subscribeEventEngine.CurrentState is HandshakeReconnectingState handshakeReconnectingState)
+            {
+                attempts = handshakeReconnectingState.AttemptedRetries;
+            }
+            else if (subscribeEventEngine.CurrentState is ReceiveReconnectingState receiveReconnectingState)
+            {
+                attempts = receiveReconnectingState.AttemptedRetries;
+            }
+            LoggingMethod.WriteToLog(pubnubLog, $"DateTime {DateTime.Now.ToString(CultureInfo.InvariantCulture)}, EE OnEventQueued : CurrentState: {subscribeEventEngine.CurrentState}; Event = {@event.GetType()}; Attempt = {attempts} of {config.ConnectionMaxRetries}", config.LogVerbosity);
+        }
+
+        private void SubscribeEventEngine_OnStateTransition(EventEngine.Core.TransitionResult obj)
+        {
+            LoggingMethod.WriteToLog(pubnubLog, $"DateTime {DateTime.Now.ToString(CultureInfo.InvariantCulture)}, EE OnStateTransition : CurrentState = {subscribeEventEngine.CurrentState} => Transition State = {obj.State}", config.LogVerbosity);
+        }
 
         internal bool Retry(bool reconnect)
         {
