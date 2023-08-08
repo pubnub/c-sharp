@@ -219,16 +219,6 @@
     <Compile Include="..\PubnubApi\EventEngine\Core\EventEngineInterfaces.cs" Link="EventEngine\Core\EventEngineInterfaces.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Core\EventQueue.cs" Link="EventEngine\Core\EventQueue.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Core\Utils.cs" Link="EventEngine\Core\Utils.cs" />
-    <Compile Include="..\PubnubApi\EventEngine\EffectDispatcher.cs" Link="EventEngine\EffectDispatcher.cs" />
-    <Compile Include="..\PubnubApi\EventEngine\EventEmitter.cs" Link="EventEngine\EventEmitter.cs" />
-    <Compile Include="..\PubnubApi\EventEngine\EventEngine.cs" Link="EventEngine\EventEngine.cs" />
-    <Compile Include="..\PubnubApi\EventEngine\HandshakeEffectHandler.cs" Link="EventEngine\HandshakeEffectHandler.cs" />
-    <Compile Include="..\PubnubApi\EventEngine\HandshakeFailedEffectHandler.cs" Link="EventEngine\HandshakeFailedEffectHandler.cs" />
-    <Compile Include="..\PubnubApi\EventEngine\HandshakeReconnectEffectHandler.cs" Link="EventEngine\HandshakeReconnectEffectHandler.cs" />
-    <Compile Include="..\PubnubApi\EventEngine\IEffectInvocationHandler.cs" Link="EventEngine\IEffectInvocationHandler.cs" />
-    <Compile Include="..\PubnubApi\EventEngine\ReceiveReconnectingEffectHandler.cs" Link="EventEngine\ReceiveReconnectingEffectHandler.cs" />
-    <Compile Include="..\PubnubApi\EventEngine\ReceivingEffectHandler.cs" Link="EventEngine\ReceivingEffectHandler.cs" />
-    <Compile Include="..\PubnubApi\EventEngine\State.cs" Link="EventEngine\State.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\Common\CommonSubscribeTypes.cs" Link="EventEngine\Subscribe\Common\CommonSubscribeTypes.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\Context\ReconnectionConfiguration.cs" Link="EventEngine\Subscribe\Context\ReconnectionConfiguration.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\Context\ReconnectionDelayUtil.cs" Link="EventEngine\Subscribe\Context\ReconnectionDelayUtil.cs" />

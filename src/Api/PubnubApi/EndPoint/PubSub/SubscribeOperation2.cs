@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Net;
 using System.Globalization;
-using PubnubApi.PubnubEventEngine;
 using PubnubApi.EventEngine.Subscribe;
 using PubnubApi;
 
@@ -49,42 +48,6 @@ namespace PubnubApi.EndPoint
             this.subscribeEventEngineFactory = subscribeEventEngineFactory;
             this.instanceId = instanceId;
             
-			var eventEmitter = new EventEmitter();
-            eventEmitter.RegisterJsonListener(JsonCallback);
-
-       //     pnEventEngine = new EventEngine(effectDispatcher, eventEmitter);
-       //     pnEventEngine.PubnubUnitTest = unit;
-       //     pnEventEngine.Setup<T>(config);
-
-       //     if (pnEventEngine.PubnubUnitTest != null)
-       //     {
-       //         pnEventEngine.PubnubUnitTest.EventTypeList = new List<KeyValuePair<string, string>>();
-       //     }
-       //     else
-       //     {
-			    //pnEventEngine.InitialState(new State(StateType.Unsubscribed) { EventType = EventType.SubscriptionChanged });
-       //     }
-        }
-
-        private void HandshakeEffect_CancelHandshakeRequested(object sender, CancelHandshakeRequestEventArgs e)
-        {
-            manager.HandshakeRequestCancellation();
-        }
-        private void HandshakeReconnectEffect_CancelHandshakeRequested(object sender, CancelHandshakeReconnectRequestEventArgs e)
-        {
-            manager.HandshakeRequestCancellation();
-        }
-        private void ReceivingEffect_CancelReceiveRequested(object sender, CancelReceiveRequestEventArgs e)
-        {
-            manager.ReceiveRequestCancellation();
-        }
-        private void ReceiveReconnectEffect_CancelReceiveRequested(object sender, CancelReceiveReconnectRequestEventArgs e)
-        {
-            manager.ReceiveReconnectRequestCancellation();
-        }
-
-        private void JsonCallback(string json, bool zeroTimeTokenRequest, int messageCount)
-        {
         }
 
         protected void ProcessListenerCallback<T>(List<object> result, bool zeroTimeTokenRequest, int messageCount, string[] channels, string[] channelGroups)
