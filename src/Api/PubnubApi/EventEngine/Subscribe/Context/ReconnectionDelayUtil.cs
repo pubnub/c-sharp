@@ -13,11 +13,10 @@ namespace PubnubApi.EventEngine.Subscribe.Context
 					delayValue = attempts * backoff + numGenerator.Next(1000);
 					break;
 				case PNReconnectionPolicy.EXPONENTIAL:
-					delayValue = (int)(Math.Pow(2, attempts - 1) * 1000 + numGenerator.Next(1000));
+					delayValue = (int)(Math.Pow(2, attempts) * 1000 + numGenerator.Next(1000));
 					break;
 			}
 			return delayValue;
-
 		}
 
 		public static bool shouldRetry(ReconnectionConfiguration reconnectionConfiguration, int attemptedRetries)
