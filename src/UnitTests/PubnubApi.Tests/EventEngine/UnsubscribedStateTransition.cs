@@ -70,5 +70,33 @@ namespace PubnubApi.Tests.EventEngine
             Assert.AreEqual(expectedState.ReconnectionConfiguration.ReconnectionPolicy, ((ReceivingState)result.State).ReconnectionConfiguration.ReconnectionPolicy);
             Assert.AreEqual(expectedState.ReconnectionConfiguration.MaximumReconnectionRetries, ((ReceivingState)result.State).ReconnectionConfiguration.MaximumReconnectionRetries);
         }
+
+        [Test]
+        public void UnsubscribedState_OnHandshakeFailureEvent_TransitionToHandshakeReconnectingState()
+        {
+            //Arrange
+            var currentState = new UnsubscribedState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
+            var eventToTriggerTransition = new HandshakeFailureEvent()
+            {
+                Channels = new string[] { "ch1", "ch2" },
+                ChannelGroups = new string[] { "cg1", "cg2" },
+            };
+            var expectedState = new HandshakeReconnectingState()
+            {
+                Channels = new string[] { "ch1", "ch2" },
+                ChannelGroups = new string[] { "cg1", "cg2" },
+                ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50)
+            };
+            
+            //Act
+            var result = currentState.Transition(eventToTriggerTransition);
+
+            //Assert
+            Assert.IsInstanceOf<HandshakeReconnectingState>(result.State);
+            CollectionAssert.AreEqual(expectedState.Channels, ((HandshakeReconnectingState)result.State).Channels);
+            CollectionAssert.AreEqual(expectedState.ChannelGroups, ((HandshakeReconnectingState)result.State).ChannelGroups);
+            Assert.AreEqual(expectedState.ReconnectionConfiguration.ReconnectionPolicy, ((HandshakeReconnectingState)result.State).ReconnectionConfiguration.ReconnectionPolicy);
+            Assert.AreEqual(expectedState.ReconnectionConfiguration.MaximumReconnectionRetries, ((HandshakeReconnectingState)result.State).ReconnectionConfiguration.MaximumReconnectionRetries);
+        }
     }
 }

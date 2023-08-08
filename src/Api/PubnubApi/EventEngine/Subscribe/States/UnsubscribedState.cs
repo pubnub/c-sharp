@@ -28,6 +28,12 @@ namespace PubnubApi.EventEngine.Subscribe.States
                     ReconnectionConfiguration = this.ReconnectionConfiguration
                 },
 
+                Events.HandshakeFailureEvent handshakeFailure => new States.HandshakeReconnectingState()
+                {
+                    Channels = handshakeFailure.Channels,
+                    ChannelGroups = handshakeFailure.ChannelGroups,
+                    ReconnectionConfiguration = this.ReconnectionConfiguration
+                },
                 _ => null
             };
         }
