@@ -80,6 +80,9 @@ namespace PubnubApi.EventEngine.Subscribe.Common
 
 		[JsonProperty("s")]
 		public long SequenceNumber { get; set; }
+		
+		[JsonProperty("u")]
+		public object UserMetadata { get; set; }
 	}
 	
 	public abstract class SubscriptionState : Core.State

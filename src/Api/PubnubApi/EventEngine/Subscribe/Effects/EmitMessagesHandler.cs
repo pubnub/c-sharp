@@ -43,7 +43,9 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
                     Channel = m.Channel,
                     Subscription = m.SubscriptionMatch,
                     Timetoken = invocation.Cursor.Timetoken.Value,
-                    UserMetadata = (m.PublishMetadata as JObject)?.ToObject<Timetoken>(),
+                    UserMetadata = (m.UserMetadata as object),
+                    // TODO Where do we put the publish timetoken metadata?
+                    // UserMetadata = (m.PublishMetadata as JObject)?.ToObject<Timetoken>(),
                     Publisher = m.IssuingClientId,
                 };
 
