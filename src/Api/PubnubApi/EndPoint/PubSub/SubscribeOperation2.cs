@@ -677,7 +677,6 @@ namespace PubnubApi.EndPoint
         private void SubscribeEventEngine_OnEventQueued(IEvent @event)
         {
             int attempts = 0;
-            SubscriptionCursor subscriptionCursor = null;
             if (subscribeEventEngine.CurrentState is HandshakeReconnectingState handshakeReconnectingState)
             {
                 attempts = handshakeReconnectingState.AttemptedRetries;
@@ -694,46 +693,6 @@ namespace PubnubApi.EndPoint
             LoggingMethod.WriteToLog(pubnubLog, $"DateTime {DateTime.Now.ToString(CultureInfo.InvariantCulture)}, EE OnStateTransition : CurrentState = {subscribeEventEngine.CurrentState.GetType().Name} => Transition State = {obj?.State.GetType().Name}", config.LogVerbosity);
         }
 
-        internal bool Retry(bool reconnect)
-        {
-            return false;
-            //if (manager == null)
-            //{
-            //    return false;
-            //}
-
-            //if (reconnect)
-            //{
-            //    return manager.Reconnect<T>(false);
-            //}
-            //else
-            //{
-            //    return manager.Disconnect();
-            //}
-        }
-
-        internal bool Retry(bool reconnect, bool resetSubscribeTimetoken)
-        {
-            return false;
-            //if (manager == null)
-            //{
-            //    return false;
-            //}
-
-            //if (reconnect)
-            //{
-            //    return manager.Reconnect<T>(resetSubscribeTimetoken);
-            //}
-            //else
-            //{
-            //    return manager.Disconnect();
-            //}
-        }
-
-        internal void CurrentPubnubInstance(Pubnub instance)
-        {
-            PubnubInstance = instance;
-        }
 		private void MessageEmitter<T>(Pubnub pubnubInstance, PNMessageResult<T> messageResult)
 		{
 			foreach (var listener in SubscribeListenerList)
