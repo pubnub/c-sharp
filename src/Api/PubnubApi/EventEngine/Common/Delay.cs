@@ -41,7 +41,7 @@ namespace PubnubApi.EventEngine.Common
 
         private void AwaiterLoop()
         {
-            while(!Cancelled)
+            while(true)
             {
                 lock (monitor)
                 {
@@ -58,6 +58,7 @@ namespace PubnubApi.EventEngine.Common
                     }
                     taskCompletionSource.SetResult(null);
                     Cancelled = true;
+                    break;
                 }
             }
         }
