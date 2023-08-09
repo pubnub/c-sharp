@@ -15,38 +15,15 @@ using PubnubApi.EventEngine.Subscribe.Common;
 namespace PubnubApi.EventEngine.Subscribe.Effects
 {
     public class ReceivingEffectHandler:
-        EffectDoubleCancellableHandler<ReceiveMessagesInvocation, ReceiveReconnectInvocation, CancelReceiveMessagesInvocation, CancelReceiveReconnectInvocation>
+        EffectCancellableHandler<ReceiveMessagesInvocation, CancelReceiveMessagesInvocation>
     {
         private SubscribeManager2 manager;
         private EventQueue eventQueue;
-        
-        private Delay retryDelay = new Delay(0);
 
         internal ReceivingEffectHandler(SubscribeManager2 manager, EventQueue eventQueue)
         {
             this.manager = manager;
             this.eventQueue = eventQueue;
-        }
-
-        public override Task Run(ReceiveReconnectInvocation invocation)
-        {
-            if (!ReconnectionDelayUtil.shouldRetry(invocation.ReconnectionConfiguration, invocation.AttemptedRetries))
-            {
-                eventQueue.Enqueue(new ReceiveReconnectGiveUpEvent() { Status = new PNStatus(PNStatusCategory.PNCancelledCategory) });
-            }
-            else
-            {
-                retryDelay = new Delay(ReconnectionDelayUtil.CalculateDelay(invocation.ReconnectionConfiguration.ReconnectionPolicy, invocation.AttemptedRetries));
-                // Run in the background
-                retryDelay.Start().ContinueWith((_) => this.Run((ReceiveMessagesInvocation)invocation));
-            }
-
-            return Utils.EmptyTask;
-        }
-
-        public override bool IsBackground(ReceiveReconnectInvocation invocation)
-        {
-            return true;
         }
 
         public override async Task Run(ReceiveMessagesInvocation invocation)
@@ -99,13 +76,55 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
 
         public override async Task Cancel()
         {
+            manager.ReceiveRequestCancellation();
+        }
+    }
+
+    public class ReceivingReconnectEffectHandler :
+        EffectCancellableHandler<ReceiveReconnectInvocation, CancelReceiveReconnectInvocation>
+    {
+        private SubscribeManager2 manager;
+        private EventQueue eventQueue;
+        private ReceivingEffectHandler receivingEffectHandler;
+        
+        private Delay retryDelay = new Delay(0);   
+        
+        internal ReceivingReconnectEffectHandler(SubscribeManager2 manager, EventQueue eventQueue, ReceivingEffectHandler receivingEffectHandler)
+        {
+            this.manager = manager;
+            this.eventQueue = eventQueue;
+            this.receivingEffectHandler = receivingEffectHandler;
+        }
+        
+        public override async Task Run(ReceiveReconnectInvocation invocation)
+        {
+            if (!ReconnectionDelayUtil.shouldRetry(invocation.ReconnectionConfiguration, invocation.AttemptedRetries))
+            {
+                eventQueue.Enqueue(new ReceiveReconnectGiveUpEvent() { Status = new PNStatus(PNStatusCategory.PNCancelledCategory) });
+            }
+            else
+            {
+                retryDelay = new Delay(ReconnectionDelayUtil.CalculateDelay(invocation.ReconnectionConfiguration.ReconnectionPolicy, invocation.AttemptedRetries));
+                // Run in the background
+                await retryDelay.Start();
+                await receivingEffectHandler.Run(invocation);
+            }
+        }
+        
+        public override bool IsBackground(ReceiveReconnectInvocation invocation)
+        {
+            return true;
+        }
+        
+        public override async Task Cancel()
+        {
             if (!retryDelay.Cancelled)
             {
                 retryDelay.Cancel();
             }
             else
             {
-                manager.ReceiveRequestCancellation();
+                await receivingEffectHandler.Cancel();
             }
         }
     }

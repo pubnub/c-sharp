@@ -39,10 +39,11 @@ namespace PubnubApi.EventEngine.Subscribe {
 			dispatcher.Register<Invocations.CancelHandshakeReconnectInvocation, Effects.HandshakeReconnectEffectHandler>(handshakeReconnectHandler);
 
 			var receiveHandler = new Effects.ReceivingEffectHandler(subscribeManager, EventQueue);
+			var receiveReconnectHandler = new Effects.ReceivingReconnectEffectHandler(subscribeManager, EventQueue, receiveHandler);
 			dispatcher.Register<Invocations.ReceiveMessagesInvocation, Effects.ReceivingEffectHandler>(receiveHandler);
 			dispatcher.Register<Invocations.CancelReceiveMessagesInvocation, Effects.ReceivingEffectHandler>(receiveHandler);
-			dispatcher.Register<Invocations.ReceiveReconnectInvocation, Effects.ReceivingEffectHandler>(receiveHandler);
-			dispatcher.Register<Invocations.CancelReceiveReconnectInvocation, Effects.ReceivingEffectHandler>(receiveHandler);
+			dispatcher.Register<Invocations.ReceiveReconnectInvocation, Effects.ReceivingReconnectEffectHandler>(receiveReconnectHandler);
+			dispatcher.Register<Invocations.CancelReceiveReconnectInvocation, Effects.ReceivingReconnectEffectHandler>(receiveReconnectHandler);
 
 			var emitMessageHandler = new Effects.EmitMessagesHandler(pubnubInstance, messageListener, Serializer, channelTypeMap, channelGroupTypeMap);
 			dispatcher.Register<Invocations.EmitMessagesInvocation, Effects.EmitMessagesHandler>(emitMessageHandler);
