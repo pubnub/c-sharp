@@ -4,6 +4,7 @@ using PubnubApi.EventEngine.Core;
 using PubnubApi.EventEngine.Subscribe.Invocations;
 using PubnubApi.EventEngine.Subscribe.Common;
 using PubnubApi.EventEngine.Subscribe.Context;
+using System.Linq;
 
 namespace PubnubApi.EventEngine.Subscribe.States
 {
@@ -20,8 +21,8 @@ namespace PubnubApi.EventEngine.Subscribe.States
 
                 Events.SubscriptionChangedEvent subscriptionChanged => new ReceiveStoppedState()
                 {
-                    Channels = subscriptionChanged.Channels,
-                    ChannelGroups = subscriptionChanged.ChannelGroups,
+                    Channels = (Channels ?? Enumerable.Empty<string>()).Union(subscriptionChanged.Channels),
+                    ChannelGroups = (ChannelGroups ?? Enumerable.Empty<string>()).Union(subscriptionChanged.ChannelGroups),
                     Cursor = this.Cursor,
                     ReconnectionConfiguration = this.ReconnectionConfiguration
                 },
