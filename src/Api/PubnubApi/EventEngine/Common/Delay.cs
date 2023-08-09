@@ -30,6 +30,7 @@ namespace PubnubApi.EventEngine.Common
 
         public void Cancel()
         {
+            if (Cancelled) return;
             lock (monitor)
             {
                 Cancelled = true;
@@ -39,7 +40,7 @@ namespace PubnubApi.EventEngine.Common
 
         private void AwaiterLoop()
         {
-            while(true)
+            while(!Cancelled)
             {
                 lock (monitor)
                 {
