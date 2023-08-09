@@ -117,14 +117,8 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
         
         public override async Task Cancel()
         {
-            if (!retryDelay.Cancelled)
-            {
-                retryDelay.Cancel();
-            }
-            else
-            {
-                await handshakeEffectHandler.Cancel();
-            }
+            retryDelay.Cancel();
+            await handshakeEffectHandler.Cancel();
         }
     }
 }
