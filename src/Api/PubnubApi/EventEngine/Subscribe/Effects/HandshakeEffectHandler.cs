@@ -39,7 +39,7 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
                 retryDelay = new Delay(ReconnectionDelayUtil.CalculateDelay(invocation.ReconnectionConfiguration.ReconnectionPolicy, invocation.AttemptedRetries));
                 await retryDelay.Start();
                 if (!retryDelay.Cancelled)
-                    await Run((HandshakeInvocation)invocation);
+                    await Run(new HandshakeInvocation() { Channels = invocation.Channels, ChannelGroups = invocation.ChannelGroups, ExternalQueryParams = invocation.ExternalQueryParams, InitialSubscribeQueryParams = invocation.InitialSubscribeQueryParams });
             }
         }
 
