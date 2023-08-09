@@ -21,7 +21,6 @@ namespace PubnubApi.EventEngine.Common
             Cancelled = false;
             #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task taskAwaiter = Task.Factory.StartNew(AwaiterLoop);
-            taskAwaiter.Wait();
             #else
             Thread awaiterThread = new Thread(AwaiterLoop);
             awaiterThread.Start();
@@ -41,25 +40,21 @@ namespace PubnubApi.EventEngine.Common
 
         private void AwaiterLoop()
         {
-            while(true)
+            lock (monitor)
             {
-                lock (monitor)
+                if (Cancelled)
                 {
-                    if (Cancelled)
-                    {
-                        taskCompletionSource.SetCanceled();
-                        break;
-                    }
-                    Monitor.Wait(monitor, milliseconds);
-                    if (Cancelled)
-                    {
-                        taskCompletionSource.SetCanceled();
-                        break;
-                    }
-                    taskCompletionSource.SetResult(null);
-                    Cancelled = true;
-                    break;
+                    taskCompletionSource.SetCanceled();
+                    return;
                 }
+                Monitor.Wait(monitor, milliseconds);
+                if (Cancelled)
+                {
+                    taskCompletionSource.SetCanceled();
+                    return;
+                }
+                taskCompletionSource.SetResult(null);
+                Cancelled = true;
             }
         }
     }
