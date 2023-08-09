@@ -15,37 +15,15 @@ using PubnubApi.EventEngine.Subscribe.Common;
 namespace PubnubApi.EventEngine.Subscribe.Effects
 {
     public class HandshakeEffectHandler : 
-        EffectDoubleCancellableHandler<HandshakeInvocation, HandshakeReconnectInvocation, CancelHandshakeInvocation, CancelHandshakeReconnectInvocation>
+        EffectCancellableHandler<HandshakeInvocation, CancelHandshakeInvocation>
     {
-        private SubscribeManager2 manager;
-        private EventQueue eventQueue;
-        
-        private Delay retryDelay = new Delay(0);
+        private readonly SubscribeManager2 manager;
+        private readonly EventQueue eventQueue;
 
         internal HandshakeEffectHandler(SubscribeManager2 manager, EventQueue eventQueue)
         {
             this.manager = manager;
             this.eventQueue = eventQueue;
-        }
-
-        public override async Task Run(HandshakeReconnectInvocation invocation)
-        {
-            if (!ReconnectionDelayUtil.shouldRetry(invocation.ReconnectionConfiguration, invocation.AttemptedRetries))
-            {
-                eventQueue.Enqueue(new HandshakeReconnectGiveUpEvent() { Status = new PNStatus(PNStatusCategory.PNCancelledCategory) });
-            }
-            else
-            {
-                retryDelay = new Delay(ReconnectionDelayUtil.CalculateDelay(invocation.ReconnectionConfiguration.ReconnectionPolicy, invocation.AttemptedRetries));
-                await retryDelay.Start();
-                if (!retryDelay.Cancelled)
-                    await Run(new HandshakeInvocation() { Channels = invocation.Channels, ChannelGroups = invocation.ChannelGroups, ExternalQueryParams = invocation.ExternalQueryParams, InitialSubscribeQueryParams = invocation.InitialSubscribeQueryParams });
-            }
-        }
-
-        public override bool IsBackground(HandshakeReconnectInvocation invocation)
-        {
-            return true;
         }
 
         public override async Task Run(HandshakeInvocation invocation)
@@ -100,15 +78,53 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
 
         public override async Task Cancel()
         {
+            manager.HandshakeRequestCancellation();
+        }
+
+    }
+
+    public class HandshakeReconnectEffectHandler : EffectCancellableHandler<HandshakeReconnectInvocation, CancelHandshakeReconnectInvocation>
+    {
+        private readonly EventQueue eventQueue;
+
+        private HandshakeEffectHandler handshakeEffectHandler;
+        
+        private Delay retryDelay = new Delay(0);
+      
+        
+        internal HandshakeReconnectEffectHandler(SubscribeManager2 manager, EventQueue eventQueue, HandshakeEffectHandler handshakeEffectHandler)
+        {
+            this.eventQueue = eventQueue;
+            this.handshakeEffectHandler = handshakeEffectHandler;
+        }
+
+        public override async Task Run(HandshakeReconnectInvocation invocation)
+        {
+            if (!ReconnectionDelayUtil.shouldRetry(invocation.ReconnectionConfiguration, invocation.AttemptedRetries))
+            {
+                eventQueue.Enqueue(new HandshakeReconnectGiveUpEvent() { Status = new PNStatus(PNStatusCategory.PNCancelledCategory) });
+            }
+            else
+            {
+                retryDelay = new Delay(ReconnectionDelayUtil.CalculateDelay(invocation.ReconnectionConfiguration.ReconnectionPolicy, invocation.AttemptedRetries));
+                await retryDelay.Start();
+                if (!retryDelay.Cancelled)
+                    await handshakeEffectHandler.Run(invocation as HandshakeInvocation);
+            }
+        }
+
+        public override bool IsBackground(HandshakeReconnectInvocation invocation) => true;
+        
+        public override async Task Cancel()
+        {
             if (!retryDelay.Cancelled)
             {
                 retryDelay.Cancel();
             }
             else
             {
-                manager.HandshakeRequestCancellation();
+                await handshakeEffectHandler.Cancel();
             }
         }
-
     }
 }

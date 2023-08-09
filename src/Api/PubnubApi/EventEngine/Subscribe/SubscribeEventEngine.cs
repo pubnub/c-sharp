@@ -8,6 +8,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using PubnubApi.EventEngine.Subscribe.Common;
 
 namespace PubnubApi.EventEngine.Subscribe {
 	public class SubscribeEventEngine : Engine {
@@ -30,10 +32,11 @@ namespace PubnubApi.EventEngine.Subscribe {
 
 			// initialize the handler, pass dependencies
 			var handshakeHandler = new Effects.HandshakeEffectHandler(subscribeManager, EventQueue);
+			var handshakeReconnectHandler = new Effects.HandshakeReconnectEffectHandler(subscribeManager, EventQueue, handshakeHandler);
 			dispatcher.Register<Invocations.HandshakeInvocation, Effects.HandshakeEffectHandler>(handshakeHandler);
 			dispatcher.Register<Invocations.CancelHandshakeInvocation, Effects.HandshakeEffectHandler>(handshakeHandler);
-			dispatcher.Register<Invocations.HandshakeReconnectInvocation, Effects.HandshakeEffectHandler>(handshakeHandler);
-			dispatcher.Register<Invocations.CancelHandshakeReconnectInvocation, Effects.HandshakeEffectHandler>(handshakeHandler);
+			dispatcher.Register<Invocations.HandshakeReconnectInvocation, Effects.HandshakeReconnectEffectHandler>(handshakeReconnectHandler);
+			dispatcher.Register<Invocations.CancelHandshakeReconnectInvocation, Effects.HandshakeReconnectEffectHandler>(handshakeReconnectHandler);
 
 			var receiveHandler = new Effects.ReceivingEffectHandler(subscribeManager, EventQueue);
 			dispatcher.Register<Invocations.ReceiveMessagesInvocation, Effects.ReceivingEffectHandler>(receiveHandler);
