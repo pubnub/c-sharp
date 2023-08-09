@@ -573,12 +573,23 @@ namespace PubnubApi
         public bool Reconnect<T>(bool resetSubscribeTimetoken)
         {
             bool ret = false;
-            if (savedSubscribeOperation is EndPoint.SubscribeOperation<T>)
+            if (pubnubConfig[InstanceId].EnableEventEngine)
             {
-                EndPoint.SubscribeOperation<T> subscibeOperationInstance = savedSubscribeOperation as EndPoint.SubscribeOperation<T>;
-                if (subscibeOperationInstance != null)
+                if (subscribeEventEngineFactory.hasEventEngine(InstanceId))
                 {
-                    ret = subscibeOperationInstance.Retry(true, resetSubscribeTimetoken);
+                    var subscribeEventEngine = subscribeEventEngineFactory.getEventEngine(InstanceId);
+                    subscribeEventEngine.EventQueue.Enqueue(new ReconnectEvent() { Channels = (subscribeEventEngine.CurrentState as SubscriptionState).Channels, ChannelGroups = (subscribeEventEngine.CurrentState as SubscriptionState).ChannelGroups, Cursor = resetSubscribeTimetoken ? null : (subscribeEventEngine.CurrentState as SubscriptionState).Cursor });
+                }
+            }
+            else
+            {
+                if (savedSubscribeOperation is EndPoint.SubscribeOperation<T>)
+                {
+                    EndPoint.SubscribeOperation<T> subscibeOperationInstance = savedSubscribeOperation as EndPoint.SubscribeOperation<T>;
+                    if (subscibeOperationInstance != null)
+                    {
+                        ret = subscibeOperationInstance.Retry(true, resetSubscribeTimetoken);
+                    }
                 }
             }
             return ret;
