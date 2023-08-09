@@ -57,7 +57,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
 					Channels = this.Channels,
 					ChannelGroups = this.ChannelGroups,
 					ReconnectionConfiguration = this.ReconnectionConfiguration,
-					AttemptedRetries = this.AttemptedRetries + 1
+					AttemptedRetries = (this.AttemptedRetries + 1) % int.MaxValue
 				}.With(new EmitStatusInvocation(handshakeReconnectFailure.Status)),
 
 				Events.HandshakeReconnectSuccessEvent handshakeReconnectSuccess => new ReceivingState()

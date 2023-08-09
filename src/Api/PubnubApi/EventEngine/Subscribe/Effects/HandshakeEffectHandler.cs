@@ -42,7 +42,7 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
             switch (invocation)
             {
                 case Invocations.HandshakeReconnectInvocation reconnectInvocation when response.Item2.Error:
-                    eventQueue.Enqueue(new Events.HandshakeReconnectFailureEvent() { AttemptedRetries = reconnectInvocation.AttemptedRetries + 1, Status = response.Item2});
+                    eventQueue.Enqueue(new Events.HandshakeReconnectFailureEvent() { AttemptedRetries = (reconnectInvocation.AttemptedRetries + 1) % int.MaxValue, Status = response.Item2});
                     break;
                 case Invocations.HandshakeReconnectInvocation reconnectInvocation:
                     eventQueue.Enqueue(new Events.HandshakeReconnectSuccessEvent() { Cursor = cursor, Status = response.Item2 });
