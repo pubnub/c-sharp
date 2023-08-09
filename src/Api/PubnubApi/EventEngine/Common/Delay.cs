@@ -18,6 +18,7 @@ namespace PubnubApi.EventEngine.Common
         public Task Start()
         {
             taskCompletionSource = new TaskCompletionSource<object>();
+            Cancelled = false;
             #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task taskAwaiter = Task.Factory.StartNew(AwaiterLoop);
             taskAwaiter.Wait();
@@ -56,6 +57,7 @@ namespace PubnubApi.EventEngine.Common
                         break;
                     }
                     taskCompletionSource.SetResult(null);
+                    Cancelled = true;
                 }
             }
         }
