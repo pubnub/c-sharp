@@ -66,7 +66,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
                     ChannelGroups = this.ChannelGroups,
                     Cursor = this.Cursor,
                     ReconnectionConfiguration = this.ReconnectionConfiguration,
-                    AttemptedRetries = 0
+                    AttemptedRetries = 1
                 },
 
                 _ => null
