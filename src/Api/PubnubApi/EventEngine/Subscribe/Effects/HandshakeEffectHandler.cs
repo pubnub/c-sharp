@@ -32,11 +32,18 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
             SubscriptionCursor cursor = null;
             if (response.Item1 != null)
             {
-                cursor = new SubscriptionCursor()
+                if (invocation.Cursor != null && invocation.Cursor.Timetoken != null) 
+                { 
+                    cursor = invocation.Cursor;
+                }
+                else if (response.Item1.Timetoken != null)
                 {
-                    Region = response.Item1.Timetoken.Region,
-                    Timetoken = response.Item1.Timetoken.Timestamp
-                };
+                    cursor = new SubscriptionCursor()
+                    {
+                        Region = response.Item1.Timetoken.Region,
+                        Timetoken = response.Item1.Timetoken.Timestamp
+                    };
+                }
             }
 
             switch (invocation)

@@ -9,10 +9,8 @@ namespace PubnubApi.EventEngine.Subscribe.States
 {
     public class HandshakingState : SubscriptionState
     {
-        public SubscriptionCursor Cursor { get; set; }
         public override IEnumerable<IEffectInvocation> OnEntry => new HandshakeInvocation()
-            { Channels = this.Channels,
-            ChannelGroups = this.ChannelGroups }.AsArray();
+            { Channels = this.Channels, ChannelGroups = this.ChannelGroups, Cursor = this.Cursor }.AsArray();
 
         public override IEnumerable<IEffectInvocation> OnExit { get; } = new CancelHandshakeInvocation().AsArray();
 
@@ -52,6 +50,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
                 {
                     Channels = disconnect.Channels,
                     ChannelGroups = disconnect.ChannelGroups,
+                    Cursor = disconnect.Cursor,
                     ReconnectionConfiguration = this.ReconnectionConfiguration
                 }.With(new EmitStatusInvocation(PNStatusCategory.PNDisconnectedCategory)),
 

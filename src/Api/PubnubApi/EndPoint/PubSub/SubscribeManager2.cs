@@ -558,58 +558,6 @@ namespace PubnubApi.EndPoint
             return status;
         }
 
-        internal List<object> WrapResultBasedOnResponseType<T>(PNOperationType type, string jsonString, string[] channels, string[] channelGroups)
-        {
-            List<object> result = new List<object>();
-            try
-            {
-                string multiChannel = (channels != null) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : "";
-                string multiChannelGroup = (channelGroups != null) ? string.Join(",", channelGroups.OrderBy(x => x).ToArray()) : "";
-
-                if (!string.IsNullOrEmpty(jsonString))
-                {
-                    object deserializedResult = jsonLibrary.DeserializeToObject(jsonString);
-                    List<object> result1 = ((IEnumerable)deserializedResult).Cast<object>().ToList();
-
-                    if (result1 != null && result1.Count > 0)
-                    {
-                        result = result1;
-                    }
-
-                    switch (type)
-                    {
-                        case PNOperationType.PNSubscribeOperation:
-                        case PNOperationType.Presence:
-                            if (result.Count == 3 && result[0] is object[] && (result[0] as object[]).Length == 0 && result[2].ToString() == "")
-                            {
-                                result.RemoveAt(2);
-                            }
-                            if (result.Count == 4 && result[0] is object[] && (result[0] as object[]).Length == 0 && result[2].ToString() == "" && result[3].ToString() == "")
-                            {
-                                result.RemoveRange(2, 2);
-                            }
-                            result.Add(multiChannelGroup);
-                            result.Add(multiChannel);
-
-                            break;
-                        case PNOperationType.PNHeartbeatOperation:
-                            //Dictionary<string, object> heartbeatadictionary = jsonLibrary.DeserializeToDictionaryOfObject(jsonString);
-                            //result = new List<object>();
-                            //result.Add(heartbeatadictionary);
-                            //result.Add(multiChannel);
-                            break;
-                        default:
-                            break;
-                    }
-                    //switch stmt end
-                }
-            }
-            catch { /* ignore */ }
-
-            return result;
-        }
-
-
         internal bool Disconnect()
         {
             return true;

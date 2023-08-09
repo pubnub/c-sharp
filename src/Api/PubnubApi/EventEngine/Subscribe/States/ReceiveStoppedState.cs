@@ -9,8 +9,6 @@ namespace PubnubApi.EventEngine.Subscribe.States
 {
     public class ReceiveStoppedState : SubscriptionState
     {
-        public SubscriptionCursor Cursor;
-
         public override TransitionResult Transition(IEvent e)
         {
             return e switch

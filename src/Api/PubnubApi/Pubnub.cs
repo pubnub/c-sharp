@@ -5,6 +5,7 @@ using System.Reflection;
 using PubnubApi.EventEngine.Subscribe;
 using PubnubApi.EndPoint;
 using PubnubApi.EventEngine.Subscribe.Events;
+using PubnubApi.EventEngine.Subscribe.Common;
 #if !NET35 && !NET40
 using System.Collections.Concurrent;
 #endif
@@ -64,9 +65,17 @@ namespace PubnubApi
 
         public EndPoint.UnsubscribeOperation<T> Unsubscribe<T>()
         {
-            EndPoint.UnsubscribeOperation<T>  unsubscribeOperation = new EndPoint.UnsubscribeOperation<T>(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
-            unsubscribeOperation.CurrentPubnubInstance(this);
-            return unsubscribeOperation;
+            if (pubnubConfig[InstanceId].EnableEventEngine)
+            {
+                //TODO: Add support for Unsubscribe in Event Engine
+                throw new NotImplementedException("Unsubscribe is not implemented for Event Engine");
+            }
+            else
+            {
+                EndPoint.UnsubscribeOperation<T>  unsubscribeOperation = new EndPoint.UnsubscribeOperation<T>(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
+                unsubscribeOperation.CurrentPubnubInstance(this);
+                return unsubscribeOperation;
+            }
         }
 
         public EndPoint.UnsubscribeAllOperation<T> UnsubscribeAll<T>()
@@ -539,12 +548,23 @@ namespace PubnubApi
         public bool Reconnect<T>()
         {
             bool ret = false;
-            if (savedSubscribeOperation is EndPoint.SubscribeOperation<T>)
+            if (pubnubConfig[InstanceId].EnableEventEngine)
             {
-                EndPoint.SubscribeOperation<T> subscibeOperationInstance = savedSubscribeOperation as EndPoint.SubscribeOperation<T>;
-                if (subscibeOperationInstance != null)
+                if (subscribeEventEngineFactory.hasEventEngine(InstanceId))
                 {
-                    ret = subscibeOperationInstance.Retry(true, false);
+                    var subscribeEventEngine = subscribeEventEngineFactory.getEventEngine(InstanceId);
+                    subscribeEventEngine.EventQueue.Enqueue(new ReconnectEvent() { Channels = (subscribeEventEngine.CurrentState as SubscriptionState).Channels, ChannelGroups = (subscribeEventEngine.CurrentState as SubscriptionState).ChannelGroups, Cursor = (subscribeEventEngine.CurrentState as SubscriptionState).Cursor });
+                }
+            }
+            else
+            {
+                if (savedSubscribeOperation is EndPoint.SubscribeOperation<T>)
+                {
+                    EndPoint.SubscribeOperation<T> subscibeOperationInstance = savedSubscribeOperation as EndPoint.SubscribeOperation<T>;
+                    if (subscibeOperationInstance != null)
+                    {
+                        ret = subscibeOperationInstance.Retry(true, false);
+                    }
                 }
             }
             return ret;
@@ -567,12 +587,23 @@ namespace PubnubApi
         public bool Disconnect<T>()
         {
             bool ret = false;
-            if (savedSubscribeOperation is EndPoint.SubscribeOperation<T>)
+            if (pubnubConfig[InstanceId].EnableEventEngine)
             {
-                EndPoint.SubscribeOperation<T> subscibeOperationInstance = savedSubscribeOperation as EndPoint.SubscribeOperation<T>;
-                if (subscibeOperationInstance != null)
+                if (subscribeEventEngineFactory.hasEventEngine(InstanceId))
                 {
-                    ret = subscibeOperationInstance.Retry(false);
+                    var subscribeEventEngine = subscribeEventEngineFactory.getEventEngine(InstanceId);
+                    subscribeEventEngine.EventQueue.Enqueue(new DisconnectEvent() { Channels = (subscribeEventEngine.CurrentState as SubscriptionState).Channels, ChannelGroups = (subscribeEventEngine.CurrentState as SubscriptionState).ChannelGroups });
+                }
+            }
+            else
+            {
+                if (savedSubscribeOperation is EndPoint.SubscribeOperation<T>)
+                {
+                    EndPoint.SubscribeOperation<T> subscibeOperationInstance = savedSubscribeOperation as EndPoint.SubscribeOperation<T>;
+                    if (subscibeOperationInstance != null)
+                    {
+                        ret = subscibeOperationInstance.Retry(false);
+                    }
                 }
             }
             return ret;

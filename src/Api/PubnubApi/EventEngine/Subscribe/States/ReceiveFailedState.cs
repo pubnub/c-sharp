@@ -9,8 +9,6 @@ namespace PubnubApi.EventEngine.Subscribe.States
 {
     public class ReceiveFailedState : SubscriptionState
     {
-        public SubscriptionCursor Cursor;
-
         public override IEnumerable<IEffectInvocation> OnEntry { get; }
         public override IEnumerable<IEffectInvocation> OnExit { get; }
 

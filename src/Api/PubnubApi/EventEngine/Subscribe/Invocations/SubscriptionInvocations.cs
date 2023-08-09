@@ -41,6 +41,7 @@ namespace PubnubApi.EventEngine.Subscribe.Invocations {
 	public class HandshakeInvocation : Core.IEffectInvocation {
 		public IEnumerable<string> Channels;
 		public IEnumerable<string> ChannelGroups;
+		public SubscriptionCursor  Cursor;
 		// TODO if we need these, figure out how to pass them.
 		public Dictionary<string, string> InitialSubscribeQueryParams = new Dictionary<string, string>();
 		public Dictionary<string, object> ExternalQueryParams = new Dictionary<string, object>();

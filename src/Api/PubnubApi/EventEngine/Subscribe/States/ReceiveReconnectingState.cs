@@ -9,11 +9,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
 {
     public class ReceiveReconnectingState : SubscriptionState
     {
-        public IEnumerable<string> Channels;
-        public IEnumerable<string> ChannelGroups;
-        public SubscriptionCursor Cursor;
-		public ReconnectionConfiguration ReconnectionConfiguration;
-        public int AttemptedRetries;
+        public int AttemptedRetries { get; set;}
 
 		public override IEnumerable<IEffectInvocation> OnEntry => new ReceiveReconnectInvocation()
         {

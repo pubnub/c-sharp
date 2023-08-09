@@ -9,8 +9,6 @@ namespace PubnubApi.EventEngine.Subscribe.States
 {
     public class ReceivingState : SubscriptionState
     {
-        public SubscriptionCursor Cursor;
-
         public override IEnumerable<IEffectInvocation> OnEntry => new ReceiveMessagesInvocation()
             { Channels = this.Channels,ChannelGroups = this.ChannelGroups, Cursor = this.Cursor }.AsArray();
 

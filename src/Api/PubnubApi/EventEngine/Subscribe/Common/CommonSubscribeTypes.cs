@@ -89,6 +89,7 @@ namespace PubnubApi.EventEngine.Subscribe.Common
 	{
 		public IEnumerable<string> Channels;
 		public IEnumerable<string> ChannelGroups;
+		public SubscriptionCursor Cursor;
 		public ReconnectionConfiguration ReconnectionConfiguration;
 	}
 }
