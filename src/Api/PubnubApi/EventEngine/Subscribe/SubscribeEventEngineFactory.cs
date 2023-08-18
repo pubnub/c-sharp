@@ -6,23 +6,23 @@ namespace PubnubApi.EventEngine.Subscribe
 {
 	public class SubscribeEventEngineFactory
 	{
-		private ConcurrentDictionary<string, SubscribeEventEngine> engineinstances;
+		private ConcurrentDictionary<string, SubscribeEventEngine> engineInstances { get; set;}
 		internal SubscribeEventEngineFactory()
 		{ 
-			this.engineinstances = new ConcurrentDictionary<string, SubscribeEventEngine>();
+			this.engineInstances = new ConcurrentDictionary<string, SubscribeEventEngine>();
 		}
-		internal bool hasEventEngine(string instanceId)
+		internal bool HasEventEngine(string instanceId)
 		{
-			return engineinstances.ContainsKey(instanceId);
+			return engineInstances.ContainsKey(instanceId);
 		}
-		internal SubscribeEventEngine getEventEngine(string instanceId)
+		internal SubscribeEventEngine GetEventEngine(string instanceId)
 		{
 			SubscribeEventEngine subscribeEventEngine;
-			engineinstances.TryGetValue(instanceId, out subscribeEventEngine);
+			engineInstances.TryGetValue(instanceId, out subscribeEventEngine);
 			return subscribeEventEngine;
 		}
 
-		internal SubscribeEventEngine initializeEventEngine(string instanceId,
+		internal SubscribeEventEngine InitializeEventEngine(string instanceId,
 			Pubnub pubnubInstance,
 			PNConfiguration pubnubConfiguration,
 			SubscribeManager2 subscribeManager,
@@ -30,7 +30,7 @@ namespace PubnubApi.EventEngine.Subscribe
 			Action<Pubnub, PNMessageResult<object>> messageListener= null)
 		{
 			var subscribeEventEngine = new SubscribeEventEngine(pubnubInstance, pubnubConfiguration: pubnubConfiguration, subscribeManager,statusListener, messageListener);
-			if (engineinstances.TryAdd(instanceId, subscribeEventEngine)) {
+			if (engineInstances.TryAdd(instanceId, subscribeEventEngine)) {
 				return subscribeEventEngine;
 			}
 			else {

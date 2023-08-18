@@ -6,6 +6,7 @@ using PubnubApi.EventEngine.Subscribe;
 using PubnubApi.EndPoint;
 using PubnubApi.EventEngine.Subscribe.Events;
 using PubnubApi.EventEngine.Subscribe.Common;
+using PubnubApi.Interface;
 #if !NET35 && !NET40
 using System.Collections.Concurrent;
 #endif
@@ -47,7 +48,7 @@ namespace PubnubApi
 		{
             if (pubnubConfig[InstanceId].EnableEventEngine)
             {
-				EndPoint.SubscribeOperation2<T> subscribeOperation = new EndPoint.SubscribeOperation2<T>(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, this.subscribeEventEngineFactory,InstanceId ,this);
+				EndPoint.SubscribeEndpoint<T> subscribeOperation = new EndPoint.SubscribeEndpoint<T>(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, this.subscribeEventEngineFactory,InstanceId ,this);
                 subscribeOperation.SubscribeListenerList = subscribeCallbackListenerList;
                                 
 				//subscribeOperation.CurrentPubnubInstance(this);
@@ -63,12 +64,12 @@ namespace PubnubApi
             }
         }
 
-        public EndPoint.UnsubscribeOperation<T> Unsubscribe<T>()
+        public IUnsubscribeOperation<T> Unsubscribe<T>()
         {
             if (pubnubConfig[InstanceId].EnableEventEngine)
             {
-                //TODO: Add support for Unsubscribe in Event Engine
-                throw new NotImplementedException("Unsubscribe is not implemented for Event Engine");
+                EndPoint.UnsubscribeEndpoint<T>  unsubscribeOperation = new EndPoint.UnsubscribeEndpoint<T>(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, subscribeEventEngineFactory, this);
+                return unsubscribeOperation;
             }
             else
             {
@@ -550,9 +551,9 @@ namespace PubnubApi
             bool ret = false;
             if (pubnubConfig[InstanceId].EnableEventEngine)
             {
-                if (subscribeEventEngineFactory.hasEventEngine(InstanceId))
+                if (subscribeEventEngineFactory.HasEventEngine(InstanceId))
                 {
-                    var subscribeEventEngine = subscribeEventEngineFactory.getEventEngine(InstanceId);
+                    var subscribeEventEngine = subscribeEventEngineFactory.GetEventEngine(InstanceId);
                     subscribeEventEngine.EventQueue.Enqueue(new ReconnectEvent() { Channels = (subscribeEventEngine.CurrentState as SubscriptionState).Channels, ChannelGroups = (subscribeEventEngine.CurrentState as SubscriptionState).ChannelGroups, Cursor = (subscribeEventEngine.CurrentState as SubscriptionState).Cursor });
                 }
             }
@@ -575,9 +576,9 @@ namespace PubnubApi
             bool ret = false;
             if (pubnubConfig[InstanceId].EnableEventEngine)
             {
-                if (subscribeEventEngineFactory.hasEventEngine(InstanceId))
+                if (subscribeEventEngineFactory.HasEventEngine(InstanceId))
                 {
-                    var subscribeEventEngine = subscribeEventEngineFactory.getEventEngine(InstanceId);
+                    var subscribeEventEngine = subscribeEventEngineFactory.GetEventEngine(InstanceId);
                     subscribeEventEngine.EventQueue.Enqueue(new ReconnectEvent() { Channels = (subscribeEventEngine.CurrentState as SubscriptionState).Channels, ChannelGroups = (subscribeEventEngine.CurrentState as SubscriptionState).ChannelGroups, Cursor = resetSubscribeTimetoken ? null : (subscribeEventEngine.CurrentState as SubscriptionState).Cursor });
                 }
             }
@@ -600,9 +601,9 @@ namespace PubnubApi
             bool ret = false;
             if (pubnubConfig[InstanceId].EnableEventEngine)
             {
-                if (subscribeEventEngineFactory.hasEventEngine(InstanceId))
+                if (subscribeEventEngineFactory.HasEventEngine(InstanceId))
                 {
-                    var subscribeEventEngine = subscribeEventEngineFactory.getEventEngine(InstanceId);
+                    var subscribeEventEngine = subscribeEventEngineFactory.GetEventEngine(InstanceId);
                     subscribeEventEngine.EventQueue.Enqueue(new DisconnectEvent() { Channels = (subscribeEventEngine.CurrentState as SubscriptionState).Channels, ChannelGroups = (subscribeEventEngine.CurrentState as SubscriptionState).ChannelGroups });
                 }
             }

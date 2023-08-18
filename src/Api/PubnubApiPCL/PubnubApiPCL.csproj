@@ -146,6 +146,7 @@
     </Compile>
     <Compile Include="..\PubnubApi\EndPoint\PubSub\RemoveMessageActionOperation.cs" Link="EndPoint\PubSub\RemoveMessageActionOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\PubSub\SignalOperation.cs" Link="EndPoint\PubSub\SignalOperation.cs" />
+    <Compile Include="..\PubnubApi\EndPoint\PubSub\SubscribeEndpoint.cs" Link="EndPoint\PubSub\SubscribeEndpoint.cs" />
     <Compile Include="..\PubnubApi\EndPoint\PubSub\SubscribeManager.cs">
       <Link>EndPoint\PubSub\SubscribeManager.cs</Link>
     </Compile>
@@ -153,10 +154,10 @@
     <Compile Include="..\PubnubApi\EndPoint\PubSub\SubscribeOperation.cs">
       <Link>EndPoint\PubSub\SubscribeOperation.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\EndPoint\PubSub\SubscribeOperation2.cs" Link="EndPoint\PubSub\SubscribeOperation2.cs" />
     <Compile Include="..\PubnubApi\EndPoint\PubSub\UnsubscribeAllOperation.cs">
       <Link>EndPoint\PubSub\UnsubscribeAllOperation.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\PubSub\UnsubscribeEndpoint.cs" Link="EndPoint\PubSub\UnsubscribeEndpoint.cs" />
     <Compile Include="..\PubnubApi\EndPoint\PubSub\UnsubscribeOperation.cs">
       <Link>EndPoint\PubSub\UnsubscribeOperation.cs</Link>
     </Compile>
@@ -262,6 +263,7 @@
       <Link>Interface\IPubnubUnitTest.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\Interface\ISubscribeOperation.cs" Link="Interface\ISubscribeOperation.cs" />
+    <Compile Include="..\PubnubApi\Interface\IUnsubscribeOperation.cs" Link="Interface\IUnsubscribeOperation.cs" />
     <Compile Include="..\PubnubApi\Interface\IUrlRequestBuilder.cs">
       <Link>Interface\IUrlRequestBuilder.cs</Link>
     </Compile>

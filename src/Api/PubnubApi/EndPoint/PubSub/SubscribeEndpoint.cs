@@ -15,7 +15,7 @@ using PubnubApi.EventEngine.Subscribe.Common;
 
 namespace PubnubApi.EndPoint
 {
-    public class SubscribeOperation2<T>: ISubscribeOperation<T>
+    public class SubscribeEndpoint<T>: ISubscribeOperation<T>
     {
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
@@ -32,15 +32,15 @@ namespace PubnubApi.EndPoint
         private Dictionary<string, object> queryParam;
         private Pubnub PubnubInstance;
         private SubscribeEventEngine subscribeEventEngine;
-        public SubscribeEventEngineFactory subscribeEventEngineFactory;
-        public string instanceId;
+        private SubscribeEventEngineFactory subscribeEventEngineFactory { get; set; }
+        private string instanceId { get; set; }
 		public List<SubscribeCallback> SubscribeListenerList
         {
             get;
             set;
         } = new List<SubscribeCallback>();
 
-        public SubscribeOperation2(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager,SubscribeEventEngineFactory subscribeEventEngineFactory, string instanceId, Pubnub instance) 
+        public SubscribeEndpoint(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager,SubscribeEventEngineFactory subscribeEventEngineFactory, string instanceId, Pubnub instance) 
         {
             PubnubInstance = instance;
             config = pubnubConfig;
@@ -654,14 +654,14 @@ namespace PubnubApi.EndPoint
 				throw new ArgumentException("Either Channel Or Channel Group or Both should be provided.");
 			}
 
-			if (this.subscribeEventEngineFactory.hasEventEngine(instanceId))
+			if (this.subscribeEventEngineFactory.HasEventEngine(instanceId))
             {
-                subscribeEventEngine = subscribeEventEngineFactory.getEventEngine(instanceId);
+                subscribeEventEngine = subscribeEventEngineFactory.GetEventEngine(instanceId);
 			}
             else
             {
 				var subscribeManager = new SubscribeManager2(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, PubnubInstance);
-				subscribeEventEngine = subscribeEventEngineFactory.initializeEventEngine(instanceId, PubnubInstance, config, subscribeManager, StatusEmitter, MessageEmitter);
+				subscribeEventEngine = subscribeEventEngineFactory.InitializeEventEngine(instanceId, PubnubInstance, config, subscribeManager, StatusEmitter, MessageEmitter);
                 subscribeEventEngine.OnStateTransition += SubscribeEventEngine_OnStateTransition;
                 subscribeEventEngine.OnEventQueued += SubscribeEventEngine_OnEventQueued;
                 subscribeEventEngine.OnEffectDispatch += SubscribeEventEngine_OnEffectDispatch;

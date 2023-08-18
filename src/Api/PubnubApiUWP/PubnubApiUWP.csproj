@@ -268,14 +268,17 @@
     <Compile Include="..\PubnubApi\EndPoint\PubSub\SubscribeOperation.cs">
       <Link>EndPoint\PubSub\SubscribeOperation.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\EndPoint\PubSub\SubscribeOperation2.cs">
-      <Link>EndPoint\PubSub\SubscribeOperation2.cs</Link>
+    <Compile Include="..\PubnubApi\EndPoint\PubSub\SubscribeEndpoint.cs">
+      <Link>EndPoint\PubSub\SubscribeEndpoint.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\EndPoint\PubSub\UnsubscribeAllOperation.cs">
       <Link>EndPoint\PubSub\UnsubscribeAllOperation.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\EndPoint\PubSub\UnsubscribeOperation.cs">
       <Link>EndPoint\PubSub\UnsubscribeOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\PubSub\UnsubscribeEndpoint.cs">
+      <Link>EndPoint\PubSub\UnsubscribeEndpoint.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\EndPoint\Push\AddPushChannelOperation.cs">
       <Link>EndPoint\Push\AddPushChannelOperation.cs</Link>
@@ -374,6 +377,9 @@
     </Compile>
     <Compile Include="..\PubnubApi\Interface\ISubscribeOperation.cs">
       <Link>Interface\ISubscribeOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Interface\IUnsubscribeOperation.cs">
+      <Link>Interface\IUnsubscribeOperation.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\Interface\IPubnubLog.cs">
       <Link>Interface\IPubnubLog.cs</Link>
