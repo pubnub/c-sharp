@@ -127,6 +127,7 @@ namespace PubnubApi.EventEngine.Core
     /// </summary>
     public interface IEffectInvocation
     {
+        string Name { get; set;}
     }
 
     /// <summary>
@@ -138,6 +139,7 @@ namespace PubnubApi.EventEngine.Core
 
     public interface IEvent
     {
+        string Name { get; set;}
     };
 
     public abstract class State

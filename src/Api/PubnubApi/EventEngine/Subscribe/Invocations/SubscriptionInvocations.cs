@@ -7,6 +7,7 @@ namespace PubnubApi.EventEngine.Subscribe.Invocations {
 	public class EmitMessagesInvocation : Core.IEffectInvocation {
 		public ReceivingResponse<object> Messages;
 		public SubscriptionCursor  Cursor;
+		public string Name { get; set; } = "EMIT_MESSAGES";
 		public EmitMessagesInvocation(SubscriptionCursor  cursor, ReceivingResponse<object> messages)
 		{
 			this.Cursor = cursor;
@@ -18,6 +19,7 @@ namespace PubnubApi.EventEngine.Subscribe.Invocations {
 		// TODO merge status variables into one?
 		public PNStatusCategory StatusCategory;
 		public PNStatus Status;
+		public string Name { get; set; } = "EMIT_STATUS";
 
 		public EmitStatusInvocation(PNStatus status)
 		{
@@ -45,6 +47,7 @@ namespace PubnubApi.EventEngine.Subscribe.Invocations {
 		// TODO if we need these, figure out how to pass them.
 		public Dictionary<string, string> InitialSubscribeQueryParams = new Dictionary<string, string>();
 		public Dictionary<string, object> ExternalQueryParams = new Dictionary<string, object>();
+		public string Name { get; set; } = "HANDSHAKE";
 	}
 	
 	public class ReceiveMessagesInvocation : Core.IEffectInvocation 
@@ -54,11 +57,18 @@ namespace PubnubApi.EventEngine.Subscribe.Invocations {
 		public SubscriptionCursor  Cursor;
 		public Dictionary<string, string> InitialSubscribeQueryParams = new Dictionary<string, string>();
 		public Dictionary<string, object> ExternalQueryParams = new Dictionary<string, object>();
+		public string Name { get; set; } = "RECEIVE_MESSAGES";
 	}
 	
-	public class CancelReceiveMessagesInvocation : ReceiveMessagesInvocation, Core.IEffectCancelInvocation { }
+	public class CancelReceiveMessagesInvocation : ReceiveMessagesInvocation, Core.IEffectCancelInvocation 
+	{
+		public new string Name { get; set; } = "CANCEL RECEIVE_MESSAGES";
+	}
 
-	public class CancelHandshakeInvocation : HandshakeInvocation, Core.IEffectCancelInvocation { }
+	public class CancelHandshakeInvocation : HandshakeInvocation, Core.IEffectCancelInvocation 
+	{
+		public new string Name { get; set; } = "CANCEL HANDSHAKE";
+	}
 
 	public class HandshakeReconnectInvocation: HandshakeInvocation
 	{
