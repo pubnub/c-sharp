@@ -554,6 +554,10 @@ namespace PubnubApi.EndPoint
             {
                 status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(type, PNStatusCategory.PNNetworkIssuesCategory, asyncRequestState, (int)HttpStatusCode.NotFound, new PNException(jsonString));
             }
+            else if (!NewtonsoftJsonDotNet.JsonFastCheck(jsonString))
+            {
+                status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(type, PNStatusCategory.PNNetworkIssuesCategory, asyncRequestState, (int)HttpStatusCode.NotFound, new PNException(jsonString));
+            }
 
             return status;
         }

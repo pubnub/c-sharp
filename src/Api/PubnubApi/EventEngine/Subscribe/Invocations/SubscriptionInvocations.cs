@@ -62,12 +62,12 @@ namespace PubnubApi.EventEngine.Subscribe.Invocations {
 	
 	public class CancelReceiveMessagesInvocation : ReceiveMessagesInvocation, Core.IEffectCancelInvocation 
 	{
-		public new string Name { get; set; } = "CANCEL RECEIVE_MESSAGES";
+		public new string Name { get; set; } = "CANCEL_RECEIVE_MESSAGES";
 	}
 
 	public class CancelHandshakeInvocation : HandshakeInvocation, Core.IEffectCancelInvocation 
 	{
-		public new string Name { get; set; } = "CANCEL HANDSHAKE";
+		public new string Name { get; set; } = "CANCEL_HANDSHAKE";
 	}
 
 	public class HandshakeReconnectInvocation: HandshakeInvocation

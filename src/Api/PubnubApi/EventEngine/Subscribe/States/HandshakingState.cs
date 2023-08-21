@@ -41,11 +41,11 @@ namespace PubnubApi.EventEngine.Subscribe.States
 
                 Events.HandshakeFailureEvent handshakeFailure => new States.HandshakeReconnectingState()
                 {
-                    Channels = this.Channels,
-                    ChannelGroups = this.ChannelGroups,
+                    Channels = handshakeFailure.Channels,
+                    ChannelGroups = handshakeFailure.ChannelGroups,
                     ReconnectionConfiguration = this.ReconnectionConfiguration,
                     AttemptedRetries = 1
-                }.With(new EmitStatusInvocation(handshakeFailure.Status)),
+                },
 
                 Events.DisconnectEvent disconnect => new States.HandshakeStoppedState()
                 {
