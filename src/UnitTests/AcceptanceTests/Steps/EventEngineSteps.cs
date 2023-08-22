@@ -13,6 +13,7 @@ using System.Threading.Channels;
 using System.Threading;
 using TechTalk.SpecFlow.Assist;
 using System.Net.Http;
+using System.Diagnostics;
 
 namespace AcceptanceTests.Steps
 {
@@ -31,10 +32,6 @@ namespace AcceptanceTests.Steps
         private string channel = "my_channel";
         private string channelGroup = "my_channelgroup";
         private string publishMsg = "hello_world";
-        //private UuidMetadataPersona uuidMetadataPersona = null;
-        //private PNGetUuidMetadataResult getUuidMetadataResult = null;
-        //private PNSetUuidMetadataResult setUuidMetadataResult = null;
-        //private PNGetAllUuidMetadataResult getAllUuidMetadataResult = null;
         PNPublishResult publishResult = null;
         SubscribeCallback subscribeCallback = null;
         private PNMessageResult<object> messageResult = null;
@@ -44,6 +41,11 @@ namespace AcceptanceTests.Steps
         PubnubError pnError = null;
         IPubnubUnitTest unitTest;
 
+        static void UnhandledExceptionTrapper(object sender, UnhandledExceptionEventArgs e)
+        {
+            Debug.WriteLine("Unhandled exception occured inside EventEngine. Exiting the test. Please try again.");
+            System.Environment.Exit(1);
+        }
         public class PubnubUnitTest : IPubnubUnitTest
         {
             long IPubnubUnitTest.Timetoken
@@ -135,6 +137,7 @@ namespace AcceptanceTests.Steps
         }
         public EventEngineSteps(ScenarioContext scenarioContext)
         {
+            AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionTrapper;
             _scenarioContext = scenarioContext;
         }
 
@@ -207,6 +210,7 @@ namespace AcceptanceTests.Steps
                 System.Diagnostics.Debug.WriteLine(mockExpectResponse);
             }
         }
+
         [Given(@"the demo keyset with event engine enabled")]
         public void GivenTheDemoKeysetWithEventEngineEnabled()
         {
@@ -234,7 +238,6 @@ namespace AcceptanceTests.Steps
                 config.LogVerbosity = PNLogVerbosity.NONE;
             }
             config.EnableEventEngine = true;
-
 
             messageReceivedEvent = new ManualResetEvent(false);
             statusReceivedEvent = new ManualResetEvent(false);
@@ -338,8 +341,8 @@ namespace AcceptanceTests.Steps
             {
                 Assert.Fail();
             }
-            System.Diagnostics.Debug.WriteLine($"COUNT = {pn.PubnubUnitTest.EventTypeList.Count} ");
-            for (int i = 0; i < pn.PubnubUnitTest.EventTypeList.Count(); i++)
+            System.Diagnostics.Debug.WriteLine($"COUNT = {pn.PubnubUnitTest.EventTypeList?.Count} ");
+            for (int i = 0; i < pn.PubnubUnitTest.EventTypeList?.Count(); i++)
             {
                 System.Diagnostics.Debug.WriteLine($"{pn.PubnubUnitTest.EventTypeList[i].Key} - {pn.PubnubUnitTest.EventTypeList[i].Value} ");
             }
@@ -369,6 +372,12 @@ namespace AcceptanceTests.Steps
         {
             config.ReconnectionPolicy = PNReconnectionPolicy.LINEAR;
             config.ConnectionMaxRetries = retryCount;
+        }
+
+        [Then(@"I receive an error in my subscribe response")]
+        public void ThenIReceiveAnErrorInMySubscribeResponse()
+        {
+            Assert.True(pnStatus != null && pnStatus.Error);
         }
 
         [Then(@"I receive an error")]

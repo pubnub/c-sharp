@@ -150,28 +150,49 @@ namespace PubnubApi.EndPoint
 
         private void SubscribeEventEngine_OnEffectDispatch(IEffectInvocation obj)
         {
-            unit?.EventTypeList.Add(new KeyValuePair<string, string>("invocation", obj?.Name));
-            LoggingMethod.WriteToLog(pubnubLog, $"DateTime {DateTime.Now.ToString(CultureInfo.InvariantCulture)}, EE OnEffectDispatch : CurrentState = {subscribeEventEngine.CurrentState.GetType().Name} => Invocation = {obj.GetType().Name}", config.LogVerbosity);
+            try
+            {
+                unit?.EventTypeList.Add(new KeyValuePair<string, string>("invocation", obj?.Name));
+                LoggingMethod.WriteToLog(pubnubLog, $"DateTime {DateTime.Now.ToString(CultureInfo.InvariantCulture)}, EE OnEffectDispatch : CurrentState = {subscribeEventEngine.CurrentState.GetType().Name} => Invocation = {obj.GetType().Name}", config.LogVerbosity);
+            }
+            catch (Exception ex)
+            {
+                LoggingMethod.WriteToLog(pubnubLog, $"DateTime {DateTime.Now.ToString(CultureInfo.InvariantCulture)}, EE OnEffectDispatch : CurrentState = {subscribeEventEngine.CurrentState.GetType().Name} => EXCEPTION = {ex}", config.LogVerbosity);
+            }
         }
 
         private void SubscribeEventEngine_OnEventQueued(IEvent @event)
         {
-            unit?.EventTypeList.Add(new KeyValuePair<string, string>("event", @event?.Name));
-            int attempts = 0;
-            if (subscribeEventEngine.CurrentState is HandshakeReconnectingState handshakeReconnectingState)
+            try
             {
-                attempts = handshakeReconnectingState.AttemptedRetries;
+                unit?.EventTypeList.Add(new KeyValuePair<string, string>("event", @event?.Name));
+                int attempts = 0;
+                if (subscribeEventEngine.CurrentState is HandshakeReconnectingState handshakeReconnectingState)
+                {
+                    attempts = handshakeReconnectingState.AttemptedRetries;
+                }
+                else if (subscribeEventEngine.CurrentState is ReceiveReconnectingState receiveReconnectingState)
+                {
+                    attempts = receiveReconnectingState.AttemptedRetries;
+                }
+                LoggingMethod.WriteToLog(pubnubLog, $"DateTime {DateTime.Now.ToString(CultureInfo.InvariantCulture)}, EE OnEventQueued : CurrentState: {subscribeEventEngine.CurrentState.GetType().Name}; Event = {@event.GetType().Name}; Attempt = {attempts} of {config.ConnectionMaxRetries}", config.LogVerbosity);
             }
-            else if (subscribeEventEngine.CurrentState is ReceiveReconnectingState receiveReconnectingState)
+            catch(Exception ex)
             {
-                attempts = receiveReconnectingState.AttemptedRetries;
+                LoggingMethod.WriteToLog(pubnubLog, $"DateTime {DateTime.Now.ToString(CultureInfo.InvariantCulture)}, EE OnEventQueued : CurrentState = {subscribeEventEngine.CurrentState.GetType().Name} => EXCEPTION = {ex}", config.LogVerbosity);
             }
-            LoggingMethod.WriteToLog(pubnubLog, $"DateTime {DateTime.Now.ToString(CultureInfo.InvariantCulture)}, EE OnEventQueued : CurrentState: {subscribeEventEngine.CurrentState.GetType().Name}; Event = {@event.GetType().Name}; Attempt = {attempts} of {config.ConnectionMaxRetries}", config.LogVerbosity);
         }
 
         private void SubscribeEventEngine_OnStateTransition(EventEngine.Core.TransitionResult obj)
         {
-            LoggingMethod.WriteToLog(pubnubLog, $"DateTime {DateTime.Now.ToString(CultureInfo.InvariantCulture)}, EE OnStateTransition : CurrentState = {subscribeEventEngine.CurrentState.GetType().Name} => Transition State = {obj?.State.GetType().Name}", config.LogVerbosity);
+            try
+            {
+                LoggingMethod.WriteToLog(pubnubLog, $"DateTime {DateTime.Now.ToString(CultureInfo.InvariantCulture)}, EE OnStateTransition : CurrentState = {subscribeEventEngine.CurrentState.GetType().Name} => Transition State = {obj?.State.GetType().Name}", config.LogVerbosity);
+            }
+            catch(Exception ex)
+            {
+                LoggingMethod.WriteToLog(pubnubLog, $"DateTime {DateTime.Now.ToString(CultureInfo.InvariantCulture)}, EE OnStateTransition : CurrentState = {subscribeEventEngine.CurrentState.GetType().Name} => EXCEPTION = {ex}", config.LogVerbosity);
+            }
         }
 
 		private void MessageEmitter<T>(Pubnub pubnubInstance, PNMessageResult<T> messageResult)

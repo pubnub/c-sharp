@@ -310,7 +310,10 @@ namespace PubnubApi.EndPoint
                     jsonString = await pubnubHttp.SendRequestAndGetJsonResponse(requestUri, pubnubRequestState, request).ConfigureAwait(false);
                 }
 #endif
-
+                if (pubnubLog != null && config != null)
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, $"DateTime {DateTime.Now.ToString(CultureInfo.InvariantCulture)}, JSON= {jsonString} for request={requestUri}", config.LogVerbosity);
+                }
                 PNStatus errStatus = GetStatusIfError<T>(pubnubRequestState, jsonString);
                 return new Tuple<string, PNStatus>((errStatus == null) ? jsonString : "", errStatus);
             }

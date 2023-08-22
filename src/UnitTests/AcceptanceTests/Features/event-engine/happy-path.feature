@@ -1,33 +1,33 @@
-@featureSet=eventEngine
+@featureSet=eventEngine @beta
 Feature: Event Engine
   This is a description of the feature
 
   Background:
     Given the demo keyset with event engine enabled
 
-  @contract=simpleSubscribe @beta
+  @contract=simpleSubscribe
   Scenario: Successfully receive messages
     When I subscribe
-    When I publish a message
     Then I receive the message in my subscribe response
     And I observe the following:
-      | type       | name                  |
-      | event      | SUBSCRIPTION_CHANGED  |
-      | invocation | HANDSHAKE             |
-      | event      | HANDSHAKE_SUCCESS     |
-      | invocation | CANCEL_HANDSHAKE      |
-      | invocation | EMIT_STATUS           |
-      | invocation | RECEIVE_EVENTS        |
-      | event      | RECEIVE_SUCCESS       |
-      | invocation | CANCEL_RECEIVE_EVENTS |
-      | invocation | EMIT_STATUS           |
-      | invocation | EMIT_EVENTS           |
+      | type       | name                    |
+      | event      | SUBSCRIPTION_CHANGED    |
+      | invocation | HANDSHAKE               |
+      | event      | HANDSHAKE_SUCCESS       |
+      | invocation | CANCEL_HANDSHAKE        |
+      | invocation | EMIT_STATUS             |
+      | invocation | RECEIVE_MESSAGES        |
+      | event      | RECEIVE_SUCCESS         |
+      | invocation | CANCEL_RECEIVE_MESSAGES |
+      | invocation | EMIT_MESSAGES           |
+      | invocation | EMIT_STATUS             |
+      | invocation | RECEIVE_MESSAGES        |
 
-  @contract=subscribeHandshakeFailure @beta
+  @contract=subscribeHandshakeFailure
   Scenario: Complete handshake failure
     Given a linear reconnection policy with 3 retries
     When I subscribe
-    Then I receive an error
+    Then I receive an error in my subscribe response
     And I observe the following:
       | type       | name                        |
       | event      | SUBSCRIPTION_CHANGED        |
@@ -48,7 +48,7 @@ Feature: Event Engine
       | invocation | CANCEL_HANDSHAKE_RECONNECT  |
       | invocation | EMIT_STATUS                 |
 
-  @contract=subscribeHandshakeRecovery @beta
+  @contract=subscribeHandshakeRecovery
   Scenario: Handshake failure recovery
     Given a linear reconnection policy with 3 retries
     When I subscribe
@@ -66,14 +66,16 @@ Feature: Event Engine
       | event      | HANDSHAKE_RECONNECT_SUCCESS |
       | invocation | CANCEL_HANDSHAKE_RECONNECT  |
       | invocation | EMIT_STATUS                 |
-      | invocation | RECEIVE_EVENTS              |
+      | invocation | RECEIVE_MESSAGES            |
       | event      | RECEIVE_SUCCESS             |
-      | invocation | CANCEL_RECEIVE_EVENTS       |
+      | invocation | CANCEL_RECEIVE_MESSAGES     |
+      | invocation | EMIT_MESSAGES               |
       | invocation | EMIT_STATUS                 |
-      | invocation | EMIT_EVENTS                 |
+      | invocation | RECEIVE_MESSAGES            |
 
-  @contract=subscribeReceivingRecovery @beta
+  @contract=subscribeReceivingRecovery
   Scenario: Receiving failure recovery
+    Given a linear reconnection policy with 3 retries
     When I subscribe
     Then I receive the message in my subscribe response
     And I observe the following:
@@ -83,12 +85,12 @@ Feature: Event Engine
       | event      | HANDSHAKE_SUCCESS         |
       | invocation | CANCEL_HANDSHAKE          |
       | invocation | EMIT_STATUS               |
-      | invocation | RECEIVE_EVENTS            |
+      | invocation | RECEIVE_MESSAGES          |
       | event      | RECEIVE_FAILURE           |
-      | invocation | CANCEL_RECEIVE_EVENTS     |
+      | invocation | CANCEL_RECEIVE_MESSAGES   |
       | invocation | RECEIVE_RECONNECT         |
       | event      | RECEIVE_RECONNECT_SUCCESS |
       | invocation | CANCEL_RECEIVE_RECONNECT  |
+      | invocation | EMIT_MESSAGES             |
       | invocation | EMIT_STATUS               |
-      | invocation | EMIT_EVENTS               |
-      | invocation | RECEIVE_EVENTS            |
+      | invocation | RECEIVE_MESSAGES          |

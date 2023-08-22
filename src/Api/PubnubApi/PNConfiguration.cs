@@ -184,7 +184,7 @@ namespace PubnubApi
             UseRandomInitializationVector = true;
             FileMessagePublishRetryLimit = 5;
             _userId = currentUserId;
-            EnableEventEngine = true;
+            EnableEventEngine = false;
             ConnectionMaxRetries = -1;
         }
         public PNConfiguration SetPresenceTimeoutWithCustomInterval(int timeout, int interval)

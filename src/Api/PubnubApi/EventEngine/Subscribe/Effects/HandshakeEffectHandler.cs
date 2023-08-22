@@ -11,6 +11,7 @@ using PubnubApi.EventEngine.Subscribe.Context;
 using PubnubApi.EventEngine.Subscribe.Events;
 using PubnubApi.EventEngine.Subscribe.Invocations;
 using PubnubApi.EventEngine.Subscribe.Common;
+using System.Diagnostics;
 
 namespace PubnubApi.EventEngine.Subscribe.Effects
 {
@@ -55,7 +56,7 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
                     eventQueue.Enqueue(new Events.HandshakeReconnectSuccessEvent() { Cursor = cursor, Status = response.Item2 });
                     break;
                 case { } when response.Item2.Error:
-                    eventQueue.Enqueue(new Events.HandshakeFailureEvent() { Status = response.Item2});
+                    eventQueue.Enqueue(new Events.HandshakeFailureEvent() { Status = response.Item2, Channels = invocation.Channels, ChannelGroups = invocation.ChannelGroups});
                     break;
                 case { }:
                     eventQueue.Enqueue(new Events.HandshakeSuccessEvent() { Cursor = cursor, Status = response.Item2 });
@@ -107,16 +108,23 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
 
         public override async Task Run(HandshakeReconnectInvocation invocation)
         {
-            if (!ReconnectionDelayUtil.shouldRetry(invocation.ReconnectionConfiguration, invocation.AttemptedRetries))
+            try
             {
-                eventQueue.Enqueue(new HandshakeReconnectGiveUpEvent() { Status = new PNStatus(PNStatusCategory.PNCancelledCategory) });
+                if (!ReconnectionDelayUtil.shouldRetry(invocation.ReconnectionConfiguration, invocation.AttemptedRetries))
+                {
+                    eventQueue.Enqueue(new HandshakeReconnectGiveUpEvent() { Status = new PNStatus(new Exception(""), PNOperationType.PNSubscribeOperation, PNStatusCategory.PNCancelledCategory, invocation.Channels, invocation.ChannelGroups ) });
+                }
+                else
+                {
+                    retryDelay = new Delay(ReconnectionDelayUtil.CalculateDelay(invocation.ReconnectionConfiguration.ReconnectionPolicy, invocation.AttemptedRetries));
+                    await retryDelay.Start();
+                    if (!retryDelay.Cancelled)
+                        await handshakeEffectHandler.Run(invocation as HandshakeInvocation);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                retryDelay = new Delay(ReconnectionDelayUtil.CalculateDelay(invocation.ReconnectionConfiguration.ReconnectionPolicy, invocation.AttemptedRetries));
-                await retryDelay.Start();
-                if (!retryDelay.Cancelled)
-                    await handshakeEffectHandler.Run(invocation as HandshakeInvocation);
+                Debug.WriteLine(ex);
             }
         }
 

@@ -47,7 +47,7 @@ namespace PubnubApi.EventEngine.Subscribe.Invocations {
 		// TODO if we need these, figure out how to pass them.
 		public Dictionary<string, string> InitialSubscribeQueryParams = new Dictionary<string, string>();
 		public Dictionary<string, object> ExternalQueryParams = new Dictionary<string, object>();
-		public string Name { get; set; } = "HANDSHAKE";
+		public virtual string Name { get; set; } = "HANDSHAKE";
 	}
 	
 	public class ReceiveMessagesInvocation : Core.IEffectInvocation 
@@ -57,32 +57,40 @@ namespace PubnubApi.EventEngine.Subscribe.Invocations {
 		public SubscriptionCursor  Cursor;
 		public Dictionary<string, string> InitialSubscribeQueryParams = new Dictionary<string, string>();
 		public Dictionary<string, object> ExternalQueryParams = new Dictionary<string, object>();
-		public string Name { get; set; } = "RECEIVE_MESSAGES";
+		public virtual string Name { get; set; } = "RECEIVE_MESSAGES";
 	}
 	
 	public class CancelReceiveMessagesInvocation : ReceiveMessagesInvocation, Core.IEffectCancelInvocation 
 	{
-		public new string Name { get; set; } = "CANCEL_RECEIVE_MESSAGES";
+		public override string Name { get; set; } = "CANCEL_RECEIVE_MESSAGES";
 	}
 
 	public class CancelHandshakeInvocation : HandshakeInvocation, Core.IEffectCancelInvocation 
 	{
-		public new string Name { get; set; } = "CANCEL_HANDSHAKE";
+		public override string Name { get; set; } = "CANCEL_HANDSHAKE";
 	}
 
 	public class HandshakeReconnectInvocation: HandshakeInvocation
 	{
 		public ReconnectionConfiguration ReconnectionConfiguration;
 		public int AttemptedRetries;
+		public override string Name { get; set; } = "HANDSHAKE_RECONNECT";
 	}
 
-	public class CancelHandshakeReconnectInvocation: HandshakeReconnectInvocation, Core.IEffectCancelInvocation { }
+	public class CancelHandshakeReconnectInvocation: HandshakeReconnectInvocation, Core.IEffectCancelInvocation 
+	{ 
+		public override string Name { get; set; } = "CANCEL_HANDSHAKE_RECONNECT";
+	}
 	
 	public class ReceiveReconnectInvocation: ReceiveMessagesInvocation 
 	{ 
 		public ReconnectionConfiguration ReconnectionConfiguration;
 		public int AttemptedRetries;
+		public override string Name { get; set; } = "RECEIVE_RECONNECT";
 	}
 
-	public class CancelReceiveReconnectInvocation: ReceiveReconnectInvocation, Core.IEffectCancelInvocation { }
+	public class CancelReceiveReconnectInvocation: ReceiveReconnectInvocation, Core.IEffectCancelInvocation 
+	{
+		public override string Name { get; set; } = "CANCEL_RECEIVE_RECONNECT";
+	}
 }

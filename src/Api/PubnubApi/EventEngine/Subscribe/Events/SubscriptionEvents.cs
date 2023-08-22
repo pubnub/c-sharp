@@ -22,7 +22,7 @@ namespace PubnubApi.EventEngine.Subscribe.Events {
 	public class HandshakeSuccessEvent : Core.IEvent {
 		public SubscriptionCursor Cursor;
 		public PNStatus Status;
-		public string Name { get; set; } = "HANDSHAKE_SUCCESS";
+		public virtual string Name { get; set; } = "HANDSHAKE_SUCCESS";
 	}
 
 	public class HandshakeFailureEvent : Core.IEvent {
@@ -30,20 +30,20 @@ namespace PubnubApi.EventEngine.Subscribe.Events {
 		public IEnumerable<string> ChannelGroups;
 		public PNStatus Status;
 		public int AttemptedRetries;
-		public string Name { get; set; } = "HANDSHAKE_FAILURE";
+		public virtual string Name { get; set; } = "HANDSHAKE_FAILURE";
 	}
 
 	public class HandshakeReconnectSuccessEvent : HandshakeSuccessEvent {
 		public PNStatus Status;
 		public SubscriptionCursor Cursor;
-		public new string Name { get; set; } = "HANDSHAKE_RECONNECT_SUCCESS";
+		public override string Name { get; set; } = "HANDSHAKE_RECONNECT_SUCCESS";
 	}
 
 	public class HandshakeReconnectFailureEvent : HandshakeFailureEvent
 	{
 		public IEnumerable<string> Channels;
 		public IEnumerable<string> ChannelGroups;
-		public new string Name { get; set; } = "HANDSHAKE_RECONNECT_FAILURE";
+		public override string Name { get; set; } = "HANDSHAKE_RECONNECT_FAILURE";
 	}
 
 	public class HandshakeReconnectGiveUpEvent : Core.IEvent {
@@ -57,22 +57,22 @@ namespace PubnubApi.EventEngine.Subscribe.Events {
 		public ReceivingResponse<object> Messages;
 		public SubscriptionCursor Cursor;
 		public PNStatus Status;
-		public string Name { get; set; } = "RECEIVE_SUCCESS";
+		public virtual string Name { get; set; } = "RECEIVE_SUCCESS";
 	}
 
 	public class ReceiveFailureEvent : Core.IEvent {
 		public PNStatus Status;
 		public int AttemptedRetries;
 		public SubscriptionCursor Cursor;
-		public string Name { get; set; } = "RECEIVE_FAILURE";
+		public virtual string Name { get; set; } = "RECEIVE_FAILURE";
 	}
 
 	public class ReceiveReconnectSuccessEvent : ReceiveSuccessEvent {
-		public new string Name { get; set; } = "RECEIVE_RECONNECT_SUCCESS";
+		public override string Name { get; set; } = "RECEIVE_RECONNECT_SUCCESS";
 	}
 
 	public class ReceiveReconnectFailureEvent : ReceiveFailureEvent {
-		public new string Name { get; set; } = "RECEIVE_RECONNECT_FAILURE";
+		public override string Name { get; set; } = "RECEIVE_RECONNECT_FAILURE";
 	}
 
 	public class ReceiveReconnectGiveUpEvent : Core.IEvent {

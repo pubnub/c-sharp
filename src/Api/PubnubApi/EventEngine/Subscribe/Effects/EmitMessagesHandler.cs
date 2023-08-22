@@ -36,7 +36,7 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
 
         public async override Task Run(EmitMessagesInvocation invocation)
         {
-            var processedMessages = invocation.Messages?.Messages.Select(m =>
+            var processedMessages = invocation.Messages?.Messages?.Select(m =>
             {
                 var msgResult = new PNMessageResult<object>()
                 {

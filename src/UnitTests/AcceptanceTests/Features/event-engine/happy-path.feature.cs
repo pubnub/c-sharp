@@ -22,13 +22,15 @@ namespace AcceptanceTests.Features.Event_Engine
     [NUnit.Framework.TestFixtureAttribute()]
     [NUnit.Framework.DescriptionAttribute("Event Engine")]
     [NUnit.Framework.CategoryAttribute("featureSet=eventEngine")]
+    [NUnit.Framework.CategoryAttribute("beta")]
     public partial class EventEngineFeature
     {
         
         private TechTalk.SpecFlow.ITestRunner testRunner;
         
         private static string[] featureTags = new string[] {
-                "featureSet=eventEngine"};
+                "featureSet=eventEngine",
+                "beta"};
         
 #line 1 "happy-path.feature"
 #line hidden
@@ -87,12 +89,10 @@ namespace AcceptanceTests.Features.Event_Engine
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("Successfully receive messages")]
         [NUnit.Framework.CategoryAttribute("contract=simpleSubscribe")]
-        [NUnit.Framework.CategoryAttribute("beta")]
         public void SuccessfullyReceiveMessages()
         {
             string[] tagsOfScenario = new string[] {
-                    "contract=simpleSubscribe",
-                    "beta"};
+                    "contract=simpleSubscribe"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Successfully receive messages", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 9
@@ -112,9 +112,6 @@ namespace AcceptanceTests.Features.Event_Engine
     testRunner.When("I subscribe", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 11
-    testRunner.When("I publish a message", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 12
     testRunner.Then("I receive the message in my subscribe response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
                 TechTalk.SpecFlow.Table table1 = new TechTalk.SpecFlow.Table(new string[] {
@@ -137,20 +134,23 @@ namespace AcceptanceTests.Features.Event_Engine
                             "EMIT_STATUS"});
                 table1.AddRow(new string[] {
                             "invocation",
-                            "RECEIVE_EVENTS"});
+                            "RECEIVE_MESSAGES"});
                 table1.AddRow(new string[] {
                             "event",
                             "RECEIVE_SUCCESS"});
                 table1.AddRow(new string[] {
                             "invocation",
-                            "CANCEL_RECEIVE_EVENTS"});
+                            "CANCEL_RECEIVE_MESSAGES"});
+                table1.AddRow(new string[] {
+                            "invocation",
+                            "EMIT_MESSAGES"});
                 table1.AddRow(new string[] {
                             "invocation",
                             "EMIT_STATUS"});
                 table1.AddRow(new string[] {
                             "invocation",
-                            "EMIT_EVENTS"});
-#line 13
+                            "RECEIVE_MESSAGES"});
+#line 12
     testRunner.And("I observe the following:", ((string)(null)), table1, "And ");
 #line hidden
             }
@@ -160,12 +160,10 @@ namespace AcceptanceTests.Features.Event_Engine
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("Complete handshake failure")]
         [NUnit.Framework.CategoryAttribute("contract=subscribeHandshakeFailure")]
-        [NUnit.Framework.CategoryAttribute("beta")]
         public void CompleteHandshakeFailure()
         {
             string[] tagsOfScenario = new string[] {
-                    "contract=subscribeHandshakeFailure",
-                    "beta"};
+                    "contract=subscribeHandshakeFailure"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Complete handshake failure", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 27
@@ -188,7 +186,7 @@ namespace AcceptanceTests.Features.Event_Engine
     testRunner.When("I subscribe", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 30
-    testRunner.Then("I receive an error", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+    testRunner.Then("I receive an error in my subscribe response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
                 TechTalk.SpecFlow.Table table2 = new TechTalk.SpecFlow.Table(new string[] {
                             "type",
@@ -254,12 +252,10 @@ namespace AcceptanceTests.Features.Event_Engine
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("Handshake failure recovery")]
         [NUnit.Framework.CategoryAttribute("contract=subscribeHandshakeRecovery")]
-        [NUnit.Framework.CategoryAttribute("beta")]
         public void HandshakeFailureRecovery()
         {
             string[] tagsOfScenario = new string[] {
-                    "contract=subscribeHandshakeRecovery",
-                    "beta"};
+                    "contract=subscribeHandshakeRecovery"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Handshake failure recovery", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 52
@@ -322,19 +318,22 @@ namespace AcceptanceTests.Features.Event_Engine
                             "EMIT_STATUS"});
                 table3.AddRow(new string[] {
                             "invocation",
-                            "RECEIVE_EVENTS"});
+                            "RECEIVE_MESSAGES"});
                 table3.AddRow(new string[] {
                             "event",
                             "RECEIVE_SUCCESS"});
                 table3.AddRow(new string[] {
                             "invocation",
-                            "CANCEL_RECEIVE_EVENTS"});
+                            "CANCEL_RECEIVE_MESSAGES"});
+                table3.AddRow(new string[] {
+                            "invocation",
+                            "EMIT_MESSAGES"});
                 table3.AddRow(new string[] {
                             "invocation",
                             "EMIT_STATUS"});
                 table3.AddRow(new string[] {
                             "invocation",
-                            "EMIT_EVENTS"});
+                            "RECEIVE_MESSAGES"});
 #line 56
     testRunner.And("I observe the following:", ((string)(null)), table3, "And ");
 #line hidden
@@ -345,15 +344,13 @@ namespace AcceptanceTests.Features.Event_Engine
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("Receiving failure recovery")]
         [NUnit.Framework.CategoryAttribute("contract=subscribeReceivingRecovery")]
-        [NUnit.Framework.CategoryAttribute("beta")]
         public void ReceivingFailureRecovery()
         {
             string[] tagsOfScenario = new string[] {
-                    "contract=subscribeReceivingRecovery",
-                    "beta"};
+                    "contract=subscribeReceivingRecovery"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Receiving failure recovery", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 76
+#line 77
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -366,10 +363,13 @@ namespace AcceptanceTests.Features.Event_Engine
 #line 5
   this.FeatureBackground();
 #line hidden
-#line 77
+#line 78
+    testRunner.Given("a linear reconnection policy with 3 retries", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 79
     testRunner.When("I subscribe", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 78
+#line 80
     testRunner.Then("I receive the message in my subscribe response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
                 TechTalk.SpecFlow.Table table4 = new TechTalk.SpecFlow.Table(new string[] {
@@ -392,13 +392,13 @@ namespace AcceptanceTests.Features.Event_Engine
                             "EMIT_STATUS"});
                 table4.AddRow(new string[] {
                             "invocation",
-                            "RECEIVE_EVENTS"});
+                            "RECEIVE_MESSAGES"});
                 table4.AddRow(new string[] {
                             "event",
                             "RECEIVE_FAILURE"});
                 table4.AddRow(new string[] {
                             "invocation",
-                            "CANCEL_RECEIVE_EVENTS"});
+                            "CANCEL_RECEIVE_MESSAGES"});
                 table4.AddRow(new string[] {
                             "invocation",
                             "RECEIVE_RECONNECT"});
@@ -410,14 +410,14 @@ namespace AcceptanceTests.Features.Event_Engine
                             "CANCEL_RECEIVE_RECONNECT"});
                 table4.AddRow(new string[] {
                             "invocation",
+                            "EMIT_MESSAGES"});
+                table4.AddRow(new string[] {
+                            "invocation",
                             "EMIT_STATUS"});
                 table4.AddRow(new string[] {
                             "invocation",
-                            "EMIT_EVENTS"});
-                table4.AddRow(new string[] {
-                            "invocation",
-                            "RECEIVE_EVENTS"});
-#line 79
+                            "RECEIVE_MESSAGES"});
+#line 81
     testRunner.And("I observe the following:", ((string)(null)), table4, "And ");
 #line hidden
             }
