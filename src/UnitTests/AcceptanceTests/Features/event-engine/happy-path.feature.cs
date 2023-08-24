@@ -146,9 +146,6 @@ namespace AcceptanceTests.Features.Event_Engine
                             "EMIT_MESSAGES"});
                 table1.AddRow(new string[] {
                             "invocation",
-                            "EMIT_STATUS"});
-                table1.AddRow(new string[] {
-                            "invocation",
                             "RECEIVE_MESSAGES"});
 #line 12
     testRunner.And("I observe the following:", ((string)(null)), table1, "And ");
@@ -158,15 +155,15 @@ namespace AcceptanceTests.Features.Event_Engine
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Complete handshake failure")]
-        [NUnit.Framework.CategoryAttribute("contract=subscribeHandshakeFailure")]
-        public void CompleteHandshakeFailure()
+        [NUnit.Framework.DescriptionAttribute("Successfully restore subscribe")]
+        [NUnit.Framework.CategoryAttribute("contract=restoringSubscribe")]
+        public void SuccessfullyRestoreSubscribe()
         {
             string[] tagsOfScenario = new string[] {
-                    "contract=subscribeHandshakeFailure"};
+                    "contract=restoringSubscribe"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Complete handshake failure", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 27
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Successfully restore subscribe", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 26
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -179,70 +176,46 @@ namespace AcceptanceTests.Features.Event_Engine
 #line 5
   this.FeatureBackground();
 #line hidden
+#line 27
+    testRunner.When("I subscribe with timetoken 42", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
 #line 28
-    testRunner.Given("a linear reconnection policy with 3 retries", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line hidden
-#line 29
-    testRunner.When("I subscribe", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 30
-    testRunner.Then("I receive an error in my subscribe response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+    testRunner.Then("I receive the message in my subscribe response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
                 TechTalk.SpecFlow.Table table2 = new TechTalk.SpecFlow.Table(new string[] {
                             "type",
                             "name"});
                 table2.AddRow(new string[] {
                             "event",
-                            "SUBSCRIPTION_CHANGED"});
+                            "SUBSCRIPTION_RESTORED"});
                 table2.AddRow(new string[] {
                             "invocation",
                             "HANDSHAKE"});
                 table2.AddRow(new string[] {
                             "event",
-                            "HANDSHAKE_FAILURE"});
+                            "HANDSHAKE_SUCCESS"});
                 table2.AddRow(new string[] {
                             "invocation",
                             "CANCEL_HANDSHAKE"});
                 table2.AddRow(new string[] {
                             "invocation",
-                            "HANDSHAKE_RECONNECT"});
-                table2.AddRow(new string[] {
-                            "event",
-                            "HANDSHAKE_RECONNECT_FAILURE"});
-                table2.AddRow(new string[] {
-                            "invocation",
-                            "CANCEL_HANDSHAKE_RECONNECT"});
-                table2.AddRow(new string[] {
-                            "invocation",
-                            "HANDSHAKE_RECONNECT"});
-                table2.AddRow(new string[] {
-                            "event",
-                            "HANDSHAKE_RECONNECT_FAILURE"});
-                table2.AddRow(new string[] {
-                            "invocation",
-                            "CANCEL_HANDSHAKE_RECONNECT"});
-                table2.AddRow(new string[] {
-                            "invocation",
-                            "HANDSHAKE_RECONNECT"});
-                table2.AddRow(new string[] {
-                            "event",
-                            "HANDSHAKE_RECONNECT_FAILURE"});
-                table2.AddRow(new string[] {
-                            "invocation",
-                            "CANCEL_HANDSHAKE_RECONNECT"});
-                table2.AddRow(new string[] {
-                            "invocation",
-                            "HANDSHAKE_RECONNECT"});
-                table2.AddRow(new string[] {
-                            "event",
-                            "HANDSHAKE_RECONNECT_GIVEUP"});
-                table2.AddRow(new string[] {
-                            "invocation",
-                            "CANCEL_HANDSHAKE_RECONNECT"});
-                table2.AddRow(new string[] {
-                            "invocation",
                             "EMIT_STATUS"});
-#line 31
+                table2.AddRow(new string[] {
+                            "invocation",
+                            "RECEIVE_MESSAGES"});
+                table2.AddRow(new string[] {
+                            "event",
+                            "RECEIVE_SUCCESS"});
+                table2.AddRow(new string[] {
+                            "invocation",
+                            "CANCEL_RECEIVE_MESSAGES"});
+                table2.AddRow(new string[] {
+                            "invocation",
+                            "EMIT_MESSAGES"});
+                table2.AddRow(new string[] {
+                            "invocation",
+                            "RECEIVE_MESSAGES"});
+#line 29
     testRunner.And("I observe the following:", ((string)(null)), table2, "And ");
 #line hidden
             }
@@ -250,15 +223,15 @@ namespace AcceptanceTests.Features.Event_Engine
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Handshake failure recovery")]
-        [NUnit.Framework.CategoryAttribute("contract=subscribeHandshakeRecovery")]
-        public void HandshakeFailureRecovery()
+        [NUnit.Framework.DescriptionAttribute("Successfully restore subscribe with failures")]
+        [NUnit.Framework.CategoryAttribute("contract=restoringSubscribeWithFailures")]
+        public void SuccessfullyRestoreSubscribeWithFailures()
         {
             string[] tagsOfScenario = new string[] {
-                    "contract=subscribeHandshakeRecovery"};
+                    "contract=restoringSubscribeWithFailures"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Handshake failure recovery", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 52
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Successfully restore subscribe with failures", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 43
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -271,13 +244,13 @@ namespace AcceptanceTests.Features.Event_Engine
 #line 5
   this.FeatureBackground();
 #line hidden
-#line 53
+#line 44
     testRunner.Given("a linear reconnection policy with 3 retries", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 54
-    testRunner.When("I subscribe", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 45
+    testRunner.When("I subscribe with timetoken 42", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 55
+#line 46
     testRunner.Then("I receive the message in my subscribe response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
                 TechTalk.SpecFlow.Table table3 = new TechTalk.SpecFlow.Table(new string[] {
@@ -285,7 +258,7 @@ namespace AcceptanceTests.Features.Event_Engine
                             "name"});
                 table3.AddRow(new string[] {
                             "event",
-                            "SUBSCRIPTION_CHANGED"});
+                            "SUBSCRIPTION_RESTORED"});
                 table3.AddRow(new string[] {
                             "invocation",
                             "HANDSHAKE"});
@@ -295,15 +268,6 @@ namespace AcceptanceTests.Features.Event_Engine
                 table3.AddRow(new string[] {
                             "invocation",
                             "CANCEL_HANDSHAKE"});
-                table3.AddRow(new string[] {
-                            "invocation",
-                            "HANDSHAKE_RECONNECT"});
-                table3.AddRow(new string[] {
-                            "event",
-                            "HANDSHAKE_RECONNECT_FAILURE"});
-                table3.AddRow(new string[] {
-                            "invocation",
-                            "CANCEL_HANDSHAKE_RECONNECT"});
                 table3.AddRow(new string[] {
                             "invocation",
                             "HANDSHAKE_RECONNECT"});
@@ -330,12 +294,190 @@ namespace AcceptanceTests.Features.Event_Engine
                             "EMIT_MESSAGES"});
                 table3.AddRow(new string[] {
                             "invocation",
+                            "RECEIVE_MESSAGES"});
+#line 47
+    testRunner.And("I observe the following:", ((string)(null)), table3, "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Complete handshake failure")]
+        [NUnit.Framework.CategoryAttribute("contract=subscribeHandshakeFailure")]
+        public void CompleteHandshakeFailure()
+        {
+            string[] tagsOfScenario = new string[] {
+                    "contract=subscribeHandshakeFailure"};
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Complete handshake failure", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 64
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 5
+  this.FeatureBackground();
+#line hidden
+#line 65
+    testRunner.Given("a linear reconnection policy with 3 retries", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 66
+    testRunner.When("I subscribe", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 67
+    testRunner.Then("I receive an error in my subscribe response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+                TechTalk.SpecFlow.Table table4 = new TechTalk.SpecFlow.Table(new string[] {
+                            "type",
+                            "name"});
+                table4.AddRow(new string[] {
+                            "event",
+                            "SUBSCRIPTION_CHANGED"});
+                table4.AddRow(new string[] {
+                            "invocation",
+                            "HANDSHAKE"});
+                table4.AddRow(new string[] {
+                            "event",
+                            "HANDSHAKE_FAILURE"});
+                table4.AddRow(new string[] {
+                            "invocation",
+                            "CANCEL_HANDSHAKE"});
+                table4.AddRow(new string[] {
+                            "invocation",
+                            "HANDSHAKE_RECONNECT"});
+                table4.AddRow(new string[] {
+                            "event",
+                            "HANDSHAKE_RECONNECT_FAILURE"});
+                table4.AddRow(new string[] {
+                            "invocation",
+                            "CANCEL_HANDSHAKE_RECONNECT"});
+                table4.AddRow(new string[] {
+                            "invocation",
+                            "HANDSHAKE_RECONNECT"});
+                table4.AddRow(new string[] {
+                            "event",
+                            "HANDSHAKE_RECONNECT_FAILURE"});
+                table4.AddRow(new string[] {
+                            "invocation",
+                            "CANCEL_HANDSHAKE_RECONNECT"});
+                table4.AddRow(new string[] {
+                            "invocation",
+                            "HANDSHAKE_RECONNECT"});
+                table4.AddRow(new string[] {
+                            "event",
+                            "HANDSHAKE_RECONNECT_FAILURE"});
+                table4.AddRow(new string[] {
+                            "invocation",
+                            "CANCEL_HANDSHAKE_RECONNECT"});
+                table4.AddRow(new string[] {
+                            "invocation",
+                            "HANDSHAKE_RECONNECT"});
+                table4.AddRow(new string[] {
+                            "event",
+                            "HANDSHAKE_RECONNECT_GIVEUP"});
+                table4.AddRow(new string[] {
+                            "invocation",
+                            "CANCEL_HANDSHAKE_RECONNECT"});
+                table4.AddRow(new string[] {
+                            "invocation",
                             "EMIT_STATUS"});
-                table3.AddRow(new string[] {
+#line 68
+    testRunner.And("I observe the following:", ((string)(null)), table4, "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Handshake failure recovery")]
+        [NUnit.Framework.CategoryAttribute("contract=subscribeHandshakeRecovery")]
+        public void HandshakeFailureRecovery()
+        {
+            string[] tagsOfScenario = new string[] {
+                    "contract=subscribeHandshakeRecovery"};
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Handshake failure recovery", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 89
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 5
+  this.FeatureBackground();
+#line hidden
+#line 90
+    testRunner.Given("a linear reconnection policy with 3 retries", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 91
+    testRunner.When("I subscribe", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 92
+    testRunner.Then("I receive the message in my subscribe response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+                TechTalk.SpecFlow.Table table5 = new TechTalk.SpecFlow.Table(new string[] {
+                            "type",
+                            "name"});
+                table5.AddRow(new string[] {
+                            "event",
+                            "SUBSCRIPTION_CHANGED"});
+                table5.AddRow(new string[] {
+                            "invocation",
+                            "HANDSHAKE"});
+                table5.AddRow(new string[] {
+                            "event",
+                            "HANDSHAKE_FAILURE"});
+                table5.AddRow(new string[] {
+                            "invocation",
+                            "CANCEL_HANDSHAKE"});
+                table5.AddRow(new string[] {
+                            "invocation",
+                            "HANDSHAKE_RECONNECT"});
+                table5.AddRow(new string[] {
+                            "event",
+                            "HANDSHAKE_RECONNECT_FAILURE"});
+                table5.AddRow(new string[] {
+                            "invocation",
+                            "CANCEL_HANDSHAKE_RECONNECT"});
+                table5.AddRow(new string[] {
+                            "invocation",
+                            "HANDSHAKE_RECONNECT"});
+                table5.AddRow(new string[] {
+                            "event",
+                            "HANDSHAKE_RECONNECT_SUCCESS"});
+                table5.AddRow(new string[] {
+                            "invocation",
+                            "CANCEL_HANDSHAKE_RECONNECT"});
+                table5.AddRow(new string[] {
+                            "invocation",
+                            "EMIT_STATUS"});
+                table5.AddRow(new string[] {
                             "invocation",
                             "RECEIVE_MESSAGES"});
-#line 56
-    testRunner.And("I observe the following:", ((string)(null)), table3, "And ");
+                table5.AddRow(new string[] {
+                            "event",
+                            "RECEIVE_SUCCESS"});
+                table5.AddRow(new string[] {
+                            "invocation",
+                            "CANCEL_RECEIVE_MESSAGES"});
+                table5.AddRow(new string[] {
+                            "invocation",
+                            "EMIT_MESSAGES"});
+                table5.AddRow(new string[] {
+                            "invocation",
+                            "RECEIVE_MESSAGES"});
+#line 93
+    testRunner.And("I observe the following:", ((string)(null)), table5, "And ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -350,7 +492,7 @@ namespace AcceptanceTests.Features.Event_Engine
                     "contract=subscribeReceivingRecovery"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Receiving failure recovery", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 77
+#line 113
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -363,62 +505,59 @@ namespace AcceptanceTests.Features.Event_Engine
 #line 5
   this.FeatureBackground();
 #line hidden
-#line 78
+#line 114
     testRunner.Given("a linear reconnection policy with 3 retries", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 79
+#line 115
     testRunner.When("I subscribe", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 80
+#line 116
     testRunner.Then("I receive the message in my subscribe response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-                TechTalk.SpecFlow.Table table4 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table6 = new TechTalk.SpecFlow.Table(new string[] {
                             "type",
                             "name"});
-                table4.AddRow(new string[] {
+                table6.AddRow(new string[] {
                             "event",
                             "SUBSCRIPTION_CHANGED"});
-                table4.AddRow(new string[] {
+                table6.AddRow(new string[] {
                             "invocation",
                             "HANDSHAKE"});
-                table4.AddRow(new string[] {
+                table6.AddRow(new string[] {
                             "event",
                             "HANDSHAKE_SUCCESS"});
-                table4.AddRow(new string[] {
+                table6.AddRow(new string[] {
                             "invocation",
                             "CANCEL_HANDSHAKE"});
-                table4.AddRow(new string[] {
+                table6.AddRow(new string[] {
                             "invocation",
                             "EMIT_STATUS"});
-                table4.AddRow(new string[] {
+                table6.AddRow(new string[] {
                             "invocation",
                             "RECEIVE_MESSAGES"});
-                table4.AddRow(new string[] {
+                table6.AddRow(new string[] {
                             "event",
                             "RECEIVE_FAILURE"});
-                table4.AddRow(new string[] {
+                table6.AddRow(new string[] {
                             "invocation",
                             "CANCEL_RECEIVE_MESSAGES"});
-                table4.AddRow(new string[] {
+                table6.AddRow(new string[] {
                             "invocation",
                             "RECEIVE_RECONNECT"});
-                table4.AddRow(new string[] {
+                table6.AddRow(new string[] {
                             "event",
                             "RECEIVE_RECONNECT_SUCCESS"});
-                table4.AddRow(new string[] {
+                table6.AddRow(new string[] {
                             "invocation",
                             "CANCEL_RECEIVE_RECONNECT"});
-                table4.AddRow(new string[] {
+                table6.AddRow(new string[] {
                             "invocation",
                             "EMIT_MESSAGES"});
-                table4.AddRow(new string[] {
-                            "invocation",
-                            "EMIT_STATUS"});
-                table4.AddRow(new string[] {
+                table6.AddRow(new string[] {
                             "invocation",
                             "RECEIVE_MESSAGES"});
-#line 81
-    testRunner.And("I observe the following:", ((string)(null)), table4, "And ");
+#line 117
+    testRunner.And("I observe the following:", ((string)(null)), table6, "And ");
 #line hidden
             }
             this.ScenarioCleanup();

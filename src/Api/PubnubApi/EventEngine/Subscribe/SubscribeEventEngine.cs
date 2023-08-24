@@ -53,7 +53,7 @@ namespace PubnubApi.EventEngine.Subscribe {
 
 			currentState = new UnsubscribedState() { ReconnectionConfiguration = new Context.ReconnectionConfiguration(pubnubConfiguration.ReconnectionPolicy, pubnubConfiguration.ConnectionMaxRetries) };
 		}
-		public void Subscribe<T>(string[] channels, string[] channelGroups)
+		public void Subscribe<T>(string[] channels, string[] channelGroups, SubscriptionCursor cursor)
 		{
 			foreach (var c in channels)
 			{
@@ -63,12 +63,19 @@ namespace PubnubApi.EventEngine.Subscribe {
 			{
 				channelGroupTypeMap[c] = typeof(T);
 			}
-			this.EventQueue.Enqueue(new SubscriptionChangedEvent() { Channels = channels, ChannelGroups = channelGroups });
+			if (cursor != null)
+			{
+				this.EventQueue.Enqueue(new SubscriptionRestoredEvent() { Channels = channels, ChannelGroups = channelGroups, Cursor = cursor });
+			}
+			else
+			{
+				this.EventQueue.Enqueue(new SubscriptionChangedEvent() { Channels = channels, ChannelGroups = channelGroups });
+			}
 		}
 
-		public void Subscribe(string[] channels, string[] channelGroups)
+		public void Subscribe(string[] channels, string[] channelGroups, SubscriptionCursor cursor)
 		{
-			Subscribe<string>(channels, channelGroups);
+			Subscribe<string>(channels, channelGroups, cursor);
 		}
 		
 		public void UnsubscribeAll()

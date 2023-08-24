@@ -517,6 +517,11 @@ namespace PubnubApi.EndPoint
                         PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, statusMessage);
                         status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(type, category, asyncRequestState, statusCode, new PNException(jsonString));
                     }
+                    else if (statusCode != 200)
+                    {
+                        PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, errorMessageJson);
+                        status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(type, category, asyncRequestState, statusCode, new PNException(jsonString));
+                    }
                 }
                 else if (deserializeStatus.Count >= 1 && deserializeStatus.ContainsKey("status") && string.Equals(deserializeStatus["status"].ToString(), "error", StringComparison.OrdinalIgnoreCase) && deserializeStatus.ContainsKey("error"))
                 {

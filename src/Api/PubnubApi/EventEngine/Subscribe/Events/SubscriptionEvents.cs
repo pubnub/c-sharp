@@ -9,6 +9,7 @@ namespace PubnubApi.EventEngine.Subscribe.Events {
 	public class SubscriptionChangedEvent : Core.IEvent {
 		public IEnumerable<string> Channels;
 		public IEnumerable<string> ChannelGroups;
+		public SubscriptionCursor Cursor;
 		public string Name { get; set; } = "SUBSCRIPTION_CHANGED";
 	}
 

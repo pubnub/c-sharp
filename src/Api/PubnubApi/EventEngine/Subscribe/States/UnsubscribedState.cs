@@ -18,6 +18,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
                 {
                     Channels = (Channels ?? Enumerable.Empty<string>()).Union(subscriptionChanged.Channels),
                     ChannelGroups = (ChannelGroups ?? Enumerable.Empty<string>()).Union(subscriptionChanged.ChannelGroups),
+                    Cursor = subscriptionChanged.Cursor,
                     ReconnectionConfiguration = this.ReconnectionConfiguration
                 },
 

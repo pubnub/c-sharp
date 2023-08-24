@@ -64,8 +64,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
                     Cursor = receiveReconnectSuccess.Cursor,
                     ReconnectionConfiguration = this.ReconnectionConfiguration
                 }.With(
-                    new EmitMessagesInvocation(receiveReconnectSuccess.Cursor, receiveReconnectSuccess.Messages),
-                    new EmitStatusInvocation(receiveReconnectSuccess.Status)
+                    new EmitMessagesInvocation(receiveReconnectSuccess.Cursor, receiveReconnectSuccess.Messages)
                 ),
 
                 Events.ReceiveReconnectFailureEvent receiveReconnectFailure => new ReceiveReconnectingState()

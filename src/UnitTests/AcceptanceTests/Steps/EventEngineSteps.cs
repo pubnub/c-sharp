@@ -20,7 +20,7 @@ namespace AcceptanceTests.Steps
     [Binding]
     public class EventEngineSteps
     {
-        public static bool enableIntenalPubnubLogging = false;
+        public static bool enableIntenalPubnubLogging = true;
         public static string currentFeature = string.Empty;
         public static string currentContract = string.Empty;
         public static bool betaVersion = false;
@@ -315,6 +315,36 @@ namespace AcceptanceTests.Steps
             }
         }
 
+        [When(@"I subscribe with timetoken (.*)")]
+        public void WhenISubscribeWithTimetoken(int p0)
+        {
+            pn = new Pubnub(config);
+            pn.PubnubUnitTest = unitTest;
+            pn.PubnubUnitTest.EventTypeList?.Clear();
+
+            messageReceivedEvent = new ManualResetEvent(false);
+            statusReceivedEvent = new ManualResetEvent(false);
+
+            pn.AddListener(subscribeCallback);
+            pn.Subscribe<object>()
+                .Channels(channel.Split(','))
+                .ChannelGroups(channelGroup.Split(','))
+                .WithTimetoken(p0)
+                .Execute();
+            statusReceivedEvent.WaitOne (60*1000);
+            if (pnStatus != null && pnStatus.Category == PNStatusCategory.PNConnectedCategory)
+            {
+                //All good.
+            }
+            else
+            {
+                if (currentContract == "simpleSubscribe")
+                {
+                    Assert.Fail("WhenISubscribe failed.");
+                }
+            }
+        }
+
         [When(@"I publish a message")]
         public async Task WhenIPublishAMessage()
         {
@@ -385,6 +415,5 @@ namespace AcceptanceTests.Steps
         {
             Assert.True(pnStatus != null && pnStatus.Error);
         }
-
     }
 }

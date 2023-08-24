@@ -20,8 +20,45 @@ Feature: Event Engine
       | event      | RECEIVE_SUCCESS         |
       | invocation | CANCEL_RECEIVE_MESSAGES |
       | invocation | EMIT_MESSAGES           |
+      | invocation | RECEIVE_MESSAGES        |
+
+  @contract=restoringSubscribe
+  Scenario: Successfully restore subscribe
+    When I subscribe with timetoken 42
+    Then I receive the message in my subscribe response
+    And I observe the following:
+      | type       | name                    |
+      | event      | SUBSCRIPTION_RESTORED   |
+      | invocation | HANDSHAKE               |
+      | event      | HANDSHAKE_SUCCESS       |
+      | invocation | CANCEL_HANDSHAKE        |
       | invocation | EMIT_STATUS             |
       | invocation | RECEIVE_MESSAGES        |
+      | event      | RECEIVE_SUCCESS         |
+      | invocation | CANCEL_RECEIVE_MESSAGES |
+      | invocation | EMIT_MESSAGES           |
+      | invocation | RECEIVE_MESSAGES        |
+
+  @contract=restoringSubscribeWithFailures
+  Scenario: Successfully restore subscribe with failures
+    Given a linear reconnection policy with 3 retries
+    When I subscribe with timetoken 42
+    Then I receive the message in my subscribe response
+    And I observe the following:
+      | type       | name                        |
+      | event      | SUBSCRIPTION_RESTORED       |
+      | invocation | HANDSHAKE                   |
+      | event      | HANDSHAKE_FAILURE           |
+      | invocation | CANCEL_HANDSHAKE            |
+      | invocation | HANDSHAKE_RECONNECT         |
+      | event      | HANDSHAKE_RECONNECT_SUCCESS |
+      | invocation | CANCEL_HANDSHAKE_RECONNECT  |
+      | invocation | EMIT_STATUS                 |
+      | invocation | RECEIVE_MESSAGES            |
+      | event      | RECEIVE_SUCCESS             |
+      | invocation | CANCEL_RECEIVE_MESSAGES     |
+      | invocation | EMIT_MESSAGES               |
+      | invocation | RECEIVE_MESSAGES            |
 
   @contract=subscribeHandshakeFailure
   Scenario: Complete handshake failure
@@ -70,7 +107,6 @@ Feature: Event Engine
       | event      | RECEIVE_SUCCESS             |
       | invocation | CANCEL_RECEIVE_MESSAGES     |
       | invocation | EMIT_MESSAGES               |
-      | invocation | EMIT_STATUS                 |
       | invocation | RECEIVE_MESSAGES            |
 
   @contract=subscribeReceivingRecovery
@@ -92,5 +128,4 @@ Feature: Event Engine
       | event      | RECEIVE_RECONNECT_SUCCESS |
       | invocation | CANCEL_RECEIVE_RECONNECT  |
       | invocation | EMIT_MESSAGES             |
-      | invocation | EMIT_STATUS               |
       | invocation | RECEIVE_MESSAGES          |

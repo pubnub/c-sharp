@@ -122,11 +122,15 @@ namespace PubnubApi.EndPoint
 
             string[] channelNames = this.subscribeChannelNames != null ? this.subscribeChannelNames.ToArray() : null;
             string[] channelGroupNames = this.subscribeChannelGroupNames != null ? this.subscribeChannelGroupNames.ToArray() : null;
-
-            Subscribe(channelNames, channelGroupNames, this.queryParam);
+            SubscriptionCursor cursor = null;
+            if (subscribeTimetoken >= 0)
+            {
+                cursor = new SubscriptionCursor { Timetoken = subscribeTimetoken, Region = 0 };
+            }
+            Subscribe(channelNames, channelGroupNames, cursor, this.queryParam);
         }
 
-        private void Subscribe(string[] channels, string[] channelGroups, Dictionary<string, object> externalQueryParam)
+        private void Subscribe(string[] channels, string[] channelGroups, SubscriptionCursor cursor, Dictionary<string, object> externalQueryParam)
         {
             if ((channels == null || channels.Length == 0) && (channelGroups == null || channelGroups.Length == 0))
             {
@@ -145,7 +149,7 @@ namespace PubnubApi.EndPoint
                 subscribeEventEngine.OnEventQueued += SubscribeEventEngine_OnEventQueued;
                 subscribeEventEngine.OnEffectDispatch += SubscribeEventEngine_OnEffectDispatch;
 			}
-			subscribeEventEngine.Subscribe<T>(channels, channelGroups);
+			subscribeEventEngine.Subscribe<T>(channels, channelGroups, cursor);
 		}
 
         private void SubscribeEventEngine_OnEffectDispatch(IEffectInvocation obj)
