@@ -43,6 +43,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
                 {
                     Channels = handshakeFailure.Channels,
                     ChannelGroups = handshakeFailure.ChannelGroups,
+                    Cursor = handshakeFailure.Cursor,
                     ReconnectionConfiguration = this.ReconnectionConfiguration,
                     AttemptedRetries = 1
                 },

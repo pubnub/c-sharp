@@ -29,6 +29,7 @@ namespace PubnubApi.EventEngine.Subscribe.Events {
 	public class HandshakeFailureEvent : Core.IEvent {
 		public IEnumerable<string> Channels;
 		public IEnumerable<string> ChannelGroups;
+		public SubscriptionCursor Cursor;
 		public PNStatus Status;
 		public int AttemptedRetries;
 		public virtual string Name { get; set; } = "HANDSHAKE_FAILURE";

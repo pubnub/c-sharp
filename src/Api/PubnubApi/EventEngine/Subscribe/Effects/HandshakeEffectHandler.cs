@@ -46,6 +46,13 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
                     };
                 }
             }
+            else
+            {
+                if (invocation.Cursor != null && invocation.Cursor.Timetoken != null) 
+                { 
+                    cursor = invocation.Cursor;
+                }
+            }
 
             switch (invocation)
             {
@@ -56,7 +63,7 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
                     eventQueue.Enqueue(new Events.HandshakeReconnectSuccessEvent() { Cursor = cursor, Status = response.Item2 });
                     break;
                 case { } when response.Item2.Error:
-                    eventQueue.Enqueue(new Events.HandshakeFailureEvent() { Status = response.Item2, Channels = invocation.Channels, ChannelGroups = invocation.ChannelGroups});
+                    eventQueue.Enqueue(new Events.HandshakeFailureEvent() { Status = response.Item2, Cursor = cursor, Channels = invocation.Channels, ChannelGroups = invocation.ChannelGroups});
                     break;
                 case { }:
                     eventQueue.Enqueue(new Events.HandshakeSuccessEvent() { Cursor = cursor, Status = response.Item2 });
