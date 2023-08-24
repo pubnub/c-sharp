@@ -22,7 +22,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
                     ReconnectionConfiguration = this.ReconnectionConfiguration
                 },
 
-                Events.SubscriptionRestoredEvent subscriptionRestored => new States.ReceivingState()
+                Events.SubscriptionRestoredEvent subscriptionRestored => new States.HandshakingState()
                 {
                     Channels = subscriptionRestored.Channels,
                     ChannelGroups = subscriptionRestored.ChannelGroups,

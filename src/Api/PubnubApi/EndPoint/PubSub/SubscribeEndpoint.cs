@@ -123,7 +123,7 @@ namespace PubnubApi.EndPoint
             string[] channelNames = this.subscribeChannelNames != null ? this.subscribeChannelNames.ToArray() : null;
             string[] channelGroupNames = this.subscribeChannelGroupNames != null ? this.subscribeChannelGroupNames.ToArray() : null;
             SubscriptionCursor cursor = null;
-            if (subscribeTimetoken >= 0)
+            if (subscribeTimetoken >= 1)
             {
                 cursor = new SubscriptionCursor { Timetoken = subscribeTimetoken, Region = 0 };
             }
