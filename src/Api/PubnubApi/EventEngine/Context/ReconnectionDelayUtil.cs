@@ -1,7 +1,11 @@
 ﻿using System;
-namespace PubnubApi.EventEngine.Subscribe.Context
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace PubnubApi.EventEngine.Context
 {
-	public static class ReconnectionDelayUtil
+    public static class ReconnectionDelayUtil
 	{
 		public static int CalculateDelay(PNReconnectionPolicy policy, int attempts)
 		{
@@ -27,4 +31,3 @@ namespace PubnubApi.EventEngine.Subscribe.Context
 		}
 	}
 }
-

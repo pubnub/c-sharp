@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using PubnubApi.EventEngine.Core;
 using PubnubApi.EventEngine.Subscribe.Common;
-using PubnubApi.EventEngine.Subscribe.Context;
+using PubnubApi.EventEngine.Context;
 
 namespace PubnubApi.EventEngine.Subscribe.Invocations {
 	public class EmitMessagesInvocation : Core.IEffectInvocation {

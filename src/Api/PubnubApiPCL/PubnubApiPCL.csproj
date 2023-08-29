@@ -215,14 +215,14 @@
       <Link>Enum\ResponseType.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\EventEngine\Common\Delay.cs" Link="EventEngine\Common\Delay.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Context\ReconnectionConfiguration.cs" Link="EventEngine\Context\ReconnectionConfiguration.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Context\ReconnectionDelayUtil.cs" Link="EventEngine\Context\ReconnectionDelayUtil.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Core\EffectDispatcher.cs" Link="EventEngine\Core\EffectDispatcher.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Core\Engine.cs" Link="EventEngine\Core\Engine.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Core\EventEngineInterfaces.cs" Link="EventEngine\Core\EventEngineInterfaces.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Core\EventQueue.cs" Link="EventEngine\Core\EventQueue.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Core\Utils.cs" Link="EventEngine\Core\Utils.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\Common\CommonSubscribeTypes.cs" Link="EventEngine\Subscribe\Common\CommonSubscribeTypes.cs" />
-    <Compile Include="..\PubnubApi\EventEngine\Subscribe\Context\ReconnectionConfiguration.cs" Link="EventEngine\Subscribe\Context\ReconnectionConfiguration.cs" />
-    <Compile Include="..\PubnubApi\EventEngine\Subscribe\Context\ReconnectionDelayUtil.cs" Link="EventEngine\Subscribe\Context\ReconnectionDelayUtil.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\Effects\EmitMessagesHandler.cs" Link="EventEngine\Subscribe\Effects\EmitMessagesHandler.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\Effects\EmitStatusEffectHandler.cs" Link="EventEngine\Subscribe\Effects\EmitStatusEffectHandler.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\Effects\HandshakeEffectHandler.cs" Link="EventEngine\Subscribe\Effects\HandshakeEffectHandler.cs" />
@@ -918,11 +918,12 @@
     <Folder Include="Enum\" />
     <Folder Include="EventEngine\Core\" />
     <Folder Include="EventEngine\Common\" />
+    <Folder Include="EventEngine\Context\" />
+    <Folder Include="EventEngine\Presence\" />
     <Folder Include="EventEngine\Subscribe\Effects\" />
     <Folder Include="EventEngine\Subscribe\Events\" />
     <Folder Include="EventEngine\Subscribe\Invocations\" />
     <Folder Include="EventEngine\Subscribe\Common\" />
-    <Folder Include="EventEngine\Subscribe\Context\" />
     <Folder Include="EventEngine\Subscribe\States\" />
     <Folder Include="HttpUtility\" />
     <Folder Include="Interface\" />

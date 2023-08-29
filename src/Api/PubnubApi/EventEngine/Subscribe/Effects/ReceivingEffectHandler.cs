@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 using PubnubApi.EndPoint;
 using PubnubApi.EventEngine.Common;
 using PubnubApi.EventEngine.Core;
-using PubnubApi.EventEngine.Subscribe.Context;
+using PubnubApi.EventEngine.Context;
 using PubnubApi.EventEngine.Subscribe.Events;
 using PubnubApi.EventEngine.Subscribe.Invocations;
 using PubnubApi.EventEngine.Subscribe.Common;
@@ -46,6 +46,9 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
                     break;
                 case Invocations.ReceiveReconnectInvocation reconnectInvocation:
                     eventQueue.Enqueue(new Events.ReceiveReconnectSuccessEvent() { Channels = invocation?.Channels, ChannelGroups = invocation?.ChannelGroups, Cursor = cursor, Status = response.Item2, Messages = response.Item1 });
+                    break;
+                case { } when response.Item2.Error && response.Item2.StatusCode == 403:
+                    eventQueue.Enqueue(new Events.ReceiveReconnectGiveUpEvent { Channels = invocation?.Channels, ChannelGroups = invocation?.ChannelGroups, Cursor = cursor, Status = response.Item2 });
                     break;
                 case { } when response.Item2.Error:
                     eventQueue.Enqueue(new Events.ReceiveFailureEvent() { Cursor = invocation.Cursor, Status = response.Item2});

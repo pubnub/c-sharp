@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 using PubnubApi.EndPoint;
 using PubnubApi.EventEngine.Common;
 using PubnubApi.EventEngine.Core;
-using PubnubApi.EventEngine.Subscribe.Context;
+using PubnubApi.EventEngine.Context;
 using PubnubApi.EventEngine.Subscribe.Events;
 using PubnubApi.EventEngine.Subscribe.Invocations;
 using PubnubApi.EventEngine.Subscribe.Common;
