@@ -22,7 +22,7 @@ namespace PubnubApi.EventEngine.Presence.States
                 Events.LeftAllEvent leftAll => new HeartbeatInactiveState() 
                 {
                     ReconnectionConfiguration = this.ReconnectionConfiguration
-                }.With(new EmitStatusInvocation(PNStatusCategory.PNDisconnectedCategory)), //TODO: Do we need PNLeaveCategory?,
+                }, 
 
                 Events.JoinedEvent joined => new States.HeartbeatingState()
                 {
@@ -36,7 +36,7 @@ namespace PubnubApi.EventEngine.Presence.States
                     Channels = (Channels ?? Enumerable.Empty<string>()).Union(left.Channels),
                     ChannelGroups = (ChannelGroups ?? Enumerable.Empty<string>()).Union(left.ChannelGroups),
                     ReconnectionConfiguration = this.ReconnectionConfiguration
-                }.With(new EmitStatusInvocation(PNStatusCategory.PNDisconnectedCategory)), //TODO: Do we need PNLeaveCategory?
+                }, 
 
                 Events.StateSetEvent stateSet => new States.HeartbeatingState()
                 {
@@ -58,7 +58,7 @@ namespace PubnubApi.EventEngine.Presence.States
                 Events.DisconnectEvent disconnect => new States.HeartbeatStoppedState()
                 {
                     ReconnectionConfiguration = this.ReconnectionConfiguration,
-                }.With(new EmitStatusInvocation(PNStatusCategory.PNDisconnectedCategory)), //TODO: Do we need PNLeaveCategory?,
+                },
 
                 _ => null
             };
