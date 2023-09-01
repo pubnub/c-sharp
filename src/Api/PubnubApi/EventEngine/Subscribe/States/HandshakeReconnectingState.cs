@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using PubnubApi.EventEngine.Core;
 using PubnubApi.EventEngine.Subscribe.Common;
-using PubnubApi.EventEngine.Subscribe.Context;
+using PubnubApi.EventEngine.Context;
 using PubnubApi.EventEngine.Subscribe.Invocations;
 
 namespace PubnubApi.EventEngine.Subscribe.States
@@ -15,6 +16,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
 		{
 			Channels = this.Channels,
 			ChannelGroups = this.ChannelGroups,
+			Cursor = this.Cursor,
 			ReconnectionConfiguration = this.ReconnectionConfiguration,
 			AttemptedRetries = this.AttemptedRetries
 		}.AsArray();
@@ -31,8 +33,8 @@ namespace PubnubApi.EventEngine.Subscribe.States
 
 				Events.SubscriptionChangedEvent subscriptionChanged => new HandshakingState()
 				{
-					Channels = subscriptionChanged.Channels,
-					ChannelGroups = subscriptionChanged.ChannelGroups,
+                    Channels = (Channels ?? Enumerable.Empty<string>()).Union(subscriptionChanged.Channels),
+                    ChannelGroups = (ChannelGroups ?? Enumerable.Empty<string>()).Union(subscriptionChanged.ChannelGroups),
 					ReconnectionConfiguration = this.ReconnectionConfiguration
 				},
 
@@ -57,8 +59,8 @@ namespace PubnubApi.EventEngine.Subscribe.States
 					Channels = this.Channels,
 					ChannelGroups = this.ChannelGroups,
 					ReconnectionConfiguration = this.ReconnectionConfiguration,
-					AttemptedRetries = this.AttemptedRetries + 1
-				}.With(new EmitStatusInvocation(handshakeReconnectFailure.Status)),
+					AttemptedRetries = (this.AttemptedRetries + 1) % int.MaxValue
+				},
 
 				Events.HandshakeReconnectSuccessEvent handshakeReconnectSuccess => new ReceivingState()
 				{

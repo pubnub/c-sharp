@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using PubnubApi.EventEngine.Core;
 using PubnubApi.EventEngine.Subscribe.Common;
-using PubnubApi.EventEngine.Subscribe.Context;
+using PubnubApi.EventEngine.Context;
 using PubnubApi.EventEngine.Subscribe.Invocations;
 
 namespace PubnubApi.EventEngine.Subscribe.States
@@ -20,8 +21,8 @@ namespace PubnubApi.EventEngine.Subscribe.States
 
                 Events.SubscriptionChangedEvent subscriptionChanged => new HandshakingState()
                 {
-                    Channels = subscriptionChanged.Channels,
-                    ChannelGroups = subscriptionChanged.ChannelGroups,
+                    Channels = (Channels ?? Enumerable.Empty<string>()).Union(subscriptionChanged.Channels),
+                    ChannelGroups = (ChannelGroups ?? Enumerable.Empty<string>()).Union(subscriptionChanged.ChannelGroups),
                     ReconnectionConfiguration = this.ReconnectionConfiguration
                 },
 

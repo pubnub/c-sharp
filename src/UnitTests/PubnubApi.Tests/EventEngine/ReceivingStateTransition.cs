@@ -1,7 +1,7 @@
 using NUnit.Framework;
 using PubnubApi.EventEngine.Core;
 using PubnubApi.EventEngine.Subscribe.Common;
-using PubnubApi.EventEngine.Subscribe.Context;
+using PubnubApi.EventEngine.Context;
 using PubnubApi.EventEngine.Subscribe.Events;
 using PubnubApi.EventEngine.Subscribe.Invocations;
 using PubnubApi.EventEngine.Subscribe.States;
@@ -41,7 +41,7 @@ namespace PubnubApi.Tests.EventEngine
                     ChannelGroups = new string[] { "cg1", "cg2" },
                     Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 },
                     Status = new PNStatus(null, PNOperationType.PNSubscribeOperation, PNStatusCategory.PNConnectedCategory),
-                    Messages = new ReceivingResponse<string>() {  Messages = new Message<string>[]{ }, Timetoken = new Timetoken(){ Region = 1, Timestamp = 1234567890 } }
+                    Messages = new ReceivingResponse<object>() {  Messages = new Message<object>[]{ }, Timetoken = new Timetoken(){ Region = 1, Timestamp = 1234567890 } }
                 },
                 new ReceivingState(){ Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) }
             }

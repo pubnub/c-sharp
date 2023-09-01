@@ -1,31 +1,33 @@
 ﻿using System;
-namespace PubnubApi.EventEngine.Subscribe.Context
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace PubnubApi.EventEngine.Context
 {
-	public static class ReconnectionDelayUtil
+    public static class ReconnectionDelayUtil
 	{
 		public static int CalculateDelay(PNReconnectionPolicy policy, int attempts)
 		{
-			Random numGenerator = new Random();
-			int delayValue = 0;
-			int backoff = 5;
+			int delayMillisecond = 0;
 			switch (policy) {
 				case PNReconnectionPolicy.LINEAR:
-					delayValue = attempts * backoff + numGenerator.Next(1000);
+					delayMillisecond = 3000;
 					break;
 				case PNReconnectionPolicy.EXPONENTIAL:
-					delayValue = (int)(Math.Pow(2, attempts - 1) * 1000 + numGenerator.Next(1000));
+					int i = attempts % int.MaxValue;
+					if (attempts % 6 == 0) i = attempts + 1;
+					delayMillisecond = (int)((Math.Pow(2, (i % 6)) - 1) * 1000);
 					break;
 			}
-			return delayValue;
-
+			return delayMillisecond;
 		}
 
 		public static bool shouldRetry(ReconnectionConfiguration reconnectionConfiguration, int attemptedRetries)
 		{
 			if (reconnectionConfiguration.ReconnectionPolicy == PNReconnectionPolicy.NONE) return false;
 			if (reconnectionConfiguration.MaximumReconnectionRetries < 0) return true;
-			return reconnectionConfiguration.MaximumReconnectionRetries < attemptedRetries;
+			return reconnectionConfiguration.MaximumReconnectionRetries >= attemptedRetries;
 		}
 	}
 }
-

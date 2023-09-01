@@ -8,6 +8,7 @@ using System.Globalization;
 using System.Collections;
 using System.Text;
 using PubnubApi.EventEngine.Subscribe.Common;
+using Newtonsoft.Json;
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -112,7 +113,7 @@ namespace PubnubApi.EndPoint
             if (!string.IsNullOrEmpty(responseTuple.Item1) && responseTuple.Item2 == null)
             {
                 PNStatus status = new PNStatus(null, PNOperationType.PNSubscribeOperation, PNStatusCategory.PNConnectedCategory, channels, channelGroups);
-                HandshakeResponse handshakeResponse = jsonLibrary.DeserializeToObject<HandshakeResponse>(responseTuple.Item1);
+                HandshakeResponse handshakeResponse = JsonConvert.DeserializeObject<HandshakeResponse>(responseTuple.Item1);
                 return new Tuple<HandshakeResponse, PNStatus>(handshakeResponse, status);
             }   
 
@@ -143,9 +144,9 @@ namespace PubnubApi.EndPoint
                     LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} SubscribeManager => HandshakeRequestCancellation. No request to cancel.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
             }
         }
-        internal async Task<Tuple<ReceivingResponse<string>, PNStatus>> ReceiveRequest<T>(PNOperationType responseType, string[] channels, string[] channelGroups, long? timetoken, int? region, Dictionary<string, string> initialSubscribeUrlParams, Dictionary<string, object> externalQueryParam)
+        internal async Task<Tuple<ReceivingResponse<object>, PNStatus>> ReceiveRequest<T>(PNOperationType responseType, string[] channels, string[] channelGroups, long? timetoken, int? region, Dictionary<string, string> initialSubscribeUrlParams, Dictionary<string, object> externalQueryParam)
         {
-            Tuple<ReceivingResponse<string>, PNStatus> resp = new Tuple<ReceivingResponse<string>, PNStatus>(null, null);
+            Tuple<ReceivingResponse<object>, PNStatus> resp = new Tuple<ReceivingResponse<object>, PNStatus>(null, null);
 
             try
             {
@@ -154,7 +155,7 @@ namespace PubnubApi.EndPoint
                 IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, null, "");
                 Uri request = urlBuilder.BuildMultiChannelSubscribeRequest("GET", "", channels, channelGroups, timetoken.GetValueOrDefault(), region.GetValueOrDefault(), channelsJsonState, initialSubscribeUrlParams, externalQueryParam);
 
-                RequestState<ReceivingResponse<string>> pubnubRequestState = new RequestState<ReceivingResponse<string>>();
+                RequestState<ReceivingResponse<object>> pubnubRequestState = new RequestState<ReceivingResponse<object>>();
                 pubnubRequestState.Channels = channels;
                 pubnubRequestState.ChannelGroups = channelGroups;
                 pubnubRequestState.ResponseType = responseType;
@@ -168,10 +169,14 @@ namespace PubnubApi.EndPoint
                 if (!string.IsNullOrEmpty(responseTuple.Item1) && responseTuple.Item2 == null)
                 {
                     PNStatus status = new PNStatus(null, PNOperationType.PNSubscribeOperation, PNStatusCategory.PNConnectedCategory, channels, channelGroups);
-                    ReceivingResponse<string> receiveResponse = jsonLibrary.DeserializeToObject<ReceivingResponse<string>>(responseTuple.Item1);
-                    return new Tuple<ReceivingResponse<string>, PNStatus>(receiveResponse, status);
-                }   
-                return new Tuple<ReceivingResponse<string>, PNStatus>(null, responseTuple.Item2);
+                    ReceivingResponse<object> receiveResponse = JsonConvert.DeserializeObject<ReceivingResponse<object>>(responseTuple.Item1);
+                    return new Tuple<ReceivingResponse<object>, PNStatus>(receiveResponse, status);
+                }
+                else if (responseTuple.Item2 != null)
+                {
+                    return new Tuple<ReceivingResponse<object>, PNStatus>(null, responseTuple.Item2);
+                }
+                return new Tuple<ReceivingResponse<object>, PNStatus>(null, new PNStatus(new Exception("ReceiveRequest failed."), PNOperationType.PNSubscribeOperation, PNStatusCategory.PNUnknownCategory, channels, channelGroups));
             }
             catch(Exception ex)
             {
@@ -305,7 +310,10 @@ namespace PubnubApi.EndPoint
                     jsonString = await pubnubHttp.SendRequestAndGetJsonResponse(requestUri, pubnubRequestState, request).ConfigureAwait(false);
                 }
 #endif
-
+                if (pubnubLog != null && config != null)
+                {
+                    LoggingMethod.WriteToLog(pubnubLog, $"DateTime {DateTime.Now.ToString(CultureInfo.InvariantCulture)}, JSON= {jsonString} for request={requestUri}", config.LogVerbosity);
+                }
                 PNStatus errStatus = GetStatusIfError<T>(pubnubRequestState, jsonString);
                 return new Tuple<string, PNStatus>((errStatus == null) ? jsonString : "", errStatus);
             }
@@ -509,6 +517,11 @@ namespace PubnubApi.EndPoint
                         PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, statusMessage);
                         status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(type, category, asyncRequestState, statusCode, new PNException(jsonString));
                     }
+                    else if (statusCode != 200)
+                    {
+                        PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, errorMessageJson);
+                        status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(type, category, asyncRequestState, statusCode, new PNException(jsonString));
+                    }
                 }
                 else if (deserializeStatus.Count >= 1 && deserializeStatus.ContainsKey("status") && string.Equals(deserializeStatus["status"].ToString(), "error", StringComparison.OrdinalIgnoreCase) && deserializeStatus.ContainsKey("error"))
                 {
@@ -549,61 +562,13 @@ namespace PubnubApi.EndPoint
             {
                 status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(type, PNStatusCategory.PNNetworkIssuesCategory, asyncRequestState, (int)HttpStatusCode.NotFound, new PNException(jsonString));
             }
+            else if (!NewtonsoftJsonDotNet.JsonFastCheck(jsonString))
+            {
+                status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(type, PNStatusCategory.PNNetworkIssuesCategory, asyncRequestState, (int)HttpStatusCode.NotFound, new PNException(jsonString));
+            }
 
             return status;
         }
-
-        internal List<object> WrapResultBasedOnResponseType<T>(PNOperationType type, string jsonString, string[] channels, string[] channelGroups)
-        {
-            List<object> result = new List<object>();
-            try
-            {
-                string multiChannel = (channels != null) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : "";
-                string multiChannelGroup = (channelGroups != null) ? string.Join(",", channelGroups.OrderBy(x => x).ToArray()) : "";
-
-                if (!string.IsNullOrEmpty(jsonString))
-                {
-                    object deserializedResult = jsonLibrary.DeserializeToObject(jsonString);
-                    List<object> result1 = ((IEnumerable)deserializedResult).Cast<object>().ToList();
-
-                    if (result1 != null && result1.Count > 0)
-                    {
-                        result = result1;
-                    }
-
-                    switch (type)
-                    {
-                        case PNOperationType.PNSubscribeOperation:
-                        case PNOperationType.Presence:
-                            if (result.Count == 3 && result[0] is object[] && (result[0] as object[]).Length == 0 && result[2].ToString() == "")
-                            {
-                                result.RemoveAt(2);
-                            }
-                            if (result.Count == 4 && result[0] is object[] && (result[0] as object[]).Length == 0 && result[2].ToString() == "" && result[3].ToString() == "")
-                            {
-                                result.RemoveRange(2, 2);
-                            }
-                            result.Add(multiChannelGroup);
-                            result.Add(multiChannel);
-
-                            break;
-                        case PNOperationType.PNHeartbeatOperation:
-                            //Dictionary<string, object> heartbeatadictionary = jsonLibrary.DeserializeToDictionaryOfObject(jsonString);
-                            //result = new List<object>();
-                            //result.Add(heartbeatadictionary);
-                            //result.Add(multiChannel);
-                            break;
-                        default:
-                            break;
-                    }
-                    //switch stmt end
-                }
-            }
-            catch { /* ignore */ }
-
-            return result;
-        }
-
 
         internal bool Disconnect()
         {

@@ -146,6 +146,7 @@
     </Compile>
     <Compile Include="..\PubnubApi\EndPoint\PubSub\RemoveMessageActionOperation.cs" Link="EndPoint\PubSub\RemoveMessageActionOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\PubSub\SignalOperation.cs" Link="EndPoint\PubSub\SignalOperation.cs" />
+    <Compile Include="..\PubnubApi\EndPoint\PubSub\SubscribeEndpoint.cs" Link="EndPoint\PubSub\SubscribeEndpoint.cs" />
     <Compile Include="..\PubnubApi\EndPoint\PubSub\SubscribeManager.cs">
       <Link>EndPoint\PubSub\SubscribeManager.cs</Link>
     </Compile>
@@ -153,10 +154,10 @@
     <Compile Include="..\PubnubApi\EndPoint\PubSub\SubscribeOperation.cs">
       <Link>EndPoint\PubSub\SubscribeOperation.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\EndPoint\PubSub\SubscribeOperation2.cs" Link="EndPoint\PubSub\SubscribeOperation2.cs" />
     <Compile Include="..\PubnubApi\EndPoint\PubSub\UnsubscribeAllOperation.cs">
       <Link>EndPoint\PubSub\UnsubscribeAllOperation.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\PubSub\UnsubscribeEndpoint.cs" Link="EndPoint\PubSub\UnsubscribeEndpoint.cs" />
     <Compile Include="..\PubnubApi\EndPoint\PubSub\UnsubscribeOperation.cs">
       <Link>EndPoint\PubSub\UnsubscribeOperation.cs</Link>
     </Compile>
@@ -214,24 +215,14 @@
       <Link>Enum\ResponseType.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\EventEngine\Common\Delay.cs" Link="EventEngine\Common\Delay.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Context\ReconnectionConfiguration.cs" Link="EventEngine\Context\ReconnectionConfiguration.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Context\ReconnectionDelayUtil.cs" Link="EventEngine\Context\ReconnectionDelayUtil.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Core\EffectDispatcher.cs" Link="EventEngine\Core\EffectDispatcher.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Core\Engine.cs" Link="EventEngine\Core\Engine.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Core\EventEngineInterfaces.cs" Link="EventEngine\Core\EventEngineInterfaces.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Core\EventQueue.cs" Link="EventEngine\Core\EventQueue.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Core\Utils.cs" Link="EventEngine\Core\Utils.cs" />
-    <Compile Include="..\PubnubApi\EventEngine\EffectDispatcher.cs" Link="EventEngine\EffectDispatcher.cs" />
-    <Compile Include="..\PubnubApi\EventEngine\EventEmitter.cs" Link="EventEngine\EventEmitter.cs" />
-    <Compile Include="..\PubnubApi\EventEngine\EventEngine.cs" Link="EventEngine\EventEngine.cs" />
-    <Compile Include="..\PubnubApi\EventEngine\HandshakeEffectHandler.cs" Link="EventEngine\HandshakeEffectHandler.cs" />
-    <Compile Include="..\PubnubApi\EventEngine\HandshakeFailedEffectHandler.cs" Link="EventEngine\HandshakeFailedEffectHandler.cs" />
-    <Compile Include="..\PubnubApi\EventEngine\HandshakeReconnectEffectHandler.cs" Link="EventEngine\HandshakeReconnectEffectHandler.cs" />
-    <Compile Include="..\PubnubApi\EventEngine\IEffectInvocationHandler.cs" Link="EventEngine\IEffectInvocationHandler.cs" />
-    <Compile Include="..\PubnubApi\EventEngine\ReceiveReconnectingEffectHandler.cs" Link="EventEngine\ReceiveReconnectingEffectHandler.cs" />
-    <Compile Include="..\PubnubApi\EventEngine\ReceivingEffectHandler.cs" Link="EventEngine\ReceivingEffectHandler.cs" />
-    <Compile Include="..\PubnubApi\EventEngine\State.cs" Link="EventEngine\State.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\Common\CommonSubscribeTypes.cs" Link="EventEngine\Subscribe\Common\CommonSubscribeTypes.cs" />
-    <Compile Include="..\PubnubApi\EventEngine\Subscribe\Context\ReconnectionConfiguration.cs" Link="EventEngine\Subscribe\Context\ReconnectionConfiguration.cs" />
-    <Compile Include="..\PubnubApi\EventEngine\Subscribe\Context\ReconnectionDelayUtil.cs" Link="EventEngine\Subscribe\Context\ReconnectionDelayUtil.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\Effects\EmitMessagesHandler.cs" Link="EventEngine\Subscribe\Effects\EmitMessagesHandler.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\Effects\EmitStatusEffectHandler.cs" Link="EventEngine\Subscribe\Effects\EmitStatusEffectHandler.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\Effects\HandshakeEffectHandler.cs" Link="EventEngine\Subscribe\Effects\HandshakeEffectHandler.cs" />
@@ -272,6 +263,7 @@
       <Link>Interface\IPubnubUnitTest.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\Interface\ISubscribeOperation.cs" Link="Interface\ISubscribeOperation.cs" />
+    <Compile Include="..\PubnubApi\Interface\IUnsubscribeOperation.cs" Link="Interface\IUnsubscribeOperation.cs" />
     <Compile Include="..\PubnubApi\Interface\IUrlRequestBuilder.cs">
       <Link>Interface\IUrlRequestBuilder.cs</Link>
     </Compile>
@@ -926,11 +918,12 @@
     <Folder Include="Enum\" />
     <Folder Include="EventEngine\Core\" />
     <Folder Include="EventEngine\Common\" />
+    <Folder Include="EventEngine\Context\" />
+    <Folder Include="EventEngine\Presence\" />
     <Folder Include="EventEngine\Subscribe\Effects\" />
     <Folder Include="EventEngine\Subscribe\Events\" />
     <Folder Include="EventEngine\Subscribe\Invocations\" />
     <Folder Include="EventEngine\Subscribe\Common\" />
-    <Folder Include="EventEngine\Subscribe\Context\" />
     <Folder Include="EventEngine\Subscribe\States\" />
     <Folder Include="HttpUtility\" />
     <Folder Include="Interface\" />

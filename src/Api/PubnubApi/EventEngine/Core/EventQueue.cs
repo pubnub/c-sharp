@@ -25,7 +25,7 @@ namespace PubnubApi.EventEngine.Core
             }
         }
 
-        private IEvent Dequeue()
+        public IEvent Dequeue()
         {
             lock (lockObj)
             {

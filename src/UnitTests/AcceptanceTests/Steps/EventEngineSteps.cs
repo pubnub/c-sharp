@@ -11,16 +11,16 @@ using System.IO;
 using System.Text.Json;
 using System.Threading.Channels;
 using System.Threading;
-using PubnubApi.PubnubEventEngine;
 using TechTalk.SpecFlow.Assist;
 using System.Net.Http;
+using System.Diagnostics;
 
 namespace AcceptanceTests.Steps
 {
     [Binding]
     public class EventEngineSteps
     {
-        public static bool enableIntenalPubnubLogging = false;
+        public static bool enableIntenalPubnubLogging = true;
         public static string currentFeature = string.Empty;
         public static string currentContract = string.Empty;
         public static bool betaVersion = false;
@@ -32,10 +32,6 @@ namespace AcceptanceTests.Steps
         private string channel = "my_channel";
         private string channelGroup = "my_channelgroup";
         private string publishMsg = "hello_world";
-        //private UuidMetadataPersona uuidMetadataPersona = null;
-        //private PNGetUuidMetadataResult getUuidMetadataResult = null;
-        //private PNSetUuidMetadataResult setUuidMetadataResult = null;
-        //private PNGetAllUuidMetadataResult getAllUuidMetadataResult = null;
         PNPublishResult publishResult = null;
         SubscribeCallback subscribeCallback = null;
         private PNMessageResult<object> messageResult = null;
@@ -45,6 +41,11 @@ namespace AcceptanceTests.Steps
         PubnubError pnError = null;
         IPubnubUnitTest unitTest;
 
+        static void UnhandledExceptionTrapper(object sender, UnhandledExceptionEventArgs e)
+        {
+            Debug.WriteLine("Unhandled exception occured inside EventEngine. Exiting the test. Please try again.");
+            System.Environment.Exit(1);
+        }
         public class PubnubUnitTest : IPubnubUnitTest
         {
             long IPubnubUnitTest.Timetoken
@@ -136,6 +137,7 @@ namespace AcceptanceTests.Steps
         }
         public EventEngineSteps(ScenarioContext scenarioContext)
         {
+            AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionTrapper;
             _scenarioContext = scenarioContext;
         }
 
@@ -208,6 +210,7 @@ namespace AcceptanceTests.Steps
                 System.Diagnostics.Debug.WriteLine(mockExpectResponse);
             }
         }
+
         [Given(@"the demo keyset with event engine enabled")]
         public void GivenTheDemoKeysetWithEventEngineEnabled()
         {
@@ -235,7 +238,6 @@ namespace AcceptanceTests.Steps
                 config.LogVerbosity = PNLogVerbosity.NONE;
             }
             config.EnableEventEngine = true;
-
 
             messageReceivedEvent = new ManualResetEvent(false);
             statusReceivedEvent = new ManualResetEvent(false);
@@ -313,6 +315,36 @@ namespace AcceptanceTests.Steps
             }
         }
 
+        [When(@"I subscribe with timetoken (.*)")]
+        public void WhenISubscribeWithTimetoken(int p0)
+        {
+            pn = new Pubnub(config);
+            pn.PubnubUnitTest = unitTest;
+            pn.PubnubUnitTest.EventTypeList?.Clear();
+
+            messageReceivedEvent = new ManualResetEvent(false);
+            statusReceivedEvent = new ManualResetEvent(false);
+
+            pn.AddListener(subscribeCallback);
+            pn.Subscribe<object>()
+                .Channels(channel.Split(','))
+                .ChannelGroups(channelGroup.Split(','))
+                .WithTimetoken(p0)
+                .Execute();
+            statusReceivedEvent.WaitOne (60*1000);
+            if (pnStatus != null && pnStatus.Category == PNStatusCategory.PNConnectedCategory)
+            {
+                //All good.
+            }
+            else
+            {
+                if (currentContract == "simpleSubscribe")
+                {
+                    Assert.Fail("WhenISubscribe failed.");
+                }
+            }
+        }
+
         [When(@"I publish a message")]
         public async Task WhenIPublishAMessage()
         {
@@ -339,8 +371,8 @@ namespace AcceptanceTests.Steps
             {
                 Assert.Fail();
             }
-            System.Diagnostics.Debug.WriteLine($"COUNT = {pn.PubnubUnitTest.EventTypeList.Count} ");
-            for (int i = 0; i < pn.PubnubUnitTest.EventTypeList.Count(); i++)
+            System.Diagnostics.Debug.WriteLine($"COUNT = {pn.PubnubUnitTest.EventTypeList?.Count} ");
+            for (int i = 0; i < pn.PubnubUnitTest.EventTypeList?.Count(); i++)
             {
                 System.Diagnostics.Debug.WriteLine($"{pn.PubnubUnitTest.EventTypeList[i].Key} - {pn.PubnubUnitTest.EventTypeList[i].Value} ");
             }
@@ -372,11 +404,16 @@ namespace AcceptanceTests.Steps
             config.ConnectionMaxRetries = retryCount;
         }
 
+        [Then(@"I receive an error in my subscribe response")]
+        public void ThenIReceiveAnErrorInMySubscribeResponse()
+        {
+            Assert.True(pnStatus != null && pnStatus.Error);
+        }
+
         [Then(@"I receive an error")]
         public void ThenIReceiveAnError()
         {
             Assert.True(pnStatus != null && pnStatus.Error);
         }
-
     }
 }

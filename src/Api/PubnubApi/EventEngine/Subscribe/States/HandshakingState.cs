@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using PubnubApi.EventEngine.Core;
 using PubnubApi.EventEngine.Subscribe.Common;
-using PubnubApi.EventEngine.Subscribe.Context;
+using PubnubApi.EventEngine.Context;
 using PubnubApi.EventEngine.Subscribe.Invocations;
 
 namespace PubnubApi.EventEngine.Subscribe.States
 {
     public class HandshakingState : SubscriptionState
     {
-        public SubscriptionCursor Cursor { get; set; }
         public override IEnumerable<IEffectInvocation> OnEntry => new HandshakeInvocation()
-            { Channels = this.Channels,
-            ChannelGroups = this.ChannelGroups }.AsArray();
+            { Channels = this.Channels, ChannelGroups = this.ChannelGroups, Cursor = this.Cursor }.AsArray();
 
         public override IEnumerable<IEffectInvocation> OnExit { get; } = new CancelHandshakeInvocation().AsArray();
 
@@ -27,8 +26,8 @@ namespace PubnubApi.EventEngine.Subscribe.States
 
                 Events.SubscriptionChangedEvent subscriptionChanged => new States.HandshakingState()
                 {
-                    Channels = subscriptionChanged.Channels,
-                    ChannelGroups = subscriptionChanged.ChannelGroups,
+                    Channels = (Channels ?? Enumerable.Empty<string>()).Union(subscriptionChanged.Channels),
+                    ChannelGroups = (ChannelGroups ?? Enumerable.Empty<string>()).Union(subscriptionChanged.ChannelGroups),
                     ReconnectionConfiguration = this.ReconnectionConfiguration
                 },
 
@@ -42,16 +41,18 @@ namespace PubnubApi.EventEngine.Subscribe.States
 
                 Events.HandshakeFailureEvent handshakeFailure => new States.HandshakeReconnectingState()
                 {
-                    Channels = this.Channels,
-                    ChannelGroups = this.ChannelGroups,
+                    Channels = handshakeFailure.Channels,
+                    ChannelGroups = handshakeFailure.ChannelGroups,
+                    Cursor = handshakeFailure.Cursor,
                     ReconnectionConfiguration = this.ReconnectionConfiguration,
-                    AttemptedRetries = 0
-                }.With(new EmitStatusInvocation(handshakeFailure.Status)),
+                    AttemptedRetries = 1
+                },
 
                 Events.DisconnectEvent disconnect => new States.HandshakeStoppedState()
                 {
                     Channels = disconnect.Channels,
                     ChannelGroups = disconnect.ChannelGroups,
+                    Cursor = disconnect.Cursor,
                     ReconnectionConfiguration = this.ReconnectionConfiguration
                 }.With(new EmitStatusInvocation(PNStatusCategory.PNDisconnectedCategory)),
 

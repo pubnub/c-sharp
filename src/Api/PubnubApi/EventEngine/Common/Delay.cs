@@ -6,7 +6,7 @@ namespace PubnubApi.EventEngine.Common
     public class Delay
     {
         public bool Cancelled { get; private set; } = false;
-        private readonly TaskCompletionSource<object> taskCompletionSource  = new TaskCompletionSource<object>();
+        private TaskCompletionSource<object> taskCompletionSource;
         private readonly object monitor = new object();
         private readonly int milliseconds;
 
@@ -17,17 +17,20 @@ namespace PubnubApi.EventEngine.Common
 
         public Task Start()
         {
+            taskCompletionSource = new TaskCompletionSource<object>();
+            Cancelled = false;
             #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task taskAwaiter = Task.Factory.StartNew(AwaiterLoop);
-            taskAwaiter.Wait();
             #else
             Thread awaiterThread = new Thread(AwaiterLoop);
             awaiterThread.Start();
             #endif
-            return taskCompletionSource.Task;        }
+            return taskCompletionSource.Task;
+        }
 
         public void Cancel()
         {
+            if (Cancelled) return;
             lock (monitor)
             {
                 Cancelled = true;
@@ -37,23 +40,21 @@ namespace PubnubApi.EventEngine.Common
 
         private void AwaiterLoop()
         {
-            while(true)
+            lock (monitor)
             {
-                lock (monitor)
+                if (Cancelled)
                 {
-                    if (Cancelled)
-                    {
-                        taskCompletionSource.SetCanceled();
-                        break;
-                    }
-                    Monitor.Wait(monitor, milliseconds);
-                    if (Cancelled)
-                    {
-                        taskCompletionSource.SetCanceled();
-                        break;
-                    }
-                    taskCompletionSource.SetResult(null);
+                    taskCompletionSource.SetCanceled();
+                    return;
                 }
+                Monitor.Wait(monitor, milliseconds);
+                if (Cancelled)
+                {
+                    taskCompletionSource.SetCanceled();
+                    return;
+                }
+                taskCompletionSource.SetResult(null);
+                Cancelled = true;
             }
         }
     }

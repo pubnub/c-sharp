@@ -85,6 +85,11 @@ namespace PubnubApi
                 requestQueryStringParams.Add("filter-expr", UriUtil.EncodeUriComponent(pubnubConfig[pubnubInstanceId].FilterExpression, currentType, false, false, false));
             }
 
+            if (!requestQueryStringParams.ContainsKey("ee") && pubnubConfig.ContainsKey(pubnubInstanceId) && pubnubConfig[pubnubInstanceId].EnableEventEngine)
+            {
+                requestQueryStringParams.Add("ee", "1");
+            }
+
             if (!requestQueryStringParams.ContainsKey("tt"))
             {
                 requestQueryStringParams.Add("tt", timetoken.ToString(CultureInfo.InvariantCulture));

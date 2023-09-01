@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using PubnubApi.EventEngine.Core;
 using PubnubApi.EventEngine.Subscribe.Invocations;
 using PubnubApi.EventEngine.Subscribe.Common;
-using PubnubApi.EventEngine.Subscribe.Context;
+using PubnubApi.EventEngine.Context;
+using System.Linq;
 
 namespace PubnubApi.EventEngine.Subscribe.States
 {
     public class ReceivingState : SubscriptionState
     {
-        public SubscriptionCursor Cursor;
-
         public override IEnumerable<IEffectInvocation> OnEntry => new ReceiveMessagesInvocation()
             { Channels = this.Channels,ChannelGroups = this.ChannelGroups, Cursor = this.Cursor }.AsArray();
 
@@ -32,15 +31,14 @@ namespace PubnubApi.EventEngine.Subscribe.States
                     Cursor = receiveSuccess.Cursor,
                     ReconnectionConfiguration = this.ReconnectionConfiguration
                 }.With(
-                    new EmitMessagesInvocation(receiveSuccess.Messages),
-                    new EmitStatusInvocation(receiveSuccess.Status)
+                    new EmitMessagesInvocation(receiveSuccess.Cursor, receiveSuccess.Messages)
                 ),
 
                 Events.SubscriptionChangedEvent subscriptionChanged => new ReceivingState()
                 {
-                    Channels = subscriptionChanged.Channels,
-                    ChannelGroups = subscriptionChanged.ChannelGroups,
-                    Cursor = this.Cursor,
+                    Channels = (Channels ?? Enumerable.Empty<string>()).Union(subscriptionChanged.Channels),
+                    ChannelGroups = (ChannelGroups ?? Enumerable.Empty<string>()).Union(subscriptionChanged.ChannelGroups),
+                    Cursor = subscriptionChanged.Cursor,
                     ReconnectionConfiguration = this.ReconnectionConfiguration
                 },
 
@@ -56,7 +54,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
                 {
                     Channels = this.Channels,
                     ChannelGroups = this.ChannelGroups,
-                    Cursor = this.Cursor,
+                    Cursor = disconnect.Cursor,
                     ReconnectionConfiguration = this.ReconnectionConfiguration
                 }.With(new EmitStatusInvocation(PNStatusCategory.PNDisconnectedCategory)),
 
@@ -64,9 +62,9 @@ namespace PubnubApi.EventEngine.Subscribe.States
                 {
                     Channels = this.Channels,
                     ChannelGroups = this.ChannelGroups,
-                    Cursor = this.Cursor,
+                    Cursor = receiveFailure.Cursor,
                     ReconnectionConfiguration = this.ReconnectionConfiguration,
-                    AttemptedRetries = 0
+                    AttemptedRetries = 1
                 },
 
                 _ => null

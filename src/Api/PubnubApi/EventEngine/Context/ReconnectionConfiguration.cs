@@ -1,7 +1,11 @@
 ﻿using System;
-namespace PubnubApi.EventEngine.Subscribe.Context
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace PubnubApi.EventEngine.Context
 {
-	public class ReconnectionConfiguration
+    public class ReconnectionConfiguration
 	{
         public PNReconnectionPolicy ReconnectionPolicy { get; set; }
         public int MaximumReconnectionRetries { get; set; }
@@ -13,4 +17,3 @@ namespace PubnubApi.EventEngine.Subscribe.Context
 		}
 	}
 }
-
