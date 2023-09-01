@@ -21,7 +21,7 @@ namespace PubnubApi.EndPoint
         private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 
         private string chMetaId = "";
-        private string chMetaName = "";
+        private string chMetaName;
         private string chMetaDesc;
         private Dictionary<string, object> chMetaCustom;
         private bool includeCustom;
