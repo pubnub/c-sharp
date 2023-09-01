@@ -31,9 +31,19 @@ namespace PubnubApi.EventEngine.Presence.Events
 		public PNStatus Status { get; set; }
 		public virtual string Name { get; set; } = "HEARTBEAT_FAILURE";
 	}
+	public class HeartbeatGiveUpEvent : Core.IEvent {  
+		public PNStatus Status { get; set; }
+		public virtual string Name { get; set; }
+	}
 	public class DisconnectEvent : Core.IEvent {
 		public IEnumerable<string> Channels{ get; set; }
 		public IEnumerable<string> ChannelGroups{ get; set; }
 		public string Name { get; set; } = "DISCONNECT";
+	}
+	public class TimesUpEvent : Core.IEvent
+	{
+		public IEnumerable<string> Channels{ get; set; }
+		public IEnumerable<string> ChannelGroups{ get; set; }
+		public string Name { get; set; } = "TIMES_UP";
 	}
 }
