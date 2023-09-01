@@ -24,14 +24,20 @@ namespace PubnubApi.EventEngine.Presence.Events
 		public string Name { get; set; } = "LEFT_ALL";
 	}
 	public class HeartbeatSuccessEvent : Core.IEvent {
+		public IEnumerable<string> Channels{ get; set; }
+		public IEnumerable<string> ChannelGroups{ get; set; }
 		public PNStatus Status { get; set; }
 		public virtual string Name { get; set; } = "HEARTBEAT_SUCCESS";
 	}
 	public class HeartbeatFailureEvent : Core.IEvent {
+		public IEnumerable<string> Channels{ get; set; }
+		public IEnumerable<string> ChannelGroups{ get; set; }
 		public PNStatus Status { get; set; }
 		public virtual string Name { get; set; } = "HEARTBEAT_FAILURE";
 	}
 	public class HeartbeatGiveUpEvent : Core.IEvent {  
+		public IEnumerable<string> Channels{ get; set; }
+		public IEnumerable<string> ChannelGroups{ get; set; }
 		public PNStatus Status { get; set; }
 		public virtual string Name { get; set; }
 	}
@@ -39,6 +45,12 @@ namespace PubnubApi.EventEngine.Presence.Events
 		public IEnumerable<string> Channels{ get; set; }
 		public IEnumerable<string> ChannelGroups{ get; set; }
 		public string Name { get; set; } = "DISCONNECT";
+	}
+	public class ReconnectEvent : Core.IEvent
+	{
+		public IEnumerable<string> Channels{ get; set; }
+		public IEnumerable<string> ChannelGroups{ get; set; }
+		public string Name { get; set; }
 	}
 	public class TimesUpEvent : Core.IEvent
 	{

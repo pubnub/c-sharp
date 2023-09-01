@@ -11,7 +11,16 @@ namespace PubnubApi.EventEngine.Presence.States
     {
         public override TransitionResult Transition(IEvent e)
         {
-            throw new NotImplementedException();
+            return e switch
+            {
+                Events.JoinedEvent joined => new States.HeartbeatingState()
+                {
+                    Channels = (Channels ?? Enumerable.Empty<string>()).Union(joined.Channels),
+                    ChannelGroups = (ChannelGroups ?? Enumerable.Empty<string>()).Union(joined.ChannelGroups),
+                    ReconnectionConfiguration = this.ReconnectionConfiguration
+                },
+                _ => null
+            };
         }
     }
 }

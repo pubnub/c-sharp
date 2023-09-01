@@ -52,6 +52,8 @@ namespace PubnubApi.EventEngine.Presence.States
 
                 Events.DisconnectEvent disconnect => new States.HeartbeatStoppedState()
                 {
+                    Channels = (Channels ?? Enumerable.Empty<string>()).Union(disconnect.Channels),
+                    ChannelGroups = (ChannelGroups ?? Enumerable.Empty<string>()).Union(disconnect.ChannelGroups),
                     ReconnectionConfiguration = this.ReconnectionConfiguration,
                 },
 

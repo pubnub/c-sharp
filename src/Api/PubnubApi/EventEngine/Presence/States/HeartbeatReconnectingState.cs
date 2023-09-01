@@ -24,6 +24,8 @@ namespace PubnubApi.EventEngine.Presence.States
 
                 Events.HeartbeatFailureEvent heartbeatFailure => new States.HeartbeatReconnectingState()
                 {
+                    Channels = (Channels ?? Enumerable.Empty<string>()).Union(heartbeatFailure.Channels),
+                    ChannelGroups = (ChannelGroups ?? Enumerable.Empty<string>()).Union(heartbeatFailure.ChannelGroups),
                     ReconnectionConfiguration = this.ReconnectionConfiguration
                 },
 
@@ -50,16 +52,22 @@ namespace PubnubApi.EventEngine.Presence.States
 
                 Events.HeartbeatSuccessEvent heartbeatSuccess => new States.HeartbeatCooldownState()
                 {
+                    Channels = (Channels ?? Enumerable.Empty<string>()).Union(heartbeatSuccess.Channels),
+                    ChannelGroups = (ChannelGroups ?? Enumerable.Empty<string>()).Union(heartbeatSuccess.ChannelGroups),
                     ReconnectionConfiguration = this.ReconnectionConfiguration
                 },
 
                 Events.HeartbeatGiveUpEvent heartbeatGiveup => new States.HeartbeatFailedState()
                 {
+                    Channels = (Channels ?? Enumerable.Empty<string>()).Union(heartbeatGiveup.Channels),
+                    ChannelGroups = (ChannelGroups ?? Enumerable.Empty<string>()).Union(heartbeatGiveup.ChannelGroups),
                     ReconnectionConfiguration = this.ReconnectionConfiguration
                 },
 
                 Events.DisconnectEvent disconnect => new States.HeartbeatStoppedState()
                 {
+                    Channels = (Channels ?? Enumerable.Empty<string>()).Union(disconnect.Channels),
+                    ChannelGroups = (ChannelGroups ?? Enumerable.Empty<string>()).Union(disconnect.ChannelGroups),
                     ReconnectionConfiguration = this.ReconnectionConfiguration,
                 },
 
