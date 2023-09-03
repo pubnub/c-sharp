@@ -1,3 +1,7 @@
+v6.17.0 - July 10 2023
+-----------------------------
+- Modified: validate json string before deserialization.
+
 v6.16.0 - May 18 2023
 -----------------------------
 - Modified: replaced ConcurrentDictionary class file with System.Collections.Concurrent package for all target frameworks except .net 3.5/4.0.

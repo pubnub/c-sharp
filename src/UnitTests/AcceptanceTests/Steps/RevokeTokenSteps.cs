@@ -31,7 +31,7 @@ namespace AcceptanceTests.Steps
                 .ExecuteAsync();
             revokeResult = revokeTokenResult.Result;
             pnStatus = revokeTokenResult.Status;
-            if (pnStatus.Error)
+            if (pnStatus != null && pnStatus.Error)
             {
                 pnError = pn.JsonPluggableLibrary.DeserializeToObject<PubnubError>(pnStatus.ErrorData.Information);
             }
