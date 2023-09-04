@@ -1,3 +1,7 @@
+v6.18.0 - September 04 2023
+-----------------------------
+- Fixed: allow name param as optional in SetChannelMetadata. Removed default empty value.
+
 v6.17.0 - July 10 2023
 -----------------------------
 - Modified: validate json string before deserialization.
