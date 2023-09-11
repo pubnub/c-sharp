@@ -610,7 +610,7 @@ namespace PubnubApi
                         System.Diagnostics.Debug.WriteLine(jsonString);
                         pubnubRequestState.GotJsonResponse = true;
                         System.Diagnostics.Debug.WriteLine("");
-                        System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "DateTime {0}, Retrieved JSON", DateTime.Now.ToString(CultureInfo.InvariantCulture)));
+                        System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "DateTime {0}, SendRequestAndGetJsonResponseTaskFactory => Retrieved JSON", DateTime.Now.ToString(CultureInfo.InvariantCulture)));
 
                         if (pubnubRequestState.Response != null)
                         {
@@ -965,7 +965,7 @@ namespace PubnubApi
 
                                 System.Diagnostics.Debug.WriteLine(jsonString);
                                 System.Diagnostics.Debug.WriteLine("");
-                                System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "DateTime {0}, Retrieved JSON", DateTime.Now.ToString(CultureInfo.InvariantCulture)));
+                                System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "DateTime {0}, SendRequestAndGetJsonResponseClassicHttp => Retrieved JSON", DateTime.Now.ToString(CultureInfo.InvariantCulture)));
                                 taskComplete.TrySetResult(jsonString);
                             }
                             if (asyncRequestState.Response != null)
@@ -1052,7 +1052,7 @@ namespace PubnubApi
 
                                 System.Diagnostics.Debug.WriteLine(jsonString);
                                 System.Diagnostics.Debug.WriteLine("");
-                                System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "DateTime {0}, Retrieved JSON", DateTime.Now.ToString(CultureInfo.InvariantCulture)));
+                                System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "DateTime {0}, SendRequestAndGetStreamResponseClassicHttp => Retrieved JSON", DateTime.Now.ToString(CultureInfo.InvariantCulture)));
                                 taskComplete.TrySetResult(null);
                             }
                             if (asyncRequestState.Response != null)

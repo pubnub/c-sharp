@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
+using PubnubApi.EventEngine.Subscribe;
+using PubnubApi.EndPoint;
+using PubnubApi.EventEngine.Subscribe.Events;
 #if !NET35 && !NET40
 using System.Collections.Concurrent;
 #endif
@@ -18,6 +21,12 @@ namespace PubnubApi
         private readonly EndPoint.TokenManager tokenManager;
         private object savedSubscribeOperation;
         private readonly string savedSdkVerion;
+        private SubscribeEventEngineFactory subscribeEventEngineFactory;
+		private List<SubscribeCallback> subscribeCallbackListenerList
+        {
+            get;
+            set;
+        } = new List<SubscribeCallback>();
 
         static Pubnub() 
         {
@@ -33,12 +42,24 @@ namespace PubnubApi
 
         #region "PubNub API Channel Methods"
 
-        public EndPoint.SubscribeOperation<T> Subscribe<T>()
+        public ISubscribeOperation<T> Subscribe<T>()
 		{
-            EndPoint.SubscribeOperation<T> subscribeOperation = new EndPoint.SubscribeOperation<T>(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, this);
-            subscribeOperation.CurrentPubnubInstance(this);
-            savedSubscribeOperation = subscribeOperation;
-            return subscribeOperation;
+            if (pubnubConfig[InstanceId].EnableEventEngine)
+            {
+				EndPoint.SubscribeOperation2<T> subscribeOperation = new EndPoint.SubscribeOperation2<T>(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, this.subscribeEventEngineFactory,InstanceId ,this);
+                subscribeOperation.SubscribeListenerList = subscribeCallbackListenerList;
+                                
+				//subscribeOperation.CurrentPubnubInstance(this);
+				savedSubscribeOperation = subscribeOperation;
+                return subscribeOperation;
+            }
+            else
+            {
+                EndPoint.SubscribeOperation<T> subscribeOperation = new EndPoint.SubscribeOperation<T>(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, this);
+                //subscribeOperation.CurrentPubnubInstance(this);
+                savedSubscribeOperation = subscribeOperation;
+                return subscribeOperation;
+            }
         }
 
         public EndPoint.UnsubscribeOperation<T> Unsubscribe<T>()
@@ -338,19 +359,27 @@ namespace PubnubApi
 
         public bool AddListener(SubscribeCallback listener)
         {
-            if (listenerManager == null)
+            if (pubnubConfig[InstanceId].EnableEventEngine)
             {
-                listenerManager = new EndPoint.ListenerManager(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, this);
+                subscribeCallbackListenerList.Add(listener);
+                return true;
             }
-            return listenerManager.AddListener(listener);
+            else
+            {
+                if (listenerManager == null)
+                {
+                    listenerManager = new EndPoint.ListenerManager(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, this);
+                }
+                return listenerManager.AddListener(listener);
+            }
         }
 
         public bool RemoveListener(SubscribeCallback listener)
         {
             bool ret = false;
-            if (listenerManager != null)
+            if (subscribeCallbackListenerList != null)
             {
-                ret = listenerManager.RemoveListener(listener);
+                ret = subscribeCallbackListenerList.Remove(listener);
             }
             return ret;
         }
@@ -862,7 +891,9 @@ namespace PubnubApi
         {
             savedSdkVerion = Version;
             InstanceId = Guid.NewGuid().ToString();
+			subscribeEventEngineFactory = new SubscribeEventEngineFactory();
             pubnubConfig.AddOrUpdate(InstanceId, config, (k, o) => config);
+
             if (config != null)
             {
                 pubnubLog = config.PubnubLog;
@@ -931,6 +962,6 @@ namespace PubnubApi
             }
         }
 
-#endregion
+		#endregion
 	}
 }

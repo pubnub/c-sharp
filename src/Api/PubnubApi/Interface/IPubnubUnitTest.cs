@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PubnubApi.PubnubEventEngine;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -49,5 +50,18 @@ namespace PubnubApi
             get;
             set;
         }
+
+        List<KeyValuePair<string,string>> EventTypeList 
+        {
+            get;
+            set;
+        }
+
+        int Attempts
+        {
+            get;
+            set;
+        }
+
     }
 }

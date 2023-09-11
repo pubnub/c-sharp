@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net35;net40;net45;net461;net48</TargetFrameworks>
+    <LangVersion>8.0</LangVersion>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>pubnub.snk</AssemblyOriginatorKeyFile>
     <DelaySign>False</DelaySign>
@@ -69,8 +70,8 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net35'">
-    <PackageReference Include="AsyncBridge.Net35">
-      <Version>0.2.0</Version>
+    <PackageReference Include="AsyncBridge">
+      <Version>0.3.1</Version>
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="System.Threading.dll">
@@ -88,7 +89,8 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net40'">
-    <PackageReference Include="AsyncBridge.JetBrains" Version="0.1.1">
+    <PackageReference Include="AsyncBridge">
+      <Version>0.3.1</Version>
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <Reference Include="System" />

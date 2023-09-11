@@ -27,7 +27,7 @@ namespace AcceptanceTests.Features
         
         private TechTalk.SpecFlow.ITestRunner testRunner;
         
-        private string[] _featureTags = new string[] {
+        private static string[] featureTags = new string[] {
                 "featureSet=access"};
         
 #line 1 "grant-token.feature"
@@ -37,10 +37,9 @@ namespace AcceptanceTests.Features
         public virtual void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "Grant an access token", "  As a PubNub customer I want to restrict and allow access to\r\n  specific PubNub " +
-                    "resources (channels, channel groups, uuids)\r\n  by my user base (both people and " +
-                    "devices) which are each\r\n  identified by a unique UUID.", ProgrammingLanguage.CSharp, new string[] {
-                        "featureSet=access"});
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "Grant an access token", "  As a PubNub customer I want to restrict and allow access to\n  specific PubNub r" +
+                    "esources (channels, channel groups, uuids)\n  by my user base (both people and de" +
+                    "vices) which are each\n  identified by a unique UUID.", ProgrammingLanguage.CSharp, featureTags);
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -52,28 +51,28 @@ namespace AcceptanceTests.Features
         }
         
         [NUnit.Framework.SetUpAttribute()]
-        public virtual void TestInitialize()
+        public void TestInitialize()
         {
         }
         
         [NUnit.Framework.TearDownAttribute()]
-        public virtual void TestTearDown()
+        public void TestTearDown()
         {
             testRunner.OnScenarioEnd();
         }
         
-        public virtual void ScenarioInitialize(TechTalk.SpecFlow.ScenarioInfo scenarioInfo)
+        public void ScenarioInitialize(TechTalk.SpecFlow.ScenarioInfo scenarioInfo)
         {
             testRunner.OnScenarioInitialize(scenarioInfo);
             testRunner.ScenarioContext.ScenarioContainer.RegisterInstanceAs<NUnit.Framework.TestContext>(NUnit.Framework.TestContext.CurrentContext);
         }
         
-        public virtual void ScenarioStart()
+        public void ScenarioStart()
         {
             testRunner.OnScenarioStart();
         }
         
-        public virtual void ScenarioCleanup()
+        public void ScenarioCleanup()
         {
             testRunner.CollectScenarioErrors();
         }
@@ -91,27 +90,17 @@ namespace AcceptanceTests.Features
         [NUnit.Framework.DescriptionAttribute("Grant an access token with all permissions on all resource types with authorized " +
             "uuid")]
         [NUnit.Framework.CategoryAttribute("contract=grantAllPermissions")]
-        public virtual void GrantAnAccessTokenWithAllPermissionsOnAllResourceTypesWithAuthorizedUuid()
+        public void GrantAnAccessTokenWithAllPermissionsOnAllResourceTypesWithAuthorizedUuid()
         {
             string[] tagsOfScenario = new string[] {
                     "contract=grantAllPermissions"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Grant an access token with all permissions on all resource types with authorized " +
-                    "uuid", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+                    "uuid", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 12
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
-            bool isScenarioIgnored = default(bool);
-            bool isFeatureIgnored = default(bool);
-            if ((tagsOfScenario != null))
-            {
-                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((this._featureTags != null))
-            {
-                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((isScenarioIgnored || isFeatureIgnored))
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
             {
                 testRunner.SkipScenario();
             }
@@ -323,26 +312,16 @@ namespace AcceptanceTests.Features
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("Grant an access token without an authorized uuid")]
         [NUnit.Framework.CategoryAttribute("contract=grantWithoutAuthorizedUUID")]
-        public virtual void GrantAnAccessTokenWithoutAnAuthorizedUuid()
+        public void GrantAnAccessTokenWithoutAnAuthorizedUuid()
         {
             string[] tagsOfScenario = new string[] {
                     "contract=grantWithoutAuthorizedUUID"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Grant an access token without an authorized uuid", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Grant an access token without an authorized uuid", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 81
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
-            bool isScenarioIgnored = default(bool);
-            bool isFeatureIgnored = default(bool);
-            if ((tagsOfScenario != null))
-            {
-                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((this._featureTags != null))
-            {
-                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((isScenarioIgnored || isFeatureIgnored))
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
             {
                 testRunner.SkipScenario();
             }
@@ -383,26 +362,16 @@ namespace AcceptanceTests.Features
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("Grant an access token successfully with an authorized uuid")]
         [NUnit.Framework.CategoryAttribute("contract=grantWithAuthorizedUUID")]
-        public virtual void GrantAnAccessTokenSuccessfullyWithAnAuthorizedUuid()
+        public void GrantAnAccessTokenSuccessfullyWithAnAuthorizedUuid()
         {
             string[] tagsOfScenario = new string[] {
                     "contract=grantWithAuthorizedUUID"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Grant an access token successfully with an authorized uuid", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Grant an access token successfully with an authorized uuid", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 92
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
-            bool isScenarioIgnored = default(bool);
-            bool isFeatureIgnored = default(bool);
-            if ((tagsOfScenario != null))
-            {
-                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((this._featureTags != null))
-            {
-                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((isScenarioIgnored || isFeatureIgnored))
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
             {
                 testRunner.SkipScenario();
             }
@@ -447,27 +416,17 @@ namespace AcceptanceTests.Features
         [NUnit.Framework.DescriptionAttribute("Attempt to grant an access token with all permissions empty or false and expect a" +
             " server error")]
         [NUnit.Framework.CategoryAttribute("contract=grantWithoutAnyPermissionsError")]
-        public virtual void AttemptToGrantAnAccessTokenWithAllPermissionsEmptyOrFalseAndExpectAServerError()
+        public void AttemptToGrantAnAccessTokenWithAllPermissionsEmptyOrFalseAndExpectAServerError()
         {
             string[] tagsOfScenario = new string[] {
                     "contract=grantWithoutAnyPermissionsError"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Attempt to grant an access token with all permissions empty or false and expect a" +
-                    " server error", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+                    " server error", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 104
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
-            bool isScenarioIgnored = default(bool);
-            bool isFeatureIgnored = default(bool);
-            if ((tagsOfScenario != null))
-            {
-                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((this._featureTags != null))
-            {
-                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((isScenarioIgnored || isFeatureIgnored))
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
             {
                 testRunner.SkipScenario();
             }
@@ -519,27 +478,17 @@ namespace AcceptanceTests.Features
         [NUnit.Framework.DescriptionAttribute("Attempt to grant an access token with a regular expression containing a syntax er" +
             "ror and expect a server error")]
         [NUnit.Framework.CategoryAttribute("contract=grantWithRegExpSyntaxError")]
-        public virtual void AttemptToGrantAnAccessTokenWithARegularExpressionContainingASyntaxErrorAndExpectAServerError()
+        public void AttemptToGrantAnAccessTokenWithARegularExpressionContainingASyntaxErrorAndExpectAServerError()
         {
             string[] tagsOfScenario = new string[] {
                     "contract=grantWithRegExpSyntaxError"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Attempt to grant an access token with a regular expression containing a syntax er" +
-                    "ror and expect a server error", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+                    "ror and expect a server error", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 118
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
-            bool isScenarioIgnored = default(bool);
-            bool isFeatureIgnored = default(bool);
-            if ((tagsOfScenario != null))
-            {
-                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((this._featureTags != null))
-            {
-                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((isScenarioIgnored || isFeatureIgnored))
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
             {
                 testRunner.SkipScenario();
             }
@@ -590,27 +539,17 @@ namespace AcceptanceTests.Features
         [NUnit.Framework.DescriptionAttribute("Attempt to grant an access token with a regular expression containing capturing g" +
             "roups and expect a server error")]
         [NUnit.Framework.CategoryAttribute("contract=grantWithRegExpNonCapturingError")]
-        public virtual void AttemptToGrantAnAccessTokenWithARegularExpressionContainingCapturingGroupsAndExpectAServerError()
+        public void AttemptToGrantAnAccessTokenWithARegularExpressionContainingCapturingGroupsAndExpectAServerError()
         {
             string[] tagsOfScenario = new string[] {
                     "contract=grantWithRegExpNonCapturingError"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Attempt to grant an access token with a regular expression containing capturing g" +
-                    "roups and expect a server error", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+                    "roups and expect a server error", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 132
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
-            bool isScenarioIgnored = default(bool);
-            bool isFeatureIgnored = default(bool);
-            if ((tagsOfScenario != null))
-            {
-                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((this._featureTags != null))
-            {
-                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((isScenarioIgnored || isFeatureIgnored))
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
             {
                 testRunner.SkipScenario();
             }
@@ -663,28 +602,18 @@ namespace AcceptanceTests.Features
             " (use default max 43200 for the test)")]
         [NUnit.Framework.CategoryAttribute("contract=grantWithTTLExceedMaxTTL")]
         [NUnit.Framework.CategoryAttribute("beta")]
-        public virtual void AttemptToGrantAnAccessTokenWhenTtlProvidedExceedsTheMaxTtlConfiguredUseDefaultMax43200ForTheTest()
+        public void AttemptToGrantAnAccessTokenWhenTtlProvidedExceedsTheMaxTtlConfiguredUseDefaultMax43200ForTheTest()
         {
             string[] tagsOfScenario = new string[] {
                     "contract=grantWithTTLExceedMaxTTL",
                     "beta"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Attempt to grant an access token when ttl provided exceeds the max ttl configured" +
-                    " (use default max 43200 for the test)", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+                    " (use default max 43200 for the test)", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 146
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
-            bool isScenarioIgnored = default(bool);
-            bool isFeatureIgnored = default(bool);
-            if ((tagsOfScenario != null))
-            {
-                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((this._featureTags != null))
-            {
-                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((isScenarioIgnored || isFeatureIgnored))
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
             {
                 testRunner.SkipScenario();
             }
