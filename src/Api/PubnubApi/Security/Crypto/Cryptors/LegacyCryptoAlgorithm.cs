@@ -14,7 +14,7 @@ namespace PubnubApi.Security.Crypto.Cryptors
         /// AES cipher block size.
         private const int AES_BLOCK_SIZE = 128;
 
-        private static readonly byte[] _identifier = new byte[] { 0x00, 0x00, 0x00, 0x00 };
+        private static readonly byte[] _identifier = new byte[] { };
 
         private readonly string _cipherKey;
         private readonly bool _useRandomIV;
