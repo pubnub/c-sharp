@@ -33,6 +33,9 @@ namespace PubnubApi.Security.Crypto.Cryptors
         public LegacyCryptoAlgorithm(string cipherKey, bool useRandomIV): this(cipherKey, useRandomIV, null, null)
         {
         }
+        public LegacyCryptoAlgorithm(string cipherKey): this(cipherKey, true, null, null)
+        {
+        }
         public byte[] Identifier => _identifier;
         private static string EncodeNonAsciiCharacters(string value)
         {
