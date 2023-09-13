@@ -45,7 +45,7 @@ namespace PubnubApi.Security.Crypto.Cryptors
             else
             {
                 CryptorHeader header = CryptorHeader.FromBytes(Convert.FromBase64String(data.Data));
-                if (header == null)
+                if (header == null || !header.Identifier.SequenceEqual(_algorithm.Identifier))
                 {
                     return new DecryptedData
                     {
@@ -77,7 +77,7 @@ namespace PubnubApi.Security.Crypto.Cryptors
             else
             {
                 CryptorHeader header = CryptorHeader.FromBytes(data.Data);
-                if (header == null)
+                if (header == null || !header.Identifier.SequenceEqual(_algorithm.Identifier))
                 {
                     return new DecryptedBytes
                     {
