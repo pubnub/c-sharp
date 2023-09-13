@@ -9,7 +9,7 @@ namespace PubnubApi.Security.Crypto
     {
         private const int IDENTIFIER_LENGTH = 4;
         //private static readonly byte[] NULL_IDENTIFIER = new byte[] { 0x00, 0x00, 0x00, 0x00 };
-        private static readonly byte[] SENTINEL = new byte[] { 0x50, 0x4E, 0x45, 0x44 }; // "PNED"
+        private static readonly byte[] SENTINEL = new byte[] { 80, 78, 69, 68 }; // "PNED";
         private const byte MAX_VERSION = 1;
 
         public byte[] Identifier { get; set; }

@@ -62,16 +62,19 @@ namespace PubnubApi.Security.Crypto.Common
             //convert to lower case
             return strKeySHA256Hash.ToLowerInvariant();
         }
-        internal static string GetEncryptionKey(string input)
+        internal static byte[] GetEncryptionKeyBytes(string input)
         {
-            //Compute Hash using the SHA256 
-            string strKeySHA256HashRaw = ComputeHashRaw(input);
-            //delete the "-" that appear after every 2 chars
-            string strKeySHA256Hash = strKeySHA256HashRaw.Replace("-", "");
-            //convert to lower case
-            return strKeySHA256Hash.ToLowerInvariant();
+            return ComputeHash(input);
         }
 
+        private static byte[] ComputeHash(string input)
+        {
+            Byte[] inputBytes = Encoding.UTF8.GetBytes(input);
+            using(SHA256 sha256 = SHA256.Create())
+            {
+                return sha256.ComputeHash(inputBytes);
+            }
+        }
         private static string ComputeHashRaw(string input)
         {
             HashAlgorithm algorithm = SHA256.Create();

@@ -6,13 +6,14 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Xml.Linq;
 
 namespace PubnubApi.Security.Crypto.Cryptors
 {
     public class AesCbcCryptoAlgorithm : ICryptoAlgorithm
     {
         /// AES cipher block size.
-        private const int AES_BLOCK_SIZE = 16;
+        private const int IV_SIZE = 16;
 
         private readonly string _cipherKey;
         private readonly bool _useRandomIV = true;
@@ -61,16 +62,16 @@ namespace PubnubApi.Security.Crypto.Cryptors
             string input = EncodeNonAsciiCharacters(data);
             byte[] dataBytes = Encoding.UTF8.GetBytes(input);
 
-            byte[] ivBytes = Util.InitializationVector(_useRandomIV, AES_BLOCK_SIZE);
+            byte[] ivBytes = Util.InitializationVector(_useRandomIV, IV_SIZE);
             if (_unitTest != null && _unitTest.IV != null)
             {
                 ivBytes = _unitTest.IV;
             }
 
-            string keyString = Util.GetEncryptionKey(_cipherKey);
+            byte[] keyBytes = Util.GetEncryptionKeyBytes(_cipherKey);
             try
             {
-                EncryptedBytes encryptedBytes = InternalEncrypt(dataBytes, ivBytes, keyString);
+                EncryptedBytes encryptedBytes = InternalEncrypt(dataBytes, ivBytes, keyBytes);
                 if (encryptedBytes.Data != null)
                 {
                     return new EncryptedData
@@ -111,17 +112,17 @@ namespace PubnubApi.Security.Crypto.Cryptors
                 };
             }
 
-            int dataOffset = _useRandomIV ? AES_BLOCK_SIZE : 0;
+            int dataOffset = _useRandomIV ? IV_SIZE : 0;
             byte[] ivBytes = Util.InitializationVector(_useRandomIV, dataOffset);
             if (_unitTest != null && _unitTest.IV != null && _unitTest.IV.Length == 16)
             {
                 ivBytes = _unitTest.IV;
             }
 
-            string keyString = Util.GetEncryptionKey(_cipherKey);
+            byte[] keyBytes = Util.GetEncryptionKeyBytes(_cipherKey);
             try
             {
-                return InternalEncrypt(data, ivBytes, keyString);
+                return InternalEncrypt(data, ivBytes, keyBytes);
             }
             catch(Exception ex)
             {
@@ -133,23 +134,37 @@ namespace PubnubApi.Security.Crypto.Cryptors
                 };
             }
         }
-        private EncryptedBytes InternalEncrypt(byte[] dataBytes, byte[] ivBytes, string keyString)
+        private EncryptedBytes InternalEncrypt(byte[] dataBytes, byte[] ivBytes, byte[] keyBytes)
         {
             try
             {
-                
+                if (_log != null)
+                {
+                    LoggingMethod.WriteToLog(_log, string.Format(CultureInfo.InvariantCulture, "DateTime {0} IV = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ivBytes.ToDisplayFormat()), PNLogVerbosity.BODY);
+                }
                 using (Aes aesAlg = Aes.Create())
                 {
                     aesAlg.KeySize = 256;
-                    aesAlg.BlockSize = AES_BLOCK_SIZE;
+                    aesAlg.BlockSize = 128;
                     aesAlg.Mode = CipherMode.CBC;
                     aesAlg.Padding = PaddingMode.PKCS7;
                     aesAlg.IV = ivBytes;
-                    aesAlg.Key = Encoding.UTF8.GetBytes(keyString);
+                    aesAlg.Key = keyBytes;
 
                     using (ICryptoTransform crypto = aesAlg.CreateEncryptor())
                     {
-                        byte[] buffer = crypto.TransformFinalBlock(dataBytes, 0, dataBytes.Length);
+                        byte[] outputBytes = crypto.TransformFinalBlock(dataBytes, 0, dataBytes.Length);
+                        CryptorHeader header = new CryptorHeader(Identifier, outputBytes.Length);
+                        byte[] headerBytes = header.ToBytes();
+                        if (_log != null)
+                        {
+                            LoggingMethod.WriteToLog(_log, string.Format(CultureInfo.InvariantCulture, "DateTime {0} Header = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), headerBytes.ToDisplayFormat()), PNLogVerbosity.BODY);
+                        }
+                        byte[] buffer = new byte[headerBytes.Length + ivBytes.Length + outputBytes.Length];
+                        Buffer.BlockCopy(headerBytes, 0, buffer, 0, headerBytes.Length);
+                        Buffer.BlockCopy(ivBytes    , 0, buffer, headerBytes.Length, ivBytes.Length);
+                        Buffer.BlockCopy(outputBytes, 0, buffer, headerBytes.Length + ivBytes.Length, outputBytes.Length);
+
                         return new EncryptedBytes
                         {
                             Metadata = _useRandomIV ? ivBytes : null,
@@ -170,7 +185,7 @@ namespace PubnubApi.Security.Crypto.Cryptors
         }
         public DecryptedData Decrypt(DataEnvelope encryptedData)
         {
-            if (encryptedData == null)
+            if (encryptedData == null || encryptedData.Data == null)
             {
                 return new DecryptedData
                 {
@@ -193,7 +208,8 @@ namespace PubnubApi.Security.Crypto.Cryptors
             try
             {
                 dataBytes = Convert.FromBase64String(encData.Data);
-                ivBytes = Convert.FromBase64String(encData.Metadata);
+                ivBytes = dataBytes.Take(16).ToArray();
+                dataBytes = dataBytes.Skip(16).ToArray();
             }
             catch(Exception ex)
             {
@@ -203,11 +219,10 @@ namespace PubnubApi.Security.Crypto.Cryptors
                     Status = new PNStatus { Error = true, ErrorData = new PNErrorData("Base64 conversion error", ex), StatusCode = 400 }
                 };
             }
-            string keyString = Util.GetEncryptionKey(_cipherKey);
-
+            byte[] keyBytes = Util.GetEncryptionKeyBytes(_cipherKey);
             try
             {
-                DecryptedBytes decryptedBytes = InternalDecrypt(dataBytes, ivBytes, keyString);
+                DecryptedBytes decryptedBytes = InternalDecrypt(dataBytes, ivBytes, keyBytes);
                 if (decryptedBytes.Data != null)
                 {
                     return new DecryptedData
@@ -255,12 +270,12 @@ namespace PubnubApi.Security.Crypto.Cryptors
                 };
             }
 
-            byte[] ivBytes = encryptedBytes.Metadata;
-            byte[] dataBytes = encryptedBytes.Data;
-            string keyString = Util.GetEncryptionKey(_cipherKey);
+            byte[] ivBytes = encryptedBytes.Data.Take(16).ToArray();
+            byte[] dataBytes = encryptedBytes.Data.Skip(16).ToArray();
+            byte[] keyBytes = Util.GetEncryptionKeyBytes(_cipherKey);
             try
             {
-                return InternalDecrypt(dataBytes, ivBytes, keyString);
+                return InternalDecrypt(dataBytes, ivBytes, keyBytes);
             }
             catch(Exception ex)
             {
@@ -271,18 +286,18 @@ namespace PubnubApi.Security.Crypto.Cryptors
                 };
             }
         }
-        private DecryptedBytes InternalDecrypt(byte[] dataBytes, byte[] ivBytes, string keyString)
+        private DecryptedBytes InternalDecrypt(byte[] dataBytes, byte[] ivBytes, byte[] keyBytes)
         {
             try
             {
                 using (Aes aesAlg = Aes.Create())
                 {
                     aesAlg.KeySize = 256;
-                    aesAlg.BlockSize = AES_BLOCK_SIZE;
+                    aesAlg.BlockSize = 128;
                     aesAlg.Mode = CipherMode.CBC;
                     aesAlg.Padding = PaddingMode.PKCS7;
                     aesAlg.IV = ivBytes;
-                    aesAlg.Key = Encoding.UTF8.GetBytes(keyString);
+                    aesAlg.Key = keyBytes;
 
                     using(ICryptoTransform decrypto = aesAlg.CreateDecryptor())
                     {

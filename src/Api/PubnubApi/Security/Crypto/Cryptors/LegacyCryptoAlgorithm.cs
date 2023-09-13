@@ -12,7 +12,7 @@ namespace PubnubApi.Security.Crypto.Cryptors
     public class LegacyCryptoAlgorithm : ICryptoAlgorithm
     {
         /// AES cipher block size.
-        private const int AES_BLOCK_SIZE = 128;
+        private const int IV_SIZE = 16;
 
         private static readonly byte[] _identifier = new byte[] { };
 
@@ -69,7 +69,7 @@ namespace PubnubApi.Security.Crypto.Cryptors
             string input = EncodeNonAsciiCharacters(data);
             byte[] dataBytes = Encoding.UTF8.GetBytes(input);
 
-            int dataOffset = _useRandomIV ? AES_BLOCK_SIZE : 0;
+            int dataOffset = _useRandomIV ? IV_SIZE : 0;
             byte[] ivBytes = Util.InitializationVector(_useRandomIV, dataOffset);
             if (_unitTest != null && _unitTest.IV != null && _unitTest.IV.Length == 16)
             {
@@ -120,7 +120,7 @@ namespace PubnubApi.Security.Crypto.Cryptors
                 };
             }
 
-            int dataOffset = _useRandomIV ? AES_BLOCK_SIZE : 0;
+            int dataOffset = _useRandomIV ? IV_SIZE : 0;
             byte[] ivBytes = Util.InitializationVector(_useRandomIV, dataOffset);
             if (_unitTest != null && _unitTest.IV != null && _unitTest.IV.Length == 16)
             {
@@ -146,11 +146,15 @@ namespace PubnubApi.Security.Crypto.Cryptors
         {
             try
             {
+                if (_log != null)
+                {
+                    LoggingMethod.WriteToLog(_log, string.Format(CultureInfo.InvariantCulture, "DateTime {0} IV = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ivBytes.ToDisplayFormat()), PNLogVerbosity.BODY);
+                }
                 byte[] buffer;
                 using (Aes aesAlg = Aes.Create())
                 {
                     aesAlg.KeySize = 256;
-                    aesAlg.BlockSize = AES_BLOCK_SIZE;
+                    aesAlg.BlockSize = 128;
                     aesAlg.Mode = CipherMode.CBC;
                     aesAlg.Padding = PaddingMode.PKCS7;
                     aesAlg.IV = ivBytes;
@@ -302,7 +306,7 @@ namespace PubnubApi.Security.Crypto.Cryptors
                 using (Aes aesAlg = Aes.Create())
                 {
                     aesAlg.KeySize = 256;
-                    aesAlg.BlockSize = AES_BLOCK_SIZE;
+                    aesAlg.BlockSize = 128;
                     aesAlg.Mode = CipherMode.CBC;
                     aesAlg.Padding = PaddingMode.PKCS7;
                     aesAlg.IV = ivBytes;
