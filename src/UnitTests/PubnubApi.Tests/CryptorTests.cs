@@ -26,9 +26,9 @@ namespace PubNubMessaging.Tests
             string message = "q/xJqqN6qbiZMXYmiQC1Fw==";
 
             Cryptor cryptor = new Cryptor(new LegacyCryptoAlgorithm("enigma", false));
-            DecryptedData decryptedMessage = cryptor.Decrypt(message);
+            string decryptedMessage = cryptor.Decrypt(message);
             
-            Assert.AreEqual("yay!", decryptedMessage.Data);
+            Assert.AreEqual("yay!", decryptedMessage);
         }
 
         [Test]
@@ -37,9 +37,9 @@ namespace PubNubMessaging.Tests
             string message = "MTIzNDU2Nzg5MDEyMzQ1NjdnONoCgo0wbuMGGMmfMX0=";
             
             Cryptor cryptor = new Cryptor(new LegacyCryptoAlgorithm("enigma", true));
-            DecryptedData decryptedMessage = cryptor.Decrypt(message);
+            string decryptedMessage = cryptor.Decrypt(message);
             
-            Assert.AreEqual("yay!", decryptedMessage.Data);
+            Assert.AreEqual("yay!", decryptedMessage);
         }
 
         [Test]
@@ -48,10 +48,10 @@ namespace PubNubMessaging.Tests
             byte[] message = new byte[] { 171, 252, 73, 170, 163, 122, 169, 184, 153, 49, 118, 38, 137, 0, 181, 23 };
 
             Cryptor cryptor = new Cryptor(new LegacyCryptoAlgorithm("enigma", false));
-            DecryptedBytes decryptedMessage = cryptor.Decrypt(message);
+            byte[] decryptedMessage = cryptor.Decrypt(message);
 
             byte[] expectedBytes = new byte[] { 121, 97, 121, 33 };
-            Assert.AreEqual(expectedBytes, decryptedMessage.Data);
+            Assert.AreEqual(expectedBytes, decryptedMessage);
         }
 
         [Test]
@@ -60,10 +60,10 @@ namespace PubNubMessaging.Tests
             byte[] message = new byte[] { 49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 49, 50, 51, 52, 53, 54, 55, 103, 56, 218, 2, 130, 141, 48, 110, 227, 6, 24, 201, 159, 49, 125 };
 
             Cryptor cryptor = new Cryptor(new LegacyCryptoAlgorithm("enigma", true));
-            DecryptedBytes decryptedMessage = cryptor.Decrypt(message);
+            byte[] decryptedMessage = cryptor.Decrypt(message);
 
             byte[] expectedBytes = new byte[] { 121, 97, 121, 33 };
-            Assert.AreEqual(expectedBytes, decryptedMessage.Data);
+            Assert.AreEqual(expectedBytes, decryptedMessage);
         }
 
         [Test]
@@ -72,9 +72,9 @@ namespace PubNubMessaging.Tests
             //deserialized string
             string message = "yay!";
             Cryptor cryptor = new Cryptor(new LegacyCryptoAlgorithm("enigma", false));
-            EncryptedData encryptedMessage = cryptor.Encrypt(message);
+            string encryptedMessage = cryptor.Encrypt(message);
 
-            Assert.AreEqual("q/xJqqN6qbiZMXYmiQC1Fw==", encryptedMessage.Data);
+            Assert.AreEqual("q/xJqqN6qbiZMXYmiQC1Fw==", encryptedMessage);
         }
         
         [Test]
@@ -86,9 +86,9 @@ namespace PubNubMessaging.Tests
             //deserialized string
             string message = "yay!";
             Cryptor cryptor = new Cryptor(new LegacyCryptoAlgorithm("enigma", true, null, pubnubUnitTest));
-            EncryptedData encryptedMessage = cryptor.Encrypt(message);
+            string encryptedMessage = cryptor.Encrypt(message);
 
-            Assert.AreEqual("MTIzNDU2Nzg5MDEyMzQ1NjdnONoCgo0wbuMGGMmfMX0=", encryptedMessage.Data);
+            Assert.AreEqual("MTIzNDU2Nzg5MDEyMzQ1NjdnONoCgo0wbuMGGMmfMX0=", encryptedMessage);
         }
 
         [Test]
@@ -99,10 +99,10 @@ namespace PubNubMessaging.Tests
             byte[] messageBytes = Encoding.UTF8.GetBytes(message);
 
             Cryptor cryptor = new Cryptor(new LegacyCryptoAlgorithm("enigma", false));
-            EncryptedBytes encryptedMessage = cryptor.Encrypt(messageBytes);
+            byte[] encryptedMessage = cryptor.Encrypt(messageBytes);
 
             byte[] expectedBytes = new byte[] { 171, 252, 73, 170, 163, 122, 169, 184, 153, 49, 118, 38, 137, 0, 181, 23 };
-            Assert.AreEqual(expectedBytes, encryptedMessage.Data);
+            Assert.AreEqual(expectedBytes, encryptedMessage);
         }
 
         [Test]
@@ -117,10 +117,10 @@ namespace PubNubMessaging.Tests
 
             //Encrypt
             Cryptor cryptor = new Cryptor(new LegacyCryptoAlgorithm("enigma", true, null, pubnubUnitTest));
-            EncryptedBytes encryptedMessage = cryptor.Encrypt(messageBytes);
+            byte[] encryptedMessage = cryptor.Encrypt(messageBytes);
 
             byte[] expectedBytes = new byte[] { 49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 49, 50, 51, 52, 53, 54, 55, 103, 56, 218, 2, 130, 141, 48, 110, 227, 6, 24, 201, 159, 49, 125 };
-            Assert.AreEqual(expectedBytes, encryptedMessage.Data);
+            Assert.AreEqual(expectedBytes, encryptedMessage);
         }
         
         [Test]
@@ -131,9 +131,9 @@ namespace PubNubMessaging.Tests
             //deserialized string
             string message = "yay!";
             Cryptor cryptor = new Cryptor(new AesCbcCryptoAlgorithm("enigma", new TestLog(), pubnubUnitTest));
-            EncryptedData encryptedMessage = cryptor.Encrypt(message);
+            string encryptedMessage = cryptor.Encrypt(message);
 
-            Assert.AreEqual("UE5FRAFDUklWEEwnIo83Jtk5G9XkuPYEn+gCu8PDp3G/SOEVWOfY3Ofj", encryptedMessage.Data);
+            Assert.AreEqual("UE5FRAFDUklWEEwnIo83Jtk5G9XkuPYEn+gCu8PDp3G/SOEVWOfY3Ofj", encryptedMessage);
         }
         
 
@@ -147,10 +147,10 @@ namespace PubNubMessaging.Tests
             byte[] messageBytes = Encoding.UTF8.GetBytes(message);
 
             Cryptor cryptor = new Cryptor(new AesCbcCryptoAlgorithm("enigma", new TestLog(), pubnubUnitTest));
-            EncryptedBytes encryptedMessage = cryptor.Encrypt(messageBytes);
+            byte[] encryptedMessage = cryptor.Encrypt(messageBytes);
 
             byte[] expectedBytes = new byte[] { 80, 78, 69, 68, 1, 67, 82, 73, 86, 16, 76, 39, 34, 143, 55, 38, 217, 57, 27, 213, 228, 184, 246, 4, 159, 232, 2, 187, 195, 195, 167, 113, 191, 72, 225, 21, 88, 231, 216, 220, 231, 227 };
-            Assert.AreEqual(expectedBytes, encryptedMessage.Data);
+            Assert.AreEqual(expectedBytes, encryptedMessage);
         }
         
         [Test]
@@ -160,9 +160,9 @@ namespace PubNubMessaging.Tests
             string encryptMessage = "UE5FRAFDUklWEEwnIo83Jtk5G9XkuPYEn+gCu8PDp3G/SOEVWOfY3Ofj";
 
             Cryptor cryptor = new Cryptor(new AesCbcCryptoAlgorithm("enigma"));
-            DecryptedData decryptedData = cryptor.Decrypt(encryptMessage);
+            string decryptedData = cryptor.Decrypt(encryptMessage);
 
-            Assert.AreEqual("yay!", decryptedData.Data);
+            Assert.AreEqual("yay!", decryptedData);
         }
         
 
@@ -173,10 +173,10 @@ namespace PubNubMessaging.Tests
             string message = "yay!";
             byte[] encryptedBytes = new byte[] { 80, 78, 69, 68, 1, 67, 82, 73, 86, 16, 76, 39, 34, 143, 55, 38, 217, 57, 27, 213, 228, 184, 246, 4, 159, 232, 2, 187, 195, 195, 167, 113, 191, 72, 225, 21, 88, 231, 216, 220, 231, 227 };
             Cryptor cryptor = new Cryptor(new AesCbcCryptoAlgorithm("enigma"));
-            DecryptedBytes decryptedBytes = cryptor.Decrypt(encryptedBytes);
+            byte[] decryptedBytes = cryptor.Decrypt(encryptedBytes);
 
             byte[] expectedBytes = Encoding.UTF8.GetBytes(message);
-            Assert.AreEqual(expectedBytes, decryptedBytes.Data);
+            Assert.AreEqual(expectedBytes, decryptedBytes);
         }
 
     }

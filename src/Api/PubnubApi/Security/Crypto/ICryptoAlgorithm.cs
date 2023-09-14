@@ -6,27 +6,6 @@ using System.Text;
 
 namespace PubnubApi.Security.Crypto
 {
-    public class EncryptedData
-    {
-        public PNStatus Status { get; set; } //TODO: Need to identify the format to send error/success status
-        public string Data { get; set; }
-    }
-    public class EncryptedBytes
-    {
-        public PNStatus Status { get; set; } //TODO: Need to identify the format to send error/success status
-        public byte[] Data { get; set; }
-    }
-    public class DecryptedData
-    {
-        public string Data { get; set; }
-        public PNStatus Status { get; set; } //TODO: Need to identify the format to send error/success status
-    }
-
-    public class DecryptedBytes
-    {
-        public byte[] Data { get; set; }
-        public PNStatus Status { get; set; } //TODO: Need to identify the format to send error/success status
-    }
     public interface ICryptoAlgorithm
     {
         /// <summary>
@@ -39,10 +18,10 @@ namespace PubnubApi.Security.Crypto
         /// </summary>
         byte[] Identifier { get; }
 
-        EncryptedData Encrypt(string data);
-        EncryptedBytes Encrypt(byte[] data);
+        string Encrypt(string data);
+        byte[] Encrypt(byte[] data);
 
-        DecryptedData Decrypt(string encryptedData);
-        DecryptedBytes Decrypt(byte[] encryptedData);
+        string Decrypt(string encryptedData);
+        byte[] Decrypt(byte[] encryptedData);
     }
 }
