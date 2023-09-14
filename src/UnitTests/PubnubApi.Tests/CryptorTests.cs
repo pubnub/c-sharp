@@ -24,10 +24,9 @@ namespace PubNubMessaging.Tests
         public void TestYayLegacyCryptoDecryptionBasic()
         {
             string message = "q/xJqqN6qbiZMXYmiQC1Fw==";
-            DataEnvelope envelope = new EncryptedData() { Metadata = null, Data = message };
 
             Cryptor cryptor = new Cryptor(new LegacyCryptoAlgorithm("enigma", false));
-            DecryptedData decryptedMessage = cryptor.Decrypt(envelope);
+            DecryptedData decryptedMessage = cryptor.Decrypt(message);
             
             Assert.AreEqual("yay!", decryptedMessage.Data);
         }
@@ -36,10 +35,9 @@ namespace PubNubMessaging.Tests
         public void TestYayLegacyCryptoDecryptionBasicWithDynamicIV()
         {
             string message = "MTIzNDU2Nzg5MDEyMzQ1NjdnONoCgo0wbuMGGMmfMX0=";
-            DataEnvelope envelope = new EncryptedData() { Metadata = null, Data = message };
             
             Cryptor cryptor = new Cryptor(new LegacyCryptoAlgorithm("enigma", true));
-            DecryptedData decryptedMessage = cryptor.Decrypt(envelope);
+            DecryptedData decryptedMessage = cryptor.Decrypt(message);
             
             Assert.AreEqual("yay!", decryptedMessage.Data);
         }
@@ -48,10 +46,9 @@ namespace PubNubMessaging.Tests
         public void TestYayByteArrayLegacyCryptoDecryptionBasic()
         {
             byte[] message = new byte[] { 171, 252, 73, 170, 163, 122, 169, 184, 153, 49, 118, 38, 137, 0, 181, 23 };
-            BytesEnvelope envelope = new EncryptedBytes() { Metadata = null, Data = message };
 
             Cryptor cryptor = new Cryptor(new LegacyCryptoAlgorithm("enigma", false));
-            DecryptedBytes decryptedMessage = cryptor.Decrypt(envelope);
+            DecryptedBytes decryptedMessage = cryptor.Decrypt(message);
 
             byte[] expectedBytes = new byte[] { 121, 97, 121, 33 };
             Assert.AreEqual(expectedBytes, decryptedMessage.Data);
@@ -61,10 +58,9 @@ namespace PubNubMessaging.Tests
         public void TestYayByteArrayLegacyCryptoDecryptionBasicWithDynamicIV()
         {
             byte[] message = new byte[] { 49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 49, 50, 51, 52, 53, 54, 55, 103, 56, 218, 2, 130, 141, 48, 110, 227, 6, 24, 201, 159, 49, 125 };
-            BytesEnvelope envelope = new EncryptedBytes() { Metadata = null, Data = message };
 
             Cryptor cryptor = new Cryptor(new LegacyCryptoAlgorithm("enigma", true));
-            DecryptedBytes decryptedMessage = cryptor.Decrypt(envelope);
+            DecryptedBytes decryptedMessage = cryptor.Decrypt(message);
 
             byte[] expectedBytes = new byte[] { 121, 97, 121, 33 };
             Assert.AreEqual(expectedBytes, decryptedMessage.Data);
@@ -162,9 +158,9 @@ namespace PubNubMessaging.Tests
         {
             //deserialized string
             string encryptMessage = "UE5FRAFDUklWEEwnIo83Jtk5G9XkuPYEn+gCu8PDp3G/SOEVWOfY3Ofj";
-            DataEnvelope envelope = new EncryptedData { Data = encryptMessage };
+
             Cryptor cryptor = new Cryptor(new AesCbcCryptoAlgorithm("enigma"));
-            DecryptedData decryptedData = cryptor.Decrypt(envelope);
+            DecryptedData decryptedData = cryptor.Decrypt(encryptMessage);
 
             Assert.AreEqual("yay!", decryptedData.Data);
         }
@@ -176,9 +172,8 @@ namespace PubNubMessaging.Tests
             //deserialized string
             string message = "yay!";
             byte[] encryptedBytes = new byte[] { 80, 78, 69, 68, 1, 67, 82, 73, 86, 16, 76, 39, 34, 143, 55, 38, 217, 57, 27, 213, 228, 184, 246, 4, 159, 232, 2, 187, 195, 195, 167, 113, 191, 72, 225, 21, 88, 231, 216, 220, 231, 227 };
-            BytesEnvelope envelope = new EncryptedBytes { Data = encryptedBytes };
             Cryptor cryptor = new Cryptor(new AesCbcCryptoAlgorithm("enigma"));
-            DecryptedBytes decryptedBytes = cryptor.Decrypt(envelope);
+            DecryptedBytes decryptedBytes = cryptor.Decrypt(encryptedBytes);
 
             byte[] expectedBytes = Encoding.UTF8.GetBytes(message);
             Assert.AreEqual(expectedBytes, decryptedBytes.Data);

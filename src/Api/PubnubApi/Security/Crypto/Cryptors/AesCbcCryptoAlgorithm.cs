@@ -54,7 +54,6 @@ namespace PubnubApi.Security.Crypto.Cryptors
             {
                 return new EncryptedData
                 {
-                    Metadata = null,
                     Data = null,
                     Status = new PNStatus { Error = true, ErrorData = new PNErrorData("Input is null", new Exception("Input is null")), StatusCode = 400 }
                 };
@@ -76,7 +75,6 @@ namespace PubnubApi.Security.Crypto.Cryptors
                 {
                     return new EncryptedData
                     {
-                        Metadata = Convert.ToBase64String(ivBytes),
                         Data = Convert.ToBase64String(encryptedBytes.Data)
                     };
                 }
@@ -84,7 +82,6 @@ namespace PubnubApi.Security.Crypto.Cryptors
                 {
                     return new EncryptedData
                     {
-                        Metadata = null,
                         Data = null,
                         Status = encryptedBytes.Status
                     };
@@ -94,7 +91,6 @@ namespace PubnubApi.Security.Crypto.Cryptors
             {
                 return new EncryptedData
                 {
-                    Metadata = null,
                     Data = null,
                     Status = new PNStatus { Error = true, ErrorData = new PNErrorData("Encryption error", ex), StatusCode = 400 }
                 };
@@ -106,7 +102,6 @@ namespace PubnubApi.Security.Crypto.Cryptors
             {
                 return new EncryptedBytes
                 {
-                    Metadata = null,
                     Data = null,
                     Status = new PNStatus { Error = true, ErrorData = new PNErrorData("Input is null", new Exception("Input is null")), StatusCode = 400 }
                 };
@@ -128,7 +123,6 @@ namespace PubnubApi.Security.Crypto.Cryptors
             {
                 return new EncryptedBytes
                 {
-                    Metadata = null,
                     Data = null,
                     Status = new PNStatus { Error = true, ErrorData = new PNErrorData("Encryption error", ex), StatusCode = 400 }
                 };
@@ -167,7 +161,6 @@ namespace PubnubApi.Security.Crypto.Cryptors
 
                         return new EncryptedBytes
                         {
-                            Metadata = _useRandomIV ? ivBytes : null,
                             Data = buffer,
                             Status = null
                         };
@@ -183,9 +176,9 @@ namespace PubnubApi.Security.Crypto.Cryptors
                 };
             }
         }
-        public DecryptedData Decrypt(DataEnvelope encryptedData)
+        public DecryptedData Decrypt(string encryptedData)
         {
-            if (encryptedData == null || encryptedData.Data == null)
+            if (encryptedData == null)
             {
                 return new DecryptedData
                 {
@@ -194,20 +187,11 @@ namespace PubnubApi.Security.Crypto.Cryptors
                 };
             }
             
-            if (!(encryptedData is EncryptedData encData))
-            {
-                return new DecryptedData
-                {
-                    Data = null,
-                    Status = new PNStatus { Error = true, ErrorData = new PNErrorData("Input is not EncryptedData", new Exception("Input is not EncryptedData")), StatusCode = 400 }
-                };
-            }
-
             byte[] dataBytes;
             byte[] ivBytes;
             try
             {
-                dataBytes = Convert.FromBase64String(encData.Data);
+                dataBytes = Convert.FromBase64String(encryptedData);
                 ivBytes = dataBytes.Take(16).ToArray();
                 dataBytes = dataBytes.Skip(16).ToArray();
             }
@@ -219,9 +203,9 @@ namespace PubnubApi.Security.Crypto.Cryptors
                     Status = new PNStatus { Error = true, ErrorData = new PNErrorData("Base64 conversion error", ex), StatusCode = 400 }
                 };
             }
-            byte[] keyBytes = Util.GetEncryptionKeyBytes(_cipherKey);
             try
             {
+                byte[] keyBytes = Util.GetEncryptionKeyBytes(_cipherKey);
                 DecryptedBytes decryptedBytes = InternalDecrypt(dataBytes, ivBytes, keyBytes);
                 if (decryptedBytes.Data != null)
                 {
@@ -250,9 +234,9 @@ namespace PubnubApi.Security.Crypto.Cryptors
                 };
             }
         }
-        public DecryptedBytes Decrypt(BytesEnvelope encryptedBytes)
+        public DecryptedBytes Decrypt(byte[] encryptedBytes)
         {
-            if (encryptedBytes == null || encryptedBytes.Data == null)
+            if (encryptedBytes == null)
             {
                 return new DecryptedBytes
                 {
@@ -261,20 +245,11 @@ namespace PubnubApi.Security.Crypto.Cryptors
                 };
             }
             
-            if (!(encryptedBytes is EncryptedBytes))
-            {
-                return new DecryptedBytes
-                {
-                    Data = null,
-                    Status = new PNStatus { Error = true, ErrorData = new PNErrorData("Input is not EncryptedData", new Exception("Input is not EncryptedData")), StatusCode = 400 }
-                };
-            }
-
-            byte[] ivBytes = encryptedBytes.Data.Take(16).ToArray();
-            byte[] dataBytes = encryptedBytes.Data.Skip(16).ToArray();
-            byte[] keyBytes = Util.GetEncryptionKeyBytes(_cipherKey);
             try
             {
+                byte[] ivBytes = encryptedBytes.Take(16).ToArray();
+                byte[] dataBytes = encryptedBytes.Skip(16).ToArray();
+                byte[] keyBytes = Util.GetEncryptionKeyBytes(_cipherKey);
                 return InternalDecrypt(dataBytes, ivBytes, keyBytes);
             }
             catch(Exception ex)

@@ -28,9 +28,9 @@ namespace PubnubApi.Security.Crypto.Cryptors
             return _algorithm.Encrypt(data);
         }
 
-        public DecryptedData Decrypt(DataEnvelope data)
+        public DecryptedData Decrypt(string data)
         {
-            if (data == null || data.Data == null)
+            if (data == null)
             {
                 return new DecryptedData
                 {
@@ -44,7 +44,7 @@ namespace PubnubApi.Security.Crypto.Cryptors
             }
             else
             {
-                CryptorHeader header = CryptorHeader.FromBytes(Convert.FromBase64String(data.Data));
+                CryptorHeader header = CryptorHeader.FromBytes(Convert.FromBase64String(data));
                 if (header == null || !header.Identifier.SequenceEqual(_algorithm.Identifier))
                 {
                     return new DecryptedData
@@ -53,16 +53,13 @@ namespace PubnubApi.Security.Crypto.Cryptors
                         Status = new PNStatus { Error = true, ErrorData = new PNErrorData("CryptorHeader mismatch", new Exception("CryptorHeader mismatch")), StatusCode = 400 }
                     };
                 }
-                DataEnvelope internalDataEnvelope = new EncryptedData 
-                { 
-                    Data = Convert.ToBase64String(Convert.FromBase64String(data.Data).Skip(5 + header.Identifier.Length + ((header.DataSize < 255) ? 1 : 3)).ToArray())
-                };
-                return _algorithm.Decrypt(internalDataEnvelope);
+                string actualData = Convert.ToBase64String(Convert.FromBase64String(data).Skip(5 + header.Identifier.Length + ((header.DataSize < 255) ? 1 : 3)).ToArray());
+                return _algorithm.Decrypt(actualData);
             }
         }
-        public DecryptedBytes Decrypt(BytesEnvelope data)
+        public DecryptedBytes Decrypt(byte[] data)
         {
-            if (data == null || data.Data == null)
+            if (data == null)
             {
                 return new DecryptedBytes
                 {
@@ -76,7 +73,7 @@ namespace PubnubApi.Security.Crypto.Cryptors
             }
             else
             {
-                CryptorHeader header = CryptorHeader.FromBytes(data.Data);
+                CryptorHeader header = CryptorHeader.FromBytes(data);
                 if (header == null || !header.Identifier.SequenceEqual(_algorithm.Identifier))
                 {
                     return new DecryptedBytes
@@ -85,12 +82,8 @@ namespace PubnubApi.Security.Crypto.Cryptors
                         Status = new PNStatus { Error = true, ErrorData = new PNErrorData("CryptorHeader mismatch", new Exception("CryptorHeader mismatch")), StatusCode = 400 }
                     };
                 }
-                BytesEnvelope internalBytesEnvelope = new EncryptedBytes 
-                { 
-                    Data = data.Data.Skip(5 + header.Identifier.Length + ((header.DataSize < 255) ? 1 : 3)).ToArray()
-                };
-
-                return _algorithm.Decrypt(internalBytesEnvelope);
+                byte[] actualBytes = data.Skip(5 + header.Identifier.Length + ((header.DataSize < 255) ? 1 : 3)).ToArray();
+                return _algorithm.Decrypt(actualBytes);
             }
         }
     }
