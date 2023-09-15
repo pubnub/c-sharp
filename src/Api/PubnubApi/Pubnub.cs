@@ -37,6 +37,9 @@ namespace PubnubApi
         }
         
         #if UNITY
+        /// <summary>
+        /// Call this function to globally clean up all background threads running in the SDK. Note that this will unsubscribe all channels.
+        /// </summary>
         public static void CleanUp()
         {
             OnCleanupCall?.Invoke();
