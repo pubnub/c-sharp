@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -8,12 +9,12 @@ namespace PubnubApi.Security.Crypto.Common
 {
     public class Util
     {
-        internal static byte[] InitializationVector(bool useRandomIV, int aesBlockSize)
+        internal static byte[] InitializationVector(bool useDynamicRandomIV, int ivSize)
         {
-            if (useRandomIV)
+            if (useDynamicRandomIV)
             {
                 #if NET35
-                byte[] iv = new byte[aesBlockSize];
+                byte[] iv = new byte[ivSize];
                 var rng = RandomNumberGenerator.Create();
                 try
                 {
@@ -31,7 +32,7 @@ namespace PubnubApi.Security.Crypto.Common
                 #else
                 using (RNGCryptoServiceProvider rngCsp = new RNGCryptoServiceProvider())
                 {
-                    byte[] iv = new byte[aesBlockSize];
+                    byte[] iv = new byte[ivSize];
                     rngCsp.GetBytes(iv);
                     return iv;
                 }
@@ -53,14 +54,14 @@ namespace PubnubApi.Security.Crypto.Common
             }
         }
 
-        internal static string GetLegacyEncryptionKey(string input)
+        internal static byte[] GetLegacyEncryptionKey(string input)
         {
             //Compute Hash using the SHA256 
             string strKeySHA256HashRaw = ComputeHashRaw(input);
             //delete the "-" that appear after every 2 chars
             string strKeySHA256Hash = strKeySHA256HashRaw.Replace("-", "").Substring(0, 32);
             //convert to lower case
-            return strKeySHA256Hash.ToLowerInvariant();
+            return Encoding.UTF8.GetBytes(strKeySHA256Hash.ToLowerInvariant());
         }
         internal static byte[] GetEncryptionKeyBytes(string input)
         {
@@ -81,6 +82,25 @@ namespace PubnubApi.Security.Crypto.Common
             Byte[] inputBytes = System.Text.Encoding.UTF8.GetBytes(input);
             Byte[] hashedBytes = algorithm.ComputeHash(inputBytes);
             return BitConverter.ToString(hashedBytes);
+        }
+
+        internal static string EncodeNonAsciiCharacters(string value)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (char c in value)
+            {
+                if (c > 127)
+                {
+                    // This character is too big for ASCII
+                    string encodedValue = "\\u" + ((int)c).ToString("x4", CultureInfo.InvariantCulture);
+                    sb.Append(encodedValue);
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+            return sb.ToString();
         }
     }
 }
