@@ -11,38 +11,35 @@ namespace PubnubApi.Security.Crypto.Common
     {
         internal static byte[] InitializationVector(bool useDynamicRandomIV, int ivSize)
         {
-            if (useDynamicRandomIV)
-            {
-                #if NET35
-                byte[] iv = new byte[ivSize];
-                var rng = RandomNumberGenerator.Create();
-                try
-                {
-                    rng.GetBytes(iv);
-                }
-                finally 
-                {
-                    var disposable = rng as IDisposable;
-                    if (disposable != null)
-                    {
-                        disposable.Dispose();
-                    }
-                }
-                return iv;
-                #else
-                using (RNGCryptoServiceProvider rngCsp = new RNGCryptoServiceProvider())
-                {
-                    byte[] iv = new byte[ivSize];
-                    rngCsp.GetBytes(iv);
-                    return iv;
-                }
-                #endif
-
-            }
-            else
+            if (!useDynamicRandomIV)
             {
                 return Encoding.UTF8.GetBytes("0123456789012345");
             }
+            
+#if NET35
+            byte[] iv = new byte[ivSize];
+            var rng = RandomNumberGenerator.Create();
+            try
+            {
+                rng.GetBytes(iv);
+            }
+            finally 
+            {
+                var disposable = rng as IDisposable;
+                if (disposable != null)
+                {
+                    disposable.Dispose();
+                }
+            }
+            return iv;
+#else
+            using (RNGCryptoServiceProvider rngCsp = new RNGCryptoServiceProvider())
+            {
+                byte[] iv = new byte[ivSize];
+                rngCsp.GetBytes(iv);
+                return iv;
+            }
+#endif
         }
 
         internal static byte[] ComputeSha256(string input)

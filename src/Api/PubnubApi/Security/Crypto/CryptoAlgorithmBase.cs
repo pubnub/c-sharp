@@ -62,20 +62,16 @@ namespace PubnubApi.Security.Crypto
 
                         return buffer;
                     }
-                    else
+
+                    if (_useDynamicRandomIV)
                     {
-                        if (_useDynamicRandomIV)
-                        {
-                            byte[] buffer = new byte[ivBytes.Length + outputBytes.Length];
-                            Buffer.BlockCopy(ivBytes, 0, buffer, 0, ivBytes.Length);
-                            Buffer.BlockCopy(outputBytes, 0, buffer, ivBytes.Length, outputBytes.Length);
-                            return buffer;
-                        }
-                        else
-                        {
-                            return outputBytes;
-                        }
+                        byte[] buffer = new byte[ivBytes.Length + outputBytes.Length];
+                        Buffer.BlockCopy(ivBytes, 0, buffer, 0, ivBytes.Length);
+                        Buffer.BlockCopy(outputBytes, 0, buffer, ivBytes.Length, outputBytes.Length);
+                        return buffer;
                     }
+
+                    return outputBytes;
                 }
             }
         }

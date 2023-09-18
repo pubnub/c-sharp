@@ -29,10 +29,8 @@ namespace PubnubApi.Security.Crypto
                 {
                     return SENTINEL.Length + 1 + IDENTIFIER_LENGTH + 1 + DataSize;
                 }
-                else
-                {
-                    return SENTINEL.Length + 1 + IDENTIFIER_LENGTH + 3 + DataSize;
-                }
+
+                return SENTINEL.Length + 1 + IDENTIFIER_LENGTH + 3 + DataSize;
             }
         }
 
