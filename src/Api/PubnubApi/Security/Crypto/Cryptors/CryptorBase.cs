@@ -6,16 +6,16 @@ using System.Security.Cryptography;
 using System.Text;
 using PubnubApi.Security.Crypto.Common;
 
-namespace PubnubApi.Security.Crypto
+namespace PubnubApi.Security.Crypto.Cryptors
 {
-    public abstract class CryptoAlgorithmBase : ICryptoAlgorithm
+    public abstract class CryptorBase : ICryptor
     {
         protected const int IV_SIZE = 16;
 
         private readonly bool _useDynamicRandomIV;
         private readonly IPubnubLog _log;
         private readonly IPubnubUnitTest _unitTest;
-        protected CryptoAlgorithmBase(string cipherKey, bool useDynamicRandomIV, IPubnubLog log, IPubnubUnitTest unitTest)
+        protected CryptorBase(string cipherKey, bool useDynamicRandomIV, IPubnubLog log, IPubnubUnitTest unitTest)
         {
             _useDynamicRandomIV = useDynamicRandomIV;
             _log = log;

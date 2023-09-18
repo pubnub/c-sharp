@@ -9,24 +9,26 @@ using System.Text;
 
 namespace PubnubApi.Security.Crypto.Cryptors
 {
-    public class LegacyCryptoAlgorithm : CryptoAlgorithmBase
+    public class LegacyCryptor : CryptorBase
     {
         private static readonly byte[] _identifier = new byte[] { };
 
         private readonly bool _useDynamicRandomIV;
-        public LegacyCryptoAlgorithm(string cipherKey, bool useDynamicRandomIV, IPubnubLog log, IPubnubUnitTest unitTest): base(cipherKey, useDynamicRandomIV, log, unitTest)
+        public LegacyCryptor(string cipherKey, bool useDynamicRandomIV, IPubnubLog log, IPubnubUnitTest unitTest): base(cipherKey, useDynamicRandomIV, log, unitTest)
         {
             _useDynamicRandomIV = useDynamicRandomIV;
         }
-        public LegacyCryptoAlgorithm(string cipherKey, bool useDynamicRandomIV, IPubnubLog log): this(cipherKey, useDynamicRandomIV, log, null)
+        public LegacyCryptor(string cipherKey, bool useDynamicRandomIV, IPubnubLog log): this(cipherKey, useDynamicRandomIV, log, null)
         {
         }
-        public LegacyCryptoAlgorithm(string cipherKey, bool useDynamicRandomIV): this(cipherKey, useDynamicRandomIV, null, null)
+        public LegacyCryptor(string cipherKey, bool useDynamicRandomIV): this(cipherKey, useDynamicRandomIV, null, null)
         {
         }
-        public LegacyCryptoAlgorithm(string cipherKey): this(cipherKey, true, null, null)
+        public LegacyCryptor(string cipherKey): this(cipherKey, true, null, null)
         {
         }
+        public new string CipherKey => base.CipherKey;
+        public bool UseDynamicRandomIV => _useDynamicRandomIV;
         public override byte[] Identifier => _identifier;
         public override string Encrypt(string data)
         {

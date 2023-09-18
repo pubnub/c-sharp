@@ -6,7 +6,7 @@ using System.Text;
 
 namespace PubnubApi.Security.Crypto
 {
-    public interface ICryptoAlgorithm
+    public interface ICryptor
     {
         /// <summary>
         /// Unique crypto algorithm identifier.
