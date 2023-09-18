@@ -12,7 +12,7 @@ namespace PubnubApi
             public int Max { get; internal set; }
         }
 
-        public Dictionary<string,List<PNHistoryItemResult>> Messages { get; internal set; }
+        public Dictionary<string,List<PNFetchHistoryItemResult>> Messages { get; internal set; }
         public MoreInfo More { get; internal set; }
     }
 }

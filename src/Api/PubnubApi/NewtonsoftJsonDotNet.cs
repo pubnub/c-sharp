@@ -269,17 +269,27 @@ namespace PubnubApi
                 string publisherValue = (listObject[3] != null) ? listObject[3].ToString() : "";
                 publisherProp.SetValue(message, publisherValue, null);
 
+                //Set Type
+                PropertyInfo typeProp = specific.GetProperty("Type");
+                string typeValue = (listObject[4] != null) ? listObject[4].ToString() : "";
+                typeProp.SetValue(message, typeValue, null);
+
+                //Set SpaceId
+                PropertyInfo spaceIdProp = specific.GetProperty("SpaceId");
+                string spaceIdValue = (listObject[5] != null) ? listObject[5].ToString() : "";
+                spaceIdProp.SetValue(message, spaceIdValue, null);
+
                 // Set ChannelName
                 PropertyInfo channelNameProp = specific.GetProperty("Channel");
-                channelNameProp.SetValue(message, (listObject.Count == 6) ? listObject[5].ToString() : listObject[4].ToString(), null);
+                channelNameProp.SetValue(message, (listObject.Count == 8) ? listObject[7].ToString() : listObject[6].ToString(), null);
 
                 // Set ChannelGroup
-                if (listObject.Count == 6)
+                if (listObject.Count == 8)
                 {
                     PropertyInfo subsciptionProp = specific.GetProperty("Subscription");
-                    subsciptionProp.SetValue(message, listObject[4].ToString(), null);
+                    subsciptionProp.SetValue(message, listObject[6].ToString(), null);
                 }
-                
+
                 //Set Metadata list second position, index=1
                 if (listObject[1] != null)
                 {
@@ -342,15 +352,25 @@ namespace PubnubApi
                 string publisherValue = (listObject[3] != null) ? listObject[3].ToString() : "";
                 publisherProp.SetValue(message, publisherValue, null);
 
+                //Set Type
+                PropertyInfo typeProp = specific.GetProperty("Type");
+                string typeValue = (listObject[4] != null) ? listObject[4].ToString() : "";
+                typeProp.SetValue(message, typeValue, null);
+
+                //Set SpaceId
+                PropertyInfo spaceIdProp = specific.GetProperty("SpaceId");
+                string spaceIdValue = (listObject[5] != null) ? listObject[5].ToString() : "";
+                spaceIdProp.SetValue(message, spaceIdValue, null);
+
                 // Set ChannelName
                 PropertyInfo channelNameProp = specific.GetRuntimeProperty("Channel");
-                channelNameProp.SetValue(message, (listObject.Count == 6) ? listObject[5].ToString() : listObject[4].ToString(), null);
+                channelNameProp.SetValue(message, (listObject.Count == 8) ? listObject[7].ToString() : listObject[6].ToString(), null);
 
                 // Set ChannelGroup
-                if (listObject.Count == 6)
+                if (listObject.Count == 8)
                 {
                     PropertyInfo subsciptionProp = specific.GetRuntimeProperty("Subscription");
-                    subsciptionProp.SetValue(message, listObject[4].ToString(), null);
+                    subsciptionProp.SetValue(message, listObject[6].ToString(), null);
                 }
 
                 //Set Metadata list second position, index=1
@@ -526,12 +546,12 @@ namespace PubnubApi
                     {
                         ack.Timetoken = presenceTimetoken;
                     }
-                    ack.Channel = (listObject.Count == 6) ? listObject[5].ToString() : listObject[4].ToString();
+                    ack.Channel = (listObject.Count == 8) ? listObject[7].ToString() : listObject[6].ToString();
                     ack.Channel = ack.Channel.Replace("-pnpres", "");
 
-                    if (listObject.Count == 6)
+                    if (listObject.Count == 8)
                     {
-                        ack.Subscription = listObject[4].ToString();
+                        ack.Subscription = listObject[6].ToString();
                         ack.Subscription = ack.Subscription.Replace("-pnpres", "");
                     }
 

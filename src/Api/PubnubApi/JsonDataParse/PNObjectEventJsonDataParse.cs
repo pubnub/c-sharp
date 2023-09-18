@@ -91,7 +91,7 @@ namespace PubnubApi
                     }
                 }
 
-                result.Channel = (listObject.Count == 6) ? listObject[5].ToString() : listObject[4].ToString();
+                result.Channel = (listObject.Count == 8) ? listObject[7].ToString() : listObject[6].ToString();
             }
 
             return result;

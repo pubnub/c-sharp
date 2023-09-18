@@ -22,6 +22,8 @@ namespace PubnubApi.EndPoint
 
         private object msg;
         private string channelName = "";
+        private string type = string.Empty;
+        private string spaceId = string.Empty;
         private PNCallback<PNPublishResult> savedCallback;
         private Dictionary<string, object> queryParam;
 
@@ -62,6 +64,17 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
+        public SignalOperation Type(string type)
+        {
+            this.type = type;
+            return this;
+        }
+        public SignalOperation SpaceId(string spaceId)
+        {
+            this.spaceId = spaceId;
+            return this;
+        }
+
         public SignalOperation QueryParam(Dictionary<string, object> customQueryParam)
         {
             queryParam = customQueryParam;
@@ -96,7 +109,7 @@ namespace PubnubApi.EndPoint
                 this.savedCallback = callback;
                 try
                 {
-                    Signal(this.channelName, this.msg, null, this.queryParam, callback);
+                    Signal(this.channelName, this.msg, null, this.type, this.spaceId, this.queryParam, callback);
                 }
                 catch(Exception ex)
                 {
@@ -110,7 +123,7 @@ namespace PubnubApi.EndPoint
                 this.savedCallback = callback;
                 try
                 {
-                    Signal(this.channelName, this.msg, null, this.queryParam, callback);
+                    Signal(this.channelName, this.msg, null, this.type, this.spaceId, this.queryParam, callback);
                 }
                 catch(Exception ex)
                 {
@@ -124,7 +137,7 @@ namespace PubnubApi.EndPoint
 
         public async Task<PNResult<PNPublishResult>> ExecuteAsync()
         {
-            return await Signal(this.channelName, this.msg, null, this.queryParam).ConfigureAwait(false);
+            return await Signal(this.channelName, this.msg, null, this.type, this.spaceId,  this.queryParam).ConfigureAwait(false);
         }
 
         internal void Retry()
@@ -132,18 +145,18 @@ namespace PubnubApi.EndPoint
 #if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
             Task.Factory.StartNew(() =>
             {
-                Signal(this.channelName, this.msg, null, this.queryParam, savedCallback);
+                Signal(this.channelName, this.msg, null, this.type, this.spaceId, this.queryParam, savedCallback);
             }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 #else
             new Thread(() =>
             {
-                Signal(this.channelName, this.msg, null, this.queryParam, savedCallback);
+                Signal(this.channelName, this.msg, null, this.type, this.spaceId, this.queryParam, savedCallback);
             })
             { IsBackground = true }.Start();
 #endif
         }
 
-        private void Signal(string channel, object message, Dictionary<string, object> metaData, Dictionary<string, object> externalQueryParam, PNCallback<PNPublishResult> callback)
+        private void Signal(string channel, object message, Dictionary<string, object> metaData, string type, string spaceid, Dictionary<string, object> externalQueryParam, PNCallback<PNPublishResult> callback)
         {
             if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()) || message == null)
             {
@@ -168,7 +181,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
             
-            Uri request = urlBuilder.BuildSignalRequest("GET", "", channel, message, metaData, externalQueryParam);
+            Uri request = urlBuilder.BuildSignalRequest("GET", "", channel, message, metaData, type, spaceid, externalQueryParam);
 
             RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>();
             requestState.Channels = new[] { channel };
@@ -210,7 +223,7 @@ namespace PubnubApi.EndPoint
             }, TaskContinuationOptions.ExecuteSynchronously).Wait();
         }
 
-        private async Task<PNResult<PNPublishResult>> Signal(string channel, object message, Dictionary<string, object> metaData, Dictionary<string, object> externalQueryParam)
+        private async Task<PNResult<PNPublishResult>> Signal(string channel, object message, Dictionary<string, object> metaData, string type, string spaceid, Dictionary<string, object> externalQueryParam)
         {
             PNResult<PNPublishResult> ret = new PNResult<PNPublishResult>();
 
@@ -237,7 +250,7 @@ namespace PubnubApi.EndPoint
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
             
-            Uri request = urlBuilder.BuildSignalRequest("GET", "", channel, message, metaData, externalQueryParam);
+            Uri request = urlBuilder.BuildSignalRequest("GET", "", channel, message, metaData, type, spaceid, externalQueryParam);
 
             RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>();
             requestState.Channels = new[] { channel };
@@ -274,6 +287,12 @@ namespace PubnubApi.EndPoint
                             ret.Status = status;
                             ret.Result = default(PNPublishResult);
                         }
+                    }
+                    else
+                    {
+                            PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(400, result[0].ToString());
+                            PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNSignalOperation, category, requestState, 400, new PNException(result[0].ToString()));
+                            ret.Status = status;
                     }
                 }
             }

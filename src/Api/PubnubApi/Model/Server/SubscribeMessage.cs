@@ -33,6 +33,11 @@ namespace PubnubApi
         private int e { get; set; }
 
         /// <summary>
+        /// custom message type
+        /// </summary>
+        private string mt { get; set; }
+
+        /// <summary>
         /// flags
         /// </summary>
         private string f { get; set; } = "";
@@ -67,6 +72,11 @@ namespace PubnubApi
         /// </summary>
         private object u { get; set; }
 
+        /// <summary>
+        /// spaceid
+        /// </summary>
+        private string si { get; set; } = "";
+
         public string Shard
         {
             get
@@ -100,6 +110,18 @@ namespace PubnubApi
             internal set
             {
                 e = value;
+            }
+        }
+
+        public string Type
+        {
+            get
+            {
+                return mt;
+            }
+            internal set
+            {
+                mt = value;
             }
         }
 
@@ -211,5 +233,16 @@ namespace PubnubApi
             }
         }
 
+        public string SpaceId
+        {
+            get
+            {
+                return si;
+            }
+            internal set
+            {
+                si = value;
+            }
+        }
     }
 }
