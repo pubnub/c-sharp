@@ -53,6 +53,10 @@ namespace PubnubApi.Security.Crypto
             {
                 throw new ArgumentException("Input is null");
             }
+            if (_cryptor is LegacyCryptor)
+            {
+                return _cryptor?.Decrypt(data);
+            }
             CryptorHeader header = CryptorHeader.FromBytes(Convert.FromBase64String(data));
             if (header == null)
             {
@@ -69,6 +73,10 @@ namespace PubnubApi.Security.Crypto
             if (data == null)
             {
                 throw new ArgumentException("Input is null");
+            }
+            if (_cryptor is LegacyCryptor)
+            {
+                return _cryptor?.Decrypt(data);
             }
             CryptorHeader header = CryptorHeader.FromBytes(data);
             if (header == null)
@@ -90,6 +98,11 @@ namespace PubnubApi.Security.Crypto
             if (string.IsNullOrEmpty(destinationFile) || destinationFile.Length < 1)
             {
                 throw new ArgumentException("destinationFile is not valid");
+            }
+            if (_cryptor is LegacyCryptor)
+            {
+                _cryptor?.DecryptFile(sourceFile, destinationFile);
+                return;
             }
             CryptorHeader header = CryptorHeader.FromFile(sourceFile);
             if (header == null)

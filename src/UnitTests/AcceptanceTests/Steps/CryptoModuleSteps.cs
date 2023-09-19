@@ -39,6 +39,7 @@ namespace AcceptanceTests.Steps
         string targetCryptoType = string.Empty;
         CryptoModule cryptoModule;
         string cryptoOutcome = string.Empty;
+        string cipherKey = string.Empty;
         bool useDynamicRandIV = false;
         string sourceFile = string.Empty;
         string encryptedFile = string.Empty;
@@ -136,13 +137,18 @@ namespace AcceptanceTests.Steps
         [Given(@"with '([^']*)' cipher key")]
         public void GivenWithCipherKey(string pubnubenigma)
         {
+            cipherKey = pubnubenigma;
+        }
+
+        private void SetCryptoModule()
+        {
             if (targetCryptoType == "acrh")
             {
-                cryptoModule = new CryptoModule(new AesCbcCryptor(pubnubenigma), null);
+                cryptoModule = new CryptoModule(new AesCbcCryptor(cipherKey), null);
             }
             else if (targetCryptoType == "legacy")
             {
-                cryptoModule = new CryptoModule(null, new LegacyCryptor(pubnubenigma));
+                cryptoModule = new CryptoModule(new LegacyCryptor(cipherKey, useDynamicRandIV), null);
             }
         }
 
@@ -159,6 +165,7 @@ namespace AcceptanceTests.Steps
             }
             try
             {
+                SetCryptoModule();
                 cryptoModule.DecryptFile(sourceFile, destFile);
                 if (new System.IO.FileInfo(destFile).Length >= 0)
                 {
@@ -186,7 +193,9 @@ namespace AcceptanceTests.Steps
         [Given(@"Legacy code with '([^']*)' cipher key and '([^']*)' vector")]
         public void GivenLegacyCodeWithCipherKeyAndVector(string pubnubenigma, string random)
         {
-            cryptoModule = new CryptoModule(null, new LegacyCryptor(pubnubenigma, random == "random"));
+            cipherKey = pubnubenigma;
+            useDynamicRandIV = random == "random";
+            //cryptoModule = new CryptoModule(null, new LegacyCryptor(pubnubenigma, random == "random"));
         }
 
         [Given(@"with '([^']*)' vector")]
@@ -207,6 +216,7 @@ namespace AcceptanceTests.Steps
                 System.IO.File.Delete(encryptedFile);
             }
             sourceFileSize = new FileInfo(sourceFile).Length;
+            SetCryptoModule();
             cryptoModule.EncryptFile(sourceFile, encryptedFile);
         }
 
@@ -216,6 +226,7 @@ namespace AcceptanceTests.Steps
             var dirPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
             string fileExt = Path.GetExtension(sourceFile);
             decryptedToOriginalFile = Path.Combine(dirPath ?? "", string.Format($"decrypt_to_original{fileExt}"));
+            SetCryptoModule();
             cryptoModule.DecryptFile(encryptedFile, decryptedToOriginalFile);
             long decryptedFileSize = new FileInfo(sourceFile).Length;
             Assert.IsTrue(sourceFileSize == decryptedFileSize);            
