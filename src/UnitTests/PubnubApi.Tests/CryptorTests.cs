@@ -32,12 +32,34 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+        public void TestYayLegacyCryptoDecryptionBasicModule()
+        {
+            string message = "q/xJqqN6qbiZMXYmiQC1Fw==";
+
+            CryptoModule module = new CryptoModule(new AesCbcCryptor("enigma"), new LegacyCryptor("enigma", false));
+            string decryptedMessage = module.Decrypt(message);
+            
+            Assert.AreEqual("yay!", decryptedMessage);
+        }
+
+        [Test]
         public void TestYayLegacyCryptoDecryptionBasicWithDynamicIV()
         {
             string message = "MTIzNDU2Nzg5MDEyMzQ1NjdnONoCgo0wbuMGGMmfMX0=";
             
             Cryptor cryptor = new Cryptor(new LegacyCryptor("enigma", true));
             string decryptedMessage = cryptor.Decrypt(message);
+            
+            Assert.AreEqual("yay!", decryptedMessage);
+        }
+
+        [Test]
+        public void TestYayLegacyCryptoDecryptionBasicModuleWithDynamicIV()
+        {
+            string message = "MTIzNDU2Nzg5MDEyMzQ1NjdnONoCgo0wbuMGGMmfMX0=";
+            
+            CryptoModule module = new CryptoModule(new AesCbcCryptor("enigma"), new LegacyCryptor("enigma", true));
+            string decryptedMessage = module.Decrypt(message);
             
             Assert.AreEqual("yay!", decryptedMessage);
         }
@@ -55,12 +77,36 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+        public void TestYayByteArrayLegacyCryptoDecryptionBasicModule()
+        {
+            byte[] message = new byte[] { 171, 252, 73, 170, 163, 122, 169, 184, 153, 49, 118, 38, 137, 0, 181, 23 };
+
+            CryptoModule module = new CryptoModule(new AesCbcCryptor("enigma"), new LegacyCryptor("enigma", false));
+            byte[] decryptedMessage = module.Decrypt(message);
+
+            byte[] expectedBytes = new byte[] { 121, 97, 121, 33 };
+            Assert.AreEqual(expectedBytes, decryptedMessage);
+        }
+
+        [Test]
         public void TestYayByteArrayLegacyCryptoDecryptionBasicWithDynamicIV()
         {
             byte[] message = new byte[] { 49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 49, 50, 51, 52, 53, 54, 55, 103, 56, 218, 2, 130, 141, 48, 110, 227, 6, 24, 201, 159, 49, 125 };
 
             Cryptor cryptor = new Cryptor(new LegacyCryptor("enigma", true));
             byte[] decryptedMessage = cryptor.Decrypt(message);
+
+            byte[] expectedBytes = new byte[] { 121, 97, 121, 33 };
+            Assert.AreEqual(expectedBytes, decryptedMessage);
+        }
+
+        [Test]
+        public void TestYayByteArrayLegacyCryptoDecryptionBasicModuleWithDynamicIV()
+        {
+            byte[] message = new byte[] { 49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 49, 50, 51, 52, 53, 54, 55, 103, 56, 218, 2, 130, 141, 48, 110, 227, 6, 24, 201, 159, 49, 125 };
+
+            CryptoModule module = new CryptoModule(new AesCbcCryptor("enigma"), new LegacyCryptor("enigma"));
+            byte[] decryptedMessage = module.Decrypt(message);
 
             byte[] expectedBytes = new byte[] { 121, 97, 121, 33 };
             Assert.AreEqual(expectedBytes, decryptedMessage);
@@ -179,5 +225,29 @@ namespace PubNubMessaging.Tests
             Assert.AreEqual(expectedBytes, decryptedBytes);
         }
 
+        [Test]
+        public void TestYayAesCbcCryptoDecryptionModule()
+        {
+            //deserialized string
+            string encryptMessage = "UE5FRAFBQ1JIEEwnIo83Jtk5G9XkuPYEn+gCu8PDp3G/SOEVWOfY3Ofj";
+
+            CryptoModule module = new CryptoModule(new AesCbcCryptor("enigma"), new LegacyCryptor("enigma"));
+            string decryptedData = module.Decrypt(encryptMessage);
+
+            Assert.AreEqual("yay!", decryptedData);
+        }
+
+        [Test]
+        public void TestYayByteArrayAesCbcCryptoDecryptionModule()
+        {
+            //deserialized string
+            string message = "yay!";
+            byte[] encryptedBytes = new byte[] { 80, 78, 69, 68, 1, 65, 67, 82, 72, 16, 76, 39, 34, 143, 55, 38, 217, 57, 27, 213, 228, 184, 246, 4, 159, 232, 2, 187, 195, 195, 167, 113, 191, 72, 225, 21, 88, 231, 216, 220, 231, 227 };
+            CryptoModule module = new CryptoModule(new AesCbcCryptor("enigma"), new LegacyCryptor("enigma"));
+            byte[] decryptedBytes = module.Decrypt(encryptedBytes);
+
+            byte[] expectedBytes = Encoding.UTF8.GetBytes(message);
+            Assert.AreEqual(expectedBytes, decryptedBytes);
+        }
     }
 }

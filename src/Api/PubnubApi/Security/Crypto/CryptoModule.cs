@@ -58,8 +58,7 @@ namespace PubnubApi.Security.Crypto
             {
                 throw new PNException("CryptorHeader mismatch");
             }
-            string actualData = Convert.ToBase64String(Convert.FromBase64String(data).Skip(5 + header.Identifier.Length + ((header.DataSize < 255) ? 1 : 3)).ToArray());
-            return _cryptor?.Decrypt(actualData);
+            return _cryptor?.Decrypt(data);
         }
         public byte[] Decrypt(byte[] data)
         {
@@ -76,8 +75,7 @@ namespace PubnubApi.Security.Crypto
             {
                 throw new PNException("CryptorHeader mismatch");
             }
-            byte[] actualBytes = data.Skip(5 + header.Identifier.Length + ((header.DataSize < 255) ? 1 : 3)).ToArray();
-            return _cryptor?.Decrypt(actualBytes);
+            return _cryptor?.Decrypt(data);
         }
     }
 }
