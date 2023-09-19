@@ -73,12 +73,16 @@ namespace PubnubApi.Security.Crypto.Cryptors
 
         public static CryptorHeader FromFile(string sourceFile)
         {
+            #if !NETSTANDARD10 && !NETSTANDARD11
             using (System.IO.FileStream fs = new System.IO.FileStream(sourceFile, System.IO.FileMode.Open, System.IO.FileAccess.Read))
             {
                 byte[] headerBytes = new byte[5 + IDENTIFIER_LENGTH + 3];
                 fs.Read(headerBytes, 0, headerBytes.Length);
                 return FromBytes(headerBytes);
             }
+            #else
+            throw new NotSupportedException("FileStream not supported in NetStandard 1.0/1.1. Consider higher version of .NetStandard.");
+            #endif
         }
         public byte[] ToBytes()
         {
