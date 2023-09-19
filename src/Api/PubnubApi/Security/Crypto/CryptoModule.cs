@@ -60,6 +60,10 @@ namespace PubnubApi.Security.Crypto
             CryptorHeader header = CryptorHeader.FromBytes(Convert.FromBase64String(data));
             if (header == null)
             {
+                if (_fallbackCryptor == null)
+                {
+                    throw new PNException("unknown cryptor error");
+                }
                 return _fallbackCryptor?.Decrypt(data);
             }
             if (!header.Identifier.SequenceEqual(_cryptor?.Identifier))
@@ -81,6 +85,10 @@ namespace PubnubApi.Security.Crypto
             CryptorHeader header = CryptorHeader.FromBytes(data);
             if (header == null)
             {
+                if (_fallbackCryptor == null)
+                {
+                    throw new PNException("unknown cryptor error");
+                }
                 return _fallbackCryptor?.Decrypt(data);
             }
             if (!header.Identifier.SequenceEqual(_cryptor?.Identifier))
