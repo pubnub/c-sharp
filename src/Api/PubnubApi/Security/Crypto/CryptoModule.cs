@@ -8,9 +8,9 @@ namespace PubnubApi.Security.Crypto
 {
     public class CryptoModule
     {
-        private readonly AesCbcCryptor _cryptor;
+        private readonly ICryptor _cryptor;
         private readonly LegacyCryptor _fallbackCryptor;
-        public CryptoModule(AesCbcCryptor cryptor, LegacyCryptor fallbackCryptor)
+        public CryptoModule(ICryptor cryptor, LegacyCryptor fallbackCryptor)
         {
             _cryptor = cryptor;
             _fallbackCryptor = fallbackCryptor;
