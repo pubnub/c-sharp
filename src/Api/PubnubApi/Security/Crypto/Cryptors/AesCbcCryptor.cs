@@ -19,7 +19,7 @@ namespace PubnubApi.Security.Crypto.Cryptors
         }
         public AesCbcCryptor(string cipherKey): this(cipherKey, null, null) { }
         public new string CipherKey => base.CipherKey;
-        public override byte[] Identifier => Encoding.ASCII.GetBytes(IDENTIFIER);
+        public override byte[] Identifier => Encoding.UTF8.GetBytes(IDENTIFIER);
         public override string Encrypt(string data)
         {
             if (data == null) { throw new ArgumentException("Invalid input","data"); }
@@ -68,7 +68,7 @@ namespace PubnubApi.Security.Crypto.Cryptors
                 dataBytes = dataBytes.Skip(16).ToArray();
                 byte[] keyBytes = Util.GetEncryptionKeyBytes(CipherKey);
                 byte[] decryptedBytes = InternalDecrypt(dataBytes, ivBytes, keyBytes);
-                return Encoding.UTF8.GetString(decryptedBytes);
+                return Encoding.UTF8.GetString(decryptedBytes, 0, decryptedBytes.Length);
             }
             catch(Exception ex)
             {

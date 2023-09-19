@@ -642,6 +642,33 @@
     <Compile Include="..\PubnubApi\Push\Mpns\MpnsToastNotification.cs">
       <Link>Push\Mpns\MpnsToastNotification.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Security\Crypto\CryptoModule.cs">
+      <Link>Security\Crypto\CryptoModule.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Security\Crypto\Cryptor.cs">
+      <Link>Security\Crypto\Cryptor.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Security\Crypto\ICryptor.cs">
+      <Link>Security\Crypto\ICryptor.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Security\Crypto\Common\ByteArrayExtensions.cs">
+      <Link>Security\Crypto\Common\ByteArrayExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Security\Crypto\Common\Util.cs">
+      <Link>Security\Crypto\Common\Util.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Security\Crypto\Cryptors\AesCbcCryptor.cs">
+      <Link>Security\Crypto\Cryptors\AesCbcCryptor.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Security\Crypto\Cryptors\CryptorBase.cs">
+      <Link>Security\Crypto\Cryptors\CryptorBase.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Security\Crypto\Cryptors\CryptorHeader.cs">
+      <Link>Security\Crypto\Cryptors\CryptorHeader.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Security\Crypto\Cryptors\LegacyCryptor.cs">
+      <Link>Security\Crypto\Cryptors\LegacyCryptor.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\Security\MD5.cs">
       <Link>Security\MD5.cs</Link>
     </Compile>

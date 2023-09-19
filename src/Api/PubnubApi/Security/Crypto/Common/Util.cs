@@ -16,7 +16,6 @@ namespace PubnubApi.Security.Crypto.Common
                 return Encoding.UTF8.GetBytes("0123456789012345");
             }
             
-#if NET35
             byte[] iv = new byte[ivSize];
             var rng = RandomNumberGenerator.Create();
             try
@@ -32,14 +31,6 @@ namespace PubnubApi.Security.Crypto.Common
                 }
             }
             return iv;
-#else
-            using (RNGCryptoServiceProvider rngCsp = new RNGCryptoServiceProvider())
-            {
-                byte[] iv = new byte[ivSize];
-                rngCsp.GetBytes(iv);
-                return iv;
-            }
-#endif
         }
 
         internal static byte[] ComputeSha256(string input)

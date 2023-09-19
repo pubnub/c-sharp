@@ -82,7 +82,7 @@ namespace PubnubApi.Security.Crypto.Cryptors
                 dataBytes = _useDynamicRandomIV ? dataBytes.Skip(16).ToArray() : dataBytes;
                 byte[] keyBytes = Util.GetLegacyEncryptionKey(CipherKey);
                 byte[] decryptedBytes = InternalDecrypt(dataBytes, ivBytes, keyBytes);
-                return Encoding.UTF8.GetString(decryptedBytes);
+                return Encoding.UTF8.GetString(decryptedBytes, 0, decryptedBytes.Length);
             }
             catch(Exception ex)
             {
