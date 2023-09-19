@@ -249,5 +249,38 @@ namespace PubNubMessaging.Tests
             byte[] expectedBytes = Encoding.UTF8.GetBytes(message);
             Assert.AreEqual(expectedBytes, decryptedBytes);
         }
+
+        [Test]
+        public void TestLocalFileEncryptionModuleFromPath()
+        {
+            IPubnubUnitTest pubnubUnitTest = new PubnubUnitTest();
+            pubnubUnitTest.IV = new byte[16] { 133, 126, 158, 123, 43, 95, 96, 90, 215, 178, 17, 73, 166, 130, 79, 156 };
+            string sourceFile = "fileupload.txt";
+            string destFile = "fileupload_encrypted.txt";
+            if (System.IO.File.Exists(destFile))
+            {
+                System.IO.File.Delete(destFile);
+            }
+            CryptoModule module = new CryptoModule(new AesCbcCryptor("enigma"), new LegacyCryptor("enigma"));
+            module.EncryptFile(sourceFile, destFile);
+            Assert.IsTrue(System.IO.File.Exists(destFile));
+
+        }
+
+        [Test]
+        public void TestLocalFileDecryptionModuleFromPath()
+        {
+            string sourceFile = "fileupload_enc.txt";
+            string destFile = "fileupload_enc_decrypted_to_original.txt";
+            if (System.IO.File.Exists(destFile))
+            {
+                System.IO.File.Delete(destFile);
+            }
+            CryptoModule module = new CryptoModule(new AesCbcCryptor("enigma"), new LegacyCryptor("enigma"));
+            module.DecryptFile(sourceFile, destFile);
+            Assert.IsTrue(System.IO.File.Exists(destFile));
+
+        }
+
     }
 }

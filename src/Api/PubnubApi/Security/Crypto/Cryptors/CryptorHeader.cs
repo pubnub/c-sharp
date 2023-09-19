@@ -71,6 +71,15 @@ namespace PubnubApi.Security.Crypto.Cryptors
             return new CryptorHeader(identifier, dataSize);
         }
 
+        public static CryptorHeader FromFile(string sourceFile)
+        {
+            using (System.IO.FileStream fs = new System.IO.FileStream(sourceFile, System.IO.FileMode.Open, System.IO.FileAccess.Read))
+            {
+                byte[] headerBytes = new byte[5 + IDENTIFIER_LENGTH + 3];
+                fs.Read(headerBytes, 0, headerBytes.Length);
+                return FromBytes(headerBytes);
+            }
+        }
         public byte[] ToBytes()
         {
             List<byte> bytes = new List<byte>();

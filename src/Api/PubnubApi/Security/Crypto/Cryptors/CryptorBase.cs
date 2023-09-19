@@ -98,5 +98,9 @@ namespace PubnubApi.Security.Crypto.Cryptors
         public abstract byte[] Encrypt(byte[] data);
         public abstract string Decrypt(string encryptedData);
         public abstract byte[] Decrypt(byte[] encryptedData);
+
+        public abstract void EncryptFile(string sourceFile, string destinationFile);
+
+        public abstract void DecryptFile(string sourceFile, string destinationFile);
     }
 }

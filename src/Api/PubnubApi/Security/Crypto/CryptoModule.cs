@@ -43,6 +43,10 @@ namespace PubnubApi.Security.Crypto
         {
             return _cryptor.Encrypt(data);
         }
+        public void EncryptFile(string sourceFile, string destinationFile)
+        {
+            _cryptor.EncryptFile(sourceFile, destinationFile);
+        }
         public string Decrypt(string data)
         {
             if (data == null)
@@ -76,6 +80,28 @@ namespace PubnubApi.Security.Crypto
                 throw new PNException("CryptorHeader mismatch");
             }
             return _cryptor?.Decrypt(data);
+        }
+        public void DecryptFile(string sourceFile, string destinationFile)
+        {
+            if (string.IsNullOrEmpty(sourceFile) || sourceFile.Length < 1)
+            {
+                throw new ArgumentException("sourceFile is not valid");
+            }
+            if (string.IsNullOrEmpty(destinationFile) || destinationFile.Length < 1)
+            {
+                throw new ArgumentException("destinationFile is not valid");
+            }
+            CryptorHeader header = CryptorHeader.FromFile(sourceFile);
+            if (header == null)
+            {
+                _fallbackCryptor?.DecryptFile(sourceFile, destinationFile);
+                return;
+            }
+            if (!header.Identifier.SequenceEqual(_cryptor?.Identifier))
+            {
+                throw new PNException("CryptorHeader mismatch");
+            }
+            _cryptor?.DecryptFile(sourceFile, destinationFile);
         }
     }
 }

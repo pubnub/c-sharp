@@ -107,5 +107,57 @@ namespace PubnubApi.Security.Crypto.Cryptors
                 throw new PNException("Decrypt Error", ex);
             }
         }
+
+        public override void EncryptFile(string sourceFile, string destinationFile)
+        {
+            if (string.IsNullOrEmpty(sourceFile) || sourceFile.Length < 1)
+            {
+                throw new ArgumentException("sourceFile is not valid");
+            }
+            #if !NETSTANDARD10 && !NETSTANDARD11
+            bool validSource = System.IO.File.Exists(sourceFile);
+            if (!validSource)
+            {
+                throw new ArgumentException("sourceFile is not valid");
+            }
+            string destDirectory = System.IO.Path.GetDirectoryName(destinationFile);
+            bool validDest = System.IO.Directory.Exists(destDirectory);
+            if (!string.IsNullOrEmpty(destDirectory) && !validDest)
+            {
+                throw new ArgumentException("destination path is not valid");
+            }
+            byte[] inputBytes = System.IO.File.ReadAllBytes(sourceFile);
+            byte[] outputBytes = Encrypt(inputBytes);
+            System.IO.File.WriteAllBytes(destinationFile, outputBytes);
+            #else
+            throw new NotSupportedException("FileSystem not supported in NetStandard 1.0/1.1. Consider higher version of .NetStandard.");
+            #endif
+        }
+
+        public override void DecryptFile(string sourceFile, string destinationFile)
+        {
+            if (string.IsNullOrEmpty(sourceFile) || sourceFile.Length < 1)
+            {
+                throw new ArgumentException("sourceFile is not valid");
+            }
+            #if !NETSTANDARD10 && !NETSTANDARD11
+            bool validSource = System.IO.File.Exists(sourceFile);
+            if (!validSource)
+            {
+                throw new ArgumentException("sourceFile is not valid");
+            }
+            string destDirectory = System.IO.Path.GetDirectoryName(destinationFile);
+            bool validDest = System.IO.Directory.Exists(destDirectory);
+            if (!string.IsNullOrEmpty(destDirectory) && !validDest)
+            {
+                throw new ArgumentException("destination path is not valid");
+            }
+            byte[] inputBytes = System.IO.File.ReadAllBytes(sourceFile);
+            byte[] outputBytes = Decrypt(inputBytes);
+            System.IO.File.WriteAllBytes(destinationFile, outputBytes);
+            #else
+            throw new NotSupportedException("FileSystem not supported in NetStandard 1.0/1.1. Consider higher version of .NetStandard.");
+            #endif
+        }
     }
 }

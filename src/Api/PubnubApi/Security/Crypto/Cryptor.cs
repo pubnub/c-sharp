@@ -30,6 +30,10 @@ namespace PubnubApi.Security.Crypto
         {
             return _cryptor.Encrypt(data);
         }
+        public void EncryptFile(string sourceFile, string destinationFile)
+        {
+            _cryptor.EncryptFile(sourceFile, destinationFile);
+        }
 
         public string Decrypt(string data)
         {
@@ -38,6 +42,10 @@ namespace PubnubApi.Security.Crypto
         public byte[] Decrypt(byte[] data)
         {
             return _cryptor.Decrypt(data);
+        }
+        public void DecryptFile(string sourceFile, string destinationFile)
+        {
+            _cryptor.DecryptFile(sourceFile, destinationFile);
         }
     }
 }

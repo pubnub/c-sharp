@@ -20,8 +20,10 @@ namespace PubnubApi.Security.Crypto
 
         string Encrypt(string data);
         byte[] Encrypt(byte[] data);
+        void EncryptFile(string sourceFile, string destinationFile);
 
         string Decrypt(string encryptedData);
         byte[] Decrypt(byte[] encryptedData);
+        void DecryptFile(string sourceFile, string destinationFile);
     }
 }
