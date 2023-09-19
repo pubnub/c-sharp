@@ -60,7 +60,7 @@ namespace PubnubApi.Security.Crypto.Cryptors
                 CryptorHeader header = CryptorHeader.FromBytes(Convert.FromBase64String(encryptedData));
                 if (header == null || !header.Identifier.SequenceEqual(Identifier))
                 {
-                    throw new PNException("CryptorHeader mismatch");
+                    throw new PNException("unknown cryptor error");
                 }
                 string actualData = Convert.ToBase64String(Convert.FromBase64String(encryptedData).Skip(5 + header.Identifier.Length + ((header.DataSize < 255) ? 1 : 3)).ToArray());
                 byte[] dataBytes = Convert.FromBase64String(actualData);
@@ -83,7 +83,7 @@ namespace PubnubApi.Security.Crypto.Cryptors
                 CryptorHeader header = CryptorHeader.FromBytes(encryptedData);
                 if (header == null || !header.Identifier.SequenceEqual(Identifier))
                 {
-                    throw new PNException("CryptorHeader mismatch");
+                    throw new PNException("unknown cryptor error");
                 }
                 byte[] actualBytes = encryptedData.Skip(5 + header.Identifier.Length + ((header.DataSize < 255) ? 1 : 3)).ToArray();
                 byte[] ivBytes = actualBytes.Take(16).ToArray();

@@ -48,12 +48,20 @@ namespace PubnubApi.Security.Crypto.Cryptors
 
             byte version = data[4];
 
-            if (version == 0 || version > MAX_VERSION)
+            if (version == 0)
             {
-                return null; // Unknown version
+                throw new PNException("decryption error");
+            }
+            if (version > MAX_VERSION)
+            {
+                throw new PNException("unknown cryptor error");
             }
 
             byte[] identifier = data.Skip(5).Take(IDENTIFIER_LENGTH).ToArray();
+            if (Encoding.UTF8.GetString(identifier,0, identifier.Length).Trim('\0').Length < 4)
+            {
+                throw new PNException("decryption error");
+            }
 
             int dataSizeOffset = 5 + IDENTIFIER_LENGTH;
 

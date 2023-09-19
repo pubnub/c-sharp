@@ -60,7 +60,7 @@ namespace PubnubApi.Security.Crypto
             }
             if (!header.Identifier.SequenceEqual(_cryptor?.Identifier))
             {
-                throw new PNException("CryptorHeader mismatch");
+                throw new PNException("unknown cryptor error");
             }
             return _cryptor?.Decrypt(data);
         }
@@ -77,7 +77,7 @@ namespace PubnubApi.Security.Crypto
             }
             if (!header.Identifier.SequenceEqual(_cryptor?.Identifier))
             {
-                throw new PNException("CryptorHeader mismatch");
+                throw new PNException("unknown cryptor error");
             }
             return _cryptor?.Decrypt(data);
         }
@@ -94,12 +94,16 @@ namespace PubnubApi.Security.Crypto
             CryptorHeader header = CryptorHeader.FromFile(sourceFile);
             if (header == null)
             {
+                if (_fallbackCryptor == null)
+                {
+                    throw new PNException("unknown cryptor error");
+                }
                 _fallbackCryptor?.DecryptFile(sourceFile, destinationFile);
                 return;
             }
             if (!header.Identifier.SequenceEqual(_cryptor?.Identifier))
             {
-                throw new PNException("CryptorHeader mismatch");
+                throw new PNException("unknown cryptor error");
             }
             _cryptor?.DecryptFile(sourceFile, destinationFile);
         }
