@@ -23,20 +23,8 @@ namespace AcceptanceTests.Steps
         private string acceptance_test_origin = "localhost:8090";
         private bool bypassMockServer = false;
         private readonly ScenarioContext _scenarioContext;
-        //private Pubnub pn;
-        //private PNConfiguration config = null;
-        //private string channel = "my_channel";
-        //private string channelGroup = "my_channelgroup";
-        //private string publishMsg = "hello_world";
-        //PNPublishResult publishResult = null;
-        //SubscribeCallback subscribeCallback = null;
-        //private PNMessageResult<object> messageResult = null;
-        ManualResetEvent messageReceivedEvent = new ManualResetEvent(false);
-        ManualResetEvent statusReceivedEvent = new ManualResetEvent(false);
-        //PNStatus pnStatus = null;
-        //PubnubError pnError = null;
-        //IPubnubUnitTest unitTest;
-        string targetCryptoType = string.Empty;
+        string defaultCryptoId = string.Empty;
+        string addlCryptoId = string.Empty;
         CryptoModule cryptoModule;
         string cryptoOutcome = string.Empty;
         string cipherKey = string.Empty;
@@ -45,7 +33,6 @@ namespace AcceptanceTests.Steps
         string encryptedFile = string.Empty;
         string decryptedToOriginalFile = string.Empty;
         long sourceFileSize = 0;
-        long decryptedFileSize = 0;
 
         static void UnhandledExceptionTrapper(object sender, UnhandledExceptionEventArgs e)
         {
@@ -129,9 +116,9 @@ namespace AcceptanceTests.Steps
         }
 
         [Given(@"Crypto module with '([^']*)' cryptor")]
-        public void GivenCryptoModuleWithCryptor(string crytorType)
+        public void GivenCryptoModuleWithCryptor(string crytorId)
         {
-            targetCryptoType = crytorType;
+            defaultCryptoId = crytorId;
         }
 
         [Given(@"with '([^']*)' cipher key")]
@@ -142,13 +129,17 @@ namespace AcceptanceTests.Steps
 
         private void SetCryptoModule()
         {
-            if (targetCryptoType == "acrh")
+            if (defaultCryptoId == "acrh" && addlCryptoId == "")
             {
                 cryptoModule = new CryptoModule(new AesCbcCryptor(cipherKey), null);
             }
-            else if (targetCryptoType == "legacy")
+            else if (defaultCryptoId == "legacy" && addlCryptoId == "")
             {
                 cryptoModule = new CryptoModule(new LegacyCryptor(cipherKey, useDynamicRandIV), null);
+            }
+            else if ((defaultCryptoId == "acrh" && addlCryptoId == "legacy") || (defaultCryptoId == "legacy" && addlCryptoId == "acrh"))
+            {
+                cryptoModule = new CryptoModule(new AesCbcCryptor(cipherKey), new LegacyCryptor(cipherKey, useDynamicRandIV));
             }
         }
 
@@ -184,18 +175,11 @@ namespace AcceptanceTests.Steps
             Assert.AreEqual(p0, cryptoOutcome);
         }
 
-        //[Given(@"Crypto module with '([^']*)' cryptor")]
-        //public void GivenCryptoModuleWithCryptor(string legacy)
-        //{
-        //    throw new PendingStepException();
-        //}
-
         [Given(@"Legacy code with '([^']*)' cipher key and '([^']*)' vector")]
         public void GivenLegacyCodeWithCipherKeyAndVector(string pubnubenigma, string random)
         {
             cipherKey = pubnubenigma;
             useDynamicRandIV = random == "random";
-            //cryptoModule = new CryptoModule(null, new LegacyCryptor(pubnubenigma, random == "random"));
         }
 
         [Given(@"with '([^']*)' vector")]
@@ -232,40 +216,31 @@ namespace AcceptanceTests.Steps
             Assert.IsTrue(sourceFileSize == decryptedFileSize);            
         }
 
-        //[When(@"I encrypt '([^']*)' file as '([^']*)'")]
-        //public void WhenIEncryptFileAs(string p0, string stream)
-        //{
-        //    throw new PendingStepException();
-        //}
-
-        //[Given(@"with '([^']*)' vector")]
-        //public void GivenWithVector(string constant)
-        //{
-        //    throw new PendingStepException();
-        //}
-
         [When(@"I decrypt '([^']*)' file as '([^']*)'")]
         public void WhenIDecryptFileAs(string p0, string fileType)
         {
-            throw new PendingStepException();
+            var dirPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            encryptedFile = Path.Combine(dirPath ?? "", "Features\\Encryption\\assets", p0);
+            string fileExt = Path.GetExtension(encryptedFile);
+            decryptedToOriginalFile = Path.Combine(dirPath ?? "", string.Format($"decrypt_to_original{fileExt}"));
+            SetCryptoModule();
+            cryptoModule.DecryptFile(encryptedFile, decryptedToOriginalFile);
         }
 
         [Then(@"Decrypted file content equal to the '([^']*)' file content")]
         public void ThenDecryptedFileContentEqualToTheFileContent(string p0)
         {
-            throw new PendingStepException();
+            var dirPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            string expectdFileContent = File.ReadAllText(Path.Combine(dirPath ?? "", "Features\\Encryption\\assets", p0));
+            string decryptedFileContent = File.ReadAllText(decryptedToOriginalFile);
+            Assert.AreEqual(expectdFileContent, decryptedFileContent);            
         }
-
-        //[When(@"I decrypt '([^']*)' file as '([^']*)'")]
-        //public void WhenIDecryptFileAs(string p0, string stream)
-        //{
-        //    throw new PendingStepException();
-        //}
 
         [Given(@"Crypto module with default '([^']*)' and additional '([^']*)' cryptors")]
         public void GivenCryptoModuleWithDefaultAndAdditionalCryptors(string legacy, string acrh)
         {
-            throw new PendingStepException();
+            defaultCryptoId = legacy;
+            addlCryptoId = acrh;
         }
     }
 }
