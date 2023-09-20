@@ -6,6 +6,8 @@ using PubnubApi.Interface;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Net;
+using PubnubApi.Security.Crypto.Cryptors;
+using PubnubApi.Security.Crypto;
 #if !NET35 && !NET40
 using System.Collections.Concurrent;
 #endif
@@ -392,14 +394,12 @@ namespace PubnubApi.EndPoint
         private string JsonEncodePublishMsg(object originalMessage)
         {
             string message = jsonLibrary.SerializeToJsonString(originalMessage);
-
-            if (config.CipherKey.Length > 0)
+            if (config.CryptoModule != null || config.CipherKey.Length > 0)
             {
-                PubnubCrypto aes = new PubnubCrypto(config.CipherKey, config, pubnubLog, null);
-                string encryptMessage = aes.Encrypt(message);
+                config.CryptoModule ??= new CryptoModule(new LegacyCryptor(config.CipherKey, config.UseRandomInitializationVector, pubnubLog, null), null);
+                string encryptMessage = config.CryptoModule.Encrypt(message);
                 message = jsonLibrary.SerializeToJsonString(encryptMessage);
             }
-
             return message;
         }
 

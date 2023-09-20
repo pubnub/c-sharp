@@ -5,6 +5,8 @@ using System.Reflection;
 #if !NET35 && !NET40
 using System.Collections.Concurrent;
 #endif
+using PubnubApi.Security.Crypto;
+using PubnubApi.Security.Crypto.Cryptors;
 
 namespace PubnubApi
 {
@@ -558,29 +560,27 @@ namespace PubnubApi
 
             if (pubnubConfig.ContainsKey(InstanceId))
             {
-                if (pubnubConfig[InstanceId] == null || string.IsNullOrEmpty(pubnubConfig[InstanceId].CipherKey))
+                if (pubnubConfig[InstanceId] == null || (string.IsNullOrEmpty(pubnubConfig[InstanceId].CipherKey) && pubnubConfig[InstanceId].CryptoModule == null))
                 {
-                    throw new ArgumentException("CipherKey missing");
+                    throw new ArgumentException("CryptoModule missing");
                 }
-
-                PubnubCrypto pc = new PubnubCrypto(pubnubConfig[InstanceId].CipherKey, pubnubConfig[InstanceId], pubnubLog, pubnubUnitTest);
-                return pc.Decrypt(inputString);
+                pubnubConfig[InstanceId].CryptoModule ??= new CryptoModule(new LegacyCryptor(pubnubConfig[InstanceId].CipherKey, pubnubConfig[InstanceId].UseRandomInitializationVector, pubnubLog, pubnubUnitTest), null);
+                return pubnubConfig[InstanceId].CryptoModule.Decrypt(inputString);
             }
             else
             {
-                throw new ArgumentException("CipherKey missing");
+                throw new ArgumentException("CryptoModule missing");
             }
         }
 
+        [Obsolete("cipherKey param is not supported.", false)]
         public string Decrypt(string inputString, string cipherKey)
         {
             if (string.IsNullOrEmpty(inputString))
             {
                 throw new ArgumentException("inputString is not valid");
             }
-
-            PubnubCrypto pc = new PubnubCrypto(cipherKey, pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, pubnubLog, pubnubUnitTest);
-            return pc.Decrypt(inputString);
+            return new CryptoModule(new LegacyCryptor(cipherKey, true, pubnubLog, pubnubUnitTest), null).Decrypt(inputString);
         }
 
         public string Encrypt(string inputString)
@@ -591,29 +591,28 @@ namespace PubnubApi
             }
             if (pubnubConfig.ContainsKey(InstanceId))
             {
-                if (pubnubConfig[InstanceId] == null || string.IsNullOrEmpty(pubnubConfig[InstanceId].CipherKey))
+                if (pubnubConfig[InstanceId] == null || (string.IsNullOrEmpty(pubnubConfig[InstanceId].CipherKey) && pubnubConfig[InstanceId].CryptoModule == null))
                 {
-                    throw new MissingMemberException("CipherKey missing");
+                    throw new MissingMemberException("CryptoModule missing");
                 }
 
-                PubnubCrypto pc = new PubnubCrypto(pubnubConfig[InstanceId].CipherKey, pubnubConfig[InstanceId], pubnubLog, pubnubUnitTest);
-                return pc.Encrypt(inputString);
+                pubnubConfig[InstanceId].CryptoModule ??= new CryptoModule(new LegacyCryptor(pubnubConfig[InstanceId].CipherKey, pubnubConfig[InstanceId].UseRandomInitializationVector, pubnubLog, pubnubUnitTest), null);
+                return pubnubConfig[InstanceId].CryptoModule.Encrypt(inputString);
             }
             else
             {
-                throw new MissingMemberException("CipherKey missing");
+                throw new MissingMemberException("CryptoModule missing");
             }
         }
 
+        [Obsolete("cipherKey param is not supported.", false)]
         public string Encrypt(string inputString, string cipherKey)
         {
             if (string.IsNullOrEmpty(inputString))
             {
                 throw new ArgumentException("inputString is not valid");
             }
-
-            PubnubCrypto pc = new PubnubCrypto(cipherKey, pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, pubnubLog, pubnubUnitTest);
-            return pc.Encrypt(inputString);
+            return new CryptoModule(new LegacyCryptor(cipherKey, true, pubnubLog, pubnubUnitTest), null).Encrypt(inputString);
         }
 
         public byte[] EncryptFile(byte[] inputBytes)
@@ -624,31 +623,26 @@ namespace PubnubApi
             }
             if (pubnubConfig.ContainsKey(InstanceId))
             {
-                if (pubnubConfig[InstanceId] == null || string.IsNullOrEmpty(pubnubConfig[InstanceId].CipherKey))
+                if (pubnubConfig[InstanceId] == null || (string.IsNullOrEmpty(pubnubConfig[InstanceId].CipherKey) && pubnubConfig[InstanceId].CryptoModule == null))
                 {
-                    throw new MissingMemberException("CipherKey missing");
+                    throw new MissingMemberException("CryptoModule missing");
                 }
-                PubnubCrypto pc = new PubnubCrypto(pubnubConfig[InstanceId].CipherKey, pubnubConfig[InstanceId], pubnubLog, pubnubUnitTest);
-                return pc.Encrypt(inputBytes, true);
+                pubnubConfig[InstanceId].CryptoModule ??= new CryptoModule(new LegacyCryptor(pubnubConfig[InstanceId].CipherKey, true, pubnubLog, pubnubUnitTest), null);
+                return pubnubConfig[InstanceId].CryptoModule.Encrypt(inputBytes);
             }
             else
             {
-                throw new ArgumentException("CipherKey missing");
+                throw new ArgumentException("CryptoModule missing");
             }
         }
+        [Obsolete("cipherKey param is not supported.", false)]
         public byte[] EncryptFile(byte[] inputBytes, string cipherKey)
         {
             if (inputBytes == null)
             {
                 throw new ArgumentException("inputBytes is not valid");
             }
-            if (pubnubConfig.ContainsKey(InstanceId) && !string.IsNullOrEmpty(pubnubConfig[InstanceId].CipherKey))
-            {
-                //Ignore this. Added this condition to pass Codacy recommendation of making this as static method
-            }
-
-            PubnubCrypto pc = new PubnubCrypto(cipherKey, pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, pubnubLog, pubnubUnitTest);
-            return pc.Encrypt(inputBytes, true);
+            return new CryptoModule(new LegacyCryptor(cipherKey, true, pubnubLog, pubnubUnitTest), null).Encrypt(inputBytes);
         }
         public void EncryptFile(string sourceFile, string destinationFile)
         {
@@ -658,9 +652,9 @@ namespace PubnubApi
             }
             if (pubnubConfig.ContainsKey(InstanceId))
             {
-                if (pubnubConfig[InstanceId] == null || string.IsNullOrEmpty(pubnubConfig[InstanceId].CipherKey))
+                if (pubnubConfig[InstanceId] == null || (string.IsNullOrEmpty(pubnubConfig[InstanceId].CipherKey) && pubnubConfig[InstanceId].CryptoModule == null))
                 {
-                    throw new MissingMemberException("CipherKey missing");
+                    throw new MissingMemberException("CryptoModule missing");
                 }
                 #if !NETSTANDARD10 && !NETSTANDARD11
                 bool validSource = System.IO.File.Exists(sourceFile);
@@ -683,9 +677,11 @@ namespace PubnubApi
             }
             else
             {
-                throw new ArgumentException("CipherKey missing");
+                throw new ArgumentException("CryptoModule missing");
             }
         }
+
+        [Obsolete("cipherKey param is not supported.", false)]
         public void EncryptFile(string sourceFile, string destinationFile, string cipherKey)
         {
             if (string.IsNullOrEmpty(sourceFile) || sourceFile.Length < 1)
@@ -722,17 +718,16 @@ namespace PubnubApi
 
             if (pubnubConfig.ContainsKey(InstanceId))
             {
-                if (pubnubConfig[InstanceId] == null || string.IsNullOrEmpty(pubnubConfig[InstanceId].CipherKey))
+                if (pubnubConfig[InstanceId] == null || (string.IsNullOrEmpty(pubnubConfig[InstanceId].CipherKey) && pubnubConfig[InstanceId].CryptoModule == null))
                 {
-                    throw new ArgumentException("CipherKey missing");
+                    throw new ArgumentException("CryptoModule missing");
                 }
-
-                PubnubCrypto pc = new PubnubCrypto(pubnubConfig[InstanceId].CipherKey, pubnubConfig[InstanceId], pubnubLog, pubnubUnitTest);
-                return pc.Decrypt(inputBytes, true);
+                pubnubConfig[InstanceId].CryptoModule ??= new CryptoModule(new LegacyCryptor(pubnubConfig[InstanceId].CipherKey, pubnubConfig[InstanceId].UseRandomInitializationVector, pubnubLog, pubnubUnitTest), null);
+                return pubnubConfig[InstanceId].CryptoModule.Decrypt(inputBytes);
             }
             else
             {
-                throw new ArgumentException("CipherKey missing");
+                throw new ArgumentException("CryptoModule missing");
             }
         }
         public void DecryptFile(string sourceFile, string destinationFile)
@@ -744,9 +739,9 @@ namespace PubnubApi
 
             if (pubnubConfig.ContainsKey(InstanceId))
             {
-                if (pubnubConfig[InstanceId] == null || string.IsNullOrEmpty(pubnubConfig[InstanceId].CipherKey))
+                if (pubnubConfig[InstanceId] == null || (string.IsNullOrEmpty(pubnubConfig[InstanceId].CipherKey) && pubnubConfig[InstanceId].CryptoModule == null))
                 {
-                    throw new ArgumentException("CipherKey missing");
+                    throw new ArgumentException("CryptoModule missing");
                 }
                 #if !NETSTANDARD10 && !NETSTANDARD11
                 bool validSource = System.IO.File.Exists(sourceFile);
@@ -761,7 +756,7 @@ namespace PubnubApi
                     throw new ArgumentException("destination path is not valid");
                 }
                 byte[] inputBytes = System.IO.File.ReadAllBytes(sourceFile);
-                byte[] outputBytes = DecryptFile(inputBytes, pubnubConfig[InstanceId].CipherKey);
+                byte[] outputBytes = DecryptFile(inputBytes);
                 System.IO.File.WriteAllBytes(destinationFile, outputBytes);
                 #else
                 throw new NotSupportedException("FileSystem not supported in NetStandard 1.0/1.1. Consider higher version of .NetStandard.");
@@ -769,22 +764,21 @@ namespace PubnubApi
             }
             else
             {
-                throw new ArgumentException("CipherKey missing");
+                throw new ArgumentException("CryptoModule missing");
             }
         }
+        
+        [Obsolete("cipherKey param is not supported.", false)]
         public byte[] DecryptFile(byte[] inputBytes, string cipherKey)
         {
             if (inputBytes == null)
             {
                 throw new ArgumentException("inputBytes is not valid");
             }
-            if (pubnubConfig.ContainsKey(InstanceId) && !string.IsNullOrEmpty(pubnubConfig[InstanceId].CipherKey))
-            {
-                //Ignore this. Added this condition to pass Codacy recommendation of making this as static method
-            }
-            PubnubCrypto pc = new PubnubCrypto(cipherKey, pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, pubnubLog, pubnubUnitTest);
-            return pc.Decrypt(inputBytes, true);
+            return new CryptoModule(new LegacyCryptor(cipherKey, true, pubnubLog, pubnubUnitTest), null).Decrypt(inputBytes);
         }
+
+        [Obsolete("cipherKey param is not supported.", false)]
         public void DecryptFile(string sourceFile, string destinationFile, string cipherKey)
         {
             if (string.IsNullOrEmpty(sourceFile) || sourceFile.Length < 1)

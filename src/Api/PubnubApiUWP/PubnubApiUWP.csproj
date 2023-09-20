@@ -4,6 +4,7 @@
 
   <PropertyGroup>
     <TargetFramework>uap10.0</TargetFramework>
+    <LangVersion>8.0</LangVersion>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>pubnub.snk</AssemblyOriginatorKeyFile>
     <DelaySign>False</DelaySign>

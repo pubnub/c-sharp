@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 #if !NET35 && !NET40
 using System.Collections.Concurrent;
 #endif
+using PubnubApi.Security.Crypto;
+using PubnubApi.Security.Crypto.Cryptors;
 
 namespace PubnubApi.EndPoint
 {
@@ -127,6 +129,7 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
+        [Obsolete("CipherKey is not supported in future. Use CryptoModule.", false)]
         public SendFileOperation CipherKey(string cipherKeyForFile)
         {
             this.currentFileCipherKey = cipherKeyForFile;
@@ -504,8 +507,7 @@ namespace PubnubApi.EndPoint
                 {
                     try
                     {
-                        PubnubCrypto aes = new PubnubCrypto(currentCipherKey, config, pubnubLog, null);
-                        byte[] encryptBytes = aes.Encrypt(sendFileByteArray, true);
+                        byte[] encryptBytes = new CryptoModule(new LegacyCryptor(currentCipherKey, true, pubnubLog, null), null).Encrypt(sendFileByteArray);
                         dataStream.Write(encryptBytes, 0, encryptBytes.Length);
                     }
                     catch (Exception ex)

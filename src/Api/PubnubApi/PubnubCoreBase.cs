@@ -20,6 +20,8 @@ using System.Net.Http.Headers;
 #if !NET35 && !NET40
 using System.Collections.Concurrent;
 #endif
+using PubnubApi.Security.Crypto;
+using PubnubApi.Security.Crypto.Cryptors;
 #endregion
 
 namespace PubnubApi
@@ -696,13 +698,13 @@ namespace PubnubApi
                                     }
                                     else
                                     {
-                                        if (currentConfig.CipherKey.Length > 0 && currentMessage.MessageType != 1) //decrypt the subscriber message if cipherkey is available
+                                        if ((currentConfig.CryptoModule != null || currentConfig.CipherKey.Length > 0) && currentMessage.MessageType != 1) //decrypt the subscriber message if cipherkey is available
                                         {
                                             string decryptMessage = "";
-                                            PubnubCrypto aes = new PubnubCrypto(currentConfig.CipherKey, currentConfig, currentLog, null);
+                                            currentConfig.CryptoModule ??= new CryptoModule(new LegacyCryptor(currentConfig.CipherKey, currentConfig.UseRandomInitializationVector, currentLog, null), null);
                                             try
                                             {
-                                                decryptMessage = aes.Decrypt(payload.ToString());
+                                                decryptMessage = currentConfig.CryptoModule.Decrypt(payload.ToString());
                                             }
                                             catch (Exception ex)
                                             {

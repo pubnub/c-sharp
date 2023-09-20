@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PubnubApi.Security.Crypto;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
@@ -137,6 +138,7 @@ namespace PubnubApi
 
         public bool UseRandomInitializationVector { get; set; }
         public int FileMessagePublishRetryLimit { get; set; }
+        public CryptoModule CryptoModule { get; set; }
 
         [Obsolete("PNConfiguration(string uuid) is deprecated, please use PNConfiguration(UserId userId) instead.")]
         public PNConfiguration(string uuid)

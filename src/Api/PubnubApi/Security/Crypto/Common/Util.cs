@@ -90,5 +90,41 @@ namespace PubnubApi.Security.Crypto.Common
             }
             return sb.ToString();
         }
+
+        internal static string GetHashRaw(string input)
+        {
+            return ComputeHashRaw(input);
+        }
+
+        public static string PubnubAccessManagerSign(string key, string data)
+        {
+            string secret = key;
+            string message = data;
+
+            var encoding = new System.Text.UTF8Encoding();
+            byte[] keyByte = encoding.GetBytes(secret);
+            byte[] messageBytes = encoding.GetBytes(message);
+
+            using (var hmacsha256 = new HMACSHA256(keyByte))
+            {
+                byte[] hashmessage = hmacsha256.ComputeHash(messageBytes);
+                return Convert.ToBase64String(hashmessage).Replace('+', '-').Replace('/', '_');
+            }
+        }
+
+        public static byte[] PubnubAccessManagerSign(string key, byte[] dataBytes)
+        {
+            string secret = key;
+
+            var encoding = new System.Text.UTF8Encoding();
+            byte[] keyByte = encoding.GetBytes(secret);
+            byte[] messageBytes = dataBytes;
+
+            using (var hmacsha256 = new HMACSHA256(keyByte))
+            {
+                byte[] hashmessage = hmacsha256.ComputeHash(messageBytes);
+                return hashmessage;
+            }
+        }
     }
 }
