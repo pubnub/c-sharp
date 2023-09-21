@@ -11,7 +11,7 @@ namespace PubnubApi.Security.Crypto.Cryptors
 {
     public class LegacyCryptor : CryptorBase
     {
-        private static readonly byte[] _identifier = new byte[] { };
+        private const string IDENTIFIER = "0000";
 
         private readonly bool _useDynamicRandomIV;
         public LegacyCryptor(string cipherKey, bool useDynamicRandomIV, IPubnubLog log, IPubnubUnitTest unitTest): base(cipherKey, useDynamicRandomIV, log, unitTest)
@@ -29,7 +29,7 @@ namespace PubnubApi.Security.Crypto.Cryptors
         }
         public new string CipherKey => base.CipherKey;
         public bool UseDynamicRandomIV => _useDynamicRandomIV;
-        public override byte[] Identifier => _identifier;
+        public override byte[] Identifier => Encoding.UTF8.GetBytes(IDENTIFIER);
         public override string Encrypt(string data)
         {
             if (data == null)
