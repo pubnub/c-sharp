@@ -699,7 +699,7 @@
       <Version>6.2.9</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
-      <Version>9.0.1</Version>
+      <Version>13.0.1</Version>
     </PackageReference>
     <PackageReference Include="PeterO.Cbor" Version="4.5.2" />
     <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.0" />
