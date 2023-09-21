@@ -48,7 +48,12 @@ namespace PubnubApi
 
         public string SecretKey { get; set; }
 
+        [Obsolete("CipherKey is deprecated, please use CryptoModule instead.", false)]
         public string CipherKey { get; set; }
+
+        [Obsolete("UseRandomInitializationVector is deprecated, please use CryptoModule instead.", false)]
+        public bool UseRandomInitializationVector { get; set; }
+        public CryptoModule CryptoModule { get; set; }
 
         public string AuthKey { get; set; }
 
@@ -136,9 +141,7 @@ namespace PubnubApi
 
         public bool SuppressLeaveEvents { get; set; }
 
-        public bool UseRandomInitializationVector { get; set; }
         public int FileMessagePublishRetryLimit { get; set; }
-        public CryptoModule CryptoModule { get; set; }
 
         [Obsolete("PNConfiguration(string uuid) is deprecated, please use PNConfiguration(UserId userId) instead.")]
         public PNConfiguration(string uuid)
