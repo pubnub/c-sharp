@@ -44,6 +44,7 @@ namespace PubnubApi
         {
             this.config = pubnubConfig;
             this.pubnubLog = log;
+            JsonConvert.DefaultSettings = () => new JsonSerializerSettings { MaxDepth = 64 };
         }
 
         #region IJsonPlugableLibrary methods implementation
