@@ -895,6 +895,14 @@ namespace PubnubApi
                 }
 
                 config.ResetUuidSetFromConstructor();
+
+                if (config.CryptoModule != null && !string.IsNullOrEmpty(config.CipherKey) && config.CipherKey.Length > 0)
+                {
+                    if (pubnubLog != null)
+                    {
+                        LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, WARNING: CryptoModule takes precedence over CipherKey.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                    }
+                }
             }
 
         }
