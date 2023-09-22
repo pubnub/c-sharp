@@ -31,9 +31,9 @@ namespace PubnubApi.Security.Crypto
                 _decryptors[decryptor.Identifier] = decryptor;
             }
         }
-        public static LegacyCryptor CreateLegacyCryptor(string cipherKey, bool useDynamicIV, IPubnubLog log, IPubnubUnitTest unitTest)
+        public static LegacyCryptor CreateLegacyCryptor(string cipherKey, bool useDynamicIV, IPubnubLog log)
         {
-            return new LegacyCryptor(cipherKey, useDynamicIV, log, unitTest);
+            return new LegacyCryptor(cipherKey, useDynamicIV, log);
         }
         public static LegacyCryptor CreateLegacyCryptor(string cipherKey, bool useDynamicIV)
         {
@@ -43,9 +43,9 @@ namespace PubnubApi.Security.Crypto
         {
             return new LegacyCryptor(cipherKey, true);
         }
-        public static AesCbcCryptor CreateAesCbcCryptor(string cipherKey, IPubnubLog log, IPubnubUnitTest unitTest)
+        public static AesCbcCryptor CreateAesCbcCryptor(string cipherKey, IPubnubLog log)
         {
-            return new AesCbcCryptor(cipherKey, log, unitTest);
+            return new AesCbcCryptor(cipherKey, log);
         }
         public static AesCbcCryptor CreateAesCbcCryptor(string cipherKey)
         {

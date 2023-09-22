@@ -396,7 +396,7 @@ namespace PubnubApi.EndPoint
             string message = jsonLibrary.SerializeToJsonString(originalMessage);
             if (config.CryptoModule != null || config.CipherKey.Length > 0)
             {
-                config.CryptoModule ??= new CryptoModule(new LegacyCryptor(config.CipherKey, config.UseRandomInitializationVector, pubnubLog, null), null);
+                config.CryptoModule ??= new CryptoModule(new LegacyCryptor(config.CipherKey, config.UseRandomInitializationVector, pubnubLog), null);
                 string encryptMessage = config.CryptoModule.Encrypt(message);
                 message = jsonLibrary.SerializeToJsonString(encryptMessage);
             }

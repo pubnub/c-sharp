@@ -14,10 +14,10 @@ namespace PubnubApi.Security.Crypto.Cryptors
     {
         private const string IDENTIFIER = "ACRH";
 
-        public AesCbcCryptor(string cipherKey, IPubnubLog log, IPubnubUnitTest unitTest): base(cipherKey, true, log, unitTest)
+        public AesCbcCryptor(string cipherKey, IPubnubLog log): base(cipherKey, true, log)
         {
         }
-        public AesCbcCryptor(string cipherKey): this(cipherKey, null, null) { }
+        public AesCbcCryptor(string cipherKey): this(cipherKey, null) { }
         public new string CipherKey => base.CipherKey;
         public override string Identifier => IDENTIFIER;
         public override string Encrypt(string data)

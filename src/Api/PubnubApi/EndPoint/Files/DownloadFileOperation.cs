@@ -165,7 +165,7 @@ namespace PubnubApi.EndPoint
                     {
                         try
                         {
-                            outputBytes = new CryptoModule(new LegacyCryptor(currentCipherKey, true, pubnubLog, null), null).Decrypt(item1Bytes);
+                            outputBytes = new CryptoModule(new LegacyCryptor(currentCipherKey, true, pubnubLog), null).Decrypt(item1Bytes);
                             LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, Stream length (after Decrypt)= {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), item1Bytes.Length), config.LogVerbosity);
                         }
                         catch (Exception ex)
@@ -233,7 +233,7 @@ namespace PubnubApi.EndPoint
                 {
                     try
                     {
-                        outputBytes = new CryptoModule(new LegacyCryptor(currentCipherKey, true, pubnubLog, null), null).Decrypt(item1Bytes);
+                        outputBytes = new CryptoModule(new LegacyCryptor(currentCipherKey, true, pubnubLog), null).Decrypt(item1Bytes);
                         LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, Stream length (after Decrypt)= {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), item1Bytes.Length), config.LogVerbosity);
                     }
                     catch (Exception ex)

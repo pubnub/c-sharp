@@ -14,19 +14,17 @@ namespace PubnubApi.Security.Crypto.Cryptors
         private const string IDENTIFIER = "0000";
 
         private readonly bool _useDynamicRandomIV;
-        public LegacyCryptor(string cipherKey, bool useDynamicRandomIV, IPubnubLog log, IPubnubUnitTest unitTest): base(cipherKey, useDynamicRandomIV, log, unitTest)
+        public LegacyCryptor(string cipherKey, bool useDynamicRandomIV, IPubnubLog log): base(cipherKey, useDynamicRandomIV, log)
         {
             _useDynamicRandomIV = useDynamicRandomIV;
         }
-        public LegacyCryptor(string cipherKey, bool useDynamicRandomIV, IPubnubLog log): this(cipherKey, useDynamicRandomIV, log, null)
+        public LegacyCryptor(string cipherKey, bool useDynamicRandomIV): this(cipherKey, useDynamicRandomIV, null)
         {
         }
-        public LegacyCryptor(string cipherKey, bool useDynamicRandomIV): this(cipherKey, useDynamicRandomIV, null, null)
+        public LegacyCryptor(string cipherKey): this(cipherKey, true)
         {
         }
-        public LegacyCryptor(string cipherKey): this(cipherKey, true, null, null)
-        {
-        }
+
         public new string CipherKey => base.CipherKey;
         public bool UseDynamicRandomIV => _useDynamicRandomIV;
         public override string Identifier => IDENTIFIER;

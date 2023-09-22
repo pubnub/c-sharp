@@ -564,7 +564,7 @@ namespace PubnubApi
                 {
                     throw new ArgumentException("CryptoModule missing");
                 }
-                pubnubConfig[InstanceId].CryptoModule ??= new CryptoModule(new LegacyCryptor(pubnubConfig[InstanceId].CipherKey, pubnubConfig[InstanceId].UseRandomInitializationVector, pubnubLog, pubnubUnitTest), null);
+                pubnubConfig[InstanceId].CryptoModule ??= new CryptoModule(new LegacyCryptor(pubnubConfig[InstanceId].CipherKey, pubnubConfig[InstanceId].UseRandomInitializationVector, pubnubLog), null);
                 return pubnubConfig[InstanceId].CryptoModule.Decrypt(inputString);
             }
             else
@@ -580,7 +580,7 @@ namespace PubnubApi
             {
                 throw new ArgumentException("inputString is not valid");
             }
-            return new CryptoModule(new LegacyCryptor(cipherKey, true, pubnubLog, pubnubUnitTest), null).Decrypt(inputString);
+            return new CryptoModule(new LegacyCryptor(cipherKey, true, pubnubLog), null).Decrypt(inputString);
         }
 
         public string Encrypt(string inputString)
@@ -596,7 +596,7 @@ namespace PubnubApi
                     throw new MissingMemberException("CryptoModule missing");
                 }
 
-                pubnubConfig[InstanceId].CryptoModule ??= new CryptoModule(new LegacyCryptor(pubnubConfig[InstanceId].CipherKey, pubnubConfig[InstanceId].UseRandomInitializationVector, pubnubLog, pubnubUnitTest), null);
+                pubnubConfig[InstanceId].CryptoModule ??= new CryptoModule(new LegacyCryptor(pubnubConfig[InstanceId].CipherKey, pubnubConfig[InstanceId].UseRandomInitializationVector, pubnubLog), null);
                 return pubnubConfig[InstanceId].CryptoModule.Encrypt(inputString);
             }
             else
@@ -612,7 +612,7 @@ namespace PubnubApi
             {
                 throw new ArgumentException("inputString is not valid");
             }
-            return new CryptoModule(new LegacyCryptor(cipherKey, true, pubnubLog, pubnubUnitTest), null).Encrypt(inputString);
+            return new CryptoModule(new LegacyCryptor(cipherKey, true, pubnubLog), null).Encrypt(inputString);
         }
 
         public byte[] EncryptFile(byte[] inputBytes)
@@ -627,7 +627,7 @@ namespace PubnubApi
                 {
                     throw new MissingMemberException("CryptoModule missing");
                 }
-                pubnubConfig[InstanceId].CryptoModule ??= new CryptoModule(new LegacyCryptor(pubnubConfig[InstanceId].CipherKey, true, pubnubLog, pubnubUnitTest), null);
+                pubnubConfig[InstanceId].CryptoModule ??= new CryptoModule(new LegacyCryptor(pubnubConfig[InstanceId].CipherKey, true, pubnubLog), null);
                 return pubnubConfig[InstanceId].CryptoModule.Encrypt(inputBytes);
             }
             else
@@ -642,7 +642,7 @@ namespace PubnubApi
             {
                 throw new ArgumentException("inputBytes is not valid");
             }
-            return new CryptoModule(new LegacyCryptor(cipherKey, true, pubnubLog, pubnubUnitTest), null).Encrypt(inputBytes);
+            return new CryptoModule(new LegacyCryptor(cipherKey, true, pubnubLog), null).Encrypt(inputBytes);
         }
         public void EncryptFile(string sourceFile, string destinationFile)
         {
@@ -722,7 +722,7 @@ namespace PubnubApi
                 {
                     throw new ArgumentException("CryptoModule missing");
                 }
-                pubnubConfig[InstanceId].CryptoModule ??= new CryptoModule(new LegacyCryptor(pubnubConfig[InstanceId].CipherKey, pubnubConfig[InstanceId].UseRandomInitializationVector, pubnubLog, pubnubUnitTest), null);
+                pubnubConfig[InstanceId].CryptoModule ??= new CryptoModule(new LegacyCryptor(pubnubConfig[InstanceId].CipherKey, pubnubConfig[InstanceId].UseRandomInitializationVector, pubnubLog), null);
                 return pubnubConfig[InstanceId].CryptoModule.Decrypt(inputBytes);
             }
             else
@@ -775,7 +775,7 @@ namespace PubnubApi
             {
                 throw new ArgumentException("inputBytes is not valid");
             }
-            return new CryptoModule(new LegacyCryptor(cipherKey, true, pubnubLog, pubnubUnitTest), null).Decrypt(inputBytes);
+            return new CryptoModule(new LegacyCryptor(cipherKey, true, pubnubLog), null).Decrypt(inputBytes);
         }
 
         [Obsolete("cipherKey param is not supported.", false)]

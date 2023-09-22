@@ -2262,7 +2262,7 @@ namespace PubnubApi
 
             if (pubnubConfig.ContainsKey(pubnubInstanceId) && (pubnubConfig[pubnubInstanceId].CryptoModule != null || pubnubConfig[pubnubInstanceId].CipherKey.Length > 0) && opType != PNOperationType.PNSignalOperation)
             {
-                pubnubConfig[pubnubInstanceId].CryptoModule ??= new CryptoModule(new LegacyCryptor(pubnubConfig[pubnubInstanceId].CipherKey, pubnubConfig[pubnubInstanceId].UseRandomInitializationVector, pubnubLog, null), null);
+                pubnubConfig[pubnubInstanceId].CryptoModule ??= new CryptoModule(new LegacyCryptor(pubnubConfig[pubnubInstanceId].CipherKey, pubnubConfig[pubnubInstanceId].UseRandomInitializationVector, pubnubLog), null);
                 string encryptMessage = pubnubConfig[pubnubInstanceId].CryptoModule.Encrypt(message);
                 message = jsonLib.SerializeToJsonString(encryptMessage);
             }

@@ -11,24 +11,28 @@ namespace PubnubApi.Security.Crypto.Cryptors
     public abstract class CryptorBase : ICryptor
     {
         protected const int IV_SIZE = 16;
+        private byte[] constantIV;
 
         private readonly bool _useDynamicRandomIV;
         private readonly IPubnubLog _log;
-        private readonly IPubnubUnitTest _unitTest;
-        protected CryptorBase(string cipherKey, bool useDynamicRandomIV, IPubnubLog log, IPubnubUnitTest unitTest)
+        public void SetTestOnlyConstantRandomIV(byte[] iv)
+        {
+            constantIV = iv;
+        }
+
+        protected CryptorBase(string cipherKey, bool useDynamicRandomIV, IPubnubLog log)
         {
             _useDynamicRandomIV = useDynamicRandomIV;
             _log = log;
-            _unitTest = unitTest;
             CipherKey = cipherKey;
         }
         public string CipherKey { get; }
         protected byte[] GenerateRandomIV(bool useDynamicRandomIV)
         {
             int dataOffset = useDynamicRandomIV ? IV_SIZE : 0;
-            if (_unitTest != null && _unitTest.IV != null && _unitTest.IV.Length == 16)
+            if (constantIV != null && constantIV.Length == 16)
             {
-                return _unitTest.IV;
+                return constantIV;
             }
             return Util.InitializationVector(useDynamicRandomIV, dataOffset);
         }

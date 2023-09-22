@@ -507,7 +507,7 @@ namespace PubnubApi.EndPoint
                 {
                     try
                     {
-                        byte[] encryptBytes = new CryptoModule(new LegacyCryptor(currentCipherKey, true, pubnubLog, null), null).Encrypt(sendFileByteArray);
+                        byte[] encryptBytes = new CryptoModule(new LegacyCryptor(currentCipherKey, true, pubnubLog), null).Encrypt(sendFileByteArray);
                         dataStream.Write(encryptBytes, 0, encryptBytes.Length);
                     }
                     catch (Exception ex)
