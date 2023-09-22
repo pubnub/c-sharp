@@ -851,31 +851,33 @@ namespace PubnubApi
         #endregion
 
         #region "Constructors"
-
         public Pubnub(PNConfiguration config)
         {
+            if (config == null)
+            {
+                throw new ArgumentNullException(nameof(config));
+            }
+            pubnubLog = config.PubnubLog;
             savedSdkVerion = Version;
             InstanceId = Guid.NewGuid().ToString();
             pubnubConfig.AddOrUpdate(InstanceId, config, (k, o) => config);
-            if (config != null)
-            {
-                pubnubLog = config.PubnubLog;
-            }
-            JsonPluggableLibrary = new NewtonsoftJsonDotNet(config, pubnubLog);
-            if (config != null && config.EnableTelemetry)
-            {
-                telemetryManager = new EndPoint.TelemetryManager(pubnubConfig[InstanceId], pubnubLog);
-            }
-            CheckRequiredConfigValues();
-            if (config != null)
-            {
-                tokenManager = new EndPoint.TokenManager(pubnubConfig[InstanceId], JsonPluggableLibrary, pubnubLog, this.InstanceId);
-            }
-            if (config != null && pubnubLog != null)
+            if (pubnubLog != null)
             {
                 PNPlatform.Print(config, pubnubLog);
             }
-            if (config != null && config.PresenceTimeout < 20)
+
+            if (config.EnableTelemetry)
+            {
+                telemetryManager = new EndPoint.TelemetryManager(pubnubConfig[InstanceId], pubnubLog);
+            }
+            CheckAndInitializeEmptyStringValues(config);
+            tokenManager = new EndPoint.TokenManager(pubnubConfig[InstanceId], JsonPluggableLibrary, pubnubLog, this.InstanceId);
+
+            //Initialize JsonPluggableLibrary
+            JsonPluggableLibrary = new NewtonsoftJsonDotNet(config, pubnubLog);
+
+            //Check PresenceTimeout
+            if (config.PresenceTimeout < 20)
             {
                 config.PresenceTimeout = 20;
                 if (pubnubLog != null)
@@ -883,56 +885,45 @@ namespace PubnubApi
                     LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, WARNING: The PresenceTimeout cannot be less than 20, defaulting the value to 20. Please update the settings in your code.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
                 }
             }
-            if (config != null)
-            {
-                if (config.UserId == null || string.IsNullOrEmpty(config.UserId.ToString()))
-                {
-                    if (pubnubLog != null)
-                    {
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, PNConfiguration.Uuid or PNConfiguration.UserId is required to use the SDK.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
-                    }
-                    throw new MissingMemberException("PNConfiguration.UserId is required to use the SDK");
-                }
 
-                config.ResetUuidSetFromConstructor();
+            //Check required UserId
+            CheckRequiredUserId(config);
 
-                if (config.CryptoModule != null && !string.IsNullOrEmpty(config.CipherKey) && config.CipherKey.Length > 0)
-                {
-                    if (pubnubLog != null)
-                    {
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, WARNING: CryptoModule takes precedence over CipherKey.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
-                    }
-                }
-            }
+            //Check CryptoModule usage
+            CheckCryptoModuleUsageForLogging(config);
 
         }
-
-        private void CheckRequiredConfigValues()
+        private void CheckRequiredUserId(PNConfiguration config)
         {
-            if (pubnubConfig != null && pubnubConfig.ContainsKey(InstanceId))
+            if (config.UserId == null || string.IsNullOrEmpty(config.UserId.ToString()))
             {
-                if (string.IsNullOrEmpty(pubnubConfig[InstanceId].SubscribeKey))
+                if (pubnubLog != null)
                 {
-                    pubnubConfig[InstanceId].SubscribeKey = "";
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, PNConfiguration.Uuid or PNConfiguration.UserId is required to use the SDK.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
                 }
+                throw new MissingMemberException("PNConfiguration.UserId is required to use the SDK");
+            }
 
-                if (string.IsNullOrEmpty(pubnubConfig[InstanceId].PublishKey))
+            //Set flag to false
+            config.ResetUuidSetFromConstructor();
+        }
+        private void CheckCryptoModuleUsageForLogging(PNConfiguration config)
+        {
+            if (config.CryptoModule != null && !string.IsNullOrEmpty(config.CipherKey) && config.CipherKey.Length > 0)
+            {
+                if (pubnubLog != null)
                 {
-                    pubnubConfig[InstanceId].PublishKey = "";
-                }
-
-                if (string.IsNullOrEmpty(pubnubConfig[InstanceId].SecretKey))
-                {
-                    pubnubConfig[InstanceId].SecretKey = "";
-                }
-
-                if (string.IsNullOrEmpty(pubnubConfig[InstanceId].CipherKey))
-                {
-                    pubnubConfig[InstanceId].CipherKey = "";
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, WARNING: CryptoModule takes precedence over CipherKey.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
                 }
             }
         }
-
-#endregion
+        private void CheckAndInitializeEmptyStringValues(PNConfiguration config)
+        {
+            config.SubscribeKey = string.IsNullOrEmpty(config.SubscribeKey) ? string.Empty : config.SubscribeKey;
+            config.PublishKey = string.IsNullOrEmpty(config.PublishKey) ? string.Empty : config.PublishKey;
+            config.SecretKey = string.IsNullOrEmpty(config.SecretKey) ? string.Empty : config.SecretKey;
+            config.CipherKey = string.IsNullOrEmpty(config.CipherKey) ? string.Empty : config.CipherKey;
+        }
+        #endregion
 	}
 }
