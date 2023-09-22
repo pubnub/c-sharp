@@ -93,7 +93,7 @@ namespace PubnubApi.Security.Crypto.Cryptors
                 }
             }
         }
-        public abstract byte[] Identifier { get; }
+        public abstract string Identifier { get; }
         public abstract string Encrypt(string data);
         public abstract byte[] Encrypt(byte[] data);
         public abstract string Decrypt(string encryptedData);

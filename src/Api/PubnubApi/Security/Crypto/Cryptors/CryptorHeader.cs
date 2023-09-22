@@ -12,10 +12,10 @@ namespace PubnubApi.Security.Crypto.Cryptors
         private static readonly byte[] SENTINEL = new byte[] { 80, 78, 69, 68 }; // "PNED";
         private const byte MAX_VERSION = 1;
 
-        public byte[] Identifier { get; set; }
+        public string Identifier { get; set; }
         public int DataSize { get; set; }
 
-        public CryptorHeader(byte[] identifier, int dataSize)
+        public CryptorHeader(string identifier, int dataSize)
         {
             Identifier = identifier;
             DataSize = dataSize;
@@ -43,7 +43,7 @@ namespace PubnubApi.Security.Crypto.Cryptors
         {
             if (data.Length < 4 || !data.Take(4).SequenceEqual(SENTINEL))
             {
-                return null; // Malformed or no header
+                return new CryptorHeader("0000", 0); // return header with legacy identifier.
             }
 
             byte version = data[4];
@@ -57,8 +57,9 @@ namespace PubnubApi.Security.Crypto.Cryptors
                 throw new PNException("unknown cryptor error");
             }
 
-            byte[] identifier = data.Skip(5).Take(IDENTIFIER_LENGTH).ToArray();
-            if (Encoding.UTF8.GetString(identifier,0, identifier.Length).Trim('\0').Length < 4)
+            byte[] identifierArray = data.Skip(5).Take(IDENTIFIER_LENGTH).ToArray();
+            string identifier = Encoding.UTF8.GetString(identifierArray,0, identifierArray.Length).Trim('\0');
+            if (identifier.Length < 4)
             {
                 throw new PNException("decryption error");
             }
@@ -98,7 +99,7 @@ namespace PubnubApi.Security.Crypto.Cryptors
 
             bytes.AddRange(SENTINEL);
             bytes.Add(Version);
-            bytes.AddRange(Identifier);
+            bytes.AddRange(Encoding.UTF8.GetBytes(Identifier));
 
             if (DataSize < 255)
             {

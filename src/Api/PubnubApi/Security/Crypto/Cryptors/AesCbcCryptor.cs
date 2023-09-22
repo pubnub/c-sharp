@@ -19,7 +19,7 @@ namespace PubnubApi.Security.Crypto.Cryptors
         }
         public AesCbcCryptor(string cipherKey): this(cipherKey, null, null) { }
         public new string CipherKey => base.CipherKey;
-        public override byte[] Identifier => Encoding.UTF8.GetBytes(IDENTIFIER);
+        public override string Identifier => IDENTIFIER;
         public override string Encrypt(string data)
         {
             if (data == null) { throw new ArgumentException("Invalid input","data"); }
@@ -58,7 +58,7 @@ namespace PubnubApi.Security.Crypto.Cryptors
             try
             {
                 CryptorHeader header = CryptorHeader.FromBytes(Convert.FromBase64String(encryptedData));
-                if (header == null || !header.Identifier.SequenceEqual(Identifier))
+                if (header == null || !header.Identifier.Equals(Identifier))
                 {
                     throw new PNException("unknown cryptor error");
                 }
@@ -81,7 +81,7 @@ namespace PubnubApi.Security.Crypto.Cryptors
             try
             {
                 CryptorHeader header = CryptorHeader.FromBytes(encryptedData);
-                if (header == null || !header.Identifier.SequenceEqual(Identifier))
+                if (header == null || !header.Identifier.Equals(Identifier))
                 {
                     throw new PNException("unknown cryptor error");
                 }

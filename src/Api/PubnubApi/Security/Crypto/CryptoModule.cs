@@ -8,12 +8,28 @@ namespace PubnubApi.Security.Crypto
 {
     public class CryptoModule
     {
-        private readonly ICryptor _cryptor;
-        private readonly LegacyCryptor _fallbackCryptor;
-        public CryptoModule(ICryptor cryptor, LegacyCryptor fallbackCryptor)
+        private readonly ICryptor _encryptor;
+        private readonly Dictionary<string, ICryptor> _decryptors;
+        public CryptoModule(ICryptor defaultCryptor, List<ICryptor> decryptors)
         {
-            _cryptor = cryptor;
-            _fallbackCryptor = fallbackCryptor;
+            _encryptor = defaultCryptor ?? throw new ArgumentNullException(nameof(defaultCryptor));;
+            _decryptors = new Dictionary<string, ICryptor>();
+            AddDecryptor(_encryptor);
+            if (decryptors != null)
+            {
+                foreach (var decryptor in decryptors)
+                {
+                    AddDecryptor(decryptor);
+                }
+            }
+        }
+
+        private void AddDecryptor(ICryptor decryptor)
+        {
+            if (!_decryptors.TryGetValue(decryptor.Identifier, out var curentDecryptor))
+            {
+                _decryptors[decryptor.Identifier] = decryptor;
+            }
         }
         public static LegacyCryptor CreateLegacyCryptor(string cipherKey, bool useDynamicIV, IPubnubLog log, IPubnubUnitTest unitTest)
         {
@@ -37,15 +53,15 @@ namespace PubnubApi.Security.Crypto
         }
         public string Encrypt(string data)
         {
-            return _cryptor.Encrypt(data);
+            return _encryptor.Encrypt(data);
         }
         public byte[] Encrypt(byte[] data)
         {
-            return _cryptor.Encrypt(data);
+            return _encryptor.Encrypt(data);
         }
         public void EncryptFile(string sourceFile, string destinationFile)
         {
-            _cryptor.EncryptFile(sourceFile, destinationFile);
+            _encryptor.EncryptFile(sourceFile, destinationFile);
         }
         public string Decrypt(string data)
         {
@@ -53,24 +69,15 @@ namespace PubnubApi.Security.Crypto
             {
                 throw new ArgumentException("Input is null");
             }
-            if (_cryptor is LegacyCryptor)
-            {
-                return _cryptor.Decrypt(data);
-            }
             CryptorHeader header = CryptorHeader.FromBytes(Convert.FromBase64String(data));
-            if (header == null)
+            if (_decryptors.TryGetValue(header.Identifier, out var decryptor))
             {
-                if (_fallbackCryptor == null)
-                {
-                    throw new PNException("unknown cryptor error");
-                }
-                return _fallbackCryptor.Decrypt(data);
+                return decryptor.Decrypt(data);
             }
-            if (!header.Identifier.SequenceEqual(_cryptor?.Identifier))
+            else
             {
                 throw new PNException("unknown cryptor error");
             }
-            return _cryptor?.Decrypt(data);
         }
         public byte[] Decrypt(byte[] data)
         {
@@ -78,24 +85,15 @@ namespace PubnubApi.Security.Crypto
             {
                 throw new ArgumentException("Input is null");
             }
-            if (_cryptor is LegacyCryptor)
-            {
-                return _cryptor.Decrypt(data);
-            }
             CryptorHeader header = CryptorHeader.FromBytes(data);
-            if (header == null)
+            if (_decryptors.TryGetValue(header.Identifier, out var decryptor))
             {
-                if (_fallbackCryptor == null)
-                {
-                    throw new PNException("unknown cryptor error");
-                }
-                return _fallbackCryptor.Decrypt(data);
+                return decryptor.Decrypt(data);
             }
-            if (!header.Identifier.SequenceEqual(_cryptor?.Identifier))
+            else
             {
                 throw new PNException("unknown cryptor error");
             }
-            return _cryptor?.Decrypt(data);
         }
         public void DecryptFile(string sourceFile, string destinationFile)
         {
@@ -107,26 +105,15 @@ namespace PubnubApi.Security.Crypto
             {
                 throw new ArgumentException("destinationFile is not valid");
             }
-            if (_cryptor is LegacyCryptor)
-            {
-                _cryptor.DecryptFile(sourceFile, destinationFile);
-                return;
-            }
             CryptorHeader header = CryptorHeader.FromFile(sourceFile);
-            if (header == null)
+            if (_decryptors.TryGetValue(header.Identifier, out var decryptor))
             {
-                if (_fallbackCryptor == null)
-                {
-                    throw new PNException("unknown cryptor error");
-                }
-                _fallbackCryptor.DecryptFile(sourceFile, destinationFile);
-                return;
+                decryptor.DecryptFile(sourceFile, destinationFile);
             }
-            if (!header.Identifier.SequenceEqual(_cryptor?.Identifier))
+            else
             {
                 throw new PNException("unknown cryptor error");
             }
-            _cryptor?.DecryptFile(sourceFile, destinationFile);
         }
     }
 }

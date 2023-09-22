@@ -137,9 +137,13 @@ namespace AcceptanceTests.Steps
             {
                 cryptoModule = new CryptoModule(new LegacyCryptor(cipherKey, useDynamicRandIV), null);
             }
-            else if ((defaultCryptoId == "acrh" && addlCryptoId == "legacy") || (defaultCryptoId == "legacy" && addlCryptoId == "acrh"))
+            else if (defaultCryptoId == "acrh" && addlCryptoId == "legacy")
             {
-                cryptoModule = new CryptoModule(new AesCbcCryptor(cipherKey), new LegacyCryptor(cipherKey, useDynamicRandIV));
+                cryptoModule = new CryptoModule(new AesCbcCryptor(cipherKey), new List<ICryptor>() { new LegacyCryptor(cipherKey, useDynamicRandIV) });
+            }
+            else if (defaultCryptoId == "legacy" && addlCryptoId == "acrh")
+            {
+                cryptoModule = new CryptoModule(new LegacyCryptor(cipherKey, useDynamicRandIV), new List<ICryptor>() { new AesCbcCryptor(cipherKey) });
             }
         }
 

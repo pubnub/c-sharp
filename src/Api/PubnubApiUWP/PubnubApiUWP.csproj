@@ -646,9 +646,6 @@
     <Compile Include="..\PubnubApi\Security\Crypto\CryptoModule.cs">
       <Link>Security\Crypto\CryptoModule.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\Security\Crypto\Cryptor.cs">
-      <Link>Security\Crypto\Cryptor.cs</Link>
-    </Compile>
     <Compile Include="..\PubnubApi\Security\Crypto\ICryptor.cs">
       <Link>Security\Crypto\ICryptor.cs</Link>
     </Compile>

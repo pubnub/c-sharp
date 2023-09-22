@@ -760,6 +760,30 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+        public void TestCryptoModuleWithMultipleCryptorsDefaultAesCbc()
+        {
+            string message = "yay!";
+            AesCbcCryptor aesCbcCryptor = CryptoModule.CreateAesCbcCryptor("enigma");
+            LegacyCryptor legacyCryptor = CryptoModule.CreateLegacyCryptor("enigma");
+            CryptoModule cm = new CryptoModule(aesCbcCryptor, new List<ICryptor> { legacyCryptor });
+            string encryptedMessage = cm.Encrypt(message);
+            string decryptedMessage = cm.Decrypt(encryptedMessage);
+            Assert.AreEqual(message, decryptedMessage);
+        }
+
+        [Test]
+        public void TestCryptoModuleWithMultipleCryptorsDefaultLegacy()
+        {
+            string message = "yay!";
+            AesCbcCryptor aesCbcCryptor = CryptoModule.CreateAesCbcCryptor("enigma");
+            LegacyCryptor legacyCryptor = CryptoModule.CreateLegacyCryptor("enigma");
+            CryptoModule cm = new CryptoModule(legacyCryptor, new List<ICryptor> { aesCbcCryptor });
+            string encryptedMessage = cm.Encrypt(message);
+            string decryptedMessage = cm.Decrypt(encryptedMessage);
+            Assert.AreEqual(message, decryptedMessage);
+        }
+
+        [Test]
         public void TestPAMSignature()
         {
             string secretKey = "secret";

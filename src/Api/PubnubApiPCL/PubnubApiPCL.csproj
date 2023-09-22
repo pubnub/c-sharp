@@ -532,7 +532,6 @@
     <Compile Include="..\PubnubApi\Security\Crypto\Common\ByteArrayExtensions.cs" Link="Security\Crypto\Common\ByteArrayExtensions.cs" />
     <Compile Include="..\PubnubApi\Security\Crypto\Common\Util.cs" Link="Security\Crypto\Common\Util.cs" />
     <Compile Include="..\PubnubApi\Security\Crypto\CryptoModule.cs" Link="Security\Crypto\CryptoModule.cs" />
-    <Compile Include="..\PubnubApi\Security\Crypto\Cryptor.cs" Link="Security\Crypto\Cryptor.cs" />
     <Compile Include="..\PubnubApi\Security\Crypto\Cryptors\AesCbcCryptor.cs" Link="Security\Crypto\Cryptors\AesCbcCryptor.cs" />
     <Compile Include="..\PubnubApi\Security\Crypto\Cryptors\CryptorBase.cs" Link="Security\Crypto\Cryptors\CryptorBase.cs" />
     <Compile Include="..\PubnubApi\Security\Crypto\Cryptors\CryptorHeader.cs" Link="Security\Crypto\Cryptors\CryptorHeader.cs" />

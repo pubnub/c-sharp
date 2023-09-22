@@ -16,7 +16,7 @@ namespace PubnubApi.Security.Crypto
         ///
         /// The identifier **must** be 4 bytes long.
         /// </summary>
-        byte[] Identifier { get; }
+        string Identifier { get; }
 
         string Encrypt(string data);
         byte[] Encrypt(byte[] data);

@@ -29,7 +29,7 @@ namespace PubnubApi.Security.Crypto.Cryptors
         }
         public new string CipherKey => base.CipherKey;
         public bool UseDynamicRandomIV => _useDynamicRandomIV;
-        public override byte[] Identifier => Encoding.UTF8.GetBytes(IDENTIFIER);
+        public override string Identifier => IDENTIFIER;
         public override string Encrypt(string data)
         {
             if (data == null)
