@@ -273,21 +273,6 @@ namespace PubNubMessaging.Tests
 
         }
 
-        //[Test]
-        public void TestFileEncryptionFromPath()
-        {
-            LegacyCryptor legacyCryptor = new LegacyCryptor("enigma", true, null);
-            legacyCryptor.SetTestOnlyConstantRandomIV(new byte[16] { 21, 113, 108, 52, 211, 105, 24, 46, 175, 249, 87, 111, 60, 71, 232, 107 });
-            CryptoModule cm = new CryptoModule(legacyCryptor, null);
-            byte[] fileByteArray = System.IO.File.ReadAllBytes(@"C:\Pandu\temp\new\input\word_test.txt");
-
-            byte[] decryptedBytes = cm.Encrypt(fileByteArray);
-            System.IO.File.WriteAllBytes(@"C:\Pandu\temp\new\input\word_test_enc.txt", decryptedBytes);
-            byte[] expectedBytes = new byte[] { 21, 113, 108, 52, 211, 105, 24, 46, 175, 249, 87, 111, 60, 71, 232, 107, 141, 182, 118, 209, 117, 159, 64, 210, 220, 133, 28, 22, 247, 245, 30, 5 };
-            Assert.AreEqual(expectedBytes, decryptedBytes);
-
-        }
-
         [Test]
         public void TestLocalFileEncryptionFromPath()
         {
@@ -336,6 +321,7 @@ namespace PubNubMessaging.Tests
             Assert.AreEqual("q/xJqqN6qbiZMXYmiQC1Fw==", encryptedMessage);
         }
         
+        #if DEBUG
         [Test]
         public void TestYayEncryptionBasicWithDynamicIV()
         {
@@ -348,7 +334,7 @@ namespace PubNubMessaging.Tests
             string encryptedMessage = cm.Encrypt(message);
             Assert.AreEqual("MTIzNDU2Nzg5MDEyMzQ1NjdnONoCgo0wbuMGGMmfMX0=", encryptedMessage);
         }
-
+        #endif
 
         /// <summary>
         /// Tests the yay encryption.
@@ -368,6 +354,7 @@ namespace PubNubMessaging.Tests
             Assert.AreEqual(expectedBytes, encryptedBytes);
         }
 
+        #if DEBUG
         [Test]
         public void TestYayByteArrayEncryptionBasicWithDynamicIV()
         {
@@ -384,7 +371,7 @@ namespace PubNubMessaging.Tests
             byte[] expectedBytes = new byte[] { 49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 49, 50, 51, 52, 53, 54, 55, 103, 56, 218, 2, 130, 141, 48, 110, 227, 6, 24, 201, 159, 49, 125 };
             Assert.AreEqual(expectedBytes, encryptedBytes);
         }
-
+        #endif
         /// <summary>
         /// Tests the yay decryption.
         /// Assumes that the input message is not deserialized  

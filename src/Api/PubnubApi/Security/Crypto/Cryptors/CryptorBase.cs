@@ -15,11 +15,12 @@ namespace PubnubApi.Security.Crypto.Cryptors
 
         private readonly bool _useDynamicRandomIV;
         private readonly IPubnubLog _log;
+        #if DEBUG
         public void SetTestOnlyConstantRandomIV(byte[] iv)
         {
             constantIV = iv;
         }
-
+        #endif
         protected CryptorBase(string cipherKey, bool useDynamicRandomIV, IPubnubLog log)
         {
             _useDynamicRandomIV = useDynamicRandomIV;
