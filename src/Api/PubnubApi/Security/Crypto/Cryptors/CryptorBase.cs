@@ -11,11 +11,11 @@ namespace PubnubApi.Security.Crypto.Cryptors
     public abstract class CryptorBase : ICryptor
     {
         protected const int IV_SIZE = 16;
-        private byte[] constantIV;
 
         private readonly bool _useDynamicRandomIV;
         private readonly IPubnubLog _log;
         #if DEBUG
+        private byte[] constantIV;
         public void SetTestOnlyConstantRandomIV(byte[] iv)
         {
             constantIV = iv;
@@ -31,10 +31,12 @@ namespace PubnubApi.Security.Crypto.Cryptors
         protected byte[] GenerateRandomIV(bool useDynamicRandomIV)
         {
             int dataOffset = useDynamicRandomIV ? IV_SIZE : 0;
+            #if DEBUG
             if (constantIV != null && constantIV.Length == 16)
             {
                 return constantIV;
             }
+            #endif
             return Util.InitializationVector(useDynamicRandomIV, dataOffset);
         }
         protected void Log(string message)
