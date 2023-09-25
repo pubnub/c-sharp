@@ -10,7 +10,7 @@ namespace PubnubApi.Security.Crypto
     {
         private readonly ICryptor _encryptor;
         private readonly Dictionary<string, ICryptor> _decryptors;
-        public CryptoModule(ICryptor defaultCryptor, List<ICryptor> decryptors)
+        public CryptoModule(ICryptor defaultCryptor, IEnumerable<ICryptor> decryptors)
         {
             _encryptor = defaultCryptor ?? throw new ArgumentNullException(nameof(defaultCryptor));;
             _decryptors = new Dictionary<string, ICryptor>();
