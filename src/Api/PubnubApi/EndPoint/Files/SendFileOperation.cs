@@ -129,7 +129,6 @@ namespace PubnubApi.EndPoint
             return this;
         }
 
-        [Obsolete("CipherKey is not supported in future. Use CryptoModule.", false)]
         public SendFileOperation CipherKey(string cipherKeyForFile)
         {
             this.currentFileCipherKey = cipherKeyForFile;
