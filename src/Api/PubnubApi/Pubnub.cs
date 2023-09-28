@@ -573,7 +573,6 @@ namespace PubnubApi
             }
         }
 
-        [Obsolete("cipherKey param is not supported.", false)]
         public string Decrypt(string inputString, string cipherKey)
         {
             if (string.IsNullOrEmpty(inputString))
@@ -605,7 +604,6 @@ namespace PubnubApi
             }
         }
 
-        [Obsolete("cipherKey param is not supported.", false)]
         public string Encrypt(string inputString, string cipherKey)
         {
             if (string.IsNullOrEmpty(inputString))
@@ -635,7 +633,6 @@ namespace PubnubApi
                 throw new ArgumentException("CryptoModule missing");
             }
         }
-        [Obsolete("cipherKey param is not supported.", false)]
         public byte[] EncryptFile(byte[] inputBytes, string cipherKey)
         {
             if (inputBytes == null)
@@ -681,7 +678,6 @@ namespace PubnubApi
             }
         }
 
-        [Obsolete("cipherKey param is not supported.", false)]
         public void EncryptFile(string sourceFile, string destinationFile, string cipherKey)
         {
             if (string.IsNullOrEmpty(sourceFile) || sourceFile.Length < 1)
@@ -768,7 +764,6 @@ namespace PubnubApi
             }
         }
         
-        [Obsolete("cipherKey param is not supported.", false)]
         public byte[] DecryptFile(byte[] inputBytes, string cipherKey)
         {
             if (inputBytes == null)
@@ -778,7 +773,6 @@ namespace PubnubApi
             return new CryptoModule(new LegacyCryptor(cipherKey, true, pubnubLog), null).Decrypt(inputBytes);
         }
 
-        [Obsolete("cipherKey param is not supported.", false)]
         public void DecryptFile(string sourceFile, string destinationFile, string cipherKey)
         {
             if (string.IsNullOrEmpty(sourceFile) || sourceFile.Length < 1)
