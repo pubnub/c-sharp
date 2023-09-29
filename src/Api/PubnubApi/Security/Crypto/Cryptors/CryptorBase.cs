@@ -59,7 +59,7 @@ namespace PubnubApi.Security.Crypto.Cryptors
                     byte[] outputBytes = crypto.TransformFinalBlock(dataBytes, 0, dataBytes.Length);
                     if (cryptoHeader)
                     {
-                        CryptorHeader header = new CryptorHeader(Identifier, outputBytes.Length);
+                        CryptorHeader header = new CryptorHeader(Identifier, ivBytes.Length);
                         byte[] headerBytes = header.ToBytes();
                         Log(string.Format(CultureInfo.InvariantCulture, "DateTime {0} Header = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), headerBytes.ToDisplayFormat()));
                         byte[] buffer = new byte[headerBytes.Length + ivBytes.Length + outputBytes.Length];

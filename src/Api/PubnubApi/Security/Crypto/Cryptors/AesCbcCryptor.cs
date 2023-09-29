@@ -86,8 +86,8 @@ namespace PubnubApi.Security.Crypto.Cryptors
                     throw new PNException("unknown cryptor error");
                 }
                 byte[] actualBytes = encryptedData.Skip(5 + header.Identifier.Length + ((header.DataSize < 255) ? 1 : 3)).ToArray();
-                byte[] ivBytes = actualBytes.Take(16).ToArray();
-                byte[] dataBytes = actualBytes.Skip(16).ToArray();
+                byte[] ivBytes = actualBytes.Take(header.DataSize).ToArray();
+                byte[] dataBytes = actualBytes.Skip(header.DataSize).ToArray();
                 byte[] keyBytes = Util.GetEncryptionKeyBytes(CipherKey);
                 return InternalDecrypt(dataBytes, ivBytes, keyBytes);
             }
