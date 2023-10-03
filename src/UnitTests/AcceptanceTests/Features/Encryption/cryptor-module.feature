@@ -12,26 +12,103 @@ Feature: Crypto module
 
     Examples:
       |  cipher_key  |              file              |        outcome        |
-      # File without header can't be processed by crypto module (it doesn't have
-      # legacy cryptor registered).
+      # A file containing encrypted data without a header is ineligible for
+      # processing by the crypto module, which  doesn't have a legacy cryptor
+      # registered.
       | pubnubenigma | file-legacy-civ.jpg            | unknown cryptor error |
-      # File without version can't be processed by specific new cryptor.
+      # A file containing encrypted data with a header that doesn't contain a
+      # version is ineligible for processing by a specific cryptor registered
+      # in the crypto module.
       | pubnubenigma | file-cryptor-no-version.txt    | decryption error      |
-      # File with header which has unknown version
+      # A file containing encrypted data with a header containing an unknown
+      # version is ineligible for processing.
       | pubnubenigma | file-cryptor-unknown-acrh.jpg  | unknown cryptor error |
-      # File with header which has too short identifier can't be processed.
+      # A file containing encrypted data with a header containing a too short
+      # cryptor identifier is ineligible for processing.
       | pubnubenigma | file-cryptor-v1-short.txt      | decryption error      |
-      # File with header with cryptor identifier not registered in crypto module
-      # can't be processed.
+      # A file containing encrypted data with a header containing a cryptor
+      # identifier that isn't registered in the crypto module is ineligible
+      # for processing.
       | pubnubenigma | file-cryptor-v1-unknown.txt    | unknown cryptor error |
+      # A file without content is ineligible for processing.
+      | pubnubenigma | empty-file-cryptor-v1-acrh.txt | decryption error      |
       | pubnubenigma | file-cryptor-v1-acrh.jpg       | success               |
-      | pubnubenigma | empty-file-cryptor-v1-acrh.txt | success               |
+
+  Scenario Outline: Empty data encryption should fail
+    Given Crypto module with '<cryptor_id>' cryptor
+    * with '<cipher_key>' cipher key
+    * with '<vector>' vector
+    When I encrypt 'empty-file.txt' file as 'binary'
+    Then I receive 'encryption error'
+
+    Examples:
+      | cryptor_id |  cipher_key  |  vector  |
+      | legacy     | pubnubenigma | constant |
+      | legacy     | pubnubenigma | random   |
+      | acrh       | pubnubenigma | -        |
+      | acrh       | pubnubenigma | -        |
+
+  # Stream-based encryption may not be supported by all platforms so it has been moved to the
+  # separate scenario with ability to opt-out.
+  @na=rust @na=dart @na=ruby
+  Scenario Outline: Empty stream data encryption should fail
+    Given Crypto module with '<cryptor_id>' cryptor
+    * with '<cipher_key>' cipher key
+    * with '<vector>' vector
+    When I encrypt 'empty-file.txt' file as 'stream'
+    Then I receive 'encryption error'
+
+    Examples:
+      | cryptor_id |  cipher_key  |  vector  |
+      | legacy     | pubnubenigma | constant |
+      | legacy     | pubnubenigma | random   |
+      | acrh       | pubnubenigma | -        |
+      | acrh       | pubnubenigma | -        |
+
+  Scenario Outline: Empty data decryption should fail
+    Given Crypto module with '<cryptor_id>' cryptor
+    * with '<cipher_key>' cipher key
+    * with '<vector>' vector
+    When I decrypt '<encrypted_file>' file as 'binary'
+    Then I receive 'decryption error'
+
+    Examples:
+      | cryptor_id |  cipher_key  |  vector  |          encrypted_file           |
+      | legacy     | pubnubenigma | constant | empty-file.txt                    |
+      | legacy     | pubnubenigma | random   | empty-file.txt                    |
+      | acrh       | pubnubenigma | -        | empty-file.txt                    |
+      # A file containing only initialization vector is ineligible for processing.
+      | legacy     | pubnubenigma | random   | empty-file-cryptor-legacy-riv.txt |
+      # A file containing only header and initialization vector is ineligible for
+      # processing.
+      | acrh       | pubnubenigma | -        | empty-file-cryptor-v1-acrh.txt    |
+
+  # Stream-based decryption may not be supported by all platforms so it has been moved to the
+  # separate scenario with ability to opt-out.
+  @na=rust @na=dart @na=ruby
+  Scenario Outline: Empty stream data decryption should fail
+    Given Crypto module with '<cryptor_id>' cryptor
+    * with '<cipher_key>' cipher key
+    * with '<vector>' vector
+    When I decrypt '<encrypted_file>' file as 'stream'
+    Then I receive 'decryption error'
+
+    Examples:
+      | cryptor_id |  cipher_key  |  vector  |          encrypted_file           |
+      | legacy     | pubnubenigma | constant | empty-file.txt                    |
+      | legacy     | pubnubenigma | random   | empty-file.txt                    |
+      | acrh       | pubnubenigma | -        | empty-file.txt                    |
+      # A file containing only initialization vector is ineligible for processing.
+      | legacy     | pubnubenigma | random   | empty-file-cryptor-legacy-riv.txt |
+      # A file containing only header and initialization vector is ineligible for
+      # processing.
+      | acrh       | pubnubenigma | -        | empty-file-cryptor-v1-acrh.txt    |
 
   Scenario Outline: Data encrypted with legacy AES-CBC cryptor is decryptable with legacy implementation
     Given Crypto module with 'legacy' cryptor
-    Given Legacy code with '<cipher_key>' cipher key and '<vector>' vector
     * with '<cipher_key>' cipher key
     * with '<vector>' vector
+    Given Legacy code with '<cipher_key>' cipher key and '<vector>' vector
     When I encrypt '<file>' file as 'binary'
     Then Successfully decrypt an encrypted file with legacy code
 
@@ -41,11 +118,10 @@ Feature: Crypto module
       | pubnubenigma | constant | file.jpg       |
       | pubnubenigma | random   | file.txt       |
       | pubnubenigma | constant | file.txt       |
-      | pubnubenigma | random   | empty-file.txt |
-      | pubnubenigma | constant | empty-file.txt |
 
   # Stream-based encryption may not be supported by all platforms so it has been moved to the
   # separate scenario with ability to opt-out.
+  @na=rust @na=dart @na=ruby
   Scenario Outline: Stream data encrypted with legacy AES-CBC cryptor is decryptable with legacy implementation
     Given Crypto module with 'legacy' cryptor
     Given Legacy code with '<cipher_key>' cipher key and '<vector>' vector
@@ -58,7 +134,6 @@ Feature: Crypto module
       |  cipher_key  | vector |      file      |
       | pubnubenigma | random | file.jpg       |
       | pubnubenigma | random | file.txt       |
-      | pubnubenigma | random | empty-file.txt |
 
   Scenario Outline: Cryptor is able to process sample files as binary
     Given Crypto module with '<cryptor_id>' cryptor
@@ -73,20 +148,16 @@ Feature: Crypto module
       | legacy     | pubnubenigma | random   | file-cryptor-legacy-riv.jpg       | file.jpg       |
       | legacy     | pubnubenigma | constant | file-cryptor-legacy-civ.txt       | file.txt       |
       | legacy     | pubnubenigma | random   | file-cryptor-legacy-riv.txt       | file.txt       |
-      | legacy     | pubnubenigma | constant | empty-file-cryptor-legacy-civ.txt | empty-file.txt |
-      | legacy     | pubnubenigma | random   | empty-file-cryptor-legacy-riv.txt | empty-file.txt |
       | legacy     | pubnubenigma | constant | file-legacy-civ.jpg               | file.jpg       |
       | legacy     | pubnubenigma | random   | file-legacy-riv.jpg               | file.jpg       |
       | legacy     | pubnubenigma | constant | file-legacy-civ.txt               | file.txt       |
       | legacy     | pubnubenigma | random   | file-legacy-riv.txt               | file.txt       |
-      | legacy     | pubnubenigma | constant | empty-file-legacy-civ.txt         | empty-file.txt |
-      | legacy     | pubnubenigma | random   | empty-file-legacy-riv.txt         | empty-file.txt |
       | acrh       | pubnubenigma | -        | file-cryptor-v1-acrh.jpg          | file.jpg       |
       | acrh       | pubnubenigma | -        | file-cryptor-v1-acrh.txt          | file.txt       |
-      | acrh       | pubnubenigma | -        | empty-file-cryptor-v1-acrh.txt    | empty-file.txt |
 
   # Stream-based decryption may not be supported by all platforms so it has been moved to the
   # separate scenario with ability to opt-out.
+  @na=rust @na=dart @na=ruby
   Scenario Outline: Cryptor is able to process sample files as stream
     Given Crypto module with '<cryptor_id>' cryptor
     * with '<cipher_key>' cipher key
@@ -98,13 +169,10 @@ Feature: Crypto module
       | cryptor_id |  cipher_key  |  vector  |          encrypted_file           |  source_file   |
       | legacy     | pubnubenigma | random   | file-cryptor-legacy-riv.jpg       | file.jpg       |
       | legacy     | pubnubenigma | random   | file-cryptor-legacy-riv.txt       | file.txt       |
-      | legacy     | pubnubenigma | random   | empty-file-cryptor-legacy-riv.txt | empty-file.txt |
       | legacy     | pubnubenigma | random   | file-legacy-riv.jpg               | file.jpg       |
       | legacy     | pubnubenigma | random   | file-legacy-riv.txt               | file.txt       |
-      | legacy     | pubnubenigma | random   | empty-file-legacy-riv.txt         | empty-file.txt |
       | acrh       | pubnubenigma | -        | file-cryptor-v1-acrh.jpg          | file.jpg       |
       | acrh       | pubnubenigma | -        | file-cryptor-v1-acrh.txt          | file.txt       |
-      | acrh       | pubnubenigma | -        | empty-file-cryptor-v1-acrh.txt    | empty-file.txt |
 
   Scenario Outline: Crypto module can handle encrypted data from different cryptors
     Given Crypto module with default '<cryptor_id1>' and additional '<cryptor_id2>' cryptors
@@ -117,5 +185,3 @@ Feature: Crypto module
       | cryptor_id1 | cryptor_id2 |  cipher_key  |  vector  |          encrypted_file           |  source_file   |
       | legacy      | acrh        | pubnubenigma | constant | file-cryptor-legacy-civ.jpg       | file.jpg       |
       | acrh        | legacy      | pubnubenigma | random   | file-legacy-riv.jpg               | file.jpg       |
-      | legacy      | acrh        | pubnubenigma | constant | empty-file-cryptor-legacy-civ.txt | empty-file.txt |
-      | acrh        | legacy      | pubnubenigma | random   | empty-file-legacy-riv.txt         | empty-file.txt |

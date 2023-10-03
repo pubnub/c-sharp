@@ -30,10 +30,8 @@ namespace PubnubApi.Security.Crypto.Cryptors
         public override string Identifier => IDENTIFIER;
         public override string Encrypt(string data)
         {
-            if (data == null)
-            {
-                throw new ArgumentException("Invalid input","data");
-            }
+            if (data == null) { throw new ArgumentException("Invalid input","data"); }
+            if (data.Length == 0) { throw new PNException("encryption error"); }
             try
             {
                 string input = Util.EncodeNonAsciiCharacters(data);
@@ -44,6 +42,10 @@ namespace PubnubApi.Security.Crypto.Cryptors
                 byte[] encryptedBytes = InternalEncrypt(false, dataBytes, ivBytes, keyBytes);
                 return Convert.ToBase64String(encryptedBytes);
             }
+            catch(PNException)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
                 throw new PNException("Encrypt Error", ex);
@@ -51,16 +53,18 @@ namespace PubnubApi.Security.Crypto.Cryptors
         }
         public override byte[] Encrypt(byte[] data)
         {
-            if (data == null)
-            {
-                throw new ArgumentException("Invalid input","data");
-            }
+            if (data == null) { throw new ArgumentException("Invalid input","data"); }
+            if (data.Length == 0) { throw new PNException("encryption error"); }
             try
             {
                 byte[] ivBytes = GenerateRandomIV(_useDynamicRandomIV);
                 Log(string.Format(CultureInfo.InvariantCulture, "DateTime {0} IV = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ivBytes.ToDisplayFormat()));
                 byte[] keyBytes = Util.GetLegacyEncryptionKey(CipherKey);
                 return InternalEncrypt(false, data, ivBytes, keyBytes);
+            }
+            catch(PNException)
+            {
+                throw;
             }
             catch (Exception ex)
             {
@@ -69,10 +73,8 @@ namespace PubnubApi.Security.Crypto.Cryptors
         }
         public override string Decrypt(string encryptedData)
         {
-            if (encryptedData == null)
-            {
-                throw new ArgumentException("Invalid input","encryptedData");
-            }
+            if (encryptedData == null) { throw new ArgumentException("Invalid input","encryptedData"); }
+            if (encryptedData.Length == 0) { throw new PNException("decryption error"); }
             try
             {
                 byte[] dataBytes = Convert.FromBase64String(encryptedData);
@@ -82,6 +84,10 @@ namespace PubnubApi.Security.Crypto.Cryptors
                 byte[] decryptedBytes = InternalDecrypt(dataBytes, ivBytes, keyBytes);
                 return Encoding.UTF8.GetString(decryptedBytes, 0, decryptedBytes.Length);
             }
+            catch(PNException)
+            {
+                throw;
+            }
             catch(Exception ex)
             {
                 throw new PNException("Decrypt Error", ex);
@@ -89,16 +95,19 @@ namespace PubnubApi.Security.Crypto.Cryptors
         }
         public override byte[] Decrypt(byte[] encryptedData)
         {
-            if (encryptedData == null)
-            {
-                throw new ArgumentException("Invalid input","encryptedData");
-            }
+            if (encryptedData == null) { throw new ArgumentException("Invalid input","encryptedData"); }
+            if (encryptedData.Length == 0) { throw new PNException("decryption error"); }
             try
             {
                 byte[] ivBytes = _useDynamicRandomIV ? encryptedData.Take(16).ToArray() : Encoding.UTF8.GetBytes("0123456789012345");
                 byte[] dataBytes = _useDynamicRandomIV ? encryptedData.Skip(16).ToArray() : encryptedData;
+                if (dataBytes.Length == 0) { throw new PNException("decryption error"); }
                 byte[] keyBytes = Util.GetLegacyEncryptionKey(CipherKey);
                 return InternalDecrypt(dataBytes, ivBytes, keyBytes);
+            }
+            catch(PNException)
+            {
+                throw;
             }
             catch(Exception ex)
             {

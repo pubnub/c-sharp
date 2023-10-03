@@ -87,8 +87,8 @@ namespace AcceptanceTests.Features.Encryption
         [NUnit.Framework.TestCaseAttribute("pubnubenigma", "file-cryptor-unknown-acrh.jpg", "unknown cryptor error", null)]
         [NUnit.Framework.TestCaseAttribute("pubnubenigma", "file-cryptor-v1-short.txt", "decryption error", null)]
         [NUnit.Framework.TestCaseAttribute("pubnubenigma", "file-cryptor-v1-unknown.txt", "unknown cryptor error", null)]
+        [NUnit.Framework.TestCaseAttribute("pubnubenigma", "empty-file-cryptor-v1-acrh.txt", "decryption error", null)]
         [NUnit.Framework.TestCaseAttribute("pubnubenigma", "file-cryptor-v1-acrh.jpg", "success", null)]
-        [NUnit.Framework.TestCaseAttribute("pubnubenigma", "empty-file-cryptor-v1-acrh.txt", "success", null)]
         public virtual void AES_CBCCryptorDataHeaderCanBeProcessed(string cipher_Key, string file, string outcome, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;
@@ -134,14 +134,250 @@ namespace AcceptanceTests.Features.Encryption
         }
         
         [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Empty data encryption should fail")]
+        [NUnit.Framework.TestCaseAttribute("legacy", "pubnubenigma", "constant", null)]
+        [NUnit.Framework.TestCaseAttribute("legacy", "pubnubenigma", "random", null)]
+        [NUnit.Framework.TestCaseAttribute("acrh", "pubnubenigma", "-", null)]
+        [NUnit.Framework.TestCaseAttribute("acrh", "pubnubenigma", "-", null)]
+        public virtual void EmptyDataEncryptionShouldFail(string cryptor_Id, string cipher_Key, string vector, string[] exampleTags)
+        {
+            string[] tagsOfScenario = exampleTags;
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            argumentsOfScenario.Add("cryptor_id", cryptor_Id);
+            argumentsOfScenario.Add("cipher_key", cipher_Key);
+            argumentsOfScenario.Add("vector", vector);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Empty data encryption should fail", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 37
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 38
+    testRunner.Given(string.Format("Crypto module with \'{0}\' cryptor", cryptor_Id), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 39
+    testRunner.And(string.Format("with \'{0}\' cipher key", cipher_Key), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "* ");
+#line hidden
+#line 40
+    testRunner.And(string.Format("with \'{0}\' vector", vector), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "* ");
+#line hidden
+#line 41
+    testRunner.When("I encrypt \'empty-file.txt\' file as \'binary\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 42
+    testRunner.Then("I receive \'encryption error\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Empty stream data encryption should fail")]
+        [NUnit.Framework.CategoryAttribute("na=rust")]
+        [NUnit.Framework.CategoryAttribute("na=dart")]
+        [NUnit.Framework.CategoryAttribute("na=ruby")]
+        [NUnit.Framework.TestCaseAttribute("legacy", "pubnubenigma", "constant", null)]
+        [NUnit.Framework.TestCaseAttribute("legacy", "pubnubenigma", "random", null)]
+        [NUnit.Framework.TestCaseAttribute("acrh", "pubnubenigma", "-", null)]
+        [NUnit.Framework.TestCaseAttribute("acrh", "pubnubenigma", "-", null)]
+        public virtual void EmptyStreamDataEncryptionShouldFail(string cryptor_Id, string cipher_Key, string vector, string[] exampleTags)
+        {
+            string[] @__tags = new string[] {
+                    "na=rust",
+                    "na=dart",
+                    "na=ruby"};
+            if ((exampleTags != null))
+            {
+                @__tags = System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Concat(@__tags, exampleTags));
+            }
+            string[] tagsOfScenario = @__tags;
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            argumentsOfScenario.Add("cryptor_id", cryptor_Id);
+            argumentsOfScenario.Add("cipher_key", cipher_Key);
+            argumentsOfScenario.Add("vector", vector);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Empty stream data encryption should fail", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 54
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 55
+    testRunner.Given(string.Format("Crypto module with \'{0}\' cryptor", cryptor_Id), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 56
+    testRunner.And(string.Format("with \'{0}\' cipher key", cipher_Key), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "* ");
+#line hidden
+#line 57
+    testRunner.And(string.Format("with \'{0}\' vector", vector), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "* ");
+#line hidden
+#line 58
+    testRunner.When("I encrypt \'empty-file.txt\' file as \'stream\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 59
+    testRunner.Then("I receive \'encryption error\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Empty data decryption should fail")]
+        [NUnit.Framework.TestCaseAttribute("legacy", "pubnubenigma", "constant", "empty-file.txt", null)]
+        [NUnit.Framework.TestCaseAttribute("legacy", "pubnubenigma", "random", "empty-file.txt", null)]
+        [NUnit.Framework.TestCaseAttribute("acrh", "pubnubenigma", "-", "empty-file.txt", null)]
+        [NUnit.Framework.TestCaseAttribute("legacy", "pubnubenigma", "random", "empty-file-cryptor-legacy-riv.txt", null)]
+        [NUnit.Framework.TestCaseAttribute("acrh", "pubnubenigma", "-", "empty-file-cryptor-v1-acrh.txt", null)]
+        public virtual void EmptyDataDecryptionShouldFail(string cryptor_Id, string cipher_Key, string vector, string encrypted_File, string[] exampleTags)
+        {
+            string[] tagsOfScenario = exampleTags;
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            argumentsOfScenario.Add("cryptor_id", cryptor_Id);
+            argumentsOfScenario.Add("cipher_key", cipher_Key);
+            argumentsOfScenario.Add("vector", vector);
+            argumentsOfScenario.Add("encrypted_file", encrypted_File);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Empty data decryption should fail", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 68
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 69
+    testRunner.Given(string.Format("Crypto module with \'{0}\' cryptor", cryptor_Id), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 70
+    testRunner.And(string.Format("with \'{0}\' cipher key", cipher_Key), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "* ");
+#line hidden
+#line 71
+    testRunner.And(string.Format("with \'{0}\' vector", vector), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "* ");
+#line hidden
+#line 72
+    testRunner.When(string.Format("I decrypt \'{0}\' file as \'binary\'", encrypted_File), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 73
+    testRunner.Then("I receive \'decryption error\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Empty stream data decryption should fail")]
+        [NUnit.Framework.CategoryAttribute("na=rust")]
+        [NUnit.Framework.CategoryAttribute("na=dart")]
+        [NUnit.Framework.CategoryAttribute("na=ruby")]
+        [NUnit.Framework.TestCaseAttribute("legacy", "pubnubenigma", "constant", "empty-file.txt", null)]
+        [NUnit.Framework.TestCaseAttribute("legacy", "pubnubenigma", "random", "empty-file.txt", null)]
+        [NUnit.Framework.TestCaseAttribute("acrh", "pubnubenigma", "-", "empty-file.txt", null)]
+        [NUnit.Framework.TestCaseAttribute("legacy", "pubnubenigma", "random", "empty-file-cryptor-legacy-riv.txt", null)]
+        [NUnit.Framework.TestCaseAttribute("acrh", "pubnubenigma", "-", "empty-file-cryptor-v1-acrh.txt", null)]
+        public virtual void EmptyStreamDataDecryptionShouldFail(string cryptor_Id, string cipher_Key, string vector, string encrypted_File, string[] exampleTags)
+        {
+            string[] @__tags = new string[] {
+                    "na=rust",
+                    "na=dart",
+                    "na=ruby"};
+            if ((exampleTags != null))
+            {
+                @__tags = System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Concat(@__tags, exampleTags));
+            }
+            string[] tagsOfScenario = @__tags;
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            argumentsOfScenario.Add("cryptor_id", cryptor_Id);
+            argumentsOfScenario.Add("cipher_key", cipher_Key);
+            argumentsOfScenario.Add("vector", vector);
+            argumentsOfScenario.Add("encrypted_file", encrypted_File);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Empty stream data decryption should fail", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 89
+  this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 90
+    testRunner.Given(string.Format("Crypto module with \'{0}\' cryptor", cryptor_Id), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 91
+    testRunner.And(string.Format("with \'{0}\' cipher key", cipher_Key), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "* ");
+#line hidden
+#line 92
+    testRunner.And(string.Format("with \'{0}\' vector", vector), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "* ");
+#line hidden
+#line 93
+    testRunner.When(string.Format("I decrypt \'{0}\' file as \'stream\'", encrypted_File), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 94
+    testRunner.Then("I receive \'decryption error\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("Data encrypted with legacy AES-CBC cryptor is decryptable with legacy implementat" +
             "ion")]
         [NUnit.Framework.TestCaseAttribute("pubnubenigma", "random", "file.jpg", null)]
         [NUnit.Framework.TestCaseAttribute("pubnubenigma", "constant", "file.jpg", null)]
         [NUnit.Framework.TestCaseAttribute("pubnubenigma", "random", "file.txt", null)]
         [NUnit.Framework.TestCaseAttribute("pubnubenigma", "constant", "file.txt", null)]
-        [NUnit.Framework.TestCaseAttribute("pubnubenigma", "random", "empty-file.txt", null)]
-        [NUnit.Framework.TestCaseAttribute("pubnubenigma", "constant", "empty-file.txt", null)]
         public virtual void DataEncryptedWithLegacyAES_CBCCryptorIsDecryptableWithLegacyImplementation(string cipher_Key, string vector, string file, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;
@@ -151,7 +387,7 @@ namespace AcceptanceTests.Features.Encryption
             argumentsOfScenario.Add("file", file);
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Data encrypted with legacy AES-CBC cryptor is decryptable with legacy implementat" +
                     "ion", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 30
+#line 107
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -171,22 +407,22 @@ namespace AcceptanceTests.Features.Encryption
             else
             {
                 this.ScenarioStart();
-#line 31
+#line 108
     testRunner.Given("Crypto module with \'legacy\' cryptor", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 32
-    testRunner.Given(string.Format("Legacy code with \'{0}\' cipher key and \'{1}\' vector", cipher_Key, vector), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line hidden
-#line 33
+#line 109
     testRunner.And(string.Format("with \'{0}\' cipher key", cipher_Key), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "* ");
 #line hidden
-#line 34
+#line 110
     testRunner.And(string.Format("with \'{0}\' vector", vector), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "* ");
 #line hidden
-#line 35
+#line 111
+    testRunner.Given(string.Format("Legacy code with \'{0}\' cipher key and \'{1}\' vector", cipher_Key, vector), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 112
     testRunner.When(string.Format("I encrypt \'{0}\' file as \'binary\'", file), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 36
+#line 113
     testRunner.Then("Successfully decrypt an encrypted file with legacy code", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -196,19 +432,29 @@ namespace AcceptanceTests.Features.Encryption
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("Stream data encrypted with legacy AES-CBC cryptor is decryptable with legacy impl" +
             "ementation")]
+        [NUnit.Framework.CategoryAttribute("na=rust")]
+        [NUnit.Framework.CategoryAttribute("na=dart")]
+        [NUnit.Framework.CategoryAttribute("na=ruby")]
         [NUnit.Framework.TestCaseAttribute("pubnubenigma", "random", "file.jpg", null)]
         [NUnit.Framework.TestCaseAttribute("pubnubenigma", "random", "file.txt", null)]
-        [NUnit.Framework.TestCaseAttribute("pubnubenigma", "random", "empty-file.txt", null)]
         public virtual void StreamDataEncryptedWithLegacyAES_CBCCryptorIsDecryptableWithLegacyImplementation(string cipher_Key, string vector, string file, string[] exampleTags)
         {
-            string[] tagsOfScenario = exampleTags;
+            string[] @__tags = new string[] {
+                    "na=rust",
+                    "na=dart",
+                    "na=ruby"};
+            if ((exampleTags != null))
+            {
+                @__tags = System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Concat(@__tags, exampleTags));
+            }
+            string[] tagsOfScenario = @__tags;
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             argumentsOfScenario.Add("cipher_key", cipher_Key);
             argumentsOfScenario.Add("vector", vector);
             argumentsOfScenario.Add("file", file);
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Stream data encrypted with legacy AES-CBC cryptor is decryptable with legacy impl" +
                     "ementation", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 49
+#line 125
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -228,22 +474,22 @@ namespace AcceptanceTests.Features.Encryption
             else
             {
                 this.ScenarioStart();
-#line 50
+#line 126
     testRunner.Given("Crypto module with \'legacy\' cryptor", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 51
+#line 127
     testRunner.Given(string.Format("Legacy code with \'{0}\' cipher key and \'{1}\' vector", cipher_Key, vector), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 52
+#line 128
     testRunner.And(string.Format("with \'{0}\' cipher key", cipher_Key), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "* ");
 #line hidden
-#line 53
+#line 129
     testRunner.And(string.Format("with \'{0}\' vector", vector), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "* ");
 #line hidden
-#line 54
+#line 130
     testRunner.When(string.Format("I encrypt \'{0}\' file as \'stream\'", file), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 55
+#line 131
     testRunner.Then("Successfully decrypt an encrypted file with legacy code", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -256,17 +502,12 @@ namespace AcceptanceTests.Features.Encryption
         [NUnit.Framework.TestCaseAttribute("legacy", "pubnubenigma", "random", "file-cryptor-legacy-riv.jpg", "file.jpg", null)]
         [NUnit.Framework.TestCaseAttribute("legacy", "pubnubenigma", "constant", "file-cryptor-legacy-civ.txt", "file.txt", null)]
         [NUnit.Framework.TestCaseAttribute("legacy", "pubnubenigma", "random", "file-cryptor-legacy-riv.txt", "file.txt", null)]
-        [NUnit.Framework.TestCaseAttribute("legacy", "pubnubenigma", "constant", "empty-file-cryptor-legacy-civ.txt", "empty-file.txt", null)]
-        [NUnit.Framework.TestCaseAttribute("legacy", "pubnubenigma", "random", "empty-file-cryptor-legacy-riv.txt", "empty-file.txt", null)]
         [NUnit.Framework.TestCaseAttribute("legacy", "pubnubenigma", "constant", "file-legacy-civ.jpg", "file.jpg", null)]
         [NUnit.Framework.TestCaseAttribute("legacy", "pubnubenigma", "random", "file-legacy-riv.jpg", "file.jpg", null)]
         [NUnit.Framework.TestCaseAttribute("legacy", "pubnubenigma", "constant", "file-legacy-civ.txt", "file.txt", null)]
         [NUnit.Framework.TestCaseAttribute("legacy", "pubnubenigma", "random", "file-legacy-riv.txt", "file.txt", null)]
-        [NUnit.Framework.TestCaseAttribute("legacy", "pubnubenigma", "constant", "empty-file-legacy-civ.txt", "empty-file.txt", null)]
-        [NUnit.Framework.TestCaseAttribute("legacy", "pubnubenigma", "random", "empty-file-legacy-riv.txt", "empty-file.txt", null)]
         [NUnit.Framework.TestCaseAttribute("acrh", "pubnubenigma", "-", "file-cryptor-v1-acrh.jpg", "file.jpg", null)]
         [NUnit.Framework.TestCaseAttribute("acrh", "pubnubenigma", "-", "file-cryptor-v1-acrh.txt", "file.txt", null)]
-        [NUnit.Framework.TestCaseAttribute("acrh", "pubnubenigma", "-", "empty-file-cryptor-v1-acrh.txt", "empty-file.txt", null)]
         public virtual void CryptorIsAbleToProcessSampleFilesAsBinary(string cryptor_Id, string cipher_Key, string vector, string encrypted_File, string source_File, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;
@@ -277,7 +518,7 @@ namespace AcceptanceTests.Features.Encryption
             argumentsOfScenario.Add("encrypted_file", encrypted_File);
             argumentsOfScenario.Add("source_file", source_File);
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Cryptor is able to process sample files as binary", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 63
+#line 138
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -297,19 +538,19 @@ namespace AcceptanceTests.Features.Encryption
             else
             {
                 this.ScenarioStart();
-#line 64
+#line 139
     testRunner.Given(string.Format("Crypto module with \'{0}\' cryptor", cryptor_Id), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 65
+#line 140
     testRunner.And(string.Format("with \'{0}\' cipher key", cipher_Key), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "* ");
 #line hidden
-#line 66
+#line 141
     testRunner.And(string.Format("with \'{0}\' vector", vector), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "* ");
 #line hidden
-#line 67
+#line 142
     testRunner.When(string.Format("I decrypt \'{0}\' file as \'binary\'", encrypted_File), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 68
+#line 143
     testRunner.Then(string.Format("Decrypted file content equal to the \'{0}\' file content", source_File), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -318,18 +559,26 @@ namespace AcceptanceTests.Features.Encryption
         
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("Cryptor is able to process sample files as stream")]
+        [NUnit.Framework.CategoryAttribute("na=rust")]
+        [NUnit.Framework.CategoryAttribute("na=dart")]
+        [NUnit.Framework.CategoryAttribute("na=ruby")]
         [NUnit.Framework.TestCaseAttribute("legacy", "pubnubenigma", "random", "file-cryptor-legacy-riv.jpg", "file.jpg", null)]
         [NUnit.Framework.TestCaseAttribute("legacy", "pubnubenigma", "random", "file-cryptor-legacy-riv.txt", "file.txt", null)]
-        [NUnit.Framework.TestCaseAttribute("legacy", "pubnubenigma", "random", "empty-file-cryptor-legacy-riv.txt", "empty-file.txt", null)]
         [NUnit.Framework.TestCaseAttribute("legacy", "pubnubenigma", "random", "file-legacy-riv.jpg", "file.jpg", null)]
         [NUnit.Framework.TestCaseAttribute("legacy", "pubnubenigma", "random", "file-legacy-riv.txt", "file.txt", null)]
-        [NUnit.Framework.TestCaseAttribute("legacy", "pubnubenigma", "random", "empty-file-legacy-riv.txt", "empty-file.txt", null)]
         [NUnit.Framework.TestCaseAttribute("acrh", "pubnubenigma", "-", "file-cryptor-v1-acrh.jpg", "file.jpg", null)]
         [NUnit.Framework.TestCaseAttribute("acrh", "pubnubenigma", "-", "file-cryptor-v1-acrh.txt", "file.txt", null)]
-        [NUnit.Framework.TestCaseAttribute("acrh", "pubnubenigma", "-", "empty-file-cryptor-v1-acrh.txt", "empty-file.txt", null)]
         public virtual void CryptorIsAbleToProcessSampleFilesAsStream(string cryptor_Id, string cipher_Key, string vector, string encrypted_File, string source_File, string[] exampleTags)
         {
-            string[] tagsOfScenario = exampleTags;
+            string[] @__tags = new string[] {
+                    "na=rust",
+                    "na=dart",
+                    "na=ruby"};
+            if ((exampleTags != null))
+            {
+                @__tags = System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Concat(@__tags, exampleTags));
+            }
+            string[] tagsOfScenario = @__tags;
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             argumentsOfScenario.Add("cryptor_id", cryptor_Id);
             argumentsOfScenario.Add("cipher_key", cipher_Key);
@@ -337,7 +586,7 @@ namespace AcceptanceTests.Features.Encryption
             argumentsOfScenario.Add("encrypted_file", encrypted_File);
             argumentsOfScenario.Add("source_file", source_File);
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Cryptor is able to process sample files as stream", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 90
+#line 161
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -357,19 +606,19 @@ namespace AcceptanceTests.Features.Encryption
             else
             {
                 this.ScenarioStart();
-#line 91
+#line 162
     testRunner.Given(string.Format("Crypto module with \'{0}\' cryptor", cryptor_Id), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 92
+#line 163
     testRunner.And(string.Format("with \'{0}\' cipher key", cipher_Key), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "* ");
 #line hidden
-#line 93
+#line 164
     testRunner.And(string.Format("with \'{0}\' vector", vector), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "* ");
 #line hidden
-#line 94
+#line 165
     testRunner.When(string.Format("I decrypt \'{0}\' file as \'stream\'", encrypted_File), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 95
+#line 166
     testRunner.Then(string.Format("Decrypted file content equal to the \'{0}\' file content", source_File), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -380,8 +629,6 @@ namespace AcceptanceTests.Features.Encryption
         [NUnit.Framework.DescriptionAttribute("Crypto module can handle encrypted data from different cryptors")]
         [NUnit.Framework.TestCaseAttribute("legacy", "acrh", "pubnubenigma", "constant", "file-cryptor-legacy-civ.jpg", "file.jpg", null)]
         [NUnit.Framework.TestCaseAttribute("acrh", "legacy", "pubnubenigma", "random", "file-legacy-riv.jpg", "file.jpg", null)]
-        [NUnit.Framework.TestCaseAttribute("legacy", "acrh", "pubnubenigma", "constant", "empty-file-cryptor-legacy-civ.txt", "empty-file.txt", null)]
-        [NUnit.Framework.TestCaseAttribute("acrh", "legacy", "pubnubenigma", "random", "empty-file-legacy-riv.txt", "empty-file.txt", null)]
         public virtual void CryptoModuleCanHandleEncryptedDataFromDifferentCryptors(string cryptor_Id1, string cryptor_Id2, string cipher_Key, string vector, string encrypted_File, string source_File, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;
@@ -393,7 +640,7 @@ namespace AcceptanceTests.Features.Encryption
             argumentsOfScenario.Add("encrypted_file", encrypted_File);
             argumentsOfScenario.Add("source_file", source_File);
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Crypto module can handle encrypted data from different cryptors", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 109
+#line 177
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -413,19 +660,19 @@ namespace AcceptanceTests.Features.Encryption
             else
             {
                 this.ScenarioStart();
-#line 110
+#line 178
     testRunner.Given(string.Format("Crypto module with default \'{0}\' and additional \'{1}\' cryptors", cryptor_Id1, cryptor_Id2), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 111
+#line 179
     testRunner.And(string.Format("with \'{0}\' cipher key", cipher_Key), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "* ");
 #line hidden
-#line 112
+#line 180
     testRunner.And(string.Format("with \'{0}\' vector", vector), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "* ");
 #line hidden
-#line 113
+#line 181
     testRunner.When(string.Format("I decrypt \'{0}\' file as \'binary\'", encrypted_File), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 114
+#line 182
     testRunner.Then(string.Format("Decrypted file content equal to the \'{0}\' file content", source_File), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }

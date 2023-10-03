@@ -189,7 +189,7 @@ namespace AcceptanceTests.Steps
         [Given(@"with '([^']*)' vector")]
         public void GivenWithVector(string vectorValue)
         {
-            useDynamicRandIV = vectorValue == "random";
+            useDynamicRandIV = !(vectorValue == "constant");
         }
 
         [When(@"I encrypt '([^']*)' file as '([^']*)'")]
@@ -203,9 +203,16 @@ namespace AcceptanceTests.Steps
             {
                 System.IO.File.Delete(encryptedFile);
             }
-            sourceFileSize = new FileInfo(sourceFile).Length;
-            SetCryptoModule();
-            cryptoModule.EncryptFile(sourceFile, encryptedFile);
+            try
+            {
+                sourceFileSize = new FileInfo(sourceFile).Length;
+                SetCryptoModule();
+                cryptoModule.EncryptFile(sourceFile, encryptedFile);
+            }
+            catch(Exception ex)
+            {
+                cryptoOutcome = ex.Message;
+            }
         }
 
         [Then(@"Successfully decrypt an encrypted file with legacy code")]
@@ -227,8 +234,15 @@ namespace AcceptanceTests.Steps
             encryptedFile = Path.Combine(dirPath ?? "", "Features\\Encryption\\assets", p0);
             string fileExt = Path.GetExtension(encryptedFile);
             decryptedToOriginalFile = Path.Combine(dirPath ?? "", string.Format($"decrypt_to_original{fileExt}"));
-            SetCryptoModule();
-            cryptoModule.DecryptFile(encryptedFile, decryptedToOriginalFile);
+            try
+            {
+                SetCryptoModule();
+                cryptoModule.DecryptFile(encryptedFile, decryptedToOriginalFile);
+            }
+            catch (Exception ex)
+            {
+                cryptoOutcome = ex.Message;
+            }
         }
 
         [Then(@"Decrypted file content equal to the '([^']*)' file content")]

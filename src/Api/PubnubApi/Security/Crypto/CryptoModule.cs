@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using PubnubApi.Security.Crypto.Cryptors;
@@ -105,6 +106,14 @@ namespace PubnubApi.Security.Crypto
             {
                 throw new ArgumentException("destinationFile is not valid");
             }
+            #if !NETSTANDARD10 && !NETSTANDARD11
+            if (new FileInfo(sourceFile).Length < 1)
+            {
+                throw new PNException("decryption error");
+            }
+            #else
+                throw new NotSupportedException("FileStream not supported in NetStandard 1.0/1.1. Consider higher version of .NetStandard.");
+            #endif
             CryptorHeader header = CryptorHeader.FromFile(sourceFile);
             if (_decryptors.TryGetValue(header.Identifier, out var decryptor))
             {

@@ -23,6 +23,7 @@ namespace PubnubApi.Security.Crypto.Cryptors
         public override string Encrypt(string data)
         {
             if (data == null) { throw new ArgumentException("Invalid input","data"); }
+            if (data.Length == 0) { throw new PNException("encryption error"); }
             try
             {
                 string input = Util.EncodeNonAsciiCharacters(data);
@@ -41,6 +42,7 @@ namespace PubnubApi.Security.Crypto.Cryptors
         public override byte[] Encrypt(byte[] data)
         {
             if (data == null) { throw new ArgumentException("Invalid input","data"); }
+            if (data.Length == 0) { throw new PNException("encryption error"); }
             try
             {
                 byte[] ivBytes = GenerateRandomIV(true);
@@ -55,6 +57,7 @@ namespace PubnubApi.Security.Crypto.Cryptors
         public override string Decrypt(string encryptedData)
         {
             if (encryptedData == null) { throw new ArgumentException("Invalid input","encryptedData"); }
+            if (encryptedData.Length == 0) { throw new PNException("decryption error"); }
             try
             {
                 CryptorHeader header = CryptorHeader.FromBytes(Convert.FromBase64String(encryptedData));
@@ -70,6 +73,10 @@ namespace PubnubApi.Security.Crypto.Cryptors
                 byte[] decryptedBytes = InternalDecrypt(dataBytes, ivBytes, keyBytes);
                 return Encoding.UTF8.GetString(decryptedBytes, 0, decryptedBytes.Length);
             }
+            catch(PNException)
+            {
+                throw;
+            }
             catch(Exception ex)
             {
                 throw new PNException("Decrypt Error", ex);
@@ -78,6 +85,7 @@ namespace PubnubApi.Security.Crypto.Cryptors
         public override byte[] Decrypt(byte[] encryptedData)
         {
             if (encryptedData == null) { throw new ArgumentException("Invalid input","encryptedData"); }
+            if (encryptedData.Length == 0) { throw new PNException("decryption error"); }
             try
             {
                 CryptorHeader header = CryptorHeader.FromBytes(encryptedData);
@@ -88,8 +96,13 @@ namespace PubnubApi.Security.Crypto.Cryptors
                 byte[] actualBytes = encryptedData.Skip(5 + header.Identifier.Length + ((header.DataSize < 255) ? 1 : 3)).ToArray();
                 byte[] ivBytes = actualBytes.Take(header.DataSize).ToArray();
                 byte[] dataBytes = actualBytes.Skip(header.DataSize).ToArray();
+                if (dataBytes.Length == 0) { throw new PNException("decryption error"); }
                 byte[] keyBytes = Util.GetEncryptionKeyBytes(CipherKey);
                 return InternalDecrypt(dataBytes, ivBytes, keyBytes);
+            }
+            catch(PNException)
+            {
+                throw;
             }
             catch (Exception ex)
             {
