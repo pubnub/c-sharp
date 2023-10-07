@@ -7,7 +7,6 @@ using PubnubApi.Interface;
 using System.Threading.Tasks;
 using System.Net;
 using System.Globalization;
-using System.Runtime.Remoting.Channels;
 #if !NET35 && !NET40
 using System.Collections.Concurrent;
 #endif
