@@ -7,6 +7,7 @@ using PubnubApi.Interface;
 using System.Threading.Tasks;
 using System.Net;
 using System.Globalization;
+using System.Runtime.Remoting.Channels;
 #if !NET35 && !NET40
 using System.Collections.Concurrent;
 #endif
@@ -77,6 +78,10 @@ namespace PubnubApi.EndPoint
 
         public void Execute()
         {
+            if (config == null || string.IsNullOrEmpty(config.SubscribeKey))
+            {
+                throw new MissingMemberException("Invalid Subscribe key");
+            }
             if (this.subscribeChannelNames == null)
             {
                 this.subscribeChannelNames = new List<string>();

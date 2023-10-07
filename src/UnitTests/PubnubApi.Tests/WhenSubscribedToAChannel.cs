@@ -141,6 +141,32 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+        public static void ThenMissingSubscribeKeyShouldReturnException()
+        {
+            server.ClearRequests();
+
+            string channel = "hello_my_channel";
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            {
+            };
+            server.RunOnHttps(true);
+
+            pubnub = createPubNubInstance(config);
+
+            Assert.Throws<MissingMemberException>(() =>
+            {
+                pubnub.Subscribe<string>()
+                        .Channels(new string[] {channel })
+                        .WithPresence()
+                        .Execute();
+            });
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
+
+        [Test]
         public static void ThenComplexMessageSubscribeShouldReturnReceivedMessage()
         {
             server.ClearRequests();
