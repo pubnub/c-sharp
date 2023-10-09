@@ -486,7 +486,7 @@ namespace PubNubMessaging.Tests
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                CipherKey = "testcipherkey",
+                CryptoModule = new CryptoModule(new LegacyCryptor("testcipherkey"), null),
                 Secure = false
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -597,7 +597,7 @@ namespace PubNubMessaging.Tests
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                CipherKey = "testcipherkey",
+                CryptoModule = new CryptoModule(new LegacyCryptor("testcipherkey"), null),
                 Secure = false
             };
             if (PubnubCommon.PAMServerSideRun)
