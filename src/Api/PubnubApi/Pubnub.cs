@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
+using PubnubApi.EndPoint;
 #if !NET35 && !NET40
 using System.Collections.Concurrent;
 #endif
@@ -18,6 +19,10 @@ namespace PubnubApi
         private readonly EndPoint.TokenManager tokenManager;
         private object savedSubscribeOperation;
         private readonly string savedSdkVerion;
+        
+        #if UNITY
+        private static System.Func<UnsubscribeAllOperation<object>> OnCleanupCall;
+        #endif
 
         static Pubnub() 
         {
@@ -30,6 +35,16 @@ namespace PubnubApi
 #endif
             Version = string.Format(CultureInfo.InvariantCulture, "{0}CSharp{1}", PNPlatform.Get(), assemblyVersion);
         }
+        
+        #if UNITY
+        /// <summary>
+        /// Call this function to globally clean up all background threads running in the SDK. Note that this will unsubscribe all channels.
+        /// </summary>
+        public static void CleanUp()
+        {
+            OnCleanupCall?.Invoke();
+        }
+        #endif
 
         #region "PubNub API Channel Methods"
 
@@ -860,6 +875,10 @@ namespace PubnubApi
 
         public Pubnub(PNConfiguration config)
         {
+            #if UNITY
+            OnCleanupCall += this.UnsubscribeAll<object>;
+            #endif
+            
             savedSdkVerion = Version;
             InstanceId = Guid.NewGuid().ToString();
             pubnubConfig.AddOrUpdate(InstanceId, config, (k, o) => config);
@@ -905,6 +924,13 @@ namespace PubnubApi
 
         }
 
+        #if UNITY
+        ~Pubnub()
+        {
+            OnCleanupCall -= this.UnsubscribeAll<object>;
+        }
+        #endif
+
         private void CheckRequiredConfigValues()
         {
             if (pubnubConfig != null && pubnubConfig.ContainsKey(InstanceId))
@@ -932,5 +958,5 @@ namespace PubnubApi
         }
 
 #endregion
-	}
+    }
 }
