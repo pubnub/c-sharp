@@ -44,6 +44,7 @@ namespace PubnubApi
         {
             this.config = pubnubConfig;
             this.pubnubLog = log;
+            JsonConvert.DefaultSettings = () => new JsonSerializerSettings { MaxDepth = 64 };
         }
 
         #region IJsonPlugableLibrary methods implementation
@@ -146,7 +147,7 @@ namespace PubnubApi
 
         public object DeserializeToObject(string jsonString)
         {
-            object result = JsonConvert.DeserializeObject<object>(jsonString, new JsonSerializerSettings { DateParseHandling = DateParseHandling.None });
+            object result = JsonConvert.DeserializeObject<object>(jsonString, new JsonSerializerSettings { DateParseHandling = DateParseHandling.None, MaxDepth = 64 });
             if (result.GetType().ToString() == "Newtonsoft.Json.Linq.JArray")
             {
                 JArray jarrayResult = result as JArray;
@@ -178,7 +179,7 @@ namespace PubnubApi
 
             try
             {
-                ret = JsonConvert.DeserializeObject<T>(jsonString, new JsonSerializerSettings { DateParseHandling = DateParseHandling.None });
+                ret = JsonConvert.DeserializeObject<T>(jsonString, new JsonSerializerSettings { DateParseHandling = DateParseHandling.None, MaxDepth = 64 });
             }
             catch { /* ignore */ }
 

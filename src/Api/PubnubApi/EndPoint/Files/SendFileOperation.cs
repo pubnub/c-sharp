@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 #if !NET35 && !NET40
 using System.Collections.Concurrent;
 #endif
+using PubnubApi.Security.Crypto;
+using PubnubApi.Security.Crypto.Cryptors;
 
 namespace PubnubApi.EndPoint
 {
@@ -199,8 +201,12 @@ namespace PubnubApi.EndPoint
             
             string dataBoundary = String.Format(CultureInfo.InvariantCulture, "----------{0:N}", Guid.NewGuid());
             string contentType = "multipart/form-data; boundary=" + dataBoundary;
-            string currentCipherKey = !string.IsNullOrEmpty(this.currentFileCipherKey) ? this.currentFileCipherKey : config.CipherKey;
-            byte[] postData = GetMultipartFormData(sendFileByteArray,generateFileUploadUrlResult.FileName, generateFileUploadUrlResult.FileUploadRequest.FormFields, dataBoundary, currentCipherKey, config, pubnubLog);
+            CryptoModule currentCryptoModule = null;
+            if (!string.IsNullOrEmpty(this.currentFileCipherKey) || !string.IsNullOrEmpty(config.CipherKey) || config.CryptoModule != null)
+            {
+                currentCryptoModule = !string.IsNullOrEmpty(this.currentFileCipherKey) ? new CryptoModule(new LegacyCryptor(this.currentFileCipherKey, true, pubnubLog), null) : (config.CryptoModule ??= new CryptoModule(new LegacyCryptor(config.CipherKey, true, pubnubLog), null));
+            }
+            byte[] postData = GetMultipartFormData(sendFileByteArray,generateFileUploadUrlResult.FileName, generateFileUploadUrlResult.FileUploadRequest.FormFields, dataBoundary, currentCryptoModule, config, pubnubLog);
 
             string json;
             UrlProcessRequest(new Uri(generateFileUploadUrlResult.FileUploadRequest.Url), requestState, false, postData, contentType).ContinueWith(r =>
@@ -300,8 +306,12 @@ namespace PubnubApi.EndPoint
 
             string dataBoundary = String.Format(CultureInfo.InvariantCulture, "----------{0:N}", Guid.NewGuid());
             string contentType = "multipart/form-data; boundary=" + dataBoundary;
-            string currentCipherKey = !string.IsNullOrEmpty(this.currentFileCipherKey) ? this.currentFileCipherKey : config.CipherKey;
-            byte[] postData = GetMultipartFormData(sendFileByteArray, generateFileUploadUrlResult.FileName, generateFileUploadUrlResult.FileUploadRequest.FormFields, dataBoundary, currentCipherKey, config, pubnubLog);
+            CryptoModule currentCryptoModule = null;
+            if (!string.IsNullOrEmpty(this.currentFileCipherKey) || !string.IsNullOrEmpty(config.CipherKey) || config.CryptoModule != null)
+            {
+                currentCryptoModule = !string.IsNullOrEmpty(this.currentFileCipherKey) ? new CryptoModule(new LegacyCryptor(this.currentFileCipherKey, true, pubnubLog), null) : (config.CryptoModule ??= new CryptoModule(new LegacyCryptor(config.CipherKey, true, pubnubLog), null));
+            }
+            byte[] postData = GetMultipartFormData(sendFileByteArray, generateFileUploadUrlResult.FileName, generateFileUploadUrlResult.FileUploadRequest.FormFields, dataBoundary, currentCryptoModule, config, pubnubLog);
 
             Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(new Uri(generateFileUploadUrlResult.FileUploadRequest.Url), requestState, false, postData, contentType).ConfigureAwait(false);
             ret.Status = JsonAndStatusTuple.Item2;
@@ -469,7 +479,7 @@ namespace PubnubApi.EndPoint
 
         }
 
-        private static byte[] GetMultipartFormData(byte[] sendFileByteArray, string fileName, Dictionary<string, object> formFields, string dataBoundary, string currentCipherKey, PNConfiguration config, IPubnubLog pubnubLog)
+        private static byte[] GetMultipartFormData(byte[] sendFileByteArray, string fileName, Dictionary<string, object> formFields, string dataBoundary, CryptoModule currentCryptoModule, PNConfiguration config, IPubnubLog pubnubLog)
         {
             byte[] ret = null;
             string fileContentType = "application/octet-stream";
@@ -500,12 +510,11 @@ namespace PubnubApi.EndPoint
                 byte[] postHeaderData = Encoding.UTF8.GetBytes(header);
 
                 dataStream.Write(postHeaderData, 0, postHeaderData.Length);
-                if (currentCipherKey.Length > 0)
+                if (currentCryptoModule != null)
                 {
                     try
                     {
-                        PubnubCrypto aes = new PubnubCrypto(currentCipherKey, config, pubnubLog, null);
-                        byte[] encryptBytes = aes.Encrypt(sendFileByteArray, true);
+                        byte[] encryptBytes = currentCryptoModule.Encrypt(sendFileByteArray);
                         dataStream.Write(encryptBytes, 0, encryptBytes.Length);
                     }
                     catch (Exception ex)

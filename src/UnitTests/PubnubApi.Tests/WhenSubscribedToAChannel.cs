@@ -5,6 +5,8 @@ using PubnubApi;
 using System.Collections.Generic;
 using MockServer;
 using System.Diagnostics;
+using PubnubApi.Security.Crypto;
+using PubnubApi.Security.Crypto.Cryptors;
 
 namespace PubNubMessaging.Tests
 {
@@ -141,6 +143,32 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
+        public static void ThenMissingSubscribeKeyShouldReturnException()
+        {
+            server.ClearRequests();
+
+            string channel = "hello_my_channel";
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            {
+            };
+            server.RunOnHttps(true);
+
+            pubnub = createPubNubInstance(config);
+
+            Assert.Throws<MissingMemberException>(() =>
+            {
+                pubnub.Subscribe<string>()
+                        .Channels(new string[] {channel })
+                        .WithPresence()
+                        .Execute();
+            });
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
+
+        [Test]
         public static void ThenComplexMessageSubscribeShouldReturnReceivedMessage()
         {
             server.ClearRequests();
@@ -164,7 +192,7 @@ namespace PubNubMessaging.Tests
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                CipherKey = cipherKey,
+                CryptoModule = new CryptoModule(new LegacyCryptor(cipherKey), null),
                 Secure = ssl
             };
             if (PubnubCommon.PAMServerSideRun)

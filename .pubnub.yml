@@ -1,8 +1,19 @@
 name: c-sharp
-version: "6.18.0"
+version: "6.19.0"
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog:
+  - date: 2023-10-16
+    version: v6.19.0
+    changes:
+      - type: feature
+        text: "Add crypto module that allows configure SDK to encrypt and decrypt messages."
+      - type: bug
+        text: "Improved security of crypto implementation by adding enhanced AES-CBC cryptor."
+      - type: bug
+        text: "Fixes Newtonsoft Json vulnerability with MaxDepth and upgrade to version  for non-PCL."
+      - type: improvement
+        text: "Add SubscribeKey validation for subscribe feature."
   - date: 2023-09-04
     version: v6.18.0
     changes:
@@ -730,7 +741,7 @@ features:
     - QUERY-PARAM
 supported-platforms:
   -
-    version: Pubnub 'C#' 6.18.0
+    version: Pubnub 'C#' 6.19.0
     platforms:
       - Windows 10 and up
       - Windows Server 2008 and up
@@ -740,7 +751,7 @@ supported-platforms:
       - .Net Framework 4.5
       - .Net Framework 4.6.1+
   -
-    version: PubnubPCL 'C#' 6.18.0
+    version: PubnubPCL 'C#' 6.19.0
     platforms:
       - Xamarin.Android
       - Xamarin.iOS
@@ -760,7 +771,7 @@ supported-platforms:
       - .Net Core
       - .Net 6.0
   -
-    version: PubnubUWP 'C#' 6.18.0
+    version: PubnubUWP 'C#' 6.19.0
     platforms:
       - Windows Phone 10
       - Universal Windows Apps
@@ -784,7 +795,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: Pubnub
-            location: https://github.com/pubnub/c-sharp/releases/tag/v6.18.0.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v6.19.0.0
             requires:
               -
                 name: ".Net"
@@ -1067,7 +1078,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: PubNubPCL
-            location: https://github.com/pubnub/c-sharp/releases/tag/v6.18.0.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v6.19.0.0
             requires:
               -
                 name: ".Net Core"
@@ -1426,7 +1437,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: PubnubUWP
-            location: https://github.com/pubnub/c-sharp/releases/tag/v6.18.0.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v6.19.0.0
             requires:
               -
                 name: "Universal Windows Platform Development"

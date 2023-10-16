@@ -6,12 +6,15 @@ using PubnubApi.Interface;
 using System.Globalization;
 using System.Threading.Tasks;
 using System.Threading;
+using PubnubApi.Security.Crypto.Common;
 #if !NETSTANDARD10 && !NETSTANDARD11 && !NETSTANDARD12 && !WP81
 using System.Reflection;
 #endif
 #if !NET35 && !NET40
 using System.Collections.Concurrent;
 #endif
+using PubnubApi.Security.Crypto;
+using PubnubApi.Security.Crypto.Cryptors;
 
 namespace PubnubApi
 {
@@ -2114,8 +2117,7 @@ namespace PubnubApi
                 string_to_sign.Append(partialUrl).Append('\n');
                 string_to_sign.Append(queryStringToSign);
 
-                PubnubCrypto pubnubCrypto = new PubnubCrypto((opType != PNOperationType.PNSignalOperation) ? pubnubConfig[pubnubInstanceId].CipherKey : "", pubnubConfig[pubnubInstanceId], this.pubnubLog, null);
-                signature = pubnubCrypto.PubnubAccessManagerSign(pubnubConfig[pubnubInstanceId].SecretKey, string_to_sign.ToString());
+                signature = Util.PubnubAccessManagerSign(pubnubConfig[pubnubInstanceId].SecretKey, string_to_sign.ToString());
                 if (this.pubnubLog != null && this.pubnubConfig != null)
                 {
                     LoggingMethod.WriteToLog(pubnubLog, "string_to_sign = " + string_to_sign, pubnubConfig[pubnubInstanceId].LogVerbosity);
@@ -2142,8 +2144,7 @@ namespace PubnubApi
                 string_to_sign.AppendFormat(CultureInfo.InvariantCulture, "{0}\n", queryStringToSign);
                 string_to_sign.Append(requestBody);
 
-                PubnubCrypto pubnubCrypto = new PubnubCrypto((opType != PNOperationType.PNSignalOperation) ? pubnubConfig[pubnubInstanceId].CipherKey : "", pubnubConfig[pubnubInstanceId], this.pubnubLog, null);
-                signature = pubnubCrypto.PubnubAccessManagerSign(pubnubConfig[pubnubInstanceId].SecretKey, string_to_sign.ToString());
+                signature = Util.PubnubAccessManagerSign(pubnubConfig[pubnubInstanceId].SecretKey, string_to_sign.ToString());
                 signature = string.Format(CultureInfo.InvariantCulture, "v2.{0}", signature.TrimEnd(new[] { '=' }));
                 if (this.pubnubLog != null && this.pubnubConfig != null)
                 {
@@ -2259,10 +2260,10 @@ namespace PubnubApi
         {
             string message = jsonLib.SerializeToJsonString(originalMessage);
 
-            if (pubnubConfig.ContainsKey(pubnubInstanceId) && pubnubConfig[pubnubInstanceId].CipherKey.Length > 0 && opType != PNOperationType.PNSignalOperation)
+            if (pubnubConfig.ContainsKey(pubnubInstanceId) && (pubnubConfig[pubnubInstanceId].CryptoModule != null || pubnubConfig[pubnubInstanceId].CipherKey.Length > 0) && opType != PNOperationType.PNSignalOperation)
             {
-                PubnubCrypto aes = new PubnubCrypto(pubnubConfig[pubnubInstanceId].CipherKey, pubnubConfig[pubnubInstanceId], pubnubLog, null);
-                string encryptMessage = aes.Encrypt(message);
+                pubnubConfig[pubnubInstanceId].CryptoModule ??= new CryptoModule(new LegacyCryptor(pubnubConfig[pubnubInstanceId].CipherKey, pubnubConfig[pubnubInstanceId].UseRandomInitializationVector, pubnubLog), null);
+                string encryptMessage = pubnubConfig[pubnubInstanceId].CryptoModule.Encrypt(message);
                 message = jsonLib.SerializeToJsonString(encryptMessage);
             }
 

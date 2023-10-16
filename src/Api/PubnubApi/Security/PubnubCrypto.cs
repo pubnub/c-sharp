@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 
 namespace PubnubApi
 {
+    [Obsolete("Use CryptoModule instead.", false)]
     public class PubnubCrypto : PubnubCryptoBase
     {
         private readonly PNConfiguration config;
