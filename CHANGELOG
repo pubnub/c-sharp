@@ -1,3 +1,12 @@
+v6.19.0 - October 16 2023
+-----------------------------
+- Added: add crypto module that allows configure SDK to encrypt and decrypt messages.
+
+- Fixed: improved security of crypto implementation by adding enhanced AES-CBC cryptor.
+- Fixed: fixes Newtonsoft Json vulnerability with MaxDepth and upgrade to version  for non-PCL.
+
+- Modified: add SubscribeKey validation for subscribe feature.
+
 v6.18.0 - September 04 2023
 -----------------------------
 - Fixed: allow name param as optional in SetChannelMetadata. Removed default empty value.
