@@ -1,11 +1,8 @@
-v6.19.0 - October 16 2023
+v6.19.0 - October 24 2023
 -----------------------------
-- Added: add crypto module that allows configure SDK to encrypt and decrypt messages.
+- Fixed: fixes issue of getting error when hereNow is called with channelGroups param only.
 
-- Fixed: improved security of crypto implementation by adding enhanced AES-CBC cryptor.
-- Fixed: fixes Newtonsoft Json vulnerability with MaxDepth and upgrade to version  for non-PCL.
 
-- Modified: add SubscribeKey validation for subscribe feature.
 
 v6.18.0 - September 04 2023
 -----------------------------

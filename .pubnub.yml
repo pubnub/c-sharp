@@ -3,18 +3,11 @@ version: "6.19.0"
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog:
-  - date: 2023-10-16
+  - date: 2023-10-24
     version: v6.19.0
     changes:
-      - type: feature
-        text: "Add crypto module that allows configure SDK to encrypt and decrypt messages."
       - type: bug
-        text: "Improved security of crypto implementation by adding enhanced AES-CBC cryptor."
-      - type: bug
-        text: "Fixes Newtonsoft Json vulnerability with MaxDepth and upgrade to version  for non-PCL."
-      - type: improvement
-        text: "Add SubscribeKey validation for subscribe feature."
-  - date: 2023-09-04
+        text: "Fixes issue of getting error when hereNow is called with channelGroups param only."  - date: 2023-09-04
     version: v6.18.0
     changes:
       - type: bug
@@ -795,7 +788,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: Pubnub
-            location: https://github.com/pubnub/c-sharp/releases/tag/v6.19.0.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v6.19.0.1
             requires:
               -
                 name: ".Net"
@@ -1078,7 +1071,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: PubNubPCL
-            location: https://github.com/pubnub/c-sharp/releases/tag/v6.19.0.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v6.19.0.1
             requires:
               -
                 name: ".Net Core"
@@ -1437,7 +1430,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: PubnubUWP
-            location: https://github.com/pubnub/c-sharp/releases/tag/v6.19.0.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v6.19.0.1
             requires:
               -
                 name: "Universal Windows Platform Development"
