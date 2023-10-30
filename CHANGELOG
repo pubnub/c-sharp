@@ -1,3 +1,7 @@
+v6.19.2 - October 30 2023
+-----------------------------
+- Modified: changed license to PubNub Software Development Kit License.
+
 v6.19.1 - October 24 2023
 -----------------------------
 - Fixed: fixes issue of getting error when hereNow is called with channelGroups param only.
