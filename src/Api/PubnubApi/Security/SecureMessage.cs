@@ -71,6 +71,7 @@ namespace PubnubApi
 
                             errorCallback.OnResponse(default(T), status);
                         }
+                        pubnubLog.WriteToLog("Failed to decrypt message!\nMessage might be not encrypted, returning as is...");
                         object decodeMessage = jsonLib.DeserializeToObject((decryptMessage == "**DECRYPT ERROR**") ? element.ToString() : decryptMessage);
                         receivedMsg.Add(decodeMessage);
                     }
@@ -154,6 +155,7 @@ namespace PubnubApi
                                             errorCallback.OnResponse(default(T), status);
                                             #endregion
                                         }
+                                        pubnubLog.WriteToLog("Failed to decrypt message!\nMessage might be not encrypted, returning as is...");
                                         object decodeMessage = jsonLib.DeserializeToObject((decryptMessage == "**DECRYPT ERROR**") ? decryptMessage : decryptMessage);
                                         dicDecrypt.Add(kvpValue.Key, decodeMessage);
                                     }
