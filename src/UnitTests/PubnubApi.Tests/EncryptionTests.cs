@@ -793,6 +793,136 @@ namespace PubNubMessaging.Tests
             Assert.AreEqual("v2.k80LsDMD-sImA8rCBj-ntRKhZ8mSjHY8Ivngt9W3Yc4", signature);
         }
 
+        [Test]
+        async public void TestSubscribeDecryption()
+        {
+            bool done = false;
+            PNConfiguration config = CreateTestConfig();
+            config.CryptoModule = new CryptoModule(new AesCbcCryptor("enigma"), new List<ICryptor> { new LegacyCryptor("enigma") });
 
+            Pubnub sut = new Pubnub(config);
+
+            sut.AddListener(new SubscribeCallbackExt(
+                        (pb, message) =>
+                        {
+                            Assert.AreEqual("test", message.Message);
+                            done = true;
+                        },
+                        (pb, presence) => {},
+                        (pb, status) => {}
+                    )
+            );
+
+            sut.Subscribe<string>().Channels(new[] { "test" }).Execute();
+
+            Pubnub sender = new Pubnub(CreateTestConfig());
+
+            // Rust generated encrypted message
+            await sender.Publish()
+                .Channel("test")
+                .Message("UE5FRAFBQ1JIEALf+E65kseYJwTw2J6BUk9MePHiCcBCS+8ykXLkBIOA")
+                .ExecuteAsync();
+
+            // It will wait until the message is received or unit test timeout is reached
+            while (!done)
+            {
+                await System.Threading.Tasks.Task.Delay(100);
+            }
+        }
+
+        [Test]
+        async public void TestSubscribeDecryptionOnNonEncryptedMessage()
+        {
+            bool done = false;
+            PNConfiguration config = CreateTestConfig();
+            config.CryptoModule = new CryptoModule(new AesCbcCryptor("enigma"), new List<ICryptor> { new LegacyCryptor("enigma") });
+
+            Pubnub sut = new Pubnub(config);
+
+            sut.AddListener(new SubscribeCallbackExt(
+                        (pb, message) =>
+                        {
+                            Assert.AreEqual("test", message.Message);
+                            done = true;
+                        },
+                        (pb, presence) => {},
+                        (pb, status) => {}
+                    )
+            );
+
+            sut.Subscribe<string>().Channels(new[] { "test" }).Execute();
+
+            Pubnub sender = new Pubnub(CreateTestConfig());
+
+            // Rust generated encrypted message
+            await sender.Publish()
+                .Channel("test")
+                .Message("test")
+                .ExecuteAsync();
+
+            // It will wait until the message is received or unit test timeout is reached
+            while (!done)
+            {
+                await System.Threading.Tasks.Task.Delay(100);
+            }
+        }
+
+        [Test]
+        async public void TestHistoryDecryption()
+        {
+            PNConfiguration config = CreateTestConfig();
+            config.CryptoModule = new CryptoModule(new AesCbcCryptor("enigma"), new List<ICryptor> { new LegacyCryptor("enigma") });
+
+            Pubnub sut = new Pubnub(config);
+
+            Pubnub sender = new Pubnub(CreateTestConfig());
+
+            // Rust generated encrypted message
+            await sender.Publish()
+                .Channel("test")
+                .Message("UE5FRAFBQ1JIEALf+E65kseYJwTw2J6BUk9MePHiCcBCS+8ykXLkBIOA")
+                .ExecuteAsync();
+
+            PNResult<PNHistoryResult> result = await sut.History()
+                .Channel("test")
+                .Count(1)
+                .ExecuteAsync();
+
+            Assert.AreEqual("test", result.Result.Messages[0].Entry);
+        }
+
+        [Test]
+        async public void TestHistoryDecryptionOnNonEncryptedMessage()
+        {
+            PNConfiguration config = CreateTestConfig();
+            config.CryptoModule = new CryptoModule(new AesCbcCryptor("enigma"), new List<ICryptor> { new LegacyCryptor("enigma") });
+
+            Pubnub sut = new Pubnub(config);
+
+            Pubnub sender = new Pubnub(CreateTestConfig());
+
+            // Rust generated encrypted message
+            await sender.Publish()
+                .Channel("test")
+                .Message("test")
+                .ExecuteAsync();
+
+            PNResult<PNHistoryResult> result = await sut.History()
+                .Channel("test")
+                .Count(1)
+                .ExecuteAsync();
+
+            Assert.AreEqual("test", result.Result.Messages[0].Entry);
+        }
+
+        private PNConfiguration CreateTestConfig()
+        {
+            // TODO: @mohitpubnub Can you check if is it possible to test that without using the real infra?
+            PNConfiguration config = new PNConfiguration(new UserId("test"));
+            config.SubscribeKey = "demo";
+            config.PublishKey = "demo";
+
+            return config;
+        }
     }
 }
