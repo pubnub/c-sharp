@@ -71,7 +71,7 @@ namespace PubnubApi
 
                             errorCallback.OnResponse(default(T), status);
                         }
-                        object decodeMessage = (decryptMessage == "**DECRYPT ERROR**") ? decryptMessage : jsonLib.DeserializeToObject(decryptMessage);
+                        object decodeMessage = jsonLib.DeserializeToObject((decryptMessage == "**DECRYPT ERROR**") ? element.ToString() : decryptMessage);
                         receivedMsg.Add(decodeMessage);
                     }
                     returnMessage.Add(receivedMsg);
@@ -154,7 +154,7 @@ namespace PubnubApi
                                             errorCallback.OnResponse(default(T), status);
                                             #endregion
                                         }
-                                        object decodeMessage = (decryptMessage == "**DECRYPT ERROR**") ? decryptMessage : jsonLib.DeserializeToObject(decryptMessage);
+                                        object decodeMessage = jsonLib.DeserializeToObject((decryptMessage == "**DECRYPT ERROR**") ? decryptMessage : decryptMessage);
                                         dicDecrypt.Add(kvpValue.Key, decodeMessage);
                                     }
                                     else

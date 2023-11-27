@@ -724,8 +724,19 @@ namespace PubnubApi
                                                 }
 
                                                 Announce(status);
+                                                
+                                                LoggingMethod.WriteToLog(
+                                                        currentLog,
+                                                        string.Format(
+                                                            CultureInfo.InvariantCulture,
+                                                            "Failed to decrypt message on channel {0} in ResponseToUserCallback due to exception={1}.\nMessage might be not encrypted, returning as is...",
+                                                            currentMessageChannel,
+                                                            ex
+                                                        ),
+                                                        currentConfig.LogVerbosity
+                                                );
                                             }
-                                            object decodeMessage = (decryptMessage == "**DECRYPT ERROR**") ? decryptMessage : jsonLib.DeserializeToObject(decryptMessage);
+                                            object decodeMessage = jsonLib.DeserializeToObject((decryptMessage == "**DECRYPT ERROR**") ? payload.ToString() : decryptMessage);
 
                                             payloadContainer.Add(decodeMessage);
                                         }
