@@ -917,7 +917,6 @@ namespace PubNubMessaging.Tests
 
         private PNConfiguration CreateTestConfig()
         {
-            // TODO: @mohitpubnub Can you check if is it possible to test that without using the real infra?
             PNConfiguration config = new PNConfiguration(new UserId("test"));
             config.SubscribeKey = "demo";
             config.PublishKey = "demo";
