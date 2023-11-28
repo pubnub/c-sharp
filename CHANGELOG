@@ -1,3 +1,7 @@
+v6.19.4 - November 28 2023
+-----------------------------
+- Fixed: handle unencrypted message while getting messages with crypto.
+
 v6.19.3 - October 31 2023
 -----------------------------
 - Fixed: fixes issue of applying default serializer settings.

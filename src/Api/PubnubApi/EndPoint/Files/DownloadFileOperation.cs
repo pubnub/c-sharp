@@ -173,7 +173,8 @@ namespace PubnubApi.EndPoint
                         }
                         catch (Exception ex)
                         {
-                            System.Diagnostics.Debug.WriteLine(ex.ToString());
+                            System.Diagnostics.Debug.WriteLine("{0}\nMessage might be not encrypted, returning as is...", ex.ToString());
+                            outputBytes = item1Bytes;
                         }
                     }
                     PNDownloadFileResult result = new PNDownloadFileResult();
@@ -241,7 +242,9 @@ namespace PubnubApi.EndPoint
                     }
                     catch (Exception ex)
                     {
-                        System.Diagnostics.Debug.WriteLine(ex.ToString());
+                        System.Diagnostics.Debug.WriteLine("{0}\nMessage might be not encrypted, returning as is...", ex.ToString());
+                        outputBytes = item1Bytes;
+                        ret.Status = new PNStatus { Error = true, ErrorData = new PNErrorData("Decryption error", ex) };
                     }
                 }
 
