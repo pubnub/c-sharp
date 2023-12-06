@@ -51,8 +51,9 @@
     <Reference Include="Numbers, Version=1.8.2.0, Culture=neutral, PublicKeyToken=9cd62db60ea5554c, processorArchitecture=MSIL">
       <HintPath>..\..\packages\PeterO.Numbers.1.8.2\lib\net40\Numbers.dll</HintPath>
     </Reference>
-    <Reference Include="Pubnub, Version=6.3.0.0, Culture=neutral, PublicKeyToken=dc66f52ce6619f44, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Pubnub.6.3.0\lib\net45\Pubnub.dll</HintPath>
+    <Reference Include="Pubnub, Version=6.19.0.0, Culture=neutral, PublicKeyToken=dc66f52ce6619f44">
+      <HintPath>..\..\packages\Pubnub.6.19.0\lib\net45\Pubnub.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
