@@ -68,12 +68,10 @@ namespace PubnubApi
                             {
                                 status.AffectedChannelGroups.AddRange(channelGroups);
                             }
-
-                            errorCallback.OnResponse(default(T), status);
+                            pubnubLog.WriteToLog("Failed to decrypt message!\nMessage might be not encrypted, returning as is...");
                         }
-                        pubnubLog.WriteToLog("Failed to decrypt message!\nMessage might be not encrypted, returning as is...");
-                        object decodeMessage = jsonLib.DeserializeToObject((decryptMessage == "**DECRYPT ERROR**") ? element.ToString() : decryptMessage);
-                        receivedMsg.Add(decodeMessage);
+                        object decodedMessage = jsonLib.DeserializeToObject((decryptMessage == "**DECRYPT ERROR**") ? jsonLib.SerializeToJsonString(element) : decryptMessage);
+                        receivedMsg.Add(decodedMessage);
                     }
                     returnMessage.Add(receivedMsg);
                 }
@@ -151,13 +149,11 @@ namespace PubnubApi
                                             {
                                                 status.AffectedChannelGroups.AddRange(channelGroups);
                                             }
-
-                                            errorCallback.OnResponse(default(T), status);
+                                            pubnubLog.WriteToLog("Failed to decrypt message!\nMessage might be not encrypted, returning as is...");
                                             #endregion
                                         }
-                                        pubnubLog.WriteToLog("Failed to decrypt message!\nMessage might be not encrypted, returning as is...");
-                                        object decodeMessage = jsonLib.DeserializeToObject((decryptMessage == "**DECRYPT ERROR**") ? decryptMessage : decryptMessage);
-                                        dicDecrypt.Add(kvpValue.Key, decodeMessage);
+                                        object decodedMessage = jsonLib.DeserializeToObject((decryptMessage == "**DECRYPT ERROR**") ? jsonLib.SerializeToJsonString(kvpValue.Value) : decryptMessage);
+                                        dicDecrypt.Add(kvpValue.Key, decodedMessage);
                                     }
                                     else
                                     {

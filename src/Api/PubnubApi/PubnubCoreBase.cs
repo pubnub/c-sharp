@@ -736,8 +736,7 @@ namespace PubnubApi
                                                         currentConfig.LogVerbosity
                                                 );
                                             }
-                                            object decodeMessage = jsonLib.DeserializeToObject((decryptMessage == "**DECRYPT ERROR**") ? payload.ToString() : decryptMessage);
-
+                                            object decodeMessage = jsonLib.DeserializeToObject((decryptMessage == "**DECRYPT ERROR**") ? jsonLib.SerializeToJsonString(payload) : decryptMessage);
                                             payloadContainer.Add(decodeMessage);
                                         }
                                         else
