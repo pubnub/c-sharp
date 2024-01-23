@@ -15,7 +15,7 @@ namespace PubnubApi.EventEngine.Presence.States
         public override IEnumerable<IEffectInvocation> OnExit => DummyInvocations();
 
         // TODO: transitions
-        public override TransitionResult Transition(Transition transition)
+        public override TransitionResult Transition(IEvent e)
         {
             return e switch 
             {
