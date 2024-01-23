@@ -38,6 +38,10 @@ namespace PubnubApi.EventEngine.Presence.States
                 {
                     Input = this.Input,
                 },
+                Events.TimesUpEvent => new HeartbeatingState()
+                {
+                    Input = this.Input,
+                },
                 _ => null,
             };
         }
