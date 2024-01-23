@@ -48,6 +48,11 @@ namespace PubnubApi.EventEngine.Presence.States
                             Reason = e.Status,
                         };                
                 },
+                Events.HeartbeatGiveUpEvent => new FailedState()
+                {
+                    Input = this.Input,
+                    Reason = this.Reason,
+                },
                 _ => null,
             };
         }
