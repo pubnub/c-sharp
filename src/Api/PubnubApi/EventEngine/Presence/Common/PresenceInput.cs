@@ -14,6 +14,15 @@ namespace PubnubApi.EventEngine.Presence.Common
             };
         }
 
+        public static PresenceInput operator -(PresenceInput a, PresenceInput b)
+        {
+            return new PresenceInput
+            {
+                Channels = a.Channels?.Except(b.Channels ?? new string[0]).ToArray(),
+                ChannelGroups = a.ChannelGroups?.Except(b.ChannelGroups ?? new string[0]).ToArray(),
+            };
+        }
+
         public bool IsEmpty()
         {
             return (Channels == null && ChannelGroups == null)
