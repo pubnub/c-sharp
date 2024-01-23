@@ -5,6 +5,8 @@ namespace PubnubApi.EventEngine.Presence.States
 {
     public class FailedState : APresenceState
     {
+        public PNStatus Reason { get; set; }
+
         // TODO: Dummy Invocation until we have real ones
         public override IEnumerable<IEffectInvocation> OnEntry => DummyInvocations();
         public override IEnumerable<IEffectInvocation> OnExit => DummyInvocations();
