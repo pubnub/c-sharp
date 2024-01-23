@@ -28,6 +28,7 @@ namespace PubnubApi.EventEngine.Presence.States
                             Input = newInput,
                         };
                 },
+                Events.LeftAllEvent e => new InactiveState(),
                  _ => null,
             };
         }
