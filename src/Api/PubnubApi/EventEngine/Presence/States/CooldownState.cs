@@ -1,6 +1,7 @@
 using PubnubApi;
 using PubnubApi.EventEngine.Presence.Invocations;
 using PubnubApi.EventEngine.Core;
+using System.Collections.Generic;
 
 namespace PubnubApi.EventEngine.Presence.States
 {
