@@ -35,6 +35,10 @@ namespace PubnubApi.EventEngine.Presence.States
                 {
                     Input = this.Input,
                 },
+                Events.DisconnectEvent => new StoppedState()
+                {
+                    Input = this.Input,
+                }, 
                 _ => null,
             };
         }
