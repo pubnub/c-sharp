@@ -29,6 +29,10 @@ namespace PubnubApi.EventEngine.Presence.States
                         };
                 },
                 Events.LeftAllEvent => new InactiveState(),
+                Events.ReconnectEvent => new HeartbeatingState()
+                {
+                    Input = this.Input,
+                },
                  _ => null,
             };
         }
