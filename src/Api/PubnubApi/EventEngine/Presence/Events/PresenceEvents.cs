@@ -1,17 +1,16 @@
 using System.Collections.Generic;
 using PubnubApi.Model.Consumer.PNStatus;
+using PubnubApi.EventEngine.Presence.Common;
 
 namespace PubnubApi.EventEngine.Presence.Events {
     public class JoinedEvent : Core.IEvent 
     {
-        public IEnumerable<string> Channels { get; set; }
-        public IEnumerable<string> ChannelGroups { get; set; }
+        public PresenceInput Input { get; set; }
     }
 
     public class LeftEvent : Core.IEvent 
     {
-        public IEnumerable<string> Channels { get; set; }
-        public IEnumerable<string> ChannelGroups { get; set; }
+        public PresenceInput Input { get; set; }
     }
 
     public class LeftAllEvent : Core.IEvent {}

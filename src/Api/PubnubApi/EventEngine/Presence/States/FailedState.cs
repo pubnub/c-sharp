@@ -16,6 +16,10 @@ namespace PubnubApi.EventEngine.Presence.States
         {
             return e switch 
             {
+                Events.JoinedEvent e => new HeartbeatingState()
+                {
+                    Input = e.Input != this.Input ? this.Input + e.Input : this.Input,
+                },
                 _ => null,
             };
         }

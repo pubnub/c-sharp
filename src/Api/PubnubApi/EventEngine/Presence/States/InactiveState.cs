@@ -7,8 +7,7 @@ namespace PubnubApi.EventEngine.Presence.States
     {
         public InactiveState()
         {
-            Channels = null;
-            ChannelGroups = null;
+            Input = null;
         }
 
         // TODO: Dummy Invocation until we have real ones
@@ -20,6 +19,10 @@ namespace PubnubApi.EventEngine.Presence.States
         {
             return e switch 
             {
+                Events.JoinedEvent e => new HeartbeatingState()
+                {
+                    Input = e.Input,
+                },
                 _ => null,
             };
         }

@@ -5,8 +5,6 @@ namespace PubnubApi.EventEngine.Presence.States
 {
     public class StoppedState : APresenceState
     {
-        public PNStatus reason { get; set; }
-
        // TODO: Dummy Invocation until we have real ones
         public override IEnumerable<IEffectInvocation> OnEntry => DummyInvocations();
         public override IEnumerable<IEffectInvocation> OnExit => DummyInvocations();
@@ -16,6 +14,10 @@ namespace PubnubApi.EventEngine.Presence.States
         {
             return e switch 
             {
+                Events.JoinedEvent e => new StoppedState()
+                {
+                    Input = e.Input != this.Input ? this.Input + e.Input : this.Input,
+                },
                 _ => null,
             };
         }
