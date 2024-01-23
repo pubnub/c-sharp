@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using PubnubApi.Model.Consumer.PNStatus;
+using PubnubApi;
 using PubnubApi.EventEngine.Presence.Common;
 
 namespace PubnubApi.EventEngine.Presence.Events {

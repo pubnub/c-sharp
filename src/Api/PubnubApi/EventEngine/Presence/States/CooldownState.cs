@@ -1,3 +1,4 @@
+using PubnubApi;
 using PubnubApi.EventEngine.Presence.Invocations;
 using PubnubApi.EventEngine.Core;
 
@@ -28,7 +29,11 @@ namespace PubnubApi.EventEngine.Presence.States
                             Input = newInput,
                         };
                 },
-                Events.LeftAllEvent e => new InactiveState(),
+                Events.LeftAllEvent => new InactiveState(),
+                Events.HeartbeatSuccessEvent => new CooldownState()
+                {
+                    Input = this.Input,
+                },
                 _ => null,
             };
         }

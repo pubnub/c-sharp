@@ -28,7 +28,19 @@ namespace PubnubApi.EventEngine.Presence.States
                             Input = newInput,
                         };
                 },
-                Events.LeftAllEvent e => new InactiveState(),
+                Events.LeftAllEvent => new InactiveState(),
+                Events.HeartbeatFailureEvent e => () => {
+                    // Request cancellation shouldn't cause any transition because there
+                    // will be another event after this. 
+                    return e.Status.Category == PNStatusCategory.PNCancelledCategory
+                        ? null 
+                        : new ReconnectingState()
+                        {
+                            Input = this.Input,
+                            RetryCount = 1,
+                            Reason = e.Status,
+                        };                
+                },
                 _ => null,
             };
         }

@@ -6,6 +6,7 @@ namespace PubnubApi.EventEngine.Presence.States
     public class ReconnectingState : APresenceState
     {
         public short RetryCount { get; set; }
+        public PNStatus Reason { get; set; }
 
         // TODO: Dummy Invocation until we have real ones
         public override IEnumerable<IEffectInvocation> OnEntry => DummyInvocations();
@@ -30,8 +31,24 @@ namespace PubnubApi.EventEngine.Presence.States
                             Input = newInput,
                         };
                 },
-                Events.LeftAllEvent e => new InactiveState(),
-                 _ => null,
+                Events.LeftAllEvent => new InactiveState(),
+                Events.HeartbeatSuccessEvent => new CooldownState()
+                {
+                    Input = this.Input,
+                },
+                Events.HeartbeatFailureEvent e => () => {
+                    // Request cancellation shouldn't cause any transition because there
+                    // will be another event after this. 
+                    return e.Status.Category == PNStatusCategory.PNCancelledCategory
+                        ? null 
+                        : new ReconnectingState()
+                        {
+                            Input = this.Input,
+                            RetryCount = this.RetryCount + 1,
+                            Reason = e.Status,
+                        };                
+                },
+                _ => null,
             };
         }
     }
