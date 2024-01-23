@@ -1,6 +1,7 @@
 using PubnubApi.EventEngine.Presence.Invocations;
 using PubnubApi.EventEngine.Core;
 using System.Collections.Generic;
+using System;
 
 namespace PubnubApi.EventEngine.Presence.States
 {
@@ -12,13 +13,13 @@ namespace PubnubApi.EventEngine.Presence.States
         }
 
         // TODO: Dummy Invocation until we have real ones
-        public override IEnumerable<IEffectInvocation> OnEntry => DummyInvocations();
-        public override IEnumerable<IEffectInvocation> OnExit => DummyInvocations();
+        public override IEnumerable<IEffectInvocation> OnEntry => new DummyInvocation().AsArray();
+        public override IEnumerable<IEffectInvocation> OnExit => new DummyInvocation().AsArray();
 
         // TODO: transitions
-        public override TransitionResult Transition(IEvent e)
+        public override TransitionResult Transition(IEvent ev)
         {
-            return e switch 
+            return ev switch 
             {
                 Events.JoinedEvent e => new HeartbeatingState()
                 {

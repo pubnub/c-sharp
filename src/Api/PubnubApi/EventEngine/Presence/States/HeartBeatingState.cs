@@ -1,53 +1,46 @@
 using PubnubApi.EventEngine.Presence.Invocations;
 using PubnubApi.EventEngine.Core;
 using System.Collections.Generic;
+using System;
 
 namespace PubnubApi.EventEngine.Presence.States
 {
     public class HeartbeatingState : APresenceState
     {
         // TODO: Dummy Invocation until we have real ones
-        public override IEnumerable<IEffectInvocation> OnEntry => DummyInvocations();
-        public override IEnumerable<IEffectInvocation> OnExit => DummyInvocations();
+        public override IEnumerable<IEffectInvocation> OnEntry => new DummyInvocation().AsArray();
+        public override IEnumerable<IEffectInvocation> OnExit => new DummyInvocation().AsArray();
 
         // TODO: transitions
-        public override TransitionResult Transition(IEvent e)
+        public override TransitionResult Transition(IEvent ev)
         {
-            return e switch 
+            return ev switch 
             {
                 Events.JoinedEvent e => new HeartbeatingState()
                 {
                     Input = e.Input != this.Input ? this.Input + e.Input : this.Input,
                 },
-                Events.LeftEvent e => () => {
-                    var newInput = this.Input - e.Input;
-
-                    return newInput.IsEmpty()
-                        ? new InactiveState()
-                        : new HeartbeatingState()
-                        {
-                            Input = newInput,
-                        };
-                },
-                Events.LeftAllEvent => new InactiveState(),
-                Events.HeartbeatFailureEvent e => () => {
-                    // Request cancellation shouldn't cause any transition because there
-                    // will be another event after this. 
-                    return e.Status.Category == PNStatusCategory.PNCancelledCategory
-                        ? null 
-                        : new ReconnectingState()
-                        {
-                            Input = this.Input,
-                            RetryCount = 1,
-                            Reason = e.Status,
-                        };                
-                },
-                Events.DisconnectEvent => new StoppedState()
+                Events.LeftEvent e => HandleLeftEvent(e),
+                Events.LeftAllEvent e => new InactiveState(),
+                Events.HeartbeatFailureEvent e => HandleHeartbeatFailureEvent(e), 
+                Events.DisconnectEvent e => new StoppedState()
                 {
                     Input = this.Input,
                 }, 
                 _ => null,
             };
+        }
+
+        private TransitionResult HandleHeartbeatFailureEvent(Events.HeartbeatFailureEvent e)
+        {
+            return e.Status.Category == PNStatusCategory.PNCancelledCategory
+                ? (TransitionResult)null 
+                : (TransitionResult)new ReconnectingState()
+                {
+                    Input = this.Input,
+                    RetryCount = 1,
+                    Reason = e.Status,
+                };                
         }
     }
     

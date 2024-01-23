@@ -1,41 +1,45 @@
 using PubnubApi.EventEngine.Presence.Invocations;
 using PubnubApi.EventEngine.Core;
 using System.Collections.Generic;
+using System;
 
 namespace PubnubApi.EventEngine.Presence.States
 {
     public class StoppedState : APresenceState
     {
-       // TODO: Dummy Invocation until we have real ones
-        public override IEnumerable<IEffectInvocation> OnEntry => DummyInvocations();
-        public override IEnumerable<IEffectInvocation> OnExit => DummyInvocations();
+        // TODO: Dummy Invocation until we have real ones
+        public override IEnumerable<IEffectInvocation> OnEntry => new DummyInvocation().AsArray();
+        public override IEnumerable<IEffectInvocation> OnExit => new DummyInvocation().AsArray();
 
         // TODO: transitions
-        public override TransitionResult Transition(IEvent e)
+        public override TransitionResult Transition(IEvent ev)
         {
-            return e switch 
+            return ev switch 
             {
                 Events.JoinedEvent e => new StoppedState()
                 {
                     Input = e.Input != this.Input ? this.Input + e.Input : this.Input,
                 },
-                Events.LeftEvent e => () => {
-                    var newInput = this.Input - e.Input;
-
-                    return newInput.IsEmpty()
-                        ? new InactiveState()
-                        : new StoppedState()
-                        {
-                            Input = newInput,
-                        };
-                },
-                Events.LeftAllEvent => new InactiveState(),
-                Events.ReconnectEvent => new HeartbeatingState()
+                Events.LeftEvent e => HandleLeftEvent(e),
+                Events.LeftAllEvent e => new InactiveState(),
+                Events.ReconnectEvent e => new HeartbeatingState()
                 {
                     Input = this.Input,
                 },
                  _ => null,
             };
+        }
+
+        protected TransitionResult HandleLeftEvent(Events.LeftEvent e)
+        {
+            var newInput = this.Input - e.Input;
+
+            return newInput.IsEmpty()
+                ? (TransitionResult)new InactiveState()
+                : (TransitionResult)new StoppedState()
+                {
+                    Input = newInput,
+                };
         }
     }
     

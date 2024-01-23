@@ -11,5 +11,17 @@ namespace PubnubApi.EventEngine.Presence.States
         {
             return Input.IsEmpty();
         }
+
+        protected TransitionResult HandleLeftEvent(Events.LeftEvent e) 
+        {
+            var newInput = this.Input - e.Input;
+
+            return newInput.IsEmpty()
+                ? (TransitionResult)new InactiveState()
+                : (TransitionResult)new HeartbeatingState()
+                {
+                    Input = newInput,
+                };
+        }
     }
 }
