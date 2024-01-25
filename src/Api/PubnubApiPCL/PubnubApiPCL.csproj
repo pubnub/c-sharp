@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard1.0;netstandard1.3;netstandard1.4;netstandard1.1;netstandard2.0;net6.0</TargetFrameworks>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>preview</LangVersion>
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>pubnub.snk</AssemblyOriginatorKeyFile>
