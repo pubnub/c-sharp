@@ -12,8 +12,8 @@ namespace PubnubApi.EventEngine.Subscribe {
 		internal SubscribeEventEngine(Pubnub pubnubInstance,
 			PNConfiguration pubnubConfiguration,
 			SubscribeManager2 subscribeManager,
-			Action<Pubnub, PNStatus> statusListener = null,
-			Action<Pubnub, PNMessageResult<object>> messageListener = null)
+			Action<Pubnub, PNStatus> statusListener,
+			Action<Pubnub, PNMessageResult<object>> messageListener)
 		{
 			this.subscribeManager = subscribeManager;
 
