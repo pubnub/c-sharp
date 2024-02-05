@@ -23,10 +23,6 @@ namespace PubnubApi.EventEngine.Presence.States
                 },
                 Events.LeftEvent e => HandleLeftEvent(e),
                 Events.LeftAllEvent e => new InactiveState(),
-                Events.HeartbeatSuccessEvent e => new CooldownState()
-                {
-                    Input = this.Input,
-                },
                 Events.DisconnectEvent e => new StoppedState()
                 {
                     Input = this.Input,
