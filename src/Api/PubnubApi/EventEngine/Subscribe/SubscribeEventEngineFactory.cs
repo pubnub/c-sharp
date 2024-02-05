@@ -34,7 +34,9 @@ namespace PubnubApi.EventEngine.Subscribe
                     pubnubConfiguration: pubnubConfiguration,
                     subscribeManager,
                     statusListener,
-                    messageListener
+                    // TODO: I cast it to the object to unlock the CI build. I will investigate this further
+                    //       and fix it in the future with the merging of the subscribe and presence event engines
+                    messageListener as Action<Pubnub, PNMessageResult<object>>
             );
 
 			if (engineinstances.TryAdd(instanceId, subscribeEventEngine)) {
