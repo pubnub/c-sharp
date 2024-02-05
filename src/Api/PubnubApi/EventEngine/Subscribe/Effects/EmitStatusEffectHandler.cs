@@ -22,6 +22,15 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
 
 		public override async Task Run(EmitStatusInvocation invocation)
 		{
+            if (invocation.Status == null) 
+                throw new Exception("Status is null");
+
+            if (this.statusEmitterFunction == null)
+                throw new Exception("StatusEmitterFunction is null");
+
+            if (this.pubnubInstance == null)
+                throw new Exception("PubnubInstance is null");
+
 			this.statusEmitterFunction(this.pubnubInstance, invocation.Status);
 		}
 	}
