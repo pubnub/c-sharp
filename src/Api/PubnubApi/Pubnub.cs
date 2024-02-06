@@ -54,7 +54,6 @@ namespace PubnubApi
             }
             else
             {
-                throw new NotSupportedException("BEST C# DEVELOPER EVER");
                 EndPoint.SubscribeOperation<T> subscribeOperation = new EndPoint.SubscribeOperation<T>(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, this);
                 //subscribeOperation.CurrentPubnubInstance(this);
                 savedSubscribeOperation = subscribeOperation;
