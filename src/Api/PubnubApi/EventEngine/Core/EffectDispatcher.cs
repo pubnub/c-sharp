@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Threading;
 
 namespace PubnubApi.EventEngine.Core {
 	public class EffectDispatcher {
@@ -52,5 +51,13 @@ namespace PubnubApi.EventEngine.Core {
 			effectInvocationHandlerMap[typeof(TEffectInvocation)] = handler;
 			return this;
 		}
+
+        ~EffectDispatcher()
+        {
+            foreach (var handler in effectInvocationHandlerMap.Values)
+            {
+                handler.Cancel().Wait();
+            }
+        }
 	}
 }
