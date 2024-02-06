@@ -28,7 +28,7 @@ namespace PubnubApi.EventEngine.Core {
 				if (handler.IsBackground(invocation))
 #if NET35 || NET40
 #pragma warning disable 4014
-                    Task.Run(() => handler.Run(invocation));
+                    handler.Run(invocation);
 #pragma warning restore 4014
 #else
 					_ = Task.Run(() => handler.Run(invocation));
