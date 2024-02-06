@@ -17,6 +17,8 @@ namespace PubnubApi.EventEngine.Core {
 			if (!effectInvocationHandlerMap.ContainsKey(invocation.GetType())) {
 				throw new ArgumentException($"No handler for {invocation.GetType().Name} found.");
 			}
+
+            Console.WriteLine($"Dispatching {invocation.GetType().Name}");
 			
 			OnEffectDispatch?.Invoke(invocation);
 
