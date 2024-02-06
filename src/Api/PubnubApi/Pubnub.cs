@@ -45,7 +45,6 @@ namespace PubnubApi
 		{
             if (pubnubConfig[InstanceId].EnableEventEngine)
             {
-                System.Diagnostics.Debug.WriteLine("Subscribe with Event Engine");
 				EndPoint.SubscribeOperation2<T> subscribeOperation = new EndPoint.SubscribeOperation2<T>(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, new SubscribeEventEngineFactory(),InstanceId ,this);
                 subscribeOperation.SubscribeListenerList = subscribeCallbackListenerList;
                                 
@@ -55,7 +54,6 @@ namespace PubnubApi
             }
             else
             {
-                System.Diagnostics.Debug.WriteLine("Subscribe without Event Engine");
                 EndPoint.SubscribeOperation<T> subscribeOperation = new EndPoint.SubscribeOperation<T>(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, this);
                 //subscribeOperation.CurrentPubnubInstance(this);
                 savedSubscribeOperation = subscribeOperation;

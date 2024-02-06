@@ -225,15 +225,15 @@ namespace AcceptanceTests.Steps
             config.PublishKey = System.Environment.GetEnvironmentVariable("PN_PUB_KEY");
             config.SubscribeKey = System.Environment.GetEnvironmentVariable("PN_SUB_KEY");
             config.SecretKey = System.Environment.GetEnvironmentVariable("PN_SEC_KEY");
-//            if (enableIntenalPubnubLogging)
-//            {
+            if (enableIntenalPubnubLogging)
+            {
                 config.LogVerbosity = PNLogVerbosity.BODY;
                 config.PubnubLog = new InternalPubnubLog();
-//            }
-//            else
-//            {
-//                config.LogVerbosity = PNLogVerbosity.NONE;
-//            }
+            }
+            else
+            {
+                config.LogVerbosity = PNLogVerbosity.NONE;
+            }
             config.EnableEventEngine = true;
 
 
@@ -270,7 +270,7 @@ namespace AcceptanceTests.Steps
                 delegate (Pubnub pnObj, PNStatus status)
                 {
                     pnStatus = status;
-                    Console.WriteLine("HERE? {0} {1} {2}", pnStatus.Operation, pnStatus.Category, pnStatus.StatusCode);
+                    Console.WriteLine("{0} {1} {2}", pnStatus.Operation, pnStatus.Category, pnStatus.StatusCode);
                     if (currentContract == "subscribeHandshakeFailure" && pn.PubnubUnitTest.Attempts == 3)
                     {
                         statusReceivedEvent.Set();
@@ -290,9 +290,6 @@ namespace AcceptanceTests.Steps
             pn = new Pubnub(config);
             pn.PubnubUnitTest = unitTest;
             pn.PubnubUnitTest.EventTypeList?.Clear();
-
-
-            System.Diagnostics.Debug.WriteLine($"When step started!");
 
             messageReceivedEvent = new ManualResetEvent(false);
             statusReceivedEvent = new ManualResetEvent(false);
