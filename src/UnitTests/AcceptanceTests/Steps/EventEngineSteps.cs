@@ -214,7 +214,10 @@ namespace AcceptanceTests.Steps
                 if (pn != null)
                 {
                     Console.WriteLine("Unsubscribing");
-                    pn.UnsubscribeAll<object>();
+                    pn.Unsubscribe<object>()
+                        .Channels(channel.Split(','))
+                        .ChannelGroups(channelGroup.Split(','))
+                        .Execute();
                     pn.Destroy();
                     Console.WriteLine("Unsubscribed and Destroyed");
                 }
