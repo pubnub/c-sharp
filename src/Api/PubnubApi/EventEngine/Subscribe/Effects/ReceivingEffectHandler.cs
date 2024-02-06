@@ -51,7 +51,38 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
 
         public override async Task Run(ReceiveMessagesInvocation invocation)
         {
+            if (invocation == null)
+            {
+                throw new ArgumentNullException($" invocation null");
+            }
+
+            if (invocation.Cursor == null)
+            {
+                throw new ArgumentNullException($" invocation.Cursor null");
+            }
+
+            if (invocation.Cursor.Timetoken == null)
+            {
+                throw new ArgumentNullException($" invocation.Cursor.Timetoken null");
+            }
+
             var response = await MakeReceiveMessagesRequest(invocation);
+
+            if (response == null)
+            {
+                throw new ArgumentNullException($" response null");
+            }
+
+            if (response.Item1 == null)
+            {
+                throw new ArgumentNullException($" response.Item1 null");
+            }
+
+            if (response.Item2 == null)
+            {
+                throw new ArgumentNullException($" response.Item2 null");
+            }
+
             var cursor = new SubscriptionCursor()
             {
                 Region = response.Item1?.Timetoken.Region,
