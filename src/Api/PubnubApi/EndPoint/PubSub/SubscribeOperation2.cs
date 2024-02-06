@@ -54,64 +54,64 @@ namespace PubnubApi.EndPoint
 			var eventEmitter = new EventEmitter();
             eventEmitter.RegisterJsonListener(JsonCallback);
 
-			var handshakeEffectHandler = new HandshakeEffectHandler(eventEmitter);
-            handshakeEffectHandler.LogCallback = LogCallback;
-            handshakeEffectHandler.HandshakeRequested += HandshakeEffect_HandshakeRequested;
-            handshakeEffectHandler.CancelHandshakeRequested += HandshakeEffect_CancelHandshakeRequested;
-            handshakeEffectHandler.AnnounceStatus = Announce;
+			//var handshakeEffectHandler = new HandshakeEffectHandler(eventEmitter);
+            //handshakeEffectHandler.LogCallback = LogCallback;
+            //handshakeEffectHandler.HandshakeRequested += HandshakeEffect_HandshakeRequested;
+            //handshakeEffectHandler.CancelHandshakeRequested += HandshakeEffect_CancelHandshakeRequested;
+            //handshakeEffectHandler.AnnounceStatus = Announce;
 
-			var handshakeReconnectEffectHandler = new HandshakeReconnectEffectHandler(eventEmitter);
-            handshakeReconnectEffectHandler.ReconnectionPolicy = config.ReconnectionPolicy;
-            handshakeReconnectEffectHandler.MaxRetries = config.ConnectionMaxRetries;
-            handshakeReconnectEffectHandler.LogCallback = LogCallback;
-            handshakeReconnectEffectHandler.HandshakeReconnectRequested += HandshakeReconnectEffect_HandshakeRequested;
-            handshakeReconnectEffectHandler.CancelHandshakeReconnectRequested += HandshakeReconnectEffect_CancelHandshakeRequested;
-            handshakeReconnectEffectHandler.AnnounceStatus = Announce;
+			//var handshakeReconnectEffectHandler = new HandshakeReconnectEffectHandler(eventEmitter);
+            //handshakeReconnectEffectHandler.ReconnectionPolicy = config.ReconnectionPolicy;
+            //handshakeReconnectEffectHandler.MaxRetries = config.ConnectionMaxRetries;
+            //handshakeReconnectEffectHandler.LogCallback = LogCallback;
+            //handshakeReconnectEffectHandler.HandshakeReconnectRequested += HandshakeReconnectEffect_HandshakeRequested;
+            //handshakeReconnectEffectHandler.CancelHandshakeReconnectRequested += HandshakeReconnectEffect_CancelHandshakeRequested;
+            //handshakeReconnectEffectHandler.AnnounceStatus = Announce;
             
-            var handshakeFailedEffectHandler = new HandshakeFailedEffectHandler(eventEmitter);
-            handshakeFailedEffectHandler.LogCallback = LogCallback;
+            //var handshakeFailedEffectHandler = new HandshakeFailedEffectHandler(eventEmitter);
+            //handshakeFailedEffectHandler.LogCallback = LogCallback;
 
-            var receivingEffectHandler = new ReceivingEffectHandler<object>(eventEmitter);
-            receivingEffectHandler.ReconnectionPolicy = config.ReconnectionPolicy;
-            receivingEffectHandler.LogCallback = LogCallback;
-            receivingEffectHandler.ReceiveRequested += ReceivingEffect_ReceiveRequested;
-            receivingEffectHandler.CancelReceiveRequested += ReceivingEffect_CancelReceiveRequested;
-            receivingEffectHandler.AnnounceStatus = Announce;
-            receivingEffectHandler.AnnounceMessage = Announce;
-            receivingEffectHandler.AnnouncePresenceEvent = Announce;
+            //var receivingEffectHandler = new ReceivingEffectHandler<object>(eventEmitter);
+            //receivingEffectHandler.ReconnectionPolicy = config.ReconnectionPolicy;
+            //receivingEffectHandler.LogCallback = LogCallback;
+            //receivingEffectHandler.ReceiveRequested += ReceivingEffect_ReceiveRequested;
+            //receivingEffectHandler.CancelReceiveRequested += ReceivingEffect_CancelReceiveRequested;
+            //receivingEffectHandler.AnnounceStatus = Announce;
+            //receivingEffectHandler.AnnounceMessage = Announce;
+            //receivingEffectHandler.AnnouncePresenceEvent = Announce;
 
-			var receiveReconnectEffectHandler = new ReceiveReconnectingEffectHandler<object>(eventEmitter);
-            receiveReconnectEffectHandler.ReconnectionPolicy = config.ReconnectionPolicy;
-            receiveReconnectEffectHandler.MaxRetries = config.ConnectionMaxRetries;
-            receiveReconnectEffectHandler.LogCallback = LogCallback;
-            receiveReconnectEffectHandler.ReceiveReconnectRequested += ReceiveReconnectEffect_ReceiveRequested;
-            receiveReconnectEffectHandler.CancelReceiveReconnectRequested += ReceiveReconnectEffect_CancelReceiveRequested;
-            receiveReconnectEffectHandler.AnnounceStatus = Announce;
+			//var receiveReconnectEffectHandler = new ReceiveReconnectingEffectHandler<object>(eventEmitter);
+            //receiveReconnectEffectHandler.ReconnectionPolicy = config.ReconnectionPolicy;
+            //receiveReconnectEffectHandler.MaxRetries = config.ConnectionMaxRetries;
+            //receiveReconnectEffectHandler.LogCallback = LogCallback;
+            //receiveReconnectEffectHandler.ReceiveReconnectRequested += ReceiveReconnectEffect_ReceiveRequested;
+            //receiveReconnectEffectHandler.CancelReceiveReconnectRequested += ReceiveReconnectEffect_CancelReceiveRequested;
+            //receiveReconnectEffectHandler.AnnounceStatus = Announce;
 
-			var effectDispatcher = new EffectDispatcher();
-            effectDispatcher.PubnubUnitTest = unit;
-            effectDispatcher.Register(EventType.Handshake,handshakeEffectHandler);
-            effectDispatcher.Register(EventType.CancelHandshake,handshakeEffectHandler);
-            effectDispatcher.Register(EventType.HandshakeSuccess, handshakeEffectHandler);
+			//var effectDispatcher = new EffectDispatcher();
+            //effectDispatcher.PubnubUnitTest = unit;
+            //effectDispatcher.Register(EventType.Handshake,handshakeEffectHandler);
+            //effectDispatcher.Register(EventType.CancelHandshake,handshakeEffectHandler);
+            //effectDispatcher.Register(EventType.HandshakeSuccess, handshakeEffectHandler);
 
-            effectDispatcher.Register(EventType.HandshakeFailure, handshakeFailedEffectHandler);
-            effectDispatcher.Register(EventType.CancelHandshakeFailure, handshakeFailedEffectHandler);
+            //effectDispatcher.Register(EventType.HandshakeFailure, handshakeFailedEffectHandler);
+            //effectDispatcher.Register(EventType.CancelHandshakeFailure, handshakeFailedEffectHandler);
 
-            effectDispatcher.Register(EventType.HandshakeReconnect, handshakeReconnectEffectHandler);
-            effectDispatcher.Register(EventType.CancelHandshakeReconnect, handshakeReconnectEffectHandler);
-            effectDispatcher.Register(EventType.HandshakeReconnectSuccess, handshakeReconnectEffectHandler);
-            effectDispatcher.Register(EventType.HandshakeReconnectGiveUp, handshakeReconnectEffectHandler);
+            //effectDispatcher.Register(EventType.HandshakeReconnect, handshakeReconnectEffectHandler);
+            //effectDispatcher.Register(EventType.CancelHandshakeReconnect, handshakeReconnectEffectHandler);
+            //effectDispatcher.Register(EventType.HandshakeReconnectSuccess, handshakeReconnectEffectHandler);
+            //effectDispatcher.Register(EventType.HandshakeReconnectGiveUp, handshakeReconnectEffectHandler);
 
-            effectDispatcher.Register(EventType.ReceiveMessages, receivingEffectHandler);
-            effectDispatcher.Register(EventType.CancelReceiveMessages, receivingEffectHandler);
-            effectDispatcher.Register(EventType.ReceiveSuccess, receivingEffectHandler);
+            //effectDispatcher.Register(EventType.ReceiveMessages, receivingEffectHandler);
+            //effectDispatcher.Register(EventType.CancelReceiveMessages, receivingEffectHandler);
+            //effectDispatcher.Register(EventType.ReceiveSuccess, receivingEffectHandler);
 
-            effectDispatcher.Register(EventType.ReceiveReconnect, receiveReconnectEffectHandler);
-            effectDispatcher.Register(EventType.CancelReceiveReconnect, receiveReconnectEffectHandler);
-            effectDispatcher.Register(EventType.ReceiveReconnectSuccess, receiveReconnectEffectHandler);
-            effectDispatcher.Register(EventType.ReceiveReconnectGiveUp, receiveReconnectEffectHandler);
+            //effectDispatcher.Register(EventType.ReceiveReconnect, receiveReconnectEffectHandler);
+            //effectDispatcher.Register(EventType.CancelReceiveReconnect, receiveReconnectEffectHandler);
+            //effectDispatcher.Register(EventType.ReceiveReconnectSuccess, receiveReconnectEffectHandler);
+            //effectDispatcher.Register(EventType.ReceiveReconnectGiveUp, receiveReconnectEffectHandler);
 
-       //     pnEventEngine = new EventEngine(effectDispatcher, eventEmitter);
+       //   //  pnEventEngine = new EventEngine(effectDispatcher, eventEmitter);
        //     pnEventEngine.PubnubUnitTest = unit;
        //     pnEventEngine.Setup<T>(config);
 
