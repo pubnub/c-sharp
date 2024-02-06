@@ -4,8 +4,6 @@ using System.Threading.Tasks;
 
 namespace PubnubApi.EventEngine.Core {
 	public class EffectDispatcher {
-        private int _dispatchCount = 0;
-        private string _log = "";
 		// assumes 1 instance of handler - capable of managing itself
 		private readonly Dictionary<System.Type, IEffectHandler> effectInvocationHandlerMap =
 			new Dictionary<System.Type, IEffectHandler>();
@@ -20,13 +18,6 @@ namespace PubnubApi.EventEngine.Core {
 				throw new ArgumentException($"No handler for {invocation.GetType().Name} found.");
 			}
 
-            this._dispatchCount++;
-            this._log += $"Dispatched {invocation.GetType().Name}\n";
-
-            if (this._dispatchCount >= 1000) {
-                throw new Exception(this._log);
-            }
-			
 			OnEffectDispatch?.Invoke(invocation);
 
 			if (invocation is IEffectCancelInvocation) {

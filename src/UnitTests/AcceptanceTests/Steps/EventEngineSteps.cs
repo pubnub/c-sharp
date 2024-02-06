@@ -271,8 +271,9 @@ namespace AcceptanceTests.Steps
                 {
                     pnStatus = status;
                     Console.WriteLine("{0} {1} {2}", pnStatus.Operation, pnStatus.Category, pnStatus.StatusCode);
-                    if (currentContract == "subscribeHandshakeFailure" && pn.PubnubUnitTest.Attempts == 3)
+                    if (currentContract == "subscribeHandshakeFailure")
                     {
+                        // Status should be emited once for this contract
                         statusReceivedEvent.Set();
                     }
                     if (pnStatus.Category == PNStatusCategory.PNConnectedCategory)
