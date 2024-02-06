@@ -291,6 +291,9 @@ namespace AcceptanceTests.Steps
             pn.PubnubUnitTest = unitTest;
             pn.PubnubUnitTest.EventTypeList?.Clear();
 
+
+            System.Diagnostics.Debug.WriteLine($"When step started!");
+
             messageReceivedEvent = new ManualResetEvent(false);
             statusReceivedEvent = new ManualResetEvent(false);
 
