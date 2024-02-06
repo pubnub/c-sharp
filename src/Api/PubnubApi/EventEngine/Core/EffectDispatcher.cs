@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace PubnubApi.EventEngine.Core {
 	public class EffectDispatcher {
+        private readonly List<Task> runningHandlers = new List<Task>();
 		// assumes 1 instance of handler - capable of managing itself
 		private readonly Dictionary<System.Type, IEffectHandler> effectInvocationHandlerMap =
 			new Dictionary<System.Type, IEffectHandler>();
@@ -14,6 +16,8 @@ namespace PubnubApi.EventEngine.Core {
 		/// Dispatch an invocation i.e. call a registered effect handler.
 		/// </summary>
 		public async Task Dispatch(IEffectInvocation invocation) {
+            runningHandlers.RemoveAll(t => t.IsCompleted);
+
 			if (!effectInvocationHandlerMap.ContainsKey(invocation.GetType())) {
 				throw new ArgumentException($"No handler for {invocation.GetType().Name} found.");
 			}
@@ -27,11 +31,9 @@ namespace PubnubApi.EventEngine.Core {
 				var handler = effectInvocationHandlerMap[invocation.GetType()];
 				if (handler.IsBackground(invocation))
 #if NET35 || NET40
-#pragma warning disable 4014
-                    handler.Run(invocation);
-#pragma warning restore 4014
+                    runningHandlers.Add(handler.Run(invocation));
 #else
-					_ = Task.Run(() => handler.Run(invocation));
+					runningHandlers.Add(Task.Run(() => handler.Run(invocation)));
 #endif
 				else
 					await handler.Run(invocation);
