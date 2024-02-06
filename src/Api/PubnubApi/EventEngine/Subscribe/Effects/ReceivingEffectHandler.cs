@@ -83,6 +83,21 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
                 throw new ArgumentNullException($" response.Item2 null");
             }
 
+            if (response.Item1.Timetoken == null)
+            {
+                throw new ArgumentNullException($" response.Item1.Timetoken null");
+            }
+
+            if (response.Item1.Timetoken.Region == null)
+            {
+                throw new ArgumentNullException($" response.Item1.Timetoken.Region null");
+            }
+
+            if (response.Item1.Timetoken.Timestamp == null)
+            {
+                throw new ArgumentNullException($" response.Item1.Timetoken.Timestamp null");
+            }
+
             var cursor = new SubscriptionCursor()
             {
                 Region = response.Item1?.Timetoken.Region,
