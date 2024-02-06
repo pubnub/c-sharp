@@ -25,10 +25,9 @@ namespace PubnubApi.EventEngine.Core {
 			} else
 			{
 				var handler = effectInvocationHandlerMap[invocation.GetType()];
-// TODO: What is this? IsBackground is meaningless here
-//				if (handler.IsBackground(invocation))
-//					handler.Run(invocation).Start();
-//				else
+				if (handler.IsBackground(invocation))
+					_ = Task.Run(() => handler.Run(invocation));
+				else
 					await handler.Run(invocation);
 			}
 		}
