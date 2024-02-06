@@ -15,7 +15,7 @@ namespace PubnubApi.EventEngine.Core {
 		/// Dispatch an invocation i.e. call a registered effect handler.
 		/// </summary>
 		public async Task Dispatch(IEffectInvocation invocation) {
-            runningHandlers.RemoveAll(t => t.IsCompleted);
+            runningHandlers.RemoveAll(t => t.IsCompleted || t.IsCanceled || t.IsFaulted);
 
 			if (!effectInvocationHandlerMap.ContainsKey(invocation.GetType())) {
 				throw new ArgumentException($"No handler for {invocation.GetType().Name} found.");
