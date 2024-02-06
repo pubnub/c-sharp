@@ -357,6 +357,8 @@ namespace AcceptanceTests.Steps
             }
             // TODO: This IPubNubUnitTest is very bad design. It should be removed.
             //       I removed the whole check for now. It should be replaced with a better design.
+            //       Gonna fix that during the whole suite implementation.
+            //
             //System.Diagnostics.Debug.WriteLine($"COUNT = {pn.PubnubUnitTest.EventTypeList.Count} ");
             //for (int i = 0; i < pn.PubnubUnitTest.EventTypeList.Count(); i++)
             //{
