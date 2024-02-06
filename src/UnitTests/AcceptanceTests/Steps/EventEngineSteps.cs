@@ -207,6 +207,15 @@ namespace AcceptanceTests.Steps
                 string mockExpectResponse = webClient.DownloadString(mockExpectContract);
                 System.Diagnostics.Debug.WriteLine(mockExpectResponse);
             }
+
+            if (currentContract == "subscribeHandshakeFailure") 
+            {
+                if (pn != null)
+                {
+                    pn.UnsubscribeAll<object>();
+                    pn.Destroy();
+                }
+            }
         }
         [Given(@"the demo keyset with event engine enabled")]
         public void GivenTheDemoKeysetWithEventEngineEnabled()
