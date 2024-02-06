@@ -270,7 +270,7 @@ namespace AcceptanceTests.Steps
                 delegate (Pubnub pnObj, PNStatus status)
                 {
                     pnStatus = status;
-                    Console.WriteLine("{0} {1} {2}", pnStatus.Operation, pnStatus.Category, pnStatus.StatusCode);
+                    Console.WriteLine("HERE? {0} {1} {2}", pnStatus.Operation, pnStatus.Category, pnStatus.StatusCode);
                     if (currentContract == "subscribeHandshakeFailure" && pn.PubnubUnitTest.Attempts == 3)
                     {
                         statusReceivedEvent.Set();
