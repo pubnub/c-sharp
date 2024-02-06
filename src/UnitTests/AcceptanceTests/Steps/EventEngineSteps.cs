@@ -225,15 +225,15 @@ namespace AcceptanceTests.Steps
             config.PublishKey = System.Environment.GetEnvironmentVariable("PN_PUB_KEY");
             config.SubscribeKey = System.Environment.GetEnvironmentVariable("PN_SUB_KEY");
             config.SecretKey = System.Environment.GetEnvironmentVariable("PN_SEC_KEY");
-            if (enableIntenalPubnubLogging)
-            {
+//            if (enableIntenalPubnubLogging)
+//            {
                 config.LogVerbosity = PNLogVerbosity.BODY;
                 config.PubnubLog = new InternalPubnubLog();
-            }
-            else
-            {
-                config.LogVerbosity = PNLogVerbosity.NONE;
-            }
+//            }
+//            else
+//            {
+//                config.LogVerbosity = PNLogVerbosity.NONE;
+//            }
             config.EnableEventEngine = true;
 
 
