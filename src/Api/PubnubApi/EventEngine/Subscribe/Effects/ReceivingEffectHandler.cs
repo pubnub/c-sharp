@@ -100,8 +100,8 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
 
             var cursor = new SubscriptionCursor()
             {
-                Region = response.Item1?.Timetoken.Region,
-                Timetoken = response.Item1?.Timetoken.Timestamp
+                Region = response.Item1?.Timetoken?.Region ?? 0,
+                Timetoken = response.Item1?.Timetoken?.Timestamp ?? 0
             };
 
             switch (invocation)
