@@ -21,6 +21,12 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
 
         public async override Task Run(EmitMessagesInvocation invocation)
         {
+            if (invocation.Messages.Messages == null || !invocation.Messages.Messages.Any())
+            {
+                // TODO: It shouldn't happen but it does. Investigate why
+                return;
+            }
+
             var processedMessages = invocation.Messages.Messages.Select(m => new PNMessageResult<object>()
             {
                 Channel = m.Channel,
