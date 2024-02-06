@@ -18,8 +18,6 @@ namespace PubnubApi.EventEngine.Core {
 				throw new ArgumentException($"No handler for {invocation.GetType().Name} found.");
 			}
 
-            Console.WriteLine($"Dispatching {invocation.GetType().Name}");
-			
 			OnEffectDispatch?.Invoke(invocation);
 
 			if (invocation is IEffectCancelInvocation) {
