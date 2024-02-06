@@ -20,6 +20,8 @@ namespace PubnubApi.EventEngine.Core {
 			
 			OnEffectDispatch?.Invoke(invocation);
 
+            System.Diagnostics.Debug.WriteLine($"Dispatching {invocation.GetType().Name} = {invocation.ToString()}");
+
 			if (invocation is IEffectCancelInvocation) {
 				await effectInvocationHandlerMap[invocation.GetType()].Cancel();
 			} else
