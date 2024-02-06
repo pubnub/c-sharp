@@ -82,10 +82,11 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
 
         private async Task<System.Tuple<ReceivingResponse<string>, PNStatus>> MakeReceiveMessagesRequest(ReceiveMessagesInvocation invocation)
         {
+            // TODO: Why channels or channelGroups are not null?
             var resp = await manager.ReceiveRequest<string>(
                 PNOperationType.PNSubscribeOperation,
-                invocation.Channels.ToArray(),
-                invocation.ChannelGroups.ToArray(),
+                invocation.Channels?.ToArray() ?? new string[0],
+                invocation.ChannelGroups?.ToArray() ?? new string[0],
                 invocation.Cursor.Timetoken.Value,
                 invocation.Cursor.Region.Value,
                 invocation.InitialSubscribeQueryParams,
