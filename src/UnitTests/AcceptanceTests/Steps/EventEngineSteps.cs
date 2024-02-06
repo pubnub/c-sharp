@@ -199,6 +199,7 @@ namespace AcceptanceTests.Steps
         [AfterScenario()]
         public void AfterScenario()
         {
+            System.Diagnostics.Debug.WriteLine("Finished " + _scenarioContext.ScenarioInfo.Title);
             if (!bypassMockServer)
             {
                 string mockExpectContract = string.Format("http://{0}/expect", acceptance_test_origin);
@@ -212,8 +213,10 @@ namespace AcceptanceTests.Steps
             {
                 if (pn != null)
                 {
+                    System.Diagnostics.Debug.WriteLine("Unsubscribing");
                     pn.UnsubscribeAll<object>();
                     pn.Destroy();
+                    System.Diagnostics.Debug.WriteLine("Unsubscribed and Destroyed");
                 }
             }
         }
