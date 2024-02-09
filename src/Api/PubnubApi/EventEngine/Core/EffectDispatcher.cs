@@ -58,6 +58,10 @@ namespace PubnubApi.EventEngine.Core {
             {
                 handler.Cancel().Wait();
             }
+            foreach (var task in runningHandlers)
+            {
+                task.Dispose();
+            }
         }
 	}
 }
