@@ -786,6 +786,9 @@ namespace PubnubApi.EndPoint
 				throw new ArgumentException("Either Channel Or Channel Group or Both should be provided.");
 			}
 
+            return;
+            // TODO: Reimplement it after implementing Presence Event Engine
+
 			if (this.subscribeEventEngineFactory.hasEventEngine(instanceId))
             {
                 subscribeEventEngine = subscribeEventEngineFactory.getEventEngine(instanceId);
