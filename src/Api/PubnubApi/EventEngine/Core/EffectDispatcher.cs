@@ -60,7 +60,7 @@ namespace PubnubApi.EventEngine.Core {
             }
             foreach (var task in runningHandlers)
             {
-                task.Dispose();
+                task.Wait();
             }
         }
 	}
