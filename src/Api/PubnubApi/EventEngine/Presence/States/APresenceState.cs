@@ -16,12 +16,14 @@ namespace PubnubApi.EventEngine.Presence.States
         {
             var newInput = this.Input - e.Input;
 
-            return newInput.IsEmpty()
+            var state = newInput.IsEmpty()
                 ? (TransitionResult)new InactiveState()
                 : (TransitionResult)new HeartbeatingState()
                 {
                     Input = newInput,
                 };
+
+            return state.With(new LeaveInvocation(){ Input = e.Input });
         }
     }
 }
