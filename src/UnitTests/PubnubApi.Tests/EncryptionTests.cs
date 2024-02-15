@@ -820,5 +820,7 @@ namespace PubNubMessaging.Tests
                     return ((char)int.Parse(m.Groups["Value"].Value, NumberStyles.HexNumber)).ToString();
                 });
         }
+        
+        Even more sus...
     }
 }
