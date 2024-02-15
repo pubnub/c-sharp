@@ -41,8 +41,7 @@ jobs:
           PN_PUB_KEY: ${{ secrets.PN_PUB_KEY }}
           PN_SUB_KEY: ${{ secrets.PN_SUB_KEY }}
           PN_SEC_KEY: ${{ secrets.PN_SEC_KEY }}    
-        run: cd ./UnitTests/PubnubApi.Tests && dotnet test --no-build --verbosity normal --logger trx --results-directory ./results
-
+        run: dotnet test ./UnitTests/PubnubApi.Tests --no-build --verbosity normal --logger trx 
       - name: Cancel workflow runs for commit on error
         if: failure()
         uses: ./.github/.release/actions/actions/utils/fast-jobs-failure
