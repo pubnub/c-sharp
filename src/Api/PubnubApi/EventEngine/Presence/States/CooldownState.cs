@@ -27,7 +27,7 @@ namespace PubnubApi.EventEngine.Presence.States
                 Events.DisconnectEvent e => new StoppedState()
                 {
                     Input = this.Input,
-                },
+                }.With(new LeaveInvocation(){ Input = this.Input }),
                 Events.TimesUpEvent e => new HeartbeatingState()
                 {
                     Input = this.Input,
