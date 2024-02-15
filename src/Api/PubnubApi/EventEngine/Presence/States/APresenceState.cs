@@ -1,5 +1,6 @@
 using PubnubApi.EventEngine.Core;
 using PubnubApi.EventEngine.Presence.Common;
+using PubnubApi.EventEngine.Presence.Invocations;
 
 namespace PubnubApi.EventEngine.Presence.States
 {
@@ -16,9 +17,9 @@ namespace PubnubApi.EventEngine.Presence.States
         {
             var newInput = this.Input - e.Input;
 
-            var state = newInput.IsEmpty()
-                ? (TransitionResult)new InactiveState()
-                : (TransitionResult)new HeartbeatingState()
+            State state = newInput.IsEmpty()
+                ? new InactiveState()
+                : new HeartbeatingState()
                 {
                     Input = newInput,
                 };

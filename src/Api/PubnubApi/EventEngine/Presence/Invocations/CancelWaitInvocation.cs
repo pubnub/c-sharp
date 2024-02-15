@@ -1,6 +1,6 @@
 using PubnubApi.EventEngine.Core;
 
-namespace PubnubApi.EventEngine.Subscribe.Invocations
+namespace PubnubApi.EventEngine.Presence.Invocations
 {
     public class CancelWaitInvocation : Core.IEffectInvocation {}
 }
