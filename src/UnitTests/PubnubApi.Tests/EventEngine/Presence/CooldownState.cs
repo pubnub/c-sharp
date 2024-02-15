@@ -87,5 +87,6 @@ namespace PubnubApi.Tests.EventEngine.Presence
         {
             CollectionAssert.AreEqual(@expected, @sut.Transition(@ev).Invocations);
         }
+        is this test even running? 
     }
 }
