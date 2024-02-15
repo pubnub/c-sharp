@@ -21,7 +21,8 @@ namespace PubnubApi.EventEngine.Presence.States
                     Input = e.Input != this.Input ? this.Input + e.Input : this.Input,
                 },
                 Events.LeftEvent e => HandleLeftEvent(e),
-                Events.LeftAllEvent e => new InactiveState(),
+                Events.LeftAllEvent e => new InactiveState()
+                    .With(new LeaveInvocation(){ Input = this.Input }),
                 Events.HeartbeatSuccessEvent e => new CooldownState()
                 {
                     Input = this.Input,
