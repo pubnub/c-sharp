@@ -4,58 +4,63 @@ using PubnubApi.EventEngine.Presence.Common;
 using PubnubApi.EventEngine.Presence.Events;
 using PubnubApi.EventEngine.Presence.States;
 
-namespace PubnubApi.Tests.EventEngine
+namespace PubnubApi.Tests.EventEngine.Presence
 {
-    internal class FailedStateTransitions
+    internal class ReconnectingStateTransitions
     {
         private static readonly object[] testCases = {
             new object[] {
-                new FailedState(),
+                new ReconnectingState(),
                 new JoinedEvent() { Input = new PresenceInput() { Channels = new [] { "a" } } },
                 new HeartbeatingState() { Input = new PresenceInput() { Channels = new [] { "a" } } },
             },
             new object[] {
-                new FailedState() { Input = new PresenceInput() { Channels = new [] { "a", "b" } } },
+                new ReconnectingState() { Input = new PresenceInput() { Channels = new [] { "a", "b" } } },
                 new LeftEvent() { Input = new PresenceInput() { Channels = new [] { "b" } } },
                 new HeartbeatingState() { Input = new PresenceInput() { Channels = new [] { "a" } } },
             },
             new object[] {
-                new FailedState() { Input = new PresenceInput() { Channels = new [] { "a" } } },
+                new ReconnectingState() { Input = new PresenceInput() { Channels = new [] { "a" } } },
                 new LeftEvent() { Input = new PresenceInput() { Channels = new [] { "a" } } },
                 new InactiveState(),
             },
             new object[] {
-                new FailedState(),
+                new ReconnectingState(),
                 new LeftAllEvent(),
                 new InactiveState(),
             },
             new object[] {
-                new FailedState(),
+                new ReconnectingState(),
                 new HeartbeatSuccessEvent(),
+                new CooldownState(),
+            },
+            new object[] {
+                new ReconnectingState() { RetryCount = 1 },
+                new HeartbeatFailureEvent(),
+                new ReconnectingState() { RetryCount = 2 },
+            },
+            new object[] {
+                new ReconnectingState(),
+                new HeartbeatFailureEvent() { Status = new PNStatus() { Category = PNStatusCategory.PNCancelledCategory} },
                 null,
             },
             new object[] {
+                new ReconnectingState(),
+                new HeartbeatGiveUpEvent(),
                 new FailedState(),
-                new HeartbeatFailureEvent() { Status = new PNStatus() },
-                null,
             },
             new object[] {
-                new FailedState(),
-                new HeartbeatGiveUpEvent() { Status = new PNStatus() { Category = PNStatusCategory.PNCancelledCategory } },
-                null,
-            },
-            new object[] {
-                new FailedState(),
+                new ReconnectingState(),
                 new ReconnectEvent(),
-                new HeartbeatingState(),
+                null,
             },
             new object[] {
-                new FailedState(),
+                new ReconnectingState(),
                 new DisconnectEvent(),
                 new StoppedState(),
             },
             new object[] {
-                new FailedState(),
+                new ReconnectingState(),
                 new TimesUpEvent(),
                 null,
             },

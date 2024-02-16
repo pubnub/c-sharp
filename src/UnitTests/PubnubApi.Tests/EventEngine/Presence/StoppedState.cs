@@ -4,53 +4,58 @@ using PubnubApi.EventEngine.Presence.Common;
 using PubnubApi.EventEngine.Presence.Events;
 using PubnubApi.EventEngine.Presence.States;
 
-namespace PubnubApi.Tests.EventEngine
+namespace PubnubApi.Tests.EventEngine.Presence
 {
-    internal class InactiveStateTransitions
+    internal class StoppedStateTransitions
     {
         private static readonly object[] testCases = {
             new object[] {
-                new InactiveState(),
+                new StoppedState(),
                 new JoinedEvent() { Input = new PresenceInput() { Channels = new [] { "a" } } },
-                new HeartbeatingState() { Input = new PresenceInput() { Channels = new [] { "a" } } },
+                new StoppedState(),
             },
             new object[] {
-                new InactiveState(),
+                new StoppedState() { Input = new PresenceInput() { Channels = new [] { "a", "b" } } },
+                new LeftEvent() { Input = new PresenceInput() { Channels = new [] { "b" } } },
+                new StoppedState() { Input = new PresenceInput() { Channels = new [] { "a" } } },
+            },
+            new object[] {
+                new StoppedState() { Input = new PresenceInput() { Channels = new [] { "a" } } },
                 new LeftEvent() { Input = new PresenceInput() { Channels = new [] { "a" } } },
-                null,
+                new InactiveState(),
             },
             new object[] {
-                new InactiveState(),
+                new StoppedState(),
                 new LeftAllEvent(),
-                null,
+                new InactiveState(),
             },
             new object[] {
-                new InactiveState(),
+                new StoppedState(),
                 new HeartbeatSuccessEvent(),
                 null,
             },
             new object[] {
-                new InactiveState(),
+                new StoppedState(),
                 new HeartbeatFailureEvent() { Status = new PNStatus() },
                 null,
             },
             new object[] {
-                new InactiveState(),
+                new StoppedState(),
                 new HeartbeatGiveUpEvent() { Status = new PNStatus() { Category = PNStatusCategory.PNCancelledCategory } },
                 null,
             },
             new object[] {
-                new InactiveState(),
+                new StoppedState(),
                 new ReconnectEvent(),
-                null,
+                new HeartbeatingState(),
             },
             new object[] {
-                new InactiveState(),
+                new StoppedState(),
                 new DisconnectEvent(),
                 null,
             },
             new object[] {
-                new InactiveState(),
+                new StoppedState(),
                 new TimesUpEvent(),
                 null,
             },
