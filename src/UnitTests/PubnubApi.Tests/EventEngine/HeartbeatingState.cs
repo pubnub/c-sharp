@@ -4,7 +4,7 @@ using PubnubApi.EventEngine.Presence.Common;
 using PubnubApi.EventEngine.Presence.Events;
 using PubnubApi.EventEngine.Presence.States;
 
-namespace PubnubApi.Tests.EventEngine.Presence
+namespace PubnubApi.Tests.EventEngine
 {
     internal class HeartbeatingStateTransitions
     {
