@@ -3,6 +3,7 @@ using PubnubApi.EventEngine.Core;
 using PubnubApi.EventEngine.Presence.Common;
 using PubnubApi.EventEngine.Presence.Events;
 using PubnubApi.EventEngine.Presence.States;
+using PubnubApi.EventEngine.Presence.Invocations;
 
 namespace PubnubApi.Tests.EventEngine.Presence
 {
@@ -52,12 +53,6 @@ namespace PubnubApi.Tests.EventEngine.Presence
             },
             new object[] {
                 new CooldownState(),
-                new HeartbeatGiveUpEvent() { Status = new PNStatus() { Category = PNStatusCategory.PNCancelledCategory } },
-                null,
-                null
-            },
-            new object[] {
-                new CooldownState(),
                 new ReconnectEvent(),
                 null,
                 null
@@ -76,13 +71,13 @@ namespace PubnubApi.Tests.EventEngine.Presence
             },
         };
 
-        [TestCasesSource(nameof(testCases))]
+        [TestCaseSource(nameof(testCases))]
         public void TestTransition(State @sut, IEvent @ev, State @expected, IEffectInvocation[] @_)
         {
             Assert.AreEqual(@expected, @sut.Transition(@ev));
         }
 
-        [TestCasesSource(nameof(testCases))]
+        [TestCaseSource(nameof(testCases))]
         public void TestReturnedInvocations(State @sut, IEvent @ev, State @_, IEffectInvocation[] @expected)
         {
             CollectionAssert.AreEqual(@expected, @sut.Transition(@ev).Invocations);

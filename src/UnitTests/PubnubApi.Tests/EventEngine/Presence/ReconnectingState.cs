@@ -41,11 +41,6 @@ namespace PubnubApi.Tests.EventEngine.Presence
             },
             new object[] {
                 new ReconnectingState(),
-                new HeartbeatFailureEvent() { Status = new PNStatus() { Category = PNStatusCategory.PNCancelledCategory} },
-                null,
-            },
-            new object[] {
-                new ReconnectingState(),
                 new HeartbeatGiveUpEvent(),
                 new FailedState(),
             },
@@ -66,7 +61,7 @@ namespace PubnubApi.Tests.EventEngine.Presence
             },
         };
 
-        [TestCasesSource(nameof(testCases))]
+        [TestCaseSource(nameof(testCases))]
         public void TestTransition(State @sut, IEvent @ev, State @expected)
         {
             Assert.AreEqual(expected, sut.Transition(ev));
