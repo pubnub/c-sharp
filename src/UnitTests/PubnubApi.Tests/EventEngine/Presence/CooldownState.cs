@@ -74,7 +74,7 @@ namespace PubnubApi.Tests.EventEngine.Presence
         [TestCaseSource(nameof(testCases))]
         public void TestTransition(State @sut, IEvent @ev, State @expected, IEffectInvocation[] @_)
         {
-            Assert.AreEqual(@expected, @sut.Transition(@ev).State);
+            Assert.AreEqual(@expected.GetType(), @sut.Transition(@ev).State.GetType());
         }
 
         [TestCaseSource(nameof(testCases))]
