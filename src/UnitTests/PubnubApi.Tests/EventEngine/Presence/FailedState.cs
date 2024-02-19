@@ -58,7 +58,6 @@ namespace PubnubApi.Tests.EventEngine.Presence
                 new DisconnectEvent(),
                 new StoppedState(),
                 new IEffectInvocation[] { new LeaveInvocation() { Input = new PresenceInput() } }
-
             },
             new object[] {
                 new FailedState(),
