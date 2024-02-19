@@ -5,8 +5,6 @@ using PubnubApi.EventEngine.Presence.Events;
 using PubnubApi.EventEngine.Presence.States;
 using PubnubApi.EventEngine.Presence.Invocations;
 using System.Linq;
-using System.Security.Policy;
-using System.Collections.Generic;
 
 namespace PubnubApi.Tests.EventEngine.Presence
 {

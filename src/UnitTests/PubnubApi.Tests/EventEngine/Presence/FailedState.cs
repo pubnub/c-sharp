@@ -27,7 +27,7 @@ namespace PubnubApi.Tests.EventEngine.Presence
                 new FailedState() { Input = new PresenceInput() { Channels = new [] { "a" } } },
                 new LeftEvent() { Input = new PresenceInput() { Channels = new [] { "a" } } },
                 new InactiveState(),
-                new IEffectInvocation[] { new LeaveInvocation() { Input = new PresenceInput() { Channels = new [] { "b" } } } }
+                new IEffectInvocation[] { new LeaveInvocation() { Input = new PresenceInput() { Channels = new [] { "a" } } } }
             },
             new object[] {
                 new FailedState(),
@@ -69,7 +69,7 @@ namespace PubnubApi.Tests.EventEngine.Presence
         };
 
         [TestCaseSource(nameof(testCases))]
-        public void TestTransition(State @sut, IEvent @ev, State @expected, IEffectInvocation[] @_)
+        public void TestTransition(APresenceState @sut, IEvent @ev, APresenceState @expected, IEffectInvocation[] @_)
         {
             var result = @sut.Transition(@ev);
 
@@ -79,7 +79,7 @@ namespace PubnubApi.Tests.EventEngine.Presence
                 return;
             }
 
-            Assert.AreEqual(@expected.GetType(), result.State.GetType());
+            Assert.AreEqual(@expected, result.State);
         }
 
         [TestCaseSource(nameof(testCases))]
