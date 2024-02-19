@@ -249,6 +249,23 @@
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\States\UnsubscribedState.cs" Link="EventEngine\Subscribe\States\UnsubscribedState.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\SubscribeEventEngine.cs" Link="EventEngine\Subscribe\SubscribeEventEngine.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\SubscribeEventEngineFactory.cs" Link="EventEngine\Subscribe\SubscribeEventEngineFactory.cs" />
+	<Compile Include="..\PubnubApi\EventEngine\Presence\Common\PresenceInput.cs" Link="EventEngine\Presence\Common\PresenceInput.cs" />
+	<Compile Include="..\PubnubApi\EventEngine\Presence\Events\PresenceEvents.cs" Link="EventEngine\Presence\Events\PresenceEvents.cs" />
+	<Compile Include="..\PubnubApi\EventEngine\Presence\Invocations\CancelDelayedHeartbeatInvocation.cs" Link="EventEngine\Presence\Invocations\CancelDelayedHeartbeatInvocation.cs" />
+	<Compile Include="..\PubnubApi\EventEngine\Presence\Invocations\CancelWaitInvocation.cs" Link="EventEngine\Presence\Invocations\CancelWaitInvocation.cs" />
+	<Compile Include="..\PubnubApi\EventEngine\Presence\Invocations\DelayedHeartbeatInvocation.cs" Link="EventEngine\Presence\Invocations\DelayedHeartbeatInvocation.cs" />
+	<Compile Include="..\PubnubApi\EventEngine\Presence\Invocations\Dummy.cs" Link="EventEngine\Presence\Invocations\Dummy.cs" />
+	<Compile Include="..\PubnubApi\EventEngine\Presence\Invocations\HearbeatInvocation.cs" Link="EventEngine\Presence\Invocations\HearbeatInvocation.cs" />
+	<Compile Include="..\PubnubApi\EventEngine\Presence\Invocations\LeaveInvocation.cs" Link="EventEngine\Presence\Invocations\LeaveInvocation.cs" />
+	<Compile Include="..\PubnubApi\EventEngine\Presence\Invocations\TerminateEventEngineInvocation.cs" Link="EventEngine\Presence\Invocations\TerminateEventEngineInvocation.cs" />
+	<Compile Include="..\PubnubApi\EventEngine\Presence\Invocations\WaitInvocation.cs" Link="EventEngine\Presence\Invocations\WaitInvocation.cs" />
+	<Compile Include="..\PubnubApi\EventEngine\Presence\States\APresenceState.cs" Link="EventEngine\Presence\States\APresenceState.cs" />
+	<Compile Include="..\PubnubApi\EventEngine\Presence\States\CooldownState.cs" Link="EventEngine\Presence\States\CooldownState.cs" />
+	<Compile Include="..\PubnubApi\EventEngine\Presence\States\FailedState.cs" Link="EventEngine\Presence\States\FailedState.cs" />
+	<Compile Include="..\PubnubApi\EventEngine\Presence\States\HeartBeatingState.cs" Link="EventEngine\Presence\States\HeartBeatingState.cs" />
+	<Compile Include="..\PubnubApi\EventEngine\Presence\States\InactiveState.cs" Link="EventEngine\Presence\States\InactiveState.cs" />
+	<Compile Include="..\PubnubApi\EventEngine\Presence\States\ReconnectingState.cs" Link="EventEngine\Presence\States\ReconnectingState.cs" />
+	<Compile Include="..\PubnubApi\EventEngine\Presence\States\StoppedState.cs" Link="EventEngine\Presence\States\StoppedState.cs" />
     <Compile Include="..\PubnubApi\Helper\MobilePushHelper.cs" Link="Helper\MobilePushHelper.cs" />
     <Compile Include="..\PubnubApi\HttpUtility\HttpUtility.cs">
       <Link>HttpUtility\HttpUtility.cs</Link>
