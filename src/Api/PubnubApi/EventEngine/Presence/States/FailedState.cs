@@ -28,11 +28,11 @@ namespace PubnubApi.EventEngine.Presence.States
                 Events.ReconnectEvent e => new HeartbeatingState()
                 {
                     Input = this.Input,
-                }.With(new LeaveInvocation(){ Input = this.Input }),
+                },
                 Events.DisconnectEvent e => new StoppedState()
                 {
                     Input = this.Input,
-                }, 
+                }.With(new LeaveInvocation() { Input = this.Input }),
                 _ => null,
             };
         }
