@@ -23,7 +23,8 @@ namespace PubnubApi.EventEngine.Presence.States
                     Input = e.Input != this.Input ? this.Input + e.Input : this.Input,
                 },
                 Events.LeftEvent e => HandleLeftEvent(e),
-                Events.LeftAllEvent e => new InactiveState(),
+                Events.LeftAllEvent e => new InactiveState()
+                    .With(new LeaveInvocation(){ Input = this.Input }),
                 Events.ReconnectEvent e => new HeartbeatingState()
                 {
                     Input = this.Input,
@@ -31,7 +32,7 @@ namespace PubnubApi.EventEngine.Presence.States
                 Events.DisconnectEvent e => new StoppedState()
                 {
                     Input = this.Input,
-                }, 
+                }.With(new LeaveInvocation() { Input = this.Input }),
                 _ => null,
             };
         }

@@ -1,4 +1,5 @@
 using PubnubApi.EventEngine.Presence.Invocations;
+using PubnubApi.EventEngine.Presence.Common;
 using PubnubApi.EventEngine.Core;
 using System.Collections.Generic;
 using System;
@@ -9,7 +10,7 @@ namespace PubnubApi.EventEngine.Presence.States
     {
         public InactiveState()
         {
-            Input = null;
+            Input = new PresenceInput();
         }
 
         // TODO: Dummy Invocation until we have real ones
