@@ -14,41 +14,49 @@ namespace PubnubApi.Tests.EventEngine.Presence
                 new InactiveState(),
                 new JoinedEvent() { Input = new PresenceInput() { Channels = new [] { "a" } } },
                 new HeartbeatingState() { Input = new PresenceInput() { Channels = new [] { "a" } } },
+                null
             },
             new object[] {
                 new InactiveState(),
                 new LeftEvent() { Input = new PresenceInput() { Channels = new [] { "a" } } },
                 null,
+                null
             },
             new object[] {
                 new InactiveState(),
                 new LeftAllEvent(),
                 null,
+                null
             },
             new object[] {
                 new InactiveState(),
                 new HeartbeatSuccessEvent(),
                 null,
+                null
             },
             new object[] {
                 new InactiveState(),
                 new HeartbeatFailureEvent() { Status = new PNStatus() },
                 null,
+                null
             },
             new object[] {
                 new InactiveState(),
                 new ReconnectEvent(),
                 null,
+                null
             },
             new object[] {
                 new InactiveState(),
                 new DisconnectEvent(),
                 null,
+                null
             },
             new object[] {
                 new InactiveState(),
                 new TimesUpEvent(),
                 null,
+                null
             },
         };
 
