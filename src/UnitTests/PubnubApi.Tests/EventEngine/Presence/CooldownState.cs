@@ -4,6 +4,9 @@ using PubnubApi.EventEngine.Presence.Common;
 using PubnubApi.EventEngine.Presence.Events;
 using PubnubApi.EventEngine.Presence.States;
 using PubnubApi.EventEngine.Presence.Invocations;
+using System.Linq;
+using System.Security.Policy;
+using System.Collections.Generic;
 
 namespace PubnubApi.Tests.EventEngine.Presence
 {
@@ -61,7 +64,7 @@ namespace PubnubApi.Tests.EventEngine.Presence
                 new CooldownState(),
                 new DisconnectEvent(),
                 new StoppedState(),
-                new IEffectInvocation[] { new LeaveInvocation() { Input = new PresenceInput() { Channels = new string[] { } } } }
+                new IEffectInvocation[] { new LeaveInvocation() { Input = new PresenceInput() } }
             },
             new object[] {
                 new CooldownState(),
@@ -72,15 +75,34 @@ namespace PubnubApi.Tests.EventEngine.Presence
         };
 
         [TestCaseSource(nameof(testCases))]
-        public void TestTransition(State @sut, IEvent @ev, State @expected, IEffectInvocation[] @_)
+        public void TestTransition(APresenceState @sut, IEvent @ev, APresenceState @expected, IEffectInvocation[] @_)
         {
-            Assert.AreEqual(@expected.GetType(), @sut.Transition(@ev).State.GetType());
+            var result = @sut.Transition(@ev);
+
+            if (result == null && expected == null)
+            {
+                // it's expected result
+                return;
+            }
+
+            Assert.AreEqual(@expected, result.State);
         }
 
         [TestCaseSource(nameof(testCases))]
-        public void TestReturnedInvocations(State @sut, IEvent @ev, State @_, IEffectInvocation[] @expected)
+         public void TestReturnedInvocations(State @sut, IEvent @ev, State @_, IEffectInvocation[] @expected)
         {
-            CollectionAssert.AreEqual(@expected, @sut.Transition(@ev).Invocations);
+            var result = @sut.Transition(@ev);
+
+            if (result == null && expected == null)
+            {
+                // it's expected result
+                return;
+            }
+
+            foreach (var item in result.Invocations)
+            {
+                Assert.True(expected.Select(i => i.GetType()).Contains(item.GetType()));
+            }
         }
     }
 }

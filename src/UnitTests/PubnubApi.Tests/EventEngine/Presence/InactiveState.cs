@@ -54,7 +54,15 @@ namespace PubnubApi.Tests.EventEngine.Presence
         [TestCaseSource(nameof(testCases))]
         public void TestTransition(State @sut, IEvent @ev, State @expected)
         {
-            Assert.AreEqual(@expected.GetType(), @sut.Transition(@ev).State.GetType());
+            var result = @sut.Transition(@ev);
+
+            if (result == null && expected == null)
+            {
+                // it's expected result
+                return;
+            }
+
+            Assert.AreEqual(@expected.GetType(), result.State.GetType());
         }
     }
 }
