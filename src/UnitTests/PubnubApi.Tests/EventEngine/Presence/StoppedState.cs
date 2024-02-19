@@ -13,47 +13,56 @@ namespace PubnubApi.Tests.EventEngine.Presence
             new object[] {
                 new StoppedState(),
                 new JoinedEvent() { Input = new PresenceInput() { Channels = new [] { "a" } } },
-                new StoppedState(),
+                new StoppedState() { Input = new PresenceInput() { Channels = new [] { "a" } } },
+                null
             },
             new object[] {
                 new StoppedState() { Input = new PresenceInput() { Channels = new [] { "a", "b" } } },
                 new LeftEvent() { Input = new PresenceInput() { Channels = new [] { "b" } } },
                 new StoppedState() { Input = new PresenceInput() { Channels = new [] { "a" } } },
+                null
             },
             new object[] {
                 new StoppedState() { Input = new PresenceInput() { Channels = new [] { "a" } } },
                 new LeftEvent() { Input = new PresenceInput() { Channels = new [] { "a" } } },
                 new InactiveState(),
+                null
             },
             new object[] {
                 new StoppedState(),
                 new LeftAllEvent(),
                 new InactiveState(),
+                null
             },
             new object[] {
                 new StoppedState(),
                 new HeartbeatSuccessEvent(),
                 null,
+                null
             },
             new object[] {
                 new StoppedState(),
                 new HeartbeatFailureEvent() { Status = new PNStatus() },
                 null,
+                null
             },
             new object[] {
                 new StoppedState(),
                 new ReconnectEvent(),
                 new HeartbeatingState(),
+                null
             },
             new object[] {
                 new StoppedState(),
                 new DisconnectEvent(),
                 null,
+                null
             },
             new object[] {
                 new StoppedState(),
                 new TimesUpEvent(),
                 null,
+                null
             },
         };
 
