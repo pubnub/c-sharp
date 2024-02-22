@@ -20,6 +20,7 @@ namespace PubnubApi.EventEngine.Presence.Events {
     public class HeartbeatFailureEvent : Core.IEvent 
     {
         public PNStatus Status { get; set; }
+        public int AttemptedRetries;
     }
 
     public class HeartbeatGiveUpEvent : Core.IEvent 
