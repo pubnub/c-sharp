@@ -686,34 +686,6 @@ namespace PubnubApi.EndPoint
 
             return result;
         }
-
-        internal async Task<PNStatus> HeartbeatRequest<T>(PNOperationType responseType, string[] channels, string[] channelGroups) {
-            PNStatus resp = null;
-
-            try
-            {
-                string channelsJsonState = BuildJsonUserState(channels, channelGroups, false);
-
-                IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, null, "");
-                Uri request = urlBuilder.BuildPresenceHeartbeatRequest("GET", "", channels, channelGroups, channelsJsonState);
-                RequestState<T> pubnubRequestState = new RequestState<T>();
-                pubnubRequestState.Channels = channels;
-                pubnubRequestState.ChannelGroups = channelGroups;
-                pubnubRequestState.ResponseType = responseType;
-                pubnubRequestState.TimeQueued = DateTime.Now;
-                
-                await UrlProcessRequest<T>(request, pubnubRequestState, false).ContinueWith(r =>
-                {
-                    resp = r.Result.Item2;
-                }, TaskContinuationOptions.ExecuteSynchronously).ConfigureAwait(false);
-            }
-            catch(Exception ex)
-            {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} SubscribeManager=> HeartbeatRequest \n channel(s)={1} \n cg(s)={2} \n Exception Details={3}", DateTime.Now.ToString(CultureInfo.InvariantCulture), string.Join(",", channels.OrderBy(x => x).ToArray()), string.Join(",", channelGroups.OrderBy(x => x).ToArray()), ex), config.LogVerbosity);
-                return resp;
-            }
-            return resp;
-        }
         internal bool Disconnect()
         {
             //if (SubscribeDisconnected[PubnubInstance.InstanceId])

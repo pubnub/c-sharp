@@ -123,6 +123,9 @@
     <Compile Include="..\PubnubApi\EndPoint\Presence\GetStateOperation.cs">
       <Link>EndPoint\Presence\GetStateOperation.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\Presence\HeartbeatOperation.cs">
+      <Link>EndPoint\Presence\HeartbeatOperation.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\EndPoint\Presence\HereNowOperation.cs">
       <Link>EndPoint\Presence\HereNowOperation.cs</Link>
     </Compile>

@@ -1,55 +1,45 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using PubnubApi.EndPoint;
 using PubnubApi.EventEngine.Common;
 using PubnubApi.EventEngine.Core;
 using PubnubApi.EventEngine.Presence.Invocations;
 using PubnubApi.EventEngine.Subscribe.Context;
-using PubnubApi.EventEngine.Subscribe.Events;
-using PubnubApi.EventEngine.Subscribe.Invocations;
 
 namespace PubnubApi.EventEngine.Presence.Effects
 {
 	public class DelayedHeartbeatEffectHandler : EffectCancellableHandler<DelayedHeartbeatInvocation, CancelDelayedHeartbeatInvocation>
 	{
-		private SubscribeManager2 manager;
+		private HertbeatOperation heartbeatOperation;
 		private EventQueue eventQueue;
 		private Delay retryDelay = new Delay(0);
 
-		internal DelayedHeartbeatEffectHandler(SubscribeManager2 manager, EventQueue eventQueue)
+		internal DelayedHeartbeatEffectHandler(HertbeatOperation heartbeatOperation, EventQueue eventQueue)
 		{
-			this.manager = manager;
+			this.heartbeatOperation = heartbeatOperation;
 			this.eventQueue = eventQueue;
 		}
 		public override bool IsBackground(DelayedHeartbeatInvocation invocation) => true;
 		public override async Task Run(DelayedHeartbeatInvocation invocation)
 		{
 
-			if (!ReconnectionDelayUtil.shouldRetry(invocation.ReconnectionConfiguration, invocation.AttemptedRetries))
-			{
+			if (!ReconnectionDelayUtil.shouldRetry(invocation.ReconnectionConfiguration, invocation.AttemptedRetries)) {
 				eventQueue.Enqueue(new Events.HeartbeatGiveUpEvent() { Status = new PNStatus(PNStatusCategory.PNCancelledCategory) });
-			}
-			else
-			{
+			} else {
 				retryDelay = new Delay(ReconnectionDelayUtil.CalculateDelay(invocation.ReconnectionConfiguration.ReconnectionPolicy, invocation.AttemptedRetries));
 				await retryDelay.Start();
 				if (!retryDelay.Cancelled)
 					await MakeHeartbeatRequest(invocation);
 			}
-
-			
 		}
 
 		private async Task MakeHeartbeatRequest(DelayedHeartbeatInvocation invocation)
 		{
-			var resp = await manager.HeartbeatRequest<string>(
-				PNOperationType.PNHeartbeatOperation,
+			var resp = await heartbeatOperation.HeartbeatRequest<string>(
 				invocation.Input.Channels.ToArray(),
 				invocation.Input.ChannelGroups.ToArray()
 			);
-			switch (resp)
-			{
+			switch (resp) {
 				case { } when resp.Error:
 					eventQueue.Enqueue(new Events.HeartbeatFailureEvent() { AttemptedRetries = invocation.AttemptedRetries + 1, Status = resp });
 					break;
@@ -61,10 +51,9 @@ namespace PubnubApi.EventEngine.Presence.Effects
 
 		public override async Task Cancel()
 		{
-            if (!retryDelay.Cancelled)
-            {
-                retryDelay.Cancel();
-            }
+			if (!retryDelay.Cancelled) {
+				retryDelay.Cancel();
+			}
 		}
 	}
 }

@@ -8,14 +8,14 @@ using PubnubApi.EventEngine.Subscribe.Invocations;
 
 namespace PubnubApi.EventEngine.Presence.Effects
 {
-	public class HeartbeatEffectHandler: EffectHandler<Invocations.HeartbeatInvocation>
+	public class HeartbeatEffectHandler : EffectHandler<Invocations.HeartbeatInvocation>
 	{
-		private SubscribeManager2 manager;
+		private HertbeatOperation heartbeatOperation;
 		private EventQueue eventQueue;
 
-		internal HeartbeatEffectHandler(SubscribeManager2 manager, EventQueue eventQueue)
+		internal HeartbeatEffectHandler(HertbeatOperation heartbeatOperation, EventQueue eventQueue)
 		{
-			this.manager = manager;
+			this.heartbeatOperation = heartbeatOperation;
 			this.eventQueue = eventQueue;
 		}
 
@@ -23,14 +23,13 @@ namespace PubnubApi.EventEngine.Presence.Effects
 
 		public override async Task Run(HeartbeatInvocation invocation)
 		{
-            var resp = await manager.HeartbeatRequest<string>(
-                PNOperationType.PNHeartbeatOperation,
-                invocation.Input.Channels.ToArray(),
-                invocation.Input.ChannelGroups.ToArray()
-            );
+			var resp = await heartbeatOperation.HeartbeatRequest<string>(
+				invocation.Input.Channels.ToArray(),
+				invocation.Input.ChannelGroups.ToArray()
+			);
 			switch (resp) {
 				case { } when resp.Error:
-					eventQueue.Enqueue(new Events.HeartbeatFailureEvent() { AttemptedRetries = 0,Status = resp});
+					eventQueue.Enqueue(new Events.HeartbeatFailureEvent() { AttemptedRetries = 0, Status = resp });
 					break;
 				case { }:
 					eventQueue.Enqueue(new Events.HeartbeatSuccessEvent());
