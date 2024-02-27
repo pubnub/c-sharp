@@ -686,6 +686,8 @@ namespace PubnubApi.EndPoint
 
             return result;
         }
+
+
         internal bool Disconnect()
         {
             //if (SubscribeDisconnected[PubnubInstance.InstanceId])
