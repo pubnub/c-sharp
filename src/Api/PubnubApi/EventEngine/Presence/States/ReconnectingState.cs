@@ -2,6 +2,7 @@ using PubnubApi.EventEngine.Presence.Invocations;
 using PubnubApi.EventEngine.Core;
 using System.Collections.Generic;
 using System;
+using System.Runtime.Remoting.Channels;
 
 namespace PubnubApi.EventEngine.Presence.States
 {
@@ -10,8 +11,11 @@ namespace PubnubApi.EventEngine.Presence.States
         public int RetryCount { get; set; }
         public PNStatus Reason { get; set; }
 
-        // TODO: Dummy Invocation until we have real ones
-        public override IEnumerable<IEffectInvocation> OnEntry => new DummyInvocation().AsArray();
+        public override IEnumerable<IEffectInvocation> OnEntry => new DelayedHeartbeatInvocation()
+        {
+            Input = this.Input,
+            RetryCount = this.RetryCount
+        }.AsArray();
         public override IEnumerable<IEffectInvocation> OnExit => new DummyInvocation().AsArray();
 
         // TODO: transitions

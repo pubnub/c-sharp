@@ -4,16 +4,15 @@ using System.Threading.Tasks;
 using PubnubApi.EndPoint;
 using PubnubApi.EventEngine.Core;
 using PubnubApi.EventEngine.Presence.Invocations;
-using PubnubApi.EventEngine.Subscribe.Invocations;
 
 namespace PubnubApi.EventEngine.Presence.Effects
 {
 	public class HeartbeatEffectHandler : EffectHandler<Invocations.HeartbeatInvocation>
 	{
-		private HertbeatOperation heartbeatOperation;
+		private HeartbeatOperation heartbeatOperation;
 		private EventQueue eventQueue;
 
-		internal HeartbeatEffectHandler(HertbeatOperation heartbeatOperation, EventQueue eventQueue)
+		internal HeartbeatEffectHandler(HeartbeatOperation heartbeatOperation, EventQueue eventQueue)
 		{
 			this.heartbeatOperation = heartbeatOperation;
 			this.eventQueue = eventQueue;
@@ -29,7 +28,7 @@ namespace PubnubApi.EventEngine.Presence.Effects
 			);
 			switch (resp) {
 				case { } when resp.Error:
-					eventQueue.Enqueue(new Events.HeartbeatFailureEvent() { AttemptedRetries = 0, Status = resp });
+					eventQueue.Enqueue(new Events.HeartbeatFailureEvent() { retryCount = 0, Status = resp });
 					break;
 				case { }:
 					eventQueue.Enqueue(new Events.HeartbeatSuccessEvent());
@@ -43,4 +42,3 @@ namespace PubnubApi.EventEngine.Presence.Effects
 		}
 	}
 }
-

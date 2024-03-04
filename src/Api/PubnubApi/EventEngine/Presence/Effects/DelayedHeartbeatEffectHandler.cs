@@ -4,33 +4,44 @@ using PubnubApi.EndPoint;
 using PubnubApi.EventEngine.Common;
 using PubnubApi.EventEngine.Core;
 using PubnubApi.EventEngine.Presence.Invocations;
-using PubnubApi.EventEngine.Subscribe.Context;
 
 namespace PubnubApi.EventEngine.Presence.Effects
 {
 	public class DelayedHeartbeatEffectHandler : EffectCancellableHandler<DelayedHeartbeatInvocation, CancelDelayedHeartbeatInvocation>
 	{
-		private HertbeatOperation heartbeatOperation;
+		private PNConfiguration pubnubConfiguration;
+		private HeartbeatOperation heartbeatOperation;
 		private EventQueue eventQueue;
 		private Delay retryDelay = new Delay(0);
 
-		internal DelayedHeartbeatEffectHandler(HertbeatOperation heartbeatOperation, EventQueue eventQueue)
+		internal DelayedHeartbeatEffectHandler(PNConfiguration pubnubConfiguration, HeartbeatOperation heartbeatOperation, EventQueue eventQueue)
 		{
+			this.pubnubConfiguration = pubnubConfiguration;
 			this.heartbeatOperation = heartbeatOperation;
 			this.eventQueue = eventQueue;
 		}
 		public override bool IsBackground(DelayedHeartbeatInvocation invocation) => true;
 		public override async Task Run(DelayedHeartbeatInvocation invocation)
 		{
-
-			if (!ReconnectionDelayUtil.shouldRetry(invocation.ReconnectionConfiguration, invocation.AttemptedRetries)) {
-				eventQueue.Enqueue(new Events.HeartbeatGiveUpEvent() { Status = new PNStatus(PNStatusCategory.PNCancelledCategory) });
-			} else {
-				retryDelay = new Delay(ReconnectionDelayUtil.CalculateDelay(invocation.ReconnectionConfiguration.ReconnectionPolicy, invocation.AttemptedRetries));
-				await retryDelay.Start();
-				if (!retryDelay.Cancelled)
-					await MakeHeartbeatRequest(invocation);
+			var retryConfiguration = pubnubConfiguration.RetryConfiguration;
+			if (retryConfiguration == null) {
+				EnqueueHeartbeatGiveUpEvent();
+				return;
 			}
+
+			if (!retryConfiguration.RetryPolicy.ShouldRetry(invocation.RetryCount, invocation.Reason)) {
+				EnqueueHeartbeatGiveUpEvent();
+				return;
+			}
+			retryDelay = new Delay(retryConfiguration.RetryPolicy.GetDelay(invocation.RetryCount, invocation.Reason, null));
+			await retryDelay.Start();
+			if (!retryDelay.Cancelled)
+				await MakeHeartbeatRequest(invocation);
+		}
+
+		private void EnqueueHeartbeatGiveUpEvent()
+		{
+			eventQueue.Enqueue(new Events.HeartbeatGiveUpEvent() { Status = new PNStatus(PNStatusCategory.PNUnexpectedDisconnectCategory) });
 		}
 
 		private async Task MakeHeartbeatRequest(DelayedHeartbeatInvocation invocation)
@@ -41,7 +52,7 @@ namespace PubnubApi.EventEngine.Presence.Effects
 			);
 			switch (resp) {
 				case { } when resp.Error:
-					eventQueue.Enqueue(new Events.HeartbeatFailureEvent() { AttemptedRetries = invocation.AttemptedRetries + 1, Status = resp });
+					eventQueue.Enqueue(new Events.HeartbeatFailureEvent() { retryCount = invocation.RetryCount + 1, Status = resp });
 					break;
 				case { }:
 					eventQueue.Enqueue(new Events.HeartbeatSuccessEvent());
