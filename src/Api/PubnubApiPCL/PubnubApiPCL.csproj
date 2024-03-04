@@ -126,6 +126,9 @@
     <Compile Include="..\PubnubApi\EndPoint\Presence\HeartbeatOperation.cs">
       <Link>EndPoint\Presence\HeartbeatOperation.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\Presence\LeaveOperation.cs">
+      <Link>EndPoint\Presence\LeaveOperation.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\EndPoint\Presence\HereNowOperation.cs">
       <Link>EndPoint\Presence\HereNowOperation.cs</Link>
     </Compile>
@@ -233,8 +236,6 @@
     <Compile Include="..\PubnubApi\EventEngine\ReceivingEffectHandler.cs" Link="EventEngine\ReceivingEffectHandler.cs" />
     <Compile Include="..\PubnubApi\EventEngine\State.cs" Link="EventEngine\State.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\Common\CommonSubscribeTypes.cs" Link="EventEngine\Subscribe\Common\CommonSubscribeTypes.cs" />
-    <Compile Include="..\PubnubApi\EventEngine\Subscribe\Context\ReconnectionConfiguration.cs" Link="EventEngine\Subscribe\Context\ReconnectionConfiguration.cs" />
-    <Compile Include="..\PubnubApi\EventEngine\Subscribe\Context\ReconnectionDelayUtil.cs" Link="EventEngine\Subscribe\Context\ReconnectionDelayUtil.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\Effects\HandshakeEffectHandler.cs" Link="EventEngine\Subscribe\Effects\HandshakeEffectHandler.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\Effects\ReceivingEffectHandler.cs" Link="EventEngine\Subscribe\Effects\ReceivingEffectHandler.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\Effects\EmitMessagesHandler.cs" Link="EventEngine\Subscribe\Effects\EmitMessagesHandler.cs" />
@@ -269,6 +270,10 @@
 	<Compile Include="..\PubnubApi\EventEngine\Presence\States\InactiveState.cs" Link="EventEngine\Presence\States\InactiveState.cs" />
 	<Compile Include="..\PubnubApi\EventEngine\Presence\States\ReconnectingState.cs" Link="EventEngine\Presence\States\ReconnectingState.cs" />
 	<Compile Include="..\PubnubApi\EventEngine\Presence\States\StoppedState.cs" Link="EventEngine\Presence\States\StoppedState.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Presence\Effects\DelayedHeartbeatEffectHandler.cs" Link="EventEngine\Presence\Effects\DelayedHeartbeatEffectHandler.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Presence\Effects\HeartbeatEffectHandler.cs" Link="EventEngine\Presence\Effects\HeartbeatEffectHandler.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Presence\Effects\LeaveEffectHandler.cs" Link="EventEngine\Presence\Effects\LeaveEffectHandler.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Presence\Effects\WaitEffectHandler.cs" Link="EventEngine\Presence\Effects\WaitEffectHandler.cs" />
     <Compile Include="..\PubnubApi\Helper\MobilePushHelper.cs" Link="Helper\MobilePushHelper.cs" />
     <Compile Include="..\PubnubApi\HttpUtility\HttpUtility.cs">
       <Link>HttpUtility\HttpUtility.cs</Link>
@@ -572,6 +577,9 @@
     <Compile Include="..\PubnubApi\PubnubCoreBase.cs">
       <Link>PubnubCoreBase.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\RetryConfiguration.cs">
+      <Link>RetryConfiguration.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\PubnubHttp.cs">
       <Link>PubnubHttp.cs</Link>
     </Compile>
@@ -681,8 +689,7 @@
     <PackageReference Include="System.ValueTuple" Version="4.4.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.Collections.Concurrent">
-      <Version>4.3.0</Version>
+    <PackageReference Include="System.Collections.Concurrent" Version="4.3.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
   </ItemGroup>
@@ -709,8 +716,7 @@
     <PackageReference Include="System.ValueTuple" Version="4.4.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.Collections.Concurrent">
-      <Version>4.3.0</Version>
+    <PackageReference Include="System.Collections.Concurrent" Version="4.3.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
   </ItemGroup>
@@ -758,8 +764,7 @@
     <PackageReference Include="System.ValueTuple" Version="4.4.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.Collections.Concurrent">
-      <Version>4.3.0</Version>
+    <PackageReference Include="System.Collections.Concurrent" Version="4.3.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
   </ItemGroup>
@@ -819,8 +824,7 @@
     <PackageReference Include="System.ValueTuple" Version="4.4.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.Collections.Concurrent">
-      <Version>4.3.0</Version>
+    <PackageReference Include="System.Collections.Concurrent" Version="4.3.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
   </ItemGroup>
@@ -868,8 +872,7 @@
     <PackageReference Include="System.ValueTuple" Version="4.4.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.Collections.Concurrent">
-      <Version>4.3.0</Version>
+    <PackageReference Include="System.Collections.Concurrent" Version="4.3.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
   </ItemGroup>
@@ -926,8 +929,7 @@
     <PackageReference Include="System.ValueTuple" Version="4.4.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.Collections.Concurrent">
-      <Version>4.3.0</Version>
+    <PackageReference Include="System.Collections.Concurrent" Version="4.3.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
   </ItemGroup>
