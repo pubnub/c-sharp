@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
 
 namespace PubnubApi
 {
-    public class PNConfiguration
+	public class PNConfiguration
     {
         private int presenceHeartbeatTimeout;
         private int presenceHeartbeatInterval;
@@ -119,7 +116,12 @@ namespace PubnubApi
 
         public bool IncludeRequestIdentifier { get; set; }
 
-        public PNReconnectionPolicy ReconnectionPolicy { get; set; } = PNReconnectionPolicy.NONE;
+        public PNReconnectionPolicy ReconnectionPolicy {
+            get => ReconnectionPolicy;
+            set => setDefaultRetryConfigurationFromPolicy(value);   // for backward compatibility.
+        }
+
+        public RetryConfiguration RetryConfiguration { get; set; }
 
         public int RequestMessageCountThreshold { get; set; } = 100;
 
@@ -187,6 +189,22 @@ namespace PubnubApi
             EnableEventEngine = false;
             ConnectionMaxRetries = -1;
         }
+
+        private void setDefaultRetryConfigurationFromPolicy(PNReconnectionPolicy policy)
+        {
+            switch (policy) 
+            {
+                case PNReconnectionPolicy.LINEAR:
+                    RetryConfiguration = RetryConfiguration.Linear(2, 10);
+                    break;
+                case PNReconnectionPolicy.EXPONENTIAL:
+                    RetryConfiguration = RetryConfiguration.Exponential(2, 150, 6);
+                    break;
+                default:
+                    break;
+            }
+        }
+
         public PNConfiguration SetPresenceTimeoutWithCustomInterval(int timeout, int interval)
         {
             this.presenceHeartbeatTimeout = timeout;
