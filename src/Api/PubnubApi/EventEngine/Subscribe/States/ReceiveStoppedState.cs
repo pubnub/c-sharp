@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using PubnubApi.EventEngine.Core;
-using PubnubApi.EventEngine.Subscribe.Invocations;
+﻿using PubnubApi.EventEngine.Core;
 using PubnubApi.EventEngine.Subscribe.Common;
-using PubnubApi.EventEngine.Subscribe.Context;
 
 namespace PubnubApi.EventEngine.Subscribe.States
 {
-    public class ReceiveStoppedState : SubscriptionState
+	public class ReceiveStoppedState : SubscriptionState
     {
         public SubscriptionCursor Cursor;
 
@@ -17,7 +13,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
             {
                 Events.UnsubscribeAllEvent unsubscribeAll => new UnsubscribedState() 
                 {
-                    ReconnectionConfiguration = this.ReconnectionConfiguration
+                    
                 },
 
                 Events.SubscriptionChangedEvent subscriptionChanged => new ReceiveStoppedState()
@@ -25,7 +21,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
                     Channels = subscriptionChanged.Channels,
                     ChannelGroups = subscriptionChanged.ChannelGroups,
                     Cursor = this.Cursor,
-                    ReconnectionConfiguration = this.ReconnectionConfiguration
+                    
                 },
                 
                 Events.ReconnectEvent reconnect => new HandshakingState()
@@ -33,7 +29,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
                     Channels = reconnect.Channels,
                     ChannelGroups = reconnect.ChannelGroups,
                     Cursor = reconnect.Cursor,
-                    ReconnectionConfiguration = this.ReconnectionConfiguration
+                    
                 },
                 
                 Events.SubscriptionRestoredEvent subscriptionRestored => new ReceiveStoppedState()
@@ -41,7 +37,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
                     Channels = subscriptionRestored.Channels,
                     ChannelGroups = subscriptionRestored.ChannelGroups,
                     Cursor = subscriptionRestored.Cursor,
-                    ReconnectionConfiguration = this.ReconnectionConfiguration
+                    
                 },
                 
                 _ => null

@@ -7,7 +7,6 @@ using Newtonsoft.Json;
 using PubnubApi.EndPoint;
 using PubnubApi.EventEngine.Common;
 using PubnubApi.EventEngine.Core;
-using PubnubApi.EventEngine.Subscribe.Context;
 using PubnubApi.EventEngine.Subscribe.Events;
 using PubnubApi.EventEngine.Subscribe.Invocations;
 using PubnubApi.EventEngine.Subscribe.Common;
@@ -17,26 +16,33 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
     public class HandshakeEffectHandler : 
         EffectDoubleCancellableHandler<HandshakeInvocation, HandshakeReconnectInvocation, CancelHandshakeInvocation, CancelHandshakeReconnectInvocation>
     {
+        private PNConfiguration pubnubConfiguration;
         private SubscribeManager2 manager;
         private EventQueue eventQueue;
         
         private Delay retryDelay = new Delay(0);
 
-        internal HandshakeEffectHandler(SubscribeManager2 manager, EventQueue eventQueue)
+        internal HandshakeEffectHandler(PNConfiguration pubnubConfiguration, SubscribeManager2 manager, EventQueue eventQueue)
         {
+            this.pubnubConfiguration = pubnubConfiguration;
             this.manager = manager;
             this.eventQueue = eventQueue;
         }
 
         public override async Task Run(HandshakeReconnectInvocation invocation)
         {
-            if (!ReconnectionDelayUtil.shouldRetry(invocation.ReconnectionConfiguration, invocation.AttemptedRetries))
+            var retryConfiguration = pubnubConfiguration.RetryConfiguration;
+            if (retryConfiguration == null)
+            {
+                eventQueue.Enqueue(new HandshakeReconnectGiveUpEvent() { Status = new PNStatus(PNStatusCategory.PNCancelledCategory) });
+            }
+            else if (!retryConfiguration.RetryPolicy.ShouldRetry(invocation.AttemptedRetries, invocation.Reason))
             {
                 eventQueue.Enqueue(new HandshakeReconnectGiveUpEvent() { Status = new PNStatus(PNStatusCategory.PNCancelledCategory) });
             }
             else
             {
-                retryDelay = new Delay(ReconnectionDelayUtil.CalculateDelay(invocation.ReconnectionConfiguration.ReconnectionPolicy, invocation.AttemptedRetries));
+                retryDelay = new Delay(retryConfiguration.RetryPolicy.GetDelay(invocation.AttemptedRetries, invocation.Reason, null));
                 await retryDelay.Start();
                 if (!retryDelay.Cancelled)
                     await Run((HandshakeInvocation)invocation);

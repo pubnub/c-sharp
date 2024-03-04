@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
-using PubnubApi.EventEngine.Core;
 using PubnubApi.EventEngine.Subscribe.Common;
-using PubnubApi.EventEngine.Subscribe.Context;
 
 namespace PubnubApi.EventEngine.Subscribe.Invocations {
 	public class EmitMessagesInvocation : Core.IEffectInvocation {
@@ -60,16 +58,18 @@ namespace PubnubApi.EventEngine.Subscribe.Invocations {
 
 	public class HandshakeReconnectInvocation: HandshakeInvocation
 	{
-		public ReconnectionConfiguration ReconnectionConfiguration;
-		public int AttemptedRetries;
+		public RetryConfiguration RetryConfiguration { get; set; }
+		public int AttemptedRetries { get; set; }
+		public PNStatus Reason { get; set; }
 	}
 
 	public class CancelHandshakeReconnectInvocation: HandshakeReconnectInvocation, Core.IEffectCancelInvocation { }
 	
 	public class ReceiveReconnectInvocation: ReceiveMessagesInvocation 
 	{ 
-		public ReconnectionConfiguration ReconnectionConfiguration;
-		public int AttemptedRetries;
+		public RetryConfiguration RetryConfiguration { get; set; }
+		public int AttemptedRetries { get; set; }
+		public PNStatus Reason { get; set; }
 	}
 
 	public class CancelReceiveReconnectInvocation: ReceiveReconnectInvocation, Core.IEffectCancelInvocation { }
