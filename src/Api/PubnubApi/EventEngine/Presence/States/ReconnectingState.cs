@@ -2,7 +2,6 @@ using PubnubApi.EventEngine.Presence.Invocations;
 using PubnubApi.EventEngine.Core;
 using System.Collections.Generic;
 using System;
-using System.Runtime.Remoting.Channels;
 
 namespace PubnubApi.EventEngine.Presence.States
 {
