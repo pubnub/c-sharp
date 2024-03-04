@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PubnubApi.EndPoint
 {
-	public class HertbeatOperation : PubnubCoreBase
+	public class HeartbeatOperation : PubnubCoreBase
 	{
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
@@ -15,7 +15,7 @@ namespace PubnubApi.EndPoint
         private readonly TelemetryManager pubnubTelemetryMgr;
         private Dictionary<string, object> userState;
 
-        public HertbeatOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
+        public HeartbeatOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
@@ -47,8 +47,8 @@ namespace PubnubApi.EndPoint
             }
             catch(Exception ex)
             {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} SubscribeManager=> HeartbeatRequest \n channel(s)={1} \n cg(s)={2} \n Exception Details={3}", DateTime.Now.ToString(CultureInfo.InvariantCulture), string.Join(",", channels.OrderBy(x => x).ToArray()), string.Join(",", channelGroups.OrderBy(x => x).ToArray()), ex), config.LogVerbosity);
-                return resp;
+                LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} HeartbeatOperation=> HeartbeatRequest \n channel(s)={1} \n cg(s)={2} \n Exception Details={3}", DateTime.Now.ToString(CultureInfo.InvariantCulture), string.Join(",", channels.OrderBy(x => x).ToArray()), string.Join(",", channelGroups.OrderBy(x => x).ToArray()), ex), config.LogVerbosity);
+                return new PNStatus(ex, PNOperationType.PNHeartbeatOperation, PNStatusCategory.PNUnknownCategory, channels, channelGroups);
             }
             return resp;
         }
