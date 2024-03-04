@@ -118,7 +118,10 @@ namespace PubnubApi
 
         public PNReconnectionPolicy ReconnectionPolicy {
             get => ReconnectionPolicy;
-            set => setDefaultRetryConfigurationFromPolicy(value);   // for backward compatibility.
+            set {
+                ReconnectionPolicy = value;
+                setDefaultRetryConfigurationFromPolicy(value);
+            }
         }
 
         public RetryConfiguration RetryConfiguration { get; set; }
