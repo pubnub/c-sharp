@@ -1,12 +1,12 @@
 ﻿using PubnubApi.EndPoint;
 using PubnubApi.EventEngine.Core;
 using PubnubApi.EventEngine.Subscribe.States;
-using PubnubApi.EventEngine.Subscribe.Effects;
-using PubnubApi.EventEngine.Subscribe.Invocations;
 using System;
 
-namespace PubnubApi.EventEngine.Subscribe {
-	public class SubscribeEventEngine : Engine {
+namespace PubnubApi.EventEngine.Subscribe
+{
+	public class SubscribeEventEngine : Engine
+	{
 		private SubscribeManager2 subscribeManager;
 
 		internal SubscribeEventEngine(Pubnub pubnubInstance,
@@ -18,12 +18,12 @@ namespace PubnubApi.EventEngine.Subscribe {
 			this.subscribeManager = subscribeManager;
 
 			// initialize the handler, pass dependencies
-			var handshakeHandler = new Effects.HandshakeEffectHandler(subscribeManager, eventQueue);
+			var handshakeHandler = new Effects.HandshakeEffectHandler(pubnubConfiguration,subscribeManager, eventQueue);
 			dispatcher.Register<Invocations.HandshakeInvocation, Effects.HandshakeEffectHandler>(handshakeHandler);
 			dispatcher.Register<Invocations.HandshakeReconnectInvocation, Effects.HandshakeEffectHandler>(handshakeHandler);
 			dispatcher.Register<Invocations.CancelHandshakeInvocation, Effects.HandshakeEffectHandler>(handshakeHandler);
 
-			var receiveHandler = new Effects.ReceivingEffectHandler(subscribeManager, eventQueue);
+			var receiveHandler = new Effects.ReceivingEffectHandler(pubnubConfiguration,subscribeManager, eventQueue);
 			dispatcher.Register<Invocations.ReceiveMessagesInvocation, Effects.ReceivingEffectHandler>(receiveHandler);
 			dispatcher.Register<Invocations.ReceiveReconnectInvocation, Effects.ReceivingEffectHandler>(receiveHandler);
 			dispatcher.Register<Invocations.CancelReceiveMessagesInvocation, Effects.ReceivingEffectHandler>(receiveHandler);
@@ -34,7 +34,7 @@ namespace PubnubApi.EventEngine.Subscribe {
 			var emitStatusHandler = new Effects.EmitStatusEffectHandler(pubnubInstance, statusListener);
 			dispatcher.Register<Invocations.EmitStatusInvocation, Effects.EmitStatusEffectHandler>(emitStatusHandler);
 
-			currentState = new UnsubscribedState() { ReconnectionConfiguration = new Context.ReconnectionConfiguration(pubnubConfiguration.ReconnectionPolicy, pubnubConfiguration.ConnectionMaxRetries) };
+			currentState = new UnsubscribedState();
 		}
 	}
 }

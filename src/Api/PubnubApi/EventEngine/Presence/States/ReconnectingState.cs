@@ -10,8 +10,11 @@ namespace PubnubApi.EventEngine.Presence.States
         public int RetryCount { get; set; }
         public PNStatus Reason { get; set; }
 
-        // TODO: Dummy Invocation until we have real ones
-        public override IEnumerable<IEffectInvocation> OnEntry => new DummyInvocation().AsArray();
+        public override IEnumerable<IEffectInvocation> OnEntry => new DelayedHeartbeatInvocation()
+        {
+            Input = this.Input,
+            RetryCount = this.RetryCount
+        }.AsArray();
         public override IEnumerable<IEffectInvocation> OnExit => new DummyInvocation().AsArray();
 
         // TODO: transitions

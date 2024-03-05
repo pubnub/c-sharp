@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using PubnubApi.EventEngine.Core;
 using PubnubApi.EventEngine.Subscribe.Common;
-using PubnubApi.EventEngine.Subscribe.Context;
 using PubnubApi.EventEngine.Subscribe.Invocations;
 
 namespace PubnubApi.EventEngine.Subscribe.States
 {
-    public class HandshakingState : SubscriptionState
+	public class HandshakingState : SubscriptionState
     {
         public SubscriptionCursor Cursor { get; set; }
         public override IEnumerable<IEffectInvocation> OnEntry => new HandshakeInvocation()
@@ -22,29 +20,25 @@ namespace PubnubApi.EventEngine.Subscribe.States
             {
                 Events.UnsubscribeAllEvent unsubscribeAll => new UnsubscribedState() 
                 {
-                    ReconnectionConfiguration = this.ReconnectionConfiguration
                 },
 
                 Events.SubscriptionChangedEvent subscriptionChanged => new States.HandshakingState()
                 {
                     Channels = subscriptionChanged.Channels,
-                    ChannelGroups = subscriptionChanged.ChannelGroups,
-                    ReconnectionConfiguration = this.ReconnectionConfiguration
+                    ChannelGroups = subscriptionChanged.ChannelGroups
                 },
 
                 Events.SubscriptionRestoredEvent subscriptionRestored => new States.HandshakingState()
                 {
                     Channels = subscriptionRestored.Channels,
                     ChannelGroups = subscriptionRestored.ChannelGroups,
-                    Cursor = subscriptionRestored.Cursor,
-                    ReconnectionConfiguration = this.ReconnectionConfiguration
+                    Cursor = subscriptionRestored.Cursor
                 },
 
                 Events.HandshakeFailureEvent handshakeFailure => new States.HandshakeReconnectingState()
                 {
                     Channels = this.Channels,
                     ChannelGroups = this.ChannelGroups,
-                    ReconnectionConfiguration = this.ReconnectionConfiguration,
                     AttemptedRetries = 0
                 }.With(new EmitStatusInvocation(handshakeFailure.Status)),
 
@@ -52,7 +46,6 @@ namespace PubnubApi.EventEngine.Subscribe.States
                 {
                     Channels = disconnect.Channels,
                     ChannelGroups = disconnect.ChannelGroups,
-                    ReconnectionConfiguration = this.ReconnectionConfiguration
                 }.With(new EmitStatusInvocation(PNStatusCategory.PNDisconnectedCategory)),
 
                 Events.HandshakeSuccessEvent success => new ReceivingState()
@@ -60,7 +53,6 @@ namespace PubnubApi.EventEngine.Subscribe.States
                     Channels = this.Channels,
                     ChannelGroups = this.ChannelGroups,
                     Cursor = success.Cursor,
-					ReconnectionConfiguration = this.ReconnectionConfiguration
 				}.With(new EmitStatusInvocation(success.Status)),
 
                 _ => null

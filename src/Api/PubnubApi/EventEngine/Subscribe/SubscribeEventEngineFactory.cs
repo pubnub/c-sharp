@@ -8,7 +8,7 @@ namespace PubnubApi.EventEngine.Subscribe
 	{
 		private ConcurrentDictionary<string, SubscribeEventEngine> engineinstances;
 		internal SubscribeEventEngineFactory()
-		{ 
+		{
 			this.engineinstances = new ConcurrentDictionary<string, SubscribeEventEngine>();
 		}
 		internal bool hasEventEngine(string instanceId)
@@ -27,16 +27,15 @@ namespace PubnubApi.EventEngine.Subscribe
 			PNConfiguration pubnubConfiguration,
 			SubscribeManager2 subscribeManager,
 			Action<Pubnub, PNStatus> statusListener = null,
-			Action<Pubnub, PNMessageResult<T>> messageListener= null)
+			Action<Pubnub, PNMessageResult<T>> messageListener = null)
 		{
 			var subscribeEventEngine = new SubscribeEventEngine(pubnubInstance, pubnubConfiguration: pubnubConfiguration, subscribeManager);
 			if (engineinstances.TryAdd(instanceId, subscribeEventEngine)) {
 				return subscribeEventEngine;
-			}
-			else {
+			} else {
 				throw new Exception("Subscribe event engine initialisation failed!");
 			}
-			
+
 		}
 	}
 }

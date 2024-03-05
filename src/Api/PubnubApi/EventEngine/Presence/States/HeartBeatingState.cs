@@ -43,7 +43,7 @@ namespace PubnubApi.EventEngine.Presence.States
                 : (TransitionResult)new ReconnectingState()
                 {
                     Input = this.Input,
-                    RetryCount = 1,
+                    RetryCount = 0,
                     Reason = e.Status,
                 };                
         }
