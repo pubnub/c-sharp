@@ -8,6 +8,7 @@ namespace PubnubApi
         private int presenceHeartbeatInterval;
         private UserId _userId;
         private bool uuidSetFromConstructor;
+        private PNReconnectionPolicy reconnectionPolicy;
 
         internal void ResetUuidSetFromConstructor()
         {
@@ -117,9 +118,9 @@ namespace PubnubApi
         public bool IncludeRequestIdentifier { get; set; }
 
         public PNReconnectionPolicy ReconnectionPolicy {
-            get => ReconnectionPolicy;
+            get => reconnectionPolicy;
             set {
-                ReconnectionPolicy = value;
+                reconnectionPolicy = value;
                 setDefaultRetryConfigurationFromPolicy(value);
             }
         }
