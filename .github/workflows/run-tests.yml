@@ -78,9 +78,12 @@ jobs:
           dotnet build --no-restore
       - name: Run acceptance tests
         env: 
-          PN_PUB_KEY: ${{ secrets.PN_PUB_KEY }}
-          PN_SUB_KEY: ${{ secrets.PN_SUB_KEY }}
-          PN_SEC_KEY: ${{ secrets.PN_SEC_KEY }}    
+          PN_PAM_PUB_KEY: ${{ secrets.SDK_PAM_PUB_KEY }}
+          PN_PAM_SUB_KEY: ${{ secrets.SDK_PAM_SUB_KEY }}
+          PN_PAM_SEC_KEY: ${{ secrets.SDK_PAM_SEC_KEY }}    
+          PN_PUB_KEY: ${{ secrets.SDK_PUB_KEY }}
+          PN_SUB_KEY: ${{ secrets.SDK_SUB_KEY }}
+          PN_SEC_KEY: ${{ secrets.SDK_SEC_KEY }}   
         run: |
           Copy-Item -Path "${{ github.workspace }}/sdk-specifications/features/access/*" -Destination "${{ github.workspace }}/src/UnitTests/AcceptanceTests/Features" -Recurse
           cd ./UnitTests/AcceptanceTests 

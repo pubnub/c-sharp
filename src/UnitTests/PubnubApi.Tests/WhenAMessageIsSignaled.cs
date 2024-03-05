@@ -6,6 +6,8 @@ using MockServer;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
+// TODO: THIS TESTS ARE DEPENDING ON COMMON VARIABLE THAT MAKES FALSE POSITIVE RESULTS...
+
 namespace PubNubMessaging.Tests
 {
     [TestFixture]

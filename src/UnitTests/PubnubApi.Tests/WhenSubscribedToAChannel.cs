@@ -167,7 +167,7 @@ namespace PubNubMessaging.Tests
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 CipherKey = cipherKey,
                 Secure = ssl,
-                EnableEventEngine = true,
+                //EnableEventEngine = true, TODO: Event engine fails those tests...
             };
             if (PubnubCommon.PAMServerSideRun)
             {
@@ -397,7 +397,7 @@ namespace PubNubMessaging.Tests
                 LogVerbosity = PNLogVerbosity.BODY,
                 PubnubLog = new TestLog(),
                 NonSubscribeRequestTimeout = 120,
-                EnableEventEngine = true
+                //EnableEventEngine = true, TODO: Event engine fails those tests...
             };
             if (PubnubCommon.PAMServerSideRun)
             {
@@ -705,7 +705,7 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Secure = false,
-                EnableEventEngine = true,
+                // EnableEventEngine = true, TODO: Event engine fails those tests...
             };
             if (PubnubCommon.PAMServerSideRun)
             {

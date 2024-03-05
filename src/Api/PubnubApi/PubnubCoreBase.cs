@@ -675,8 +675,10 @@ namespace PubnubApi
                                         double objectsVersion = -1;
                                         Dictionary<string, object> objectsDic = payload as Dictionary<string, object>;
                                         if (objectsDic != null 
-                                            && objectsDic.ContainsKey("source") && objectsDic.ContainsKey("version")
-                                            && objectsDic["source"].ToString() == "objects" && Double.TryParse(objectsDic["version"].ToString(), out objectsVersion))
+                                            && objectsDic.ContainsKey("source")
+                                            && objectsDic.ContainsKey("version")
+                                            && objectsDic["source"].ToString() == "objects" 
+                                            && Double.TryParse(objectsDic["version"].ToString().Trim(), NumberStyles.Number, CultureInfo.InvariantCulture, out objectsVersion))
                                         {
                                             if (objectsVersion.CompareTo(2D) == 0) //Process only version=2 for Objects Simplification. Ignore 1. 
                                             {
