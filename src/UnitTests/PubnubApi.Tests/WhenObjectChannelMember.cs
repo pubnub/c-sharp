@@ -1163,8 +1163,8 @@ namespace PubNubMessaging.Tests
 
             PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
-                PublishKey = PubnubCommon.PublishKey,
-                SubscribeKey = PubnubCommon.SubscribeKey,
+                PublishKey = PubnubCommon.PublishKeyNoPam,
+                SubscribeKey = PubnubCommon.SubscribeKeyNoPam,
                 Secure = false,
             };
             if (PubnubCommon.PAMServerSideRun)
