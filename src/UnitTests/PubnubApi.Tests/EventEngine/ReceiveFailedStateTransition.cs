@@ -1,7 +1,6 @@
 ﻿using NUnit.Framework;
 using PubnubApi.EventEngine.Core;
 using PubnubApi.EventEngine.Subscribe.Common;
-using PubnubApi.EventEngine.Subscribe.Context;
 using PubnubApi.EventEngine.Subscribe.Events;
 using PubnubApi.EventEngine.Subscribe.States;
 using System.Linq;
@@ -64,7 +63,7 @@ namespace PubnubApi.Tests.EventEngine
         public void ReceiveFailedState_OnUnsubscribeAllEvent_TransitionToUnsubscribedState()
         {
             //Arrange
-            var receiveFailedState = new ReceiveFailedState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) };
+            var receiveFailedState = new ReceiveFailedState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 } };
             var @event = new UnsubscribeAllEvent() { };
 
             //Act

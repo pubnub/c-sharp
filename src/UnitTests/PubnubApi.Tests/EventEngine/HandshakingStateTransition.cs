@@ -1,7 +1,6 @@
 ﻿using NUnit.Framework;
 using PubnubApi.EventEngine.Core;
 using PubnubApi.EventEngine.Subscribe.Common;
-using PubnubApi.EventEngine.Subscribe.Context;
 using PubnubApi.EventEngine.Subscribe.Events;
 using PubnubApi.EventEngine.Subscribe.Invocations;
 using PubnubApi.EventEngine.Subscribe.States;
@@ -13,24 +12,24 @@ namespace PubnubApi.Tests.EventEngine
     {
         private static object[] handshakingEventCases = {
             new object[] {
-                new HandshakingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) },
+                new HandshakingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" } },
                 new SubscriptionChangedEvent()
                 {
                     Channels = new string[] { "ch1", "ch2", "ch3" },
                     ChannelGroups = new string[] { "cg1", "cg2", "cg3" }
                 },
-                new HandshakingState(){ Channels = new string[] { "ch1", "ch2", "ch3" }, ChannelGroups = new string[] { "cg1", "cg2", "cg3" }, Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) }
+                new HandshakingState(){ Channels = new string[] { "ch1", "ch2", "ch3" }, ChannelGroups = new string[] { "cg1", "cg2", "cg3" }, Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 } }
             },
             new object[]
             {
-                new HandshakingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) },
+                new HandshakingState() { Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, },
                 new SubscriptionRestoredEvent()
                 {
                     Channels = new string[] { "ch1", "ch2" },
                     ChannelGroups = new string[] { "cg1", "cg2" },
                     Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 }
                 },
-                new HandshakingState(){ Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 }, ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) }
+                new HandshakingState(){ Channels = new string[] { "ch1", "ch2" }, ChannelGroups = new string[] { "cg1", "cg2" }, Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 } }
             }
         };
 
@@ -45,8 +44,6 @@ namespace PubnubApi.Tests.EventEngine
             Assert.IsInstanceOf<HandshakingState>(result.State);
             Assert.AreEqual(expectedState.Channels, ((HandshakingState)result.State).Channels);
             Assert.AreEqual(expectedState.ChannelGroups, ((HandshakingState)result.State).ChannelGroups);
-            Assert.AreEqual(expectedState.ReconnectionConfiguration.ReconnectionPolicy, ((HandshakingState)result.State).ReconnectionConfiguration.ReconnectionPolicy);
-            Assert.AreEqual(expectedState.ReconnectionConfiguration.MaximumReconnectionRetries, ((HandshakingState)result.State).ReconnectionConfiguration.MaximumReconnectionRetries);
             if (@event is SubscriptionRestoredEvent)
             {
             Assert.AreEqual(expectedState.Cursor.Region, ((HandshakingState)result.State).Cursor.Region);
@@ -60,7 +57,6 @@ namespace PubnubApi.Tests.EventEngine
             { 
                 Channels = new string[] { "ch1", "ch2" }, 
                 ChannelGroups = new string[] { "cg1", "cg2" }, 
-                ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50) 
             };
         }
 
@@ -74,7 +70,6 @@ namespace PubnubApi.Tests.EventEngine
             {
                 Channels = new string[] { "ch1", "ch2" },
                 ChannelGroups = new string[] { "cg1", "cg2" },
-                ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50)
             };
             
             //Act
@@ -84,8 +79,6 @@ namespace PubnubApi.Tests.EventEngine
             Assert.IsInstanceOf<HandshakeReconnectingState>(result.State);
             CollectionAssert.AreEqual(expectedState.Channels, ((HandshakeReconnectingState)result.State).Channels);
             CollectionAssert.AreEqual(expectedState.ChannelGroups, ((HandshakeReconnectingState)result.State).ChannelGroups);
-            Assert.AreEqual(expectedState.ReconnectionConfiguration.ReconnectionPolicy, ((HandshakeReconnectingState)result.State).ReconnectionConfiguration.ReconnectionPolicy);
-            Assert.AreEqual(expectedState.ReconnectionConfiguration.MaximumReconnectionRetries, ((HandshakeReconnectingState)result.State).ReconnectionConfiguration.MaximumReconnectionRetries);
             Assert.IsInstanceOf<EmitStatusInvocation>(result.Invocations.ElementAt(0));
             Assert.AreEqual(PNStatusCategory.PNUnknownCategory, ((EmitStatusInvocation)result.Invocations.ElementAt(0)).StatusCategory);
         }
@@ -105,7 +98,6 @@ namespace PubnubApi.Tests.EventEngine
             {
                 Channels = new string[] { "ch1", "ch2" },
                 ChannelGroups = new string[] { "cg1", "cg2" },
-                ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50)
             };
 
             //Act
@@ -115,8 +107,6 @@ namespace PubnubApi.Tests.EventEngine
             Assert.IsInstanceOf<HandshakeStoppedState>(result.State);
             CollectionAssert.AreEqual(expectedState.Channels, ((HandshakeStoppedState)result.State).Channels);
             CollectionAssert.AreEqual(expectedState.ChannelGroups, ((HandshakeStoppedState)result.State).ChannelGroups);
-            Assert.AreEqual(expectedState.ReconnectionConfiguration.ReconnectionPolicy, ((HandshakeStoppedState)result.State).ReconnectionConfiguration.ReconnectionPolicy);
-            Assert.AreEqual(expectedState.ReconnectionConfiguration.MaximumReconnectionRetries, ((HandshakeStoppedState)result.State).ReconnectionConfiguration.MaximumReconnectionRetries);
             Assert.IsInstanceOf<EmitStatusInvocation>(result.Invocations.ElementAt(0));
             Assert.AreEqual(PNStatusCategory.PNDisconnectedCategory, ((EmitStatusInvocation)result.Invocations.ElementAt(0)).StatusCategory);
         }
@@ -135,7 +125,6 @@ namespace PubnubApi.Tests.EventEngine
             {
                 Channels = new string[] { "ch1", "ch2" },
                 ChannelGroups = new string[] { "cg1", "cg2" },
-                ReconnectionConfiguration = new ReconnectionConfiguration(PNReconnectionPolicy.LINEAR, 50)
             };
 
             //Act
@@ -145,8 +134,6 @@ namespace PubnubApi.Tests.EventEngine
             Assert.IsInstanceOf<ReceivingState>(result.State);
             CollectionAssert.AreEqual(expectedState.Channels, ((ReceivingState)result.State).Channels);
             CollectionAssert.AreEqual(expectedState.ChannelGroups, ((ReceivingState)result.State).ChannelGroups);
-            Assert.AreEqual(expectedState.ReconnectionConfiguration.ReconnectionPolicy, ((ReceivingState)result.State).ReconnectionConfiguration.ReconnectionPolicy);
-            Assert.AreEqual(expectedState.ReconnectionConfiguration.MaximumReconnectionRetries, ((ReceivingState)result.State).ReconnectionConfiguration.MaximumReconnectionRetries);
             Assert.IsInstanceOf<EmitStatusInvocation>(result.Invocations.ElementAt(0));
             Assert.AreEqual(PNStatusCategory.PNConnectedCategory, ((EmitStatusInvocation)result.Invocations.ElementAt(0)).StatusCategory);
         }
