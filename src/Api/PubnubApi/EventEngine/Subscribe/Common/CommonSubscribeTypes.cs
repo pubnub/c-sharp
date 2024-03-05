@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
-using PubnubApi.EventEngine.Subscribe.Context;
 
 namespace PubnubApi.EventEngine.Subscribe.Common
 {
@@ -89,6 +88,5 @@ namespace PubnubApi.EventEngine.Subscribe.Common
 	{
 		public IEnumerable<string> Channels;
 		public IEnumerable<string> ChannelGroups;
-		public ReconnectionConfiguration ReconnectionConfiguration;
 	}
 }

@@ -5,6 +5,7 @@ using System.Text;
 
 namespace PubnubApi
 {
+    // TODO: deprecate old way of specifying retry configuration.
     public enum PNReconnectionPolicy
     {
         NONE,
