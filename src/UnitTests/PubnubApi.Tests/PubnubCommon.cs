@@ -6,13 +6,13 @@ namespace PubNubMessaging.Tests
     {
         private static readonly string EnvPAMServerSideRun = Environment.GetEnvironmentVariable("PN_PAM_SERVER_SIDE");
         
-        private static readonly string EnvPublishKey = Environment.GetEnvironmentVariable("SDK_PAM_PUB_KEY");
-        private static readonly string EnvSubscribeKey = Environment.GetEnvironmentVariable("SDK_PAM_SUB_KEY");
-        private static readonly string EnvSecretKey = Environment.GetEnvironmentVariable("SDK_PAM_SEC_KEY");
+        private static readonly string EnvPublishKey = Environment.GetEnvironmentVariable("PN_PAM_PUB_KEY");
+        private static readonly string EnvSubscribeKey = Environment.GetEnvironmentVariable("PN_PAM_SUB_KEY");
+        private static readonly string EnvSecretKey = Environment.GetEnvironmentVariable("PN_PAM_SEC_KEY");
 
-        private static readonly string EnvPublishKeyNoPam = Environment.GetEnvironmentVariable("SDK_PUB_KEY");
-        private static readonly string EnvSubscribeKeyNoPam = Environment.GetEnvironmentVariable("SDK_SUB_KEY");
-        private static readonly string EnvSecretKeyNoPam = Environment.GetEnvironmentVariable("SDK_SEC_KEY");
+        private static readonly string EnvPublishKeyNoPam = Environment.GetEnvironmentVariable("PN_PUB_KEY");
+        private static readonly string EnvSubscribeKeyNoPam = Environment.GetEnvironmentVariable("PN_SUB_KEY");
+        private static readonly string EnvSecretKeyNoPam = Environment.GetEnvironmentVariable("PN_SEC_KEY");
 
         public static readonly bool PAMServerSideRun = (!string.IsNullOrEmpty(EnvPAMServerSideRun) && EnvPAMServerSideRun == "1");
         public static readonly bool PAMServerSideGrant = !PAMServerSideRun;
