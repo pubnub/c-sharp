@@ -517,7 +517,7 @@ namespace PubNubMessaging.Tests
                     }
                 },
                 delegate(Pubnub o, PNStatus s) {
-                    Debug.WriteLine(string.Format("~~~~~~~~~~~> {0} {1} {2}", s.Operation, s.Category, s.StatusCode));
+                    Debug.WriteLine(string.Format("{0} {1} {2}", s.Operation, s.Category, s.StatusCode));
                     if (s.StatusCode != 200 || s.Error)
                     {
                         receivedErrorMessage = true;
