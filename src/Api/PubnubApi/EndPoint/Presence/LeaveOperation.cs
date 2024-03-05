@@ -20,7 +20,6 @@ namespace PubnubApi.EndPoint
 			unit = pubnubUnit;
 			pubnubLog = log;
 			pubnubTelemetryManager = telemetryManager;
-
 			PubnubInstance = instance;
 		}
 
@@ -35,7 +34,6 @@ namespace PubnubApi.EndPoint
 				pubnubRequestState.ChannelGroups = channelGroups;
 				pubnubRequestState.ResponseType = PNOperationType.Leave;
 				pubnubRequestState.TimeQueued = DateTime.Now;
-
 				await UrlProcessRequest<T>(request, pubnubRequestState, false).ContinueWith(r => {
 					resp = r.Result.Item2;
 				}, TaskContinuationOptions.ExecuteSynchronously).ConfigureAwait(false);
