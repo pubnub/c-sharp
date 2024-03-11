@@ -10,6 +10,7 @@ using PubnubApi.PubnubEventEngine;
 using PubnubApi.EventEngine.Subscribe;
 using PubnubApi.EventEngine.Subscribe.Events;
 using PubnubApi;
+using PubnubApi.EndPoint.Presence;
 
 namespace PubnubApi.EndPoint
 {
@@ -27,6 +28,7 @@ namespace PubnubApi.EndPoint
         private long subscribeTimetoken = -1;
         private bool presenceSubscribeEnabled;
         private SubscribeManager2 manager;
+        private PresenceOperation<T> presenceOpeartion;
         private Dictionary<string, object> queryParam;
         private PubnubEventEngine.EventEngine pnEventEngine;
         private Pubnub PubnubInstance;
@@ -39,7 +41,7 @@ namespace PubnubApi.EndPoint
             set;
         } = new List<SubscribeCallback>();
 
-        public SubscribeOperation2(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager,SubscribeEventEngineFactory subscribeEventEngineFactory, string instanceId, Pubnub instance) 
+        public SubscribeOperation2(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager,SubscribeEventEngineFactory subscribeEventEngineFactory, string instanceId, Pubnub instance, PresenceOperation<T> presenceOperation) 
         {
             PubnubInstance = instance;
             config = pubnubConfig;
@@ -800,6 +802,10 @@ namespace PubnubApi.EndPoint
 				subscribeEventEngine = subscribeEventEngineFactory.initializeEventEngine(instanceId, PubnubInstance, config, subscribeManager, statusListener, messageListener);
 
 			}
+            if (presenceOpeartion != null)
+            {
+                this.presenceOpeartion.Start(channels, channelGroups);
+            }
 			subscribeEventEngine.eventQueue.Enqueue(new SubscriptionChangedEvent() { Channels = channels, ChannelGroups = channelGroups });
 		}
 
