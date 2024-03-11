@@ -5,7 +5,6 @@ using System.Reflection;
 using PubnubApi.EventEngine.Subscribe;
 using PubnubApi.EndPoint;
 using PubnubApi.EventEngine.Subscribe.Events;
-using PubnubApi.EndPoint.Presence;
 #if !NET35 && !NET40
 using System.Collections.Concurrent;
 #endif

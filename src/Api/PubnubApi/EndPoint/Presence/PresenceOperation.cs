@@ -2,7 +2,7 @@
 using PubnubApi.EventEngine.Presence;
 using PubnubApi.EventEngine.Presence.Events;
 
-namespace PubnubApi.EndPoint.Presence
+namespace PubnubApi.EndPoint
 {
 	public class PresenceOperation<T>
 	{

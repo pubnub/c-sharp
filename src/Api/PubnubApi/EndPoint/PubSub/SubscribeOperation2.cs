@@ -10,7 +10,6 @@ using PubnubApi.PubnubEventEngine;
 using PubnubApi.EventEngine.Subscribe;
 using PubnubApi.EventEngine.Subscribe.Events;
 using PubnubApi;
-using PubnubApi.EndPoint.Presence;
 
 namespace PubnubApi.EndPoint
 {
@@ -28,7 +27,7 @@ namespace PubnubApi.EndPoint
         private long subscribeTimetoken = -1;
         private bool presenceSubscribeEnabled;
         private SubscribeManager2 manager;
-        private PresenceOperation<T> presenceOpeartion;
+        private PresenceOperation<T> presenceOperation;
         private Dictionary<string, object> queryParam;
         private PubnubEventEngine.EventEngine pnEventEngine;
         private Pubnub PubnubInstance;
@@ -52,6 +51,7 @@ namespace PubnubApi.EndPoint
             pubnubTokenMgr = tokenManager;
             this.subscribeEventEngineFactory = subscribeEventEngineFactory;
             this.instanceId = instanceId;
+			this.presenceOperation = presenceOperation;
             
 			var eventEmitter = new EventEmitter();
             eventEmitter.RegisterJsonListener(JsonCallback);
@@ -802,9 +802,9 @@ namespace PubnubApi.EndPoint
 				subscribeEventEngine = subscribeEventEngineFactory.initializeEventEngine(instanceId, PubnubInstance, config, subscribeManager, statusListener, messageListener);
 
 			}
-            if (presenceOpeartion != null)
+            if (this.presenceOperation != null)
             {
-                this.presenceOpeartion.Start(channels, channelGroups);
+                this.presenceOperation.Start(channels, channelGroups);
             }
 			subscribeEventEngine.eventQueue.Enqueue(new SubscriptionChangedEvent() { Channels = channels, ChannelGroups = channelGroups });
 		}
