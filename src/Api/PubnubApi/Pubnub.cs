@@ -5,6 +5,7 @@ using System.Reflection;
 using PubnubApi.EventEngine.Subscribe;
 using PubnubApi.EndPoint;
 using PubnubApi.EventEngine.Subscribe.Events;
+using PubnubApi.EndPoint.Presence;
 #if !NET35 && !NET40
 using System.Collections.Concurrent;
 #endif
@@ -43,9 +44,13 @@ namespace PubnubApi
 
         public ISubscribeOperation<T> Subscribe<T>()
 		{
+            PresenceOperation<T> presenceOperation = null;
             if (pubnubConfig[InstanceId].EnableEventEngine)
             {
-				EndPoint.SubscribeOperation2<T> subscribeOperation = new EndPoint.SubscribeOperation2<T>(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, new SubscribeEventEngineFactory(),InstanceId ,this);
+                if (pubnubConfig[InstanceId].PresenceTimeout > 0) {
+                    presenceOperation = new PresenceOperation<T>(this, InstanceId, pubnubLog, telemetryManager, tokenManager, new EventEngine.Presence.PresenceEventEngineFactory());
+                }
+				EndPoint.SubscribeOperation2<T> subscribeOperation = new EndPoint.SubscribeOperation2<T>(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, new SubscribeEventEngineFactory(),InstanceId ,this, presenceOperation);
                 subscribeOperation.SubscribeListenerList = subscribeCallbackListenerList;
                                 
 				//subscribeOperation.CurrentPubnubInstance(this);
