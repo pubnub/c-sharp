@@ -9,10 +9,12 @@ namespace PubnubApi.EventEngine.Presence.Effects
 	{
 		private Delay retryDelay = new(0);
 		private EventQueue eventQueue;
+		private PNConfiguration pnConfiguration;
 
-		internal WaitEffectHandler(EventQueue eventQueue)
+		internal WaitEffectHandler(PNConfiguration pnConfiguration, EventQueue eventQueue)
 		{
 			this.eventQueue = eventQueue;
+			this.pnConfiguration = pnConfiguration;
 		}
 
 		public override async Task Cancel()
@@ -29,7 +31,7 @@ namespace PubnubApi.EventEngine.Presence.Effects
 
 		public override async Task Run(WaitInvocation invocation)
 		{
-			retryDelay = new Delay((int)(invocation.HeartbeatInterval * 1000));
+			retryDelay = new Delay((int)(pnConfiguration.PresenceInterval * 1000));
 			await retryDelay.Start();
 			if (!retryDelay.Cancelled)
 				eventQueue.Enqueue(new Events.TimesUpEvent());

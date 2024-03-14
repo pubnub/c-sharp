@@ -8,9 +8,10 @@ namespace PubnubApi.EventEngine.Presence.States
 {
     public class CooldownState : APresenceState
     {
-        // TODO: Dummy Invocation until we have real ones
-        public override IEnumerable<IEffectInvocation> OnEntry => new DummyInvocation().AsArray();
-        public override IEnumerable<IEffectInvocation> OnExit => new DummyInvocation().AsArray();
+        public override IEnumerable<IEffectInvocation> OnEntry => new WaitInvocation() {
+            Input = this.Input
+        }.AsArray();
+        public override IEnumerable<IEffectInvocation> OnExit => new CancelWaitInvocation().AsArray();
 
         // TODO: transitions
         public override TransitionResult Transition(IEvent ev)
