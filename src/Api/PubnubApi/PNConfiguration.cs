@@ -143,6 +143,8 @@ namespace PubnubApi
 
         public bool UseRandomInitializationVector { get; set; }
 
+        public bool MaintainPresenceState { get; set; } = true;
+
         public bool EnableEventEngine { get; set; }
         public int FileMessagePublishRetryLimit { get; set; }
         public int ConnectionMaxRetries { get; set; }

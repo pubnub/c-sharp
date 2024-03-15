@@ -1741,11 +1741,11 @@ namespace PubnubApi
 
             if (local)
             {
-                if (!string.IsNullOrEmpty(channel) && ChannelLocalUserState[PubnubInstance.InstanceId].ContainsKey(channel))
+                if (!string.IsNullOrEmpty(channel) && ChannelLocalUserState.ContainsKey(PubnubInstance.InstanceId) && ChannelLocalUserState[PubnubInstance.InstanceId].ContainsKey(channel))
                 {
                     ChannelLocalUserState[PubnubInstance.InstanceId].TryGetValue(channel, out channelUserStateDictionary);
                 }
-                if (!string.IsNullOrEmpty(channelGroup) && ChannelGroupLocalUserState[PubnubInstance.InstanceId].ContainsKey(channelGroup))
+                if (!string.IsNullOrEmpty(channelGroup) && ChannelLocalUserState.ContainsKey(PubnubInstance.InstanceId) && ChannelGroupLocalUserState[PubnubInstance.InstanceId].ContainsKey(channelGroup))
                 {
                     ChannelGroupLocalUserState[PubnubInstance.InstanceId].TryGetValue(channelGroup, out channelGroupUserStateDictionary);
                 }

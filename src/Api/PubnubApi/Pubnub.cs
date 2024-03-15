@@ -21,6 +21,7 @@ namespace PubnubApi
         private readonly EndPoint.TokenManager tokenManager;
         private object savedSubscribeOperation;
         private readonly string savedSdkVerion;
+        private SubscribeEventEngineFactory subscribeEventEngineFactory;
         private List<SubscribeCallback> subscribeCallbackListenerList
         {
             get;
@@ -46,14 +47,14 @@ namespace PubnubApi
             PresenceOperation<T> presenceOperation = null;
             if (pubnubConfig[InstanceId].EnableEventEngine)
             {
-                if (pubnubConfig[InstanceId].PresenceTimeout > 0) {
+                if (pubnubConfig[InstanceId].PresenceInterval > 0) {
                     presenceOperation = new PresenceOperation<T>(this, InstanceId, pubnubLog, telemetryManager, tokenManager, new EventEngine.Presence.PresenceEventEngineFactory());
                 }
-				EndPoint.SubscribeOperation2<T> subscribeOperation = new EndPoint.SubscribeOperation2<T>(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, new SubscribeEventEngineFactory(),InstanceId ,this, presenceOperation);
+                EndPoint.SubscribeOperation2<T> subscribeOperation = new EndPoint.SubscribeOperation2<T>(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, new SubscribeEventEngineFactory(), InstanceId, this, presenceOperation);
                 subscribeOperation.SubscribeListenerList = subscribeCallbackListenerList;
-                                
-				//subscribeOperation.CurrentPubnubInstance(this);
-				savedSubscribeOperation = subscribeOperation;
+                subscribeEventEngineFactory = subscribeOperation.subscribeEventEngineFactory;
+                // subscribeOperation.CurrentPubnubInstance(this);
+                savedSubscribeOperation = subscribeOperation;
                 return subscribeOperation;
             }
             else
@@ -67,7 +68,7 @@ namespace PubnubApi
 
         public EndPoint.UnsubscribeOperation<T> Unsubscribe<T>()
         {
-            EndPoint.UnsubscribeOperation<T>  unsubscribeOperation = new EndPoint.UnsubscribeOperation<T>(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this);
+            EndPoint.UnsubscribeOperation<T>  unsubscribeOperation = new EndPoint.UnsubscribeOperation<T>(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, telemetryManager, tokenManager, this, subscribeEventEngineFactory);
             unsubscribeOperation.CurrentPubnubInstance(this);
             return unsubscribeOperation;
         }

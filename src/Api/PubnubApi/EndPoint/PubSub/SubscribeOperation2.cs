@@ -802,11 +802,13 @@ namespace PubnubApi.EndPoint
 				subscribeEventEngine = subscribeEventEngineFactory.initializeEventEngine(instanceId, PubnubInstance, config, subscribeManager, statusListener, messageListener);
 
 			}
+            if(channels!=null && channels.Length > 0) subscribeEventEngine.Channels = subscribeEventEngine.Channels.Concat(channels).ToArray();
+            if(channelGroups!=null && channelGroups.Length > 0)subscribeEventEngine.Channelgroups = subscribeEventEngine.Channelgroups.Concat(channelGroups).ToArray();
+			subscribeEventEngine.eventQueue.Enqueue(new SubscriptionChangedEvent() { Channels = subscribeEventEngine.Channels, ChannelGroups = subscribeEventEngine.Channelgroups });
             if (this.presenceOperation != null)
             {
                 this.presenceOperation.Start(channels, channelGroups);
             }
-			subscribeEventEngine.eventQueue.Enqueue(new SubscriptionChangedEvent() { Channels = channels, ChannelGroups = channelGroups });
 		}
 
         internal bool Retry(bool reconnect)

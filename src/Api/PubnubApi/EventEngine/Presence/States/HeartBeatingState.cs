@@ -10,7 +10,6 @@ namespace PubnubApi.EventEngine.Presence.States
         public override IEnumerable<IEffectInvocation> OnEntry => new HeartbeatInvocation() {
             Input = this.Input
         }.AsArray();
-        public override IEnumerable<IEffectInvocation> OnExit => new DummyInvocation().AsArray();
 
         // TODO: transitions
         public override TransitionResult Transition(IEvent ev)
