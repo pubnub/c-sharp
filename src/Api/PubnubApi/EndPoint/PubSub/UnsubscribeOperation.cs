@@ -67,12 +67,12 @@ namespace PubnubApi.EndPoint
                         Channels = subscribeEventEngine.Channels, ChannelGroups = subscribeEventEngine.Channelgroups
                     });
                     if (ChannelLocalUserState.TryGetValue(PubnubInstance.InstanceId, out var userState)) {
-                        foreach (var channel in this.subscribeChannelNames ?? Array.Empty<string>()) {
+                        foreach (var channel in this.subscribeChannelNames ?? new string[0]) {
                             userState.TryRemove(channel, out _);
                         }
                     }
                     if (ChannelGroupLocalUserState.TryGetValue(PubnubInstance.InstanceId, out var channelGroupUserState)) {
-                        foreach (var channelGroup in this.subscribeChannelGroupNames ?? Array.Empty<string>()) {
+                        foreach (var channelGroup in this.subscribeChannelGroupNames ?? new string[0]) {
                             channelGroupUserState.TryRemove(channelGroup, out _);
                         }
                     }
