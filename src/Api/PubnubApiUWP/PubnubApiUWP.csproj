@@ -239,6 +239,9 @@
     <Compile Include="..\PubnubApi\EndPoint\Presence\HeartbeatOperation.cs">
       <Link>EndPoint\Presence\HeartbeatOperation.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\Presence\PresenceOperation.cs">
+      <Link>EndPoint\Presence\PresenceOperation.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\EndPoint\Presence\LeaveOperation.cs">
       <Link>EndPoint\Presence\LeaveOperation.cs</Link>
     </Compile>
@@ -370,6 +373,8 @@
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\States\UnsubscribedState.cs" Link="EventEngine\Subscribe\States\UnsubscribedState.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\SubscribeEventEngine.cs" Link="EventEngine\Subscribe\SubscribeEventEngine.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\SubscribeEventEngineFactory.cs" Link="EventEngine\Subscribe\SubscribeEventEngineFactory.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Presence\PresenceEventEngine.cs" Link="EventEngine\Presence\PresenceEventEngine.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Presence\PresenceEventEngineFactory.cs" Link="EventEngine\Presence\PresenceEventEngineFactory.cs" />
 	<Compile Include="..\PubnubApi\EventEngine\Presence\Common\PresenceInput.cs" Link="EventEngine\Presence\Common\PresenceInput.cs" />
 	<Compile Include="..\PubnubApi\EventEngine\Presence\Events\PresenceEvents.cs" Link="EventEngine\Presence\Events\PresenceEvents.cs" />
 	<Compile Include="..\PubnubApi\EventEngine\Presence\Invocations\CancelDelayedHeartbeatInvocation.cs" Link="EventEngine\Presence\Invocations\CancelDelayedHeartbeatInvocation.cs" />

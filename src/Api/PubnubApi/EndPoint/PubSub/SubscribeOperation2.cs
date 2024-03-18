@@ -27,6 +27,7 @@ namespace PubnubApi.EndPoint
         private long subscribeTimetoken = -1;
         private bool presenceSubscribeEnabled;
         private SubscribeManager2 manager;
+        private PresenceOperation<T> presenceOperation;
         private Dictionary<string, object> queryParam;
         private PubnubEventEngine.EventEngine pnEventEngine;
         private Pubnub PubnubInstance;
@@ -39,7 +40,7 @@ namespace PubnubApi.EndPoint
             set;
         } = new List<SubscribeCallback>();
 
-        public SubscribeOperation2(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager,SubscribeEventEngineFactory subscribeEventEngineFactory, string instanceId, Pubnub instance) 
+        public SubscribeOperation2(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager,SubscribeEventEngineFactory subscribeEventEngineFactory, string instanceId, Pubnub instance, PresenceOperation<T> presenceOperation) 
         {
             PubnubInstance = instance;
             config = pubnubConfig;
@@ -50,6 +51,7 @@ namespace PubnubApi.EndPoint
             pubnubTokenMgr = tokenManager;
             this.subscribeEventEngineFactory = subscribeEventEngineFactory;
             this.instanceId = instanceId;
+			this.presenceOperation = presenceOperation;
             
 			var eventEmitter = new EventEmitter();
             eventEmitter.RegisterJsonListener(JsonCallback);
@@ -800,7 +802,13 @@ namespace PubnubApi.EndPoint
 				subscribeEventEngine = subscribeEventEngineFactory.initializeEventEngine(instanceId, PubnubInstance, config, subscribeManager, statusListener, messageListener);
 
 			}
-			subscribeEventEngine.eventQueue.Enqueue(new SubscriptionChangedEvent() { Channels = channels, ChannelGroups = channelGroups });
+            if(channels!=null && channels.Length > 0) subscribeEventEngine.Channels = subscribeEventEngine.Channels.Concat(channels).ToArray();
+            if(channelGroups!=null && channelGroups.Length > 0)subscribeEventEngine.Channelgroups = subscribeEventEngine.Channelgroups.Concat(channelGroups).ToArray();
+			subscribeEventEngine.eventQueue.Enqueue(new SubscriptionChangedEvent() { Channels = subscribeEventEngine.Channels, ChannelGroups = subscribeEventEngine.Channelgroups });
+            if (this.presenceOperation != null)
+            {
+                this.presenceOperation.Start(channels, channelGroups);
+            }
 		}
 
         internal bool Retry(bool reconnect)

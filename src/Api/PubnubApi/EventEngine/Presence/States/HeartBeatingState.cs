@@ -7,9 +7,9 @@ namespace PubnubApi.EventEngine.Presence.States
 {
     public class HeartbeatingState : APresenceState
     {
-        // TODO: Dummy Invocation until we have real ones
-        public override IEnumerable<IEffectInvocation> OnEntry => new DummyInvocation().AsArray();
-        public override IEnumerable<IEffectInvocation> OnExit => new DummyInvocation().AsArray();
+        public override IEnumerable<IEffectInvocation> OnEntry => new HeartbeatInvocation() {
+            Input = this.Input
+        }.AsArray();
 
         // TODO: transitions
         public override TransitionResult Transition(IEvent ev)

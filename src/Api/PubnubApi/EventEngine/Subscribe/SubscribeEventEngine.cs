@@ -9,6 +9,9 @@ namespace PubnubApi.EventEngine.Subscribe
 	{
 		private SubscribeManager2 subscribeManager;
 
+		public string[] Channels { get; set; } = new string[] {};
+		public string[] Channelgroups { get; set; } = new string[] {};
+
 		internal SubscribeEventEngine(Pubnub pubnubInstance,
 			PNConfiguration pubnubConfiguration,
 			SubscribeManager2 subscribeManager,

@@ -98,10 +98,11 @@ namespace PubnubApi.EndPoint
 
             try
             {
-                string channelsJsonState = BuildJsonUserState(channels, channelGroups, false);
+                string presenceState = string.Empty;
+                if (config.MaintainPresenceState) presenceState =  BuildJsonUserState(channels, channelGroups, true);
 
                 IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, null, "");
-                Uri request = urlBuilder.BuildMultiChannelSubscribeRequest("GET", "", channels, channelGroups, timetoken.GetValueOrDefault(), region.GetValueOrDefault(), channelsJsonState, initialSubscribeUrlParams, externalQueryParam);
+                Uri request = urlBuilder.BuildMultiChannelSubscribeRequest("GET", "", channels, channelGroups, timetoken.GetValueOrDefault(), region.GetValueOrDefault(), presenceState, initialSubscribeUrlParams, externalQueryParam);
 
                 RequestState<T> pubnubRequestState = new RequestState<T>();
                 pubnubRequestState.Channels = channels;
