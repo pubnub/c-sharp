@@ -1,12 +1,15 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 
 namespace PubnubApi.EventEngine.Core {
 	public abstract class Engine {
-		public EventQueue eventQueue = new EventQueue();
+		public readonly EventQueue EventQueue = new EventQueue();
 		
 		protected EffectDispatcher dispatcher = new EffectDispatcher();
 		protected State currentState;
+		public State CurrentState => currentState;
+		private bool transitioning = false;
 
 		private Task currentTransitionLoop = Utils.EmptyTask;
 
@@ -32,31 +35,39 @@ namespace PubnubApi.EventEngine.Core {
 		public event System.Action<IEvent> OnEventQueued;
 
 		public Engine() {
-			eventQueue.OnEventQueued += OnEvent;
+			EventQueue.OnEventQueued += OnEvent;
 		}
 
 		~Engine() {
-			eventQueue.OnEventQueued -= OnEvent;
+			EventQueue.OnEventQueued -= OnEvent;
 		}
 
 		private async void OnEvent(EventQueue q)
 		{
 			OnEventQueued?.Invoke(q.Peek());
-			await currentTransitionLoop;
-			currentTransitionLoop = eventQueue.Loop(async e => currentState = await Transition(e));
+			if (transitioning) return;
+			transitioning = true;
+			while (q.Count > 0)
+			{
+				await Transition(q.Dequeue());
+			}
+
+			transitioning = false;
 		}
 		
-		private async Task<State> Transition(IEvent e) {
+		private async Task Transition(IEvent e)
+		{
 			var stateInvocationPair = currentState.Transition(e);
 			OnStateTransition?.Invoke(stateInvocationPair);
 
-			if (stateInvocationPair is null) {
-				return currentState;
+			if (stateInvocationPair is null)
+			{
+				return;
 			}
 
 			await ExecuteStateChange(currentState, stateInvocationPair.State, stateInvocationPair.Invocations);
 
-			return stateInvocationPair.State;
+			this.currentState = stateInvocationPair.State;
 		}
 
 		/// <summary>

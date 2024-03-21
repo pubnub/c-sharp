@@ -26,10 +26,15 @@ namespace PubnubApi.EventEngine.Core {
 			{
 				var handler = effectInvocationHandlerMap[invocation.GetType()];
 				if (handler.IsBackground(invocation))
-					handler.Run(invocation).Start();
+					FireAndForget(handler, invocation);
 				else
 					await handler.Run(invocation);
 			}
+		}
+
+		void FireAndForget(IEffectHandler handler, IEffectInvocation invocation)
+		{
+			handler.Run(invocation);
 		}
 
 		/// <summary>

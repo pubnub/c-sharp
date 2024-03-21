@@ -20,7 +20,7 @@ namespace PubnubApi.EndPoint
 
 		public void Start(string[] channels, string[] channelGroups)
 		{
-			this.presenceEventEngine.eventQueue.Enqueue(new JoinedEvent() {
+			this.presenceEventEngine.EventQueue.Enqueue(new JoinedEvent() {
 				Input = new EventEngine.Presence.Common.PresenceInput() { Channels = channels, ChannelGroups = channelGroups }
 			});
 		}

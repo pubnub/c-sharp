@@ -1,4 +1,5 @@
-﻿using PubnubApi.EventEngine.Core;
+﻿using System.Linq;
+using PubnubApi.EventEngine.Core;
 using PubnubApi.EventEngine.Subscribe.Common;
 
 namespace PubnubApi.EventEngine.Subscribe.States
@@ -11,15 +12,16 @@ namespace PubnubApi.EventEngine.Subscribe.States
             {
                 Events.SubscriptionChangedEvent subscriptionChanged => new HandshakingState()
                 {
-                    Channels = subscriptionChanged.Channels,
-                    ChannelGroups = subscriptionChanged.ChannelGroups
+                    Channels = (Channels ?? Enumerable.Empty<string>()).Union(subscriptionChanged.Channels),
+                    ChannelGroups = (ChannelGroups ?? Enumerable.Empty<string>()).Union(subscriptionChanged.ChannelGroups),
+                    Cursor = subscriptionChanged.Cursor,
                 },
 
                 Events.SubscriptionRestoredEvent subscriptionRestored => new States.ReceivingState()
                 {
                     Channels = subscriptionRestored.Channels,
                     ChannelGroups = subscriptionRestored.ChannelGroups,
-                    Cursor = subscriptionRestored.Cursor
+                    Cursor = subscriptionRestored.Cursor,
                 },
 
                 _ => null

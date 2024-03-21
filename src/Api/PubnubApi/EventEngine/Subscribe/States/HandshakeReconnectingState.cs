@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using PubnubApi.EventEngine.Core;
 using PubnubApi.EventEngine.Subscribe.Common;
 using PubnubApi.EventEngine.Subscribe.Invocations;
@@ -12,6 +13,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
 		public override IEnumerable<IEffectInvocation> OnEntry => new HandshakeReconnectInvocation() {
 			Channels = this.Channels,
 			ChannelGroups = this.ChannelGroups,
+			Cursor = this.Cursor,
 			AttemptedRetries = this.AttemptedRetries
 		}.AsArray();
 		public override IEnumerable<IEffectInvocation> OnExit { get; } = new CancelHandshakeReconnectInvocation().AsArray();
@@ -23,8 +25,8 @@ namespace PubnubApi.EventEngine.Subscribe.States
 				},
 
 				Events.SubscriptionChangedEvent subscriptionChanged => new HandshakingState() {
-					Channels = subscriptionChanged.Channels,
-					ChannelGroups = subscriptionChanged.ChannelGroups,
+					Channels = (Channels ?? Enumerable.Empty<string>()).Union(subscriptionChanged.Channels),
+					ChannelGroups = (ChannelGroups ?? Enumerable.Empty<string>()).Union(subscriptionChanged.ChannelGroups),
 				},
 
 				Events.DisconnectEvent disconnect => new HandshakeStoppedState() {

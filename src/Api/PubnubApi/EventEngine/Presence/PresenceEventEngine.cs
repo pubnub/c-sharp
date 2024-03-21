@@ -7,14 +7,14 @@ namespace PubnubApi.EventEngine.Presence
 	{
 		public PresenceEventEngine(PNConfiguration pnConfiguration, HeartbeatOperation heartbeatOperation, LeaveOperation leaveOperation)
 		{
-			var heartbeatEffectHandler = new Effects.HeartbeatEffectHandler(heartbeatOperation, eventQueue);
+			var heartbeatEffectHandler = new Effects.HeartbeatEffectHandler(heartbeatOperation, EventQueue);
 			dispatcher.Register<Invocations.HeartbeatInvocation, Effects.HeartbeatEffectHandler>(heartbeatEffectHandler);
 
-			var delayedHeartbeatEffectHandler = new Effects.DelayedHeartbeatEffectHandler(pnConfiguration, heartbeatOperation, eventQueue);
+			var delayedHeartbeatEffectHandler = new Effects.DelayedHeartbeatEffectHandler(pnConfiguration, heartbeatOperation, EventQueue);
 			dispatcher.Register<Invocations.DelayedHeartbeatInvocation, Effects.DelayedHeartbeatEffectHandler>(delayedHeartbeatEffectHandler);
 			dispatcher.Register<Invocations.CancelDelayedHeartbeatInvocation, Effects.DelayedHeartbeatEffectHandler>(delayedHeartbeatEffectHandler);
 
-			var waitEffectHandler = new Effects.WaitEffectHandler(pnConfiguration, eventQueue);
+			var waitEffectHandler = new Effects.WaitEffectHandler(pnConfiguration, EventQueue);
 			dispatcher.Register<Invocations.WaitInvocation, Effects.WaitEffectHandler>(waitEffectHandler);
 			dispatcher.Register<Invocations.CancelWaitInvocation, Effects.WaitEffectHandler>(waitEffectHandler);
 

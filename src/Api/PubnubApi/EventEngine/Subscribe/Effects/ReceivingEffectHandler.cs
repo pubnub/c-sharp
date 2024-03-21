@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
+﻿using System.Linq;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using PubnubApi.EndPoint;
 using PubnubApi.EventEngine.Common;
 using PubnubApi.EventEngine.Core;
@@ -14,24 +10,90 @@ using PubnubApi.EventEngine.Subscribe.Common;
 namespace PubnubApi.EventEngine.Subscribe.Effects
 {
     public class ReceivingEffectHandler:
-        EffectDoubleCancellableHandler<ReceiveMessagesInvocation, ReceiveReconnectInvocation, CancelReceiveMessagesInvocation, CancelReceiveReconnectInvocation>
+        EffectCancellableHandler<ReceiveMessagesInvocation, CancelReceiveMessagesInvocation>
     {
-        private PNConfiguration pubnubConfiguration;
         private SubscribeManager2 manager;
         private EventQueue eventQueue;
-        
-        private Delay retryDelay = new Delay(0);
 
-        internal ReceivingEffectHandler(PNConfiguration pubnubConfiguration, SubscribeManager2 manager, EventQueue eventQueue)
+        internal ReceivingEffectHandler(SubscribeManager2 manager, EventQueue eventQueue)
         {
-            this.pubnubConfiguration = pubnubConfiguration;
             this.manager = manager;
             this.eventQueue = eventQueue;
         }
 
-        public override Task Run(ReceiveReconnectInvocation invocation)
+        public override async Task Run(ReceiveMessagesInvocation invocation)
         {
-			var retryConfiguration = pubnubConfiguration.RetryConfiguration;
+            var response = await MakeReceiveMessagesRequest(invocation);
+            var cursor = new SubscriptionCursor()
+            {
+                Region = response.Item1?.Timetoken?.Region,
+                Timetoken = response.Item1?.Timetoken?.Timestamp
+            };
+
+            // Assume that if status is null, the effect was cancelled.
+            if (response.Item2 is null)
+                return;
+
+            switch (invocation)
+            {
+                case Invocations.ReceiveReconnectInvocation reconnectInvocation when response.Item2.Error:
+                    eventQueue.Enqueue(new Events.ReceiveReconnectFailureEvent() { AttemptedRetries = (reconnectInvocation.AttemptedRetries + 1) % int.MaxValue, Status = response.Item2});
+                    break;
+                case Invocations.ReceiveReconnectInvocation reconnectInvocation:
+                    eventQueue.Enqueue(new Events.ReceiveReconnectSuccessEvent() { Channels = invocation?.Channels, ChannelGroups = invocation?.ChannelGroups, Cursor = cursor, Status = response.Item2, Messages = response.Item1 });
+                    break;
+                case { } when response.Item2.Error:
+                    eventQueue.Enqueue(new Events.ReceiveFailureEvent() { Cursor = invocation.Cursor, Status = response.Item2});
+                    break;
+                case { }:
+                    eventQueue.Enqueue(new Events.ReceiveSuccessEvent() { Channels = invocation?.Channels, ChannelGroups = invocation?.ChannelGroups, Cursor = cursor, Messages= response.Item1, Status = response.Item2 });
+                    break;
+            }
+        }
+
+        public override bool IsBackground(ReceiveMessagesInvocation invocation)
+        {
+            return true;
+        }
+
+        private async Task<System.Tuple<ReceivingResponse<object>, PNStatus>> MakeReceiveMessagesRequest(ReceiveMessagesInvocation invocation)
+        {
+            return await manager.ReceiveRequest<ReceivingResponse<object>>(
+                PNOperationType.PNSubscribeOperation,
+                invocation.Channels?.ToArray(),
+                invocation.ChannelGroups?.ToArray(),
+                invocation.Cursor.Timetoken.Value,
+                invocation.Cursor.Region.Value,
+                invocation.InitialSubscribeQueryParams,
+                invocation.ExternalQueryParams
+            );
+        }
+
+        public override async Task Cancel()
+        {
+            manager.ReceiveRequestCancellation();
+        }
+    }
+
+    public class ReceivingReconnectEffectHandler :
+        EffectCancellableHandler<ReceiveReconnectInvocation, CancelReceiveReconnectInvocation>
+    {
+        private PNConfiguration pubnubConfiguration;
+        private EventQueue eventQueue;
+        private ReceivingEffectHandler receivingEffectHandler;
+        
+        private Delay retryDelay = new Delay(0);   
+        
+        internal ReceivingReconnectEffectHandler(PNConfiguration pubnubConfiguration,  EventQueue eventQueue, ReceivingEffectHandler receivingEffectHandler)
+        {
+            this.pubnubConfiguration = pubnubConfiguration;
+            this.eventQueue = eventQueue;
+            this.receivingEffectHandler = receivingEffectHandler;
+        }
+        
+        public override async Task Run(ReceiveReconnectInvocation invocation)
+        {
+            var retryConfiguration = pubnubConfiguration.RetryConfiguration;
 			if (retryConfiguration == null)
             {
                 eventQueue.Enqueue(new ReceiveReconnectGiveUpEvent() { Status = new PNStatus(PNStatusCategory.PNCancelledCategory) });
@@ -44,82 +106,23 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
             {
                 retryDelay = new Delay(retryConfiguration.RetryPolicy.GetDelay(invocation.AttemptedRetries, invocation.Reason, null));
                 // Run in the background
-                retryDelay.Start().ContinueWith((_) => this.Run((ReceiveMessagesInvocation)invocation));
+                await retryDelay.Start();
+                await receivingEffectHandler.Run(invocation);
             }
-
-            return Utils.EmptyTask;
         }
-
+        
         public override bool IsBackground(ReceiveReconnectInvocation invocation)
         {
             return true;
         }
-
-        public override async Task Run(ReceiveMessagesInvocation invocation)
-        {
-            var response = await MakeReceiveMessagesRequest(invocation);
-            var cursor = new SubscriptionCursor()
-            {
-                Region = response.Item1?.Timetoken.Region,
-                Timetoken = response.Item1?.Timetoken.Timestamp
-            };
-
-            switch (invocation)
-            {
-                case Invocations.ReceiveReconnectInvocation reconnectInvocation when response.Item2.Error:
-                    eventQueue.Enqueue(new Events.ReceiveReconnectFailureEvent() { AttemptedRetries = reconnectInvocation.AttemptedRetries + 1, Status = response.Item2});
-                    break;
-                case Invocations.ReceiveReconnectInvocation reconnectInvocation:
-                    eventQueue.Enqueue(new Events.ReceiveReconnectSuccessEvent() { Cursor = cursor, Status = response.Item2 });
-                    break;
-                case { } when response.Item2.Error:
-                    eventQueue.Enqueue(new Events.ReceiveFailureEvent() { Cursor = cursor, Status = response.Item2});
-                    break;
-                case { }:
-                    eventQueue.Enqueue(new Events.ReceiveSuccessEvent() { Cursor = cursor, Messages= response.Item1, Status = response.Item2 });
-                    break;
-            }
-        }
-
-        public override bool IsBackground(ReceiveMessagesInvocation invocation)
-        {
-            return true;
-        }
-
-        private async Task<System.Tuple<ReceivingResponse<string>, PNStatus>> MakeReceiveMessagesRequest(ReceiveMessagesInvocation invocation)
-        {
-            var resp = await manager.ReceiveRequest<string>(
-                PNOperationType.PNSubscribeOperation,
-                invocation.Channels.ToArray(),
-                invocation.ChannelGroups.ToArray(),
-                invocation.Cursor.Timetoken.Value,
-                invocation.Cursor.Region.Value,
-                invocation.InitialSubscribeQueryParams,
-                invocation.ExternalQueryParams
-            );
-
-            try
-            {
-                //TODO: get ReceivingResponse from manager.ReceiveRequest
-                var receiveResponse = JsonConvert.DeserializeObject<ReceivingResponse<string>>(resp.Item1);
-                return new System.Tuple<ReceivingResponse<string>, PNStatus>(receiveResponse, resp.Item2);
-            }
-            catch (Exception e)
-            {
-                return new Tuple<ReceivingResponse<string>, PNStatus>(null, new PNStatus(e, PNOperationType.PNSubscribeOperation, PNStatusCategory.PNUnknownCategory, invocation.Channels, invocation.ChannelGroups));
-            }
-        }
-
+        
         public override async Task Cancel()
         {
             if (!retryDelay.Cancelled)
             {
                 retryDelay.Cancel();
             }
-            else
-            {
-                manager.ReceiveRequestCancellation();
-            }
+            await receivingEffectHandler.Cancel();
         }
     }
 }

@@ -2,13 +2,12 @@
 using PubnubApi.EventEngine.Core;
 using PubnubApi.EventEngine.Subscribe.Invocations;
 using PubnubApi.EventEngine.Subscribe.Common;
+using System.Linq;
 
 namespace PubnubApi.EventEngine.Subscribe.States
 {
 	public class ReceivingState : SubscriptionState
     {
-        public SubscriptionCursor Cursor;
-
         public override IEnumerable<IEffectInvocation> OnEntry => new ReceiveMessagesInvocation()
             { Channels = this.Channels,ChannelGroups = this.ChannelGroups, Cursor = this.Cursor }.AsArray();
 
@@ -18,10 +17,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
         {
             return e switch
             {
-                Events.UnsubscribeAllEvent unsubscribeAll => new UnsubscribedState() 
-                {
-					
-				},
+                Events.UnsubscribeAllEvent unsubscribeAll => new UnsubscribedState() { },
 
                 Events.ReceiveSuccessEvent receiveSuccess => new ReceivingState()
                 {
@@ -30,16 +26,14 @@ namespace PubnubApi.EventEngine.Subscribe.States
                     Cursor = receiveSuccess.Cursor,
                     
                 }.With(
-                    new EmitMessagesInvocation(receiveSuccess.Messages),
-                    new EmitStatusInvocation(receiveSuccess.Status)
+                    new EmitMessagesInvocation(receiveSuccess.Cursor, receiveSuccess.Messages)
                 ),
 
                 Events.SubscriptionChangedEvent subscriptionChanged => new ReceivingState()
                 {
-                    Channels = subscriptionChanged.Channels,
-                    ChannelGroups = subscriptionChanged.ChannelGroups,
-                    Cursor = this.Cursor,
-                    
+                    Channels = (Channels ?? Enumerable.Empty<string>()).Union(subscriptionChanged.Channels),
+                    ChannelGroups = (ChannelGroups ?? Enumerable.Empty<string>()).Union(subscriptionChanged.ChannelGroups),
+                    Cursor = subscriptionChanged.Cursor,
                 },
 
                 Events.SubscriptionRestoredEvent subscriptionRestored => new ReceivingState()
@@ -47,7 +41,6 @@ namespace PubnubApi.EventEngine.Subscribe.States
                     Channels = subscriptionRestored.Channels,
                     ChannelGroups = subscriptionRestored.ChannelGroups,
                     Cursor = subscriptionRestored.Cursor,
-                    
                 },
 
                 Events.DisconnectEvent disconnect => new ReceiveStoppedState()
@@ -62,7 +55,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
                 {
                     Channels = this.Channels,
                     ChannelGroups = this.ChannelGroups,
-                    Cursor = this.Cursor,
+                    Cursor = receiveFailure.Cursor,
                     AttemptedRetries = 0
                 },
 
