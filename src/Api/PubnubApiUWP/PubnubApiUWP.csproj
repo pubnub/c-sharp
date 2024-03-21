@@ -735,7 +735,6 @@
     </Compile>
     <None Include="..\PubnubApi\LICENSE.txt" Link="LICENSE.txt" Pack="true" PackagePath="" />
     <EmbeddedResource Include="Properties\PubnubApiUWP.rd.xml" />
-  </ItemGroup>
   <!--<ItemGroup>
     <PackageReference Include="NETStandard.Library" Version="1.6.1"/>
   </ItemGroup>-->
