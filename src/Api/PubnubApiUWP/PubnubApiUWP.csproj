@@ -285,9 +285,6 @@
     <Compile Include="..\PubnubApi\EndPoint\PubSub\UnsubscribeOperation.cs">
       <Link>EndPoint\PubSub\UnsubscribeOperation.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\EndPoint\PubSub\UnsubscribeEndpoint.cs">
-      <Link>EndPoint\PubSub\UnsubscribeEndpoint.cs</Link>
-    </Compile>
     <Compile Include="..\PubnubApi\EndPoint\Push\AddPushChannelOperation.cs">
       <Link>EndPoint\Push\AddPushChannelOperation.cs</Link>
     </Compile>
