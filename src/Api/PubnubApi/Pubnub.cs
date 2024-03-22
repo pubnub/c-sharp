@@ -333,7 +333,7 @@ namespace PubnubApi
 
 #endregion
 
-#region "PubNub API Channel Group Methods"
+        #region "PubNub API Channel Group Methods"
 
         public EndPoint.AddChannelsToChannelGroupOperation AddChannelsToChannelGroup()
 		{
@@ -937,6 +937,7 @@ namespace PubnubApi
         {
             savedSdkVerion = Version;
             InstanceId = Guid.NewGuid().ToString();
+			subscribeEventEngineFactory = new SubscribeEventEngineFactory();
             pubnubConfig.AddOrUpdate(InstanceId, config, (k, o) => config);
 
             if (config != null)

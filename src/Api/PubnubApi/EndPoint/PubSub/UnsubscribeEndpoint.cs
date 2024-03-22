@@ -35,6 +35,7 @@ namespace PubnubApi.EndPoint
             pubnubLog = log;
             pubnubTelemetryMgr = telemetryManager;
             pubnubTokenMgr = tokenManager;
+            this.subscribeEventEngineFactory = subscribeEventEngineFactory;
             instanceId = instance.InstanceId;
         }
 
