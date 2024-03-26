@@ -36,6 +36,7 @@ namespace PubnubApi.EventEngine.Presence.Events
 	}
 
 	public class ReconnectEvent : Core.IEvent {
+		public PresenceInput Input { get; set; }
 		public string Name { get; set; } = "RECONNECT";
 	}
 

@@ -24,10 +24,11 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
         public override async Task Run(ReceiveMessagesInvocation invocation)
         {
             var response = await MakeReceiveMessagesRequest(invocation);
+            if (response.Item1 is null) return;
             var cursor = new SubscriptionCursor()
             {
-                Region = response.Item1?.Timetoken?.Region,
-                Timetoken = response.Item1?.Timetoken?.Timestamp
+                Region = response.Item1.Timetoken.Region,
+                Timetoken = response.Item1.Timetoken.Timestamp
             };
 
             // Assume that if status is null, the effect was cancelled.
