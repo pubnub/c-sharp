@@ -43,7 +43,7 @@ namespace PubnubApi.EventEngine.Common
                 {
                     if (Cancelled)
                     {
-                        taskCompletionSource.SetCanceled();
+                        taskCompletionSource.TrySetCanceled();
                         break;
                     }
                     Monitor.Wait(monitor, milliseconds);

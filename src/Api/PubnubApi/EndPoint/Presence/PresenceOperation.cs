@@ -11,10 +11,10 @@ namespace PubnubApi.EndPoint
 		public PresenceOperation(Pubnub instance, string instanceId, IPubnubLog pubnubLog, TelemetryManager telemetryManager, TokenManager tokenManager, PresenceEventEngineFactory presenceEventEngineFactory)
 		{
 			this.presenceEventEngineFactory = presenceEventEngineFactory;
-			if (this.presenceEventEngineFactory.hasEventEngine(instanceId)) {
-				presenceEventEngine = this.presenceEventEngineFactory.getEventEngine(instanceId);
+			if (this.presenceEventEngineFactory.HasEventEngine(instanceId)) {
+				presenceEventEngine = this.presenceEventEngineFactory.GetEventEngine(instanceId);
 			} else {
-				presenceEventEngine = this.presenceEventEngineFactory.initializeEventEngine<T>(instanceId, instance, pubnubLog, telemetryManager, tokenManager);
+				presenceEventEngine = this.presenceEventEngineFactory.InitializeEventEngine<T>(instanceId, instance, pubnubLog, telemetryManager, tokenManager);
 			}
 		}
 
