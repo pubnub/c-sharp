@@ -166,6 +166,9 @@
     <Compile Include="..\PubnubApi\EndPoint\PubSub\UnsubscribeAllOperation.cs">
       <Link>EndPoint\PubSub\UnsubscribeAllOperation.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\PubSub\UnsubscribeAllEndpoint.cs">
+      <Link>EndPoint\PubSub\UnsubscribeAllEndpoint.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\EndPoint\PubSub\UnsubscribeEndpoint.cs" Link="EndPoint\PubSub\UnsubscribeEndpoint.cs" />
     <Compile Include="..\PubnubApi\EndPoint\PubSub\UnsubscribeOperation.cs">
       <Link>EndPoint\PubSub\UnsubscribeOperation.cs</Link>
