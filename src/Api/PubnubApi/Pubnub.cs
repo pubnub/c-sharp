@@ -599,7 +599,11 @@ namespace PubnubApi
                 if (subscribeEventEngineFactory.HasEventEngine(InstanceId))
                 {
                     var subscribeEventEngine = subscribeEventEngineFactory.GetEventEngine(InstanceId);
-                    subscribeEventEngine.EventQueue.Enqueue(new ReconnectEvent() { Channels = (subscribeEventEngine.CurrentState as SubscriptionState).Channels, ChannelGroups = (subscribeEventEngine.CurrentState as SubscriptionState).ChannelGroups, Cursor = resetSubscribeTimetoken ? null : (subscribeEventEngine.CurrentState as SubscriptionState).Cursor });
+                    subscribeEventEngine.EventQueue.Enqueue(new ReconnectEvent() {
+                        Channels = (subscribeEventEngine.CurrentState as SubscriptionState).Channels,
+                        ChannelGroups = (subscribeEventEngine.CurrentState as SubscriptionState).ChannelGroups,
+                        Cursor = resetSubscribeTimetoken ? null : (subscribeEventEngine.CurrentState as SubscriptionState).Cursor 
+                        });
                 }
                 if (presenceEventengineFactory.HasEventEngine(InstanceId)) {
                     var presenceEventEngine = presenceEventengineFactory.GetEventEngine(InstanceId);
