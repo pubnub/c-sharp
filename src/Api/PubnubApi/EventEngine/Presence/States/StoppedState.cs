@@ -7,11 +7,6 @@ namespace PubnubApi.EventEngine.Presence.States
 {
     public class StoppedState : APresenceState
     {
-        // TODO: Dummy Invocation until we have real ones
-        public override IEnumerable<IEffectInvocation> OnEntry => new DummyInvocation().AsArray();
-        public override IEnumerable<IEffectInvocation> OnExit => new DummyInvocation().AsArray();
-
-        // TODO: transitions
         public override TransitionResult Transition(IEvent ev)
         {
             return ev switch 

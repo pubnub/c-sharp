@@ -3,74 +3,68 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using PubnubApi.EndPoint;
 using PubnubApi.EventEngine.Common;
 using PubnubApi.EventEngine.Core;
 using PubnubApi.EventEngine.Subscribe.Events;
 using PubnubApi.EventEngine.Subscribe.Invocations;
 using PubnubApi.EventEngine.Subscribe.Common;
+using System.Diagnostics;
 
 namespace PubnubApi.EventEngine.Subscribe.Effects
 {
     public class HandshakeEffectHandler : 
-        EffectDoubleCancellableHandler<HandshakeInvocation, HandshakeReconnectInvocation, CancelHandshakeInvocation, CancelHandshakeReconnectInvocation>
+        EffectCancellableHandler<HandshakeInvocation, CancelHandshakeInvocation>
     {
-        private PNConfiguration pubnubConfiguration;
-        private SubscribeManager2 manager;
-        private EventQueue eventQueue;
-        
-        private Delay retryDelay = new Delay(0);
+        private readonly SubscribeManager2 manager;
+        private readonly EventQueue eventQueue;
 
-        internal HandshakeEffectHandler(PNConfiguration pubnubConfiguration, SubscribeManager2 manager, EventQueue eventQueue)
+        internal HandshakeEffectHandler(SubscribeManager2 manager, EventQueue eventQueue)
         {
-            this.pubnubConfiguration = pubnubConfiguration;
             this.manager = manager;
             this.eventQueue = eventQueue;
-        }
-
-        public override async Task Run(HandshakeReconnectInvocation invocation)
-        {
-            var retryConfiguration = pubnubConfiguration.RetryConfiguration;
-            if (retryConfiguration == null)
-            {
-                eventQueue.Enqueue(new HandshakeReconnectGiveUpEvent() { Status = new PNStatus(PNStatusCategory.PNCancelledCategory) });
-            }
-            else if (!retryConfiguration.RetryPolicy.ShouldRetry(invocation.AttemptedRetries, invocation.Reason))
-            {
-                eventQueue.Enqueue(new HandshakeReconnectGiveUpEvent() { Status = new PNStatus(PNStatusCategory.PNCancelledCategory) });
-            }
-            else
-            {
-                retryDelay = new Delay(retryConfiguration.RetryPolicy.GetDelay(invocation.AttemptedRetries, invocation.Reason, null));
-                await retryDelay.Start();
-                if (!retryDelay.Cancelled)
-                    await Run((HandshakeInvocation)invocation);
-            }
-        }
-
-        public override bool IsBackground(HandshakeReconnectInvocation invocation)
-        {
-            return true;
         }
 
         public override async Task Run(HandshakeInvocation invocation)
         {
             var response = await MakeHandshakeRequest(invocation);
+            SubscriptionCursor cursor = null;
+            if (response.Item1 != null)
+            {
+                if (invocation.Cursor != null && invocation.Cursor.Timetoken != null) 
+                { 
+                    cursor = invocation.Cursor;
+                }
+                else if (response.Item1.Timetoken != null)
+                {
+                    cursor = new SubscriptionCursor()
+                    {
+                        Region = response.Item1.Timetoken.Region,
+                        Timetoken = response.Item1.Timetoken.Timestamp
+                    };
+                }
+            }
+            else
+            {
+                if (invocation.Cursor != null && invocation.Cursor.Timetoken != null) 
+                { 
+                    cursor = invocation.Cursor;
+                }
+            }
 
             switch (invocation)
             {
                 case Invocations.HandshakeReconnectInvocation reconnectInvocation when response.Item2.Error:
-                    eventQueue.Enqueue(new Events.HandshakeReconnectFailureEvent() { AttemptedRetries = reconnectInvocation.AttemptedRetries + 1, Status = response.Item2});
+                    eventQueue.Enqueue(new Events.HandshakeReconnectFailureEvent() { AttemptedRetries = (reconnectInvocation.AttemptedRetries + 1) % int.MaxValue, Status = response.Item2});
                     break;
                 case Invocations.HandshakeReconnectInvocation reconnectInvocation:
-                    eventQueue.Enqueue(new Events.HandshakeReconnectSuccessEvent() { Cursor = response.Item1, Status = response.Item2 });
+                    eventQueue.Enqueue(new Events.HandshakeReconnectSuccessEvent() { Cursor = cursor, Status = response.Item2 });
                     break;
                 case { } when response.Item2.Error:
-                    eventQueue.Enqueue(new Events.HandshakeFailureEvent() { Status = response.Item2});
+                    eventQueue.Enqueue(new Events.HandshakeFailureEvent() { Status = response.Item2, Cursor = cursor, Channels = invocation.Channels, ChannelGroups = invocation.ChannelGroups});
                     break;
                 case { }:
-                    eventQueue.Enqueue(new Events.HandshakeSuccessEvent() { Cursor = response.Item1, Status = response.Item2 });
+                    eventQueue.Enqueue(new Events.HandshakeSuccessEvent() { Cursor = cursor, Status = response.Item2 });
                     break;
                 
             }
@@ -82,9 +76,9 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
         }
 
 
-        private async Task<System.Tuple<SubscriptionCursor, PNStatus>> MakeHandshakeRequest(HandshakeInvocation invocation)
+        private async Task<System.Tuple<HandshakeResponse, PNStatus>> MakeHandshakeRequest(HandshakeInvocation invocation)
         {
-            var resp = await manager.HandshakeRequest<string>(
+            return await manager.HandshakeRequest(
                 PNOperationType.PNSubscribeOperation,
                 invocation.Channels.ToArray(),
                 invocation.ChannelGroups.ToArray(),
@@ -93,34 +87,69 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
                 invocation.InitialSubscribeQueryParams,
                 invocation.ExternalQueryParams
             );
+        }
 
+        public override async Task Cancel()
+        {
+            manager.HandshakeRequestCancellation();
+        }
+
+    }
+
+    public class HandshakeReconnectEffectHandler : EffectCancellableHandler<HandshakeReconnectInvocation, CancelHandshakeReconnectInvocation>
+    {
+        private readonly EventQueue eventQueue;
+
+        private HandshakeEffectHandler handshakeEffectHandler;
+
+        private PNConfiguration pubnubConfiguration;
+        
+        private Delay retryDelay = new Delay(0);
+      
+        
+        internal HandshakeReconnectEffectHandler(PNConfiguration pubnubConfiguration, EventQueue eventQueue, HandshakeEffectHandler handshakeEffectHandler)
+        {
+            this.pubnubConfiguration = pubnubConfiguration;
+            this.eventQueue = eventQueue;
+            this.handshakeEffectHandler = handshakeEffectHandler;
+        }
+
+        public override async Task Run(HandshakeReconnectInvocation invocation)
+        {
+            var retryConfiguration = pubnubConfiguration.RetryConfiguration;
             try
             {
-                var handshakeResponse = JsonConvert.DeserializeObject<HandshakeResponse>(resp.Item1);
-                var c = new SubscriptionCursor()
+                if (retryConfiguration == null)
                 {
-                    Region = handshakeResponse.Timetoken.Region,
-                    Timetoken = handshakeResponse.Timetoken.Timestamp
-                };
-                return new System.Tuple<SubscriptionCursor, PNStatus>(c, resp.Item2);
+                    eventQueue.Enqueue(new HandshakeReconnectGiveUpEvent() { Status = new PNStatus(new Exception(""), PNOperationType.PNSubscribeOperation, PNStatusCategory.PNUnexpectedDisconnectCategory, invocation.Channels, invocation.ChannelGroups ) });
+                }
+                else if (!retryConfiguration.RetryPolicy.ShouldRetry(invocation.AttemptedRetries, invocation.Reason))
+                {
+                    eventQueue.Enqueue(new HandshakeReconnectGiveUpEvent() { Status = new PNStatus(new Exception(""), PNOperationType.PNSubscribeOperation, PNStatusCategory.PNUnexpectedDisconnectCategory, invocation.Channels, invocation.ChannelGroups ) });
+                }
+                else
+                {
+                    retryDelay = new Delay(retryConfiguration.RetryPolicy.GetDelay(invocation.AttemptedRetries, invocation.Reason, null));
+                    await retryDelay.Start();
+                    if (!retryDelay.Cancelled)
+                        await handshakeEffectHandler.Run(invocation as HandshakeInvocation);
+                }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                return new Tuple<SubscriptionCursor, PNStatus>(null, new PNStatus(e, PNOperationType.PNSubscribeOperation, PNStatusCategory.PNUnknownCategory, invocation.Channels, invocation.ChannelGroups));
+                Debug.WriteLine(ex);
             }
         }
 
+        public override bool IsBackground(HandshakeReconnectInvocation invocation) => true;
+        
         public override async Task Cancel()
         {
             if (!retryDelay.Cancelled)
             {
                 retryDelay.Cancel();
             }
-            else
-            {
-                manager.HandshakeRequestCancellation();
-            }
+            await handshakeEffectHandler.Cancel();
         }
-
     }
 }

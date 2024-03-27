@@ -7,5 +7,6 @@ namespace PubnubApi.EventEngine.Presence.Invocations
         public PresenceInput Input { get; set; }
 		public int RetryCount { get; set; }
         public PNStatus Reason { get; set; }
+        public virtual string Name { get; set; } = "DELAYED_HEARTBEAT";
     }
 }

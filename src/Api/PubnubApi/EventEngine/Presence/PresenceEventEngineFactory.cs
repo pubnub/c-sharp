@@ -12,19 +12,19 @@ namespace PubnubApi.EventEngine.Presence
 			this.engineInstances = new ConcurrentDictionary<string, PresenceEventEngine>();
 		}
 
-		internal bool hasEventEngine(string instanceId)
+		internal bool HasEventEngine(string instanceId)
 		{
 			return engineInstances.ContainsKey(instanceId);
 		}
 
-		internal PresenceEventEngine getEventEngine(string instanceId)
+		internal PresenceEventEngine GetEventEngine(string instanceId)
 		{
 			PresenceEventEngine subscribeEventEngine;
 			engineInstances.TryGetValue(instanceId, out subscribeEventEngine);
 			return subscribeEventEngine;
 		}
 
-		internal PresenceEventEngine initializeEventEngine<T>(string instanceId,
+		internal PresenceEventEngine InitializeEventEngine<T>(string instanceId,
 			Pubnub pubnubInstance, IPubnubLog pubnubLog, TelemetryManager telemetryManager, TokenManager tokenManager)
 		{
 			HeartbeatOperation heartbeatOperation = new HeartbeatOperation(pubnubInstance.PNConfig, pubnubInstance.JsonPluggableLibrary, pubnubInstance.PubnubUnitTest, pubnubLog, telemetryManager, tokenManager, pubnubInstance);

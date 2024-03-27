@@ -5,15 +5,14 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using PubnubApi.EventEngine.Subscribe;
-using PubnubApi.EventEngine.Subscribe.Events;
+using PubnubApi.Interface;
 #if !NET35 && !NET40
 using System.Collections.Concurrent;
 #endif
 
 namespace PubnubApi.EndPoint
 {
-    public class UnsubscribeOperation<T> : PubnubCoreBase
+    public class UnsubscribeOperation<T> : PubnubCoreBase, IUnsubscribeOperation<T>
     {
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
@@ -25,9 +24,8 @@ namespace PubnubApi.EndPoint
         private string[] subscribeChannelNames;
         private string[] subscribeChannelGroupNames;
         private Dictionary<string, object> queryParam;
-        private SubscribeEventEngineFactory subscribeEventEngineFactory;
 
-        public UnsubscribeOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance, SubscribeEventEngineFactory subscribeEventEngineFactory) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
+        public UnsubscribeOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
@@ -35,22 +33,21 @@ namespace PubnubApi.EndPoint
             pubnubLog = log;
             pubnubTelemetryMgr = telemetryManager;
             pubnubTokenMgr = tokenManager;
-            this.subscribeEventEngineFactory = subscribeEventEngineFactory;
         }
 
-        public UnsubscribeOperation<T> Channels(string[] channels)
+        public IUnsubscribeOperation<T> Channels(string[] channels)
         {
             this.subscribeChannelNames = channels;
             return this;
         }
 
-        public UnsubscribeOperation<T> ChannelGroups(string[] channelGroups)
+        public IUnsubscribeOperation<T> ChannelGroups(string[] channelGroups)
         {
             this.subscribeChannelGroupNames = channelGroups;
             return this;
         }
 
-        public UnsubscribeOperation<T> QueryParam(Dictionary<string, object> customQueryParam)
+        public IUnsubscribeOperation<T> QueryParam(Dictionary<string, object> customQueryParam)
         {
             this.queryParam = customQueryParam;
             return this;
@@ -58,30 +55,7 @@ namespace PubnubApi.EndPoint
 
         public void Execute()
         {
-            if (config.EnableEventEngine && subscribeEventEngineFactory != null) {
-                if (subscribeEventEngineFactory.hasEventEngine(PubnubInstance.InstanceId)) {
-                    var subscribeEventEngine = subscribeEventEngineFactory.getEventEngine(PubnubInstance.InstanceId);
-                    subscribeEventEngine.Channels = subscribeEventEngine.Channels.Except(this.subscribeChannelNames).ToArray();
-                    subscribeEventEngine.Channelgroups = subscribeEventEngine.Channelgroups.Except(this.subscribeChannelGroupNames).ToArray();
-                    subscribeEventEngine.eventQueue.Enqueue(new SubscriptionChangedEvent() {
-                        Channels = subscribeEventEngine.Channels, ChannelGroups = subscribeEventEngine.Channelgroups
-                    });
-                    if (ChannelLocalUserState.TryGetValue(PubnubInstance.InstanceId, out var userState)) {
-                        foreach (var channel in this.subscribeChannelNames ?? new string[0]) {
-                            userState.TryRemove(channel, out _);
-                        }
-                    }
-                    if (ChannelGroupLocalUserState.TryGetValue(PubnubInstance.InstanceId, out var channelGroupUserState)) {
-                        foreach (var channelGroup in this.subscribeChannelGroupNames ?? new string[0]) {
-                            channelGroupUserState.TryRemove(channelGroup, out _);
-                        }
-                    }
-                }
-            }
-            else {
                 Unsubscribe(subscribeChannelNames, subscribeChannelGroupNames);
-            }
-            
         }
 
         private void Unsubscribe(string[] channels, string[] channelGroups)

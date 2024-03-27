@@ -68,10 +68,10 @@ namespace PubnubApi.EventEngine.Core
     {
 
         public new Task Run(IEffectInvocation invocation) =>
-            invocation is T1 ? (this as EffectHandler<T1>).Run(invocation) : Run(invocation as T2);
+            invocation is T2 ? Run(invocation as T2) : (this as EffectHandler<T1>).Run(invocation);
 
         public new bool IsBackground(IEffectInvocation invocation) => 
-            invocation is T1 ? (this as EffectHandler<T1>).IsBackground(invocation) : IsBackground(invocation as T2);
+            invocation is T2 ? IsBackground(invocation as T2) : (this as EffectHandler<T1>).IsBackground(invocation);
 
         public abstract Task Run(T2 invocation);
 
@@ -127,6 +127,7 @@ namespace PubnubApi.EventEngine.Core
     /// </summary>
     public interface IEffectInvocation
     {
+        string Name { get; set;}
     }
 
     /// <summary>
@@ -138,6 +139,7 @@ namespace PubnubApi.EventEngine.Core
 
     public interface IEvent
     {
+        string Name { get; set;}
     };
 
     public abstract class State
