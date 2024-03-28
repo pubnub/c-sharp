@@ -1,3 +1,7 @@
+v6.19.6 - March 28 2024
+-----------------------------
+- Fixed: fixes issue of inaccurate DateTime to TimeToken conversion in TranslateDateTimeToPubnubUnixNanoSeconds.
+
 v6.19.5 - January 17 2024
 -----------------------------
 - Fixed: fixes issue of getting exception for custom objects in subscription and history when crypto module is configured.
