@@ -39,8 +39,9 @@ namespace PubnubApi.EventEngine.Subscribe.States
                     Channels = handshakeFailure.Channels,
                     ChannelGroups = handshakeFailure.ChannelGroups,
                     Cursor = handshakeFailure.Cursor,
+                    Reason = handshakeFailure.Status,
                     AttemptedRetries = 0
-                }.With(new EmitStatusInvocation(handshakeFailure.Status)),
+                },
 
                 Events.DisconnectEvent disconnect => new States.HandshakeStoppedState()
                 {

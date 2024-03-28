@@ -6,6 +6,7 @@ using PubnubApi.EventEngine.Core;
 using PubnubApi.EventEngine.Subscribe.Events;
 using PubnubApi.EventEngine.Subscribe.Invocations;
 using PubnubApi.EventEngine.Subscribe.Common;
+using System;
 
 namespace PubnubApi.EventEngine.Subscribe.Effects
 {
@@ -24,14 +25,14 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
         public override async Task Run(ReceiveMessagesInvocation invocation)
         {
             var response = await MakeReceiveMessagesRequest(invocation);
-            if (response.Item1 is null) return;
-            var cursor = new SubscriptionCursor()
-            {
-                Region = response.Item1.Timetoken.Region,
-                Timetoken = response.Item1.Timetoken.Timestamp
-            };
+            SubscriptionCursor cursor = null;
+            if (response.Item1 is not null) {
+                cursor = new SubscriptionCursor() {
+                    Region = response.Item1.Timetoken.Region,
+                    Timetoken = response.Item1.Timetoken.Timestamp
+                };
+            }
 
-            // Assume that if status is null, the effect was cancelled.
             if (response.Item2 is null)
                 return;
 
@@ -44,7 +45,7 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
                     eventQueue.Enqueue(new Events.ReceiveReconnectSuccessEvent() { Channels = invocation?.Channels, ChannelGroups = invocation?.ChannelGroups, Cursor = cursor, Status = response.Item2, Messages = response.Item1 });
                     break;
                 case { } when response.Item2.Error:
-                    eventQueue.Enqueue(new Events.ReceiveFailureEvent() { Cursor = invocation.Cursor, Status = response.Item2});
+                    eventQueue.Enqueue(new Events.ReceiveFailureEvent() { Cursor = invocation.Cursor, Status = response.Item2, AttemptedRetries = 0});
                     break;
                 case { }:
                     eventQueue.Enqueue(new Events.ReceiveSuccessEvent() { Channels = invocation?.Channels, ChannelGroups = invocation?.ChannelGroups, Cursor = cursor, Messages= response.Item1, Status = response.Item2 });
@@ -97,11 +98,11 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
             var retryConfiguration = pubnubConfiguration.RetryConfiguration;
 			if (retryConfiguration == null)
             {
-                eventQueue.Enqueue(new ReceiveReconnectGiveUpEvent() { Status = new PNStatus(PNStatusCategory.PNCancelledCategory) });
+                eventQueue.Enqueue(new ReceiveReconnectGiveUpEvent() { Status = new PNStatus(new Exception(""), PNOperationType.PNSubscribeOperation, PNStatusCategory.PNUnexpectedDisconnectCategory, invocation.Channels, invocation.ChannelGroups ) });
             }
 			else if (!retryConfiguration.RetryPolicy.ShouldRetry(invocation.AttemptedRetries, invocation.Reason))
             {
-				eventQueue.Enqueue(new ReceiveReconnectGiveUpEvent() { Status = new PNStatus(PNStatusCategory.PNCancelledCategory) });
+				eventQueue.Enqueue(new ReceiveReconnectGiveUpEvent() { Status = new PNStatus(new Exception(""), PNOperationType.PNSubscribeOperation, PNStatusCategory.PNUnexpectedDisconnectCategory, invocation.Channels, invocation.ChannelGroups ) });
 			}
             else
             {

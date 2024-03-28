@@ -17,7 +17,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
                     Cursor = subscriptionChanged.Cursor,
                 },
 
-                Events.SubscriptionRestoredEvent subscriptionRestored => new States.ReceivingState()
+                Events.SubscriptionRestoredEvent subscriptionRestored => new States.HandshakingState()
                 {
                     Channels = subscriptionRestored.Channels,
                     ChannelGroups = subscriptionRestored.ChannelGroups,
