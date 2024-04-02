@@ -1,3 +1,7 @@
+v6.19.7 - April 02 2024
+-----------------------------
+- Fixed: resolved the issue where an incorrect network status was emitted when no internet connection was detected.
+
 v6.19.6 - March 28 2024
 -----------------------------
 - Fixed: fixes issue of inaccurate DateTime to TimeToken conversion in TranslateDateTimeToPubnubUnixNanoSeconds.
