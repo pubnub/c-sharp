@@ -10,17 +10,20 @@ namespace PubnubApi.EventEngine.Presence.Effects
 	public class LeaveEffectHandler : EffectHandler<Invocations.LeaveInvocation>
 	{
 		private LeaveOperation leaveOperation;
+		private PNConfiguration configuration;
 
-		public LeaveEffectHandler(LeaveOperation leaveOperation)
+		public LeaveEffectHandler(PNConfiguration configuration, LeaveOperation leaveOperation)
 		{
 			this.leaveOperation = leaveOperation;
+			this.configuration = configuration;
 		}
 
 		public override async Task Run(LeaveInvocation invocation)
 		{
+			if (!configuration.SuppressLeaveEvents)
 			await leaveOperation.LeaveRequest<string>(
-				invocation.Input.Channels.ToArray(),
-				invocation.Input.ChannelGroups.ToArray()
+				invocation.Input.Channels?.ToArray(),
+				invocation.Input.ChannelGroups?.ToArray()
 			);
 		}
 

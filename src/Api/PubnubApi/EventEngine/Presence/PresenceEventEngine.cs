@@ -18,7 +18,7 @@ namespace PubnubApi.EventEngine.Presence
 			dispatcher.Register<Invocations.WaitInvocation, Effects.WaitEffectHandler>(waitEffectHandler);
 			dispatcher.Register<Invocations.CancelWaitInvocation, Effects.WaitEffectHandler>(waitEffectHandler);
 
-			var leaveEffectHandler = new Effects.LeaveEffectHandler(leaveOperation);
+			var leaveEffectHandler = new Effects.LeaveEffectHandler(pnConfiguration,leaveOperation);
 			dispatcher.Register<Invocations.LeaveInvocation, Effects.LeaveEffectHandler>(leaveEffectHandler);
 
 			currentState = new States.InactiveState();
