@@ -1,8 +1,13 @@
 name: c-sharp
-version: "6.19.6"
+version: "6.19.7"
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog:
+  - date: 2024-04-02
+    version: v6.19.7
+    changes:
+      - type: bug
+        text: "Resolved the issue where an incorrect network status was emitted when no internet connection was detected."
   - date: 2024-03-28
     version: v6.19.6
     changes:
@@ -771,7 +776,7 @@ features:
     - QUERY-PARAM
 supported-platforms:
   -
-    version: Pubnub 'C#' 6.19.6
+    version: Pubnub 'C#' 6.19.7
     platforms:
       - Windows 10 and up
       - Windows Server 2008 and up
@@ -781,7 +786,7 @@ supported-platforms:
       - .Net Framework 4.5
       - .Net Framework 4.6.1+
   -
-    version: PubnubPCL 'C#' 6.19.6
+    version: PubnubPCL 'C#' 6.19.7
     platforms:
       - Xamarin.Android
       - Xamarin.iOS
@@ -801,7 +806,7 @@ supported-platforms:
       - .Net Core
       - .Net 6.0
   -
-    version: PubnubUWP 'C#' 6.19.6
+    version: PubnubUWP 'C#' 6.19.7
     platforms:
       - Windows Phone 10
       - Universal Windows Apps
@@ -825,7 +830,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: Pubnub
-            location: https://github.com/pubnub/c-sharp/releases/tag/v6.19.6.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v6.19.7.0
             requires:
               -
                 name: ".Net"
@@ -1108,7 +1113,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: PubNubPCL
-            location: https://github.com/pubnub/c-sharp/releases/tag/v6.19.6.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v6.19.7.0
             requires:
               -
                 name: ".Net Core"
@@ -1467,7 +1472,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: PubnubUWP
-            location: https://github.com/pubnub/c-sharp/releases/tag/v6.19.6.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v6.19.7.0
             requires:
               -
                 name: "Universal Windows Platform Development"
