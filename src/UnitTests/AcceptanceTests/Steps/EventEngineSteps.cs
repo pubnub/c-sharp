@@ -6,10 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using System.Net;
-using System.Globalization;
 using System.IO;
-using System.Text.Json;
-using System.Threading.Channels;
 using System.Threading;
 using TechTalk.SpecFlow.Assist;
 using System.Net.Http;
@@ -17,7 +14,7 @@ using System.Diagnostics;
 
 namespace AcceptanceTests.Steps
 {
-    [Binding]
+	[Binding]
     public class EventEngineSteps
     {
         public static bool enableIntenalPubnubLogging = true;
@@ -37,6 +34,7 @@ namespace AcceptanceTests.Steps
         private PNMessageResult<object> messageResult = null;
         ManualResetEvent messageReceivedEvent = new ManualResetEvent(false);
         ManualResetEvent statusReceivedEvent = new ManualResetEvent(false);
+        ManualResetEvent presenceEvent = new ManualResetEvent(false);
         PNStatus pnStatus = null;
         PubnubError pnError = null;
         IPubnubUnitTest unitTest;
@@ -48,7 +46,7 @@ namespace AcceptanceTests.Steps
         }
         public class PubnubUnitTest : IPubnubUnitTest
         {
-            long IPubnubUnitTest.Timetoken
+			long IPubnubUnitTest.Timetoken
             {
                 get;
                 set;
@@ -95,6 +93,11 @@ namespace AcceptanceTests.Steps
                 set;
             }
             int IPubnubUnitTest.Attempts
+            {
+                get;
+                set;
+            }
+			public List<KeyValuePair<string, string>> PresenceActivityList
             {
                 get;
                 set;
@@ -209,9 +212,13 @@ namespace AcceptanceTests.Steps
                 string mockExpectResponse = webClient.DownloadString(mockExpectContract);
                 System.Diagnostics.Debug.WriteLine(mockExpectResponse);
             }
+            if (pn != null) {
+                pn.UnsubscribeAll<object>();
+            }
         }
 
         [Given(@"the demo keyset with event engine enabled")]
+        [Given(@"the demo keyset with Presence EE enabled")]
         public void GivenTheDemoKeysetWithEventEngineEnabled()
         {
             unitTest = new PubnubUnitTest();
@@ -252,6 +259,7 @@ namespace AcceptanceTests.Steps
                 delegate (Pubnub pnObj, PNPresenceEventResult presenceEvnt)
                 {
                     Console.WriteLine(pn.JsonPluggableLibrary.SerializeToJsonString(presenceEvnt));
+                    presenceEvent.Set();
                 },
                 delegate (Pubnub pnObj, PNSignalResult<object> signalMsg)
                 {
@@ -284,6 +292,89 @@ namespace AcceptanceTests.Steps
                 }
                 );
 
+        }
+
+        [Given(@"heartbeatInterval set to '(.*)', timeout set to '(.*)' and suppressLeaveEvents set to '(.*)'")]
+        public void GivenPresenceConfiguration(string heartbeatInterval, string timeout, string suppressLeaveEvents)
+        {
+            config.SetPresenceTimeoutWithCustomInterval(Convert.ToInt32(timeout), Convert.ToInt32(heartbeatInterval));
+            config.SuppressLeaveEvents = Convert.ToBoolean(suppressLeaveEvents);
+        }
+
+        [When(@"I join '(.*)', '(.*)', '(.*)' channels")]
+        public void WhenIJoinChannels(string first, string second, string third)
+        {
+            pn = new Pubnub(config);
+            pn.PubnubUnitTest = unitTest;
+            pn.PubnubUnitTest.PresenceActivityList?.Clear();
+
+            messageReceivedEvent = new ManualResetEvent(false);
+            statusReceivedEvent = new ManualResetEvent(false);
+
+            pn.AddListener(subscribeCallback);
+            pn.Subscribe<object>()
+                .Channels(new string[] { first, second, third })
+                .Execute();
+        }
+
+        [When(@"I join '(.*)', '(.*)', '(.*)' channels with presence")]
+        public void WhenIJoinChannelsWithPresence(string first, string second, string third)
+        {
+            pn = new Pubnub(config);
+            pn.PubnubUnitTest = unitTest;
+            pn.PubnubUnitTest.PresenceActivityList?.Clear();
+
+            messageReceivedEvent = new ManualResetEvent(false);
+            statusReceivedEvent = new ManualResetEvent(false);
+            presenceEvent = new ManualResetEvent(false);
+
+            pn.AddListener(subscribeCallback);
+            pn.Subscribe<object>()
+                .Channels(new string[] { first, second, third })
+                .WithPresence()
+                .Execute();
+        }
+
+        [Then(@"I wait '(.*)' seconds")]
+        public void ThenIWait(string waitSeconds)
+        {
+            Thread.Sleep(Convert.ToInt32(waitSeconds) * 1000);
+        }
+
+        [Then(@"I wait for getting Presence joined events")]
+        public void ThenIWaitForPresenceJoinEvents()
+        {
+            messageReceivedEvent.WaitOne(TimeSpan.FromSeconds(5));
+        }
+
+        [Then(@"I observe the following Events and Invocations of the Presence EE:")]
+        public void ThenIObserverPresenceEventEngine(Table table)
+        {
+            if (pn.PubnubUnitTest == null)
+            {
+                Assert.Fail();
+            }
+            System.Diagnostics.Debug.WriteLine($"COUNT = {pn.PubnubUnitTest.PresenceActivityList?.Count} ");
+            for (int i = 0; i < pn.PubnubUnitTest.PresenceActivityList?.Count(); i++)
+            {
+                System.Diagnostics.Debug.WriteLine($"{pn.PubnubUnitTest.PresenceActivityList[i].Key} - {pn.PubnubUnitTest.PresenceActivityList[i].Value} ");
+			}
+            IEnumerable<SubscribeResponseRow> expectedRowSet =  table.CreateSet<SubscribeResponseRow>();
+                
+            Assert.True(pn.PubnubUnitTest.PresenceActivityList.Count() >= expectedRowSet?.Count());
+            bool match = false;
+            for (int rowIndex = 0; rowIndex < expectedRowSet.Count(); rowIndex++) {
+                SubscribeResponseRow row = expectedRowSet.ElementAt(rowIndex);
+                System.Diagnostics.Debug.WriteLine($"{row.type} - {row.name} ");
+                if (row.type == pn.PubnubUnitTest.PresenceActivityList[rowIndex].Key
+                    && row.name == pn.PubnubUnitTest.PresenceActivityList[rowIndex].Value) {
+                    match = true;
+                } else {
+                    match = false;
+                    break;
+                }
+            }
+            Assert.True(match == true);
         }
 
         [When(@"I subscribe")]
@@ -397,6 +488,14 @@ namespace AcceptanceTests.Steps
             Assert.True(match == true);
         }
 
+        [Then(@"I leave '(.*)' and '(.*)' channels with presence")]
+        public void ThenILeaveAndChannelsWithPresence(string first0, string second1)
+        {
+            pn.Unsubscribe<object>()
+                .Channels(new string[] { first0, second1 })
+                .Execute();
+        }
+
         [Given(@"a linear reconnection policy with (.*) retries")]
         public void GivenALinearReconnectionPolicyWithRetries(int retryCount)
         {
@@ -407,6 +506,19 @@ namespace AcceptanceTests.Steps
         public void ThenIReceiveAnErrorInMySubscribeResponse()
         {
             Assert.True(pnStatus != null && pnStatus.Error);
+        }
+
+        [Then(@"I don't observe any Events and Invocations of the Presence EE")]
+        public void ThenIDontObserveAnyEventsAndInvocationsOfThePresenceEE()
+        {
+            Assert.IsNull(pn.PubnubUnitTest.PresenceActivityList);
+        }
+
+        [Then(@"I receive an error in my heartbeat response")]
+        public void ThenHeartbeatError()
+        {
+            // wait till heartbeat give up.
+            Thread.Sleep(9*1000);
         }
 
         [Then(@"I receive an error")]
