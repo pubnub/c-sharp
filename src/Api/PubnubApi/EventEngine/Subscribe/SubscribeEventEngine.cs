@@ -68,11 +68,18 @@ namespace PubnubApi.EventEngine.Subscribe
 			}
 			if (cursor != null)
 			{
-				this.EventQueue.Enqueue(new SubscriptionRestoredEvent() { Channels = channels, ChannelGroups = channelGroups, Cursor = cursor });
+				EventQueue.Enqueue(new SubscriptionRestoredEvent() {
+					Channels = Channels.Concat(channels ?? new string[] {}),
+					ChannelGroups = Channelgroups.Concat(channelGroups ?? new string[] {}),
+					Cursor = cursor
+				});
 			}
 			else
 			{
-				this.EventQueue.Enqueue(new SubscriptionChangedEvent() { Channels = channels, ChannelGroups = channelGroups });
+				EventQueue.Enqueue(new SubscriptionChangedEvent() {
+					Channels = Channels.Concat(channels??new string[] {}),
+					ChannelGroups = Channelgroups.Concat(channelGroups?? new string[] {})
+				});
 			}
 		}
 
@@ -83,14 +90,22 @@ namespace PubnubApi.EventEngine.Subscribe
 		
 		public void UnsubscribeAll()
 		{
-			this.EventQueue.Enqueue(new UnsubscribeAllEvent());
+			EventQueue.Enqueue(new UnsubscribeAllEvent());
 		}
 
 		public void Unsubscribe(string[] channels, string[] channelGroups)
 		{
+			var channelNames = new List<string>();
+			var groupNames = new List<string>();
+			foreach (var channel in channels?? Enumerable.Empty<string>()) {
+				channelNames.Add($"{channel}-pnpres");
+			}
+			foreach (var cg in channelGroups ?? Enumerable.Empty<string>()) {
+				groupNames.Add($"{cg}-pnpres");
+			}
 			this.EventQueue.Enqueue(new SubscriptionChangedEvent() {
-				Channels = (this.currentState as SubscriptionState).Channels.Except(channels),
-				ChannelGroups = (this.currentState as SubscriptionState).ChannelGroups.Except(channelGroups)
+				Channels = (this.currentState as SubscriptionState).Channels?.Except(channels?.Union(channelNames)??Enumerable.Empty<string>()),
+				ChannelGroups = (this.currentState as SubscriptionState).ChannelGroups?.Except(channelGroups?.Union(groupNames)??Enumerable.Empty<string>())
 			});
 		}
 	}

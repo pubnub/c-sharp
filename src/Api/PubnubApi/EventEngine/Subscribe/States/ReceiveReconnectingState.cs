@@ -34,8 +34,8 @@ namespace PubnubApi.EventEngine.Subscribe.States
 
                 Events.SubscriptionChangedEvent subscriptionChanged => new ReceivingState()
                 {
-                    Channels = (Channels ?? Enumerable.Empty<string>()).Union(subscriptionChanged.Channels),
-                    ChannelGroups = (ChannelGroups ?? Enumerable.Empty<string>()).Union(subscriptionChanged.ChannelGroups),
+                    Channels = subscriptionChanged.Channels?? Enumerable.Empty<string>(),
+                    ChannelGroups = subscriptionChanged.ChannelGroups??Enumerable.Empty<string>(),
                     Cursor = this.Cursor,
                 },
 

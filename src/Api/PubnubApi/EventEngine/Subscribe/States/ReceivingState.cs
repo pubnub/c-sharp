@@ -11,7 +11,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
         public override IEnumerable<IEffectInvocation> OnEntry => new ReceiveMessagesInvocation()
             { Channels = this.Channels,ChannelGroups = this.ChannelGroups, Cursor = this.Cursor }.AsArray();
 
-        public override IEnumerable<IEffectInvocation> OnExit { get; } = new CancelReceiveMessagesInvocation().AsArray();
+        public override IEnumerable<IEffectInvocation> OnExit { get; } = new CancelReceiveMessagesInvocation() { }.AsArray();
 
         public override TransitionResult Transition(IEvent e)
         {
@@ -31,9 +31,9 @@ namespace PubnubApi.EventEngine.Subscribe.States
 
                 Events.SubscriptionChangedEvent subscriptionChanged => new ReceivingState()
                 {
-                    Channels = (Channels ?? Enumerable.Empty<string>()).Union(subscriptionChanged.Channels),
-                    ChannelGroups = (ChannelGroups ?? Enumerable.Empty<string>()).Union(subscriptionChanged.ChannelGroups),
-                    Cursor = subscriptionChanged.Cursor,
+                    Channels = subscriptionChanged.Channels?? Enumerable.Empty<string>(),
+                    ChannelGroups = subscriptionChanged.ChannelGroups??Enumerable.Empty<string>(),
+                    Cursor = Cursor,
                 },
 
                 Events.SubscriptionRestoredEvent subscriptionRestored => new ReceivingState()
