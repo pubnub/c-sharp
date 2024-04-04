@@ -213,6 +213,7 @@ namespace AcceptanceTests.Steps
                 System.Diagnostics.Debug.WriteLine(mockExpectResponse);
             }
             if (pn != null) {
+                pn.Destroy();
                 pn.UnsubscribeAll<object>();
             }
         }
@@ -392,7 +393,7 @@ namespace AcceptanceTests.Steps
                 .Channels(channel.Split(','))
                 .ChannelGroups(channelGroup.Split(','))
                 .Execute();
-            statusReceivedEvent.WaitOne (60*1000);
+            statusReceivedEvent.WaitOne (10*1000);
             if (pnStatus != null && pnStatus.Category == PNStatusCategory.PNConnectedCategory)
             {
                 //All good.
