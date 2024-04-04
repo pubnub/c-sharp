@@ -213,14 +213,13 @@ namespace AcceptanceTests.Steps
                 System.Diagnostics.Debug.WriteLine(mockExpectResponse);
             }
             if (pn != null) {
-                pn.UnsubscribeAll<object>();
-                //pn.Disconnect<object>();
-                //pn.Destroy();
+                //pn.UnsubscribeAll<object>();
+                pn.Disconnect<object>();
+                pn.Destroy();
             }
         }
 
         [Given(@"the demo keyset with event engine enabled")]
-        [Given(@"the demo keyset with Presence EE enabled")]
         public void GivenTheDemoKeysetWithEventEngineEnabled()
         {
             unitTest = new PubnubUnitTest();
@@ -296,6 +295,59 @@ namespace AcceptanceTests.Steps
 
         }
 
+        [Given(@"the demo keyset with Presence EE enabled")]
+        public void GivenTheDemoKeysetWithPresenceEEenabled()
+        {
+            unitTest = new PubnubUnitTest();
+            unitTest.Timetoken = 16820876821905844; //Hardcoded timetoken
+            unitTest.RequestId = "myRequestId";
+            unitTest.InternetAvailable = true;
+            unitTest.SdkVersion = "Csharp";
+            unitTest.IncludePnsdk = true;
+            unitTest.IncludeUuid = true;
+
+            config = new PNConfiguration(new UserId("pn-csharp-acceptance-test-uuid"));
+            config.Origin = acceptance_test_origin;
+            config.Secure = false;
+            config.PublishKey = System.Environment.GetEnvironmentVariable("PN_PUB_KEY");
+            config.SubscribeKey = System.Environment.GetEnvironmentVariable("PN_SUB_KEY");
+            config.SecretKey = System.Environment.GetEnvironmentVariable("PN_SEC_KEY");
+            if (enableIntenalPubnubLogging)
+            {
+                config.LogVerbosity = PNLogVerbosity.BODY;
+                config.PubnubLog = new InternalPubnubLog();
+            }
+            else
+            {
+                config.LogVerbosity = PNLogVerbosity.NONE;
+            }
+            config.EnableEventEngine = true;
+
+            messageReceivedEvent = new ManualResetEvent(false);
+            statusReceivedEvent = new ManualResetEvent(false);
+
+            subscribeCallback = new SubscribeCallbackExt(
+                delegate (Pubnub pnObj, PNMessageResult<object> pubMsg)
+                {
+                    Console.WriteLine($"Message received in listener. {pn.JsonPluggableLibrary.SerializeToJsonString(pubMsg)}");
+                    messageResult = pubMsg;
+                    messageReceivedEvent.Set();
+                },
+                delegate (Pubnub pnObj, PNPresenceEventResult presenceEvnt)
+                {
+                    Console.WriteLine(pn.JsonPluggableLibrary.SerializeToJsonString(presenceEvnt));
+                    presenceEvent.Set();
+                },
+                delegate (Pubnub pnObj, PNStatus status)
+                {
+                    pnStatus = status;
+                    if (pnStatus.Category == PNStatusCategory.PNConnectedCategory)
+                    {
+                        statusReceivedEvent.Set();
+                    }
+                }
+                );
+        }
         [Given(@"heartbeatInterval set to '(.*)', timeout set to '(.*)' and suppressLeaveEvents set to '(.*)'")]
         public void GivenPresenceConfiguration(string heartbeatInterval, string timeout, string suppressLeaveEvents)
         {
@@ -338,9 +390,10 @@ namespace AcceptanceTests.Steps
         }
 
         [Then(@"I wait '(.*)' seconds")]
-        public void ThenIWait(string waitSeconds)
+        public async Task ThenIWaitAsync(string waitSeconds)
         {
-            Thread.Sleep(Convert.ToInt32(waitSeconds) * 1000);
+            //Thread.Sleep(Convert.ToInt32(waitSeconds) * 1000);
+            await Task.Delay(TimeSpan.FromSeconds(Convert.ToInt32(waitSeconds)));
         }
 
         [Then(@"I wait for getting Presence joined events")]
@@ -424,7 +477,7 @@ namespace AcceptanceTests.Steps
                 .ChannelGroups(channelGroup.Split(','))
                 .WithTimetoken(p0)
                 .Execute();
-            statusReceivedEvent.WaitOne (60*1000);
+            statusReceivedEvent.WaitOne (10*1000);
             if (pnStatus != null && pnStatus.Category == PNStatusCategory.PNConnectedCategory)
             {
                 //All good.
@@ -517,10 +570,11 @@ namespace AcceptanceTests.Steps
         }
 
         [Then(@"I receive an error in my heartbeat response")]
-        public void ThenHeartbeatError()
+        public async Task ThenHeartbeatErrorAsync()
         {
             // wait till heartbeat give up.
-            Thread.Sleep(9*1000);
+            //Thread.Sleep(9*1000);
+            await Task.Delay(TimeSpan.FromSeconds(9));
         }
 
         [Then(@"I receive an error")]
