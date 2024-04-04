@@ -213,8 +213,9 @@ namespace AcceptanceTests.Steps
                 System.Diagnostics.Debug.WriteLine(mockExpectResponse);
             }
             if (pn != null) {
-                pn.Destroy();
                 pn.UnsubscribeAll<object>();
+                //pn.Disconnect<object>();
+                //pn.Destroy();
             }
         }
 

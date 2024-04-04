@@ -20,11 +20,13 @@ namespace PubnubApi.EventEngine.Presence.Effects
 
 		public override async Task Run(LeaveInvocation invocation)
 		{
-			if (!configuration.SuppressLeaveEvents)
-			await leaveOperation.LeaveRequest<string>(
-				invocation.Input.Channels?.ToArray(),
-				invocation.Input.ChannelGroups?.ToArray()
-			);
+			try {
+				if (!configuration.SuppressLeaveEvents)
+					await leaveOperation.LeaveRequest<string>(
+						invocation.Input.Channels?.ToArray(),
+						invocation.Input.ChannelGroups?.ToArray()
+					);
+			} catch (Exception) { }
 		}
 
 		public override bool IsBackground(LeaveInvocation invocation) => true;
