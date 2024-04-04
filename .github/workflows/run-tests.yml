@@ -88,6 +88,17 @@ jobs:
           Copy-Item -Path "${{ github.workspace }}/sdk-specifications/features/access/*" -Destination "${{ github.workspace }}/src/UnitTests/AcceptanceTests/Features" -Recurse
           cd ./UnitTests/AcceptanceTests 
           dotnet test --no-build --verbosity detailed --logger trx --results-directory ./results
+
+          $files = Get-ChildItem -Path ./results -Recurse -Filter *.trx
+          if ($files.Count -gt 0) {
+              foreach ($file in $files) {
+                  Write-Host "Contents of file: $($file.FullName)"
+                  Get-Content -Path $file.FullName
+                  Write-Host "---------------------------------"
+              }
+          } else {
+              Write-Host "No files found with the specified extension."
+          }
       - name: Upload acceptance tests reports
         if: always()
         uses: actions/upload-artifact@v3
