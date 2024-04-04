@@ -66,10 +66,10 @@ jobs:
         uses: ./.github/.release/actions/actions/mock-server
         with:
           token: ${{ secrets.GH_TOKEN }}
-      - name: Setup .NET 6.0.x
+      - name: Setup .NET 6.0.0
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 6.0.x
+          dotnet-version: 6.0.0
       - name: Restore dependencies
         run: dotnet restore
       - name: Build Projects
