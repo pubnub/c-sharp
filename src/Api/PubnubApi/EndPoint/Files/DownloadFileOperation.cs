@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 #if !NET35 && !NET40
 using System.Collections.Concurrent;
 #endif
+using PubnubApi.Security.Crypto;
+using PubnubApi.Security.Crypto.Cryptors;
 
 namespace PubnubApi.EndPoint
 {
@@ -156,23 +158,23 @@ namespace PubnubApi.EndPoint
                 if (item1Bytes != null)
                 {
                     byte[] outputBytes = null;
-                    string currentCipherKey = !string.IsNullOrEmpty(this.currentFileCipherKey) ? this.currentFileCipherKey : config.CipherKey;
-                    if (currentCipherKey.Length > 0)
+                    if (string.IsNullOrEmpty(this.currentFileCipherKey) && string.IsNullOrEmpty(config.CipherKey) && config.CryptoModule == null)
                     {
+                        outputBytes = item1Bytes;
+                    }
+                    else
+                    {
+                        CryptoModule currentCryptoModule = !string.IsNullOrEmpty(this.currentFileCipherKey) ? new CryptoModule(new LegacyCryptor(this.currentFileCipherKey, true, pubnubLog), null) : (config.CryptoModule ??= new CryptoModule(new LegacyCryptor(config.CipherKey, true, pubnubLog), null));
                         try
                         {
-                            PubnubCrypto aes = new PubnubCrypto(currentCipherKey, config, pubnubLog, null);
-                            outputBytes = aes.Decrypt(item1Bytes, true);
+                            outputBytes = currentCryptoModule.Decrypt(item1Bytes);
                             LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, Stream length (after Decrypt)= {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), item1Bytes.Length), config.LogVerbosity);
                         }
                         catch (Exception ex)
                         {
-                            System.Diagnostics.Debug.WriteLine(ex.ToString());
+                            System.Diagnostics.Debug.WriteLine("{0}\nMessage might be not encrypted, returning as is...", ex.ToString());
+                            outputBytes = item1Bytes;
                         }
-                    }
-                    else
-                    {
-                        outputBytes = item1Bytes;
                     }
                     PNDownloadFileResult result = new PNDownloadFileResult();
                     result.FileBytes = outputBytes;
@@ -225,25 +227,26 @@ namespace PubnubApi.EndPoint
             if (item1Bytes != null)
             {
                 byte[] outputBytes = null;
-                string currentCipherKey = !string.IsNullOrEmpty(this.currentFileCipherKey) ? this.currentFileCipherKey : config.CipherKey;
-                if (currentCipherKey.Length > 0)
+                if (string.IsNullOrEmpty(this.currentFileCipherKey) && string.IsNullOrEmpty(config.CipherKey) && config.CryptoModule == null)
                 {
+                    outputBytes = item1Bytes;
+                }
+                else
+                {
+                    CryptoModule currentCryptoModule = !string.IsNullOrEmpty(this.currentFileCipherKey) ? new CryptoModule(new LegacyCryptor(this.currentFileCipherKey, true, pubnubLog), null) : (config.CryptoModule ??= new CryptoModule(new LegacyCryptor(config.CipherKey, true, pubnubLog), null));
                     try
                     {
-                        PubnubCrypto aes = new PubnubCrypto(currentCipherKey, config, pubnubLog, null);
-                        outputBytes = aes.Decrypt(item1Bytes, true);
+                        outputBytes = currentCryptoModule.Decrypt(item1Bytes);
                         LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, Stream length (after Decrypt)= {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), item1Bytes.Length), config.LogVerbosity);
                     }
                     catch (Exception ex)
                     {
-                        System.Diagnostics.Debug.WriteLine(ex.ToString());
+                        System.Diagnostics.Debug.WriteLine("{0}\nMessage might be not encrypted, returning as is...", ex.ToString());
+                        outputBytes = item1Bytes;
+                        ret.Status = new PNStatus { Error = true, ErrorData = new PNErrorData("Decryption error", ex) };
                     }
                 }
-                else
-                {
-                    outputBytes = item1Bytes;
-                }
-                
+
                 PNDownloadFileResult result = new PNDownloadFileResult();
                 result.FileBytes = outputBytes;
                 result.FileName = currentFileName;

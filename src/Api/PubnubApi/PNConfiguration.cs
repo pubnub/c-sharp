@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PubnubApi.Security.Crypto;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
@@ -47,7 +48,12 @@ namespace PubnubApi
 
         public string SecretKey { get; set; }
 
+        [Obsolete("CipherKey is deprecated, please use CryptoModule instead.", false)]
         public string CipherKey { get; set; }
+
+        [Obsolete("UseRandomInitializationVector is deprecated, please use CryptoModule instead.", false)]
+        public bool UseRandomInitializationVector { get; set; }
+        public CryptoModule CryptoModule { get; set; }
 
         public string AuthKey { get; set; }
 
@@ -136,6 +142,8 @@ namespace PubnubApi
         public bool SuppressLeaveEvents { get; set; }
 
         public bool UseRandomInitializationVector { get; set; }
+
+        public bool MaintainPresenceState { get; set; } = true;
 
         public bool EnableEventEngine { get; set; }
         public int FileMessagePublishRetryLimit { get; set; }

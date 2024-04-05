@@ -10,6 +10,8 @@ using PubnubApi;
 using MockServer;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using PubnubApi.Security.Crypto;
+using PubnubApi.Security.Crypto.Cryptors;
 
 namespace PubNubMessaging.Tests
 {
@@ -669,7 +671,7 @@ namespace PubNubMessaging.Tests
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                CipherKey = "enigma",
+                CryptoModule = new CryptoModule(new LegacyCryptor("enigma"), null),
                 Secure = false
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -791,7 +793,7 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Secure = false,
-                CipherKey = "enigma",
+                CryptoModule = new CryptoModule(new LegacyCryptor("enigma"), null),
             };
             if (PubnubCommon.PAMServerSideRun)
             {
@@ -909,7 +911,7 @@ namespace PubNubMessaging.Tests
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                CipherKey = "enigma",
+                CryptoModule = new CryptoModule(new LegacyCryptor("enigma"), null),
                 Secure = true
             };
             if (PubnubCommon.PAMServerSideRun)
@@ -1029,7 +1031,7 @@ namespace PubNubMessaging.Tests
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                CipherKey = "enigma",
+                CryptoModule = new CryptoModule(new LegacyCryptor("enigma"), null),
                 Secure = true
             };
             if (PubnubCommon.PAMServerSideRun)

@@ -20,6 +20,8 @@ using System.Net.Http.Headers;
 #if !NET35 && !NET40
 using System.Collections.Concurrent;
 #endif
+using PubnubApi.Security.Crypto;
+using PubnubApi.Security.Crypto.Cryptors;
 #endregion
 
 namespace PubnubApi
@@ -696,13 +698,13 @@ namespace PubnubApi
                                     }
                                     else
                                     {
-                                        if (currentConfig.CipherKey.Length > 0 && currentMessage.MessageType != 1) //decrypt the subscriber message if cipherkey is available
+                                        if ((currentConfig.CryptoModule != null || currentConfig.CipherKey.Length > 0) && currentMessage.MessageType != 1) //decrypt the subscriber message if cipherkey is available
                                         {
                                             string decryptMessage = "";
-                                            PubnubCrypto aes = new PubnubCrypto(currentConfig.CipherKey, currentConfig, currentLog, null);
+                                            currentConfig.CryptoModule ??= new CryptoModule(new LegacyCryptor(currentConfig.CipherKey, currentConfig.UseRandomInitializationVector, currentLog), null);
                                             try
                                             {
-                                                decryptMessage = aes.Decrypt(payload.ToString());
+                                                decryptMessage = currentConfig.CryptoModule.Decrypt(payload.ToString());
                                             }
                                             catch (Exception ex)
                                             {
@@ -722,9 +724,19 @@ namespace PubnubApi
                                                 }
 
                                                 Announce(status);
+                                                
+                                                LoggingMethod.WriteToLog(
+                                                        currentLog,
+                                                        string.Format(
+                                                            CultureInfo.InvariantCulture,
+                                                            "Failed to decrypt message on channel {0} in ResponseToUserCallback due to exception={1}.\nMessage might be not encrypted, returning as is...",
+                                                            currentMessageChannel,
+                                                            ex
+                                                        ),
+                                                        currentConfig.LogVerbosity
+                                                );
                                             }
-                                            object decodeMessage = (decryptMessage == "**DECRYPT ERROR**") ? decryptMessage : jsonLib.DeserializeToObject(decryptMessage);
-
+                                            object decodeMessage = jsonLib.DeserializeToObject((decryptMessage == "**DECRYPT ERROR**") ? jsonLib.SerializeToJsonString(payload) : decryptMessage);
                                             payloadContainer.Add(decodeMessage);
                                         }
                                         else

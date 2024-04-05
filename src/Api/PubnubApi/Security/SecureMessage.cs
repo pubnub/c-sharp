@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Collections;
 using System.Net;
+using PubnubApi.Security.Crypto;
+using PubnubApi.Security.Crypto.Cryptors;
 
 namespace PubnubApi
 {
@@ -26,9 +28,9 @@ namespace PubnubApi
         {
             List<object> returnMessage = new List<object>();
 
-            if (config.CipherKey.Length > 0)
+            if (config.CryptoModule != null || config.CipherKey.Length > 0)
             {
-                PubnubCrypto aes = new PubnubCrypto(config.CipherKey, config, pubnubLog, null);
+                config.CryptoModule ??= new CryptoModule(new LegacyCryptor(config.CipherKey, config.UseRandomInitializationVector, pubnubLog), null);
                 object[] myObjectArray = (from item in messageList
                                      select item as object).ToArray();
                 object[] enumerable = myObjectArray[0] as object[];
@@ -43,13 +45,13 @@ namespace PubnubApi
                             Dictionary<string, object> historyEnv = jsonLib.ConvertToDictionaryObject(element);
                             if (historyEnv != null && historyEnv.ContainsKey("message"))
                             {
-                                string dictionaryValue = aes.Decrypt(historyEnv["message"].ToString());
+                                string dictionaryValue = config.CryptoModule.Decrypt(historyEnv["message"].ToString());
                                 historyEnv["message"] = jsonLib.DeserializeToObject(dictionaryValue);
                                 decryptMessage = jsonLib.SerializeToJsonString(historyEnv);
                             }
                             else
                             {
-                                decryptMessage = aes.Decrypt(element.ToString());
+                                decryptMessage = config.CryptoModule.Decrypt(element.ToString());
                             }
                         }
                         catch (Exception ex)
@@ -66,11 +68,10 @@ namespace PubnubApi
                             {
                                 status.AffectedChannelGroups.AddRange(channelGroups);
                             }
-
-                            errorCallback.OnResponse(default(T), status);
+                            pubnubLog.WriteToLog("Failed to decrypt message!\nMessage might be not encrypted, returning as is...");
                         }
-                        object decodeMessage = (decryptMessage == "**DECRYPT ERROR**") ? decryptMessage : jsonLib.DeserializeToObject(decryptMessage);
-                        receivedMsg.Add(decodeMessage);
+                        object decodedMessage = jsonLib.DeserializeToObject((decryptMessage == "**DECRYPT ERROR**") ? jsonLib.SerializeToJsonString(element) : decryptMessage);
+                        receivedMsg.Add(decodedMessage);
                     }
                     returnMessage.Add(receivedMsg);
                 }
@@ -125,13 +126,13 @@ namespace PubnubApi
                                 Dictionary<string, object> dicDecrypt = new Dictionary<string, object>();
                                 foreach (KeyValuePair<string, object> kvpValue in dicValue)
                                 {
-                                    if (kvpValue.Key == "message" && config.CipherKey.Length > 0)
+                                    if (kvpValue.Key == "message" && (config.CryptoModule != null || config.CipherKey.Length > 0))
                                     {
-                                        PubnubCrypto aes = new PubnubCrypto(config.CipherKey, config, pubnubLog, null);
+                                        config.CryptoModule ??= new CryptoModule(new LegacyCryptor(config.CipherKey, config.UseRandomInitializationVector, pubnubLog), null);
                                         string decryptMessage = "";
                                         try
                                         {
-                                            decryptMessage = aes.Decrypt(kvpValue.Value.ToString());
+                                            decryptMessage = config.CryptoModule.Decrypt(kvpValue.Value.ToString());
                                         }
                                         catch (Exception ex)
                                         {
@@ -148,12 +149,11 @@ namespace PubnubApi
                                             {
                                                 status.AffectedChannelGroups.AddRange(channelGroups);
                                             }
-
-                                            errorCallback.OnResponse(default(T), status);
+                                            pubnubLog.WriteToLog("Failed to decrypt message!\nMessage might be not encrypted, returning as is...");
                                             #endregion
                                         }
-                                        object decodeMessage = (decryptMessage == "**DECRYPT ERROR**") ? decryptMessage : jsonLib.DeserializeToObject(decryptMessage);
-                                        dicDecrypt.Add(kvpValue.Key, decodeMessage);
+                                        object decodedMessage = jsonLib.DeserializeToObject((decryptMessage == "**DECRYPT ERROR**") ? jsonLib.SerializeToJsonString(kvpValue.Value) : decryptMessage);
+                                        dicDecrypt.Add(kvpValue.Key, decodedMessage);
                                     }
                                     else
                                     {

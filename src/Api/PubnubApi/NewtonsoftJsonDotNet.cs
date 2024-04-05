@@ -13,6 +13,7 @@ namespace PubnubApi
     {
         private readonly PNConfiguration config;
         private readonly IPubnubLog pubnubLog;
+        private readonly JsonSerializerSettings defaultJsonSerializerSettings;
         #region "IL2CPP workarounds"
         //Got an exception when using JSON serialisation for [],
         //IL2CPP needs to know about the array type at compile time.
@@ -44,6 +45,7 @@ namespace PubnubApi
         {
             this.config = pubnubConfig;
             this.pubnubLog = log;
+            defaultJsonSerializerSettings = new JsonSerializerSettings { MaxDepth = 64 };
         }
 
         #region IJsonPlugableLibrary methods implementation
@@ -134,19 +136,19 @@ namespace PubnubApi
 
         public string SerializeToJsonString(object objectToSerialize)
         {
-            return JsonConvert.SerializeObject(objectToSerialize);
+            return JsonConvert.SerializeObject(objectToSerialize, defaultJsonSerializerSettings);
         }
 
         public List<object> DeserializeToListOfObject(string jsonString)
         {
-            List<object> result = JsonConvert.DeserializeObject<List<object>>(jsonString);
+            List<object> result = JsonConvert.DeserializeObject<List<object>>(jsonString, defaultJsonSerializerSettings);
 
             return result;
         }
 
         public object DeserializeToObject(string jsonString)
         {
-            object result = JsonConvert.DeserializeObject<object>(jsonString, new JsonSerializerSettings { DateParseHandling = DateParseHandling.None });
+            object result = JsonConvert.DeserializeObject<object>(jsonString, new JsonSerializerSettings { DateParseHandling = DateParseHandling.None, MaxDepth = 64 });
             if (result.GetType().ToString() == "Newtonsoft.Json.Linq.JArray")
             {
                 JArray jarrayResult = result as JArray;
@@ -169,7 +171,7 @@ namespace PubnubApi
 
         public void PopulateObject(string value, object target)
         {
-            JsonConvert.PopulateObject(value, target);
+            JsonConvert.PopulateObject(value, target, defaultJsonSerializerSettings);
         }
 
         public virtual T DeserializeToObject<T>(string jsonString)
@@ -178,7 +180,7 @@ namespace PubnubApi
 
             try
             {
-                ret = JsonConvert.DeserializeObject<T>(jsonString, new JsonSerializerSettings { DateParseHandling = DateParseHandling.None });
+                ret = JsonConvert.DeserializeObject<T>(jsonString, new JsonSerializerSettings { DateParseHandling = DateParseHandling.None, MaxDepth = 64 });
             }
             catch { /* ignore */ }
 
@@ -243,7 +245,7 @@ namespace PubnubApi
                     JToken token = listObject[0] as JToken;
                     if (dataProp.PropertyType == typeof(string))
                     {
-                        userMessage = JsonConvert.SerializeObject(token);
+                        userMessage = JsonConvert.SerializeObject(token, defaultJsonSerializerSettings);
                     }
                     else
                     {
@@ -316,7 +318,7 @@ namespace PubnubApi
                     JToken token = listObject[0] as JToken;
                     if (dataProp.PropertyType == typeof(string))
                     {
-                        userMessage = JsonConvert.SerializeObject(token);
+                        userMessage = JsonConvert.SerializeObject(token, defaultJsonSerializerSettings);
                     }
                     else
                     {
@@ -1239,7 +1241,7 @@ namespace PubnubApi
             {
                 if (JsonFastCheck(jsonString))
                 {
-                    result = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString);
+                    result = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonString, defaultJsonSerializerSettings);
                 }
             }
             catch

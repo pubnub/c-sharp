@@ -145,6 +145,10 @@ namespace PubnubApi.EndPoint
 
         public void Execute()
         {
+            if (config == null || string.IsNullOrEmpty(config.SubscribeKey))
+            {
+                throw new MissingMemberException("Invalid Subscribe key");
+            }
             if (this.subscribeChannelNames == null)
             {
                 this.subscribeChannelNames = new List<string>();

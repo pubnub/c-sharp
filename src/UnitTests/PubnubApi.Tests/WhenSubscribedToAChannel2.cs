@@ -5,6 +5,8 @@ using PubnubApi;
 using System.Collections.Generic;
 using MockServer;
 using System.Diagnostics;
+using PubnubApi.Security.Crypto;
+using PubnubApi.Security.Crypto.Cryptors;
 
 namespace PubNubMessaging.Tests
 {
@@ -126,11 +128,11 @@ namespace PubNubMessaging.Tests
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                CipherKey = cipherKey,
+                CryptoModule = new CryptoModule(new LegacyCryptor(cipherKey), null),
                 Secure = ssl,
                 LogVerbosity = PNLogVerbosity.BODY,
                 PubnubLog = new TestLog(),
-                NonSubscribeRequestTimeout = 120
+                NonSubscribeRequestTimeout = 120,
             };
             if (PubnubCommon.PAMServerSideRun)
             {
@@ -323,11 +325,11 @@ namespace PubNubMessaging.Tests
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                CipherKey = cipherKey,
+                CryptoModule = new CryptoModule(new LegacyCryptor(cipherKey), null),
                 Secure = ssl,
                 LogVerbosity = PNLogVerbosity.BODY,
                 PubnubLog = new TestLog(),
-                NonSubscribeRequestTimeout = 120
+                NonSubscribeRequestTimeout = 120,
             };
             if (PubnubCommon.PAMServerSideRun)
             {
