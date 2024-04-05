@@ -13,7 +13,8 @@ namespace PubnubApi.EventEngine.Presence.States
         public override IEnumerable<IEffectInvocation> OnEntry => new DelayedHeartbeatInvocation()
         {
             Input = this.Input,
-            RetryCount = this.RetryCount
+            RetryCount = this.RetryCount,
+            Reason = Reason
         }.AsArray();
         public override IEnumerable<IEffectInvocation> OnExit => new CancelDelayedHeartbeatInvocation().AsArray();
 
@@ -33,7 +34,11 @@ namespace PubnubApi.EventEngine.Presence.States
                 {
                     Input = this.Input,
                 },
-                Events.HeartbeatFailureEvent e => HandleHeartbeatFailureEvent(e),
+                Events.HeartbeatFailureEvent e => new ReconnectingState() {
+                    Input = this.Input,
+                    RetryCount = RetryCount + 1,
+                    Reason = e.Status
+                },
                 Events.HeartbeatGiveUpEvent e => new FailedState()
                 {
                     Input = this.Input,
@@ -45,18 +50,6 @@ namespace PubnubApi.EventEngine.Presence.States
                 }.With(new LeaveInvocation(){ Input = this.Input }), 
                 _ => null,
             };
-        }
-
-        private TransitionResult HandleHeartbeatFailureEvent(Events.HeartbeatFailureEvent e)
-        {
-            return e.Status.Category == PNStatusCategory.PNCancelledCategory
-                ? (TransitionResult)null 
-                : (TransitionResult)new ReconnectingState()
-                {
-                    Input = this.Input,
-                    RetryCount = this.RetryCount + 1,
-                    Reason = e.Status,
-                };                
         }
     }
     

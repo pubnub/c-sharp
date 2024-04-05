@@ -32,8 +32,11 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
             if (response.Item1 != null)
             {
                 if (invocation.Cursor != null && invocation.Cursor.Timetoken != null) 
-                { 
-                    cursor = invocation.Cursor;
+                {
+                    cursor = new SubscriptionCursor() {
+                        Region = response.Item1.Timetoken.Region,
+                        Timetoken = invocation.Cursor.Timetoken
+                    };
                 }
                 else if (response.Item1.Timetoken != null)
                 {
@@ -121,11 +124,11 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
             {
                 if (retryConfiguration == null)
                 {
-                    eventQueue.Enqueue(new HandshakeReconnectGiveUpEvent() { Status = new PNStatus(new Exception(""), PNOperationType.PNSubscribeOperation, PNStatusCategory.PNUnexpectedDisconnectCategory, invocation.Channels, invocation.ChannelGroups ) });
+                    eventQueue.Enqueue(new HandshakeReconnectGiveUpEvent() { Status = new PNStatus(new Exception(""), PNOperationType.PNSubscribeOperation, PNStatusCategory.PNConnectionErrorCategory, invocation.Channels, invocation.ChannelGroups ) });
                 }
                 else if (!retryConfiguration.RetryPolicy.ShouldRetry(invocation.AttemptedRetries, invocation.Reason))
                 {
-                    eventQueue.Enqueue(new HandshakeReconnectGiveUpEvent() { Status = new PNStatus(new Exception(""), PNOperationType.PNSubscribeOperation, PNStatusCategory.PNUnexpectedDisconnectCategory, invocation.Channels, invocation.ChannelGroups ) });
+                    eventQueue.Enqueue(new HandshakeReconnectGiveUpEvent() { Status = new PNStatus(new Exception(""), PNOperationType.PNSubscribeOperation, PNStatusCategory.PNConnectionErrorCategory, invocation.Channels, invocation.ChannelGroups ) });
                 }
                 else
                 {

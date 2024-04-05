@@ -52,7 +52,7 @@ namespace PubnubApi
             if (pubnubConfig[InstanceId].EnableEventEngine)
             {
                 if (pubnubConfig[InstanceId].PresenceInterval > 0) {
-                    presenceOperation = new PresenceOperation<T>(this, InstanceId, pubnubLog, telemetryManager, tokenManager, presenceEventengineFactory);
+                    presenceOperation = new PresenceOperation<T>(this, InstanceId, pubnubLog, pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null ,telemetryManager, tokenManager, pubnubUnitTest ,presenceEventengineFactory);
                 }
 				EndPoint.SubscribeEndpoint<T> subscribeOperation = new EndPoint.SubscribeEndpoint<T>(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, this.subscribeEventEngineFactory, presenceOperation, InstanceId ,this);
                 subscribeOperation.SubscribeListenerList = subscribeCallbackListenerList;

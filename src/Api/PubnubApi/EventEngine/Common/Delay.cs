@@ -49,10 +49,10 @@ namespace PubnubApi.EventEngine.Common
                     Monitor.Wait(monitor, milliseconds);
                     if (Cancelled)
                     {
-                        taskCompletionSource.SetCanceled();
+                        taskCompletionSource.TrySetCanceled();
                         break;
                     }
-                    taskCompletionSource.SetResult(null);
+                    taskCompletionSource.TrySetResult(null);
                 }
             }
         }

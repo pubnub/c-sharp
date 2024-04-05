@@ -166,7 +166,7 @@ namespace PubnubApi.EndPoint
                 pubnubRequestState.TimeQueued = DateTime.Now;
 
                 // Wait for message
-                var responseTuple = await UrlProcessRequest(request, pubnubRequestState, false).ConfigureAwait(false);
+                var responseTuple = await UrlProcessRequest(request, pubnubRequestState, true).ConfigureAwait(false);
                 if (!string.IsNullOrEmpty(responseTuple.Item1) && responseTuple.Item2 == null)
                 {
                     PNStatus status = new PNStatus(null, PNOperationType.PNSubscribeOperation, PNStatusCategory.PNConnectedCategory, channels, channelGroups);

@@ -53,6 +53,12 @@ namespace PubnubApi
             set;
         }
 
+        List<KeyValuePair<string,string>> PresenceActivityList 
+        {
+            get;
+            set;
+        }
+
         int Attempts
         {
             get;

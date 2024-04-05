@@ -57,5 +57,10 @@ namespace PubNubMessaging.Tests
             get;
             set;
         }
+		public List<KeyValuePair<string, string>> PresenceActivityList
+        {
+            get;
+            set;
+        }
     }
 }

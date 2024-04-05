@@ -23,8 +23,8 @@ namespace PubnubApi.EventEngine.Subscribe.States
 
                 Events.SubscriptionChangedEvent subscriptionChanged => new States.HandshakingState()
                 {
-                    Channels = (Channels ?? Enumerable.Empty<string>()).Union(subscriptionChanged.Channels),
-                    ChannelGroups = (ChannelGroups ?? Enumerable.Empty<string>()).Union(subscriptionChanged.ChannelGroups),
+                    Channels = subscriptionChanged.Channels?? Enumerable.Empty<string>(),
+                    ChannelGroups = subscriptionChanged.ChannelGroups??Enumerable.Empty<string>(),
                 },
 
                 Events.SubscriptionRestoredEvent subscriptionRestored => new States.HandshakingState()
@@ -39,8 +39,9 @@ namespace PubnubApi.EventEngine.Subscribe.States
                     Channels = handshakeFailure.Channels,
                     ChannelGroups = handshakeFailure.ChannelGroups,
                     Cursor = handshakeFailure.Cursor,
+                    Reason = handshakeFailure.Status,
                     AttemptedRetries = 0
-                }.With(new EmitStatusInvocation(handshakeFailure.Status)),
+                },
 
                 Events.DisconnectEvent disconnect => new States.HandshakeStoppedState()
                 {

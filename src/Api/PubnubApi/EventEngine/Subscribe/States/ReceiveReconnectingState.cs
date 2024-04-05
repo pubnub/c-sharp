@@ -9,13 +9,15 @@ namespace PubnubApi.EventEngine.Subscribe.States
 	public class ReceiveReconnectingState : SubscriptionState
     {
         public int AttemptedRetries { get; set;}
+        public PNStatus Reason { get; set; }
 
 		public override IEnumerable<IEffectInvocation> OnEntry => new ReceiveReconnectInvocation()
         {
             Channels = this.Channels,
             ChannelGroups = this.ChannelGroups,
             Cursor = this.Cursor,
-            AttemptedRetries = this.AttemptedRetries
+            AttemptedRetries = this.AttemptedRetries,
+            Reason = this.Reason
         }.AsArray();
 
         public override IEnumerable<IEffectInvocation> OnExit { get; } =
@@ -32,8 +34,8 @@ namespace PubnubApi.EventEngine.Subscribe.States
 
                 Events.SubscriptionChangedEvent subscriptionChanged => new ReceivingState()
                 {
-                    Channels = (Channels ?? Enumerable.Empty<string>()).Union(subscriptionChanged.Channels),
-                    ChannelGroups = (ChannelGroups ?? Enumerable.Empty<string>()).Union(subscriptionChanged.ChannelGroups),
+                    Channels = subscriptionChanged.Channels?? Enumerable.Empty<string>(),
+                    ChannelGroups = subscriptionChanged.ChannelGroups??Enumerable.Empty<string>(),
                     Cursor = this.Cursor,
                 },
 
@@ -68,7 +70,8 @@ namespace PubnubApi.EventEngine.Subscribe.States
                     Channels = this.Channels,
                     ChannelGroups = this.ChannelGroups,
                     Cursor = this.Cursor,
-                    AttemptedRetries = this.AttemptedRetries + 1
+                    AttemptedRetries = this.AttemptedRetries + 1,
+                    Reason = receiveReconnectFailure.Status
 				},
 
                 Events.ReceiveReconnectGiveUpEvent receiveReconnectGiveUp => new ReceiveFailedState()

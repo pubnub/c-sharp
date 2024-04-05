@@ -12,12 +12,12 @@ namespace PubnubApi.EventEngine.Subscribe.States
             {
                 Events.SubscriptionChangedEvent subscriptionChanged => new HandshakingState()
                 {
-                    Channels = (Channels ?? Enumerable.Empty<string>()).Union(subscriptionChanged.Channels),
-                    ChannelGroups = (ChannelGroups ?? Enumerable.Empty<string>()).Union(subscriptionChanged.ChannelGroups),
+                    Channels = subscriptionChanged.Channels?? Enumerable.Empty<string>(),
+                    ChannelGroups = subscriptionChanged.ChannelGroups??Enumerable.Empty<string>(),
                     Cursor = subscriptionChanged.Cursor,
                 },
 
-                Events.SubscriptionRestoredEvent subscriptionRestored => new States.ReceivingState()
+                Events.SubscriptionRestoredEvent subscriptionRestored => new States.HandshakingState()
                 {
                     Channels = subscriptionRestored.Channels,
                     ChannelGroups = subscriptionRestored.ChannelGroups,

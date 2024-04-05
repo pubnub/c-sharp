@@ -8,12 +8,14 @@ namespace PubnubApi.EventEngine.Subscribe.States
 {
 	public class HandshakeReconnectingState : SubscriptionState
 	{
-		public int AttemptedRetries;
+		public int AttemptedRetries { get; set; }
+		public PNStatus Reason { get; set; }
 
 		public override IEnumerable<IEffectInvocation> OnEntry => new HandshakeReconnectInvocation() {
 			Channels = this.Channels,
 			ChannelGroups = this.ChannelGroups,
 			Cursor = this.Cursor,
+			Reason = this.Reason,
 			AttemptedRetries = this.AttemptedRetries
 		}.AsArray();
 		public override IEnumerable<IEffectInvocation> OnExit { get; } = new CancelHandshakeReconnectInvocation().AsArray();
@@ -25,8 +27,8 @@ namespace PubnubApi.EventEngine.Subscribe.States
 				},
 
 				Events.SubscriptionChangedEvent subscriptionChanged => new HandshakingState() {
-					Channels = (Channels ?? Enumerable.Empty<string>()).Union(subscriptionChanged.Channels),
-					ChannelGroups = (ChannelGroups ?? Enumerable.Empty<string>()).Union(subscriptionChanged.ChannelGroups),
+                    Channels = subscriptionChanged.Channels?? Enumerable.Empty<string>(),
+                    ChannelGroups = subscriptionChanged.ChannelGroups??Enumerable.Empty<string>(),
 				},
 
 				Events.DisconnectEvent disconnect => new HandshakeStoppedState() {
@@ -44,8 +46,9 @@ namespace PubnubApi.EventEngine.Subscribe.States
 				Events.HandshakeReconnectFailureEvent handshakeReconnectFailure => new HandshakeReconnectingState() {
 					Channels = this.Channels,
 					ChannelGroups = this.ChannelGroups,
+					Reason = handshakeReconnectFailure.Status,
 					AttemptedRetries = this.AttemptedRetries + 1
-				}.With(new EmitStatusInvocation(handshakeReconnectFailure.Status)),
+				},
 
 				Events.HandshakeReconnectSuccessEvent handshakeReconnectSuccess => new ReceivingState() {
 					Channels = this.Channels,
