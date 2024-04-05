@@ -150,8 +150,6 @@ namespace PubnubApi
 
         public bool SuppressLeaveEvents { get; set; }
 
-        public bool UseRandomInitializationVector { get; set; }
-
         public bool MaintainPresenceState { get; set; } = true;
 
         public bool EnableEventEngine { get; set; }
