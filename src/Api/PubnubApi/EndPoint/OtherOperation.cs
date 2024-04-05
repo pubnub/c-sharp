@@ -96,7 +96,7 @@ namespace PubnubApi.EndPoint
         public static long TranslateDateTimeToPubnubUnixNanoSeconds(DateTime dotNetUTCDateTime)
         {
             TimeSpan timeSpan = dotNetUTCDateTime - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-            long timeStamp = Convert.ToInt64(timeSpan.TotalSeconds) * 10000000;
+            long timeStamp = Convert.ToInt64(timeSpan.TotalSeconds * 10000000);
             return timeStamp;
         }
 

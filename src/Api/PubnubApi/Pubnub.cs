@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
@@ -8,9 +8,12 @@ using PubnubApi.EventEngine.Subscribe.Events;
 using PubnubApi.EventEngine.Subscribe.Common;
 using PubnubApi.Interface;
 using PubnubApi.EventEngine.Presence;
+
 #if !NET35 && !NET40
 using System.Collections.Concurrent;
 #endif
+using PubnubApi.Security.Crypto;
+using PubnubApi.Security.Crypto.Cryptors;
 
 namespace PubnubApi
 {
@@ -31,6 +34,10 @@ namespace PubnubApi
             get;
             set;
         } = new List<SubscribeCallback>();
+        
+        #if UNITY
+        private static System.Func<UnsubscribeAllOperation<object>> OnCleanupCall;
+        #endif
 
         static Pubnub() 
         {
@@ -43,6 +50,16 @@ namespace PubnubApi
 #endif
             Version = string.Format(CultureInfo.InvariantCulture, "{0}CSharp{1}", PNPlatform.Get(), assemblyVersion);
         }
+        
+        #if UNITY
+        /// <summary>
+        /// Call this function to globally clean up all background threads running in the SDK. Note that this will unsubscribe all channels.
+        /// </summary>
+        public static void CleanUp()
+        {
+            OnCleanupCall?.Invoke();
+        }
+        #endif
 
         #region "PubNub API Channel Methods"
 
@@ -669,17 +686,16 @@ namespace PubnubApi
 
             if (pubnubConfig.ContainsKey(InstanceId))
             {
-                if (pubnubConfig[InstanceId] == null || string.IsNullOrEmpty(pubnubConfig[InstanceId].CipherKey))
+                if (pubnubConfig[InstanceId] == null || (string.IsNullOrEmpty(pubnubConfig[InstanceId].CipherKey) && pubnubConfig[InstanceId].CryptoModule == null))
                 {
-                    throw new ArgumentException("CipherKey missing");
+                    throw new ArgumentException("CryptoModule missing");
                 }
-
-                PubnubCrypto pc = new PubnubCrypto(pubnubConfig[InstanceId].CipherKey, pubnubConfig[InstanceId], pubnubLog, pubnubUnitTest);
-                return pc.Decrypt(inputString);
+                pubnubConfig[InstanceId].CryptoModule ??= new CryptoModule(new LegacyCryptor(pubnubConfig[InstanceId].CipherKey, pubnubConfig[InstanceId].UseRandomInitializationVector, pubnubLog), null);
+                return pubnubConfig[InstanceId].CryptoModule.Decrypt(inputString);
             }
             else
             {
-                throw new ArgumentException("CipherKey missing");
+                throw new ArgumentException("CryptoModule missing");
             }
         }
 
@@ -689,9 +705,7 @@ namespace PubnubApi
             {
                 throw new ArgumentException("inputString is not valid");
             }
-
-            PubnubCrypto pc = new PubnubCrypto(cipherKey, pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, pubnubLog, pubnubUnitTest);
-            return pc.Decrypt(inputString);
+            return new CryptoModule(new LegacyCryptor(cipherKey, true, pubnubLog), null).Decrypt(inputString);
         }
 
         public string Encrypt(string inputString)
@@ -702,17 +716,17 @@ namespace PubnubApi
             }
             if (pubnubConfig.ContainsKey(InstanceId))
             {
-                if (pubnubConfig[InstanceId] == null || string.IsNullOrEmpty(pubnubConfig[InstanceId].CipherKey))
+                if (pubnubConfig[InstanceId] == null || (string.IsNullOrEmpty(pubnubConfig[InstanceId].CipherKey) && pubnubConfig[InstanceId].CryptoModule == null))
                 {
-                    throw new MissingMemberException("CipherKey missing");
+                    throw new MissingMemberException("CryptoModule missing");
                 }
 
-                PubnubCrypto pc = new PubnubCrypto(pubnubConfig[InstanceId].CipherKey, pubnubConfig[InstanceId], pubnubLog, pubnubUnitTest);
-                return pc.Encrypt(inputString);
+                pubnubConfig[InstanceId].CryptoModule ??= new CryptoModule(new LegacyCryptor(pubnubConfig[InstanceId].CipherKey, pubnubConfig[InstanceId].UseRandomInitializationVector, pubnubLog), null);
+                return pubnubConfig[InstanceId].CryptoModule.Encrypt(inputString);
             }
             else
             {
-                throw new MissingMemberException("CipherKey missing");
+                throw new MissingMemberException("CryptoModule missing");
             }
         }
 
@@ -722,9 +736,7 @@ namespace PubnubApi
             {
                 throw new ArgumentException("inputString is not valid");
             }
-
-            PubnubCrypto pc = new PubnubCrypto(cipherKey, pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, pubnubLog, pubnubUnitTest);
-            return pc.Encrypt(inputString);
+            return new CryptoModule(new LegacyCryptor(cipherKey, true, pubnubLog), null).Encrypt(inputString);
         }
 
         public byte[] EncryptFile(byte[] inputBytes)
@@ -735,16 +747,16 @@ namespace PubnubApi
             }
             if (pubnubConfig.ContainsKey(InstanceId))
             {
-                if (pubnubConfig[InstanceId] == null || string.IsNullOrEmpty(pubnubConfig[InstanceId].CipherKey))
+                if (pubnubConfig[InstanceId] == null || (string.IsNullOrEmpty(pubnubConfig[InstanceId].CipherKey) && pubnubConfig[InstanceId].CryptoModule == null))
                 {
-                    throw new MissingMemberException("CipherKey missing");
+                    throw new MissingMemberException("CryptoModule missing");
                 }
-                PubnubCrypto pc = new PubnubCrypto(pubnubConfig[InstanceId].CipherKey, pubnubConfig[InstanceId], pubnubLog, pubnubUnitTest);
-                return pc.Encrypt(inputBytes, true);
+                pubnubConfig[InstanceId].CryptoModule ??= new CryptoModule(new LegacyCryptor(pubnubConfig[InstanceId].CipherKey, true, pubnubLog), null);
+                return pubnubConfig[InstanceId].CryptoModule.Encrypt(inputBytes);
             }
             else
             {
-                throw new ArgumentException("CipherKey missing");
+                throw new ArgumentException("CryptoModule missing");
             }
         }
         public byte[] EncryptFile(byte[] inputBytes, string cipherKey)
@@ -753,13 +765,7 @@ namespace PubnubApi
             {
                 throw new ArgumentException("inputBytes is not valid");
             }
-            if (pubnubConfig.ContainsKey(InstanceId) && !string.IsNullOrEmpty(pubnubConfig[InstanceId].CipherKey))
-            {
-                //Ignore this. Added this condition to pass Codacy recommendation of making this as static method
-            }
-
-            PubnubCrypto pc = new PubnubCrypto(cipherKey, pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, pubnubLog, pubnubUnitTest);
-            return pc.Encrypt(inputBytes, true);
+            return new CryptoModule(new LegacyCryptor(cipherKey, true, pubnubLog), null).Encrypt(inputBytes);
         }
         public void EncryptFile(string sourceFile, string destinationFile)
         {
@@ -769,9 +775,9 @@ namespace PubnubApi
             }
             if (pubnubConfig.ContainsKey(InstanceId))
             {
-                if (pubnubConfig[InstanceId] == null || string.IsNullOrEmpty(pubnubConfig[InstanceId].CipherKey))
+                if (pubnubConfig[InstanceId] == null || (string.IsNullOrEmpty(pubnubConfig[InstanceId].CipherKey) && pubnubConfig[InstanceId].CryptoModule == null))
                 {
-                    throw new MissingMemberException("CipherKey missing");
+                    throw new MissingMemberException("CryptoModule missing");
                 }
                 #if !NETSTANDARD10 && !NETSTANDARD11
                 bool validSource = System.IO.File.Exists(sourceFile);
@@ -794,9 +800,10 @@ namespace PubnubApi
             }
             else
             {
-                throw new ArgumentException("CipherKey missing");
+                throw new ArgumentException("CryptoModule missing");
             }
         }
+
         public void EncryptFile(string sourceFile, string destinationFile, string cipherKey)
         {
             if (string.IsNullOrEmpty(sourceFile) || sourceFile.Length < 1)
@@ -833,17 +840,16 @@ namespace PubnubApi
 
             if (pubnubConfig.ContainsKey(InstanceId))
             {
-                if (pubnubConfig[InstanceId] == null || string.IsNullOrEmpty(pubnubConfig[InstanceId].CipherKey))
+                if (pubnubConfig[InstanceId] == null || (string.IsNullOrEmpty(pubnubConfig[InstanceId].CipherKey) && pubnubConfig[InstanceId].CryptoModule == null))
                 {
-                    throw new ArgumentException("CipherKey missing");
+                    throw new ArgumentException("CryptoModule missing");
                 }
-
-                PubnubCrypto pc = new PubnubCrypto(pubnubConfig[InstanceId].CipherKey, pubnubConfig[InstanceId], pubnubLog, pubnubUnitTest);
-                return pc.Decrypt(inputBytes, true);
+                pubnubConfig[InstanceId].CryptoModule ??= new CryptoModule(new LegacyCryptor(pubnubConfig[InstanceId].CipherKey, pubnubConfig[InstanceId].UseRandomInitializationVector, pubnubLog), null);
+                return pubnubConfig[InstanceId].CryptoModule.Decrypt(inputBytes);
             }
             else
             {
-                throw new ArgumentException("CipherKey missing");
+                throw new ArgumentException("CryptoModule missing");
             }
         }
         public void DecryptFile(string sourceFile, string destinationFile)
@@ -855,9 +861,9 @@ namespace PubnubApi
 
             if (pubnubConfig.ContainsKey(InstanceId))
             {
-                if (pubnubConfig[InstanceId] == null || string.IsNullOrEmpty(pubnubConfig[InstanceId].CipherKey))
+                if (pubnubConfig[InstanceId] == null || (string.IsNullOrEmpty(pubnubConfig[InstanceId].CipherKey) && pubnubConfig[InstanceId].CryptoModule == null))
                 {
-                    throw new ArgumentException("CipherKey missing");
+                    throw new ArgumentException("CryptoModule missing");
                 }
                 #if !NETSTANDARD10 && !NETSTANDARD11
                 bool validSource = System.IO.File.Exists(sourceFile);
@@ -872,7 +878,7 @@ namespace PubnubApi
                     throw new ArgumentException("destination path is not valid");
                 }
                 byte[] inputBytes = System.IO.File.ReadAllBytes(sourceFile);
-                byte[] outputBytes = DecryptFile(inputBytes, pubnubConfig[InstanceId].CipherKey);
+                byte[] outputBytes = DecryptFile(inputBytes);
                 System.IO.File.WriteAllBytes(destinationFile, outputBytes);
                 #else
                 throw new NotSupportedException("FileSystem not supported in NetStandard 1.0/1.1. Consider higher version of .NetStandard.");
@@ -880,22 +886,19 @@ namespace PubnubApi
             }
             else
             {
-                throw new ArgumentException("CipherKey missing");
+                throw new ArgumentException("CryptoModule missing");
             }
         }
+        
         public byte[] DecryptFile(byte[] inputBytes, string cipherKey)
         {
             if (inputBytes == null)
             {
                 throw new ArgumentException("inputBytes is not valid");
             }
-            if (pubnubConfig.ContainsKey(InstanceId) && !string.IsNullOrEmpty(pubnubConfig[InstanceId].CipherKey))
-            {
-                //Ignore this. Added this condition to pass Codacy recommendation of making this as static method
-            }
-            PubnubCrypto pc = new PubnubCrypto(cipherKey, pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, pubnubLog, pubnubUnitTest);
-            return pc.Decrypt(inputBytes, true);
+            return new CryptoModule(new LegacyCryptor(cipherKey, true, pubnubLog), null).Decrypt(inputBytes);
         }
+
         public void DecryptFile(string sourceFile, string destinationFile, string cipherKey)
         {
             if (string.IsNullOrEmpty(sourceFile) || sourceFile.Length < 1)
@@ -968,34 +971,39 @@ namespace PubnubApi
         #endregion
 
         #region "Constructors"
-
         public Pubnub(PNConfiguration config)
         {
+            if (config == null)
+            {
+                throw new ArgumentNullException(nameof(config));
+            }
+            #if UNITY
+            OnCleanupCall += this.UnsubscribeAll<object>;
+            #endif
+            pubnubLog = config.PubnubLog;
             savedSdkVerion = Version;
             InstanceId = Guid.NewGuid().ToString();
-			subscribeEventEngineFactory = new SubscribeEventEngineFactory();
+			      subscribeEventEngineFactory = new SubscribeEventEngineFactory();
             presenceEventengineFactory = new PresenceEventEngineFactory();
             pubnubConfig.AddOrUpdate(InstanceId, config, (k, o) => config);
 
-            if (config != null)
-            {
-                pubnubLog = config.PubnubLog;
-            }
-            JsonPluggableLibrary = new NewtonsoftJsonDotNet(config, pubnubLog);
-            if (config != null && config.EnableTelemetry)
-            {
-                telemetryManager = new EndPoint.TelemetryManager(pubnubConfig[InstanceId], pubnubLog);
-            }
-            CheckRequiredConfigValues();
-            if (config != null)
-            {
-                tokenManager = new EndPoint.TokenManager(pubnubConfig[InstanceId], JsonPluggableLibrary, pubnubLog, this.InstanceId);
-            }
-            if (config != null && pubnubLog != null)
+            if (pubnubLog != null)
             {
                 PNPlatform.Print(config, pubnubLog);
             }
-            if (config != null && config.PresenceTimeout < 20)
+
+            if (config.EnableTelemetry)
+            {
+                telemetryManager = new EndPoint.TelemetryManager(pubnubConfig[InstanceId], pubnubLog);
+            }
+            CheckAndInitializeEmptyStringValues(config);
+            tokenManager = new EndPoint.TokenManager(pubnubConfig[InstanceId], JsonPluggableLibrary, pubnubLog, this.InstanceId);
+
+            //Initialize JsonPluggableLibrary
+            JsonPluggableLibrary = new NewtonsoftJsonDotNet(config, pubnubLog);
+
+            //Check PresenceTimeout
+            if (config.PresenceTimeout < 20)
             {
                 config.PresenceTimeout = 20;
                 if (pubnubLog != null)
@@ -1003,48 +1011,54 @@ namespace PubnubApi
                     LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, WARNING: The PresenceTimeout cannot be less than 20, defaulting the value to 20. Please update the settings in your code.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
                 }
             }
-            if (config != null)
-            {
-                if (config.UserId == null || string.IsNullOrEmpty(config.UserId.ToString()))
-                {
-                    if (pubnubLog != null)
-                    {
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, PNConfiguration.Uuid or PNConfiguration.UserId is required to use the SDK.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
-                    }
-                    throw new MissingMemberException("PNConfiguration.UserId is required to use the SDK");
-                }
 
-                config.ResetUuidSetFromConstructor();
-            }
+            //Check required UserId
+            CheckRequiredUserId(config);
+
+            //Check CryptoModule usage
+            CheckCryptoModuleUsageForLogging(config);
 
         }
-
-        private void CheckRequiredConfigValues()
+        
+        #if UNITY
+        ~Pubnub()
         {
-            if (pubnubConfig != null && pubnubConfig.ContainsKey(InstanceId))
+            OnCleanupCall -= this.UnsubscribeAll<object>;
+        }
+        #endif
+
+        private void CheckRequiredUserId(PNConfiguration config)
+        {
+            if (config.UserId == null || string.IsNullOrEmpty(config.UserId.ToString()))
             {
-                if (string.IsNullOrEmpty(pubnubConfig[InstanceId].SubscribeKey))
+                if (pubnubLog != null)
                 {
-                    pubnubConfig[InstanceId].SubscribeKey = "";
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, PNConfiguration.Uuid or PNConfiguration.UserId is required to use the SDK.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
                 }
+                throw new MissingMemberException("PNConfiguration.UserId is required to use the SDK");
+            }
 
-                if (string.IsNullOrEmpty(pubnubConfig[InstanceId].PublishKey))
+            //Set flag to false
+            config.ResetUuidSetFromConstructor();
+        }
+        private void CheckCryptoModuleUsageForLogging(PNConfiguration config)
+        {
+            if (config.CryptoModule != null && !string.IsNullOrEmpty(config.CipherKey) && config.CipherKey.Length > 0)
+            {
+                if (pubnubLog != null)
                 {
-                    pubnubConfig[InstanceId].PublishKey = "";
-                }
-
-                if (string.IsNullOrEmpty(pubnubConfig[InstanceId].SecretKey))
-                {
-                    pubnubConfig[InstanceId].SecretKey = "";
-                }
-
-                if (string.IsNullOrEmpty(pubnubConfig[InstanceId].CipherKey))
-                {
-                    pubnubConfig[InstanceId].CipherKey = "";
+                    LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, WARNING: CryptoModule takes precedence over CipherKey.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
                 }
             }
         }
 
-		#endregion
+        private void CheckAndInitializeEmptyStringValues(PNConfiguration config)
+        {
+            config.SubscribeKey = string.IsNullOrEmpty(config.SubscribeKey) ? string.Empty : config.SubscribeKey;
+            config.PublishKey = string.IsNullOrEmpty(config.PublishKey) ? string.Empty : config.PublishKey;
+            config.SecretKey = string.IsNullOrEmpty(config.SecretKey) ? string.Empty : config.SecretKey;
+            config.CipherKey = string.IsNullOrEmpty(config.CipherKey) ? string.Empty : config.CipherKey;
+        }
+        #endregion
 	}
 }

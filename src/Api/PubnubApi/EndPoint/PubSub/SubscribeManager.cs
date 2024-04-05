@@ -1212,7 +1212,7 @@ namespace PubnubApi.EndPoint
 
                                 if (netState.Channels != null && netState.Channels.Length > 0)
                                 {
-                                    PNStatus status = new StatusBuilder(config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId] : null, jsonLibrary).CreateStatusResponse<T>(netState.ResponseType, PNStatusCategory.PNReconnectedCategory, null, (int)System.Net.HttpStatusCode.NotFound, new PNException("Internet connection problem. Retrying connection"));
+                                    PNStatus status = new StatusBuilder(config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId] : null, jsonLibrary).CreateStatusResponse<T>(netState.ResponseType, PNStatusCategory.PNNetworkIssuesCategory, null, (int)System.Net.HttpStatusCode.NotFound, new PNException("Internet connection problem. Retrying connection"));
                                     if (netState.Channels != null && netState.Channels.Length > 0)
                                     {
                                         status.AffectedChannels.AddRange(netState.Channels.ToList());

@@ -32,6 +32,7 @@ jobs:
           dotnet-version: |
             5.0.x
             6.0.x
+            7.0.x
       - name: Build packages
         env:
           WORKSPACE_PATH: ${{ github.workspace }}

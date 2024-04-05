@@ -5,12 +5,15 @@ using System.Text;
 using System.Globalization;
 using System.Threading.Tasks;
 using System.Threading;
+using PubnubApi.Security.Crypto.Common;
 #if !NETSTANDARD10 && !NETSTANDARD11 && !NETSTANDARD12 && !WP81
 using System.Reflection;
 #endif
 #if !NET35 && !NET40
 using System.Collections.Concurrent;
 #endif
+using PubnubApi.Security.Crypto;
+using PubnubApi.Security.Crypto.Cryptors;
 
 namespace PubnubApi
 {
@@ -279,18 +282,18 @@ namespace PubnubApi
         Uri IUrlRequestBuilder.BuildHereNowRequest(string requestMethod, string requestBody, string[] channels, string[] channelGroups, bool showUUIDList, bool includeUserState, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PNHereNowOperation;
-            string channel = (channels != null && channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : "";
+            if ((channels == null || channels.Length == 0) && (channelGroups == null || channelGroups.Length == 0)) {
+                throw new ArgumentException("Please provide Channels or ChannelGroups.");
+            }
+            string channel = (channels != null && channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : ",";
 
             List<string> url = new List<string>();
             url.Add("v2");
             url.Add("presence");
             url.Add("sub_key");
             url.Add(pubnubConfig.ContainsKey(pubnubInstanceId) ? pubnubConfig[pubnubInstanceId].SubscribeKey : "");
-            if (!string.IsNullOrEmpty(channel))
-            {
-                url.Add("channel");
-                url.Add(channel);
-            }
+            url.Add("channel");
+            url.Add(channel);
 
             int disableUUID = showUUIDList ? 0 : 1;
             int userState = includeUserState ? 1 : 0;
@@ -2118,8 +2121,7 @@ namespace PubnubApi
                 string_to_sign.Append(partialUrl).Append('\n');
                 string_to_sign.Append(queryStringToSign);
 
-                PubnubCrypto pubnubCrypto = new PubnubCrypto((opType != PNOperationType.PNSignalOperation) ? pubnubConfig[pubnubInstanceId].CipherKey : "", pubnubConfig[pubnubInstanceId], this.pubnubLog, null);
-                signature = pubnubCrypto.PubnubAccessManagerSign(pubnubConfig[pubnubInstanceId].SecretKey, string_to_sign.ToString());
+                signature = Util.PubnubAccessManagerSign(pubnubConfig[pubnubInstanceId].SecretKey, string_to_sign.ToString());
                 if (this.pubnubLog != null && this.pubnubConfig != null)
                 {
                     LoggingMethod.WriteToLog(pubnubLog, "string_to_sign = " + string_to_sign, pubnubConfig[pubnubInstanceId].LogVerbosity);
@@ -2146,8 +2148,7 @@ namespace PubnubApi
                 string_to_sign.AppendFormat(CultureInfo.InvariantCulture, "{0}\n", queryStringToSign);
                 string_to_sign.Append(requestBody);
 
-                PubnubCrypto pubnubCrypto = new PubnubCrypto((opType != PNOperationType.PNSignalOperation) ? pubnubConfig[pubnubInstanceId].CipherKey : "", pubnubConfig[pubnubInstanceId], this.pubnubLog, null);
-                signature = pubnubCrypto.PubnubAccessManagerSign(pubnubConfig[pubnubInstanceId].SecretKey, string_to_sign.ToString());
+                signature = Util.PubnubAccessManagerSign(pubnubConfig[pubnubInstanceId].SecretKey, string_to_sign.ToString());
                 signature = string.Format(CultureInfo.InvariantCulture, "v2.{0}", signature.TrimEnd(new[] { '=' }));
                 if (this.pubnubLog != null && this.pubnubConfig != null)
                 {
@@ -2263,10 +2264,10 @@ namespace PubnubApi
         {
             string message = jsonLib.SerializeToJsonString(originalMessage);
 
-            if (pubnubConfig.ContainsKey(pubnubInstanceId) && pubnubConfig[pubnubInstanceId].CipherKey.Length > 0 && opType != PNOperationType.PNSignalOperation)
+            if (pubnubConfig.ContainsKey(pubnubInstanceId) && (pubnubConfig[pubnubInstanceId].CryptoModule != null || pubnubConfig[pubnubInstanceId].CipherKey.Length > 0) && opType != PNOperationType.PNSignalOperation)
             {
-                PubnubCrypto aes = new PubnubCrypto(pubnubConfig[pubnubInstanceId].CipherKey, pubnubConfig[pubnubInstanceId], pubnubLog, null);
-                string encryptMessage = aes.Encrypt(message);
+                pubnubConfig[pubnubInstanceId].CryptoModule ??= new CryptoModule(new LegacyCryptor(pubnubConfig[pubnubInstanceId].CipherKey, pubnubConfig[pubnubInstanceId].UseRandomInitializationVector, pubnubLog), null);
+                string encryptMessage = pubnubConfig[pubnubInstanceId].CryptoModule.Encrypt(message);
                 message = jsonLib.SerializeToJsonString(encryptMessage);
             }
 

@@ -39,5 +39,12 @@
       "clearedPrefix": true,
       "clearedSuffix": false
     }
+  ],
+  "src/Api/PubnubApiUnity/PubnubApiUnity.csproj": [
+    {
+      "pattern": "^\\s{2,}<PackageVersion>(v?(\\d+\\.?){2,}([a-zA-Z0-9-]+(\\.?\\d+)?)?)<\/PackageVersion>$",
+      "clearedPrefix": true,
+      "clearedSuffix": false
+    }
   ]
 }

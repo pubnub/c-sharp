@@ -15,7 +15,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubPCL</PackageId>
-    <PackageVersion>6.17.0.0</PackageVersion>
+    <PackageVersion>6.19.7.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -23,7 +23,7 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>Validate json string before deserialization.</PackageReleaseNotes>
+    <PackageReleaseNotes>Resolved the issue where an incorrect network status was emitted when no internet connection was detected.</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
@@ -594,6 +594,14 @@
     <Compile Include="..\PubnubApi\Push\Mpns\MpnsToastNotification.cs">
       <Link>Push\Mpns\MpnsToastNotification.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Security\Crypto\Common\ByteArrayExtensions.cs" Link="Security\Crypto\Common\ByteArrayExtensions.cs" />
+    <Compile Include="..\PubnubApi\Security\Crypto\Common\Util.cs" Link="Security\Crypto\Common\Util.cs" />
+    <Compile Include="..\PubnubApi\Security\Crypto\CryptoModule.cs" Link="Security\Crypto\CryptoModule.cs" />
+    <Compile Include="..\PubnubApi\Security\Crypto\Cryptors\AesCbcCryptor.cs" Link="Security\Crypto\Cryptors\AesCbcCryptor.cs" />
+    <Compile Include="..\PubnubApi\Security\Crypto\Cryptors\CryptorBase.cs" Link="Security\Crypto\Cryptors\CryptorBase.cs" />
+    <Compile Include="..\PubnubApi\Security\Crypto\Cryptors\CryptorHeader.cs" Link="Security\Crypto\Cryptors\CryptorHeader.cs" />
+    <Compile Include="..\PubnubApi\Security\Crypto\Cryptors\LegacyCryptor.cs" Link="Security\Crypto\Cryptors\LegacyCryptor.cs" />
+    <Compile Include="..\PubnubApi\Security\Crypto\ICryptor.cs" Link="Security\Crypto\ICryptor.cs" />
     <Compile Include="..\PubnubApi\Security\MD5.cs">
       <Link>Security\MD5.cs</Link>
     </Compile>
@@ -978,8 +986,9 @@
     <Folder Include="JsonDataParse\" />
     <Folder Include="Properties\" />
     <Folder Include="Push\Mpns\" />
-    <Folder Include="Security\" />
     <Folder Include="Proxy\" />
+    <Folder Include="Security\Crypto\Common\" />
+    <Folder Include="Security\Crypto\Cryptors\" />
   </ItemGroup>
   
   <!--<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.4' ">

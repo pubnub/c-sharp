@@ -285,17 +285,27 @@ namespace PubNubMessaging.Tests
         public static void TranslateDateTimeToUnixTime()
         {
             //Test for 26th June 2012 GMT
-            DateTime dt = new DateTime(2012, 6, 26, 0, 0, 0, DateTimeKind.Utc);
+            DateTime dt = new DateTime(2012, 6, 26, 21, 37, 13, 37, DateTimeKind.Utc);
             long nanoSecondTime = Pubnub.TranslateDateTimeToPubnubUnixNanoSeconds(dt);
-            Assert.True(13406688000000000 == nanoSecondTime);
+            Assert.True(13407466330370000 == nanoSecondTime);
+        }
+        
+        [Test]
+        public static void TranslateDateTimeToUnixTimeAndBack()
+        {
+            //Test for 26th June 2012 GMT
+            DateTime expectedDate = new DateTime(2012, 6, 26, 21, 37, 13, 37, DateTimeKind.Utc);
+            long nanoSecondTime = Pubnub.TranslateDateTimeToPubnubUnixNanoSeconds(expectedDate);
+            DateTime dateAgain = Pubnub.TranslatePubnubUnixNanoSecondsToDateTime(nanoSecondTime);
+            Assert.True(expectedDate.Equals(dateAgain));
         }
 
         [Test]
         public static void TranslateUnixTimeToDateTime()
         {
             //Test for 26th June 2012 GMT
-            DateTime expectedDate = new DateTime(2012, 6, 26, 0, 0, 0, DateTimeKind.Utc);
-            DateTime actualDate = Pubnub.TranslatePubnubUnixNanoSecondsToDateTime(13406688000000000);
+            DateTime expectedDate = new DateTime(2012, 6, 26, 21, 37, 13, 37, DateTimeKind.Utc);
+            DateTime actualDate = Pubnub.TranslatePubnubUnixNanoSecondsToDateTime(13407466330370000);
             Assert.True(expectedDate == actualDate);
         }
 
