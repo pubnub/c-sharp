@@ -213,7 +213,6 @@ namespace AcceptanceTests.Steps
                 System.Diagnostics.Debug.WriteLine(mockExpectResponse);
             }
             if (pn != null) {
-                //pn.UnsubscribeAll<object>();
                 pn.Disconnect<object>();
                 pn.Destroy();
             }
@@ -299,7 +298,6 @@ namespace AcceptanceTests.Steps
         public void GivenTheDemoKeysetWithPresenceEEenabled()
         {
             unitTest = new PubnubUnitTest();
-            unitTest.Timetoken = 16820876821905844; //Hardcoded timetoken
             unitTest.RequestId = "myRequestId";
             unitTest.InternetAvailable = true;
             unitTest.SdkVersion = "Csharp";
@@ -392,7 +390,6 @@ namespace AcceptanceTests.Steps
         [Then(@"I wait '(.*)' seconds")]
         public async Task ThenIWaitAsync(string waitSeconds)
         {
-            //Thread.Sleep(Convert.ToInt32(waitSeconds) * 1000);
             await Task.Delay(TimeSpan.FromSeconds(Convert.ToInt32(waitSeconds)));
         }
 
@@ -573,7 +570,6 @@ namespace AcceptanceTests.Steps
         public async Task ThenHeartbeatErrorAsync()
         {
             // wait till heartbeat give up.
-            //Thread.Sleep(9*1000);
             await Task.Delay(TimeSpan.FromSeconds(9));
         }
 
