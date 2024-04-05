@@ -1,4 +1,6 @@
 ﻿using PubnubApi;
+using System;
+using System.Collections.Generic;
 
 namespace PubNubMessaging.Tests
 {
@@ -41,6 +43,16 @@ namespace PubNubMessaging.Tests
         }
 
         bool IPubnubUnitTest.IncludeUuid
+        {
+            get;
+            set;
+        }
+        List<KeyValuePair<string, string>> IPubnubUnitTest.EventTypeList
+        {
+            get;
+            set;
+        }
+        int IPubnubUnitTest.Attempts
         {
             get;
             set;
