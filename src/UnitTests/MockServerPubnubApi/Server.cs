@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
@@ -101,14 +102,14 @@ namespace MockServer
                 parameters = String.Format("?{0}", sb.ToString().Substring(1));
             }
 
-            string requestUri = String.Format("{0} {1}{2}", request.Method, request.Path, parameters == null ? "" : parameters);
-            if (!requests.ContainsKey(requestUri))
+            string requestUriOutset = String.Format("{0} {1}", request.Method, request.Path);
+            if (!requests.ContainsKey(requestUriOutset))
             {
-                requests.Add(String.Format("{0} {1}{2}", request.Method, request.Path, parameters == null ? "" : parameters), request);
+                requests.Add(requestUriOutset, request);
             }
             else
             {
-                requests[requestUri] = request;
+                requests[requestUriOutset] = request;
             }
 
             return this;
@@ -218,9 +219,12 @@ namespace MockServer
                         }
 
                         string[] lines = strData.Split(new [] { "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
-                        string path = lines[0].Substring(0, lines[0].LastIndexOf(" ", StringComparison.InvariantCultureIgnoreCase));
+                        string url = lines[0].Substring(0, lines[0].LastIndexOf(" ", StringComparison.InvariantCultureIgnoreCase));
+                        System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("        ###  MM/dd/yyyy HH:mm:ss:fff") + " - " + url);
+                        string path = url.Substring(0, url.LastIndexOf("?", StringComparison.InvariantCultureIgnoreCase));
                         responses.Add(path);
-                        System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("        ###  MM/dd/yyyy HH:mm:ss:fff") + " - " + path);
+                        int parameterIndex = url.LastIndexOf("?", StringComparison.InvariantCultureIgnoreCase);
+                        string parameters = url.Substring(parameterIndex, url.Length - parameterIndex);
 
                         try
                         {
@@ -228,54 +232,25 @@ namespace MockServer
                             try
                             {
                                 item = requests[path];
+
+                                if (!item.Parameters.All((param) =>
+                                {
+                                    // TODO: Remove debug log
+                                    var returned = parameters.Contains(param);
+                                    Debug.WriteLine(String.Format("==> {0} ? {1} == {2}", param, parameters, returned));
+                                    return returned;
+                                }))
+                                {
+                                    throw new Exception();
+                                };
                             }
                             catch
                             {
-                                try
+                                item = new Request()
                                 {
-                                    item = requests[path.Substring(0, path.IndexOf("?"))];
-                                }
-                                catch
-                                {
-                                    item = new MockServer.Request();
-                                    item.Method = "GET";
-
-                                    if (path.Contains("GET /v2/presence/") && !path.Contains("/leave?"))
-                                    {
-                                        item.Response = "{\"t\":{\"t\":\"14844074079055214\",\"r\":7},\"m\":[]}";
-                                        item.StatusCode = HttpStatusCode.OK;
-                                    }
-                                    else if (path.Contains("GET /v2/subscribe/"))
-                                    {
-                                        item.Response = "{}";
-                                        item.StatusCode = HttpStatusCode.OK;
-                                    }
-                                    else if (path.Contains("GET /time/0"))
-                                    {
-                                        item.Response = "[14827611897607991]";
-                                        item.StatusCode = HttpStatusCode.OK;
-                                    }
-                                    else if (path.Contains("/leave?"))
-                                    {
-                                        item.Response = "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}";
-                                        item.StatusCode = HttpStatusCode.OK;
-                                    }
-                                    else if (path.Contains("GET /publish/"))
-                                    {
-                                        item.Response = "[1,\"Sent\",\"14715322883933786\"]";
-                                        item.StatusCode = HttpStatusCode.OK;
-                                    }
-                                    else if(path.Contains("DELETE /v3/history/sub-key"))
-                                    {
-                                        item.Response = "{\"status\": 200, \"error\": false, \"error_message\": \"\"}";
-                                        item.StatusCode = HttpStatusCode.OK;
-                                    }
-                                    else
-                                    {
-                                        item.Response = "";
-                                        item.StatusCode = HttpStatusCode.OK;    //// HttpStatusCode.NotFound;
-                                    }
-                                }
+                                    Response = this.notFoundContent,
+                                    StatusCode = HttpStatusCode.NotFound
+                                };
                             }
 
                             LoggingMethod.WriteToLog(String.Format("Response: {0}", item.Response), LoggingMethod.LevelVerbose);

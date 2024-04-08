@@ -6,6 +6,7 @@ using PubnubApi;
 using MockServer;
 using System.Diagnostics;
 
+// TODO: Why those tests ignore when not used on real server.
 namespace PubNubMessaging.Tests
 {
     [TestFixture]
