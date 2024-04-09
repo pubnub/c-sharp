@@ -155,7 +155,6 @@ namespace PubnubApi
         public bool EnableEventEngine { get; set; }
 
         public int FileMessagePublishRetryLimit { get; set; }
-        public int ConnectionMaxRetries { get; set; }
 
         [Obsolete("PNConfiguration(string uuid) is deprecated, please use PNConfiguration(UserId userId) instead.")]
         public PNConfiguration(string uuid)
@@ -201,7 +200,6 @@ namespace PubnubApi
             FileMessagePublishRetryLimit = 5;
             _userId = currentUserId;
             EnableEventEngine = false;
-            ConnectionMaxRetries = -1;
         }
 
         private void setDefaultRetryConfigurationFromPolicy(PNReconnectionPolicy policy)
