@@ -820,7 +820,10 @@ namespace PubNubMessaging.Tests
             server.Start();
 
             ManualResetEvent done = new ManualResetEvent(false);
-            PNConfiguration config = CreateTestConfig();
+            PNConfiguration config = new PNConfiguration(new UserId("test")) {
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                PublishKey = PubnubCommon.PublishKey
+            };
             config.LogVerbosity = PNLogVerbosity.BODY;
             config.CryptoModule = new CryptoModule(new AesCbcCryptor("enigma"), new List<ICryptor> { new LegacyCryptor("enigma") });
 
