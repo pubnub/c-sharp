@@ -884,15 +884,22 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        async public void TestSubscribeDecryptionOnNonEncryptedMessage()
+        public void TestSubscribeDecryptionOnNonEncryptedMessage()
         {
+            server.ClearRequests();
+            server.Start();
+
             ManualResetEvent done = new ManualResetEvent(false);
-            PNConfiguration config = CreateTestConfig();
+            PNConfiguration config = new PNConfiguration(new UserId("test")) {
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                PublishKey = PubnubCommon.PublishKey
+            };
+            config.LogVerbosity = PNLogVerbosity.BODY;
             config.CryptoModule = new CryptoModule(new AesCbcCryptor("enigma"), new List<ICryptor> { new LegacyCryptor("enigma") });
 
-            Pubnub sut = new Pubnub(config);
+            Pubnub pn = new Pubnub(config);
 
-            sut.AddListener(new SubscribeCallbackExt(
+            pn.AddListener(new SubscribeCallbackExt(
                         (pb, message) =>
                         {
                             Assert.AreEqual("test", message.Message);
@@ -903,15 +910,45 @@ namespace PubNubMessaging.Tests
                     )
             );
 
-            sut.Subscribe<string>().Channels(new[] { "test" }).Execute();
+            // Time call because subscribe loop uses it before makine subscribe call
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath("/v2/time/0")
+                    .WithParameter("channel", "test")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("uuid", "test")
+                    .WithResponse("[17127333770142652]")
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            Pubnub sender = new Pubnub(CreateTestConfig());
+            string expected = "{\"t\":{\"t\":\"14836303477713304\",\"r\":7},\"m\":[]}";
+            string expectedMessage = "{\"t\":{\"t\":\"14836303477713304\",\"r\":7},\"m\":[\"test\"]}";
+            string channel = "test";
+            // handshake
+            server.AddRequest(new Request()
+			.WithMethod("GET")
+                    .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, channel))
+                    .WithParameter("heartbeat", "300")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("tt", "0")
+                    .WithParameter("uuid", config.UserId)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            // Rust generated encrypted message
-            sender.Publish()
-                .Channel("test")
-                .Message("test")
-                .Execute(new PNPublishResultExt((r, s) => { }));
+            server.AddRequest(new Request()
+			.WithMethod("GET")
+                    .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, channel))
+                    .WithParameter("heartbeat", "300")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("tt", "14836303477713304")
+                    .WithParameter("tr", "7")
+                    .WithParameter("uuid", config.UserId)
+                    .WithResponse(expectedMessage)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            pn.Subscribe<string>().Channels(new[] { "test" }).Execute();
 
             bool passed = done.WaitOne(5000);
             Assert.True(passed);
