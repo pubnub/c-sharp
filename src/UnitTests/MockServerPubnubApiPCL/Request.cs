@@ -91,5 +91,18 @@ namespace MockServer
             this.StatusCode = statusCode;
             return this;
         }
+
+        public override int GetHashCode()
+        {
+            var hashCode = this.Path.GetHashCode(StringComparison.InvariantCulture);
+            return this.Parameters.Aggregate(hashCode, (current, queryParam) => current + queryParam.GetHashCode());
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is null || obj is not Request)
+                return false;
+            return this.GetHashCode() == (obj as Request).GetHashCode();
+        }
     }
 }
