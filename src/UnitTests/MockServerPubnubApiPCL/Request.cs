@@ -92,7 +92,7 @@ namespace MockServer
             return this;
         }
 
-        public override int GetHashCode()
+        public long CalculateHashCode()
         {
             var hashCode = this.Path.GetHashCode(StringComparison.InvariantCulture);
             return this.Parameters.Aggregate(hashCode, (current, queryParam) => current + queryParam.GetHashCode());
@@ -102,7 +102,7 @@ namespace MockServer
         {
             if (obj is null || obj is not Request)
                 return false;
-            return this.GetHashCode() == (obj as Request).GetHashCode();
+            return this.CalculateHashCode() == (obj as Request).CalculateHashCode();
         }
     }
 }

@@ -20,7 +20,7 @@ namespace MockServer
         private string notFoundContent = "<html><head><title>Not Found</title></head><body>Sorry, the object you requested was not found.</body><html>";
         private readonly Uri uri;
         private Thread trf;
-        private Dictionary<int, Request> requests = new Dictionary<int, Request>();
+        private Dictionary<long, Request> requests = new Dictionary<long, Request>();
         private List<string> responses = new List<string>();
         private bool finalizeServer;
         private bool secure;
@@ -101,7 +101,7 @@ namespace MockServer
                 parameters = String.Format("?{0}", sb.ToString().Substring(1));
             }
 
-             requests[request.GetHashCode()] = request;
+             requests[request.CalculateHashCode()] = request;
 
             return this;
         }
@@ -218,7 +218,7 @@ namespace MockServer
                             Request item = null;
                                 try
                                 {
-                                    int urlHashCode = CalculateHasCode(path);
+                                    long urlHashCode = CalculateHasCode(path);
                                     item = requests[urlHashCode];
                                 }
                                 catch 
