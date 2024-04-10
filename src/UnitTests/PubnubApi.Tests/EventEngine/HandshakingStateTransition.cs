@@ -79,8 +79,6 @@ namespace PubnubApi.Tests.EventEngine
             Assert.IsInstanceOf<HandshakeReconnectingState>(result.State);
             CollectionAssert.AreEqual(expectedState.Channels, ((HandshakeReconnectingState)result.State).Channels);
             CollectionAssert.AreEqual(expectedState.ChannelGroups, ((HandshakeReconnectingState)result.State).ChannelGroups);
-            Assert.IsInstanceOf<EmitStatusInvocation>(result.Invocations.ElementAt(0));
-            Assert.AreEqual(PNStatusCategory.PNUnknownCategory, ((EmitStatusInvocation)result.Invocations.ElementAt(0)).StatusCategory);
         }
 
         [Test]

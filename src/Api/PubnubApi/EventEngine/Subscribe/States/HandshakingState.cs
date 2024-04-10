@@ -36,9 +36,9 @@ namespace PubnubApi.EventEngine.Subscribe.States
 
                 Events.HandshakeFailureEvent handshakeFailure => new States.HandshakeReconnectingState()
                 {
-                    Channels = handshakeFailure.Channels,
-                    ChannelGroups = handshakeFailure.ChannelGroups,
-                    Cursor = handshakeFailure.Cursor,
+                    Channels = this.Channels,
+                    ChannelGroups = this.ChannelGroups,
+                    Cursor = this.Cursor,
                     Reason = handshakeFailure.Status,
                     AttemptedRetries = 0
                 },

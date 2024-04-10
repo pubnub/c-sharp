@@ -55,7 +55,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
                 {
                     Channels = this.Channels,
                     ChannelGroups = this.ChannelGroups,
-                    Cursor = receiveFailure.Cursor,
+                    Cursor = this.Cursor,
                     AttemptedRetries = 0,
                     Reason = receiveFailure.Status
                 },

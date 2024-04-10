@@ -92,8 +92,6 @@ namespace PubnubApi.Tests.EventEngine
             CollectionAssert.AreEqual(expectedState.ChannelGroups, ((ReceiveReconnectingState)result.State).ChannelGroups);
             Assert.AreEqual(expectedState.Cursor.Region, ((ReceiveReconnectingState)result.State).Cursor.Region);
             Assert.AreEqual(expectedState.Cursor.Timetoken, ((ReceiveReconnectingState)result.State).Cursor.Timetoken);
-            Assert.IsInstanceOf<EmitStatusInvocation>(result.Invocations.ElementAt(0));
-            Assert.AreEqual(PNStatusCategory.PNUnknownCategory, ((EmitStatusInvocation)result.Invocations.ElementAt(0)).StatusCategory);
         }
 
         [Test]

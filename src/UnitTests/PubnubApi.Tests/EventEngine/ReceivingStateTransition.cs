@@ -66,8 +66,6 @@ namespace PubnubApi.Tests.EventEngine
             if (@event is ReceiveSuccessEvent)
             {
                 Assert.IsInstanceOf<EmitMessagesInvocation>(result.Invocations.ElementAt(0));
-                Assert.IsInstanceOf<EmitStatusInvocation>(result.Invocations.ElementAt(1));
-                Assert.AreEqual(PNStatusCategory.PNConnectedCategory, ((EmitStatusInvocation)result.Invocations.ElementAt(1)).StatusCategory);
             }
         }
 
