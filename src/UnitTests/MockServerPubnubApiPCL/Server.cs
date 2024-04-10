@@ -20,7 +20,7 @@ namespace MockServer
         private string notFoundContent = "<html><head><title>Not Found</title></head><body>Sorry, the object you requested was not found.</body><html>";
         private readonly Uri uri;
         private Thread trf;
-        private Dictionary<string, Request> requests = new Dictionary<string, Request>();
+        private Dictionary<int, Request> requests = new Dictionary<int, Request>();
         private List<string> responses = new List<string>();
         private bool finalizeServer;
         private bool secure;
@@ -101,15 +101,7 @@ namespace MockServer
                 parameters = String.Format("?{0}", sb.ToString().Substring(1));
             }
 
-            string requestUriOutset = String.Format("{0} {1}", request.Method, request.Path);
-            if (!requests.ContainsKey(requestUriOutset))
-            {
-                requests.Add(requestUriOutset, request);
-            }
-            else
-            {
-                requests[requestUriOutset] = request;
-            }
+             requests[request.GetHashCode()] = request;
 
             return this;
         }
@@ -221,19 +213,13 @@ namespace MockServer
                         string path = lines[0].Substring(0, lines[0].LastIndexOf(" ", StringComparison.InvariantCultureIgnoreCase));
                         responses.Add(path);
                         System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("        ###  MM/dd/yyyy HH:mm:ss:fff") + " - " + path);
-
                         try
                         {
                             Request item = null;
-                            try
-                            {
-                                item = requests[path];
-                            }
-                            catch
-                            {
                                 try
                                 {
-                                    item = requests[path.Substring(0, path.IndexOf("?"))];
+                                    int urlHashCode = CalculateHasCode(path);
+                                    item = requests[urlHashCode];
                                 }
                                 catch 
                                 {
@@ -276,7 +262,7 @@ namespace MockServer
                                         item.StatusCode = HttpStatusCode.OK;    //// HttpStatusCode.NotFound;
                                     }
                                 }
-                            }
+
 
                             LoggingMethod.WriteToLog(String.Format("Response: {0}", item.Response), LoggingMethod.LevelVerbose);
 
@@ -362,6 +348,19 @@ namespace MockServer
                     goto Start;
                 }
             }
+        }
+
+        private static int CalculateHasCode(string url)
+        {
+            int hashCode = 0;
+            string pathSegment = url.Substring(0, url.IndexOf("?")).Substring(url.IndexOf(" "));
+            string[] queryParametersSegment = url.Substring(url.IndexOf("?")+1).Split("&");
+
+            hashCode += pathSegment.GetHashCode();
+            foreach (var query in queryParametersSegment) {
+	            hashCode += query.GetHashCode();
+            }
+            return hashCode;
         }
 
         /// <summary>
