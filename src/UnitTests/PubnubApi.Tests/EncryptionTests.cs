@@ -12,6 +12,8 @@ using PeterO.Cbor;
 using PubnubApi.Security.Crypto;
 using PubnubApi.Security.Crypto.Cryptors;
 using PubnubApi.Security.Crypto.Common;
+using System.Threading;
+using System.Security.Policy;
 
 namespace PubNubMessaging.Tests
 {
@@ -794,9 +796,9 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        async public void TestSubscribeDecryption()
+        public void TestSubscribeDecryption()
         {
-            bool done = false;
+            ManualResetEvent done = new ManualResetEvent(false);
             PNConfiguration config = CreateTestConfig();
             config.CryptoModule = new CryptoModule(new AesCbcCryptor("enigma"), new List<ICryptor> { new LegacyCryptor("enigma") });
 
@@ -806,7 +808,7 @@ namespace PubNubMessaging.Tests
                         (pb, message) =>
                         {
                             Assert.AreEqual("test", message.Message);
-                            done = true;
+                            done.Set();
                         },
                         (pb, presence) => {},
                         (pb, status) => {}
@@ -818,22 +820,19 @@ namespace PubNubMessaging.Tests
             Pubnub sender = new Pubnub(CreateTestConfig());
 
             // Rust generated encrypted message
-            await sender.Publish()
+            sender.Publish()
                 .Channel("test")
                 .Message("UE5FRAFBQ1JIEALf+E65kseYJwTw2J6BUk9MePHiCcBCS+8ykXLkBIOA")
-                .ExecuteAsync();
+                .Execute(new PNPublishResultExt((r, s) => { }));
 
-            // It will wait until the message is received or unit test timeout is reached
-            while (!done)
-            {
-                await System.Threading.Tasks.Task.Delay(100);
-            }
+            bool passed = done.WaitOne(5000);
+            Assert.True(passed);
         }
 
         [Test]
         async public void TestSubscribeDecryptionOnNonEncryptedMessage()
         {
-            bool done = false;
+            ManualResetEvent done = new ManualResetEvent(false);
             PNConfiguration config = CreateTestConfig();
             config.CryptoModule = new CryptoModule(new AesCbcCryptor("enigma"), new List<ICryptor> { new LegacyCryptor("enigma") });
 
@@ -843,7 +842,7 @@ namespace PubNubMessaging.Tests
                         (pb, message) =>
                         {
                             Assert.AreEqual("test", message.Message);
-                            done = true;
+                            done.Set();
                         },
                         (pb, presence) => {},
                         (pb, status) => {}
@@ -855,21 +854,19 @@ namespace PubNubMessaging.Tests
             Pubnub sender = new Pubnub(CreateTestConfig());
 
             // Rust generated encrypted message
-            await sender.Publish()
+            sender.Publish()
                 .Channel("test")
                 .Message("test")
-                .ExecuteAsync();
+                .Execute(new PNPublishResultExt((r, s) => { }));
 
-            // It will wait until the message is received or unit test timeout is reached
-            while (!done)
-            {
-                await System.Threading.Tasks.Task.Delay(100);
-            }
+            bool passed = done.WaitOne(5000);
+            Assert.True(passed);
         }
 
         [Test]
-        async public void TestHistoryDecryption()
+        public void TestHistoryDecryption()
         {
+            ManualResetEvent done = new ManualResetEvent(false);
             PNConfiguration config = CreateTestConfig();
             config.CryptoModule = new CryptoModule(new AesCbcCryptor("enigma"), new List<ICryptor> { new LegacyCryptor("enigma") });
 
@@ -878,22 +875,29 @@ namespace PubNubMessaging.Tests
             Pubnub sender = new Pubnub(CreateTestConfig());
 
             // Rust generated encrypted message
-            await sender.Publish()
+            sender.Publish()
                 .Channel("test")
                 .Message("UE5FRAFBQ1JIEALf+E65kseYJwTw2J6BUk9MePHiCcBCS+8ykXLkBIOA")
-                .ExecuteAsync();
+                .Execute(new PNPublishResultExt((r, s) => { }));
 
-            PNResult<PNHistoryResult> result = await sut.History()
+            Thread.Sleep(1000);
+
+            sut.History()
                 .Channel("test")
                 .Count(1)
-                .ExecuteAsync();
+                .Execute(new PNHistoryResultExt((r, s) => {
+                    Assert.AreEqual("test", r.Messages[0].Entry);
+                    done.Set();
+                }));
 
-            Assert.AreEqual("test", result.Result.Messages[0].Entry);
+            bool passed = done.WaitOne(5000);
+            Assert.True(passed);
         }
 
         [Test]
-        async public void TestHistoryDecryptionOnNonEncryptedMessage()
+        public void TestHistoryDecryptionOnNonEncryptedMessage()
         {
+            ManualResetEvent done = new ManualResetEvent(false);
             PNConfiguration config = CreateTestConfig();
             config.CryptoModule = new CryptoModule(new AesCbcCryptor("enigma"), new List<ICryptor> { new LegacyCryptor("enigma") });
 
@@ -902,17 +906,23 @@ namespace PubNubMessaging.Tests
             Pubnub sender = new Pubnub(CreateTestConfig());
 
             // Rust generated encrypted message
-            await sender.Publish()
+            sender.Publish()
                 .Channel("test")
                 .Message("test")
-                .ExecuteAsync();
+                .Execute(new PNPublishResultExt((r, s) => { }));
 
-            PNResult<PNHistoryResult> result = await sut.History()
+            Thread.Sleep(1000);
+
+            sut.History()
                 .Channel("test")
                 .Count(1)
-                .ExecuteAsync();
+                .Execute(new PNHistoryResultExt((r, s) => {
+                    Assert.AreEqual("test", r.Messages[0].Entry);
+                    done.Set();
+                }));
 
-            Assert.AreEqual("test", result.Result.Messages[0].Entry);
+            bool passed = done.WaitOne(5000);
+            Assert.True(passed);
         }
 
         private PNConfiguration CreateTestConfig()

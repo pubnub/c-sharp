@@ -101,14 +101,14 @@ namespace MockServer
                 parameters = String.Format("?{0}", sb.ToString().Substring(1));
             }
 
-            string requestUri = String.Format("{0} {1}{2}", request.Method, request.Path, parameters == null ? "" : parameters);
-            if (!requests.ContainsKey(requestUri))
+            string requestUriOutset = String.Format("{0} {1}", request.Method, request.Path);
+            if (!requests.ContainsKey(requestUriOutset))
             {
-                requests.Add(String.Format("{0} {1}{2}", request.Method, request.Path, parameters == null ? "" : parameters), request);
+                requests.Add(requestUriOutset, request);
             }
             else
             {
-                requests[requestUri] = request;
+                requests[requestUriOutset] = request;
             }
 
             return this;
@@ -235,11 +235,11 @@ namespace MockServer
                                 {
                                     item = requests[path.Substring(0, path.IndexOf("?"))];
                                 }
-                                catch
+                                catch 
                                 {
                                     item = new MockServer.Request();
                                     item.Method = "GET";
-
+                                    
                                     if (path.Contains("GET /v2/presence/") && !path.Contains("/leave?"))
                                     {
                                         item.Response = "{\"t\":{\"t\":\"14844074079055214\",\"r\":7},\"m\":[]}";
