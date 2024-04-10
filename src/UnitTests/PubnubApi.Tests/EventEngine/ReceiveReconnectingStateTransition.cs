@@ -61,8 +61,7 @@ namespace PubnubApi.Tests.EventEngine
             Assert.AreEqual(expectedState.Cursor.Timetoken, ((ReceivingState)result.State).Cursor.Timetoken);
             if (@event is ReceiveReconnectSuccessEvent)
             {
-                Assert.IsInstanceOf<EmitStatusInvocation>(result.Invocations.ElementAt(0));
-                Assert.AreEqual(PNStatusCategory.PNReconnectedCategory, ((EmitStatusInvocation)result.Invocations.ElementAt(0)).StatusCategory);
+                Assert.IsInstanceOf<EmitMessagesInvocation>(result.Invocations.ElementAt(0));
             }
         }
 

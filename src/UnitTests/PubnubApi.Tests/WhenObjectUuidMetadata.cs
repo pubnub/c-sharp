@@ -109,8 +109,8 @@ namespace PubNubMessaging.Tests
 
             PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
-                PublishKey = PubnubCommon.PublishKeyNoPam,
-                SubscribeKey = PubnubCommon.SubscribeKeyNoPam,
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
                 Secure = false,
                 IncludeInstanceIdentifier = false,
                 IncludeRequestIdentifier = false
@@ -256,8 +256,8 @@ namespace PubNubMessaging.Tests
 
             PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
-                PublishKey = PubnubCommon.PublishKeyNoPam,
-                SubscribeKey = PubnubCommon.SubscribeKeyNoPam,
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
                 Secure = false,
                 IncludeInstanceIdentifier = false,
                 IncludeRequestIdentifier = false
