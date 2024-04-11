@@ -227,6 +227,7 @@
       <Link>Enum\ResponseType.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\EventEngine\Common\Delay.cs" Link="EventEngine\Common\Delay.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Common\EventEmitter.cs" Link="EventEngine\Common\EventEmitter.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Core\EffectDispatcher.cs" Link="EventEngine\Core\EffectDispatcher.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Core\Engine.cs" Link="EventEngine\Core\Engine.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Core\EventEngineInterfaces.cs" Link="EventEngine\Core\EventEngineInterfaces.cs" />

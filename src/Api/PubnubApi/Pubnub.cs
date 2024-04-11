@@ -983,7 +983,7 @@ namespace PubnubApi
             pubnubLog = config.PubnubLog;
             savedSdkVerion = Version;
             InstanceId = Guid.NewGuid().ToString();
-			      subscribeEventEngineFactory = new SubscribeEventEngineFactory();
+            subscribeEventEngineFactory = new SubscribeEventEngineFactory();
             presenceEventengineFactory = new PresenceEventEngineFactory();
             pubnubConfig.AddOrUpdate(InstanceId, config, (k, o) => config);
 

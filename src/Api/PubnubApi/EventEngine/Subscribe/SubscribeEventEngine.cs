@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using PubnubApi.EventEngine.Subscribe.Events;
+using PubnubApi.EventEngine.Common;
 
 namespace PubnubApi.EventEngine.Subscribe
 {
@@ -28,8 +29,8 @@ namespace PubnubApi.EventEngine.Subscribe
 		internal SubscribeEventEngine(Pubnub pubnubInstance,
 			PNConfiguration pubnubConfiguration,
 			SubscribeManager2 subscribeManager,
-			Action<Pubnub, PNStatus> statusListener = null,
-			Action<Pubnub, PNMessageResult<object>> messageListener = null)
+            EventEmitter eventEmitter,
+            Action<Pubnub, PNStatus> statusListener = null)
 		{
 			this.subscribeManager = subscribeManager;
 			var handshakeHandler = new Effects.HandshakeEffectHandler(subscribeManager, EventQueue);
@@ -48,7 +49,7 @@ namespace PubnubApi.EventEngine.Subscribe
 			dispatcher.Register<Invocations.ReceiveReconnectInvocation, Effects.ReceivingReconnectEffectHandler>(receiveReconnectHandler);
 			dispatcher.Register<Invocations.CancelReceiveReconnectInvocation, Effects.ReceivingReconnectEffectHandler>(receiveReconnectHandler);
 
-			var emitMessageHandler = new Effects.EmitMessagesHandler(pubnubInstance, messageListener, Serializer, channelTypeMap, channelGroupTypeMap);
+			var emitMessageHandler = new Effects.EmitMessagesHandler(eventEmitter, Serializer, channelTypeMap, channelGroupTypeMap);
 			dispatcher.Register<Invocations.EmitMessagesInvocation, Effects.EmitMessagesHandler>(emitMessageHandler);
 
 			var emitStatusHandler = new Effects.EmitStatusEffectHandler(pubnubInstance, statusListener);

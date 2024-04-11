@@ -168,6 +168,7 @@
     </Compile>
     <Compile Include="..\PubnubApi\EndPoint\PubSub\UnsubscribeEndpoint.cs" Link="EndPoint\PubSub\UnsubscribeEndpoint.cs" />
 	<Compile Include="..\PubnubApi\EventEngine\Common\Delay.cs" Link="EventEngine\Common\Delay.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Common\EventEmitter.cs" Link="EventEngine\Common\EventEmitter.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Core\EffectDispatcher.cs" Link="EventEngine\Core\EffectDispatcher.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Core\Engine.cs" Link="EventEngine\Core\Engine.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Core\EventEngineInterfaces.cs" Link="EventEngine\Core\EventEngineInterfaces.cs" />
@@ -699,8 +700,7 @@
     <PackageReference Include="System.ValueTuple" Version="4.4.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.Collections.Concurrent">
-      <Version>4.3.0</Version>
+    <PackageReference Include="System.Collections.Concurrent" Version="4.3.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
   </ItemGroup>
@@ -727,8 +727,7 @@
     <PackageReference Include="System.ValueTuple" Version="4.4.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.Collections.Concurrent">
-      <Version>4.3.0</Version>
+    <PackageReference Include="System.Collections.Concurrent" Version="4.3.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
   </ItemGroup>
@@ -776,8 +775,7 @@
     <PackageReference Include="System.ValueTuple" Version="4.4.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.Collections.Concurrent">
-      <Version>4.3.0</Version>
+    <PackageReference Include="System.Collections.Concurrent" Version="4.3.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
   </ItemGroup>
@@ -837,8 +835,7 @@
     <PackageReference Include="System.ValueTuple" Version="4.4.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.Collections.Concurrent">
-      <Version>4.3.0</Version>
+    <PackageReference Include="System.Collections.Concurrent" Version="4.3.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
   </ItemGroup>
@@ -886,8 +883,7 @@
     <PackageReference Include="System.ValueTuple" Version="4.4.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.Collections.Concurrent">
-      <Version>4.3.0</Version>
+    <PackageReference Include="System.Collections.Concurrent" Version="4.3.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
   </ItemGroup>
@@ -944,8 +940,7 @@
     <PackageReference Include="System.ValueTuple" Version="4.4.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.Collections.Concurrent">
-      <Version>4.3.0</Version>
+    <PackageReference Include="System.Collections.Concurrent" Version="4.3.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
   </ItemGroup>

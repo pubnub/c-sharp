@@ -323,6 +323,7 @@ namespace AcceptanceTests.Steps
 
             messageReceivedEvent = new ManualResetEvent(false);
             statusReceivedEvent = new ManualResetEvent(false);
+            presenceEvent = new ManualResetEvent(false);
 
             subscribeCallback = new SubscribeCallbackExt(
                 delegate (Pubnub pnObj, PNMessageResult<object> pubMsg)
@@ -362,6 +363,7 @@ namespace AcceptanceTests.Steps
 
             messageReceivedEvent = new ManualResetEvent(false);
             statusReceivedEvent = new ManualResetEvent(false);
+            presenceEvent = new ManualResetEvent(false);
 
             pn.AddListener(subscribeCallback);
             pn.Subscribe<object>()
@@ -396,7 +398,7 @@ namespace AcceptanceTests.Steps
         [Then(@"I wait for getting Presence joined events")]
         public void ThenIWaitForPresenceJoinEvents()
         {
-            messageReceivedEvent.WaitOne(TimeSpan.FromSeconds(5));
+            presenceEvent.WaitOne(TimeSpan.FromSeconds(5));
         }
 
         [Then(@"I observe the following Events and Invocations of the Presence EE:")]

@@ -43,7 +43,6 @@ namespace PubnubApi.EventEngine.Core {
 		public EffectDispatcher Register<TEffectInvocation, TEffectHandler>(TEffectHandler handler)
 			where TEffectInvocation : IEffectInvocation
 			where TEffectHandler : IEffectHandler<TEffectInvocation> {
-			// TODO log
 			// if (effectInvocationHandlerMap.ContainsKey(typeof(TEffectInvocation)))
 
 			effectInvocationHandlerMap[typeof(TEffectInvocation)] = handler;

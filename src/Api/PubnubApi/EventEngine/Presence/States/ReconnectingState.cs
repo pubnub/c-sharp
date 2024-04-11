@@ -18,7 +18,6 @@ namespace PubnubApi.EventEngine.Presence.States
         }.AsArray();
         public override IEnumerable<IEffectInvocation> OnExit => new CancelDelayedHeartbeatInvocation().AsArray();
 
-        // TODO: transitions
         public override TransitionResult Transition(IEvent ev)
         {
             return ev switch 

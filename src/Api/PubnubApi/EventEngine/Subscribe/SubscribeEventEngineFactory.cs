@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using PubnubApi.EndPoint;
+using PubnubApi.EventEngine.Common;
 
 namespace PubnubApi.EventEngine.Subscribe
 {
@@ -26,17 +27,17 @@ namespace PubnubApi.EventEngine.Subscribe
 			Pubnub pubnubInstance,
 			PNConfiguration pubnubConfiguration,
 			SubscribeManager2 subscribeManager,
-			Action<Pubnub, PNStatus> statusListener = null,
-			Action<Pubnub, PNMessageResult<object>> messageListener= null)
+			EventEmitter eventEmitter,
+			Action<Pubnub, PNStatus> statusListener = null)
 		{
-			var subscribeEventEngine = new SubscribeEventEngine(pubnubInstance, pubnubConfiguration: pubnubConfiguration, subscribeManager,statusListener, messageListener);
+			
+			var subscribeEventEngine = new SubscribeEventEngine(pubnubInstance, pubnubConfiguration: pubnubConfiguration, subscribeManager,eventEmitter, statusListener);
 			if (engineInstances.TryAdd(instanceId, subscribeEventEngine)) {
 				return subscribeEventEngine;
 			}
 			else {
 				throw new Exception("Subscribe event engine initialisation failed!");
 			}
-			
 		}
 	}
 }

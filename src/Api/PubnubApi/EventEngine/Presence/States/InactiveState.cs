@@ -13,7 +13,6 @@ namespace PubnubApi.EventEngine.Presence.States
             Input = new PresenceInput();
         }
 
-        // TODO: transitions
         public override TransitionResult Transition(IEvent ev)
         {
             return ev switch 

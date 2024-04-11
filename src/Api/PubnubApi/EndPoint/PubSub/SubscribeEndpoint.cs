@@ -6,6 +6,7 @@ using PubnubApi.EventEngine.Subscribe;
 using PubnubApi.EventEngine.Core;
 using PubnubApi.EventEngine.Subscribe.States;
 using PubnubApi.EventEngine.Subscribe.Common;
+using PubnubApi.EventEngine.Common;
 
 namespace PubnubApi.EndPoint
 {
@@ -125,7 +126,8 @@ namespace PubnubApi.EndPoint
 				subscribeEventEngine = subscribeEventEngineFactory.GetEventEngine(instanceId);
 			} else {
 				var subscribeManager = new SubscribeManager2(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, PubnubInstance);
-				subscribeEventEngine = subscribeEventEngineFactory.InitializeEventEngine(instanceId, PubnubInstance, config, subscribeManager, StatusEmitter, MessageEmitter);
+                var eventEmitter = new EventEmitter(config, SubscribeListenerList, jsonLibrary, pubnubTokenMgr, pubnubLog, PubnubInstance);
+				subscribeEventEngine = subscribeEventEngineFactory.InitializeEventEngine(instanceId, PubnubInstance, config, subscribeManager, eventEmitter, StatusEmitter);
 				subscribeEventEngine.OnStateTransition += SubscribeEventEngine_OnStateTransition;
 				subscribeEventEngine.OnEventQueued += SubscribeEventEngine_OnEventQueued;
 				subscribeEventEngine.OnEffectDispatch += SubscribeEventEngine_OnEffectDispatch;

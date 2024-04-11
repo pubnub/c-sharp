@@ -9,7 +9,6 @@ namespace PubnubApi.EventEngine.Presence.States
     {
         public PNStatus Reason { get; set; }
 
-        // TODO: transitions
         public override TransitionResult Transition(IEvent ev)
         {
             return ev switch 
