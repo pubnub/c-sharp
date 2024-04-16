@@ -45,6 +45,7 @@ namespace MockServer
         public Request WithParameter(string parameter, string value)
         {
             Parameters.Add(String.Format("{0}={1}", parameter, value));
+            Parameters.Sort();
             return this;
         }
 

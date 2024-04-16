@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <!--<Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />-->
   <PropertyGroup>
-    <TargetFrameworks>net35;net40;net45;net461;net48</TargetFrameworks>
     <IncludeSymbols>False</IncludeSymbols>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <AssemblyTitle>PubNub C# .NET - MockServerPubnubApi</AssemblyTitle>
@@ -10,6 +9,8 @@
     <!--<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>-->
     <!--<ProjectGuid>b86acd44-b255-4bb1-90d0-6c4751b51d7f</ProjectGuid>-->
     <OutputType>Library</OutputType>
+    <LangVersion>10</LangVersion>
+    <TargetFramework>net6.0</TargetFramework>
     <!--<AppDesignerFolder>Properties</AppDesignerFolder>-->
     <!--<RootNamespace>MockServerPubnubApi</RootNamespace>
     <FileAlignment>512</FileAlignment>

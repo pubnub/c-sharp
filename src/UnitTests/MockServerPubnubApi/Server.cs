@@ -26,14 +26,9 @@ namespace MockServer
         private bool finalizeServer;
         private bool secure;
 
-        static public Server Instance()
+        public static Server Instance()
         {
-            if (server == null)
-            {
-                server = new MockServer.Server(new Uri("http://localhost:9191"));
-            }
-
-            return server;
+            return server ??= new MockServer.Server(new Uri("http://localhost:9191"));
         }
 
         /// <summary>
@@ -90,29 +85,35 @@ namespace MockServer
         /// <returns></returns>
         public Server AddRequest(Request request)
         {
-            StringBuilder sb = new StringBuilder();
-            string parameters = null;
-            foreach (var item in request.Parameters)
+            var allParameters = string.Empty;
+            foreach (var parameter in request.Parameters)
             {
-                sb.Append(String.Format("&{0}", item));
+                allParameters += parameter;
             }
-
-            if (sb.Length > 0)
-            {
-                parameters = String.Format("?{0}", sb.ToString().Substring(1));
-            }
-
-            string requestUriOutset = String.Format("{0} {1}", request.Method, request.Path);
-            if (!requests.ContainsKey(requestUriOutset))
-            {
-                requests.Add(requestUriOutset, request);
-            }
-            else
-            {
-                requests[requestUriOutset] = request;
-            }
-
+            var requestUriOutset = $"{request.Method} {request.Path} {allParameters}";
+            requests[requestUriOutset] = request;
             return this;
+        }
+        
+        /// <summary>
+        /// Turns a request URL into a pseudo-hash used for the requests dictionary
+        /// </summary>
+        private string UrlToRequestKey(string requestUri)
+        {
+            var spaceIndex = requestUri.IndexOf(" ", StringComparison.Ordinal);
+            var questionIndex = requestUri.IndexOf("?", StringComparison.Ordinal);
+            var method = requestUri.Substring(0, spaceIndex);
+            var path = requestUri.Substring(spaceIndex+1,questionIndex - (spaceIndex + 1));
+            var joinedParams = requestUri.Substring(questionIndex+1);
+            var splitParams = joinedParams.Split("&").ToList();
+            splitParams.Sort();
+            var allParameters = string.Empty;
+            foreach (var parameter in splitParams)
+            {
+                allParameters += parameter;
+            }
+            var key = $"{method} {path} {allParameters}";
+            return key;
         }
 
         /// <summary>
@@ -220,39 +221,22 @@ namespace MockServer
 
                         string[] lines = strData.Split(new [] { "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
                         string url = lines[0].Substring(0, lines[0].LastIndexOf(" ", StringComparison.InvariantCultureIgnoreCase));
-                        System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("        ###  MM/dd/yyyy HH:mm:ss:fff") + " - " + url);
+                        Debug.WriteLine(DateTime.Now.ToString("        ###  MM/dd/yyyy HH:mm:ss:fff") + " - " + url);
                         string path = url.Substring(0, url.LastIndexOf("?", StringComparison.InvariantCultureIgnoreCase));
                         responses.Add(path);
-                        int parameterIndex = url.LastIndexOf("?", StringComparison.InvariantCultureIgnoreCase);
-                        string parameters = url.Substring(parameterIndex, url.Length - parameterIndex);
 
                         try
                         {
-                            Request item = null;
-                            try
+                            if (!requests.TryGetValue(UrlToRequestKey(url), out var item))
                             {
-                                item = requests[path];
-
-                                if (!item.Parameters.All((param) =>
-                                {
-                                    // TODO: Remove debug log
-                                    var returned = parameters.Contains(param);
-                                    Debug.WriteLine(String.Format("==> {0} ? {1} == {2}", param, parameters, returned));
-                                    return returned;
-                                }))
-                                {
-                                    throw new Exception();
-                                };
-                            }
-                            catch
-                            {
+                                LoggingMethod.WriteToLog("Request not found in Mock Server!", LoggingMethod.LevelVerbose);
                                 item = new Request()
                                 {
                                     Response = this.notFoundContent,
                                     StatusCode = HttpStatusCode.NotFound
                                 };
                             }
-
+      
                             LoggingMethod.WriteToLog(String.Format("Response: {0}", item.Response), LoggingMethod.LevelVerbose);
 
                             switch (item.StatusCode)
@@ -319,7 +303,7 @@ namespace MockServer
 
                         stream.Flush();
                         stream.Close();
-                        clientSocket.Close();
+                        sock.Close(1000);
                     }));
 
                     trfS.IsBackground = true;
