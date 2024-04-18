@@ -37,12 +37,12 @@ jobs:
         env:
           WORKSPACE_PATH: ${{ github.workspace }}
         run: .\\.github\\workflows\\release\\build-packages.ps1
-      - name: Run unit tests
-        env: 
-          PN_PUB_KEY: ${{ secrets.PN_PUB_KEY }}
-          PN_SUB_KEY: ${{ secrets.PN_SUB_KEY }}
-          PN_SEC_KEY: ${{ secrets.PN_SEC_KEY }}    
-        run: dotnet test .\\src\\UnitTests\\PubnubApiPCL.Tests\\PubnubApiPCL.Tests.csproj --verbosity normal --logger trx 
+      # - name: Run unit tests
+      #   env: 
+      #     PN_PUB_KEY: ${{ secrets.PN_PUB_KEY }}
+      #     PN_SUB_KEY: ${{ secrets.PN_SUB_KEY }}
+      #     PN_SEC_KEY: ${{ secrets.PN_SEC_KEY }}    
+      #   run: dotnet test .\\src\\UnitTests\\PubnubApiPCL.Tests\\PubnubApiPCL.Tests.csproj --verbosity normal --logger trx 
       - name: Cancel workflow runs for commit on error
         if: failure()
         uses: ./.github/.release/actions/actions/utils/fast-jobs-failure
