@@ -5,13 +5,14 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using PubnubApi.Interface;
 #if !NET35 && !NET40
 using System.Collections.Concurrent;
 #endif
 
 namespace PubnubApi.EndPoint
 {
-    public class UnsubscribeOperation<T> : PubnubCoreBase
+    public class UnsubscribeOperation<T> : PubnubCoreBase, IUnsubscribeOperation<T>
     {
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
@@ -34,19 +35,19 @@ namespace PubnubApi.EndPoint
             pubnubTokenMgr = tokenManager;
         }
 
-        public UnsubscribeOperation<T> Channels(string[] channels)
+        public IUnsubscribeOperation<T> Channels(string[] channels)
         {
             this.subscribeChannelNames = channels;
             return this;
         }
 
-        public UnsubscribeOperation<T> ChannelGroups(string[] channelGroups)
+        public IUnsubscribeOperation<T> ChannelGroups(string[] channelGroups)
         {
             this.subscribeChannelGroupNames = channelGroups;
             return this;
         }
 
-        public UnsubscribeOperation<T> QueryParam(Dictionary<string, object> customQueryParam)
+        public IUnsubscribeOperation<T> QueryParam(Dictionary<string, object> customQueryParam)
         {
             this.queryParam = customQueryParam;
             return this;
@@ -54,7 +55,7 @@ namespace PubnubApi.EndPoint
 
         public void Execute()
         {
-            Unsubscribe(subscribeChannelNames, subscribeChannelGroupNames);
+                Unsubscribe(subscribeChannelNames, subscribeChannelGroupNames);
         }
 
         private void Unsubscribe(string[] channels, string[] channelGroups)

@@ -1,5 +1,4 @@
 ﻿using System;
-using PubnubApi.Interface;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;

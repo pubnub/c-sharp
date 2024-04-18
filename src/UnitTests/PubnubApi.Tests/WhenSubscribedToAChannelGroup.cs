@@ -163,6 +163,7 @@ namespace PubNubMessaging.Tests
             server.Stop();
         }
 
+        // TODO: This test seems to be not stable...
         [Test]
         public static void ThenSubscribeShouldReturnReceivedMessage()
         {

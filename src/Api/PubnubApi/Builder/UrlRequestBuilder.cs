@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using PubnubApi.Interface;
 using System.Globalization;
 using System.Threading.Tasks;
 using System.Threading;
@@ -87,6 +86,11 @@ namespace PubnubApi
             if (!requestQueryStringParams.ContainsKey("filter-expr") && pubnubConfig.ContainsKey(pubnubInstanceId) && !string.IsNullOrEmpty(pubnubConfig[pubnubInstanceId].FilterExpression))
             {
                 requestQueryStringParams.Add("filter-expr", UriUtil.EncodeUriComponent(pubnubConfig[pubnubInstanceId].FilterExpression, currentType, false, false, false));
+            }
+
+            if (!requestQueryStringParams.ContainsKey("ee") && pubnubConfig.ContainsKey(pubnubInstanceId) && pubnubConfig[pubnubInstanceId].EnableEventEngine)
+            {
+                requestQueryStringParams.Add("ee", "");
             }
 
             if (!requestQueryStringParams.ContainsKey("tt"))

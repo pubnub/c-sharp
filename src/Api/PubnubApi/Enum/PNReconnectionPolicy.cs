@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace PubnubApi
+﻿namespace PubnubApi
 {
-    public enum PNReconnectionPolicy
+	public enum PNReconnectionPolicy
     {
         NONE,
         LINEAR,

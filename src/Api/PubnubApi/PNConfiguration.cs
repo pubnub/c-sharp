@@ -1,4 +1,4 @@
-﻿using PubnubApi.Security.Crypto;
+using PubnubApi.Security.Crypto;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -6,12 +6,13 @@ using System.Text;
 
 namespace PubnubApi
 {
-    public class PNConfiguration
+	public class PNConfiguration
     {
         private int presenceHeartbeatTimeout;
         private int presenceHeartbeatInterval;
         private UserId _userId;
         private bool uuidSetFromConstructor;
+        private PNReconnectionPolicy reconnectionPolicy;
 
         internal void ResetUuidSetFromConstructor()
         {
@@ -125,7 +126,15 @@ namespace PubnubApi
 
         public bool IncludeRequestIdentifier { get; set; }
 
-        public PNReconnectionPolicy ReconnectionPolicy { get; set; } = PNReconnectionPolicy.NONE;
+        public PNReconnectionPolicy ReconnectionPolicy {
+            get => reconnectionPolicy;
+            set {
+                reconnectionPolicy = value;
+                setDefaultRetryConfigurationFromPolicy(value);
+            }
+        }
+
+        public RetryConfiguration RetryConfiguration { get; set; }
 
         public int RequestMessageCountThreshold { get; set; } = 100;
 
@@ -140,6 +149,10 @@ namespace PubnubApi
         public bool DedupOnSubscribe { get; set; }
 
         public bool SuppressLeaveEvents { get; set; }
+
+        public bool MaintainPresenceState { get; set; } = true;
+
+        public bool EnableEventEngine { get; set; }
 
         public int FileMessagePublishRetryLimit { get; set; }
 
@@ -186,7 +199,24 @@ namespace PubnubApi
             UseRandomInitializationVector = true;
             FileMessagePublishRetryLimit = 5;
             _userId = currentUserId;
+            EnableEventEngine = false;
         }
+
+        private void setDefaultRetryConfigurationFromPolicy(PNReconnectionPolicy policy)
+        {
+            switch (policy) 
+            {
+                case PNReconnectionPolicy.LINEAR:
+                    RetryConfiguration = RetryConfiguration.Linear(2, 10);
+                    break;
+                case PNReconnectionPolicy.EXPONENTIAL:
+                    RetryConfiguration = RetryConfiguration.Exponential(2, 150, 6);
+                    break;
+                default:
+                    break;
+            }
+        }
+
         public PNConfiguration SetPresenceTimeoutWithCustomInterval(int timeout, int interval)
         {
             this.presenceHeartbeatTimeout = timeout;

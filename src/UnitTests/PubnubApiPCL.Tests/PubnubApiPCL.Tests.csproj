@@ -51,6 +51,21 @@
   <ItemGroup>
     <Compile Include="..\PubnubApi.Tests\CleanupGrant.cs" Link="CleanupGrant.cs" />
     <Compile Include="..\PubnubApi.Tests\EncryptionTests.cs" Link="EncryptionTests.cs" />
+    <Compile Include="..\PubnubApi.Tests\EventEngine\HandshakeFailedStateTransition.cs" Link="EventEngine\HandshakeFailedStateTransition.cs" />
+    <Compile Include="..\PubnubApi.Tests\EventEngine\HandshakeReconnectingStateTransition.cs" Link="EventEngine\HandshakeReconnectingStateTransition.cs" />
+    <Compile Include="..\PubnubApi.Tests\EventEngine\HandshakeStoppedStateTransition.cs" Link="EventEngine\HandshakeStoppedStateTransition.cs" />
+    <Compile Include="..\PubnubApi.Tests\EventEngine\HandshakingStateTransition.cs" Link="EventEngine\HandshakingStateTransition.cs" />
+    <Compile Include="..\PubnubApi.Tests\EventEngine\ReceiveFailedStateTransition.cs" Link="EventEngine\ReceiveFailedStateTransition.cs" />
+    <Compile Include="..\PubnubApi.Tests\EventEngine\ReceiveReconnectingStateTransition.cs" Link="EventEngine\ReceiveReconnectingStateTransition.cs" />
+    <Compile Include="..\PubnubApi.Tests\EventEngine\ReceiveStoppedStateTransition.cs" Link="EventEngine\ReceiveStoppedStateTransition.cs" />
+    <Compile Include="..\PubnubApi.Tests\EventEngine\ReceivingStateTransition.cs" Link="EventEngine\ReceivingStateTransition.cs" />
+    <Compile Include="..\PubnubApi.Tests\EventEngine\UnsubscribedStateTransition.cs" Link="EventEngine\UnsubscribedStateTransition.cs" />
+    <Compile Include="..\PubnubApi.Tests\EventEngine\Presence\CooldownState.cs" Link="EventEngine\Presence\CooldownState.cs" />
+    <Compile Include="..\PubnubApi.Tests\EventEngine\Presence\FailedState.cs" Link="EventEngine\Presence\FailedState.cs" />
+    <Compile Include="..\PubnubApi.Tests\EventEngine\Presence\HeartbeatingState.cs" Link="EventEngine\Presence\HeartbeatingState.cs" />
+    <Compile Include="..\PubnubApi.Tests\EventEngine\Presence\InactiveState.cs" Link="EventEngine\Presence\InactiveState.cs" />
+    <Compile Include="..\PubnubApi.Tests\EventEngine\Presence\ReconnectingState.cs" Link="EventEngine\Presence\ReconnectingState.cs" />
+    <Compile Include="..\PubnubApi.Tests\EventEngine\Presence\StoppedState.cs" Link="EventEngine\Presence\StoppedState.cs" />
     <Compile Include="..\PubnubApi.Tests\GenerateSampleGrant.cs" Link="GenerateSampleGrant.cs" />
     <Compile Include="..\PubnubApi.Tests\PubnubCommon.cs" Link="PubnubCommon.cs" />
     <Compile Include="..\PubnubApi.Tests\PubnubUnitTest.cs" Link="PubnubUnitTest.cs" />
@@ -109,6 +124,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resource.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="EventEngine\" />
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="copy $(ProjectDir)fileupload.txt $(ProjectDir)$(OutDir)" />

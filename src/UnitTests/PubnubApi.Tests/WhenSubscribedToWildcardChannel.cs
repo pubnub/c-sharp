@@ -843,6 +843,7 @@ namespace PubNubMessaging.Tests
         [Test]
         public static void ChannelAndChannelGroupAndWildcardChannelSubscribeShouldReturnReceivedMessage()
         {
+            // TODO: this test seems to be unstable...
             server.ClearRequests();
 
             bool receivedMessage = false;

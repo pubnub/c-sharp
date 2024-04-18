@@ -18,7 +18,7 @@ namespace PubNubMessaging.Tests
                 unitTest.Timetoken = 1567581283; //Hardcoded timetoken
                 unitTest.RequestId = "myRequestId";
                 unitTest.InternetAvailable = true;
-                unitTest.SdkVersion = "Csharp";
+                unitTest.SdkVersion = PubnubCommon.EncodedSDK;
                 unitTest.IncludePnsdk = true;
                 unitTest.IncludeUuid = true;
 

@@ -184,6 +184,7 @@ namespace PubNubMessaging.Tests
             {
                 Assert.Ignore("Ignored for Server side run");
             }
+            bool receivedSubscribedMessage = false;
             bool internalReceivedMessage = false;
             bool receivedErrorMessage = false;
             CustomClass publishedMessage = new CustomClass();
@@ -207,6 +208,7 @@ namespace PubNubMessaging.Tests
             server.RunOnHttps(ssl);
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
+            ManualResetEvent subscribeMessageManualEvent = new ManualResetEvent(false);
 
             SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
                 (o, m) => 
@@ -215,11 +217,11 @@ namespace PubNubMessaging.Tests
                     if (m != null)
                     {
                         Debug.WriteLine("SubscribeCallback: PNMessageResult: {0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(m.Message));
-                        if (pubnub.JsonPluggableLibrary.SerializeToJsonString(publishedMessage) == m.Message.ToString())
+                        if (pubnub.JsonPluggableLibrary.SerializeToJsonString(publishedMessage) == pubnub.JsonPluggableLibrary.SerializeToJsonString(m.Message))
                         {
                             internalReceivedMessage = true;
                         }
-                        subscribeManualEvent.Set();
+                        subscribeMessageManualEvent.Set();
                     }
                 },
                 (o, p) => {
@@ -305,6 +307,7 @@ namespace PubNubMessaging.Tests
 
             if (!receivedErrorMessage)
             {
+                internalReceivedMessage = false;
                 ManualResetEvent publishManualEvent = new ManualResetEvent(false);
                 pubnub.Publish().Channel(channel).Message(publishedMessage)
                         .Execute(new PNPublishResultExt((r, s) =>
@@ -317,6 +320,11 @@ namespace PubNubMessaging.Tests
                         }));
 
                 publishManualEvent.WaitOne(manualResetEventWaitTimeout);
+                receivedMessage = internalReceivedMessage;
+
+                subscribeMessageManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+                Thread.Sleep(1000);
 
                 pubnub.Unsubscribe<string>().Channels(new[] { channel }).Execute();
 
@@ -415,7 +423,8 @@ namespace PubNubMessaging.Tests
                 Secure = false,
                 LogVerbosity = PNLogVerbosity.BODY,
                 PubnubLog = new TestLog(),
-                NonSubscribeRequestTimeout = 120
+                NonSubscribeRequestTimeout = 120,
+                //EnableEventEngine = true, TODO: Event engine fails those tests...
             };
             if (PubnubCommon.PAMServerSideRun)
             {
@@ -722,7 +731,8 @@ namespace PubNubMessaging.Tests
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Secure = false
+                Secure = false,
+                // EnableEventEngine = true, TODO: Event engine fails those tests...
             };
             if (PubnubCommon.PAMServerSideRun)
             {
@@ -773,7 +783,7 @@ namespace PubNubMessaging.Tests
 
             manualResetEventWaitTimeout = 310 * 1000;
 
-            string channel = "hello_my_channel";
+            string channel = "hello_my_channel1";
             numberOfReceivedMessages = 0;
 
             string expected = "{\"t\":{\"t\":\"14839022442039237\",\"r\":7},\"m\":[]}";

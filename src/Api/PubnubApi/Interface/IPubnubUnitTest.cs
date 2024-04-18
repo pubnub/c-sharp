@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
 
 namespace PubnubApi
 {
@@ -49,5 +46,24 @@ namespace PubnubApi
             get;
             set;
         }
+
+        List<KeyValuePair<string,string>> EventTypeList 
+        {
+            get;
+            set;
+        }
+
+        List<KeyValuePair<string,string>> PresenceActivityList 
+        {
+            get;
+            set;
+        }
+
+        int Attempts
+        {
+            get;
+            set;
+        }
+
     }
 }

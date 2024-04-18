@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
@@ -25,14 +26,9 @@ namespace MockServer
         private bool finalizeServer;
         private bool secure;
 
-        static public Server Instance()
+        public static Server Instance()
         {
-            if (server == null)
-            {
-                server = new MockServer.Server(new Uri("http://localhost:9191"));
-            }
-
-            return server;
+            return server ??= new MockServer.Server(new Uri("http://localhost:9191"));
         }
 
         /// <summary>
@@ -89,29 +85,35 @@ namespace MockServer
         /// <returns></returns>
         public Server AddRequest(Request request)
         {
-            StringBuilder sb = new StringBuilder();
-            string parameters = null;
-            foreach (var item in request.Parameters)
+            var allParameters = string.Empty;
+            foreach (var parameter in request.Parameters)
             {
-                sb.Append(String.Format("&{0}", item));
+                allParameters += parameter;
             }
-
-            if (sb.Length > 0)
-            {
-                parameters = String.Format("?{0}", sb.ToString().Substring(1));
-            }
-
-            string requestUri = String.Format("{0} {1}{2}", request.Method, request.Path, parameters == null ? "" : parameters);
-            if (!requests.ContainsKey(requestUri))
-            {
-                requests.Add(String.Format("{0} {1}{2}", request.Method, request.Path, parameters == null ? "" : parameters), request);
-            }
-            else
-            {
-                requests[requestUri] = request;
-            }
-
+            var requestUriOutset = $"{request.Method} {request.Path} {allParameters}";
+            requests[requestUriOutset] = request;
             return this;
+        }
+        
+        /// <summary>
+        /// Turns a request URL into a pseudo-hash used for the requests dictionary
+        /// </summary>
+        private string UrlToRequestKey(string requestUri)
+        {
+            var spaceIndex = requestUri.IndexOf(" ", StringComparison.Ordinal);
+            var questionIndex = requestUri.IndexOf("?", StringComparison.Ordinal);
+            var method = requestUri.Substring(0, spaceIndex);
+            var path = requestUri.Substring(spaceIndex+1,questionIndex - (spaceIndex + 1));
+            var joinedParams = requestUri.Substring(questionIndex+1);
+            var splitParams = joinedParams.Split("&").ToList();
+            splitParams.Sort();
+            var allParameters = string.Empty;
+            foreach (var parameter in splitParams)
+            {
+                allParameters += parameter;
+            }
+            var key = $"{method} {path} {allParameters}";
+            return key;
         }
 
         /// <summary>
@@ -218,66 +220,23 @@ namespace MockServer
                         }
 
                         string[] lines = strData.Split(new [] { "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
-                        string path = lines[0].Substring(0, lines[0].LastIndexOf(" ", StringComparison.InvariantCultureIgnoreCase));
+                        string url = lines[0].Substring(0, lines[0].LastIndexOf(" ", StringComparison.InvariantCultureIgnoreCase));
+                        Debug.WriteLine(DateTime.Now.ToString("        ###  MM/dd/yyyy HH:mm:ss:fff") + " - " + url);
+                        string path = url.Substring(0, url.LastIndexOf("?", StringComparison.InvariantCultureIgnoreCase));
                         responses.Add(path);
-                        System.Diagnostics.Debug.WriteLine(DateTime.Now.ToString("        ###  MM/dd/yyyy HH:mm:ss:fff") + " - " + path);
 
                         try
                         {
-                            Request item = null;
-                            try
+                            if (!requests.TryGetValue(UrlToRequestKey(url), out var item))
                             {
-                                item = requests[path];
-                            }
-                            catch
-                            {
-                                try
+                                LoggingMethod.WriteToLog("Request not found in Mock Server!", LoggingMethod.LevelVerbose);
+                                item = new Request()
                                 {
-                                    item = requests[path.Substring(0, path.IndexOf("?"))];
-                                }
-                                catch
-                                {
-                                    item = new MockServer.Request();
-                                    item.Method = "GET";
-
-                                    if (path.Contains("GET /v2/presence/") && !path.Contains("/leave?"))
-                                    {
-                                        item.Response = "{\"t\":{\"t\":\"14844074079055214\",\"r\":7},\"m\":[]}";
-                                        item.StatusCode = HttpStatusCode.OK;
-                                    }
-                                    else if (path.Contains("GET /v2/subscribe/"))
-                                    {
-                                        item.Response = "{}";
-                                        item.StatusCode = HttpStatusCode.OK;
-                                    }
-                                    else if (path.Contains("GET /time/0"))
-                                    {
-                                        item.Response = "[14827611897607991]";
-                                        item.StatusCode = HttpStatusCode.OK;
-                                    }
-                                    else if (path.Contains("/leave?"))
-                                    {
-                                        item.Response = "{\"status\": 200, \"action\": \"leave\", \"message\": \"OK\", \"service\": \"Presence\"}";
-                                        item.StatusCode = HttpStatusCode.OK;
-                                    }
-                                    else if (path.Contains("GET /publish/"))
-                                    {
-                                        item.Response = "[1,\"Sent\",\"14715322883933786\"]";
-                                        item.StatusCode = HttpStatusCode.OK;
-                                    }
-                                    else if(path.Contains("DELETE /v3/history/sub-key"))
-                                    {
-                                        item.Response = "{\"status\": 200, \"error\": false, \"error_message\": \"\"}";
-                                        item.StatusCode = HttpStatusCode.OK;
-                                    }
-                                    else
-                                    {
-                                        item.Response = "";
-                                        item.StatusCode = HttpStatusCode.OK;    //// HttpStatusCode.NotFound;
-                                    }
-                                }
+                                    Response = this.notFoundContent,
+                                    StatusCode = HttpStatusCode.NotFound
+                                };
                             }
-
+      
                             LoggingMethod.WriteToLog(String.Format("Response: {0}", item.Response), LoggingMethod.LevelVerbose);
 
                             switch (item.StatusCode)
@@ -344,7 +303,7 @@ namespace MockServer
 
                         stream.Flush();
                         stream.Close();
-                        clientSocket.Close();
+                        sock.Close(1000);
                     }));
 
                     trfS.IsBackground = true;

@@ -62,4 +62,19 @@
        <Version>4.0.0</Version>
      </PackageReference>
    </ItemGroup>
+  
+   <ItemGroup>
+     <Compile Include="..\MockServerPubnubApi\IMockServerLog.cs">
+       <Link>IMockServerLog.cs</Link>
+     </Compile>
+     <Compile Include="..\MockServerPubnubApi\LoggingMethod.cs">
+       <Link>LoggingMethod.cs</Link>
+     </Compile>
+     <Compile Include="..\MockServerPubnubApi\Request.cs">
+       <Link>Request.cs</Link>
+     </Compile>
+     <Compile Include="..\MockServerPubnubApi\Server.cs">
+       <Link>Server.cs</Link>
+     </Compile>
+   </ItemGroup>
  </Project>

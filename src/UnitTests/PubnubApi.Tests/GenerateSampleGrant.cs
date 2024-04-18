@@ -4,6 +4,7 @@ using System.Threading;
 using PubnubApi;
 using MockServer;
 using System.Diagnostics;
+using PubnubApi.Security.Crypto.Cryptors;
 
 namespace PubNubMessaging.Tests
 {
@@ -59,36 +60,30 @@ namespace PubNubMessaging.Tests
 
             pubnub = createPubNubInstance(config);
 
-            if (PubnubCommon.EnableStubTest) sampleCount = 1;
+            grantManualEvent = new ManualResetEvent(false);
+            string channelName = "csharp-pam-ul-channel";
+            string authKey = "csharp-pam-authkey-0-0,csharp-pam-authkey-1-0";
 
-            for (int index = 0; index < sampleCount; index++)
-            {
-                grantManualEvent = new ManualResetEvent(false);
-                string channelName = string.Format("csharp-pam-ul-channel-{0}", index);
-                string authKey = string.Format("csharp-pam-authkey-0-{0},csharp-pam-authkey-1-{1}", index, index);
+            string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group\",\"subscribe_key\":\"pam\",\"ttl\":20,\"channel-groups\":{\"hello_my_group\":{\"r\":1,\"w\":0,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
 
-                string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group\",\"subscribe_key\":\"pam\",\"ttl\":20,\"channel-groups\":{\"hello_my_group\":{\"r\":1,\"w\":0,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
+            server.AddRequest(new Request()
+                .WithMethod("GET")
+                .WithPath(string.Format("/v2/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey))
+                .WithParameter("auth", "csharp-pam-authkey-0-0%2Ccsharp-pam-authkey-1-0")
+                .WithParameter("channel", channelName)
+                .WithParameter("m", "0")
+                .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                .WithParameter("r", "1")
+                .WithParameter("requestid", "myRequestId")
+                .WithParameter("uuid", config.UserId)
+                .WithParameter("w", "1")
+                .WithResponse(expected)
+                .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                server.AddRequest(new Request()
-                    .WithMethod("GET")
-                    .WithPath(string.Format("/v2/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey))
-                    .WithParameter("auth", "csharp-pam-authkey-0-0%2Ccsharp-pam-authkey-1-0")
-                    .WithParameter("channel", channelName)
-                    .WithParameter("m", "0")
-                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
-                    .WithParameter("r", "1")
-                    .WithParameter("requestid", "myRequestId")
-                    .WithParameter("timestamp", "1356998400")
-                    .WithParameter("uuid", config.UserId)
-                    .WithParameter("w", "1")
-                    .WithParameter("signature", "tCnUUS8KPeTmepj_b2mLoEny3shgtxX1JzhbIIyA0wU=")
-                    .WithResponse(expected)
-                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+            Thread.Sleep(1000);
 
-                pubnub.Grant().Channels(new [] { channelName }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(false).Execute(new GrantResult());
-                grantManualEvent.WaitOne(5000);
-            }
-
+            pubnub.Grant().Channels(new [] { channelName }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(false).Execute(new GrantResult());
+            grantManualEvent.WaitOne(5000);
 
             pubnub.Destroy();
             pubnub = null;
@@ -99,14 +94,8 @@ namespace PubNubMessaging.Tests
         public static void AtChannelLevel()
         {
             server.ClearRequests();
-
+            // TODO: Reviewers, I understand that it helps to debug the testing suite - question is if maybe there are better ways?
             currentUnitTestCase = "AtChannelLevel";
-
-            if (!PubnubCommon.PAMServerSideGrant)
-            {
-                Assert.Ignore("PAM not enabled; GenerateSampleGrant -> AtChannelLevel.");
-                return;
-            }
 
             receivedGrantMessage = false;
 
@@ -120,38 +109,31 @@ namespace PubNubMessaging.Tests
 
             pubnub = createPubNubInstance(config);
 
-            if (PubnubCommon.EnableStubTest) sampleCount = 1;
+            grantManualEvent = new ManualResetEvent(false);
+            string channelName = "csharp-pam-cl-channel";
 
-            for (int index = 0; index < sampleCount; index++)
-            {
-                grantManualEvent = new ManualResetEvent(false);
-                string channelName = string.Format("csharp-pam-cl-channel-{0}", index);
+            string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group\",\"subscribe_key\":\"pam\",\"ttl\":20,\"channel-groups\":{\"hello_my_group\":{\"r\":1,\"w\":0,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
 
-                string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"channel-group\",\"subscribe_key\":\"pam\",\"ttl\":20,\"channel-groups\":{\"hello_my_group\":{\"r\":1,\"w\":0,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(string.Format("/v2/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey))
+                    .WithParameter("channel", channelName)
+                    .WithParameter("m", "0")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("r", "1")
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("uuid", config.UserId)
+                    .WithParameter("w", "1")
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-                server.AddRequest(new Request()
-                        .WithMethod("GET")
-                        .WithPath(string.Format("/v2/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey))
-                        .WithParameter("channel", channelName)
-                        .WithParameter("m", "0")
-                        .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
-                        .WithParameter("r", "1")
-                        .WithParameter("requestid", "myRequestId")
-                        .WithParameter("timestamp", "1356998400")
-                        .WithParameter("uuid", config.UserId)
-                        .WithParameter("w", "1")
-                        .WithParameter("signature", "gumjPtSDtaYGB7Pj-fFUY-ZFD_jKuu7n9sQEBhNbAKg=")
-                        .WithResponse(expected)
-                        .WithStatusCode(System.Net.HttpStatusCode.OK));
+            pubnub.Grant().Channels(new [] { channelName }).Read(true).Write(true).Manage(false)
+                .Execute(new GrantResult());
 
-                pubnub.Grant().Channels(new [] { channelName }).Read(true).Write(true).Manage(false)
-                    .Execute(new GrantResult());
-                grantManualEvent.WaitOne(5000);
-            }
-
-
+            grantManualEvent.WaitOne(5000);
             pubnub.Destroy();
             pubnub = null;
+
             Assert.IsTrue(receivedGrantMessage, "GenerateSampleGrant -> AtChannelLevel failed.");
         }
 

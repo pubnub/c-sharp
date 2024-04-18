@@ -677,8 +677,10 @@ namespace PubnubApi
                                         double objectsVersion = -1;
                                         Dictionary<string, object> objectsDic = payload as Dictionary<string, object>;
                                         if (objectsDic != null 
-                                            && objectsDic.ContainsKey("source") && objectsDic.ContainsKey("version")
-                                            && objectsDic["source"].ToString() == "objects" && Double.TryParse(objectsDic["version"].ToString(), out objectsVersion))
+                                            && objectsDic.ContainsKey("source")
+                                            && objectsDic.ContainsKey("version")
+                                            && objectsDic["source"].ToString() == "objects" 
+                                            && Double.TryParse(objectsDic["version"].ToString().Trim(), NumberStyles.Number, CultureInfo.InvariantCulture, out objectsVersion))
                                         {
                                             if (objectsVersion.CompareTo(2D) == 0) //Process only version=2 for Objects Simplification. Ignore 1. 
                                             {
@@ -834,7 +836,7 @@ namespace PubnubApi
                                                     if (fileObjDic != null && fileObjDic.ContainsKey("id") && fileObjDic.ContainsKey("name"))
                                                     {
                                                         fileMessage.File = new PNFile { Id = fileObjDic["id"].ToString(), Name = fileObjDic["name"].ToString() };
-                                                        PubnubApi.Interface.IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(currentConfig, jsonLib, unitTest, currentLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+                                                        IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(currentConfig, jsonLib, unitTest, currentLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
                                                         Uri fileUrlRequest = urlBuilder.BuildGetFileUrlOrDeleteReqest("GET", "", fileMessage.Channel, fileMessage.File.Id, fileMessage.File.Name, null, type);
                                                         fileMessage.File.Url = fileUrlRequest.ToString();
                                                     }
@@ -1751,11 +1753,11 @@ namespace PubnubApi
 
             if (local)
             {
-                if (!string.IsNullOrEmpty(channel) && ChannelLocalUserState[PubnubInstance.InstanceId].ContainsKey(channel))
+                if (!string.IsNullOrEmpty(channel) && ChannelLocalUserState.ContainsKey(PubnubInstance.InstanceId) && ChannelLocalUserState[PubnubInstance.InstanceId].ContainsKey(channel))
                 {
                     ChannelLocalUserState[PubnubInstance.InstanceId].TryGetValue(channel, out channelUserStateDictionary);
                 }
-                if (!string.IsNullOrEmpty(channelGroup) && ChannelGroupLocalUserState[PubnubInstance.InstanceId].ContainsKey(channelGroup))
+                if (!string.IsNullOrEmpty(channelGroup) && ChannelLocalUserState.ContainsKey(PubnubInstance.InstanceId) && ChannelGroupLocalUserState[PubnubInstance.InstanceId].ContainsKey(channelGroup))
                 {
                     ChannelGroupLocalUserState[PubnubInstance.InstanceId].TryGetValue(channelGroup, out channelGroupUserStateDictionary);
                 }

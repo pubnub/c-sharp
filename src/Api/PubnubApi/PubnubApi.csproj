@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net35;net40;net45;net461;net48</TargetFrameworks>
-    <LangVersion>8.0</LangVersion>
+    <LangVersion>latest</LangVersion>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>pubnub.snk</AssemblyOriginatorKeyFile>
     <DelaySign>False</DelaySign>
@@ -14,7 +14,7 @@
 
   <PropertyGroup>
     <PackageId>Pubnub</PackageId>
-    <PackageVersion>6.19.7.0</PackageVersion>
+    <PackageVersion>6.20.0.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -22,7 +22,8 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>Resolved the issue where an incorrect network status was emitted when no internet connection was detected.</PackageReleaseNotes>
+    <PackageReleaseNotes>Added event engine implementation for subscribe and presence operation.
+Added support for `RetryConfiguration` to configure subscribe request retry.</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
@@ -70,16 +71,13 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net35'">
-    <PackageReference Include="AsyncBridge.Net35">
-      <Version>0.2.0</Version>
+    <PackageReference Include="AsyncBridge" Version="0.3.1">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.Threading.dll">
-      <Version>1.0.2856</Version>
+    <PackageReference Include="System.Threading.dll" Version="1.0.2856">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="TaskParallelLibrary">
-      <Version>1.0.2856</Version>
+    <PackageReference Include="TaskParallelLibrary" Version="1.0.2856">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <Reference Include="System" />
@@ -89,7 +87,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net40'">
-    <PackageReference Include="AsyncBridge.JetBrains" Version="0.1.1">
+    <PackageReference Include="AsyncBridge" Version="0.3.1">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <Reference Include="System" />
@@ -105,38 +103,33 @@
     <PackageReference Include="System.ValueTuple" Version="4.4.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.Collections.Concurrent">
-      <Version>4.3.0</Version>
+    <PackageReference Include="System.Collections.Concurrent" Version="4.3.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
-    <PackageReference Include="System.Security.Cryptography.Algorithms">
-      <Version>4.3.0</Version>
+    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.0">
     </PackageReference>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
     <PackageReference Include="System.ValueTuple" Version="4.4.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.Collections.Concurrent">
-      <Version>4.3.0</Version>
+    <PackageReference Include="System.Collections.Concurrent" Version="4.3.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
-    <PackageReference Include="System.Security.Cryptography.Algorithms">
-      <Version>4.3.0</Version>
+    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.0">
     </PackageReference>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
     <PackageReference Include="System.ValueTuple" Version="4.4.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.Collections.Concurrent">
-      <Version>4.3.0</Version>
+    <PackageReference Include="System.Collections.Concurrent" Version="4.3.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
   </ItemGroup>

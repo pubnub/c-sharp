@@ -12,6 +12,9 @@ using PeterO.Cbor;
 using PubnubApi.Security.Crypto;
 using PubnubApi.Security.Crypto.Cryptors;
 using PubnubApi.Security.Crypto.Common;
+using System.Threading;
+using System.Security.Policy;
+using MockServer;
 
 namespace PubNubMessaging.Tests
 {
@@ -44,14 +47,16 @@ namespace PubNubMessaging.Tests
 
         public PubnubDemoMessage DemoMessage { get; set; } = new PubnubDemoMessage();
 
-        public PubnubDemoMessage CustomMessage { get; set; } = new PubnubDemoMessage("Welcome to the world of Pubnub for Publish and Subscribe. Hah!");
+        public PubnubDemoMessage CustomMessage { get; set; } =
+            new PubnubDemoMessage("Welcome to the world of Pubnub for Publish and Subscribe. Hah!");
 
         public Person[] SampleXml { get; set; } = new DemoRoot().Person.ToArray();
     }
 
     public class PubnubDemoMessage
     {
-        public string DefaultMessage { get; set; } = "~!@#$%^&*()_+ `1234567890-= qwertyuiop[]\\ {}| asdfghjkl;' :\" zxcvbnm,./ <>? ";
+        public string DefaultMessage { get; set; } =
+            "~!@#$%^&*()_+ `1234567890-= qwertyuiop[]\\ {}| asdfghjkl;' :\" zxcvbnm,./ <>? ";
 
         public PubnubDemoMessage()
         {
@@ -143,14 +148,33 @@ namespace PubNubMessaging.Tests
     }
 
     [TestFixture]
-    public class EncryptionTests
+    public class EncryptionTests : TestHarness
     {
+        private static Server server;
+
+        [SetUp]
+        public static void Init()
+        {
+            UnitTestLog unitLog = new Tests.UnitTestLog();
+            unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
+            server = Server.Instance();
+            MockServer.LoggingMethod.MockServerLog = unitLog;
+        }
+
+        [TearDown]
+        public static void Exit()
+        {
+            server.Stop();
+        }
+
         [Test]
         public void ParseGrantTokenTest()
         {
-            string expected = "{\"Version\":2,\"Timestamp\":1568739458,\"TTL\":100,\"Resources\":{\"Channels\":{},\"ChannelGroups\":{},\"Uuids\":{},\"Users\":{},\"Spaces\":{}},\"Patterns\":{\"Channels\":{},\"ChannelGroups\":{},\"Uuids\":{},\"Users\":{\"^emp-*\":{\"Read\":true,\"Write\":true,\"Manage\":false,\"Delete\":false,\"Create\":false,\"Get\":false,\"Update\":false,\"Join\":false},\"^mgr-*\":{\"Read\":true,\"Write\":true,\"Manage\":false,\"Delete\":true,\"Create\":true,\"Get\":false,\"Update\":false,\"Join\":false}},\"Spaces\":{\"^public-*\":{\"Read\":true,\"Write\":true,\"Manage\":false,\"Delete\":false,\"Create\":false,\"Get\":false,\"Update\":false,\"Join\":false},\"^private-*\":{\"Read\":true,\"Write\":true,\"Manage\":false,\"Delete\":true,\"Create\":true,\"Get\":false,\"Update\":false,\"Join\":false}}},\"Meta\":{},\"AuthorizedUuid\":null,\"Signature\":\"LL8xpndq3ILa/a3LOK9ragvO2EqaUmKrPQin2jOSEWQ=\"}";
+            string expected =
+                "{\"Version\":2,\"Timestamp\":1568739458,\"TTL\":100,\"Resources\":{\"Channels\":{},\"ChannelGroups\":{},\"Uuids\":{},\"Users\":{},\"Spaces\":{}},\"Patterns\":{\"Channels\":{},\"ChannelGroups\":{},\"Uuids\":{},\"Users\":{\"^emp-*\":{\"Read\":true,\"Write\":true,\"Manage\":false,\"Delete\":false,\"Create\":false,\"Get\":false,\"Update\":false,\"Join\":false},\"^mgr-*\":{\"Read\":true,\"Write\":true,\"Manage\":false,\"Delete\":true,\"Create\":true,\"Get\":false,\"Update\":false,\"Join\":false}},\"Spaces\":{\"^public-*\":{\"Read\":true,\"Write\":true,\"Manage\":false,\"Delete\":false,\"Create\":false,\"Get\":false,\"Update\":false,\"Join\":false},\"^private-*\":{\"Read\":true,\"Write\":true,\"Manage\":false,\"Delete\":true,\"Create\":true,\"Get\":false,\"Update\":false,\"Join\":false}}},\"Meta\":{},\"AuthorizedUuid\":null,\"Signature\":\"LL8xpndq3ILa/a3LOK9ragvO2EqaUmKrPQin2jOSEWQ=\"}";
             string actual = "";
-            string token = "p0F2AkF0Gl2BEIJDdHRsGGRDcmVzpERjaGFuoENncnCgQ3VzcqBDc3BjoENwYXSkRGNoYW6gQ2dycKBDdXNyomZeZW1wLSoDZl5tZ3ItKhgbQ3NwY6JpXnB1YmxpYy0qA2pecHJpdmF0ZS0qGBtEbWV0YaBDc2lnWCAsvzGmd2rcgtr9rcs4r2tqC87YSppSYqs9CKfaM5IRZA==";
+            string token =
+                "p0F2AkF0Gl2BEIJDdHRsGGRDcmVzpERjaGFuoENncnCgQ3VzcqBDc3BjoENwYXSkRGNoYW6gQ2dycKBDdXNyomZeZW1wLSoDZl5tZ3ItKhgbQ3NwY6JpXnB1YmxpYy0qA2pecHJpdmF0ZS0qGBtEbWV0YaBDc2lnWCAsvzGmd2rcgtr9rcs4r2tqC87YSppSYqs9CKfaM5IRZA==";
             //string token = "qEF2AkF0GmFLd-NDdHRsGQWgQ3Jlc6VEY2hhbqFjY2gxGP9DZ3JwoWNjZzEY_0N1c3KgQ3NwY6BEdXVpZKFldXVpZDEY_0NwYXSlRGNoYW6gQ2dycKBDdXNyoENzcGOgRHV1aWShYl4kAURtZXRho2VzY29yZRhkZWNvbG9yY3JlZGZhdXRob3JlcGFuZHVEdXVpZGtteWF1dGh1dWlkMUNzaWdYIP2vlxHik0EPZwtgYxAW3-LsBaX_WgWdYvtAXpYbKll3";
             try
             {
@@ -166,12 +190,12 @@ namespace PubNubMessaging.Tests
                 {
                     actual = Newtonsoft.Json.JsonConvert.SerializeObject(pnGrant);
                 }
-
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("Exception = " + ex.ToString());
             }
+
             Assert.AreEqual(actual, expected);
         }
 
@@ -185,7 +209,7 @@ namespace PubNubMessaging.Tests
             CryptoModule cm = new CryptoModule(new LegacyCryptor("enigma", false), null);
             ////serialized string
             string message = null;
-            Assert.Throws<ArgumentException>(() => 
+            Assert.Throws<ArgumentException>(() =>
             {
                 ////encrypt
                 cm.Encrypt(message);
@@ -230,9 +254,9 @@ namespace PubNubMessaging.Tests
         {
             CryptoModule cm = new CryptoModule(new LegacyCryptor("enigma", true, null), null);
             string message = "MTIzNDU2Nzg5MDEyMzQ1NjdnONoCgo0wbuMGGMmfMX0=";
-            
+
             string decryptedMessage = cm.Decrypt(message);
-            
+
             Assert.AreEqual("yay!", decryptedMessage);
         }
 
@@ -241,7 +265,8 @@ namespace PubNubMessaging.Tests
         public void TestYayByteArrayDecryptionBasic()
         {
             CryptoModule cm = new CryptoModule(new LegacyCryptor("enigma", false), null);
-            byte[] messageBytes = new byte[] { 171, 252, 73, 170, 163, 122, 169, 184, 153, 49, 118, 38, 137, 0, 181, 23 };
+            byte[] messageBytes = new byte[]
+                { 171, 252, 73, 170, 163, 122, 169, 184, 153, 49, 118, 38, 137, 0, 181, 23 };
             ////decrypt
             byte[] decryptedBytes = cm.Decrypt(messageBytes);
             byte[] expectedBytes = new byte[] { 121, 97, 121, 33 };
@@ -252,8 +277,12 @@ namespace PubNubMessaging.Tests
         public void TestYayByteArrayDecryptionBasicWithDynamicIV()
         {
             CryptoModule cm = new CryptoModule(new LegacyCryptor("enigma", true, null), null);
-            byte[] messageBytes = new byte[] { 49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 49, 50, 51, 52, 53, 54, 55, 103, 56, 218, 2, 130, 141, 48, 110, 227, 6, 24, 201, 159, 49, 125 };
-            
+            byte[] messageBytes = new byte[]
+            {
+                49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 49, 50, 51, 52, 53, 54, 55, 103, 56, 218, 2, 130, 141, 48, 110,
+                227, 6, 24, 201, 159, 49, 125
+            };
+
             byte[] decryptedBytes = cm.Decrypt(messageBytes);
             byte[] expectedBytes = new byte[] { 121, 97, 121, 33 };
             Assert.AreEqual(expectedBytes, decryptedBytes);
@@ -263,14 +292,14 @@ namespace PubNubMessaging.Tests
         public void TestMoonImageDecryption()
         {
             CryptoModule cm = new CryptoModule(new LegacyCryptor("enigma", true, null), null);
-            string base64str = "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";
+            string base64str =
+                "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";
             byte[] messageBytes = Convert.FromBase64CharArray(base64str.ToCharArray(), 0, base64str.Length);
 
             byte[] decryptedBytes = cm.Decrypt(messageBytes);
             System.IO.File.WriteAllBytes(@"C:\Pandu\temp\file_dec_364234.png", decryptedBytes);
             byte[] expectedBytes = new byte[] { 121, 97, 121, 33 };
             Assert.AreEqual(expectedBytes, decryptedBytes);
-
         }
 
         [Test]
@@ -282,11 +311,11 @@ namespace PubNubMessaging.Tests
             {
                 System.IO.File.Delete(destFile);
             }
+
             PNConfiguration config = new PNConfiguration(new UserId("uuid"));
             Pubnub pn = new Pubnub(config);
             pn.EncryptFile(sourceFile, destFile, "enigma");
             Assert.IsTrue(System.IO.File.Exists(destFile));
-
         }
 
         [Test]
@@ -298,11 +327,11 @@ namespace PubNubMessaging.Tests
             {
                 System.IO.File.Delete(destFile);
             }
+
             PNConfiguration config = new PNConfiguration(new UserId("unit-test-uuid"));
             Pubnub pn = new Pubnub(config);
             pn.DecryptFile(sourceFile, destFile, "enigma");
             Assert.IsTrue(System.IO.File.Exists(destFile));
-
         }
 
         /// <summary>
@@ -320,13 +349,14 @@ namespace PubNubMessaging.Tests
             string encryptedMessage = cm.Encrypt(message);
             Assert.AreEqual("q/xJqqN6qbiZMXYmiQC1Fw==", encryptedMessage);
         }
-        
-        #if DEBUG
+
+#if DEBUG
         [Test]
         public void TestYayEncryptionBasicWithDynamicIV()
         {
             LegacyCryptor legacyCryptor = new LegacyCryptor("enigma", true, null);
-            legacyCryptor.SetTestOnlyConstantRandomIV(new byte[16] { 49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 49, 50, 51, 52, 53, 54 });
+            legacyCryptor.SetTestOnlyConstantRandomIV(new byte[16]
+                { 49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 49, 50, 51, 52, 53, 54 });
             CryptoModule cm = new CryptoModule(legacyCryptor, null);
             //deserialized string
             string message = "yay!";
@@ -334,7 +364,7 @@ namespace PubNubMessaging.Tests
             string encryptedMessage = cm.Encrypt(message);
             Assert.AreEqual("MTIzNDU2Nzg5MDEyMzQ1NjdnONoCgo0wbuMGGMmfMX0=", encryptedMessage);
         }
-        #endif
+#endif
 
         /// <summary>
         /// Tests the yay encryption.
@@ -350,16 +380,18 @@ namespace PubNubMessaging.Tests
             byte[] messageBytes = Encoding.UTF8.GetBytes(message);
             ////Encrypt
             byte[] encryptedBytes = cm.Encrypt(messageBytes);
-            byte[] expectedBytes = new byte[] { 171, 252, 73, 170, 163, 122, 169, 184, 153, 49, 118, 38, 137, 0, 181, 23 };
+            byte[] expectedBytes = new byte[]
+                { 171, 252, 73, 170, 163, 122, 169, 184, 153, 49, 118, 38, 137, 0, 181, 23 };
             Assert.AreEqual(expectedBytes, encryptedBytes);
         }
 
-        #if DEBUG
+#if DEBUG
         [Test]
         public void TestYayByteArrayEncryptionBasicWithDynamicIV()
         {
             LegacyCryptor legacyCryptor = new LegacyCryptor("enigma", true, null);
-            legacyCryptor.SetTestOnlyConstantRandomIV(new byte[16] { 49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 49, 50, 51, 52, 53, 54 });
+            legacyCryptor.SetTestOnlyConstantRandomIV(new byte[16]
+                { 49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 49, 50, 51, 52, 53, 54 });
             CryptoModule cm = new CryptoModule(legacyCryptor, null);
             //deserialized string
             string message = "yay!";
@@ -368,10 +400,14 @@ namespace PubNubMessaging.Tests
             byte[] encryptedBytes = cm.Encrypt(messageBytes);
 
 
-            byte[] expectedBytes = new byte[] { 49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 49, 50, 51, 52, 53, 54, 55, 103, 56, 218, 2, 130, 141, 48, 110, 227, 6, 24, 201, 159, 49, 125 };
+            byte[] expectedBytes = new byte[]
+            {
+                49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 49, 50, 51, 52, 53, 54, 55, 103, 56, 218, 2, 130, 141, 48, 110,
+                227, 6, 24, 201, 159, 49, 125
+            };
             Assert.AreEqual(expectedBytes, encryptedBytes);
         }
-        #endif
+#endif
         /// <summary>
         /// Tests the yay decryption.
         /// Assumes that the input message is not deserialized  
@@ -603,7 +639,9 @@ namespace PubNubMessaging.Tests
             ////decrypt
             string decryptedMessage = cm.Decrypt(message);
             ////deserialize
-            message = (decryptedMessage != "**DECRYPT ERROR**") ? JsonConvert.DeserializeObject<string>(decryptedMessage) : "";
+            message = (decryptedMessage != "**DECRYPT ERROR**")
+                ? JsonConvert.DeserializeObject<string>(decryptedMessage)
+                : "";
             Assert.AreEqual("Pubnub Messaging API 1", message);
         }
 
@@ -703,7 +741,9 @@ namespace PubNubMessaging.Tests
             ////decrypt
             string decryptedMessage = cm.Decrypt(message);
             ////deserialize
-            message = (decryptedMessage != "**DECRYPT ERROR**") ? JsonConvert.DeserializeObject<string>(decryptedMessage) : "";
+            message = (decryptedMessage != "**DECRYPT ERROR**")
+                ? JsonConvert.DeserializeObject<string>(decryptedMessage)
+                : "";
 
             Assert.AreEqual("漢語", message);
         }
@@ -722,7 +762,9 @@ namespace PubNubMessaging.Tests
             ////decrypt
             string decryptedMessage = cm.Decrypt(message);
             ////deserialize
-            message = (decryptedMessage != "**DECRYPT ERROR**") ? JsonConvert.DeserializeObject<string>(decryptedMessage) : "";
+            message = (decryptedMessage != "**DECRYPT ERROR**")
+                ? JsonConvert.DeserializeObject<string>(decryptedMessage)
+                : "";
 
             Assert.AreEqual("ÜÖ", message);
         }
@@ -784,7 +826,8 @@ namespace PubNubMessaging.Tests
         public void TestPAMv3Signature()
         {
             string secretKey = "wMfbo9G0xVUG8yfTfYw5qIdfJkTd7A";
-            string message = "POST\ndemo\n/v3/pam/demo/grant\nPoundsSterling=%C2%A313.37&timestamp=123456789\n{\n  \"ttl\": 1440,\n  \"permissions\": {\n    \"resources\" : {\n      \"channels\": {\n        \"inbox-jay\": 3\n      },\n      \"groups\": {},\n      \"users\": {},\n      \"spaces\": {}\n    },\n    \"patterns\" : {\n      \"channels\": {},\n      \"groups\": {},\n      \"users\": {},\n      \"spaces\": {}\n    },\n    \"meta\": {\n      \"user-id\": \"jay@example.com\",\n      \"contains-unicode\": \"The 💩 test.\"\n    }\n  }\n}";
+            string message =
+                "POST\ndemo\n/v3/pam/demo/grant\nPoundsSterling=%C2%A313.37&timestamp=123456789\n{\n  \"ttl\": 1440,\n  \"permissions\": {\n    \"resources\" : {\n      \"channels\": {\n        \"inbox-jay\": 3\n      },\n      \"groups\": {},\n      \"users\": {},\n      \"spaces\": {}\n    },\n    \"patterns\" : {\n      \"channels\": {},\n      \"groups\": {},\n      \"users\": {},\n      \"spaces\": {}\n    },\n    \"meta\": {\n      \"user-id\": \"jay@example.com\",\n      \"contains-unicode\": \"The 💩 test.\"\n    }\n  }\n}";
 
             string signature = Util.PubnubAccessManagerSign(secretKey, message);
             signature = string.Format("v2.{0}", signature.TrimEnd(new char[] { '=' }));
@@ -794,125 +837,219 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        async public void TestSubscribeDecryption()
+        public void TestSubscribeDecryption()
         {
-            bool done = false;
-            PNConfiguration config = CreateTestConfig();
-            config.CryptoModule = new CryptoModule(new AesCbcCryptor("enigma"), new List<ICryptor> { new LegacyCryptor("enigma") });
+            server.ClearRequests();
+            server.Start();
 
-            Pubnub sut = new Pubnub(config);
+            ManualResetEvent done = new ManualResetEvent(false);
+            PNConfiguration config = new PNConfiguration(new UserId("test"))
+            {
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                PublishKey = PubnubCommon.PublishKey,
+                Secure = false
+            };
+            config.LogVerbosity = PNLogVerbosity.BODY;
+            config.CryptoModule = new CryptoModule(new AesCbcCryptor("enigma"),
+                new List<ICryptor> { new LegacyCryptor("enigma") });
 
-            sut.AddListener(new SubscribeCallbackExt(
-                        (pb, message) =>
-                        {
-                            Assert.AreEqual("test", message.Message);
-                            done = true;
-                        },
-                        (pb, presence) => {},
-                        (pb, status) => {}
-                    )
+            Pubnub pn = createPubNubInstance(config);
+            pn.AddListener(new SubscribeCallbackExt(
+                    (pb, message) =>
+                    {
+                        Assert.AreEqual("test", message.Message);
+                        done.Set();
+                    },
+                    (pb, presence) => { },
+                    (pb, status) => { }
+                )
             );
 
-            sut.Subscribe<string>().Channels(new[] { "test" }).Execute();
+            // Time call because subscribe loop uses it before makine subscribe call
+            server.AddRequest(new Request()
+                .WithMethod("GET")
+                .WithPath("/v2/time/0")
+                .WithParameter("channel", "test")
+                .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                .WithParameter("requestid", "myRequestId")
+                .WithParameter("uuid", "test")
+                .WithResponse("[17127333770142652]")
+                .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            Pubnub sender = new Pubnub(CreateTestConfig());
+            string channel = "test";
 
-            // Rust generated encrypted message
-            await sender.Publish()
-                .Channel("test")
-                .Message("UE5FRAFBQ1JIEALf+E65kseYJwTw2J6BUk9MePHiCcBCS+8ykXLkBIOA")
-                .ExecuteAsync();
+            // handshake
+            string expected = "{\"t\":{\"t\":\"14836303477713304\",\"r\":7},\"m\":[]}";
+            server.AddRequest(new Request()
+                .WithMethod("GET")
+                .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, channel))
+                .WithParameter("heartbeat", "300")
+                .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                .WithParameter("requestid", "myRequestId")
+                .WithParameter("tt", "0")
+                .WithParameter("uuid", config.UserId)
+                .WithResponse(expected)
+                .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            // It will wait until the message is received or unit test timeout is reached
-            while (!done)
-            {
-                await System.Threading.Tasks.Task.Delay(100);
-            }
+            var expectedMessage =
+                "{\"t\": {\"t\": \"14836303477713304\",\"r\": 7},\"m\": [\n{\"p\": {\"t\": \"14836303477713999\",\"r\": 7},\"k\": \"demo\",\"c\": \"test\",\"d\": \"UE5FRAFBQ1JIEALf+E65kseYJwTw2J6BUk9MePHiCcBCS+8ykXLkBIOA\",\"b\": \"test\"}]}";
+            server.AddRequest(new Request()
+                .WithMethod("GET")
+                .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, channel))
+                .WithParameter("heartbeat", "300")
+                .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                .WithParameter("requestid", "myRequestId")
+                .WithParameter("tt", "14836303477713304")
+                .WithParameter("tr", "7")
+                .WithParameter("uuid", config.UserId)
+                .WithResponse(expectedMessage)
+                .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            Thread.Sleep(1000);
+
+            pn.Subscribe<string>().Channels(new[] { "test" }).Execute();
+
+            bool passed = done.WaitOne(5000);
+            Assert.True(passed);
         }
 
         [Test]
-        async public void TestSubscribeDecryptionOnNonEncryptedMessage()
+        public void TestSubscribeDecryptionOnNonEncryptedMessage()
         {
-            bool done = false;
-            PNConfiguration config = CreateTestConfig();
-            config.CryptoModule = new CryptoModule(new AesCbcCryptor("enigma"), new List<ICryptor> { new LegacyCryptor("enigma") });
+            server.ClearRequests();
+            server.Start();
 
-            Pubnub sut = new Pubnub(config);
+            ManualResetEvent done = new ManualResetEvent(false);
+            PNConfiguration config = new PNConfiguration(new UserId("test"))
+            {
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                PublishKey = PubnubCommon.PublishKey,
+            };
+            config.LogVerbosity = PNLogVerbosity.BODY;
+            config.CryptoModule = new CryptoModule(new AesCbcCryptor("enigma"),
+                new List<ICryptor> { new LegacyCryptor("enigma") });
 
-            sut.AddListener(new SubscribeCallbackExt(
-                        (pb, message) =>
-                        {
-                            Assert.AreEqual("test", message.Message);
-                            done = true;
-                        },
-                        (pb, presence) => {},
-                        (pb, status) => {}
-                    )
+            Pubnub pn = new Pubnub(config);
+
+            pn.AddListener(new SubscribeCallbackExt(
+                    (pb, message) =>
+                    {
+                        Assert.AreEqual("test", message.Message);
+                        done.Set();
+                    },
+                    (pb, presence) => { },
+                    (pb, status) => { }
+                )
             );
 
-            sut.Subscribe<string>().Channels(new[] { "test" }).Execute();
+            // Time call because subscribe loop uses it before makine subscribe call
+            server.AddRequest(new Request()
+                .WithMethod("GET")
+                .WithPath("/v2/time/0")
+                .WithParameter("channel", "test")
+                .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                .WithParameter("requestid", "myRequestId")
+                .WithParameter("uuid", "test")
+                .WithResponse("[17127333770142652]")
+                .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            Pubnub sender = new Pubnub(CreateTestConfig());
+            string expected = "{\"t\":{\"t\":\"14836303477713304\",\"r\":7},\"m\":[]}";
+            string expectedMessage = "{\"t\":{\"t\":\"14836303477713304\",\"r\":7},\"m\":[\"test\"]}";
+            string channel = "test";
+            // handshake
+            server.AddRequest(new Request()
+                .WithMethod("GET")
+                .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, channel))
+                .WithParameter("heartbeat", "300")
+                .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                .WithParameter("requestid", "myRequestId")
+                .WithParameter("tt", "0")
+                .WithParameter("uuid", config.UserId)
+                .WithResponse(expected)
+                .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            // Rust generated encrypted message
-            await sender.Publish()
-                .Channel("test")
-                .Message("test")
-                .ExecuteAsync();
+            server.AddRequest(new Request()
+                .WithMethod("GET")
+                .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, channel))
+                .WithParameter("heartbeat", "300")
+                .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                .WithParameter("requestid", "myRequestId")
+                .WithParameter("tt", "14836303477713304")
+                .WithParameter("tr", "7")
+                .WithParameter("uuid", config.UserId)
+                .WithResponse(expectedMessage)
+                .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            // It will wait until the message is received or unit test timeout is reached
-            while (!done)
-            {
-                await System.Threading.Tasks.Task.Delay(100);
-            }
+            pn.Subscribe<string>().Channels(new[] { "test" }).Execute();
+
+            bool passed = done.WaitOne(5000);
+            Assert.True(passed);
         }
 
         [Test]
-        async public void TestHistoryDecryption()
+        public void TestHistoryDecryption()
         {
+            ManualResetEvent done = new ManualResetEvent(false);
             PNConfiguration config = CreateTestConfig();
-            config.CryptoModule = new CryptoModule(new AesCbcCryptor("enigma"), new List<ICryptor> { new LegacyCryptor("enigma") });
+            config.CryptoModule = new CryptoModule(new AesCbcCryptor("enigma"),
+                new List<ICryptor> { new LegacyCryptor("enigma") });
 
             Pubnub sut = new Pubnub(config);
 
             Pubnub sender = new Pubnub(CreateTestConfig());
 
             // Rust generated encrypted message
-            await sender.Publish()
+            sender.Publish()
                 .Channel("test")
                 .Message("UE5FRAFBQ1JIEALf+E65kseYJwTw2J6BUk9MePHiCcBCS+8ykXLkBIOA")
-                .ExecuteAsync();
+                .Execute(new PNPublishResultExt((r, s) => { }));
 
-            PNResult<PNHistoryResult> result = await sut.History()
+            Thread.Sleep(1000);
+
+            sut.History()
                 .Channel("test")
                 .Count(1)
-                .ExecuteAsync();
+                .Execute(new PNHistoryResultExt((r, s) =>
+                {
+                    Assert.AreEqual("test", r.Messages[0].Entry);
+                    done.Set();
+                }));
 
-            Assert.AreEqual("test", result.Result.Messages[0].Entry);
+            bool passed = done.WaitOne(5000);
+            Assert.True(passed);
         }
 
         [Test]
-        async public void TestHistoryDecryptionOnNonEncryptedMessage()
+        public void TestHistoryDecryptionOnNonEncryptedMessage()
         {
+            ManualResetEvent done = new ManualResetEvent(false);
             PNConfiguration config = CreateTestConfig();
-            config.CryptoModule = new CryptoModule(new AesCbcCryptor("enigma"), new List<ICryptor> { new LegacyCryptor("enigma") });
+            config.CryptoModule = new CryptoModule(new AesCbcCryptor("enigma"),
+                new List<ICryptor> { new LegacyCryptor("enigma") });
 
             Pubnub sut = new Pubnub(config);
 
             Pubnub sender = new Pubnub(CreateTestConfig());
 
             // Rust generated encrypted message
-            await sender.Publish()
+            sender.Publish()
                 .Channel("test")
                 .Message("test")
-                .ExecuteAsync();
+                .Execute(new PNPublishResultExt((r, s) => { }));
 
-            PNResult<PNHistoryResult> result = await sut.History()
+            Thread.Sleep(1000);
+
+            sut.History()
                 .Channel("test")
                 .Count(1)
-                .ExecuteAsync();
+                .Execute(new PNHistoryResultExt((r, s) =>
+                {
+                    Assert.AreEqual("test", r.Messages[0].Entry);
+                    done.Set();
+                }));
 
-            Assert.AreEqual("test", result.Result.Messages[0].Entry);
+            bool passed = done.WaitOne(5000);
+            Assert.True(passed);
         }
 
         private PNConfiguration CreateTestConfig()

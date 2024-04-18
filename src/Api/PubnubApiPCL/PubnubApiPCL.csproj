@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard1.0;netstandard1.3;netstandard1.4;netstandard1.1;netstandard2.0;net6.0</TargetFrameworks>
-    <LangVersion>8.0</LangVersion>
+    <LangVersion>latest</LangVersion>
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>pubnub.snk</AssemblyOriginatorKeyFile>
@@ -15,7 +15,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubPCL</PackageId>
-    <PackageVersion>6.19.7.0</PackageVersion>
+    <PackageVersion>6.20.0.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -23,7 +23,8 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>Resolved the issue where an incorrect network status was emitted when no internet connection was detected.</PackageReleaseNotes>
+    <PackageReleaseNotes>Added event engine implementation for subscribe and presence operation.
+Added support for `RetryConfiguration` to configure subscribe request retry.</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
@@ -123,6 +124,15 @@
     <Compile Include="..\PubnubApi\EndPoint\Presence\GetStateOperation.cs">
       <Link>EndPoint\Presence\GetStateOperation.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\Presence\HeartbeatOperation.cs">
+      <Link>EndPoint\Presence\HeartbeatOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\Presence\PresenceOperation.cs">
+      <Link>EndPoint\Presence\PresenceOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\Presence\LeaveOperation.cs">
+      <Link>EndPoint\Presence\LeaveOperation.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\EndPoint\Presence\HereNowOperation.cs">
       <Link>EndPoint\Presence\HereNowOperation.cs</Link>
     </Compile>
@@ -146,15 +156,21 @@
     </Compile>
     <Compile Include="..\PubnubApi\EndPoint\PubSub\RemoveMessageActionOperation.cs" Link="EndPoint\PubSub\RemoveMessageActionOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\PubSub\SignalOperation.cs" Link="EndPoint\PubSub\SignalOperation.cs" />
+    <Compile Include="..\PubnubApi\EndPoint\PubSub\SubscribeEndpoint.cs" Link="EndPoint\PubSub\SubscribeEndpoint.cs" />
     <Compile Include="..\PubnubApi\EndPoint\PubSub\SubscribeManager.cs">
       <Link>EndPoint\PubSub\SubscribeManager.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\PubSub\SubscribeManager2.cs" Link="EndPoint\PubSub\SubscribeManager2.cs" />
     <Compile Include="..\PubnubApi\EndPoint\PubSub\SubscribeOperation.cs">
       <Link>EndPoint\PubSub\SubscribeOperation.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\EndPoint\PubSub\UnsubscribeAllOperation.cs">
       <Link>EndPoint\PubSub\UnsubscribeAllOperation.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\PubSub\UnsubscribeAllEndpoint.cs">
+      <Link>EndPoint\PubSub\UnsubscribeAllEndpoint.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\PubSub\UnsubscribeEndpoint.cs" Link="EndPoint\PubSub\UnsubscribeEndpoint.cs" />
     <Compile Include="..\PubnubApi\EndPoint\PubSub\UnsubscribeOperation.cs">
       <Link>EndPoint\PubSub\UnsubscribeOperation.cs</Link>
     </Compile>
@@ -211,6 +227,52 @@
     <Compile Include="..\PubnubApi\Enum\ResponseType.cs">
       <Link>Enum\ResponseType.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\EventEngine\Common\Delay.cs" Link="EventEngine\Common\Delay.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Common\EventEmitter.cs" Link="EventEngine\Common\EventEmitter.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Core\EffectDispatcher.cs" Link="EventEngine\Core\EffectDispatcher.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Core\Engine.cs" Link="EventEngine\Core\Engine.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Core\EventEngineInterfaces.cs" Link="EventEngine\Core\EventEngineInterfaces.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Core\EventQueue.cs" Link="EventEngine\Core\EventQueue.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Core\Utils.cs" Link="EventEngine\Core\Utils.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Subscribe\Common\CommonSubscribeTypes.cs" Link="EventEngine\Subscribe\Common\CommonSubscribeTypes.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Subscribe\Effects\HandshakeEffectHandler.cs" Link="EventEngine\Subscribe\Effects\HandshakeEffectHandler.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Subscribe\Effects\ReceivingEffectHandler.cs" Link="EventEngine\Subscribe\Effects\ReceivingEffectHandler.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Subscribe\Effects\EmitMessagesHandler.cs" Link="EventEngine\Subscribe\Effects\EmitMessagesHandler.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Subscribe\Effects\EmitStatusEffectHandler.cs" Link="EventEngine\Subscribe\Effects\EmitStatusEffectHandler.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Subscribe\Events\SubscriptionEvents.cs" Link="EventEngine\Subscribe\Events\SubscriptionEvents.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Subscribe\Invocations\SubscriptionInvocations.cs" Link="EventEngine\Subscribe\Invocations\SubscriptionInvocations.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Subscribe\States\HandshakeFailedState.cs" Link="EventEngine\Subscribe\States\HandshakeFailedState.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Subscribe\States\HandshakeReconnectingState.cs" Link="EventEngine\Subscribe\States\HandshakeReconnectingState.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Subscribe\States\HandshakeStoppedState.cs" Link="EventEngine\Subscribe\States\HandshakeStoppedState.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Subscribe\States\HandshakingState.cs" Link="EventEngine\Subscribe\States\HandshakingState.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Subscribe\States\ReceiveFailedState.cs" Link="EventEngine\Subscribe\States\ReceiveFailedState.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Subscribe\States\ReceiveReconnectingState.cs" Link="EventEngine\Subscribe\States\ReceiveReconnectingState.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Subscribe\States\ReceiveStoppedState.cs" Link="EventEngine\Subscribe\States\ReceiveStoppedState.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Subscribe\States\ReceivingState.cs" Link="EventEngine\Subscribe\States\ReceivingState.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Subscribe\States\UnsubscribedState.cs" Link="EventEngine\Subscribe\States\UnsubscribedState.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Subscribe\SubscribeEventEngine.cs" Link="EventEngine\Subscribe\SubscribeEventEngine.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Subscribe\SubscribeEventEngineFactory.cs" Link="EventEngine\Subscribe\SubscribeEventEngineFactory.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Presence\PresenceEventEngine.cs" Link="EventEngine\Presence\PresenceEventEngine.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Presence\PresenceEventEngineFactory.cs" Link="EventEngine\Presence\PresenceEventEngineFactory.cs" />
+	<Compile Include="..\PubnubApi\EventEngine\Presence\Common\PresenceInput.cs" Link="EventEngine\Presence\Common\PresenceInput.cs" />
+	<Compile Include="..\PubnubApi\EventEngine\Presence\Events\PresenceEvents.cs" Link="EventEngine\Presence\Events\PresenceEvents.cs" />
+	<Compile Include="..\PubnubApi\EventEngine\Presence\Invocations\CancelDelayedHeartbeatInvocation.cs" Link="EventEngine\Presence\Invocations\CancelDelayedHeartbeatInvocation.cs" />
+	<Compile Include="..\PubnubApi\EventEngine\Presence\Invocations\CancelWaitInvocation.cs" Link="EventEngine\Presence\Invocations\CancelWaitInvocation.cs" />
+	<Compile Include="..\PubnubApi\EventEngine\Presence\Invocations\DelayedHeartbeatInvocation.cs" Link="EventEngine\Presence\Invocations\DelayedHeartbeatInvocation.cs" />
+	<Compile Include="..\PubnubApi\EventEngine\Presence\Invocations\HearbeatInvocation.cs" Link="EventEngine\Presence\Invocations\HearbeatInvocation.cs" />
+	<Compile Include="..\PubnubApi\EventEngine\Presence\Invocations\LeaveInvocation.cs" Link="EventEngine\Presence\Invocations\LeaveInvocation.cs" />
+	<Compile Include="..\PubnubApi\EventEngine\Presence\Invocations\WaitInvocation.cs" Link="EventEngine\Presence\Invocations\WaitInvocation.cs" />
+	<Compile Include="..\PubnubApi\EventEngine\Presence\States\APresenceState.cs" Link="EventEngine\Presence\States\APresenceState.cs" />
+	<Compile Include="..\PubnubApi\EventEngine\Presence\States\CooldownState.cs" Link="EventEngine\Presence\States\CooldownState.cs" />
+	<Compile Include="..\PubnubApi\EventEngine\Presence\States\FailedState.cs" Link="EventEngine\Presence\States\FailedState.cs" />
+	<Compile Include="..\PubnubApi\EventEngine\Presence\States\HeartBeatingState.cs" Link="EventEngine\Presence\States\HeartBeatingState.cs" />
+	<Compile Include="..\PubnubApi\EventEngine\Presence\States\InactiveState.cs" Link="EventEngine\Presence\States\InactiveState.cs" />
+	<Compile Include="..\PubnubApi\EventEngine\Presence\States\ReconnectingState.cs" Link="EventEngine\Presence\States\ReconnectingState.cs" />
+	<Compile Include="..\PubnubApi\EventEngine\Presence\States\StoppedState.cs" Link="EventEngine\Presence\States\StoppedState.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Presence\Effects\DelayedHeartbeatEffectHandler.cs" Link="EventEngine\Presence\Effects\DelayedHeartbeatEffectHandler.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Presence\Effects\HeartbeatEffectHandler.cs" Link="EventEngine\Presence\Effects\HeartbeatEffectHandler.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Presence\Effects\LeaveEffectHandler.cs" Link="EventEngine\Presence\Effects\LeaveEffectHandler.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Presence\Effects\WaitEffectHandler.cs" Link="EventEngine\Presence\Effects\WaitEffectHandler.cs" />
     <Compile Include="..\PubnubApi\Helper\MobilePushHelper.cs" Link="Helper\MobilePushHelper.cs" />
     <Compile Include="..\PubnubApi\HttpUtility\HttpUtility.cs">
       <Link>HttpUtility\HttpUtility.cs</Link>
@@ -233,6 +295,8 @@
     <Compile Include="..\PubnubApi\Interface\IPubnubUnitTest.cs">
       <Link>Interface\IPubnubUnitTest.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Interface\ISubscribeOperation.cs" Link="Interface\ISubscribeOperation.cs" />
+    <Compile Include="..\PubnubApi\Interface\IUnsubscribeOperation.cs" Link="Interface\IUnsubscribeOperation.cs" />
     <Compile Include="..\PubnubApi\Interface\IUrlRequestBuilder.cs">
       <Link>Interface\IUrlRequestBuilder.cs</Link>
     </Compile>
@@ -513,6 +577,9 @@
     <Compile Include="..\PubnubApi\PubnubCoreBase.cs">
       <Link>PubnubCoreBase.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\RetryConfiguration.cs">
+      <Link>RetryConfiguration.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\PubnubHttp.cs">
       <Link>PubnubHttp.cs</Link>
     </Compile>
@@ -630,8 +697,7 @@
     <PackageReference Include="System.ValueTuple" Version="4.4.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.Collections.Concurrent">
-      <Version>4.3.0</Version>
+    <PackageReference Include="System.Collections.Concurrent" Version="4.3.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
   </ItemGroup>
@@ -658,8 +724,7 @@
     <PackageReference Include="System.ValueTuple" Version="4.4.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.Collections.Concurrent">
-      <Version>4.3.0</Version>
+    <PackageReference Include="System.Collections.Concurrent" Version="4.3.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
   </ItemGroup>
@@ -707,8 +772,7 @@
     <PackageReference Include="System.ValueTuple" Version="4.4.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.Collections.Concurrent">
-      <Version>4.3.0</Version>
+    <PackageReference Include="System.Collections.Concurrent" Version="4.3.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
   </ItemGroup>
@@ -768,8 +832,7 @@
     <PackageReference Include="System.ValueTuple" Version="4.4.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.Collections.Concurrent">
-      <Version>4.3.0</Version>
+    <PackageReference Include="System.Collections.Concurrent" Version="4.3.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
   </ItemGroup>
@@ -817,8 +880,7 @@
     <PackageReference Include="System.ValueTuple" Version="4.4.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.Collections.Concurrent">
-      <Version>4.3.0</Version>
+    <PackageReference Include="System.Collections.Concurrent" Version="4.3.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
   </ItemGroup>
@@ -875,8 +937,7 @@
     <PackageReference Include="System.ValueTuple" Version="4.4.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="System.Collections.Concurrent">
-      <Version>4.3.0</Version>
+    <PackageReference Include="System.Collections.Concurrent" Version="4.3.0">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
   </ItemGroup>
@@ -893,6 +954,14 @@
     <Folder Include="EndPoint\PubSub\" />
     <Folder Include="EndPoint\Presence\" />
     <Folder Include="Enum\" />
+    <Folder Include="EventEngine\Core\" />
+    <Folder Include="EventEngine\Common\" />
+    <Folder Include="EventEngine\Subscribe\Effects\" />
+    <Folder Include="EventEngine\Subscribe\Events\" />
+    <Folder Include="EventEngine\Subscribe\Invocations\" />
+    <Folder Include="EventEngine\Subscribe\Common\" />
+    <Folder Include="EventEngine\Subscribe\Context\" />
+    <Folder Include="EventEngine\Subscribe\States\" />
     <Folder Include="HttpUtility\" />
     <Folder Include="Interface\" />
     <Folder Include="Log\" />

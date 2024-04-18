@@ -5,6 +5,7 @@ using PubnubApi;
 using System.Collections.Generic;
 using MockServer;
 using System.Diagnostics;
+using System.Linq;
 
 namespace PubNubMessaging.Tests
 {
@@ -187,20 +188,13 @@ namespace PubNubMessaging.Tests
                         Debug.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
                         if (result.Channels != null && result.Channels.Count > 0)
                         {
-                            foreach (KeyValuePair<string, Dictionary<string, PNAccessManagerKeyData>> channelKP in result.Channels)
-                            {
-                                string channel = channelKP.Key;
-                                var read = result.Channels[channel][authKey].ReadEnabled;
-                                var write = result.Channels[channel][authKey].WriteEnabled;
-                                if (read && write)
-                                {
-                                    receivedGrantMessage = true;
-                                }
-                                else
-                                {
-                                    receivedGrantMessage = false;
-                                }
-                            }
+                            receivedGrantMessage = result
+                                .Channels
+                                .All(channel => {
+                                    var options = channel.Value[authKey];
+
+                                    return options.ReadEnabled && options.WriteEnabled;
+                            });
                         }
                     }
                 }
