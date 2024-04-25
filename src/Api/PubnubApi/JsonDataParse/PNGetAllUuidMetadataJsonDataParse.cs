@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace PubnubApi
 {
     internal static class PNGetAllUuidMetadataJsonDataParse
     {
-        internal static PNGetAllUuidMetadataResult GetObject(List<object> listObject)
+        internal static PNGetAllUuidMetadataResult GetObject(IJsonPluggableLibrary jsonPlug, List<object> listObject)
         {
             PNGetAllUuidMetadataResult result = null;
             for (int listIndex=0; listIndex < listObject.Count; listIndex++)
             {
-                Dictionary<string, object> dicObj = JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[listIndex]);
+                Dictionary<string, object> dicObj = jsonPlug.ConvertToDictionaryObject(listObject[listIndex]);
                 if (dicObj != null && dicObj.Count > 0)
                 {
                     if  (result == null)
@@ -23,7 +21,7 @@ namespace PubnubApi
                     {
                         result.Uuids = new List<PNUuidMetadataResult>();
 
-                        Dictionary<string, object> getUserDataDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(dicObj["data"]);
+                        Dictionary<string, object> getUserDataDic = jsonPlug.ConvertToDictionaryObject(dicObj["data"]);
                         if (getUserDataDic != null && getUserDataDic.Count > 0)
                         {
                             var uuidMetaData = new PNUuidMetadataResult
@@ -37,18 +35,18 @@ namespace PubnubApi
                             };
                             if (getUserDataDic.ContainsKey("custom"))
                             {
-                                uuidMetaData.Custom = JsonDataParseInternalUtil.ConvertToDictionaryObject(getUserDataDic["custom"]);
+                                uuidMetaData.Custom = jsonPlug.ConvertToDictionaryObject(getUserDataDic["custom"]);
                             }
                             result.Uuids.Add(uuidMetaData);
                         }
                         else
                         {
-                            object[] userDataArray = JsonDataParseInternalUtil.ConvertToObjectArray(dicObj["data"]);
+                            object[] userDataArray = jsonPlug.ConvertToObjectArray(dicObj["data"]);
                             if (userDataArray != null && userDataArray.Length > 0)
                             {
                                 for (int index = 0; index < userDataArray.Length; index++)
                                 {
-                                    Dictionary<string, object> userDataDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(userDataArray[index]);
+                                    Dictionary<string, object> userDataDic = jsonPlug.ConvertToDictionaryObject(userDataArray[index]);
                                     if (userDataDic != null && userDataDic.Count > 0)
                                     {
                                         var uuidMetadata = new PNUuidMetadataResult
@@ -63,7 +61,7 @@ namespace PubnubApi
 
                                         if (userDataDic.ContainsKey("custom"))
                                         {
-                                            uuidMetadata.Custom = JsonDataParseInternalUtil.ConvertToDictionaryObject(userDataDic["custom"]);
+                                            uuidMetadata.Custom = jsonPlug.ConvertToDictionaryObject(userDataDic["custom"]);
                                         }
                                         result.Uuids.Add(uuidMetadata);
                                     }

@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace PubnubApi
 {
     internal static class PNRevokeTokenJsonDataParse
     {
-        internal static PNAccessManagerRevokeTokenResult GetObject(List<object> listObject)
+        internal static PNAccessManagerRevokeTokenResult GetObject(IJsonPluggableLibrary jsonPlug, List<object> listObject)
         {
             PNAccessManagerRevokeTokenResult result = null;
 
-            Dictionary<string, object> revokeTokenDictObj = JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[0]);
+            Dictionary<string, object> revokeTokenDictObj = jsonPlug.ConvertToDictionaryObject(listObject[0]);
             if (revokeTokenDictObj != null && revokeTokenDictObj.ContainsKey("data"))
             {
                 result = new PNAccessManagerRevokeTokenResult();

@@ -300,7 +300,9 @@ Added support for `RetryConfiguration` to configure subscribe request retry.</Pa
     <Compile Include="..\PubnubApi\Interface\IUrlRequestBuilder.cs">
       <Link>Interface\IUrlRequestBuilder.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\JsonDataParse\JsonDataParseInternalUtil.cs" Link="JsonDataParse\JsonDataParseInternalUtil.cs" />
+    <Compile Include="..\PubnubApi\JsonDataParse\DeserializeToInternalObjectUtility.cs">
+      <Link>JsonDataParse\DeserializeToInternalObjectUtility.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\JsonDataParse\PNAccessManagerGrantJsonDataParse.cs" Link="JsonDataParse\PNAccessManagerGrantJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNAddMessageActionJsonDataParse.cs" Link="JsonDataParse\PNAddMessageActionJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNFetchHistoryJsonDataParse.cs" Link="JsonDataParse\PNFetchHistoryJsonDataParse.cs" />
@@ -985,7 +987,6 @@ Added support for `RetryConfiguration` to configure subscribe request retry.</Pa
     <Folder Include="Model\Derived\Presence\" />
     <Folder Include="Model\Server\" />
     <Folder Include="Helper\" />
-    <Folder Include="JsonDataParse\" />
     <Folder Include="Properties\" />
     <Folder Include="Push\Mpns\" />
     <Folder Include="Proxy\" />

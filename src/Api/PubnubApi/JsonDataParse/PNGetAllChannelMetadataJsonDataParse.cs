@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace PubnubApi
 {
     internal static class PNGetAllChannelMetadataJsonDataParse
     {
-        internal static PNGetAllChannelMetadataResult GetObject(List<object> listObject)
+        internal static PNGetAllChannelMetadataResult GetObject(IJsonPluggableLibrary jsonPlug, List<object> listObject)
         {
             PNGetAllChannelMetadataResult result = null;
             for (int listIndex = 0; listIndex < listObject.Count; listIndex++)
             {
-                Dictionary<string, object> dicObj = JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[listIndex]);
+                Dictionary<string, object> dicObj = jsonPlug.ConvertToDictionaryObject(listObject[listIndex]);
                 if (dicObj != null && dicObj.Count > 0)
                 {
                     if (result == null)
@@ -23,7 +21,7 @@ namespace PubnubApi
                     {
                         result.Channels = new List<PNChannelMetadataResult>();
 
-                        Dictionary<string, object> getChMetadataDataDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(dicObj["data"]);
+                        Dictionary<string, object> getChMetadataDataDic = jsonPlug.ConvertToDictionaryObject(dicObj["data"]);
                         if (getChMetadataDataDic != null && getChMetadataDataDic.Count > 0)
                         {
                             var chMetadata = new PNChannelMetadataResult
@@ -35,18 +33,18 @@ namespace PubnubApi
                             };
                             if (getChMetadataDataDic.ContainsKey("custom"))
                             {
-                                chMetadata.Custom = JsonDataParseInternalUtil.ConvertToDictionaryObject(getChMetadataDataDic["custom"]);
+                                chMetadata.Custom = jsonPlug.ConvertToDictionaryObject(getChMetadataDataDic["custom"]);
                             }
                             result.Channels.Add(chMetadata);
                         }
                         else
                         {
-                            object[] chMetadataDataArray = JsonDataParseInternalUtil.ConvertToObjectArray(dicObj["data"]);
+                            object[] chMetadataDataArray = jsonPlug.ConvertToObjectArray(dicObj["data"]);
                             if (chMetadataDataArray != null && chMetadataDataArray.Length > 0)
                             {
                                 for (int index = 0; index < chMetadataDataArray.Length; index++)
                                 {
-                                    Dictionary<string, object> chMetadataDataDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(chMetadataDataArray[index]);
+                                    Dictionary<string, object> chMetadataDataDic = jsonPlug.ConvertToDictionaryObject(chMetadataDataArray[index]);
                                     if (chMetadataDataDic != null && chMetadataDataDic.Count > 0)
                                     {
                                         var chMetadataData = new PNChannelMetadataResult
@@ -59,7 +57,7 @@ namespace PubnubApi
 
                                         if (chMetadataDataDic.ContainsKey("custom"))
                                         {
-                                            chMetadataData.Custom = JsonDataParseInternalUtil.ConvertToDictionaryObject(chMetadataDataDic["custom"]);
+                                            chMetadataData.Custom = jsonPlug.ConvertToDictionaryObject(chMetadataDataDic["custom"]);
                                         }
                                         result.Channels.Add(chMetadataData);
                                     }

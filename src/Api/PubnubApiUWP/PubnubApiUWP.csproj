@@ -418,7 +418,9 @@ Added support for `RetryConfiguration` to configure subscribe request retry.</Pa
     <Compile Include="..\PubnubApi\Interface\IUrlRequestBuilder.cs">
       <Link>Interface\IUrlRequestBuilder.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\JsonDataParse\JsonDataParseInternalUtil.cs" Link="JsonDataParse\JsonDataParseInternalUtil.cs" />
+    <Compile Include="..\PubnubApi\JsonDataParse\DeserializeToInternalObjectUtility.cs">
+      <Link>JsonDataParse\DeserializeToInternalObjectUtility.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\JsonDataParse\PNAccessManagerGrantJsonDataParse.cs" Link="JsonDataParse\PNAccessManagerGrantJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNAddMessageActionJsonDataParse.cs" Link="JsonDataParse\PNAddMessageActionJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNChannelMembersJsonDataParse.cs" Link="JsonDataParse\PNChannelMembersJsonDataParse.cs" />
@@ -799,7 +801,6 @@ Added support for `RetryConfiguration` to configure subscribe request retry.</Pa
     <Folder Include="Model\Derived\DeleteMessage\" />
     <Folder Include="Model\Derived\Files\" />
     <Folder Include="Model\Derived\Objects\" />
-    <Folder Include="JsonDataParse\" />
     <Folder Include="Helper\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">

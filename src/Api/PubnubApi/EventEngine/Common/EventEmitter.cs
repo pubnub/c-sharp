@@ -167,13 +167,13 @@ namespace PubnubApi.EventEngine.Common
 						Timetoken = pnFileResult.Timetoken,
 						Publisher = pnFileResult.Publisher,
 					};
-					Dictionary<string, object> pnMsgObjDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(pnFileResult.Message);
+					Dictionary<string, object> pnMsgObjDic = jsonLibrary.ConvertToDictionaryObject(pnFileResult.Message);
 					if (pnMsgObjDic != null && pnMsgObjDic.Count > 0) {
 						if (pnMsgObjDic.ContainsKey("message") && pnMsgObjDic["message"] != null) {
 							fileMessage.Message = pnMsgObjDic["message"];
 						}
 						if (pnMsgObjDic.ContainsKey("file")) {
-							Dictionary<string, object> fileObjDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(pnMsgObjDic["file"]);
+							Dictionary<string, object> fileObjDic = jsonLibrary.ConvertToDictionaryObject(pnMsgObjDic["file"]);
 							if (fileObjDic != null && fileObjDic.ContainsKey("id") && fileObjDic.ContainsKey("name")) {
 								fileMessage.File = new PNFile { Id = fileObjDic["id"].ToString(), Name = fileObjDic["name"].ToString() };
 

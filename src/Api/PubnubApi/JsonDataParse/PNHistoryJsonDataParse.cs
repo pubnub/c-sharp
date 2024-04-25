@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace PubnubApi
 {
     internal static class PNHistoryJsonDataParse
     {
-        internal static PNHistoryResult GetObject(List<object> listObject)
+        internal static PNHistoryResult GetObject(IJsonPluggableLibrary jsonPlug, List<object> listObject)
         {
             PNHistoryResult ack = new PNHistoryResult();
             if (listObject == null || listObject.Count == 0)
@@ -40,7 +39,7 @@ namespace PubnubApi
                 foreach (var message in messagesContainer)
                 {
                     PNHistoryItemResult result = new PNHistoryItemResult();
-                    Dictionary<string, object> dicMessageTimetoken = JsonDataParseInternalUtil.ConvertToDictionaryObject(message);
+                    Dictionary<string, object> dicMessageTimetoken = jsonPlug.ConvertToDictionaryObject(message);
                     if (dicMessageTimetoken != null)
                     {
                         if (dicMessageTimetoken.ContainsKey("message") &&

@@ -1,21 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace PubnubApi
 {
     internal static class PNGetChannelMetadataJsonDataParse
     {
-        internal static PNGetChannelMetadataResult GetObject(List<object> listObject)
+        internal static PNGetChannelMetadataResult GetObject(IJsonPluggableLibrary jsonPlug, List<object> listObject)
         {
             PNGetChannelMetadataResult result = null;
-            Dictionary<string, object> getChMetadataDicObj = (listObject != null && listObject.Count >= 2) ? JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[1]) : null;
+            Dictionary<string, object> getChMetadataDicObj = (listObject != null && listObject.Count >= 2) ? jsonPlug.ConvertToDictionaryObject(listObject[1]) : null;
             if (getChMetadataDicObj != null && getChMetadataDicObj.ContainsKey("data"))
             {
                 result = new PNGetChannelMetadataResult();
 
-                Dictionary<string, object> getChMetadataDataDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(getChMetadataDicObj["data"]);
+                Dictionary<string, object> getChMetadataDataDic = jsonPlug.ConvertToDictionaryObject(getChMetadataDicObj["data"]);
                 if (getChMetadataDataDic != null && getChMetadataDataDic.Count > 0)
                 {
                     var chMetadata = new PNGetChannelMetadataResult
@@ -27,7 +24,7 @@ namespace PubnubApi
                     };
                     if (getChMetadataDataDic.ContainsKey("custom"))
                     {
-                        chMetadata.Custom = JsonDataParseInternalUtil.ConvertToDictionaryObject(getChMetadataDataDic["custom"]);
+                        chMetadata.Custom = jsonPlug.ConvertToDictionaryObject(getChMetadataDataDic["custom"]);
                     }
                     result = chMetadata;
                 }
