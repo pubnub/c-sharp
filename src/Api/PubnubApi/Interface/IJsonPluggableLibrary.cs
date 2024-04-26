@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 namespace PubnubApi
 {
@@ -17,7 +19,9 @@ namespace PubnubApi
         T DeserializeToObject<T>(string jsonString);
 
         T DeserializeToObject<T>(List<object> listObject);
-
+        
+        object DeserializeToObject(object rawObject, Type type);
+        
         Dictionary<string, object> DeserializeToDictionaryOfObject(string jsonString);
 
         Dictionary<string, object> ConvertToDictionaryObject(object localContainer);

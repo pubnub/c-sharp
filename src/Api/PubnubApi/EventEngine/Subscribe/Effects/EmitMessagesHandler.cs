@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using PubnubApi.EventEngine.Common;
 using PubnubApi.EventEngine.Core;
 using PubnubApi.EventEngine.Subscribe.Invocations;
@@ -14,18 +12,18 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
 	{
 		private readonly Dictionary<string, Type> channelTypeMap;
 		private readonly Dictionary<string, Type> channelGroupTypeMap;
-		private readonly JsonSerializer serializer;
+		private readonly IJsonPluggableLibrary jsonPluggableLibrary;
 		private readonly EventEmitter eventEmitter;
 
 		public EmitMessagesHandler(EventEmitter eventEmitter,
-			JsonSerializer serializer,
+			IJsonPluggableLibrary jsonPluggableLibrary,
 			Dictionary<string, Type> channelTypeMap = null,
 			Dictionary<string, Type> channelGroupTypeMap = null)
 		{
 			this.eventEmitter = eventEmitter;
 			this.channelTypeMap = channelTypeMap;
 			this.channelGroupTypeMap = channelGroupTypeMap;
-			this.serializer = serializer;
+			this.jsonPluggableLibrary = jsonPluggableLibrary;
 		}
 
 		public async override Task Run(EmitMessagesInvocation invocation)
@@ -45,17 +43,14 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
 		private object DeserializePayload(string key, object rawMessage)
 		{
 			try {
-				if (rawMessage is JObject message) {
-					Type t;
-					if ((channelTypeMap is not null && channelTypeMap.TryGetValue(key, out t) ||
-						channelGroupTypeMap is not null && channelGroupTypeMap.TryGetValue(key, out t)) &&
-						t != typeof(string)) {
-						return message.ToObject(t, serializer);
-					} else {
-						return message.ToString(Formatting.None);
-					}
+				Type t;
+				if ((channelTypeMap is not null && channelTypeMap.TryGetValue(key, out t) ||
+					channelGroupTypeMap is not null && channelGroupTypeMap.TryGetValue(key, out t)) &&
+					t != typeof(string))
+				{
+					return jsonPluggableLibrary.DeserializeToObject(rawMessage, t);
 				} else {
-					return rawMessage;
+					return rawMessage.ToString();
 				}
 			} catch (Exception) {
 				return rawMessage;

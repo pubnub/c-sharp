@@ -164,6 +164,26 @@ namespace PubnubApi
             return result;
         }
 
+        public object DeserializeToObject(object rawObject, Type type)
+        {
+            try
+            {
+                if (rawObject is JObject jObject)
+                {
+                    return jObject.ToObject(type);
+                }
+                else
+                {
+                    return rawObject;
+                }
+            }
+            catch (Exception e)
+            {
+                pubnubLog.WriteToLog(e.ToString());
+                return rawObject;
+            }
+        }
+
         public object DeserializeToObject(string jsonString)
         {
             object result = JsonConvert.DeserializeObject<object>(jsonString,
