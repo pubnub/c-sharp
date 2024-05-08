@@ -550,6 +550,10 @@ namespace PubnubApi.EndPoint
                         status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(type, category, asyncRequestState, statusCode, new PNException(jsonString));
                     }
                 }
+                else if (deserializeStatus.ContainsKey("message") && statusCode != 200) {
+                    PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, deserializeStatus["message"].ToString());
+                    status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(type, category, asyncRequestState, statusCode, new PNException(jsonString));
+                }
 
             }
             else if (jsonString.ToLowerInvariant().TrimStart().IndexOf("<head", StringComparison.CurrentCultureIgnoreCase) == 0
