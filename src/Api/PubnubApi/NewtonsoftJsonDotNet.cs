@@ -179,7 +179,7 @@ namespace PubnubApi
             }
             catch (Exception e)
             {
-                pubnubLog.WriteToLog(e.ToString());
+                LoggingMethod.WriteToLog(pubnubLog, e.ToString(), config.LogVerbosity);
                 return rawObject;
             }
         }
