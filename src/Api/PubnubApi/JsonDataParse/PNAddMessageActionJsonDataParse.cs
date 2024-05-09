@@ -1,21 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace PubnubApi
 {
     internal static class PNAddMessageActionJsonDataParse
     {
-        internal static PNAddMessageActionResult GetObject(List<object> listObject)
+        internal static PNAddMessageActionResult GetObject(IJsonPluggableLibrary jsonPlug, List<object> listObject)
         {
-            Dictionary<string, object> addMsgActionDicObj = JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[1]);
+            Dictionary<string, object> addMsgActionDicObj = jsonPlug.ConvertToDictionaryObject(listObject[1]);
             PNAddMessageActionResult result = null;
             if (addMsgActionDicObj != null && addMsgActionDicObj.ContainsKey("data"))
             {
                 result = new PNAddMessageActionResult();
 
-                Dictionary<string, object> addMsgActionDataDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(addMsgActionDicObj["data"]);
+                Dictionary<string, object> addMsgActionDataDic = jsonPlug.ConvertToDictionaryObject(addMsgActionDicObj["data"]);
                 if (addMsgActionDataDic != null && addMsgActionDataDic.Count > 0)
                 {
                     long messageTimetoken;

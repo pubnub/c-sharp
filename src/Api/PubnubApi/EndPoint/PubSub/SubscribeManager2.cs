@@ -114,7 +114,7 @@ namespace PubnubApi.EndPoint
             if (!string.IsNullOrEmpty(responseTuple.Item1) && responseTuple.Item2 == null)
             {
                 PNStatus status = new PNStatus(null, PNOperationType.PNSubscribeOperation, PNStatusCategory.PNConnectedCategory, channels, channelGroups);
-                HandshakeResponse handshakeResponse = JsonConvert.DeserializeObject<HandshakeResponse>(responseTuple.Item1);
+                HandshakeResponse handshakeResponse = jsonLibrary.DeserializeToObject<HandshakeResponse>(responseTuple.Item1);
                 return new Tuple<HandshakeResponse, PNStatus>(handshakeResponse, status);
             }   
 
@@ -170,7 +170,7 @@ namespace PubnubApi.EndPoint
                 if (!string.IsNullOrEmpty(responseTuple.Item1) && responseTuple.Item2 == null)
                 {
                     PNStatus status = new PNStatus(null, PNOperationType.PNSubscribeOperation, PNStatusCategory.PNConnectedCategory, channels, channelGroups);
-                    ReceivingResponse<object> receiveResponse = JsonConvert.DeserializeObject<ReceivingResponse<object>>(responseTuple.Item1);
+                    ReceivingResponse<object> receiveResponse = jsonLibrary.DeserializeToObject<ReceivingResponse<object>>(responseTuple.Item1);
                     return new Tuple<ReceivingResponse<object>, PNStatus>(receiveResponse, status);
                 }
                 else if (responseTuple.Item2 != null)
@@ -549,6 +549,10 @@ namespace PubnubApi.EndPoint
                         PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, statusMessage);
                         status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(type, category, asyncRequestState, statusCode, new PNException(jsonString));
                     }
+                }
+                else if (deserializeStatus.ContainsKey("message") && statusCode != 200) {
+                    PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, deserializeStatus["message"].ToString());
+                    status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(type, category, asyncRequestState, statusCode, new PNException(jsonString));
                 }
 
             }

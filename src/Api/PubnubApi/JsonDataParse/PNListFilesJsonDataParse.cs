@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace PubnubApi
 {
     internal static class PNListFilesJsonDataParse
     {
-        internal static PNListFilesResult GetObject(List<object> listObject)
+        internal static PNListFilesResult GetObject(IJsonPluggableLibrary jsonPlug, List<object> listObject)
         {
             PNListFilesResult result = null;
             for (int listIndex = 0; listIndex < listObject.Count; listIndex++)
             {
-                Dictionary<string, object> dicObj = JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[listIndex]);
+                Dictionary<string, object> dicObj = jsonPlug.ConvertToDictionaryObject(listObject[listIndex]);
                 if (dicObj != null && dicObj.Count > 0)
                 {
                     if (result == null)
@@ -21,13 +19,13 @@ namespace PubnubApi
                     }
                     if (dicObj.ContainsKey("data") && dicObj["data"] != null)
                     {
-                        object[] fileDataArray = JsonDataParseInternalUtil.ConvertToObjectArray(dicObj["data"]);
+                        object[] fileDataArray = jsonPlug.ConvertToObjectArray(dicObj["data"]);
                         if (fileDataArray != null && fileDataArray.Length > 0)
                         {
                             result.FilesList = new List<PNFileResult>();
                             for (int index = 0; index < fileDataArray.Length; index++)
                             {
-                                Dictionary<string, object> getFileDataDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(fileDataArray[index]);
+                                Dictionary<string, object> getFileDataDic = jsonPlug.ConvertToDictionaryObject(fileDataArray[index]);
                                 if (getFileDataDic != null && getFileDataDic.Count > 0)
                                 {
                                     int fileSize;

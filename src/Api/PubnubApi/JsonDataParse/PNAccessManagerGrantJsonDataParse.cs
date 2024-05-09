@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace PubnubApi
 {
     internal static class PNAccessManagerGrantJsonDataParse
     {
-        internal static PNAccessManagerGrantResult GetObject(List<object> listObject)
+        internal static PNAccessManagerGrantResult GetObject(IJsonPluggableLibrary jsonPlug, List<object> listObject)
         {
             PNAccessManagerGrantResult ack = null;
 
-            Dictionary<string, object> grantDictObj = JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[0]);
+            Dictionary<string, object> grantDictObj = jsonPlug.ConvertToDictionaryObject(listObject[0]);
 
             if (grantDictObj != null)
             {
@@ -19,7 +17,7 @@ namespace PubnubApi
 
                 if (grantDictObj.ContainsKey("payload"))
                 {
-                    Dictionary<string, object> grantAckPayloadDict = JsonDataParseInternalUtil.ConvertToDictionaryObject(grantDictObj["payload"]);
+                    Dictionary<string, object> grantAckPayloadDict = jsonPlug.ConvertToDictionaryObject(grantDictObj["payload"]);
                     if (grantAckPayloadDict != null && grantAckPayloadDict.Count > 0)
                     {
                         if (grantAckPayloadDict.ContainsKey("level"))
@@ -51,24 +49,24 @@ namespace PubnubApi
                             {
                                 ack.Channels = new Dictionary<string, Dictionary<string, PNAccessManagerKeyData>>();
 
-                                Dictionary<string, object> grantAckChannelListDict = JsonDataParseInternalUtil.ConvertToDictionaryObject(grantAckPayloadDict["channels"]);
+                                Dictionary<string, object> grantAckChannelListDict = jsonPlug.ConvertToDictionaryObject(grantAckPayloadDict["channels"]);
                                 if (grantAckChannelListDict != null && grantAckChannelListDict.Count > 0)
                                 {
                                     foreach (string channel in grantAckChannelListDict.Keys)
                                     {
-                                        Dictionary<string, object> grantAckChannelDataDict = JsonDataParseInternalUtil.ConvertToDictionaryObject(grantAckChannelListDict[channel]);
+                                        Dictionary<string, object> grantAckChannelDataDict = jsonPlug.ConvertToDictionaryObject(grantAckChannelListDict[channel]);
                                         if (grantAckChannelDataDict != null && grantAckChannelDataDict.Count > 0)
                                         {
                                             if (grantAckChannelDataDict.ContainsKey("auths"))
                                             {
                                                 Dictionary<string, PNAccessManagerKeyData> authKeyDataDict = new Dictionary<string, PNAccessManagerKeyData>();
 
-                                                Dictionary<string, object> grantAckChannelAuthListDict = JsonDataParseInternalUtil.ConvertToDictionaryObject(grantAckChannelDataDict["auths"]);
+                                                Dictionary<string, object> grantAckChannelAuthListDict = jsonPlug.ConvertToDictionaryObject(grantAckChannelDataDict["auths"]);
                                                 if (grantAckChannelAuthListDict != null && grantAckChannelAuthListDict.Count > 0)
                                                 {
                                                     foreach (string authKey in grantAckChannelAuthListDict.Keys)
                                                     {
-                                                        Dictionary<string, object> grantAckChannelAuthDataDict = JsonDataParseInternalUtil.ConvertToDictionaryObject(grantAckChannelAuthListDict[authKey]);
+                                                        Dictionary<string, object> grantAckChannelAuthDataDict = jsonPlug.ConvertToDictionaryObject(grantAckChannelAuthListDict[authKey]);
 
                                                         if (grantAckChannelAuthDataDict != null && grantAckChannelAuthDataDict.Count > 0)
                                                         {
@@ -94,13 +92,13 @@ namespace PubnubApi
                                 {
                                     Dictionary<string, PNAccessManagerKeyData> authKeyDataDict = new Dictionary<string, PNAccessManagerKeyData>();
 
-                                    Dictionary<string, object> grantAckChannelAuthListDict = JsonDataParseInternalUtil.ConvertToDictionaryObject(grantAckPayloadDict["auths"]);
+                                    Dictionary<string, object> grantAckChannelAuthListDict = jsonPlug.ConvertToDictionaryObject(grantAckPayloadDict["auths"]);
 
                                     if (grantAckChannelAuthListDict != null && grantAckChannelAuthListDict.Count > 0)
                                     {
                                         foreach (string authKey in grantAckChannelAuthListDict.Keys)
                                         {
-                                            Dictionary<string, object> grantAckChannelAuthDataDict = JsonDataParseInternalUtil.ConvertToDictionaryObject(grantAckChannelAuthListDict[authKey]);
+                                            Dictionary<string, object> grantAckChannelAuthDataDict = jsonPlug.ConvertToDictionaryObject(grantAckChannelAuthListDict[authKey]);
                                             if (grantAckChannelAuthDataDict != null && grantAckChannelAuthDataDict.Count > 0)
                                             {
                                                 PNAccessManagerKeyData authData = GetAccessManagerKeyData(grantAckChannelAuthDataDict);
@@ -118,24 +116,24 @@ namespace PubnubApi
                             {
                                 ack.ChannelGroups = new Dictionary<string, Dictionary<string, PNAccessManagerKeyData>>();
 
-                                Dictionary<string, object> grantAckCgListDict = JsonDataParseInternalUtil.ConvertToDictionaryObject(grantAckPayloadDict["channel-groups"]);
+                                Dictionary<string, object> grantAckCgListDict = jsonPlug.ConvertToDictionaryObject(grantAckPayloadDict["channel-groups"]);
                                 if (grantAckCgListDict != null && grantAckCgListDict.Count > 0)
                                 {
                                     foreach (string channelgroup in grantAckCgListDict.Keys)
                                     {
-                                        Dictionary<string, object> grantAckCgDataDict = JsonDataParseInternalUtil.ConvertToDictionaryObject(grantAckCgListDict[channelgroup]);
+                                        Dictionary<string, object> grantAckCgDataDict = jsonPlug.ConvertToDictionaryObject(grantAckCgListDict[channelgroup]);
                                         if (grantAckCgDataDict != null && grantAckCgDataDict.Count > 0)
                                         {
                                             if (grantAckCgDataDict.ContainsKey("auths"))
                                             {
                                                 Dictionary<string, PNAccessManagerKeyData> authKeyDataDict = new Dictionary<string, PNAccessManagerKeyData>();
 
-                                                Dictionary<string, object> grantAckCgAuthListDict = JsonDataParseInternalUtil.ConvertToDictionaryObject(grantAckCgDataDict["auths"]);
+                                                Dictionary<string, object> grantAckCgAuthListDict = jsonPlug.ConvertToDictionaryObject(grantAckCgDataDict["auths"]);
                                                 if (grantAckCgAuthListDict != null && grantAckCgAuthListDict.Count > 0)
                                                 {
                                                     foreach (string authKey in grantAckCgAuthListDict.Keys)
                                                     {
-                                                        Dictionary<string, object> grantAckCgAuthDataDict = JsonDataParseInternalUtil.ConvertToDictionaryObject(grantAckCgAuthListDict[authKey]);
+                                                        Dictionary<string, object> grantAckCgAuthDataDict = jsonPlug.ConvertToDictionaryObject(grantAckCgAuthListDict[authKey]);
                                                         if (grantAckCgAuthDataDict != null && grantAckCgAuthDataDict.Count > 0)
                                                         {
                                                             PNAccessManagerKeyData authData = GetAccessManagerKeyData(grantAckCgAuthDataDict);
@@ -157,13 +155,13 @@ namespace PubnubApi
                                     {
                                         Dictionary<string, PNAccessManagerKeyData> authKeyDataDict = new Dictionary<string, PNAccessManagerKeyData>();
 
-                                        Dictionary<string, object> grantAckChannelAuthListDict = JsonDataParseInternalUtil.ConvertToDictionaryObject(grantAckPayloadDict["auths"]);
+                                        Dictionary<string, object> grantAckChannelAuthListDict = jsonPlug.ConvertToDictionaryObject(grantAckPayloadDict["auths"]);
 
                                         if (grantAckChannelAuthListDict != null && grantAckChannelAuthListDict.Count > 0)
                                         {
                                             foreach (string authKey in grantAckChannelAuthListDict.Keys)
                                             {
-                                                Dictionary<string, object> grantAckChannelAuthDataDict = JsonDataParseInternalUtil.ConvertToDictionaryObject(grantAckChannelAuthListDict[authKey]);
+                                                Dictionary<string, object> grantAckChannelAuthDataDict = jsonPlug.ConvertToDictionaryObject(grantAckChannelAuthListDict[authKey]);
                                                 if (grantAckChannelAuthDataDict != null && grantAckChannelAuthDataDict.Count > 0)
                                                 {
                                                     PNAccessManagerKeyData authData = GetAccessManagerKeyData(grantAckChannelAuthDataDict);
@@ -187,13 +185,13 @@ namespace PubnubApi
                                 {
                                     Dictionary<string, PNAccessManagerKeyData> authKeyDataDict = new Dictionary<string, PNAccessManagerKeyData>();
 
-                                    Dictionary<string, object> grantAckChannelAuthListDict = JsonDataParseInternalUtil.ConvertToDictionaryObject(grantAckPayloadDict["auths"]);
+                                    Dictionary<string, object> grantAckChannelAuthListDict = jsonPlug.ConvertToDictionaryObject(grantAckPayloadDict["auths"]);
 
                                     if (grantAckChannelAuthListDict != null && grantAckChannelAuthListDict.Count > 0)
                                     {
                                         foreach (string authKey in grantAckChannelAuthListDict.Keys)
                                         {
-                                            Dictionary<string, object> grantAckChannelAuthDataDict = JsonDataParseInternalUtil.ConvertToDictionaryObject(grantAckChannelAuthListDict[authKey]);
+                                            Dictionary<string, object> grantAckChannelAuthDataDict = jsonPlug.ConvertToDictionaryObject(grantAckChannelAuthListDict[authKey]);
                                             if (grantAckChannelAuthDataDict != null && grantAckChannelAuthDataDict.Count > 0)
                                             {
                                                 PNAccessManagerKeyData authData = GetAccessManagerKeyData(grantAckChannelAuthDataDict);
@@ -211,24 +209,24 @@ namespace PubnubApi
                             {
                                 ack.Uuids = new Dictionary<string, Dictionary<string, PNAccessManagerKeyData>>();
 
-                                Dictionary<string, object> grantAckCgListDict = JsonDataParseInternalUtil.ConvertToDictionaryObject(grantAckPayloadDict["uuids"]);
+                                Dictionary<string, object> grantAckCgListDict = jsonPlug.ConvertToDictionaryObject(grantAckPayloadDict["uuids"]);
                                 if (grantAckCgListDict != null && grantAckCgListDict.Count > 0)
                                 {
                                     foreach (string uuid in grantAckCgListDict.Keys)
                                     {
-                                        Dictionary<string, object> grantAckUuidDataDict = JsonDataParseInternalUtil.ConvertToDictionaryObject(grantAckCgListDict[uuid]);
+                                        Dictionary<string, object> grantAckUuidDataDict = jsonPlug.ConvertToDictionaryObject(grantAckCgListDict[uuid]);
                                         if (grantAckUuidDataDict != null && grantAckUuidDataDict.Count > 0)
                                         {
                                             if (grantAckUuidDataDict.ContainsKey("auths"))
                                             {
                                                 Dictionary<string, PNAccessManagerKeyData> authKeyDataDict = new Dictionary<string, PNAccessManagerKeyData>();
 
-                                                Dictionary<string, object> grantAckUuidAuthListDict = JsonDataParseInternalUtil.ConvertToDictionaryObject(grantAckUuidDataDict["auths"]);
+                                                Dictionary<string, object> grantAckUuidAuthListDict = jsonPlug.ConvertToDictionaryObject(grantAckUuidDataDict["auths"]);
                                                 if (grantAckUuidAuthListDict != null && grantAckUuidAuthListDict.Count > 0)
                                                 {
                                                     foreach (string authKey in grantAckUuidAuthListDict.Keys)
                                                     {
-                                                        Dictionary<string, object> grantAckUuidAuthDataDict = JsonDataParseInternalUtil.ConvertToDictionaryObject(grantAckUuidAuthListDict[authKey]);
+                                                        Dictionary<string, object> grantAckUuidAuthDataDict = jsonPlug.ConvertToDictionaryObject(grantAckUuidAuthListDict[authKey]);
                                                         if (grantAckUuidAuthDataDict != null && grantAckUuidAuthDataDict.Count > 0)
                                                         {
                                                             PNAccessManagerKeyData authData = GetAccessManagerKeyData(grantAckUuidAuthDataDict);
@@ -250,13 +248,13 @@ namespace PubnubApi
                                     {
                                         Dictionary<string, PNAccessManagerKeyData> authKeyDataDict = new Dictionary<string, PNAccessManagerKeyData>();
 
-                                        Dictionary<string, object> grantAckUuidAuthListDict = JsonDataParseInternalUtil.ConvertToDictionaryObject(grantAckPayloadDict["auths"]);
+                                        Dictionary<string, object> grantAckUuidAuthListDict = jsonPlug.ConvertToDictionaryObject(grantAckPayloadDict["auths"]);
 
                                         if (grantAckUuidAuthListDict != null && grantAckUuidAuthListDict.Count > 0)
                                         {
                                             foreach (string authKey in grantAckUuidAuthListDict.Keys)
                                             {
-                                                Dictionary<string, object> grantAckUuidAuthDataDict = JsonDataParseInternalUtil.ConvertToDictionaryObject(grantAckUuidAuthListDict[authKey]);
+                                                Dictionary<string, object> grantAckUuidAuthDataDict = jsonPlug.ConvertToDictionaryObject(grantAckUuidAuthListDict[authKey]);
                                                 if (grantAckUuidAuthDataDict != null && grantAckUuidAuthDataDict.Count > 0)
                                                 {
                                                     PNAccessManagerKeyData authData = GetAccessManagerKeyData(grantAckUuidAuthDataDict);
@@ -280,13 +278,13 @@ namespace PubnubApi
                                 {
                                     Dictionary<string, PNAccessManagerKeyData> authKeyDataDict = new Dictionary<string, PNAccessManagerKeyData>();
 
-                                    Dictionary<string, object> grantAckChannelAuthListDict = JsonDataParseInternalUtil.ConvertToDictionaryObject(grantAckPayloadDict["auths"]);
+                                    Dictionary<string, object> grantAckChannelAuthListDict = jsonPlug.ConvertToDictionaryObject(grantAckPayloadDict["auths"]);
 
                                     if (grantAckChannelAuthListDict != null && grantAckChannelAuthListDict.Count > 0)
                                     {
                                         foreach (string authKey in grantAckChannelAuthListDict.Keys)
                                         {
-                                            Dictionary<string, object> grantAckChannelAuthDataDict = JsonDataParseInternalUtil.ConvertToDictionaryObject(grantAckChannelAuthListDict[authKey]);
+                                            Dictionary<string, object> grantAckChannelAuthDataDict = jsonPlug.ConvertToDictionaryObject(grantAckChannelAuthListDict[authKey]);
                                             if (grantAckChannelAuthDataDict != null && grantAckChannelAuthDataDict.Count > 0)
                                             {
                                                 PNAccessManagerKeyData authData = GetAccessManagerKeyData(grantAckChannelAuthDataDict);

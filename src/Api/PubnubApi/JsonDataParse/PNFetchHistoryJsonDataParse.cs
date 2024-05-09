@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace PubnubApi
 {
     internal static class PNFetchHistoryJsonDataParse
     {
-        internal static PNFetchHistoryResult GetObject(List<object> listObject)
+        internal static PNFetchHistoryResult GetObject(IJsonPluggableLibrary jsonPlug, List<object> listObject)
         {
             PNFetchHistoryResult ack = new PNFetchHistoryResult();
 
@@ -28,10 +26,10 @@ namespace PubnubApi
                         {
                             string channel = channelKVP.Key;
                             List<PNHistoryItemResult> resultList = new List<PNHistoryItemResult>();
-                            object[] channelValArray = channelKVP.Value != null ? JsonDataParseInternalUtil.ConvertToObjectArray(channelKVP.Value) : new object[0];
+                            object[] channelValArray = channelKVP.Value != null ? jsonPlug.ConvertToObjectArray(channelKVP.Value) : new object[0];
                             foreach (object msgContainerObj in channelValArray)
                             {
-                                Dictionary<string, object> messagesContainer = JsonDataParseInternalUtil.ConvertToDictionaryObject(msgContainerObj);
+                                Dictionary<string, object> messagesContainer = jsonPlug.ConvertToDictionaryObject(msgContainerObj);
                                 if (messagesContainer != null)
                                 {
                                     PNHistoryItemResult result = new PNHistoryItemResult();

@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace PubnubApi
 {
     internal static class PNMembershipsJsonDataParse
     {
-        internal static PNMembershipsResult GetObject(List<object> listObject)
+        internal static PNMembershipsResult GetObject(IJsonPluggableLibrary jsonPlug, List<object> listObject)
         {
             PNMembershipsResult result = null;
             for (int listIndex = 0; listIndex < listObject.Count; listIndex++)
             {
-                Dictionary<string, object> dicObj = JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[listIndex]);
+                Dictionary<string, object> dicObj = jsonPlug.ConvertToDictionaryObject(listObject[listIndex]);
                 if (dicObj != null && dicObj.Count > 0)
                 {
                     if (result == null)
@@ -23,12 +21,12 @@ namespace PubnubApi
                     {
                         result.Memberships = new List<PNMembershipsItemResult>();
 
-                        object[] channelMetadataArray = JsonDataParseInternalUtil.ConvertToObjectArray(dicObj["data"]);
+                        object[] channelMetadataArray = jsonPlug.ConvertToObjectArray(dicObj["data"]);
                         if (channelMetadataArray != null && channelMetadataArray.Length > 0)
                         {
                             for (int index = 0; index < channelMetadataArray.Length; index++)
                             {
-                                Dictionary<string, object> getMbrshipItemDataDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(channelMetadataArray[index]);
+                                Dictionary<string, object> getMbrshipItemDataDic = jsonPlug.ConvertToDictionaryObject(channelMetadataArray[index]);
                                 if (getMbrshipItemDataDic != null && getMbrshipItemDataDic.Count > 0)
                                 {
                                     var mbrshipItem = new PNMembershipsItemResult
@@ -37,11 +35,11 @@ namespace PubnubApi
                                     };
                                     if (getMbrshipItemDataDic.ContainsKey("custom"))
                                     {
-                                        mbrshipItem.Custom = JsonDataParseInternalUtil.ConvertToDictionaryObject(getMbrshipItemDataDic["custom"]);
+                                        mbrshipItem.Custom = jsonPlug.ConvertToDictionaryObject(getMbrshipItemDataDic["custom"]);
                                     }
                                     if (getMbrshipItemDataDic.ContainsKey("channel"))
                                     {
-                                        Dictionary<string, object> channelMetadataDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(getMbrshipItemDataDic["channel"]);
+                                        Dictionary<string, object> channelMetadataDic = jsonPlug.ConvertToDictionaryObject(getMbrshipItemDataDic["channel"]);
                                         if (channelMetadataDic != null && channelMetadataDic.Count > 0)
                                         {
                                             var channelMetadataResult = new PNChannelMetadataResult
@@ -50,7 +48,7 @@ namespace PubnubApi
                                                 Name = (channelMetadataDic.ContainsKey("name") && channelMetadataDic["name"] != null) ? channelMetadataDic["name"].ToString() : null,
                                                 Description = (channelMetadataDic.ContainsKey("description") && channelMetadataDic["description"] != null) ? channelMetadataDic["description"].ToString() : null,
                                                 Updated = (channelMetadataDic.ContainsKey("updated") && channelMetadataDic["updated"] != null) ? channelMetadataDic["updated"].ToString() : null,
-                                                Custom = (channelMetadataDic.ContainsKey("custom") && channelMetadataDic["custom"] != null) ? JsonDataParseInternalUtil.ConvertToDictionaryObject(channelMetadataDic["custom"]) : null
+                                                Custom = (channelMetadataDic.ContainsKey("custom") && channelMetadataDic["custom"] != null) ? jsonPlug.ConvertToDictionaryObject(channelMetadataDic["custom"]) : null
                                             };
                                             mbrshipItem.ChannelMetadata = channelMetadataResult;
                                         }

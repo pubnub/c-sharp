@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace PubnubApi
 {
     internal static class PNObjectEventJsonDataParse
     {
-        internal static PNObjectEventResult GetObject(List<object> listObject)
+        internal static PNObjectEventResult GetObject(IJsonPluggableLibrary jsonPlug, List<object> listObject)
         {
             PNObjectEventResult result = null;
 
-            Dictionary<string, object> objectEventDicObj = (listObject != null && listObject.Count > 0) ? JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[0]) : null;
+            Dictionary<string, object> objectEventDicObj = (listObject != null && listObject.Count > 0) ? jsonPlug.ConvertToDictionaryObject(listObject[0]) : null;
             if (objectEventDicObj != null)
             {
                 if (result == null)
@@ -52,7 +50,7 @@ namespace PubnubApi
                                 ExternalId = (dataDic.ContainsKey("externalId") && dataDic["externalId"] != null) ? dataDic["externalId"].ToString() : null,
                                 ProfileUrl = (dataDic.ContainsKey("profileUrl") && dataDic["profileUrl"] != null) ? dataDic["profileUrl"].ToString() : null,
                                 Email = (dataDic.ContainsKey("email") && dataDic["email"] != null) ? dataDic["email"].ToString() : null,
-                                Custom = (dataDic.ContainsKey("custom") && dataDic["custom"] != null) ? JsonDataParseInternalUtil.ConvertToDictionaryObject(dataDic["custom"]) : null,
+                                Custom = (dataDic.ContainsKey("custom") && dataDic["custom"] != null) ? jsonPlug.ConvertToDictionaryObject(dataDic["custom"]) : null,
                                 Updated = (dataDic.ContainsKey("updated") && dataDic["updated"] != null) ? dataDic["updated"].ToString() : null
                             };
                         }
@@ -63,7 +61,7 @@ namespace PubnubApi
                                 Channel = dataDic["id"] != null ? dataDic["id"].ToString() : null,
                                 Name = (dataDic.ContainsKey("name") && dataDic["name"] != null) ? dataDic["name"].ToString() : null,
                                 Description = (dataDic.ContainsKey("description") && dataDic["description"] != null) ? dataDic["description"].ToString() : null,
-                                Custom = (dataDic.ContainsKey("custom") && dataDic["custom"] != null) ? JsonDataParseInternalUtil.ConvertToDictionaryObject(dataDic["custom"]) : null,
+                                Custom = (dataDic.ContainsKey("custom") && dataDic["custom"] != null) ? jsonPlug.ConvertToDictionaryObject(dataDic["custom"]) : null,
                                 Updated = (dataDic.ContainsKey("updated") && dataDic["updated"] != null) ? dataDic["updated"].ToString() : null
                             };
                         }

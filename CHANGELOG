@@ -1,3 +1,7 @@
+v6.20.1 - May 09 2024
+-----------------------------
+- Fixed: fixes issue of Unity SDK not being able to have a fully independent IJsonPluggableLibrary implementation because of direct nu-get Newtonsoft usage in C# SDK (Unity has it's own version that works with IL2CPP builds).
+
 v6.20.0 - April 18 2024
 -----------------------------
 - Added: added event engine implementation for subscribe and presence operation.

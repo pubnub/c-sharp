@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace PubnubApi
 {
     internal static class PNChannelMembersJsonDataParse
     {
-        internal static PNChannelMembersResult GetObject(List<object> listObject)
+        internal static PNChannelMembersResult GetObject(IJsonPluggableLibrary jsonPlug, List<object> listObject)
         {
             PNChannelMembersResult result = null;
             for (int listIndex = 0; listIndex < listObject.Count; listIndex++)
             {
-                Dictionary<string, object> dicObj = JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[listIndex]);
+                Dictionary<string, object> dicObj = jsonPlug.ConvertToDictionaryObject(listObject[listIndex]);
                 if (dicObj != null && dicObj.Count > 0)
                 {
                     if (result == null)
@@ -23,12 +21,12 @@ namespace PubnubApi
                     {
                         result.ChannelMembers = new List<PNChannelMembersItemResult>();
 
-                        object[] userArray = JsonDataParseInternalUtil.ConvertToObjectArray(dicObj["data"]);
+                        object[] userArray = jsonPlug.ConvertToObjectArray(dicObj["data"]);
                         if (userArray != null && userArray.Length > 0)
                         {
                             for (int index = 0; index < userArray.Length; index++)
                             {
-                                Dictionary<string, object> getMbrItemDataDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(userArray[index]);
+                                Dictionary<string, object> getMbrItemDataDic = jsonPlug.ConvertToDictionaryObject(userArray[index]);
                                 if (getMbrItemDataDic != null && getMbrItemDataDic.Count > 0)
                                 {
                                     var mbrItem = new PNChannelMembersItemResult
@@ -37,11 +35,11 @@ namespace PubnubApi
                                     };
                                     if (getMbrItemDataDic.ContainsKey("custom"))
                                     {
-                                        mbrItem.Custom = JsonDataParseInternalUtil.ConvertToDictionaryObject(getMbrItemDataDic["custom"]);
+                                        mbrItem.Custom = jsonPlug.ConvertToDictionaryObject(getMbrItemDataDic["custom"]);
                                     }
                                     if (getMbrItemDataDic.ContainsKey("uuid"))
                                     {
-                                        Dictionary<string, object> uuidMetadataDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(getMbrItemDataDic["uuid"]);
+                                        Dictionary<string, object> uuidMetadataDic = jsonPlug.ConvertToDictionaryObject(getMbrItemDataDic["uuid"]);
                                         if (uuidMetadataDic != null && uuidMetadataDic.Count > 0)
                                         {
                                             var uuidMetadataResult = new PNUuidMetadataResult
@@ -52,7 +50,7 @@ namespace PubnubApi
                                                 ProfileUrl = (uuidMetadataDic.ContainsKey("profileUrl") && uuidMetadataDic["profileUrl"] != null) ? uuidMetadataDic["profileUrl"].ToString() : "",
                                                 Email = (uuidMetadataDic.ContainsKey("email") && uuidMetadataDic["email"] != null) ? uuidMetadataDic["email"].ToString() : "",
                                                 Updated = (uuidMetadataDic.ContainsKey("updated") && uuidMetadataDic["updated"] != null) ? uuidMetadataDic["updated"].ToString() : "",
-                                                Custom = (uuidMetadataDic.ContainsKey("custom") && uuidMetadataDic["custom"] != null) ? JsonDataParseInternalUtil.ConvertToDictionaryObject(uuidMetadataDic["custom"]) : null
+                                                Custom = (uuidMetadataDic.ContainsKey("custom") && uuidMetadataDic["custom"] != null) ? jsonPlug.ConvertToDictionaryObject(uuidMetadataDic["custom"]) : null
                                             };
                                             mbrItem.UuidMetadata = uuidMetadataResult;
                                         }

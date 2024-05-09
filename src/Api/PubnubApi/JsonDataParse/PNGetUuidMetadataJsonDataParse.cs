@@ -1,21 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace PubnubApi
 {
     internal static class PNGetUuidMetadataJsonDataParse
     {
-        internal static PNGetUuidMetadataResult GetObject(List<object> listObject)
+        internal static PNGetUuidMetadataResult GetObject(IJsonPluggableLibrary jsonPlug, List<object> listObject)
         {
             PNGetUuidMetadataResult result = null;
-            Dictionary<string, object> getUserDicObj = (listObject.Count >= 2) ? JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[1]) : null;
+            Dictionary<string, object> getUserDicObj = (listObject.Count >= 2) ? jsonPlug.ConvertToDictionaryObject(listObject[1]) : null;
             if (getUserDicObj != null && getUserDicObj.ContainsKey("data"))
             {
                 result = new PNGetUuidMetadataResult();
 
-                Dictionary<string, object> userDataDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(getUserDicObj["data"]);
+                Dictionary<string, object> userDataDic = jsonPlug.ConvertToDictionaryObject(getUserDicObj["data"]);
                 if (userDataDic != null && userDataDic.Count > 0)
                 {
                     var usrData = new PNGetUuidMetadataResult
@@ -30,7 +27,7 @@ namespace PubnubApi
 
                     if (userDataDic.ContainsKey("custom"))
                     {
-                        usrData.Custom = JsonDataParseInternalUtil.ConvertToDictionaryObject(userDataDic["custom"]);
+                        usrData.Custom = jsonPlug.ConvertToDictionaryObject(userDataDic["custom"]);
                     }
                     result = usrData;
                 }
