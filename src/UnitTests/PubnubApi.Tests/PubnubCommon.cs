@@ -12,7 +12,7 @@ namespace PubNubMessaging.Tests
         public static readonly bool PAMServerSideRun = (!string.IsNullOrEmpty(EnvPAMServerSideRun) && EnvPAMServerSideRun == "1");
         public static readonly bool PAMServerSideGrant = !PAMServerSideRun;
         public static readonly bool SuppressAuthKey = PAMServerSideRun;
-        public static readonly bool EnableStubTest = true;
+        public static readonly bool EnableStubTest = false;
 
         //USE demo-36 keys for unit tests 
         public static readonly string PublishKey = string.IsNullOrEmpty(EnvPublishKey) ? "demo-36" : EnvPublishKey;
