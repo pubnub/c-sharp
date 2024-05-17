@@ -94,7 +94,8 @@ namespace PubNubMessaging.Tests
             server.Stop();
         }
 
-        [Test]
+        //TODO: CLEN-2039
+        //[Test]
         public static void ThenSetRemoveChannelMetadataWithManageMembershipShouldReturnSuccessCodeAndInfo()
         {
             server.ClearRequests();

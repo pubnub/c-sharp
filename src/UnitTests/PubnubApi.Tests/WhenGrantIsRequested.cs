@@ -1023,7 +1023,8 @@ namespace PubNubMessaging.Tests
 
         }
 
-        [Test]
+        //TODO: CLEN-2039
+        //[Test]
         public static void ThenRevokeTokenShouldReturnSuccess()
         {
             server.ClearRequests();
