@@ -28,10 +28,11 @@ namespace PubnubApi.EventEngine.Subscribe
 			PNConfiguration pubnubConfiguration,
 			SubscribeManager2 subscribeManager,
 			EventEmitter eventEmitter,
+			IJsonPluggableLibrary jsonPluggableLibrary,
 			Action<Pubnub, PNStatus> statusListener = null)
 		{
 			
-			var subscribeEventEngine = new SubscribeEventEngine(pubnubInstance, pubnubConfiguration: pubnubConfiguration, subscribeManager,eventEmitter, statusListener);
+			var subscribeEventEngine = new SubscribeEventEngine(pubnubInstance, pubnubConfiguration: pubnubConfiguration, subscribeManager,eventEmitter, jsonPluggableLibrary, statusListener);
 			if (engineInstances.TryAdd(instanceId, subscribeEventEngine)) {
 				return subscribeEventEngine;
 			}

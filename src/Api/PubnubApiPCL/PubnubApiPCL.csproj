@@ -15,7 +15,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubPCL</PackageId>
-    <PackageVersion>6.20.0.0</PackageVersion>
+    <PackageVersion>6.20.1.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -23,8 +23,7 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>Added event engine implementation for subscribe and presence operation.
-Added support for `RetryConfiguration` to configure subscribe request retry.</PackageReleaseNotes>
+    <PackageReleaseNotes>Fixes issue of Unity SDK not being able to have a fully independent IJsonPluggableLibrary implementation because of direct nu-get Newtonsoft usage in C# SDK (Unity has it's own version that works with IL2CPP builds).</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
@@ -305,7 +304,9 @@ Added support for `RetryConfiguration` to configure subscribe request retry.</Pa
     <Compile Include="..\PubnubApi\Interface\IUrlRequestBuilder.cs">
       <Link>Interface\IUrlRequestBuilder.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\JsonDataParse\JsonDataParseInternalUtil.cs" Link="JsonDataParse\JsonDataParseInternalUtil.cs" />
+    <Compile Include="..\PubnubApi\JsonDataParse\DeserializeToInternalObjectUtility.cs">
+      <Link>JsonDataParse\DeserializeToInternalObjectUtility.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\JsonDataParse\PNAccessManagerGrantJsonDataParse.cs" Link="JsonDataParse\PNAccessManagerGrantJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNAddMessageActionJsonDataParse.cs" Link="JsonDataParse\PNAddMessageActionJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNFetchHistoryJsonDataParse.cs" Link="JsonDataParse\PNFetchHistoryJsonDataParse.cs" />
@@ -990,7 +991,6 @@ Added support for `RetryConfiguration` to configure subscribe request retry.</Pa
     <Folder Include="Model\Derived\Presence\" />
     <Folder Include="Model\Server\" />
     <Folder Include="Helper\" />
-    <Folder Include="JsonDataParse\" />
     <Folder Include="Properties\" />
     <Folder Include="Push\Mpns\" />
     <Folder Include="Proxy\" />

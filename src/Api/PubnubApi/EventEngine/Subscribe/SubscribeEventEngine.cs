@@ -4,8 +4,6 @@ using PubnubApi.EventEngine.Subscribe.States;
 using System.Collections.Generic;
 using System.Linq;
 using PubnubApi.EventEngine.Subscribe.Common;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using PubnubApi.EventEngine.Subscribe.Events;
 using PubnubApi.EventEngine.Common;
@@ -17,11 +15,7 @@ namespace PubnubApi.EventEngine.Subscribe
 		private SubscribeManager2 subscribeManager;
 		private readonly Dictionary<string, Type> channelTypeMap = new Dictionary<string, Type>();
 		private readonly Dictionary<string, Type> channelGroupTypeMap = new Dictionary<string, Type>();
-
-		private static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings()
-			{ Formatting = Formatting.None, DateParseHandling = DateParseHandling.None };
-		private static readonly JsonSerializer Serializer = JsonSerializer.Create(SerializerSettings); 
-
+		private readonly IJsonPluggableLibrary jsonPluggableLibrary;
 
 		public string[] Channels { get; set; } = new string[] {};
 		public string[] Channelgroups { get; set; } = new string[] {};
@@ -30,9 +24,11 @@ namespace PubnubApi.EventEngine.Subscribe
 			PNConfiguration pubnubConfiguration,
 			SubscribeManager2 subscribeManager,
             EventEmitter eventEmitter,
+			IJsonPluggableLibrary jsonPluggableLibrary,
             Action<Pubnub, PNStatus> statusListener = null)
 		{
 			this.subscribeManager = subscribeManager;
+			this.jsonPluggableLibrary = jsonPluggableLibrary;
 			var handshakeHandler = new Effects.HandshakeEffectHandler(subscribeManager, EventQueue);
 			var handshakeReconnectHandler = new Effects.HandshakeReconnectEffectHandler(pubnubConfiguration, EventQueue, handshakeHandler);
 
@@ -49,7 +45,7 @@ namespace PubnubApi.EventEngine.Subscribe
 			dispatcher.Register<Invocations.ReceiveReconnectInvocation, Effects.ReceivingReconnectEffectHandler>(receiveReconnectHandler);
 			dispatcher.Register<Invocations.CancelReceiveReconnectInvocation, Effects.ReceivingReconnectEffectHandler>(receiveReconnectHandler);
 
-			var emitMessageHandler = new Effects.EmitMessagesHandler(eventEmitter, Serializer, channelTypeMap, channelGroupTypeMap);
+			var emitMessageHandler = new Effects.EmitMessagesHandler(eventEmitter, jsonPluggableLibrary, channelTypeMap, channelGroupTypeMap);
 			dispatcher.Register<Invocations.EmitMessagesInvocation, Effects.EmitMessagesHandler>(emitMessageHandler);
 
 			var emitStatusHandler = new Effects.EmitStatusEffectHandler(pubnubInstance, statusListener);

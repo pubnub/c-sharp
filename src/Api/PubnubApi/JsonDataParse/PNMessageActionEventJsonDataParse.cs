@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace PubnubApi
 {
     internal static class PNMessageActionEventJsonDataParse
     {
-        internal static PNMessageActionEventResult GetObject(List<object> listObject)
+        internal static PNMessageActionEventResult GetObject(IJsonPluggableLibrary jsonPlug, List<object> listObject)
         {
             PNMessageActionEventResult result = null;
 
-            Dictionary<string, object> msgActionEventDicObj = JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[0]);
+            Dictionary<string, object> msgActionEventDicObj = jsonPlug.ConvertToDictionaryObject(listObject[0]);
             if (msgActionEventDicObj != null)
             {
                 result = new PNMessageActionEventResult();

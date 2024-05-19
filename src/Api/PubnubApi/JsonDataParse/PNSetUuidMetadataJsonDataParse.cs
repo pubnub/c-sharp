@@ -1,21 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace PubnubApi
 {
     internal static class PNSetUuidMetadataJsonDataParse
     {
-        internal static PNSetUuidMetadataResult GetObject(List<object> listObject)
+        internal static PNSetUuidMetadataResult GetObject(IJsonPluggableLibrary jsonPlug, List<object> listObject)
         {
-            Dictionary<string, object> setUuidDicObj = (listObject != null && listObject.Count >= 2) ? JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[1]) : null;
+            Dictionary<string, object> setUuidDicObj = (listObject != null && listObject.Count >= 2) ? jsonPlug.ConvertToDictionaryObject(listObject[1]) : null;
             PNSetUuidMetadataResult result = null;
             if (setUuidDicObj != null && setUuidDicObj.ContainsKey("data"))
             {
                 result = new PNSetUuidMetadataResult();
 
-                Dictionary<string, object> setUuidDataDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(setUuidDicObj["data"]);
+                Dictionary<string, object> setUuidDataDic = jsonPlug.ConvertToDictionaryObject(setUuidDicObj["data"]);
                 if (setUuidDataDic != null && setUuidDataDic.Count > 0)
                 {
                     result.Uuid = setUuidDataDic.ContainsKey("id") && setUuidDataDic["id"] != null ? setUuidDataDic["id"].ToString() : null;
@@ -26,7 +23,7 @@ namespace PubnubApi
                     result.Updated = setUuidDataDic.ContainsKey("updated") && setUuidDataDic["updated"] != null ? setUuidDataDic["updated"].ToString() : "";
                     if (setUuidDataDic.ContainsKey("custom"))
                     {
-                        result.Custom = JsonDataParseInternalUtil.ConvertToDictionaryObject(setUuidDataDic["custom"]);
+                        result.Custom = jsonPlug.ConvertToDictionaryObject(setUuidDataDic["custom"]);
                     }
                 }
             }

@@ -1,28 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace PubnubApi
 {
     internal static class PNGetMessageActionsJsonDataParse
     {
-        internal static PNGetMessageActionsResult GetObject(List<object> listObject)
+        internal static PNGetMessageActionsResult GetObject(IJsonPluggableLibrary jsonPlug, List<object> listObject)
         {
-            Dictionary<string, object> getMsgActionsDicObj = (listObject != null && listObject.Count >= 2) ? JsonDataParseInternalUtil.ConvertToDictionaryObject(listObject[1]) : null;
+            Dictionary<string, object> getMsgActionsDicObj = (listObject != null && listObject.Count >= 2) ? jsonPlug.ConvertToDictionaryObject(listObject[1]) : null;
             PNGetMessageActionsResult result = null;
             if (getMsgActionsDicObj != null && getMsgActionsDicObj.ContainsKey("data"))
             {
                 result = new PNGetMessageActionsResult();
 
-                object[] getMsgActionsDataList = JsonDataParseInternalUtil.ConvertToObjectArray(getMsgActionsDicObj["data"]);
+                object[] getMsgActionsDataList = jsonPlug.ConvertToObjectArray(getMsgActionsDicObj["data"]);
                 if (getMsgActionsDataList != null && getMsgActionsDataList.Length > 0)
                 {
                     result.MessageActions = new List<PNMessageActionItem>();
 
                     foreach (object getMsgActionObj in getMsgActionsDataList)
                     {
-                        Dictionary<string, object> getMsgActionItemDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(getMsgActionObj);
+                        Dictionary<string, object> getMsgActionItemDic = jsonPlug.ConvertToDictionaryObject(getMsgActionObj);
                         if (getMsgActionItemDic != null && getMsgActionItemDic.Count > 0)
                         {
                             PNMessageActionItem actionItem = new PNMessageActionItem();
@@ -54,7 +52,7 @@ namespace PubnubApi
 
                 if (getMsgActionsDicObj.ContainsKey("more"))
                 {
-                    Dictionary<string, object> getMsgActionsMoreDic = JsonDataParseInternalUtil.ConvertToDictionaryObject(getMsgActionsDicObj["more"]);
+                    Dictionary<string, object> getMsgActionsMoreDic = jsonPlug.ConvertToDictionaryObject(getMsgActionsDicObj["more"]);
                     if (getMsgActionsMoreDic != null && getMsgActionsMoreDic.Count > 0)
                     {
                         result.More = new PNGetMessageActionsResult.MoreInfo();
