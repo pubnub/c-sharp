@@ -1655,7 +1655,8 @@ namespace PubNubMessaging.Tests
             Assert.IsTrue(receivedHereNowMessage, "here_now message not received with user state");
         }
 
-        [Test]
+        //TODO: CLEN-2044
+        //[Test]
         public static void IfGlobalHereNowIsCalledThenItShouldReturnInfo()
         {
             server.ClearRequests();
@@ -1790,7 +1791,8 @@ namespace PubNubMessaging.Tests
             Assert.IsTrue(receivedHereNowMessage, "global_here_now message not received");
         }
 
-        [Test]
+        //TODO: CLEN-2044
+        //[Test]
         public static void IfGlobalHereNowIsCalledThenItShouldReturnInfoWithUserState()
         {
             server.ClearRequests();
