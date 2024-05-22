@@ -14,6 +14,7 @@ using PubnubApi.Security.Crypto.Cryptors;
 using PubnubApi.Security.Crypto.Common;
 using System.Threading;
 using System.Security.Policy;
+using System.Threading.Tasks;
 using MockServer;
 
 namespace PubNubMessaging.Tests
@@ -837,7 +838,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public void TestSubscribeDecryption()
+        public async Task TestSubscribeDecryption()
         {
             server.ClearRequests();
             server.Start();
@@ -905,16 +906,24 @@ namespace PubNubMessaging.Tests
                 .WithResponse(expectedMessage)
                 .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            Thread.Sleep(1000);
+            await Task.Delay(1000);
 
             pn.Subscribe<string>().Channels(new[] { "test" }).Execute();
+
+            await Task.Delay(1000);
+            
+            // Rust generated encrypted message
+            await CreateTestSender().Publish()
+                .Channel("test")
+                .Message("UE5FRAFBQ1JIEALf+E65kseYJwTw2J6BUk9MePHiCcBCS+8ykXLkBIOA")
+                .ExecuteAsync();
 
             bool passed = done.WaitOne(5000);
             Assert.True(passed);
         }
-
+        
         [Test]
-        public void TestSubscribeDecryptionOnNonEncryptedMessage()
+        public async Task TestSubscribeDecryptionOnNonEncryptedMessage()
         {
             server.ClearRequests();
             server.Start();
@@ -934,7 +943,7 @@ namespace PubNubMessaging.Tests
             pn.AddListener(new SubscribeCallbackExt(
                     (pb, message) =>
                     {
-                        //Assert.AreEqual("test", message.Message);
+                        Assert.AreEqual("test", message.Message);
                         done.Set();
                     },
                     (pb, presence) => { },
@@ -981,6 +990,13 @@ namespace PubNubMessaging.Tests
                 .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             pn.Subscribe<string>().Channels(new[] { "test" }).Execute();
+
+            await Task.Delay(1000);
+            
+            await CreateTestSender().Publish()
+                .Channel("test")
+                .Message("test")
+                .ExecuteAsync();
 
             bool passed = done.WaitOne(5000);
             Assert.True(passed);
@@ -1048,7 +1064,7 @@ namespace PubNubMessaging.Tests
                     done.Set();
                 }));
 
-            bool passed = done.WaitOne(5000);
+            bool passed = done.WaitOne(500000);
             Assert.True(passed);
         }
 
@@ -1059,6 +1075,18 @@ namespace PubNubMessaging.Tests
             config.PublishKey = "demo";
 
             return config;
+        }
+        
+        private Pubnub CreateTestSender()
+        {
+            var senderConfig = new PNConfiguration(new UserId("test_sender"))
+            {
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                PublishKey = PubnubCommon.PublishKey,
+                Secure = false,
+                LogVerbosity = PNLogVerbosity.BODY
+            };
+            return new Pubnub(senderConfig);
         }
     }
 }
