@@ -1119,7 +1119,7 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent manualEvent = new ManualResetEvent(false);
             pubnub.Subscribe<string>().Channels(new string[] { uuidMetadataId, channelMetadataId1, channelMetadataId2 }).Execute();
-            manualEvent.WaitOne(2000);
+            manualEvent.WaitOne(7000);
 
 
             manualResetEventWaitTimeout = 310 * 1000;
@@ -1127,19 +1127,19 @@ namespace PubNubMessaging.Tests
             manualEvent = new ManualResetEvent(false);
             pubnub.RemoveUuidMetadata().Uuid(uuidMetadataId).Execute(new PNRemoveUuidMetadataResultExt(
                 delegate (PNRemoveUuidMetadataResult result, PNStatus status) { }));
-            manualEvent.WaitOne(2000);
+            manualEvent.WaitOne(7000);
 
             System.Diagnostics.Debug.WriteLine("pubnub.RemoveChannelMetadata() 1 STARTED");
             manualEvent = new ManualResetEvent(false);
             pubnub.RemoveChannelMetadata().Channel(channelMetadataId1).Execute(new PNRemoveChannelMetadataResultExt(
                 delegate (PNRemoveChannelMetadataResult result, PNStatus status) { }));
-            manualEvent.WaitOne(2000);
+            manualEvent.WaitOne(7000);
 
             System.Diagnostics.Debug.WriteLine("pubnub.RemoveChannelMetadata() 2 STARTED");
             manualEvent = new ManualResetEvent(false);
             pubnub.RemoveChannelMetadata().Channel(channelMetadataId2).Execute(new PNRemoveChannelMetadataResultExt(
                 delegate (PNRemoveChannelMetadataResult result, PNStatus status) { }));
-            manualEvent.WaitOne(2000);
+            manualEvent.WaitOne(7000);
 
             manualEvent = new ManualResetEvent(false);
             receivedMessage = false;
@@ -1283,7 +1283,7 @@ namespace PubNubMessaging.Tests
                 manualEvent.WaitOne(manualResetEventWaitTimeout);
             }
 
-            Thread.Sleep(2000);
+            Thread.Sleep(6000);
 
             pubnub.Unsubscribe<string>().Channels(new string[] { uuidMetadataId, channelMetadataId1, channelMetadataId2 }).Execute();
             pubnub.RemoveListener(eventListener);
