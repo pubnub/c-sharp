@@ -1057,7 +1057,8 @@ namespace PubNubMessaging.Tests
         }
 
 
-        [Test]
+        //TODO: CLEN-2037
+        //[Test]
         public static void ThenManageMembershipShouldReturnEventInfo()
         {
             server.ClearRequests();

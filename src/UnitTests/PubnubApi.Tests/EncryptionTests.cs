@@ -3,18 +3,12 @@ using System.Text;
 using System.Collections.Generic;
 using NUnit.Framework;
 using PubnubApi;
-using System.Text.RegularExpressions;
-using System.Globalization;
 using Newtonsoft.Json;
 using System.Diagnostics;
-using System.Linq;
-using PeterO.Cbor;
 using PubnubApi.Security.Crypto;
 using PubnubApi.Security.Crypto.Cryptors;
 using PubnubApi.Security.Crypto.Common;
 using System.Threading;
-using System.Security.Policy;
-using System.Threading.Tasks;
 using MockServer;
 
 namespace PubNubMessaging.Tests
@@ -838,7 +832,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public async Task TestSubscribeDecryption()
+        public void TestSubscribeDecryption()
         {
             server.ClearRequests();
             server.Start();
@@ -906,24 +900,24 @@ namespace PubNubMessaging.Tests
                 .WithResponse(expectedMessage)
                 .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            await Task.Delay(1000);
+            Thread.Sleep(1000);
 
             pn.Subscribe<string>().Channels(new[] { "test" }).Execute();
 
-            await Task.Delay(1000);
+            Thread.Sleep(1000);
             
             // Rust generated encrypted message
-            await CreateTestSender().Publish()
+            CreateTestSender().Publish()
                 .Channel("test")
                 .Message("UE5FRAFBQ1JIEALf+E65kseYJwTw2J6BUk9MePHiCcBCS+8ykXLkBIOA")
-                .ExecuteAsync();
+                .Execute(new PNPublishResultExt((r,s)=>{}));
 
             bool passed = done.WaitOne(5000);
             Assert.True(passed);
         }
         
         [Test]
-        public async Task TestSubscribeDecryptionOnNonEncryptedMessage()
+        public void TestSubscribeDecryptionOnNonEncryptedMessage()
         {
             server.ClearRequests();
             server.Start();
@@ -991,12 +985,12 @@ namespace PubNubMessaging.Tests
 
             pn.Subscribe<string>().Channels(new[] { "test" }).Execute();
 
-            await Task.Delay(1000);
+            Thread.Sleep(1000);
             
-            await CreateTestSender().Publish()
+            CreateTestSender().Publish()
                 .Channel("test")
                 .Message("test")
-                .ExecuteAsync();
+                .Execute(new PNPublishResultExt((r,s)=>{}));
 
             bool passed = done.WaitOne(5000);
             Assert.True(passed);
