@@ -11,8 +11,7 @@ jobs:
   tests:
     name: Integration and Unit tests
     runs-on:
-      group: Default Larger Runners
-      labels: windows-latest-m
+      group: windows-creditable
     defaults:
       run:
         shell: powershell
@@ -51,8 +50,7 @@ jobs:
   acceptance-tests:
     name: Acceptance tests
     runs-on:
-      group: Default Larger Runners
-      labels: windows-latest-m
+      group: windows-creditable
     defaults:
       run:
         shell: powershell
