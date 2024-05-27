@@ -42,7 +42,7 @@ jobs:
           PN_PUB_KEY: ${{ secrets.SDK_PUB_KEY }}
           PN_SUB_KEY: ${{ secrets.SDK_SUB_KEY }}
           PN_SEC_KEY: ${{ secrets.SDK_SEC_KEY }} 
-        run: dotnet test .\\src\\UnitTests\\PubnubApiPCL.Tests\\PubnubApiPCL.Tests.csproj --verbosity normal --logger trx 
+        run: dotnet test .\\src\\UnitTests\\PubnubApiPCL.Tests\\PubnubApiPCL.Tests.csproj --verbosity diagnostic --logger trx 
       - name: Cancel workflow runs for commit on error
         if: failure()
         uses: ./.github/.release/actions/actions/utils/fast-jobs-failure
@@ -88,7 +88,7 @@ jobs:
         run: |
           Copy-Item -Path "${{ github.workspace }}/sdk-specifications/features/access/*" -Destination "${{ github.workspace }}/src/UnitTests/AcceptanceTests/Features" -Recurse
           cd ./UnitTests/AcceptanceTests 
-          dotnet test --no-build --verbosity normal --logger trx --results-directory ./results
+          dotnet test --no-build --verbosity diagnostic --logger trx --results-directory ./results
       - name: Upload acceptance tests reports
         if: always()
         uses: actions/upload-artifact@v3
