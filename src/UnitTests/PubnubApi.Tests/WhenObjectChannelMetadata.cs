@@ -213,6 +213,8 @@ namespace PubNubMessaging.Tests
                 #endregion
                 manualEvent.WaitOne(manualResetEventWaitTimeout);
             }
+            
+            Debug.WriteLine("---TEST---");
 
             if (!receivedMessage)
             {
