@@ -67,7 +67,7 @@ namespace PubnubApi
 			this.EventEmitter.RemoveListener(listener, this.ChannelNames.ToArray(), this.ChannelGroupNames.ToArray());
 		}
 
-		public void UnSubscribe<T>()
+		public void Unsubscribe<T>()
 		{
 			this.Pubnub.Unsubscribe<T>().Channels(ChannelNames.ToArray()).ChannelGroups(ChannelGroupNames.ToArray()).Execute();
 		}
