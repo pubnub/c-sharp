@@ -17,15 +17,15 @@ namespace PubnubApi.EventEngine.Subscribe
 		private readonly Dictionary<string, Type> channelGroupTypeMap = new Dictionary<string, Type>();
 		private readonly IJsonPluggableLibrary jsonPluggableLibrary;
 
-		public string[] Channels { get; set; } = new string[] {};
-		public string[] Channelgroups { get; set; } = new string[] {};
+		public List<string> Channels { get; set; } = new List<string>();
+		public List<string> ChannelGroups { get; set; } = new List<string>();
 
 		internal SubscribeEventEngine(Pubnub pubnubInstance,
 			PNConfiguration pubnubConfiguration,
 			SubscribeManager2 subscribeManager,
-            EventEmitter eventEmitter,
+			EventEmitter eventEmitter,
 			IJsonPluggableLibrary jsonPluggableLibrary,
-            Action<Pubnub, PNStatus> statusListener = null)
+			Action<Pubnub, PNStatus> statusListener = null)
 		{
 			this.subscribeManager = subscribeManager;
 			this.jsonPluggableLibrary = jsonPluggableLibrary;
@@ -55,27 +55,25 @@ namespace PubnubApi.EventEngine.Subscribe
 		}
 		public void Subscribe<T>(string[] channels, string[] channelGroups, SubscriptionCursor cursor)
 		{
-			foreach (var c in channels)
-			{
+			Channels.AddRange(channels);
+			ChannelGroups.AddRange(channelGroups);
+
+			foreach (var c in channels) {
 				channelTypeMap[c] = typeof(T);
 			}
-			foreach (var c in channelGroups)
-			{
+			foreach (var c in channelGroups) {
 				channelGroupTypeMap[c] = typeof(T);
 			}
-			if (cursor != null)
-			{
+			if (cursor != null) {
 				EventQueue.Enqueue(new SubscriptionRestoredEvent() {
-					Channels = Channels.Concat(channels ?? new string[] {}),
-					ChannelGroups = Channelgroups.Concat(channelGroups ?? new string[] {}),
+					Channels = Channels.Concat(channels ?? new string[] { }).Distinct(),
+					ChannelGroups = ChannelGroups.Concat(channelGroups ?? new string[] { }).Distinct(),
 					Cursor = cursor
 				});
-			}
-			else
-			{
+			} else {
 				EventQueue.Enqueue(new SubscriptionChangedEvent() {
-					Channels = Channels.Concat(channels??new string[] {}),
-					ChannelGroups = Channelgroups.Concat(channelGroups?? new string[] {})
+					Channels = Channels.Concat(channels ?? new string[] { }).Distinct(),
+					ChannelGroups = ChannelGroups.Concat(channelGroups ?? new string[] { }).Distinct()
 				});
 			}
 		}
@@ -84,7 +82,7 @@ namespace PubnubApi.EventEngine.Subscribe
 		{
 			Subscribe<string>(channels, channelGroups, cursor);
 		}
-		
+
 		public void UnsubscribeAll()
 		{
 			EventQueue.Enqueue(new UnsubscribeAllEvent());
@@ -92,17 +90,9 @@ namespace PubnubApi.EventEngine.Subscribe
 
 		public void Unsubscribe(string[] channels, string[] channelGroups)
 		{
-			var channelNames = new List<string>();
-			var groupNames = new List<string>();
-			foreach (var channel in channels?? Enumerable.Empty<string>()) {
-				channelNames.Add($"{channel}-pnpres");
-			}
-			foreach (var cg in channelGroups ?? Enumerable.Empty<string>()) {
-				groupNames.Add($"{cg}-pnpres");
-			}
 			this.EventQueue.Enqueue(new SubscriptionChangedEvent() {
-				Channels = (this.currentState as SubscriptionState).Channels?.Except(channels?.Union(channelNames)??Enumerable.Empty<string>()),
-				ChannelGroups = (this.currentState as SubscriptionState).ChannelGroups?.Except(channelGroups?.Union(groupNames)??Enumerable.Empty<string>())
+				Channels = this.Channels?.Except(channels ?? Enumerable.Empty<string>()),
+				ChannelGroups = this.ChannelGroups?.Except(channelGroups ?? Enumerable.Empty<string>())
 			});
 		}
 	}

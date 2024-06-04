@@ -30,6 +30,7 @@ namespace PubnubApi.EndPoint
         private SubscribeEventEngineFactory subscribeEventEngineFactory;
         private PresenceOperation<T> presenceOperation;
         private string instanceId { get; set; }
+        public EventEmitter EventEmitter { get; set; }
 		public List<SubscribeCallback> SubscribeListenerList
         {
             get;
@@ -126,8 +127,7 @@ namespace PubnubApi.EndPoint
 				subscribeEventEngine = subscribeEventEngineFactory.GetEventEngine(instanceId);
 			} else {
 				var subscribeManager = new SubscribeManager2(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, PubnubInstance);
-                var eventEmitter = new EventEmitter(config, SubscribeListenerList, jsonLibrary, pubnubTokenMgr, pubnubLog, PubnubInstance);
-				subscribeEventEngine = subscribeEventEngineFactory.InitializeEventEngine(instanceId, PubnubInstance, config, subscribeManager, eventEmitter, jsonLibrary, StatusEmitter);
+				subscribeEventEngine = subscribeEventEngineFactory.InitializeEventEngine(instanceId, PubnubInstance, config, subscribeManager, this.EventEmitter, jsonLibrary, StatusEmitter);
 				subscribeEventEngine.OnStateTransition += SubscribeEventEngine_OnStateTransition;
 				subscribeEventEngine.OnEventQueued += SubscribeEventEngine_OnEventQueued;
 				subscribeEventEngine.OnEffectDispatch += SubscribeEventEngine_OnEffectDispatch;

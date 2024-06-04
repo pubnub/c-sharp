@@ -213,6 +213,12 @@
     <Compile Include="..\PubnubApi\EventEngine\Presence\Effects\HeartbeatEffectHandler.cs" Link="EventEngine\Presence\Effects\HeartbeatEffectHandler.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Presence\Effects\LeaveEffectHandler.cs" Link="EventEngine\Presence\Effects\LeaveEffectHandler.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Presence\Effects\WaitEffectHandler.cs" Link="EventEngine\Presence\Effects\WaitEffectHandler.cs" />
+    <Compile Include="..\PubnubApi\Entity\Channel.cs" Link="Entity\Channel.cs" />
+    <Compile Include="..\PubnubApi\Entity\ChannelGroup.cs" Link="Entity\ChannelGroup.cs" />
+    <Compile Include="..\PubnubApi\Entity\Subscription.cs" Link="Entity\Subscription.cs" />
+    <Compile Include="..\PubnubApi\Entity\SubscriptionSet.cs" Link="Entity\SubscriptionSet.cs" />
+    <Compile Include="..\PubnubApi\Entity\SubscriptionOptions.cs" Link="Entity\SubscriptionOptions.cs" />
+    <Compile Include="..\PubnubApi\Entity\SubscribeCapable.cs" Link="Entity\SubscribeCapable.cs" />
     <Compile Include="..\PubnubApi\EndPoint\PubSub\UnsubscribeAllOperation.cs">
       <Link>EndPoint\PubSub\UnsubscribeAllOperation.cs</Link>
     </Compile>

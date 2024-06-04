@@ -277,6 +277,7 @@
     <Compile Include="..\PubnubApi\Entity\Subscription.cs" Link="Entity\Subscription.cs" />
     <Compile Include="..\PubnubApi\Entity\SubscriptionSet.cs" Link="Entity\SubscriptionSet.cs" />
     <Compile Include="..\PubnubApi\Entity\SubscriptionOptions.cs" Link="Entity\SubscriptionOptions.cs" />
+    <Compile Include="..\PubnubApi\Entity\SubscribeCapable.cs" Link="Entity\SubscribeCapable.cs" />
     <Compile Include="..\PubnubApi\Helper\MobilePushHelper.cs" Link="Helper\MobilePushHelper.cs" />
     <Compile Include="..\PubnubApi\HttpUtility\HttpUtility.cs">
       <Link>HttpUtility\HttpUtility.cs</Link>
