@@ -973,6 +973,8 @@ namespace PubnubApi
 
         public Channel Channel(string name) => new Channel(name, this, eventEmitter);
         public ChannelGroup ChannelGroup(string name) => new ChannelGroup(name, this, eventEmitter);
+        public ChannelMetadata ChannelMetadata(string id) => new ChannelMetadata(id, this, eventEmitter);
+        public UserMetadata UserMetadata(string id) => new UserMetadata(id, this, eventEmitter);
 
         public SubscriptionSet SubscriptionSet(string[] channels, string[] channelGroups, SubscriptionOptions options) => new SubscriptionSet(channels, channelGroups, options, this, eventEmitter);
 

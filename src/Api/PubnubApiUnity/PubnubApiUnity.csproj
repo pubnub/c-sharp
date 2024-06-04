@@ -214,6 +214,8 @@
     <Compile Include="..\PubnubApi\EventEngine\Presence\Effects\LeaveEffectHandler.cs" Link="EventEngine\Presence\Effects\LeaveEffectHandler.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Presence\Effects\WaitEffectHandler.cs" Link="EventEngine\Presence\Effects\WaitEffectHandler.cs" />
     <Compile Include="..\PubnubApi\Entity\Channel.cs" Link="Entity\Channel.cs" />
+    <Compile Include="..\PubnubApi\Entity\ChannelMetadata.cs" Link="Entity\ChannelMetadata.cs" />
+    <Compile Include="..\PubnubApi\Entity\UserMetadata.cs" Link="Entity\UserMetadata.cs" />
     <Compile Include="..\PubnubApi\Entity\ChannelGroup.cs" Link="Entity\ChannelGroup.cs" />
     <Compile Include="..\PubnubApi\Entity\Subscription.cs" Link="Entity\Subscription.cs" />
     <Compile Include="..\PubnubApi\Entity\SubscriptionSet.cs" Link="Entity\SubscriptionSet.cs" />
