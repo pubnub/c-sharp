@@ -26,6 +26,15 @@ namespace PubnubApi
 			objectEventAction = null;
 			fileAction = null;
 		}
+		public SubscribeCallbackExt(Action<Pubnub, PNStatus> statusCallback)
+		{
+			subscribeAction = null;
+			presenceAction = null;
+			statusAction = statusCallback;
+			signalAction = null;
+			objectEventAction = null;
+			fileAction = null;
+		}
 		public SubscribeCallbackExt(Action<Pubnub, PNMessageResult<object>> messageCallback, Action<Pubnub, PNPresenceEventResult> presenceCallback, Action<Pubnub, PNStatus> statusCallback)
 		{
 			subscribeAction = messageCallback;
@@ -130,6 +139,23 @@ namespace PubnubApi
 			statusAction = statusCallback;
 			signalAction = signalCallback;
 			objectEventAction = objectEventCallback;
+		}
+
+		public SubscribeCallbackExt(Action<Pubnub, PNMessageResult<object>> messageCallback,
+			Action<Pubnub, PNPresenceEventResult> presenceCallback,
+			Action<Pubnub, PNSignalResult<object>> signalCallback,
+			Action<Pubnub, PNObjectEventResult> objectEventCallback,
+			Action<Pubnub, PNMessageActionEventResult> messageActionCallback,
+			Action<Pubnub, PNFileEventResult> fileCallback
+			)
+		{
+			subscribeAction = messageCallback;
+			presenceAction = presenceCallback;
+			statusAction = null;
+			signalAction = signalCallback;
+			messageAction = messageActionCallback;
+			objectEventAction = objectEventCallback;
+			fileAction = fileCallback;
 		}
 
 		public SubscribeCallbackExt(Action<Pubnub, PNMessageResult<object>> messageCallback,

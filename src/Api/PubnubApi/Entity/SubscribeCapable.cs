@@ -11,7 +11,7 @@ namespace PubnubApi
 		public abstract List<string> ChannelGroupNames { get; set; }
 		public abstract Pubnub Pubnub { get; set; }
 		public abstract EventEmitter EventEmitter { get; set; }
-		public abstract SubscriptionOptions Options { get; set; }
+		public abstract SubscriptionOptions? Options { get; set; }
 		public abstract SubscribeCallbackExt Listener { get; set; }
 
 		public Action<Pubnub, PNPresenceEventResult> OnPresence {
@@ -57,12 +57,12 @@ namespace PubnubApi
 			}
 		}
 
-		public void AddListener(SubscribeCallbackExt listener)
+		public void AddListener(SubscribeCallback listener)
 		{
 			this.EventEmitter.AddListener(listener, this.ChannelNames.ToArray(), this.ChannelGroupNames.ToArray());
 		}
 
-		public void RemoveListener(SubscribeCallbackExt listener)
+		public void RemoveListener(SubscribeCallback listener)
 		{
 			this.EventEmitter.RemoveListener(listener, this.ChannelNames.ToArray(), this.ChannelGroupNames.ToArray());
 		}

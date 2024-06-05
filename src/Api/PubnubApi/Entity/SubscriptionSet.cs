@@ -12,11 +12,11 @@ namespace PubnubApi
 		public override List<string> ChannelGroupNames { get; set; } = new List<string>();
 		public override Pubnub Pubnub { get; set; }
 		public override EventEmitter EventEmitter { get; set; }
-		public override SubscriptionOptions Options { get; set; }
+		public override SubscriptionOptions? Options { get; set; }
 		List<Subscription> SubscriptionList { get; set; } = new List<Subscription>();
 		public override SubscribeCallbackExt Listener { get; set; } = new SubscribeCallbackExt();
 
-		public SubscriptionSet(string[] channels, string[] channelGroups, SubscriptionOptions options, Pubnub pubnub, EventEmitter eventEmitter)
+		public SubscriptionSet(string[] channels, string[] channelGroups, SubscriptionOptions? options, Pubnub pubnub, EventEmitter eventEmitter)
 		{
 			this.Pubnub = pubnub;
 			this.EventEmitter = eventEmitter;
