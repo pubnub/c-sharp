@@ -17,7 +17,7 @@ namespace PubnubApi
 
 		public Subscription Subscription(SubscriptionOptions options = SubscriptionOptions.None)
 		{
-			return new Subscription(options == SubscriptionOptions.ReceivePresenceEvents ? new string[] { Id, $"{Id}-pnpres" } : new string[] { Id }, new string[] { }, options, this.Pubnub, this.EventEmitter);
+			return new Subscription(options == SubscriptionOptions.ReceivePresenceEvents ? new string[] { Id, $"{Id}{Constants.Pnpres}" } : new string[] { Id }, new string[] { }, options, this.Pubnub, this.EventEmitter);
 		}
 	}
 }

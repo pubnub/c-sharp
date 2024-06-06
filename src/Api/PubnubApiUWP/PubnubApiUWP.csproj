@@ -724,6 +724,9 @@
     <Compile Include="..\PubnubApi\Push\Mpns\MpnsToastNotification.cs">
       <Link>Push\Mpns\MpnsToastNotification.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Constants.cs">
+      <Link>Constants.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\Security\Crypto\CryptoModule.cs">
       <Link>Security\Crypto\CryptoModule.cs</Link>
     </Compile>

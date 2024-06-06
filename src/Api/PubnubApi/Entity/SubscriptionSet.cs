@@ -23,14 +23,14 @@ namespace PubnubApi
 			this.Options = options;
 
 			foreach (var c in channels
-				.Where(c => !c.EndsWith("-pnpres"))) {
+				.Where(c => !c.EndsWith(Constants.Pnpres))) {
 				var subscription = this.Pubnub.Channel(c).Subscription(this.Options);
 				this.ChannelNames.AddRange(subscription.ChannelNames);
 				this.SubscriptionList.Add(subscription);
 			}
 
 			foreach (var cg in channelGroups
-				.Where(cg => !cg.EndsWith("-pnpres"))) {
+				.Where(cg => !cg.EndsWith(Constants.Pnpres))) {
 				var subscription = this.Pubnub.ChannelGroup(cg).Subscription(this.Options);
 				this.ChannelGroupNames.AddRange(subscription.ChannelGroupNames);
 				this.SubscriptionList.Add(subscription);

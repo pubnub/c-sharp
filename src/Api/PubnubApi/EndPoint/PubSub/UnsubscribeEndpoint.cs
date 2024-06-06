@@ -78,12 +78,12 @@ namespace PubnubApi.EndPoint
 				subscribeEventEngine = subscribeEventEngineFactory.GetEventEngine(instanceId);
 				channels = channels ?? new string[] { };
 				channelGroups = channelGroups ?? new string[] { };
-				var channelsWithPresence = channels.Concat(channels.Select((c) => $"{c}-pnpres")).ToList();
+				var channelsWithPresence = channels.Concat(channels.Select((c) => $"{c}{Constants.Pnpres}")).ToList();
 				var filteredChannelNames = new List<string>(subscribeEventEngine.Channels);
 				foreach (var c in channelsWithPresence) {
 					filteredChannelNames.Remove(c);
 				}
-				var channelGroupsWithPresence = channelGroups.Concat(channelGroups.Select((cg) => $"{cg}-pnpres")).ToList();
+				var channelGroupsWithPresence = channelGroups.Concat(channelGroups.Select((cg) => $"{cg}{Constants.Pnpres}")).ToList();
 				var filteredChannelGroupNames = new List<string>(subscribeEventEngine.ChannelGroups);
 				foreach (var g in channelGroupsWithPresence) {
 					filteredChannelGroupNames.Remove(g);

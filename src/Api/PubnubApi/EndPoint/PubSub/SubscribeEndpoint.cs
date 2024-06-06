@@ -5,7 +5,6 @@ using System.Globalization;
 using PubnubApi.EventEngine.Subscribe;
 using PubnubApi.EventEngine.Core;
 using PubnubApi.EventEngine.Subscribe.States;
-using PubnubApi.EventEngine.Subscribe.Common;
 using PubnubApi.EventEngine.Common;
 
 namespace PubnubApi.EndPoint
@@ -134,7 +133,7 @@ namespace PubnubApi.EndPoint
 			}
 			subscribeEventEngine.Subscribe<T>(channels, channelGroups, cursor);
 			if (this.presenceOperation != null) {
-				presenceOperation.Start(channels?.Where(c => !c.EndsWith("-pnpres")).ToArray(), channelGroups?.Where(cg => !cg.EndsWith("-pnpres")).ToArray());
+				presenceOperation.Start(channels?.Where(c => !c.EndsWith(Constants.Pnpres)).ToArray(), channelGroups?.Where(cg => !cg.EndsWith(Constants.Pnpres)).ToArray());
 			}
 		}
 

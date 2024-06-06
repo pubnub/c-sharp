@@ -605,6 +605,9 @@
     <Compile Include="..\PubnubApi\Push\Mpns\MpnsToastNotification.cs">
       <Link>Push\Mpns\MpnsToastNotification.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Constants.cs">
+      <Link>Constants.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\Security\Crypto\Common\ByteArrayExtensions.cs" Link="Security\Crypto\Common\ByteArrayExtensions.cs" />
     <Compile Include="..\PubnubApi\Security\Crypto\Common\Util.cs" Link="Security\Crypto\Common\Util.cs" />
     <Compile Include="..\PubnubApi\Security\Crypto\CryptoModule.cs" Link="Security\Crypto\CryptoModule.cs" />
