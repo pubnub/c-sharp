@@ -6,6 +6,7 @@ using PubnubApi.EndPoint;
 using PubnubApi.EventEngine.Subscribe.Common;
 using PubnubApi.Security.Crypto;
 using PubnubApi.Security.Crypto.Cryptors;
+using Newtonsoft.Json.Linq;
 
 namespace PubnubApi.EventEngine.Common
 {
@@ -95,14 +96,21 @@ namespace PubnubApi.EventEngine.Common
 			if (currentMessageChannel.Replace("-pnpres", "") == currentMessageChannelGroup?.Replace("-pnpres", "")) {
 				currentMessageChannelGroup = "";
 			}
-			object payload = eventData.Payload;
+			object payload;
+			string payloadAsString = eventData.Payload as string;
+			if (payloadAsString != null) {
+				var jsonObject = jsonLibrary.BuildJsonObject(payloadAsString.ToString());
+				payload = jsonObject ?? payloadAsString;
+			} else {
+				payload = eventData.Payload;
+			}
 			List<object> payloadContainer = new List<object>(); //First item always message
 			if (currentMessageChannel.Contains("-pnpres") || currentMessageChannel.Contains(".*-pnpres")) {
 				payloadContainer.Add(payload);
 			} else if (eventData.MessageType == 2) //Objects Simplification events
 			  {
 				double objectsVersion = -1;
-				Dictionary<string, object> objectsDic = payload as Dictionary<string, object>;
+				Dictionary<string, object> objectsDic = payload as Dictionary<string, object> ?? (payload as JObject).ToObject<Dictionary<string, object>>();
 				if (objectsDic != null
 					&& objectsDic.ContainsKey("source")
 					&& objectsDic.ContainsKey("version")
@@ -114,10 +122,10 @@ namespace PubnubApi.EventEngine.Common
 					}
 				}
 			} else {
-				if ((configuration.CryptoModule != null || configuration.CipherKey.Length > 0) && eventData.MessageType != 1) //decrypt the subscriber message if cipherkey is available
+				if ((configuration.CryptoModule != null || configuration.CipherKey.Length > 0) && (eventData.MessageType == 0 || eventData.MessageType == 4)) //decrypt the subscriber message if cipherkey is available
 				{
 					string decryptMessage = "";
-					configuration.CryptoModule ??= new CryptoModule(new LegacyCryptor(configuration.CipherKey, configuration.UseRandomInitializationVector, log), null);
+					configuration.CryptoModule ??= new CryptoModule(new AesCbcCryptor(configuration.CipherKey, log), new List<ICryptor>() { new LegacyCryptor(configuration.CipherKey, configuration.UseRandomInitializationVector) });
 					try {
 						decryptMessage = configuration.CryptoModule.Decrypt(payload.ToString());
 					} catch (Exception ex) {
@@ -150,7 +158,7 @@ namespace PubnubApi.EventEngine.Common
 
 			payloadContainer.Add(userMetaData); //Second one always user meta data
 
-			payloadContainer.Add(GetTimetokenMetadata(eventData.PublishMetadata)); //Third one always Timetoken
+			payloadContainer.Add(GetTimetokenMetadata(eventData.PublishMetadata).Timetoken); //Third one always Timetoken
 
 			payloadContainer.Add(eventData.IssuingClientId); //Fourth one always Publisher
 
@@ -183,7 +191,7 @@ namespace PubnubApi.EventEngine.Common
 							l?.Signal(instance, signalMessage);
 						}
 					}
-					if (!string.IsNullOrEmpty(signalMessage.Subscription) && channelListenersMap.ContainsKey(signalMessage.Subscription)) {
+					if (!string.IsNullOrEmpty(signalMessage.Subscription) && channelGroupListenersMap.ContainsKey(signalMessage.Subscription)) {
 						foreach (var l in channelGroupListenersMap[signalMessage.Subscription]) {
 							l?.Signal(instance, signalMessage);
 						}
@@ -201,6 +209,11 @@ namespace PubnubApi.EventEngine.Common
 							l?.ObjectEvent(instance, objectApiEvent);
 						}
 					}
+					if (!string.IsNullOrEmpty(objectApiEvent.Subscription) && channelGroupListenersMap.ContainsKey(objectApiEvent.Subscription)) {
+						foreach (var l in channelGroupListenersMap[objectApiEvent.Subscription]) {
+							l?.ObjectEvent(instance, objectApiEvent);
+						}
+					}
 				}
 			} else if (eventData.MessageType == 3) {
 				ResponseBuilder responseBuilder = new ResponseBuilder(configuration, jsonLibrary, log);
@@ -211,6 +224,11 @@ namespace PubnubApi.EventEngine.Common
 					}
 					if (!string.IsNullOrEmpty(messageActionEvent.Channel) && channelListenersMap.ContainsKey(messageActionEvent.Channel)) {
 						foreach (var l in channelListenersMap[messageActionEvent.Channel]) {
+							l?.MessageAction(instance, messageActionEvent);
+						}
+					}
+					if (!string.IsNullOrEmpty(messageActionEvent.Subscription) && channelGroupListenersMap.ContainsKey(messageActionEvent.Subscription)) {
+						foreach (var l in channelGroupListenersMap[messageActionEvent.Subscription]) {
 							l?.MessageAction(instance, messageActionEvent);
 						}
 					}
@@ -253,7 +271,7 @@ namespace PubnubApi.EventEngine.Common
 							l?.File(instance, fileMessage);
 						}
 					}
-					if (!string.IsNullOrEmpty(fileMessage.Subscription) && channelListenersMap.ContainsKey(fileMessage.Subscription)) {
+					if (!string.IsNullOrEmpty(fileMessage.Subscription) && channelGroupListenersMap.ContainsKey(fileMessage.Subscription)) {
 						foreach (var l in channelGroupListenersMap[fileMessage.Subscription]) {
 							l?.File(instance, fileMessage);
 						}
@@ -271,7 +289,7 @@ namespace PubnubApi.EventEngine.Common
 							l?.Presence(instance, presenceEvent);
 						}
 					}
-					if (!string.IsNullOrEmpty(presenceEvent.Subscription) && channelListenersMap.ContainsKey(presenceEvent.Subscription)) {
+					if (!string.IsNullOrEmpty(presenceEvent.Subscription) && channelGroupListenersMap.ContainsKey(presenceEvent.Subscription)) {
 						foreach (var l in channelGroupListenersMap[presenceEvent.Subscription]) {
 							l?.Presence(instance, presenceEvent);
 						}
@@ -290,7 +308,7 @@ namespace PubnubApi.EventEngine.Common
 							l?.Message(instance, message);
 						}
 					}
-					if (!string.IsNullOrEmpty(message.Subscription) && channelListenersMap.ContainsKey(message.Subscription)) {
+					if (!string.IsNullOrEmpty(message.Subscription) && channelGroupListenersMap.ContainsKey(message.Subscription)) {
 						foreach (var l in channelGroupListenersMap[message.Subscription]) {
 							l?.Message(instance, message);
 						}

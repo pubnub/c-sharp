@@ -19,5 +19,6 @@ namespace PubnubApi
         public PNChannelMetadataResult ChannelMetadata { get; internal set; } //Populate when Type = channel
         public long Timestamp { get; internal set; }
         public string Channel { get; internal set; } //Subscribed channel
+        public string Subscription { get; internal set; }
     }
 }
