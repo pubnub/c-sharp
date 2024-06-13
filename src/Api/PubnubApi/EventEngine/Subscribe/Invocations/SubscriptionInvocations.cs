@@ -17,6 +17,7 @@ namespace PubnubApi.EventEngine.Subscribe.Invocations {
 		// TODO merge status variables into one?
 		public PNStatusCategory StatusCategory;
 		public PNStatus Status;
+		public int StatusCode;
 		public string Name { get; set; } = "EMIT_STATUS";
 
 		public EmitStatusInvocation(PNStatus status)
@@ -25,6 +26,7 @@ namespace PubnubApi.EventEngine.Subscribe.Invocations {
 			if (status != null)
 			{
 				this.StatusCategory = status.Category;
+				this.StatusCode = status.StatusCode;
 			}
 		}
 
