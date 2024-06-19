@@ -12,38 +12,15 @@ namespace PubnubApi
 		public abstract Pubnub Pubnub { get; set; }
 		public abstract EventEmitter EventEmitter { get; set; }
 		public abstract SubscriptionOptions? Options { get; set; }
-		public abstract SubscribeCallbackExt Listener { get; set; }
+		protected abstract SubscribeCallbackExt Listener { get; set; }
 
-		public Action<Pubnub, PNPresenceEventResult> OnPresence {
-			set {
-				Listener.presenceAction = value;
-			}
-		}
-		public Action<Pubnub, PNObjectEventResult> OnObjects {
-			set {
-				Listener.objectEventAction = value;
-			}
-		}
-		public Action<Pubnub, PNFileEventResult> OnFile {
-			set {
-				Listener.fileAction = value;
-			}
-		}
-		public Action<Pubnub, PNMessageActionEventResult> OnMessageAction {
-			set {
-				Listener.messageAction = value;
-			}
-		}
-		public Action<Pubnub, PNMessageResult<object>> OnMessage {
-			set {
-				Listener.subscribeAction = value;
-			}
-		}
-		public Action<Pubnub, PNSignalResult<object>> OnSignal {
-			set {
-				Listener.signalAction = value;
-			}
-		}
+		public abstract event Action<Pubnub, PNMessageResult<object>> onMessage;
+		public abstract event Action<Pubnub, PNPresenceEventResult> onPresence;
+		public abstract event Action<Pubnub, PNSignalResult<object>> onSignal;
+		public abstract event Action<Pubnub, PNObjectEventResult> onObject;
+		public abstract event Action<Pubnub, PNMessageActionEventResult> onMessageAction;
+		public abstract event Action<Pubnub, PNFileEventResult> onFile;
+		public abstract event Action<Pubnub, PNStatus> onStatus;
 
 		public void Subscribe<T>(SubscriptionCursor cursor = null)
 		{

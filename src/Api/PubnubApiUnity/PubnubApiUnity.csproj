@@ -583,6 +583,9 @@
     <Compile Include="..\PubnubApi\Proxy\PubnubProxy.cs">
       <Link>Proxy\PubnubProxy.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\EventListener.cs">
+      <Link>EventListener.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\Pubnub.cs">
       <Link>Pubnub.cs</Link>
     </Compile>
