@@ -98,11 +98,11 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
             var retryConfiguration = pubnubConfiguration.RetryConfiguration;
 			if (retryConfiguration == null)
             {
-                eventQueue.Enqueue(new ReceiveReconnectGiveUpEvent() { Status = new PNStatus(new Exception(""), PNOperationType.PNSubscribeOperation, PNStatusCategory.PNUnexpectedDisconnectCategory, invocation.Channels, invocation.ChannelGroups ) });
+                eventQueue.Enqueue(new ReceiveReconnectGiveUpEvent() { Status = new PNStatus(new Exception(""), PNOperationType.PNSubscribeOperation, PNStatusCategory.PNUnexpectedDisconnectCategory, invocation.Channels, invocation.ChannelGroups, invocation.Reason.StatusCode ) });
             }
 			else if (!retryConfiguration.RetryPolicy.ShouldRetry(invocation.AttemptedRetries, invocation.Reason))
             {
-				eventQueue.Enqueue(new ReceiveReconnectGiveUpEvent() { Status = new PNStatus(new Exception(""), PNOperationType.PNSubscribeOperation, PNStatusCategory.PNUnexpectedDisconnectCategory, invocation.Channels, invocation.ChannelGroups ) });
+				eventQueue.Enqueue(new ReceiveReconnectGiveUpEvent() { Status = new PNStatus(new Exception(""), PNOperationType.PNSubscribeOperation, PNStatusCategory.PNUnexpectedDisconnectCategory, invocation.Channels, invocation.ChannelGroups, invocation.Reason.StatusCode ) });
 			}
             else
             {
