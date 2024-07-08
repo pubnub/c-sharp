@@ -16,7 +16,6 @@ namespace PubnubApi.EndPoint
         private readonly IJsonPluggableLibrary jsonLibrary;
         private readonly IPubnubUnitTest unit;
         private readonly IPubnubLog pubnubLog;
-        private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 
         private string channelMetadataId = "";
         private int limit = -1;
@@ -29,13 +28,12 @@ namespace PubnubApi.EndPoint
         private PNCallback<PNChannelMembersResult> savedCallback;
         private Dictionary<string, object> queryParam;
 
-        public GetChannelMembersOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
+        public GetChannelMembersOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
             pubnubLog = log;
-            pubnubTelemetryMgr = telemetryManager;
 
             if (instance != null)
             {
@@ -156,7 +154,7 @@ namespace PubnubApi.EndPoint
             if (page == null) { internalPage = new PNPageObject(); }
             else { internalPage = page; }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
             
             Uri request = urlBuilder.BuildGetAllMembersRequest("GET", "", spaceId, internalPage.Next, internalPage.Prev, limit, includeCount, includeOptions, filter, sort, externalQueryParam);
 
@@ -193,7 +191,7 @@ namespace PubnubApi.EndPoint
             if (page == null) { internalPage = new PNPageObject(); }
             else { internalPage = page; }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
             
             Uri request = urlBuilder.BuildGetAllMembersRequest("GET", "", spaceId, internalPage.Next, internalPage.Prev, limit, includeCount, includeOptions, filter, sort, externalQueryParam);
 

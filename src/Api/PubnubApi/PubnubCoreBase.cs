@@ -46,7 +46,6 @@ namespace PubnubApi
         private static IJsonPluggableLibrary jsonLib;
         private static IPubnubUnitTest unitTest;
         private static ConcurrentDictionary<string, IPubnubLog> pubnubLog { get; } = new ConcurrentDictionary<string, IPubnubLog>();
-        private static EndPoint.TelemetryManager pubnubTelemetryMgr;
         protected static ConcurrentDictionary<string, EndPoint.TokenManager> PubnubTokenMgrCollection { get; } = new ConcurrentDictionary<string, EndPoint.TokenManager>();
         private static EndPoint.DuplicationManager pubnubSubscribeDuplicationManager { get; set; }
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
@@ -149,7 +148,7 @@ namespace PubnubApi
             set;
         } = new ConcurrentDictionary<string, DateTime>();
 
-        protected PubnubCoreBase(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance)
+        protected PubnubCoreBase(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance)
         {
             if (pubnubConfiguation == null)
             {
@@ -158,15 +157,15 @@ namespace PubnubApi
             
             if (jsonPluggableLibrary == null)
             {
-                InternalConstructor(pubnubConfiguation, new NewtonsoftJsonDotNet(pubnubConfiguation,log), pubnubUnitTest, log, telemetryManager, tokenManager, instance);
+                InternalConstructor(pubnubConfiguation, new NewtonsoftJsonDotNet(pubnubConfiguation,log), pubnubUnitTest, log, tokenManager, instance);
             }
             else
             {
-                InternalConstructor(pubnubConfiguation, jsonPluggableLibrary, pubnubUnitTest, log, telemetryManager, tokenManager, instance);
+                InternalConstructor(pubnubConfiguation, jsonPluggableLibrary, pubnubUnitTest, log, tokenManager, instance);
             }
         }
 
-        private void InternalConstructor(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance)
+        private void InternalConstructor(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance)
         {
             PubnubInstance = instance;
             pubnubConfig.AddOrUpdate(instance.InstanceId, pubnubConfiguation, (k,o)=> pubnubConfiguation);
@@ -174,7 +173,6 @@ namespace PubnubApi
             unitTest = pubnubUnitTest;
             pubnubLog.AddOrUpdate(instance.InstanceId, log, (k, o) => log);
             PubnubTokenMgrCollection.AddOrUpdate(instance.InstanceId, tokenManager, (k,o)=> tokenManager);
-            pubnubTelemetryMgr = telemetryManager;
             pubnubSubscribeDuplicationManager = new EndPoint.DuplicationManager(pubnubConfiguation, jsonPluggableLibrary, log);
 
             CurrentUserId.AddOrUpdate(instance.InstanceId, pubnubConfiguation.UserId, (k,o) => pubnubConfiguation.UserId);
@@ -222,9 +220,9 @@ namespace PubnubApi
                 httpClientNonsubscribe.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 httpClientNonsubscribe.Timeout = TimeSpan.FromSeconds(pubnubConfiguation.NonSubscribeRequestTimeout);
             }
-            pubnubHttp = new PubnubHttp(pubnubConfiguation, jsonLib, log, pubnubTelemetryMgr, httpClientSubscribe, httpClientNonsubscribe);
+            pubnubHttp = new PubnubHttp(pubnubConfiguation, jsonLib, log, httpClientSubscribe, httpClientNonsubscribe);
 #else
-            pubnubHttp = new PubnubHttp(pubnubConfiguation, jsonLib, log, pubnubTelemetryMgr);
+            pubnubHttp = new PubnubHttp(pubnubConfiguation, jsonLib, log);
 #endif
 
 
@@ -836,7 +834,7 @@ namespace PubnubApi
                                                     if (fileObjDic != null && fileObjDic.ContainsKey("id") && fileObjDic.ContainsKey("name"))
                                                     {
                                                         fileMessage.File = new PNFile { Id = fileObjDic["id"].ToString(), Name = fileObjDic["name"].ToString() };
-                                                        IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(currentConfig, jsonLib, unitTest, currentLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+                                                        IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(currentConfig, jsonLib, unitTest, currentLog, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
                                                         Uri fileUrlRequest = urlBuilder.BuildGetFileUrlOrDeleteReqest("GET", "", fileMessage.Channel, fileMessage.File.Id, fileMessage.File.Name, null, type);
                                                         fileMessage.File.Url = fileUrlRequest.ToString();
                                                     }
@@ -2109,14 +2107,6 @@ namespace PubnubApi
             }
         }
 
-        protected static void TerminateTelemetry()
-        {
-            if (pubnubTelemetryMgr != null)
-            {
-                pubnubTelemetryMgr.Destroy();
-            }
-        }
-
         protected void TerminateTokenManagerCollection()
         {
             if (PubnubTokenMgrCollection != null && PubnubTokenMgrCollection.Count > 0)
@@ -2310,7 +2300,6 @@ namespace PubnubApi
             TerminateReconnectTimer();
             RemoveUserState();
             PubnubCoreBase.TerminatePresenceHeartbeatTimer();
-            TerminateTelemetry();
             TerminateDedupeManager();
             TerminateTokenManagerCollection();
 

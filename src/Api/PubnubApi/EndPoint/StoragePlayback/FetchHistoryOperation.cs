@@ -17,7 +17,6 @@ namespace PubnubApi.EndPoint
         private readonly IJsonPluggableLibrary jsonLibrary;
         private readonly IPubnubUnitTest unit;
         private readonly IPubnubLog pubnubLog;
-        private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 
         private bool reverseOption;
         private bool withMetaOption;
@@ -32,13 +31,12 @@ namespace PubnubApi.EndPoint
         private string[] channelNames;
         private PNCallback<PNFetchHistoryResult> savedCallback;
 
-        public FetchHistoryOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
+        public FetchHistoryOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
             pubnubLog = log;
-            pubnubTelemetryMgr = telemetryManager;
 
             PubnubInstance = instance;
 
@@ -194,7 +192,7 @@ namespace PubnubApi.EndPoint
             }
             string channel = string.Join(",", this.channelNames);
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
             
             Uri request = urlBuilder.BuildFetchRequest("GET", "", this.channelNames, this.startTimetoken, this.endTimetoken, this.perChannelCount, this.reverseOption, this.withMetaOption, this.withMessageActionsOption, this.withUuidOption, this.includeMessageType, this.queryParam);
 
@@ -225,7 +223,7 @@ namespace PubnubApi.EndPoint
             PNResult<PNFetchHistoryResult> ret = new PNResult<PNFetchHistoryResult>();
             string channel = string.Join(",", this.channelNames);
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
             
             Uri request = urlBuilder.BuildFetchRequest("GET", "", this.channelNames, this.startTimetoken, this.endTimetoken, this.perChannelCount, this.reverseOption, this.withMetaOption, this.withMessageActionsOption, this.withUuidOption, this.includeMessageType, this.queryParam);
 

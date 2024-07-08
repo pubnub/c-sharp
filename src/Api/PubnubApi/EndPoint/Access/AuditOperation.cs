@@ -17,7 +17,6 @@ namespace PubnubApi.EndPoint
         private readonly IJsonPluggableLibrary jsonLibrary;
         private readonly IPubnubUnitTest unit;
         private readonly IPubnubLog pubnubLog;
-        private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 
         private string channelName;
         private string channelGroupName;
@@ -25,13 +24,12 @@ namespace PubnubApi.EndPoint
         private PNCallback<PNAccessManagerAuditResult> savedCallback;
         private Dictionary<string, object> queryParam;
 
-        public AuditOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, null, instance)
+        public AuditOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, null, instance)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
             pubnubLog = log;
-            pubnubTelemetryMgr = telemetryManager;
         }
 
         public AuditOperation Channel(string channel)
@@ -113,7 +111,7 @@ namespace PubnubApi.EndPoint
 
             string authKeysCommaDelimited = (authKeys != null && authKeys.Length > 0) ? string.Join(",", authKeys.OrderBy(x => x).ToArray()) : "";
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
             Uri request = urlBuilder.BuildAuditAccessRequest("GET", "", channel, channelGroup, authKeysCommaDelimited, externalQueryParam);
 
             RequestState<PNAccessManagerAuditResult> requestState = new RequestState<PNAccessManagerAuditResult>();
@@ -154,7 +152,7 @@ namespace PubnubApi.EndPoint
 
             string authKeysCommaDelimited = (authKeys != null && authKeys.Length > 0) ? string.Join(",", authKeys.OrderBy(x => x).ToArray()) : "";
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
             Uri request = urlBuilder.BuildAuditAccessRequest("GET", "", channel, channelGroup, authKeysCommaDelimited, externalQueryParam);
 
             RequestState<PNAccessManagerAuditResult> requestState = new RequestState<PNAccessManagerAuditResult>();

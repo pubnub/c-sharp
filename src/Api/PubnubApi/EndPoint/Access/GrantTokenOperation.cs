@@ -18,7 +18,6 @@ namespace PubnubApi.EndPoint
         private readonly IJsonPluggableLibrary jsonLibrary;
         private readonly IPubnubUnitTest unit;
         private readonly IPubnubLog pubnubLog;
-        private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 
         private PNTokenResources pubnubResources = new PNTokenResources
         { 
@@ -44,13 +43,12 @@ namespace PubnubApi.EndPoint
         private string pubnubAuthorizedUuid = string.Empty;
         private string pubnubAuthorizedUserId = string.Empty;
 
-        public GrantTokenOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
+        public GrantTokenOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
             pubnubLog = log;
-            pubnubTelemetryMgr = telemetryManager;
             PubnubInstance = instance;
 
             InitializeDefaultVariableObjectStates();
@@ -326,7 +324,7 @@ namespace PubnubApi.EndPoint
             string requestMethodName = "POST";
             string postMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
             byte[] postData = Encoding.UTF8.GetBytes(postMessage);
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
             Uri request = urlBuilder.BuildGrantV3AccessRequest(requestMethodName, postMessage, this.queryParam);
 
             UrlProcessRequest(request, requestState, false, postData).ContinueWith(r => 
@@ -458,7 +456,7 @@ namespace PubnubApi.EndPoint
             string requestMethodName = "POST";
             string postMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
             byte[] postData = Encoding.UTF8.GetBytes(postMessage);
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
             Uri request = urlBuilder.BuildGrantV3AccessRequest(requestMethodName, postMessage, this.queryParam);
 
             RequestState<PNAccessManagerTokenResult> requestState = new RequestState<PNAccessManagerTokenResult>();

@@ -11,15 +11,13 @@ namespace PubnubApi.EndPoint
 		private readonly IJsonPluggableLibrary jsonLibrary;
 		private readonly IPubnubUnitTest unit;
 		private readonly IPubnubLog pubnubLog;
-		private readonly TelemetryManager pubnubTelemetryManager;
 
-		public LeaveOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
+		public LeaveOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
 		{
 			config = pubnubConfig;
 			jsonLibrary = jsonPluggableLibrary;
 			unit = pubnubUnit;
 			pubnubLog = log;
-			pubnubTelemetryManager = telemetryManager;
 			PubnubInstance = instance;
 		}
 
@@ -27,7 +25,7 @@ namespace PubnubApi.EndPoint
 		{
 			PNStatus resp = null;
 			try {
-				IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryManager, null, string.Empty);
+				IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, null, string.Empty);
 				Uri request = urlBuilder.BuildMultiChannelLeaveRequest("GET", string.Empty, channels, channelGroups, string.Empty, null);
 				RequestState<T> pubnubRequestState = new RequestState<T>();
 				pubnubRequestState.Channels = channels;
