@@ -187,7 +187,6 @@
     <Compile Include="..\PubnubApi\EndPoint\StoragePlayback\FetchHistoryOperation.cs" Link="EndPoint\StoragePlayback\FetchHistoryOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\StoragePlayback\HistoryOperation.cs" Link="EndPoint\StoragePlayback\HistoryOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\StoragePlayback\MessageCountsOperation.cs" Link="EndPoint\StoragePlayback\MessageCountsOperation.cs" />
-    <Compile Include="..\PubnubApi\EndPoint\TelemetryManager.cs" Link="EndPoint\TelemetryManager.cs" />
     <Compile Include="..\PubnubApi\EndPoint\TimeOperation.cs">
       <Link>EndPoint\TimeOperation.cs</Link>
     </Compile>

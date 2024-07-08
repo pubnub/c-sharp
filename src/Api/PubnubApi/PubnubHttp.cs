@@ -20,22 +20,20 @@ namespace PubnubApi
         private readonly PNConfiguration pubnubConfig;
         private readonly IJsonPluggableLibrary jsonLib;
         private readonly IPubnubLog pubnubLog;
-        private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
         private static HttpClient httpClientSubscribe;
         private static HttpClient httpClientNonsubscribe;
 #endif
 
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
-        public PubnubHttp(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, HttpClient refHttpClientSubscribe, HttpClient refHttpClientNonsubscribe)
+        public PubnubHttp(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubLog log, HttpClient refHttpClientSubscribe, HttpClient refHttpClientNonsubscribe)
 #else
-        public PubnubHttp(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubLog log, EndPoint.TelemetryManager telemetryManager)
+        public PubnubHttp(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubLog log)
 #endif
         {
             pubnubConfig = config;
             jsonLib = jsonPluggableLibrary;
             pubnubLog = log;
-            pubnubTelemetryMgr = telemetryManager;
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
             httpClientSubscribe = refHttpClientSubscribe;
             httpClientNonsubscribe = refHttpClientNonsubscribe;
@@ -227,10 +225,6 @@ namespace PubnubApi
                 {
                     var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
                     stopWatch.Stop();
-                    if (pubnubTelemetryMgr != null)
-                    {
-                        await pubnubTelemetryMgr.StoreLatency(stopWatch.ElapsedMilliseconds, pubnubRequestState.ResponseType);
-                    }
                     using (StreamReader streamReader = new StreamReader(stream))
                     {
                         jsonString = await streamReader.ReadToEndAsync().ConfigureAwait(false);
@@ -307,10 +301,6 @@ namespace PubnubApi
                 {
                     var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
                     stopWatch.Stop();
-                    if (pubnubTelemetryMgr != null)
-                    {
-                        await pubnubTelemetryMgr.StoreLatency(stopWatch.ElapsedMilliseconds, pubnubRequestState.ResponseType);
-                    }
                     using (MemoryStream ms = new MemoryStream())
                     {
                         stream.CopyTo(ms);
@@ -402,10 +392,6 @@ namespace PubnubApi
                 if (response.IsSuccessStatusCode || response.Content != null)
                 {
                     stopWatch.Stop();
-                    if (pubnubTelemetryMgr != null)
-                    {
-                        await pubnubTelemetryMgr.StoreLatency(stopWatch.ElapsedMilliseconds, pubnubRequestState.ResponseType).ConfigureAwait(false);
-                    }
                     System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "DateTime {0}, Got POST HttpResponseMessage for {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), requestUri));
                     if ((int)response.StatusCode == 204 && pubnubRequestState.ResponseType == PNOperationType.PNFileUploadOperation)
                     {
@@ -514,10 +500,6 @@ namespace PubnubApi
                 {
                     var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
                     stopWatch.Stop();
-                    if (pubnubTelemetryMgr != null)
-                    {
-                        await pubnubTelemetryMgr.StoreLatency(stopWatch.ElapsedMilliseconds, pubnubRequestState.ResponseType).ConfigureAwait(false);
-                    }
                     using (StreamReader streamReader = new StreamReader(stream))
                     {
                         jsonString = await streamReader.ReadToEndAsync().ConfigureAwait(false);
@@ -591,10 +573,6 @@ namespace PubnubApi
                 var _ = new Timer(OnPubnubWebRequestTimeout<T>, pubnubRequestState, GetTimeoutInSecondsForResponseType(pubnubRequestState.ResponseType) * 1000, Timeout.Infinite);
                 response = await Task.Factory.FromAsync<HttpWebResponse>(request.BeginGetResponse, asyncPubnubResult => (HttpWebResponse)request.EndGetResponse(asyncPubnubResult), pubnubRequestState).ConfigureAwait(false);
                 stopWatch.Stop();
-                if (pubnubConfig.EnableTelemetry && pubnubTelemetryMgr != null)
-                {
-                    await pubnubTelemetryMgr.StoreLatency(stopWatch.ElapsedMilliseconds, pubnubRequestState.ResponseType).ConfigureAwait(false);
-                }
                 if (response != null) 
                 { 
                     pubnubRequestState.Response = response;
@@ -675,10 +653,6 @@ namespace PubnubApi
                 stopWatch.Start();
                 response = await Task.Factory.FromAsync<HttpWebResponse>(request.BeginGetResponse, asyncPubnubResult => (HttpWebResponse)request.EndGetResponse(asyncPubnubResult), pubnubRequestState).ConfigureAwait(false);
                 stopWatch.Stop();
-                if (pubnubConfig.EnableTelemetry && pubnubTelemetryMgr != null)
-                {
-                    await pubnubTelemetryMgr.StoreLatency(stopWatch.ElapsedMilliseconds, pubnubRequestState.ResponseType).ConfigureAwait(false);
-                }
                 pubnubRequestState.Response = response;
                 System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "DateTime {0}, Got PubnubWebResponse for {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), request.RequestUri.ToString()));
                 int statusCode = (int)pubnubRequestState.Response.StatusCode;
@@ -766,10 +740,6 @@ namespace PubnubApi
 
                 WebResponse response = await Task.Factory.FromAsync(request.BeginGetResponse, request.EndGetResponse, pubnubRequestState).ConfigureAwait(false);
                 stopWatch.Stop();
-                if (pubnubTelemetryMgr != null)
-                {
-                    await pubnubTelemetryMgr.StoreLatency(stopWatch.ElapsedMilliseconds, pubnubRequestState.ResponseType).ConfigureAwait(false);
-                }
                 pubnubRequestState.Response = response as HttpWebResponse;
                 System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "DateTime {0}, Got PubnubWebResponse With POST for {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), request.RequestUri.ToString()));
                 int statusCode = (int)pubnubRequestState.Response.StatusCode;
@@ -867,10 +837,6 @@ namespace PubnubApi
 
                 WebResponse response = await Task.Factory.FromAsync(request.BeginGetResponse, request.EndGetResponse, pubnubRequestState).ConfigureAwait(false);
                 stopWatch.Stop();
-                if (pubnubTelemetryMgr != null)
-                {
-                    await pubnubTelemetryMgr.StoreLatency(stopWatch.ElapsedMilliseconds, pubnubRequestState.ResponseType).ConfigureAwait(false);
-                }
                 pubnubRequestState.Response = response as HttpWebResponse;
                 System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "DateTime {0}, Got PubnubWebResponse With PATCH for {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), request.RequestUri.ToString()));
                 using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
@@ -950,10 +916,6 @@ namespace PubnubApi
                             System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "DateTime {0}, Before EndGetResponse", DateTime.Now.ToString(CultureInfo.InvariantCulture)));
                             HttpWebResponse asyncWebResponse = (HttpWebResponse)asyncWebRequest.EndGetResponse(asynchronousResult);
                             stopWatch.Stop();
-                            if (pubnubTelemetryMgr != null)
-                            {
-                                await pubnubTelemetryMgr.StoreLatency(stopWatch.ElapsedMilliseconds, pubnubRequestState.ResponseType).ConfigureAwait(false);
-                            }
                             asyncRequestState.Response = asyncWebResponse;
                             System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "DateTime {0}, After EndGetResponse", DateTime.Now.ToString(CultureInfo.InvariantCulture)));
                             using (StreamReader streamReader = new StreamReader(asyncWebResponse.GetResponseStream()))
@@ -1037,10 +999,6 @@ namespace PubnubApi
                             System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "DateTime {0}, Before EndGetResponse", DateTime.Now.ToString(CultureInfo.InvariantCulture)));
                             HttpWebResponse asyncWebResponse = (HttpWebResponse)asyncWebRequest.EndGetResponse(asynchronousResult);
                             stopWatch.Stop();
-                            if (pubnubTelemetryMgr != null)
-                            {
-                                await pubnubTelemetryMgr.StoreLatency(stopWatch.ElapsedMilliseconds, pubnubRequestState.ResponseType).ConfigureAwait(false);
-                            }
                             asyncRequestState.Response = asyncWebResponse;
                             System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "DateTime {0}, After EndGetResponse", DateTime.Now.ToString(CultureInfo.InvariantCulture)));
                             using (StreamReader streamReader = new StreamReader(asyncWebResponse.GetResponseStream()))
@@ -1139,10 +1097,6 @@ namespace PubnubApi
                             System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "DateTime {0}, Before EndGetResponse With POST ", DateTime.Now.ToString(CultureInfo.InvariantCulture)));
                             HttpWebResponse asyncWebResponse = (HttpWebResponse)asyncWebRequest.EndGetResponse(asynchronousResult);
                             stopWatch.Stop();
-                            if (pubnubTelemetryMgr != null)
-                            {
-                                await pubnubTelemetryMgr.StoreLatency(stopWatch.ElapsedMilliseconds, pubnubRequestState.ResponseType).ConfigureAwait(false);
-                            }
                             asyncRequestState.Response = asyncWebResponse;
                             System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "DateTime {0}, After EndGetResponse With POST ", DateTime.Now.ToString(CultureInfo.InvariantCulture)));
                             using (StreamReader streamReader = new StreamReader(asyncWebResponse.GetResponseStream()))
@@ -1242,10 +1196,6 @@ namespace PubnubApi
                             System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "DateTime {0}, Before EndGetResponse With PATCH ", DateTime.Now.ToString(CultureInfo.InvariantCulture)));
                             HttpWebResponse asyncWebResponse = (HttpWebResponse)asyncWebRequest.EndGetResponse(asynchronousResult);
                             stopWatch.Stop();
-                            if (pubnubTelemetryMgr != null)
-                            {
-                                await pubnubTelemetryMgr.StoreLatency(stopWatch.ElapsedMilliseconds, pubnubRequestState.ResponseType).ConfigureAwait(false);
-                            }
                             asyncRequestState.Response = asyncWebResponse;
                             System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "DateTime {0}, After EndGetResponse With PATCH ", DateTime.Now.ToString(CultureInfo.InvariantCulture)));
                             using (StreamReader streamReader = new StreamReader(asyncWebResponse.GetResponseStream()))

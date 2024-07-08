@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Net;
@@ -18,7 +17,6 @@ namespace PubnubApi.EndPoint
         private readonly IJsonPluggableLibrary jsonLibrary;
         private readonly IPubnubUnitTest unit;
         private readonly IPubnubLog pubnubLog;
-        private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 
         private string[] pubnubChannelNames;
         private string[] pubnubChannelGroupNames;
@@ -35,13 +33,12 @@ namespace PubnubApi.EndPoint
         private PNCallback<PNAccessManagerGrantResult> savedCallback;
         private Dictionary<string, object> queryParam;
 
-        public GrantOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, null, instance)
+        public GrantOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, null, instance)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
             pubnubLog = log;
-            pubnubTelemetryMgr = telemetryManager;
         }
 
         public GrantOperation Channels(string[] channels)
@@ -224,7 +221,7 @@ namespace PubnubApi.EndPoint
             string targetUuidsCommaDelimited = string.Join(",", uuidList.OrderBy(x => x).ToArray());
             string authKeysCommaDelimited = string.Join(",", authList.OrderBy(x => x).ToArray());
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
             Uri request = urlBuilder.BuildGrantV2AccessRequest("GET", "", channelsCommaDelimited, channelGroupsCommaDelimited, targetUuidsCommaDelimited, authKeysCommaDelimited, this.grantRead, this.grantWrite, this.grantDelete, this.grantManage, this.grantGet, this.grantUpdate, this.grantJoin, this.grantTTL, this.queryParam);
 
             RequestState<PNAccessManagerGrantResult> requestState = new RequestState<PNAccessManagerGrantResult>();
@@ -290,7 +287,7 @@ namespace PubnubApi.EndPoint
             string targetUuidsCommaDelimited = string.Join(",", uuidList.OrderBy(x => x).ToArray());
             string authKeysCommaDelimited = string.Join(",", authList.OrderBy(x => x).ToArray());
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
             Uri request = urlBuilder.BuildGrantV2AccessRequest("GET", "", channelsCommaDelimited, channelGroupsCommaDelimited, targetUuidsCommaDelimited,authKeysCommaDelimited, this.grantRead, this.grantWrite, this.grantDelete, this.grantManage, this.grantGet, this.grantUpdate, this.grantJoin, this.grantTTL, this.queryParam);
 
             RequestState<PNAccessManagerGrantResult> requestState = new RequestState<PNAccessManagerGrantResult>();

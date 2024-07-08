@@ -12,16 +12,13 @@ namespace PubnubApi.EndPoint
 		private readonly IJsonPluggableLibrary jsonLibrary;
 		private readonly IPubnubUnitTest unit;
 		private readonly IPubnubLog pubnubLog;
-		private readonly TelemetryManager pubnubTelemetryMgr;
 
-		public HeartbeatOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
+		public HeartbeatOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
 		{
 			config = pubnubConfig;
 			jsonLibrary = jsonPluggableLibrary;
 			unit = pubnubUnit;
 			pubnubLog = log;
-			pubnubTelemetryMgr = telemetryManager;
-
 			PubnubInstance = instance;
 		}
 
@@ -33,7 +30,7 @@ namespace PubnubApi.EndPoint
 
 				if (config.MaintainPresenceState) presenceState = BuildJsonUserState(channels, channelGroups, true);
 
-				IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, null, "");
+				IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, null, "");
 				Uri request = urlBuilder.BuildPresenceHeartbeatRequest("GET", "", channels, channelGroups, presenceState);
 				RequestState<T> pubnubRequestState = new RequestState<T>();
 				pubnubRequestState.Channels = channels;

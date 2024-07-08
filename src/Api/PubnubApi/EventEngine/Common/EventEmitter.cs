@@ -253,7 +253,7 @@ namespace PubnubApi.EventEngine.Common
 							if (fileObjDic != null && fileObjDic.ContainsKey("id") && fileObjDic.ContainsKey("name")) {
 								fileMessage.File = new PNFile { Id = fileObjDic["id"].ToString(), Name = fileObjDic["name"].ToString() };
 
-								IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(configuration, jsonLibrary, null, log, null, tokenManager, (instance != null) ? instance.InstanceId : "");
+								IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(configuration, jsonLibrary, null, log, tokenManager, (instance != null) ? instance.InstanceId : "");
 								Uri fileUrlRequest = urlBuilder.BuildGetFileUrlOrDeleteReqest("GET", "", fileMessage.Channel, fileMessage.File.Id, fileMessage.File.Name, null, PNOperationType.PNGenerateFileUploadUrlOperation);
 								fileMessage.File.Url = fileUrlRequest.ToString();
 							}

@@ -22,7 +22,6 @@ namespace PubnubApi.EndPoint
         private IJsonPluggableLibrary jsonLibrary;
         private IPubnubUnitTest unit;
         private IPubnubLog pubnubLog;
-        private EndPoint.TelemetryManager pubnubTelemetryMgr;
         private IPubnubHttp pubnubHttp;
 
         private Timer SubscribeHeartbeatCheckTimer;
@@ -34,13 +33,12 @@ namespace PubnubApi.EndPoint
 #else
         private HttpWebRequest httpSubscribe { get; set; }
 #endif
-        public SubscribeManager2(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance)
+        public SubscribeManager2(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
             pubnubLog = log;
-            pubnubTelemetryMgr = telemetryManager;
             //PubnubInstance = instance;
 
 #if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
@@ -86,9 +84,9 @@ namespace PubnubApi.EndPoint
                 httpNonsubscribe.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 httpNonsubscribe.Timeout = TimeSpan.FromSeconds(config.NonSubscribeRequestTimeout);
             }
-            pubnubHttp = new PubnubHttp(config, jsonLibrary, log, pubnubTelemetryMgr, httpSubscribe, httpNonsubscribe);
+            pubnubHttp = new PubnubHttp(config, jsonLibrary, log, httpSubscribe, httpNonsubscribe);
 #else
-            pubnubHttp = new PubnubHttp(config, jsonLibrary, log, pubnubTelemetryMgr);
+            pubnubHttp = new PubnubHttp(config, jsonLibrary, log);
 #endif
         }
 
@@ -99,7 +97,7 @@ namespace PubnubApi.EndPoint
                 string presenceState = string.Empty;
                 if (config.MaintainPresenceState) presenceState =  BuildJsonUserState(channels, channelGroups, true);
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, null, "");
+            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, null, "");
             Uri request = urlBuilder.BuildMultiChannelSubscribeRequest("GET", "", channels, channelGroups, timetoken.GetValueOrDefault(), region.GetValueOrDefault(), presenceState, initialSubscribeUrlParams, externalQueryParam);
 
             RequestState<HandshakeResponse> pubnubRequestState = new RequestState<HandshakeResponse>();
@@ -153,7 +151,7 @@ namespace PubnubApi.EndPoint
             {
                 string channelsJsonState = BuildJsonUserState(channels, channelGroups, false);
 
-                IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, null, "");
+                IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, null, "");
                 Uri request = urlBuilder.BuildMultiChannelSubscribeRequest("GET", "", channels, channelGroups, timetoken.GetValueOrDefault(), region.GetValueOrDefault(), channelsJsonState, initialSubscribeUrlParams, externalQueryParam);
 
                 RequestState<ReceivingResponse<object>> pubnubRequestState = new RequestState<ReceivingResponse<object>>();

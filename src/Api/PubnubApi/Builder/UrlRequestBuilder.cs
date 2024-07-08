@@ -24,16 +24,14 @@ namespace PubnubApi
         private readonly IPubnubUnitTest pubnubUnitTest;
         private readonly IPubnubLog pubnubLog;
         private readonly string pubnubInstanceId;
-        private readonly EndPoint.TelemetryManager telemetryMgr;
         private readonly EndPoint.TokenManager tokenMgr;
 
-        public UrlRequestBuilder(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager pubnubTelemetryMgr, EndPoint.TokenManager pubnubTokenMgr, string pnInstanceId)
+        public UrlRequestBuilder(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TokenManager pubnubTokenMgr, string pnInstanceId)
         {
             pubnubConfig.AddOrUpdate(pnInstanceId, config, (k, o) => config);
             this.jsonLib = jsonPluggableLibrary;
             this.pubnubUnitTest = pubnubUnitTest;
             this.pubnubLog = log;
-            this.telemetryMgr = pubnubTelemetryMgr;
             this.tokenMgr = pubnubTokenMgr;
             this.pubnubInstanceId = string.IsNullOrEmpty(pnInstanceId) ? "" : pnInstanceId;
         }
@@ -2074,18 +2072,6 @@ namespace PubnubApi
                 if (pubnubConfig.ContainsKey(pubnubInstanceId) && pubnubConfig[pubnubInstanceId].IncludeInstanceIdentifier && !string.IsNullOrEmpty(pubnubInstanceId) && pubnubInstanceId.Trim().Length > 0)
                 {
                     ret.Add("instanceid", pubnubInstanceId);
-                }
-
-                if (pubnubConfig.ContainsKey(pubnubInstanceId) && pubnubConfig[pubnubInstanceId].EnableTelemetry && telemetryMgr != null)
-                {
-                    Dictionary<string, string> opsLatency = telemetryMgr.GetOperationsLatency().ConfigureAwait(false).GetAwaiter().GetResult();
-                    if (opsLatency != null && opsLatency.Count > 0)
-                    {
-                        foreach (string key in opsLatency.Keys)
-                        {
-                            ret.Add(key, opsLatency[key]);
-                        }
-                    }
                 }
 
                 if (pubnubConfig.ContainsKey(pubnubInstanceId) && !string.IsNullOrEmpty(pubnubConfig[pubnubInstanceId].SecretKey))
