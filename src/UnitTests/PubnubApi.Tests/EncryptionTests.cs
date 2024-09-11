@@ -842,6 +842,7 @@ namespace PubNubMessaging.Tests
             {
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 PublishKey = PubnubCommon.PublishKey,
+                SecretKey = PubnubCommon.SecretKey,
                 Secure = false
             };
             config.LogVerbosity = PNLogVerbosity.BODY;
@@ -927,6 +928,7 @@ namespace PubNubMessaging.Tests
             {
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 PublishKey = PubnubCommon.PublishKey,
+                SecretKey = PubnubCommon.SecretKey
             };
             config.LogVerbosity = PNLogVerbosity.BODY;
             config.CryptoModule = new CryptoModule(new AesCbcCryptor("enigma"),
@@ -1077,6 +1079,7 @@ namespace PubNubMessaging.Tests
             {
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 PublishKey = PubnubCommon.PublishKey,
+                SecretKey = PubnubCommon.SecretKey,
                 Secure = false,
                 LogVerbosity = PNLogVerbosity.BODY
             };
