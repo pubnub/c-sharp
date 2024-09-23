@@ -628,6 +628,13 @@
     <Compile Include="..\PubnubApi\Model\Derived\Objects\PNRemoveUuidMetadataResultExt.cs" Link="Model\Derived\Objects\PNRemoveUuidMetadataResultExt.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\Objects\PNSetChannelMetadataResultExt.cs" Link="Model\Derived\Objects\PNSetChannelMetadataResultExt.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\Objects\PNSetUuidMetadataResultExt.cs" Link="Model\Derived\Objects\PNSetUuidMetadataResultExt.cs" />
+    <Compile Include="..\PubnubApi\Transport\HttpClientService.cs" Link="Transport\HttpClientService.cs" />
+    <Compile Include="..\PubnubApi\Transport\Middleware.cs" Link="Transport\Middleware.cs" />
+    <Compile Include="..\PubnubApi\Transport\RequestParameter.cs" Link="Transport\RequestParameter.cs" />
+    <Compile Include="..\PubnubApi\TransportContract\IHttpClientService.cs" Link="TransportContract\IHttpClientService.cs" />
+    <Compile Include="..\PubnubApi\TransportContract\IMiddleware.cs" Link="TransportContract\IMiddleware.cs" />
+    <Compile Include="..\PubnubApi\TransportContract\TransportRequest.cs" Link="TransportContract\TransportRequest.cs" />
+    <Compile Include="..\PubnubApi\TransportContract\TransportResponse.cs" Link="TransportContract\TransportResponse.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\PNTimeResultExt.cs">
       <Link>Model\Derived\PNTimeResultExt.cs</Link>
     </Compile>

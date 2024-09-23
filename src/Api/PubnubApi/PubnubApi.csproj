@@ -61,6 +61,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Transport\" />
+    <None Remove="TransportContract\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="LICENSE.txt" Pack="true" PackagePath="" />
@@ -139,5 +140,6 @@
 
   <ItemGroup>
     <Folder Include="Transport\" />
+    <Folder Include="TransportContract\" />
   </ItemGroup>
 </Project>

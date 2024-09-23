@@ -1,39 +1,131 @@
 ﻿using System;
-using System.Threading;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Linq;
+using System.Text;
 
 namespace PubnubApi
 {
-	public class HttpClientService
+	public class HttpClientService : IHttpClientService
 	{
-		private static readonly HttpClient _httpClient = new HttpClient();
+		private readonly HttpClient _httpClient;
 
 		public HttpClientService()
 		{
+			_httpClient = new HttpClient();
 		}
 
-		public async Task<HttpResponseMessage> GetRequest(string url, CancellationToken cancellationToken, TimeSpan? timeout = null)
+		public async Task<TransportResponse> GetRequest(TransportRequest transportRequest)
 		{
-			if (timeout.HasValue) _httpClient.Timeout = (TimeSpan)timeout;
-			return await _httpClient.GetAsync(url, cancellationToken);
+			TransportResponse response;
+			try {
+				if (transportRequest.Timeout.HasValue) _httpClient.Timeout = (TimeSpan)transportRequest.Timeout;
+				HttpRequestMessage requestMessage = new HttpRequestMessage(method: HttpMethod.Get, requestUri: transportRequest.RequestUrl);
+				if (transportRequest.Headers.Keys.Count > 0) {
+					foreach (var kvp in transportRequest.Headers) {
+						requestMessage.Headers.Add(kvp.Key, kvp.Value);
+					}
+				}
+				var httpResult = await _httpClient.SendAsync(request: requestMessage, cancellationToken: transportRequest.CancellationToken);
+				var responseContent = await httpResult.Content.ReadAsByteArrayAsync();
+				response = new TransportResponse() {
+					StatusCode = (int)httpResult.StatusCode,
+					Content = responseContent,
+					Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
+					RequestUrl = httpResult.RequestMessage.RequestUri.AbsolutePath
+				};
+			} catch (Exception ex) {
+				response = new TransportResponse() {
+					RequestUrl = transportRequest.RequestUrl,
+					Error = ex
+				};
+			}
+			return response;
 		}
 
-		public Task<HttpResponseMessage> PostRequest(string url, HttpContent content, CancellationToken cancellationToken)
+		public async Task<TransportResponse> PostRequest(TransportRequest transportRequest)
 		{
-			return _httpClient.PostAsync(url, content, cancellationToken);
+			if (transportRequest.Timeout.HasValue) _httpClient.Timeout = (TimeSpan)transportRequest.Timeout;
+			HttpContent postData = null;
+
+			if (!string.IsNullOrEmpty(transportRequest.BodyContentString)) {
+				postData = new StringContent(transportRequest.BodyContentString, Encoding.UTF8, "application/json");
+			} else if (transportRequest.BodyContentBytes != null) {
+				postData = new ByteArrayContent(transportRequest.FormData);
+				postData.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
+			}
+			HttpRequestMessage requestMessage = new HttpRequestMessage(method: HttpMethod.Post, requestUri: transportRequest.RequestUrl) { Content = postData };
+			if (transportRequest.Headers.Keys.Count > 0) {
+				foreach (var kvp in transportRequest.Headers) {
+					requestMessage.Headers.Add(kvp.Key, kvp.Value);
+				}
+			}
+			var httpResult = await _httpClient.SendAsync(request: requestMessage, cancellationToken: transportRequest.CancellationToken);
+			var responseContent = await httpResult.Content.ReadAsByteArrayAsync();
+			var response = new TransportResponse() {
+				StatusCode = (int)httpResult.StatusCode,
+				Content = responseContent,
+				Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
+				RequestUrl = httpResult.RequestMessage.RequestUri.AbsolutePath
+			};
+			return response;
 		}
 
-		public Task<HttpResponseMessage> PutRequest(string url, HttpContent content, CancellationToken cancellationToken)
+		public async Task<TransportResponse> PutRequest(TransportRequest transportRequest)
 		{
-			return _httpClient.PutAsync(url, content, cancellationToken);
+			if (transportRequest.Timeout.HasValue) _httpClient.Timeout = (TimeSpan)transportRequest.Timeout;
+			HttpContent postData = null;
+
+			if (!string.IsNullOrEmpty(transportRequest.BodyContentString)) {
+				postData = new StringContent(transportRequest.BodyContentString, Encoding.UTF8, "application/json");
+			} else if (transportRequest.BodyContentBytes != null) {
+				postData = new ByteArrayContent(transportRequest.FormData);
+				postData.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
+			}
+			HttpRequestMessage requestMessage = new HttpRequestMessage(method: HttpMethod.Put, requestUri: transportRequest.RequestUrl) { Content = postData };
+			if (transportRequest.Headers.Keys.Count > 0) {
+				foreach (var kvp in transportRequest.Headers) {
+					requestMessage.Headers.Add(kvp.Key, kvp.Value);
+				}
+			}
+			var httpResult = await _httpClient.SendAsync(request: requestMessage, cancellationToken: transportRequest.CancellationToken);
+			var responseContent = await httpResult.Content.ReadAsByteArrayAsync();
+			var response = new TransportResponse() {
+				StatusCode = (int)httpResult.StatusCode,
+				Content = responseContent,
+				Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
+				RequestUrl = httpResult.RequestMessage.RequestUri.AbsolutePath
+			};
+			return response;
 		}
 
-		public Task<HttpResponseMessage> DeleteRequest(string url, CancellationToken cancellationToken)
+		public async Task<TransportResponse> DeleteRequest(TransportRequest transportRequest)
 		{
-			return _httpClient.DeleteAsync(url);
+			TransportResponse response;
+			try {
+				if (transportRequest.Timeout.HasValue) _httpClient.Timeout = (TimeSpan)transportRequest.Timeout;
+				HttpRequestMessage requestMessage = new HttpRequestMessage(method: HttpMethod.Delete, requestUri: transportRequest.RequestUrl);
+				if (transportRequest.Headers.Keys.Count > 0) {
+					foreach (var kvp in transportRequest.Headers) {
+						requestMessage.Headers.Add(kvp.Key, kvp.Value);
+					}
+				}
+				var httpResult = await _httpClient.SendAsync(request: requestMessage, cancellationToken: transportRequest.CancellationToken);
+				var responseContent = await httpResult.Content.ReadAsByteArrayAsync();
+				response = new TransportResponse() {
+					StatusCode = (int)httpResult.StatusCode,
+					Content = responseContent,
+					Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
+					RequestUrl = httpResult.RequestMessage.RequestUri.AbsolutePath
+				};
+			} catch (Exception ex) {
+				response = new TransportResponse() {
+					RequestUrl = transportRequest.RequestUrl,
+					Error = ex
+				};
+			}
+			return response;
 		}
-
 	}
 }
 

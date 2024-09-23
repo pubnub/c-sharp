@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Globalization;
+using System.Text;
 #if !NET35 && !NET40
 using System.Collections.Concurrent;
 #endif
@@ -92,42 +94,19 @@ namespace PubnubApi.EndPoint
 
         public void Execute(PNCallback<PNGetAllUuidMetadataResult> callback)
         {
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
-            Task.Factory.StartNew(() =>
-            {
-                this.savedCallback = callback;
-                GetUuidMetadataList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.sortField, this.queryParam, savedCallback);
-            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
-#else
-            new Thread(() =>
-            {
-                this.savedCallback = callback;
-                GetUuidMetadataList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.sortField, this.queryParam, savedCallback);
-            })
-            { IsBackground = true }.Start();
-#endif
+            this.savedCallback = callback;
+            GetUuidMetadataList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.sortField, this.queryParam, savedCallback);
         }
 
         public async Task<PNResult<PNGetAllUuidMetadataResult>> ExecuteAsync()
         {
-            return await GetUuidMetadataList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.sortField, this.queryParam).ConfigureAwait(false);
+            return await GetUuidMetadataList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.sortField, this.queryParam);
         }
 
 
         internal void Retry()
         {
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
-            Task.Factory.StartNew(() =>
-            {
-                GetUuidMetadataList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.sortField, this.queryParam, savedCallback);
-            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
-#else
-            new Thread(() =>
-            {
-                GetUuidMetadataList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.sortField, this.queryParam, savedCallback);
-            })
-            { IsBackground = true }.Start();
-#endif
+            GetUuidMetadataList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.sortField, this.queryParam, savedCallback);
         }
 
         private void GetUuidMetadataList(PNPageObject page, int limit, bool includeCount, bool includeCustom, string filter, List<string> sort, Dictionary<string, object> externalQueryParam, PNCallback<PNGetAllUuidMetadataResult> callback)
@@ -139,47 +118,59 @@ namespace PubnubApi.EndPoint
             PNPageObject internalPage;
             if (page == null) { internalPage = new PNPageObject(); }
             else { internalPage = page; }
-
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
-            Uri request = urlBuilder.BuildGetAllUuidMetadataRequest("GET", "", internalPage.Next, internalPage.Prev, limit, includeCount, includeCustom, filter, sort, externalQueryParam);
-
             RequestState<PNGetAllUuidMetadataResult> requestState = new RequestState<PNGetAllUuidMetadataResult>();
             requestState.ResponseType = PNOperationType.PNGetAllUuidMetadataOperation;
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;
 
-            requestState.UsePostMethod = false;
-            UrlProcessRequest(request, requestState, false).ContinueWith(r =>
-            {
-                string json = r.Result.Item1;
-                if (!string.IsNullOrEmpty(json))
-                {
-                    List<object> result = ProcessJsonResponse(requestState, json);
-                    ProcessResponseCallbacks(result, requestState);
-                }
-            }, TaskContinuationOptions.ExecuteSynchronously).Wait();
+            var requestParameter = CreateRequestParameter();
+			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNGetAllUuidMetadataOperation);
+			PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ContinueWith(t => {
+				var transportResponse = t.Result;
+				if (transportResponse.Error == null) {
+					var responseString = Encoding.UTF8.GetString(transportResponse.Content);
+					if (!string.IsNullOrEmpty(responseString)) {
+						List<object> result = ProcessJsonResponse(requestState, responseString);
+						ProcessResponseCallbacks(result, requestState);
+					}
+				} else {
+					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
+					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
+					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNGetAllUuidMetadataOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
+					requestState.PubnubCallback.OnResponse(default(PNGetAllUuidMetadataResult), status);
+				}
+			});
         }
 
         private async Task<PNResult<PNGetAllUuidMetadataResult>> GetUuidMetadataList(PNPageObject page, int limit, bool includeCount, bool includeCustom, string filter, List<string> sort, Dictionary<string, object> externalQueryParam)
         {
-            PNResult<PNGetAllUuidMetadataResult> ret = new PNResult<PNGetAllUuidMetadataResult>();
+            PNResult<PNGetAllUuidMetadataResult> returnValue = new PNResult<PNGetAllUuidMetadataResult>();
 
             PNPageObject internalPage;
             if (page == null) { internalPage = new PNPageObject(); }
             else { internalPage = page; }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
-            Uri request = urlBuilder.BuildGetAllUuidMetadataRequest("GET", "", internalPage.Next, internalPage.Prev, limit, includeCount, includeCustom, filter, sort, externalQueryParam);
-
             RequestState<PNGetAllUuidMetadataResult> requestState = new RequestState<PNGetAllUuidMetadataResult>();
             requestState.ResponseType = PNOperationType.PNGetAllUuidMetadataOperation;
             requestState.Reconnect = false;
-            requestState.EndPointOperation = this;
-
             requestState.UsePostMethod = false;
-            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false).ConfigureAwait(false);
-            ret.Status = JsonAndStatusTuple.Item2;
+            requestState.EndPointOperation = this;
+            Tuple<string, PNStatus> JsonAndStatusTuple;
+
+            var requestParameter = CreateRequestParameter();
+			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNGetAllUuidMetadataOperation);
+			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest);
+			if (transportResponse.Error == null) {
+				var responseString = Encoding.UTF8.GetString(transportResponse.Content);
+				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
+				if (errorStatus == null) {
+					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, (int)HttpStatusCode.OK, null);
+					JsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
+				} else {
+					JsonAndStatusTuple = new Tuple<string, PNStatus>(string.Empty, errorStatus);
+				}
+				returnValue.Status = JsonAndStatusTuple.Item2;
             string json = JsonAndStatusTuple.Item1;
             if (!string.IsNullOrEmpty(json))
             {
@@ -188,11 +179,77 @@ namespace PubnubApi.EndPoint
                 PNGetAllUuidMetadataResult responseResult = responseBuilder.JsonToObject<PNGetAllUuidMetadataResult>(resultList, true);
                 if (responseResult != null)
                 {
-                    ret.Result = responseResult;
+                    returnValue.Result = responseResult;
                 }
             }
+			} else {
+				int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
+				PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
+				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNGetAllUuidMetadataOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
+				returnValue.Status = status;
+			}
 
-            return ret;
+            return returnValue;
+        }
+
+        private RequestParameter CreateRequestParameter()
+        {
+			List<string> pathSegments = new List<string>
+			{
+				"v2",
+				"objects",
+				config.SubscribeKey,
+				"uuids"
+			};
+
+			Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+            if (!string.IsNullOrEmpty(page.Next))
+            {
+                requestQueryStringParams.Add("start", UriUtil.EncodeUriComponent(page.Next, PNOperationType.PNGetAllUuidMetadataOperation, false, false, false));
+            }
+            if (!string.IsNullOrEmpty(page.Prev))
+            {
+                requestQueryStringParams.Add("end", UriUtil.EncodeUriComponent(page.Prev, PNOperationType.PNGetAllUuidMetadataOperation, false, false, false));
+            }
+            if (limit >= 0)
+            {
+                requestQueryStringParams.Add("limit", limit.ToString(CultureInfo.InvariantCulture));
+            }
+            if (includeCount)
+            {
+                requestQueryStringParams.Add("count", "true");
+            }
+            if (includeCustom)
+            {
+                requestQueryStringParams.Add("include", "custom");
+            }
+            if (!string.IsNullOrEmpty(usersFilter))
+            {
+                requestQueryStringParams.Add("filter", UriUtil.EncodeUriComponent(usersFilter, PNOperationType.PNGetAllUuidMetadataOperation, false, false, false));
+            }
+            if (sortField != null && sortField.Count > 0)
+            {
+                requestQueryStringParams.Add("sort", UriUtil.EncodeUriComponent(string.Join(",",sortField.ToArray()), PNOperationType.PNGetAllUuidMetadataOperation, false, false, false));
+            }
+
+            if (queryParam != null && queryParam.Count > 0)
+            {
+                foreach (KeyValuePair<string, object> kvp in queryParam)
+                {
+                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    {
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), PNOperationType.PNGetAllUuidMetadataOperation, false, false, false));
+                    }
+                }
+            }
+            string queryString = UriUtil.BuildQueryString(requestQueryStringParams);
+            var requestParameter = new RequestParameter() {
+                RequestType = Constants.GET,
+                PathSegment = pathSegments,
+                Query = requestQueryStringParams
+            };
+
+            return requestParameter;
         }
     }
 }

@@ -12,6 +12,8 @@ using System.Collections.Concurrent;
 #endif
 using PubnubApi.Security.Crypto;
 using PubnubApi.Security.Crypto.Cryptors;
+using static System.Net.WebRequestMethods;
+using System.Threading.Channels;
 
 namespace PubnubApi.EndPoint
 {
@@ -139,9 +141,10 @@ namespace PubnubApi.EndPoint
 
         private void ProcessFileDownloadRequest(Dictionary<string, object> externalQueryParam, PNCallback<PNDownloadFileResult> callback)
         {
+            var requestParameter = CreateRequestParameter();
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
 
-            Uri request = urlBuilder.BuildGetFileUrlOrDeleteReqest("GET", "", this.channelName, this.currentFileId, this.currentFileName, externalQueryParam, PNOperationType.PNDownloadFileOperation);
+            Uri request = urlBuilder.BuildGetFileUrlOrDeleteReqest(Constants.GET, "", this.channelName, this.currentFileId, this.currentFileName, externalQueryParam, PNOperationType.PNDownloadFileOperation);
 
             RequestState<PNDownloadFileResult> requestState = new RequestState<PNDownloadFileResult>();
             requestState.ResponseType = PNOperationType.PNDownloadFileOperation;
@@ -209,10 +212,10 @@ namespace PubnubApi.EndPoint
                 return ret;
             }
 
-
+            var requestParameter = CreateRequestParameter();
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
 
-            Uri request = urlBuilder.BuildGetFileUrlOrDeleteReqest("GET", "", this.channelName, this.currentFileId, this.currentFileName, externalQueryParam, PNOperationType.PNDownloadFileOperation);
+            Uri request = urlBuilder.BuildGetFileUrlOrDeleteReqest(Constants.GET, "", this.channelName, this.currentFileId, this.currentFileName, externalQueryParam, PNOperationType.PNDownloadFileOperation);
 
             RequestState<PNDownloadFileResult> requestState = new RequestState<PNDownloadFileResult>();
             requestState.ResponseType = PNOperationType.PNDownloadFileOperation;
@@ -254,5 +257,42 @@ namespace PubnubApi.EndPoint
             return ret;
         }
 
+        private RequestParameter CreateRequestParameter()
+        {
+			List<string> pathSegments = new List<string>
+			{
+				"v1",
+				"files",
+				config.SubscribeKey,
+				"channels",
+				channelName,
+				"files",
+				currentFileId,
+				currentFileName
+			};
+
+			Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+
+            if (queryParam != null && queryParam.Count > 0)
+            {
+                foreach (KeyValuePair<string, object> kvp in queryParam)
+                {
+                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    {
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), PNOperationType.PNDownloadFileOperation, false, false, false));
+                    }
+                }
+            }
+
+            string queryString = UriUtil.BuildQueryString(requestQueryStringParams);
+
+            var requestParameter = new RequestParameter() {
+                RequestType = Constants.GET,
+                PathSegment = pathSegments,
+                Query = requestQueryStringParams
+            };
+
+            return requestParameter;
+        }
     }
 }

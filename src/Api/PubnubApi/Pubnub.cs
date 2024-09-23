@@ -8,13 +8,10 @@ using PubnubApi.EventEngine.Subscribe.Events;
 using PubnubApi.EventEngine.Subscribe.Common;
 using PubnubApi.Interface;
 using PubnubApi.EventEngine.Presence;
-
-#if !NET35 && !NET40
-using System.Collections.Concurrent;
-#endif
 using PubnubApi.Security.Crypto;
 using PubnubApi.Security.Crypto.Cryptors;
 using PubnubApi.EventEngine.Common;
+using System.Collections.Concurrent;
 
 namespace PubnubApi
 {
@@ -966,7 +963,8 @@ namespace PubnubApi
 
         public static string Version { get; private set; }
 
-
+        internal IHttpClientService httpClientService;
+        internal Middleware transportMiddleware;
 
         public string InstanceId { get; private set; }
 
@@ -1022,7 +1020,8 @@ namespace PubnubApi
             eventEmitter = new EventEmitter(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, subscribeCallbackListenerList, JsonPluggableLibrary, tokenManager, pubnubLog, this);
             //Check CryptoModule usage
             CheckCryptoModuleUsageForLogging(config);
-
+            httpClientService = new HttpClientService();
+            transportMiddleware = new Middleware(httpClientService,config, this, tokenManager);
         }
         
         #if UNITY

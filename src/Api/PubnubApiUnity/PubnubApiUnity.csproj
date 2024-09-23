@@ -618,6 +618,13 @@
     <Compile Include="..\PubnubApi\Security\Crypto\Cryptors\CryptorHeader.cs" Link="Security\Crypto\Cryptors\CryptorHeader.cs" />
     <Compile Include="..\PubnubApi\Security\Crypto\Cryptors\LegacyCryptor.cs" Link="Security\Crypto\Cryptors\LegacyCryptor.cs" />
     <Compile Include="..\PubnubApi\Security\Crypto\ICryptor.cs" Link="Security\Crypto\ICryptor.cs" />
+    <Compile Include="..\PubnubApi\Transport\HttpClientService.cs" Link="Transport\HttpClientService.cs" />
+    <Compile Include="..\PubnubApi\Transport\Middleware.cs" Link="Transport\Middleware.cs" />
+    <Compile Include="..\PubnubApi\Transport\RequestParameter.cs" Link="Transport\RequestParameter.cs" />
+    <Compile Include="..\PubnubApi\TransportContract\IHttpClientService.cs" Link="TransportContract\IHttpClientService.cs" />
+    <Compile Include="..\PubnubApi\TransportContract\IMiddleware.cs" Link="TransportContract\IMiddleware.cs" />
+    <Compile Include="..\PubnubApi\TransportContract\TransportRequest.cs" Link="TransportContract\TransportRequest.cs" />
+    <Compile Include="..\PubnubApi\TransportContract\TransportResponse.cs" Link="TransportContract\TransportResponse.cs" />
     <Compile Include="..\PubnubApi\Security\MD5.cs">
       <Link>Security\MD5.cs</Link>
     </Compile>

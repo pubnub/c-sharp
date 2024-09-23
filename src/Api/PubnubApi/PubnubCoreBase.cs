@@ -1401,7 +1401,7 @@ namespace PubnubApi
             return result;
         }
 
-        private PNStatus GetStatusIfError<T>(RequestState<T> asyncRequestState, string jsonString)
+        protected PNStatus GetStatusIfError<T>(RequestState<T> asyncRequestState, string jsonString)
         {
             PNStatus status = null;
             if (string.IsNullOrEmpty(jsonString)) { return status;  }

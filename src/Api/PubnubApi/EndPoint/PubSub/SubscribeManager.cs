@@ -80,7 +80,7 @@ namespace PubnubApi.EndPoint
                     string channelsJsonState = BuildJsonUserState(currentChannels, currentChannelGroups, false);
                     IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config[PubnubInstance.InstanceId], jsonLibrary, unit, pubnubLog, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
                     
-                    Uri request = urlBuilder.BuildMultiChannelLeaveRequest("GET", "", currentChannels, currentChannelGroups, channelsJsonState, externalQueryParam);
+                    Uri request = urlBuilder.BuildMultiChannelLeaveRequest(Constants.GET, "", currentChannels, currentChannelGroups, channelsJsonState, externalQueryParam);
 
                     RequestState<T> requestState = new RequestState<T>();
                     requestState.Channels = currentChannels;
@@ -241,7 +241,7 @@ namespace PubnubApi.EndPoint
                             string channelsJsonState = BuildJsonUserState(validChannels.ToArray(), validChannelGroups.ToArray(), false);
                             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config[PubnubInstance.InstanceId], jsonLibrary, unit, pubnubLog, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
                             
-                            Uri request = urlBuilder.BuildMultiChannelLeaveRequest("GET", "", validChannels.ToArray(), validChannelGroups.ToArray(), channelsJsonState, externalQueryParam);
+                            Uri request = urlBuilder.BuildMultiChannelLeaveRequest(Constants.GET, "", validChannels.ToArray(), validChannelGroups.ToArray(), channelsJsonState, externalQueryParam);
 
                             RequestState<T> requestState = new RequestState<T>();
                             requestState.Channels = new [] { channel };
@@ -665,7 +665,7 @@ namespace PubnubApi.EndPoint
                 config[PubnubInstance.InstanceId].UserId = CurrentUserId[PubnubInstance.InstanceId]; // to make sure we capture if UUID is changed
                 IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config[PubnubInstance.InstanceId], jsonLibrary, unit, pubnubLog, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
                 
-                Uri request = urlBuilder.BuildMultiChannelSubscribeRequest("GET", "", channels, channelGroups, (Convert.ToInt64(timetoken.ToString(), CultureInfo.InvariantCulture) == 0) ? Convert.ToInt64(timetoken.ToString(), CultureInfo.InvariantCulture) : lastTimetoken, region, channelsJsonState, initialSubscribeUrlParams, externalQueryParam);
+                Uri request = urlBuilder.BuildMultiChannelSubscribeRequest(Constants.GET, "", channels, channelGroups, (Convert.ToInt64(timetoken.ToString(), CultureInfo.InvariantCulture) == 0) ? Convert.ToInt64(timetoken.ToString(), CultureInfo.InvariantCulture) : lastTimetoken, region, channelsJsonState, initialSubscribeUrlParams, externalQueryParam);
 
                 pubnubRequestState = new RequestState<T>();
                 pubnubRequestState.Channels = channels;
@@ -1411,7 +1411,7 @@ namespace PubnubApi.EndPoint
                         string channelsJsonState = BuildJsonUserState(subscriberChannels, subscriberChannelGroups, false);
                         IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId] : null, jsonLibrary, unit, pubnubLog, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
                         
-                        Uri request = urlBuilder.BuildPresenceHeartbeatRequest("GET", "", subscriberChannels, subscriberChannelGroups, channelsJsonState);
+                        Uri request = urlBuilder.BuildPresenceHeartbeatRequest(Constants.GET, "", subscriberChannels, subscriberChannelGroups, channelsJsonState);
 
                         RequestState<PNHeartbeatResult> requestState = new RequestState<PNHeartbeatResult>();
                         requestState.Channels = currentState.Channels;

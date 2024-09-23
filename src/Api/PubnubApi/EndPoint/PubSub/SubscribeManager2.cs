@@ -98,7 +98,7 @@ namespace PubnubApi.EndPoint
                 if (config.MaintainPresenceState) presenceState =  BuildJsonUserState(channels, channelGroups, true);
 
             IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, null, "");
-            Uri request = urlBuilder.BuildMultiChannelSubscribeRequest("GET", "", channels, channelGroups, timetoken.GetValueOrDefault(), region.GetValueOrDefault(), presenceState, initialSubscribeUrlParams, externalQueryParam);
+            Uri request = urlBuilder.BuildMultiChannelSubscribeRequest(Constants.GET, "", channels, channelGroups, timetoken.GetValueOrDefault(), region.GetValueOrDefault(), presenceState, initialSubscribeUrlParams, externalQueryParam);
 
             RequestState<HandshakeResponse> pubnubRequestState = new RequestState<HandshakeResponse>();
             pubnubRequestState.Channels = channels;
@@ -152,7 +152,7 @@ namespace PubnubApi.EndPoint
                 string channelsJsonState = BuildJsonUserState(channels, channelGroups, false);
 
                 IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, null, "");
-                Uri request = urlBuilder.BuildMultiChannelSubscribeRequest("GET", "", channels, channelGroups, timetoken.GetValueOrDefault(), region.GetValueOrDefault(), channelsJsonState, initialSubscribeUrlParams, externalQueryParam);
+                Uri request = urlBuilder.BuildMultiChannelSubscribeRequest(Constants.GET, "", channels, channelGroups, timetoken.GetValueOrDefault(), region.GetValueOrDefault(), channelsJsonState, initialSubscribeUrlParams, externalQueryParam);
 
                 RequestState<ReceivingResponse<object>> pubnubRequestState = new RequestState<ReceivingResponse<object>>();
                 pubnubRequestState.Channels = channels;
