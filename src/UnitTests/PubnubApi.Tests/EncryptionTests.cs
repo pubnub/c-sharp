@@ -185,6 +185,8 @@ namespace PubNubMessaging.Tests
                 {
                     actual = Newtonsoft.Json.JsonConvert.SerializeObject(pnGrant);
                 }
+                
+                pubnub.Destroy();
             }
             catch (Exception ex)
             {
@@ -835,7 +837,10 @@ namespace PubNubMessaging.Tests
         public void TestSubscribeDecryption()
         {
             server.ClearRequests();
-            server.Start();
+            if (PubnubCommon.EnableStubTest)
+            {
+                server.Start();   
+            }
 
             ManualResetEvent done = new ManualResetEvent(false);
             PNConfiguration config = new PNConfiguration(new UserId("test"))
@@ -921,7 +926,10 @@ namespace PubNubMessaging.Tests
         public void TestSubscribeDecryptionOnNonEncryptedMessage()
         {
             server.ClearRequests();
-            server.Start();
+            if (PubnubCommon.EnableStubTest)
+            {
+                server.Start();   
+            }
 
             ManualResetEvent done = new ManualResetEvent(false);
             PNConfiguration config = new PNConfiguration(new UserId("test"))

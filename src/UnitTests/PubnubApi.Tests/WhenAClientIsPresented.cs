@@ -38,7 +38,10 @@ namespace PubNubMessaging.Tests
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
             server = Server.Instance();
             MockServer.LoggingMethod.MockServerLog = unitLog;
-            server.Start();
+            if (PubnubCommon.EnableStubTest)
+            {
+                server.Start();   
+            }
 
             if (!PubnubCommon.PAMServerSideGrant) { return; }
 
@@ -103,6 +106,12 @@ namespace PubNubMessaging.Tests
         [TearDown]
         public static void Exit()
         {
+            if (pubnub != null)
+            {
+                pubnub.Destroy();
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
+            }
             server.Stop();
         }
 
@@ -300,12 +309,12 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new [] { channel }).WithPresence().Execute();
             presenceManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-            if (!PubnubCommon.EnableStubTest) { Thread.Sleep(1000); }
+            if (!PubnubCommon.EnableStubTest) { Thread.Sleep(4000); }
             else { Thread.Sleep(100); }
 
             pubnub.Unsubscribe<string>().Channels(new [] { channel }).Execute();
 
-            Thread.Sleep(100);
+            Thread.Sleep(4000);
 
             if (!pubnub.RemoveListener(listenerSubCallack))
             {

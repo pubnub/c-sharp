@@ -28,11 +28,13 @@ namespace PubNubMessaging.Tests
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
             server = Server.Instance();
             MockServer.LoggingMethod.MockServerLog = unitLog;
-            server.Start();
+            if (PubnubCommon.EnableStubTest)
+            {
+                server.Start();   
+            }
 
             if (!PubnubCommon.PAMServerSideGrant) { return; }
-
-            bool receivedGrantMessage = false;
+            
             string channel = "hello_my_channel";
 
             PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
@@ -84,7 +86,7 @@ namespace PubNubMessaging.Tests
                                 var write = r.Channels[channel][authKey].WriteEnabled;
                                 if (read && write)
                                 {
-                                    receivedGrantMessage = true;
+                                    grantManualEvent.Set();
                                 }
                             }
                         }
@@ -92,8 +94,7 @@ namespace PubNubMessaging.Tests
                     catch { /* ignore */ }
                     finally { grantManualEvent.Set(); }
                 }));
-            Thread.Sleep(1000);
-            grantManualEvent.WaitOne();
+            var receivedGrantMessage = grantManualEvent.WaitOne(5000);
 
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
@@ -105,6 +106,12 @@ namespace PubNubMessaging.Tests
         public static void Exit()
         {
             server.Stop();
+            if (pubnub != null)
+            {
+                pubnub.Destroy();
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
+            }
         }
 
         [Test]

@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
 using System.Threading;
 using PubnubApi;
 using System.Collections.Generic;
@@ -12,63 +13,81 @@ namespace PubNubMessaging.Tests
     [TestFixture]
     public class WhenFileIsRequested : TestHarness
     {
-        private static string currentUnitTestCase = "";
         private static string channelName = "hello_my_channel";
-        private static string authKey = "myauth";
+        private static string token;
 
         private static Pubnub pubnub;
         private static Server server;
 
         [SetUp]
-        public static void Init()
+        public static async Task Init()
         {
             UnitTestLog unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
             server = Server.Instance();
             MockServer.LoggingMethod.MockServerLog = unitLog;
-            server.Start();
+            if (PubnubCommon.EnableStubTest)
+            {
+                server.Start();
+            }
 
             if (!PubnubCommon.PAMServerSideGrant)
             {
                 return;
             }
 
-            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid_file_tests"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
-                AuthKey = authKey,
                 Secure = false
             };
 
             pubnub = createPubNubInstance(config);
-            var messageReset = new ManualResetEvent(false);
-            var grantReset = new ManualResetEvent(false);
 
-            pubnub.Grant().Channels(new[] { channelName }).AuthKeys(new[] { authKey }).Read(true).Write(true).Manage(true).Delete(true).Update(true).Get(true).TTL(20)
-                .Execute(new PNAccessManagerGrantResultExt((r,s)=> 
-                { 
-                    if (r != null)
+            var grantResult = await pubnub.GrantToken().TTL(20).AuthorizedUuid(config.UserId).Resources(
+                new PNTokenResources()
+                {
+                    Channels = new Dictionary<string, PNTokenAuthValues>()
                     {
-                        messageReset.Set();
+                        {
+                            channelName, new PNTokenAuthValues()
+                            {
+                                Read = true,
+                                Write = true,
+                                Create = true,
+                                Get = true,
+                                Delete = true,
+                                Join = true, 
+                                Update = true, 
+                                Manage = true
+                            }
+                        }
                     }
+                }).ExecuteAsync();
+            
+            await Task.Delay(3000);
 
-                    grantReset.Set();
-                }));
-
-            var granted = grantReset.WaitOne(2000);
-            var received = messageReset.WaitOne(2000);
-
+            token = grantResult.Result?.Token;
+            
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Assert.IsTrue(granted && received, "WhenFileUploadIsRequested Grant access failed.");
+            Assert.IsTrue(grantResult.Status.Error == false && grantResult.Result != null,
+                "WhenFileUploadIsRequested Grant access failed.");
         }
 
         [TearDown]
         public static void Exit()
         {
+            if (pubnub != null)
+            {
+                pubnub.Destroy();
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
+            }
+
             server.Stop();
         }
 
@@ -80,18 +99,16 @@ namespace PubNubMessaging.Tests
             var eventReset = new ManualResetEvent(false);
 
             SubscribeCallbackExt eventListener = new SubscribeCallbackExt(
-                delegate (Pubnub pnObj, PNFileEventResult eventResult)
+                delegate(Pubnub pnObj, PNFileEventResult eventResult)
                 {
                     eventReset.Set();
-                    System.Diagnostics.Debug.WriteLine("FILE EVENT: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(eventResult));
+                    System.Diagnostics.Debug.WriteLine("FILE EVENT: " +
+                                                       pubnub.JsonPluggableLibrary.SerializeToJsonString(eventResult));
                 },
-                delegate (Pubnub pnObj, PNStatus status)
-                {
+                delegate(Pubnub pnObj, PNStatus status) { }
+            );
 
-                }
-                );
-
-            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid_file_tests"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -101,38 +118,39 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
+
             pubnub = createPubNubInstance(config);
+            pubnub.SetAuthToken(token);
+            
             pubnub.AddListener(eventListener);
 
-            
+
             pubnub.Subscribe<string>().Channels(new string[] { channelName }).Execute();
 
             var messageReset = new ManualResetEvent(false);
 
             string fileId = "";
             string fileName = "";
-            
+
             string targetFileUpload = @"fileupload.txt";
-            pubnub.SendFile().Channel(channelName).File(targetFileUpload).CipherKey("enigma").Message("This is my sample file")
+            pubnub.SendFile().Channel(channelName).File(targetFileUpload).CipherKey("enigma")
+                .Message("This is my sample file")
                 .Execute(new PNFileUploadResultExt((result, status) =>
                 {
                     if (result != null)
                     {
-                        System.Diagnostics.Debug.WriteLine("SendFile result = " + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                        System.Diagnostics.Debug.WriteLine("SendFile result = " +
+                                                           pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
                         fileId = result.FileId;
                         fileName = result.FileName;
                         messageReset.Set();
                     }
                     else
                     {
-                        System.Diagnostics.Debug.WriteLine("SendFile failed = " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                        System.Diagnostics.Debug.WriteLine("SendFile failed = " +
+                                                           pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
                     }
                 }));
-            Thread.Sleep(1000);
             var receivedMessage = messageReset.WaitOne(3 * 1000 * 60);
 
             if (receivedMessage)
@@ -143,7 +161,9 @@ namespace PubNubMessaging.Tests
                     {
                         if (result != null)
                         {
-                            System.Diagnostics.Debug.WriteLine("ListFiles result = " + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                            System.Diagnostics.Debug.WriteLine("ListFiles result = " +
+                                                               pubnub.JsonPluggableLibrary
+                                                                   .SerializeToJsonString(result));
                             messageReset.Set();
                         }
                     }));
@@ -152,16 +172,19 @@ namespace PubNubMessaging.Tests
 
             if (receivedMessage)
             {
-                System.Net.ServicePointManager.SecurityProtocol = (System.Net.SecurityProtocolType)3072; //Need this line for .net 3.5/4.0/4.5
+                System.Net.ServicePointManager.SecurityProtocol =
+                    (System.Net.SecurityProtocolType)3072; //Need this line for .net 3.5/4.0/4.5
                 messageReset = new ManualResetEvent(false);
-                pubnub.DownloadFile().Channel(channelName).FileId(fileId).FileName(fileName).Execute(new PNDownloadFileResultExt((result, status) =>
-                {
-                    if (result != null && result.FileBytes != null && result.FileBytes.Length > 0)
+                pubnub.DownloadFile().Channel(channelName).FileId(fileId).FileName(fileName).Execute(
+                    new PNDownloadFileResultExt((result, status) =>
                     {
-                        System.Diagnostics.Debug.WriteLine("DownloadFile result = " + result.FileBytes.Length);
-                        messageReset.Set();
-                    }
-                }));
+                        if (result != null && result.FileBytes != null && result.FileBytes.Length > 0)
+                        {
+                            System.Diagnostics.Debug.WriteLine(
+                                "DownloadFile result = " + result.FileBytes.Length);
+                            messageReset.Set();
+                        }
+                    }));
                 receivedMessage = messageReset.WaitOne(2 * 1000 * 60);
             }
 
@@ -173,13 +196,15 @@ namespace PubNubMessaging.Tests
                     {
                         if (result != null)
                         {
-                            System.Diagnostics.Debug.WriteLine("DeleteFile result = " + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                            System.Diagnostics.Debug.WriteLine("DeleteFile result = " +
+                                                               pubnub.JsonPluggableLibrary
+                                                                   .SerializeToJsonString(result));
                             messageReset.Set();
                         }
                     }));
                 receivedMessage = messageReset.WaitOne(2 * 1000 * 60);
             }
-            
+
             var receivedEvent = false;
             if (receivedMessage)
             {
@@ -205,18 +230,16 @@ namespace PubNubMessaging.Tests
             var eventReset = new ManualResetEvent(false);
 
             SubscribeCallbackExt eventListener = new SubscribeCallbackExt(
-                delegate (Pubnub pnObj, PNFileEventResult eventResult)
+                delegate(Pubnub pnObj, PNFileEventResult eventResult)
                 {
                     eventReset.Set();
-                    System.Diagnostics.Debug.WriteLine("FILE EVENT: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(eventResult));
+                    System.Diagnostics.Debug.WriteLine("FILE EVENT: " +
+                                                       pubnub.JsonPluggableLibrary.SerializeToJsonString(eventResult));
                 },
-                delegate (Pubnub pnObj, PNStatus status)
-                {
+                delegate(Pubnub pnObj, PNStatus status) { }
+            );
 
-                }
-                );
-
-            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid_file_tests"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -226,13 +249,11 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
+
             pubnub = createPubNubInstance(config);
+            pubnub.SetAuthToken(token);
             pubnub.AddListener(eventListener);
-            
+
             pubnub.Subscribe<string>().Channels(new string[] { channelName }).Execute();
 
             string fileId = "";
@@ -242,13 +263,18 @@ namespace PubNubMessaging.Tests
             myInternalMsg.Add("color", "red");
             myInternalMsg.Add("name", "John Doe");
 #if NET40
-            PNResult<PNFileUploadResult> sendFileResult = Task.Factory.StartNew(async () => await pubnub.SendFile().Channel(channelName).File(targetFileUpload).Message(myInternalMsg).ExecuteAsync()).Result.Result;
+            PNResult<PNFileUploadResult> sendFileResult =
+ Task.Factory.StartNew(async () => await pubnub.SendFile().Channel(channelName).File(targetFileUpload).Message(myInternalMsg).ExecuteAsync()).Result.Result;
 #else
-            PNResult<PNFileUploadResult> sendFileResult = await pubnub.SendFile().Channel(channelName).File(targetFileUpload).Message(myInternalMsg).ExecuteAsync();
+            PNResult<PNFileUploadResult> sendFileResult = await pubnub.SendFile().Channel(channelName)
+                .File(targetFileUpload).Message(myInternalMsg).ExecuteAsync();
 #endif
-            if (sendFileResult.Result != null && !string.IsNullOrEmpty(sendFileResult.Result.FileId) && sendFileResult.Result.Timetoken > 0)
+            if (sendFileResult.Result != null && !string.IsNullOrEmpty(sendFileResult.Result.FileId) &&
+                sendFileResult.Result.Timetoken > 0)
             {
-                System.Diagnostics.Debug.WriteLine("SendFile result = " + pubnub.JsonPluggableLibrary.SerializeToJsonString(sendFileResult.Result));
+                System.Diagnostics.Debug.WriteLine("SendFile result = " +
+                                                   pubnub.JsonPluggableLibrary.SerializeToJsonString(sendFileResult
+                                                       .Result));
                 fileId = sendFileResult.Result.FileId;
                 fileName = sendFileResult.Result.FileName;
             }
@@ -259,25 +285,28 @@ namespace PubNubMessaging.Tests
                 {
                     if (result != null)
                     {
-                        System.Diagnostics.Debug.WriteLine("ListFiles result = " + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                        System.Diagnostics.Debug.WriteLine("ListFiles result = " +
+                                                           pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
                         messageReset.Set();
                     }
                 }));
             var receivedMessage = messageReset.WaitOne(2 * 1000 * 60);
-            
+
             if (receivedMessage)
             {
-                System.Net.ServicePointManager.SecurityProtocol = (System.Net.SecurityProtocolType)3072; //Need this line for .net 3.5/4.0/4.5
+                System.Net.ServicePointManager.SecurityProtocol =
+                    (System.Net.SecurityProtocolType)3072; //Need this line for .net 3.5/4.0/4.5
                 receivedMessage = false;
                 messageReset = new ManualResetEvent(false);
-                pubnub.DownloadFile().Channel(channelName).FileId(fileId).FileName(fileName).Execute(new PNDownloadFileResultExt((result, status) =>
-                {
-                    if (result != null && result.FileBytes != null && result.FileBytes.Length > 0)
+                pubnub.DownloadFile().Channel(channelName).FileId(fileId).FileName(fileName).Execute(
+                    new PNDownloadFileResultExt((result, status) =>
                     {
-                        System.Diagnostics.Debug.WriteLine("DownloadFile result = " + result.FileBytes.Length);
-                        messageReset.Set();
-                    }
-                }));
+                        if (result != null && result.FileBytes != null && result.FileBytes.Length > 0)
+                        {
+                            System.Diagnostics.Debug.WriteLine("DownloadFile result = " + result.FileBytes.Length);
+                            messageReset.Set();
+                        }
+                    }));
                 receivedMessage = messageReset.WaitOne(2 * 1000 * 60);
             }
 
@@ -289,7 +318,9 @@ namespace PubNubMessaging.Tests
                     {
                         if (result != null)
                         {
-                            System.Diagnostics.Debug.WriteLine("DeleteFile result = " + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                            System.Diagnostics.Debug.WriteLine("DeleteFile result = " +
+                                                               pubnub.JsonPluggableLibrary
+                                                                   .SerializeToJsonString(result));
                             messageReset.Set();
                         }
                     }));
@@ -301,18 +332,20 @@ namespace PubNubMessaging.Tests
             {
                 receivedEvent = eventReset.WaitOne(10000);
             }
+
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Assert.IsTrue(receivedMessage && receivedEvent, "WhenFileIsRequested -> ThenWithAsyncSendFileShouldReturnSuccess failed.");
+            Assert.IsTrue(receivedMessage && receivedEvent,
+                "WhenFileIsRequested -> ThenWithAsyncSendFileShouldReturnSuccess failed.");
         }
 
         //[Test]
         public static void ThenDownloadFileShouldReturnSuccess()
         {
             server.ClearRequests();
-            
-            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid_file_tests"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -322,26 +355,25 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
+
             pubnub = createPubNubInstance(config);
+            pubnub.SetAuthToken(token);
 
             var messageReset = new ManualResetEvent(false);
             string fileId = "b0a5c0df-7523-432e-8ea9-01567c93da7d";
             string fileName = "pandu_test.gif";
-            
-            pubnub.DownloadFile().Channel(channelName).FileId(fileId).FileName(fileName).CipherKey("enigma").Execute(new PNDownloadFileResultExt((result, status) =>
-            {
-                if (result != null)
+
+            pubnub.DownloadFile().Channel(channelName).FileId(fileId).FileName(fileName).CipherKey("enigma").Execute(
+                new PNDownloadFileResultExt((result, status) =>
                 {
-                    //result.SaveToLocal(@"C:\Pandu\temp\new\output\hi_file.gif");
-                    //result.SaveToLocal(@"C:\Pandu\temp\new\");
-                    result.SaveFileToLocal("what_is_hi_file.gif");
-                    messageReset.Set();
-                }
-            }));
+                    if (result != null)
+                    {
+                        //result.SaveToLocal(@"C:\Pandu\temp\new\output\hi_file.gif");
+                        //result.SaveToLocal(@"C:\Pandu\temp\new\");
+                        result.SaveFileToLocal("what_is_hi_file.gif");
+                        messageReset.Set();
+                    }
+                }));
             var receivedMessage = messageReset.WaitOne(4000);
 
             pubnub.Destroy();
@@ -354,8 +386,8 @@ namespace PubNubMessaging.Tests
         public static void ThenGetFileUrlShouldReturnSuccess()
         {
             server.ClearRequests();
-            
-            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid_file_tests"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -365,24 +397,23 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
+
             pubnub = createPubNubInstance(config);
+            pubnub.SetAuthToken(token);
 
             var messageReset = new ManualResetEvent(false);
             string fileId = "bc03db55-6345-4a0f-aa58-beac970b2c5b";
             string fileName = "whoami.txt";
-            
-            pubnub.GetFileUrl().Channel(channelName).FileId(fileId).FileName(fileName).Execute(new PNFileUrlResultExt((result, status) =>
-            {
-                if (result != null)
+
+            pubnub.GetFileUrl().Channel(channelName).FileId(fileId).FileName(fileName).Execute(new PNFileUrlResultExt(
+                (result, status) =>
                 {
-                    System.Diagnostics.Debug.WriteLine(result.Url);
-                    messageReset.Set();
-                }
-            }));
+                    if (result != null)
+                    {
+                        System.Diagnostics.Debug.WriteLine(result.Url);
+                        messageReset.Set();
+                    }
+                }));
             var receivedMessage = messageReset.WaitOne(5000);
 
             pubnub.Destroy();
@@ -395,8 +426,8 @@ namespace PubNubMessaging.Tests
         public static void ThenListFilesShouldReturnSuccess()
         {
             server.ClearRequests();
-            
-            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid_file_tests"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -407,19 +438,18 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
+
             pubnub = createPubNubInstance(config);
-            
+            pubnub.SetAuthToken(token);
+
             var messageReset = new ManualResetEvent(false);
             pubnub.ListFiles().Channel(channelName)
                 .Execute(new PNListFilesResultExt((result, status) =>
                 {
                     if (result != null)
                     {
-                        System.Diagnostics.Debug.WriteLine("result = " + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
+                        System.Diagnostics.Debug.WriteLine("result = " +
+                                                           pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
                         messageReset.Set();
                     }
                 }));
@@ -439,8 +469,8 @@ namespace PubNubMessaging.Tests
 #endif
         {
             server.ClearRequests();
-            
-            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid_file_tests"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -451,47 +481,55 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
+
             pubnub = createPubNubInstance(config);
+            pubnub.SetAuthToken(token);
 
             var messageReset = new ManualResetEvent(false);
 #if NET40
-            PNResult<PNListFilesResult> listFilesResponse = Task.Factory.StartNew(async () => await pubnub.ListFiles().Channel(channelName).ExecuteAsync()).Result.Result;
+            PNResult<PNListFilesResult> listFilesResponse =
+ Task.Factory.StartNew(async () => await pubnub.ListFiles().Channel(channelName).ExecuteAsync()).Result.Result;
 #else
-            PNResult<PNListFilesResult> listFilesResponse = await pubnub.ListFiles().Channel(channelName).ExecuteAsync();
+            PNResult<PNListFilesResult> listFilesResponse =
+                await pubnub.ListFiles().Channel(channelName).ExecuteAsync();
 #endif
-            if (listFilesResponse.Result != null && listFilesResponse.Result.FilesList != null && listFilesResponse.Result.FilesList.Count > 0 && !listFilesResponse.Status.Error)
+            if (listFilesResponse.Result != null && listFilesResponse.Result.FilesList != null &&
+                listFilesResponse.Result.FilesList.Count > 0 && !listFilesResponse.Status.Error)
             {
                 List<PNFileResult> filesList = listFilesResponse.Result.FilesList;
                 foreach (var file in filesList)
                 {
 #if NET40
-                    PNResult<PNDeleteFileResult> deleteFileResponse = Task.Factory.StartNew(async () => await pubnub.DeleteFile().Channel(channelName).FileId(file.Id).FileName(file.Name).ExecuteAsync()).Result.Result;
+                    PNResult<PNDeleteFileResult> deleteFileResponse =
+ Task.Factory.StartNew(async () => await pubnub.DeleteFile().Channel(channelName).FileId(file.Id).FileName(file.Name).ExecuteAsync()).Result.Result;
 #else
-                    PNResult<PNDeleteFileResult> deleteFileResponse = await pubnub.DeleteFile().Channel(channelName).FileId(file.Id).FileName(file.Name).ExecuteAsync();
+                    PNResult<PNDeleteFileResult> deleteFileResponse = await pubnub.DeleteFile().Channel(channelName)
+                        .FileId(file.Id).FileName(file.Name).ExecuteAsync();
 #endif
                     PNDeleteFileResult deleteFileResult = deleteFileResponse.Result;
                     if (deleteFileResult != null)
                     {
-                        System.Diagnostics.Debug.WriteLine(string.Format("File Id={0}, Name={1} => deleted successfully", file.Id, file.Name));
+                        System.Diagnostics.Debug.WriteLine(
+                            string.Format("File Id={0}, Name={1} => deleted successfully", file.Id, file.Name));
                     }
                 }
+
                 messageReset.Set();
             }
             else
             {
 #if NET40
-                PNResult<PNDeleteFileResult> deleteFileResponse = Task.Factory.StartNew(async () => await pubnub.DeleteFile().Channel(channelName).FileId("test_file_id").FileName("test_file_name.test").ExecuteAsync()).Result.Result;
+                PNResult<PNDeleteFileResult> deleteFileResponse =
+ Task.Factory.StartNew(async () => await pubnub.DeleteFile().Channel(channelName).FileId("test_file_id").FileName("test_file_name.test").ExecuteAsync()).Result.Result;
 #else
-                PNResult<PNDeleteFileResult> deleteFileResponse = await pubnub.DeleteFile().Channel(channelName).FileId("test_file_id").FileName("test_file_name.test").ExecuteAsync();
+                PNResult<PNDeleteFileResult> deleteFileResponse = await pubnub.DeleteFile().Channel(channelName)
+                    .FileId("test_file_id").FileName("test_file_name.test").ExecuteAsync();
 #endif
                 PNDeleteFileResult deleteFileResult = deleteFileResponse.Result;
                 if (deleteFileResult != null)
                 {
-                    System.Diagnostics.Debug.WriteLine("File Id=test_file_id, Name=test_file_name.test => deleted successfully");
+                    System.Diagnostics.Debug.WriteLine(
+                        "File Id=test_file_id, Name=test_file_name.test => deleted successfully");
                     messageReset.Set();
                 }
             }
@@ -502,7 +540,6 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedMessage, "WhenFileIsRequested -> ThenWithAsyncDeleteFileShouldReturnSuccess failed.");
-
         }
     }
 }
