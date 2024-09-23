@@ -10,15 +10,16 @@ concurrency:
 jobs:
   tests:
     name: Integration and Unit tests
-    runs-on: windows-2019
+    runs-on:
+      group: windows-gh
     defaults:
       run:
         shell: powershell
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Checkout actions
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: pubnub/client-engineering-deployment-tools
           ref: v1
@@ -27,9 +28,10 @@ jobs:
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1
       - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
+            3.x
             5.0.x
             6.0.x
             7.0.x
@@ -48,16 +50,17 @@ jobs:
         uses: ./.github/.release/actions/actions/utils/fast-jobs-failure
   acceptance-tests:
     name: Acceptance tests
-    runs-on: windows-2019
+    runs-on:
+      group: windows-gh
     defaults:
       run:
         shell: powershell
         working-directory: ./src
     steps:
       - name: Checkout Project
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Checkout mock-server action
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: pubnub/client-engineering-deployment-tools
           ref: v1
@@ -68,7 +71,7 @@ jobs:
         with:
           token: ${{ secrets.GH_TOKEN }}
       - name: Setup .NET 6.0.x
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 6.0.x
       - name: Restore dependencies
@@ -78,20 +81,20 @@ jobs:
           cd ./UnitTests/AcceptanceTests 
           dotnet build --no-restore
       - name: Run acceptance tests
-        env: 
+        env:
           PN_PAM_PUB_KEY: ${{ secrets.SDK_PAM_PUB_KEY }}
           PN_PAM_SUB_KEY: ${{ secrets.SDK_PAM_SUB_KEY }}
-          PN_PAM_SEC_KEY: ${{ secrets.SDK_PAM_SEC_KEY }}    
+          PN_PAM_SEC_KEY: ${{ secrets.SDK_PAM_SEC_KEY }}
           PN_PUB_KEY: ${{ secrets.SDK_PUB_KEY }}
           PN_SUB_KEY: ${{ secrets.SDK_SUB_KEY }}
-          PN_SEC_KEY: ${{ secrets.SDK_SEC_KEY }}   
+          PN_SEC_KEY: ${{ secrets.SDK_SEC_KEY }}
         run: |
           Copy-Item -Path "${{ github.workspace }}/sdk-specifications/features/access/*" -Destination "${{ github.workspace }}/src/UnitTests/AcceptanceTests/Features" -Recurse
           cd ./UnitTests/AcceptanceTests 
           dotnet test --no-build --verbosity normal --logger "console;verbosity=detailed" --results-directory ./results
       - name: Upload acceptance tests reports
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: acceptance-test-reports
           path: |
@@ -102,8 +105,9 @@ jobs:
         uses: ./.github/.release/actions/actions/utils/fast-jobs-failure
   all-tests:
     name: Tests
-    runs-on: ubuntu-latest
     needs: [tests, acceptance-tests]
+    runs-on:
+      group: Default
     steps:
       - name: Tests summary
         run: echo -e "\033[38;2;95;215;0m\033[1mAll tests successfully passed"
