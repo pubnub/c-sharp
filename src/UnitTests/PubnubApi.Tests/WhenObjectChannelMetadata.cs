@@ -31,6 +31,7 @@ namespace PubNubMessaging.Tests
 
             if (!PubnubCommon.PAMServerSideGrant)
             {
+                Assert.Fail("-----TEST FAIL ASSERT-----");
                 return;
             }
 
@@ -268,8 +269,6 @@ namespace PubNubMessaging.Tests
 
             bool receivedMessage = false;
 
-            string channelMetadataId = "pandu-ut-sid";
-
             PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
@@ -429,8 +428,7 @@ namespace PubNubMessaging.Tests
             bool receivedMessage = false;
             bool receivedDeleteEvent = false;
             bool receivedUpdateEvent = false;
-
-            string channelMetadataId = "pandu-ut-sid";
+            
             manualResetEventWaitTimeout = 310 * 1000;
 
             SubscribeCallbackExt eventListener = new SubscribeCallbackExt(
@@ -572,8 +570,7 @@ namespace PubNubMessaging.Tests
             bool receivedMessage = false;
             bool receivedDeleteEvent = false;
             bool receivedUpdateEvent = false;
-
-            string channelMetadataId = "pandu-ut-sid";
+            
             manualResetEventWaitTimeout = 310 * 1000;
 
             SubscribeCallbackExt eventListener = new SubscribeCallbackExt(
