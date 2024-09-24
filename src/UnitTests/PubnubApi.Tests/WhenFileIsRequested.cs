@@ -458,7 +458,7 @@ namespace PubNubMessaging.Tests
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Assert.IsTrue(receivedMessage, "WhenFileIsRequested -> ThenListFilesShouldReturnSuccess failed.");
+            Assert.IsTrue(receivedMessage, $"WhenFileIsRequested -> ThenListFilesShouldReturnSuccess failed. DUMP: {PubnubCommon.TEMP_DebugDump()}");
         }
 
         [Test]
