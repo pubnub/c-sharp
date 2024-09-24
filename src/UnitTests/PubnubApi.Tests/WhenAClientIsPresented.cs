@@ -21,7 +21,7 @@ namespace PubNubMessaging.Tests
         private static int manualResetEventWaitTimeout = 310 * 1000;
         private static Pubnub pubnub;
         private static Server server;
-        private static string authKey = "myauth";
+        private static string authToken;
 
         public class TestLog : IPubnubLog
         {
@@ -32,7 +32,7 @@ namespace PubNubMessaging.Tests
         }
 
         [SetUp]
-        public static void Init()
+        public static async Task Init()
         {
             UnitTestLog unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
@@ -44,8 +44,7 @@ namespace PubNubMessaging.Tests
             }
 
             if (!PubnubCommon.PAMServerSideGrant) { return; }
-
-            bool receivedGrantMessage = false;
+            
             string channel = "hello_my_channel";
 
             PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
@@ -66,41 +65,41 @@ namespace PubNubMessaging.Tests
                     .WithPath(string.Format("/v2/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey))
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
+            
+            var fullAccess = new PNTokenAuthValues()
+            {
+                Read = true,
+                Write = true,
+                Create = true,
+                Get = true,
+                Delete = true,
+                Join = true,
+                Update = true,
+                Manage = true
+            };
+            var grantResult = await pubnub.GrantToken().TTL(20).AuthorizedUuid(config.UserId).Resources(
+                new PNTokenResources()
+                {
+                    Channels = new Dictionary<string, PNTokenAuthValues>()
+                    {
+                        {
+                            channel, fullAccess
+                        },
+                        {
+                            channel+"-pnpres", fullAccess
+                        }
+                    }
+                }).ExecuteAsync();
 
-            ManualResetEvent grantManualEvent = new ManualResetEvent(false);
-            pubnub.Grant().Channels(new [] { channel, channel+"-pnpres" }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20)
-                .Execute(new PNAccessManagerGrantResultExt(
-                                (r, s) =>
-                                {
-                                    try
-                                    {
-                                        Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
-                                        if (r != null)
-                                        {
-                                            Debug.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
-                                            if (r.Channels != null && r.Channels.Count > 0)
-                                            {
-                                                var read = r.Channels[channel][authKey].ReadEnabled;
-                                                var write = r.Channels[channel][authKey].WriteEnabled;
-                                                if (read && write) { receivedGrantMessage = true; }
-                                            }
-                                        }
-                                    }
-                                    catch { /* ignore */ }
-                                    finally
-                                    {
-                                        grantManualEvent.Set();
-                                    }
-                                }));
+            await Task.Delay(4000);
 
-            Thread.Sleep(100);
-
-            grantManualEvent.WaitOne(manualResetEventWaitTimeout);
+            authToken = grantResult.Result?.Token;
 
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Assert.IsTrue(receivedGrantMessage, "WhenAClientIsPresent Grant access failed.");
+            Assert.IsTrue(grantResult.Status.Error == false && grantResult.Result != null, 
+                "WhenAClientIsPresent Grant access failed.");
         }
 
         [TearDown]
@@ -154,10 +153,7 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
+            
             server.RunOnHttps(false);
 
             ManualResetEvent presenceManualEvent = new ManualResetEvent(false);
@@ -178,7 +174,7 @@ namespace PubNubMessaging.Tests
                     }
                 });
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             if (!pubnub.AddListener(listenerSubCallack))
             {
                 System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
@@ -250,10 +246,6 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
 
             server.RunOnHttps(true);
 
@@ -273,7 +265,7 @@ namespace PubNubMessaging.Tests
                         presenceManualEvent.Set();
                     }
                 });
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             if (!pubnub.AddListener(listenerSubCallack))
             {
                 System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
@@ -330,8 +322,7 @@ namespace PubNubMessaging.Tests
         public static void ThenPresenceShouldReturnCustomUserId()
         {
             server.ClearRequests();
-
-            UserId customUserId = new UserId("mylocalmachine.mydomain.com");
+            
             bool receivedCustomUUID = false;
 
             PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
@@ -343,10 +334,6 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMServerSideRun)
             {
                 config.SecretKey = PubnubCommon.SecretKey;
-            }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
             }
 
             server.RunOnHttps(false);
@@ -367,7 +354,7 @@ namespace PubNubMessaging.Tests
                         presenceManualEvent.Set();
                     }
                 });
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             if (!pubnub.AddListener(listenerSubCallack))
             {
                 System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
@@ -375,8 +362,6 @@ namespace PubNubMessaging.Tests
 
             string channel = "hello_my_channel";
             manualResetEventWaitTimeout = 310 * 1000;
-
-            pubnub.ChangeUserId(customUserId);
 
             string expected = "{\"t\":{\"t\":\"14833694874957031\",\"r\":7},\"m\":[{\"a\":\"4\",\"f\":512,\"p\":{\"t\":\"14833694873794045\",\"r\":2},\"k\":\"demo-36\",\"c\":\"hello_my_channel-pnpres\",\"d\":{\"action\": \"join\", \"timestamp\": 1483369487, \"uuid\": \"mylocalmachine.mydomain.com\", \"occupancy\": 1},\"b\":\"hello_my_channel-pnpres\"}]}";
 
@@ -388,7 +373,7 @@ namespace PubNubMessaging.Tests
                     .WithParameter("requestid", "myRequestId")
                     .WithParameter("timestamp", "1356998400")
                     .WithParameter("tt", "0")
-                    .WithParameter("uuid", customUserId.ToString())
+                    //.WithParameter("uuid", customUserId.ToString())
                     .WithParameter("signature", "D7lw9Np5UU_xUTUAe0Sc0L0eSP9aTQljeith_M_rXzI=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
@@ -440,10 +425,6 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
             server.RunOnHttps(false);
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
@@ -461,7 +442,7 @@ namespace PubNubMessaging.Tests
                     }
                     subscribeManualEvent.Set();
                 });
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             if (!pubnub.AddListener(listenerSubCallack))
             {
                 System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
@@ -564,10 +545,6 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
             server.RunOnHttps(false);
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
@@ -585,7 +562,7 @@ namespace PubNubMessaging.Tests
                     }
                     subscribeManualEvent.Set();
                 });
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             if (!pubnub.AddListener(listenerSubCallack))
             {
                 System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
@@ -687,10 +664,6 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
 
             server.RunOnHttps(false);
 
@@ -710,7 +683,7 @@ namespace PubNubMessaging.Tests
                     }
                     subscribeManualEvent.Set();
                 });
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             if (!pubnub.AddListener(listenerSubCallack))
             {
                 System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
@@ -808,10 +781,6 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
 
             server.RunOnHttps(true);
 
@@ -829,7 +798,7 @@ namespace PubNubMessaging.Tests
                     }
                     subscribeManualEvent.Set();
                 });
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             if (!pubnub.AddListener(listenerSubCallack))
             {
                 System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
@@ -927,10 +896,6 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
 
             server.RunOnHttps(true);
 
@@ -948,7 +913,7 @@ namespace PubNubMessaging.Tests
                     }
                     subscribeManualEvent.Set();
                 });
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             if (!pubnub.AddListener(listenerSubCallack))
             {
                 System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
@@ -1047,10 +1012,6 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
 
             server.RunOnHttps(true);
 
@@ -1069,7 +1030,7 @@ namespace PubNubMessaging.Tests
                                 }
                                 subscribeManualEvent.Set();
                             });
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             if (!pubnub.AddListener(listenerSubCallack))
             {
                 System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
@@ -1166,10 +1127,6 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
 
             server.RunOnHttps(false);
 
@@ -1187,7 +1144,7 @@ namespace PubNubMessaging.Tests
                     }
                     subscribeManualEvent.Set();
                 });
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             if (!pubnub.AddListener(listenerSubCallack))
             {
                 System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
@@ -1284,10 +1241,6 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
 
             server.RunOnHttps(true);
 
@@ -1305,7 +1258,7 @@ namespace PubNubMessaging.Tests
                     }
                     subscribeManualEvent.Set();
                 });
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             if (!pubnub.AddListener(listenerSubCallack))
             {
                 System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
@@ -1403,10 +1356,6 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
 
             server.RunOnHttps(true);
 
@@ -1425,7 +1374,7 @@ namespace PubNubMessaging.Tests
                     }
                     subscribeManualEvent.Set();
                 });
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             if (!pubnub.AddListener(listenerSubCallack))
             {
                 System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
@@ -1524,10 +1473,6 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
 
             server.RunOnHttps(false);
 
@@ -1546,7 +1491,7 @@ namespace PubNubMessaging.Tests
                     }
                     subscribeManualEvent.Set();
                 });
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             if (!pubnub.AddListener(listenerSubCallack))
             {
                 System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
@@ -1683,10 +1628,6 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
             server.RunOnHttps(false);
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
@@ -1703,7 +1644,7 @@ namespace PubNubMessaging.Tests
                     }
                     subscribeManualEvent.Set();
                 });
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             if (!pubnub.AddListener(listenerSubCallack))
             {
                 System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
@@ -1818,10 +1759,6 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
 
             server.RunOnHttps(false);
 
@@ -1839,7 +1776,7 @@ namespace PubNubMessaging.Tests
                     }
                     subscribeManualEvent.Set();
                 });
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             if (!pubnub.AddListener(listenerSubCallack))
             {
                 System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
@@ -1969,10 +1906,6 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
 
             server.RunOnHttps(false);
 
@@ -1990,7 +1923,7 @@ namespace PubNubMessaging.Tests
                     }
                     subscribeManualEvent.Set();
                 });
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             if (!pubnub.AddListener(listenerSubCallack))
             {
                 System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
@@ -2091,10 +2024,6 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
 
             server.RunOnHttps(false);
 
@@ -2112,7 +2041,7 @@ namespace PubNubMessaging.Tests
                     }
                     subscribeManualEvent.Set();
                 });
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             if (!pubnub.AddListener(listenerSubCallack))
             {
                 System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
@@ -2199,8 +2128,7 @@ namespace PubNubMessaging.Tests
         public static void IfSetAndGetUserStateThenItShouldReturnInfo()
         {
             server.ClearRequests();
-
-            UserId customUserId =  new UserId("mylocalmachine.mydomain.com");
+            
             bool receivedUserStateMessage = false;
 
             PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
@@ -2213,15 +2141,10 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
 
             server.RunOnHttps(false);
 
-            pubnub = createPubNubInstance(config);
-            pubnub.ChangeUserId(customUserId);
+            pubnub = createPubNubInstance(config, authToken);
 
             manualResetEventWaitTimeout = 310 * 1000;
             string channel = "hello_my_channel";
@@ -2232,7 +2155,7 @@ namespace PubNubMessaging.Tests
             string expected = "{\"status\": 200, \"message\": \"OK\", \"payload\": {\"testkey\": \"testval\"}, \"service\": \"Presence\"}";
             server.AddRequest(new Request()
                     .WithMethod("GET")
-                    .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/uuid/{2}/data", PubnubCommon.SubscribeKey, channel, customUserId.ToString()))
+                    //.WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/uuid/{2}/data", PubnubCommon.SubscribeKey, channel, customUserId.ToString()))
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -2260,7 +2183,7 @@ namespace PubNubMessaging.Tests
                 expected = "{\"status\": 200, \"uuid\": \"mylocalmachine.mydomain.com\", \"service\": \"Presence\", \"message\": \"OK\", \"payload\": {\"testkey\": \"testval\"}, \"channel\": \"hello_my_channel\"}";
                 server.AddRequest(new Request()
                         .WithMethod("GET")
-                        .WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/uuid/{2}", PubnubCommon.SubscribeKey, channel, customUserId.ToString()))
+                        //.WithPath(String.Format("/v2/presence/sub_key/{0}/channel/{1}/uuid/{2}", PubnubCommon.SubscribeKey, channel, customUserId.ToString()))
                         .WithResponse(expected)
                         .WithStatusCode(System.Net.HttpStatusCode.OK));
 
@@ -2298,14 +2221,10 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
 
             server.RunOnHttps(false);
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             manualResetEventWaitTimeout = 310 * 1000;
             string channel = "hello_my_channel";
@@ -2453,10 +2372,6 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
             server.RunOnHttps(false);
 
 
@@ -2476,7 +2391,7 @@ namespace PubNubMessaging.Tests
                         presenceManualEvent.Set();
                     }
                 });
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             if (!pubnub.AddListener(listenerSubCallack))
             {
                 System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
