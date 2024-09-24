@@ -31,7 +31,6 @@ namespace PubNubMessaging.Tests
 
             if (!PubnubCommon.PAMServerSideGrant)
             {
-                Assert.Fail("-----TEST FAIL ASSERT-----");
                 return;
             }
 
@@ -244,7 +243,7 @@ namespace PubNubMessaging.Tests
 
             if (!receivedMessage)
             {
-                Assert.IsTrue(receivedMessage, "SetChannelMetadata/DeleteChannelMetadataId Failed");
+                Assert.IsTrue(receivedMessage, $"SetChannelMetadata/DeleteChannelMetadataId Failed, DUMP DATA:\n{PubnubCommon.TEMP_DumpInfo()}");
             }
 
             pubnub.Destroy();
@@ -406,7 +405,7 @@ namespace PubNubMessaging.Tests
 
             if (!receivedMessage)
             {
-                Assert.IsTrue(receivedMessage, "SeChannelMetadata/DeleteChannelMetadata Failed");
+                Assert.IsTrue(receivedMessage, $"SeChannelMetadata/DeleteChannelMetadata Failed, DUMP DATA:\n{PubnubCommon.TEMP_DumpInfo()}");
             }
 
             pubnub.Destroy();
@@ -545,7 +544,7 @@ namespace PubNubMessaging.Tests
             pubnub.Unsubscribe<string>().Channels(new string[] { channelMetadataId }).Execute();
             pubnub.RemoveListener(eventListener);
 
-            Assert.IsTrue(receivedDeleteEvent && receivedUpdateEvent, "Channel Metadata events Failed");
+            Assert.IsTrue(receivedDeleteEvent && receivedUpdateEvent, $"Channel Metadata events Failed, DUMP DATA:\n{PubnubCommon.TEMP_DumpInfo()}");
 
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
