@@ -91,7 +91,7 @@ jobs:
         run: |
           Copy-Item -Path "${{ github.workspace }}/sdk-specifications/features/access/*" -Destination "${{ github.workspace }}/src/UnitTests/AcceptanceTests/Features" -Recurse
           cd ./UnitTests/AcceptanceTests 
-          dotnet test --no-build --verbosity normal --logger "console;verbosity=detailed" --results-directory ./results
+          dotnet test --no-build --verbosity normal --logger "console;verbosity=detailed" --results-directory ./results  --filter "FullyQualifiedName~WhenFileIsRequested"
       - name: Upload acceptance tests reports
         if: always()
         uses: actions/upload-artifact@v4

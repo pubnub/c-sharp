@@ -153,6 +153,8 @@ namespace PubNubMessaging.Tests
                 }));
             var receivedMessage = messageReset.WaitOne(3 * 1000 * 60);
 
+            Assert.IsTrue(receivedMessage, "Send File Failed");
+            
             if (receivedMessage)
             {
                 messageReset = new ManualResetEvent(false);
@@ -169,6 +171,8 @@ namespace PubNubMessaging.Tests
                     }));
                 receivedMessage = messageReset.WaitOne(2 * 1000 * 60);
             }
+            
+            Assert.IsTrue(receivedMessage, "List Files Failed");
 
             if (receivedMessage)
             {
@@ -187,6 +191,8 @@ namespace PubNubMessaging.Tests
                     }));
                 receivedMessage = messageReset.WaitOne(2 * 1000 * 60);
             }
+            
+            Assert.IsTrue(receivedMessage, "Download File Failed");
 
             if (receivedMessage)
             {
@@ -204,6 +210,8 @@ namespace PubNubMessaging.Tests
                     }));
                 receivedMessage = messageReset.WaitOne(2 * 1000 * 60);
             }
+            
+            Assert.IsTrue(receivedMessage, "Delete File Failed");
 
             var receivedEvent = false;
             if (receivedMessage)
@@ -214,7 +222,7 @@ namespace PubNubMessaging.Tests
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Assert.IsTrue(receivedEvent);
+            Assert.IsTrue(receivedEvent, "Receiving file event failed.");
             Assert.IsTrue(receivedMessage, "WhenFileIsRequested -> TheSendFileShouldReturnSuccess failed.");
         }
 
