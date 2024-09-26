@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Threading;
 using System.Net;
 using System.Linq;
 using System.Globalization;
-using System.Threading.Channels;
 using System.Text;
-#if !NET35 && !NET40
-using System.Collections.Concurrent;
-#endif
 
 namespace PubnubApi.EndPoint
 {
@@ -208,16 +203,6 @@ namespace PubnubApi.EndPoint
 		internal void CurrentPubnubInstance(Pubnub instance)
 		{
 			PubnubInstance = instance;
-
-			if (!ChannelRequest.ContainsKey(instance.InstanceId)) {
-				ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
-			}
-			if (!ChannelInternetStatus.ContainsKey(instance.InstanceId)) {
-				ChannelInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
-			}
-			if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId)) {
-				ChannelGroupInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
-			}
 		}
 
 	}
