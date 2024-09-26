@@ -25,10 +25,5 @@ namespace PubNubMessaging.Tests
         static PubnubCommon()
         {
         }
-
-        public static string TEMP_DebugDump()
-        {
-            return $"EnvPAMServerSideRun: {EnvPAMServerSideRun}, EnvPublishKey: {EnvPublishKey[^4]}, EnvSubscribeKey: {EnvSubscribeKey[^4]}, EnvSecretKey: {EnvSecretKey[^4]}";
-        }
     }
 }

@@ -239,11 +239,9 @@ namespace PubNubMessaging.Tests
                 manualEvent.WaitOne(manualResetEventWaitTimeout);
             }
 
-            Debug.WriteLine("---TEST---");
-
             if (!receivedMessage)
             {
-                Assert.IsTrue(receivedMessage, $"SetChannelMetadata/DeleteChannelMetadataId Failed, DUMP:\n{PubnubCommon.TEMP_DebugDump()}");
+                Assert.IsTrue(receivedMessage, $"SetChannelMetadata/DeleteChannelMetadataId Failed.");
             }
 
             pubnub.Destroy();
