@@ -2,23 +2,18 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Net;
 using System.Threading;
-using System.Threading.Tasks;
 using PubnubApi.Interface;
-#if !NET35 && !NET40
-using System.Collections.Concurrent;
-#endif
 
 namespace PubnubApi.EndPoint
 {
-    public class UnsubscribeOperation<T> : PubnubCoreBase, IUnsubscribeOperation<T>
+	public class UnsubscribeOperation<T> : PubnubCoreBase, IUnsubscribeOperation<T>
     {
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
         private readonly IPubnubUnitTest unit;
         private readonly IPubnubLog pubnubLog;
-        private readonly EndPoint.TokenManager pubnubTokenMgr;
+        private readonly TokenManager pubnubTokenMgr;
 
         private string[] subscribeChannelNames;
         private string[] subscribeChannelGroupNames;
@@ -89,27 +84,6 @@ namespace PubnubApi.EndPoint
         internal void CurrentPubnubInstance(Pubnub instance)
         {
             PubnubInstance = instance;
-
-            if (!MultiChannelSubscribe.ContainsKey(instance.InstanceId))
-            {
-                MultiChannelSubscribe.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, long>());
-            }
-            if (!MultiChannelGroupSubscribe.ContainsKey(instance.InstanceId))
-            {
-                MultiChannelGroupSubscribe.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, long>());
-            }
-            if (!ChannelRequest.ContainsKey(instance.InstanceId))
-            {
-                ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
-            }
-            if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
-            {
-                ChannelInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
-            }
-            if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId))
-            {
-                ChannelGroupInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
-            }
         }
     }
 }

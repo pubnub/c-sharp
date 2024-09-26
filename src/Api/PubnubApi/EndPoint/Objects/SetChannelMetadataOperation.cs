@@ -2,10 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using System.Net;
-#if !NET35 && !NET40
-using System.Collections.Concurrent;
-#endif
 
 namespace PubnubApi.EndPoint
 {
@@ -31,18 +27,6 @@ namespace PubnubApi.EndPoint
 			jsonLibrary = jsonPluggableLibrary;
 			unit = pubnubUnit;
 			pubnubLog = log;
-
-			if (instance != null) {
-				if (!ChannelRequest.ContainsKey(instance.InstanceId)) {
-					ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
-				}
-				if (!ChannelInternetStatus.ContainsKey(instance.InstanceId)) {
-					ChannelInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
-				}
-				if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId)) {
-					ChannelGroupInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
-				}
-			}
 		}
 
 		public SetChannelMetadataOperation Channel(string channelName)
@@ -173,7 +157,7 @@ namespace PubnubApi.EndPoint
 				var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
 				if (errorStatus == null) {
-					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, (int)HttpStatusCode.OK, null);
+					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, 200, null);
 					JsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
 				} else {
 					JsonAndStatusTuple = new Tuple<string, PNStatus>(string.Empty, errorStatus);

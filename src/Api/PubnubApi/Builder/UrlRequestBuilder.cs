@@ -3,21 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Globalization;
-using System.Threading.Tasks;
-using System.Threading;
 using PubnubApi.Security.Crypto.Common;
-#if !NETSTANDARD10 && !NETSTANDARD11 && !NETSTANDARD12 && !WP81
-using System.Reflection;
-#endif
-#if !NET35 && !NET40
-using System.Collections.Concurrent;
-#endif
 using PubnubApi.Security.Crypto;
 using PubnubApi.Security.Crypto.Cryptors;
+using System.Collections.Concurrent;
+using System.Reflection;
 
 namespace PubnubApi
 {
-    public sealed class UrlRequestBuilder : IUrlRequestBuilder
+	public sealed class UrlRequestBuilder : IUrlRequestBuilder
     {
         private ConcurrentDictionary<string, PNConfiguration> pubnubConfig { get; } = new ConcurrentDictionary<string, PNConfiguration>();
         private readonly IJsonPluggableLibrary jsonLib ;

@@ -30,16 +30,6 @@ namespace PubnubApi.EndPoint
 			pubnubLog = log;
 
 			PubnubInstance = instance;
-
-			if (!ChannelRequest.ContainsKey(instance.InstanceId)) {
-				ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
-			}
-			if (!ChannelInternetStatus.ContainsKey(instance.InstanceId)) {
-				ChannelInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
-			}
-			if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId)) {
-				ChannelGroupInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
-			}
 		}
 
 		public AddPushChannelOperation PushType(PNPushType pushType)
