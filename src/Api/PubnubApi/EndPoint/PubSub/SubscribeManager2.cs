@@ -84,7 +84,7 @@ namespace PubnubApi.EndPoint
                 httpNonsubscribe.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 httpNonsubscribe.Timeout = TimeSpan.FromSeconds(config.NonSubscribeRequestTimeout);
             }
-            pubnubHttp = new PubnubHttp(config, jsonLibrary, log, httpSubscribe, httpNonsubscribe);
+            //pubnubHttp = new PubnubHttp(config, jsonLibrary, log, httpSubscribe, httpNonsubscribe);
 #else
             pubnubHttp = new PubnubHttp(config, jsonLibrary, log);
 #endif

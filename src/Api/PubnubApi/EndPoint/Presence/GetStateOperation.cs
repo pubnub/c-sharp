@@ -4,9 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Net;
-#if !NET35 && !NET40
+using System.Threading;
 using System.Collections.Concurrent;
-#endif
 
 namespace PubnubApi.EndPoint
 {
@@ -175,7 +174,7 @@ namespace PubnubApi.EndPoint
 			PubnubInstance = instance;
 
 			if (!ChannelRequest.ContainsKey(instance.InstanceId)) {
-				ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
+				ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, CancellationTokenSource>());
 			}
 			if (!ChannelInternetStatus.ContainsKey(instance.InstanceId)) {
 				ChannelInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());

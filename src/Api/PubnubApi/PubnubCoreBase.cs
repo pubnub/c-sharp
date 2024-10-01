@@ -13,10 +13,10 @@ using System.Threading;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
-using System.Net.Http;
-using System.Net.Http.Headers;
-#endif
+//#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
+//using System.Net.Http;
+//using System.Net.Http.Headers;
+//#endif
 using PubnubApi.Security.Crypto;
 using PubnubApi.Security.Crypto.Cryptors;
 using System.Collections.Concurrent;
@@ -46,12 +46,6 @@ namespace PubnubApi
         private static ConcurrentDictionary<string, IPubnubLog> pubnubLog { get; } = new ConcurrentDictionary<string, IPubnubLog>();
         protected static ConcurrentDictionary<string, EndPoint.TokenManager> PubnubTokenMgrCollection { get; } = new ConcurrentDictionary<string, EndPoint.TokenManager>();
         private static EndPoint.DuplicationManager pubnubSubscribeDuplicationManager { get; set; }
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
-        private static HttpClient httpClientSubscribe { get; set; }
-        private static HttpClient httpClientNonsubscribe { get; set; }
-        private static HttpClient httpClientNetworkStatus { get; set; }
-        private static PubnubHttpClientHandler pubnubHttpClientHandler { get; set; }
-#endif
 
         private bool clientNetworkStatusInternetStatus = true;
         protected static ConcurrentDictionary<string, bool> SubscribeDisconnected { get; set; } = new ConcurrentDictionary<string, bool>();
@@ -98,11 +92,11 @@ namespace PubnubApi
             set;
         } = new ConcurrentDictionary<string, ConcurrentDictionary<string, Timer>>();
 
-        protected static ConcurrentDictionary<string, ConcurrentDictionary<string, HttpWebRequest>> ChannelRequest
+        protected static ConcurrentDictionary<string, ConcurrentDictionary<string, CancellationTokenSource>> ChannelRequest
         {
             get;
             set;
-        } = new ConcurrentDictionary<string, ConcurrentDictionary<string, HttpWebRequest>>();
+        } = new ConcurrentDictionary<string, ConcurrentDictionary<string, CancellationTokenSource>>();
 
         protected static ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> ChannelInternetStatus
         {
@@ -174,56 +168,6 @@ namespace PubnubApi
             pubnubSubscribeDuplicationManager = new EndPoint.DuplicationManager(pubnubConfiguation, jsonPluggableLibrary, log);
 
             CurrentUserId.AddOrUpdate(instance.InstanceId, pubnubConfiguation.UserId, (k,o) => pubnubConfiguation.UserId);
-
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
-            if (httpClientSubscribe == null)
-            {
-                if (pubnubConfiguation.Proxy != null)
-                {
-                    HttpClientHandler httpClientHandler = new HttpClientHandler();
-                    if (httpClientHandler.SupportsProxy)
-                    {
-                        httpClientHandler.Proxy = pubnubConfiguation.Proxy;
-                        httpClientHandler.UseProxy = true;
-                    }
-                    pubnubHttpClientHandler = new PubnubHttpClientHandler("PubnubHttpClientHandler", httpClientHandler, pubnubConfiguation, jsonLib, unitTest, log);
-                    httpClientSubscribe = new HttpClient(pubnubHttpClientHandler);
-                }
-                else
-                {
-                    httpClientSubscribe = new HttpClient();
-                }
-                httpClientSubscribe.DefaultRequestHeaders.Accept.Clear();
-                httpClientSubscribe.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                httpClientSubscribe.Timeout = TimeSpan.FromSeconds(pubnubConfiguation.SubscribeTimeout);
-            }
-            if (httpClientNonsubscribe == null)
-            {
-                if (pubnubConfiguation.Proxy != null)
-                {
-                    HttpClientHandler httpClientHandler = new HttpClientHandler();
-                    if (httpClientHandler.SupportsProxy)
-                    {
-                        httpClientHandler.Proxy = pubnubConfiguation.Proxy;
-                        httpClientHandler.UseProxy = true;
-                    }
-                    pubnubHttpClientHandler = new PubnubHttpClientHandler("PubnubHttpClientHandler", httpClientHandler, pubnubConfiguation, jsonLib, unitTest, log);
-                    httpClientNonsubscribe = new HttpClient(pubnubHttpClientHandler);
-                }
-                else
-                {
-                    httpClientNonsubscribe = new HttpClient();
-                }
-                httpClientNonsubscribe.DefaultRequestHeaders.Accept.Clear();
-                httpClientNonsubscribe.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                httpClientNonsubscribe.Timeout = TimeSpan.FromSeconds(pubnubConfiguation.NonSubscribeRequestTimeout);
-            }
-            pubnubHttp = new PubnubHttp(pubnubConfiguation, jsonLib, log, httpClientSubscribe, httpClientNonsubscribe);
-#else
-            pubnubHttp = new PubnubHttp(pubnubConfiguation, jsonLib, log);
-#endif
-
-
             UpdatePubnubNetworkTcpCheckIntervalInSeconds();
             if (pubnubConfiguation.PresenceInterval > 10)
             {
@@ -298,23 +242,7 @@ namespace PubnubApi
             ClientNetworkStatus.JsonLibrary = jsonLib;
             ClientNetworkStatus.PubnubUnitTest = unitTest;
             ClientNetworkStatus.PubnubLog = currentLog;
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
-            if (httpClientNetworkStatus == null)
-            {
-                if (currentConfig.Proxy != null && pubnubHttpClientHandler != null)
-                {
-                    httpClientNetworkStatus = new HttpClient(pubnubHttpClientHandler);
-                }
-                else
-                {
-                    httpClientNetworkStatus = new HttpClient();
-                }
-                httpClientNetworkStatus.DefaultRequestHeaders.Accept.Clear();
-                httpClientNetworkStatus.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                httpClientNetworkStatus.Timeout = TimeSpan.FromSeconds(currentConfig.NonSubscribeRequestTimeout);
-            }
-            ClientNetworkStatus.RefHttpClient = httpClientNetworkStatus;
-#endif
+            ClientNetworkStatus.PubnubInstance = PubnubInstance;
             if (!ClientNetworkStatus.IsInternetCheckRunning())
             {
                 clientNetworkStatusInternetStatus = ClientNetworkStatus.CheckInternetStatus<T>(PubnetSystemActive, type, callback, channels, channelGroups);
@@ -348,7 +276,7 @@ namespace PubnubApi
                 }
                 else
                 {
-                    var _ = Int64.TryParse(result[1].ToString(), out jsonTimetoken);
+                    var _ = long.TryParse(result[1].ToString(), out jsonTimetoken);
                 }
             }
 
@@ -1878,53 +1806,6 @@ namespace PubnubApi
 
 #region "Terminate requests and Timers"
 
-        protected void TerminatePendingWebRequest()
-        {
-            TerminatePendingWebRequest<object>(null);
-        }
-
-        protected void TerminatePendingWebRequest<T>(RequestState<T> state)
-        {
-            PNConfiguration currentConfig;
-            IPubnubLog currentLog;
-            if (state != null && state.Request != null)
-            {
-                try
-                {
-                    if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig) && pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog))
-                    {
-                        LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, TerminatePendingWebRequest - {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), state.Request.RequestUri.ToString()), currentConfig.LogVerbosity);
-                    }
-                    state.Request.Abort();
-                }
-                catch { /* ignore */ }
-            }
-            else
-            {
-                ICollection<string> keyCollection = ChannelRequest[PubnubInstance.InstanceId].Keys;
-                foreach (string key in keyCollection.ToList())
-                {
-                    HttpWebRequest currentRequest;
-                    if (ChannelRequest[PubnubInstance.InstanceId].TryGetValue(key, out currentRequest) && currentRequest != null)
-                    {
-                        TerminatePendingWebRequest(currentRequest);
-                    }
-                }
-            }
-        }
-
-        protected static void TerminatePendingWebRequest(HttpWebRequest request)
-        {
-            if (request != null)
-            {
-                try
-                {
-                    request.Abort();
-                }
-                catch { /* ignore */ }
-            }
-        }
-
         private void RemoveChannelDictionary()
         {
             RemoveChannelDictionary<object>(null);
@@ -1935,13 +1816,13 @@ namespace PubnubApi
             PNConfiguration currentConfig;
             IPubnubLog currentLog;
 
-            if (state != null && state.Request != null)
+            if (state != null && state.RequestCancellationTokenSource != null)
             {
                 string channel = (state.Channels != null) ? string.Join(",", state.Channels.OrderBy(x => x).ToArray()) : ",";
 
                 if (ChannelRequest[PubnubInstance.InstanceId].ContainsKey(channel))
                 {
-                    HttpWebRequest removedRequest;
+                    CancellationTokenSource removedRequest;
                     bool removeKey = ChannelRequest[PubnubInstance.InstanceId].TryRemove(channel, out removedRequest);
                     if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig) && pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog))
                     {
@@ -1964,7 +1845,7 @@ namespace PubnubApi
                     List<string> keysList = keyCollection.ToList();
                     foreach (string key in keysList)
                     {
-                        HttpWebRequest currentRequest;
+                        CancellationTokenSource currentRequest;
                         if (ChannelRequest[PubnubInstance.InstanceId].TryGetValue(key, out currentRequest) && currentRequest != null)
                         {
                             bool removeKey = ChannelRequest[PubnubInstance.InstanceId].TryRemove(key, out currentRequest);
@@ -2294,10 +2175,10 @@ namespace PubnubApi
             }
 
             RemoveChannelDictionary();
-            TerminatePendingWebRequest();
+            //TerminatePendingWebRequest();
             TerminateReconnectTimer();
             RemoveUserState();
-            PubnubCoreBase.TerminatePresenceHeartbeatTimer();
+			TerminatePresenceHeartbeatTimer();
             TerminateDedupeManager();
             TerminateTokenManagerCollection();
 
@@ -2342,35 +2223,6 @@ namespace PubnubApi
         internal static void RemoveHttpClients()
         {
             //Conditionalmethod logic
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
-            if (httpClientNetworkStatus != null)
-            {
-                try{
-                    httpClientNetworkStatus.CancelPendingRequests();
-                    httpClientNetworkStatus.Dispose();
-                    httpClientNetworkStatus = null;
-                }
-                catch { /* ignore */ }
-            }
-            if (httpClientSubscribe != null)
-            {
-                try{
-                    httpClientSubscribe.CancelPendingRequests();
-                    httpClientSubscribe.Dispose();
-                    httpClientSubscribe = null;
-                }
-                catch { /* ignore */ }
-            }
-            if (httpClientNonsubscribe != null)
-            {
-                try{
-                    httpClientNonsubscribe.CancelPendingRequests();
-                    httpClientNonsubscribe.Dispose();
-                    httpClientNonsubscribe = null;
-                }
-                catch { /* ignore */ }
-            }
-#endif
         }
         
         internal void TerminateCurrentSubscriberRequest()
@@ -2379,32 +2231,22 @@ namespace PubnubApi
             if (channels != null)
             {
                 string multiChannel = (channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : ",";
-                HttpWebRequest request;
+                CancellationTokenSource request;
                 if (ChannelRequest[PubnubInstance.InstanceId].ContainsKey(multiChannel) && ChannelRequest[PubnubInstance.InstanceId].TryGetValue(multiChannel, out request) && request != null)
                 {
                     PNConfiguration currentConfig;
                     IPubnubLog currentLog;
                     if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig) && pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog))
                     {
-                        LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} TerminateCurrentSubsciberRequest {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), request.RequestUri.ToString()), currentConfig.LogVerbosity);
+                        LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} TerminateCurrentSubsciberRequest {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), request.IsCancellationRequested), currentConfig.LogVerbosity);
                     }
                     try
                     {
-                        request.Abort();
+                        request.Cancel();
                     }
                     catch { /* ignore */ }
                 }
             }
-#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
-            if (httpClientSubscribe != null)
-            {
-                try
-                {
-                    httpClientSubscribe.CancelPendingRequests();
-                }
-                catch {  /* ignore */ }
-            }
-#endif
         }
 
         #endregion
@@ -2498,7 +2340,7 @@ namespace PubnubApi
         {
             if (!ChannelRequest.ContainsKey(PubnubInstance.InstanceId))
             {
-                ChannelRequest.GetOrAdd(PubnubInstance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
+                ChannelRequest.GetOrAdd(PubnubInstance.InstanceId, new ConcurrentDictionary<string, CancellationTokenSource>());
             }
             if (!ChannelInternetStatus.ContainsKey(PubnubInstance.InstanceId))
             {
