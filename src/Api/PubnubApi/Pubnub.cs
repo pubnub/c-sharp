@@ -412,15 +412,18 @@ namespace PubnubApi
             }
         }
 
-        public bool RemoveListener(SubscribeCallback listener)
-        {
-            bool ret = false;
-            if (subscribeCallbackListenerList != null)
-            {
-                ret = subscribeCallbackListenerList.Remove(listener);
-            }
-            return ret;
-        }
+		public bool RemoveListener(SubscribeCallback listener)
+		{
+			bool ret = false;
+			if (subscribeCallbackListenerList != null) {
+				ret = subscribeCallbackListenerList.Remove(listener);
+			}
+			if (listenerManager != null) {
+				var removeFromListenerManager = listenerManager.RemoveListener(listener);
+				if (!ret) ret = ret || removeFromListenerManager;
+			}
+			return ret;
+		}
         #endregion
 
         public EndPoint.SendFileOperation SendFile()
