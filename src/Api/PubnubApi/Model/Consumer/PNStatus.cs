@@ -14,7 +14,7 @@ namespace PubnubApi
 
         public PNStatus() { }
 
-        public PNStatus(Exception e, PNOperationType operationType, PNStatusCategory category, IEnumerable<string> affectedChannels = null, IEnumerable<string> affectedChannelGroups = null)
+        public PNStatus(Exception e, PNOperationType operationType, PNStatusCategory category, IEnumerable<string> affectedChannels = null, IEnumerable<string> affectedChannelGroups = null, int? statusCode = null)
         {
             this.Error = e != null;
             this.Operation = operationType;
@@ -22,6 +22,7 @@ namespace PubnubApi
             this.AffectedChannels = affectedChannels?.ToList(); 
             this.AffectedChannelGroups = affectedChannelGroups?.ToList();
             this.Category = category;
+            this.StatusCode = statusCode ?? 200;
             if (!Error)
             {
                 this.StatusCode = 200;
@@ -31,10 +32,17 @@ namespace PubnubApi
         internal PNStatus(object endpointOperation)
         {
             this.savedEndpointOperation = endpointOperation;
+            if(endpointOperation is PNStatus) {
+                var status = (PNStatus)endpointOperation;
+                this.Error = status.Error;
+                this.Category = status.Category;
+                this.StatusCode = status.StatusCode;
+                this.ErrorData = status.ErrorData;
+            }
         }
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public PNStatusCategory Category { get; internal set; }
+        public PNStatusCategory Category { get; set; }
 
         public PNErrorData ErrorData { get; internal set; }
         public bool Error { get; internal set; }

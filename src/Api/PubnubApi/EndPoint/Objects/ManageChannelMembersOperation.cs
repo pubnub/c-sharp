@@ -3,27 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Threading;
 using System.Net;
-using Newtonsoft.Json;
-#if !NET35 && !NET40
+using System.Globalization;
+using System.Threading;
 using System.Collections.Concurrent;
-#endif
 
 namespace PubnubApi.EndPoint
 {
-    public class ManageChannelMembersOperation : PubnubCoreBase
+	public class ManageChannelMembersOperation : PubnubCoreBase
     {
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
         private readonly IPubnubUnitTest unit;
         private readonly IPubnubLog pubnubLog;
-        private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 
-        private string chMetadataId = "";
+        private string channelId = string.Empty;
         private List<PNChannelMember> setMember;
         private List<string> delMember;
-        private string commandDelimitedIncludeOptions = "";
+        private string commandDelimitedIncludeOptions = string.Empty;
         private PNPageObject page;
         private int limit = -1;
         private bool includeCount;
@@ -32,19 +29,18 @@ namespace PubnubApi.EndPoint
         private PNCallback<PNChannelMembersResult> savedCallback;
         private Dictionary<string, object> queryParam;
 
-        public ManageChannelMembersOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
+        public ManageChannelMembersOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
             pubnubLog = log;
-            pubnubTelemetryMgr = telemetryManager;
 
             if (instance != null)
             {
                 if (!ChannelRequest.ContainsKey(instance.InstanceId))
                 {
-                    ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
+                    ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, CancellationTokenSource>());
                 }
                 if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
                 {
@@ -59,7 +55,7 @@ namespace PubnubApi.EndPoint
 
         public ManageChannelMembersOperation Channel(string channelName)
         {
-            this.chMetadataId = channelName;
+            this.channelId = channelName;
             return this;
         }
 
@@ -117,7 +113,7 @@ namespace PubnubApi.EndPoint
 
         public void Execute(PNCallback<PNChannelMembersResult> callback)
         {
-            if (string.IsNullOrEmpty(this.chMetadataId) || string.IsNullOrEmpty(chMetadataId.Trim()))
+            if (string.IsNullOrEmpty(this.channelId) || string.IsNullOrEmpty(channelId.Trim()))
             {
                 throw new ArgumentException("Missing Channel");
             }
@@ -132,41 +128,18 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing callback");
             }
 
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
-            Task.Factory.StartNew(() =>
-            {
-                this.savedCallback = callback;
-                ProcessMembersOperationRequest(this.chMetadataId, this.setMember, this.delMember, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.sortField, this.queryParam, callback);
-            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
-#else
-            new Thread(() =>
-            {
-                this.savedCallback = callback;
-                ProcessMembersOperationRequest(this.chMetadataId, this.setMember, this.delMember, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.sortField, this.queryParam, callback);
-            })
-            { IsBackground = true }.Start();
-#endif
+            this.savedCallback = callback;
+            ProcessMembersOperationRequest(this.channelId, this.setMember, this.delMember, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.sortField, this.queryParam, callback);
         }
 
         public async Task<PNResult<PNChannelMembersResult>> ExecuteAsync()
         {
-            return await ProcessMembersOperationRequest(this.chMetadataId, this.setMember, this.delMember, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.sortField, this.queryParam).ConfigureAwait(false);
+            return await ProcessMembersOperationRequest(this.channelId, this.setMember, this.delMember, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.sortField, this.queryParam).ConfigureAwait(false);
         }
 
         internal void Retry()
         {
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
-            Task.Factory.StartNew(() =>
-            {
-                ProcessMembersOperationRequest(this.chMetadataId, this.setMember, this.delMember, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.sortField, this.queryParam, savedCallback);
-            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
-#else
-            new Thread(() =>
-            {
-                ProcessMembersOperationRequest(this.chMetadataId, this.setMember, this.delMember, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.sortField, this.queryParam, savedCallback);
-            })
-            { IsBackground = true }.Start();
-#endif
+            ProcessMembersOperationRequest(this.channelId, this.setMember, this.delMember, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.sortField, this.queryParam, savedCallback);
         }
 
         private void ProcessMembersOperationRequest(string spaceId, List<PNChannelMember> setMemberList, List<string> removeMemberList, PNPageObject page, int limit, bool includeCount, string includeOptions, List<string> sort, Dictionary<string, object> externalQueryParam, PNCallback<PNChannelMembersResult> callback)
@@ -179,85 +152,48 @@ namespace PubnubApi.EndPoint
             requestState.ResponseType = PNOperationType.PNManageChannelMembersOperation;
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
+            requestState.UsePatchMethod = true;
             requestState.EndPointOperation = this;
 
-            requestState.UsePatchMethod = true;
-            Dictionary<string, object> messageEnvelope = new Dictionary<string, object>();
-            if (setMemberList != null)
-            {
-                List<Dictionary<string, object>> setMemberFormatList = new List<Dictionary<string, object>>();
-                for (int index = 0; index < setMemberList.Count; index++)
-                {
-                    Dictionary<string, object> currentMemberFormat = new Dictionary<string, object>();
-                    currentMemberFormat.Add("uuid", new Dictionary<string, string> { { "id", setMemberList[index].Uuid } });
-                    if (setMemberList[index].Custom != null)
-                    {
-                        currentMemberFormat.Add("custom", setMemberList[index].Custom);
-                    }
-                    setMemberFormatList.Add(currentMemberFormat);
-                }
-                if (setMemberFormatList.Count > 0)
-                {
-                    messageEnvelope.Add("set", setMemberFormatList);
-                }
-            }
-            if (removeMemberList != null)
-            {
-                List<Dictionary<string, Dictionary<string, string>>> removeMemberFormatList = new List<Dictionary<string, Dictionary<string, string>>>();
-                for (int index = 0; index < removeMemberList.Count; index++)
-                {
-                    Dictionary<string, Dictionary<string, string>> currentMemberFormat = new Dictionary<string, Dictionary<string, string>>();
-                    if (!string.IsNullOrEmpty(removeMemberList[index]))
-                    {
-                        currentMemberFormat.Add("uuid", new Dictionary<string, string> { { "id", removeMemberList[index] } });
-                        removeMemberFormatList.Add(currentMemberFormat);
-                    }
-                }
-                if (removeMemberFormatList.Count > 0)
-                {
-                    messageEnvelope.Add("delete", removeMemberFormatList);
-                }
-            }
-            string patchMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
-            byte[] patchData = Encoding.UTF8.GetBytes(patchMessage);
+            var requestParameter = CreateRequestParameter();
+			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNManageChannelMembersOperation);
+			PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ContinueWith(t => {
+				var transportResponse = t.Result;
+				if (transportResponse.Error == null) {
+					var responseString = Encoding.UTF8.GetString(transportResponse.Content);
+					if (!string.IsNullOrEmpty(responseString)) {
+						List<object> result = ProcessJsonResponse(requestState, responseString);
+						ProcessResponseCallbacks(result, requestState);
+					} else {
+						PNStatus errorStatus = GetStatusIfError(requestState, responseString);
+						callback.OnResponse(default, errorStatus);
+					}
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
-            Uri request = urlBuilder.BuildMemberAddUpdateRemoveChannelRequest("PATCH", patchMessage, spaceId, internalPage.Next, internalPage.Prev, limit, includeCount, includeOptions, sort, externalQueryParam);
-
-            UrlProcessRequest(request, requestState, false, patchData).ContinueWith(r =>
-            {
-                string json = r.Result.Item1;
-                if (!string.IsNullOrEmpty(json))
-                {
-                    List<object> result = ProcessJsonResponse(requestState, json);
-                    ProcessResponseCallbacks(result, requestState);
-                }
-                else
-                {
-                    if (r.Result.Item2 != null)
-                    {
-                        callback.OnResponse(null, r.Result.Item2);
-                    }
-                }
-            }, TaskContinuationOptions.ExecuteSynchronously).Wait();
+				} else {
+					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
+					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
+					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNManageChannelMembersOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
+					requestState.PubnubCallback.OnResponse(default, status);
+				}
+			});
         }
 
         private async Task<PNResult<PNChannelMembersResult>> ProcessMembersOperationRequest(string channel, List<PNChannelMember> setMemberList, List<string> removeMemberList, PNPageObject page, int limit, bool includeCount, string includeOptions, List<string> sort, Dictionary<string, object> externalQueryParam)
         {
-            PNResult<PNChannelMembersResult> ret = new PNResult<PNChannelMembersResult>();
+            PNResult<PNChannelMembersResult> returnValue = new PNResult<PNChannelMembersResult>();
 
             if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()))
             {
                 PNStatus errStatus = new PNStatus { Error = true, ErrorData = new PNErrorData("Missing Channel", new ArgumentException("Missing Channel")) };
-                ret.Status = errStatus;
-                return ret;
+                returnValue.Status = errStatus;
+                return returnValue;
             }
 
             if (string.IsNullOrEmpty(config.SubscribeKey) || string.IsNullOrEmpty(config.SubscribeKey.Trim()) || config.SubscribeKey.Length <= 0)
             {
                 PNStatus errStatus = new PNStatus { Error = true, ErrorData = new PNErrorData("Invalid Subscribe key", new ArgumentException("Invalid Subscribe key")) };
-                ret.Status = errStatus;
-                return ret;
+                returnValue.Status = errStatus;
+                return returnValue;
             }
 
             PNPageObject internalPage;
@@ -268,53 +204,21 @@ namespace PubnubApi.EndPoint
             requestState.ResponseType = PNOperationType.PNManageChannelMembersOperation;
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;
-
             requestState.UsePatchMethod = true;
-            requestState.UsePatchMethod = true;
-            Dictionary<string, object> messageEnvelope = new Dictionary<string, object>();
-            if (setMemberList != null)
-            {
-                List<Dictionary<string, object>> setMemberFormatList = new List<Dictionary<string, object>>();
-                for (int index = 0; index < setMemberList.Count; index++)
-                {
-                    Dictionary<string, object> currentMemberFormat = new Dictionary<string, object>();
-                    currentMemberFormat.Add("uuid", new Dictionary<string, string> { { "id", setMemberList[index].Uuid } });
-                    if (setMemberList[index].Custom != null)
-                    {
-                        currentMemberFormat.Add("custom", setMemberList[index].Custom);
-                    }
-                    setMemberFormatList.Add(currentMemberFormat);
-                }
-                if (setMemberFormatList.Count > 0)
-                {
-                    messageEnvelope.Add("set", setMemberFormatList);
-                }
-            }
-            if (removeMemberList != null)
-            {
-                List<Dictionary<string, Dictionary<string, string>>> removeMemberFormatList = new List<Dictionary<string, Dictionary<string, string>>>();
-                for (int index = 0; index < removeMemberList.Count; index++)
-                {
-                    Dictionary<string, Dictionary<string, string>> currentMemberFormat = new Dictionary<string, Dictionary<string, string>>();
-                    if (!string.IsNullOrEmpty(removeMemberList[index]))
-                    {
-                        currentMemberFormat.Add("uuid", new Dictionary<string, string> { { "id", removeMemberList[index] } });
-                        removeMemberFormatList.Add(currentMemberFormat);
-                    }
-                }
-                if (removeMemberFormatList.Count > 0)
-                {
-                    messageEnvelope.Add("delete", removeMemberFormatList);
-                }
-            }
-            string patchMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
-            byte[] patchData = Encoding.UTF8.GetBytes(patchMessage);
-
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
-            Uri request = urlBuilder.BuildMemberAddUpdateRemoveChannelRequest("PATCH", patchMessage, channel, internalPage.Next, internalPage.Prev, limit, includeCount, includeOptions, sort, externalQueryParam);
-
-            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false, patchData).ConfigureAwait(false);
-            ret.Status = JsonAndStatusTuple.Item2;
+            var requestParameter = CreateRequestParameter();
+			Tuple<string, PNStatus> JsonAndStatusTuple;
+			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNManageChannelMembersOperation);
+			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest);
+			if (transportResponse.Error == null) {
+				var responseString = Encoding.UTF8.GetString(transportResponse.Content);
+				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
+				if (errorStatus == null) {
+					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, (int)HttpStatusCode.OK, null);
+					JsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
+				} else {
+					JsonAndStatusTuple = new Tuple<string, PNStatus>(string.Empty, errorStatus);
+				}
+				returnValue.Status = JsonAndStatusTuple.Item2;
             string json = JsonAndStatusTuple.Item1;
             if (!string.IsNullOrEmpty(json))
             {
@@ -323,11 +227,16 @@ namespace PubnubApi.EndPoint
                 PNChannelMembersResult responseResult = responseBuilder.JsonToObject<PNChannelMembersResult>(resultList, true);
                 if (responseResult != null)
                 {
-                    ret.Result = responseResult;
+                    returnValue.Result = responseResult;
                 }
             }
-
-            return ret;
+			} else {
+				int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
+				PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
+				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNManageChannelMembersOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
+				returnValue.Status = status;
+			}
+            return returnValue;
         }
 
         private static string MapEnumValueToEndpoint(string enumValue)
@@ -356,5 +265,101 @@ namespace PubnubApi.EndPoint
             return ret;
         }
 
+        private RequestParameter CreateRequestParameter()
+        {
+            Dictionary<string, object> messageEnvelope = new Dictionary<string, object>();
+            if (setMember != null)
+            {
+                List<Dictionary<string, object>> setMemberFormatList = new List<Dictionary<string, object>>();
+                for (int index = 0; index < setMember.Count; index++)
+                {
+					Dictionary<string, object> currentMemberFormat = new Dictionary<string, object>
+					{
+						{ "uuid", new Dictionary<string, string> { { "id", setMember[index].Uuid } } }
+					};
+					if (setMember[index].Custom != null)
+                    {
+                        currentMemberFormat.Add("custom", setMember[index].Custom);
+                    }
+                    setMemberFormatList.Add(currentMemberFormat);
+                }
+                if (setMemberFormatList.Count > 0)
+                {
+                    messageEnvelope.Add("set", setMemberFormatList);
+                }
+            }
+            if (delMember != null)
+            {
+                List<Dictionary<string, Dictionary<string, string>>> removeMemberFormatList = new List<Dictionary<string, Dictionary<string, string>>>();
+                for (int index = 0; index < delMember.Count; index++)
+                {
+                    Dictionary<string, Dictionary<string, string>> currentMemberFormat = new Dictionary<string, Dictionary<string, string>>();
+                    if (!string.IsNullOrEmpty(delMember[index]))
+                    {
+                        currentMemberFormat.Add("uuid", new Dictionary<string, string> { { "id", delMember[index] } });
+                        removeMemberFormatList.Add(currentMemberFormat);
+                    }
+                }
+                if (removeMemberFormatList.Count > 0)
+                {
+                    messageEnvelope.Add("delete", removeMemberFormatList);
+                }
+            }
+            string patchMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
+
+			List<string> pathSegments = new List<string>
+			{
+				"v2",
+				"objects",
+				config.SubscribeKey,
+				"channels",
+				string.IsNullOrEmpty(channelId) ? "" : channelId,
+				"uuids"
+			};
+
+			Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+            if (!string.IsNullOrEmpty(page.Next))
+            {
+                requestQueryStringParams.Add("start", UriUtil.EncodeUriComponent(page.Next, PNOperationType.PNManageChannelMembersOperation, false, false, false));
+            }
+            if (!string.IsNullOrEmpty(page.Prev))
+            {
+                requestQueryStringParams.Add("end", UriUtil.EncodeUriComponent(page.Prev, PNOperationType.PNManageChannelMembersOperation, false, false, false));
+            }
+            if (limit >= 0)
+            {
+                requestQueryStringParams.Add("limit", limit.ToString(CultureInfo.InvariantCulture));
+            }
+            if (includeCount)
+            {
+                requestQueryStringParams.Add("count", "true");
+            }
+            if (!string.IsNullOrEmpty(commandDelimitedIncludeOptions))
+            {
+                requestQueryStringParams.Add("include", UriUtil.EncodeUriComponent(commandDelimitedIncludeOptions, PNOperationType.PNManageChannelMembersOperation, false, false, false));
+            }
+            if (sortField != null && sortField.Count > 0)
+            {
+                requestQueryStringParams.Add("sort", UriUtil.EncodeUriComponent(string.Join(",", sortField.ToArray()), PNOperationType.PNManageChannelMembersOperation, false, false, false));
+            }
+            if (queryParam != null && queryParam.Count > 0)
+            {
+                foreach (KeyValuePair<string, object> kvp in queryParam)
+                {
+                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    {
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), PNOperationType.PNManageChannelMembersOperation, false, false, false));
+                    }
+                }
+            }
+
+            var requestParameter = new RequestParameter() {
+                RequestType = Constants.PATCH,
+                PathSegment = pathSegments,
+                Query = requestQueryStringParams,
+                BodyContentString = patchMessage
+            };
+            return requestParameter;
+        }
     }
 }

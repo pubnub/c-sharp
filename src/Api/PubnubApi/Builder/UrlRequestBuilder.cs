@@ -3,37 +3,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Globalization;
-using System.Threading.Tasks;
-using System.Threading;
 using PubnubApi.Security.Crypto.Common;
-#if !NETSTANDARD10 && !NETSTANDARD11 && !NETSTANDARD12 && !WP81
-using System.Reflection;
-#endif
-#if !NET35 && !NET40
-using System.Collections.Concurrent;
-#endif
 using PubnubApi.Security.Crypto;
 using PubnubApi.Security.Crypto.Cryptors;
+using System.Collections.Concurrent;
+using System.Reflection;
 
 namespace PubnubApi
 {
-    public sealed class UrlRequestBuilder : IUrlRequestBuilder
+	public sealed class UrlRequestBuilder : IUrlRequestBuilder
     {
         private ConcurrentDictionary<string, PNConfiguration> pubnubConfig { get; } = new ConcurrentDictionary<string, PNConfiguration>();
         private readonly IJsonPluggableLibrary jsonLib ;
         private readonly IPubnubUnitTest pubnubUnitTest;
         private readonly IPubnubLog pubnubLog;
         private readonly string pubnubInstanceId;
-        private readonly EndPoint.TelemetryManager telemetryMgr;
         private readonly EndPoint.TokenManager tokenMgr;
 
-        public UrlRequestBuilder(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TelemetryManager pubnubTelemetryMgr, EndPoint.TokenManager pubnubTokenMgr, string pnInstanceId)
+        public UrlRequestBuilder(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TokenManager pubnubTokenMgr, string pnInstanceId)
         {
             pubnubConfig.AddOrUpdate(pnInstanceId, config, (k, o) => config);
             this.jsonLib = jsonPluggableLibrary;
             this.pubnubUnitTest = pubnubUnitTest;
             this.pubnubLog = log;
-            this.telemetryMgr = pubnubTelemetryMgr;
             this.tokenMgr = pubnubTokenMgr;
             this.pubnubInstanceId = string.IsNullOrEmpty(pnInstanceId) ? "" : pnInstanceId;
         }
@@ -2071,18 +2063,6 @@ namespace PubnubApi
                 if (pubnubConfig.ContainsKey(pubnubInstanceId) && pubnubConfig[pubnubInstanceId].IncludeInstanceIdentifier && !string.IsNullOrEmpty(pubnubInstanceId) && pubnubInstanceId.Trim().Length > 0)
                 {
                     ret.Add("instanceid", pubnubInstanceId);
-                }
-
-                if (pubnubConfig.ContainsKey(pubnubInstanceId) && pubnubConfig[pubnubInstanceId].EnableTelemetry && telemetryMgr != null)
-                {
-                    Dictionary<string, string> opsLatency = telemetryMgr.GetOperationsLatency().ConfigureAwait(false).GetAwaiter().GetResult();
-                    if (opsLatency != null && opsLatency.Count > 0)
-                    {
-                        foreach (string key in opsLatency.Keys)
-                        {
-                            ret.Add(key, opsLatency[key]);
-                        }
-                    }
                 }
 
                 if (pubnubConfig.ContainsKey(pubnubInstanceId) && !string.IsNullOrEmpty(pubnubConfig[pubnubInstanceId].SecretKey))

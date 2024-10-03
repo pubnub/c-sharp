@@ -40,7 +40,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
 					Channels = this.Channels,
 					ChannelGroups = this.ChannelGroups,
 				}.With(
-					new EmitStatusInvocation(handshakeReconnectGiveUp.Status)
+					new EmitStatusInvocation(new PNStatus(handshakeReconnectGiveUp.Status) )
 				),
 
 				Events.HandshakeReconnectFailureEvent handshakeReconnectFailure => new HandshakeReconnectingState() {

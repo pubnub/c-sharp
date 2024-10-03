@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 
 namespace PubnubApi
@@ -195,6 +197,11 @@ namespace PubnubApi
 
             // Not a high-surrogate or low-surrogate. Genereate the UTF32 value for the BMP characters.
             return (int)s[index];
+        }
+
+        public static string BuildQueryString(Dictionary<string, string> queryStringParamMap)
+        {
+            return string.Join("&", queryStringParamMap?.OrderBy(kvp => kvp.Key, StringComparer.Ordinal).Select(kvp => string.Format(CultureInfo.InvariantCulture, "{0}={1}", kvp.Key, kvp.Value)).ToArray());
         }
     }
 }

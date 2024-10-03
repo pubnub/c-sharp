@@ -1,337 +1,307 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Net;
-#if !NET35 && !NET40
+using PubnubApi.Security.Crypto;
+using PubnubApi.Security.Crypto.Cryptors;
 using System.Collections.Concurrent;
-#endif
 
 namespace PubnubApi.EndPoint
 {
-    public class FireOperation : PubnubCoreBase
-    {
-        private readonly PNConfiguration config;
-        private readonly IJsonPluggableLibrary jsonLibrary;
-        private readonly IPubnubUnitTest unit;
-        private readonly IPubnubLog pubnubLog;
-        private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
+	public class FireOperation : PubnubCoreBase
+	{
+		private readonly PNConfiguration config;
+		private readonly IJsonPluggableLibrary jsonLibrary;
+		private readonly IPubnubUnitTest unit;
+		private readonly IPubnubLog pubnubLog;
 
-        private object msg;
-        private string channelName = "";
-        private bool httpPost;
-        private Dictionary<string, object> userMetadata;
-        private readonly int ttl = -1;
-        private PNCallback<PNPublishResult> savedCallback;
-        private bool syncRequest;
-        private Dictionary<string, object> queryParam;
+		private object publishContent;
+		private string channelName = "";
+		private bool httpPost;
+		private Dictionary<string, object> userMetadata;
+		private readonly int ttl = -1;
+		private PNCallback<PNPublishResult> savedCallback;
+		private bool syncRequest;
+		private Dictionary<string, object> queryParam;
 
-        public FireOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
-        {
-            config = pubnubConfig;
-            jsonLibrary = jsonPluggableLibrary;
-            unit = pubnubUnit;
-            pubnubLog = log;
-            pubnubTelemetryMgr = telemetryManager;
-        }
+		public FireOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
+		{
+			config = pubnubConfig;
+			jsonLibrary = jsonPluggableLibrary;
+			unit = pubnubUnit;
+			pubnubLog = log;
+		}
 
-        public FireOperation Message(object message)
-        {
-            this.msg = message;
-            return this;
-        }
+		public FireOperation Message(object message)
+		{
+			this.publishContent = message;
+			return this;
+		}
 
-        public FireOperation Channel(string channelName)
-        {
-            this.channelName = channelName;
-            return this;
-        }
+		public FireOperation Channel(string channelName)
+		{
+			this.channelName = channelName;
+			return this;
+		}
 
-        public FireOperation Meta(Dictionary<string, object> metadata)
-        {
-            this.userMetadata = metadata;
-            return this;
-        }
+		public FireOperation Meta(Dictionary<string, object> metadata)
+		{
+			this.userMetadata = metadata;
+			return this;
+		}
 
-        public FireOperation UsePOST(bool post)
-        {
-            this.httpPost = post;
-            return this;
-        }
+		public FireOperation UsePOST(bool post)
+		{
+			this.httpPost = post;
+			return this;
+		}
 
-        public FireOperation QueryParam(Dictionary<string, object> customQueryParam)
-        {
-            this.queryParam = customQueryParam;
-            return this;
-        }
+		public FireOperation QueryParam(Dictionary<string, object> customQueryParam)
+		{
+			this.queryParam = customQueryParam;
+			return this;
+		}
 
-        [Obsolete("Async is deprecated, please use Execute instead.")]
-        public void Async(PNCallback<PNPublishResult> callback)
-        {
-            Execute(callback);
-        }
+		[Obsolete("Async is deprecated, please use Execute instead.")]
+		public void Async(PNCallback<PNPublishResult> callback)
+		{
+			Execute(callback);
+		}
 
-        public void Execute(PNCallback<PNPublishResult> callback)
-        {
-            if (string.IsNullOrEmpty(this.channelName) || string.IsNullOrEmpty(this.channelName.Trim()) || this.msg == null)
-            {
-                throw new ArgumentException("Missing Channel or Message");
-            }
+		public void Execute(PNCallback<PNPublishResult> callback)
+		{
+			if (string.IsNullOrEmpty(this.channelName) || string.IsNullOrEmpty(this.channelName.Trim()) || this.publishContent == null) {
+				throw new ArgumentException("Missing Channel or Message");
+			}
 
-            if (string.IsNullOrEmpty(config.PublishKey) || string.IsNullOrEmpty(config.PublishKey.Trim()) || config.PublishKey.Length <= 0)
-            {
-                throw new MissingMemberException("Invalid publish key");
-            }
+			if (string.IsNullOrEmpty(config.PublishKey) || string.IsNullOrEmpty(config.PublishKey.Trim()) || config.PublishKey.Length <= 0) {
+				throw new MissingMemberException("Invalid publish key");
+			}
 
-            if (callback == null)
-            {
-                throw new ArgumentException("Missing userCallback");
-            }
+			if (callback == null) {
+				throw new ArgumentException("Missing userCallback");
+			}
+			Fire(this.channelName, this.publishContent, false, this.ttl, this.userMetadata, this.queryParam, callback);
+		}
 
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
-            Task.Factory.StartNew(() =>
-            {
-                syncRequest = false;
-                this.savedCallback = callback;
-                Fire(this.channelName, this.msg, false, this.ttl, this.userMetadata, this.queryParam, callback);
-            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
-#else
-            new Thread(() =>
-            {
-                syncRequest = false;
-                this.savedCallback = callback;
-                Fire(this.channelName, this.msg, false, this.ttl, this.userMetadata, this.queryParam, callback);
-            })
-            { IsBackground = true }.Start();
-#endif
-        }
+		public async Task<PNResult<PNPublishResult>> ExecuteAsync()
+		{
+			syncRequest = false;
+			return await Fire(this.channelName, this.publishContent, false, this.ttl, this.userMetadata, this.queryParam).ConfigureAwait(false);
+		}
 
-        public async Task<PNResult<PNPublishResult>> ExecuteAsync()
-        {
-            syncRequest = false;
-            return await Fire(this.channelName, this.msg, false, this.ttl, this.userMetadata, this.queryParam).ConfigureAwait(false);
-        }
+		public PNPublishResult Sync()
+		{
+			System.Threading.ManualResetEvent syncEvent = new System.Threading.ManualResetEvent(false);
+			Task<PNPublishResult> task = Task<PNPublishResult>.Factory.StartNew(() => {
+				syncRequest = true;
+				syncEvent = new System.Threading.ManualResetEvent(false);
+				Fire(this.channelName, this.publishContent, false, this.ttl, this.userMetadata, this.queryParam, new PNPublishResultExt((r, s) => { SyncResult = r; syncEvent.Set(); }));
+				syncEvent.WaitOne(config.NonSubscribeRequestTimeout * 1000);
 
-        public PNPublishResult Sync()
-        {
-            System.Threading.ManualResetEvent syncEvent = new System.Threading.ManualResetEvent(false);
-            Task<PNPublishResult> task = Task<PNPublishResult>.Factory.StartNew(() =>
-            {
-                syncRequest = true;
-                syncEvent = new System.Threading.ManualResetEvent(false);
-                Fire(this.channelName, this.msg, false, this.ttl, this.userMetadata, this.queryParam, new PNPublishResultExt((r,s)=> { SyncResult = r; syncEvent.Set(); }));
-                syncEvent.WaitOne(config.NonSubscribeRequestTimeout * 1000);
+				return SyncResult;
+			}, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default);
+			return task.Result;
+		}
 
-                return SyncResult;
-            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default);
-            return task.Result;
-        }
+		private static PNPublishResult SyncResult { get; set; }
 
-        private static PNPublishResult SyncResult { get; set; }
+		internal void Retry()
+		{
+			Fire(this.channelName, this.publishContent, false, this.ttl, this.userMetadata, this.queryParam, savedCallback);
+		}
 
-        internal void Retry()
-        {
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
-            Task.Factory.StartNew(() =>
-            {
-                if (!syncRequest)
-                {
-                    Fire(this.channelName, this.msg, false, this.ttl, this.userMetadata, this.queryParam, savedCallback);
-                }
-            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
-#else
-            new Thread(() =>
-            {
-                if (!syncRequest)
-                {
-                    Fire(this.channelName, this.msg, false, this.ttl, this.userMetadata, this.queryParam, savedCallback);
-                }
-            })
-            { IsBackground = true }.Start();
-#endif
-        }
+		private void Fire(string channel, object message, bool storeInHistory, int ttl, Dictionary<string, object> metaData, Dictionary<string, object> externalQueryParam, PNCallback<PNPublishResult> callback)
+		{
+			if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()) || message == null) {
+				PNStatus status = new PNStatus { Error = true, ErrorData = new PNErrorData("Missing Channel or Message", new ArgumentException("Missing Channel or Message")) };
+				callback.OnResponse(null, status);
+				return;
+			}
 
-        private void Fire(string channel, object message, bool storeInHistory, int ttl, Dictionary<string, object> metaData, Dictionary<string, object> externalQueryParam, PNCallback<PNPublishResult> callback)
-        {
-            if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()) || message == null)
-            {
-                PNStatus status = new PNStatus { Error = true, ErrorData = new PNErrorData("Missing Channel or Message", new ArgumentException("Missing Channel or Message")) };
-                callback.OnResponse(null, status);
-                return;
-            }
+			if (string.IsNullOrEmpty(config.PublishKey) || string.IsNullOrEmpty(config.PublishKey.Trim()) || config.PublishKey.Length <= 0) {
+				PNStatus status = new PNStatus { Error = true, ErrorData = new PNErrorData("Invalid publish key", new ArgumentException("Invalid publish key")) };
+				callback.OnResponse(null, status);
+				return;
+			}
 
-            if (string.IsNullOrEmpty(config.PublishKey) || string.IsNullOrEmpty(config.PublishKey.Trim()) || config.PublishKey.Length <= 0)
-            {
-                PNStatus status = new PNStatus { Error = true, ErrorData = new PNErrorData("Invalid publish key", new ArgumentException("Invalid publish key")) };
-                callback.OnResponse(null, status);
-                return;
-            }
+			if (callback == null) {
+				return;
+			}
 
-            if (callback == null)
-            {
-                return;
-            }
+			RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>();
+			requestState.Channels = new[] { channel };
+			requestState.ResponseType = PNOperationType.PNFireOperation;
+			requestState.PubnubCallback = callback;
+			requestState.Reconnect = false;
+			requestState.EndPointOperation = this;
 
-            Dictionary<string, string> urlParam = new Dictionary<string, string>();
-            urlParam.Add("norep", "true");
+			var requestParameter = CreateRequestParameter();
+			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNFireOperation);
 
-            string requestMethodName = (this.httpPost) ? "POST" : "GET";
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
-            
-            Uri request = urlBuilder.BuildPublishRequest(requestMethodName, "", channel, message, storeInHistory, ttl, metaData, urlParam, externalQueryParam);
+			PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ContinueWith(t => {
+				var transportResponse = t.Result;
+				if (transportResponse.Error == null) {
+					var responseString = Encoding.UTF8.GetString(transportResponse.Content);
+					if (!string.IsNullOrEmpty(responseString)) {
+						List<object> result = ProcessJsonResponse<PNPublishResult>(requestState, responseString);
+						if (result != null && result.Count >= 3) {
+							int publishStatus;
+							var _ = Int32.TryParse(result[0].ToString(), out publishStatus);
+							if (publishStatus == 1) {
+								ProcessResponseCallbacks(result, requestState);
+							} else {
+								PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(400, result[1].ToString());
+								PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<PNPublishResult>(PNOperationType.PNFireOperation, category, requestState, 400, new PNException(responseString));
+								if (requestState.PubnubCallback != null) {
+									requestState.PubnubCallback.OnResponse(default(PNPublishResult), status);
+								}
+							}
+						} else {
+							ProcessResponseCallbacks(result, requestState);
+						}
+					}
+				} else {
+					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
+					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
+					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNFireOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
+					requestState.PubnubCallback.OnResponse(default(PNPublishResult), status);
+				}
+			});
+		}
 
-            RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>();
-            requestState.Channels = new [] { channel };
-            requestState.ResponseType = PNOperationType.PNFireOperation;
-            requestState.PubnubCallback = callback;
-            requestState.Reconnect = false;
-            requestState.EndPointOperation = this;
+		private async Task<PNResult<PNPublishResult>> Fire(string channel, object message, bool storeInHistory, int ttl, Dictionary<string, object> metaData, Dictionary<string, object> externalQueryParam)
+		{
+			PNResult<PNPublishResult> returnValue = new PNResult<PNPublishResult>();
 
-            string json = "";
+			if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()) || message == null) {
+				PNStatus errStatus = new PNStatus { Error = true, ErrorData = new PNErrorData("Missing Channel or Message", new ArgumentException("Missing Channel or Message")) };
+				returnValue.Status = errStatus;
+				return returnValue;
+			}
 
-            if (this.httpPost)
-            {
-                requestState.UsePostMethod = true;
-                Dictionary<string, object> messageEnvelope = new Dictionary<string, object>();
-                messageEnvelope.Add("message", message);
-                string postMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
-                byte[] postData = Encoding.UTF8.GetBytes(postMessage);
-                UrlProcessRequest(request, requestState, false, postData).ContinueWith(r =>
-                {
-                    json = r.Result.Item1;
-                }, TaskContinuationOptions.ExecuteSynchronously).Wait();
-            }
-            else
-            {
-                UrlProcessRequest(request, requestState, false).ContinueWith(r =>
-                {
-                    json = r.Result.Item1;
-                }, TaskContinuationOptions.ExecuteSynchronously).Wait();
-            }
+			if (string.IsNullOrEmpty(config.PublishKey) || string.IsNullOrEmpty(config.PublishKey.Trim()) || config.PublishKey.Length <= 0) {
+				PNStatus errStatus = new PNStatus { Error = true, ErrorData = new PNErrorData("Invalid publish key", new ArgumentException("Invalid publish key")) };
+				returnValue.Status = errStatus;
+				return returnValue;
+			}
 
-            if (!string.IsNullOrEmpty(json))
-            {
-                List<object> result = ProcessJsonResponse<PNPublishResult>(requestState, json);
-                if (result != null && result.Count >= 3)
-                {
-                    int publishStatus;
-                    var _ = Int32.TryParse(result[0].ToString(), out publishStatus);
-                    if (publishStatus == 1)
-                    {
-                        ProcessResponseCallbacks(result, requestState);
-                    }
-                    else
-                    {
-                        PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(400, result[1].ToString());
-                        PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<PNPublishResult>(PNOperationType.PNFireOperation, category, requestState, 400, new PNException(json));
-                        if (requestState.PubnubCallback != null)
-                        {
-                            requestState.PubnubCallback.OnResponse(default(PNPublishResult), status);
-                        }
-                    }
-                }
-                else
-                {
-                    ProcessResponseCallbacks(result, requestState);
-                }
-            }
-        }
+			RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>();
+			requestState.Channels = new[] { channel };
+			requestState.ResponseType = PNOperationType.PNFireOperation;
+			requestState.Reconnect = false;
+			requestState.EndPointOperation = this;
 
-        private async Task<PNResult<PNPublishResult>> Fire(string channel, object message, bool storeInHistory, int ttl, Dictionary<string, object> metaData, Dictionary<string, object> externalQueryParam)
-        {
-            PNResult<PNPublishResult> ret = new PNResult<PNPublishResult>();
+			Tuple<string, PNStatus> JsonAndStatusTuple;
+			var requestParameter = CreateRequestParameter();
+			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNFireOperation);
+			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest);
 
-            if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()) || message == null)
-            {
-                PNStatus errStatus = new PNStatus { Error = true, ErrorData = new PNErrorData("Missing Channel or Message", new ArgumentException("Missing Channel or Message")) };
-                ret.Status = errStatus;
-                return ret;
-            }
+			if (transportResponse.Error == null) {
+				string responseString = Encoding.UTF8.GetString(transportResponse.Content);
+				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
+				if (errorStatus == null) {
+					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, (int)HttpStatusCode.OK, null);
+					JsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
+				} else {
+					JsonAndStatusTuple = new Tuple<string, PNStatus>("", errorStatus);
+				}
+				returnValue.Status = JsonAndStatusTuple.Item2;
+				string json = JsonAndStatusTuple.Item1;
+				if (!string.IsNullOrEmpty(json)) {
+					List<object> result = ProcessJsonResponse(requestState, json);
 
-            if (string.IsNullOrEmpty(config.PublishKey) || string.IsNullOrEmpty(config.PublishKey.Trim()) || config.PublishKey.Length <= 0)
-            {
-                PNStatus errStatus = new PNStatus { Error = true, ErrorData = new PNErrorData("Invalid publish key", new ArgumentException("Invalid publish key")) };
-                ret.Status = errStatus;
-                return ret;
-            }
+					if (result != null && result.Count >= 3) {
+						int publishStatus;
+						_ = int.TryParse(result[0].ToString(), out publishStatus);
+						if (publishStatus == 1) {
+							List<object> resultList = ProcessJsonResponse(requestState, json);
+							if (resultList != null && resultList.Count > 0) {
+								ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+								PNPublishResult responseResult = responseBuilder.JsonToObject<PNPublishResult>(resultList, true);
+								if (responseResult != null) {
+									returnValue.Result = responseResult;
+								}
+							}
+						}
+					}
+				}
+			} else {
+				int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
+				PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
+				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNFireOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
+				returnValue.Status = status;
+			}
+			return returnValue;
+		}
 
-            Dictionary<string, string> urlParam = new Dictionary<string, string>();
-            urlParam.Add("norep", "true");
+		internal void CurrentPubnubInstance(Pubnub instance)
+		{
+			PubnubInstance = instance;
 
-            string requestMethodName = (this.httpPost) ? "POST" : "GET";
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
-            
-            Uri request = urlBuilder.BuildPublishRequest(requestMethodName, "", channel, message, storeInHistory, ttl, metaData, urlParam, externalQueryParam);
+			if (!ChannelRequest.ContainsKey(instance.InstanceId)) {
+				ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, CancellationTokenSource>());
+			}
+			if (!ChannelInternetStatus.ContainsKey(instance.InstanceId)) {
+				ChannelInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+			}
+			if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId)) {
+				ChannelGroupInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+			}
+		}
 
-            RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>();
-            requestState.Channels = new[] { channel };
-            requestState.ResponseType = PNOperationType.PNFireOperation;
-            requestState.Reconnect = false;
-            requestState.EndPointOperation = this;
+		private RequestParameter CreateRequestParameter()
+		{
+			List<string> urlSegments = new List<string>
+			{
+				"publish",
+				config.PublishKey?? "",
+				config.SubscribeKey??"",
+				"0",
+				channelName,
+				"0"
+			};
+			if (!httpPost) {
+				urlSegments.Add(PrepareContent(this.publishContent));
+			}
+			Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
 
-            Tuple<string, PNStatus> JsonAndStatusTuple;
+			if (userMetadata != null) {
+				string jsonMetaData = jsonLibrary.SerializeToJsonString(userMetadata);
+				requestQueryStringParams.Add("meta", UriUtil.EncodeUriComponent(jsonMetaData, PNOperationType.PNPublishOperation, false, false, false));
+			}
+			requestQueryStringParams.Add("norep", "true");
 
-            if (this.httpPost)
-            {
-                requestState.UsePostMethod = true;
-                Dictionary<string, object> messageEnvelope = new Dictionary<string, object>();
-                messageEnvelope.Add("message", message);
-                string postMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
-                byte[] postData = Encoding.UTF8.GetBytes(postMessage);
-                JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false, postData).ConfigureAwait(false);
-            }
-            else
-            {
-                JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false).ConfigureAwait(false);
-            }
-
-            ret.Status = JsonAndStatusTuple.Item2;
-            string json = JsonAndStatusTuple.Item1;
-            if (!string.IsNullOrEmpty(json))
-            {
-                List<object> result = ProcessJsonResponse<PNPublishResult>(requestState, json);
-                if (result != null && result.Count >= 3)
-                {
-                    int publishStatus;
-                    var _ = Int32.TryParse(result[0].ToString(), out publishStatus);
-                    if (publishStatus == 1)
-                    {
-                        List<object> resultList = ProcessJsonResponse(requestState, json);
-                        if (resultList != null && resultList.Count > 0)
-                        {
-                            ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
-                            PNPublishResult responseResult = responseBuilder.JsonToObject<PNPublishResult>(resultList, true);
-                            if (responseResult != null)
-                            {
-                                ret.Result = responseResult;
-                            }
-                        }
-                    }
-                }
-            }
-
-            return ret;
-        }
-
-        internal void CurrentPubnubInstance(Pubnub instance)
-        {
-            PubnubInstance = instance;
-
-            if (!ChannelRequest.ContainsKey(instance.InstanceId))
-            {
-                ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
-            }
-            if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
-            {
-                ChannelInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
-            }
-            if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId))
-            {
-                ChannelGroupInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
-            }
-        }
-    }
+			if (queryParam != null && queryParam.Count > 0) {
+				foreach (KeyValuePair<string, object> kvp in queryParam) {
+					if (!requestQueryStringParams.ContainsKey(kvp.Key)) {
+						requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), PNOperationType.PNPublishOperation, false, false, false));
+					}
+				}
+			}
+			var requestParam = new RequestParameter() {
+				RequestType = httpPost ? Constants.POST : Constants.GET,
+				PathSegment = urlSegments,
+				Query = requestQueryStringParams
+			};
+			if (httpPost) {
+				string postMessage = PrepareContent(publishContent);
+				requestParam.BodyContentString = postMessage;
+			}
+			return requestParam;
+		}
+		private string PrepareContent(object originalMessage)
+		{
+			string message = jsonLibrary.SerializeToJsonString(originalMessage);
+			if (config.CryptoModule != null || config.CipherKey.Length > 0) {
+				config.CryptoModule ??= new CryptoModule(new LegacyCryptor(config.CipherKey, config.UseRandomInitializationVector, pubnubLog), null);
+				string encryptMessage = config.CryptoModule.Encrypt(message);
+				message = jsonLibrary.SerializeToJsonString(encryptMessage);
+			}
+			return message;
+		}
+	}
 
 }

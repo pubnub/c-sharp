@@ -152,7 +152,7 @@ namespace PubnubApi
 
         public bool MaintainPresenceState { get; set; } = true;
 
-        public bool EnableEventEngine { get; set; }
+        public bool EnableEventEngine { get; set; } = true;
 
         public int FileMessagePublishRetryLimit { get; set; }
 

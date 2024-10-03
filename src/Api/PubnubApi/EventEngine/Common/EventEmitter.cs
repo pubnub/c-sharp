@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Globalization;
 using PubnubApi.EndPoint;
 using PubnubApi.EventEngine.Subscribe.Common;
 using PubnubApi.Security.Crypto;
 using PubnubApi.Security.Crypto.Cryptors;
+using Newtonsoft.Json.Linq;
 
 namespace PubnubApi.EventEngine.Common
 {
@@ -16,6 +18,8 @@ namespace PubnubApi.EventEngine.Common
 		private IJsonPluggableLibrary jsonLibrary;
 		private Pubnub instance;
 		private TokenManager tokenManager;
+		private Dictionary<string, List<SubscribeCallback>> channelListenersMap;
+		private Dictionary<string, List<SubscribeCallback>> channelGroupListenersMap;
 
 		public EventEmitter(PNConfiguration configuration, List<SubscribeCallback> listenerCallbacks, IJsonPluggableLibrary jsonPluggableLibrary, TokenManager tokenManager, IPubnubLog log, Pubnub instance)
 		{
@@ -25,6 +29,8 @@ namespace PubnubApi.EventEngine.Common
 			this.tokenManager = tokenManager;
 			jsonLibrary = jsonPluggableLibrary;
 			listeners = listenerCallbacks;
+			channelGroupListenersMap = new Dictionary<string, List<SubscribeCallback>>();
+			channelListenersMap = new Dictionary<string, List<SubscribeCallback>>();
 		}
 
 		private TimetokenMetadata GetTimetokenMetadata(object t)
@@ -47,6 +53,39 @@ namespace PubnubApi.EventEngine.Common
 			return null;
 		}
 
+		public void AddListener(SubscribeCallback listener, string[] channels, string[] groups)
+		{
+			foreach (var c in channels.Where(c => !c.EndsWith("-pnpres"))) {
+				if (channelListenersMap.ContainsKey(c)) {
+					channelListenersMap[c].Add(listener);
+				} else {
+					channelListenersMap[c] = new List<SubscribeCallback> { listener };
+				}
+			}
+
+			foreach (var cg in groups.Where(cg => !cg.EndsWith("-pnpres"))) {
+				if (channelGroupListenersMap.ContainsKey(cg)) {
+					channelGroupListenersMap[cg].Add(listener);
+				} else {
+					channelGroupListenersMap[cg] = new List<SubscribeCallback> { listener };
+				}
+			}
+		}
+
+		public void RemoveListener(SubscribeCallback listener, string[] channels, string[] groups)
+		{
+			foreach (var c in channels.Where(c => !c.EndsWith("-pnpres"))) {
+				if (channelListenersMap.ContainsKey(c)) {
+					channelListenersMap[c].Remove(listener);
+				}
+			}
+			foreach (var cg in groups.Where(cg => !cg.EndsWith("-pnpres"))) {
+				if (channelGroupListenersMap.ContainsKey(cg)) {
+					channelGroupListenersMap[cg].Remove(listener);
+				}
+			}
+		}
+
 		public void EmitEvent<T>(object e)
 		{
 			Message<T> eventData = e as Message<T>;
@@ -57,14 +96,21 @@ namespace PubnubApi.EventEngine.Common
 			if (currentMessageChannel.Replace("-pnpres", "") == currentMessageChannelGroup?.Replace("-pnpres", "")) {
 				currentMessageChannelGroup = "";
 			}
-			object payload = eventData.Payload;
+			object payload;
+			string payloadAsString = eventData.Payload as string;
+			if (payloadAsString != null) {
+				var jsonObject = jsonLibrary.BuildJsonObject(payloadAsString.ToString());
+				payload = jsonObject ?? payloadAsString;
+			} else {
+				payload = eventData.Payload;
+			}
 			List<object> payloadContainer = new List<object>(); //First item always message
 			if (currentMessageChannel.Contains("-pnpres") || currentMessageChannel.Contains(".*-pnpres")) {
 				payloadContainer.Add(payload);
 			} else if (eventData.MessageType == 2) //Objects Simplification events
 			  {
 				double objectsVersion = -1;
-				Dictionary<string, object> objectsDic = payload as Dictionary<string, object>;
+				Dictionary<string, object> objectsDic = payload as Dictionary<string, object> ?? (payload as JObject).ToObject<Dictionary<string, object>>();
 				if (objectsDic != null
 					&& objectsDic.ContainsKey("source")
 					&& objectsDic.ContainsKey("version")
@@ -76,10 +122,10 @@ namespace PubnubApi.EventEngine.Common
 					}
 				}
 			} else {
-				if ((configuration.CryptoModule != null || configuration.CipherKey.Length > 0) && eventData.MessageType != 1) //decrypt the subscriber message if cipherkey is available
+				if ((configuration.CryptoModule != null || configuration.CipherKey.Length > 0) && (eventData.MessageType == 0 || eventData.MessageType == 4)) //decrypt the subscriber message if cipherkey is available
 				{
 					string decryptMessage = "";
-					configuration.CryptoModule ??= new CryptoModule(new LegacyCryptor(configuration.CipherKey, configuration.UseRandomInitializationVector, log), null);
+					configuration.CryptoModule ??= new CryptoModule(new AesCbcCryptor(configuration.CipherKey, log), new List<ICryptor>() { new LegacyCryptor(configuration.CipherKey, configuration.UseRandomInitializationVector) });
 					try {
 						decryptMessage = configuration.CryptoModule.Decrypt(payload.ToString());
 					} catch (Exception ex) {
@@ -112,7 +158,7 @@ namespace PubnubApi.EventEngine.Common
 
 			payloadContainer.Add(userMetaData); //Second one always user meta data
 
-			payloadContainer.Add(GetTimetokenMetadata(eventData.PublishMetadata)); //Third one always Timetoken
+			payloadContainer.Add(GetTimetokenMetadata(eventData.PublishMetadata).Timetoken); //Third one always Timetoken
 
 			payloadContainer.Add(eventData.IssuingClientId); //Fourth one always Publisher
 
@@ -140,6 +186,16 @@ namespace PubnubApi.EventEngine.Common
 					foreach (var listener in listeners) {
 						listener?.Signal(instance, signalMessage);
 					}
+					if (!string.IsNullOrEmpty(signalMessage.Channel) && channelListenersMap.ContainsKey(signalMessage.Channel)) {
+						foreach (var l in channelListenersMap[signalMessage.Channel]) {
+							l?.Signal(instance, signalMessage);
+						}
+					}
+					if (!string.IsNullOrEmpty(signalMessage.Subscription) && channelGroupListenersMap.ContainsKey(signalMessage.Subscription)) {
+						foreach (var l in channelGroupListenersMap[signalMessage.Subscription]) {
+							l?.Signal(instance, signalMessage);
+						}
+					}
 				}
 			} else if (eventData.MessageType == 2) {
 				ResponseBuilder responseBuilder = new ResponseBuilder(configuration, jsonLibrary, log);
@@ -148,6 +204,16 @@ namespace PubnubApi.EventEngine.Common
 					foreach (var listener in listeners) {
 						listener?.ObjectEvent(instance, objectApiEvent);
 					}
+					if (!string.IsNullOrEmpty(objectApiEvent.Channel) && channelListenersMap.ContainsKey(objectApiEvent.Channel)) {
+						foreach (var l in channelListenersMap[objectApiEvent.Channel]) {
+							l?.ObjectEvent(instance, objectApiEvent);
+						}
+					}
+					if (!string.IsNullOrEmpty(objectApiEvent.Subscription) && channelGroupListenersMap.ContainsKey(objectApiEvent.Subscription)) {
+						foreach (var l in channelGroupListenersMap[objectApiEvent.Subscription]) {
+							l?.ObjectEvent(instance, objectApiEvent);
+						}
+					}
 				}
 			} else if (eventData.MessageType == 3) {
 				ResponseBuilder responseBuilder = new ResponseBuilder(configuration, jsonLibrary, log);
@@ -155,6 +221,16 @@ namespace PubnubApi.EventEngine.Common
 				if (messageActionEvent != null) {
 					foreach (var listener in listeners) {
 						listener?.MessageAction(instance, messageActionEvent);
+					}
+					if (!string.IsNullOrEmpty(messageActionEvent.Channel) && channelListenersMap.ContainsKey(messageActionEvent.Channel)) {
+						foreach (var l in channelListenersMap[messageActionEvent.Channel]) {
+							l?.MessageAction(instance, messageActionEvent);
+						}
+					}
+					if (!string.IsNullOrEmpty(messageActionEvent.Subscription) && channelGroupListenersMap.ContainsKey(messageActionEvent.Subscription)) {
+						foreach (var l in channelGroupListenersMap[messageActionEvent.Subscription]) {
+							l?.MessageAction(instance, messageActionEvent);
+						}
 					}
 				}
 			} else if (eventData.MessageType == 4) {
@@ -177,7 +253,7 @@ namespace PubnubApi.EventEngine.Common
 							if (fileObjDic != null && fileObjDic.ContainsKey("id") && fileObjDic.ContainsKey("name")) {
 								fileMessage.File = new PNFile { Id = fileObjDic["id"].ToString(), Name = fileObjDic["name"].ToString() };
 
-								IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(configuration, jsonLibrary, null, log, null, tokenManager, (instance != null) ? instance.InstanceId : "");
+								IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(configuration, jsonLibrary, null, log, tokenManager, (instance != null) ? instance.InstanceId : "");
 								Uri fileUrlRequest = urlBuilder.BuildGetFileUrlOrDeleteReqest("GET", "", fileMessage.Channel, fileMessage.File.Id, fileMessage.File.Name, null, PNOperationType.PNGenerateFileUploadUrlOperation);
 								fileMessage.File.Url = fileUrlRequest.ToString();
 							}
@@ -190,23 +266,52 @@ namespace PubnubApi.EventEngine.Common
 					foreach (var listener in listeners) {
 						listener?.File(instance, fileMessage);
 					}
+					if (!string.IsNullOrEmpty(fileMessage.Channel) && channelListenersMap.ContainsKey(fileMessage.Channel)) {
+						foreach (var l in channelListenersMap[fileMessage.Channel]) {
+							l?.File(instance, fileMessage);
+						}
+					}
+					if (!string.IsNullOrEmpty(fileMessage.Subscription) && channelGroupListenersMap.ContainsKey(fileMessage.Subscription)) {
+						foreach (var l in channelGroupListenersMap[fileMessage.Subscription]) {
+							l?.File(instance, fileMessage);
+						}
+					}
 				}
-			}
-			else if (currentMessageChannel.Contains("-pnpres")) {
+			} else if (currentMessageChannel.Contains("-pnpres")) {
 				ResponseBuilder responseBuilder = new ResponseBuilder(configuration, jsonLibrary, log);
 				PNPresenceEventResult presenceEvent = responseBuilder.JsonToObject<PNPresenceEventResult>(payloadContainer, true);
 				if (presenceEvent != null) {
 					foreach (var listener in listeners) {
 						listener?.Presence(instance, presenceEvent);
 					}
+					if (!string.IsNullOrEmpty(presenceEvent.Channel) && channelListenersMap.ContainsKey(presenceEvent.Channel)) {
+						foreach (var l in channelListenersMap[presenceEvent.Channel]) {
+							l?.Presence(instance, presenceEvent);
+						}
+					}
+					if (!string.IsNullOrEmpty(presenceEvent.Subscription) && channelGroupListenersMap.ContainsKey(presenceEvent.Subscription)) {
+						foreach (var l in channelGroupListenersMap[presenceEvent.Subscription]) {
+							l?.Presence(instance, presenceEvent);
+						}
+					}
 				}
-			}
-			else {
+
+			} else {
 				ResponseBuilder responseBuilder = new ResponseBuilder(configuration, jsonLibrary, log);
 				PNMessageResult<T> message = responseBuilder.JsonToObject<PNMessageResult<T>>(payloadContainer, true);
 				if (message != null) {
 					foreach (var listener in listeners) {
 						listener?.Message(instance, message);
+					}
+					if (!string.IsNullOrEmpty(message.Channel) && channelListenersMap.ContainsKey(message.Channel)) {
+						foreach (var l in channelListenersMap[message.Channel]) {
+							l?.Message(instance, message);
+						}
+					}
+					if (!string.IsNullOrEmpty(message.Subscription) && channelGroupListenersMap.ContainsKey(message.Subscription)) {
+						foreach (var l in channelGroupListenersMap[message.Subscription]) {
+							l?.Message(instance, message);
+						}
 					}
 				}
 			}
