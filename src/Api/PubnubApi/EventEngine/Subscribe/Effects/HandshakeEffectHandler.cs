@@ -124,11 +124,11 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
             {
                 if (retryConfiguration == null)
                 {
-                    eventQueue.Enqueue(new HandshakeReconnectGiveUpEvent() { Status = new PNStatus(new Exception(""), PNOperationType.PNSubscribeOperation, PNStatusCategory.PNConnectionErrorCategory, invocation.Channels, invocation.ChannelGroups ) });
+                    eventQueue.Enqueue(new HandshakeReconnectGiveUpEvent() { Status = new PNStatus(new Exception(""), PNOperationType.PNSubscribeOperation, PNStatusCategory.PNConnectionErrorCategory, invocation.Channels, invocation.ChannelGroups, invocation.Reason.StatusCode ) });
                 }
                 else if (!retryConfiguration.RetryPolicy.ShouldRetry(invocation.AttemptedRetries, invocation.Reason))
                 {
-                    eventQueue.Enqueue(new HandshakeReconnectGiveUpEvent() { Status = new PNStatus(new Exception(""), PNOperationType.PNSubscribeOperation, PNStatusCategory.PNConnectionErrorCategory, invocation.Channels, invocation.ChannelGroups ) });
+                    eventQueue.Enqueue(new HandshakeReconnectGiveUpEvent() { Status = new PNStatus(new Exception(""), PNOperationType.PNSubscribeOperation, PNStatusCategory.PNConnectionErrorCategory, invocation.Channels, invocation.ChannelGroups, invocation.Reason.StatusCode ) });
                 }
                 else
                 {

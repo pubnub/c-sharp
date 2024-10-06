@@ -14,6 +14,7 @@ using System.Collections.Concurrent;
 #endif
 using PubnubApi.Security.Crypto;
 using PubnubApi.Security.Crypto.Cryptors;
+using PubnubApi.EventEngine.Common;
 
 namespace PubnubApi
 {
@@ -29,6 +30,7 @@ namespace PubnubApi
         private readonly string savedSdkVerion;
         private SubscribeEventEngineFactory subscribeEventEngineFactory;
         private PresenceEventEngineFactory presenceEventengineFactory;
+        private EventEmitter eventEmitter;
         private List<SubscribeCallback> subscribeCallbackListenerList
         {
             get;
@@ -72,6 +74,7 @@ namespace PubnubApi
                     presenceOperation = new PresenceOperation<T>(this, InstanceId, pubnubLog, pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null ,telemetryManager, tokenManager, pubnubUnitTest ,presenceEventengineFactory);
                 }
 				EndPoint.SubscribeEndpoint<T> subscribeOperation = new EndPoint.SubscribeEndpoint<T>(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, null, tokenManager, this.subscribeEventEngineFactory, presenceOperation, InstanceId ,this);
+                subscribeOperation.EventEmitter = this.eventEmitter;
                 subscribeOperation.SubscribeListenerList = subscribeCallbackListenerList;
                 savedSubscribeOperation = subscribeOperation;
                 return subscribeOperation;
@@ -971,6 +974,13 @@ namespace PubnubApi
 
         public string InstanceId { get; private set; }
 
+        public Channel Channel(string name) => new Channel(name, this, eventEmitter);
+        public ChannelGroup ChannelGroup(string name) => new ChannelGroup(name, this, eventEmitter);
+        public ChannelMetadata ChannelMetadata(string id) => new ChannelMetadata(id, this, eventEmitter);
+        public UserMetadata UserMetadata(string id) => new UserMetadata(id, this, eventEmitter);
+        
+        public SubscriptionSet SubscriptionSet(string[] channels, string[] channelGroups = null, SubscriptionOptions? options = null) => new SubscriptionSet(channels, channelGroups?? new string[] {}, options, this, eventEmitter);
+
         #endregion
 
         #region "Constructors"
@@ -1001,10 +1011,10 @@ namespace PubnubApi
             }
             CheckAndInitializeEmptyStringValues(config);
             tokenManager = new EndPoint.TokenManager(pubnubConfig[InstanceId], JsonPluggableLibrary, pubnubLog, this.InstanceId);
-
+            
             //Initialize JsonPluggableLibrary
             JsonPluggableLibrary = new NewtonsoftJsonDotNet(config, pubnubLog);
-
+            
             //Check PresenceTimeout
             if (config.PresenceTimeout < 20)
             {
@@ -1017,7 +1027,7 @@ namespace PubnubApi
 
             //Check required UserId
             CheckRequiredUserId(config);
-
+            eventEmitter = new EventEmitter(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, subscribeCallbackListenerList, JsonPluggableLibrary, tokenManager, pubnubLog, this);
             //Check CryptoModule usage
             CheckCryptoModuleUsageForLogging(config);
 

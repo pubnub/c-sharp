@@ -5,7 +5,6 @@ using System.Globalization;
 using PubnubApi.EventEngine.Subscribe;
 using PubnubApi.EventEngine.Core;
 using PubnubApi.EventEngine.Subscribe.States;
-using PubnubApi.EventEngine.Subscribe.Common;
 using PubnubApi.EventEngine.Common;
 
 namespace PubnubApi.EndPoint
@@ -30,6 +29,7 @@ namespace PubnubApi.EndPoint
         private SubscribeEventEngineFactory subscribeEventEngineFactory;
         private PresenceOperation<T> presenceOperation;
         private string instanceId { get; set; }
+        public EventEmitter EventEmitter { get; set; }
 		public List<SubscribeCallback> SubscribeListenerList
         {
             get;
@@ -126,15 +126,14 @@ namespace PubnubApi.EndPoint
 				subscribeEventEngine = subscribeEventEngineFactory.GetEventEngine(instanceId);
 			} else {
 				var subscribeManager = new SubscribeManager2(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, PubnubInstance);
-                var eventEmitter = new EventEmitter(config, SubscribeListenerList, jsonLibrary, pubnubTokenMgr, pubnubLog, PubnubInstance);
-				subscribeEventEngine = subscribeEventEngineFactory.InitializeEventEngine(instanceId, PubnubInstance, config, subscribeManager, eventEmitter, jsonLibrary, StatusEmitter);
+				subscribeEventEngine = subscribeEventEngineFactory.InitializeEventEngine(instanceId, PubnubInstance, config, subscribeManager, this.EventEmitter, jsonLibrary, StatusEmitter);
 				subscribeEventEngine.OnStateTransition += SubscribeEventEngine_OnStateTransition;
 				subscribeEventEngine.OnEventQueued += SubscribeEventEngine_OnEventQueued;
 				subscribeEventEngine.OnEffectDispatch += SubscribeEventEngine_OnEffectDispatch;
 			}
 			subscribeEventEngine.Subscribe<T>(channels, channelGroups, cursor);
 			if (this.presenceOperation != null) {
-				presenceOperation.Start(channels?.Where(c => !c.EndsWith("-pnpres")).ToArray(), channelGroups?.Where(cg => !cg.EndsWith("-pnpres")).ToArray());
+				presenceOperation.Start(channels?.Where(c => !c.EndsWith(Constants.Pnpres)).ToArray(), channelGroups?.Where(cg => !cg.EndsWith(Constants.Pnpres)).ToArray());
 			}
 		}
 
