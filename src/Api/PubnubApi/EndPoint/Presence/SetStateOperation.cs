@@ -309,6 +309,7 @@ namespace PubnubApi.EndPoint
 			if (transportResponse.Error == null) {
 				var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
+				requestState.GotJsonResponse = true;
 				if (errorStatus == null) {
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, (int)HttpStatusCode.OK, null);
 					JsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);

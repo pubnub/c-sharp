@@ -1,5 +1,4 @@
-﻿using System;
-namespace PubnubApi
+﻿namespace PubnubApi
 {
 	public static class Constants
 	{
@@ -10,6 +9,8 @@ namespace PubnubApi
 		public const string PATCH = "PATCH";
 		public const string PUT = "PUT";
 		public const string DELETE = "DELETE";
+
+		public const int ResourceNotFoundStatusCode = 404;
+		public const int HttpRequestSuccessStatusCode = 200;
 	}
 }
-

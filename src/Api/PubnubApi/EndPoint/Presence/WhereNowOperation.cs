@@ -110,6 +110,7 @@ namespace PubnubApi.EndPoint
 			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest);
 			if (transportResponse.Error == null) {
 				var responseString = Encoding.UTF8.GetString(transportResponse.Content);
+				requestState.GotJsonResponse = true;
 				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
 				if (errorStatus == null) {
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, (int)HttpStatusCode.OK, null);

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Collections.Concurrent;
-using System.Threading.Tasks;
 
 namespace PubnubApi.EndPoint
 {
@@ -34,14 +33,6 @@ namespace PubnubApi.EndPoint
 
         private void UnsubscribeAll()
         {
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
-            Task.Factory.StartNew(() =>
-            {
-                SubscribeManager manager = new SubscribeManager(config, jsonLibrary, unit, pubnubLog, pubnubTokenMgr, PubnubInstance);
-                manager.CurrentPubnubInstance(PubnubInstance);
-                manager.MultiChannelUnSubscribeAll<T>(PNOperationType.PNUnsubscribeOperation, this.queryParam);
-            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
-#else
             new Thread(() =>
             {
                 SubscribeManager manager = new SubscribeManager(config, jsonLibrary, unit, pubnubLog, pubnubTokenMgr, PubnubInstance);
@@ -49,7 +40,6 @@ namespace PubnubApi.EndPoint
                 manager.MultiChannelUnSubscribeAll<T>(PNOperationType.PNUnsubscribeOperation, this.queryParam);
             })
             { IsBackground = true }.Start();
-#endif
         }
 
         internal void CurrentPubnubInstance(Pubnub instance)
