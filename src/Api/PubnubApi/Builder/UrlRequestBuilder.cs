@@ -274,9 +274,6 @@ namespace PubnubApi
         Uri IUrlRequestBuilder.BuildHereNowRequest(string requestMethod, string requestBody, string[] channels, string[] channelGroups, bool showUUIDList, bool includeUserState, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PNHereNowOperation;
-            if ((channels == null || channels.Length == 0) && (channelGroups == null || channelGroups.Length == 0)) {
-                throw new ArgumentException("Please provide Channels or ChannelGroups.");
-            }
             string channel = (channels != null && channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : ",";
 
             List<string> url = new List<string>();

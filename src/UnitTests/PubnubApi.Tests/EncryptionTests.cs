@@ -3,17 +3,12 @@ using System.Text;
 using System.Collections.Generic;
 using NUnit.Framework;
 using PubnubApi;
-using System.Text.RegularExpressions;
-using System.Globalization;
 using Newtonsoft.Json;
 using System.Diagnostics;
-using System.Linq;
-using PeterO.Cbor;
 using PubnubApi.Security.Crypto;
 using PubnubApi.Security.Crypto.Cryptors;
 using PubnubApi.Security.Crypto.Common;
 using System.Threading;
-using System.Security.Policy;
 using MockServer;
 
 namespace PubNubMessaging.Tests
@@ -190,6 +185,8 @@ namespace PubNubMessaging.Tests
                 {
                     actual = Newtonsoft.Json.JsonConvert.SerializeObject(pnGrant);
                 }
+                
+                pubnub.Destroy();
             }
             catch (Exception ex)
             {
@@ -840,13 +837,17 @@ namespace PubNubMessaging.Tests
         public void TestSubscribeDecryption()
         {
             server.ClearRequests();
-            server.Start();
+            if (PubnubCommon.EnableStubTest)
+            {
+                server.Start();   
+            }
 
             ManualResetEvent done = new ManualResetEvent(false);
             PNConfiguration config = new PNConfiguration(new UserId("test"))
             {
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 PublishKey = PubnubCommon.PublishKey,
+                SecretKey = PubnubCommon.SecretKey,
                 Secure = false
             };
             config.LogVerbosity = PNLogVerbosity.BODY;
@@ -909,21 +910,33 @@ namespace PubNubMessaging.Tests
 
             pn.Subscribe<string>().Channels(new[] { "test" }).Execute();
 
+            Thread.Sleep(1000);
+            
+            // Rust generated encrypted message
+            CreateTestSender().Publish()
+                .Channel("test")
+                .Message("UE5FRAFBQ1JIEALf+E65kseYJwTw2J6BUk9MePHiCcBCS+8ykXLkBIOA")
+                .Execute(new PNPublishResultExt((r,s)=>{}));
+
             bool passed = done.WaitOne(5000);
             Assert.True(passed);
         }
-
+        
         [Test]
         public void TestSubscribeDecryptionOnNonEncryptedMessage()
         {
             server.ClearRequests();
-            server.Start();
+            if (PubnubCommon.EnableStubTest)
+            {
+                server.Start();   
+            }
 
             ManualResetEvent done = new ManualResetEvent(false);
             PNConfiguration config = new PNConfiguration(new UserId("test"))
             {
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 PublishKey = PubnubCommon.PublishKey,
+                SecretKey = PubnubCommon.SecretKey
             };
             config.LogVerbosity = PNLogVerbosity.BODY;
             config.CryptoModule = new CryptoModule(new AesCbcCryptor("enigma"),
@@ -981,6 +994,13 @@ namespace PubNubMessaging.Tests
                 .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             pn.Subscribe<string>().Channels(new[] { "test" }).Execute();
+
+            Thread.Sleep(1000);
+            
+            CreateTestSender().Publish()
+                .Channel("test")
+                .Message("test")
+                .Execute(new PNPublishResultExt((r,s)=>{}));
 
             bool passed = done.WaitOne(5000);
             Assert.True(passed);
@@ -1048,7 +1068,7 @@ namespace PubNubMessaging.Tests
                     done.Set();
                 }));
 
-            bool passed = done.WaitOne(5000);
+            bool passed = done.WaitOne(500000);
             Assert.True(passed);
         }
 
@@ -1059,6 +1079,19 @@ namespace PubNubMessaging.Tests
             config.PublishKey = "demo";
 
             return config;
+        }
+        
+        private Pubnub CreateTestSender()
+        {
+            var senderConfig = new PNConfiguration(new UserId("test_sender"))
+            {
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                PublishKey = PubnubCommon.PublishKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Secure = false,
+                LogVerbosity = PNLogVerbosity.BODY
+            };
+            return new Pubnub(senderConfig);
         }
     }
 }

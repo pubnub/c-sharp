@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Globalization;
 using System.Collections.Concurrent;
+using System.Threading.Tasks;
 
 
 namespace PubnubApi.EndPoint

@@ -9,6 +9,7 @@ using System.Net;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Threading;
 using System.Globalization;
 using System.Linq;
@@ -1619,17 +1620,20 @@ namespace PubnubApi
                         case PNOperationType.PNRemoveGroupOperation:
                         case PNOperationType.ChannelGroupGet:
                         case PNOperationType.ChannelGroupAllGet:
-                            Dictionary<string, object> channelGroupDictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
+                            Dictionary<string, object> channelGroupDictionary =
+                                jsonLib.DeserializeToDictionaryOfObject(jsonString);
                             result = new List<object>();
                             result.Add(channelGroupDictionary);
                             if (multiChannelGroup != "")
                             {
                                 result.Add(multiChannelGroup);
                             }
+
                             if (multiChannel != "")
                             {
                                 result.Add(multiChannel);
                             }
+
                             break;
                         default:
                             break;
@@ -1637,7 +1641,10 @@ namespace PubnubApi
                     //switch stmt end
                 }
             }
-            catch { /* ignore */ }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+            }
 
             return result;
         }

@@ -23,7 +23,10 @@ namespace PubNubMessaging.Tests
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
             server = Server.Instance();
             MockServer.LoggingMethod.MockServerLog = unitLog;
-            server.Start();
+            if (PubnubCommon.EnableStubTest)
+            {
+                server.Start();   
+            }
 
             if (!PubnubCommon.PAMServerSideGrant) { return; }
 
@@ -92,6 +95,12 @@ namespace PubNubMessaging.Tests
         [TearDown]
         public static void Exit()
         {
+            if (pubnub != null)
+            {
+                pubnub.Destroy();
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
+            }
             server.Stop();
         }
 
@@ -278,7 +287,6 @@ namespace PubNubMessaging.Tests
                 #endregion
                 manualEvent.WaitOne(manualResetEventWaitTimeout);
             }
-
             if (receivedMessage)
             {
                 receivedMessage = false;
@@ -1121,7 +1129,7 @@ namespace PubNubMessaging.Tests
 
 
         [Test]
-        public static void ThenManageChannelMembersShouldReturnEventInfo()
+        public async Task ThenManageChannelMembersShouldReturnEventInfo()
         {
             server.ClearRequests();
 
@@ -1179,32 +1187,28 @@ namespace PubNubMessaging.Tests
             }
             pubnub.AddListener(eventListener);
 
-            ManualResetEvent manualEvent = new ManualResetEvent(false);
+            
             pubnub.Subscribe<string>().Channels(new string[] { uuidMetadataId1, uuidMetadataId2, channelMetadataId }).Execute();
-            manualEvent.WaitOne(2000);
+            await Task.Delay(3000);
 
-
-            manualResetEventWaitTimeout = 310 * 1000;
+            
             System.Diagnostics.Debug.WriteLine("pubnub.RemoveUuidMetadata() 1 STARTED");
-            manualEvent = new ManualResetEvent(false);
             pubnub.RemoveUuidMetadata().Uuid(uuidMetadataId1).Execute(new PNRemoveUuidMetadataResultExt(
                 delegate (PNRemoveUuidMetadataResult result, PNStatus status) { }));
-            manualEvent.WaitOne(2000);
+            await Task.Delay(3000);
 
             System.Diagnostics.Debug.WriteLine("pubnub.RemoveUuidMetadata() 2 STARTED");
-            manualEvent = new ManualResetEvent(false);
             pubnub.RemoveUuidMetadata().Uuid(uuidMetadataId2).Execute(new PNRemoveUuidMetadataResultExt(
                 delegate (PNRemoveUuidMetadataResult result, PNStatus status) { }));
-            manualEvent.WaitOne(2000);
+            await Task.Delay(3000);
 
             System.Diagnostics.Debug.WriteLine("pubnub.RemoveChannelMetadata() STARTED");
-            manualEvent = new ManualResetEvent(false);
             pubnub.RemoveChannelMetadata().Channel(channelMetadataId).Execute(new PNRemoveChannelMetadataResultExt(
                 delegate (PNRemoveChannelMetadataResult result, PNStatus status) { }));
-            manualEvent.WaitOne(2000);
-
-            manualEvent = new ManualResetEvent(false);
-            receivedMessage = false;
+            await Task.Delay(3000);
+            
+            manualResetEventWaitTimeout = 310 * 1000;
+            var manualEvent = new ManualResetEvent(false);
             #region "SetUuidMetadata 1"
             System.Diagnostics.Debug.WriteLine("pubnub.SetUuidMetadata() 1 STARTED");
             pubnub.SetUuidMetadata().Uuid(uuidMetadataId1).Name("pandu-ut-un1")
@@ -1215,17 +1219,15 @@ namespace PubNubMessaging.Tests
                             pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
                             if (uuidMetadataId1 == r.Uuid)
                             {
-                                receivedMessage = true;
+                                manualEvent.Set();
                             }
                         }
-                        manualEvent.Set();
                     }));
             #endregion
-            manualEvent.WaitOne(manualResetEventWaitTimeout);
+            receivedMessage = manualEvent.WaitOne(manualResetEventWaitTimeout);
 
             if (receivedMessage)
             {
-                receivedMessage = false;
                 manualEvent = new ManualResetEvent(false);
                 #region "SetUuidMetadata 2"
                 System.Diagnostics.Debug.WriteLine("pubnub.SetUuidMetadata() 2 STARTED");
@@ -1237,17 +1239,15 @@ namespace PubNubMessaging.Tests
                                 pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
                                 if (uuidMetadataId2 == r.Uuid)
                                 {
-                                    receivedMessage = true;
+                                    manualEvent.Set();
                                 }
                             }
-                            manualEvent.Set();
                         }));
                 #endregion
-                manualEvent.WaitOne(manualResetEventWaitTimeout);
+                receivedMessage = manualEvent.WaitOne(manualResetEventWaitTimeout);
             }
             if (receivedMessage)
             {
-                receivedMessage = false;
                 manualEvent = new ManualResetEvent(false);
                 #region "SetChannelMetadata"
                 System.Diagnostics.Debug.WriteLine("pubnub.SetChannelMetadata() STARTED");
@@ -1259,18 +1259,16 @@ namespace PubNubMessaging.Tests
                                 pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
                                 if (channelMetadataId == r.Channel)
                                 {
-                                    receivedMessage = true;
+                                    manualEvent.Set();
                                 }
                             }
-                            manualEvent.Set();
                         }));
                 #endregion
-                manualEvent.WaitOne(manualResetEventWaitTimeout);
+                receivedMessage = manualEvent.WaitOne(manualResetEventWaitTimeout);
             }
 
             if (receivedMessage)
             {
-                receivedMessage = false;
                 manualEvent = new ManualResetEvent(false);
                 #region "ManageChannelMembers Add"
                 System.Diagnostics.Debug.WriteLine("pubnub.ManageChannelMembers() ADD STARTED");
@@ -1289,18 +1287,16 @@ namespace PubNubMessaging.Tests
                             && r.ChannelMembers.Find(x => x.UuidMetadata.Uuid == uuidMetadataId1) != null
                             && r.ChannelMembers.Find(x => x.UuidMetadata.Uuid == uuidMetadataId2) != null)
                             {
-                                receivedMessage = true;
+                                manualEvent.Set();
                             }
                         }
-                        manualEvent.Set();
                     }));
                 #endregion
-                manualEvent.WaitOne(manualResetEventWaitTimeout);
+                receivedMessage = manualEvent.WaitOne(manualResetEventWaitTimeout);
             }
 
             if (receivedMessage)
             {
-                receivedMessage = false;
                 manualEvent = new ManualResetEvent(false);
                 #region "ManageChannelMembers Update"
                 if (!string.IsNullOrEmpty(config.SecretKey))
@@ -1320,10 +1316,9 @@ namespace PubNubMessaging.Tests
                                 if (r.ChannelMembers != null
                                 && r.ChannelMembers.Find(x => x.UuidMetadata.Uuid == uuidMetadataId1) != null)
                                 {
-                                    receivedMessage = true;
+                                    manualEvent.Set();
                                 }
                             }
-                            manualEvent.Set();
                         }));
                 }
                 else
@@ -1336,16 +1331,15 @@ namespace PubNubMessaging.Tests
                             if (r != null && s.StatusCode == 200 && !s.Error)
                             {
                                 pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
-                                receivedMessage = true;
+                                manualEvent.Set();
                             }
-                            manualEvent.Set();
                         }));
                 }
                 #endregion
-                manualEvent.WaitOne(manualResetEventWaitTimeout);
+                receivedMessage = manualEvent.WaitOne(manualResetEventWaitTimeout);
             }
 
-            Thread.Sleep(2000);
+            await Task.Delay(3000);
 
             pubnub.Unsubscribe<string>().Channels(new string[] { uuidMetadataId1, uuidMetadataId2, channelMetadataId }).Execute();
             pubnub.RemoveListener(eventListener);
@@ -1422,7 +1416,7 @@ namespace PubNubMessaging.Tests
 
             ManualResetEvent manualEvent = new ManualResetEvent(false);
             pubnub.Subscribe<string>().Channels(new string[] { uuidMetadataId1, uuidMetadataId2, channelMetadataId }).Execute();
-            manualEvent.WaitOne(2000);
+            manualEvent.WaitOne(4000);
 
             System.Diagnostics.Debug.WriteLine("pubnub.RemoveUuidMetadata() 1 STARTED");
 #if NET40
@@ -1540,7 +1534,7 @@ namespace PubNubMessaging.Tests
                 #endregion
             }
 
-            Thread.Sleep(2000);
+            await Task.Delay(4000);
 
             if (receivedMessage)
             {
@@ -1597,10 +1591,10 @@ namespace PubNubMessaging.Tests
                 #endregion
             }
 
-            Thread.Sleep(4000);
+            await Task.Delay(4000);
             /* */
             pubnub.Unsubscribe<string>().Channels(new string[] { uuidMetadataId1, uuidMetadataId2, channelMetadataId }).Execute();
-            Thread.Sleep(1000);
+            await Task.Delay(4000);
             pubnub.RemoveListener(eventListener);
 
             Assert.IsTrue(receivedDeleteEvent && receivedSetEvent, "Async ManageMembers events Failed");
