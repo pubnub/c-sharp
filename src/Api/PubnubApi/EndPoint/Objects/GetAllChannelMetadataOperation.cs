@@ -20,7 +20,7 @@ namespace PubnubApi.EndPoint
 		private bool includeCount;
 		private bool includeCustom;
 		private string channelsFilter;
-		private PNPageObject page;
+		private PNPageObject page = new PNPageObject();
 		private List<string> sortField;
 
 		private PNCallback<PNGetAllChannelMetadataResult> savedCallback;
@@ -109,8 +109,6 @@ namespace PubnubApi.EndPoint
 			if (callback == null) {
 				throw new ArgumentException("Missing callback");
 			}
-			PNPageObject internalPage;
-			if (page == null) { internalPage = new PNPageObject(); } else { internalPage = page; }
 
 			RequestState<PNGetAllChannelMetadataResult> requestState = new RequestState<PNGetAllChannelMetadataResult>();
 			requestState.ResponseType = PNOperationType.PNGetAllChannelMetadataOperation;
@@ -133,7 +131,7 @@ namespace PubnubApi.EndPoint
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNGetAllChannelMetadataOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
-					requestState.PubnubCallback.OnResponse(default(PNGetAllChannelMetadataResult), status);
+					requestState.PubnubCallback.OnResponse(default, status);
 				}
 			});
 		}
@@ -141,9 +139,6 @@ namespace PubnubApi.EndPoint
 		private async Task<PNResult<PNGetAllChannelMetadataResult>> GetAllChannelMetadataList(PNPageObject page, int limit, bool includeCount, bool includeCustom, string filter, List<string> sort, Dictionary<string, object> externalQueryParam)
 		{
 			PNResult<PNGetAllChannelMetadataResult> returnValue = new PNResult<PNGetAllChannelMetadataResult>();
-
-			PNPageObject internalPage;
-			if (page == null) { internalPage = new PNPageObject(); } else { internalPage = page; }
 			RequestState<PNGetAllChannelMetadataResult> requestState = new RequestState<PNGetAllChannelMetadataResult>();
 			requestState.ResponseType = PNOperationType.PNGetAllChannelMetadataOperation;
 			requestState.Reconnect = false;
@@ -156,7 +151,8 @@ namespace PubnubApi.EndPoint
 			if (transportResponse.Error == null) {
 				var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
-				if (errorStatus == null) {
+				if (errorStatus == null && transportResponse.StatusCode == Constants.HttpRequestSuccessStatusCode) {
+					requestState.GotJsonResponse = true;
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, (int)HttpStatusCode.OK, null);
 					JsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
 				} else {
@@ -193,10 +189,10 @@ namespace PubnubApi.EndPoint
 			};
 
 			Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
-			if (!string.IsNullOrEmpty(page.Next)) {
+			if (!string.IsNullOrEmpty(page?.Next)) {
 				requestQueryStringParams.Add("start", UriUtil.EncodeUriComponent(page.Next, PNOperationType.PNGetAllChannelMetadataOperation, false, false, false));
 			}
-			if (!string.IsNullOrEmpty(page.Prev)) {
+			if (!string.IsNullOrEmpty(page?.Prev)) {
 				requestQueryStringParams.Add("end", UriUtil.EncodeUriComponent(page.Prev, PNOperationType.PNGetAllChannelMetadataOperation, false, false, false));
 			}
 			if (limit >= 0) {

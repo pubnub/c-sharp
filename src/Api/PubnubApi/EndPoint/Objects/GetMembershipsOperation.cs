@@ -20,7 +20,7 @@ namespace PubnubApi.EndPoint
 		private bool includeCount;
 		private string commandDelimitedIncludeOptions = "";
 		private string membershipsFilter;
-		private PNPageObject page;
+		private PNPageObject page = new PNPageObject();
 		private List<string> sortField;
 
 		private PNCallback<PNMembershipsResult> savedCallback;
@@ -110,9 +110,6 @@ namespace PubnubApi.EndPoint
 				uuid = config.UserId;
 			}
 
-			PNPageObject internalPage;
-			if (page == null) { internalPage = new PNPageObject(); } else { internalPage = page; }
-
 			RequestState<PNMembershipsResult> requestState = new RequestState<PNMembershipsResult>();
 			requestState.ResponseType = PNOperationType.PNGetMembershipsOperation;
 			requestState.PubnubCallback = callback;
@@ -150,9 +147,6 @@ namespace PubnubApi.EndPoint
 			if (string.IsNullOrEmpty(uuid)) {
 				uuid = config.UserId;
 			}
-
-			PNPageObject internalPage;
-			if (page == null) { internalPage = new PNPageObject(); } else { internalPage = page; }
 			RequestState<PNMembershipsResult> requestState = new RequestState<PNMembershipsResult>();
 			requestState.ResponseType = PNOperationType.PNGetMembershipsOperation;
 			requestState.UsePostMethod = false;
@@ -167,7 +161,8 @@ namespace PubnubApi.EndPoint
 			if (transportResponse.Error == null) {
 				var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
-				if (errorStatus == null) {
+				if (errorStatus == null && transportResponse.StatusCode == Constants.HttpRequestSuccessStatusCode) {
+					requestState.GotJsonResponse = true;
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, (int)HttpStatusCode.OK, null);
 					JsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
 				} else {

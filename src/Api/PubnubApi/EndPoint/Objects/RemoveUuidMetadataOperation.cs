@@ -81,7 +81,7 @@ namespace PubnubApi.EndPoint
 		private void RemoveUuidMetadata(string uuid, Dictionary<string, object> externalQueryParam, PNCallback<PNRemoveUuidMetadataResult> callback)
 		{
 			if (string.IsNullOrEmpty(uuid)) {
-				uuid = config.UserId;
+				this.uuid = config.UserId;
 			}
 			RequestState<PNRemoveUuidMetadataResult> requestState = new RequestState<PNRemoveUuidMetadataResult>();
 			requestState.ResponseType = PNOperationType.PNDeleteUuidMetadataOperation;
@@ -118,7 +118,7 @@ namespace PubnubApi.EndPoint
 			PNResult<PNRemoveUuidMetadataResult> returnValue = new PNResult<PNRemoveUuidMetadataResult>();
 
 			if (string.IsNullOrEmpty(uuid)) {
-				uuid = config.UserId;
+				this.uuid = config.UserId;
 			}
 
 			if (string.IsNullOrEmpty(config.SubscribeKey) || string.IsNullOrEmpty(config.SubscribeKey.Trim()) || config.SubscribeKey.Length <= 0) {
@@ -138,7 +138,8 @@ namespace PubnubApi.EndPoint
 			if (transportResponse.Error == null) {
 				var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
-				if (errorStatus == null) {
+				if (errorStatus == null && transportResponse.StatusCode == Constants.HttpRequestSuccessStatusCode) {
+					requestState.GotJsonResponse = true;
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, (int)HttpStatusCode.OK, null);
 					JsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
 				} else {

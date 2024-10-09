@@ -20,7 +20,7 @@ namespace PubnubApi.EndPoint
         private bool includeCount;
         private bool includeCustom;
         private string usersFilter;
-        private PNPageObject page;
+        private PNPageObject page = new PNPageObject();
         private List<string> sortField;
 
         private PNCallback<PNGetAllUuidMetadataResult> savedCallback;
@@ -113,9 +113,6 @@ namespace PubnubApi.EndPoint
             {
                 throw new ArgumentException("Missing callback");
             }
-            PNPageObject internalPage;
-            if (page == null) { internalPage = new PNPageObject(); }
-            else { internalPage = page; }
             RequestState<PNGetAllUuidMetadataResult> requestState = new RequestState<PNGetAllUuidMetadataResult>();
             requestState.ResponseType = PNOperationType.PNGetAllUuidMetadataOperation;
             requestState.PubnubCallback = callback;
@@ -144,11 +141,6 @@ namespace PubnubApi.EndPoint
         private async Task<PNResult<PNGetAllUuidMetadataResult>> GetUuidMetadataList(PNPageObject page, int limit, bool includeCount, bool includeCustom, string filter, List<string> sort, Dictionary<string, object> externalQueryParam)
         {
             PNResult<PNGetAllUuidMetadataResult> returnValue = new PNResult<PNGetAllUuidMetadataResult>();
-
-            PNPageObject internalPage;
-            if (page == null) { internalPage = new PNPageObject(); }
-            else { internalPage = page; }
-
             RequestState<PNGetAllUuidMetadataResult> requestState = new RequestState<PNGetAllUuidMetadataResult>();
             requestState.ResponseType = PNOperationType.PNGetAllUuidMetadataOperation;
             requestState.Reconnect = false;
@@ -162,7 +154,8 @@ namespace PubnubApi.EndPoint
 			if (transportResponse.Error == null) {
 				var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
-				if (errorStatus == null) {
+				if (errorStatus == null && transportResponse.StatusCode == Constants.HttpRequestSuccessStatusCode) {
+					requestState.GotJsonResponse = true;
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, (int)HttpStatusCode.OK, null);
 					JsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
 				} else {

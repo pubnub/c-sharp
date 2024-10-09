@@ -21,7 +21,7 @@ namespace PubnubApi.EndPoint
         private List<PNChannelMember> setMember;
         private List<string> delMember;
         private string commandDelimitedIncludeOptions = string.Empty;
-        private PNPageObject page;
+        private PNPageObject page = new PNPageObject();
         private int limit = -1;
         private bool includeCount;
         private List<string> sortField;
@@ -144,10 +144,6 @@ namespace PubnubApi.EndPoint
 
         private void ProcessMembersOperationRequest(string spaceId, List<PNChannelMember> setMemberList, List<string> removeMemberList, PNPageObject page, int limit, bool includeCount, string includeOptions, List<string> sort, Dictionary<string, object> externalQueryParam, PNCallback<PNChannelMembersResult> callback)
         {
-            PNPageObject internalPage;
-            if (page == null) { internalPage = new PNPageObject(); }
-            else { internalPage = page; }
-
             RequestState<PNChannelMembersResult> requestState = new RequestState<PNChannelMembersResult>();
             requestState.ResponseType = PNOperationType.PNManageChannelMembersOperation;
             requestState.PubnubCallback = callback;
@@ -195,11 +191,6 @@ namespace PubnubApi.EndPoint
                 returnValue.Status = errStatus;
                 return returnValue;
             }
-
-            PNPageObject internalPage;
-            if (page == null) { internalPage = new PNPageObject(); }
-            else { internalPage = page; }
-
             RequestState<PNChannelMembersResult> requestState = new RequestState<PNChannelMembersResult>();
             requestState.ResponseType = PNOperationType.PNManageChannelMembersOperation;
             requestState.Reconnect = false;
@@ -212,7 +203,8 @@ namespace PubnubApi.EndPoint
 			if (transportResponse.Error == null) {
 				var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
-				if (errorStatus == null) {
+				if (errorStatus == null && transportResponse.StatusCode == Constants.HttpRequestSuccessStatusCode) {
+					requestState.GotJsonResponse = true;
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, (int)HttpStatusCode.OK, null);
 					JsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
 				} else {

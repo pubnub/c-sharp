@@ -81,7 +81,7 @@ namespace PubnubApi.EndPoint
 				throw new ArgumentException("Missing callback");
 			}
 			if (string.IsNullOrEmpty(uuid)) {
-				uuid = config.UserId;
+				this.uuid = config.UserId;
 			}
 			RequestState<PNGetUuidMetadataResult> requestState = new RequestState<PNGetUuidMetadataResult>();
 			requestState.ResponseType = PNOperationType.PNGetUuidMetadataOperation;
@@ -116,7 +116,7 @@ namespace PubnubApi.EndPoint
 		private async Task<PNResult<PNGetUuidMetadataResult>> GetSingleUuidMetadata(string uuid, bool includeCustom, Dictionary<string, object> externalQueryParam)
 		{
 			if (string.IsNullOrEmpty(uuid)) {
-				uuid = config.UserId;
+				this.uuid = config.UserId;
 			}
 			PNResult<PNGetUuidMetadataResult> returnValue = new PNResult<PNGetUuidMetadataResult>();
 			RequestState<PNGetUuidMetadataResult> requestState = new RequestState<PNGetUuidMetadataResult>();
@@ -132,7 +132,8 @@ namespace PubnubApi.EndPoint
 			if (transportResponse.Error == null) {
 				var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
-				if (errorStatus == null) {
+				if (errorStatus == null && transportResponse.StatusCode == Constants.HttpRequestSuccessStatusCode) {
+					requestState.GotJsonResponse = true;
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, (int)HttpStatusCode.OK, null);
 					JsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
 				} else {

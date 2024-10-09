@@ -108,6 +108,8 @@ namespace PubnubApi
 					return httpClientService.GetRequest(transportRequest);
 				case Constants.POST:
 					return httpClientService.PostRequest(transportRequest);
+				case Constants.PATCH:
+					return httpClientService.PatchRequest(transportRequest);
 				case Constants.PUT:
 					return httpClientService.PutRequest(transportRequest);
 				case Constants.DELETE:

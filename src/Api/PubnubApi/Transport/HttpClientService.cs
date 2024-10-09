@@ -126,6 +126,34 @@ namespace PubnubApi
 			}
 			return response;
 		}
+
+		public async Task<TransportResponse> PatchRequest(TransportRequest transportRequest)
+		{
+			if (transportRequest.Timeout.HasValue) _httpClient.Timeout = (TimeSpan)transportRequest.Timeout;
+			HttpContent patchData = null;
+
+			if (!string.IsNullOrEmpty(transportRequest.BodyContentString)) {
+				patchData = new StringContent(transportRequest.BodyContentString, Encoding.UTF8, "application/json");
+			} else if (transportRequest.BodyContentBytes != null) {
+				patchData = new ByteArrayContent(transportRequest.FormData);
+				patchData.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
+			}
+			HttpRequestMessage requestMessage = new HttpRequestMessage(new HttpMethod("PATCH"), requestUri: transportRequest.RequestUrl) { Content = patchData };
+			if (transportRequest.Headers.Keys.Count > 0) {
+				foreach (var kvp in transportRequest.Headers) {
+					requestMessage.Headers.Add(kvp.Key, kvp.Value);
+				}
+			}
+			var httpResult = await _httpClient.SendAsync(request: requestMessage, cancellationToken: transportRequest.CancellationToken);
+			var responseContent = await httpResult.Content.ReadAsByteArrayAsync();
+			var response = new TransportResponse() {
+				StatusCode = (int)httpResult.StatusCode,
+				Content = responseContent,
+				Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
+				RequestUrl = httpResult.RequestMessage.RequestUri.AbsolutePath
+			};
+			return response;
+		}
 	}
 }
 

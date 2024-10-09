@@ -18,7 +18,7 @@ namespace PubnubApi.EndPoint
 		private string uuid = "";
 		private List<PNMembership> addMembership;
 		private string commandDelimitedIncludeOptions = "";
-		private PNPageObject page;
+		private PNPageObject page = new PNPageObject();
 		private int limit = -1;
 		private bool includeCount;
 		private List<string> sortField;
@@ -112,11 +112,8 @@ namespace PubnubApi.EndPoint
 		private void SetChannelMembershipWithUuid(string uuid, List<PNMembership> setMembership, PNPageObject page, int limit, bool includeCount, string includeOptions, List<string> sort, Dictionary<string, object> externalQueryParam, PNCallback<PNMembershipsResult> callback)
 		{
 			if (string.IsNullOrEmpty(uuid)) {
-				uuid = config.UserId;
+				this.uuid = config.UserId;
 			}
-
-			PNPageObject internalPage;
-			if (page == null) { internalPage = new PNPageObject(); } else { internalPage = page; }
 			RequestState<PNMembershipsResult> requestState = new RequestState<PNMembershipsResult>();
 			requestState.ResponseType = PNOperationType.PNSetMembershipsOperation;
 			requestState.PubnubCallback = callback;
@@ -152,7 +149,7 @@ namespace PubnubApi.EndPoint
 			PNResult<PNMembershipsResult> returnValue = new PNResult<PNMembershipsResult>();
 
 			if (string.IsNullOrEmpty(uuid)) {
-				uuid = config.UserId;
+				this.uuid = config.UserId;
 			}
 
 			if (string.IsNullOrEmpty(config.SubscribeKey) || string.IsNullOrEmpty(config.SubscribeKey.Trim()) || config.SubscribeKey.Length <= 0) {
@@ -160,9 +157,6 @@ namespace PubnubApi.EndPoint
 				returnValue.Status = errStatus;
 				return returnValue;
 			}
-
-			PNPageObject internalPage;
-			if (page == null) { internalPage = new PNPageObject(); } else { internalPage = page; }
 
 			RequestState<PNMembershipsResult> requestState = new RequestState<PNMembershipsResult>();
 			requestState.ResponseType = PNOperationType.PNSetMembershipsOperation;
@@ -177,7 +171,8 @@ namespace PubnubApi.EndPoint
 			if (transportResponse.Error == null) {
 				var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
-				if (errorStatus == null) {
+				if (errorStatus == null && transportResponse.StatusCode == Constants.HttpRequestSuccessStatusCode) {
+					requestState.GotJsonResponse = true;
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, (int)HttpStatusCode.OK, null);
 					JsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
 				} else {
@@ -248,7 +243,7 @@ namespace PubnubApi.EndPoint
 				"objects",
 				config.SubscribeKey,
 				"uuids",
-				string.IsNullOrEmpty(uuid) ? "" : uuid,
+				string.IsNullOrEmpty(this.uuid) ? string.Empty : uuid,
 				"channels"
 			};
 

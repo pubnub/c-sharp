@@ -71,8 +71,9 @@ namespace PubnubApi.EndPoint
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNAccessManagerRevokeToken);
 			PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ContinueWith(t => {
 				var transportResponse = t.Result;
-				if (transportResponse.Error == null) {
+				if (transportResponse.Error == null && transportResponse.StatusCode == Constants.HttpRequestSuccessStatusCode) {
 					var responseString = Encoding.UTF8.GetString(t.Result.Content);
+					requestState.GotJsonResponse = true;
 					if (!string.IsNullOrEmpty(responseString)) {
 						List<object> result = ProcessJsonResponse(requestState, responseString);
 						ProcessResponseCallbacks(result, requestState);
@@ -103,8 +104,9 @@ namespace PubnubApi.EndPoint
 			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest);
 			if (transportResponse.Error == null) {
 				var responseString = Encoding.UTF8.GetString(transportResponse.Content);
+				requestState.GotJsonResponse = true;
 				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
-				if (errorStatus == null) {
+				if (errorStatus == null  && transportResponse.StatusCode == Constants.HttpRequestSuccessStatusCode) {
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, transportResponse.StatusCode, null);
 					JsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
 				} else {
