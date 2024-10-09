@@ -107,7 +107,7 @@ namespace PubnubApi.EndPoint
 		private void GetMembershipsList(string uuid, PNPageObject page, int limit, bool includeCount, string includeOptions, string filter, List<string> sort, Dictionary<string, object> externalQueryParam, PNCallback<PNMembershipsResult> callback)
 		{
 			if (string.IsNullOrEmpty(uuid)) {
-				uuid = config.UserId;
+				this.uuid = config.UserId;
 			}
 
 			RequestState<PNMembershipsResult> requestState = new RequestState<PNMembershipsResult>();
@@ -145,7 +145,7 @@ namespace PubnubApi.EndPoint
 			PNResult<PNMembershipsResult> returnValue = new PNResult<PNMembershipsResult>();
 
 			if (string.IsNullOrEmpty(uuid)) {
-				uuid = config.UserId;
+				this.uuid = config.UserId;
 			}
 			RequestState<PNMembershipsResult> requestState = new RequestState<PNMembershipsResult>();
 			requestState.ResponseType = PNOperationType.PNGetMembershipsOperation;
