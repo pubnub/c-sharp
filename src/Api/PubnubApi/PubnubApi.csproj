@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net35;net40;net45;net461;net48</TargetFrameworks>
+    <TargetFrameworks>net60</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>pubnub.snk</AssemblyOriginatorKeyFile>
@@ -59,6 +59,10 @@
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net40|AnyCPU'">
     <NoWarn>0436;</NoWarn>
   </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Transport\" />
+    <None Remove="TransportContract\" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="LICENSE.txt" Pack="true" PackagePath="" />
   </ItemGroup>
@@ -134,4 +138,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Transport\" />
+    <Folder Include="TransportContract\" />
+  </ItemGroup>
 </Project>

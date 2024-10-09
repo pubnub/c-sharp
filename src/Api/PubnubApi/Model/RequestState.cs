@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Net;
+using System.Threading;
 
 namespace PubnubApi
 {
     public sealed class RequestState<T>
     {
         public DateTime? TimeQueued { get; internal set; }
-        public HttpWebRequest Request { get; internal set; }
-        public HttpWebResponse Response { get; internal set; }
+        public CancellationTokenSource RequestCancellationTokenSource { get; internal set; }
+        public TransportResponse Response { get; internal set; }
         public bool GotJsonResponse { get; internal set; }
         public PNOperationType ResponseType { get; internal set; }
         public string[] Channels { get; internal set; }
@@ -24,7 +25,7 @@ namespace PubnubApi
         public RequestState()
         {
             PubnubCallback = null;
-            Request = null;
+            RequestCancellationTokenSource = null;
             Response = null;
             Channels = null;
             ChannelGroups = null;

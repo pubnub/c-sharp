@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
-using System.Net;
-#if !NET35 && !NET40
 using System.Collections.Concurrent;
-#endif
 
 namespace PubnubApi.EndPoint
 {
-    internal class OtherOperation : PubnubCoreBase
+	internal class OtherOperation : PubnubCoreBase
     {
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
@@ -53,7 +49,7 @@ namespace PubnubApi.EndPoint
                         string channelsJsonState = BuildJsonUserState(channels.ToArray(), channelGroups.ToArray(), false);
                         IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
 
-                        Uri request = urlBuilder.BuildMultiChannelLeaveRequest("GET", "", channels, channelGroups, channelsJsonState, null);
+                        Uri request = urlBuilder.BuildMultiChannelLeaveRequest(Constants.GET, "", channels, channelGroups, channelsJsonState, null);
 
                         RequestState<string> requestState = new RequestState<string>();
                         requestState.Channels = channels;
@@ -175,7 +171,7 @@ namespace PubnubApi.EndPoint
 
             if (!ChannelRequest.ContainsKey(instance.InstanceId))
             {
-                ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
+                ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, CancellationTokenSource>());
             }
             if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
             {

@@ -3,21 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Globalization;
-using System.Threading.Tasks;
-using System.Threading;
 using PubnubApi.Security.Crypto.Common;
-#if !NETSTANDARD10 && !NETSTANDARD11 && !NETSTANDARD12 && !WP81
-using System.Reflection;
-#endif
-#if !NET35 && !NET40
-using System.Collections.Concurrent;
-#endif
 using PubnubApi.Security.Crypto;
 using PubnubApi.Security.Crypto.Cryptors;
+using System.Collections.Concurrent;
+using System.Reflection;
 
 namespace PubnubApi
 {
-    public sealed class UrlRequestBuilder : IUrlRequestBuilder
+	public sealed class UrlRequestBuilder : IUrlRequestBuilder
     {
         private ConcurrentDictionary<string, PNConfiguration> pubnubConfig { get; } = new ConcurrentDictionary<string, PNConfiguration>();
         private readonly IJsonPluggableLibrary jsonLib ;
@@ -280,9 +274,6 @@ namespace PubnubApi
         Uri IUrlRequestBuilder.BuildHereNowRequest(string requestMethod, string requestBody, string[] channels, string[] channelGroups, bool showUUIDList, bool includeUserState, Dictionary<string, object> externalQueryParam)
         {
             PNOperationType currentType = PNOperationType.PNHereNowOperation;
-            if ((channels == null || channels.Length == 0) && (channelGroups == null || channelGroups.Length == 0)) {
-                throw new ArgumentException("Please provide Channels or ChannelGroups.");
-            }
             string channel = (channels != null && channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : ",";
 
             List<string> url = new List<string>();

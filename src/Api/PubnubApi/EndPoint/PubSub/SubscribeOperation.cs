@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Net;
 using System.Globalization;
-#if !NET35 && !NET40
 using System.Collections.Concurrent;
-#endif
+using System.Threading.Tasks;
+
 
 namespace PubnubApi.EndPoint
 {
-    public class SubscribeOperation<T> : PubnubCoreBase, ISubscribeOperation<T>
+	public class SubscribeOperation<T> : PubnubCoreBase, ISubscribeOperation<T>
     {
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
@@ -46,7 +43,7 @@ namespace PubnubApi.EndPoint
             }
             if (!ChannelRequest.ContainsKey(instance.InstanceId))
             {
-                ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
+                ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, CancellationTokenSource>());
             }
             if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
             {

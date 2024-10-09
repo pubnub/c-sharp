@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.0;netstandard1.3;netstandard1.4;netstandard1.1;netstandard2.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>netstandard1.3;netstandard1.4;netstandard2.0;net6.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
     <SignAssembly>True</SignAssembly>
@@ -618,6 +618,13 @@
     <Compile Include="..\PubnubApi\Security\Crypto\Cryptors\CryptorHeader.cs" Link="Security\Crypto\Cryptors\CryptorHeader.cs" />
     <Compile Include="..\PubnubApi\Security\Crypto\Cryptors\LegacyCryptor.cs" Link="Security\Crypto\Cryptors\LegacyCryptor.cs" />
     <Compile Include="..\PubnubApi\Security\Crypto\ICryptor.cs" Link="Security\Crypto\ICryptor.cs" />
+    <Compile Include="..\PubnubApi\Transport\HttpClientService.cs" Link="Transport\HttpClientService.cs" />
+    <Compile Include="..\PubnubApi\Transport\Middleware.cs" Link="Transport\Middleware.cs" />
+    <Compile Include="..\PubnubApi\Transport\RequestParameter.cs" Link="Transport\RequestParameter.cs" />
+    <Compile Include="..\PubnubApi\TransportContract\IHttpClientService.cs" Link="TransportContract\IHttpClientService.cs" />
+    <Compile Include="..\PubnubApi\TransportContract\IMiddleware.cs" Link="TransportContract\IMiddleware.cs" />
+    <Compile Include="..\PubnubApi\TransportContract\TransportRequest.cs" Link="TransportContract\TransportRequest.cs" />
+    <Compile Include="..\PubnubApi\TransportContract\TransportResponse.cs" Link="TransportContract\TransportResponse.cs" />
     <Compile Include="..\PubnubApi\Security\MD5.cs">
       <Link>Security\MD5.cs</Link>
     </Compile>

@@ -38,17 +38,17 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
 
             switch (invocation)
             {
-                case Invocations.ReceiveReconnectInvocation reconnectInvocation when response.Item2.Error:
-                    eventQueue.Enqueue(new Events.ReceiveReconnectFailureEvent() { AttemptedRetries = (reconnectInvocation.AttemptedRetries + 1) % int.MaxValue, Status = response.Item2});
+                case ReceiveReconnectInvocation reconnectInvocation when response.Item2.Error:
+                    eventQueue.Enqueue(new ReceiveReconnectFailureEvent() { AttemptedRetries = (reconnectInvocation.AttemptedRetries + 1) % int.MaxValue, Status = response.Item2});
                     break;
-                case Invocations.ReceiveReconnectInvocation reconnectInvocation:
-                    eventQueue.Enqueue(new Events.ReceiveReconnectSuccessEvent() { Channels = invocation?.Channels, ChannelGroups = invocation?.ChannelGroups, Cursor = cursor, Status = response.Item2, Messages = response.Item1 });
+                case ReceiveReconnectInvocation reconnectInvocation:
+                    eventQueue.Enqueue(new ReceiveReconnectSuccessEvent() { Channels = invocation?.Channels, ChannelGroups = invocation?.ChannelGroups, Cursor = cursor, Status = response.Item2, Messages = response.Item1 });
                     break;
                 case { } when response.Item2.Error:
-                    eventQueue.Enqueue(new Events.ReceiveFailureEvent() { Cursor = invocation.Cursor, Status = response.Item2, AttemptedRetries = 0});
+                    eventQueue.Enqueue(new ReceiveFailureEvent() { Cursor = invocation.Cursor, Status = response.Item2, AttemptedRetries = 0});
                     break;
                 case { }:
-                    eventQueue.Enqueue(new Events.ReceiveSuccessEvent() { Channels = invocation?.Channels, ChannelGroups = invocation?.ChannelGroups, Cursor = cursor, Messages= response.Item1, Status = response.Item2 });
+                    eventQueue.Enqueue(new ReceiveSuccessEvent() { Channels = invocation?.Channels, ChannelGroups = invocation?.ChannelGroups, Cursor = cursor, Messages= response.Item1, Status = response.Item2 });
                     break;
             }
         }
@@ -58,7 +58,7 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
             return true;
         }
 
-        private async Task<System.Tuple<ReceivingResponse<object>, PNStatus>> MakeReceiveMessagesRequest(ReceiveMessagesInvocation invocation)
+        private async Task<Tuple<ReceivingResponse<object>, PNStatus>> MakeReceiveMessagesRequest(ReceiveMessagesInvocation invocation)
         {
             return await manager.ReceiveRequest<ReceivingResponse<object>>(
                 PNOperationType.PNSubscribeOperation,

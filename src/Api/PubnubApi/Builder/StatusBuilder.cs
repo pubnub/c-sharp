@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Text;
 
 namespace PubnubApi
 {
-    public class StatusBuilder
+	public class StatusBuilder
     {
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
@@ -98,11 +96,11 @@ namespace PubnubApi
 
             if (asyncRequestState != null)
             {
-                if (asyncRequestState.Request != null)
+                if (asyncRequestState.RequestCancellationTokenSource != null)
                 {
-                    status.ClientRequest = asyncRequestState.Request;
+                    status.ClientRequest = asyncRequestState.RequestCancellationTokenSource;
 
-                    HttpValueCollection restUriQueryCollection = HttpUtility.ParseQueryString(asyncRequestState.Request.RequestUri.Query);
+                    HttpValueCollection restUriQueryCollection = HttpUtility.ParseQueryString(new Uri(asyncRequestState.Response.RequestUrl).Query);
                     if (restUriQueryCollection.ContainsKey("auth"))
                     {
                         string auth = restUriQueryCollection["auth"];
