@@ -497,6 +497,7 @@ namespace PubnubApi
                 }
                 throw new MissingMemberException("UserId cannot be null/empty");
             }
+            this.PNConfig.UserId = newUserId;
             EndPoint.OtherOperation endPoint = new EndPoint.OtherOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, tokenManager, this);
             endPoint.CurrentPubnubInstance(this);
         }
