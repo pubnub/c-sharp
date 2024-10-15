@@ -31,11 +31,9 @@ namespace PubnubApi.EndPoint
 		{
 			string presenceState = string.Empty;
 			if (config.MaintainPresenceState) presenceState = BuildJsonUserState(channels, channelGroups, true);
-			CancellationTokenSource cts = new CancellationTokenSource();
-			cancellationTokenSource = cts;
 			var requestParameter = CreateSubscribeRequestParameter(channels: channels, channelGroups: channelGroups, timetoken: timetoken.GetValueOrDefault(), region: region.GetValueOrDefault(), stateJsonValue: presenceState, initialSubscribeUrlParams: initialSubscribeUrlParams, externalQueryParam: externalQueryParam);
 			var transportRequest = pubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNSubscribeOperation);
-			transportRequest.CancellationToken = cts.Token;
+			cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(transportRequest.CancellationToken);
 			RequestState<HandshakeResponse> pubnubRequestState = new RequestState<HandshakeResponse>();
 			pubnubRequestState.Channels = channels;
 			pubnubRequestState.ChannelGroups = channelGroups;
@@ -83,12 +81,9 @@ namespace PubnubApi.EndPoint
 			Tuple<ReceivingResponse<object>, PNStatus> resp = new Tuple<ReceivingResponse<object>, PNStatus>(null, null);
 			try {
 				string channelsJsonState = BuildJsonUserState(channels, channelGroups, false);
-				CancellationTokenSource cts = new CancellationTokenSource();
-				cancellationTokenSource = cts;
-
 				var requestParameter = CreateSubscribeRequestParameter(channels: channels, channelGroups: channelGroups, timetoken: timetoken.GetValueOrDefault(), region: region.GetValueOrDefault(), stateJsonValue: channelsJsonState, initialSubscribeUrlParams: initialSubscribeUrlParams, externalQueryParam: externalQueryParam);
 				var transportRequest = pubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNSubscribeOperation);
-				transportRequest.CancellationToken = cts.Token;
+				cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(transportRequest.CancellationToken);
 				RequestState<ReceivingResponse<object>> pubnubRequestState = new RequestState<ReceivingResponse<object>>();
 				pubnubRequestState.Channels = channels;
 				pubnubRequestState.ChannelGroups = channelGroups;
@@ -103,7 +98,7 @@ namespace PubnubApi.EndPoint
 					PNStatus status = new PNStatus(null, PNOperationType.PNSubscribeOperation, PNStatusCategory.PNConnectedCategory, channels, channelGroups);
 					ReceivingResponse<object> receiveResponse = jsonLibrary.DeserializeToObject<ReceivingResponse<object>>(responseJson);
 					return new Tuple<ReceivingResponse<object>, PNStatus>(receiveResponse, status);
-				}  else {
+				}
 				PNStatus errStatus;
 				if (transportResponse.Error != null) {
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(transportResponse.Error);
@@ -114,7 +109,6 @@ namespace PubnubApi.EndPoint
 					errStatus = GetStatusIfError(pubnubRequestState, responseString);
 				}
 				return new Tuple<ReceivingResponse<object>, PNStatus>(null, errStatus);
-			}
 			} catch (Exception ex) {
 				LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} SubscribeManager=> MultiChannelSubscribeInit \n channel(s)={1} \n cg(s)={2} \n Exception Details={3}", DateTime.Now.ToString(CultureInfo.InvariantCulture), string.Join(",", channels.OrderBy(x => x).ToArray()), string.Join(",", channelGroups.OrderBy(x => x).ToArray()), ex), config.LogVerbosity);
 			}
@@ -297,8 +291,8 @@ namespace PubnubApi.EndPoint
 				  || jsonString.ToLowerInvariant().TrimStart().IndexOf("<!doctype", StringComparison.CurrentCultureIgnoreCase) == 0)//Html is not expected. Only json format messages are expected.
 			  {
 				status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(type, PNStatusCategory.PNNetworkIssuesCategory, asyncRequestState, Constants.ResourceNotFoundStatusCode, new PNException(jsonString));
-			} else if (jsonString.ToLowerInvariant().TrimStart().IndexOf("<?xml", StringComparison.CurrentCultureIgnoreCase) == 0
-					|| jsonString.ToLowerInvariant().TrimStart().IndexOf("<Error", StringComparison.CurrentCultureIgnoreCase) == 0) {
+			  } else if (jsonString.ToLowerInvariant().TrimStart().IndexOf("<?xml", StringComparison.CurrentCultureIgnoreCase) == 0
+			             || jsonString.ToLowerInvariant().TrimStart().IndexOf("<Error", StringComparison.CurrentCultureIgnoreCase) == 0) {
 				status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(type, PNStatusCategory.PNNetworkIssuesCategory, asyncRequestState, Constants.ResourceNotFoundStatusCode, new PNException(jsonString));
 			} else if (!NewtonsoftJsonDotNet.JsonFastCheck(jsonString)) {
 				status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<T>(type, PNStatusCategory.PNNetworkIssuesCategory, asyncRequestState, Constants.ResourceNotFoundStatusCode, new PNException(jsonString));

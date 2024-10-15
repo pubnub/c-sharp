@@ -172,6 +172,7 @@ namespace PubnubApi.EndPoint
 				var transportResponse = t.Result;
 				if (transportResponse.Error == null) {
 					var responseString = Encoding.UTF8.GetString(transportResponse.Content);
+                    requestState.GotJsonResponse = true;
 					if (!string.IsNullOrEmpty(responseString)) {
 						List<object> result = ProcessJsonResponse(requestState, responseString);
 						ProcessResponseCallbacks(result, requestState);
@@ -210,26 +211,27 @@ namespace PubnubApi.EndPoint
 				var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
 				if (errorStatus == null) {
+                    requestState.GotJsonResponse = true;
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, transportResponse.StatusCode, null);
 					JsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
 				} else {
 					JsonAndStatusTuple = new Tuple<string, PNStatus>(string.Empty, errorStatus);
 				}
-            returnValue.Status = JsonAndStatusTuple.Item2;
-            string json = JsonAndStatusTuple.Item1;
-            if (!string.IsNullOrEmpty(json))
-            {
-                List<object> resultList = ProcessJsonResponse(requestState, json);
-                if (resultList != null && resultList.Count > 0)
+                returnValue.Status = JsonAndStatusTuple.Item2;
+                string json = JsonAndStatusTuple.Item1;
+                if (!string.IsNullOrEmpty(json))
                 {
-                    ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
-                    PNAccessManagerGrantResult responseResult = responseBuilder.JsonToObject<PNAccessManagerGrantResult>(resultList, true);
-                    if (responseResult != null)
+                    List<object> resultList = ProcessJsonResponse(requestState, json);
+                    if (resultList != null && resultList.Count > 0)
                     {
-                        returnValue.Result = responseResult;
+                        ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+                        PNAccessManagerGrantResult responseResult = responseBuilder.JsonToObject<PNAccessManagerGrantResult>(resultList, true);
+                        if (responseResult != null)
+                        {
+                            returnValue.Result = responseResult;
+                        }
                     }
                 }
-            }
 			} else {
 				int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 				PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);

@@ -131,6 +131,7 @@ namespace PubnubApi.EndPoint
 				if (t.Result.Error == null) {
 					var responseString = Encoding.UTF8.GetString(t.Result.Content);
 					if (!string.IsNullOrEmpty(responseString)) {
+                        requestState.GotJsonResponse = true;
 						List<object> result = ProcessJsonResponse(requestState, responseString);
 						ProcessResponseCallbacks(result, requestState);
 					}
@@ -179,6 +180,7 @@ namespace PubnubApi.EndPoint
 				string responseString = Encoding.UTF8.GetString(transportResponse.Content);
 				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
 				if (errorStatus == null) {
+					requestState.GotJsonResponse = true;
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, (int)HttpStatusCode.OK, null);
 					JsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
 				} else {

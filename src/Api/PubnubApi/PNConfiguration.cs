@@ -10,7 +10,7 @@ namespace PubnubApi
     {
         private int presenceHeartbeatTimeout;
         private int presenceHeartbeatInterval;
-        private UserId _userId;
+        private UserId userId;
         private bool uuidSetFromConstructor;
         private PNReconnectionPolicy reconnectionPolicy;
 
@@ -63,18 +63,18 @@ namespace PubnubApi
         {
             get
             {
-                return _userId.ToString();
+                return userId.ToString();
             }
             set
             {
-                if (_userId != null && !uuidSetFromConstructor)
+                if (userId != null && !uuidSetFromConstructor)
                 {
                     throw new ArgumentException("Either UserId or Uuid can be used. Not both.");
                 }
 
                 if (value != null && value.Trim().Length > 0)
                 {
-                    _userId = new UserId(value);
+                    userId = new UserId(value);
                 }
                 else
                 {
@@ -87,7 +87,7 @@ namespace PubnubApi
         {
             get
             {
-                return _userId;
+                return userId;
             }
             set
             {
@@ -99,7 +99,7 @@ namespace PubnubApi
                 if (value != null && !string.IsNullOrEmpty(value.ToString()))
                 {
                     uuidSetFromConstructor = false;
-                    _userId = value;
+                    userId = value;
                 }
                 else
                 {
@@ -114,9 +114,9 @@ namespace PubnubApi
 
         public Proxy Proxy { get; set; }
 
-        public int SubscribeTimeout { get; set; } //How long to keep the subscribe loop running before disconnect.
+        public int SubscribeTimeout { get; set; } = 310;
 
-        public int NonSubscribeRequestTimeout { get; set; } //On non subscribe operations, how long to wait for server response.
+        public int NonSubscribeRequestTimeout { get; set; } = 15;
 
         public PNHeartbeatNotificationOption HeartbeatNotificationOption { get; set; }
 
@@ -198,7 +198,7 @@ namespace PubnubApi
             SuppressLeaveEvents = false;
             UseRandomInitializationVector = true;
             FileMessagePublishRetryLimit = 5;
-            _userId = currentUserId;
+            userId = currentUserId;
             EnableEventEngine = false;
         }
 
@@ -211,8 +211,6 @@ namespace PubnubApi
                     break;
                 case PNReconnectionPolicy.EXPONENTIAL:
                     RetryConfiguration = RetryConfiguration.Exponential(2, 150, 6);
-                    break;
-                default:
                     break;
             }
         }

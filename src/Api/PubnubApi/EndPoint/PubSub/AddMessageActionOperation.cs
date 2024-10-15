@@ -124,17 +124,19 @@ namespace PubnubApi.EndPoint
 				var responseString = Encoding.UTF8.GetString(t.Result.Content);
 				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
 				if (errorStatus == null) {
+					requestState.GotJsonResponse = true;
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, (int)HttpStatusCode.OK, null);
 					JsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
 				} else {
 					JsonAndStatusTuple = new Tuple<string, PNStatus>("", errorStatus);
 				}
 				string json = JsonAndStatusTuple.Item1;
-				if (!string.IsNullOrEmpty(json)) {
+				if (!string.IsNullOrEmpty(json))
+				{
 					List<object> result = ProcessJsonResponse(requestState, json);
 					ProcessResponseCallbacks(result, requestState);
 				} else {
-					requestState.PubnubCallback.OnResponse(default(PNAddMessageActionResult), errorStatus);
+					requestState.PubnubCallback.OnResponse(default, errorStatus);
 				}
 			} else {
 				int statusCode = PNStatusCodeHelper.GetHttpStatusCode(t.Result.Error.Message);
@@ -142,7 +144,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNPublishOperation, category, requestState, statusCode, new PNException(t.Result.Error.Message, t.Result.Error));
 				requestState.PubnubCallback.OnResponse(default(PNAddMessageActionResult), status);
 			}
-				CleanUp();
+			CleanUp();
 			});
 		}
 
@@ -180,6 +182,7 @@ namespace PubnubApi.EndPoint
 				var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
 				if (errorStatus == null) {
+					requestState.GotJsonResponse = true;
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, (int)HttpStatusCode.OK, null);
 					JsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
 				} else {
@@ -221,7 +224,7 @@ namespace PubnubApi.EndPoint
 
 			Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
 
-			if (this.queryParam != null && this.queryParam.Count > 0) {
+			if (queryParam != null && queryParam.Count > 0) {
 				foreach (KeyValuePair<string, object> kvp in queryParam) {
 					if (!requestQueryStringParams.ContainsKey(kvp.Key)) {
 						requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), PNOperationType.PNAddMessageActionOperation, false, false, false));

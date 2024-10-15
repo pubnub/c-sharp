@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Collections.Concurrent;
-using System.Threading.Tasks;
 
 namespace PubnubApi.EndPoint
 {
@@ -34,13 +33,9 @@ namespace PubnubApi.EndPoint
 
         private void UnsubscribeAll()
         {
-            new Thread(() =>
-            {
-                SubscribeManager manager = new SubscribeManager(config, jsonLibrary, unit, pubnubLog, pubnubTokenMgr, PubnubInstance);
-                manager.CurrentPubnubInstance(PubnubInstance);
-                manager.MultiChannelUnSubscribeAll<T>(PNOperationType.PNUnsubscribeOperation, this.queryParam);
-            })
-            { IsBackground = true }.Start();
+            SubscribeManager manager = new SubscribeManager(config, jsonLibrary, unit, pubnubLog, pubnubTokenMgr, PubnubInstance);
+            manager.CurrentPubnubInstance(PubnubInstance);
+            manager.MultiChannelUnSubscribeAll<T>(PNOperationType.PNUnsubscribeOperation, this.queryParam);
         }
 
         internal void CurrentPubnubInstance(Pubnub instance)

@@ -13,7 +13,7 @@ namespace PubnubApi.EndPoint
 		private readonly IPubnubLog pubnubLog;
 
 		private object signalMessage;
-		private string channelName = "";
+		private string channelName = string.Empty;
 		private PNCallback<PNPublishResult> savedCallback;
 		private Dictionary<string, object> queryParam;
 
@@ -106,17 +106,18 @@ namespace PubnubApi.EndPoint
 				if (t.Result.Error == null) {
 					var responseString = Encoding.UTF8.GetString(t.Result.Content);
 					if (!string.IsNullOrEmpty(responseString)) {
+                        requestState.GotJsonResponse = true;
 						List<object> result = ProcessJsonResponse(requestState, responseString);
 
-						if (result != null && result.Count >= 3) {
-							int signalStatus;
-							var _ = Int32.TryParse(result[0].ToString(), out signalStatus);
+						if (result != null && result.Count >= 3)
+						{
+							_ = Int32.TryParse(result[0].ToString(), out var signalStatus);
 							if (signalStatus == 1) {
 								ProcessResponseCallbacks(result, requestState);
 							} else {
 								PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(400, result[1].ToString());
 								PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<PNPublishResult>(PNOperationType.PNSignalOperation, category, requestState, 400, new PNException(responseString));
-								requestState.PubnubCallback.OnResponse(default(PNPublishResult), status);
+								requestState.PubnubCallback.OnResponse(default, status);
 							}
 						} else {
 							ProcessResponseCallbacks(result, requestState);
@@ -126,7 +127,7 @@ namespace PubnubApi.EndPoint
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(t.Result.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, t.Result.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNSignalOperation, category, requestState, statusCode, new PNException(t.Result.Error.Message, t.Result.Error));
-					requestState.PubnubCallback.OnResponse(default(PNPublishResult), status);
+					requestState.PubnubCallback.OnResponse(default, status);
 				}
 			});
 		}
@@ -165,10 +166,11 @@ namespace PubnubApi.EndPoint
 			if (transportResponse.Error == null) {
 				string responseString = Encoding.UTF8.GetString(transportResponse.Content);
 				if (!string.IsNullOrEmpty(responseString)) {
-					List<object> result = ProcessJsonResponse<PNPublishResult>(requestState, responseString);
-					if (result != null && result.Count >= 3) {
-						int publishStatus;
-						var _ = Int32.TryParse(result[0].ToString(), out publishStatus);
+					requestState.GotJsonResponse = true;
+					List<object> result = ProcessJsonResponse(requestState, responseString);
+					if (result != null && result.Count >= 3)
+					{
+						_ = int.TryParse(result[0].ToString(), out var publishStatus);
 						if (publishStatus == 1) {
 							List<object> resultList = ProcessJsonResponse(requestState, responseString);
 							if (resultList != null && resultList.Count > 0) {
@@ -179,7 +181,7 @@ namespace PubnubApi.EndPoint
 								}
 							} else {
 								PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(400, result[1].ToString());
-								PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<PNPublishResult>(PNOperationType.PNSignalOperation, category, requestState, 400, new PNException(responseString));
+								PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNSignalOperation, category, requestState, 400, new PNException(responseString));
 								returnValue.Status = status;
 								returnValue.Result = default;
 							}
@@ -203,17 +205,17 @@ namespace PubnubApi.EndPoint
 				config.PublishKey,
 				config.SubscribeKey,
 				"0",
-				this.channelName,
+				channelName,
 				"0",
 				jsonLibrary.SerializeToJsonString(this.signalMessage)
 			};
 
-			var requestParemeter = new RequestParameter() {
+			var requestParameter = new RequestParameter() {
 				RequestType = Constants.GET,
 				PathSegment = urlSegments
 			};
 
-			return requestParemeter;
+			return requestParameter;
 		}
 	}
 }

@@ -16,63 +16,23 @@ namespace PubnubApi
 
 		private static bool networkStatus = true;
 
-		public static Pubnub PubnubInstance {
-			set {
-				pubnubInstance = value;
-			}
-			get {
-				return pubnubInstance;
-			}
-		}
+		public static Pubnub PubnubInstance { get; set; }
 
-		public static PNConfiguration PubnubConfiguation {
-			set {
-				pubnubConfig = value;
-			}
-			get {
-				return pubnubConfig;
-			}
-		}
+		public static PNConfiguration PubnubConfiguation { get; set; }
 
-		public static IJsonPluggableLibrary JsonLibrary {
-			set {
-				jsonLib = value;
-			}
-			get {
-				return jsonLib;
-			}
-		}
+		public static IJsonPluggableLibrary JsonLibrary { get; set; }
 
-		public static IPubnubUnitTest PubnubUnitTest {
-			set {
-				unit = value;
-			}
-			get {
-				return unit;
-			}
-		}
+		public static IPubnubUnitTest PubnubUnitTest { get; set; }
 
-		public static IPubnubLog PubnubLog {
-			set {
-				pubnubLog = value;
-			}
-			get {
-				return pubnubLog;
-			}
-		}
+		public static IPubnubLog PubnubLog { get; set; }
 
-		internal static bool CheckInternetStatus<T>(bool systemActive, PNOperationType type, PNCallback<T> callback, string[] channels, string[] channelGroups)
+		internal static async Task<bool> CheckInternetStatus<T>(bool systemActive, PNOperationType type, PNCallback<T> callback, string[] channels, string[] channelGroups)
 		{
 			if (unit != null) {
 				return unit.InternetAvailable;
 			} else {
 				try {
-					Task[] tasks = new Task[1];
-					tasks[0] = Task.Factory.StartNew(async () => {
-						await CheckClientNetworkAvailability(CallbackClientNetworkStatus, type, callback, channels, channelGroups).ConfigureAwait(false);
-					}, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default);
-					tasks[0].ConfigureAwait(false);
-					Task.WaitAll(tasks);
+					await CheckClientNetworkAvailability(CallbackClientNetworkStatus, type, callback, channels, channelGroups).ConfigureAwait(false);
 				} catch (AggregateException ae) {
 					foreach (var ie in ae.InnerExceptions) {
 						LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} AggregateException CheckInternetStatus Error: {1} {2} ", DateTime.Now.ToString(CultureInfo.InvariantCulture), ie.GetType().Name, ie.Message), pubnubConfig.LogVerbosity);
@@ -138,9 +98,8 @@ namespace PubnubApi
 				pubnubCallback = state.PubnubCallbacck;
 			}
 			try {
-				bool gotTimeResp = false;
-				gotTimeResp = await GetTimeWithTaskFactoryAsync().ConfigureAwait(false);
-
+				var gotTimeResp = await GetTimeWithTaskFactoryAsync();
+				isInternetCheckRunning = gotTimeResp;
 			} catch (Exception ex) {
 				networkStatus = false;
 				LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} CheckSocketConnect (HttpClient Or Task.Factory) Failed {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex.Message), pubnubConfig.LogVerbosity);
@@ -149,8 +108,6 @@ namespace PubnubApi
 					isInternetCheckRunning = false;
 					ParseCheckSocketConnectException<T>(ex, type, pubnubCallback, internalCallback);
 				}
-			} finally {
-				isInternetCheckRunning = false;
 			}
 			return isInternetCheckRunning;
 		}
@@ -180,7 +137,7 @@ namespace PubnubApi
 			} finally {
 				networkStatus = successFlag;
 			}
-			return networkStatus;
+			return successFlag;
 		}
 
 		private static async Task<TransportResponse> TimeRequest()

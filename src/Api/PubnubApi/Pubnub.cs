@@ -499,7 +499,6 @@ namespace PubnubApi
             }
             EndPoint.OtherOperation endPoint = new EndPoint.OtherOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, tokenManager, this);
             endPoint.CurrentPubnubInstance(this);
-            endPoint.ChangeUserId(newUserId);
         }
 
         public static long TranslateDateTimeToPubnubUnixNanoSeconds(DateTime dotNetUTCDateTime)

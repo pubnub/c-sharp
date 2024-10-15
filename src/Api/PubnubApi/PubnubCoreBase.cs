@@ -246,7 +246,7 @@ namespace PubnubApi
             ClientNetworkStatus.PubnubInstance = PubnubInstance;
             if (!ClientNetworkStatus.IsInternetCheckRunning())
             {
-                clientNetworkStatusInternetStatus = ClientNetworkStatus.CheckInternetStatus<T>(PubnetSystemActive, type, callback, channels, channelGroups);
+                clientNetworkStatusInternetStatus = ClientNetworkStatus.CheckInternetStatus<T>(PubnetSystemActive, type, callback, channels, channelGroups).GetAwaiter().GetResult();
             }
             return clientNetworkStatusInternetStatus;
         }

@@ -95,15 +95,11 @@ namespace PubnubApi.EndPoint
 		public PNPublishResult Sync()
 		{
 			System.Threading.ManualResetEvent syncEvent = new System.Threading.ManualResetEvent(false);
-			Task<PNPublishResult> task = Task<PNPublishResult>.Factory.StartNew(() => {
-				syncRequest = true;
-				syncEvent = new System.Threading.ManualResetEvent(false);
-				Fire(this.channelName, this.publishContent, false, this.ttl, this.userMetadata, this.queryParam, new PNPublishResultExt((r, s) => { SyncResult = r; syncEvent.Set(); }));
-				syncEvent.WaitOne(config.NonSubscribeRequestTimeout * 1000);
-
-				return SyncResult;
-			}, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default);
-			return task.Result;
+			syncRequest = true;
+			syncEvent = new System.Threading.ManualResetEvent(false);
+			Fire(this.channelName, this.publishContent, false, this.ttl, this.userMetadata, this.queryParam, new PNPublishResultExt((r, s) => { SyncResult = r; syncEvent.Set(); }));
+			syncEvent.WaitOne(config.NonSubscribeRequestTimeout * 1000);
+			return SyncResult;
 		}
 
 		private static PNPublishResult SyncResult { get; set; }
@@ -146,6 +142,7 @@ namespace PubnubApi.EndPoint
 				if (transportResponse.Error == null) {
 					var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 					if (!string.IsNullOrEmpty(responseString)) {
+                        requestState.GotJsonResponse = true;
 						List<object> result = ProcessJsonResponse<PNPublishResult>(requestState, responseString);
 						if (result != null && result.Count >= 3) {
 							int publishStatus;
@@ -203,6 +200,7 @@ namespace PubnubApi.EndPoint
 				string responseString = Encoding.UTF8.GetString(transportResponse.Content);
 				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
 				if (errorStatus == null) {
+					requestState.GotJsonResponse = true;
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, (int)HttpStatusCode.OK, null);
 					JsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
 				} else {
@@ -212,7 +210,6 @@ namespace PubnubApi.EndPoint
 				string json = JsonAndStatusTuple.Item1;
 				if (!string.IsNullOrEmpty(json)) {
 					List<object> result = ProcessJsonResponse(requestState, json);
-
 					if (result != null && result.Count >= 3) {
 						int publishStatus;
 						_ = int.TryParse(result[0].ToString(), out publishStatus);

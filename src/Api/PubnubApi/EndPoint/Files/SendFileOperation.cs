@@ -306,7 +306,7 @@ namespace PubnubApi.EndPoint
 						publishFailed = true;
 						returnValue.Status = publishFileMessageStatus;
 						LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} PublishFileMessage Failed. currentFileRetryCount={1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), currentFileRetryCount), config.LogVerbosity);
-						Task.Delay(1000).Wait();
+						await Task.Delay(1000);
 					}
 				}
 				while (publishFailed && currentFileRetryCount <= publishFileRetryLimit);

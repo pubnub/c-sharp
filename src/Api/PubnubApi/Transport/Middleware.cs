@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using PubnubApi.EndPoint;
 using PubnubApi.Security.Crypto.Common;
@@ -77,27 +78,30 @@ namespace PubnubApi
 			var pathString = GeneratePathString(requestParameter.PathSegment, operationType);
 			if (!string.IsNullOrEmpty(configuration.SecretKey))
 			{
-				string signature = "";
-				StringBuilder string_to_sign = new StringBuilder();
-				string_to_sign.AppendFormat(CultureInfo.InvariantCulture, "{0}\n", requestParameter.RequestType);
-				string_to_sign.AppendFormat(CultureInfo.InvariantCulture, "{0}\n", configuration.PublishKey);
-				string_to_sign.AppendFormat(CultureInfo.InvariantCulture, "{0}\n", pathString);
-				string_to_sign.AppendFormat(CultureInfo.InvariantCulture, "{0}\n", queryString);
-				if (!string.IsNullOrEmpty(requestParameter.BodyContentString)) string_to_sign.Append(requestParameter.BodyContentString);
-				signature = Util.PubnubAccessManagerSign(configuration.SecretKey, string_to_sign.ToString());
+				string signature = string.Empty;
+				StringBuilder stringToSign = new StringBuilder();
+				stringToSign.AppendFormat(CultureInfo.InvariantCulture, "{0}\n", requestParameter.RequestType);
+				stringToSign.AppendFormat(CultureInfo.InvariantCulture, "{0}\n", configuration.PublishKey);
+				stringToSign.AppendFormat(CultureInfo.InvariantCulture, "{0}\n", pathString);
+				stringToSign.AppendFormat(CultureInfo.InvariantCulture, "{0}\n", queryString);
+				if (!string.IsNullOrEmpty(requestParameter.BodyContentString)) stringToSign.Append(requestParameter.BodyContentString);
+				signature = Util.PubnubAccessManagerSign(configuration.SecretKey, stringToSign.ToString());
 				signature = string.Format(CultureInfo.InvariantCulture, "v2.{0}", signature.TrimEnd(new[] { '=' }));
 				requestParameter.Query.Add("signature", signature);
 			}
 			var urlString = $"{(configuration.Secure ? "https://" : "http://")}{configuration.Origin}{pathString}?{UriUtil.BuildQueryString(requestParameter.Query)}";
 
-			var transporRequest = new TransportRequest()
+			var cts = new CancellationTokenSource();
+			cts.CancelAfter(operationType == PNOperationType.PNSubscribeOperation ? configuration.SubscribeTimeout * 1000 : configuration.NonSubscribeRequestTimeout* 1000);
+			var transportRequest = new TransportRequest()
 			{
 				RequestType = requestParameter.RequestType,
 				RequestUrl = urlString,
 				BodyContentString = requestParameter.BodyContentString,
-				FormData = requestParameter.FormData
+				FormData = requestParameter.FormData,
+				CancellationToken = cts.Token
 			};
-			return transporRequest;
+			return transportRequest;
 		}
 
 		public Task<TransportResponse> Send(TransportRequest transportRequest)

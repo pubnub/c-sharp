@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Threading;
 using PubnubApi.Interface;
-using System.Threading.Tasks;
 
 namespace PubnubApi.EndPoint
 {
@@ -20,7 +18,7 @@ namespace PubnubApi.EndPoint
         private string[] subscribeChannelGroupNames;
         private Dictionary<string, object> queryParam;
 
-        public UnsubscribeOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
+        public UnsubscribeOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
@@ -49,7 +47,7 @@ namespace PubnubApi.EndPoint
 
         public void Execute()
         {
-                Unsubscribe(subscribeChannelNames, subscribeChannelGroupNames);
+            Unsubscribe(subscribeChannelNames, subscribeChannelGroupNames);
         }
 
         private void Unsubscribe(string[] channels, string[] channelGroups)
@@ -63,14 +61,10 @@ namespace PubnubApi.EndPoint
             string channelGroup = (channelGroups != null) ? string.Join(",", channelGroups.OrderBy(x => x).ToArray()) : "";
 
             LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, requested unsubscribe for channel(s)={1}, cg(s)={2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), channel, channelGroup), config.LogVerbosity);
-
-            new Thread(() =>
-            {
-                SubscribeManager manager = new SubscribeManager(config, jsonLibrary, unit, pubnubLog, pubnubTokenMgr, PubnubInstance);
-                manager.CurrentPubnubInstance(PubnubInstance);
-                manager.MultiChannelUnSubscribeInit<T>(PNOperationType.PNUnsubscribeOperation, channel, channelGroup, this.queryParam);
-            })
-            { IsBackground = true }.Start();
+            
+            SubscribeManager manager = new SubscribeManager(config, jsonLibrary, unit, pubnubLog, pubnubTokenMgr, PubnubInstance);
+            manager.CurrentPubnubInstance(PubnubInstance);
+            manager.MultiChannelUnSubscribeInit<T>(PNOperationType.PNUnsubscribeOperation, channel, channelGroup, this.queryParam);
         }
 
         internal void CurrentPubnubInstance(Pubnub instance)
