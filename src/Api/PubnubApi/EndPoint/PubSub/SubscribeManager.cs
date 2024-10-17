@@ -1084,10 +1084,8 @@ namespace PubnubApi.EndPoint
 				}
 			}
 		}
-
-#pragma warning disable
+		
 		void OnPresenceHeartbeatIntervalTimeout<T>(System.Object presenceHeartbeatState)
-#pragma warning restore
 		{
 			//Make presence heartbeat call
 			RequestState<T> currentState = presenceHeartbeatState as RequestState<T>;

@@ -168,6 +168,9 @@
     <Compile Include="..\PubnubApi\Builder\UrlRequestBuilder.cs">
       <Link>Builder\UrlRequestBuilder.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Builder\UrlParameterConverter.cs">
+      <Link>Builder\UrlParameterConverter.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\Callbacks\PNCallback.cs">
       <Link>Callbacks\PNCallback.cs</Link>
     </Compile>

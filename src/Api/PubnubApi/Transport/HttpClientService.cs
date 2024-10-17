@@ -19,20 +19,20 @@ namespace PubnubApi
 		{
 			TransportResponse response;
 			try {
-				if (transportRequest.Timeout.HasValue) _httpClient.Timeout = (TimeSpan)transportRequest.Timeout;
 				HttpRequestMessage requestMessage = new HttpRequestMessage(method: HttpMethod.Get, requestUri: transportRequest.RequestUrl);
 				if (transportRequest.Headers.Keys.Count > 0) {
 					foreach (var kvp in transportRequest.Headers) {
 						requestMessage.Headers.Add(kvp.Key, kvp.Value);
 					}
 				}
+				System.Diagnostics.Debug.WriteLine($"Making call with {requestMessage.RequestUri}");
 				var httpResult = await _httpClient.SendAsync(request: requestMessage, cancellationToken: transportRequest.CancellationToken);
 				var responseContent = await httpResult.Content.ReadAsByteArrayAsync();
 				response = new TransportResponse() {
 					StatusCode = (int)httpResult.StatusCode,
 					Content = responseContent,
 					Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
-					RequestUrl = httpResult.RequestMessage.RequestUri.AbsolutePath
+					RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath
 				};
 			} catch (Exception ex) {
 				response = new TransportResponse() {
@@ -66,7 +66,7 @@ namespace PubnubApi
 				StatusCode = (int)httpResult.StatusCode,
 				Content = responseContent,
 				Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
-				RequestUrl = httpResult.RequestMessage.RequestUri.AbsolutePath
+				RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath
 			};
 			return response;
 		}
@@ -94,7 +94,7 @@ namespace PubnubApi
 				StatusCode = (int)httpResult.StatusCode,
 				Content = responseContent,
 				Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
-				RequestUrl = httpResult.RequestMessage.RequestUri.AbsolutePath
+				RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath
 			};
 			return response;
 		}
@@ -150,7 +150,7 @@ namespace PubnubApi
 				StatusCode = (int)httpResult.StatusCode,
 				Content = responseContent,
 				Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
-				RequestUrl = httpResult.RequestMessage.RequestUri.AbsolutePath
+				RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath
 			};
 			return response;
 		}

@@ -74,7 +74,7 @@ namespace PubnubApi
 			state.Channels = channels;
 			state.ChannelGroups = channelGroups;
 
-			networkStatus = await CheckSocketConnect<T>(state).ConfigureAwait(false);
+			networkStatus = await CheckSocketConnect<T>(state);
 			return networkStatus;
 		}
 
@@ -83,7 +83,6 @@ namespace PubnubApi
 			lock (internetCheckLock) {
 				isInternetCheckRunning = true;
 			}
-			LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} CheckSocketConnect Entered", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
 
 			Action<bool> internalCallback = null;
 			PNCallback<T> pubnubCallback = null;
