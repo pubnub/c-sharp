@@ -159,13 +159,24 @@ namespace PubnubApi.EndPoint
 			requestState.ResponseType = PNOperationType.PNSignalOperation;
 			requestState.Reconnect = false;
 			requestState.EndPointOperation = this;
+			Tuple<string, PNStatus> JsonAndStatusTuple;
 			var requestParameter = CreateRequestParameter();
 
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNSignalOperation);
 			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest);
 			if (transportResponse.Error == null) {
 				string responseString = Encoding.UTF8.GetString(transportResponse.Content);
-				if (!string.IsNullOrEmpty(responseString)) {
+				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
+				if (errorStatus == null) {
+					requestState.GotJsonResponse = true;
+					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, Constants.HttpRequestSuccessStatusCode, null);
+					JsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
+				} else {
+					JsonAndStatusTuple = new Tuple<string, PNStatus>("", errorStatus);
+				}
+				returnValue.Status = JsonAndStatusTuple.Item2;
+				string json = JsonAndStatusTuple.Item1;
+				if (!string.IsNullOrEmpty(json)) {
 					requestState.GotJsonResponse = true;
 					List<object> result = ProcessJsonResponse(requestState, responseString);
 					if (result != null && result.Count >= 3)
@@ -180,8 +191,8 @@ namespace PubnubApi.EndPoint
 									returnValue.Result = responseResult;
 								}
 							} else {
-								PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(400, result[1].ToString());
-								PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNSignalOperation, category, requestState, 400, new PNException(responseString));
+								PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(transportResponse.StatusCode, result[1].ToString());
+								PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNSignalOperation, category, requestState, transportResponse.StatusCode, new PNException(responseString));
 								returnValue.Status = status;
 								returnValue.Result = default;
 							}

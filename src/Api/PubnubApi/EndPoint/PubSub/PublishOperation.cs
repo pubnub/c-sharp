@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;
-using System.Net;
 using PubnubApi.Security.Crypto.Cryptors;
 using PubnubApi.Security.Crypto;
 using System.Globalization;
@@ -176,8 +175,7 @@ namespace PubnubApi.EndPoint
                         requestState.GotJsonResponse = true;
 						List<object> result = ProcessJsonResponse(requestState, responseString);
 						if (result != null && result.Count >= 3) {
-							int publishStatus;
-							_ = int.TryParse(result[0].ToString(), out publishStatus);
+							_ = int.TryParse(result[0].ToString(), out var publishStatus);
 							if (publishStatus == 1) {
 								ProcessResponseCallbacks(result, requestState);
 							} else {
@@ -206,9 +204,11 @@ namespace PubnubApi.EndPoint
 			PNResult<PNPublishResult> returnValue = new PNResult<PNPublishResult>();
 
 			if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()) || message == null) {
-				PNStatus errStatus = new PNStatus();
-				errStatus.Error = true;
-				errStatus.ErrorData = new PNErrorData("Missing Channel or Message", new ArgumentException("Missing Channel or Message"));
+				PNStatus errStatus = new PNStatus
+				{
+					Error = true,
+					ErrorData = new PNErrorData("Missing Channel or Message", new ArgumentException("Missing Channel or Message"))
+				};
 				returnValue.Status = errStatus;
 				return returnValue;
 			}
@@ -234,7 +234,7 @@ namespace PubnubApi.EndPoint
 				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
 				if (errorStatus == null) {
 					requestState.GotJsonResponse = true;
-					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, (int)HttpStatusCode.OK, null);
+					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, Constants.HttpRequestSuccessStatusCode, null);
 					JsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
 				} else {
 					JsonAndStatusTuple = new Tuple<string, PNStatus>("", errorStatus);
@@ -245,12 +245,11 @@ namespace PubnubApi.EndPoint
 				if (!string.IsNullOrEmpty(json)) {
 					List<object> result = ProcessJsonResponse(requestState, json);
 
-					if (result != null && result.Count >= 3) {
-						int publishStatus;
-						_ = int.TryParse(result[0].ToString(), out publishStatus);
+					if (result is { Count: >= 3 }) {
+						_ = int.TryParse(result[0].ToString(), out var publishStatus);
 						if (publishStatus == 1) {
 							List<object> resultList = ProcessJsonResponse(requestState, json);
-							if (resultList != null && resultList.Count > 0) {
+							if (resultList is { Count: > 0 }) {
 								ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
 								PNPublishResult responseResult = responseBuilder.JsonToObject<PNPublishResult>(resultList, true);
 								if (responseResult != null) {
@@ -261,7 +260,7 @@ namespace PubnubApi.EndPoint
 					}
 				}
 			} else {
-				int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
+				var statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 				PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNPublishOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
