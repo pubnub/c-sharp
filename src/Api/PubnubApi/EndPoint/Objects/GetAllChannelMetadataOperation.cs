@@ -96,7 +96,7 @@ namespace PubnubApi.EndPoint
 
 		public async Task<PNResult<PNGetAllChannelMetadataResult>> ExecuteAsync()
 		{
-			return await GetAllChannelMetadataList(this.page, this.limit, this.includeCount, this.includeCustom, this.channelsFilter, this.sortField, this.queryParam);
+			return await GetAllChannelMetadataList(this.page, this.limit, this.includeCount, this.includeCustom, this.channelsFilter, this.sortField, this.queryParam).ConfigureAwait(false);
 		}
 
 		internal void Retry()
@@ -148,7 +148,7 @@ namespace PubnubApi.EndPoint
 			Tuple<string, PNStatus> JsonAndStatusTuple;
 			var requestParameter = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNGetAllChannelMetadataOperation);
-			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest);
+			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ConfigureAwait(false);
 			if (transportResponse.Error == null) {
 				var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 				PNStatus errorStatus = GetStatusIfError(requestState, responseString);

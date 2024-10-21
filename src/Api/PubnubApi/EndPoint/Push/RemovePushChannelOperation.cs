@@ -104,7 +104,7 @@ namespace PubnubApi.EndPoint
 
 		public async Task<PNResult<PNPushRemoveChannelResult>> ExecuteAsync()
 		{
-			return await RemoveChannelForDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, this.pushEnvironment, this.deviceTopic, this.queryParam);
+			return await RemoveChannelForDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, this.pushEnvironment, this.deviceTopic, this.queryParam).ConfigureAwait(false);
 		}
 
 		internal void Retry()
@@ -175,7 +175,7 @@ namespace PubnubApi.EndPoint
 
 			var requestParameter = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PushRemove);
-			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest);
+			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ConfigureAwait(false);
 			if (transportResponse.Error == null) {
 				var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 				PNStatus errorStatus = GetStatusIfError(requestState, responseString);

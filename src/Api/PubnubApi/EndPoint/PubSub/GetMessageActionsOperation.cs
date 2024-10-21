@@ -92,7 +92,7 @@ namespace PubnubApi.EndPoint
 				throw new MissingMemberException("subscribe key is required");
 			}
 
-			return await GetMessageActions(this.messageActionChannelName, this.startTimetoken, this.endTimetoken, this.limit, this.queryParam);
+			return await GetMessageActions(this.messageActionChannelName, this.startTimetoken, this.endTimetoken, this.limit, this.queryParam).ConfigureAwait(false);
 		}
 
 		internal void Retry()
@@ -180,7 +180,7 @@ namespace PubnubApi.EndPoint
 			var requestParameter = CreateRequestParameter();
 
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNGetMessageActionsOperation);
-			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest);
+			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ConfigureAwait(false);
 			if (transportResponse.Error == null) {
 				string responseString = Encoding.UTF8.GetString(transportResponse.Content);
 				PNStatus errorStatus = GetStatusIfError(requestState, responseString);

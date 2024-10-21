@@ -123,7 +123,7 @@ namespace PubnubApi.EndPoint
 
 		public async Task<PNResult<PNFileUploadResult>> ExecuteAsync()
 		{
-			return await ProcessFileUpload();
+			return await ProcessFileUpload().ConfigureAwait(false);
 		}
 
 		private void ProcessFileUpload(PNCallback<PNFileUploadResult> callback)
@@ -249,7 +249,7 @@ namespace PubnubApi.EndPoint
 			};
 			transportRequest.Headers.Add("Content-Type", contentType);
 			Tuple<string, PNStatus> jsonAndStatusTuple;
-			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest);
+			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ConfigureAwait(false);
 			if (transportResponse.StatusCode == 204 && transportResponse.Error == null) {
 				var responseString = "{}";
 				PNStatus errStatus = GetStatusIfError<PNFileUploadResult>(requestState, responseString);
@@ -329,7 +329,7 @@ namespace PubnubApi.EndPoint
 
 			var requestParameter = CreateFileUploadUrlRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNGenerateFileUploadUrlOperation);
-			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest);
+			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ConfigureAwait(false);
 			if (transportResponse.Error == null) {
 				var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
@@ -375,7 +375,7 @@ namespace PubnubApi.EndPoint
 			requestState.EndPointOperation = this;
 
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNPublishFileMessageOperation);
-			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest);
+			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest).ConfigureAwait(false);
 			if (transportResponse.Error == null) {
 				string responseString = Encoding.UTF8.GetString(transportResponse.Content);
 				if (!string.IsNullOrEmpty(responseString)) {

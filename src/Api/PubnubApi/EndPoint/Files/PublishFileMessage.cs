@@ -174,7 +174,7 @@ namespace PubnubApi.EndPoint
 			requestState.EndPointOperation = this;
 			Tuple<string, PNStatus> JsonAndStatusTuple;
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNPublishFileMessageOperation);
-			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest);
+			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest).ConfigureAwait(false);
 			if (transportResponse.Error == null) {
 				string responseString = Encoding.UTF8.GetString(transportResponse.Content);
 				PNStatus errorStatus = GetStatusIfError(requestState, responseString);

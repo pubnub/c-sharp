@@ -25,8 +25,8 @@ namespace PubnubApi
 						requestMessage.Headers.Add(kvp.Key, kvp.Value);
 					}
 				}
-				var httpResult = await _httpClient.SendAsync(request: requestMessage, cancellationToken: transportRequest.CancellationToken);
-				var responseContent = await httpResult.Content.ReadAsByteArrayAsync();
+				var httpResult = await _httpClient.SendAsync(request: requestMessage, cancellationToken: transportRequest.CancellationToken).ConfigureAwait(false);
+				var responseContent = await httpResult.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
 				response = new TransportResponse() {
 					StatusCode = (int)httpResult.StatusCode,
 					Content = responseContent,
@@ -59,9 +59,9 @@ namespace PubnubApi
 					}
 				}
 				HttpRequestMessage requestMessage = new HttpRequestMessage(method: HttpMethod.Post, requestUri: transportRequest.RequestUrl) { Content = postData };
-				var httpResult = await _httpClient.SendAsync(request: requestMessage, cancellationToken: transportRequest.CancellationToken);
+				var httpResult = await _httpClient.SendAsync(request: requestMessage, cancellationToken: transportRequest.CancellationToken).ConfigureAwait(false);
 
-				var responseContent = await httpResult.Content.ReadAsByteArrayAsync();
+				var responseContent = await httpResult.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
 				transportResponse= new TransportResponse() {
 					StatusCode = (int)httpResult.StatusCode,
 					Content = responseContent,
@@ -109,8 +109,8 @@ namespace PubnubApi
 				}
 
 				var httpResult = await _httpClient.SendAsync(request: requestMessage,
-					cancellationToken: transportRequest.CancellationToken);
-				var responseContent = await httpResult.Content.ReadAsByteArrayAsync();
+					cancellationToken: transportRequest.CancellationToken).ConfigureAwait(false);
+				var responseContent = await httpResult.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
 				transportResponse = new TransportResponse()
 				{
 					StatusCode = (int)httpResult.StatusCode,
@@ -140,8 +140,8 @@ namespace PubnubApi
 						requestMessage.Headers.Add(kvp.Key, kvp.Value);
 					}
 				}
-				var httpResult = await _httpClient.SendAsync(request: requestMessage, cancellationToken: transportRequest.CancellationToken);
-				var responseContent = await httpResult.Content.ReadAsByteArrayAsync();
+				var httpResult = await _httpClient.SendAsync(request: requestMessage, cancellationToken: transportRequest.CancellationToken).ConfigureAwait(false);
+				var responseContent = await httpResult.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
 				response = new TransportResponse() {
 					StatusCode = (int)httpResult.StatusCode,
 					Content = responseContent,
@@ -190,8 +190,8 @@ namespace PubnubApi
 				}
 
 				var httpResult = await _httpClient.SendAsync(request: requestMessage,
-					cancellationToken: transportRequest.CancellationToken);
-				var responseContent = await httpResult.Content.ReadAsByteArrayAsync();
+					cancellationToken: transportRequest.CancellationToken).ConfigureAwait(false);
+				var responseContent = await httpResult.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
 				transportResponse = new TransportResponse()
 				{
 					StatusCode = (int)httpResult.StatusCode,

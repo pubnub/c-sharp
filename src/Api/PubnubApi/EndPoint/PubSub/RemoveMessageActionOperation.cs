@@ -174,7 +174,7 @@ namespace PubnubApi.EndPoint
 
 			var requestParameter = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNRemoveMessageActionOperation);
-			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest);
+			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ConfigureAwait(false);
 
 			if (transportResponse.Error == null) {
 				string responseString = Encoding.UTF8.GetString(transportResponse.Content);

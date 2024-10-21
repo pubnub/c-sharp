@@ -108,7 +108,7 @@ namespace PubnubApi.EndPoint
 			var requestParameter = CreateRequestParameter();
 			Tuple<string, PNStatus> JsonAndStatusTuple;
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNWhereNowOperation);
-			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest);
+			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ConfigureAwait(false);
 			if (transportResponse.Error == null) {
 				var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 				requestState.GotJsonResponse = true;

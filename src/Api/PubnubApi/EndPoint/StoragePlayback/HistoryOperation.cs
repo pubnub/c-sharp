@@ -117,7 +117,7 @@ namespace PubnubApi.EndPoint
 				throw new MissingMemberException("Invalid Subscribe Key");
 			}
 
-			return await History();
+			return await History().ConfigureAwait(false);
 		}
 
 		internal void Retry()

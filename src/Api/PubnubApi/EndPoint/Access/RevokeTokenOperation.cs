@@ -47,7 +47,7 @@ namespace PubnubApi.EndPoint
 
 		public async Task<PNResult<PNAccessManagerRevokeTokenResult>> ExecuteAsync()
 		{
-			return await RevokeAccess();
+			return await RevokeAccess().ConfigureAwait(false);
 		}
 
 		internal void Retry()
@@ -101,7 +101,7 @@ namespace PubnubApi.EndPoint
 
 			var requestParameter = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNAccessManagerRevokeToken);
-			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest);
+			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ConfigureAwait(false);
 			if (transportResponse.Error == null) {
 				var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 				requestState.GotJsonResponse = true;

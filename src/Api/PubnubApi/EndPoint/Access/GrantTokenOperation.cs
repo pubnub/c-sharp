@@ -154,7 +154,7 @@ namespace PubnubApi.EndPoint
 
 		public async Task<PNResult<PNAccessManagerTokenResult>> ExecuteAsync()
 		{
-			return await GrantAccess();
+			return await GrantAccess().ConfigureAwait(false);
 		}
 
 		internal void Retry()
@@ -238,7 +238,7 @@ namespace PubnubApi.EndPoint
 			PNResult<PNAccessManagerTokenResult> returnValue = new PNResult<PNAccessManagerTokenResult>();
 			var requestParameter = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNAccessManagerGrantToken);
-			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest);
+			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ConfigureAwait(false);
 
 			if (transportResponse.Error == null) {
 				var responseString = Encoding.UTF8.GetString(transportResponse.Content);

@@ -59,7 +59,7 @@ namespace PubnubApi.EndPoint
 
 		public async Task<PNResult<PNGenerateFileUploadUrlResult>> ExecuteAsync()
 		{
-			return await GenerateFileUploadUrl();
+			return await GenerateFileUploadUrl().ConfigureAwait(false);
 		}
 
 		private void GenerateFileUploadUrl(PNCallback<PNGenerateFileUploadUrlResult> callback)
@@ -112,7 +112,7 @@ namespace PubnubApi.EndPoint
 
 			var requestParameter = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNGenerateFileUploadUrlOperation);
-			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest);
+			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ConfigureAwait(false);
 			if (transportResponse.Error == null) {
 				var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 				PNStatus errorStatus = GetStatusIfError(requestState, responseString);

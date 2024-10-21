@@ -74,7 +74,7 @@ namespace PubnubApi
 			state.Channels = channels;
 			state.ChannelGroups = channelGroups;
 
-			networkStatus = await CheckSocketConnect<T>(state);
+			networkStatus = await CheckSocketConnect<T>(state).ConfigureAwait(false);
 			return networkStatus;
 		}
 
@@ -97,7 +97,7 @@ namespace PubnubApi
 				pubnubCallback = state.PubnubCallbacck;
 			}
 			try {
-				var gotTimeResp = await GetTimeWithTaskFactoryAsync();
+				var gotTimeResp = await GetTimeWithTaskFactoryAsync().ConfigureAwait(false);
 				isInternetCheckRunning = gotTimeResp;
 			} catch (Exception ex) {
 				networkStatus = false;
@@ -130,7 +130,7 @@ namespace PubnubApi
 		{
 			bool successFlag = false;
 			try {
-				var transportResponse = await TimeRequest();
+				var transportResponse = await TimeRequest().ConfigureAwait(false);
 				if (transportResponse.Error != null) throw transportResponse.Error;
 				successFlag = transportResponse.StatusCode == 200;
 			} finally {
@@ -150,7 +150,7 @@ namespace PubnubApi
 				PathSegment = pathSegments
 			};
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNTimeOperation);
-			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest);
+			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ConfigureAwait(false);
 			return transportResponse;
 		}
 	}

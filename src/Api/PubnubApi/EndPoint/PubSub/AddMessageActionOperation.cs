@@ -80,7 +80,7 @@ namespace PubnubApi.EndPoint
 				throw new MissingMemberException("subscribe key is required");
 			}
 
-			return await Publish(this.channelName, this.messageTimetoken, this.messageAction, this.queryParam);
+			return await Publish(this.channelName, this.messageTimetoken, this.messageAction, this.queryParam).ConfigureAwait(false);
 		}
 
 

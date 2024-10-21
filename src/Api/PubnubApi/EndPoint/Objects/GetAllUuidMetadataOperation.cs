@@ -98,7 +98,7 @@ namespace PubnubApi.EndPoint
 
         public async Task<PNResult<PNGetAllUuidMetadataResult>> ExecuteAsync()
         {
-            return await GetUuidMetadataList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.sortField, this.queryParam);
+            return await GetUuidMetadataList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.sortField, this.queryParam).ConfigureAwait(false);
         }
 
 
@@ -151,7 +151,7 @@ namespace PubnubApi.EndPoint
 
             var requestParameter = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNGetAllUuidMetadataOperation);
-			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest);
+			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ConfigureAwait(false);
 			if (transportResponse.Error == null) {
 				var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
