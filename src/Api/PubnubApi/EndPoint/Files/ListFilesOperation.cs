@@ -61,20 +61,20 @@ namespace PubnubApi.EndPoint
 				throw new ArgumentException("Missing Channel Name");
 			}
 			this.savedCallback = callback;
-			ProcessListFilesRequest(this.queryParam, savedCallback);
+			ProcessListFilesRequest(savedCallback);
 		}
 
 		public async Task<PNResult<PNListFilesResult>> ExecuteAsync()
 		{
-			return await ProcessListFilesRequest(this.queryParam).ConfigureAwait(false);
+			return await ProcessListFilesRequest();
 		}
 
 		internal void Retry()
 		{
-			ProcessListFilesRequest(this.queryParam, savedCallback);
+			ProcessListFilesRequest(savedCallback);
 		}
 
-		private void ProcessListFilesRequest(Dictionary<string, object> externalQueryParam, PNCallback<PNListFilesResult> callback)
+		private void ProcessListFilesRequest(PNCallback<PNListFilesResult> callback)
 		{
 			RequestState<PNListFilesResult> requestState = new RequestState<PNListFilesResult>();
 			requestState.ResponseType = PNOperationType.PNListFilesOperation;
@@ -89,6 +89,7 @@ namespace PubnubApi.EndPoint
 				var transportResponse = t.Result;
 				if (transportResponse.Error == null) {
 					var responseString = Encoding.UTF8.GetString(transportResponse.Content);
+					requestState.GotJsonResponse = true;
 					if (!string.IsNullOrEmpty(responseString)) {
 						List<object> result = ProcessJsonResponse(requestState, responseString);
 						ProcessResponseCallbacks(result, requestState);
@@ -105,7 +106,7 @@ namespace PubnubApi.EndPoint
 			});
 		}
 
-		private async Task<PNResult<PNListFilesResult>> ProcessListFilesRequest(Dictionary<string, object> externalQueryParam)
+		private async Task<PNResult<PNListFilesResult>> ProcessListFilesRequest()
 		{
 			PNResult<PNListFilesResult> returnValue = new PNResult<PNListFilesResult>();
 
@@ -120,20 +121,21 @@ namespace PubnubApi.EndPoint
 			requestState.EndPointOperation = this;
 			requestState.UsePostMethod = false;
 			var requestParameter = CreateRequestParameter();
-			Tuple<string, PNStatus> JsonAndStatusTuple;
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNListFilesOperation);
 			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest);
 			if (transportResponse.Error == null) {
 				var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
+				Tuple<string, PNStatus> jsonAndStatusTuple;
 				if (errorStatus == null) {
+					requestState.GotJsonResponse = true;
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, transportResponse.StatusCode, null);
-					JsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
+					jsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
 				} else {
-					JsonAndStatusTuple = new Tuple<string, PNStatus>(string.Empty, errorStatus);
+					jsonAndStatusTuple = new Tuple<string, PNStatus>(string.Empty, errorStatus);
 				}
-				returnValue.Status = JsonAndStatusTuple.Item2;
-				string json = JsonAndStatusTuple.Item1;
+				returnValue.Status = jsonAndStatusTuple.Item2;
+				string json = jsonAndStatusTuple.Item1;
 				if (!string.IsNullOrEmpty(json)) {
 					List<object> resultList = ProcessJsonResponse(requestState, json);
 					ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);

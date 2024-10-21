@@ -22,7 +22,7 @@ namespace PubnubApi.EndPoint
 		private string currentFileName;
 		private string currentFileCipherKey;
 
-		public DownloadFileOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
+		public DownloadFileOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
 		{
 			config = pubnubConfig;
 			jsonLibrary = jsonPluggableLibrary;
@@ -32,61 +32,58 @@ namespace PubnubApi.EndPoint
 
 		public DownloadFileOperation Channel(string channel)
 		{
-			this.channelName = channel;
+			channelName = channel;
 			return this;
 		}
 
 		public DownloadFileOperation FileId(string fileId)
 		{
-			this.currentFileId = fileId;
+			currentFileId = fileId;
 			return this;
 		}
 
 		public DownloadFileOperation FileName(string fileName)
 		{
-			this.currentFileName = fileName;
+			currentFileName = fileName;
 			return this;
 		}
 
 		public DownloadFileOperation CipherKey(string cipherKeyForFile)
 		{
-			this.currentFileCipherKey = cipherKeyForFile;
+			currentFileCipherKey = cipherKeyForFile;
 			return this;
 		}
 
 		public DownloadFileOperation QueryParam(Dictionary<string, object> customQueryParam)
 		{
-			this.queryParam = customQueryParam;
+			queryParam = customQueryParam;
 			return this;
 		}
 
 		public void Execute(PNCallback<PNDownloadFileResult> callback)
 		{
-			if (callback == null) {
-				throw new ArgumentException("Missing callback");
-			}
-
-			if (string.IsNullOrEmpty(this.currentFileId)) {
+			if (string.IsNullOrEmpty(currentFileId)) {
 				throw new ArgumentException("Missing File Id");
 			}
-			if (string.IsNullOrEmpty(this.currentFileName)) {
+			if (string.IsNullOrEmpty(currentFileName)) {
 				throw new ArgumentException("Missing File Name");
 			}
 
-			ProcessFileDownloadRequest(this.queryParam, savedCallback);
+			savedCallback = callback ?? throw new ArgumentException("Missing callback");
+			ProcessFileDownloadRequest(savedCallback);
 		}
 
 		public async Task<PNResult<PNDownloadFileResult>> ExecuteAsync()
 		{
-			return await ProcessFileDownloadRequest(this.queryParam).ConfigureAwait(false);
+			return await ProcessFileDownloadRequest();
 		}
 
 		internal void Retry()
 		{
-			ProcessFileDownloadRequest(this.queryParam, savedCallback);
+			ProcessFileDownloadRequest(savedCallback);
 		}
 
-		private void ProcessFileDownloadRequest(Dictionary<string, object> externalQueryParam, PNCallback<PNDownloadFileResult> callback)
+		private void ProcessFileDownloadRequest(PNCallback<PNDownloadFileResult> callback)
 		{
 			RequestState<PNDownloadFileResult> requestState = new RequestState<PNDownloadFileResult>();
 			requestState.ResponseType = PNOperationType.PNDownloadFileOperation;
@@ -94,19 +91,20 @@ namespace PubnubApi.EndPoint
 			requestState.Reconnect = false;
 			requestState.EndPointOperation = this;
 
-			byte[] fileContentBytes = null;
 			var requestParameter = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNDownloadFileOperation);
 			PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ContinueWith(t => {
 				var transportResponse = t.Result;
-				if (transportResponse.Error == null) {
-					fileContentBytes = transportResponse.Content;
+				if (transportResponse.Error == null)
+				{
+					var fileContentBytes = transportResponse.Content;
 					if (fileContentBytes != null) {
-						byte[] outputBytes = null;
-						if (string.IsNullOrEmpty(this.currentFileCipherKey) && string.IsNullOrEmpty(config.CipherKey) && config.CryptoModule == null) {
+						requestState.GotJsonResponse = true;
+						byte[] outputBytes;
+						if (string.IsNullOrEmpty(currentFileCipherKey) && string.IsNullOrEmpty(config.CipherKey) && config.CryptoModule == null) {
 							outputBytes = fileContentBytes;
 						} else {
-							CryptoModule currentCryptoModule = !string.IsNullOrEmpty(this.currentFileCipherKey) ? new CryptoModule(new LegacyCryptor(this.currentFileCipherKey, true, pubnubLog), null) : (config.CryptoModule ??= new CryptoModule(new LegacyCryptor(config.CipherKey, true, pubnubLog), null));
+							CryptoModule currentCryptoModule = !string.IsNullOrEmpty(currentFileCipherKey) ? new CryptoModule(new LegacyCryptor(currentFileCipherKey, true, pubnubLog), null) : (config.CryptoModule ??= new CryptoModule(new LegacyCryptor(config.CipherKey, true, pubnubLog), null));
 							try {
 								outputBytes = currentCryptoModule.Decrypt(fileContentBytes);
 								LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, Stream length (after Decrypt)= {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), fileContentBytes.Length), config.LogVerbosity);
@@ -115,9 +113,11 @@ namespace PubnubApi.EndPoint
 								outputBytes = fileContentBytes;
 							}
 						}
-						PNDownloadFileResult result = new PNDownloadFileResult();
-						result.FileBytes = outputBytes;
-						result.FileName = currentFileName;
+						PNDownloadFileResult result = new PNDownloadFileResult
+						{
+							FileBytes = outputBytes,
+							FileName = currentFileName
+						};
 						PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, 200, null);
 						callback.OnResponse(result, status);
 					} else {
@@ -132,43 +132,41 @@ namespace PubnubApi.EndPoint
 				}
 			});
 		}
-		private async Task<PNResult<PNDownloadFileResult>> ProcessFileDownloadRequest(Dictionary<string, object> externalQueryParam)
+		private async Task<PNResult<PNDownloadFileResult>> ProcessFileDownloadRequest()
 		{
 			PNResult<PNDownloadFileResult> returnValue = new PNResult<PNDownloadFileResult>();
 
-			if (string.IsNullOrEmpty(this.currentFileId)) {
+			if (string.IsNullOrEmpty(currentFileId)) {
 				PNStatus errStatus = new PNStatus { Error = true, ErrorData = new PNErrorData("Missing File Id", new ArgumentException("Missing File Id")) };
 				returnValue.Status = errStatus;
 				return returnValue;
 			}
 
-			if (string.IsNullOrEmpty(this.currentFileName)) {
+			if (string.IsNullOrEmpty(currentFileName)) {
 				PNStatus errStatus = new PNStatus { Error = true, ErrorData = new PNErrorData("Invalid file name", new ArgumentException("Invalid file name")) };
 				returnValue.Status = errStatus;
 				return returnValue;
 			}
-
-
-			IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
-
-			Uri request = urlBuilder.BuildGetFileUrlOrDeleteReqest(Constants.GET, "", this.channelName, this.currentFileId, this.currentFileName, externalQueryParam, PNOperationType.PNDownloadFileOperation);
-
-			RequestState<PNDownloadFileResult> requestState = new RequestState<PNDownloadFileResult>();
-			requestState.ResponseType = PNOperationType.PNDownloadFileOperation;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
+			
+			RequestState<PNDownloadFileResult> requestState = new RequestState<PNDownloadFileResult>
+				{
+					ResponseType = PNOperationType.PNDownloadFileOperation,
+					Reconnect = false,
+					EndPointOperation = this
+				};
 			var requestParameter = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNDownloadFileOperation);
 			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest);
-			byte[] fileContentBytes = null;
-			if (transportResponse.Error == null) {
-				fileContentBytes = transportResponse.Content;
+			if (transportResponse.Error == null)
+			{
+				var fileContentBytes = transportResponse.Content;
 				if (fileContentBytes != null) {
-					byte[] outputBytes = null;
-					if (string.IsNullOrEmpty(this.currentFileCipherKey) && string.IsNullOrEmpty(config.CipherKey) && config.CryptoModule == null) {
+					byte[] outputBytes;
+					requestState.GotJsonResponse = true;
+					if (string.IsNullOrEmpty(currentFileCipherKey) && string.IsNullOrEmpty(config.CipherKey) && config.CryptoModule == null) {
 						outputBytes = fileContentBytes;
 					} else {
-						CryptoModule currentCryptoModule = !string.IsNullOrEmpty(this.currentFileCipherKey) ? new CryptoModule(new LegacyCryptor(this.currentFileCipherKey, true, pubnubLog), null) : (config.CryptoModule ??= new CryptoModule(new LegacyCryptor(config.CipherKey, true, pubnubLog), null));
+						CryptoModule currentCryptoModule = !string.IsNullOrEmpty(currentFileCipherKey) ? new CryptoModule(new LegacyCryptor(currentFileCipherKey, true, pubnubLog), null) : (config.CryptoModule ??= new CryptoModule(new LegacyCryptor(config.CipherKey, true, pubnubLog), null));
 						try {
 							outputBytes = currentCryptoModule.Decrypt(fileContentBytes);
 							LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, Stream length (after Decrypt)= {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), fileContentBytes.Length), config.LogVerbosity);
@@ -179,9 +177,11 @@ namespace PubnubApi.EndPoint
 						}
 					}
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, transportResponse.StatusCode, null);
-					PNDownloadFileResult result = new PNDownloadFileResult();
-					result.FileBytes = outputBytes;
-					result.FileName = currentFileName;
+					PNDownloadFileResult result = new PNDownloadFileResult
+					{
+						FileBytes = outputBytes,
+						FileName = currentFileName
+					};
 					returnValue.Result = result;
 					returnValue.Status = status;
 				} else {
@@ -199,7 +199,7 @@ namespace PubnubApi.EndPoint
 
 		private RequestParameter CreateRequestParameter()
 		{
-			List<string> pathSegments = new List<string>
+			var pathSegments = new List<string>
 			{
 				"v1",
 				"files",

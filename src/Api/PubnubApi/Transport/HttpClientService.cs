@@ -25,7 +25,6 @@ namespace PubnubApi
 						requestMessage.Headers.Add(kvp.Key, kvp.Value);
 					}
 				}
-				System.Diagnostics.Debug.WriteLine($"Making call with {requestMessage.RequestUri}");
 				var httpResult = await _httpClient.SendAsync(request: requestMessage, cancellationToken: transportRequest.CancellationToken);
 				var responseContent = await httpResult.Content.ReadAsByteArrayAsync();
 				response = new TransportResponse() {
@@ -45,30 +44,40 @@ namespace PubnubApi
 
 		public async Task<TransportResponse> PostRequest(TransportRequest transportRequest)
 		{
-			if (transportRequest.Timeout.HasValue) _httpClient.Timeout = (TimeSpan)transportRequest.Timeout;
-			HttpContent postData = null;
-
-			if (!string.IsNullOrEmpty(transportRequest.BodyContentString)) {
-				postData = new StringContent(transportRequest.BodyContentString, Encoding.UTF8, "application/json");
-			} else if (transportRequest.BodyContentBytes != null) {
-				postData = new ByteArrayContent(transportRequest.FormData);
-				postData.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
-			}
-			HttpRequestMessage requestMessage = new HttpRequestMessage(method: HttpMethod.Post, requestUri: transportRequest.RequestUrl) { Content = postData };
-			if (transportRequest.Headers.Keys.Count > 0) {
-				foreach (var kvp in transportRequest.Headers) {
-					requestMessage.Headers.Add(kvp.Key, kvp.Value);
+			TransportResponse transportResponse; 
+			try
+			{
+				HttpContent postData = null;
+				if (!string.IsNullOrEmpty(transportRequest.BodyContentString)) {
+					postData = new StringContent(transportRequest.BodyContentString, Encoding.UTF8, "application/json");
+				} else if (transportRequest.BodyContentBytes != null)
+				{
+					postData = new ByteArrayContent(transportRequest.BodyContentBytes);
+					foreach (var transportRequestHeader in transportRequest.Headers)
+					{
+						postData.Headers.Add(transportRequestHeader.Key, transportRequestHeader.Value);
+					}
+					// if (transportRequest.Headers.TryGetValue("Content-Type", out var header))
+					// 	if (!string.IsNullOrEmpty(header))
+					// 		postData.Headers.Add("Content-Type", header);
 				}
+				HttpRequestMessage requestMessage = new HttpRequestMessage(method: HttpMethod.Post, requestUri: transportRequest.RequestUrl) { Content = postData };
+				var httpResult = await _httpClient.SendAsync(request: requestMessage, cancellationToken: transportRequest.CancellationToken);
+
+				var responseContent = await httpResult.Content.ReadAsByteArrayAsync();
+				transportResponse= new TransportResponse() {
+					StatusCode = (int)httpResult.StatusCode,
+					Content = responseContent,
+					Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
+					RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath
+				};
+			} catch (Exception e) {
+				transportResponse = new TransportResponse() {
+					RequestUrl = transportRequest.RequestUrl,
+					Error = e
+				};
 			}
-			var httpResult = await _httpClient.SendAsync(request: requestMessage, cancellationToken: transportRequest.CancellationToken);
-			var responseContent = await httpResult.Content.ReadAsByteArrayAsync();
-			var response = new TransportResponse() {
-				StatusCode = (int)httpResult.StatusCode,
-				Content = responseContent,
-				Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
-				RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath
-			};
-			return response;
+			return transportResponse;
 		}
 
 		public async Task<TransportResponse> PutRequest(TransportRequest transportRequest)
