@@ -92,7 +92,7 @@ namespace PubNubMessaging.Tests
 
             pubnub.Grant().Channels(channelsGrant).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Execute(new UTGrantResult());
 
-            Thread.Sleep(1000);
+            Thread.Sleep(3000);
 
             grantManualEvent.WaitOne();
 

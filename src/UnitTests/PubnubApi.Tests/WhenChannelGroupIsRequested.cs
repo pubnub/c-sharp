@@ -76,7 +76,7 @@ namespace PubNubMessaging.Tests
 
             pubnub.Grant().ChannelGroups(new [] { channelGroupName }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Execute(new GrantResult());
 
-            Thread.Sleep(1000);
+            Thread.Sleep(3000);
 
             grantManualEvent.WaitOne();
 
@@ -191,12 +191,8 @@ namespace PubNubMessaging.Tests
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             channelGroupManualEvent = new ManualResetEvent(false);
-
-#if NET40
-            PNResult<PNChannelGroupsAddChannelResult> cgAddResult = Task.Factory.StartNew(async () => await pubnub.AddChannelsToChannelGroup().Channels(new[] { channelName }).ChannelGroup(channelGroupName).ExecuteAsync()).Result.Result;
-#else
+            
             PNResult<PNChannelGroupsAddChannelResult> cgAddResult = await pubnub.AddChannelsToChannelGroup().Channels(new[] { channelName }).ChannelGroup(channelGroupName).ExecuteAsync();
-#endif
             Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(cgAddResult.Status));
 
             if (cgAddResult.Result != null)
