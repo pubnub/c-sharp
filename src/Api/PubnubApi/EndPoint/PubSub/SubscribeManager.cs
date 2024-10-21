@@ -680,10 +680,12 @@ namespace PubnubApi.EndPoint
 
                 // Wait for message
                 string json = "";
+                PNStatus pNStatus = null;
                 UrlProcessRequest<T>(request, pubnubRequestState, false).ContinueWith(r =>
                 {
+                    pNStatus = r.Result.Item2;
                     json = r.Result.Item1;
-                }, TaskContinuationOptions.ExecuteSynchronously).Wait();
+                }, TaskContinuationOptions.ExecuteSynchronously).Wait(); //TODO: Maybe it's time to port this to full async/await syntax? Just saying.
                 if (!string.IsNullOrEmpty(json))
                 {
                     string subscribedChannels = (MultiChannelSubscribe.ContainsKey(PubnubInstance.InstanceId) && MultiChannelSubscribe[PubnubInstance.InstanceId].Count > 0) ? MultiChannelSubscribe[PubnubInstance.InstanceId].Keys.OrderBy(x=>x).Aggregate((x, y) => x + "," + y) : "";
@@ -738,7 +740,7 @@ namespace PubnubApi.EndPoint
                     }
 
                 }
-                else
+                else if (pNStatus == null || pNStatus.Category != PNStatusCategory.PNAccessDeniedCategory) //so we do not retry if you get a 403. Only if there's no connection, i.e. the pnStatus object is null.
                 {
                     if (multiplexExceptionTimer != null)
                     {
@@ -747,8 +749,15 @@ namespace PubnubApi.EndPoint
                     ConnectionErrors++;
                     UpdatePubnubNetworkTcpCheckIntervalInSeconds();
                     multiplexExceptionTimer = new Timer(new TimerCallback(MultiplexExceptionHandlerTimerCallback<T>), pubnubRequestState,
-                                      (-1 == PubnubNetworkTcpCheckIntervalInSeconds) ? Timeout.Infinite : PubnubNetworkTcpCheckIntervalInSeconds * 1000, 
+                                      (-1 == PubnubNetworkTcpCheckIntervalInSeconds) ? Timeout.Infinite : PubnubNetworkTcpCheckIntervalInSeconds * 1000,
                                       Timeout.Infinite);
+                }
+                else
+                {
+                    //TODO: we have a situation that we should probably let the user know about so that the client code can deal with it, or let the user know.
+                    //List<object> result = ProcessJsonResponse<T>(pubnubRequestState, json);
+                    //ProcessResponseCallbacks(result, pubnubRequestState);
+                    Announce(pNStatus);
                 }
             }
             catch (Exception ex)
