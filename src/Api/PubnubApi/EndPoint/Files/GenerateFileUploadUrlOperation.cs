@@ -54,15 +54,15 @@ namespace PubnubApi.EndPoint
 				throw new ArgumentException("Missing File Name");
 			}
 
-			GenerateFileUploadUrl(this.queryParam, callback);
+			GenerateFileUploadUrl(callback);
 		}
 
 		public async Task<PNResult<PNGenerateFileUploadUrlResult>> ExecuteAsync()
 		{
-			return await GenerateFileUploadUrl(this.queryParam).ConfigureAwait(false);
+			return await GenerateFileUploadUrl();
 		}
 
-		private void GenerateFileUploadUrl(Dictionary<string, object> externalQueryParam, PNCallback<PNGenerateFileUploadUrlResult> callback)
+		private void GenerateFileUploadUrl(PNCallback<PNGenerateFileUploadUrlResult> callback)
 		{
 			RequestState<PNGenerateFileUploadUrlResult> requestState = new RequestState<PNGenerateFileUploadUrlResult>();
 			requestState.ResponseType = PNOperationType.PNGenerateFileUploadUrlOperation;
@@ -77,6 +77,7 @@ namespace PubnubApi.EndPoint
 				var transportResponse = t.Result;
 				if (transportResponse.Error == null) {
 					var responseString = Encoding.UTF8.GetString(transportResponse.Content);
+					requestState.GotJsonResponse = true;
 					if (!string.IsNullOrEmpty(responseString)) {
 						List<object> result = ProcessJsonResponse(requestState, responseString);
 						ProcessResponseCallbacks(result, requestState);
@@ -93,7 +94,7 @@ namespace PubnubApi.EndPoint
 			});
 		}
 
-		private async Task<PNResult<PNGenerateFileUploadUrlResult>> GenerateFileUploadUrl(Dictionary<string, object> externalQueryParam)
+		private async Task<PNResult<PNGenerateFileUploadUrlResult>> GenerateFileUploadUrl()
 		{
 			PNResult<PNGenerateFileUploadUrlResult> returnValue = new PNResult<PNGenerateFileUploadUrlResult>();
 			if (string.IsNullOrEmpty(sendFileName)) {
@@ -110,20 +111,21 @@ namespace PubnubApi.EndPoint
 			requestState.EndPointOperation = this;
 
 			var requestParameter = CreateRequestParameter();
-			Tuple<string, PNStatus> JsonAndStatusTuple;
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNGenerateFileUploadUrlOperation);
 			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest);
 			if (transportResponse.Error == null) {
 				var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
+				Tuple<string, PNStatus> jsonAndStatusTuple;
 				if (errorStatus == null) {
+					requestState.GotJsonResponse = true;
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, transportResponse.StatusCode, null);
-					JsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
+					jsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
 				} else {
-					JsonAndStatusTuple = new Tuple<string, PNStatus>(string.Empty, errorStatus);
+					jsonAndStatusTuple = new Tuple<string, PNStatus>(string.Empty, errorStatus);
 				}
-				returnValue.Status = JsonAndStatusTuple.Item2;
-				string json = JsonAndStatusTuple.Item1;
+				returnValue.Status = jsonAndStatusTuple.Item2;
+				string json = jsonAndStatusTuple.Item1;
 				if (!string.IsNullOrEmpty(json)) {
 					List<object> resultList = ProcessJsonResponse(requestState, json);
 					ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
@@ -162,7 +164,6 @@ namespace PubnubApi.EndPoint
 					}
 				}
 			}
-
 			Dictionary<string, object> messageEnvelope = new Dictionary<string, object>();
 			if (!string.IsNullOrEmpty(sendFileName)) {
 				messageEnvelope.Add("name", sendFileName);

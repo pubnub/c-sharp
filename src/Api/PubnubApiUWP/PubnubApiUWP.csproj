@@ -165,9 +165,6 @@
     <Compile Include="..\PubnubApi\Builder\UriUtil.cs">
       <Link>Builder\UriUtil.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\Builder\UrlRequestBuilder.cs">
-      <Link>Builder\UrlRequestBuilder.cs</Link>
-    </Compile>
     <Compile Include="..\PubnubApi\Builder\UrlParameterConverter.cs">
       <Link>Builder\UrlParameterConverter.cs</Link>
     </Compile>
