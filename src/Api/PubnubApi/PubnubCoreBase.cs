@@ -1,5 +1,4 @@
-﻿//Build Date: April 13, 2017
-#region "Header"
+﻿#region "Header"
 #if (__MonoCS__)
 #define TRACE
 #endif
@@ -13,11 +12,6 @@ using System.Diagnostics;
 using System.Threading;
 using System.Globalization;
 using System.Linq;
-using System.Threading.Tasks;
-//#if !NET35 && !NET40 && !NET45 && !NET461 && !NET48 && !NETSTANDARD10
-//using System.Net.Http;
-//using System.Net.Http.Headers;
-//#endif
 using PubnubApi.Security.Crypto;
 using PubnubApi.Security.Crypto.Cryptors;
 using System.Collections.Concurrent;
@@ -39,8 +33,7 @@ namespace PubnubApi
         private const int MINEXPONENTIALBACKOFF = 1;
         private const int MAXEXPONENTIALBACKOFF = 32;
         private const int INTERVAL = 3;
-
-        private static IPubnubHttp pubnubHttp;
+        
         private static ConcurrentDictionary<string, PNConfiguration> pubnubConfig { get; } = new ConcurrentDictionary<string, PNConfiguration>();
         private static IJsonPluggableLibrary jsonLib;
         private static IPubnubUnitTest unitTest;
@@ -1846,7 +1839,6 @@ namespace PubnubApi
             }
 
             RemoveChannelDictionary();
-            //TerminatePendingWebRequest();
             TerminateReconnectTimer();
             RemoveUserState();
 			TerminatePresenceHeartbeatTimer();
@@ -1882,18 +1874,8 @@ namespace PubnubApi
             {
                 ChannelGroupUserState[PubnubInstance.InstanceId].Clear();
             }
-
-            if (MultiChannelSubscribe.Count > 0 && !MultiChannelSubscribe.Where(t => t.Value.Keys.Count > 0).Any()
-                 && MultiChannelGroupSubscribe.Count > 0 && !MultiChannelGroupSubscribe.Where(t => t.Value.Keys.Count > 0).Any())
-            {
-                RemoveHttpClients();
-            }
+            
             PubnubInstance = null;
-        }
-
-        internal static void RemoveHttpClients()
-        {
-            //Conditionalmethod logic
         }
         
         internal void TerminateCurrentSubscriberRequest()

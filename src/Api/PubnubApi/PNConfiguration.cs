@@ -1,8 +1,5 @@
 using PubnubApi.Security.Crypto;
 using System;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
 
 namespace PubnubApi
 {
@@ -22,10 +19,7 @@ namespace PubnubApi
 
         public int PresenceTimeout
         {
-            get
-            {
-                return presenceHeartbeatTimeout;
-            }
+            get => presenceHeartbeatTimeout;
             set
             {
                 presenceHeartbeatTimeout = value;
@@ -33,13 +27,7 @@ namespace PubnubApi
             }
         }
 
-        public int PresenceInterval
-        {
-            get
-            {
-                return presenceHeartbeatInterval;
-            }
-        }
+        public int PresenceInterval => presenceHeartbeatInterval;
 
         public bool Secure { get; set; }
 
@@ -61,10 +49,7 @@ namespace PubnubApi
         [Obsolete("Uuid is deprecated, please use UserId instead.")]
         public string Uuid
         {
-            get
-            {
-                return userId.ToString();
-            }
+            get => userId.ToString();
             set
             {
                 if (userId != null && !uuidSetFromConstructor)
@@ -85,10 +70,7 @@ namespace PubnubApi
 
         public UserId UserId
         {
-            get
-            {
-                return userId;
-            }
+            get => userId;
             set
             {
                 if (uuidSetFromConstructor)
@@ -137,12 +119,6 @@ namespace PubnubApi
         public RetryConfiguration RetryConfiguration { get; set; }
 
         public int RequestMessageCountThreshold { get; set; } = 100;
-
-        public bool UseClassicHttpWebRequest { get; set; }
-
-        public bool UseTaskFactoryAsyncInsteadOfHttpClient { get; set; }
-
-        public bool EnableTelemetry { get; set; } = true;
 
         public  int MaximumMessagesCacheSize { get; set; }
 
@@ -217,8 +193,8 @@ namespace PubnubApi
 
         public PNConfiguration SetPresenceTimeoutWithCustomInterval(int timeout, int interval)
         {
-            this.presenceHeartbeatTimeout = timeout;
-            this.presenceHeartbeatInterval = interval;
+            presenceHeartbeatTimeout = timeout;
+            presenceHeartbeatInterval = interval;
 
             return this;
         }

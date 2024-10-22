@@ -29,9 +29,6 @@
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
     <Copyright>PubNub 2012-2021</Copyright>
 
-    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.0' ">$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
-    <!--<NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.0' ">1.6.1</NetStandardImplicitPackageVersion>-->
-
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.1' ">$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
     <!--<NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.1' ">1.6.1</NetStandardImplicitPackageVersion>-->
 
@@ -300,17 +297,11 @@
     <Compile Include="..\PubnubApi\Interface\IJsonPluggableLibrary.cs">
       <Link>Interface\IJsonPluggableLibrary.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\Interface\IPubnubHttp.cs">
-      <Link>Interface\IPubnubHttp.cs</Link>
-    </Compile>
     <Compile Include="..\PubnubApi\Interface\IPubnubLog.cs">
       <Link>Interface\IPubnubLog.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\Interface\IPubnubUnitTest.cs">
       <Link>Interface\IPubnubUnitTest.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\Interface\IUrlRequestBuilder.cs">
-      <Link>Interface\IUrlRequestBuilder.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\JsonDataParse\PNAccessManagerGrantJsonDataParse.cs" Link="JsonDataParse\PNAccessManagerGrantJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNAddMessageActionJsonDataParse.cs" Link="JsonDataParse\PNAddMessageActionJsonDataParse.cs" />
@@ -591,10 +582,6 @@
     <Compile Include="..\PubnubApi\PubnubCoreBase.cs">
       <Link>PubnubCoreBase.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\PubnubHttp.cs">
-      <Link>PubnubHttp.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\PubnubHttpClientHandler.cs" Link="PubnubHttpClientHandler.cs" />
     <Compile Include="..\PubnubApi\Push\Mpns\MpnsCycleTileNotification.cs">
       <Link>Push\Mpns\MpnsCycleTileNotification.cs</Link>
     </Compile>
