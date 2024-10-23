@@ -47,7 +47,10 @@ namespace PubNubMessaging.Tests
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
             server = Server.Instance();
             MockServer.LoggingMethod.MockServerLog = unitLog;
-            server.Start();
+            if (PubnubCommon.EnableStubTest)
+            {
+                server.Start();   
+            }
 
             if (!PubnubCommon.PAMServerSideGrant)
             {
@@ -89,7 +92,7 @@ namespace PubNubMessaging.Tests
 
             pubnub.Grant().Channels(channelsGrant).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Execute(new UTGrantResult());
 
-            Thread.Sleep(1000);
+            Thread.Sleep(3000);
 
             grantManualEvent.WaitOne();
 
@@ -103,6 +106,12 @@ namespace PubNubMessaging.Tests
         [TearDown]
         public static void Exit()
         {
+            if (pubnub != null)
+            {
+                pubnub.Destroy();
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
+            }
             server.Stop();
         }
 

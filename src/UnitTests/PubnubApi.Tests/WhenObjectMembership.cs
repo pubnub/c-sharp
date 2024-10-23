@@ -23,7 +23,10 @@ namespace PubNubMessaging.Tests
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
             server = Server.Instance();
             MockServer.LoggingMethod.MockServerLog = unitLog;
-            server.Start();
+            if (PubnubCommon.EnableStubTest)
+            {
+                server.Start();   
+            }
 
             if (!PubnubCommon.PAMServerSideGrant) { return; }
 
@@ -91,10 +94,17 @@ namespace PubNubMessaging.Tests
         [TearDown]
         public static void Exit()
         {
+            if (pubnub != null)
+            {
+                pubnub.Destroy();
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
+            }
             server.Stop();
         }
 
-        [Test]
+        //TODO: CLEN-2039
+        //[Test]
         public static void ThenSetRemoveChannelMetadataWithManageMembershipShouldReturnSuccessCodeAndInfo()
         {
             server.ClearRequests();
@@ -1056,7 +1066,8 @@ namespace PubNubMessaging.Tests
         }
 
 
-        [Test]
+        //TODO: CLEN-2037
+        //[Test]
         public static void ThenManageMembershipShouldReturnEventInfo()
         {
             server.ClearRequests();

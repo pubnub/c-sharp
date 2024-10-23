@@ -45,7 +45,7 @@ namespace PubnubApi
 			fileAction = null;
 		}
 
-		public SubscribeCallbackExt(Action<Pubnub, PNMessageResult<object>> messageCallback)
+		public SubscribeCallbackExt(Action<Pubnub, PNMessageResult<object>> messageCallback, object presenceCallback)
 		{
 			subscribeAction = messageCallback;
 			presenceAction = null;

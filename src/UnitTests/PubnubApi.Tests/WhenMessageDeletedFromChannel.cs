@@ -20,7 +20,7 @@ namespace PubNubMessaging.Tests
 
         private static int manualResetEventWaitTimeout = 310 * 1000;
         private static string channel = "hello_my_channel";
-        private static string authKey = "myauth";
+        private static string token;
         private static string currentTestCase = "";
 
         private static Pubnub pubnub;
@@ -28,15 +28,21 @@ namespace PubNubMessaging.Tests
         private static Server server;
 
         [SetUp]
-        public static void Init()
+        public static async Task Init()
         {
             UnitTestLog unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
             server = Server.Instance();
             MockServer.LoggingMethod.MockServerLog = unitLog;
-            server.Start();
+            if (PubnubCommon.EnableStubTest)
+            {
+                server.Start();   
+            }
 
-            if (!PubnubCommon.PAMServerSideGrant) { return; }
+            if (!PubnubCommon.PAMServerSideGrant)
+            {
+                return;
+            }
 
             receivedGrantMessage = false;
 
@@ -45,7 +51,6 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
-                AuthKey = authKey,
                 Secure = false
             };
             server.RunOnHttps(false);
@@ -59,7 +64,7 @@ namespace PubNubMessaging.Tests
             server.AddRequest(new Request()
                     .WithMethod("GET")
                     .WithPath(string.Format("/v2/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey))
-                    .WithParameter("auth", authKey)
+                    //.WithParameter("auth", authKey)
                     .WithParameter("channel", channel)
                     .WithParameter("m", "1")
                     .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
@@ -73,22 +78,48 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).Delete(true).Manage(true).Update(true).TTL(20).Execute(new UTGrantResult());
+            var grantResult = await pubnub.GrantToken().TTL(20).AuthorizedUuid(config.UserId).Resources(
+                new PNTokenResources()
+                {
+                    Channels = new Dictionary<string, PNTokenAuthValues>()
+                    {
+                        {
+                            channel, new PNTokenAuthValues()
+                            {
+                                Read = true,
+                                Write = true,
+                                Create = true,
+                                Get = true,
+                                Delete = true,
+                                Join = true, 
+                                Update = true, 
+                                Manage = true
+                            }
+                        }
+                    }
+                }).ExecuteAsync();
 
-            Thread.Sleep(1000);
+            await Task.Delay(3000);
 
-            grantManualEvent.WaitOne();
-
+            token = grantResult.Result?.Token;
+            
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
 
-            Assert.IsTrue(receivedGrantMessage, "WhenUnsubscribedToAChannelGroup Grant access failed.");
+            Assert.IsTrue(grantResult.Status.Error == false && grantResult.Result != null, 
+                "WhenUnsubscribedToAChannelGroup Grant access failed.");
         }
 
         [TearDown]
         public static void Exit()
         {
+            if (pubnub != null)
+            {
+                pubnub.Destroy();
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
+            }
             server.Stop();
         }
 
@@ -110,11 +141,8 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
             pubnub = createPubNubInstance(config);
+            pubnub.SetAuthToken(token);
 
             string expected = "{\"status\": 200, \"error\": false, \"error_message\": \"\"}";
 
@@ -172,11 +200,8 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
             pubnub = createPubNubInstance(config);
+            pubnub.SetAuthToken(token);
 
             string expected = "{\"status\": 200, \"error\": false, \"error_message\": \"\"}";
 
@@ -207,62 +232,5 @@ namespace PubNubMessaging.Tests
 
             Assert.IsTrue(receivedMessage, "ThenWithAsyncDeleteMessageShouldReturnSuccessMessage - DeleteMessages Result not expected");
         }
-
-        private class UTGrantResult : PNCallback<PNAccessManagerGrantResult>
-        {
-            public override void OnResponse(PNAccessManagerGrantResult result, PNStatus status)
-            {
-                try
-                {
-                    Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-
-                    if (result != null)
-                    {
-                        Debug.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-                        if (result.Channels != null && result.Channels.Count > 0)
-                        {
-                            var read = result.Channels[channel][authKey].ReadEnabled;
-                            var write = result.Channels[channel][authKey].WriteEnabled;
-                            if (read && write)
-                            {
-                                receivedGrantMessage = true;
-                            }
-                        }
-                    }
-                }
-                catch
-                {
-                }
-                finally
-                {
-                    grantManualEvent.Set();
-                }
-            }
-        }
-
-        public class UTDeleteMessagaeResult : PNCallback<PNDeleteMessageResult>
-        {
-            public override void OnResponse(PNDeleteMessageResult result, PNStatus status)
-            {
-                Debug.WriteLine("DeleteMessage Response: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-                Debug.WriteLine("DeleteMessage PNStatus => Status = : " + status.StatusCode.ToString());
-                if (status != null && status.Error)
-                {
-                    deleteMessageManualEvent.Set();
-                }
-                else if (result != null && status.StatusCode == 200 && !status.Error)
-                {
-                    switch (currentTestCase)
-                    {
-                        case "DeleteMessageShouldReturnSuccessMessage":
-                            receivedMessage = true;
-                            deleteMessageManualEvent.Set();
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-        };
     }
 }

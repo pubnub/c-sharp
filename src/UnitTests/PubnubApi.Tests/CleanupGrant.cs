@@ -14,6 +14,17 @@ namespace PubNubMessaging.Tests
         private static Pubnub pubnub;
         private static int manualResetEventWaitTimeout = 20 * 1000;
 
+        [TearDown]
+        public static void Exit()
+        {
+            if (pubnub != null)
+            {
+                pubnub.Destroy();
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
+            }
+        }
+        
         [Test]
         public static void AtUserLevel()
         {

@@ -23,12 +23,27 @@ namespace PubNubMessaging.Tests
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
             server = Server.Instance();
             MockServer.LoggingMethod.MockServerLog = unitLog;
-            server.Start();
+            if (PubnubCommon.EnableStubTest)
+            {
+                server.Start();   
+            }
         }
 
         [TearDown]
-        public void Exit()
+        public static void Exit()
         {
+            if (pubnub1 != null)
+            {
+                pubnub1.Destroy();
+                pubnub1.PubnubUnitTest = null;
+                pubnub1 = null;
+            }
+            if (pubnub2 != null)
+            {
+                pubnub2.Destroy();
+                pubnub2.PubnubUnitTest = null;
+                pubnub2 = null;
+            }
             server.Stop();
         }
 

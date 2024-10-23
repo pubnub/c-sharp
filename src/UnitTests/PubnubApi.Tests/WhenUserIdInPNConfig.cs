@@ -11,17 +11,6 @@ namespace PubNubMessaging.Tests
     [TestFixture]
     public class WhenUserIdInPNConfig : TestHarness
     {
-        [SetUp]
-        public static void Init()
-        { 
-        }
-
-        [TearDown]
-        public static void Exit()
-        {
-            
-        }
-
         [Test]
         public static void ThenUuidSetShouldFailWithUserIdConstructorValue()
         {

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace PubnubApi
 {
@@ -13,9 +10,9 @@ namespace PubnubApi
 
         public ResponseBuilder(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubLog log)
         {
-            this.config = pubnubConfig;
-            this.jsonLib = jsonPluggableLibrary;
-            this.pubnubLog = log;
+            config = pubnubConfig;
+            jsonLib = jsonPluggableLibrary;
+            pubnubLog = log;
         }
 
         public T JsonToObject<T>(List<object> result, bool internalObject)
@@ -28,7 +25,7 @@ namespace PubnubApi
             }
             else
             {
-                NewtonsoftJsonDotNet jsonNewtonLib = new NewtonsoftJsonDotNet(this.config, this.pubnubLog);
+                NewtonsoftJsonDotNet jsonNewtonLib = new NewtonsoftJsonDotNet(config, pubnubLog);
                 ret = jsonNewtonLib.DeserializeToObject<T>(result);
             }
 

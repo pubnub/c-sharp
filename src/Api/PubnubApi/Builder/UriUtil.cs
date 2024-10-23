@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
+using PubnubApi.EndPoint;
 
 namespace PubnubApi
 {
-    public class UriUtil
+    public static class UriUtil
     {
         public static string EncodeUriComponent(string s, PNOperationType type, bool ignoreComma, bool ignoreColon, bool ignorePercent2fEncode)
         {
@@ -75,13 +78,7 @@ namespace PubnubApi
                     }
                     else
                     {
-                        string escapeChar = System.Uri.EscapeDataString(ch.ToString());
-#if NET35 || NET40
-                        if (escapeChar == ch.ToString() && IsUnsafeToEncode(ch, ignoreComma, ignoreColon))
-                        {
-                            escapeChar = string.Format(CultureInfo.InvariantCulture, "%{0}{1}", ToHex(ch / 16), ToHex(ch % 16));
-                        }
-#endif
+                        string escapeChar = Uri.EscapeDataString(ch.ToString());
                         o.Append(escapeChar);
                     }
                 }
@@ -160,7 +157,7 @@ namespace PubnubApi
             }
 
             // Check if the character at index is a high surrogate.
-            int temp1 = (int)s[index] - HighSurrogateStart;
+            int temp1 = s[index] - HighSurrogateStart;
             if (temp1 >= 0 && temp1 <= 0x7ff)
             {
                 // Found a surrogate char.
@@ -169,7 +166,7 @@ namespace PubnubApi
                     // Found a high surrogate.
                     if (index < s.Length - 1)
                     {
-                        int temp2 = (int)s[index + 1] - LowSurrogateStart;
+                        int temp2 = s[index + 1] - LowSurrogateStart;
                         if (temp2 >= 0 && temp2 <= 0x3ff)
                         {
                             // Found a low surrogate.
@@ -194,7 +191,33 @@ namespace PubnubApi
             }
 
             // Not a high-surrogate or low-surrogate. Genereate the UTF32 value for the BMP characters.
-            return (int)s[index];
+            return s[index];
+        }
+
+        public static string BuildQueryString(Dictionary<string, string> queryStringParamMap)
+        {
+            return string.Join("&", queryStringParamMap?.OrderBy(kvp => kvp.Key, StringComparer.Ordinal).Select(kvp => string.Format(CultureInfo.InvariantCulture, "{0}={1}", kvp.Key, kvp.Value)).ToArray() ?? Array.Empty<string>());
+        }
+
+        public static string GetFileUrl(string fileId, string fileName, string channel, PNConfiguration pnConfiguration, Pubnub pubnub, TokenManager tokenmanager)
+        {
+            var requestParameters = new RequestParameter()
+            {
+                RequestType = Constants.GET,
+                PathSegment = [
+                    "v1",
+                    "files",
+                    pnConfiguration.SubscribeKey,
+                    "channels",
+                    channel,
+                    "files",
+                    fileId,
+                    fileName
+                ],
+                Query = new Dictionary<string, string>()
+            };
+            var transportRequest = pubnub.transportMiddleware.PreapareTransportRequest(requestParameter:requestParameters, PNOperationType.PNFileUrlOperation);
+            return transportRequest.RequestUrl;
         }
     }
 }
