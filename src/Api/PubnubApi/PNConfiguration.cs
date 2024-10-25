@@ -165,7 +165,7 @@ namespace PubnubApi
             SubscribeKey = "";
             SecretKey = "";
             Secure = true;
-            ReconnectionPolicy = PNReconnectionPolicy.NONE;
+            ReconnectionPolicy = PNReconnectionPolicy.EXPONENTIAL;
             HeartbeatNotificationOption = PNHeartbeatNotificationOption.Failures;
             IncludeRequestIdentifier = true;
             IncludeInstanceIdentifier = false;

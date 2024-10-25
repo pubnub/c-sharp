@@ -345,11 +345,9 @@
     <Compile Include="..\PubnubApi\EventEngine\Core\EventQueue.cs" Link="EventEngine\Core\EventQueue.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Core\Utils.cs" Link="EventEngine\Core\Utils.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\Effects\EmitMessagesHandler.cs" Link="EventEngine\Subscribe\Effects\EmitMessagesHandler.cs" />
-    <Compile Include="..\PubnubApi\EventEngine\Subscribe\Effects\EmitStatusEffectHandler.cs" Link="EventEngine\Subscribe\Effects\EmitStatusEffectHandler.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\Common\CommonSubscribeTypes.cs" Link="EventEngine\Subscribe\Common\CommonSubscribeTypes.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\Effects\HandshakeEffectHandler.cs" Link="EventEngine\Subscribe\Effects\HandshakeEffectHandler.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\Effects\ReceivingEffectHandler.cs" Link="EventEngine\Subscribe\Effects\ReceivingEffectHandler.cs" />
-    <Compile Include="..\PubnubApi\EventEngine\Subscribe\Effects\EmitMessagesHandler.cs" Link="EventEngine\Subscribe\Effects\EmitMessagesHandler.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\Effects\EmitStatusEffectHandler.cs" Link="EventEngine\Subscribe\Effects\EmitStatusEffectHandler.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\Events\SubscriptionEvents.cs" Link="EventEngine\Subscribe\Events\SubscriptionEvents.cs" />    <Compile Include="..\PubnubApi\EventEngine\Subscribe\Invocations\SubscriptionInvocations.cs" Link="EventEngine\Subscribe\Invocations\SubscriptionInvocations.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\States\HandshakeFailedState.cs" Link="EventEngine\Subscribe\States\HandshakeFailedState.cs" />

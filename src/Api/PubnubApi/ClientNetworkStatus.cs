@@ -66,12 +66,14 @@ namespace PubnubApi
 				}
 			}
 
-			InternetState<T> state = new InternetState<T>();
-			state.InternalCallback = internalCallback;
-			state.PubnubCallbacck = callback;
-			state.ResponseType = type;
-			state.Channels = channels;
-			state.ChannelGroups = channelGroups;
+			InternetState<T> state = new InternetState<T>
+			{
+				InternalCallback = internalCallback,
+				PubnubCallbacck = callback,
+				ResponseType = type,
+				Channels = channels,
+				ChannelGroups = channelGroups
+			};
 
 			networkStatus = await CheckSocketConnect<T>(state).ConfigureAwait(false);
 			return networkStatus;
@@ -128,11 +130,15 @@ namespace PubnubApi
 		private static async Task<bool> GetTimeWithTaskFactoryAsync()
 		{
 			bool successFlag = false;
-			try {
+			try
+			{
 				var transportResponse = await TimeRequest().ConfigureAwait(false);
-				if (transportResponse.Error != null) throw transportResponse.Error;
-				successFlag = transportResponse.StatusCode == 200;
-			} finally {
+				if (transportResponse.Error == null)
+				{
+					successFlag = transportResponse.StatusCode == 200;
+				}
+			}
+			finally {
 				networkStatus = successFlag;
 			}
 			return successFlag;
@@ -140,10 +146,11 @@ namespace PubnubApi
 
 		private static async Task<TransportResponse> TimeRequest()
 		{
-			List<string> pathSegments = new List<string> {
+			List<string> pathSegments =
+			[
 				"time",
 				"0"
-			};
+			];
 			var requestParameter = new RequestParameter() {
 				RequestType = Constants.GET,
 				PathSegment = pathSegments

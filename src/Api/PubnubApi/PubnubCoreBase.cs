@@ -4,10 +4,8 @@
 #endif
 using System;
 using System.Text;
-using System.Net;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Threading;
 using System.Globalization;
@@ -26,7 +24,6 @@ namespace PubnubApi
         protected static bool OverrideTcpKeepAlive { get; set; } = true;
         protected static System.Threading.Timer PresenceHeartbeatTimer { get; set; }
         protected static bool PubnetSystemActive { get; set; } = true;
-        protected Collection<Uri> PushRemoteImageDomainUri { get; set; } = new Collection<Uri>();
         protected static int ConnectionErrors { get; set; }
         #endregion
 
@@ -42,16 +39,26 @@ namespace PubnubApi
         private static EndPoint.DuplicationManager pubnubSubscribeDuplicationManager { get; set; }
 
         private bool clientNetworkStatusInternetStatus = true;
+        protected static ConcurrentDictionary<string, CancellationTokenSource> OngoingSubscriptionCancellationTokenSources { get; } = new();
         protected static ConcurrentDictionary<string, bool> SubscribeDisconnected { get; set; } = new ConcurrentDictionary<string, bool>();
 
         protected Pubnub PubnubInstance { get; set; }
 
+        protected static ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> SubscriptionChannels
+        {
+            get;
+        } = new();
+        
+        protected static ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> SubscriptionChannelGroups
+        {
+            get;
+        } = new();
         protected static ConcurrentDictionary<string, bool> UserIdChanged { get; set; } = new ConcurrentDictionary<string, bool>();
 
         protected static ConcurrentDictionary<string, UserId> CurrentUserId { get; set; } = new ConcurrentDictionary<string, UserId>();
 
-        protected static ConcurrentDictionary<string, long> LastSubscribeTimetoken { get; set; } = new ConcurrentDictionary<string, long>();
-        protected static ConcurrentDictionary<string, int> LastSubscribeRegion { get; set; } = new ConcurrentDictionary<string, int>();
+        protected static ConcurrentDictionary<string, long> LastSubscribeTimetoken { get; } = new();
+        protected static ConcurrentDictionary<string, int> LastSubscribeRegion { get; } = new();
 
         protected static int PubnubNetworkTcpCheckIntervalInSeconds { get; set; } = 3;
         private static int PubnubLocalHeartbeatCheckIntervalInSeconds { get; set; } = 30;
@@ -133,7 +140,7 @@ namespace PubnubApi
             get;
             set;
         } = new ConcurrentDictionary<string, DateTime>();
-
+        
         protected PubnubCoreBase(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance)
         {
             if (pubnubConfiguation == null)
@@ -239,7 +246,8 @@ namespace PubnubApi
             ClientNetworkStatus.PubnubInstance = PubnubInstance;
             if (!ClientNetworkStatus.IsInternetCheckRunning())
             {
-                clientNetworkStatusInternetStatus = ClientNetworkStatus.CheckInternetStatus<T>(PubnetSystemActive, type, callback, channels, channelGroups).GetAwaiter().GetResult();
+                clientNetworkStatusInternetStatus = ClientNetworkStatus
+                    .CheckInternetStatus<T>(PubnetSystemActive, type, callback, channels, channelGroups).Result;
             }
             return clientNetworkStatusInternetStatus;
         }
@@ -464,7 +472,7 @@ namespace PubnubApi
             return isTargetOfDedup;
         }
 
-        private bool IsZeroTimeTokenRequest<T>(RequestState<T> asyncRequestState, List<object> result)
+        private bool IsZeroTimeTokenRequest<T>(RequestState<T> requestState, List<object> result)
         {
             bool ret = false;
             PNConfiguration currentConfig = null;
@@ -474,21 +482,12 @@ namespace PubnubApi
                 pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig);
                 pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog);
 
-                if (asyncRequestState != null && asyncRequestState.ResponseType == PNOperationType.PNSubscribeOperation && result != null && result.Count > 0)
+                if (requestState != null && requestState.ResponseType == PNOperationType.PNSubscribeOperation && requestState.Timetoken == 0 && result != null && result.Count > 0)
                 {
                     List<SubscribeMessage> message = GetMessageFromMultiplexResult(result);
                     if (message != null && message.Count == 0)
                     {
-                        IEnumerable<string> newChannels = from channel in MultiChannelSubscribe[PubnubInstance.InstanceId]
-                                                          where channel.Value == 0
-                                                          select channel.Key;
-                        IEnumerable<string> newChannelGroups = from channelGroup in MultiChannelGroupSubscribe[PubnubInstance.InstanceId]
-                                                               where channelGroup.Value == 0
-                                                               select channelGroup.Key;
-                        if ((newChannels != null && newChannels.Any()) || (newChannelGroups != null && newChannelGroups.Any()))
-                        {
                             ret = true;
-                        }
                     }
                 }
             }
@@ -507,7 +506,7 @@ namespace PubnubApi
             PNConfiguration currentConfig;
             pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig);
             StatusBuilder statusBuilder = new StatusBuilder(currentConfig, jsonLib);
-            PNStatus status = statusBuilder.CreateStatusResponse(type, PNStatusCategory.PNConnectedCategory, asyncRequestState, (int)HttpStatusCode.OK, null);
+            PNStatus status = statusBuilder.CreateStatusResponse(type, PNStatusCategory.PNConnectedCategory, asyncRequestState, Constants.HttpRequestSuccessStatusCode, null);
 
             //Check callback exists and make sure previous timetoken = 0
             if (channels != null && channels.Length > 0)
@@ -556,7 +555,7 @@ namespace PubnubApi
                             if (messageList.Count >= currentConfig.RequestMessageCountThreshold)
                             {
                                 StatusBuilder statusBuilder = new StatusBuilder(currentConfig, jsonLib);
-                                PNStatus status = statusBuilder.CreateStatusResponse(type, PNStatusCategory.PNRequestMessageCountExceededCategory, asyncRequestState, (int)HttpStatusCode.OK, null);
+                                PNStatus status = statusBuilder.CreateStatusResponse(type, PNStatusCategory.PNRequestMessageCountExceededCategory, asyncRequestState, Constants.HttpRequestSuccessStatusCode, null);
                                 Announce(status);
                             }
 
@@ -631,7 +630,7 @@ namespace PubnubApi
                                                 decryptMessage = "**DECRYPT ERROR**";
 
                                                 PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(ex);
-                                                PNStatus status = new StatusBuilder(currentConfig, jsonLib).CreateStatusResponse<T>(type, category, null, (int)HttpStatusCode.NotFound, new PNException(ex));
+                                                PNStatus status = new StatusBuilder(currentConfig, jsonLib).CreateStatusResponse<T>(type, category, null, Constants.ResourceNotFoundStatusCode, new PNException(ex));
                                                 if (!string.IsNullOrEmpty(currentMessageChannel))
                                                 {
                                                     status.AffectedChannels.Add(currentMessageChannel);
@@ -864,7 +863,7 @@ namespace PubnubApi
                             T userResult = responseBuilder.JsonToObject<T>(result, true);
 
                             StatusBuilder statusBuilder = new StatusBuilder(currentConfig, jsonLib);
-                            PNStatus status = statusBuilder.CreateStatusResponse(type, PNStatusCategory.PNAcknowledgmentCategory, asyncRequestState, (int)HttpStatusCode.OK, null);
+                            PNStatus status = statusBuilder.CreateStatusResponse(type, PNStatusCategory.PNAcknowledgmentCategory, asyncRequestState,Constants.HttpRequestSuccessStatusCode, null);
 
                             if (userCallback != null)
                             {
@@ -888,7 +887,7 @@ namespace PubnubApi
                                     PNException ex = null;
                                     if (userResult != null && userResult.Status == 200)
                                     {
-                                        status = statusBuilder.CreateStatusResponse(type, PNStatusCategory.PNAcknowledgmentCategory, asyncRequestState, (int)HttpStatusCode.OK, null);
+                                        status = statusBuilder.CreateStatusResponse(type, PNStatusCategory.PNAcknowledgmentCategory, asyncRequestState, Constants.HttpRequestSuccessStatusCode, null);
                                     }
                                     else
                                     {
@@ -936,14 +935,12 @@ namespace PubnubApi
 
 #endregion
 
-#region "Helpers"
-
         protected string[] GetCurrentSubscriberChannels()
         {
             string[] channels = null;
-            if (MultiChannelSubscribe != null && MultiChannelSubscribe.ContainsKey(PubnubInstance.InstanceId) && MultiChannelSubscribe[PubnubInstance.InstanceId].Keys.Count > 0)
+            if (SubscriptionChannels.ContainsKey(PubnubInstance.InstanceId) && SubscriptionChannels[PubnubInstance.InstanceId] != null)
             {
-                channels = MultiChannelSubscribe[PubnubInstance.InstanceId].Keys.ToArray<string>();
+                channels = SubscriptionChannels[PubnubInstance.InstanceId].Keys.ToArray();
             }
 
             return channels;
@@ -952,14 +949,13 @@ namespace PubnubApi
         protected string[] GetCurrentSubscriberChannelGroups()
         {
             string[] channelGroups = null;
-            if (MultiChannelGroupSubscribe != null && MultiChannelGroupSubscribe.ContainsKey(PubnubInstance.InstanceId) && MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Keys.Count > 0)
+            if (SubscriptionChannelGroups.ContainsKey(PubnubInstance.InstanceId) && SubscriptionChannelGroups[PubnubInstance.InstanceId] != null)
             {
-                channelGroups = MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Keys.ToArray<string>();
+                channelGroups = SubscriptionChannelGroups[PubnubInstance.InstanceId].Keys.ToArray();
             }
 
             return channelGroups;
         }
-#endregion
 
         internal protected List<object> ProcessJsonResponse<T>(RequestState<T> asyncRequestState, string jsonString)
         {
@@ -1006,7 +1002,7 @@ namespace PubnubApi
                 {
                     if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig))
                     {
-                        status = new StatusBuilder(currentConfig, jsonLib).CreateStatusResponse<T>(type, PNStatusCategory.PNUnknownCategory, asyncRequestState, (int)HttpStatusCode.NotFound, new PNException(jsonString));
+                        status = new StatusBuilder(currentConfig, jsonLib).CreateStatusResponse<T>(type, PNStatusCategory.PNUnknownCategory, asyncRequestState, Constants.ResourceNotFoundStatusCode, new PNException(jsonString));
                     }
                 }
                 else if (deserializeStatus.Count >= 1 && deserializeStatus.ContainsKey("error") && deserializeStatus.ContainsKey("status") && Int32.TryParse(deserializeStatus["status"].ToString(), out statusCode) && statusCode > 0)
@@ -1069,7 +1065,7 @@ namespace PubnubApi
             {
                 if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig))
                 {
-                    status = new StatusBuilder(currentConfig, jsonLib).CreateStatusResponse<T>(type, PNStatusCategory.PNNetworkIssuesCategory, asyncRequestState, (int)HttpStatusCode.NotFound, new PNException(jsonString));
+                    status = new StatusBuilder(currentConfig, jsonLib).CreateStatusResponse<T>(type, PNStatusCategory.PNNetworkIssuesCategory, asyncRequestState, Constants.ResourceNotFoundStatusCode, new PNException(jsonString));
                 }
             }
             else if (jsonString.ToLowerInvariant().TrimStart().IndexOf("<?xml", StringComparison.CurrentCultureIgnoreCase) == 0
@@ -1077,11 +1073,26 @@ namespace PubnubApi
             {
                 if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig))
                 {
-                    status = new StatusBuilder(currentConfig, jsonLib).CreateStatusResponse<T>(type, PNStatusCategory.PNNetworkIssuesCategory, asyncRequestState, (int)HttpStatusCode.NotFound, new PNException(jsonString));
+                    string message = ExtractValue(jsonString, "<Message>", "</Message>");
+                    string proposedSize = ExtractValue(jsonString, "<ProposedSize>", "</ProposedSize>");
+                    var errorMessage = string.IsNullOrEmpty((message)) ? jsonString : $"File upload failed: {message}";
+                    errorMessage+= string.IsNullOrEmpty(proposedSize)?"":$", maximum allowed size is {proposedSize}";
+                    status = new StatusBuilder(currentConfig, jsonLib).CreateStatusResponse<T>(type, PNStatusCategory.PNUnknownCategory, asyncRequestState, Constants.HttpRequestEntityTooLargeStatusCode, new PNException(errorMessage));
                 }
             }
 
             return status;
+        }
+        
+        private static string ExtractValue(string input, string startTag, string endTag)
+        {
+            int startIndex = input.IndexOf(startTag) + startTag.Length;
+            int endIndex = input.IndexOf(endTag, startIndex);
+            if (startIndex < 0 || endIndex < 0)
+            {
+                return null;
+            }
+            return input.Substring(startIndex, endIndex - startIndex).Trim();
         }
         protected List<object> WrapResultBasedOnResponseType<T>(PNOperationType type, string jsonString, string[] channels, string[] channelGroups, bool reconnect, long lastTimetoken, PNCallback<T> callback)
         {
@@ -1108,11 +1119,11 @@ namespace PubnubApi
                     {
                         case PNOperationType.PNSubscribeOperation:
                         case PNOperationType.Presence:
-                            if (result.Count == 3 && result[0] is object[] && (result[0] as object[]).Length == 0 && result[2].ToString() == "")
+                            if (result.Count == 3 && result[0] is object[] && ((object[])result[0]).Length == 0 && result[2].ToString() == "")
                             {
                                 result.RemoveAt(2);
                             }
-                            if (result.Count == 4 && result[0] is object[] && (result[0] as object[]).Length == 0 && result[2].ToString() == "" && result[3].ToString() == "")
+                            if (result.Count == 4 && result[0] is object[] && ((object[])result[0]).Length == 0 && result[2].ToString() == "" && result[3].ToString() == "")
                             {
                                 result.RemoveRange(2, 2);
                             }
@@ -1123,51 +1134,8 @@ namespace PubnubApi
                             LastSubscribeRegion[PubnubInstance.InstanceId] = receivedRegion;
 
                             long receivedTimetoken = GetTimetokenFromMultiplexResult(result);
-
-                            long minimumTimetoken1 = (MultiChannelSubscribe[PubnubInstance.InstanceId].Count > 0) ? MultiChannelSubscribe[PubnubInstance.InstanceId].Min(token => token.Value) : 0;
-                            long minimumTimetoken2 = (MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Count > 0) ? MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Min(token => token.Value) : 0;
-                            long minimumTimetoken = Math.Max(minimumTimetoken1, minimumTimetoken2);
-
-                            long maximumTimetoken1 = (MultiChannelSubscribe[PubnubInstance.InstanceId].Count > 0) ? MultiChannelSubscribe[PubnubInstance.InstanceId].Max(token => token.Value) : 0;
-                            long maximumTimetoken2 = (MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Count > 0) ? MultiChannelGroupSubscribe[PubnubInstance.InstanceId].Max(token => token.Value) : 0;
-                            long maximumTimetoken = Math.Max(maximumTimetoken1, maximumTimetoken2);
-
-                            if (minimumTimetoken == 0 || lastTimetoken == 0)
-                            {
-                                if (maximumTimetoken == 0)
-                                {
-                                    LastSubscribeTimetoken[PubnubInstance.InstanceId] = receivedTimetoken;
-                                }
-                                else
-                                {
-                                    if (!enableResumeOnReconnect)
-                                    {
-                                        LastSubscribeTimetoken[PubnubInstance.InstanceId] = receivedTimetoken;
-                                    }
-                                    else
-                                    {
-                                        //do nothing. keep last subscribe token
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                if (reconnect)
-                                {
-                                    if (enableResumeOnReconnect)
-                                    {
-                                        //do nothing. keep last subscribe token
-                                    }
-                                    else
-                                    {
-                                        LastSubscribeTimetoken[PubnubInstance.InstanceId] = receivedTimetoken;
-                                    }
-                                }
-                                else
-                                {
-                                    LastSubscribeTimetoken[PubnubInstance.InstanceId] = receivedTimetoken;
-                                }
-                            }
+                            if (receivedTimetoken != 0)
+                                LastSubscribeTimetoken[PubnubInstance.InstanceId] = receivedTimetoken;
                             break;
                         case PNOperationType.PNHeartbeatOperation:
                             Dictionary<string, object> heartbeatadictionary = jsonLib.DeserializeToDictionaryOfObject(jsonString);
@@ -1310,11 +1278,7 @@ namespace PubnubApi
 
         protected void ProcessResponseCallbacks<T>(List<object> result, RequestState<T> asyncRequestState)
         {
-            bool callbackAvailable = false;
-            if (result != null && result.Count >= 1 && (asyncRequestState.PubnubCallback != null || SubscribeCallbackListenerList.Count >= 1))
-            {
-                callbackAvailable = true;
-            }
+            bool callbackAvailable = result != null && result.Count >= 1 && (asyncRequestState.PubnubCallback != null || SubscribeCallbackListenerList.Count >= 1);
             if (callbackAvailable)
             {
                 bool zeroTimeTokenRequest = IsZeroTimeTokenRequest(asyncRequestState, result);
@@ -1880,24 +1844,17 @@ namespace PubnubApi
         
         internal void TerminateCurrentSubscriberRequest()
         {
-            string[] channels = GetCurrentSubscriberChannels();
-            if (channels != null)
+            if (OngoingSubscriptionCancellationTokenSources.ContainsKey(PubnubInstance.InstanceId) 
+                && OngoingSubscriptionCancellationTokenSources[PubnubInstance.InstanceId] is not null)
             {
-                string multiChannel = (channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : ",";
-                CancellationTokenSource request;
-                if (ChannelRequest[PubnubInstance.InstanceId].ContainsKey(multiChannel) && ChannelRequest[PubnubInstance.InstanceId].TryGetValue(multiChannel, out request) && request != null)
-                {
-                    PNConfiguration currentConfig;
-                    IPubnubLog currentLog;
-                    if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig) && pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog))
-                    {
-                        LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} TerminateCurrentSubsciberRequest {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), request.IsCancellationRequested), currentConfig.LogVerbosity);
-                    }
-                    try
-                    {
-                        request.Cancel();
-                    }
-                    catch { /* ignore */ }
+                var cts = OngoingSubscriptionCancellationTokenSources[PubnubInstance.InstanceId];
+                try {
+                    cts.Cancel();
+                    cts.Dispose();
+                    OngoingSubscriptionCancellationTokenSources[PubnubInstance.InstanceId] = null;
+                }
+                catch {
+                    // ignored
                 }
             }
         }

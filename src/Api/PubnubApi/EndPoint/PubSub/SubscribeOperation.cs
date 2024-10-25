@@ -204,7 +204,7 @@ namespace PubnubApi.EndPoint
             
             manager = new SubscribeManager(config, jsonLibrary, unit, pubnubLog, pubnubTokenMgr, PubnubInstance);
             manager.CurrentPubnubInstance(PubnubInstance);
-            manager.MultiChannelSubscribeInit<T>(PNOperationType.PNSubscribeOperation, channels, channelGroups, initialSubscribeUrlParams, externalQueryParam);
+            manager.MultiChannelSubscribeInit<T>(PNOperationType.PNSubscribeOperation, channels??[], channelGroups??[], initialSubscribeUrlParams, externalQueryParam);
         }
 
         internal bool Retry(bool reconnect)

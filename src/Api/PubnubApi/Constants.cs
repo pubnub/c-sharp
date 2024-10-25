@@ -12,5 +12,6 @@
 
 		public const int ResourceNotFoundStatusCode = 404;
 		public const int HttpRequestSuccessStatusCode = 200;
+		public const int HttpRequestEntityTooLargeStatusCode = 413;
 	}
 }

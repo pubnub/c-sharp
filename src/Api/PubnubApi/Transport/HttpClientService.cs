@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 
 namespace PubnubApi
 {
@@ -12,13 +13,17 @@ namespace PubnubApi
 		private readonly HttpClient httpClient;
 		public HttpClientService(IWebProxy proxy = default)
 		{
-			httpClient = new HttpClient();
+			httpClient = new HttpClient()
+			{
+				Timeout = Timeout.InfiniteTimeSpan
+			};
 			if (proxy == null) return;
 			httpClient = new HttpClient(new HttpClientHandler()
 			{
 				Proxy = proxy,
-				UseProxy = true,
+				UseProxy = true
 			});
+			httpClient.Timeout = Timeout.InfiniteTimeSpan;
 		}
 
 		public async Task<TransportResponse> GetRequest(TransportRequest transportRequest)
@@ -65,8 +70,8 @@ namespace PubnubApi
 					}
 				}
 				HttpRequestMessage requestMessage = new HttpRequestMessage(method: HttpMethod.Post, requestUri: transportRequest.RequestUrl) { Content = postData };
+				
 				var httpResult = await httpClient.SendAsync(request: requestMessage, cancellationToken: transportRequest.CancellationToken).ConfigureAwait(false);
-
 				var responseContent = await httpResult.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
 				transportResponse= new TransportResponse() {
 					StatusCode = (int)httpResult.StatusCode,

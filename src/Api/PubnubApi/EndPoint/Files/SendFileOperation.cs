@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using PubnubApi.Security.Crypto;
 using PubnubApi.Security.Crypto.Cryptors;
@@ -224,8 +225,7 @@ namespace PubnubApi.EndPoint
 			PNGenerateFileUploadUrlResult generateFileUploadUrlResult = generateFileUploadUrl.Result;
 			PNStatus generateFileUploadUrlStatus = generateFileUploadUrl.Status;
 			if (generateFileUploadUrlStatus.Error || generateFileUploadUrlResult == null) {
-				PNStatus errStatus = new PNStatus { Error = true, ErrorData = new PNErrorData("Error in GenerateFileUploadUrl.", new ArgumentException("Error in GenerateFileUploadUrl.")) };
-				returnValue.Status = errStatus;
+				returnValue.Status = generateFileUploadUrlStatus;
 				return returnValue;
 			}
 			LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} GenerateFileUploadUrl executed.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
@@ -242,10 +242,13 @@ namespace PubnubApi.EndPoint
 				currentCryptoModule = !string.IsNullOrEmpty(currentFileCipherKey) ? new CryptoModule(new LegacyCryptor(currentFileCipherKey, true, pubnubLog), null) : (config.CryptoModule ??= new CryptoModule(new LegacyCryptor(config.CipherKey, true, pubnubLog), null));
 			}
 			byte[] postData = GetMultipartFormData(sendFileByteArray, generateFileUploadUrlResult.FileName, generateFileUploadUrlResult.FileUploadRequest.FormFields, dataBoundary, currentCryptoModule, config, pubnubLog);
+			CancellationTokenSource cts = new CancellationTokenSource();
+			cts.CancelAfter(TimeSpan.FromMinutes(5));
 			var transportRequest = new TransportRequest() {
 				RequestType = Constants.POST,
 				RequestUrl = generateFileUploadUrlResult.FileUploadRequest.Url,
 				BodyContentBytes = postData,
+				CancellationToken = cts.Token
 			};
 			transportRequest.Headers.Add("Content-Type", contentType);
 			Tuple<string, PNStatus> jsonAndStatusTuple;
@@ -260,11 +263,27 @@ namespace PubnubApi.EndPoint
 				} else {
 					jsonAndStatusTuple = new Tuple<string, PNStatus>(string.Empty, errStatus);
 				}
-			} else {
-				int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
-				PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
-				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNFileUploadOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
-				jsonAndStatusTuple = new Tuple<string, PNStatus>(string.Empty, status);
+			} else
+			{
+				PNStatus error = new PNStatus();
+				if (transportResponse.Content != null)
+				{
+					error = GetStatusIfError(requestState, Encoding.UTF8.GetString(transportResponse.Content));
+				}
+				else
+				{
+					if (transportResponse.Error.Message != null)
+					{
+						error = GetStatusIfError(requestState, transportResponse.Error.Message);
+					}
+					else
+					{
+						PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(transportResponse.StatusCode, transportResponse.Error.Message);
+						error = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNFileUploadOperation, category, requestState, transportResponse.StatusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
+					}
+					
+				}
+				jsonAndStatusTuple = new Tuple<string, PNStatus>(string.Empty, error);
 			}
 			returnValue.Status = jsonAndStatusTuple.Item2;
 			string json = jsonAndStatusTuple.Item1;
