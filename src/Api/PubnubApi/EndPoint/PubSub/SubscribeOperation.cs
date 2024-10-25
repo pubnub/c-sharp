@@ -93,6 +93,14 @@ namespace PubnubApi.EndPoint
             {
                 SubscribeRequestTracker.GetOrAdd(instance.InstanceId, DateTime.Now);
             }
+            if (!SubscriptionChannels.ContainsKey(instance.InstanceId))
+            {
+                SubscriptionChannels.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+            }
+            if (!SubscriptionChannelGroups.ContainsKey(instance.InstanceId))
+            {
+                SubscriptionChannelGroups.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+            }
 
         }
 
