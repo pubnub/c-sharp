@@ -175,7 +175,7 @@ namespace PubnubApi
             UseRandomInitializationVector = true;
             FileMessagePublishRetryLimit = 5;
             userId = currentUserId;
-            EnableEventEngine = false;
+            EnableEventEngine = true;
         }
 
         private void setDefaultRetryConfigurationFromPolicy(PNReconnectionPolicy policy)
