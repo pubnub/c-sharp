@@ -180,7 +180,7 @@ namespace PubNubMessaging.Tests
                 System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
             }
 
-            string channel = "hello_my_channel";
+            string channel = "hello_my_channel_3";
             manualResetEventWaitTimeout = 310 * 1000;
 
             string expected = "{\"t\":{\"t\":\"14833694874957031\",\"r\":7},\"m\":[{\"a\":\"4\",\"f\":512,\"p\":{\"t\":\"14833694873794045\",\"r\":2},\"k\":\"demo-36\",\"c\":\"hello_my_channel-pnpres\",\"d\":{\"action\": \"join\", \"timestamp\": 1483369487, \"uuid\": \"mylocalmachine.mydomain.com\", \"occupancy\": 1},\"b\":\"hello_my_channel-pnpres\"}]}";
@@ -272,7 +272,7 @@ namespace PubNubMessaging.Tests
             }
 
 
-            string channel = "hello_my_channel";
+            string channel = "hello_my_channel_4";
             manualResetEventWaitTimeout = 310 * 1000;
 
             string expected = "{\"t\":{\"t\":\"14833694874957031\",\"r\":7},\"m\":[{\"a\":\"4\",\"f\":512,\"p\":{\"t\":\"14833694873794045\",\"r\":2},\"k\":\"demo-36\",\"c\":\"hello_my_channel-pnpres\",\"d\":{\"action\": \"join\", \"timestamp\": 1483369487, \"uuid\": \"mylocalmachine.mydomain.com\", \"occupancy\": 1},\"b\":\"hello_my_channel-pnpres\"}]}";
@@ -360,7 +360,7 @@ namespace PubNubMessaging.Tests
                 System.Diagnostics.Debug.WriteLine("ATTENTION: AddListener failed");
             }
 
-            string channel = "hello_my_channel";
+            string channel = "hello_my_channel_2";
             manualResetEventWaitTimeout = 310 * 1000;
 
             string expected = "{\"t\":{\"t\":\"14833694874957031\",\"r\":7},\"m\":[{\"a\":\"4\",\"f\":512,\"p\":{\"t\":\"14833694873794045\",\"r\":2},\"k\":\"demo-36\",\"c\":\"hello_my_channel-pnpres\",\"d\":{\"action\": \"join\", \"timestamp\": 1483369487, \"uuid\": \"mylocalmachine.mydomain.com\", \"occupancy\": 1},\"b\":\"hello_my_channel-pnpres\"}]}";
@@ -2398,7 +2398,7 @@ namespace PubNubMessaging.Tests
             }
 
 
-            string channel = "hello_my_channel";
+            string channel = "hello_my_channel_1";
             manualResetEventWaitTimeout = 310 * 1000;
 
             string expected = "{\"t\":{\"t\":\"14828440156769626\",\"r\":7},\"m\":[{\"a\":\"4\",\"f\":512,\"p\":{\"t\":\"14828440155770431\",\"r\":2},\"k\":\"demo-36\",\"c\":\"hello_my_channel-pnpres\",\"d\":{\"action\": \"join\", \"timestamp\": 1482844015, \"uuid\": \"mytestuuid\", \"occupancy\": 1},\"b\":\"hello_my_channel-pnpres\"}]}";
