@@ -25,13 +25,13 @@ namespace PubnubApi
 
 		public static IPubnubLog PubnubLog { get; set; }
 
-		internal static async Task<bool> CheckInternetStatus<T>(bool systemActive, PNOperationType type, PNCallback<T> callback, string[] channels, string[] channelGroups)
+		internal static  bool CheckInternetStatus<T>(bool systemActive, PNOperationType type, PNCallback<T> callback, string[] channels, string[] channelGroups)
 		{
 			if (unit != null) {
 				return unit.InternetAvailable;
 			} else {
 				try {
-					await CheckClientNetworkAvailability(CallbackClientNetworkStatus, type, callback, channels, channelGroups).ConfigureAwait(false);
+					return CheckClientNetworkAvailability(CallbackClientNetworkStatus, type, callback, channels, channelGroups);
 				} catch (AggregateException ae) {
 					foreach (var ie in ae.InnerExceptions) {
 						LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} AggregateException CheckInternetStatus Error: {1} {2} ", DateTime.Now.ToString(CultureInfo.InvariantCulture), ie.GetType().Name, ie.Message), pubnubConfig.LogVerbosity);
@@ -57,7 +57,7 @@ namespace PubnubApi
 			return isInternetCheckRunning;
 		}
 
-		private static async Task<bool> CheckClientNetworkAvailability<T>(Action<bool> internalCallback, PNOperationType type, PNCallback<T> callback, string[] channels, string[] channelGroups)
+		private static bool CheckClientNetworkAvailability<T>(Action<bool> internalCallback, PNOperationType type, PNCallback<T> callback, string[] channels, string[] channelGroups)
 		{
 			lock (internetCheckLock) {
 				if (isInternetCheckRunning) {
@@ -75,7 +75,7 @@ namespace PubnubApi
 				ChannelGroups = channelGroups
 			};
 
-			networkStatus = await CheckSocketConnect<T>(state).ConfigureAwait(false);
+			CheckSocketConnect<T>(state).ConfigureAwait(false);
 			return networkStatus;
 		}
 
@@ -100,6 +100,7 @@ namespace PubnubApi
 			try {
 				var gotTimeResp = await GetTimeWithTaskFactoryAsync().ConfigureAwait(false);
 				isInternetCheckRunning = gotTimeResp;
+				networkStatus = gotTimeResp;
 			} catch (Exception ex) {
 				networkStatus = false;
 				LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} CheckSocketConnect (HttpClient Or Task.Factory) Failed {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex.Message), pubnubConfig.LogVerbosity);
