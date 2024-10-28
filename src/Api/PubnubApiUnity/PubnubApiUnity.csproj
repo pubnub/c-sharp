@@ -627,9 +627,6 @@
     <Compile Include="..\PubnubApi\Security\SecureMessage.cs">
       <Link>Security\SecureMessage.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\Timer.cs">
-      <Link>Timer.cs</Link>
-    </Compile>
   </ItemGroup>
 
   <PropertyGroup>

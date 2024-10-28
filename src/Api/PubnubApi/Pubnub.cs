@@ -42,7 +42,9 @@ namespace PubnubApi
             var assembly = typeof(Pubnub).GetTypeInfo().Assembly;
             var assemblyName = new AssemblyName(assembly.FullName);
             string assemblyVersion = assemblyName.Version.ToString();
-            Version = string.Format(CultureInfo.InvariantCulture, "{0}CSharp{1}", PNPlatform.Get(), assemblyVersion);
+            var targetFramework = assembly.GetCustomAttribute<System.Runtime.Versioning.TargetFrameworkAttribute>()?.FrameworkDisplayName?.Replace(".",string.Empty).Replace(" ", string.Empty);
+            
+            Version = string.Format(CultureInfo.InvariantCulture, "{0}/CSharp/{1}", targetFramework??"UNKNOWN", assemblyVersion);
         }
         
         #if UNITY

@@ -760,9 +760,6 @@
     <Compile Include="..\PubnubApi\Security\SecureMessage.cs">
       <Link>Security\SecureMessage.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\Timer.cs">
-      <Link>Timer.cs</Link>
-    </Compile>
     <None Include="..\PubnubApi\LICENSE.txt" Link="LICENSE.txt" Pack="true" PackagePath="" />
     <EmbeddedResource Include="Properties\PubnubApiUWP.rd.xml" />
   </ItemGroup>
