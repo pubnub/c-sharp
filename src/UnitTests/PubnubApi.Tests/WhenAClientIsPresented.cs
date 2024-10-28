@@ -46,6 +46,10 @@ namespace PubNubMessaging.Tests
             if (!PubnubCommon.PAMServerSideGrant) { return; }
             
             string channel = "hello_my_channel";
+            string channel1 = "hello_my_channel_1";
+            string channel2 = "hello_my_channel_2";
+            string channel3 = "hello_my_channel_3";
+            string channel4 = "hello_my_channel_4";
 
             PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
@@ -87,6 +91,30 @@ namespace PubNubMessaging.Tests
                         },
                         {
                             channel+"-pnpres", fullAccess
+                        },
+                        {
+                            channel1, fullAccess
+                        },
+                        {
+                            channel1+"-pnpres", fullAccess
+                        },
+                        {
+                            channel2, fullAccess
+                        },
+                        {
+                            channel2+"-pnpres", fullAccess
+                        },
+                        {
+                            channel3, fullAccess
+                        },
+                        {
+                            channel3+"-pnpres", fullAccess
+                        },
+                        {
+                            channel4, fullAccess
+                        },
+                        {
+                            channel4+"-pnpres", fullAccess
                         }
                     }
                 }).ExecuteAsync();
