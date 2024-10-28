@@ -54,7 +54,8 @@ namespace PubNubMessaging.Tests
                 AuthKey = authKey,
                 Secure = false,
                 LogVerbosity = PNLogVerbosity.BODY,
-                PubnubLog = new TestLog()
+                PubnubLog = new TestLog(),
+                EnableEventEngine = false
             };
             server.RunOnHttps(false);
 

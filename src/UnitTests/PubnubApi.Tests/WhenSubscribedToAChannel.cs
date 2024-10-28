@@ -513,7 +513,8 @@ namespace PubNubMessaging.Tests
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Secure = false
+                Secure = false,
+                EnableEventEngine = false
             };
             if (PubnubCommon.PAMServerSideRun)
             {
