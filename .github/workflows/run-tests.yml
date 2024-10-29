@@ -11,7 +11,7 @@ jobs:
   tests:
     name: Integration and Unit tests
     runs-on:
-      group: windows-gh
+      group: organization/windows-gh
     defaults:
       run:
         shell: powershell
@@ -31,7 +31,6 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
-            3.x
             5.0.x
             6.0.x
             7.0.x
@@ -39,19 +38,22 @@ jobs:
         env:
           WORKSPACE_PATH: ${{ github.workspace }}
         run: .\\.github\\workflows\\release\\build-packages.ps1
-      # - name: Run unit tests
-      #   env:
-      #     PN_PUB_KEY: ${{ secrets.PN_PUB_KEY }}
-      #     PN_SUB_KEY: ${{ secrets.PN_SUB_KEY }}
-      #     PN_SEC_KEY: ${{ secrets.PN_SEC_KEY }}
-      #   run: dotnet test .\\src\\UnitTests\\PubnubApiPCL.Tests\\PubnubApiPCL.Tests.csproj --verbosity normal --logger trx
+      - name: Run unit tests
+        env: 
+          PN_PUB_KEY: ${{ secrets.SDK_PUB_KEY }}
+          PN_SUB_KEY: ${{ secrets.SDK_SUB_KEY }}
+          PN_SEC_KEY: ${{ secrets.SDK_SEC_KEY }} 
+          PN_PAM_PUB_KEY: ${{ secrets.SDK_PAM_PUB_KEY }}
+          PN_PAM_SUB_KEY: ${{ secrets.SDK_PAM_SUB_KEY }}
+          PN_PAM_SEC_KEY: ${{ secrets.SDK_PAM_SEC_KEY }}
+        run: dotnet test .\\src\\UnitTests\\PubnubApiPCL.Tests\\PubnubApiPCL.Tests.csproj --verbosity normal --logger "console;verbosity=detailed"
       - name: Cancel workflow runs for commit on error
         if: failure()
         uses: ./.github/.release/actions/actions/utils/fast-jobs-failure
   acceptance-tests:
     name: Acceptance tests
     runs-on:
-      group: windows-gh
+      group: organization/windows-gh
     defaults:
       run:
         shell: powershell
@@ -91,7 +93,7 @@ jobs:
         run: |
           Copy-Item -Path "${{ github.workspace }}/sdk-specifications/features/access/*" -Destination "${{ github.workspace }}/src/UnitTests/AcceptanceTests/Features" -Recurse
           cd ./UnitTests/AcceptanceTests 
-          dotnet test --no-build --verbosity normal --logger trx --results-directory ./results
+          dotnet test --no-build --verbosity normal --logger "console;verbosity=detailed" --results-directory ./results
       - name: Upload acceptance tests reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -107,7 +109,7 @@ jobs:
     name: Tests
     needs: [tests, acceptance-tests]
     runs-on:
-      group: Default
+      group: organization/Default
     steps:
       - name: Tests summary
         run: echo -e "\033[38;2;95;215;0m\033[1mAll tests successfully passed"

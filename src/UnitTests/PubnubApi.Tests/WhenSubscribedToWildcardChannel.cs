@@ -37,7 +37,10 @@ namespace PubNubMessaging.Tests
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
             server = Server.Instance();
             MockServer.LoggingMethod.MockServerLog = unitLog;
-            server.Start();
+            if (PubnubCommon.EnableStubTest)
+            {
+                server.Start();   
+            }
 
             if (!PubnubCommon.PAMServerSideGrant) { return; }
 
@@ -51,7 +54,8 @@ namespace PubNubMessaging.Tests
                 AuthKey = authKey,
                 Secure = false,
                 LogVerbosity = PNLogVerbosity.BODY,
-                PubnubLog = new TestLog()
+                PubnubLog = new TestLog(),
+                EnableEventEngine = false
             };
             server.RunOnHttps(false);
 
@@ -420,6 +424,12 @@ namespace PubNubMessaging.Tests
         [TearDown]
         public static void Exit()
         {
+            if (pubnub != null)
+            {
+                pubnub.Destroy();
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
+            }
             server.Stop();
         }
 

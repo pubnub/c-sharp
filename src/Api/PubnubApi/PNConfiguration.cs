@@ -1,8 +1,5 @@
 using PubnubApi.Security.Crypto;
 using System;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
 
 namespace PubnubApi
 {
@@ -10,7 +7,7 @@ namespace PubnubApi
     {
         private int presenceHeartbeatTimeout;
         private int presenceHeartbeatInterval;
-        private UserId _userId;
+        private UserId userId;
         private bool uuidSetFromConstructor;
         private PNReconnectionPolicy reconnectionPolicy;
 
@@ -22,10 +19,7 @@ namespace PubnubApi
 
         public int PresenceTimeout
         {
-            get
-            {
-                return presenceHeartbeatTimeout;
-            }
+            get => presenceHeartbeatTimeout;
             set
             {
                 presenceHeartbeatTimeout = value;
@@ -33,13 +27,7 @@ namespace PubnubApi
             }
         }
 
-        public int PresenceInterval
-        {
-            get
-            {
-                return presenceHeartbeatInterval;
-            }
-        }
+        public int PresenceInterval => presenceHeartbeatInterval;
 
         public bool Secure { get; set; }
 
@@ -61,20 +49,17 @@ namespace PubnubApi
         [Obsolete("Uuid is deprecated, please use UserId instead.")]
         public string Uuid
         {
-            get
-            {
-                return _userId.ToString();
-            }
+            get => userId.ToString();
             set
             {
-                if (_userId != null && !uuidSetFromConstructor)
+                if (userId != null && !uuidSetFromConstructor)
                 {
                     throw new ArgumentException("Either UserId or Uuid can be used. Not both.");
                 }
 
                 if (value != null && value.Trim().Length > 0)
                 {
-                    _userId = new UserId(value);
+                    userId = new UserId(value);
                 }
                 else
                 {
@@ -85,10 +70,7 @@ namespace PubnubApi
 
         public UserId UserId
         {
-            get
-            {
-                return _userId;
-            }
+            get => userId;
             set
             {
                 if (uuidSetFromConstructor)
@@ -99,7 +81,7 @@ namespace PubnubApi
                 if (value != null && !string.IsNullOrEmpty(value.ToString()))
                 {
                     uuidSetFromConstructor = false;
-                    _userId = value;
+                    userId = value;
                 }
                 else
                 {
@@ -114,9 +96,9 @@ namespace PubnubApi
 
         public Proxy Proxy { get; set; }
 
-        public int SubscribeTimeout { get; set; } //How long to keep the subscribe loop running before disconnect.
+        public int SubscribeTimeout { get; set; } = 310;
 
-        public int NonSubscribeRequestTimeout { get; set; } //On non subscribe operations, how long to wait for server response.
+        public int NonSubscribeRequestTimeout { get; set; } = 15;
 
         public PNHeartbeatNotificationOption HeartbeatNotificationOption { get; set; }
 
@@ -137,12 +119,6 @@ namespace PubnubApi
         public RetryConfiguration RetryConfiguration { get; set; }
 
         public int RequestMessageCountThreshold { get; set; } = 100;
-
-        public bool UseClassicHttpWebRequest { get; set; }
-
-        public bool UseTaskFactoryAsyncInsteadOfHttpClient { get; set; }
-
-        public bool EnableTelemetry { get; set; } = true;
 
         public  int MaximumMessagesCacheSize { get; set; }
 
@@ -189,7 +165,7 @@ namespace PubnubApi
             SubscribeKey = "";
             SecretKey = "";
             Secure = true;
-            ReconnectionPolicy = PNReconnectionPolicy.NONE;
+            ReconnectionPolicy = PNReconnectionPolicy.EXPONENTIAL;
             HeartbeatNotificationOption = PNHeartbeatNotificationOption.Failures;
             IncludeRequestIdentifier = true;
             IncludeInstanceIdentifier = false;
@@ -198,8 +174,8 @@ namespace PubnubApi
             SuppressLeaveEvents = false;
             UseRandomInitializationVector = true;
             FileMessagePublishRetryLimit = 5;
-            _userId = currentUserId;
-            EnableEventEngine = false;
+            userId = currentUserId;
+            EnableEventEngine = true;
         }
 
         private void setDefaultRetryConfigurationFromPolicy(PNReconnectionPolicy policy)
@@ -212,15 +188,13 @@ namespace PubnubApi
                 case PNReconnectionPolicy.EXPONENTIAL:
                     RetryConfiguration = RetryConfiguration.Exponential(2, 150, 6);
                     break;
-                default:
-                    break;
             }
         }
 
         public PNConfiguration SetPresenceTimeoutWithCustomInterval(int timeout, int interval)
         {
-            this.presenceHeartbeatTimeout = timeout;
-            this.presenceHeartbeatInterval = interval;
+            presenceHeartbeatTimeout = timeout;
+            presenceHeartbeatInterval = interval;
 
             return this;
         }

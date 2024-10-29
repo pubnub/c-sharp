@@ -5,7 +5,7 @@ namespace PubNubMessaging.Tests
 {
     public class TestHarness
     {
-        protected static Pubnub createPubNubInstance(PNConfiguration pnConfiguration)
+        protected static Pubnub createPubNubInstance(PNConfiguration pnConfiguration, string authToken = "")
         {
             Pubnub pubnub = null;
             if (PubnubCommon.EnableStubTest)
@@ -29,7 +29,12 @@ namespace PubNubMessaging.Tests
             else
             {
                 pnConfiguration.Origin = "ps.pndsn.com";
+                pnConfiguration.EnableEventEngine = false;
                 pubnub = new Pubnub(pnConfiguration);
+            }
+            if (!string.IsNullOrEmpty(authToken))
+            {
+                pubnub.SetAuthToken(authToken);
             }
             return pubnub;
         }

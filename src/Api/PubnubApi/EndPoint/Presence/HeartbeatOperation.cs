@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace PubnubApi.EndPoint
@@ -24,29 +26,79 @@ namespace PubnubApi.EndPoint
 
 		internal async Task<PNStatus> HeartbeatRequest<T>(string[] channels, string[] channelGroups)
 		{
-			PNStatus resp = null;
+			PNStatus responseStatus = null;
 			try {
 				string presenceState = string.Empty;
 
 				if (config.MaintainPresenceState) presenceState = BuildJsonUserState(channels, channelGroups, true);
 
-				IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, null, "");
-				Uri request = urlBuilder.BuildPresenceHeartbeatRequest("GET", "", channels, channelGroups, presenceState);
 				RequestState<T> pubnubRequestState = new RequestState<T>();
 				pubnubRequestState.Channels = channels;
 				pubnubRequestState.ChannelGroups = channelGroups;
 				pubnubRequestState.ResponseType = PNOperationType.PNHeartbeatOperation;
 				pubnubRequestState.TimeQueued = DateTime.Now;
 
-				await UrlProcessRequest<T>(request, pubnubRequestState, false).ContinueWith(r => {
-					resp = r.Result.Item2;
-				}, TaskContinuationOptions.ExecuteSynchronously).ConfigureAwait(false);
+				var requestParameter = CreateRequestParameter(channels: channels, channelGroups: channelGroups);
+				var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNHeartbeatOperation);
+				var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ConfigureAwait(false);
+				if (transportResponse.Error == null) {
+					var responseString = Encoding.UTF8.GetString(transportResponse.Content);
+					pubnubRequestState.GotJsonResponse = true;
+					PNStatus errorStatus = GetStatusIfError(pubnubRequestState, responseString);
+					if (errorStatus == null) {
+						responseStatus = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(pubnubRequestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, pubnubRequestState, (int)HttpStatusCode.OK, null);
+					} else {
+						responseStatus = errorStatus;
+					}
+				} else {
+					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
+					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
+					responseStatus = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNHeartbeatOperation, category, pubnubRequestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
+				}
 			} catch (Exception ex) {
 				LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} HeartbeatOperation=> HeartbeatRequest \n channel(s)={1} \n cg(s)={2} \n Exception Details={3}", DateTime.Now.ToString(CultureInfo.InvariantCulture), string.Join(",", channels.OrderBy(x => x).ToArray()), string.Join(",", channelGroups.OrderBy(x => x).ToArray()), ex), config.LogVerbosity);
 				return new PNStatus(ex, PNOperationType.PNHeartbeatOperation, PNStatusCategory.PNUnknownCategory, channels, channelGroups);
 			}
-			return resp;
+			return responseStatus;
 		}
 
+		private RequestParameter CreateRequestParameter(string[] channels, string[] channelGroups)
+		{
+			string channelString = (channels != null && channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : ",";
+			List<string> pathSegments = new List<string>
+			{
+				"v2",
+				"presence",
+				"sub_key",
+				config.SubscribeKey,
+				"channel",
+				channelString,
+				"heartbeat"
+			};
+			string presenceState = string.Empty;
+
+			if (config.MaintainPresenceState) presenceState = BuildJsonUserState(channels, channelGroups, true);
+			Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+
+			string channelsJsonState = presenceState;
+			if (channelsJsonState != "{}" && channelsJsonState != string.Empty) {
+				requestQueryStringParams.Add("state", UriUtil.EncodeUriComponent(channelsJsonState, PNOperationType.PNHeartbeatOperation, false, false, false));
+			}
+
+			if (channelGroups != null && channelGroups.Length > 0) {
+				requestQueryStringParams.Add("channel-group", UriUtil.EncodeUriComponent(string.Join(",", channelGroups.OrderBy(x => x).ToArray()), PNOperationType.PNHeartbeatOperation, false, false, false));
+			}
+
+			if (config.PresenceTimeout != 0) {
+				requestQueryStringParams.Add("heartbeat", config.PresenceTimeout.ToString(CultureInfo.InvariantCulture));
+			}
+
+			var requestParameter = new RequestParameter() {
+				RequestType = Constants.GET,
+				PathSegment = pathSegments,
+				Query = requestQueryStringParams
+			};
+			return requestParameter;
+		}
 	}
 }

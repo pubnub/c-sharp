@@ -3,188 +3,216 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-#if !NET35 && !NET40
+using System.Globalization;
+using System.Threading;
 using System.Collections.Concurrent;
-#endif
 
 namespace PubnubApi.EndPoint
 {
-    public class MessageCountsOperation : PubnubCoreBase
-    {
-        private readonly PNConfiguration config;
-        private readonly IJsonPluggableLibrary jsonLibrary;
-        private readonly IPubnubUnitTest unit;
-        private readonly IPubnubLog pubnubLog;
+	public class MessageCountsOperation : PubnubCoreBase
+	{
+		private readonly PNConfiguration config;
+		private readonly IJsonPluggableLibrary jsonLibrary;
+		private readonly IPubnubUnitTest unit;
+		private readonly IPubnubLog pubnubLog;
 
-        private Dictionary<string, object> queryParam;
+		private Dictionary<string, object> queryParam;
 
-        private string[] channelNames;
-        private long[] msgCountArrayTimetoken;
-        private PNCallback<PNMessageCountResult> savedCallback;
+		private string[] channelNames;
+		private long[] timetokens;
+		private PNCallback<PNMessageCountResult> savedCallback;
 
-        public MessageCountsOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
-        {
-            config = pubnubConfig;
-            jsonLibrary = jsonPluggableLibrary;
-            unit = pubnubUnit;
-            pubnubLog = log;
-        }
+		public MessageCountsOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
+		{
+			config = pubnubConfig;
+			jsonLibrary = jsonPluggableLibrary;
+			unit = pubnubUnit;
+			pubnubLog = log;
+		}
 
-        public MessageCountsOperation Channels(string[] channels)
-        {
-            this.channelNames = channels;
-            return this;
-        }
+		public MessageCountsOperation Channels(string[] channels)
+		{
+			this.channelNames = channels;
+			return this;
+		}
 
-        public MessageCountsOperation ChannelsTimetoken(long[] timetokens)
-        {
-            this.msgCountArrayTimetoken = timetokens;
-            return this;
-        }
+		public MessageCountsOperation ChannelsTimetoken(long[] timetokens)
+		{
+			this.timetokens = timetokens;
+			return this;
+		}
 
-        public MessageCountsOperation QueryParam(Dictionary<string, object> customQueryParam)
-        {
-            this.queryParam = customQueryParam;
-            return this;
-        }
+		public MessageCountsOperation QueryParam(Dictionary<string, object> customQueryParam)
+		{
+			this.queryParam = customQueryParam;
+			return this;
+		}
 
-        [Obsolete("Async is deprecated, please use Execute instead.")]
-        public void Async(PNCallback<PNMessageCountResult> callback)
-        {
-            Execute(callback);
-        }
+		[Obsolete("Async is deprecated, please use Execute instead.")]
+		public void Async(PNCallback<PNMessageCountResult> callback)
+		{
+			Execute(callback);
+		}
 
-        public void Execute(PNCallback<PNMessageCountResult> callback)
-        {
-            if (string.IsNullOrEmpty(config.SubscribeKey) || config.SubscribeKey.Trim().Length == 0)
-            {
-                throw new MissingMemberException("Invalid Subscribe Key");
-            }
+		public void Execute(PNCallback<PNMessageCountResult> callback)
+		{
+			if (string.IsNullOrEmpty(config.SubscribeKey) || config.SubscribeKey.Trim().Length == 0) {
+				throw new MissingMemberException("Invalid Subscribe Key");
+			}
+			this.savedCallback = callback;
+			MessageCounts(this.channelNames, this.timetokens, this.queryParam, savedCallback);
+		}
 
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
-            Task.Factory.StartNew(() =>
-            {
-                this.savedCallback = callback;
-                MessageCounts(this.channelNames, this.msgCountArrayTimetoken, this.queryParam, savedCallback);
-            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
-#else
-            new Thread(() =>
-            {
-                this.savedCallback = callback;
-                MessageCounts(this.channelNames, this.msgCountArrayTimetoken, this.queryParam, savedCallback);
-            })
-            { IsBackground = true }.Start();
-#endif
-        }
+		public async Task<PNResult<PNMessageCountResult>> ExecuteAsync()
+		{
+			if (string.IsNullOrEmpty(config.SubscribeKey) || config.SubscribeKey.Trim().Length == 0) {
+				throw new MissingMemberException("Invalid Subscribe Key");
+			}
 
-        public async Task<PNResult<PNMessageCountResult>> ExecuteAsync()
-        {
-            if (string.IsNullOrEmpty(config.SubscribeKey) || config.SubscribeKey.Trim().Length == 0)
-            {
-                throw new MissingMemberException("Invalid Subscribe Key");
-            }
+			return await MessageCounts(this.channelNames, this.timetokens, this.queryParam);
+		}
 
-            return await MessageCounts(this.channelNames, this.msgCountArrayTimetoken, this.queryParam).ConfigureAwait(false);
-        }
+		internal void Retry()
+		{
+			MessageCounts(this.channelNames, this.timetokens, this.queryParam, savedCallback);
+		}
 
-        internal void Retry()
-        {
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
-            Task.Factory.StartNew(() =>
-            {
-                MessageCounts(this.channelNames, this.msgCountArrayTimetoken, this.queryParam, savedCallback);
-            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
-#else
-            new Thread(() =>
-            {
-                MessageCounts(this.channelNames, this.msgCountArrayTimetoken, this.queryParam, savedCallback);
-            })
-            { IsBackground = true }.Start();
-#endif
-        }
+		internal void MessageCounts(string[] channels, long[] timetokens, Dictionary<string, object> externalQueryParam, PNCallback<PNMessageCountResult> callback)
+		{
+			if (channels == null || channels.Length == 0) {
+				throw new ArgumentException("Missing Channel");
+			}
+			RequestState<PNMessageCountResult> requestState = new RequestState<PNMessageCountResult>();
+			requestState.Channels = channels;
+			requestState.ResponseType = PNOperationType.PNMessageCountsOperation;
+			requestState.PubnubCallback = callback;
+			requestState.Reconnect = false;
+			requestState.EndPointOperation = this;
 
-        internal void MessageCounts(string[] channels, long[] timetokens, Dictionary<string, object> externalQueryParam, PNCallback<PNMessageCountResult> callback)
-        {
-            if (channels == null || channels.Length == 0)
-            {
-                throw new ArgumentException("Missing Channel");
-            }
+			var requestParameter = CreateRequestParameter();
+			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNMessageCountsOperation);
+			PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ContinueWith(t => {
+				var transportResponse = t.Result;
+				if (transportResponse.Error == null) {
+					var responseString = Encoding.UTF8.GetString(transportResponse.Content);
+					requestState.GotJsonResponse = true;
+					if (!string.IsNullOrEmpty(responseString)) {
+						List<object> result = ProcessJsonResponse(requestState, responseString);
+						ProcessResponseCallbacks(result, requestState);
+					}
+				} else {
+					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
+					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
+					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNMessageCountsOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
+					requestState.PubnubCallback.OnResponse(default(PNMessageCountResult), status);
+				}
+			});
+		}
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
-            
-            Uri request = urlBuilder.BuildMessageCountsRequest("GET", "", channels, timetokens, externalQueryParam);
+		internal async Task<PNResult<PNMessageCountResult>> MessageCounts(string[] channels, long[] timetokens, Dictionary<string, object> externalQueryParam)
+		{
+			if (channels == null || channels.Length == 0) {
+				throw new ArgumentException("Missing Channel");
+			}
+			PNResult<PNMessageCountResult> returnValue = new PNResult<PNMessageCountResult>();
+			RequestState<PNMessageCountResult> requestState = new RequestState<PNMessageCountResult>();
+			requestState.Channels = channels;
+			requestState.ResponseType = PNOperationType.PNMessageCountsOperation;
+			requestState.Reconnect = false;
+			requestState.EndPointOperation = this;
+			Tuple<string, PNStatus> JsonAndStatusTuple;
 
-            RequestState<PNMessageCountResult> requestState = new RequestState<PNMessageCountResult>();
-            requestState.Channels = channels;
-            requestState.ResponseType = PNOperationType.PNMessageCountsOperation;
-            requestState.PubnubCallback = callback;
-            requestState.Reconnect = false;
-            requestState.EndPointOperation = this;
+			var requestParameter = CreateRequestParameter();
+			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNMessageCountsOperation);
+			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ConfigureAwait(false);
+			if (transportResponse.Error == null) {
+				var responseString = Encoding.UTF8.GetString(transportResponse.Content);
+				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
+				if (errorStatus == null) {
+					requestState.GotJsonResponse = true;
+					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, (int)HttpStatusCode.OK, null);
+					JsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
+				} else {
+					JsonAndStatusTuple = new Tuple<string, PNStatus>(string.Empty, errorStatus);
+				}
+				returnValue.Status = JsonAndStatusTuple.Item2;
+				string json = JsonAndStatusTuple.Item1;
+				if (!string.IsNullOrEmpty(json)) {
+					List<object> resultList = ProcessJsonResponse(requestState, json);
+					ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+					PNMessageCountResult responseResult = responseBuilder.JsonToObject<PNMessageCountResult>(resultList, true);
+					if (responseResult != null) {
+						returnValue.Result = responseResult;
+					}
+				}
+			} else {
+				int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
+				PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
+				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNMessageCountsOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
+				returnValue.Status = status;
+			}
+			return returnValue;
+		}
 
-            UrlProcessRequest(request, requestState, false).ContinueWith(r =>
-            {
-                string json = r.Result.Item1;
-                if (!string.IsNullOrEmpty(json))
-                {
-                    List<object> result = ProcessJsonResponse<PNMessageCountResult>(requestState, json);
-                    ProcessResponseCallbacks(result, requestState);
-                }
-            }, TaskContinuationOptions.ExecuteSynchronously).Wait();
-        }
+		internal void CurrentPubnubInstance(Pubnub instance)
+		{
+			PubnubInstance = instance;
 
-        internal async Task<PNResult<PNMessageCountResult>> MessageCounts(string[] channels, long[] timetokens, Dictionary<string, object> externalQueryParam)
-        {
-            if (channels == null || channels.Length == 0)
-            {
-                throw new ArgumentException("Missing Channel");
-            }
-            PNResult<PNMessageCountResult> ret = new PNResult<PNMessageCountResult>();
+			if (!ChannelRequest.ContainsKey(instance.InstanceId)) {
+				ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, CancellationTokenSource>());
+			}
+			if (!ChannelInternetStatus.ContainsKey(instance.InstanceId)) {
+				ChannelInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+			}
+			if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId)) {
+				ChannelGroupInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+			}
+		}
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
-            
-            Uri request = urlBuilder.BuildMessageCountsRequest("GET", "", channels, timetokens, externalQueryParam);
+		private RequestParameter CreateRequestParameter()
+		{
+			string channelString = (channelNames != null && channelNames.Length > 0) ? string.Join(",", channelNames) : "";
 
-            RequestState<PNMessageCountResult> requestState = new RequestState<PNMessageCountResult>();
-            requestState.Channels = channels;
-            requestState.ResponseType = PNOperationType.PNMessageCountsOperation;
-            requestState.Reconnect = false;
-            requestState.EndPointOperation = this;
+			List<string> pathSegments = new List<string>() {
+				"v3",
+				"history",
+				"sub-key",
+				config.SubscribeKey,
+				"message-counts"
+			};
 
-            Tuple<string, PNStatus> JsonAndStatusTuple = await UrlProcessRequest(request, requestState, false).ConfigureAwait(false);
-            ret.Status = JsonAndStatusTuple.Item2;
-            string json = JsonAndStatusTuple.Item1;
-            if (!string.IsNullOrEmpty(json))
-            {
-                List<object> resultList = ProcessJsonResponse(requestState, json);
-                ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
-                PNMessageCountResult responseResult = responseBuilder.JsonToObject<PNMessageCountResult>(resultList, true);
-                if (responseResult != null)
-                {
-                    ret.Result = responseResult;
-                }
-            }
+			if (!string.IsNullOrEmpty(channelString)) {
+				pathSegments.Add(UriUtil.EncodeUriComponent(channelString, PNOperationType.PNMessageCountsOperation, true, false, false));
+			}
 
-            return ret;
-        }
+			Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
 
-        internal void CurrentPubnubInstance(Pubnub instance)
-        {
-            PubnubInstance = instance;
+			if (timetokens != null && timetokens.Length > 0) {
+				string tt = string.Join(",", timetokens.Select(x => x.ToString(CultureInfo.InvariantCulture)).ToArray());
+				if (timetokens.Length == 1) {
+					requestQueryStringParams.Add("timetoken", tt);
+				} else {
+					requestQueryStringParams.Add("channelsTimetoken", UriUtil.EncodeUriComponent(tt, PNOperationType.PNMessageCountsOperation, false, false, false));
+				}
+			}
 
-            if (!ChannelRequest.ContainsKey(instance.InstanceId))
-            {
-                ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
-            }
-            if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
-            {
-                ChannelInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
-            }
-            if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId))
-            {
-                ChannelGroupInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
-            }
-        }
-    }
+			if (queryParam != null && queryParam.Count > 0) {
+				foreach (KeyValuePair<string, object> kvp in queryParam) {
+					if (!requestQueryStringParams.ContainsKey(kvp.Key)) {
+						requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), PNOperationType.PNMessageCountsOperation, false, false, false));
+					}
+				}
+			}
+
+			var queryString = UriUtil.BuildQueryString(requestQueryStringParams);
+
+			var requestParameter = new RequestParameter() {
+				RequestType = Constants.GET,
+				PathSegment = pathSegments,
+				Query = requestQueryStringParams
+			};
+			return requestParameter;
+		}
+	}
 }
