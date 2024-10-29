@@ -29,9 +29,6 @@
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
     <Copyright>PubNub 2012-2021</Copyright>
-
-    <!--<PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.0' ">$(PackageTargetFallback);dnxcore50</PackageTargetFallback>-->
-    <!--<NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.0' ">1.6.1</NetStandardImplicitPackageVersion>-->
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'uap10.0' ">
@@ -165,8 +162,8 @@
     <Compile Include="..\PubnubApi\Builder\UriUtil.cs">
       <Link>Builder\UriUtil.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\Builder\UrlRequestBuilder.cs">
-      <Link>Builder\UrlRequestBuilder.cs</Link>
+    <Compile Include="..\PubnubApi\Builder\UrlParameterConverter.cs">
+      <Link>Builder\UrlParameterConverter.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\Callbacks\PNCallback.cs">
       <Link>Callbacks\PNCallback.cs</Link>
@@ -302,7 +299,6 @@
     <Compile Include="..\PubnubApi\EndPoint\StoragePlayback\FetchHistoryOperation.cs" Link="EndPoint\StoragePlayback\FetchHistoryOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\StoragePlayback\HistoryOperation.cs" Link="EndPoint\StoragePlayback\HistoryOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\StoragePlayback\MessageCountsOperation.cs" Link="EndPoint\StoragePlayback\MessageCountsOperation.cs" />
-    <Compile Include="..\PubnubApi\EndPoint\TelemetryManager.cs" Link="EndPoint\TelemetryManager.cs" />
     <Compile Include="..\PubnubApi\EndPoint\TimeOperation.cs">
       <Link>EndPoint\TimeOperation.cs</Link>
     </Compile>
@@ -349,11 +345,9 @@
     <Compile Include="..\PubnubApi\EventEngine\Core\EventQueue.cs" Link="EventEngine\Core\EventQueue.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Core\Utils.cs" Link="EventEngine\Core\Utils.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\Effects\EmitMessagesHandler.cs" Link="EventEngine\Subscribe\Effects\EmitMessagesHandler.cs" />
-    <Compile Include="..\PubnubApi\EventEngine\Subscribe\Effects\EmitStatusEffectHandler.cs" Link="EventEngine\Subscribe\Effects\EmitStatusEffectHandler.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\Common\CommonSubscribeTypes.cs" Link="EventEngine\Subscribe\Common\CommonSubscribeTypes.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\Effects\HandshakeEffectHandler.cs" Link="EventEngine\Subscribe\Effects\HandshakeEffectHandler.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\Effects\ReceivingEffectHandler.cs" Link="EventEngine\Subscribe\Effects\ReceivingEffectHandler.cs" />
-    <Compile Include="..\PubnubApi\EventEngine\Subscribe\Effects\EmitMessagesHandler.cs" Link="EventEngine\Subscribe\Effects\EmitMessagesHandler.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\Effects\EmitStatusEffectHandler.cs" Link="EventEngine\Subscribe\Effects\EmitStatusEffectHandler.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\Events\SubscriptionEvents.cs" Link="EventEngine\Subscribe\Events\SubscriptionEvents.cs" />    <Compile Include="..\PubnubApi\EventEngine\Subscribe\Invocations\SubscriptionInvocations.cs" Link="EventEngine\Subscribe\Invocations\SubscriptionInvocations.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\States\HandshakeFailedState.cs" Link="EventEngine\Subscribe\States\HandshakeFailedState.cs" />
@@ -409,9 +403,6 @@
     <Compile Include="..\PubnubApi\Interface\IJsonPluggableLibrary.cs">
       <Link>Interface\IJsonPluggableLibrary.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\Interface\IPubnubHttp.cs">
-      <Link>Interface\IPubnubHttp.cs</Link>
-    </Compile>
     <Compile Include="..\PubnubApi\Interface\ISubscribeOperation.cs">
       <Link>Interface\ISubscribeOperation.cs</Link>
     </Compile>
@@ -421,9 +412,6 @@
     </Compile>
     <Compile Include="..\PubnubApi\Interface\IPubnubUnitTest.cs">
       <Link>Interface\IPubnubUnitTest.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\Interface\IUrlRequestBuilder.cs">
-      <Link>Interface\IUrlRequestBuilder.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\JsonDataParse\DeserializeToInternalObjectUtility.cs">
       <Link>JsonDataParse\DeserializeToInternalObjectUtility.cs</Link>
@@ -629,6 +617,13 @@
     <Compile Include="..\PubnubApi\Model\Derived\Objects\PNRemoveUuidMetadataResultExt.cs" Link="Model\Derived\Objects\PNRemoveUuidMetadataResultExt.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\Objects\PNSetChannelMetadataResultExt.cs" Link="Model\Derived\Objects\PNSetChannelMetadataResultExt.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\Objects\PNSetUuidMetadataResultExt.cs" Link="Model\Derived\Objects\PNSetUuidMetadataResultExt.cs" />
+    <Compile Include="..\PubnubApi\Transport\HttpClientService.cs" Link="Transport\HttpClientService.cs" />
+    <Compile Include="..\PubnubApi\Transport\Middleware.cs" Link="Transport\Middleware.cs" />
+    <Compile Include="..\PubnubApi\Transport\RequestParameter.cs" Link="Transport\RequestParameter.cs" />
+    <Compile Include="..\PubnubApi\TransportContract\IHttpClientService.cs" Link="TransportContract\IHttpClientService.cs" />
+    <Compile Include="..\PubnubApi\TransportContract\IMiddleware.cs" Link="TransportContract\IMiddleware.cs" />
+    <Compile Include="..\PubnubApi\TransportContract\TransportRequest.cs" Link="TransportContract\TransportRequest.cs" />
+    <Compile Include="..\PubnubApi\TransportContract\TransportResponse.cs" Link="TransportContract\TransportResponse.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\PNTimeResultExt.cs">
       <Link>Model\Derived\PNTimeResultExt.cs</Link>
     </Compile>
@@ -711,10 +706,6 @@
     <Compile Include="..\PubnubApi\RetryConfiguration.cs">
       <Link>RetryConfiguration.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\PubnubHttp.cs">
-      <Link>PubnubHttp.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\PubnubHttpClientHandler.cs" Link="PubnubHttpClientHandler.cs" />
     <Compile Include="..\PubnubApi\Push\Mpns\MpnsCycleTileNotification.cs">
       <Link>Push\Mpns\MpnsCycleTileNotification.cs</Link>
     </Compile>
@@ -768,9 +759,6 @@
     </Compile>
     <Compile Include="..\PubnubApi\Security\SecureMessage.cs">
       <Link>Security\SecureMessage.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\Timer.cs">
-      <Link>Timer.cs</Link>
     </Compile>
     <None Include="..\PubnubApi\LICENSE.txt" Link="LICENSE.txt" Pack="true" PackagePath="" />
     <EmbeddedResource Include="Properties\PubnubApiUWP.rd.xml" />

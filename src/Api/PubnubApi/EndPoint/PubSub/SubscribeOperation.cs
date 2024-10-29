@@ -1,24 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Net;
 using System.Globalization;
-#if !NET35 && !NET40
 using System.Collections.Concurrent;
-#endif
+using System.Threading.Tasks;
+
 
 namespace PubnubApi.EndPoint
 {
-    public class SubscribeOperation<T> : PubnubCoreBase, ISubscribeOperation<T>
+	public class SubscribeOperation<T> : PubnubCoreBase, ISubscribeOperation<T>
     {
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
         private readonly IPubnubUnitTest unit;
         private readonly IPubnubLog pubnubLog;
-        private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
         private readonly EndPoint.TokenManager pubnubTokenMgr;
 
         private List<string> subscribeChannelNames = new List<string>();
@@ -28,13 +24,12 @@ namespace PubnubApi.EndPoint
         private SubscribeManager manager;
         private Dictionary<string, object> queryParam;
 
-        public SubscribeOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
+        public SubscribeOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
             pubnubLog = log;
-            pubnubTelemetryMgr = telemetryManager;
             pubnubTokenMgr = tokenManager;
 
             PubnubInstance = instance;
@@ -48,7 +43,7 @@ namespace PubnubApi.EndPoint
             }
             if (!ChannelRequest.ContainsKey(instance.InstanceId))
             {
-                ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
+                ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, CancellationTokenSource>());
             }
             if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
             {
@@ -97,6 +92,14 @@ namespace PubnubApi.EndPoint
             if (!SubscribeRequestTracker.ContainsKey(instance.InstanceId))
             {
                 SubscribeRequestTracker.GetOrAdd(instance.InstanceId, DateTime.Now);
+            }
+            if (!SubscriptionChannels.ContainsKey(instance.InstanceId))
+            {
+                SubscriptionChannels.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+            }
+            if (!SubscriptionChannelGroups.ContainsKey(instance.InstanceId))
+            {
+                SubscriptionChannelGroups.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
             }
 
         }
@@ -206,23 +209,10 @@ namespace PubnubApi.EndPoint
             {
                 initialSubscribeUrlParams.Add("filter-expr", UriUtil.EncodeUriComponent(config.FilterExpression, PNOperationType.PNSubscribeOperation, false, false, false));
             }
-
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
-            Task.Factory.StartNew(() =>
-            {
-                manager = new SubscribeManager(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, PubnubInstance);
-                manager.CurrentPubnubInstance(PubnubInstance);
-                manager.MultiChannelSubscribeInit<T>(PNOperationType.PNSubscribeOperation, channels, channelGroups, initialSubscribeUrlParams, externalQueryParam);
-            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
-#else
-            new Thread(() =>
-            {
-                manager = new SubscribeManager(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, pubnubTokenMgr, PubnubInstance);
-                manager.CurrentPubnubInstance(PubnubInstance);
-                manager.MultiChannelSubscribeInit<T>(PNOperationType.PNSubscribeOperation, channels, channelGroups, initialSubscribeUrlParams, externalQueryParam);
-            })
-            { IsBackground = true }.Start();
-#endif
+            
+            manager = new SubscribeManager(config, jsonLibrary, unit, pubnubLog, pubnubTokenMgr, PubnubInstance);
+            manager.CurrentPubnubInstance(PubnubInstance);
+            manager.MultiChannelSubscribeInit<T>(PNOperationType.PNSubscribeOperation, channels??[], channelGroups??[], initialSubscribeUrlParams, externalQueryParam);
         }
 
         internal bool Retry(bool reconnect)

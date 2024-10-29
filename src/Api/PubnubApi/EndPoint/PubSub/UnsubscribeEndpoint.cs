@@ -14,7 +14,6 @@ namespace PubnubApi.EndPoint
 		private readonly IJsonPluggableLibrary jsonLibrary;
 		private readonly IPubnubUnitTest unit;
 		private readonly IPubnubLog pubnubLog;
-		private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 		private readonly EndPoint.TokenManager pubnubTokenMgr;
 
 		private string[] subscribeChannelNames;
@@ -26,14 +25,13 @@ namespace PubnubApi.EndPoint
 		private PresenceEventEngineFactory presenceEventEngineFactory;
 		private string instanceId { get; set; }
 
-		public UnsubscribeEndpoint(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, SubscribeEventEngineFactory subscribeEventEngineFactory, PresenceEventEngineFactory presenceEventEngineFactory, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
+		public UnsubscribeEndpoint(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, SubscribeEventEngineFactory subscribeEventEngineFactory, PresenceEventEngineFactory presenceEventEngineFactory, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
 		{
 			pubnubInstance = instance;
 			config = pubnubConfig;
 			jsonLibrary = jsonPluggableLibrary;
 			unit = pubnubUnit;
 			pubnubLog = log;
-			pubnubTelemetryMgr = telemetryManager;
 			pubnubTokenMgr = tokenManager;
 			this.subscribeEventEngineFactory = subscribeEventEngineFactory;
 			this.presenceEventEngineFactory = presenceEventEngineFactory;
@@ -94,11 +92,25 @@ namespace PubnubApi.EndPoint
 					var channelsToRemove = FindUniqueCommonElements(subscribeEventEngine.Channels, channels.ToList());
 					var channelGroupsToRemove = FindUniqueCommonElements(subscribeEventEngine.ChannelGroups, channelGroups.ToList());
 
-					subscribeEventEngine.Unsubscribe(channelsToRemove.ToArray(), channelGroupsToRemove.ToArray());
+					var toRemove = channelsToRemove as string[] ?? channelsToRemove.ToArray();
+					var channelNames = toRemove.ToList();
+					foreach (var c in channelNames.ToList())
+					{
+						if(!c.EndsWith(Constants.Pnpres)) channelNames.Add($"{c}{Constants.Pnpres}");
+					}
+
+					string[] groupsToRemove = channelGroupsToRemove as string[] ?? channelGroupsToRemove.ToArray();
+					var channelGroupNames = groupsToRemove.ToList();
+					foreach (var cg in channelGroupNames.ToList())
+					{
+						if(!cg.EndsWith(Constants.Pnpres)) channelGroupNames.Add($"{cg}{Constants.Pnpres}");
+					}
+					
+					subscribeEventEngine.Unsubscribe(channelNames.ToArray(), channelGroupNames.ToArray());
 
 					if (config.PresenceInterval > 0 && presenceEventEngineFactory.HasEventEngine(instanceId)) {
 						PresenceEventEngine presenceEventEngine = presenceEventEngineFactory.GetEventEngine(instanceId);
-						presenceEventEngine.EventQueue.Enqueue(new EventEngine.Presence.Events.LeftEvent() { Input = new EventEngine.Presence.Common.PresenceInput() { Channels = channelsToRemove.ToArray(), ChannelGroups = channelGroupsToRemove.ToArray() } });
+						presenceEventEngine.EventQueue.Enqueue(new EventEngine.Presence.Events.LeftEvent() { Input = new EventEngine.Presence.Common.PresenceInput() { Channels = toRemove.ToArray(), ChannelGroups = groupsToRemove.ToArray() } });
 					}
 					if (config.MaintainPresenceState) {
 						if (ChannelLocalUserState.TryGetValue(PubnubInstance.InstanceId, out

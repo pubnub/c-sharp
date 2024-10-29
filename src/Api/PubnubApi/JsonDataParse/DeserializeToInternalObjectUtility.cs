@@ -994,12 +994,11 @@ namespace PubnubApi
                 {
                     ret = (T)(object)listObject;
                 }
-                catch
+                catch(Exception e)
                 {
-                    /* ignore */
+                    System.Diagnostics.Debug.WriteLine($"DeserializeToObject<T>(list) exception {e.Message}");
                 }
             }
-
             return ret;
         }
     }

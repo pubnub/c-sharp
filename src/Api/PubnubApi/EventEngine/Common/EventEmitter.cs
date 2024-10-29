@@ -252,10 +252,8 @@ namespace PubnubApi.EventEngine.Common
 							Dictionary<string, object> fileObjDic = jsonLibrary.ConvertToDictionaryObject(pnMsgObjDic["file"]);
 							if (fileObjDic != null && fileObjDic.ContainsKey("id") && fileObjDic.ContainsKey("name")) {
 								fileMessage.File = new PNFile { Id = fileObjDic["id"].ToString(), Name = fileObjDic["name"].ToString() };
-
-								IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(configuration, jsonLibrary, null, log, null, tokenManager, (instance != null) ? instance.InstanceId : "");
-								Uri fileUrlRequest = urlBuilder.BuildGetFileUrlOrDeleteReqest("GET", "", fileMessage.Channel, fileMessage.File.Id, fileMessage.File.Name, null, PNOperationType.PNGenerateFileUploadUrlOperation);
-								fileMessage.File.Url = fileUrlRequest.ToString();
+								fileMessage.File.Url = UriUtil.GetFileUrl(fileName: fileMessage.File.Name, fileId: fileMessage.File.Id, channel:fileMessage.Channel,
+									pnConfiguration:configuration, pubnub:instance, tokenmanager:tokenManager);
 							}
 						}
 					} else {

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.0;netstandard1.3;netstandard1.4;netstandard1.1;netstandard2.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>netstandard1.3;netstandard1.4;netstandard2.0;net6.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
     <SignAssembly>True</SignAssembly>
@@ -29,9 +29,6 @@
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
     <Copyright>PubNub 2012-2021</Copyright>
 
-    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.0' ">$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
-    <!--<NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.0' ">1.6.1</NetStandardImplicitPackageVersion>-->
-
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.1' ">$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
     <!--<NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.1' ">1.6.1</NetStandardImplicitPackageVersion>-->
 
@@ -56,8 +53,8 @@
     <Compile Include="..\PubnubApi\Builder\UriUtil.cs">
       <Link>Builder\UriUtil.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\Builder\UrlRequestBuilder.cs">
-      <Link>Builder\UrlRequestBuilder.cs</Link>
+    <Compile Include="..\PubnubApi\Builder\UrlParameterConverter.cs">
+      <Link>Builder\UrlParameterConverter.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\Callbacks\PNCallback.cs">
       <Link>Callbacks\PNCallback.cs</Link>
@@ -187,7 +184,6 @@
     <Compile Include="..\PubnubApi\EndPoint\StoragePlayback\FetchHistoryOperation.cs" Link="EndPoint\StoragePlayback\FetchHistoryOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\StoragePlayback\HistoryOperation.cs" Link="EndPoint\StoragePlayback\HistoryOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\StoragePlayback\MessageCountsOperation.cs" Link="EndPoint\StoragePlayback\MessageCountsOperation.cs" />
-    <Compile Include="..\PubnubApi\EndPoint\TelemetryManager.cs" Link="EndPoint\TelemetryManager.cs" />
     <Compile Include="..\PubnubApi\EndPoint\TimeOperation.cs">
       <Link>EndPoint\TimeOperation.cs</Link>
     </Compile>
@@ -293,9 +289,6 @@
     <Compile Include="..\PubnubApi\Interface\IJsonPluggableLibrary.cs">
       <Link>Interface\IJsonPluggableLibrary.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\Interface\IPubnubHttp.cs">
-      <Link>Interface\IPubnubHttp.cs</Link>
-    </Compile>
     <Compile Include="..\PubnubApi\Interface\IPubnubLog.cs">
       <Link>Interface\IPubnubLog.cs</Link>
     </Compile>
@@ -304,9 +297,6 @@
     </Compile>
     <Compile Include="..\PubnubApi\Interface\ISubscribeOperation.cs" Link="Interface\ISubscribeOperation.cs" />
     <Compile Include="..\PubnubApi\Interface\IUnsubscribeOperation.cs" Link="Interface\IUnsubscribeOperation.cs" />
-    <Compile Include="..\PubnubApi\Interface\IUrlRequestBuilder.cs">
-      <Link>Interface\IUrlRequestBuilder.cs</Link>
-    </Compile>
     <Compile Include="..\PubnubApi\JsonDataParse\DeserializeToInternalObjectUtility.cs">
       <Link>JsonDataParse\DeserializeToInternalObjectUtility.cs</Link>
     </Compile>
@@ -592,10 +582,6 @@
     <Compile Include="..\PubnubApi\RetryConfiguration.cs">
       <Link>RetryConfiguration.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\PubnubHttp.cs">
-      <Link>PubnubHttp.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\PubnubHttpClientHandler.cs" Link="PubnubHttpClientHandler.cs" />
     <Compile Include="..\PubnubApi\Push\Mpns\MpnsCycleTileNotification.cs">
       <Link>Push\Mpns\MpnsCycleTileNotification.cs</Link>
     </Compile>
@@ -619,6 +605,13 @@
     <Compile Include="..\PubnubApi\Security\Crypto\Cryptors\CryptorHeader.cs" Link="Security\Crypto\Cryptors\CryptorHeader.cs" />
     <Compile Include="..\PubnubApi\Security\Crypto\Cryptors\LegacyCryptor.cs" Link="Security\Crypto\Cryptors\LegacyCryptor.cs" />
     <Compile Include="..\PubnubApi\Security\Crypto\ICryptor.cs" Link="Security\Crypto\ICryptor.cs" />
+    <Compile Include="..\PubnubApi\Transport\HttpClientService.cs" Link="Transport\HttpClientService.cs" />
+    <Compile Include="..\PubnubApi\Transport\Middleware.cs" Link="Transport\Middleware.cs" />
+    <Compile Include="..\PubnubApi\Transport\RequestParameter.cs" Link="Transport\RequestParameter.cs" />
+    <Compile Include="..\PubnubApi\TransportContract\IHttpClientService.cs" Link="TransportContract\IHttpClientService.cs" />
+    <Compile Include="..\PubnubApi\TransportContract\IMiddleware.cs" Link="TransportContract\IMiddleware.cs" />
+    <Compile Include="..\PubnubApi\TransportContract\TransportRequest.cs" Link="TransportContract\TransportRequest.cs" />
+    <Compile Include="..\PubnubApi\TransportContract\TransportResponse.cs" Link="TransportContract\TransportResponse.cs" />
     <Compile Include="..\PubnubApi\Security\MD5.cs">
       <Link>Security\MD5.cs</Link>
     </Compile>
@@ -633,9 +626,6 @@
     </Compile>
     <Compile Include="..\PubnubApi\Security\SecureMessage.cs">
       <Link>Security\SecureMessage.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\Timer.cs">
-      <Link>Timer.cs</Link>
     </Compile>
   </ItemGroup>
 

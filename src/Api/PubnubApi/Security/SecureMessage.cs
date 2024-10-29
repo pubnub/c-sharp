@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Collections;
+using System.Diagnostics;
 using System.Net;
 using PubnubApi.Security.Crypto;
 using PubnubApi.Security.Crypto.Cryptors;
@@ -59,19 +60,24 @@ namespace PubnubApi
                             decryptMessage = "**DECRYPT ERROR**";
 
                             PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(ex);
-                            PNStatus status = new StatusBuilder(config, jsonLib).CreateStatusResponse<T>(type, category, null, (int)HttpStatusCode.NotFound, new PNException(ex));
+                            PNStatus status = new StatusBuilder(config, jsonLib).CreateStatusResponse<T>(type, category,
+                                null, (int)HttpStatusCode.NotFound, new PNException(ex));
                             if (channels != null && channels.Length > 0)
                             {
                                 status.AffectedChannels.AddRange(channels);
                             }
+
                             if (channelGroups != null && channelGroups.Length > 0)
                             {
                                 status.AffectedChannelGroups.AddRange(channelGroups);
                             }
-                            pubnubLog.WriteToLog("Failed to decrypt message!\nMessage might be not encrypted, returning as is...");
+                            
+                            LoggingMethod.WriteToLog(pubnubLog, "Failed to decrypt message!\nMessage might be not encrypted, returning as is...", config.LogVerbosity);
                         }
+                        
                         object decodedMessage = jsonLib.DeserializeToObject((decryptMessage == "**DECRYPT ERROR**") ? jsonLib.SerializeToJsonString(element) : decryptMessage);
                         receivedMsg.Add(decodedMessage);
+                        
                     }
                     returnMessage.Add(receivedMsg);
                 }
@@ -149,7 +155,7 @@ namespace PubnubApi
                                             {
                                                 status.AffectedChannelGroups.AddRange(channelGroups);
                                             }
-                                            pubnubLog.WriteToLog("Failed to decrypt message!\nMessage might be not encrypted, returning as is...");
+                                            LoggingMethod.WriteToLog(pubnubLog, "Failed to decrypt message!\nMessage might be not encrypted, returning as is...",config.LogVerbosity);
                                             #endregion
                                         }
                                         object decodedMessage = jsonLib.DeserializeToObject((decryptMessage == "**DECRYPT ERROR**") ? jsonLib.SerializeToJsonString(kvpValue.Value) : decryptMessage);

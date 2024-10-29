@@ -1,75 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
-using System.Net;
-#if !NET35 && !NET40
 using System.Collections.Concurrent;
-#endif
 
 namespace PubnubApi.EndPoint
 {
-    internal class OtherOperation : PubnubCoreBase
+	internal class OtherOperation : PubnubCoreBase
     {
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
         private readonly IPubnubUnitTest unit;
         private readonly IPubnubLog pubnubLog;
-        private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 
-        public OtherOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
+        public OtherOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
             pubnubLog = log;
-            pubnubTelemetryMgr = telemetryManager;
-        }
-
-        public void ChangeUserId(UserId newUserId)
-        {
-            if (newUserId == null || string.IsNullOrEmpty(newUserId.ToString().Trim()) || config.UserId.ToString() == newUserId.ToString())
-            {
-                return;
-            }
-
-            Task.Factory.StartNew(() =>
-            {
-                try
-                {
-                    config.UserId = newUserId;
-                    CurrentUserId.AddOrUpdate(PubnubInstance.InstanceId, newUserId, (k, o) => newUserId);
-                    UserIdChanged.AddOrUpdate(PubnubInstance.InstanceId, true, (k, o) => true);
-
-
-                    string[] channels = GetCurrentSubscriberChannels();
-                    string[] channelGroups = GetCurrentSubscriberChannelGroups();
-
-                    channels = (channels != null) ? channels : new string[] { };
-                    channelGroups = (channelGroups != null) ? channelGroups : new string[] { };
-
-                    if (channels.Length > 0 || channelGroups.Length > 0)
-                    {
-                        string channelsJsonState = BuildJsonUserState(channels.ToArray(), channelGroups.ToArray(), false);
-                        IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
-
-                        Uri request = urlBuilder.BuildMultiChannelLeaveRequest("GET", "", channels, channelGroups, channelsJsonState, null);
-
-                        RequestState<string> requestState = new RequestState<string>();
-                        requestState.Channels = channels;
-                        requestState.ChannelGroups = channelGroups;
-                        requestState.ResponseType = PNOperationType.Leave;
-                        requestState.Reconnect = false;
-
-                        UrlProcessRequest(request, requestState, false).ContinueWith(r => { }, TaskContinuationOptions.ExecuteSynchronously).Wait(); // connectCallback = null
-                    }
-
-                    TerminateCurrentSubscriberRequest();
-                }
-                catch {  /* ignore */ }
-            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
         }
 
         public UserId GetCurrentUserId()
@@ -177,7 +127,7 @@ namespace PubnubApi.EndPoint
 
             if (!ChannelRequest.ContainsKey(instance.InstanceId))
             {
-                ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
+                ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, CancellationTokenSource>());
             }
             if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
             {
