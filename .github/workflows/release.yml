@@ -31,7 +31,7 @@ jobs:
     needs: check-release
     if: needs.check-release.outputs.release == 'true'
     runs-on:
-      group: windows-gh
+      group: organization/windows-gh
     defaults:
       run:
         shell: powershell
