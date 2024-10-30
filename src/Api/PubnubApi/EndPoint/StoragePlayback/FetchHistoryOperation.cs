@@ -142,7 +142,7 @@ namespace PubnubApi.EndPoint
 				throw new NotSupportedException("Only one channel can be used along with MessageActions");
 			}
 
-			return await History();
+			return await History().ConfigureAwait(false);
 		}
 
 		internal void Retry()
