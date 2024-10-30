@@ -12,12 +12,12 @@ namespace PubnubApi.EventEngine.Subscribe
 	public class SubscribeEventEngine : Engine
 	{
 		private SubscribeManager2 subscribeManager;
-		private readonly Dictionary<string, Type> channelTypeMap = new Dictionary<string, Type>();
+		private readonly Dictionary<string, Type> channelTypeMap = new();
 		private readonly Dictionary<string, Type> channelGroupTypeMap = new Dictionary<string, Type>();
 		private readonly IJsonPluggableLibrary jsonPluggableLibrary;
 
-		public List<string> Channels { get; set; } = new List<string>();
-		public List<string> ChannelGroups { get; set; } = new List<string>();
+		public List<string> Channels { get; } = [];
+		public List<string> ChannelGroups { get; } = [];
 
 		internal SubscribeEventEngine(Pubnub pubnubInstance,
 			PNConfiguration pubnubConfiguration,
@@ -65,14 +65,14 @@ namespace PubnubApi.EventEngine.Subscribe
 			}
 			if (cursor != null) {
 				EventQueue.Enqueue(new SubscriptionRestoredEvent() {
-					Channels = Channels.Concat(channels ?? new string[] { }).Distinct(),
-					ChannelGroups = ChannelGroups.Concat(channelGroups ?? new string[] { }).Distinct(),
+					Channels = Channels.Distinct(),
+					ChannelGroups = ChannelGroups.Distinct(),
 					Cursor = cursor
 				});
 			} else {
 				EventQueue.Enqueue(new SubscriptionChangedEvent() {
-					Channels = Channels.Concat(channels ?? new string[] { }).Distinct(),
-					ChannelGroups = ChannelGroups.Concat(channelGroups ?? new string[] { }).Distinct()
+					Channels = Channels.Distinct(),
+					ChannelGroups = ChannelGroups.Distinct()
 				});
 			}
 		}
@@ -90,9 +90,9 @@ namespace PubnubApi.EventEngine.Subscribe
 		public void Unsubscribe(string[] channels, string[] channelGroups)
 		{
 			if(channels.Length>0 || channelGroups.Length>0)
-				this.EventQueue.Enqueue(new SubscriptionChangedEvent() {
-					Channels = this.Channels?.Except(channels ?? Enumerable.Empty<string>()),
-					ChannelGroups = this.ChannelGroups?.Except(channelGroups ?? Enumerable.Empty<string>())
+				EventQueue.Enqueue(new SubscriptionChangedEvent() {
+					Channels = Channels.Distinct(),
+					ChannelGroups = ChannelGroups.Distinct()
 				});
 		}
 	}

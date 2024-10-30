@@ -9,7 +9,6 @@ namespace PubnubApi.EndPoint
         private readonly IJsonPluggableLibrary jsonLibrary;
         private readonly IPubnubUnitTest unit;
         private readonly IPubnubLog pubnubLog;
-        private readonly EndPoint.TokenManager pubnubTokenManager;
         private readonly SubscribeEventEngineFactory subscribeEventEngineFactory;
         private readonly PresenceEventEngineFactory presenceEventEngineFactory;
         private readonly string instanceId;
@@ -20,7 +19,6 @@ namespace PubnubApi.EndPoint
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
             pubnubLog = log;
-            pubnubTokenManager = tokenManager;
             this.subscribeEventEngineFactory = subscribeEventEngineFactory;
             this.presenceEventEngineFactory = presenceEventEngineFactory;
             instanceId = PubnubInstance.InstanceId;

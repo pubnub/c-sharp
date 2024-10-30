@@ -34,13 +34,15 @@ namespace PubnubApi.EndPoint
 			var requestParameter = CreateSubscribeRequestParameter(channels: channels, channelGroups: channelGroups, timetoken: timetoken.GetValueOrDefault(), region: region.GetValueOrDefault(), stateJsonValue: presenceState, initialSubscribeUrlParams: initialSubscribeUrlParams, externalQueryParam: externalQueryParam);
 			var transportRequest = pubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNSubscribeOperation);
 			cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(transportRequest.CancellationToken);
-			RequestState<HandshakeResponse> pubnubRequestState = new RequestState<HandshakeResponse>();
-			pubnubRequestState.Channels = channels;
-			pubnubRequestState.ChannelGroups = channelGroups;
-			pubnubRequestState.ResponseType = responseType;
-			pubnubRequestState.Timetoken = timetoken.GetValueOrDefault();
-			pubnubRequestState.Region = region.GetValueOrDefault();
-			pubnubRequestState.TimeQueued = DateTime.Now;
+			RequestState<HandshakeResponse> pubnubRequestState = new RequestState<HandshakeResponse>
+			{
+				Channels = channels,
+				ChannelGroups = channelGroups,
+				ResponseType = responseType,
+				Timetoken = timetoken.GetValueOrDefault(),
+				Region = region.GetValueOrDefault(),
+				TimeQueued = DateTime.Now
+			};
 			var transportResponse = await pubnubInstance.transportMiddleware.Send(transportRequest: transportRequest);
 
 			if (transportResponse.StatusCode == Constants.HttpRequestSuccessStatusCode && transportResponse.Error == null && transportResponse.Content != null) {
@@ -48,18 +50,18 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new PNStatus(null, PNOperationType.PNSubscribeOperation, PNStatusCategory.PNConnectedCategory, channels, channelGroups);
 				HandshakeResponse handshakeResponse = jsonLibrary.DeserializeToObject<HandshakeResponse>(responseJson);
 				return new Tuple<HandshakeResponse, PNStatus>(handshakeResponse, status);
-			} else {
-				PNStatus errStatus;
-				if (transportResponse.Error != null) {
-					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(transportResponse.Error);
-					errStatus = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(pubnubRequestState.ResponseType, category, pubnubRequestState, Constants.ResourceNotFoundStatusCode, new PNException(transportResponse.Error));
-				} else {
-					string responseString = string.Empty;
-					if (transportResponse.Content != null) responseString = Encoding.UTF8.GetString(transportResponse.Content);
-					errStatus = GetStatusIfError(pubnubRequestState, responseString);
-				}
-				return new Tuple<HandshakeResponse, PNStatus>(null, errStatus);
 			}
+
+			PNStatus errStatus;
+			if (transportResponse.Error != null) {
+				PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(transportResponse.Error);
+				errStatus = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(pubnubRequestState.ResponseType, category, pubnubRequestState, Constants.ResourceNotFoundStatusCode, new PNException(transportResponse.Error));
+			} else {
+				string responseString = string.Empty;
+				if (transportResponse.Content != null) responseString = Encoding.UTF8.GetString(transportResponse.Content);
+				errStatus = GetStatusIfError(pubnubRequestState, responseString);
+			}
+			return new Tuple<HandshakeResponse, PNStatus>(null, errStatus);
 		}
 
 		internal void HandshakeRequestCancellation()
@@ -84,13 +86,15 @@ namespace PubnubApi.EndPoint
 				var requestParameter = CreateSubscribeRequestParameter(channels: channels, channelGroups: channelGroups, timetoken: timetoken.GetValueOrDefault(), region: region.GetValueOrDefault(), stateJsonValue: channelsJsonState, initialSubscribeUrlParams: initialSubscribeUrlParams, externalQueryParam: externalQueryParam);
 				var transportRequest = pubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNSubscribeOperation);
 				cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(transportRequest.CancellationToken);
-				RequestState<ReceivingResponse<object>> pubnubRequestState = new RequestState<ReceivingResponse<object>>();
-				pubnubRequestState.Channels = channels;
-				pubnubRequestState.ChannelGroups = channelGroups;
-				pubnubRequestState.ResponseType = responseType;
-				pubnubRequestState.Timetoken = timetoken.GetValueOrDefault();
-				pubnubRequestState.Region = region.GetValueOrDefault();
-				pubnubRequestState.TimeQueued = DateTime.Now;
+				RequestState<ReceivingResponse<object>> pubnubRequestState = new RequestState<ReceivingResponse<object>>
+					{
+						Channels = channels,
+						ChannelGroups = channelGroups,
+						ResponseType = responseType,
+						Timetoken = timetoken.GetValueOrDefault(),
+						Region = region.GetValueOrDefault(),
+						TimeQueued = DateTime.Now
+					};
 
 				var transportResponse = await pubnubInstance.transportMiddleware.Send(transportRequest: transportRequest);
 				if (transportResponse.Content != null && transportResponse.Error == null && transportResponse.StatusCode == Constants.HttpRequestSuccessStatusCode) {
@@ -314,7 +318,6 @@ namespace PubnubApi.EndPoint
 				if (SubscribeHeartbeatCheckTimer != null) {
 					SubscribeHeartbeatCheckTimer.Dispose();
 				}
-
 				disposedValue = true;
 			}
 		}

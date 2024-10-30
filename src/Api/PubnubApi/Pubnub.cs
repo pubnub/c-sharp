@@ -527,6 +527,10 @@ namespace PubnubApi
         }
         public List<string> GetSubscribedChannels()
         {
+            if (pubnubConfig[InstanceId].EnableEventEngine)
+            {
+                return this.subscribeEventEngineFactory.GetEventEngine(InstanceId).Channels;
+            }
             OtherOperation endpoint = new OtherOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, tokenManager, this);
             endpoint.CurrentPubnubInstance(this);
             return endpoint.GetSubscribedChannels();
@@ -534,6 +538,10 @@ namespace PubnubApi
 
         public List<string> GetSubscribedChannelGroups()
         {
+            if (pubnubConfig[InstanceId].EnableEventEngine)
+            {
+                return this.subscribeEventEngineFactory.GetEventEngine(InstanceId).ChannelGroups;
+            }
             OtherOperation endpoint = new OtherOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, pubnubLog, tokenManager, this);
             endpoint.CurrentPubnubInstance(this);
             return endpoint.GetSubscribedChannelGroups();
