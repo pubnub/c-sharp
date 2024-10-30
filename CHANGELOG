@@ -1,3 +1,12 @@
+v7.0.0 - October 30 2024
+-----------------------------
+- Added: added support for `Channel`, `ChannelGroup`, `Subscription` and `SubscriptionSet`, `ChannelMetadata`, `UserMetadata`  entities for Subscribe related operation.
+- BREAKING CHANGES: Added new event listeners support.
+- BREAKING CHANGES: All apis calls will be made through `HttpClient` by default.
+- Added: default value for `EnableEventEngine` is set to `true`, Subscribe operation will be executed by event engine by default.
+
+- Modified: removed telemetry manager.
+
 v6.20.2 - October 03 2024
 -----------------------------
 - Fixed: fixes issue of listener not being removed on RemoveListener call.
