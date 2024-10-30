@@ -958,7 +958,7 @@ namespace PubnubApi
         #endregion
 
         #region "Constructors"
-        public Pubnub(PNConfiguration config)
+        public Pubnub(PNConfiguration config, IHttpClientService httpTransportService = default, ITransportMiddleware middleware = default)
         {
             if (config == null)
             {
@@ -995,8 +995,8 @@ namespace PubnubApi
             CheckRequiredUserId(config);
             eventEmitter = new EventEmitter(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, subscribeCallbackListenerList, JsonPluggableLibrary, tokenManager, pubnubLog, this);
             CheckCryptoModuleUsageForLogging(config);
-            IHttpClientService httpClientService = new HttpClientService(config.Proxy);
-            transportMiddleware = new Middleware(httpClientService,config, this, tokenManager);
+            IHttpClientService httpClientService = httpTransportService ?? new HttpClientService(proxy:config.Proxy, pubnubLog: config.PubnubLog, verbosity: config.LogVerbosity);
+            transportMiddleware = middleware ?? new Middleware(httpClientService,config, this, tokenManager);
         }
         
         #if UNITY

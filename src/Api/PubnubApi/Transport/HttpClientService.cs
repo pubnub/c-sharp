@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Linq;
@@ -11,7 +12,9 @@ namespace PubnubApi
 	public class HttpClientService : IHttpClientService
 	{
 		private readonly HttpClient httpClient;
-		public HttpClientService(IWebProxy proxy = default)
+		private IPubnubLog Log { get; set; }
+		private PNLogVerbosity LogVerbosity { get; set; }
+		public HttpClientService(IWebProxy proxy = default, IPubnubLog pubnubLog = default, PNLogVerbosity verbosity = default)
 		{
 			httpClient = new HttpClient()
 			{
@@ -24,6 +27,8 @@ namespace PubnubApi
 				UseProxy = true
 			});
 			httpClient.Timeout = Timeout.InfiniteTimeSpan;
+			Log = pubnubLog;
+			LogVerbosity = verbosity;
 		}
 
 		public async Task<TransportResponse> GetRequest(TransportRequest transportRequest)
@@ -44,10 +49,11 @@ namespace PubnubApi
 					Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
 					RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath
 				};
-			} catch (Exception ex) {
+			} catch (Exception e) {
+				LoggingMethod.WriteToLog(Log, $"{DateTime.Now.ToString(CultureInfo.InvariantCulture)}: Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}", LogVerbosity);
 				response = new TransportResponse() {
 					RequestUrl = transportRequest.RequestUrl,
-					Error = ex
+					Error = e
 				};
 			}
 			return response;
@@ -80,6 +86,7 @@ namespace PubnubApi
 					RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath
 				};
 			} catch (Exception e) {
+				LoggingMethod.WriteToLog(Log, $"{DateTime.Now.ToString(CultureInfo.InvariantCulture)}: Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}", LogVerbosity);
 				transportResponse = new TransportResponse() {
 					RequestUrl = transportRequest.RequestUrl,
 					Error = e
@@ -132,6 +139,7 @@ namespace PubnubApi
 			}
 			catch (Exception e)
 			{
+				LoggingMethod.WriteToLog(Log, $"{DateTime.Now.ToString(CultureInfo.InvariantCulture)}: Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}", LogVerbosity);
 				transportResponse = new TransportResponse() {
 					RequestUrl = transportRequest.RequestUrl,
 					Error = e
@@ -159,10 +167,11 @@ namespace PubnubApi
 					Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
 					RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath
 				};
-			} catch (Exception ex) {
+			} catch (Exception e) {
+				LoggingMethod.WriteToLog(Log, $"{DateTime.Now.ToString(CultureInfo.InvariantCulture)}: Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}", LogVerbosity);
 				response = new TransportResponse() {
 					RequestUrl = transportRequest.RequestUrl,
-					Error = ex
+					Error = e
 				};
 			}
 			return response;
@@ -213,6 +222,7 @@ namespace PubnubApi
 			}
 			catch (Exception e)
 			{
+				LoggingMethod.WriteToLog(Log, $"{DateTime.Now.ToString(CultureInfo.InvariantCulture)}: Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}", LogVerbosity);
 				transportResponse = new TransportResponse() {
 					RequestUrl = transportRequest.RequestUrl,
 					Error = e
