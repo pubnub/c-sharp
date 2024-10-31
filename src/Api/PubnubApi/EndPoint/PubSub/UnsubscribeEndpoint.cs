@@ -5,8 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading;
 
 namespace PubnubApi.EndPoint
 {
@@ -16,7 +14,6 @@ namespace PubnubApi.EndPoint
 		private readonly IJsonPluggableLibrary jsonLibrary;
 		private readonly IPubnubUnitTest unit;
 		private readonly IPubnubLog pubnubLog;
-		private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 		private readonly EndPoint.TokenManager pubnubTokenMgr;
 
 		private string[] subscribeChannelNames;
@@ -28,14 +25,13 @@ namespace PubnubApi.EndPoint
 		private PresenceEventEngineFactory presenceEventEngineFactory;
 		private string instanceId { get; set; }
 
-		public UnsubscribeEndpoint(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, SubscribeEventEngineFactory subscribeEventEngineFactory, PresenceEventEngineFactory presenceEventEngineFactory, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
+		public UnsubscribeEndpoint(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, SubscribeEventEngineFactory subscribeEventEngineFactory, PresenceEventEngineFactory presenceEventEngineFactory, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
 		{
 			pubnubInstance = instance;
 			config = pubnubConfig;
 			jsonLibrary = jsonPluggableLibrary;
 			unit = pubnubUnit;
 			pubnubLog = log;
-			pubnubTelemetryMgr = telemetryManager;
 			pubnubTokenMgr = tokenManager;
 			this.subscribeEventEngineFactory = subscribeEventEngineFactory;
 			this.presenceEventEngineFactory = presenceEventEngineFactory;
@@ -71,35 +67,77 @@ namespace PubnubApi.EndPoint
 				throw new ArgumentException("Either Channel Or Channel Group or Both should be provided.");
 			}
 
-			string channel = (channels != null) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : "";
-			string channelGroup = (channelGroups != null) ? string.Join(",", channelGroups.OrderBy(x => x).ToArray()) : "";
+			LoggingMethod.WriteToLog(pubnubLog,$"Unsubscription request for channels: {string.Join(",", channels ?? [])}, channelGroups: {string.Join(",", channelGroups ?? [])} ", config.LogVerbosity);
 
-			LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, requested unsubscribe for channel(s)={1}, cg(s)={2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), channel, channelGroup), config.LogVerbosity);
-
-			if (this.subscribeEventEngineFactory.HasEventEngine(instanceId)) {
+			if (subscribeEventEngineFactory.HasEventEngine(instanceId)) {
 				subscribeEventEngine = subscribeEventEngineFactory.GetEventEngine(instanceId);
-				subscribeEventEngine.Unsubscribe(channels, channelGroups);
+				channels ??= [];
+				channelGroups ??= [];
+				var uniqueChannelsToRemove = new List<string>();
+				var uniqueChannelGroupsToRemove = new List<string>();
+				var channelNamesToRemove = new List<string>(channels);
+				channelNamesToRemove =
+					channelNamesToRemove.Concat(channelNamesToRemove.Where(c=>!c.EndsWith(Constants.Pnpres)).Select(c => $"{c}{Constants.Pnpres}")).ToList();
+				var uniqueChannelNamesCount  = subscribeEventEngine.Channels.Distinct().Count();
+				foreach (var c in channelNamesToRemove)
+				{
+					if (subscribeEventEngine.Channels.Contains(c))
+					{
+						subscribeEventEngine.Channels.Remove(c);
+						if (!subscribeEventEngine.Channels.Contains(c) && !c.EndsWith(Constants.Pnpres))
+							uniqueChannelsToRemove.Add(c);
+					}
+				}
+				var uniqueChannelNamesCountAfterRemoval = subscribeEventEngine.Channels.Distinct().Count();
+				bool isUniqueChannelCountChanged = uniqueChannelNamesCount != uniqueChannelNamesCountAfterRemoval;
+				
+				var channelGroupNamesToRemove = new List<string>(channelGroups);
+				channelGroupNamesToRemove =
+					channelGroupNamesToRemove.Concat(channelGroupNamesToRemove.Where(cg=>!cg.EndsWith(Constants.Pnpres)).Select(c => $"{c}{Constants.Pnpres}")).ToList();
+				var uniqueChannelGroupNamesCount  = subscribeEventEngine.ChannelGroups.Distinct().Count();
+				foreach (var cg in channelGroupNamesToRemove)
+				{
+					if (subscribeEventEngine.ChannelGroups.Contains(cg))
+					{
+						subscribeEventEngine.ChannelGroups.Remove(cg);
+						if (!subscribeEventEngine.ChannelGroups.Contains(cg) && !cg.EndsWith(Constants.Pnpres))
+							uniqueChannelGroupsToRemove.Add(cg);
+					}
+				}
+				var uniqueChannelGroupNamesCountAfterRemoval = subscribeEventEngine.ChannelGroups.Distinct().Count();
+				bool isUniqueChannelGroupCountChanged = uniqueChannelGroupNamesCount != uniqueChannelGroupNamesCountAfterRemoval;
+				
+				var isSubscriptionChanged = isUniqueChannelCountChanged || isUniqueChannelGroupCountChanged;
+				if (isSubscriptionChanged)
+				{
+					subscribeEventEngine.Unsubscribe(subscribeEventEngine.Channels.ToArray(), subscribeEventEngine.Channels.ToArray());
+					if (config.PresenceInterval > 0 && presenceEventEngineFactory.HasEventEngine(instanceId) && (uniqueChannelsToRemove.Count > 0 || uniqueChannelGroupsToRemove.Count > 0)) {
+						PresenceEventEngine presenceEventEngine = presenceEventEngineFactory.GetEventEngine(instanceId);
+						presenceEventEngine.EventQueue.Enqueue(new EventEngine.Presence.Events.LeftEvent()
+						{
+							Input = new EventEngine.Presence.Common.PresenceInput() 
+								{ Channels = uniqueChannelsToRemove.ToArray(), ChannelGroups = uniqueChannelGroupsToRemove.ToArray() }
+						});
+					}
+					if (config.MaintainPresenceState) {
+						if (ChannelLocalUserState.TryGetValue(PubnubInstance.InstanceId, out
+							    var userState)) {
+							foreach (var channelName in uniqueChannelsToRemove ) {
+								userState.TryRemove(channelName, out _);
+							}
+						}
+						if (ChannelGroupLocalUserState.TryGetValue(PubnubInstance.InstanceId, out
+							    var channelGroupUserState)) {
+							foreach (var channelGroupName in uniqueChannelGroupsToRemove) {
+								channelGroupUserState.TryRemove(channelGroupName, out _);
+							}
+						}
+					}	
+				}
 			} else {
-				LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, $"DateTime {DateTime.Now.ToString(CultureInfo.InvariantCulture)}, Attempted Unsubscribe without EventEngine subscribe."), config.LogVerbosity);
+				LoggingMethod.WriteToLog(pubnubLog,$"{DateTime.Now.ToString(CultureInfo.InvariantCulture)}: Attempted unsubscribe without event engine" , config.LogVerbosity);
 			}
-			if (config.PresenceInterval > 0 && presenceEventEngineFactory.HasEventEngine(instanceId)) {
-				PresenceEventEngine presenceEventEngine = presenceEventEngineFactory.GetEventEngine(instanceId);
-				presenceEventEngine.EventQueue.Enqueue(new EventEngine.Presence.Events.LeftEvent() { Input = new EventEngine.Presence.Common.PresenceInput() { Channels = channels, ChannelGroups = channelGroups } });
-			}
-			if (config.MaintainPresenceState) {
-				if (ChannelLocalUserState.TryGetValue(PubnubInstance.InstanceId, out
-					var userState)) {
-					foreach (var channelName in channels ?? new string[0]) {
-						userState.TryRemove(channelName, out _);
-					}
-				}
-				if (ChannelGroupLocalUserState.TryGetValue(PubnubInstance.InstanceId, out
-					var channelGroupUserState)) {
-					foreach (var channelGroupName in channelGroups ?? new string[0]) {
-						channelGroupUserState.TryRemove(channelGroupName, out _);
-					}
-				}
-			}
+
 		}
 	}
 }

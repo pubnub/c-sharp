@@ -10,5 +10,6 @@ namespace PubnubApi
         public PNMessageAction Action { get; internal set; }
         public string Uuid { get; internal set; }
         public string Channel { get; internal set; }
+        public string Subscription { get; internal set; }
     }
 }

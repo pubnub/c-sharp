@@ -25,10 +25,10 @@ namespace PubnubApi.EventEngine.Presence
 		}
 
 		internal PresenceEventEngine InitializeEventEngine<T>(string instanceId,
-			Pubnub pubnubInstance, IPubnubLog pubnubLog, TelemetryManager telemetryManager, TokenManager tokenManager)
+			Pubnub pubnubInstance, IPubnubLog pubnubLog, TokenManager tokenManager)
 		{
-			HeartbeatOperation heartbeatOperation = new HeartbeatOperation(pubnubInstance.PNConfig, pubnubInstance.JsonPluggableLibrary, pubnubInstance.PubnubUnitTest, pubnubLog, telemetryManager, tokenManager, pubnubInstance);
-			LeaveOperation leaveOperation = new LeaveOperation(pubnubInstance.PNConfig, pubnubInstance.JsonPluggableLibrary, pubnubInstance.PubnubUnitTest, pubnubLog, telemetryManager, tokenManager, pubnubInstance);
+			HeartbeatOperation heartbeatOperation = new HeartbeatOperation(pubnubInstance.PNConfig, pubnubInstance.JsonPluggableLibrary, pubnubInstance.PubnubUnitTest, pubnubLog, tokenManager, pubnubInstance);
+			LeaveOperation leaveOperation = new LeaveOperation(pubnubInstance.PNConfig, pubnubInstance.JsonPluggableLibrary, pubnubInstance.PubnubUnitTest, pubnubLog, tokenManager, pubnubInstance);
 			var presenceEventEngine = new PresenceEventEngine(pubnubInstance.PNConfig, heartbeatOperation, leaveOperation);
 			if (engineInstances.TryAdd(instanceId, presenceEventEngine)) {
 				return presenceEventEngine;

@@ -21,7 +21,7 @@ namespace PubnubApi.EventEngine.Core {
 			OnEffectDispatch?.Invoke(invocation);
 
 			if (invocation is IEffectCancelInvocation) {
-				await effectInvocationHandlerMap[invocation.GetType()].Cancel();
+				await effectInvocationHandlerMap[invocation.GetType()].Cancel().ConfigureAwait(false);
 			} else
 			{
 				var handler = effectInvocationHandlerMap[invocation.GetType()];

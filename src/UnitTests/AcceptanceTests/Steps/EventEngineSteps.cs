@@ -11,6 +11,7 @@ using System.Threading;
 using TechTalk.SpecFlow.Assist;
 using System.Net.Http;
 using System.Diagnostics;
+using PubnubApi.EventEngine.Subscribe.Common;
 
 namespace AcceptanceTests.Steps
 {
@@ -26,17 +27,19 @@ namespace AcceptanceTests.Steps
         private readonly ScenarioContext _scenarioContext;
         private Pubnub pn;
         private PNConfiguration config = null;
-        private string channel = "my_channel";
-        private string channelGroup = "my_channelgroup";
+        private string channel = "test";
+        private string channelGroup = "test";
         private string publishMsg = "hello_world";
         PNPublishResult publishResult = null;
         SubscribeCallback subscribeCallback = null;
+        SubscribeCallback statusCallback = null;
         private PNMessageResult<object> messageResult = null;
         ManualResetEvent messageReceivedEvent = new ManualResetEvent(false);
         ManualResetEvent statusReceivedEvent = new ManualResetEvent(false);
         ManualResetEvent presenceEvent = new ManualResetEvent(false);
         PNStatus pnStatus = null;
         PubnubError pnError = null;
+        SubscriptionSet subscriptionFirstSecond;
         IPubnubUnitTest unitTest;
 
         static void UnhandledExceptionTrapper(object sender, UnhandledExceptionEventArgs e)
@@ -242,14 +245,25 @@ namespace AcceptanceTests.Steps
             }
             else
             {
-                config.LogVerbosity = PNLogVerbosity.NONE;
-            }
-            config.EnableEventEngine = true;
+				config.LogVerbosity = PNLogVerbosity.NONE;
+			}
+			config.EnableEventEngine = true;
 
-            messageReceivedEvent = new ManualResetEvent(false);
-            statusReceivedEvent = new ManualResetEvent(false);
+			messageReceivedEvent = new ManualResetEvent(false);
+			statusReceivedEvent = new ManualResetEvent(false);
 
-            subscribeCallback = new SubscribeCallbackExt(
+			statusCallback = new SubscribeCallbackExt(delegate (Pubnub pnObj, PNStatus status)  {
+				pnStatus = status;
+				Console.WriteLine("{0} {1} {2}", pnStatus.Operation, pnStatus.Category, pnStatus.StatusCode);
+				if (currentContract == "subscribeHandshakeFailure" && pn.PubnubUnitTest.Attempts == 3) {
+					statusReceivedEvent.Set();
+				}
+				if (pnStatus.Category == PNStatusCategory.PNConnectedCategory) {
+					statusReceivedEvent.Set();
+				}
+			});
+
+			subscribeCallback = new SubscribeCallbackExt(
                 delegate (Pubnub pnObj, PNMessageResult<object> pubMsg)
                 {
                     Console.WriteLine($"Message received in listener. {pn.JsonPluggableLibrary.SerializeToJsonString(pubMsg)}");
@@ -276,22 +290,7 @@ namespace AcceptanceTests.Steps
                 delegate (Pubnub pnObj, PNFileEventResult fileEvent)
                 {
                     System.Diagnostics.Debug.WriteLine(pn.JsonPluggableLibrary.SerializeToJsonString(fileEvent));
-                },
-                delegate (Pubnub pnObj, PNStatus status)
-                {
-                    pnStatus = status;
-                    Console.WriteLine("{0} {1} {2}", pnStatus.Operation, pnStatus.Category, pnStatus.StatusCode);
-                    if (currentContract == "subscribeHandshakeFailure" && pn.PubnubUnitTest.Attempts == 3)
-                    {
-                        statusReceivedEvent.Set();
-                    }
-                    if (pnStatus.Category == PNStatusCategory.PNConnectedCategory)
-                    {
-                        statusReceivedEvent.Set();
-                    }
-                }
-                );
-
+                });
         }
 
         [Given(@"the demo keyset with Presence EE enabled")]
@@ -324,7 +323,16 @@ namespace AcceptanceTests.Steps
             messageReceivedEvent = new ManualResetEvent(false);
             statusReceivedEvent = new ManualResetEvent(false);
             presenceEvent = new ManualResetEvent(false);
-
+            statusCallback = new SubscribeCallbackExt(
+                delegate (Pubnub pnObj, PNStatus status)
+                {
+                    pnStatus = status;
+                    if (pnStatus.Category == PNStatusCategory.PNConnectedCategory)
+                    {
+                        statusReceivedEvent.Set();
+                    }
+                }
+            );
             subscribeCallback = new SubscribeCallbackExt(
                 delegate (Pubnub pnObj, PNMessageResult<object> pubMsg)
                 {
@@ -336,16 +344,7 @@ namespace AcceptanceTests.Steps
                 {
                     Console.WriteLine(pn.JsonPluggableLibrary.SerializeToJsonString(presenceEvnt));
                     presenceEvent.Set();
-                },
-                delegate (Pubnub pnObj, PNStatus status)
-                {
-                    pnStatus = status;
-                    if (pnStatus.Category == PNStatusCategory.PNConnectedCategory)
-                    {
-                        statusReceivedEvent.Set();
-                    }
-                }
-                );
+                });
         }
         [Given(@"heartbeatInterval set to '(.*)', timeout set to '(.*)' and suppressLeaveEvents set to '(.*)'")]
         public void GivenPresenceConfiguration(string heartbeatInterval, string timeout, string suppressLeaveEvents)
@@ -365,10 +364,10 @@ namespace AcceptanceTests.Steps
             statusReceivedEvent = new ManualResetEvent(false);
             presenceEvent = new ManualResetEvent(false);
 
-            pn.AddListener(subscribeCallback);
-            pn.Subscribe<object>()
-                .Channels(new string[] { first, second, third })
-                .Execute();
+            pn.AddListener(statusCallback);
+            SubscriptionSet subscriptionSet = pn.SubscriptionSet(new string[] { first, second, third });
+            subscriptionSet.AddListener(subscribeCallback);
+            subscriptionSet.Subscribe<object>();
         }
 
         [When(@"I join '(.*)', '(.*)', '(.*)' channels with presence")]
@@ -382,11 +381,17 @@ namespace AcceptanceTests.Steps
             statusReceivedEvent = new ManualResetEvent(false);
             presenceEvent = new ManualResetEvent(false);
 
-            pn.AddListener(subscribeCallback);
-            pn.Subscribe<object>()
-                .Channels(new string[] { first, second, third })
-                .WithPresence()
-                .Execute();
+            pn.AddListener(statusCallback);
+            
+            Subscription subscriptionFirst = pn.Channel(first).Subscription(SubscriptionOptions.ReceivePresenceEvents);
+            Subscription subscriptionSecond = pn.Channel(second).Subscription(SubscriptionOptions.ReceivePresenceEvents);
+            subscriptionFirstSecond = subscriptionFirst.Add(subscriptionSecond);
+            SubscriptionSet subscriptionSet = pn.SubscriptionSet(new string[] { third }, new string[] { }, SubscriptionOptions.ReceivePresenceEvents);
+            
+            subscriptionSet.Add(subscriptionFirstSecond);
+            
+            subscriptionSet.AddListener(subscribeCallback);
+            subscriptionSet.Subscribe<object>();
         }
 
         [Then(@"I wait '(.*)' seconds")]
@@ -441,11 +446,10 @@ namespace AcceptanceTests.Steps
             messageReceivedEvent = new ManualResetEvent(false);
             statusReceivedEvent = new ManualResetEvent(false);
 
-            pn.AddListener(subscribeCallback);
-            pn.Subscribe<object>()
-                .Channels(channel.Split(','))
-                .ChannelGroups(channelGroup.Split(','))
-                .Execute();
+            pn.AddListener(statusCallback);
+            SubscriptionSet subscription = pn.SubscriptionSet(channel.Split(','), channelGroup.Split(','));
+            subscription.AddListener(subscribeCallback);
+            subscription.Subscribe<object>();
             statusReceivedEvent.WaitOne (10*1000);
             if (pnStatus != null && pnStatus.Category == PNStatusCategory.PNConnectedCategory)
             {
@@ -470,12 +474,10 @@ namespace AcceptanceTests.Steps
             messageReceivedEvent = new ManualResetEvent(false);
             statusReceivedEvent = new ManualResetEvent(false);
 
-            pn.AddListener(subscribeCallback);
-            pn.Subscribe<object>()
-                .Channels(channel.Split(','))
-                .ChannelGroups(channelGroup.Split(','))
-                .WithTimetoken(p0)
-                .Execute();
+            pn.AddListener(statusCallback);
+            SubscriptionSet subscription = pn.SubscriptionSet(channel.Split(','), channelGroup.Split(','));
+            subscription.AddListener(subscribeCallback);
+            subscription.Subscribe<object>(new SubscriptionCursor(p0));
             statusReceivedEvent.WaitOne (10*1000);
             if (pnStatus != null && pnStatus.Category == PNStatusCategory.PNConnectedCategory)
             {
@@ -545,9 +547,7 @@ namespace AcceptanceTests.Steps
         [Then(@"I leave '(.*)' and '(.*)' channels with presence")]
         public void ThenILeaveAndChannelsWithPresence(string first0, string second1)
         {
-            pn.Unsubscribe<object>()
-                .Channels(new string[] { first0, second1 })
-                .Execute();
+            subscriptionFirstSecond.Unsubscribe<object>();
         }
 
         [Given(@"a linear reconnection policy with (.*) retries")]

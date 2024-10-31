@@ -1,18 +1,28 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 
+namespace PubnubApi
+{
+	public class SubscriptionCursor
+	{
+		public long? Timetoken { get; set; }
+		public int? Region { get; set; }
+		public SubscriptionCursor() {}
+		public SubscriptionCursor(long? timetoken, int? region = null)
+		{
+			this.Timetoken = timetoken;
+			this.Region = region;
+		}
+
+	}
+}
+
 namespace PubnubApi.EventEngine.Subscribe.Common
 {
-    public class SubscriptionCursor
-    {
-        public long? Timetoken { get; set; }
-        public int? Region { get; set; }
-    }
-    
-    public class HandshakeResponse
-    {
-        [JsonProperty("t")]
-        public Timetoken Timetoken { get; set; }
+	public class HandshakeResponse
+	{
+		[JsonProperty("t")]
+		public Timetoken Timetoken { get; set; }
 
         [JsonProperty("m")]
         public object[] Messages { get; set; }

@@ -1,24 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-#if !NET35 && !NET40
-using System.Collections.Concurrent;
-#endif
 
 namespace PubnubApi.EndPoint
 {
-    public class GetFileUrlOperation : PubnubCoreBase
+	public class GetFileUrlOperation : PubnubCoreBase
     {
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
         private readonly IPubnubUnitTest unit;
         private readonly IPubnubLog pubnubLog;
-        private readonly EndPoint.TelemetryManager pubnubTelemetryMgr;
 
         private PNCallback<PNFileUrlResult> savedCallback;
         private Dictionary<string, object> queryParam;
@@ -27,29 +18,13 @@ namespace PubnubApi.EndPoint
         private string currentFileId;
         private string currentFileName;
 
-        public GetFileUrlOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TelemetryManager telemetryManager, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, telemetryManager, tokenManager, instance)
+        public GetFileUrlOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
             pubnubLog = log;
-            pubnubTelemetryMgr = telemetryManager;
-
-            if (instance != null)
-            {
-                if (!ChannelRequest.ContainsKey(instance.InstanceId))
-                {
-                    ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, HttpWebRequest>());
-                }
-                if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
-                {
-                    ChannelInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
-                }
-                if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId))
-                {
-                    ChannelGroupInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
-                }
-            }
+            PubnubInstance = instance;
         }
 
         public GetFileUrlOperation Channel(string channel)
@@ -90,21 +65,8 @@ namespace PubnubApi.EndPoint
             {
                 throw new ArgumentException("Missing File Name");
             }
-
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
-            Task.Factory.StartNew(() =>
-            {
-                this.savedCallback = callback;
-                ProcessGetFileUrl(this.queryParam, savedCallback);
-            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
-#else
-            new Thread(() =>
-            {
-                this.savedCallback = callback;
-                ProcessGetFileUrl(this.queryParam, savedCallback);
-            })
-            { IsBackground = true }.Start();
-#endif
+            this.savedCallback = callback;
+            ProcessGetFileUrl(this.queryParam, savedCallback);
         }
 
         public async Task<PNResult<PNFileUrlResult>> ExecuteAsync()
@@ -114,67 +76,84 @@ namespace PubnubApi.EndPoint
 
         internal void Retry()
         {
-#if NETFX_CORE || WINDOWS_UWP || UAP || NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
-            Task.Factory.StartNew(() =>
-            {
-                ProcessGetFileUrl(this.queryParam, savedCallback);
-            }, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
-#else
-            new Thread(() =>
-            {
-                ProcessGetFileUrl(this.queryParam, savedCallback);
-            })
-            { IsBackground = true }.Start();
-#endif
+            ProcessGetFileUrl(this.queryParam, savedCallback);
         }
 
         private void ProcessGetFileUrl(Dictionary<string, object> externalQueryParam, PNCallback<PNFileUrlResult> callback)
         {
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
-
-            Uri request = urlBuilder.BuildGetFileUrlOrDeleteReqest("GET", "", this.channelName, this.currentFileId, this.currentFileName, externalQueryParam, PNOperationType.PNFileUrlOperation);
-
+            var requestParameter = CreateRequestParameter();
             PNFileUrlResult result = new PNFileUrlResult();
-            result.Url = request.ToString();
-
+            var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNFileUrlOperation);
+            result.Url = transportRequest.RequestUrl;
             PNStatus status = new PNStatus { Error = false, StatusCode = 200 };
-
             callback.OnResponse(result, status);
         }
 
-        private async Task<PNResult<PNFileUrlResult>> ProcessGetFileUrl(Dictionary<string, object> externalQueryParam)
+        private Task<PNResult<PNFileUrlResult>> ProcessGetFileUrl(Dictionary<string, object> externalQueryParam)
         {
-            PNResult<PNFileUrlResult> ret = new PNResult<PNFileUrlResult>();
+            var requestParameter = CreateRequestParameter();
+            PNResult<PNFileUrlResult> returnValue = new PNResult<PNFileUrlResult>();
+            var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNFileUrlOperation);
 
             if (string.IsNullOrEmpty(this.currentFileId))
             {
                 PNStatus errStatus = new PNStatus { Error = true, ErrorData = new PNErrorData("Missing File Id", new ArgumentException("Missing File Id")) };
-                ret.Status = errStatus;
-                return ret;
+                returnValue.Status = errStatus;
+                return Task.FromResult(returnValue);
             }
 
             if (string.IsNullOrEmpty(this.currentFileName))
             {
                 PNStatus errStatus = new PNStatus { Error = true, ErrorData = new PNErrorData("Invalid file name", new ArgumentException("Invalid file name")) };
-                ret.Status = errStatus;
-                return ret;
+                returnValue.Status = errStatus;
+                return Task.FromResult(returnValue);
             }
 
-            IUrlRequestBuilder urlBuilder = new UrlRequestBuilder(config, jsonLibrary, unit, pubnubLog, pubnubTelemetryMgr, (PubnubInstance != null && !string.IsNullOrEmpty(PubnubInstance.InstanceId) && PubnubTokenMgrCollection.ContainsKey(PubnubInstance.InstanceId)) ? PubnubTokenMgrCollection[PubnubInstance.InstanceId] : null, (PubnubInstance != null) ? PubnubInstance.InstanceId : "");
-
-            Uri request = urlBuilder.BuildGetFileUrlOrDeleteReqest("GET", "", this.channelName, this.currentFileId, this.currentFileName, externalQueryParam, PNOperationType.PNFileUrlOperation);
-
             PNFileUrlResult result = new PNFileUrlResult();
-            result.Url = request.ToString();
+            result.Url = transportRequest.RequestUrl;
 
             PNStatus status = new PNStatus { Error = false, StatusCode = 200 };
 
-            ret.Result = result;
-            ret.Status = status;
-            await Task.Factory.StartNew(() =>{ }).ConfigureAwait(false);//dummy stmt.
+            returnValue.Result = result;
+            returnValue.Status = status;
 
-            return ret;
+            return Task.FromResult(returnValue);
         }
 
+        private RequestParameter CreateRequestParameter()
+        {
+			List<string> pathSegments = new List<string>
+			{
+				"v1",
+				"files",
+				config.SubscribeKey,
+				"channels",
+				channelName,
+				"files",
+				currentFileId,
+				currentFileName
+			};
+
+			Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+
+            if (queryParam != null && queryParam.Count > 0)
+            {
+                foreach (KeyValuePair<string, object> kvp in queryParam)
+                {
+                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    {
+                        requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), PNOperationType.PNDownloadFileOperation, false, false, false));
+                    }
+                }
+            }
+
+            var requestParameter = new RequestParameter() {
+                RequestType = Constants.GET,
+                PathSegment = pathSegments,
+                Query = requestQueryStringParams
+            };
+
+            return requestParameter;
+        }
     }
 }

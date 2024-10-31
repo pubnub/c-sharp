@@ -5,6 +5,7 @@ using PubnubApi;
 using System.Collections.Generic;
 using MockServer;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace PubNubMessaging.Tests
 {
@@ -17,10 +18,9 @@ namespace PubNubMessaging.Tests
         private static string channelName = "hello_my_channel";
 
         private static object publishedMessage;
-        private static long publishTimetoken = 0;
 
         static int manualResetEventWaitTimeout = 310 * 1000;
-        private static string authKey = "myauth";
+        private static string authToken;
 
         private static Pubnub pubnub;
         private static Server server;
@@ -34,17 +34,18 @@ namespace PubNubMessaging.Tests
         }
 
         [SetUp]
-        public static void Init()
+        public static async Task Init()
         {
             UnitTestLog unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
             server = Server.Instance();
             MockServer.LoggingMethod.MockServerLog = unitLog;
-            server.Start();
+            if (PubnubCommon.EnableStubTest)
+            {
+                server.Start();   
+            }
 
             if (!PubnubCommon.PAMServerSideGrant) { return; }
-
-            bool receivedGrantMessage = false;
 
             PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
@@ -57,15 +58,13 @@ namespace PubNubMessaging.Tests
 
             pubnub = createPubNubInstance(config);
             manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
-
-            ManualResetEvent grantManualEvent = new ManualResetEvent(false);
-
+            
             string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"user\",\"subscribe_key\":\"demo-36\",\"ttl\":20,\"channel\":\"hello_my_channel\",\"auths\":{\"myAuth\":{\"r\":1,\"w\":1,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
 
             server.AddRequest(new Request()
                     .WithMethod("GET")
                     .WithPath(string.Format("/v2/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey))
-                    .WithParameter("auth", authKey)
+                    //.WithParameter("auth", authKey)
                     .WithParameter("channel", "hello_my_channel")
                     .WithParameter("channel-group", "hello_my_group%2Chello_my_group1%2Chello_my_group2")
                     .WithParameter("m", "1")
@@ -80,86 +79,61 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Grant().AuthKeys(new [] { authKey }).ChannelGroups(new [] { channelGroupName, channelGroupName1, channelGroupName2 }).Channels(new [] { channelName }).Read(true).Write(true).Manage(true).TTL(20)
-                .Execute(new PNAccessManagerGrantResultExt(
-                                (r, s) =>
-                                {
-                                    try
-                                    {
-                                        if (r != null && s.StatusCode == 200 && !s.Error)
-                                        {
-                                            Debug.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+            var fullAccess = new PNTokenAuthValues()
+            {
+                Read = true,
+                Write = true,
+                Create = true,
+                Get = true,
+                Delete = true,
+                Join = true,
+                Update = true,
+                Manage = true
+            };
+            var grantResult = await pubnub.GrantToken().TTL(20).AuthorizedUuid(config.UserId).Resources(
+                new PNTokenResources()
+                {
+                    Channels = new Dictionary<string, PNTokenAuthValues>()
+                    {
+                        {
+                            channelName, fullAccess
+                        }
+                    },
+                    ChannelGroups = new Dictionary<string, PNTokenAuthValues>()
+                    {
+                        {
+                            channelGroupName, fullAccess
+                        },
+                        {
+                            channelGroupName1, fullAccess
+                        },
+                        {
+                            channelGroupName2, fullAccess
+                        }
+                    }
+                }).ExecuteAsync();
 
-                                            if (r.ChannelGroups != null && r.ChannelGroups.Count > 0)
-                                            {
-                                                foreach (KeyValuePair<string, Dictionary<string, PNAccessManagerKeyData>> channelGroupKP in r.ChannelGroups)
-                                                {
-                                                    receivedGrantMessage = false;
+            await Task.Delay(4000);
 
-                                                    string channelGroup = channelGroupKP.Key;
-                                                    var read = r.ChannelGroups[channelGroup][authKey].ReadEnabled;
-                                                    var write = r.ChannelGroups[channelGroup][authKey].WriteEnabled;
-                                                    var manage = r.ChannelGroups[channelGroup][authKey].ManageEnabled;
-
-                                                    if (read && write && manage)
-                                                    {
-                                                        receivedGrantMessage = true;
-                                                    }
-                                                    else
-                                                    {
-                                                        receivedGrantMessage = false;
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                            if (r.Channels != null && r.Channels.Count > 0)
-                                            {
-                                                foreach (KeyValuePair<string, Dictionary<string, PNAccessManagerKeyData>> channelKP in r.Channels)
-                                                {
-                                                    receivedGrantMessage = false;
-
-                                                    string channel = channelKP.Key;
-                                                    var read = r.Channels[channel][authKey].ReadEnabled;
-                                                    var write = r.Channels[channel][authKey].WriteEnabled;
-                                                    var manage = r.Channels[channel][authKey].ManageEnabled;
-
-                                                    if (read && write && manage)
-                                                    {
-                                                        receivedGrantMessage = true;
-                                                    }
-                                                    else
-                                                    {
-                                                        receivedGrantMessage = false;
-                                                        break;
-                                                    }
-                                                }
-                                            }
-
-                                        }
-                                        else
-                                        {
-                                            Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
-                                        }
-                                    }
-                                    catch { /* ignore */  }
-                                    finally
-                                    {
-                                        grantManualEvent.Set();
-                                    }
-                                }));
-            Thread.Sleep(1000);
-            grantManualEvent.WaitOne(manualResetEventWaitTimeout);
-
+            authToken = grantResult.Result?.Token;
+            
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
 
-            Assert.IsTrue(receivedGrantMessage, "WhenSubscribedToAChannelGroup Grant access failed.");
+            Assert.IsTrue(grantResult.Status.Error == false && grantResult.Result != null, 
+                "WhenSubscribedToAChannelGroup Grant access failed.");
         }
 
         [TearDown]
         public static void Exit()
         {
+            if (pubnub != null)
+            {
+                pubnub.Destroy();
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
+            }
             server.Stop();
         }
 
@@ -183,10 +157,6 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMServerSideRun)
             {
                 config.SecretKey = PubnubCommon.SecretKey;
-            }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
             }
 
             server.RunOnHttps(false);
@@ -219,7 +189,7 @@ namespace PubNubMessaging.Tests
                         subscribeManualEvent.Set();
                     }
                 });
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             pubnub.AddListener(listenerSubCallack);
 
             string expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}";
@@ -264,7 +234,7 @@ namespace PubNubMessaging.Tests
                 server.AddRequest(new Request()
                         .WithMethod("GET")
                         .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, ","))
-                        .WithParameter("auth", authKey)
+                        //.WithParameter("auth", authKey)
                         .WithParameter("channel-group", "hello_my_group")
                         .WithParameter("heartbeat", "300")
                         .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
@@ -307,7 +277,6 @@ namespace PubNubMessaging.Tests
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
                             Debug.WriteLine("Publish Response: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
-                            publishTimetoken = r.Timetoken;
                             receivedMessage = true;
                         }
 
@@ -349,10 +318,6 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
 
             server.RunOnHttps(false);
 
@@ -376,7 +341,7 @@ namespace PubNubMessaging.Tests
                         subscribeManualEvent.Set();
                     }
                 });
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             pubnub.AddListener(listenerSubCallack);
 
             string expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}";
@@ -421,7 +386,7 @@ namespace PubNubMessaging.Tests
                 server.AddRequest(new Request()
                         .WithMethod("GET")
                         .WithPath(String.Format("/v2/subscribe/{0}/{1}/0", PubnubCommon.SubscribeKey, ","))
-                        .WithParameter("auth", authKey)
+                        //.WithParameter("auth", authKey)
                         .WithParameter("channel-group", "hello_my_group")
                         .WithParameter("heartbeat", "300")
                         .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
@@ -474,10 +439,6 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
 
             server.RunOnHttps(false);
 
@@ -502,7 +463,7 @@ namespace PubNubMessaging.Tests
                         subscribeManualEvent.Set();
                     }
                 });
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             pubnub.AddListener(listenerSubCallack);
 
             manualResetEventWaitTimeout = 310 * 1000;
