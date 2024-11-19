@@ -14,6 +14,7 @@ namespace PubnubApi.EndPoint
 
 		private object signalMessage;
 		private string channelName = string.Empty;
+		private string customMessageType;
 		private PNCallback<PNPublishResult> savedCallback;
 		private Dictionary<string, object> queryParam;
 
@@ -34,6 +35,12 @@ namespace PubnubApi.EndPoint
 		public SignalOperation Channel(string channelName)
 		{
 			this.channelName = channelName;
+			return this;
+		}
+		
+		public SignalOperation CustomMessageType(string customMessageType)
+		{
+			this.customMessageType = customMessageType;
 			return this;
 		}
 
@@ -159,48 +166,53 @@ namespace PubnubApi.EndPoint
 			requestState.ResponseType = PNOperationType.PNSignalOperation;
 			requestState.Reconnect = false;
 			requestState.EndPointOperation = this;
-			Tuple<string, PNStatus> JsonAndStatusTuple;
 			var requestParameter = CreateRequestParameter();
-
-			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNSignalOperation);
-			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ConfigureAwait(false);
+			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNPublishOperation);
+			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest).ConfigureAwait(false);
 			if (transportResponse.Error == null) {
 				string responseString = Encoding.UTF8.GetString(transportResponse.Content);
-				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
-				if (errorStatus == null) {
+				PNStatus errorStatus = GetStatusIfError<PNPublishResult>(requestState, responseString);
+				Tuple<string, PNStatus> jsonAndStatusTuple;
+				if (errorStatus == null && transportResponse.StatusCode == Constants.HttpRequestSuccessStatusCode) {
 					requestState.GotJsonResponse = true;
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, Constants.HttpRequestSuccessStatusCode, null);
-					JsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
+					jsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
 				} else {
-					JsonAndStatusTuple = new Tuple<string, PNStatus>("", errorStatus);
-				}
-				returnValue.Status = JsonAndStatusTuple.Item2;
-				string json = JsonAndStatusTuple.Item1;
-				if (!string.IsNullOrEmpty(json)) {
 					requestState.GotJsonResponse = true;
-					List<object> result = ProcessJsonResponse(requestState, responseString);
-					if (result != null && result.Count >= 3)
-					{
+					jsonAndStatusTuple = new Tuple<string, PNStatus>(responseString??"", errorStatus);
+				}
+				returnValue.Status = jsonAndStatusTuple.Item2;
+				string json = jsonAndStatusTuple.Item1;
+
+				if (!string.IsNullOrEmpty(json)) {
+					List<object> result = ProcessJsonResponse(requestState, json);
+
+					if (result is { Count: >= 3 }) {
 						_ = int.TryParse(result[0].ToString(), out var publishStatus);
 						if (publishStatus == 1) {
-							List<object> resultList = ProcessJsonResponse(requestState, responseString);
-							if (resultList != null && resultList.Count > 0) {
+							List<object> resultList = ProcessJsonResponse(requestState, json);
+							if (resultList is { Count: > 0 }) {
 								ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
 								PNPublishResult responseResult = responseBuilder.JsonToObject<PNPublishResult>(resultList, true);
 								if (responseResult != null) {
 									returnValue.Result = responseResult;
 								}
-							} else {
-								PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(transportResponse.StatusCode, result[1].ToString());
-								PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNSignalOperation, category, requestState, transportResponse.StatusCode, new PNException(responseString));
-								returnValue.Status = status;
-								returnValue.Result = default;
 							}
+						}
+						else
+						{
+							PNStatusCategory category =
+								PNStatusCategoryHelper.GetPNStatusCategory(400, result[1].ToString());
+							PNStatus status =
+								new StatusBuilder(config, jsonLibrary).CreateStatusResponse<PNPublishResult>(
+									PNOperationType.PNPublishOperation, category, requestState, 400,
+									new PNException(responseString));
+							returnValue.Status = status;
 						}
 					}
 				}
 			} else {
-				int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
+				var statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 				PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNPublishOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
@@ -210,8 +222,8 @@ namespace PubnubApi.EndPoint
 
 		private RequestParameter CreateRequestParameter()
 		{
-			List<string> urlSegments = new List<string>()
-			{
+			List<string> urlSegments =
+			[
 				"signal",
 				config.PublishKey,
 				config.SubscribeKey,
@@ -219,11 +231,25 @@ namespace PubnubApi.EndPoint
 				channelName,
 				"0",
 				jsonLibrary.SerializeToJsonString(this.signalMessage)
-			};
+			];
+			Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+			
+			if (!string.IsNullOrEmpty(customMessageType)) {
+				requestQueryStringParams.Add("custom_message_type", customMessageType);
+			}
+			
+			if (queryParam is { Count: > 0 }) {
+				foreach (KeyValuePair<string, object> kvp in queryParam) {
+					if (!requestQueryStringParams.ContainsKey(kvp.Key)) {
+						requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), PNOperationType.PNPublishOperation, false, false, false));
+					}
+				}
+			}
 
 			var requestParameter = new RequestParameter() {
 				RequestType = Constants.GET,
-				PathSegment = urlSegments
+				PathSegment = urlSegments,
+				Query = requestQueryStringParams
 			};
 
 			return requestParameter;

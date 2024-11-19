@@ -92,6 +92,9 @@ namespace PubnubApi.EventEngine.Subscribe.Common
 		
 		[JsonProperty("u")]
 		public object UserMetadata { get; set; }
+
+		[JsonProperty("cmt")]
+		public string CustomMessageType { get; set; }
 	}
 	
 	public abstract class SubscriptionState : Core.State

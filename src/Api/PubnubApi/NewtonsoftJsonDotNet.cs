@@ -319,22 +319,21 @@ namespace PubnubApi
 
                 // Set ChannelName
                 PropertyInfo channelNameProp = specific.GetRuntimeProperty("Channel");
-                channelNameProp.SetValue(message,
-                    (listObject.Count == 6) ? listObject[5].ToString() : listObject[4].ToString(), null);
+                channelNameProp.SetValue(message, listObject[5]?.ToString(), null);
 
                 // Set ChannelGroup
-                if (listObject.Count == 6)
-                {
-                    PropertyInfo subsciptionProp = specific.GetRuntimeProperty("Subscription");
-                    subsciptionProp.SetValue(message, listObject[4].ToString(), null);
-                }
-
+                PropertyInfo subsciptionProp = specific.GetRuntimeProperty("Subscription");
+                subsciptionProp.SetValue(message, listObject[4]?.ToString(), null);
+                
+                PropertyInfo customMessageType = specific.GetRuntimeProperty("CustomMessageType");
+                customMessageType.SetValue(message, listObject[6], null);
                 //Set Metadata list second position, index=1
                 if (listObject[1] != null)
                 {
                     PropertyInfo userMetadataProp = specific.GetRuntimeProperty("UserMetadata");
                     userMetadataProp.SetValue(message, listObject[1], null);
                 }
+                
 
                 ret = (T)Convert.ChangeType(message, specific, CultureInfo.InvariantCulture);
             }

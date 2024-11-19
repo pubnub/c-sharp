@@ -31,6 +31,10 @@
 
   <ItemGroup>
     <Folder Include="Drivers\" />
+    <Folder Include="Features\files\" />
+    <Folder Include="Features\history\" />
+    <Folder Include="Features\publish\" />
+    <Folder Include="Features\subscribe\" />
     <Folder Include="Hooks\" />
     <Folder Include="Data\" />
   </ItemGroup>

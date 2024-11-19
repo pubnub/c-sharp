@@ -67,6 +67,8 @@ namespace PubnubApi
         /// </summary>
         private object u { get; set; }
 
+        private string cmt { get; set; }
+
         public string Shard
         {
             get
@@ -208,6 +210,18 @@ namespace PubnubApi
             internal set
             {
                 u = value;
+            }
+        }
+        
+        public string CustomMessageType
+        {
+            get
+            {
+                return cmt;
+            }
+            internal set
+            {
+                cmt = value;
             }
         }
 

@@ -161,15 +161,10 @@ namespace PubnubApi.EventEngine.Common
 			payloadContainer.Add(GetTimetokenMetadata(eventData.PublishMetadata).Timetoken); //Third one always Timetoken
 
 			payloadContainer.Add(eventData.IssuingClientId); //Fourth one always Publisher
-
-			if (!string.IsNullOrEmpty(currentMessageChannelGroup)) //Add cg first before channel
-			{
-				payloadContainer.Add(currentMessageChannelGroup);
-			}
-
-			if (!string.IsNullOrEmpty(currentMessageChannel)) {
-				payloadContainer.Add(currentMessageChannel);
-			}
+			
+			payloadContainer.Add(currentMessageChannelGroup);
+			
+			payloadContainer.Add(currentMessageChannel);
 
 			if (eventData.MessageType == 1) {
 				ResponseBuilder responseBuilder = new ResponseBuilder(configuration, jsonLibrary, log);
@@ -295,6 +290,7 @@ namespace PubnubApi.EventEngine.Common
 				}
 
 			} else {
+				payloadContainer.Add(eventData.CustomMessageType);
 				ResponseBuilder responseBuilder = new ResponseBuilder(configuration, jsonLibrary, log);
 				PNMessageResult<T> message = responseBuilder.JsonToObject<PNMessageResult<T>>(payloadContainer, true);
 				if (message != null) {

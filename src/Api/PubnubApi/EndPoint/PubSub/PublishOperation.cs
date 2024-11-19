@@ -23,6 +23,7 @@ namespace PubnubApi.EndPoint
 		private bool httpPost;
 		private Dictionary<string, object> userMetadata;
 		private int ttl = -1;
+		private string customMessageType;
 		private PNCallback<PNPublishResult> savedCallback;
 		private bool syncRequest;
 		private Dictionary<string, object> queryParam;
@@ -73,6 +74,12 @@ namespace PubnubApi.EndPoint
 		public PublishOperation Ttl(int ttl)
 		{
 			this.ttl = ttl;
+			return this;
+		}
+		
+		public PublishOperation CustomMessageType(string customMessageType)
+		{
+			this.customMessageType = customMessageType;
 			return this;
 		}
 
@@ -157,12 +164,14 @@ namespace PubnubApi.EndPoint
 				callback.OnResponse(null, status);
 				return;
 			}
-			RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>();
-			requestState.Channels = new[] { channel };
-			requestState.ResponseType = PNOperationType.PNPublishOperation;
-			requestState.PubnubCallback = callback;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
+			RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>
+			{
+				Channels = [channel],
+				ResponseType = PNOperationType.PNPublishOperation,
+				PubnubCallback = callback,
+				Reconnect = false,
+				EndPointOperation = this
+			};
 
 			var requestParameters = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameters, operationType: PNOperationType.PNPublishOperation);
@@ -220,27 +229,30 @@ namespace PubnubApi.EndPoint
 				returnValue.Status = errStatus;
 				return returnValue;
 			}
-			RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>();
-			Tuple<string, PNStatus> JsonAndStatusTuple;
-			requestState.Channels = new[] { channel };
-			requestState.ResponseType = PNOperationType.PNPublishOperation;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
+			RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>
+			{
+				Channels = [channel],
+				ResponseType = PNOperationType.PNPublishOperation,
+				Reconnect = false,
+				EndPointOperation = this
+			};
 			var requestParameter = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNPublishOperation);
 			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest).ConfigureAwait(false);
 			if (transportResponse.Error == null) {
 				string responseString = Encoding.UTF8.GetString(transportResponse.Content);
-				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
-				if (errorStatus == null) {
+				PNStatus errorStatus = GetStatusIfError<PNPublishResult>(requestState, responseString);
+				Tuple<string, PNStatus> jsonAndStatusTuple;
+				if (errorStatus == null && transportResponse.StatusCode == Constants.HttpRequestSuccessStatusCode) {
 					requestState.GotJsonResponse = true;
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, Constants.HttpRequestSuccessStatusCode, null);
-					JsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
+					jsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
 				} else {
-					JsonAndStatusTuple = new Tuple<string, PNStatus>("", errorStatus);
+					requestState.GotJsonResponse = true;
+					jsonAndStatusTuple = new Tuple<string, PNStatus>(responseString??"", errorStatus);
 				}
-				returnValue.Status = JsonAndStatusTuple.Item2;
-				string json = JsonAndStatusTuple.Item1;
+				returnValue.Status = jsonAndStatusTuple.Item2;
+				string json = jsonAndStatusTuple.Item1;
 
 				if (!string.IsNullOrEmpty(json)) {
 					List<object> result = ProcessJsonResponse(requestState, json);
@@ -256,6 +268,16 @@ namespace PubnubApi.EndPoint
 									returnValue.Result = responseResult;
 								}
 							}
+						}
+						else
+						{
+							PNStatusCategory category =
+								PNStatusCategoryHelper.GetPNStatusCategory(400, result[1].ToString());
+							PNStatus status =
+								new StatusBuilder(config, jsonLibrary).CreateStatusResponse<PNPublishResult>(
+									PNOperationType.PNPublishOperation, category, requestState, 400,
+									new PNException(responseString));
+							returnValue.Status = status;
 						}
 					}
 				}
@@ -296,15 +318,15 @@ namespace PubnubApi.EndPoint
 
 		private RequestParameter CreateRequestParameter()
 		{
-			List<string> urlSegments = new List<string>
-			{
+			List<string> urlSegments =
+			[
 				"publish",
-				config.PublishKey?? "",
-				config.SubscribeKey??"",
+				config.PublishKey ?? "",
+				config.SubscribeKey ?? "",
 				"0",
 				channelName,
 				"0"
-			};
+			];
 			if (!httpPost) {
 				urlSegments.Add(PrepareContent(this.publishContent));
 			}
@@ -323,7 +345,11 @@ namespace PubnubApi.EndPoint
 				requestQueryStringParams.Add("store", "0");
 			}
 
-			if (queryParam != null && queryParam.Count > 0) {
+			if (!string.IsNullOrEmpty(customMessageType)) {
+				requestQueryStringParams.Add("custom_message_type", customMessageType);
+			}
+
+			if (queryParam is { Count: > 0 }) {
 				foreach (KeyValuePair<string, object> kvp in queryParam) {
 					if (!requestQueryStringParams.ContainsKey(kvp.Key)) {
 						requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), PNOperationType.PNPublishOperation, false, false, false));

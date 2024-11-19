@@ -13,5 +13,7 @@ namespace PubnubApi
         public object Actions { get; internal set; }
         public string Uuid { get; internal set; }
         public int MessageType { get; internal set; }
+        
+        public string CustomMessageType { get; internal set; }
     }
 }

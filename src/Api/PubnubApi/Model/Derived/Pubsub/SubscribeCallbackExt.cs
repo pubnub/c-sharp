@@ -199,6 +199,7 @@ namespace PubnubApi
 			message1.Timetoken = message.Timetoken;
 			message1.UserMetadata = message.UserMetadata;
 			message1.Publisher = message.Publisher;
+			message1.CustomMessageType = message.CustomMessageType;
 
 			subscribeAction?.Invoke(pubnub, message1);
 		}
@@ -222,6 +223,7 @@ namespace PubnubApi
 			message1.Timetoken = signalMessage.Timetoken;
 			message1.UserMetadata = signalMessage.UserMetadata;
 			message1.Publisher = signalMessage.Publisher;
+			message1.CustomMessageType = signalMessage.CustomMessageType;
 
 			signalAction?.Invoke(pubnub, message1);
 		}
