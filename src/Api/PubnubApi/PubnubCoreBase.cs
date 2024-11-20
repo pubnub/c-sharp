@@ -727,6 +727,7 @@ namespace PubnubApi
                                     }
                                     else if (currentMessage.MessageType == 4)
                                     {
+                                        payloadContainer.Add(currentMessage.CustomMessageType);
                                         ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
                                         PNMessageResult<object> pnFileResult = responseBuilder.JsonToObject<PNMessageResult<object>>(payloadContainer, true);
                                         if (pnFileResult != null)

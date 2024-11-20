@@ -9,7 +9,7 @@ changelog:
       - type: feature
         text: "Added support for `Channel`, `ChannelGroup`, `Subscription` and `SubscriptionSet`, `ChannelMetadata`, `UserMetadata`  entities for Subscribe related operation."
       - type: feature
-        text: "BREAKING CHANGES: Added new event listeners support."
+        text: "BREAKING CHANGES: Default Reconnection policy is set to Exponential."
       - type: feature
         text: "BREAKING CHANGES: All apis calls will be made through `HttpClient` by default."
       - type: feature
