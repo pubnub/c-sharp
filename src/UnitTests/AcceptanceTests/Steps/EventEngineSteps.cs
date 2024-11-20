@@ -254,7 +254,6 @@ namespace AcceptanceTests.Steps
 
 			statusCallback = new SubscribeCallbackExt(delegate (Pubnub pnObj, PNStatus status)  {
 				pnStatus = status;
-				Console.WriteLine("{0} {1} {2}", pnStatus.Operation, pnStatus.Category, pnStatus.StatusCode);
 				if (currentContract == "subscribeHandshakeFailure" && pn.PubnubUnitTest.Attempts == 3) {
 					statusReceivedEvent.Set();
 				}
@@ -266,30 +265,24 @@ namespace AcceptanceTests.Steps
 			subscribeCallback = new SubscribeCallbackExt(
                 delegate (Pubnub pnObj, PNMessageResult<object> pubMsg)
                 {
-                    Console.WriteLine($"Message received in listener. {pn.JsonPluggableLibrary.SerializeToJsonString(pubMsg)}");
                     messageResult = pubMsg;
                     messageReceivedEvent.Set();
                 },
                 delegate (Pubnub pnObj, PNPresenceEventResult presenceEvnt)
                 {
-                    Console.WriteLine(pn.JsonPluggableLibrary.SerializeToJsonString(presenceEvnt));
                     presenceEvent.Set();
                 },
                 delegate (Pubnub pnObj, PNSignalResult<object> signalMsg)
                 {
-                    Console.WriteLine(pn.JsonPluggableLibrary.SerializeToJsonString(signalMsg));
                 },
                 delegate (Pubnub pnObj, PNObjectEventResult objectEventObj)
                 {
-                    Console.WriteLine(pn.JsonPluggableLibrary.SerializeToJsonString(objectEventObj));
                 },
                 delegate (Pubnub pnObj, PNMessageActionEventResult msgActionEvent)
                 {
-                    System.Diagnostics.Debug.WriteLine(pn.JsonPluggableLibrary.SerializeToJsonString(msgActionEvent));
                 },
                 delegate (Pubnub pnObj, PNFileEventResult fileEvent)
                 {
-                    System.Diagnostics.Debug.WriteLine(pn.JsonPluggableLibrary.SerializeToJsonString(fileEvent));
                 });
         }
 
@@ -303,12 +296,14 @@ namespace AcceptanceTests.Steps
             unitTest.IncludePnsdk = true;
             unitTest.IncludeUuid = true;
 
-            config = new PNConfiguration(new UserId("pn-csharp-acceptance-test-uuid"));
-            config.Origin = acceptance_test_origin;
-            config.Secure = false;
-            config.PublishKey = System.Environment.GetEnvironmentVariable("PN_PUB_KEY");
-            config.SubscribeKey = System.Environment.GetEnvironmentVariable("PN_SUB_KEY");
-            config.SecretKey = System.Environment.GetEnvironmentVariable("PN_SEC_KEY");
+            config = new PNConfiguration(new UserId("pn-csharp-acceptance-test-uuid"))
+            {
+                Origin = acceptance_test_origin,
+                Secure = false,
+                PublishKey = System.Environment.GetEnvironmentVariable("PN_PUB_KEY"),
+                SubscribeKey = System.Environment.GetEnvironmentVariable("PN_SUB_KEY"),
+                SecretKey = System.Environment.GetEnvironmentVariable("PN_SEC_KEY")
+            };
             if (enableIntenalPubnubLogging)
             {
                 config.LogVerbosity = PNLogVerbosity.BODY;
@@ -336,13 +331,11 @@ namespace AcceptanceTests.Steps
             subscribeCallback = new SubscribeCallbackExt(
                 delegate (Pubnub pnObj, PNMessageResult<object> pubMsg)
                 {
-                    Console.WriteLine($"Message received in listener. {pn.JsonPluggableLibrary.SerializeToJsonString(pubMsg)}");
                     messageResult = pubMsg;
                     messageReceivedEvent.Set();
                 },
                 delegate (Pubnub pnObj, PNPresenceEventResult presenceEvnt)
                 {
-                    Console.WriteLine(pn.JsonPluggableLibrary.SerializeToJsonString(presenceEvnt));
                     presenceEvent.Set();
                 });
         }
@@ -356,8 +349,10 @@ namespace AcceptanceTests.Steps
         [When(@"I join '(.*)', '(.*)', '(.*)' channels")]
         public void WhenIJoinChannels(string first, string second, string third)
         {
-            pn = new Pubnub(config);
-            pn.PubnubUnitTest = unitTest;
+            pn = new Pubnub(config)
+            {
+                PubnubUnitTest = unitTest
+            };
             pn.PubnubUnitTest.PresenceActivityList?.Clear();
 
             messageReceivedEvent = new ManualResetEvent(false);

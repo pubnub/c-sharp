@@ -187,8 +187,8 @@ namespace PubnubApi
 
                     if (listObject.Count == 6)
                     {
-                        ack.Subscription = listObject[4].ToString();
-                        ack.Subscription = ack.Subscription.Replace("-pnpres", "");
+                        ack.Subscription = listObject[5]?.ToString();
+                        ack.Subscription = ack.Subscription?.Replace("-pnpres", "");
                     }
 
                     if (listObject[1] != null)
