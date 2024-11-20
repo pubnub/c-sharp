@@ -441,7 +441,70 @@ namespace PubNubMessaging.Tests
 
             Assert.IsTrue(receivedPublishMessage, "Unencrypt Fire Failed");
         }
+        
+        public class MockObject
+        {
+            public string Text;
+            public int Number;
+            public bool Flag;
+        }
 
+        [Test]
+        public static async Task ThenSendAndReceiveCustomObject()
+        {
+            var config = new PNConfiguration(new UserId("mytestuuid"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Secure = false,
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+            pubnub = createPubNubInstance(config);
+
+            var objectMessage = new MockObject()
+            {
+                Text = "some_text",
+                Flag = true,
+                Number = 2137
+            };
+
+            var receivedObject = new ManualResetEvent(false);
+            var listener = new SubscribeCallbackExt(
+                (o, m) =>
+                {
+                    if (m is { Message: MockObject { Text: "some_text", Flag: true, Number: 2137 } })
+                    {
+                        receivedObject.Set();
+                    }
+                },
+                (o, p) => {
+                },
+                (o, s) => {
+                });
+            pubnub.AddListener(listener);
+            
+            var channel = "hello_my_channel";
+            
+            pubnub.Subscribe<MockObject>().Channels(new []{channel}).Execute();
+
+            await Task.Delay(3000);
+            
+            await pubnub.Publish().Channel(channel).Message(objectMessage).ExecuteAsync();
+
+            var received = receivedObject.WaitOne(10000);
+            Assert.True(received);
+            
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
 
         [Test]
         public static void ThenUnencryptPublishPOSTShouldReturnSuccessCodeAndInfo()
