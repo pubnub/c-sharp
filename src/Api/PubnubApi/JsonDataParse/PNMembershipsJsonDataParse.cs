@@ -53,6 +53,17 @@ namespace PubnubApi
                                             mbrshipItem.ChannelMetadata = channelMetadataResult;
                                         }
                                     }
+
+                                    mbrshipItem.Status =
+                                        (getMbrshipItemDataDic.ContainsKey("status") &&
+                                         getMbrshipItemDataDic["status"] != null)
+                                            ? getMbrshipItemDataDic["status"]?.ToString()
+                                            : null;
+                                    mbrshipItem.Type =
+                                        (getMbrshipItemDataDic.ContainsKey("type") &&
+                                         getMbrshipItemDataDic["type"] != null)
+                                            ? getMbrshipItemDataDic["type"]?.ToString()
+                                            : null;
                                     result.Memberships.Add(mbrshipItem);
                                 }
                             }

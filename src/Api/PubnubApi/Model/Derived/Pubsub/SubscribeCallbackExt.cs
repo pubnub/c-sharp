@@ -247,6 +247,7 @@ namespace PubnubApi
 			message1.Timetoken = fileEvent.Timetoken;
 			message1.Publisher = fileEvent.Publisher;
 			message1.File = fileEvent.File;
+			message1.CustomMessageType = fileEvent.CustomMessageType;
 
 			fileAction?.Invoke(pubnub, message1);
 		}

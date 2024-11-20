@@ -229,6 +229,7 @@ namespace PubnubApi.EventEngine.Common
                     }
                 }
             } else if (eventData.MessageType == 4) {
+                payloadContainer.Add(eventData.CustomMessageType);
                 ResponseBuilder responseBuilder = new ResponseBuilder(configuration, jsonLibrary, log);
                 PNMessageResult<object> pnFileResult = responseBuilder.JsonToObject<PNMessageResult<object>>(payloadContainer, true);
                 if (pnFileResult != null) {

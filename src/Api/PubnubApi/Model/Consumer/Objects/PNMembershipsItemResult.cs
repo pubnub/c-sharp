@@ -9,6 +9,10 @@ namespace PubnubApi
     {
         public PNChannelMetadataResult ChannelMetadata { get; internal set; }
         public Dictionary<string, object> Custom { get; internal set; }
+
+        public string Type { get; set; }
+
+        public string Status { get; set; }
         public string Updated { get; internal set; }
     }
 }
