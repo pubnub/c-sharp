@@ -129,8 +129,8 @@ public class FilesCustomMessageTypeSteps
         {
             Origin = acceptance_test_origin,
             Secure = false,
-            PublishKey = System.Environment.GetEnvironmentVariable("PN_PUB_KEY"),
-            SubscribeKey = System.Environment.GetEnvironmentVariable("PN_SUB_KEY")
+            PublishKey = System.Environment.GetEnvironmentVariable("PN_PUB_KEY")??"test",
+            SubscribeKey = System.Environment.GetEnvironmentVariable("PN_SUB_KEY")??"test""
         };
     }
     
@@ -143,7 +143,6 @@ public class FilesCustomMessageTypeSteps
         fileResult = result.Result;
     }
     
-    //I receive a successful response
     [Then(@"I receive a successful response")]
     public void ThenIReceiveASuccessfulResponse()
     {

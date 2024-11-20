@@ -129,8 +129,8 @@ public class HistoryCustomMessageTypeSteps
         {
             Origin = acceptance_test_origin,
             Secure = false,
-            PublishKey = System.Environment.GetEnvironmentVariable("PN_PUB_KEY"),
-            SubscribeKey = System.Environment.GetEnvironmentVariable("PN_SUB_KEY")
+            PublishKey = System.Environment.GetEnvironmentVariable("PN_PUB_KEY")??"test",
+            SubscribeKey = System.Environment.GetEnvironmentVariable("PN_SUB_KEY")??"test"
         };
     }
 
@@ -152,7 +152,6 @@ public class HistoryCustomMessageTypeSteps
         pnStatus = historyResult.Status;
     }
     
-    // I fetch message history with 'include_custom_message_type' set to 'false' for 'some-channel' channel
     [When(@"I fetch message history with 'include_custom_message_type' set to '(.*)' for '(.*)' channel")]
     public async Task WhenIFetchMessageHistoryWithCustomMessageTypeForChannel(bool include,string channel)
     {
@@ -171,13 +170,16 @@ public class HistoryCustomMessageTypeSteps
     public void ThenHistoryResponseContainsMessageTypes(string valueOne, string valueTwo)
     {
         var channelMessages = historyResult.Result.Messages[channel];
-        if (currentContract == "fetchHistoryWithPubNubMessageTypes"){
             Assert.IsTrue(channelMessages.Where(m=> m.MessageType == int.Parse(valueOne)).ToList().Count >0);
             Assert.IsTrue(channelMessages.Where(m=> m.MessageType == int.Parse(valueTwo)).ToList().Count >0);
-        } else {
-            Assert.IsTrue(channelMessages.Where(m=> m.CustomMessageType == valueOne).ToList().Count >0);
-            Assert.IsTrue(channelMessages.Where(m=> m.CustomMessageType == valueTwo).ToList().Count >0);
-        }
+    }
+    
+    [Then(@"history response contains messages with '(.*)' and '(.*)' types")]
+    public void ThenHistoryResponseContainsTypes(string valueOne, string valueTwo)
+    {
+        var channelMessages = historyResult.Result.Messages[channel];
+        Assert.IsTrue(channelMessages.Where(m=> m.CustomMessageType == valueOne).ToList().Count >0);
+        Assert.IsTrue(channelMessages.Where(m=> m.CustomMessageType == valueTwo).ToList().Count >0);
     }
     
     [Then(@"history response contains messages without customMessageType")]
@@ -186,4 +188,5 @@ public class HistoryCustomMessageTypeSteps
         var channelMessages = historyResult.Result.Messages[channel];
         Assert.IsTrue(channelMessages.Where(m=> m.CustomMessageType != null).ToList().Count == 0);
     }
+    
 }
