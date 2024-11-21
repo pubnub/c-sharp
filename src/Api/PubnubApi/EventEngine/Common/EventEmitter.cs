@@ -88,8 +88,7 @@ namespace PubnubApi.EventEngine.Common
 
         public void EmitEvent<T>(object e)
         {
-            Message<T> eventData = e as Message<T>;
-
+            var eventData = e as Message<object>;
             string currentMessageChannel = eventData.Channel;
             string currentMessageChannelGroup = eventData.SubscriptionMatch;
 
