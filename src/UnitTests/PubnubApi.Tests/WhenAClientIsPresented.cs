@@ -123,6 +123,50 @@ namespace PubNubMessaging.Tests
             await Task.Delay(4000);
 
             authToken = grantResult.Result?.Token;
+            Assert.IsTrue(grantResult.Status.Error == false && grantResult.Result != null, 
+                "WhenAClientIsPresent Grant access failed.");
+            
+            grantResult = await pubnub.GrantToken().TTL(20).AuthorizedUuid("mytestuuid2").Resources(
+                new PNTokenResources()
+                {
+                    Channels = new Dictionary<string, PNTokenAuthValues>()
+                    {
+                        {
+                            channel, fullAccess
+                        },
+                        {
+                            channel+"-pnpres", fullAccess
+                        },
+                        {
+                            channel1, fullAccess
+                        },
+                        {
+                            channel1+"-pnpres", fullAccess
+                        },
+                        {
+                            channel2, fullAccess
+                        },
+                        {
+                            channel2+"-pnpres", fullAccess
+                        },
+                        {
+                            channel3, fullAccess
+                        },
+                        {
+                            channel3+"-pnpres", fullAccess
+                        },
+                        {
+                            channel4, fullAccess
+                        },
+                        {
+                            channel4+"-pnpres", fullAccess
+                        }
+                    }
+                }).ExecuteAsync();
+
+            await Task.Delay(4000);
+
+            authToken = grantResult.Result?.Token;
 
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
@@ -163,6 +207,65 @@ namespace PubNubMessaging.Tests
         {
             Debug.Write("UsingNewtonSoft");
             Assert.True(true, "UsingNewtonSoft");
+        }
+
+        [Test]
+        public async Task ThenPresenceCallbackShouldFire()
+        {
+            var config = new PNConfiguration(new UserId("mytestuuid"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Secure = false,
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            var pubnub1 = createPubNubInstance(config);
+            
+            var joinReset = new ManualResetEvent(false);
+            var listener = new SubscribeCallbackExt(
+                (o, m) => {
+                },
+                (o, p) =>
+                {
+                    if (p.Event == "join" && p.Uuid == "mytestuuid2")
+                    {
+                        joinReset.Set();
+                    }
+                },
+                (o, s) => {
+                });
+            pubnub1.AddListener(listener);
+            
+            var channel = "hello_my_channel";
+            pubnub1.Subscribe<string>().Channels(new []{channel}).WithPresence().Execute();
+
+            await Task.Delay(3000);
+            
+            var config2 = new PNConfiguration(new UserId("mytestuuid2"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Secure = false,
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            var pubnub2 = createPubNubInstance(config2);
+            pubnub2.Subscribe<string>().Channels(new []{channel}).WithPresence().Execute();
+            
+            var joined = joinReset.WaitOne(12000);
+            Assert.True(joined);
+            
+            pubnub1.Destroy();
+            pubnub2.Destroy();
+            pubnub1.PubnubUnitTest = null;
+            pubnub2.PubnubUnitTest = null;
+            pubnub1 = null;
+            pubnub2 = null;
         }
 
         [Test]
