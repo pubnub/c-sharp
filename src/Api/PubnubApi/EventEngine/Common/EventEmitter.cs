@@ -166,6 +166,7 @@ namespace PubnubApi.EventEngine.Common
             payloadContainer.Add(currentMessageChannel);
 
             if (eventData.MessageType == 1) {
+                payloadContainer.Add(eventData.CustomMessageType);
                 ResponseBuilder responseBuilder = new ResponseBuilder(configuration, jsonLibrary, log);
                 PNMessageResult<T> pnMessageResult = responseBuilder.JsonToObject<PNMessageResult<T>>(payloadContainer, true);
                 if (pnMessageResult != null) {
