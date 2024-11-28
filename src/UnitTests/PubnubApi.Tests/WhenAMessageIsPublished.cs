@@ -167,7 +167,6 @@ namespace PubNubMessaging.Tests
                         .Message(message)
                         .Execute(new PNPublishResultExt((r, s) => { }));
             });
-
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
@@ -500,7 +499,7 @@ namespace PubNubMessaging.Tests
 
             var received = receivedObject.WaitOne(10000);
             Assert.True(received);
-            
+            pubnub.Unsubscribe<MockObject>().Channels(new []{channel}).Execute();
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
