@@ -494,7 +494,7 @@ namespace PubNubMessaging.Tests
             
             pubnub.Subscribe<MockObject>().Channels(new []{channel}).Execute();
 
-            await Task.Delay(3000);
+            await Task.Delay(1000);
             
             await pubnub.Publish().Channel(channel).Message(objectMessage).ExecuteAsync();
 
