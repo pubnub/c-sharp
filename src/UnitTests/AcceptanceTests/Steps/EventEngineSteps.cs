@@ -235,8 +235,8 @@ namespace AcceptanceTests.Steps
             config = new PNConfiguration(new UserId("pn-csharp-acceptance-test-uuid"));
             config.Origin = acceptance_test_origin;
             config.Secure = false;
-            config.PublishKey = System.Environment.GetEnvironmentVariable("PN_PUB_KEY");
-            config.SubscribeKey = System.Environment.GetEnvironmentVariable("PN_SUB_KEY");
+            config.PublishKey = System.Environment.GetEnvironmentVariable("PN_PUB_KEY")??"pubKey";
+            config.SubscribeKey = System.Environment.GetEnvironmentVariable("PN_SUB_KEY")??"subkey";
             config.SecretKey = System.Environment.GetEnvironmentVariable("PN_SEC_KEY");
             if (enableIntenalPubnubLogging)
             {

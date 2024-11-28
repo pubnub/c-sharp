@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using PubnubApi.EventEngine.Core;
 using PubnubApi.EventEngine.Subscribe.Common;
+using PubnubApi.EventEngine.Subscribe.Invocations;
 
 namespace PubnubApi.EventEngine.Subscribe.States
 {
@@ -10,10 +11,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
         {
             return e switch
             {
-                Events.UnsubscribeAllEvent unsubscribeAll => new UnsubscribedState() 
-                {
-					
-				},
+                Events.UnsubscribeAllEvent unsubscribeAll => new UnsubscribedState() { }.With(new EmitStatusInvocation(PNStatusCategory.PNDisconnectedCategory)),
 
                 Events.SubscriptionChangedEvent subscriptionChanged => new HandshakingState()
                 {

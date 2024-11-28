@@ -58,7 +58,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
                     Cursor = this.Cursor,
                     AttemptedRetries = 0,
                     Reason = receiveFailure.Status
-                }.With(new EmitStatusInvocation(PNStatusCategory.PNUnexpectedDisconnectCategory)),
+                },
 
                 _ => null
             };

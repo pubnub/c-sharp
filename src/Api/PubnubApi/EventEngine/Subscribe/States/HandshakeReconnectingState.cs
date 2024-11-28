@@ -23,8 +23,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
 		public override TransitionResult Transition(IEvent e)
 		{
 			return e switch {
-				Events.UnsubscribeAllEvent unsubscribeAll => new UnsubscribedState() {
-				},
+				Events.UnsubscribeAllEvent unsubscribeAll => new UnsubscribedState() { }.With(new EmitStatusInvocation(PNStatusCategory.PNDisconnectedCategory)),
 
 				Events.SubscriptionChangedEvent subscriptionChanged => new HandshakingState() {
                     Channels = subscriptionChanged.Channels?? Enumerable.Empty<string>(),
