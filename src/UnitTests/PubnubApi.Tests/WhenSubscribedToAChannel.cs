@@ -514,7 +514,6 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 Secure = false,
-                EnableEventEngine = false
             };
             if (PubnubCommon.PAMServerSideRun)
             {
@@ -573,9 +572,10 @@ namespace PubNubMessaging.Tests
             string channel2 = "hello_my_channel2";
             if (receivedMessage)
             {
-                receivedMessage = false;
+                // Reason:  As per eventEngine specification, Connected Status won't be emitted on Subscription entity changes
+                // receivedMessage = false;
 
-                subscribeManualEvent = new ManualResetEvent(false);
+                // subscribeManualEvent = new ManualResetEvent(false);
 
                 expected = "{\"t\":{\"t\":\"14836303477713304\",\"r\":7},\"m\":[]}";
 
@@ -600,7 +600,7 @@ namespace PubNubMessaging.Tests
 
                 Thread.Sleep(1000);
                 pubnub.Subscribe<string>().Channels(new [] { channel2 }).Execute();
-                subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for Connect Status
+                // subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for Connect Status
             }
 
             Thread.Sleep(1000);

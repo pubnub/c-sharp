@@ -89,11 +89,18 @@ namespace PubnubApi.EventEngine.Subscribe
 
 		public void Unsubscribe(string[] channels, string[] channelGroups)
 		{
-			if(channels.Length>0 || channelGroups.Length>0)
-				EventQueue.Enqueue(new SubscriptionChangedEvent() {
+			if (channels.Length > 0 || channelGroups.Length > 0)
+			{
+				EventQueue.Enqueue(new SubscriptionChangedEvent()
+				{
 					Channels = Channels.Distinct(),
 					ChannelGroups = ChannelGroups.Distinct()
 				});
+			}
+			else
+			{
+				EventQueue.Enqueue(new UnsubscribeAllEvent());
+			}
 		}
 	}
 }
