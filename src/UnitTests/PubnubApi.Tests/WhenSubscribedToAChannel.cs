@@ -687,8 +687,9 @@ namespace PubNubMessaging.Tests
             string channel2 = "hello_my_channel2";
             if (receivedMessage)
             {
-                receivedMessage = false;
-                subscribeManualEvent = new ManualResetEvent(false);
+                // Reason: EventEngine will not emit connected status when a new channel entity is added.
+                // receivedMessage = false;
+                // subscribeManualEvent = new ManualResetEvent(false);
 
                 expected = "{\"t\":{\"t\":\"14836303477713304\",\"r\":7},\"m\":[]}";
 
@@ -719,8 +720,9 @@ namespace PubNubMessaging.Tests
 
             Thread.Sleep(1000);
 
-            pubnub.Unsubscribe<string>().Channels(new [] { channel1, channel2 }).Execute();
+            
             pubnub.RemoveListener(listenerSubCallack);
+            pubnub.Unsubscribe<string>().Channels(new [] { channel1, channel2 }).Execute();
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
