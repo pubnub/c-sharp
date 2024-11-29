@@ -295,20 +295,27 @@ namespace PubnubApi.EventEngine.Common
                 payloadContainer.Add(eventData.CustomMessageType);
                 ResponseBuilder responseBuilder = new ResponseBuilder(configuration, jsonLibrary, log);
                 PNMessageResult<T> message = responseBuilder.JsonToObject<PNMessageResult<T>>(payloadContainer, true);
-                if (message != null) {
-                    foreach (var listener in listeners) {
-                        listener?.Message(instance, message);
-                    }
-                    if (!string.IsNullOrEmpty(message.Channel) && channelListenersMap.ContainsKey(message.Channel)) {
-                        foreach (var l in channelListenersMap[message.Channel]) {
-                            l?.Message(instance, message);
+                try
+                {
+                    if (message != null) {
+                        foreach (var listener in listeners) {
+                            listener?.Message(instance, message);
+                        }
+                        if (!string.IsNullOrEmpty(message.Channel) && channelListenersMap.ContainsKey(message.Channel)) {
+                            foreach (var l in channelListenersMap[message.Channel]) {
+                                l?.Message(instance, message);
+                            }
+                        }
+                        if (!string.IsNullOrEmpty(message.Subscription) && channelGroupListenersMap.ContainsKey(message.Subscription)) {
+                            foreach (var l in channelGroupListenersMap[message.Subscription]) {
+                                l?.Message(instance, message);
+                            }
                         }
                     }
-                    if (!string.IsNullOrEmpty(message.Subscription) && channelGroupListenersMap.ContainsKey(message.Subscription)) {
-                        foreach (var l in channelGroupListenersMap[message.Subscription]) {
-                            l?.Message(instance, message);
-                        }
-                    }
+                }
+                catch (Exception ex)
+                {
+                    LoggingMethod.WriteToLog(this.log, $"Listener call back execution encounters error: {ex.Message}\n{ex?.StackTrace}", configuration.LogVerbosity);
                 }
             }
         }
