@@ -433,7 +433,7 @@ namespace PubNubMessaging.Tests
                 LogVerbosity = PNLogVerbosity.BODY,
                 PubnubLog = new TestLog(),
                 NonSubscribeRequestTimeout = 120,
-                //EnableEventEngine = true, TODO: Event engine fails those tests...
+                //EnableEventEngine = true, //default enabled
             };
             if (PubnubCommon.PAMServerSideRun)
             {
@@ -604,9 +604,10 @@ namespace PubNubMessaging.Tests
             }
 
             Thread.Sleep(1000);
-
-            pubnub.Unsubscribe<string>().Channels(new [] { channel1, channel2 }).Execute();
+            
             pubnub.RemoveListener(listenerSubCallack);
+            pubnub.Unsubscribe<string>().Channels(new [] { channel1, channel2 }).Execute();
+            pubnub.Disconnect<string>();
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
