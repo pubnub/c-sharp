@@ -56,7 +56,6 @@ namespace PubNubMessaging.Tests
                 SecretKey = PubnubCommon.SecretKey,
                 AuthKey = authKey,
                 Secure = false,
-                EnableEventEngine = false
             };
             server.RunOnHttps(false);
 
