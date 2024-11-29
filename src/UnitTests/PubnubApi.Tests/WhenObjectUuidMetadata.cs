@@ -216,7 +216,7 @@ namespace PubNubMessaging.Tests
                 manualEvent = new ManualResetEvent(false);
                 #region "GetAllUuidMetadata"
                 System.Diagnostics.Debug.WriteLine("pubnub.GetAllUuidMetadata() STARTED");
-                pubnub.GetAllUuidMetadata().IncludeCount(true)
+                pubnub.GetAllUuidMetadata().IncludeCount(true).Filter($"id LIKE '{uuidMetadataId}*'")
                     .Execute(new PNGetAllUuidMetadataResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
@@ -364,7 +364,7 @@ namespace PubNubMessaging.Tests
 #if NET40
                 PNResult<PNGetAllUuidMetadataResult> getUsersResult = Task.Factory.StartNew(async () => await pubnub.GetAllUuidMetadata().IncludeCount(true).ExecuteAsync()).Result.Result;
 #else
-                PNResult<PNGetAllUuidMetadataResult> getUsersResult = await pubnub.GetAllUuidMetadata().IncludeCount(true).ExecuteAsync();
+                PNResult<PNGetAllUuidMetadataResult> getUsersResult = await pubnub.GetAllUuidMetadata().IncludeCount(true).Filter($"id LIKE '{uuidMetadataId}*'").ExecuteAsync();
 #endif
                 if (getUsersResult.Result != null && getUsersResult.Status.StatusCode == 200 && !getUsersResult.Status.Error)
                 {
