@@ -79,9 +79,7 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
 
         public override bool IsBackground(EmitMessagesInvocation invocation) => false;
 
-        public override Task Cancel()
-        {
-            throw new NotImplementedException();
-        }
+        public override Task Cancel() => Task.CompletedTask;
+        
     }
 }
