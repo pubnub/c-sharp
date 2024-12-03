@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using PubnubApi.EventEngine.Common;
 using PubnubApi.EventEngine.Core;
+using PubnubApi.EventEngine.Subscribe.Common;
 using PubnubApi.EventEngine.Subscribe.Invocations;
 
 namespace PubnubApi.EventEngine.Subscribe.Effects
@@ -30,6 +31,10 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
         public async override Task Run(EmitMessagesInvocation invocation)
         {
             var processedMessages = invocation.Messages?.Messages?.Select(m => {
+                if (CheckForNonGenericSerialization(m))
+                {
+                    return m;
+                }
                 m.Payload = DeserializePayload(m.Channel, m.Payload);
                 return m;
             });
@@ -43,6 +48,17 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
                 var genericMethod = methodInfo?.MakeGenericMethod([type]);
                 genericMethod?.Invoke(eventEmitter, [message]);
             }
+        }
+
+        private bool CheckForNonGenericSerialization<T>(Message<T> message)
+        {
+            var channel = message.Channel;
+            var channelGroup = message.SubscriptionMatch;
+            var type = message.MessageType;
+            if (channel.EndsWith(Constants.Pnpres)) return true;
+            if (!string.IsNullOrEmpty(channelGroup) && channelGroup.EndsWith(Constants.Pnpres)) return true;
+            if (type == 0) return false;
+            return true;
         }
 
         private Type MessageTypeValue(string channel)
