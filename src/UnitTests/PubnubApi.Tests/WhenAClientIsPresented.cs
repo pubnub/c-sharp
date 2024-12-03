@@ -2477,7 +2477,7 @@ namespace PubNubMessaging.Tests
         {
             bool receivedPresenceMessage = false;
 
-            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            PNConfiguration config = new PNConfiguration(new UserId($"user{new Random().Next(10,100)}"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
