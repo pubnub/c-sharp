@@ -2472,5 +2472,65 @@ namespace PubNubMessaging.Tests
             Assert.IsTrue(receivedPresenceMessage, "ThenPresenceHeartbeatShouldReturnMessage not received");
         }
         
+        [Test]
+        public static async Task ThenReceiveCustomObjectPresenceCallback()
+        {
+            bool receivedPresenceMessage = false;
+
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            
+            ManualResetEvent presenceManualEvent = new ManualResetEvent(false);
+            SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
+                (o, m) => { Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
+                (o, p) => {
+                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(p));
+                    if (p.Event == "join") { receivedPresenceMessage = true; }
+                    presenceManualEvent.Set();
+                },
+                (o, s) => {
+                    Debug.WriteLine(string.Format("{0} {1} {2}", s.Operation, s.Category, s.StatusCode));
+                    if (s.StatusCode != 200 || s.Error)
+                    {
+                        if (s.ErrorData != null) { Debug.WriteLine(s.ErrorData.Information); }
+                        presenceManualEvent.Set();
+                    }
+                });
+            pubnub = createPubNubInstance(config, authToken);
+            if (!pubnub.AddListener(listenerSubCallack))
+            {
+                Assert.Fail("ATTENTION: AddListener failed");
+            }
+
+            string channel = "hello_my_channel_1";
+            manualResetEventWaitTimeout = 15000;
+            
+            pubnub.Subscribe<WhenAMessageIsPublished.MockObject>().Channels(new [] { channel }).WithPresence().Execute();
+            presenceManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            await Task.Delay(10000);
+
+            pubnub.Unsubscribe<string>().Channels(new [] { channel }).Execute();
+
+            await Task.Delay(2000);
+
+            if (!pubnub.RemoveListener(listenerSubCallack))
+            {
+                Assert.Fail("ATTENTION: RemoveListener failed");
+            }
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+            Assert.IsTrue(receivedPresenceMessage, "ThenReceiveCustomObjectPresenceCallback not received");
+        }
+        
     }
 }
