@@ -22,6 +22,7 @@ namespace PubNubMessaging.Tests
         private static Pubnub pubnub;
         private static Server server;
         private static string authToken;
+        private static string presenceTestChannel = $"presenceTest{new Random().Next(100,1000)}";
 
         public class TestLog : IPubnubLog
         {
@@ -116,8 +117,14 @@ namespace PubNubMessaging.Tests
                         },
                         {
                             channel4+"-pnpres", fullAccess
-                        }
-                    }
+                        },
+                        {
+                            presenceTestChannel, fullAccess
+                        },
+                        {
+                            $"{presenceTestChannel}{Constants.Pnpres}", fullAccess
+                        },
+                    },
                 }).ExecuteAsync();
 
             await Task.Delay(4000);
@@ -2477,7 +2484,7 @@ namespace PubNubMessaging.Tests
         {
             bool receivedPresenceMessage = false;
 
-            PNConfiguration config = new PNConfiguration(new UserId($"user{new Random().Next(10,100)}"))
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -2487,7 +2494,6 @@ namespace PubNubMessaging.Tests
             {
                 config.SecretKey = PubnubCommon.SecretKey;
             }
-            
             ManualResetEvent presenceManualEvent = new ManualResetEvent(false);
             SubscribeCallback listenerSubCallack = new SubscribeCallbackExt(
                 (o, m) => { Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(m)); },
@@ -2510,15 +2516,14 @@ namespace PubNubMessaging.Tests
                 Assert.Fail("ATTENTION: AddListener failed");
             }
 
-            string channel = "hello_my_channel_1";
             manualResetEventWaitTimeout = 15000;
             
-            pubnub.Subscribe<WhenAMessageIsPublished.MockObject>().Channels(new [] { channel }).WithPresence().Execute();
+            pubnub.Subscribe<WhenAMessageIsPublished.MockObject>().Channels(new [] { presenceTestChannel }).WithPresence().Execute();
             presenceManualEvent.WaitOne(manualResetEventWaitTimeout);
 
             await Task.Delay(10000);
 
-            pubnub.Unsubscribe<string>().Channels(new [] { channel }).Execute();
+            pubnub.Unsubscribe<string>().Channels(new [] { presenceTestChannel }).Execute();
 
             await Task.Delay(2000);
 
