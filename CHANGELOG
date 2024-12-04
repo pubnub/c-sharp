@@ -1,3 +1,8 @@
+v7.1.0 - December 04 2024
+-----------------------------
+- Added: added support for CustomMessageType in publish, signal, files features.
+- Added: added support for Type field in membership APIs.
+
 v7.0.0 - October 30 2024
 -----------------------------
 - Added: added support for `Channel`, `ChannelGroup`, `Subscription` and `SubscriptionSet`, `ChannelMetadata`, `UserMetadata`  entities for Subscribe related operation.

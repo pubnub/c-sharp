@@ -29,7 +29,6 @@ namespace PubNubMessaging.Tests
             else
             {
                 pnConfiguration.Origin = "ps.pndsn.com";
-                pnConfiguration.EnableEventEngine = false;
                 pubnub = new Pubnub(pnConfiguration);
             }
             if (!string.IsNullOrEmpty(authToken))

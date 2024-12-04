@@ -17,7 +17,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
         {
             return e switch
             {
-                Events.UnsubscribeAllEvent unsubscribeAll => new UnsubscribedState() { },
+                Events.UnsubscribeAllEvent unsubscribeAll => new UnsubscribedState() { }.With(new EmitStatusInvocation(PNStatusCategory.PNDisconnectedCategory)),
 
                 Events.ReceiveSuccessEvent receiveSuccess => new ReceivingState()
                 {

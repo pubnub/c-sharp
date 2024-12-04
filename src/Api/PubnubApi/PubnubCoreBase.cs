@@ -353,6 +353,9 @@ namespace PubnubApi
                                 case "c":
                                     msg.Channel = dicItem[key].ToString();
                                     break;
+                                case "cmt":
+                                    msg.CustomMessageType = dicItem[key]?.ToString();
+                                    break;
                                 case "d":
                                     msg.Payload = dicItem[key];
                                     break;
@@ -680,16 +683,10 @@ namespace PubnubApi
                                     payloadContainer.Add(currentMessage.PublishTimetokenMetadata.Timetoken); //Third one always Timetoken
 
                                     payloadContainer.Add(currentMessage.IssuingClientId); //Fourth one always Publisher
-
-                                    if (!string.IsNullOrEmpty(currentMessageChannelGroup)) //Add cg first before channel
-                                    {
-                                        payloadContainer.Add(currentMessageChannelGroup);
-                                    }
-
-                                    if (!string.IsNullOrEmpty(currentMessageChannel))
-                                    {
-                                        payloadContainer.Add(currentMessageChannel);
-                                    }
+                                    
+                                    payloadContainer.Add(currentMessageChannelGroup);
+                                        
+                                    payloadContainer.Add(currentMessageChannel);
 
                                     if (currentMessage.MessageType == 1)
                                     {
@@ -704,7 +701,8 @@ namespace PubnubApi
                                                 Subscription = pnMessageResult.Subscription,
                                                 Timetoken = pnMessageResult.Timetoken,
                                                 UserMetadata = pnMessageResult.UserMetadata,
-                                                Publisher = pnMessageResult.Publisher
+                                                Publisher = pnMessageResult.Publisher,
+                                                CustomMessageType = pnMessageResult.CustomMessageType
                                             };
                                             Announce(signalMessage);
                                         }
@@ -729,6 +727,7 @@ namespace PubnubApi
                                     }
                                     else if (currentMessage.MessageType == 4)
                                     {
+                                        payloadContainer.Add(currentMessage.CustomMessageType);
                                         ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
                                         PNMessageResult<object> pnFileResult = responseBuilder.JsonToObject<PNMessageResult<object>>(payloadContainer, true);
                                         if (pnFileResult != null)
@@ -785,6 +784,7 @@ namespace PubnubApi
                                         {
                                             LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, ResponseToUserCallback - payload = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), jsonLib.SerializeToJsonString(payloadContainer)), currentConfig.LogVerbosity);
                                         }
+                                        payloadContainer.Add(currentMessage.CustomMessageType);
                                         ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
                                         PNMessageResult<T> userMessage = responseBuilder.JsonToObject<PNMessageResult<T>>(payloadContainer, true);
                                         if (userMessage != null)

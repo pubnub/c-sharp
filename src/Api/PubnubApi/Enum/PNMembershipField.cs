@@ -9,6 +9,8 @@ namespace PubnubApi
     {
         CUSTOM,
         CHANNEL,
-        CHANNEL_CUSTOM
+        CHANNEL_CUSTOM,
+        STATUS,
+        TYPE
     }
 }

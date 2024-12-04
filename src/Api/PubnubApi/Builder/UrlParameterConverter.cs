@@ -28,6 +28,14 @@ namespace PubnubApi.EndPoint
             {
                 endpointParameterName = "uuid.custom";
             }
+            else if (enumValue.ToLowerInvariant() == "status")
+            {
+                endpointParameterName = "status";
+            }
+            else if (enumValue.ToLowerInvariant() == "type")
+            {
+                endpointParameterName = "type";
+            }
 
             return endpointParameterName;
         }

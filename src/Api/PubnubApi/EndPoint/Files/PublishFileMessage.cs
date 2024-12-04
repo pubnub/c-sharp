@@ -25,6 +25,7 @@ namespace PubnubApi.EndPoint
 		private object publishMessageContent;
 		private bool storeInHistory = true;
 		private Dictionary<string, object> userMetadata;
+		private string customMessageType;
 		private int ttl = -1;
 
 		public PublishFileMessageOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
@@ -74,6 +75,11 @@ namespace PubnubApi.EndPoint
 		public PublishFileMessageOperation FileName(string name)
 		{
 			this.currentFileName = name;
+			return this;
+		}
+		public PublishFileMessageOperation CustomMessageType(string customMessageType)
+		{
+			this.customMessageType = customMessageType;
 			return this;
 		}
 
@@ -249,6 +255,10 @@ namespace PubnubApi.EndPoint
 
 			if (!storeInHistory) {
 				requestQueryStringParams.Add("store", "0");
+			}
+			
+			if (!string.IsNullOrEmpty(customMessageType)) {
+				requestQueryStringParams.Add("custom_message_type", customMessageType);
 			}
 
 			if (queryParam != null && queryParam.Count > 0) {

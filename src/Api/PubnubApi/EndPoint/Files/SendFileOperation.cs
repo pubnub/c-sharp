@@ -29,6 +29,7 @@ namespace PubnubApi.EndPoint
 		private bool storeInHistory = true;
 		private Dictionary<string, object> userMetadata;
 		private int ttl = -1;
+		private string customMessageType;
 
 		public SendFileOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
 		{
@@ -65,6 +66,12 @@ namespace PubnubApi.EndPoint
 		public SendFileOperation Ttl(int ttl)
 		{
 			this.ttl = ttl;
+			return this;
+		}
+		
+		public SendFileOperation CustomMessageType(string customMessageType)
+		{
+			this.customMessageType = customMessageType;
 			return this;
 		}
 
@@ -180,11 +187,12 @@ namespace PubnubApi.EndPoint
 						int publishFileRetryLimit = config.FileMessagePublishRetryLimit;
 						int currentFileRetryCount = 0;
 						bool publishFailed;
+						PNStatus publishFileMessageStatus;
 						do {
 							currentFileRetryCount += 1;
 							PNResult<PNPublishFileMessageResult> publishFileMessageResponse = PublishFileMessage(publishPayload, queryParam).Result;
 							PNPublishFileMessageResult publishFileMessage = publishFileMessageResponse.Result;
-							PNStatus publishFileMessageStatus = publishFileMessageResponse.Status;
+							publishFileMessageStatus = publishFileMessageResponse.Status;
 							if (publishFileMessageStatus != null && !publishFileMessageStatus.Error && publishFileMessage != null) {
 								publishFailed = false;
 								PNFileUploadResult result = new PNFileUploadResult();
@@ -202,11 +210,11 @@ namespace PubnubApi.EndPoint
 								LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} PublishFileMessage Failed. currentFileRetryCount={1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), currentFileRetryCount), config.LogVerbosity);
 							}
 						}
-						while (publishFailed && currentFileRetryCount <= publishFileRetryLimit);
+						while (publishFailed && currentFileRetryCount <= publishFileRetryLimit && !(publishFileMessageStatus?.StatusCode != 400 || publishFileMessageStatus.StatusCode != 403));
 					} else {
-						int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
-						PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
-						PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNFileUploadOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
+						int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse?.Error?.Message);
+						PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse?.Error?.Message);
+						PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNFileUploadOperation, category, requestState, statusCode, new PNException(transportResponse?.Error?.Message, transportResponse?.Error));
 						requestState.PubnubCallback.OnResponse(default, status);
 					}
 				}
@@ -229,11 +237,13 @@ namespace PubnubApi.EndPoint
 				return returnValue;
 			}
 			LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} GenerateFileUploadUrl executed.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
-			RequestState<PNFileUploadResult> requestState = new RequestState<PNFileUploadResult>();
-			requestState.ResponseType = PNOperationType.PNFileUploadOperation;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
-			requestState.UsePostMethod = true;
+			RequestState<PNFileUploadResult> requestState = new RequestState<PNFileUploadResult>
+			{
+				ResponseType = PNOperationType.PNFileUploadOperation,
+				Reconnect = false,
+				EndPointOperation = this,
+				UsePostMethod = true
+			};
 			byte[] sendFileByteArray = sendFileBytes ?? GetByteArrayFromFilePath(sendFileFullPath);
 			string dataBoundary = string.Format(CultureInfo.InvariantCulture, "----------{0:N}", Guid.NewGuid());
 			string contentType = "multipart/form-data; boundary=" + dataBoundary;
@@ -303,11 +313,12 @@ namespace PubnubApi.EndPoint
 				int publishFileRetryLimit = config.FileMessagePublishRetryLimit;
 				int currentFileRetryCount = 0;
 				bool publishFailed;
+				PNStatus publishFileMessageStatus;
 				do {
 					currentFileRetryCount += 1;
 					PNResult<PNPublishFileMessageResult> publishFileMessageResponse = await PublishFileMessage(publishPayload, queryParam).ConfigureAwait(false);
 					PNPublishFileMessageResult publishFileMessage = publishFileMessageResponse.Result;
-					PNStatus publishFileMessageStatus = publishFileMessageResponse.Status;
+					publishFileMessageStatus = publishFileMessageResponse.Status;
 					if (publishFileMessageStatus != null && !publishFileMessageStatus.Error && publishFileMessage != null) {
 						publishFailed = false;
 						PNFileUploadResult result = new PNFileUploadResult
@@ -326,7 +337,7 @@ namespace PubnubApi.EndPoint
 						await Task.Delay(1000);
 					}
 				}
-				while (publishFailed && currentFileRetryCount <= publishFileRetryLimit);
+				while (publishFailed && currentFileRetryCount <= publishFileRetryLimit && !(publishFileMessageStatus?.StatusCode != 400 || publishFileMessageStatus.StatusCode != 403));
 			}
 
 			return returnValue;
@@ -403,7 +414,7 @@ namespace PubnubApi.EndPoint
 					ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
 					PNPublishFileMessageResult publishResult = responseBuilder.JsonToObject<PNPublishFileMessageResult>(result, true);
 					StatusBuilder statusBuilder = new StatusBuilder(config, jsonLibrary);
-					if (publishResult != null) {
+					if (publishResult != null && transportResponse.StatusCode == Constants.HttpRequestSuccessStatusCode) {
 						returnValue.Result = publishResult;
 						PNStatus status = statusBuilder.CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, transportResponse.StatusCode, null);
 						returnValue.Status = status;
@@ -564,6 +575,10 @@ namespace PubnubApi.EndPoint
 			if (storeInHistory && ttl >= 0) {
 				requestQueryStringParams.Add("ttl", ttl.ToString(CultureInfo.InvariantCulture));
 			}
+			
+			if (!string.IsNullOrEmpty(customMessageType)) {
+				requestQueryStringParams.Add("custom_message_type", customMessageType);
+			}
 
 			if (!storeInHistory) {
 				requestQueryStringParams.Add("store", "0");
@@ -587,8 +602,8 @@ namespace PubnubApi.EndPoint
 		private string PrepareContent(object originalMessage)
 		{
 			string message = jsonLibrary.SerializeToJsonString(originalMessage);
-			if (config.CryptoModule != null || config.CipherKey.Length > 0) {
-				config.CryptoModule ??= new CryptoModule(new LegacyCryptor(config.CipherKey, config.UseRandomInitializationVector, pubnubLog), null);
+			if (config.CryptoModule != null || config.CipherKey.Length > 0 || currentFileCipherKey != null) {
+				config.CryptoModule ??= new CryptoModule(new LegacyCryptor(currentFileCipherKey ?? config.CipherKey, config.UseRandomInitializationVector, pubnubLog), null);
 				string encryptMessage = config.CryptoModule.Encrypt(message);
 				message = jsonLibrary.SerializeToJsonString(encryptMessage);
 			}

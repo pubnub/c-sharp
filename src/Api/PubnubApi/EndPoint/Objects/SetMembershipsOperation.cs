@@ -204,13 +204,20 @@ namespace PubnubApi.EndPoint
 			Dictionary<string, object> messageEnvelope = new Dictionary<string, object>();
 			if (addMembership != null) {
 				List<Dictionary<string, object>> setMembershipFormatList = new List<Dictionary<string, object>>();
-				for (int index = 0; index < addMembership.Count; index++) {
+				foreach (var membership in addMembership)
+				{
 					Dictionary<string, object> currentMembershipFormat = new Dictionary<string, object>
 					{
-						{ "channel", new Dictionary<string, string> { { "id", addMembership[index].Channel } } }
+						{ "channel", new Dictionary<string, string> { { "id", membership.Channel } } }
 					};
-					if (addMembership[index].Custom != null) {
-						currentMembershipFormat.Add("custom", addMembership[index].Custom);
+					if (membership.Custom != null) {
+						currentMembershipFormat.Add("custom", membership.Custom);
+					}
+					if (membership.Status != null) {
+						currentMembershipFormat.Add("status", membership.Status);
+					}
+					if (membership.Type != null) {
+						currentMembershipFormat.Add("type", membership.Type);
 					}
 					setMembershipFormatList.Add(currentMembershipFormat);
 				}

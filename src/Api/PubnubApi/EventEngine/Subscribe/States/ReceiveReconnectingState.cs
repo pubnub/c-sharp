@@ -27,10 +27,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
         {
             return e switch
             {
-                Events.UnsubscribeAllEvent unsubscribeAll => new UnsubscribedState() 
-                {
-					
-				},
+                Events.UnsubscribeAllEvent unsubscribeAll => new UnsubscribedState() { }.With(new EmitStatusInvocation(PNStatusCategory.PNDisconnectedCategory)),
 
                 Events.SubscriptionChangedEvent subscriptionChanged => new ReceivingState()
                 {
@@ -72,7 +69,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
                     Cursor = this.Cursor,
                     AttemptedRetries = this.AttemptedRetries + 1,
                     Reason = receiveReconnectFailure.Status
-				},
+				}.With(new EmitStatusInvocation(PNStatusCategory.PNUnexpectedDisconnectCategory)),
 
                 Events.ReceiveReconnectGiveUpEvent receiveReconnectGiveUp => new ReceiveFailedState()
                 {

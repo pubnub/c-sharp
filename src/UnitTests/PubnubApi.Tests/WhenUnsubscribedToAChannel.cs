@@ -247,7 +247,20 @@ namespace PubNubMessaging.Tests
             public override void Status(Pubnub pubnub, PNStatus status)
             {
                 Debug.WriteLine("SubscribeCallback: PNStatus: " + status.StatusCode.ToString());
-                if (status.StatusCode != 200 || status.Error)
+                // Reason: No status code info in status of Dicsonnected as per Event Engine specification
+                if (status.Category == PNStatusCategory.PNDisconnectedCategory)
+                {
+                    switch (currentTestCase)
+                    {
+                        case "ThenShouldReturnUnsubscribedMessage":
+                            receivedMessage = true;
+                            subscribeManualEvent.Set();
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                else if (status.StatusCode != 200 || status.Error)
                 {
                     switch (currentTestCase)
                     {
@@ -275,19 +288,6 @@ namespace PubNubMessaging.Tests
                             break;
                     }
                 }
-                else if (status.StatusCode == 200 && status.Category == PNStatusCategory.PNDisconnectedCategory)
-                {
-                    switch (currentTestCase)
-                    {
-                        case "ThenShouldReturnUnsubscribedMessage":
-                            receivedMessage = true;
-                            subscribeManualEvent.Set();
-                            break;
-                        default:
-                            break;
-                    }
-                }
-
 
             }
 

@@ -150,18 +150,18 @@ namespace PubNubMessaging.Tests
                 (o, p) => { /* Catch the presence events */ },
                 (o, s) => {
                     Debug.WriteLine("SubscribeCallback: PNStatus: " + s.StatusCode.ToString());
-                    if (s.StatusCode != 200 || s.Error)
+                    // Reason: No Status code information emitted on Disconnected Event
+                    if (s.Category == PNStatusCategory.PNConnectedCategory || s.Category == PNStatusCategory.PNDisconnectedCategory)
+                    {
+                        receivedMessage = true;
+                        subscribeManualEvent.Set();
+                    } else if (s.StatusCode != 200 || s.Error)
                     {
                         subscribeManualEvent.Set();
                         if (s.ErrorData != null)
                         {
                             Debug.WriteLine(s.ErrorData.Information);
                         }
-                    }
-                    else if (s.StatusCode == 200 && (s.Category == PNStatusCategory.PNConnectedCategory || s.Category == PNStatusCategory.PNDisconnectedCategory))
-                    {
-                        receivedMessage = true;
-                        subscribeManualEvent.Set();
                     }
                 });
             pubnub = createPubNubInstance(config);

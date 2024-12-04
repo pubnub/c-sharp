@@ -62,6 +62,11 @@ namespace PubnubApi
                                         {
                                             result.MessageType = messageType;
                                         }
+
+                                        if (messagesContainer.ContainsKey("custom_message_type") && !string.IsNullOrEmpty((string)messagesContainer["custom_message_type"]))
+                                        {
+                                            result.CustomMessageType = messagesContainer["custom_message_type"].ToString();
+                                        }
                                     }
                                     resultList.Add(result);
                                 }

@@ -93,6 +93,7 @@ namespace PubnubApi.EndPoint
 			PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ContinueWith(t => {
 				var transportResponse = t.Result;
 				if (transportResponse.Error == null) {
+					requestState.GotJsonResponse = true;
 					var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 					if (!string.IsNullOrEmpty(responseString)) {
 						List<object> result = ProcessJsonResponse(requestState, responseString);
@@ -140,6 +141,7 @@ namespace PubnubApi.EndPoint
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNDeleteFileOperation);
 			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ConfigureAwait(false);
 			if (transportResponse.Error == null) {
+				requestState.GotJsonResponse = true;
 				var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
 				if (errorStatus == null) {

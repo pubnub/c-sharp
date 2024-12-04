@@ -110,7 +110,7 @@ namespace PubnubApi.EndPoint
 				var isSubscriptionChanged = isUniqueChannelCountChanged || isUniqueChannelGroupCountChanged;
 				if (isSubscriptionChanged)
 				{
-					subscribeEventEngine.Unsubscribe(subscribeEventEngine.Channels.ToArray(), subscribeEventEngine.Channels.ToArray());
+					subscribeEventEngine.Unsubscribe(subscribeEventEngine.Channels.ToArray(), subscribeEventEngine.ChannelGroups.ToArray());
 					if (config.PresenceInterval > 0 && presenceEventEngineFactory.HasEventEngine(instanceId) && (uniqueChannelsToRemove.Count > 0 || uniqueChannelGroupsToRemove.Count > 0)) {
 						PresenceEventEngine presenceEventEngine = presenceEventEngineFactory.GetEventEngine(instanceId);
 						presenceEventEngine.EventQueue.Enqueue(new EventEngine.Presence.Events.LeftEvent()

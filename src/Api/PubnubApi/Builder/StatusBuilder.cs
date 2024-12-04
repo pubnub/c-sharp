@@ -154,7 +154,7 @@ namespace PubnubApi
                 status.Category = PNStatusCategory.PNAccessDeniedCategory;
             }
 
-
+            status.Uuid = config.UserId;
             status.Origin = config.Origin;
             status.TlsEnabled = config.Secure;
 

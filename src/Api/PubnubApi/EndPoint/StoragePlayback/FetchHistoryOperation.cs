@@ -25,6 +25,7 @@ namespace PubnubApi.EndPoint
 		private long startTimetoken = -1;
 		private long endTimetoken = -1;
 		private int perChannelCount = -1;
+		private bool includeCustomMessageType;
 		private Dictionary<string, object> queryParam;
 
 		private string[] channelNames;
@@ -72,6 +73,12 @@ namespace PubnubApi.EndPoint
 		public FetchHistoryOperation IncludeMessageType(bool withMessageType)
 		{
 			includeMessageType = withMessageType;
+			return this;
+		}
+		
+		public FetchHistoryOperation IncludeCustomMessageType(bool withCustomMessageType)
+		{
+			includeCustomMessageType = withCustomMessageType;
 			return this;
 		}
 
@@ -269,6 +276,9 @@ namespace PubnubApi.EndPoint
 			if (includeMessageType) {
 				requestQueryStringParams.Add("include_message_type", "true");
 			}
+			
+			requestQueryStringParams.Add("include_custom_message_type", includeCustomMessageType?"true":"false");
+			
 
 			if (queryParam != null && queryParam.Count > 0) {
 				foreach (KeyValuePair<string, object> kvp in queryParam) {

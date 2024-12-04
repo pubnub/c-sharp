@@ -355,18 +355,17 @@ namespace PubNubMessaging.Tests
 
                 subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-                pubnub.Unsubscribe<string>().Channels(new[] { channel }).Execute();
-
                 Thread.Sleep(1000);
 
-                pubnub.RemoveListener(listenerSubCallack);
-                pubnub.Destroy();
-                pubnub.PubnubUnitTest = null;
-                pubnub = null;
                 if (receivedErrorMessage)
                 {
                     internalReceivedMessage = false;
                 }
+                pubnub.RemoveListener(listenerSubCallack);
+                pubnub.Unsubscribe<string>().Channels(new[] { channel }).Execute();
+                pubnub.Destroy();
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(internalReceivedMessage, "WhenSubscribedToAChannel --> ThenUnencryptSignalListenerShouldGetMessagae Failed");
             }
         }
@@ -463,18 +462,16 @@ namespace PubNubMessaging.Tests
 
                 subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-                pubnub.Unsubscribe<string>().Channels(new[] { channel }).Execute();
-
                 Thread.Sleep(1000);
-
-                pubnub.RemoveListener(listenerSubCallack);
-                pubnub.Destroy();
-                pubnub.PubnubUnitTest = null;
-                pubnub = null;
                 if (receivedErrorMessage)
                 {
                     internalReceivedMessage = false;
                 }
+                pubnub.RemoveListener(listenerSubCallack);
+                pubnub.Unsubscribe<string>().Channels(new[] { channel }).Execute();
+                pubnub.Destroy();
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(internalReceivedMessage, "WhenSubscribedToAChannel --> ThenWithAsyncUnencryptSignalListenerShouldGetMessagae Failed");
             }
         }
@@ -520,7 +517,7 @@ namespace PubNubMessaging.Tests
                     if (m != null)
                     {
                         Debug.WriteLine(string.Format("Signal SubscribeCallback: PNMessageResult: {0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(m.Message)));
-                        if (pubnub.JsonPluggableLibrary.SerializeToJsonString(messageForUnencryptSignal) == m.Message.ToString())
+                        if (messageForUnencryptSignal == m.Message.ToString())
                         {
                             internalReceivedMessage = true;
                         }
@@ -570,18 +567,17 @@ namespace PubNubMessaging.Tests
 
                 subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
 
-                pubnub.Unsubscribe<string>().Channels(new[] { channel }).Execute();
-
                 Thread.Sleep(1000);
-
-                pubnub.RemoveListener(listenerSubCallack);
-                pubnub.Destroy();
-                pubnub.PubnubUnitTest = null;
-                pubnub = null;
+                
                 if (receivedErrorMessage)
                 {
                     internalReceivedMessage = false;
                 }
+                pubnub.RemoveListener(listenerSubCallack);
+                pubnub.Unsubscribe<string>().Channels(new[] { channel }).Execute();
+                pubnub.Destroy();
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(internalReceivedMessage, "WhenSubscribedToAChannel --> ThenUnencryptSignalListenerShouldGetMessagae Failed");
             }
         }
@@ -676,18 +672,17 @@ namespace PubNubMessaging.Tests
                     internalReceivedMessage = true;
                 }
 
-                pubnub.Unsubscribe<string>().Channels(new[] { channel }).Execute();
-
                 Thread.Sleep(1000);
-
-                pubnub.RemoveListener(listenerSubCallack);
-                pubnub.Destroy();
-                pubnub.PubnubUnitTest = null;
-                pubnub = null;
+                
                 if (receivedErrorMessage)
                 {
                     internalReceivedMessage = false;
                 }
+                pubnub.RemoveListener(listenerSubCallack);
+                pubnub.Unsubscribe<string>().Channels(new[] { channel }).Execute();
+                pubnub.Destroy();
+                pubnub.PubnubUnitTest = null;
+                pubnub = null;
                 Assert.IsTrue(internalReceivedMessage, "WhenSubscribedToAChannel --> ThenWithAsyncIgnoreCipherKeyUnencryptSignalListenerShouldGetMessagae Failed");
             }
         }
