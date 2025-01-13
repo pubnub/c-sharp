@@ -399,9 +399,12 @@ namespace PubnubApi
 
                 PropertyInfo subsciptionProp = specific.GetRuntimeProperty("Subscription");
                 subsciptionProp.SetValue(message, jsonFields["channelGroup"]?.ToString(), null);
-                
-                PropertyInfo customMessageType = specific.GetRuntimeProperty("CustomMessageType");
-                customMessageType.SetValue(message, jsonFields["customMessageType"], null);
+
+                if (jsonFields.ContainsKey("customMessageType"))
+                {
+                    PropertyInfo customMessageType = specific.GetRuntimeProperty("CustomMessageType");
+                    customMessageType.SetValue(message, jsonFields["customMessageType"], null);
+                }
 
                 if (jsonFields["userMetadata"] != null)
                 {
