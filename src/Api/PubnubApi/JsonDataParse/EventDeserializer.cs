@@ -47,31 +47,29 @@ public class EventDeserializer
 
     private PNPresenceEventResult DeserializePresenceEvent(IDictionary<string, object> jsonFields)
     {
-        Dictionary<string, object> presenceDicObj = jsonLibrary.ConvertToDictionaryObject(jsonFields["payload"]);
+        Dictionary<string, object> presenceDataFields = jsonLibrary.ConvertToDictionaryObject(jsonFields["payload"]);
 
         PNPresenceEventResult presenceEvent = null;
 
-        if (presenceDicObj != null)
+        if (presenceDataFields != null)
         {
-            presenceEvent = new PNPresenceEventResult();
-            presenceEvent.Event = presenceDicObj["action"].ToString();
-            long presenceTimeStamp;
-            if (Int64.TryParse(presenceDicObj["timestamp"].ToString(), out presenceTimeStamp))
+            presenceEvent = new PNPresenceEventResult
+            {
+                Event = presenceDataFields["action"]?.ToString()
+            };
+            if (Int64.TryParse(presenceDataFields["timestamp"].ToString(), out var presenceTimeStamp))
             {
                 presenceEvent.Timestamp = presenceTimeStamp;
             }
 
-            if (presenceDicObj.TryGetValue("uuid", out var value))
-            {
-                presenceEvent.Uuid = value.ToString();
-            }
+            presenceEvent.Uuid = presenceDataFields["uuid"]?.ToString();
 
-            if (Int32.TryParse(presenceDicObj["occupancy"].ToString(), out var presenceOccupany))
+            if (Int32.TryParse(presenceDataFields["occupancy"]?.ToString(), out var presenceOccupany))
             {
                 presenceEvent.Occupancy = presenceOccupany;
             }
 
-            if (presenceDicObj.TryGetValue("data", out var presenceEventDataField))
+            if (presenceDataFields.TryGetValue("data", out var presenceEventDataField))
             {
                 if (presenceEventDataField is Dictionary<string, object> presenceData)
                 {
@@ -86,8 +84,7 @@ public class EventDeserializer
 
             presenceEvent.Channel = jsonFields["channel"]?.ToString();
             presenceEvent.Channel = presenceEvent.Channel?.Replace("-pnpres", "");
-
-
+            
             presenceEvent.Subscription = jsonFields["channelGroup"]?.ToString();
             presenceEvent.Subscription = presenceEvent.Subscription?.Replace("-pnpres", "");
 
@@ -99,7 +96,7 @@ public class EventDeserializer
 
             if (presenceEvent.Event != null && presenceEvent.Event.ToLowerInvariant() == "interval")
             {
-                if (presenceDicObj.TryGetValue("join", out var joinUserList))
+                if (presenceDataFields.TryGetValue("join", out var joinUserList))
                 {
                     List<object> joinDeltaList = joinUserList as List<object>;
                     if (joinDeltaList is { Count: > 0 })
@@ -108,27 +105,27 @@ public class EventDeserializer
                     }
                 }
 
-                if (presenceDicObj.ContainsKey("timeout"))
+                if (presenceDataFields.ContainsKey("timeout"))
                 {
-                    List<object> timeoutDeltaList = presenceDicObj["timeout"] as List<object>;
+                    List<object> timeoutDeltaList = presenceDataFields["timeout"] as List<object>;
                     if (timeoutDeltaList != null && timeoutDeltaList.Count > 0)
                     {
                         presenceEvent.Timeout = timeoutDeltaList.Select(x => x.ToString()).ToArray();
                     }
                 }
 
-                if (presenceDicObj.ContainsKey("leave"))
+                if (presenceDataFields.ContainsKey("leave"))
                 {
-                    List<object> leaveDeltaList = presenceDicObj["leave"] as List<object>;
+                    List<object> leaveDeltaList = presenceDataFields["leave"] as List<object>;
                     if (leaveDeltaList != null && leaveDeltaList.Count > 0)
                     {
                         presenceEvent.Leave = leaveDeltaList.Select(x => x.ToString()).ToArray();
                     }
                 }
 
-                if (presenceDicObj.ContainsKey("here_now_refresh"))
+                if (presenceDataFields.ContainsKey("here_now_refresh"))
                 {
-                    string hereNowRefreshStr = presenceDicObj["here_now_refresh"].ToString();
+                    string hereNowRefreshStr = presenceDataFields["here_now_refresh"].ToString();
                     if (!string.IsNullOrEmpty(hereNowRefreshStr))
                     {
                         bool boolHereNowRefresh = false;
