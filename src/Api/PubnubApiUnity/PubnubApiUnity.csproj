@@ -226,6 +226,7 @@
     <Compile Include="..\PubnubApi\JsonDataParse\DeserializeToInternalObjectUtility.cs">
       <Link>JsonDataParse\DeserializeToInternalObjectUtility.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\JsonDataParse\EventDeserializer.cs" Link="JsonDataParse\EventDeserializer.cs" />
 	<Compile Include="..\PubnubApi\RetryConfiguration.cs">
       <Link>RetryConfiguration.cs</Link>
     </Compile>

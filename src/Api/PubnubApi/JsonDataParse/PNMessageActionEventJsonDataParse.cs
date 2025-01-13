@@ -5,11 +5,11 @@ namespace PubnubApi
 {
     internal static class PNMessageActionEventJsonDataParse
     {
-        internal static PNMessageActionEventResult GetObject(IJsonPluggableLibrary jsonPlug, List<object> listObject)
+        internal static PNMessageActionEventResult GetObject(IJsonPluggableLibrary jsonPlug, IDictionary<string, object> listObject)
         {
             PNMessageActionEventResult result = null;
 
-            Dictionary<string, object> msgActionEventDicObj = jsonPlug.ConvertToDictionaryObject(listObject[0]);
+            Dictionary<string, object> msgActionEventDicObj = jsonPlug.ConvertToDictionaryObject(listObject["payload"]);
             if (msgActionEventDicObj != null)
             {
                 result = new PNMessageActionEventResult();
@@ -43,12 +43,10 @@ namespace PubnubApi
                         };
                     }
                 }
-                result.Uuid = listObject[3].ToString();
-                result.Subscription = listObject[4]?.ToString();
-                result.Channel = listObject[5]?.ToString();
-
+                result.Uuid = listObject["userId"]?.ToString();
+                result.Subscription = listObject["channelGroup"]?.ToString();
+                result.Channel = listObject["channel"]?.ToString();
             }
-
             return result;
         }
     }

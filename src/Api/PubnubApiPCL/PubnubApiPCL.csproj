@@ -302,6 +302,7 @@ Added support for Type field in membership APIs.</PackageReleaseNotes>
       <Link>JsonDataParse\DeserializeToInternalObjectUtility.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\JsonDataParse\PNAccessManagerGrantJsonDataParse.cs" Link="JsonDataParse\PNAccessManagerGrantJsonDataParse.cs" />
+    <Compile Include="..\PubnubApi\JsonDataParse\EventDeserializer.cs" Link="JsonDataParse\EventDeserializer.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNAddMessageActionJsonDataParse.cs" Link="JsonDataParse\PNAddMessageActionJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNFetchHistoryJsonDataParse.cs" Link="JsonDataParse\PNFetchHistoryJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNGenerateFileUploadUrlDataParse.cs" Link="JsonDataParse\PNGenerateFileUploadUrlDataParse.cs" />

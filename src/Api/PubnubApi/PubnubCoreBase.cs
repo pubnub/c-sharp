@@ -586,11 +586,11 @@ namespace PubnubApi
                                     }
 
                                     object payload = currentMessage.Payload;
+                                    var jsonFields = new Dictionary<string, object>();
 
-                                    List<object> payloadContainer = new List<object>(); //First item always message
                                     if (currentMessageChannel.Contains("-pnpres") || currentMessageChannel.Contains(".*-pnpres"))
                                     {
-                                        payloadContainer.Add(payload);
+                                        jsonFields.Add("payload", payload);
                                     }
                                     else if (currentMessage.MessageType == 2) //Objects Simplification events
                                     {
@@ -604,7 +604,7 @@ namespace PubnubApi
                                         {
                                             if (objectsVersion.CompareTo(2D) == 0) //Process only version=2 for Objects Simplification. Ignore 1. 
                                             {
-                                                payloadContainer.Add(payload);
+                                                jsonFields.Add("payload", payload);
                                             }
                                             else
                                             {
@@ -659,7 +659,7 @@ namespace PubnubApi
                                                 );
                                             }
                                             object decodeMessage = jsonLib.DeserializeToObject((decryptMessage == "**DECRYPT ERROR**") ? jsonLib.SerializeToJsonString(payload) : decryptMessage);
-                                            payloadContainer.Add(decodeMessage);
+                                            jsonFields.Add("payload", decodeMessage);
                                         }
                                         else
                                         {
@@ -667,31 +667,31 @@ namespace PubnubApi
                                             object payloadJObject = jsonLib.BuildJsonObject(payloadJson);
                                             if (payloadJObject == null)
                                             {
-                                                payloadContainer.Add(payload);
+                                                jsonFields.Add("payload", payload);
                                             }
                                             else
                                             {
-                                                payloadContainer.Add(payloadJObject);
+                                                jsonFields.Add("payload", payloadJObject);    
                                             }
                                         }
                                     }
 
                                     object userMetaData = currentMessage.UserMetadata;
+                                    jsonFields.Add("userMetadata", userMetaData);
 
-                                    payloadContainer.Add(userMetaData); //Second one always user meta data
+                                    jsonFields.Add("publishTimetoken", currentMessage.PublishTimetokenMetadata.Timetoken);
 
-                                    payloadContainer.Add(currentMessage.PublishTimetokenMetadata.Timetoken); //Third one always Timetoken
+                                    jsonFields.Add("userId", currentMessage.IssuingClientId);
 
-                                    payloadContainer.Add(currentMessage.IssuingClientId); //Fourth one always Publisher
-                                    
-                                    payloadContainer.Add(currentMessageChannelGroup);
-                                        
-                                    payloadContainer.Add(currentMessageChannel);
+                                    jsonFields.Add("channelGroup", currentMessageChannelGroup);
+
+                                    jsonFields.Add("channel", currentMessageChannel);
 
                                     if (currentMessage.MessageType == 1)
                                     {
+                                        jsonFields.Add("customMessageType", currentMessage.CustomMessageType);
                                         ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
-                                        PNMessageResult<T> pnMessageResult = responseBuilder.JsonToObject<PNMessageResult<T>>(payloadContainer, true);
+                                        PNMessageResult<T> pnMessageResult = responseBuilder.GetEventResultObject<PNMessageResult<T>>(jsonFields);
                                         if (pnMessageResult != null)
                                         {
                                             PNSignalResult<T> signalMessage = new PNSignalResult<T>
@@ -710,7 +710,7 @@ namespace PubnubApi
                                     else if (currentMessage.MessageType == 2)
                                     {
                                         ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
-                                        PNObjectEventResult objectApiEvent = responseBuilder.JsonToObject<PNObjectEventResult>(payloadContainer, true);
+                                        PNObjectEventResult objectApiEvent = responseBuilder.GetEventResultObject<PNObjectEventResult>(jsonFields);
                                         if (objectApiEvent != null)
                                         {
                                             Announce(objectApiEvent);
@@ -719,39 +719,39 @@ namespace PubnubApi
                                     else if (currentMessage.MessageType == 3)
                                     {
                                         ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
-                                        PNMessageActionEventResult msgActionEventEvent = responseBuilder.JsonToObject<PNMessageActionEventResult>(payloadContainer, true);
-                                        if (msgActionEventEvent != null)
+                                        PNMessageActionEventResult messageActionEvent = responseBuilder.GetEventResultObject<PNMessageActionEventResult>(jsonFields);
+                                        if (messageActionEvent != null)
                                         {
-                                            Announce(msgActionEventEvent);
+                                            Announce(messageActionEvent);
                                         }
                                     }
                                     else if (currentMessage.MessageType == 4)
                                     {
-                                        payloadContainer.Add(currentMessage.CustomMessageType);
+                                        jsonFields.Add("customMessageType", currentMessage.CustomMessageType);
                                         ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
-                                        PNMessageResult<object> pnFileResult = responseBuilder.JsonToObject<PNMessageResult<object>>(payloadContainer, true);
-                                        if (pnFileResult != null)
+                                        PNMessageResult<object> filesEvent = responseBuilder.GetEventResultObject<PNMessageResult<object>>(jsonFields);
+                                        if (filesEvent != null)
                                         {
                                             PNFileEventResult fileMessage = new PNFileEventResult
                                             {
-                                                Channel = pnFileResult.Channel,
-                                                Subscription = pnFileResult.Subscription,
-                                                Timetoken = pnFileResult.Timetoken,
-                                                Publisher = pnFileResult.Publisher,
+                                                Channel = filesEvent.Channel,
+                                                Subscription = filesEvent.Subscription,
+                                                Timetoken = filesEvent.Timetoken,
+                                                Publisher = filesEvent.Publisher,
                                             };
-                                            Dictionary<string, object> pnMsgObjDic = jsonLib.ConvertToDictionaryObject(pnFileResult.Message);
-                                            if (pnMsgObjDic != null && pnMsgObjDic.Count > 0)
+                                            Dictionary<string, object> fileEventMessageField = jsonLib.ConvertToDictionaryObject(filesEvent.Message);
+                                            if (fileEventMessageField != null && fileEventMessageField.Count > 0)
                                             {
-                                                if (pnMsgObjDic.ContainsKey("message") && pnMsgObjDic["message"]!= null)
+                                                if (fileEventMessageField.ContainsKey("message") && fileEventMessageField["message"]!= null)
                                                 {
-                                                    fileMessage.Message = pnMsgObjDic["message"];
+                                                    fileMessage.Message = fileEventMessageField["message"];
                                                 }
-                                                if (pnMsgObjDic.ContainsKey("file"))
+                                                if (fileEventMessageField.ContainsKey("file"))
                                                 {
-                                                    Dictionary<string, object> fileObjDic = jsonLib.ConvertToDictionaryObject(pnMsgObjDic["file"]);
-                                                    if (fileObjDic != null && fileObjDic.ContainsKey("id") && fileObjDic.ContainsKey("name"))
+                                                    Dictionary<string, object> fileDetailFields = jsonLib.ConvertToDictionaryObject(fileEventMessageField["file"]);
+                                                    if (fileDetailFields != null && fileDetailFields.ContainsKey("id") && fileDetailFields.ContainsKey("name"))
                                                     {
-                                                        fileMessage.File = new PNFile { Id = fileObjDic["id"].ToString(), Name = fileObjDic["name"].ToString() };
+                                                        fileMessage.File = new PNFile { Id = fileDetailFields["id"].ToString(), Name = fileDetailFields["name"].ToString() };
                                                         PubnubTokenMgrCollection.TryGetValue(
                                                             PubnubInstance.InstanceId ?? "", out var tokenManager);
                                                         fileMessage.File.Url = UriUtil.GetFileUrl(fileName: fileMessage.File.Name, fileId: fileMessage.File.Id, channel:fileMessage.Channel,
@@ -761,9 +761,9 @@ namespace PubnubApi
                                             }
                                             else
                                             {
-                                                if (pnFileResult.Message != null)
+                                                if (filesEvent.Message != null)
                                                 {
-                                                    fileMessage.Message = pnFileResult.Message;
+                                                    fileMessage.Message = filesEvent.Message;
                                                 }
                                             }
                                             Announce(fileMessage);
@@ -772,7 +772,7 @@ namespace PubnubApi
                                     else if (currentMessageChannel.Contains("-pnpres"))
                                     {
                                         ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
-                                        PNPresenceEventResult presenceEvent = responseBuilder.JsonToObject<PNPresenceEventResult>(payloadContainer, true);
+                                        PNPresenceEventResult presenceEvent = responseBuilder.GetEventResultObject<PNPresenceEventResult>(jsonFields);
                                         if (presenceEvent != null)
                                         {
                                             Announce(presenceEvent);
@@ -782,11 +782,11 @@ namespace PubnubApi
                                     {
                                         if (currentConfig != null && currentLog != null)
                                         {
-                                            LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, ResponseToUserCallback - payload = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), jsonLib.SerializeToJsonString(payloadContainer)), currentConfig.LogVerbosity);
+                                            LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, ResponseToUserCallback", DateTime.Now.ToString(CultureInfo.InvariantCulture)), currentConfig.LogVerbosity);
                                         }
-                                        payloadContainer.Add(currentMessage.CustomMessageType);
+                                        jsonFields.Add("customMessageType", currentMessage.CustomMessageType);
                                         ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
-                                        PNMessageResult<T> userMessage = responseBuilder.JsonToObject<PNMessageResult<T>>(payloadContainer, true);
+                                        PNMessageResult<T> userMessage = responseBuilder.GetEventResultObject<PNMessageResult<T>>(jsonFields);
                                         if (userMessage != null)
                                         {
                                             Announce(userMessage);
