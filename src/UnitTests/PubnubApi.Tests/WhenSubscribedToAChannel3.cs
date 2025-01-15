@@ -5,6 +5,7 @@ using PubnubApi;
 using System.Collections.Generic;
 using MockServer;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using PubnubApi.Security.Crypto;
 using PubnubApi.Security.Crypto.Cryptors;
 
@@ -27,6 +28,7 @@ namespace PubNubMessaging.Tests
         private static string[] channelsGrant = { "hello_my_channel", "hello_my_channel1", "hello_my_channel2" };
         private static string authKey = "myauth";
         private static string currentTestCase = "";
+        private static string authToken;
 
         private static Pubnub pubnub;
 
@@ -34,7 +36,7 @@ namespace PubNubMessaging.Tests
         private static UnitTestLog unitLog;
 
         [SetUp]
-        public static void Init()
+        public static async Task Init()
         {
             unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
@@ -80,17 +82,35 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Grant().Channels(channelsGrant).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Execute(new UTGrantResult());
+            var authValues = new PNTokenAuthValues()
+            {
+                Read = true,
+                Write = true,
+                Create = true,
+                Get = true,
+                Delete = true,
+                Join = true,
+                Update = true,
+                Manage = true
+            };
+            var grantTokenResult = await pubnub.GrantToken().TTL(20).AuthorizedUuid(config.UserId).Resources(
+                new PNTokenResources() {
+                    Channels = new Dictionary<string, PNTokenAuthValues>() 
+                    { 
+                        {
+                            channel,authValues 
+                        },
+                    }
+                }).ExecuteAsync();
+            await Task.Delay(4000);
 
-            Thread.Sleep(1000);
-
-            grantManualEvent.WaitOne();
+            authToken = grantTokenResult.Result?.Token;
 
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
 
-            Assert.IsTrue(receivedGrantMessage, "WhenSubscribedToAChannel3 Grant access failed.");
+            Assert.IsTrue(grantTokenResult.Status.Error == false && grantTokenResult.Result != null, "WhenSubscribedToAChannel3 Grant access failed.");
         }
 
         [TearDown]
@@ -142,7 +162,7 @@ namespace PubNubMessaging.Tests
             server.RunOnHttps(ssl);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             pubnub.AddListener(listenerSubCallack);
 
             manualResetEventWaitTimeout = 310 * 1000;
@@ -257,7 +277,7 @@ namespace PubNubMessaging.Tests
             server.RunOnHttps(ssl);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             pubnub.AddListener(listenerSubCallack);
 
             manualResetEventWaitTimeout =  310 * 1000;
@@ -446,7 +466,7 @@ namespace PubNubMessaging.Tests
             server.RunOnHttps(ssl);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             pubnub.AddListener(listenerSubCallack);
 
             manualResetEventWaitTimeout =  310 * 1000;
