@@ -7,7 +7,6 @@ namespace PubnubApi
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLib;
         private readonly IPubnubLog pubnubLog;
-        private readonly NewtonsoftJsonDotNet newtonsoftJsonDotNet;
         private readonly EventDeserializer eventDeserializer;
 
         public ResponseBuilder(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubLog log)
@@ -15,7 +14,6 @@ namespace PubnubApi
             config = pubnubConfig;
             jsonLib = jsonPluggableLibrary;
             pubnubLog = log;
-            newtonsoftJsonDotNet = new NewtonsoftJsonDotNet(config, pubnubLog);
             eventDeserializer = new EventDeserializer(jsonLib);
         }
 
@@ -29,7 +27,8 @@ namespace PubnubApi
             }
             else
             {
-                ret = newtonsoftJsonDotNet.DeserializeToObject<T>(result);
+                NewtonsoftJsonDotNet jsonNewtonLib = new NewtonsoftJsonDotNet(config, pubnubLog);
+                ret = jsonNewtonLib.DeserializeToObject<T>(result);
             }
 
             return ret;
