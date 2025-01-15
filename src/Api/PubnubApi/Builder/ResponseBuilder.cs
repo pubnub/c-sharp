@@ -16,7 +16,7 @@ namespace PubnubApi
             jsonLib = jsonPluggableLibrary;
             pubnubLog = log;
             newtonsoftJsonDotNet = new NewtonsoftJsonDotNet(config, pubnubLog);
-            eventDeserializer = new EventDeserializer(jsonLib, newtonsoftJsonDotNet);
+            eventDeserializer = new EventDeserializer(jsonLib);
         }
 
         public T JsonToObject<T>(List<object> result, bool internalObject)

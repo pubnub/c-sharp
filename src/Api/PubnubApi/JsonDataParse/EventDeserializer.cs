@@ -9,12 +9,9 @@ namespace PubnubApi;
 public class EventDeserializer
 {
     private readonly IJsonPluggableLibrary jsonLibrary;
-    private readonly NewtonsoftJsonDotNet newtonSoftJsonLibrary; // the default serializer of sdk
-
-    public EventDeserializer(IJsonPluggableLibrary jsonLibrary, NewtonsoftJsonDotNet newtonSoftJsonLibrary)
+    public EventDeserializer(IJsonPluggableLibrary jsonLibrary)
     {
         this.jsonLibrary = jsonLibrary;
-        this.newtonSoftJsonLibrary = newtonSoftJsonLibrary;
     }
 
     public T Deserialize<T>(IDictionary<string, object> json)
@@ -23,7 +20,7 @@ public class EventDeserializer
         var typeInfo = typeof(T);
         if (typeInfo.GetTypeInfo().IsGenericType && typeInfo.GetGenericTypeDefinition() == typeof(PNMessageResult<>))
         {
-            response = newtonSoftJsonLibrary.DeserializeMessageResultEvent<T>(json);
+            response = jsonLibrary.DeserializeToObject<T>(json);
         }
         else if (typeof(T) == typeof(PNObjectEventResult))
         {

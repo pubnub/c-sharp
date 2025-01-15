@@ -341,7 +341,7 @@ namespace PubnubApi
             return ret;
         }
 
-        internal T DeserializeMessageResultEvent<T>(IDictionary<string, object> jsonFields)
+        public T DeserializeToObject<T>(IDictionary<string, object> jsonFields)
         {
             T response = default(T);
             Type dataType = typeof(T).GetTypeInfo().GenericTypeArguments[0];
