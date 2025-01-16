@@ -20,6 +20,8 @@ namespace PubnubApi
 
         T DeserializeToObject<T>(List<object> listObject);
         
+        T DeserializeToObject<T>(IDictionary<string, object> json);
+        
         object DeserializeToObject(object rawObject, Type type);
         
         Dictionary<string, object> DeserializeToDictionaryOfObject(string jsonString);
@@ -29,6 +31,5 @@ namespace PubnubApi
         object[] ConvertToObjectArray(object localContainer);
 
         void PopulateObject(string value, object target);
-
     }
 }

@@ -15,7 +15,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubPCL</PackageId>
-    <PackageVersion>7.1.0.0</PackageVersion>
+    <PackageVersion>7.1.1.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -23,8 +23,7 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>Added support for CustomMessageType in publish, signal, files features.
-Added support for Type field in membership APIs.</PackageReleaseNotes>
+    <PackageReleaseNotes>Refactored event result data parsing logic within the subscribe feature for enhanced performance and maintainability.</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
@@ -302,6 +301,7 @@ Added support for Type field in membership APIs.</PackageReleaseNotes>
       <Link>JsonDataParse\DeserializeToInternalObjectUtility.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\JsonDataParse\PNAccessManagerGrantJsonDataParse.cs" Link="JsonDataParse\PNAccessManagerGrantJsonDataParse.cs" />
+    <Compile Include="..\PubnubApi\JsonDataParse\EventDeserializer.cs" Link="JsonDataParse\EventDeserializer.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNAddMessageActionJsonDataParse.cs" Link="JsonDataParse\PNAddMessageActionJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNFetchHistoryJsonDataParse.cs" Link="JsonDataParse\PNFetchHistoryJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNGenerateFileUploadUrlDataParse.cs" Link="JsonDataParse\PNGenerateFileUploadUrlDataParse.cs" />

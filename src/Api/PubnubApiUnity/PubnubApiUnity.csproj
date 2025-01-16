@@ -15,7 +15,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubApiUnity</PackageId>
-    <PackageVersion>7.1.0.0</PackageVersion>
+    <PackageVersion>7.1.1.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -226,6 +226,7 @@
     <Compile Include="..\PubnubApi\JsonDataParse\DeserializeToInternalObjectUtility.cs">
       <Link>JsonDataParse\DeserializeToInternalObjectUtility.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\JsonDataParse\EventDeserializer.cs" Link="JsonDataParse\EventDeserializer.cs" />
 	<Compile Include="..\PubnubApi\RetryConfiguration.cs">
       <Link>RetryConfiguration.cs</Link>
     </Compile>

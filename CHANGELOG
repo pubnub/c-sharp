@@ -1,3 +1,7 @@
+v7.1.1 - January 16 2025
+-----------------------------
+- Modified: refactored event result data parsing logic within the subscribe feature for enhanced performance and maintainability.
+
 v7.1.0 - December 04 2024
 -----------------------------
 - Added: added support for CustomMessageType in publish, signal, files features.
