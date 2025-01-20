@@ -5,31 +5,25 @@ namespace PubnubApi
 {
     internal static class PNObjectEventJsonDataParse
     {
-        internal static PNObjectEventResult GetObject(IJsonPluggableLibrary jsonPlug, List<object> listObject)
+        internal static PNObjectEventResult GetObject(IJsonPluggableLibrary jsonPlug, IDictionary<string, object> jsonFields)
         {
             PNObjectEventResult result = null;
 
-            Dictionary<string, object> objectEventDicObj = (listObject != null && listObject.Count > 0) ? jsonPlug.ConvertToDictionaryObject(listObject[0]) : null;
+            Dictionary<string, object> objectEventDicObj = jsonFields is { Count: > 0 } ? jsonPlug.ConvertToDictionaryObject(jsonFields["payload"]) : null;
             if (objectEventDicObj != null)
             {
-                if (result == null)
-                {
-                    result = new PNObjectEventResult();
-                }
+                result = new PNObjectEventResult();
 
                 if (objectEventDicObj.ContainsKey("event") && objectEventDicObj["event"] != null)
                 {
                     result.Event = objectEventDicObj["event"].ToString();
                 }
 
-                if (listObject.Count > 2)
+                if (Int64.TryParse(jsonFields["publishTimetoken"]?.ToString(), out var objectEventTimeStamp))
                 {
-                    long objectEventTimeStamp;
-                    if (Int64.TryParse(listObject[2].ToString(), out objectEventTimeStamp))
-                    {
-                        result.Timestamp = objectEventTimeStamp;
-                    }
+                    result.Timestamp = objectEventTimeStamp;
                 }
+                
 
                 if (objectEventDicObj.ContainsKey("type") && objectEventDicObj["type"] != null)
                 {
@@ -38,58 +32,58 @@ namespace PubnubApi
 
                 if (objectEventDicObj.ContainsKey("data") && objectEventDicObj["data"] != null)
                 {
-                    Dictionary<string, object> dataDic = objectEventDicObj["data"] as Dictionary<string, object>;
-                    if (dataDic != null)
+                    Dictionary<string, object> dataFields = objectEventDicObj["data"] as Dictionary<string, object>;
+                    if (dataFields != null)
                     {
-                        if (result.Type.ToLowerInvariant() == "uuid" && dataDic.ContainsKey("id"))
+                        if (result.Type?.ToLowerInvariant() == "uuid" && dataFields.ContainsKey("id"))
                         {
                             result.UuidMetadata = new PNUuidMetadataResult
                             {
-                                Uuid = dataDic["id"] != null ? dataDic["id"].ToString() : null,
-                                Name = (dataDic.ContainsKey("name") && dataDic["name"] != null) ? dataDic["name"].ToString() : null,
-                                ExternalId = (dataDic.ContainsKey("externalId") && dataDic["externalId"] != null) ? dataDic["externalId"].ToString() : null,
-                                ProfileUrl = (dataDic.ContainsKey("profileUrl") && dataDic["profileUrl"] != null) ? dataDic["profileUrl"].ToString() : null,
-                                Email = (dataDic.ContainsKey("email") && dataDic["email"] != null) ? dataDic["email"].ToString() : null,
-                                Custom = (dataDic.ContainsKey("custom") && dataDic["custom"] != null) ? jsonPlug.ConvertToDictionaryObject(dataDic["custom"]) : null,
-                                Updated = (dataDic.ContainsKey("updated") && dataDic["updated"] != null) ? dataDic["updated"].ToString() : null
+                                Uuid = dataFields["id"]?.ToString(),
+                                Name = (dataFields.ContainsKey("name") && dataFields["name"] != null) ? dataFields["name"].ToString() : null,
+                                ExternalId = (dataFields.ContainsKey("externalId") && dataFields["externalId"] != null) ? dataFields["externalId"].ToString() : null,
+                                ProfileUrl = (dataFields.ContainsKey("profileUrl") && dataFields["profileUrl"] != null) ? dataFields["profileUrl"].ToString() : null,
+                                Email = (dataFields.ContainsKey("email") && dataFields["email"] != null) ? dataFields["email"].ToString() : null,
+                                Custom = (dataFields.ContainsKey("custom") && dataFields["custom"] != null) ? jsonPlug.ConvertToDictionaryObject(dataFields["custom"]) : null,
+                                Updated = (dataFields.ContainsKey("updated") && dataFields["updated"] != null) ? dataFields["updated"].ToString() : null
                             };
                         }
-                        else if (result.Type.ToLowerInvariant() == "channel" && dataDic.ContainsKey("id"))
+                        else if (result.Type.ToLowerInvariant() == "channel" && dataFields.ContainsKey("id"))
                         {
                             result.ChannelMetadata = new PNChannelMetadataResult
                             {
-                                Channel = dataDic["id"] != null ? dataDic["id"].ToString() : null,
-                                Name = (dataDic.ContainsKey("name") && dataDic["name"] != null) ? dataDic["name"].ToString() : null,
-                                Description = (dataDic.ContainsKey("description") && dataDic["description"] != null) ? dataDic["description"].ToString() : null,
-                                Custom = (dataDic.ContainsKey("custom") && dataDic["custom"] != null) ? jsonPlug.ConvertToDictionaryObject(dataDic["custom"]) : null,
-                                Updated = (dataDic.ContainsKey("updated") && dataDic["updated"] != null) ? dataDic["updated"].ToString() : null
+                                Channel = dataFields["id"]?.ToString(),
+                                Name = (dataFields.ContainsKey("name") && dataFields["name"] != null) ? dataFields["name"].ToString() : null,
+                                Description = (dataFields.ContainsKey("description") && dataFields["description"] != null) ? dataFields["description"].ToString() : null,
+                                Custom = (dataFields.ContainsKey("custom") && dataFields["custom"] != null) ? jsonPlug.ConvertToDictionaryObject(dataFields["custom"]) : null,
+                                Updated = (dataFields.ContainsKey("updated") && dataFields["updated"] != null) ? dataFields["updated"].ToString() : null
                             };
                         }
-                        else if (result.Type.ToLowerInvariant() == "membership" && dataDic.ContainsKey("uuid") && dataDic.ContainsKey("channel"))
+                        else if (result.Type.ToLowerInvariant() == "membership" && dataFields.ContainsKey("uuid") && dataFields.ContainsKey("channel"))
                         {
-                            Dictionary<string, object> uuidMetadataIdDic = dataDic["uuid"] as Dictionary<string, object>;
-                            if (uuidMetadataIdDic != null && uuidMetadataIdDic.ContainsKey("id"))
+                            Dictionary<string, object> userMetadataFields = dataFields["uuid"] as Dictionary<string, object>;
+                            if (userMetadataFields != null && userMetadataFields.ContainsKey("id"))
                             {
                                 result.UuidMetadata = new PNUuidMetadataResult
                                 {
-                                    Uuid = uuidMetadataIdDic["id"] != null ? uuidMetadataIdDic["id"].ToString() : null
+                                    Uuid = userMetadataFields["id"]?.ToString()
                                 };
                             }
 
-                            Dictionary<string, object> channelMetadataIdDic = dataDic["channel"] as Dictionary<string, object>;
-                            if (channelMetadataIdDic != null && channelMetadataIdDic.ContainsKey("id"))
+                            Dictionary<string, object> channelMetadataFields = dataFields["channel"] as Dictionary<string, object>;
+                            if (channelMetadataFields != null && channelMetadataFields.ContainsKey("id"))
                             {
                                 result.ChannelMetadata = new PNChannelMetadataResult
                                 {
-                                    Channel = channelMetadataIdDic["id"] != null ? channelMetadataIdDic["id"].ToString() : null
+                                    Channel = channelMetadataFields["id"]?.ToString()
                                 };
                             }
 
                         }
                     }
                 }
-                result.Subscription = listObject[4]?.ToString();
-                result.Channel = listObject[5].ToString();
+                result.Subscription = jsonFields["channelGroup"]?.ToString();
+                result.Channel = jsonFields["channel"].ToString();
             }
 
             return result;

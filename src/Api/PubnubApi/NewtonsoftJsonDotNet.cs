@@ -341,6 +341,84 @@ namespace PubnubApi
             return ret;
         }
 
+        public T DeserializeToObject<T>(IDictionary<string, object> jsonFields)
+        {
+            T response = default(T);
+            Type dataType = typeof(T).GetTypeInfo().GenericTypeArguments[0];
+            Type generic = typeof(PNMessageResult<>);
+            Type specific = generic.MakeGenericType(dataType);
+
+            var content = jsonFields["payload"];
+            ConstructorInfo ci = specific.GetTypeInfo().DeclaredConstructors.FirstOrDefault();
+            if (ci != null)
+            {
+                object message = ci.Invoke(new object[] { });
+                PropertyInfo dataProp = specific.GetRuntimeProperty("Message");
+                object userMessage = null;
+                
+                if (content.GetType() == typeof(JValue))
+                {
+                    JValue jsonValue = content as JValue;
+                    userMessage = jsonValue.Value;
+                    userMessage = ConvertToDataType(dataType, userMessage);
+
+                    dataProp.SetValue(message, userMessage, null);
+                }
+                else if (content.GetType() == typeof(JObject) ||
+                         content.GetType() == typeof(JArray))
+                {
+                    JToken token = content as JToken;
+                    if (dataProp.PropertyType == typeof(string))
+                    {
+                        userMessage = JsonConvert.SerializeObject(token, defaultJsonSerializerSettings);
+                    }
+                    else
+                    {
+                        userMessage = token.ToObject(dataProp.PropertyType, JsonSerializer.Create());
+                    }
+
+                    dataProp.SetValue(message, userMessage, null);
+                }
+                else if (content.GetType() == typeof(System.String))
+                {
+                    userMessage = content as string;
+                    dataProp.SetValue(message, userMessage, null);
+                }
+
+                PropertyInfo timeProp = specific.GetRuntimeProperty("Timetoken");
+                long timetoken;
+                Int64.TryParse(jsonFields["publishTimetoken"].ToString(), out timetoken);
+                timeProp.SetValue(message, timetoken, null);
+
+                PropertyInfo publisherProp = specific.GetRuntimeProperty("Publisher");
+                string publisherValue = (jsonFields["userId"] != null) ? jsonFields["userId"].ToString() : "";
+                publisherProp.SetValue(message, publisherValue, null);
+
+                PropertyInfo channelNameProp = specific.GetRuntimeProperty("Channel");
+                channelNameProp.SetValue(message, jsonFields["channel"]?.ToString(), null);
+
+                PropertyInfo subsciptionProp = specific.GetRuntimeProperty("Subscription");
+                subsciptionProp.SetValue(message, jsonFields["channelGroup"]?.ToString(), null);
+
+                if (jsonFields.ContainsKey("customMessageType"))
+                {
+                    PropertyInfo customMessageType = specific.GetRuntimeProperty("CustomMessageType");
+                    customMessageType.SetValue(message, jsonFields["customMessageType"], null);
+                }
+
+                if (jsonFields["userMetadata"] != null)
+                {
+                    PropertyInfo userMetadataProp = specific.GetRuntimeProperty("UserMetadata");
+                    userMetadataProp.SetValue(message, jsonFields["userMetadata"], null);
+                }
+                
+
+                response = (T)Convert.ChangeType(message, specific, CultureInfo.InvariantCulture);
+            }
+
+            return response;
+        }
+
         public virtual T DeserializeToObject<T>(List<object> listObject)
         {
             T ret = default(T);

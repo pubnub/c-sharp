@@ -905,24 +905,6 @@ namespace PubnubApi
 
                 #endregion
             }
-            else if (typeof(T) == typeof(PNObjectEventResult))
-            {
-                #region "PNObjectEventResult"
-
-                PNObjectEventResult result = PNObjectEventJsonDataParse.GetObject(jsonPlug, listObject);
-                ret = (T)Convert.ChangeType(result, typeof(PNObjectEventResult), CultureInfo.InvariantCulture);
-
-                #endregion
-            }
-            else if (typeof(T) == typeof(PNMessageActionEventResult))
-            {
-                #region "PNMessageActionEventResult"
-
-                PNMessageActionEventResult result = PNMessageActionEventJsonDataParse.GetObject(jsonPlug, listObject);
-                ret = (T)Convert.ChangeType(result, typeof(PNMessageActionEventResult), CultureInfo.InvariantCulture);
-
-                #endregion
-            }
             else if (typeof(T) == typeof(PNAddMessageActionResult))
             {
                 #region "PNAddMessageActionResult"
