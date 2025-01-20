@@ -567,6 +567,12 @@
     <Compile Include="..\PubnubApi\PNConfiguration.cs">
       <Link>PNConfiguration.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\PNSDK\DotNetPNSDKSource.cs">
+      <Link>PNSDK\DotNetPNSDKSource.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\PNSDK\IPNSDKSource.cs">
+      <Link>PNSDK\IPNSDKSource.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\Properties\AssemblyInfo.cs" Link="Properties\AssemblyInfo.cs" />
     <Compile Include="..\PubnubApi\Proxy\PubnubProxy.cs">
       <Link>Proxy\PubnubProxy.cs</Link>

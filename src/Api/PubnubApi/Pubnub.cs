@@ -12,6 +12,7 @@ using PubnubApi.Security.Crypto;
 using PubnubApi.Security.Crypto.Cryptors;
 using PubnubApi.EventEngine.Common;
 using System.Collections.Concurrent;
+using PubnubApi.PNSDK;
 
 namespace PubnubApi
 {
@@ -36,16 +37,6 @@ namespace PubnubApi
         #if UNITY
         private static System.Func<UnsubscribeAllOperation<object>> OnCleanupCall;
         #endif
-
-        static Pubnub() 
-        {
-            var assembly = typeof(Pubnub).GetTypeInfo().Assembly;
-            var assemblyName = new AssemblyName(assembly.FullName);
-            string assemblyVersion = assemblyName.Version.ToString();
-            var targetFramework = assembly.GetCustomAttribute<System.Runtime.Versioning.TargetFrameworkAttribute>()?.FrameworkDisplayName?.Replace(".",string.Empty).Replace(" ", string.Empty);
-            
-            Version = string.Format(CultureInfo.InvariantCulture, "{0}/CSharp/{1}", targetFramework??"UNKNOWN", assemblyVersion);
-        }
         
         #if UNITY
         /// <summary>
@@ -942,7 +933,7 @@ namespace PubnubApi
             JsonPluggableLibrary = customJson;
         }
 
-        public static string Version { get; private set; }
+        public string Version { get; private set; }
 
         internal readonly ITransportMiddleware transportMiddleware;
 
@@ -958,7 +949,7 @@ namespace PubnubApi
         #endregion
 
         #region "Constructors"
-        public Pubnub(PNConfiguration config, IHttpClientService httpTransportService = default, ITransportMiddleware middleware = default)
+        public Pubnub(PNConfiguration config, IHttpClientService httpTransportService = default, ITransportMiddleware middleware = default, IPNSDKSource ipnsdkSource = default)
         {
             if (config == null)
             {
@@ -995,6 +986,8 @@ namespace PubnubApi
             CheckRequiredUserId(config);
             eventEmitter = new EventEmitter(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, subscribeCallbackListenerList, JsonPluggableLibrary, tokenManager, pubnubLog, this);
             CheckCryptoModuleUsageForLogging(config);
+            //Defaulting to DotNet PNSDK source if no custom one is specified
+            Version = (ipnsdkSource == default) ? new DotNetPNSDKSource().GetPNSDK() : ipnsdkSource.GetPNSDK();
             IHttpClientService httpClientService = httpTransportService ?? new HttpClientService(proxy:config.Proxy, pubnubLog: config.PubnubLog, verbosity: config.LogVerbosity);
             transportMiddleware = middleware ?? new Middleware(httpClientService,config, this, tokenManager);
         }

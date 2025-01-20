@@ -34,7 +34,7 @@ namespace PubnubApi
 			Dictionary<string, string> commonQueryParameters = new Dictionary<string, string>
 			{
 				{ "uuid",UriUtil.EncodeUriComponent(configuration.UserId.ToString(),PNOperationType.PNSubscribeOperation, false, false, true)},
-				{ "pnsdk", UriUtil.EncodeUriComponent(Pubnub.Version, PNOperationType.PNSubscribeOperation, false, false, true) }
+				{ "pnsdk", UriUtil.EncodeUriComponent(pnInstance.Version, PNOperationType.PNSubscribeOperation, false, false, true) }
 			};
 
 			if (configuration.IncludeInstanceIdentifier)
