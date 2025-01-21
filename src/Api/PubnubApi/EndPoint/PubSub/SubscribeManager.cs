@@ -224,7 +224,6 @@ namespace PubnubApi.EndPoint
 							SubscribeHeartbeatCheckTimer.Change(Timeout.Infinite, Timeout.Infinite);
 						} catch {  /* ignore */ }
 					}
-					SubscribeHeartbeatCheckTimer = new Timer(StartSubscribeHeartbeatCheckCallback<T>, null, config[PubnubInstance.InstanceId].SubscribeTimeout * 500, config[PubnubInstance.InstanceId].SubscribeTimeout * 500);
 				}
 			} catch (Exception ex) {
 				LoggingMethod.WriteToLog(pubnubLog, $"subscribe initialisation opeartion encountered error {ex.Message}", config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);

@@ -1,3 +1,7 @@
+v7.1.2 - January 21 2025
+-----------------------------
+- Fixed: fixes issue of receiving duplicate messages when event engine is disabled.
+
 v7.1.1 - January 16 2025
 -----------------------------
 - Modified: refactored event result data parsing logic within the subscribe feature for enhanced performance and maintainability.
