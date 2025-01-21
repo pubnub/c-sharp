@@ -100,6 +100,12 @@ namespace PubNubMessaging.Tests
                         {
                             channel,authValues 
                         },
+                        {
+                            channelsGrant[1],authValues 
+                        },
+                        {
+                            channelsGrant[2],authValues 
+                        },
                     }
                 }).ExecuteAsync();
             await Task.Delay(4000);
