@@ -15,7 +15,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubApiUnity</PackageId>
-    <PackageVersion>7.1.1.0</PackageVersion>
+    <PackageVersion>7.1.2.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
