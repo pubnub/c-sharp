@@ -37,7 +37,7 @@ namespace PubnubApi.EndPoint
 			try {
 				unit?.PresenceActivityList.Add(new KeyValuePair<string, string>("event", e?.Name));
 			} catch (Exception ex) {
-				LoggingMethod.WriteToLog(pubnubLog, $"DateTime {DateTime.Now.ToString(CultureInfo.InvariantCulture)}, presemce ee OnEventQueued : CurrentState = {presenceEventEngine.CurrentState.GetType().Name} => EXCEPTION = {ex}", configuration.LogVerbosity);
+				LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error:  presence event engine OnEventQueued : CurrentState = {presenceEventEngine.CurrentState.GetType().Name} => EXCEPTION = {ex}", configuration.LogVerbosity);
 			}
 		}
 
@@ -46,7 +46,7 @@ namespace PubnubApi.EndPoint
 			try {
 				unit?.PresenceActivityList.Add(new KeyValuePair<string, string>("invocation", invocation?.Name));
 			} catch (Exception ex) {
-				LoggingMethod.WriteToLog(pubnubLog, $"DateTime {DateTime.Now.ToString(CultureInfo.InvariantCulture)}, presence ee OnEffectDispatch : CurrentState = {presenceEventEngine.CurrentState.GetType().Name} => EXCEPTION = {ex}", configuration.LogVerbosity);
+				LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: presence event engine OnEffectDispatch : CurrentState = {presenceEventEngine.CurrentState.GetType().Name} => EXCEPTION = {ex}", configuration.LogVerbosity);
 			}
 		}
 

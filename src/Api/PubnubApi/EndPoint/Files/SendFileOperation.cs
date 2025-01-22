@@ -147,7 +147,7 @@ namespace PubnubApi.EndPoint
 				}
 				return;
 			}
-			LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} GenerateFileUploadUrl executed.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+			LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] GenerateFileUploadUrl executed.", config.LogVerbosity);
 			RequestState<PNFileUploadResult> requestState = new RequestState<PNFileUploadResult>();
 			requestState.ResponseType = PNOperationType.PNFileUploadOperation;
 			requestState.PubnubCallback = callback;
@@ -174,7 +174,7 @@ namespace PubnubApi.EndPoint
 					if (transportResponse.StatusCode == 204 && transportResponse.Error == null)
 					{
 						requestState.GotJsonResponse = true;
-						LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} file upload request executed.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+						LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] file upload request executed.", config.LogVerbosity);
 						Dictionary<string, object> publishPayload = new Dictionary<string, object>();
 						if (publishFileMessageContent != null && !string.IsNullOrEmpty(publishFileMessageContent.ToString())) {
 							publishPayload.Add("message", publishFileMessageContent);
@@ -199,7 +199,7 @@ namespace PubnubApi.EndPoint
 								result.Timetoken = publishFileMessage.Timetoken;
 								result.FileId = generateFileUploadUrlResult.FileId;
 								result.FileName = generateFileUploadUrlResult.FileName;
-								LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} GenerateFileUploadUrl -> file upload -> PublishFileMessage -> OK.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+								LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Publish file message executed successfully.", config.LogVerbosity);
 								var status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, 200, null);
 								callback.OnResponse(result, status);
 							} else {
@@ -207,7 +207,7 @@ namespace PubnubApi.EndPoint
 								if (currentFileRetryCount == publishFileRetryLimit) {
 									callback.OnResponse(null, publishFileMessageStatus);
 								}
-								LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} PublishFileMessage Failed. currentFileRetryCount={1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), currentFileRetryCount), config.LogVerbosity);
+								LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] PublishFileMessage Failed rety count ={currentFileRetryCount}",  config.LogVerbosity);
 							}
 						}
 						while (publishFailed && currentFileRetryCount <= publishFileRetryLimit && !(publishFileMessageStatus?.StatusCode != 400 || publishFileMessageStatus.StatusCode != 403));
@@ -236,7 +236,7 @@ namespace PubnubApi.EndPoint
 				returnValue.Status = generateFileUploadUrlStatus;
 				return returnValue;
 			}
-			LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} GenerateFileUploadUrl executed.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+			LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] GenerateFileUploadUrl executed.", config.LogVerbosity);
 			RequestState<PNFileUploadResult> requestState = new RequestState<PNFileUploadResult>
 			{
 				ResponseType = PNOperationType.PNFileUploadOperation,
@@ -298,7 +298,7 @@ namespace PubnubApi.EndPoint
 			returnValue.Status = jsonAndStatusTuple.Item2;
 			string json = jsonAndStatusTuple.Item1;
 			if (!string.IsNullOrEmpty(json)) {
-				LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} GenerateFileUploadUrl -> file upload OK.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);                //do internal publish after successful file upload
+				LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] File upload successfully", config.LogVerbosity);
 
 				Dictionary<string, object> publishPayload = new Dictionary<string, object>();
 				if (publishFileMessageContent != null && !string.IsNullOrEmpty(publishFileMessageContent.ToString())) {
@@ -329,11 +329,11 @@ namespace PubnubApi.EndPoint
 						};
 						returnValue.Result = result;
 						if (returnValue.Status != null) returnValue.Status.Error = false;
-						LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} GenerateFileUploadUrl -> file upload -> PublishFileMessage -> Success.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+						LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] File message published successfully", config.LogVerbosity);
 					} else {
 						publishFailed = true;
 						returnValue.Status = publishFileMessageStatus;
-						LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} PublishFileMessage Failed. currentFileRetryCount={1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), currentFileRetryCount), config.LogVerbosity);
+						LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] PublishFileMessage Failed. retry count={1}", config.LogVerbosity);
 						await Task.Delay(1000);
 					}
 				}
@@ -451,7 +451,7 @@ namespace PubnubApi.EndPoint
 				byteArray = System.IO.File.ReadAllBytes(filePath);
 			}
 			else {
-				LoggingMethod.WriteToLog(pubnubLog, $"Error while reading file at {filePath}", config.LogVerbosity);
+				LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error while reading file at {filePath}", config.LogVerbosity);
 			}
 			return byteArray;
 		}

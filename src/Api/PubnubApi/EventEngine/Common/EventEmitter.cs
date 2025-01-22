@@ -170,7 +170,7 @@ namespace PubnubApi.EventEngine.Common
                     catch (Exception ex)
                     {
                         decryptMessage = "**DECRYPT ERROR**";
-                        LoggingMethod.WriteToLog(log, $"Failed to decrypt message on channel {currentMessageChannel} due to exception={ex}.\n Message might be not encrypted", configuration.LogVerbosity);
+                        LoggingMethod.WriteToLog(log, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Failed to decrypt message on channel {currentMessageChannel} due to exception={ex}.\n Message might be not encrypted", configuration.LogVerbosity);
                     }
 
                     object decodeMessage = jsonLibrary.DeserializeToObject((decryptMessage == "**DECRYPT ERROR**") ? jsonLibrary.SerializeToJsonString(payload) : decryptMessage);
@@ -437,7 +437,7 @@ namespace PubnubApi.EventEngine.Common
                         }
                         catch (Exception ex)
                         {
-                            LoggingMethod.WriteToLog(this.log, $"Listener call back execution encounters error: {ex.Message}\n{ex?.StackTrace}", configuration.LogVerbosity);
+                            LoggingMethod.WriteToLog(this.log, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: Listener call back execution encounters error: {ex.Message}\n{ex?.StackTrace}", configuration.LogVerbosity);
                         }
                     }
 

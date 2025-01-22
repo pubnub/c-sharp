@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Collections;
 using System.Diagnostics;
+using System.Globalization;
 using System.Net;
 using PubnubApi.Security.Crypto;
 using PubnubApi.Security.Crypto.Cryptors;
@@ -72,7 +73,7 @@ namespace PubnubApi
                                 status.AffectedChannelGroups.AddRange(channelGroups);
                             }
                             
-                            LoggingMethod.WriteToLog(pubnubLog, "Failed to decrypt message!\nMessage might be not encrypted, returning as is...", config.LogVerbosity);
+                            LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Failed to decrypt message!\nMessage might be not encrypted, Returning the original content as received ", config.LogVerbosity);
                         }
                         
                         object decodedMessage = jsonLib.DeserializeToObject((decryptMessage == "**DECRYPT ERROR**") ? jsonLib.SerializeToJsonString(element) : decryptMessage);
@@ -155,7 +156,7 @@ namespace PubnubApi
                                             {
                                                 status.AffectedChannelGroups.AddRange(channelGroups);
                                             }
-                                            LoggingMethod.WriteToLog(pubnubLog, "Failed to decrypt message!\nMessage might be not encrypted, returning as is...",config.LogVerbosity);
+                                            LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Failed to decrypt message!\nMessage might be not encrypted, returning as is...",config.LogVerbosity);
                                             #endregion
                                         }
                                         object decodedMessage = jsonLib.DeserializeToObject((decryptMessage == "**DECRYPT ERROR**") ? jsonLib.SerializeToJsonString(kvpValue.Value) : decryptMessage);

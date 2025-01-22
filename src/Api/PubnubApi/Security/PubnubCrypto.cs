@@ -117,7 +117,7 @@ namespace PubnubApi
             }
             if (config != null)
             {
-                LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} IV = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), GetDisplayableBytes(ivBytes)), config.LogVerbosity);
+                LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] IV = {GetDisplayableBytes(ivBytes)}", config.LogVerbosity);
             }
 
             Aes aesAlg = Aes.Create();
@@ -168,7 +168,7 @@ namespace PubnubApi
                 {
                     if (config != null)
                     {
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} Decrypt Error. {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), config.LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: Decryption Error. {ex}", config.LogVerbosity);
                     }
                     throw;
                 }

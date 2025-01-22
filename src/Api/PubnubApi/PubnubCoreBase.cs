@@ -451,14 +451,14 @@ namespace PubnubApi
                     isTargetOfDedup = true;
                     if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig) && pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog))
                     {
-                        LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, Dedupe - Duplicate skipped - msg = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), jsonLib.SerializeToJsonString(message)), currentConfig.LogVerbosity);
+                        LoggingMethod.WriteToLog(currentLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Dedupe - Duplicate skipped - msg = {jsonLib.SerializeToJsonString(message)}", currentConfig.LogVerbosity);
                     }
                 }
                 else
                 {
                     if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig) && pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog))
                     {
-                        LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, Dedupe - AddEntry - msg = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), jsonLib.SerializeToJsonString(message)), currentConfig.LogVerbosity);
+                        LoggingMethod.WriteToLog(currentLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Dedupe - AddEntry - msg = {jsonLib.SerializeToJsonString(message)}", currentConfig.LogVerbosity);
                     }
                     pubnubSubscribeDuplicationManager.AddEntry(message);
                 }
@@ -468,7 +468,7 @@ namespace PubnubApi
                 //Log and ignore any exception due to Dedupe manager
                 if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig) && pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog))
                 {
-                    LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, IsTargetForDedup - dedupe error = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), currentConfig.LogVerbosity);
+                    LoggingMethod.WriteToLog(currentLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] IsTargetFor Dedupe - dedupe error = {ex}", currentConfig.LogVerbosity);
                 }
             }
 
@@ -498,7 +498,7 @@ namespace PubnubApi
             {
                 if (currentConfig != null && currentLog != null)
                 {
-                    LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, IsZeroTimeTokenRequest - Exception = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), currentConfig.LogVerbosity);
+                    LoggingMethod.WriteToLog(currentLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: IsZeroTimeTokenRequest - Exception = {ex}", currentConfig.LogVerbosity);
                 }
             }
             return ret;
@@ -564,7 +564,7 @@ namespace PubnubApi
 
                             if (currentConfig != null && currentLog != null)
                             {
-                                LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, ResponseToUserCallback - messageList.Count = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), messageList.Count), currentConfig.LogVerbosity);
+                                LoggingMethod.WriteToLog(currentLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] ResponseToUserCallback - messageList.Count = {messageList.Count}", currentConfig.LogVerbosity);
                             }
                             for (int messageIndex = 0; messageIndex < messageList.Count; messageIndex++)
                             {
@@ -573,7 +573,7 @@ namespace PubnubApi
                                 {
                                     if (currentConfig != null && currentLog != null && currentConfig.DedupOnSubscribe && IsTargetForDedup(currentMessage))
                                     {
-                                        LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, ResponseToUserCallback - messageList for loop - messageIndex = {1} => IsTargetForDedup", DateTime.Now.ToString(CultureInfo.InvariantCulture), messageIndex), currentConfig.LogVerbosity);
+                                        LoggingMethod.WriteToLog(currentLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] ResponseToUserCallback - messageList for loop - messageIndex = {messageIndex} => IsTargetForDedupe", currentConfig.LogVerbosity);
                                         continue;
                                     }
 
@@ -608,13 +608,13 @@ namespace PubnubApi
                                             }
                                             else
                                             {
-                                                LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, ResponseToUserCallback - Legacy Objects V1. Ignoring this.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), currentConfig.LogVerbosity);
+                                                LoggingMethod.WriteToLog(currentLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] ResponseToUserCallback - Legacy Objects V1. Ignoring this.", currentConfig.LogVerbosity);
                                                 continue;
                                             }
                                         }
                                         else
                                         {
-                                            LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, ResponseToUserCallback - MessageType =2 but NOT valid format to process", DateTime.Now.ToString(CultureInfo.InvariantCulture)), currentConfig.LogVerbosity);
+                                            LoggingMethod.WriteToLog(currentLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] ResponseToUserCallback - MessageType =2 but NOT valid format to process", currentConfig.LogVerbosity);
                                             continue;
                                         }
                                     }
@@ -649,12 +649,7 @@ namespace PubnubApi
                                                 
                                                 LoggingMethod.WriteToLog(
                                                         currentLog,
-                                                        string.Format(
-                                                            CultureInfo.InvariantCulture,
-                                                            "Failed to decrypt message on channel {0} in ResponseToUserCallback due to exception={1}.\nMessage might be not encrypted, returning as is...",
-                                                            currentMessageChannel,
-                                                            ex
-                                                        ),
+                                                        $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Failed to decrypt message on channel {currentMessageChannel} in ResponseToUserCallback due to exception={ex}.\nMessage might be not encrypted, returning content as received",
                                                         currentConfig.LogVerbosity
                                                 );
                                             }
@@ -782,7 +777,7 @@ namespace PubnubApi
                                     {
                                         if (currentConfig != null && currentLog != null)
                                         {
-                                            LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, ResponseToUserCallback", DateTime.Now.ToString(CultureInfo.InvariantCulture)), currentConfig.LogVerbosity);
+                                            LoggingMethod.WriteToLog(currentLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] ResponseToUserCallback", currentConfig.LogVerbosity);
                                         }
                                         jsonFields.Add("customMessageType", currentMessage.CustomMessageType);
                                         ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
@@ -798,7 +793,7 @@ namespace PubnubApi
                                 {
                                     if (currentConfig != null && currentLog != null)
                                     {
-                                        LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, ResponseToUserCallback - messageList for loop - messageIndex = {1} => null message", DateTime.Now.ToString(CultureInfo.InvariantCulture), messageIndex), currentConfig.LogVerbosity);
+                                        LoggingMethod.WriteToLog(currentLog,$"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] ResponseToUserCallback - messageList for loop - messageIndex = {messageIndex} => null message", currentConfig.LogVerbosity);
                                     }
                                 }
                             }
@@ -915,7 +910,7 @@ namespace PubnubApi
             {
                 if (currentConfig != null && currentLog != null)
                 {
-                    LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, ResponseToUserCallback - Exception = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), currentConfig.LogVerbosity);
+                    LoggingMethod.WriteToLog(currentLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: ResponseToUserCallback - Exception = {ex}", currentConfig.LogVerbosity);
                 }
             }
         }
@@ -1456,11 +1451,11 @@ namespace PubnubApi
                     {
                         if (removeKey)
                         {
-                            LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} Remove web request from dictionary in RemoveChannelDictionary for channel= {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), channel), currentConfig.LogVerbosity);
+                            LoggingMethod.WriteToLog(currentLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Remove web request from dictionary in RemoveChannelDictionary for channel= {channel}", currentConfig.LogVerbosity);
                         }
                         else
                         {
-                            LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} Unable to remove web request from dictionary in RemoveChannelDictionary for channel= {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), channel), currentConfig.LogVerbosity);
+                            LoggingMethod.WriteToLog(currentLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Unable to remove web request from dictionary in RemoveChannelDictionary for channel= {channel}", currentConfig.LogVerbosity);
                         }
                     }
                 }
@@ -1481,11 +1476,11 @@ namespace PubnubApi
                             {
                                 if (removeKey)
                                 {
-                                    LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} Remove web request from dictionary in RemoveChannelDictionary for channel= {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), key), currentConfig.LogVerbosity);
+                                    LoggingMethod.WriteToLog(currentLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Remove web request from dictionary in RemoveChannelDictionary for channel= {key}", currentConfig.LogVerbosity);
                                 }
                                 else
                                 {
-                                    LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} Unable to remove web request from dictionary in RemoveChannelDictionary for channel= {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), key), currentConfig.LogVerbosity);
+                                    LoggingMethod.WriteToLog(currentLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Unable to remove web request from dictionary in RemoveChannelDictionary for channel= {key}", currentConfig.LogVerbosity);
                                 }
                             }
                         }
@@ -1520,11 +1515,11 @@ namespace PubnubApi
                         {
                             if (removeKey)
                             {
-                                LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} RemoveUserState from local user state dictionary for channel= {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), key), currentConfig.LogVerbosity);
+                                LoggingMethod.WriteToLog(currentLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] RemoveUserState from local user state dictionary for channel= {key}", currentConfig.LogVerbosity);
                             }
                             else
                             {
-                                LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} Unable to RemoveUserState from local user state dictionary for channel= {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), key), currentConfig.LogVerbosity);
+                                LoggingMethod.WriteToLog(currentLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Unable to RemoveUserState from local user state dictionary for channel= {key}", currentConfig.LogVerbosity);
                             }
                         }
                     }
@@ -1544,11 +1539,11 @@ namespace PubnubApi
                         {
                             if (removeKey)
                             {
-                                LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} RemoveUserState from user state dictionary for channel= {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), key), currentConfig.LogVerbosity);
+                                LoggingMethod.WriteToLog(currentLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}]RemoveUserState from user state dictionary for channel= {key}",currentConfig.LogVerbosity);
                             }
                             else
                             {
-                                LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} Unable to RemoveUserState from user state dictionary for channel= {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), key), currentConfig.LogVerbosity);
+                                LoggingMethod.WriteToLog(currentLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Unable to RemoveUserState from user state dictionary for channel= {key}", currentConfig.LogVerbosity);
                             }
                         }
                     }
@@ -1568,11 +1563,11 @@ namespace PubnubApi
                         {
                             if (removeKey)
                             {
-                                LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} RemoveUserState from local user state dictionary for channelgroup= {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), key), currentConfig.LogVerbosity);
+                                LoggingMethod.WriteToLog(currentLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] RemoveUserState from local user state dictionary for channelGroup= {key}",  currentConfig.LogVerbosity);
                             }
                             else
                             {
-                                LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} Unable to RemoveUserState from local user state dictionary for channelgroup= {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), key), currentConfig.LogVerbosity);
+                                LoggingMethod.WriteToLog(currentLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Unable to RemoveUserState from local user state dictionary for channelGroup= {key}", currentConfig.LogVerbosity);
                             }
                         }
                     }
@@ -1593,11 +1588,11 @@ namespace PubnubApi
                         {
                             if (removeKey)
                             {
-                                LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} RemoveUserState from user state dictionary for channelgroup= {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), key), currentConfig.LogVerbosity);
+                                LoggingMethod.WriteToLog(currentLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] RemoveUserState from user state dictionary for channelgroup= {key}", currentConfig.LogVerbosity);
                             }
                             else
                             {
-                                LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} Unable to RemoveUserState from user state dictionary for channelgroup= {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), key), currentConfig.LogVerbosity);
+                                LoggingMethod.WriteToLog(currentLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Unable to RemoveUserState from user state dictionary for channelgroup= {key}", currentConfig.LogVerbosity);
                             }
                         }
                     }
@@ -1654,7 +1649,7 @@ namespace PubnubApi
                         ConnectionErrors = 1;
                         if (pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog))
                         {
-                            LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, EXPONENTIAL timerInterval > MAXEXPONENTIALBACKOFF", DateTime.Now.ToString(CultureInfo.InvariantCulture)), currentConfig.LogVerbosity);
+                            LoggingMethod.WriteToLog(currentLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] EXPONENTIAL timerInterval > MAXEXPONENTIALBACKOFF", currentConfig.LogVerbosity);
                         }
                     }
                     else if (timerInterval < 1)
@@ -1663,7 +1658,7 @@ namespace PubnubApi
                     }
                     if (pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog))
                     {
-                        LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, EXPONENTIAL timerInterval = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), timerInterval.ToString(CultureInfo.InvariantCulture)), currentConfig.LogVerbosity);
+                        LoggingMethod.WriteToLog(currentLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] EXPONENTIAL timerInterval = {timerInterval.ToString(CultureInfo.InvariantCulture)}", currentConfig.LogVerbosity);
                     }
                 }
                 else if (currentConfig.ReconnectionPolicy == PNReconnectionPolicy.LINEAR)
@@ -1716,7 +1711,7 @@ namespace PubnubApi
                             {
                                 if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig) && pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog))
                                 {
-                                    LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} TerminateReconnectTimer(null) - Unable to remove channel reconnect timer reference from collection for {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), key), currentConfig.LogVerbosity);
+                                    LoggingMethod.WriteToLog(currentLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] TerminateReconnectTimer(null) - Unable to remove channel reconnect timer reference from collection for {key}", currentConfig.LogVerbosity);
                                 }
                             }
                         }
@@ -1753,7 +1748,7 @@ namespace PubnubApi
                             {
                                 if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig) && pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog))
                                 {
-                                    LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} TerminateReconnectTimer(null) - Unable to remove channelgroup reconnect timer reference from collection for {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), groupKey), currentConfig.LogVerbosity);
+                                    LoggingMethod.WriteToLog(currentLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] TerminateReconnectTimer(null) - Unable to remove channelGroup reconnect timer reference from collection for {groupKey}", currentConfig.LogVerbosity);
                                 }
                             }
                         }
@@ -1764,7 +1759,7 @@ namespace PubnubApi
             {
                 if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig) && pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog))
                 {
-                    LoggingMethod.WriteToLog(currentLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} TerminateReconnectTimer exception: {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), currentConfig.LogVerbosity);
+                    LoggingMethod.WriteToLog(currentLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: TerminateReconnectTimer exception: {ex}", currentConfig.LogVerbosity);
                 }
             }
         }

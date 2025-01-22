@@ -195,9 +195,7 @@ namespace PubnubApi.EndPoint
             string channel = (channels != null) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : "";
             string channelGroup = (channelGroups != null) ? string.Join(",", channelGroups.OrderBy(x => x).ToArray()) : "";
 
-            PNPlatform.Print(config, pubnubLog);
-
-            LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, requested subscribe for channel(s)={1} and channel group(s)={2}", DateTime.Now.ToString(CultureInfo.InvariantCulture), channel, channelGroup), config.LogVerbosity);
+            LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] requested subscribe for channel(s)={channel} and channel group(s)={channelGroup}", config.LogVerbosity);
 
             Dictionary<string, string> initialSubscribeUrlParams = new Dictionary<string, string>();
             if (this.subscribeTimetoken >= 0)

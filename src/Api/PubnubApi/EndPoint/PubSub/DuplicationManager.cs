@@ -40,7 +40,7 @@ namespace PubnubApi.EndPoint
                 long keyValue;
                 if (!HashHistory.TryRemove(HashHistory.Aggregate((l,r)=> l.Value < r.Value ? l : r).Key, out keyValue))
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} DuplicationManager => AddEntry => TryRemove is false", DateTime.Now.ToString(System.Globalization.CultureInfo.InvariantCulture)), PNLogVerbosity.BODY);
+                    LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] DuplicationManager => AddEntry => TryRemove is false",  PNLogVerbosity.BODY);
                 }
             }
             HashHistory.TryAdd(this.GetSubscribeMessageHashKey(message),Pubnub.TranslateDateTimeToPubnubUnixNanoSeconds(DateTime.UtcNow));

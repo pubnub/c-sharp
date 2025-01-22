@@ -34,10 +34,10 @@ namespace PubnubApi
 					return CheckClientNetworkAvailability(CallbackClientNetworkStatus, type, callback, channels, channelGroups);
 				} catch (AggregateException ae) {
 					foreach (var ie in ae.InnerExceptions) {
-						LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} AggregateException CheckInternetStatus Error: {1} {2} ", DateTime.Now.ToString(CultureInfo.InvariantCulture), ie.GetType().Name, ie.Message), pubnubConfig.LogVerbosity);
+						LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: AggregateException CheckInternetStatus : {ie.GetType().Name} {ie.Message}", pubnubConfig.LogVerbosity);
 					}
 				} catch (Exception ex) {
-					LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} Exception CheckInternetStatus Error: {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex.Message), pubnubConfig.LogVerbosity);
+					LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error CheckInternetStatus Exception: {ex.Message}",pubnubConfig.LogVerbosity);
 				}
 
 				return networkStatus;
@@ -61,7 +61,7 @@ namespace PubnubApi
 		{
 			lock (internetCheckLock) {
 				if (isInternetCheckRunning) {
-					LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} InternetCheckRunning Already running", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.LogVerbosity);
+					LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] InternetCheckRunning Already running", pubnubConfig.LogVerbosity);
 					return networkStatus;
 				}
 			}
@@ -103,7 +103,7 @@ namespace PubnubApi
 				networkStatus = gotTimeResp;
 			} catch (Exception ex) {
 				networkStatus = false;
-				LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} CheckSocketConnect (HttpClient Or Task.Factory) Failed {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex.Message), pubnubConfig.LogVerbosity);
+				LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] CheckSocketConnect (HttpClient Or Task.Factory) Failed {ex.Message}", pubnubConfig.LogVerbosity);
 				if (!networkStatus) {
 					t.TrySetResult(false);
 					isInternetCheckRunning = false;
@@ -124,7 +124,7 @@ namespace PubnubApi
 				callback.OnResponse(default(T), status);
 			}
 
-			LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} ParseCheckSocketConnectException Error. {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex.Message), pubnubConfig.LogVerbosity);
+			LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] ParseCheckSocketConnectException Error. {ex.Message}", pubnubConfig.LogVerbosity);
 			internalcallback(false);
 		}
 

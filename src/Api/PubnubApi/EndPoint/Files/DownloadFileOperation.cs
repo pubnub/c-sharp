@@ -107,9 +107,9 @@ namespace PubnubApi.EndPoint
 							CryptoModule currentCryptoModule = !string.IsNullOrEmpty(currentFileCipherKey) ? new CryptoModule(new LegacyCryptor(currentFileCipherKey, true, pubnubLog), null) : (config.CryptoModule ??= new CryptoModule(new LegacyCryptor(config.CipherKey, true, pubnubLog), null));
 							try {
 								outputBytes = currentCryptoModule.Decrypt(fileContentBytes);
-								LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, Stream length (after Decrypt)= {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), fileContentBytes.Length), config.LogVerbosity);
+								LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}], Stream length (after Decrypt)= {fileContentBytes.Length}", config.LogVerbosity);
 							} catch (Exception ex) {
-								System.Diagnostics.Debug.WriteLine("{0}\nMessage might be not encrypted, returning as is...", ex.ToString());
+								LoggingMethod.WriteToLog(pubnubLog,$"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] {ex}\nMessage might be not encrypted, returning message content", config.LogVerbosity);
 								outputBytes = fileContentBytes;
 							}
 						}
@@ -169,9 +169,9 @@ namespace PubnubApi.EndPoint
 						CryptoModule currentCryptoModule = !string.IsNullOrEmpty(currentFileCipherKey) ? new CryptoModule(new LegacyCryptor(currentFileCipherKey, true, pubnubLog), null) : (config.CryptoModule ??= new CryptoModule(new LegacyCryptor(config.CipherKey, true, pubnubLog), null));
 						try {
 							outputBytes = currentCryptoModule.Decrypt(fileContentBytes);
-							LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, Stream length (after Decrypt)= {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), fileContentBytes.Length), config.LogVerbosity);
+							LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}], Stream length (after Decrypt)= {fileContentBytes.Length}", config.LogVerbosity);
 						} catch (Exception ex) {
-							System.Diagnostics.Debug.WriteLine("{0}\nFile content might be not encrypted, returning as is...", ex.ToString());
+							LoggingMethod.WriteToLog(pubnubLog,$"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] {ex}\nFile content might be not encrypted, returning content" ,config.LogVerbosity);
 							outputBytes = fileContentBytes;
 							returnValue.Status = new PNStatus { Error = true, ErrorData = new PNErrorData("Decryption error", ex) };
 						}
