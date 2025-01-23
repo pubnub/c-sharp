@@ -1,3 +1,7 @@
+v7.1.3 - January 23 2025
+-----------------------------
+- Modified: informative log statements throughout SDK.
+
 v7.1.2 - January 21 2025
 -----------------------------
 - Fixed: fixes issue of receiving duplicate messages when event engine is disabled.
