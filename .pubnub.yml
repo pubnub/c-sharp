@@ -1,8 +1,13 @@
 name: c-sharp
-version: "7.1.2"
+version: "7.1.3"
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog:
+  - date: 2025-01-23
+    version: v7.1.3
+    changes:
+      - type: improvement
+        text: "Informative log statements throughout SDK."
   - date: 2025-01-21
     version: v7.1.2
     changes:
@@ -823,7 +828,7 @@ features:
     - QUERY-PARAM
 supported-platforms:
   -
-    version: Pubnub 'C#' 7.1.2
+    version: Pubnub 'C#' 7.1.3
     platforms:
       - Windows 10 and up
       - Windows Server 2008 and up
@@ -834,7 +839,7 @@ supported-platforms:
       - .Net Framework 4.6.1+
       - .Net Framework 6.0
   -
-    version: PubnubPCL 'C#' 7.1.2
+    version: PubnubPCL 'C#' 7.1.3
     platforms:
       - Xamarin.Android
       - Xamarin.iOS
@@ -854,7 +859,7 @@ supported-platforms:
       - .Net Core
       - .Net 6.0
   -
-    version: PubnubUWP 'C#' 7.1.2
+    version: PubnubUWP 'C#' 7.1.3
     platforms:
       - Windows Phone 10
       - Universal Windows Apps
@@ -878,7 +883,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: Pubnub
-            location: https://github.com/pubnub/c-sharp/releases/tag/v7.1.2.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v7.1.3.0
             requires:
               -
                 name: ".Net"
@@ -1161,7 +1166,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: PubNubPCL
-            location: https://github.com/pubnub/c-sharp/releases/tag/v7.1.2.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v7.1.3.0
             requires:
               -
                 name: ".Net Core"
@@ -1520,7 +1525,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: PubnubUWP
-            location: https://github.com/pubnub/c-sharp/releases/tag/v7.1.2.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v7.1.3.0
             requires:
               -
                 name: "Universal Windows Platform Development"

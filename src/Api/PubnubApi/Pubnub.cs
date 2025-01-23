@@ -485,7 +485,7 @@ namespace PubnubApi
             {
                 if (pubnubLog != null && pubnubConfig != null)
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, UserId cannot be null/empty.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId].LogVerbosity : PNLogVerbosity.NONE);
+                    LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: UserId cannot be null/empty.",  pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId].LogVerbosity : PNLogVerbosity.NONE);
                 }
                 throw new MissingMemberException("UserId cannot be null/empty");
             }
@@ -965,11 +965,6 @@ namespace PubnubApi
             presenceEventengineFactory = new PresenceEventEngineFactory();
             pubnubConfig.AddOrUpdate(InstanceId, config, (k, o) => config);
 
-            if (pubnubLog != null)
-            {
-                PNPlatform.Print(config, pubnubLog);
-            }
-
             CheckAndInitializeEmptyStringValues(config);
             tokenManager = new TokenManager(pubnubConfig[InstanceId], JsonPluggableLibrary, pubnubLog, InstanceId);
             
@@ -980,7 +975,7 @@ namespace PubnubApi
                 config.PresenceTimeout = 20;
                 if (pubnubLog != null)
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, WARNING: The PresenceTimeout cannot be less than 20, defaulting the value to 20. Please update the settings in your code.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] WARNING: The PresenceTimeout cannot be less than 20, defaulting the value to 20. Please update the settings in your code.", config.LogVerbosity);
                 }
             }
             CheckRequiredUserId(config);
@@ -1005,7 +1000,7 @@ namespace PubnubApi
             {
                 if (pubnubLog != null)
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, PNConfiguration.Uuid or PNConfiguration.UserId is required to use the SDK.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: PNConfiguration.Uuid or PNConfiguration.UserId is required to use the SDK.", config.LogVerbosity);
                 }
                 throw new MissingMemberException("PNConfiguration.UserId is required to use the SDK");
             }
@@ -1018,7 +1013,7 @@ namespace PubnubApi
             {
                 if (pubnubLog != null)
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, WARNING: CryptoModule takes precedence over CipherKey.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
+                    LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] WARNING: CryptoModule takes precedence over CipherKey.", config.LogVerbosity);
                 }
             }
         }

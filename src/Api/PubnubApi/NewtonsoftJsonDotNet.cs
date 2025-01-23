@@ -179,7 +179,7 @@ namespace PubnubApi
             }
             catch (Exception e)
             {
-                LoggingMethod.WriteToLog(pubnubLog, e.ToString(), config.LogVerbosity);
+                LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: DeserializeToObject exception {e}", config.LogVerbosity);
                 return rawObject;
             }
         }
@@ -234,30 +234,18 @@ namespace PubnubApi
 
         private bool IsGenericTypeForMessage<T>()
         {
-            bool ret = false;
-            PNPlatform.Print(config, pubnubLog);
-            if (typeof(T).GetTypeInfo().IsGenericType &&
-                typeof(T).GetGenericTypeDefinition() == typeof(PNMessageResult<>))
-            {
-                ret = true;
-            }
+            bool ret = typeof(T).GetTypeInfo().IsGenericType &&
+                       typeof(T).GetGenericTypeDefinition() == typeof(PNMessageResult<>);
 
             LoggingMethod.WriteToLog(pubnubLog,
-                string.Format(CultureInfo.InvariantCulture,
-                    "DateTime: {0}, typeof(T).GetTypeInfo().IsGenericType = {1}",
-                    DateTime.Now.ToString(CultureInfo.InvariantCulture),
-                    typeof(T).GetTypeInfo().IsGenericType.ToString()), config.LogVerbosity);
+                $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] typeof(T).GetTypeInfo().IsGenericType = {typeof(T).GetTypeInfo().IsGenericType}", config.LogVerbosity);
             if (typeof(T).GetTypeInfo().IsGenericType)
             {
                 LoggingMethod.WriteToLog(pubnubLog,
-                    string.Format(CultureInfo.InvariantCulture,
-                        "DateTime: {0}, typeof(T).GetGenericTypeDefinition() = {1}",
-                        DateTime.Now.ToString(CultureInfo.InvariantCulture),
-                        typeof(T).GetGenericTypeDefinition().ToString()), config.LogVerbosity);
+                    $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] typeof(T).GetGenericTypeDefinition() = {typeof(T).GetGenericTypeDefinition()}", config.LogVerbosity);
             }
             LoggingMethod.WriteToLog(pubnubLog,
-                string.Format(CultureInfo.InvariantCulture, "DateTime: {0}, IsGenericTypeForMessage = {1}",
-                    DateTime.Now.ToString(CultureInfo.InvariantCulture), ret.ToString()), config.LogVerbosity);
+                $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] IsGenericTypeForMessage = {ret}", config.LogVerbosity);
             return ret;
         }
 

@@ -53,7 +53,7 @@ namespace PubnubApi.EndPoint
                     }
                     catch (Exception ex)
                     {
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, ListenerManager AddListener => Exception = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), pubnubConfig.LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: AddListener exception {ex}" ,pubnubConfig.LogVerbosity);
                     }
                 }
             }
@@ -82,7 +82,7 @@ namespace PubnubApi.EndPoint
                     }
                     catch (Exception ex)
                     {
-                        LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, ListenerManager RemoveListener => Exception = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), ex), pubnubConfig.LogVerbosity);
+                        LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: removeListener Exception {ex}", pubnubConfig.LogVerbosity);
                     }
                 }
             }

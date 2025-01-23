@@ -106,7 +106,7 @@ namespace PubnubApi
 
 		public Task<TransportResponse> Send(TransportRequest transportRequest)
 		{
-			LoggingMethod.WriteToLog(pnInstance.PNConfig.PubnubLog,$"{DateTime.Now.ToString(CultureInfo.InvariantCulture)}: Sending request with url = {transportRequest.RequestUrl}" , pnInstance.PNConfig.LogVerbosity);
+			LoggingMethod.WriteToLog(pnInstance.PNConfig.PubnubLog,$"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Sending request with url = {transportRequest.RequestUrl}" , pnInstance.PNConfig.LogVerbosity);
 			switch (transportRequest.RequestType)
 			{
 				case Constants.GET:

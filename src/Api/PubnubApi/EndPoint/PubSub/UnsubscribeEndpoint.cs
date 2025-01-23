@@ -67,7 +67,7 @@ namespace PubnubApi.EndPoint
 				throw new ArgumentException("Either Channel Or Channel Group or Both should be provided.");
 			}
 
-			LoggingMethod.WriteToLog(pubnubLog,$"Unsubscription request for channels: {string.Join(",", channels ?? [])}, channelGroups: {string.Join(",", channelGroups ?? [])} ", config.LogVerbosity);
+			LoggingMethod.WriteToLog(pubnubLog,$"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Unsubscribe request for channels: {string.Join(",", channels ?? [])}, channelGroups: {string.Join(",", channelGroups ?? [])} ", config.LogVerbosity);
 
 			if (subscribeEventEngineFactory.HasEventEngine(instanceId)) {
 				subscribeEventEngine = subscribeEventEngineFactory.GetEventEngine(instanceId);
@@ -135,7 +135,7 @@ namespace PubnubApi.EndPoint
 					}	
 				}
 			} else {
-				LoggingMethod.WriteToLog(pubnubLog,$"{DateTime.Now.ToString(CultureInfo.InvariantCulture)}: Attempted unsubscribe without event engine" , config.LogVerbosity);
+				LoggingMethod.WriteToLog(pubnubLog,$"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Attempted unsubscribe without event engine" , config.LogVerbosity);
 			}
 
 		}

@@ -345,7 +345,7 @@ namespace PubnubApi.EndPoint
 			}
 
 			if (!atleastOnePermission) {
-				LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} At least one permission is needed for at least one or more of uuids/users, channels/spaces or groups", DateTime.Now.ToString(CultureInfo.InvariantCulture)), PNLogVerbosity.BODY);
+				LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] At least one permission is needed for at least one or more of uuids/users, channels/spaces or groups", PNLogVerbosity.BODY);
 			}
 
 			Dictionary<string, object> resourcesCollection = new Dictionary<string, object>

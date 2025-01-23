@@ -53,14 +53,14 @@ namespace PubnubApi.EndPoint
 					responseStatus = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.Leave, category, pubnubRequestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				}
 			} catch (Exception ex) {
-				LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} HeartbeatOperation=> HeartbeatRequest \n channel(s)={1} \n cg(s)={2} \n Exception Details={3}", DateTime.Now.ToString(CultureInfo.InvariantCulture), string.Join(",", channels.OrderBy(x => x).ToArray()), string.Join(",", channelGroups.OrderBy(x => x).ToArray()), ex), config.LogVerbosity);
+				LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: Presence Leave request for channel(s)={string.Join(", ", channels.OrderBy(x => x))} \n channelGroup(s)={string.Join(", ", channelGroups.OrderBy(x => x))} \n Exception Details={ex}", config.LogVerbosity);
 				return new PNStatus(ex, PNOperationType.Leave, PNStatusCategory.PNUnknownCategory, channels, channelGroups);
 			}
 			return responseStatus;
 		}
 		private RequestParameter CreateRequestParameter(string[] channels, string[] channelGroups)
 		{
-			string channleString = (channels != null && channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : ",";
+			string channelString = (channels != null && channels.Length > 0) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : ",";
 			List<string> pathSegments = new List<string>
 			{
 				"v2",
@@ -68,7 +68,7 @@ namespace PubnubApi.EndPoint
 				"sub_key",
 				config.SubscribeKey,
 				"channel",
-				channleString,
+				channelString,
 				"leave"
 			};
 
