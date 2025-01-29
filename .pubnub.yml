@@ -887,7 +887,7 @@ sdks:
             requires:
               -
                 name: ".Net"
-                min-version: "3.5 or higher"
+                min-version: "6 or higher"
                 license: "MS-EULA"
                 license-url: "https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm"
                 location: "Should be installed on computer"
@@ -1026,7 +1026,7 @@ sdks:
             requires:
               -
                 name: ".Net"
-                min-version: "3.5 or higher"
+                min-version: "6 or higher"
                 license: "MS-EULA"
                 license-url: "https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm"
                 location: "Should be installed on computer"
