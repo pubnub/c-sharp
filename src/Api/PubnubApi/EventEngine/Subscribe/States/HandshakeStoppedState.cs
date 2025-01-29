@@ -17,7 +17,8 @@ namespace PubnubApi.EventEngine.Subscribe.States
                 {
                     Channels = subscriptionChanged.Channels?? Enumerable.Empty<string>(),
                     ChannelGroups = subscriptionChanged.ChannelGroups??Enumerable.Empty<string>(),
-                },
+                }.With(
+                    new EmitStatusInvocation(new PNStatus(null,PNOperationType.PNSubscribeOperation, PNStatusCategory.PNSubscriptionChangedCategory, this.Channels, this.ChannelGroups, Constants.HttpRequestSuccessStatusCode))),
 
                 Events.ReconnectEvent reconnect => new HandshakingState()
                 {

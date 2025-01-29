@@ -152,14 +152,13 @@ namespace PubNubMessaging.Tests
                 delegate (Pubnub pnObj, PNStatus status)
                 {
                     Debug.WriteLine("Received STATUS callback");
-                    if (status.AffectedChannels != null && status.Category == PNStatusCategory.PNConnectedCategory)
+                    if (status.AffectedChannels != null && (status.Category == PNStatusCategory.PNConnectedCategory || status.Category == PNStatusCategory.PNSubscriptionChangedCategory))
                     {
-                        if (status.AffectedChannels.Contains(channel))
+                        if (status.Category == PNStatusCategory.PNConnectedCategory && status.AffectedChannels.Contains(channel))
                         {
                             firstChannel.Set();
-                            return;
                         }
-                        if (status.AffectedChannels.Contains(channel2))
+                        if (status.Category == PNStatusCategory.PNSubscriptionChangedCategory && status.AffectedChannels.Contains(channel2))
                         {
                             secondChannel.Set();
                         }
@@ -170,6 +169,7 @@ namespace PubNubMessaging.Tests
             pubnub.AddListener(eventListener);
             pubnub.Subscribe<string>().Channels(new []{channel}).Execute();
             var firstCallbackSuccess = firstChannel.WaitOne(5000);
+            await Task.Delay(2000);
             pubnub.Subscribe<string>().Channels(new []{channel2}).Execute();
             var secondCallbackSuccess = secondChannel.WaitOne(5000);
             Assert.True(firstCallbackSuccess && secondCallbackSuccess);

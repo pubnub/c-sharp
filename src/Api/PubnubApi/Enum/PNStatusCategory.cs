@@ -13,6 +13,7 @@ namespace PubnubApi
         PNTimeoutCategory,
         PNNetworkIssuesCategory,
         PNConnectedCategory,
+        PNSubscriptionChangedCategory,
         PNReconnectedCategory,
         PNDisconnectedCategory,
         PNUnexpectedDisconnectCategory,

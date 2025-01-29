@@ -23,7 +23,8 @@ namespace PubnubApi.EventEngine.Subscribe.States
                 {
                     Channels = subscriptionChanged.Channels?? Enumerable.Empty<string>(),
                     ChannelGroups = subscriptionChanged.ChannelGroups??Enumerable.Empty<string>(),
-                },
+                }.With(
+                    new EmitStatusInvocation(new PNStatus(null,PNOperationType.PNSubscribeOperation, PNStatusCategory.PNSubscriptionChangedCategory, this.Channels, this.ChannelGroups, Constants.HttpRequestSuccessStatusCode))),
 
                 Events.SubscriptionRestoredEvent subscriptionRestored => new States.HandshakingState()
                 {
@@ -53,7 +54,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
                     Channels = this.Channels,
                     ChannelGroups = this.ChannelGroups,
                     Cursor = success.Cursor,
-				}.With(new EmitStatusInvocation(success.Status)),
+				}.With(new EmitStatusInvocation(new PNStatus(null, PNOperationType.PNSubscribeOperation, PNStatusCategory.PNConnectedCategory, this.Channels, this.ChannelGroups, Constants.HttpRequestSuccessStatusCode))),
 
                 _ => null
             };
