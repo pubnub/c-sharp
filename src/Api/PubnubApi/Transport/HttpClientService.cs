@@ -205,7 +205,7 @@ namespace PubnubApi
 				{
 					foreach (var kvp in transportRequest.Headers)
 					{
-						requestMessage.Headers.Add(kvp.Key, kvp.Value);
+						requestMessage.Headers.Add(kvp.Key, $"\"{kvp.Value}\"");
 					}
 				}
 
