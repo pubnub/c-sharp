@@ -18,6 +18,7 @@ namespace PubnubApi.EndPoint
 		private Dictionary<string, object> custom;
 		private bool includeCustom;
 
+		private string ifMatchesEtag = null;
 		private PNCallback<PNSetChannelMetadataResult> savedCallback;
 		private Dictionary<string, object> queryParam;
 
@@ -66,6 +67,11 @@ namespace PubnubApi.EndPoint
 			return this;
 		}
 
+		public SetChannelMetadataOperation IfMatchesEtag(string etag)
+		{
+			this.ifMatchesEtag = etag;
+			return this;
+		}
 		public void Execute(PNCallback<PNSetChannelMetadataResult> callback)
 		{
 			if (string.IsNullOrEmpty(channelId) || string.IsNullOrEmpty(channelId.Trim())) {
@@ -226,7 +232,10 @@ namespace PubnubApi.EndPoint
 				Query = requestQueryStringParams,
 				BodyContentString = patchMessage
 			};
-
+			if (!string.IsNullOrEmpty(ifMatchesEtag))
+			{
+				requestParameter.Headers.Add("If-Match", ifMatchesEtag);
+			}
 			return requestParameter;
 		}
 	}

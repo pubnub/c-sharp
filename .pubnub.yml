@@ -1,8 +1,15 @@
 name: c-sharp
-version: "7.1.3"
+version: "7.2.0"
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog:
+  - date: 2025-01-29
+    version: v7.2.0
+    changes:
+      - type: feature
+        text: "Added new optional parameter `IfMatchesEtag` for `setUUIDMetadata` and `setChannelMetadata`. When provided, the server compares the argument value with the eTag on the server and if they don't match a HTTP 412 error is returned."
+      - type: bug
+        text: "Fixes issue of not getting `PNSubscriptionChangedCategory` status when subscription change happens."
   - date: 2025-01-23
     version: v7.1.3
     changes:
@@ -828,7 +835,7 @@ features:
     - QUERY-PARAM
 supported-platforms:
   -
-    version: Pubnub 'C#' 7.1.3
+    version: Pubnub 'C#' 7.2.0
     platforms:
       - Windows 10 and up
       - Windows Server 2008 and up
@@ -839,7 +846,7 @@ supported-platforms:
       - .Net Framework 4.6.1+
       - .Net Framework 6.0
   -
-    version: PubnubPCL 'C#' 7.1.3
+    version: PubnubPCL 'C#' 7.2.0
     platforms:
       - Xamarin.Android
       - Xamarin.iOS
@@ -859,7 +866,7 @@ supported-platforms:
       - .Net Core
       - .Net 6.0
   -
-    version: PubnubUWP 'C#' 7.1.3
+    version: PubnubUWP 'C#' 7.2.0
     platforms:
       - Windows Phone 10
       - Universal Windows Apps
@@ -883,11 +890,11 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: Pubnub
-            location: https://github.com/pubnub/c-sharp/releases/tag/v7.1.3.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v7.2.0.0
             requires:
               -
                 name: ".Net"
-                min-version: "3.5 or higher"
+                min-version: "6 or higher"
                 license: "MS-EULA"
                 license-url: "https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm"
                 location: "Should be installed on computer"
@@ -1026,7 +1033,7 @@ sdks:
             requires:
               -
                 name: ".Net"
-                min-version: "3.5 or higher"
+                min-version: "6 or higher"
                 license: "MS-EULA"
                 license-url: "https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm"
                 location: "Should be installed on computer"
@@ -1166,7 +1173,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: PubNubPCL
-            location: https://github.com/pubnub/c-sharp/releases/tag/v7.1.3.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v7.2.0.0
             requires:
               -
                 name: ".Net Core"
@@ -1525,7 +1532,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: PubnubUWP
-            location: https://github.com/pubnub/c-sharp/releases/tag/v7.1.3.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v7.2.0.0
             requires:
               -
                 name: "Universal Windows Platform Development"

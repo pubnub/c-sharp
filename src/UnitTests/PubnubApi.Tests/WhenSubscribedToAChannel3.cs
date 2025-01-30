@@ -25,6 +25,7 @@ namespace PubNubMessaging.Tests
 
         private static int manualResetEventWaitTimeout = 310 * 1000;
         private static string channel = "hello_my_channel";
+        private static string channel2 = "hello_my_channel_2";
         private static string[] channelsGrant = { "hello_my_channel", "hello_my_channel1", "hello_my_channel2" };
         private static string authKey = "myauth";
         private static string currentTestCase = "";
@@ -101,11 +102,8 @@ namespace PubNubMessaging.Tests
                             channel,authValues 
                         },
                         {
-                            channelsGrant[1],authValues 
-                        },
-                        {
-                            channelsGrant[2],authValues 
-                        },
+                            channel2,authValues
+                        }
                     }
                 }).ExecuteAsync();
             await Task.Delay(4000);
@@ -129,6 +127,52 @@ namespace PubNubMessaging.Tests
                 pubnub = null;
             }
             server.Stop();
+        }
+
+        [Test]
+        public static async Task ThenStatusCallbackShouldKeepFiring()
+        {
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                LogVerbosity = PNLogVerbosity.BODY
+            };
+            if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+
+            var firstChannel = new ManualResetEvent(false);
+            var secondChannel = new ManualResetEvent(false);
+            SubscribeCallbackExt eventListener = new SubscribeCallbackExt(
+                delegate (Pubnub pnObj, PNObjectEventResult eventResult)
+                {
+                },
+                delegate (Pubnub pnObj, PNStatus status)
+                {
+                    Debug.WriteLine("Received STATUS callback");
+                    if (status.AffectedChannels != null && (status.Category == PNStatusCategory.PNConnectedCategory || status.Category == PNStatusCategory.PNSubscriptionChangedCategory))
+                    {
+                        if (status.Category == PNStatusCategory.PNConnectedCategory && status.AffectedChannels.Contains(channel))
+                        {
+                            firstChannel.Set();
+                        }
+                        if (status.Category == PNStatusCategory.PNSubscriptionChangedCategory && status.AffectedChannels.Contains(channel2))
+                        {
+                            secondChannel.Set();
+                        }
+                    }
+                }
+            );
+            pubnub = createPubNubInstance(config, authToken);
+            pubnub.AddListener(eventListener);
+            pubnub.Subscribe<string>().Channels(new []{channel}).Execute();
+            var firstCallbackSuccess = firstChannel.WaitOne(5000);
+            await Task.Delay(2000);
+            pubnub.Subscribe<string>().Channels(new []{channel2}).Execute();
+            var secondCallbackSuccess = secondChannel.WaitOne(5000);
+            Assert.True(firstCallbackSuccess && secondCallbackSuccess);
         }
 
         [Test]

@@ -9,5 +9,7 @@ namespace PubnubApi
 		public Dictionary<string, string> Query { get; set; } = new Dictionary<string, string>();
 		public string BodyContentString { get; set; }
 		public byte[] FormData { get; set; }
+
+		public Dictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
 	}
 }

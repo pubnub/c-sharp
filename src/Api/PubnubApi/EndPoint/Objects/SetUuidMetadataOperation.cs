@@ -22,7 +22,7 @@ namespace PubnubApi.EndPoint
 		private string uuidProfileUrl;
 		private Dictionary<string, object> uuidCustom;
 		private bool includeCustom;
-
+		private string ifMatchesEtag = null;
 
 		private PNCallback<PNSetUuidMetadataResult> savedCallback;
 		private Dictionary<string, object> queryParam;
@@ -94,6 +94,11 @@ namespace PubnubApi.EndPoint
 		public SetUuidMetadataOperation QueryParam(Dictionary<string, object> customQueryParam)
 		{
 			this.queryParam = customQueryParam;
+			return this;
+		}
+		public SetUuidMetadataOperation IfMatchesEtag(string etag)
+		{
+			this.ifMatchesEtag = etag;
 			return this;
 		}
 
@@ -248,6 +253,10 @@ namespace PubnubApi.EndPoint
 				Query = requestQueryStringParams,
 				BodyContentString = patchMessage
 			};
+			if (!string.IsNullOrEmpty(ifMatchesEtag))
+			{
+				requestParameter.Headers.Add("If-Match", ifMatchesEtag);
+			}
 			return requestParameter;
 		}
 	}
