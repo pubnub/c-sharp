@@ -571,7 +571,7 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string channel = "hello_my_channel";
             manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;

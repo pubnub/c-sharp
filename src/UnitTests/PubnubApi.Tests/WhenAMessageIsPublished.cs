@@ -86,7 +86,6 @@ namespace PubNubMessaging.Tests
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Assert.IsTrue(receivedGrantMessage, "WhenAMessageIsPublished Grant access failed.");
         }
 
         [TearDown]
@@ -125,7 +124,7 @@ namespace PubNubMessaging.Tests
 
             server.RunOnHttps(true);
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string expected = "";
 
@@ -176,7 +175,7 @@ namespace PubNubMessaging.Tests
                 config.AuthKey = authToken;
             }
             server.RunOnHttps(true);
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string expected = "[1,\"Sent\",\"14715278266153304\"]";
 
@@ -282,7 +281,7 @@ namespace PubNubMessaging.Tests
                 config.AuthKey = authToken;
             }
             server.RunOnHttps(true);
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string expected = "[1,\"Sent\",\"14715278266153304\"]";
 
@@ -383,7 +382,7 @@ namespace PubNubMessaging.Tests
                 config.AuthKey = authToken;
             }
             server.RunOnHttps(true);
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string expected = "[1,\"Sent\",\"14715278266153304\"]";
 
@@ -509,7 +508,7 @@ namespace PubNubMessaging.Tests
                 config.AuthKey = authKey;
             }
             server.RunOnHttps(true);
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string expected = "[1,\"Sent\",\"14715278266153304\"]";
 
@@ -610,7 +609,7 @@ namespace PubNubMessaging.Tests
                 config.AuthKey = authKey;
             }
             server.RunOnHttps(true);
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string expected = "[1,\"Sent\",\"14715286132003364\"]";
 
@@ -713,7 +712,7 @@ namespace PubNubMessaging.Tests
                 config.AuthKey = authKey;
             }
             server.RunOnHttps(false);
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string expected = "[1,\"Sent\",\"14715322883933786\"]";
 
@@ -815,7 +814,7 @@ namespace PubNubMessaging.Tests
                 config.AuthKey = authKey;
             }
             server.RunOnHttps(true);
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string expected = "[1,\"Sent\",\"14715322883933786\"]";
 
@@ -917,7 +916,7 @@ namespace PubNubMessaging.Tests
                 config.AuthKey = authKey;
             }
             server.RunOnHttps(false);
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string expected = "[1,\"Sent\",\"14715426119520817\"]";
 
@@ -1030,7 +1029,7 @@ namespace PubNubMessaging.Tests
 
             server.RunOnHttps(false);
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string expected = "[1, \"Sent\", \"14715438956854374\"]";
 
@@ -1136,7 +1135,7 @@ namespace PubNubMessaging.Tests
         //     }
         //     server.RunOnHttps(false);
         //
-        //     pubnub = createPubNubInstance(config);
+        // pubnub = createPubNubInstance(config, authToken);
         //
         //     string expected = "[1, \"Sent\", \"14715459088445832\"]";
         //
@@ -1224,7 +1223,7 @@ namespace PubNubMessaging.Tests
                     SubscribeKey = PubnubCommon.SubscribeKey,
                 };
 
-                pubnub = createPubNubInstance(config);
+                pubnub = createPubNubInstance(config, authToken);
             });
 
             pubnub = null;
@@ -1239,7 +1238,7 @@ namespace PubNubMessaging.Tests
                 SubscribeKey = PubnubCommon.SubscribeKey,
             };
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string channel = "hello_my_channel";
             string message = "Pubnub API Usage Example";
@@ -1278,7 +1277,7 @@ namespace PubNubMessaging.Tests
             }
             server.RunOnHttps(false);
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string channel = "hello_my_channel";
             string message = "Pubnub API Usage Example";
@@ -1342,7 +1341,7 @@ namespace PubNubMessaging.Tests
                 config.AuthKey = authKey;
             }
             server.RunOnHttps(true);
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string expected = "[1,\"Sent\",\"14722484585147754\"]";
 
@@ -1564,7 +1563,7 @@ namespace PubNubMessaging.Tests
 
             server.RunOnHttps(false);
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string expected = "[1,\"Sent\",\"14722484585147754\"]";
 
@@ -1638,7 +1637,7 @@ namespace PubNubMessaging.Tests
 
             server.RunOnHttps(false);
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string expected = "[1,\"Sent\",\"14722484585147754\"]";
 
@@ -1717,7 +1716,7 @@ namespace PubNubMessaging.Tests
 
             server.RunOnHttps(false);
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string expected = "[1,\"Sent\",\"14722484585147754\"]";
 
@@ -1790,7 +1789,7 @@ namespace PubNubMessaging.Tests
 
             server.RunOnHttps(false);
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string expected = "[1,\"Sent\",\"14722484585147754\"]";
 

@@ -1,14 +1,8 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using NUnit.Framework;
-using System.ComponentModel;
 using System.Threading;
-using System.Collections;
 using PubnubApi;
 using MockServer;
-using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace PubNubMessaging.Tests
@@ -28,6 +22,7 @@ namespace PubNubMessaging.Tests
         private static long publishTimetoken = 0;
         private static string currentTestCase = "";
         private static int manualResetEventWaitTimeout = 310 * 1000;
+        private static string authToken;
 
         private static Pubnub pubnub;
 
@@ -35,7 +30,7 @@ namespace PubNubMessaging.Tests
 
 
         [SetUp]
-        public static void Init()
+        public static async Task Init()
         {
             UnitTestLog unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
@@ -83,35 +78,14 @@ namespace PubNubMessaging.Tests
                     .WithParameter("signature", "JMQKzXgfqNo-HaHuabC0gq0X6IkVMHa9AWBCg6BGN1Q=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
-
-            pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20)
-                .Execute(new PNAccessManagerGrantResultExt((result, status)=> 
-                {
-                    if (result != null)
-                    {
-                        Debug.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-                        if (result.Channels != null && result.Channels.Count > 0)
-                        {
-                            var read = result.Channels[channel][authKey].ReadEnabled;
-                            var write = result.Channels[channel][authKey].WriteEnabled;
-                            if (read && write)
-                            {
-                                receivedGrantMessage = true;
-                            }
-                        }
-                    }
-                    grantManualEvent.Set();
-                }));
-
-            Thread.Sleep(1000);
-
-            grantManualEvent.WaitOne();
-
+            if (string.IsNullOrEmpty(PubnubCommon.GrantToken))
+            {
+                await GenerateTestGrantToken(pubnub);
+            }
+            authToken = PubnubCommon.GrantToken;
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-
-            Assert.IsTrue(receivedGrantMessage, "WhenPushIsRequested Grant access failed.");
         }
 
         [TearDown]
@@ -151,7 +125,7 @@ namespace PubNubMessaging.Tests
             }
 
             server.RunOnHttps(false);
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             MpnsToastNotification toast = new MpnsToastNotification();
             toast.text1 = "hardcode message";
@@ -215,7 +189,7 @@ namespace PubNubMessaging.Tests
             }
 
             server.RunOnHttps(false);
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             MpnsFlipTileNotification tile = new MpnsFlipTileNotification();
             tile.title = "front title";
@@ -284,7 +258,7 @@ namespace PubNubMessaging.Tests
             }
 
             server.RunOnHttps(false);
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string channel = "hello_my_channel";
 
@@ -354,7 +328,7 @@ namespace PubNubMessaging.Tests
 
             server.RunOnHttps(false);
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string channel = "hello_my_channel";
 
@@ -429,7 +403,7 @@ namespace PubNubMessaging.Tests
 
             server.RunOnHttps(false);
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
 
@@ -487,7 +461,7 @@ namespace PubNubMessaging.Tests
 
             server.RunOnHttps(false);
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
 
@@ -542,7 +516,7 @@ namespace PubNubMessaging.Tests
 
             server.RunOnHttps(false);
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
 
@@ -606,7 +580,7 @@ namespace PubNubMessaging.Tests
 
             server.RunOnHttps(false);
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
 
@@ -672,7 +646,7 @@ namespace PubNubMessaging.Tests
 
             server.RunOnHttps(false);
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
 
@@ -736,7 +710,7 @@ namespace PubNubMessaging.Tests
 
             server.RunOnHttps(false);
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
 
@@ -802,7 +776,7 @@ namespace PubNubMessaging.Tests
 
             server.RunOnHttps(false);
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
 
@@ -865,7 +839,7 @@ namespace PubNubMessaging.Tests
 
             server.RunOnHttps(false);
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
 #if NET40
             PNResult<PNPushListProvisionsResult> resp = Task.Factory.StartNew(async () => await pubnub.AuditPushChannelProvisions()
@@ -925,7 +899,7 @@ namespace PubNubMessaging.Tests
 
             server.RunOnHttps(false);
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
 
@@ -988,7 +962,7 @@ namespace PubNubMessaging.Tests
 
             server.RunOnHttps(false);
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
 

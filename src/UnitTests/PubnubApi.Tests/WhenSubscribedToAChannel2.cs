@@ -5,6 +5,7 @@ using PubnubApi;
 using System.Collections.Generic;
 using MockServer;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using PubnubApi.Security.Crypto;
 using PubnubApi.Security.Crypto.Cryptors;
 
@@ -27,6 +28,7 @@ namespace PubNubMessaging.Tests
         private static string[] channelsGrant = { "hello_my_channel", "hello_my_channel1", "hello_my_channel2" };
         private static string authKey = "myauth";
         private static string currentTestCase = "";
+        private static string authToken;
 
         private static Pubnub pubnub;
 
@@ -41,7 +43,7 @@ namespace PubNubMessaging.Tests
         }
 
         [SetUp]
-        public static void Init()
+        public static async Task Init()
         {
             UnitTestLog unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
@@ -91,17 +93,14 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Grant().Channels(channelsGrant).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Execute(new UTGrantResult());
-
-            Thread.Sleep(3000);
-
-            grantManualEvent.WaitOne();
-
+            if (string.IsNullOrEmpty(PubnubCommon.GrantToken))
+            {
+                await GenerateTestGrantToken(pubnub);
+            }
+            authToken = PubnubCommon.GrantToken;
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-
-            Assert.IsTrue(receivedGrantMessage, "WhenSubscribedToAChannel2 Grant access failed.");
         }
 
         [TearDown]
@@ -156,7 +155,7 @@ namespace PubNubMessaging.Tests
             server.RunOnHttps(ssl);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             pubnub.AddListener(listenerSubCallack);
 
             manualResetEventWaitTimeout = 310 * 1000;
@@ -353,7 +352,7 @@ namespace PubNubMessaging.Tests
             server.RunOnHttps(ssl);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             pubnub.AddListener(listenerSubCallack);
 
             manualResetEventWaitTimeout = 310 * 1000;
