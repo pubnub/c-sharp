@@ -77,10 +77,7 @@ namespace PubNubMessaging.Tests
             {
                 await GenerateTestGrantToken(pubnub);
             }
-            else
-            {
-                authToken = PubnubCommon.GrantToken;
-            }
+            authToken = PubnubCommon.GrantToken;
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
@@ -118,12 +115,12 @@ namespace PubNubMessaging.Tests
             }
             else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
             {
-                config.AuthKey = authKey;
+                config.AuthKey = authToken;
             }
 
             server.RunOnHttps(false);
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string channel = "hello_my_channel";
             string message = messageForNoStorePublish;
@@ -240,7 +237,7 @@ namespace PubNubMessaging.Tests
                 config.AuthKey = "myAuth";
             }
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string channel = "hello_my_channel";
             string message = messageForPublish;
@@ -363,7 +360,7 @@ namespace PubNubMessaging.Tests
                 config.AuthKey = "myAuth";
             }
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string channel = "hello_my_channel";
             string message = messageForPublish;
@@ -489,7 +486,7 @@ namespace PubNubMessaging.Tests
                 config.AuthKey = "myAuth";
             }
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string channel = "hello_my_channel";
             manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
@@ -559,7 +556,7 @@ namespace PubNubMessaging.Tests
                 config.AuthKey = "myAuth";
             }
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string channel = "hello_my_channel";
             manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
@@ -625,7 +622,7 @@ namespace PubNubMessaging.Tests
 
             server.RunOnHttps(false);
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string channel = "hello_my_channel";
             manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
@@ -691,7 +688,7 @@ namespace PubNubMessaging.Tests
 
             server.RunOnHttps(false);
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string channel = "hello_my_channel";
             manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
@@ -761,7 +758,7 @@ namespace PubNubMessaging.Tests
                 config.AuthKey = "myAuth";
             }
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string channel = "hello_my_channel";
 
@@ -827,7 +824,7 @@ namespace PubNubMessaging.Tests
                 config.AuthKey = "myAuth";
             }
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string channel = "hello_my_channel";
 
@@ -964,7 +961,7 @@ namespace PubNubMessaging.Tests
                 config.AuthKey = "myAuth";
             }
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string channel = "hello_my_channel";
 
@@ -1091,7 +1088,7 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string channel = "hello_my_channel";
             manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
@@ -1374,7 +1371,7 @@ namespace PubNubMessaging.Tests
 
             server.RunOnHttps(ssl);
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string channel = "hello_my_channel";
 
@@ -1721,7 +1718,7 @@ namespace PubNubMessaging.Tests
 
             server.RunOnHttps(ssl);
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string channel = "hello_my_channel";
 
@@ -2038,7 +2035,7 @@ namespace PubNubMessaging.Tests
 
             server.RunOnHttps(ssl);
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string channel = "hello_my_channel";
 
@@ -2396,7 +2393,7 @@ namespace PubNubMessaging.Tests
 
             server.RunOnHttps(ssl);
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string channel = "hello_my_channel";
 
@@ -2714,7 +2711,7 @@ namespace PubNubMessaging.Tests
 
             server.RunOnHttps(false);
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string channel = "hello_my_channel";
             manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
@@ -2769,12 +2766,12 @@ namespace PubNubMessaging.Tests
             if (PubnubCommon.PAMServerSideRun) {
                 config.SecretKey = PubnubCommon.SecretKey;
             } else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey) {
-                config.AuthKey = authKey;
+                config.AuthKey = authToken;
             }
 
             server.RunOnHttps(false);
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string channel = "hello_my_channel";
             manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
@@ -2834,7 +2831,7 @@ namespace PubNubMessaging.Tests
 
             server.RunOnHttps(false);
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string channel = "hello_my_channel";
             manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;
@@ -2895,7 +2892,7 @@ namespace PubNubMessaging.Tests
 
             server.RunOnHttps(false);
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string channel = "hello_my_channel";
             manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;

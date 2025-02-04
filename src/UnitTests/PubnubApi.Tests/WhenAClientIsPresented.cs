@@ -76,10 +76,7 @@ namespace PubNubMessaging.Tests
             {
                 await GenerateTestGrantToken(pubnub, presenceTestChannel);
             }
-            else
-            {
-                authToken = PubnubCommon.GrantToken;
-            }
+            authToken = PubnubCommon.GrantToken;
 
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;

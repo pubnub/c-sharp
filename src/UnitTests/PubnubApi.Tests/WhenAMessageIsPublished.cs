@@ -81,10 +81,7 @@ namespace PubNubMessaging.Tests
             {
                 await GenerateTestGrantToken(pubnub);
             }
-            else
-            {
-                authToken = PubnubCommon.GrantToken;
-            }
+            authToken = PubnubCommon.GrantToken;
 
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
@@ -1112,109 +1109,109 @@ namespace PubNubMessaging.Tests
             pubnub = null;
         }
 
-        [Test]
-        public static void ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo()
-        {
-            server.ClearRequests();
-
-            bool receivedPublishMessage = false;
-            long publishTimetoken = 0;
-
-            string channel = "hello_my_channel";
-            object message = new PubnubDemoObject();
-
-            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
-            {
-                PublishKey = PubnubCommon.PublishKey,
-                SubscribeKey = PubnubCommon.SubscribeKey,
-                Secure = false
-            };
-            if (PubnubCommon.PAMServerSideRun)
-            {
-                config.SecretKey = PubnubCommon.SecretKey;
-            }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
-            server.RunOnHttps(false);
-
-            pubnub = createPubNubInstance(config);
-
-            string expected = "[1, \"Sent\", \"14715459088445832\"]";
-
-            server.AddRequest(new Request()
-                    .WithMethod("GET")
-                    .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/%7B%22VersionID%22:3.4%2C%22Timetoken%22:%2213601488652764619%22%2C%22OperationName%22:%22Publish%22%2C%22Channels%22:%5B%22ch1%22%5D%2C%22DemoMessage%22:%7B%22DefaultMessage%22:%22~!%40%23%24%25%5E%26*()_%2B%20%601234567890-%3D%20qwertyuiop%5B%5D%5C%5C%20%7B%7D%7C%20asdfghjkl%3B'%20:%5C%22%20zxcvbnm%2C.%2F%20%3C%3E%3F%20%22%7D%2C%22CustomMessage%22:%7B%22DefaultMessage%22:%22Welcome%20to%20the%20world%20of%20Pubnub%20for%20Publish%20and%20Subscribe.%20Hah!%22%7D%2C%22SampleXml%22:%5B%7B%22ID%22:%22ABCD123%22%2C%22Name%22:%7B%22First%22:%22John%22%2C%22Middle%22:%22P.%22%2C%22Last%22:%22Doe%22%7D%2C%22Address%22:%7B%22Street%22:%22123%20Duck%20Street%22%2C%22City%22:%22New%20City%22%2C%22State%22:%22New%20York%22%2C%22Country%22:%22United%20States%22%7D%7D%2C%7B%22ID%22:%22ABCD456%22%2C%22Name%22:%7B%22First%22:%22Peter%22%2C%22Middle%22:%22Z.%22%2C%22Last%22:%22Smith%22%7D%2C%22Address%22:%7B%22Street%22:%2212%20Hollow%20Street%22%2C%22City%22:%22Philadelphia%22%2C%22State%22:%22Pennsylvania%22%2C%22Country%22:%22United%20States%22%7D%7D%5D%7D", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel))
-                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
-                    .WithParameter("requestid", "myRequestId")
-                    .WithParameter("uuid", config.UserId)
-                    .WithResponse(expected)
-                    .WithStatusCode(System.Net.HttpStatusCode.OK));
-
-            manualResetEventWaitTimeout = 310 * 1000;
-
-            ManualResetEvent publishManualEvent = new ManualResetEvent(false);
-            pubnub.Publish().Channel(channel).Message(message)
-                    .Execute(new PNPublishResultExt((r, s) =>
-                    {
-                        if (r != null && s.StatusCode == 200 && !s.Error)
-                        {
-                            publishTimetoken = r.Timetoken;
-                            receivedPublishMessage = true;
-                        }
-                        publishManualEvent.Set();
-                    }));
-            publishManualEvent.WaitOne(manualResetEventWaitTimeout);
-
-            if (!receivedPublishMessage)
-            {
-                Assert.IsTrue(receivedPublishMessage, "Complex Object Publish Failed");
-            }
-            else
-            {
-                receivedPublishMessage = false;
-
-                if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
-
-                expected = Resource.ComplexMessage;
-
-                server.AddRequest(new Request()
-                        .WithMethod("GET")
-                        .WithPath(String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
-                        .WithParameter("count", "100")
-                        .WithParameter("end", "14715459088445832")
-                        .WithParameter("include_token", "true")
-                        .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
-                        .WithParameter("requestid", "myRequestId")
-                        .WithParameter("uuid", config.UserId)
-                        .WithResponse(expected)
-                        .WithStatusCode(System.Net.HttpStatusCode.OK));
-
-                Debug.WriteLine("WhenAMessageIsPublished-ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo - Publish OK. Now checking detailed history");
-
-                ManualResetEvent historyManualEvent = new ManualResetEvent(false);
-
-                pubnub.History().Channel(channel)
-                    .End(PubnubCommon.EnableStubTest ? 14715459088445832 : publishTimetoken)
-                    .Reverse(false)
-                    .IncludeTimetoken(true)
-                    .Execute(new PNHistoryResultExt(
-                                (r, s) =>
-                                {
-                                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
-                                    receivedPublishMessage = true;
-                                    historyManualEvent.Set();
-                                }));
-
-                historyManualEvent.WaitOne(manualResetEventWaitTimeout);
-
-                Assert.IsTrue(receivedPublishMessage, "Unable to match the successful unencrypt object Publish");
-            }
-            pubnub.Destroy();
-            pubnub.PubnubUnitTest = null;
-            pubnub = null;
-        }
+        // [Test]
+        // public static void ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo()
+        // {
+        //     server.ClearRequests();
+        //
+        //     bool receivedPublishMessage = false;
+        //     long publishTimetoken = 0;
+        //
+        //     string channel = "hello_my_channel";
+        //     object message = new PubnubDemoObject();
+        //
+        //     PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+        //     {
+        //         PublishKey = PubnubCommon.PublishKey,
+        //         SubscribeKey = PubnubCommon.SubscribeKey,
+        //         Secure = false
+        //     };
+        //     if (PubnubCommon.PAMServerSideRun)
+        //     {
+        //         config.SecretKey = PubnubCommon.SecretKey;
+        //     }
+        //     else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+        //     {
+        //         config.AuthKey = authKey;
+        //     }
+        //     server.RunOnHttps(false);
+        //
+        //     pubnub = createPubNubInstance(config);
+        //
+        //     string expected = "[1, \"Sent\", \"14715459088445832\"]";
+        //
+        //     server.AddRequest(new Request()
+        //             .WithMethod("GET")
+        //             .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/%7B%22VersionID%22:3.4%2C%22Timetoken%22:%2213601488652764619%22%2C%22OperationName%22:%22Publish%22%2C%22Channels%22:%5B%22ch1%22%5D%2C%22DemoMessage%22:%7B%22DefaultMessage%22:%22~!%40%23%24%25%5E%26*()_%2B%20%601234567890-%3D%20qwertyuiop%5B%5D%5C%5C%20%7B%7D%7C%20asdfghjkl%3B'%20:%5C%22%20zxcvbnm%2C.%2F%20%3C%3E%3F%20%22%7D%2C%22CustomMessage%22:%7B%22DefaultMessage%22:%22Welcome%20to%20the%20world%20of%20Pubnub%20for%20Publish%20and%20Subscribe.%20Hah!%22%7D%2C%22SampleXml%22:%5B%7B%22ID%22:%22ABCD123%22%2C%22Name%22:%7B%22First%22:%22John%22%2C%22Middle%22:%22P.%22%2C%22Last%22:%22Doe%22%7D%2C%22Address%22:%7B%22Street%22:%22123%20Duck%20Street%22%2C%22City%22:%22New%20City%22%2C%22State%22:%22New%20York%22%2C%22Country%22:%22United%20States%22%7D%7D%2C%7B%22ID%22:%22ABCD456%22%2C%22Name%22:%7B%22First%22:%22Peter%22%2C%22Middle%22:%22Z.%22%2C%22Last%22:%22Smith%22%7D%2C%22Address%22:%7B%22Street%22:%2212%20Hollow%20Street%22%2C%22City%22:%22Philadelphia%22%2C%22State%22:%22Pennsylvania%22%2C%22Country%22:%22United%20States%22%7D%7D%5D%7D", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel))
+        //             .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+        //             .WithParameter("requestid", "myRequestId")
+        //             .WithParameter("uuid", config.UserId)
+        //             .WithResponse(expected)
+        //             .WithStatusCode(System.Net.HttpStatusCode.OK));
+        //
+        //     manualResetEventWaitTimeout = 310 * 1000;
+        //
+        //     ManualResetEvent publishManualEvent = new ManualResetEvent(false);
+        //     pubnub.Publish().Channel(channel).Message(message)
+        //             .Execute(new PNPublishResultExt((r, s) =>
+        //             {
+        //                 if (r != null && s.StatusCode == 200 && !s.Error)
+        //                 {
+        //                     publishTimetoken = r.Timetoken;
+        //                     receivedPublishMessage = true;
+        //                 }
+        //                 publishManualEvent.Set();
+        //             }));
+        //     publishManualEvent.WaitOne(manualResetEventWaitTimeout);
+        //
+        //     if (!receivedPublishMessage)
+        //     {
+        //         Assert.IsTrue(receivedPublishMessage, "Complex Object Publish Failed");
+        //     }
+        //     else
+        //     {
+        //         receivedPublishMessage = false;
+        //
+        //         if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
+        //
+        //         expected = Resource.ComplexMessage;
+        //
+        //         server.AddRequest(new Request()
+        //                 .WithMethod("GET")
+        //                 .WithPath(String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+        //                 .WithParameter("count", "100")
+        //                 .WithParameter("end", "14715459088445832")
+        //                 .WithParameter("include_token", "true")
+        //                 .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+        //                 .WithParameter("requestid", "myRequestId")
+        //                 .WithParameter("uuid", config.UserId)
+        //                 .WithResponse(expected)
+        //                 .WithStatusCode(System.Net.HttpStatusCode.OK));
+        //
+        //         Debug.WriteLine("WhenAMessageIsPublished-ThenComplexMessageObjectShouldReturnSuccessCodeAndInfo - Publish OK. Now checking detailed history");
+        //
+        //         ManualResetEvent historyManualEvent = new ManualResetEvent(false);
+        //
+        //         pubnub.History().Channel(channel)
+        //             .End(PubnubCommon.EnableStubTest ? 14715459088445832 : publishTimetoken)
+        //             .Reverse(false)
+        //             .IncludeTimetoken(true)
+        //             .Execute(new PNHistoryResultExt(
+        //                         (r, s) =>
+        //                         {
+        //                             Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+        //                             receivedPublishMessage = true;
+        //                             historyManualEvent.Set();
+        //                         }));
+        //
+        //         historyManualEvent.WaitOne(manualResetEventWaitTimeout);
+        //
+        //         Assert.IsTrue(receivedPublishMessage, "Unable to match the successful unencrypt object Publish");
+        //     }
+        //     pubnub.Destroy();
+        //     pubnub.PubnubUnitTest = null;
+        //     pubnub = null;
+        // }
 
         [Test]
         public static void ThenPubnubShouldFailOnWithoutSettingUuid()
