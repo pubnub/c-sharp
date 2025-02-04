@@ -21,9 +21,10 @@ namespace PubNubMessaging.Tests
         private static Pubnub pubnub;
         private static Server server;
         private static string authKey = "myauth";
+        private static string authToken;
 
         [SetUp]
-        public static void Init()
+        public static async Task Init()
         {
             UnitTestLog unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
@@ -72,37 +73,17 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            ManualResetEvent grantManualEvent = new ManualResetEvent(false);
-            pubnub.Grant().Channels(new[] { grantChannel }).AuthKeys(new[] { authKey }).Read(true).Write(true).Manage(true).TTL(20)
-                .Execute(new PNAccessManagerGrantResultExt((r, s) => {
-                    try
-                    {
-                        Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
-
-                        if (r != null)
-                        {
-                            Debug.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
-                            if (r.Channels != null && r.Channels.Count > 0)
-                            {
-                                var read = r.Channels[channel][authKey].ReadEnabled;
-                                var write = r.Channels[channel][authKey].WriteEnabled;
-                                if (read && write)
-                                {
-                                    receivedGrantMessage = true;
-                                }
-                            }
-                        }
-                    }
-                    catch { /* ignore */ }
-                    finally { grantManualEvent.Set(); }
-                }));
-            Thread.Sleep(1000);
-            grantManualEvent.WaitOne();
-
+            if (string.IsNullOrEmpty(PubnubCommon.GrantToken))
+            {
+                await GenerateTestGrantToken(pubnub);
+            }
+            else
+            {
+                authToken = PubnubCommon.GrantToken;
+            }
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Assert.IsTrue(receivedGrantMessage, "WhenDetailedHistoryIsRequested Grant access failed.");
         }
 
         [TearDown]

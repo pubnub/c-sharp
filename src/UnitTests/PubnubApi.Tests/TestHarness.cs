@@ -1,5 +1,8 @@
 ﻿using PubnubApi;
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using NUnit.Framework;
 
 namespace PubNubMessaging.Tests
 {
@@ -36,6 +39,81 @@ namespace PubNubMessaging.Tests
                 pubnub.SetAuthToken(authToken);
             }
             return pubnub;
+        }
+
+        public static async Task GenerateTestGrantToken(Pubnub pubnub, string presenceTestChannel = "presenceTestChannel")
+        {
+            string channel = "hello_my_channel";
+            string channel1 = "hello_my_channel_1";
+            string channel2 = "hello_my_channel_2";
+            string channel3 = "hello_my_channel_3";
+            string channel4 = "hello_my_channel_4";
+            string group = "hello_my_group";
+            
+            var fullAccess = new PNTokenAuthValues()
+            {
+                Read = true,
+                Write = true,
+                Create = true,
+                Get = true,
+                Delete = true,
+                Join = true,
+                Update = true,
+                Manage = true
+            };
+            var grantResult = await pubnub.GrantToken().TTL(30).AuthorizedUuid(pubnub.PNConfig.UserId).Resources(
+                new PNTokenResources()
+                {
+                    Channels = new Dictionary<string, PNTokenAuthValues>()
+                    {
+                        {
+                            channel, fullAccess
+                        },
+                        {
+                            channel+"-pnpres", fullAccess
+                        },
+                        {
+                            channel1, fullAccess
+                        },
+                        {
+                            channel1+"-pnpres", fullAccess
+                        },
+                        {
+                            channel2, fullAccess
+                        },
+                        {
+                            channel2+"-pnpres", fullAccess
+                        },
+                        {
+                            channel3, fullAccess
+                        },
+                        {
+                            channel3+"-pnpres", fullAccess
+                        },
+                        {
+                            channel4, fullAccess
+                        },
+                        {
+                            channel4+"-pnpres", fullAccess
+                        },
+                        {
+                            presenceTestChannel, fullAccess
+                        },
+                        {
+                            $"{presenceTestChannel}{Constants.Pnpres}", fullAccess
+                        },
+                    },
+                    ChannelGroups = new Dictionary<string, PNTokenAuthValues>()
+                    {
+                        {group, fullAccess}
+                    }
+                }).ExecuteAsync();
+
+            await Task.Delay(4000);
+
+            PubnubCommon.GrantToken = grantResult.Result?.Token;
+            Assert.IsTrue(grantResult.Status.Error == false && grantResult.Result != null, 
+                "GrantToken() failed.");
         }
     }
 }

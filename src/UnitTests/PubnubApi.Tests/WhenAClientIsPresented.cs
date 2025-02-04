@@ -71,71 +71,19 @@ namespace PubNubMessaging.Tests
                     .WithPath(string.Format("/v2/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey))
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
-            
-            var fullAccess = new PNTokenAuthValues()
+
+            if (string.IsNullOrEmpty(PubnubCommon.GrantToken))
             {
-                Read = true,
-                Write = true,
-                Create = true,
-                Get = true,
-                Delete = true,
-                Join = true,
-                Update = true,
-                Manage = true
-            };
-            var grantResult = await pubnub.GrantToken().TTL(20).AuthorizedUuid(config.UserId).Resources(
-                new PNTokenResources()
-                {
-                    Channels = new Dictionary<string, PNTokenAuthValues>()
-                    {
-                        {
-                            channel, fullAccess
-                        },
-                        {
-                            channel+"-pnpres", fullAccess
-                        },
-                        {
-                            channel1, fullAccess
-                        },
-                        {
-                            channel1+"-pnpres", fullAccess
-                        },
-                        {
-                            channel2, fullAccess
-                        },
-                        {
-                            channel2+"-pnpres", fullAccess
-                        },
-                        {
-                            channel3, fullAccess
-                        },
-                        {
-                            channel3+"-pnpres", fullAccess
-                        },
-                        {
-                            channel4, fullAccess
-                        },
-                        {
-                            channel4+"-pnpres", fullAccess
-                        },
-                        {
-                            presenceTestChannel, fullAccess
-                        },
-                        {
-                            $"{presenceTestChannel}{Constants.Pnpres}", fullAccess
-                        },
-                    },
-                }).ExecuteAsync();
-
-            await Task.Delay(4000);
-
-            authToken = grantResult.Result?.Token;
+                await GenerateTestGrantToken(pubnub, presenceTestChannel);
+            }
+            else
+            {
+                authToken = PubnubCommon.GrantToken;
+            }
 
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Assert.IsTrue(grantResult.Status.Error == false && grantResult.Result != null, 
-                "WhenAClientIsPresent Grant access failed.");
         }
 
         [TearDown]
