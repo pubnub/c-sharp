@@ -17,8 +17,8 @@ namespace PubNubMessaging.Tests
 
         private static string currentUnitTestCase = "";
         private static string channelGroupName = "hello_my_group";
-        private static string channelName1 = "hello_my_channel1";
-        private static string channelName2 = "hello_my_channel2";
+        private static string channelName1 = "hello_my_channel_1";
+        private static string channelName2 = "hello_my_channel_2";
         private static string authToken;
 
         private static Pubnub pubnub;
