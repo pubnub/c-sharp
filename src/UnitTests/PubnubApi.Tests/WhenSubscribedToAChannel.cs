@@ -500,7 +500,7 @@ namespace PubNubMessaging.Tests
 
             manualResetEventWaitTimeout = 310 * 1000;
 
-            string channel1 = "hello_my_channel1";
+            string channel1 = "hello_my_channel_1";
 
             string expected = "{\"t\":{\"t\":\"14839022442039237\",\"r\":7},\"m\":[]}";
 
@@ -616,7 +616,7 @@ namespace PubNubMessaging.Tests
 
             manualResetEventWaitTimeout = 310 * 1000;
 
-            string channel1 = "hello_my_channel1";
+            string channel1 = "hello_my_channel_1";
 
             string expected = "{\"t\":{\"t\":\"14839022442039237\",\"r\":7},\"m\":[]}";
 
@@ -753,7 +753,7 @@ namespace PubNubMessaging.Tests
 
             manualResetEventWaitTimeout = 310 * 1000;
 
-            string channel = "hello_my_channel1";
+            string channel = "hello_my_channel_1";
             numberOfReceivedMessages = 0;
 
             string expected = "{\"t\":{\"t\":\"14839022442039237\",\"r\":7},\"m\":[]}";

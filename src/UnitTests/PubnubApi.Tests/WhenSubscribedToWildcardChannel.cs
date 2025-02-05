@@ -4,6 +4,7 @@ using System.Threading;
 using PubnubApi;
 using MockServer;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using PubnubApi.Security.Crypto;
 using PubnubApi.Security.Crypto.Cryptors;
 
@@ -18,6 +19,7 @@ namespace PubNubMessaging.Tests
         private static int manualResetEventWaitTimeout = 310 * 1000;
         private static string channel = "hello_my_channel";
         private static string authKey = "myauth";
+        private static string authToken;
 
         private static Pubnub pubnub;
         private static Server server;
@@ -31,7 +33,7 @@ namespace PubNubMessaging.Tests
         }
 
         [SetUp]
-        public static void Init()
+        public static async Task Init()
         {
             UnitTestLog unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
@@ -44,8 +46,6 @@ namespace PubNubMessaging.Tests
 
             if (!PubnubCommon.PAMServerSideGrant) { return; }
 
-            bool receivedGrantMessage = false;
-
             PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
                 PublishKey = PubnubCommon.PublishKey,
@@ -55,370 +55,22 @@ namespace PubNubMessaging.Tests
                 Secure = false,
                 LogVerbosity = PNLogVerbosity.BODY,
                 PubnubLog = new TestLog(),
-                EnableEventEngine = false
             };
             server.RunOnHttps(false);
 
             pubnub = createPubNubInstance(config);
             manualResetEventWaitTimeout = 310 * 1000;
-
-            channel = "foo.*";
-            string expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"user\",\"subscribe_key\":\"demo-36\",\"ttl\":20,\"channel\":\"foo.*\",\"auths\":{\"myAuth\":{\"r\":1,\"w\":1,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
-
-            server.AddRequest(new Request()
-                    .WithMethod("GET")
-                    .WithPath(string.Format("/v2/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey))
-                    .WithParameter("auth", authKey)
-                    .WithParameter("channel", "foo.%2A")
-                    .WithParameter("m", "1")
-                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
-                    .WithParameter("r", "1")
-                    .WithParameter("requestid", "myRequestId")
-                    .WithParameter("timestamp", "1356998400")
-                    .WithParameter("ttl", "20")
-                    .WithParameter("uuid", config.UserId)
-                    .WithParameter("w", "1")
-                    .WithParameter("signature", "0OiQ1k5uyR4Y56XBmpCfMFtMkUiJKMf6k-OZEs5ea5c=")
-                    .WithResponse(expected)
-                    .WithStatusCode(System.Net.HttpStatusCode.OK));
-
-            ManualResetEvent grantManualEvent = new ManualResetEvent(false);
-
-            pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20)
-                .Execute(new PNAccessManagerGrantResultExt(
-                                (r, s) =>
-                                {
-                                    try
-                                    {
-                                        if (r != null && s.StatusCode == 200 && !s.Error)
-                                        {
-                                            Debug.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
-                                            if (r.Channels != null && r.Channels.Count > 0)
-                                            {
-                                                var read = r.Channels[channel][authKey].ReadEnabled;
-                                                var write = r.Channels[channel][authKey].WriteEnabled;
-                                                if (read && write)
-                                                {
-                                                    receivedGrantMessage = true;
-                                                }
-                                            }
-                                            else if (r.ChannelGroups != null && r.ChannelGroups.Count > 0)
-                                            {
-                                                var read = r.ChannelGroups[channelGroupName][authKey].ReadEnabled;
-                                                var write = r.ChannelGroups[channelGroupName][authKey].WriteEnabled;
-                                                var manage = r.ChannelGroups[channelGroupName][authKey].ManageEnabled;
-                                                if (read && write && manage)
-                                                {
-                                                    receivedGrantMessage = true;
-                                                }
-                                            }
-                                        }
-                                        else
-                                        {
-                                            Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
-                                        }
-                                    }
-                                    catch {  /* ignore */  }
-                                    finally
-                                    {
-                                        grantManualEvent.Set();
-                                    }
-                                }));
-            Thread.Sleep(1000);
-            grantManualEvent.WaitOne(manualResetEventWaitTimeout);
-
-            if (receivedGrantMessage)
+            
+            if (string.IsNullOrEmpty(PubnubCommon.GrantToken))
             {
-                receivedGrantMessage = false;
-
-                channel = "foo.bar";
-                grantManualEvent = new ManualResetEvent(false);
-
-                expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"user\",\"subscribe_key\":\"demo-36\",\"ttl\":20,\"channel\":\"foo.bar\",\"auths\":{\"myAuth\":{\"r\":1,\"w\":1,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
-
-                server.AddRequest(new Request()
-                        .WithMethod("GET")
-                        .WithPath(string.Format("/v2/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey))
-                        .WithParameter("auth", authKey)
-                        .WithParameter("channel", channel)
-                        .WithParameter("m", "1")
-                        .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
-                        .WithParameter("r", "1")
-                        .WithParameter("requestid", "myRequestId")
-                        .WithParameter("timestamp", "1356998400")
-                        .WithParameter("ttl", "20")
-                        .WithParameter("uuid", config.UserId)
-                        .WithParameter("w", "1")
-                        .WithParameter("signature", "aIQJHjVxSH626VLkW7ULvBcifLYGyZBWGQ-Nbpss4Qw=")
-                        .WithResponse(expected)
-                        .WithStatusCode(System.Net.HttpStatusCode.OK));
-
-                pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20)
-                .Execute(new PNAccessManagerGrantResultExt(
-                                (r, s) =>
-                                {
-                                    try
-                                    {
-                                        if (r != null && s.StatusCode == 200 && !s.Error)
-                                        {
-                                            Debug.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
-                                            if (r.Channels != null && r.Channels.Count > 0)
-                                            {
-                                                var read = r.Channels[channel][authKey].ReadEnabled;
-                                                var write = r.Channels[channel][authKey].WriteEnabled;
-                                                if (read && write)
-                                                {
-                                                    receivedGrantMessage = true;
-                                                }
-                                            }
-                                            else if (r.ChannelGroups != null && r.ChannelGroups.Count > 0)
-                                            {
-                                                var read = r.ChannelGroups[channelGroupName][authKey].ReadEnabled;
-                                                var write = r.ChannelGroups[channelGroupName][authKey].WriteEnabled;
-                                                var manage = r.ChannelGroups[channelGroupName][authKey].ManageEnabled;
-                                                if (read && write && manage)
-                                                {
-                                                    receivedGrantMessage = true;
-                                                }
-                                            }
-                                        }
-                                        else
-                                        {
-                                            Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
-                                        }
-                                    }
-                                    catch
-                                    {
-                                    }
-                                    finally
-                                    {
-                                        grantManualEvent.Set();
-                                    }
-                                }));
-                Thread.Sleep(1000);
-                grantManualEvent.WaitOne(manualResetEventWaitTimeout);
+                await GenerateTestGrantToken(pubnub);
             }
-
-            if (receivedGrantMessage)
-            {
-                receivedGrantMessage = false;
-
-                channel = "hello_my_channel";
-                grantManualEvent = new ManualResetEvent(false);
-
-                expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"user\",\"subscribe_key\":\"demo-36\",\"ttl\":20,\"channel\":\"hello_my_channel\",\"auths\":{\"myAuth\":{\"r\":1,\"w\":1,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
-
-                server.AddRequest(new Request()
-                        .WithMethod("GET")
-                        .WithPath(string.Format("/v2/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey))
-                        .WithParameter("auth", authKey)
-                        .WithParameter("channel", channel)
-                        .WithParameter("m", "1")
-                        .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
-                        .WithParameter("r", "1")
-                        .WithParameter("requestid", "myRequestId")
-                        .WithParameter("timestamp", "1356998400")
-                        .WithParameter("ttl", "20")
-                        .WithParameter("uuid", config.UserId)
-                        .WithParameter("w", "1")
-                        .WithParameter("signature", "JMQKzXgfqNo-HaHuabC0gq0X6IkVMHa9AWBCg6BGN1Q=")
-                        .WithResponse(expected)
-                        .WithStatusCode(System.Net.HttpStatusCode.OK));
-
-                pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20)
-                .Execute(new PNAccessManagerGrantResultExt(
-                                (r, s) =>
-                                {
-                                    try
-                                    {
-                                        if (r != null && s.StatusCode == 200 && !s.Error)
-                                        {
-                                            Debug.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
-                                            if (r.Channels != null && r.Channels.Count > 0)
-                                            {
-                                                var read = r.Channels[channel][authKey].ReadEnabled;
-                                                var write = r.Channels[channel][authKey].WriteEnabled;
-                                                if (read && write)
-                                                {
-                                                    receivedGrantMessage = true;
-                                                }
-                                            }
-                                            else if (r.ChannelGroups != null && r.ChannelGroups.Count > 0)
-                                            {
-                                                var read = r.ChannelGroups[channelGroupName][authKey].ReadEnabled;
-                                                var write = r.ChannelGroups[channelGroupName][authKey].WriteEnabled;
-                                                var manage = r.ChannelGroups[channelGroupName][authKey].ManageEnabled;
-                                                if (read && write && manage)
-                                                {
-                                                    receivedGrantMessage = true;
-                                                }
-                                            }
-                                        }
-                                        else
-                                        {
-                                            Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
-                                        }
-                                    }
-                                    catch
-                                    {
-                                    }
-                                    finally
-                                    {
-                                        grantManualEvent.Set();
-                                    }
-                                }));
-                Thread.Sleep(1000);
-                grantManualEvent.WaitOne(manualResetEventWaitTimeout);
-            }
-
-            if (receivedGrantMessage)
-            {
-                receivedGrantMessage = false;
-
-                channel = "hello_my_channel1";
-                grantManualEvent = new ManualResetEvent(false);
-
-                expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"user\",\"subscribe_key\":\"demo-36\",\"ttl\":20,\"channel\":\"hello_my_channel1\",\"auths\":{\"myAuth\":{\"r\":1,\"w\":1,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
-
-                server.AddRequest(new Request()
-                        .WithMethod("GET")
-                        .WithPath(string.Format("/v2/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey))
-                        .WithParameter("auth", authKey)
-                        .WithParameter("channel", channel)
-                        .WithParameter("m", "1")
-                        .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
-                        .WithParameter("r", "1")
-                        .WithParameter("requestid", "myRequestId")
-                        .WithParameter("timestamp", "1356998400")
-                        .WithParameter("ttl", "20")
-                        .WithParameter("uuid", config.UserId)
-                        .WithParameter("w", "1")
-                        .WithParameter("signature", "FVeU4RXzcxTzOf7xvmMyEPllc388HDpDfdT5lnGcLVE=")
-                        .WithResponse(expected)
-                        .WithStatusCode(System.Net.HttpStatusCode.OK));
-
-                pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20)
-                .Execute(new PNAccessManagerGrantResultExt(
-                                (r, s) =>
-                                {
-                                    try
-                                    {
-                                        if (r != null && s.StatusCode == 200 && !s.Error)
-                                        {
-                                            Debug.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
-                                            if (r.Channels != null && r.Channels.Count > 0)
-                                            {
-                                                var read = r.Channels[channel][authKey].ReadEnabled;
-                                                var write = r.Channels[channel][authKey].WriteEnabled;
-                                                if (read && write)
-                                                {
-                                                    receivedGrantMessage = true;
-                                                }
-                                            }
-                                            else if (r.ChannelGroups != null && r.ChannelGroups.Count > 0)
-                                            {
-                                                var read = r.ChannelGroups[channelGroupName][authKey].ReadEnabled;
-                                                var write = r.ChannelGroups[channelGroupName][authKey].WriteEnabled;
-                                                var manage = r.ChannelGroups[channelGroupName][authKey].ManageEnabled;
-                                                if (read && write && manage)
-                                                {
-                                                    receivedGrantMessage = true;
-                                                }
-                                            }
-                                        }
-                                        else
-                                        {
-                                            Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
-                                        }
-                                    }
-                                    catch
-                                    {
-                                    }
-                                    finally
-                                    {
-                                        grantManualEvent.Set();
-                                    }
-                                }));
-                Thread.Sleep(1000);
-                grantManualEvent.WaitOne(manualResetEventWaitTimeout);
-            }
-
-            if (receivedGrantMessage)
-            {
-                receivedGrantMessage = false;
-                channelGroupName = "hello_my_group";
-
-                expected = "{\"message\":\"Success\",\"payload\":{\"level\":\"user\",\"subscribe_key\":\"demo-36\",\"ttl\":20,\"channel-group\":\"hello_my_group\",\"auths\":{\"myAuth\":{\"r\":1,\"w\":1,\"m\":1}}},\"service\":\"Access Manager\",\"status\":200}";
-
-                server.AddRequest(new Request()
-                        .WithMethod("GET")
-                        .WithPath(string.Format("/v2/auth/grant/sub-key/{0}", PubnubCommon.SubscribeKey))
-                        .WithParameter("auth", authKey)
-                        .WithParameter("channel-group", channelGroupName)
-                        .WithParameter("m", "1")
-                        .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
-                        .WithParameter("r", "1")
-                        .WithParameter("requestid", "myRequestId")
-                        .WithParameter("timestamp", "1356998400")
-                        .WithParameter("ttl", "20")
-                        .WithParameter("uuid", config.UserId)
-                        .WithParameter("w", "1")
-                        .WithParameter("signature", "mnWJN7WSbajMt_LWpuiXGhcs3NUcVbU3L_MZpb9_blU=")
-                        .WithResponse(expected)
-                        .WithStatusCode(System.Net.HttpStatusCode.OK));
-
-                grantManualEvent = new ManualResetEvent(false);
-                pubnub.Grant().ChannelGroups(new [] { channelGroupName }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20)
-                .Execute(new PNAccessManagerGrantResultExt(
-                                (r, s) =>
-                                {
-                                    try
-                                    {
-                                        if (r != null && s.StatusCode == 200 && !s.Error)
-                                        {
-                                            Debug.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
-                                            if (r.Channels != null && r.Channels.Count > 0)
-                                            {
-                                                var read = r.Channels[channel][authKey].ReadEnabled;
-                                                var write = r.Channels[channel][authKey].WriteEnabled;
-                                                if (read && write)
-                                                {
-                                                    receivedGrantMessage = true;
-                                                }
-                                            }
-                                            else if (r.ChannelGroups != null && r.ChannelGroups.Count > 0)
-                                            {
-                                                var read = r.ChannelGroups[channelGroupName][authKey].ReadEnabled;
-                                                var write = r.ChannelGroups[channelGroupName][authKey].WriteEnabled;
-                                                var manage = r.ChannelGroups[channelGroupName][authKey].ManageEnabled;
-                                                if (read && write && manage)
-                                                {
-                                                    receivedGrantMessage = true;
-                                                }
-                                            }
-                                        }
-                                        else
-                                        {
-                                            Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(s));
-                                        }
-                                    }
-                                    catch
-                                    {
-                                    }
-                                    finally
-                                    {
-                                        grantManualEvent.Set();
-                                    }
-                                }));
-                Thread.Sleep(1000);
-                grantManualEvent.WaitOne(manualResetEventWaitTimeout);
-            }
-
+            authToken = PubnubCommon.GrantToken;
+            
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
 
-            Assert.IsTrue(receivedGrantMessage, "WhenSubscribedToWildcardChannel Grant access failed.");
         }
 
         [TearDown]
@@ -504,7 +156,7 @@ namespace PubNubMessaging.Tests
                         subscribeManualEvent.Set();
                     }
                 });
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             pubnub.AddListener(listenerSubCallack);
 
             string wildCardSubscribeChannel = "foo.*";
@@ -718,7 +370,7 @@ namespace PubNubMessaging.Tests
                         subscribeManualEvent.Set();
                     }
                 });
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             pubnub.AddListener(listenerSubCallack);
 
             string wildCardSubscribeChannel = "foo.*";
@@ -907,14 +559,14 @@ namespace PubNubMessaging.Tests
                         subscribeManualEvent.Set();
                     }
                 });
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             pubnub.AddListener(listenerSubCallack);
 
             string wildCardSubscribeChannel = "foo.*";
             string subChannelName = "hello_my_channel";
             string[] commaDelimitedChannel = new [] { subChannelName, wildCardSubscribeChannel };
             channelGroupName = "hello_my_group";
-            string channelAddForGroup = "hello_my_channel1";
+            string channelAddForGroup = "hello_my_channel_1";
             string pubWildChannelName = "foo.a";
             manualResetEventWaitTimeout = 310 * 1000;
 
@@ -1141,7 +793,7 @@ namespace PubNubMessaging.Tests
                         subscribeManualEvent.Set();
                     }
                 });
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             pubnub.AddListener(listenerSubCallack);
 
             string wildCardSubscribeChannel = "foo.*";
