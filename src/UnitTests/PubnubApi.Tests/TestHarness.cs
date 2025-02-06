@@ -106,14 +106,16 @@ namespace PubNubMessaging.Tests
                     },
                     ChannelGroups = new Dictionary<string, PNTokenAuthValues>()
                     {
-                        {group, fullAccess}
+                        {group, fullAccess},
+                        {group+"-pnpres", fullAccess}
                     }
                 })
                 .Patterns(new PNTokenPatterns()
                 {
                     Channels = new Dictionary<string, PNTokenAuthValues>()
                     {
-                        { channelPattern, fullAccess }
+                        { channelPattern, fullAccess },
+                        { channelPattern+"-pnpres", fullAccess }
                     }
                 })
                 .ExecuteAsync();

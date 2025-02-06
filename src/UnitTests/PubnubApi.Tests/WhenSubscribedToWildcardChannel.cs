@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using System.Threading;
 using PubnubApi;
@@ -739,14 +740,48 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public static void ThenSubscribeShouldReturnWildCardPresenceEventInWildcardPresenceCallback()
+        public static async Task ThenSubscribeShouldReturnWildCardPresenceEventInWildcardPresenceCallback()
         {
             server.ClearRequests();
 
             bool receivedMessage = false;
             bool receivedErrorMessage = true;
 
-            PNConfiguration config = new PNConfiguration(new UserId($"user{new Random().Next(10,100)}"))
+            string userId = $"user{new Random().Next(10, 100)}";
+            
+            var fullAccess = new PNTokenAuthValues()
+            {
+                Read = true,
+                Write = true,
+                Create = true,
+                Get = true,
+                Delete = true,
+                Join = true,
+                Update = true,
+                Manage = true
+            };
+            pubnub = createPubNubInstance(new PNConfiguration(userId)
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey
+            });
+            var grantResult = await pubnub.GrantToken().TTL(30).AuthorizedUuid(userId)
+                .Patterns(new PNTokenPatterns()
+                {
+                    Channels = new Dictionary<string, PNTokenAuthValues>()
+                    {
+                        { "foo.*", fullAccess },
+                        { "foo.*-pnpres", fullAccess }
+                    }
+                })
+                .ExecuteAsync();
+
+            await Task.Delay(4000);
+            Assert.IsTrue(grantResult.Status.Error == false && grantResult.Result != null, 
+                "GrantToken() for wildCardChannelSubscribe Test failed.");
+            var accessToken = grantResult.Result.Token;
+            PNConfiguration config = new PNConfiguration(new UserId(userId))
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
@@ -763,6 +798,7 @@ namespace PubNubMessaging.Tests
             {
                 config.AuthKey = authKey;
             }
+
             server.RunOnHttps(false);
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
@@ -793,7 +829,7 @@ namespace PubNubMessaging.Tests
                         subscribeManualEvent.Set();
                     }
                 });
-            pubnub = createPubNubInstance(config, authToken);
+            pubnub = createPubNubInstance(config, accessToken);
             pubnub.AddListener(listenerSubCallack);
 
             string wildCardSubscribeChannel = "foo.*";
