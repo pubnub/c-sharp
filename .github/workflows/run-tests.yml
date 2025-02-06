@@ -3,15 +3,15 @@ name: Tests
 on:
   pull_request:
     branches:
-      - main
+      - master
     types: [opened, synchronize, reopened, ready_for_review]
   pull_request_review:
     branches:
-      - main
+      - master
     types: [submitted]
   push:
     branches:
-      - main
+      - master
   workflow_dispatch:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
