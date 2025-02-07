@@ -773,6 +773,10 @@ namespace PubNubMessaging.Tests
                     {
                         { "foo.*", fullAccess },
                         { "foo.*-pnpres", fullAccess }
+                    }, ChannelGroups = new Dictionary<string, PNTokenAuthValues>()
+                    {
+                        { "hello_my_group", fullAccess },
+                        { "hello_my_group-pnpres", fullAccess }
                     }
                 })
                 .ExecuteAsync();
