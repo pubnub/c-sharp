@@ -2,12 +2,12 @@ name: Tests
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-  pull_request_review:
-    types: [submitted]
-  push:
     branches:
       - master
+    types:
+      - ready_for_review
+      - synchronize
+      - reopened 
   workflow_dispatch:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
