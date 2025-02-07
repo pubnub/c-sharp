@@ -1,8 +1,6 @@
-﻿using System;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using System.Threading;
 using PubnubApi;
-using System.Collections.Generic;
 using MockServer;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -20,7 +18,7 @@ namespace PubNubMessaging.Tests
 
         private static int manualResetEventWaitTimeout = 310 * 1000;
         private static string channel = "hello_my_channel";
-        private static string token;
+        private static string authToken;
         private static string currentTestCase = "";
 
         private static Pubnub pubnub;
@@ -77,38 +75,14 @@ namespace PubNubMessaging.Tests
                     .WithParameter("signature", "JMQKzXgfqNo-HaHuabC0gq0X6IkVMHa9AWBCg6BGN1Q=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
-
-            var grantResult = await pubnub.GrantToken().TTL(20).AuthorizedUuid(config.UserId).Resources(
-                new PNTokenResources()
-                {
-                    Channels = new Dictionary<string, PNTokenAuthValues>()
-                    {
-                        {
-                            channel, new PNTokenAuthValues()
-                            {
-                                Read = true,
-                                Write = true,
-                                Create = true,
-                                Get = true,
-                                Delete = true,
-                                Join = true, 
-                                Update = true, 
-                                Manage = true
-                            }
-                        }
-                    }
-                }).ExecuteAsync();
-
-            await Task.Delay(3000);
-
-            token = grantResult.Result?.Token;
-            
+            if (string.IsNullOrEmpty(PubnubCommon.GrantToken))
+            {
+                await GenerateTestGrantToken(pubnub);
+            }
+            authToken = PubnubCommon.GrantToken;
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-
-            Assert.IsTrue(grantResult.Status.Error == false && grantResult.Result != null, 
-                "WhenUnsubscribedToAChannelGroup Grant access failed.");
         }
 
         [TearDown]
@@ -142,7 +116,7 @@ namespace PubNubMessaging.Tests
                 config.SecretKey = PubnubCommon.SecretKey;
             }
             pubnub = createPubNubInstance(config);
-            pubnub.SetAuthToken(token);
+            pubnub.SetAuthToken(authToken);
 
             string expected = "{\"status\": 200, \"error\": false, \"error_message\": \"\"}";
 
@@ -201,7 +175,7 @@ namespace PubNubMessaging.Tests
                 config.SecretKey = PubnubCommon.SecretKey;
             }
             pubnub = createPubNubInstance(config);
-            pubnub.SetAuthToken(token);
+            pubnub.SetAuthToken(authToken);
 
             string expected = "{\"status\": 200, \"error\": false, \"error_message\": \"\"}";
 

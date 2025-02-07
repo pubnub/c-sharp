@@ -5,6 +5,7 @@ using PubnubApi;
 using System.Collections.Generic;
 using MockServer;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using PubnubApi.Security.Crypto;
 using PubnubApi.Security.Crypto.Cryptors;
 
@@ -16,6 +17,7 @@ namespace PubNubMessaging.Tests
         static int manualResetEventWaitTimeout = 310 * 1000;
         private static string authKey = "myauth";
         private static string channel = "hello_my_channel";
+        private static string authToken;
 
         private static Pubnub pubnub;
         private static Server server;
@@ -29,7 +31,7 @@ namespace PubNubMessaging.Tests
         }
 
         [SetUp]
-        public static void Init()
+        public static async Task Init()
         {
             UnitTestLog unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
@@ -78,59 +80,14 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            ManualResetEvent grantManualEvent = new ManualResetEvent(false);
-            pubnub.Grant().Channels(channelsGrant).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20)
-                .Execute(new PNAccessManagerGrantResultExt(
-                                (r, s) =>
-                                {
-                                    try
-                                    {
-                                        if (r != null)
-                                        {
-                                            Debug.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
-                                            if (r.Channels != null && r.Channels.Count > 0)
-                                            {
-                                                foreach (KeyValuePair<string, Dictionary<string, PNAccessManagerKeyData>> channelKP in r.Channels)
-                                                {
-                                                    string receivedChannel = channelKP.Key;
-                                                    if (Array.IndexOf(channelsGrant, receivedChannel) > -1)
-                                                    {
-                                                        var read = r.Channels[receivedChannel][authKey].ReadEnabled;
-                                                        var write = r.Channels[receivedChannel][authKey].WriteEnabled;
-                                                        if (read && write)
-                                                        {
-                                                            receivedGrantMessage = true;
-                                                        }
-                                                        else
-                                                        {
-                                                            receivedGrantMessage = false;
-                                                        }
-                                                    }
-                                                    else
-                                                    {
-                                                        receivedGrantMessage = false;
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                    catch { /* ignore */ }
-                                    finally
-                                    {
-                                        grantManualEvent.Set();
-                                    }
-                                }));
-
-            Thread.Sleep(1000);
-
-            grantManualEvent.WaitOne();
-
+            if (string.IsNullOrEmpty(PubnubCommon.GrantToken))
+            {
+                await GenerateTestGrantToken(pubnub);
+            }
+            authToken = PubnubCommon.GrantToken;
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-
-            Assert.IsTrue(receivedGrantMessage, "WhenSubscribedToAChannel Grant access failed.");
         }
 
         [TearDown]
@@ -162,7 +119,7 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(true);
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             Assert.Throws<MissingMemberException>(() =>
             {
@@ -250,7 +207,7 @@ namespace PubNubMessaging.Tests
                         subscribeManualEvent.Set();
                     }
                 });
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             pubnub.AddListener(listenerSubCallack);
 
             string channel = "hello_my_channel";
@@ -458,7 +415,7 @@ namespace PubNubMessaging.Tests
                     }
                     subscribeManualEvent.Set();
                 });
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             pubnub.AddListener(listenerSubCallack);
 
             string channel = "hello_my_channel";
@@ -538,12 +495,12 @@ namespace PubNubMessaging.Tests
                     }
                     subscribeManualEvent.Set();
                 });
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             pubnub.AddListener(listenerSubCallack);
 
             manualResetEventWaitTimeout = 310 * 1000;
 
-            string channel1 = "hello_my_channel1";
+            string channel1 = "hello_my_channel_1";
 
             string expected = "{\"t\":{\"t\":\"14839022442039237\",\"r\":7},\"m\":[]}";
 
@@ -654,12 +611,12 @@ namespace PubNubMessaging.Tests
                     }
                     subscribeManualEvent.Set();
                 });
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             pubnub.AddListener(listenerSubCallack);
 
             manualResetEventWaitTimeout = 310 * 1000;
 
-            string channel1 = "hello_my_channel1";
+            string channel1 = "hello_my_channel_1";
 
             string expected = "{\"t\":{\"t\":\"14839022442039237\",\"r\":7},\"m\":[]}";
 
@@ -791,12 +748,12 @@ namespace PubNubMessaging.Tests
                         subscribeManualEvent.Set();
                     }
                 });
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             pubnub.AddListener(listenerSubCallack);
 
             manualResetEventWaitTimeout = 310 * 1000;
 
-            string channel = "hello_my_channel1";
+            string channel = "hello_my_channel_1";
             numberOfReceivedMessages = 0;
 
             string expected = "{\"t\":{\"t\":\"14839022442039237\",\"r\":7},\"m\":[]}";

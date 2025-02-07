@@ -1,10 +1,7 @@
 ﻿using NUnit.Framework;
 using System.Threading;
 using PubnubApi;
-using System.Collections.Generic;
 using MockServer;
-using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace PubNubMessaging.Tests
@@ -20,8 +17,8 @@ namespace PubNubMessaging.Tests
 
         private static string currentUnitTestCase = "";
         private static string channelGroupName = "hello_my_group";
-        private static string channelName1 = "hello_my_channel1";
-        private static string channelName2 = "hello_my_channel2";
+        private static string channelName1 = "hello_my_channel_1";
+        private static string channelName2 = "hello_my_channel_2";
         private static string authToken;
 
         private static Pubnub pubnub;
@@ -68,41 +65,14 @@ namespace PubNubMessaging.Tests
                     .WithParameter("signature", "MhmxFFbUb_HlzWqTuvJAMRjAb3fgP9dbykaiPsSZuUc=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
-
-            var fullAccess = new PNTokenAuthValues()
+            if (string.IsNullOrEmpty(PubnubCommon.GrantToken))
             {
-                Read = true,
-                Write = true,
-                Create = true,
-                Get = true,
-                Delete = true,
-                Join = true,
-                Update = true,
-                Manage = true
-            };
-            var grantResult = await pubnub.GrantToken().TTL(20).AuthorizedUuid(config.UserId).Resources(
-                new PNTokenResources()
-                {
-                    Channels = new Dictionary<string, PNTokenAuthValues>()
-                    {
-                        {
-                            channelName1, fullAccess
-                        },
-                        {
-                            channelName2, fullAccess
-                        }
-                    }
-                }).ExecuteAsync();
-
-            await Task.Delay(4000);
-
-            authToken = grantResult.Result?.Token;
-
+                await GenerateTestGrantToken(pubnub);
+            }
+            authToken = PubnubCommon.GrantToken;
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Assert.IsTrue(grantResult.Result != null && grantResult.Status.Error == false, 
-                "WhenMessageCountIsRequested Grant access failed.");
         }
 
         [TearDown]

@@ -22,12 +22,13 @@ namespace PubNubMessaging.Tests
         private static string channelGroupName = "hello_my_group";
         private static string channelName = "hello_my_channel";
         private static string authKey = "myauth";
+        private static string authToken;
 
         private static Pubnub pubnub;
         private static Server server;
 
         [SetUp]
-        public static void Init()
+        public static async Task Init()
         {
             UnitTestLog unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
@@ -74,16 +75,14 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Grant().ChannelGroups(new [] { channelGroupName }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Execute(new GrantResult());
-
-            Thread.Sleep(3000);
-
-            grantManualEvent.WaitOne();
-
+            if (string.IsNullOrEmpty(PubnubCommon.GrantToken))
+            {
+                await GenerateTestGrantToken(pubnub);
+            }
+            authToken = PubnubCommon.GrantToken;
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Assert.IsTrue(receivedGrantMessage, "WhenChannelGroupIsRequested Grant access failed.");
         }
 
         [TearDown]
@@ -119,7 +118,7 @@ namespace PubNubMessaging.Tests
             {
                 config.AuthKey = authKey;
             }
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}";
 
@@ -174,7 +173,7 @@ namespace PubNubMessaging.Tests
             {
                 config.AuthKey = authKey;
             }
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}";
 
@@ -233,7 +232,7 @@ namespace PubNubMessaging.Tests
             {
                 config.AuthKey = authKey;
             }
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}";
 
@@ -290,7 +289,7 @@ namespace PubNubMessaging.Tests
             {
                 config.AuthKey = authKey;
             }
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"channel-registry\", \"error\": false}";
 
@@ -356,7 +355,7 @@ namespace PubNubMessaging.Tests
             {
                 config.AuthKey = authKey;
             }
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string expected = "{\"status\": 200, \"payload\": {\"channels\": [\"" + channelName + "\"], \"group\": \"" + channelGroupName + "\"}, \"service\": \"channel-registry\", \"error\": false}";
 
@@ -411,7 +410,7 @@ namespace PubNubMessaging.Tests
             {
                 config.AuthKey = authKey;
             }
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string expected = "{\"status\": 200, \"payload\": {\"channels\": [\"" + channelName + "\"], \"group\": \"" + channelGroupName + "\"}, \"service\": \"channel-registry\", \"error\": false}";
 
@@ -477,7 +476,7 @@ namespace PubNubMessaging.Tests
             {
                 config.AuthKey = authKey;
             }
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string expected = "{\"status\": 200, \"payload\": {\"namespace\": \"\", \"groups\": [\"" + channelGroupName + "\", \"hello_my_group1\"]}, \"service\": \"channel-registry\", \"error\": false}";
 
@@ -535,7 +534,7 @@ namespace PubNubMessaging.Tests
             {
                 config.AuthKey = authKey;
             }
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string expected = "{\"status\": 200, \"payload\": {\"namespace\": \"\", \"groups\": [\"" + channelGroupName + "\", \"hello_my_group1\"]}, \"service\": \"channel-registry\", \"error\": false}";
 

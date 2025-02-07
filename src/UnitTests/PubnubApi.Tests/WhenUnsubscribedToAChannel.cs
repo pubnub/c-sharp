@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using MockServer;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace PubNubMessaging.Tests
 {
@@ -21,6 +22,7 @@ namespace PubNubMessaging.Tests
         private static int manualResetEventWaitTimeout = 310 * 1000;
         private static string channel = "hello_my_channel";
         private static string authKey = "myauth";
+        private static string authToken;
         private static string currentTestCase = "";
 
         private static Pubnub pubnub;
@@ -29,7 +31,7 @@ namespace PubNubMessaging.Tests
 
 
         [SetUp]
-        public static void Init()
+        public static async Task Init()
         {
             UnitTestLog unitLog = new Tests.UnitTestLog();
             unitLog.LogLevel = MockServer.LoggingMethod.Level.Verbose;
@@ -75,16 +77,14 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            pubnub.Grant().Channels(new [] { channel }).AuthKeys(new [] { authKey }).Read(true).Write(true).Manage(true).TTL(20).Execute(new UTGrantResult());
-
-            Thread.Sleep(1000);
-
-            grantManualEvent.WaitOne();
-
+            if (string.IsNullOrEmpty(PubnubCommon.GrantToken))
+            {
+                await GenerateTestGrantToken(pubnub);
+            }
+            authToken = PubnubCommon.GrantToken;
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Assert.IsTrue(receivedGrantMessage, "WhenUnsubscribedToAChannel Grant access failed.");
         }
 
         [TearDown]
@@ -124,7 +124,7 @@ namespace PubNubMessaging.Tests
             server.RunOnHttps(false);
 
             SubscribeCallback listenerSubCallack = new UTSubscribeCallback();
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
             pubnub.AddListener(listenerSubCallack);
 
             string currentChannelName = "hello_my_channel";

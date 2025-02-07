@@ -21,6 +21,8 @@ namespace PubNubMessaging.Tests
 
         public static readonly string StubOrign = "localhost:9191";
         public static readonly string EncodedSDK = "PubNubCSharp";
+        
+        public static string GrantToken = "";
 
         static PubnubCommon()
         {

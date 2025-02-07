@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using NUnit.Framework;
 using System.Threading;
 using PubnubApi;
 using MockServer;
-using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace PubNubMessaging.Tests
@@ -65,38 +63,14 @@ namespace PubNubMessaging.Tests
                     .WithParameter("signature", "JMQKzXgfqNo-HaHuabC0gq0X6IkVMHa9AWBCg6BGN1Q=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
-
-            var fullAccess = new PNTokenAuthValues()
+            if (string.IsNullOrEmpty(PubnubCommon.GrantToken))
             {
-                Read = true,
-                Write = true,
-                Create = true,
-                Get = true,
-                Delete = true,
-                Join = true,
-                Update = true,
-                Manage = true
-            };
-            var grantResult = await pubnub.GrantToken().TTL(20).AuthorizedUuid(config.UserId).Resources(
-                new PNTokenResources()
-                {
-                    Channels = new Dictionary<string, PNTokenAuthValues>()
-                    {
-                        {
-                            grantChannel, fullAccess
-                        }
-                    }
-                }).ExecuteAsync();
-
-            await Task.Delay(4000);
-
-            authToken = grantResult.Result?.Token;
-
+                await GenerateTestGrantToken(pubnub);
+            }
+            authToken = PubnubCommon.GrantToken;
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Assert.IsTrue(grantResult.Result != null && grantResult.Status.Error == false, 
-                "WhenDetailedHistoryIsRequested Grant access failed.");
         }
 
         [TearDown]
