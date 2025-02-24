@@ -33,7 +33,7 @@ namespace PubnubApi.EndPoint
 			if (config.MaintainPresenceState) presenceState = BuildJsonUserState(channels, channelGroups, true);
 			var requestParameter = CreateSubscribeRequestParameter(channels: channels, channelGroups: channelGroups, timetoken: timetoken.GetValueOrDefault(), region: region.GetValueOrDefault(), stateJsonValue: presenceState, initialSubscribeUrlParams: initialSubscribeUrlParams, externalQueryParam: externalQueryParam);
 			var transportRequest = pubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNSubscribeOperation);
-			cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(transportRequest.CancellationToken);
+			cancellationTokenSource = transportRequest.CancellationTokenSource;
 			RequestState<HandshakeResponse> pubnubRequestState = new RequestState<HandshakeResponse>
 			{
 				Channels = channels,
@@ -85,7 +85,7 @@ namespace PubnubApi.EndPoint
 				string channelsJsonState = BuildJsonUserState(channels, channelGroups, false);
 				var requestParameter = CreateSubscribeRequestParameter(channels: channels, channelGroups: channelGroups, timetoken: timetoken.GetValueOrDefault(), region: region.GetValueOrDefault(), stateJsonValue: channelsJsonState, initialSubscribeUrlParams: initialSubscribeUrlParams, externalQueryParam: externalQueryParam);
 				var transportRequest = pubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNSubscribeOperation);
-				cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(transportRequest.CancellationToken);
+				cancellationTokenSource = transportRequest.CancellationTokenSource;
 				RequestState<ReceivingResponse<object>> pubnubRequestState = new RequestState<ReceivingResponse<object>>
 					{
 						Channels = channels,

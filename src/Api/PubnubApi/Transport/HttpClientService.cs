@@ -9,228 +9,310 @@ using System.Threading;
 
 namespace PubnubApi
 {
-	public class HttpClientService : IHttpClientService
-	{
-		private readonly HttpClient httpClient;
-		private IPubnubLog Log { get; set; }
-		private PNLogVerbosity LogVerbosity { get; set; }
-		public HttpClientService(IWebProxy proxy = default, IPubnubLog pubnubLog = default, PNLogVerbosity verbosity = default)
-		{
-			httpClient = new HttpClient()
-			{
-				Timeout = Timeout.InfiniteTimeSpan
-			};
-			if (proxy == null) return;
-			httpClient = new HttpClient(new HttpClientHandler()
-			{
-				Proxy = proxy,
-				UseProxy = true
-			});
-			httpClient.Timeout = Timeout.InfiniteTimeSpan;
-			Log = pubnubLog;
-			LogVerbosity = verbosity;
-		}
+    public class HttpClientService : IHttpClientService
+    {
+        private readonly HttpClient httpClient;
+        private IPubnubLog Log { get; set; }
+        private PNLogVerbosity LogVerbosity { get; set; }
 
-		public async Task<TransportResponse> GetRequest(TransportRequest transportRequest)
-		{
-			TransportResponse response;
-			try {
-				HttpRequestMessage requestMessage = new HttpRequestMessage(method: HttpMethod.Get, requestUri: transportRequest.RequestUrl);
-				if (transportRequest.Headers.Keys.Count > 0) {
-					foreach (var kvp in transportRequest.Headers) {
-						requestMessage.Headers.Add(kvp.Key, kvp.Value);
-					}
-				}
-				var httpResult = await httpClient.SendAsync(request: requestMessage, cancellationToken: transportRequest.CancellationToken).ConfigureAwait(false);
-				var responseContent = await httpResult.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
-				response = new TransportResponse() {
-					StatusCode = (int)httpResult.StatusCode,
-					Content = responseContent,
-					Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
-					RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath
-				};
-			} catch (Exception e) {
-				LoggingMethod.WriteToLog(Log, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}", LogVerbosity);
-				response = new TransportResponse() {
-					RequestUrl = transportRequest.RequestUrl,
-					Error = e
-				};
-			}
-			return response;
-		}
+        public HttpClientService(IWebProxy proxy = default, IPubnubLog pubnubLog = default,
+            PNLogVerbosity verbosity = default)
+        {
+            httpClient = new HttpClient()
+            {
+                Timeout = Timeout.InfiniteTimeSpan
+            };
+            if (proxy == null) return;
+            httpClient = new HttpClient(new HttpClientHandler()
+            {
+                Proxy = proxy,
+                UseProxy = true
+            });
+            httpClient.Timeout = Timeout.InfiniteTimeSpan;
+            Log = pubnubLog;
+            LogVerbosity = verbosity;
+        }
 
-		public async Task<TransportResponse> PostRequest(TransportRequest transportRequest)
-		{
-			TransportResponse transportResponse; 
-			try
-			{
-				HttpContent postData = null;
-				if (!string.IsNullOrEmpty(transportRequest.BodyContentString)) {
-					postData = new StringContent(transportRequest.BodyContentString, Encoding.UTF8, "application/json");
-				} else if (transportRequest.BodyContentBytes != null)
-				{
-					postData = new ByteArrayContent(transportRequest.BodyContentBytes);
-					foreach (var transportRequestHeader in transportRequest.Headers)
-					{
-						postData.Headers.Add(transportRequestHeader.Key, transportRequestHeader.Value);
-					}
-				}
-				HttpRequestMessage requestMessage = new HttpRequestMessage(method: HttpMethod.Post, requestUri: transportRequest.RequestUrl) { Content = postData };
-				
-				var httpResult = await httpClient.SendAsync(request: requestMessage, cancellationToken: transportRequest.CancellationToken).ConfigureAwait(false);
-				var responseContent = await httpResult.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
-				transportResponse= new TransportResponse() {
-					StatusCode = (int)httpResult.StatusCode,
-					Content = responseContent,
-					Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
-					RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath
-				};
-			} catch (Exception e) {
-				LoggingMethod.WriteToLog(Log, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}", LogVerbosity);
-				transportResponse = new TransportResponse() {
-					RequestUrl = transportRequest.RequestUrl,
-					Error = e
-				};
-			}
-			return transportResponse;
-		}
+        public async Task<TransportResponse> GetRequest(TransportRequest transportRequest)
+        {
+            TransportResponse response;
+            try
+            {
+                HttpRequestMessage requestMessage =
+                    new HttpRequestMessage(method: HttpMethod.Get, requestUri: transportRequest.RequestUrl);
+                if (transportRequest.Headers.Keys.Count > 0)
+                {
+                    foreach (var kvp in transportRequest.Headers)
+                    {
+                        requestMessage.Headers.Add(kvp.Key, kvp.Value);
+                    }
+                }
 
-		public async Task<TransportResponse> PutRequest(TransportRequest transportRequest)
-		{
-			TransportResponse transportResponse;
-			try
-			{
-				HttpContent putData = null;
+                var httpResult = await httpClient.SendAsync(request: requestMessage,
+                    cancellationToken: transportRequest.CancellationTokenSource.Token);
+                var responseContent = await httpResult.Content.ReadAsByteArrayAsync();
+                response = new TransportResponse()
+                {
+                    StatusCode = (int)httpResult.StatusCode,
+                    Content = responseContent,
+                    Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
+                    RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath
+                };
+            }
+            catch (TaskCanceledException)
+            {
+                response = null;
+                LoggingMethod.WriteToLog(Log,
+                    $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: Http request cancelled",
+                    LogVerbosity);
+            }
+            catch (Exception e)
+            {
+                LoggingMethod.WriteToLog(Log,
+                    $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}",
+                    LogVerbosity);
+                response = new TransportResponse()
+                {
+                    RequestUrl = transportRequest.RequestUrl,
+                    Error = e
+                };
+            }
 
-				if (!string.IsNullOrEmpty(transportRequest.BodyContentString))
-				{
-					putData = new StringContent(transportRequest.BodyContentString, Encoding.UTF8, "application/json");
-				}
-				else if (transportRequest.BodyContentBytes != null)
-				{
-					putData = new ByteArrayContent(transportRequest.FormData);
-					foreach (var transportRequestHeader in transportRequest.Headers)
-					{
-						putData.Headers.Add(transportRequestHeader.Key, transportRequestHeader.Value);
-					}
-				}
+            return response;
+        }
 
-				HttpRequestMessage requestMessage =
-					new HttpRequestMessage(method: HttpMethod.Put, requestUri: transportRequest.RequestUrl)
-						{ Content = putData };
-				if (transportRequest.Headers.Keys.Count > 0)
-				{
-					foreach (var kvp in transportRequest.Headers)
-					{
-						requestMessage.Headers.Add(kvp.Key, kvp.Value);
-					}
-				}
+        public async Task<TransportResponse> PostRequest(TransportRequest transportRequest)
+        {
+            TransportResponse transportResponse;
+            try
+            {
+                HttpContent postData = null;
+                if (!string.IsNullOrEmpty(transportRequest.BodyContentString))
+                {
+                    postData = new StringContent(transportRequest.BodyContentString, Encoding.UTF8, "application/json");
+                }
+                else if (transportRequest.BodyContentBytes != null)
+                {
+                    postData = new ByteArrayContent(transportRequest.BodyContentBytes);
+                    foreach (var transportRequestHeader in transportRequest.Headers)
+                    {
+                        postData.Headers.Add(transportRequestHeader.Key, transportRequestHeader.Value);
+                    }
+                }
 
-				var httpResult = await httpClient.SendAsync(request: requestMessage,
-					cancellationToken: transportRequest.CancellationToken).ConfigureAwait(false);
-				var responseContent = await httpResult.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
-				transportResponse = new TransportResponse()
-				{
-					StatusCode = (int)httpResult.StatusCode,
-					Content = responseContent,
-					Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
-					RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath
-				};
-			}
-			catch (Exception e)
-			{
-				LoggingMethod.WriteToLog(Log, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}", LogVerbosity);
-				transportResponse = new TransportResponse() {
-					RequestUrl = transportRequest.RequestUrl,
-					Error = e
-				};
-			}
-			return transportResponse;
-		}
+                HttpRequestMessage requestMessage =
+                    new HttpRequestMessage(method: HttpMethod.Post, requestUri: transportRequest.RequestUrl)
+                        { Content = postData };
 
-		public async Task<TransportResponse> DeleteRequest(TransportRequest transportRequest)
-		{
-			TransportResponse response;
-			try {
-				if (transportRequest.Timeout.HasValue) httpClient.Timeout = (TimeSpan)transportRequest.Timeout;
-				HttpRequestMessage requestMessage = new HttpRequestMessage(method: HttpMethod.Delete, requestUri: transportRequest.RequestUrl);
-				if (transportRequest.Headers.Keys.Count > 0) {
-					foreach (var kvp in transportRequest.Headers) {
-						requestMessage.Headers.Add(kvp.Key, kvp.Value);
-					}
-				}
-				var httpResult = await httpClient.SendAsync(request: requestMessage, cancellationToken: transportRequest.CancellationToken).ConfigureAwait(false);
-				var responseContent = await httpResult.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
-				response = new TransportResponse() {
-					StatusCode = (int)httpResult.StatusCode,
-					Content = responseContent,
-					Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
-					RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath
-				};
-			} catch (Exception e) {
-				LoggingMethod.WriteToLog(Log, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}", LogVerbosity);
-				response = new TransportResponse() {
-					RequestUrl = transportRequest.RequestUrl,
-					Error = e
-				};
-			}
-			return response;
-		}
+                var httpResult = await httpClient.SendAsync(request: requestMessage,
+                    cancellationToken: transportRequest.CancellationTokenSource.Token);
+                var responseContent = await httpResult.Content.ReadAsByteArrayAsync();
+                transportResponse = new TransportResponse()
+                {
+                    StatusCode = (int)httpResult.StatusCode,
+                    Content = responseContent,
+                    Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
+                    RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath
+                };
+            }
+            catch (TaskCanceledException)
+            {
+                transportResponse = null;
+                LoggingMethod.WriteToLog(Log,
+                    $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: Http request cancelled",
+                    LogVerbosity);
+            }
+            catch (Exception e)
+            {
+                LoggingMethod.WriteToLog(Log,
+                    $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}",
+                    LogVerbosity);
+                transportResponse = new TransportResponse()
+                {
+                    RequestUrl = transportRequest.RequestUrl,
+                    Error = e
+                };
+            }
 
-		public async Task<TransportResponse> PatchRequest(TransportRequest transportRequest)
-		{
-			TransportResponse transportResponse;
-			try
-			{
-				HttpContent patchData = null;
+            return transportResponse;
+        }
 
-				if (!string.IsNullOrEmpty(transportRequest.BodyContentString))
-				{
-					patchData = new StringContent(transportRequest.BodyContentString, Encoding.UTF8,
-						"application/json");
-				}
-				else if (transportRequest.BodyContentBytes != null)
-				{
-					patchData = new ByteArrayContent(transportRequest.FormData);
-					foreach (var transportRequestHeader in transportRequest.Headers)
-					{
-						patchData.Headers.Add(transportRequestHeader.Key, transportRequestHeader.Value);
-					}
-				}
+        public async Task<TransportResponse> PutRequest(TransportRequest transportRequest)
+        {
+            TransportResponse transportResponse;
+            try
+            {
+                HttpContent putData = null;
 
-				HttpRequestMessage requestMessage =
-					new HttpRequestMessage(new HttpMethod("PATCH"), requestUri: transportRequest.RequestUrl)
-						{ Content = patchData };
-				if (transportRequest.Headers.Keys.Count > 0)
-				{
-					foreach (var kvp in transportRequest.Headers)
-					{
-						requestMessage.Headers.Add(kvp.Key, $"\"{kvp.Value}\"");
-					}
-				}
+                if (!string.IsNullOrEmpty(transportRequest.BodyContentString))
+                {
+                    putData = new StringContent(transportRequest.BodyContentString, Encoding.UTF8, "application/json");
+                }
+                else if (transportRequest.BodyContentBytes != null)
+                {
+                    putData = new ByteArrayContent(transportRequest.FormData);
+                    foreach (var transportRequestHeader in transportRequest.Headers)
+                    {
+                        putData.Headers.Add(transportRequestHeader.Key, transportRequestHeader.Value);
+                    }
+                }
 
-				var httpResult = await httpClient.SendAsync(request: requestMessage,
-					cancellationToken: transportRequest.CancellationToken).ConfigureAwait(false);
-				var responseContent = await httpResult.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
-				transportResponse = new TransportResponse()
-				{
-					StatusCode = (int)httpResult.StatusCode,
-					Content = responseContent,
-					Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
-					RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath
-				};
-			}
-			catch (Exception e)
-			{
-				LoggingMethod.WriteToLog(Log, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}", LogVerbosity);
-				transportResponse = new TransportResponse() {
-					RequestUrl = transportRequest.RequestUrl,
-					Error = e
-				};
-			}
+                HttpRequestMessage requestMessage =
+                    new HttpRequestMessage(method: HttpMethod.Put, requestUri: transportRequest.RequestUrl)
+                        { Content = putData };
+                if (transportRequest.Headers.Keys.Count > 0)
+                {
+                    foreach (var kvp in transportRequest.Headers)
+                    {
+                        requestMessage.Headers.Add(kvp.Key, kvp.Value);
+                    }
+                }
 
-			return transportResponse;
-		}
-	}
+                var httpResult = await httpClient.SendAsync(request: requestMessage,
+                    cancellationToken: transportRequest.CancellationTokenSource.Token);
+                var responseContent = await httpResult.Content.ReadAsByteArrayAsync();
+                transportResponse = new TransportResponse()
+                {
+                    StatusCode = (int)httpResult.StatusCode,
+                    Content = responseContent,
+                    Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
+                    RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath
+                };
+            }
+            catch (TaskCanceledException)
+            {
+                transportResponse = null;
+                LoggingMethod.WriteToLog(Log,
+                    $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: Http request cancelled",
+                    LogVerbosity);
+            }
+            catch (Exception e)
+            {
+                LoggingMethod.WriteToLog(Log,
+                    $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}",
+                    LogVerbosity);
+                transportResponse = new TransportResponse()
+                {
+                    RequestUrl = transportRequest.RequestUrl,
+                    Error = e
+                };
+            }
+
+            return transportResponse;
+        }
+
+        public async Task<TransportResponse> DeleteRequest(TransportRequest transportRequest)
+        {
+            TransportResponse response;
+            try
+            {
+                if (transportRequest.Timeout.HasValue) httpClient.Timeout = (TimeSpan)transportRequest.Timeout;
+                HttpRequestMessage requestMessage =
+                    new HttpRequestMessage(method: HttpMethod.Delete, requestUri: transportRequest.RequestUrl);
+                if (transportRequest.Headers.Keys.Count > 0)
+                {
+                    foreach (var kvp in transportRequest.Headers)
+                    {
+                        requestMessage.Headers.Add(kvp.Key, kvp.Value);
+                    }
+                }
+
+                var httpResult = await httpClient.SendAsync(request: requestMessage,
+                    cancellationToken: transportRequest.CancellationTokenSource.Token);
+                var responseContent = await httpResult.Content.ReadAsByteArrayAsync();
+                response = new TransportResponse()
+                {
+                    StatusCode = (int)httpResult.StatusCode,
+                    Content = responseContent,
+                    Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
+                    RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath
+                };
+            }
+            catch (TaskCanceledException)
+            {
+                response = null;
+                LoggingMethod.WriteToLog(Log,
+                    $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: Http request cancelled",
+                    LogVerbosity);
+            }
+            catch (Exception e)
+            {
+                LoggingMethod.WriteToLog(Log,
+                    $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}",
+                    LogVerbosity);
+                response = new TransportResponse()
+                {
+                    RequestUrl = transportRequest.RequestUrl,
+                    Error = e
+                };
+            }
+
+            return response;
+        }
+
+        public async Task<TransportResponse> PatchRequest(TransportRequest transportRequest)
+        {
+            TransportResponse transportResponse;
+            try
+            {
+                HttpContent patchData = null;
+
+                if (!string.IsNullOrEmpty(transportRequest.BodyContentString))
+                {
+                    patchData = new StringContent(transportRequest.BodyContentString, Encoding.UTF8,
+                        "application/json");
+                }
+                else if (transportRequest.BodyContentBytes != null)
+                {
+                    patchData = new ByteArrayContent(transportRequest.FormData);
+                    foreach (var transportRequestHeader in transportRequest.Headers)
+                    {
+                        patchData.Headers.Add(transportRequestHeader.Key, transportRequestHeader.Value);
+                    }
+                }
+
+                HttpRequestMessage requestMessage =
+                    new HttpRequestMessage(new HttpMethod("PATCH"), requestUri: transportRequest.RequestUrl)
+                        { Content = patchData };
+                if (transportRequest.Headers.Keys.Count > 0)
+                {
+                    foreach (var kvp in transportRequest.Headers)
+                    {
+                        requestMessage.Headers.Add(kvp.Key, $"\"{kvp.Value}\"");
+                    }
+                }
+
+                var httpResult = await httpClient.SendAsync(request: requestMessage,
+                    cancellationToken: transportRequest.CancellationTokenSource.Token);
+                var responseContent = await httpResult.Content.ReadAsByteArrayAsync();
+                transportResponse = new TransportResponse()
+                {
+                    StatusCode = (int)httpResult.StatusCode,
+                    Content = responseContent,
+                    Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
+                    RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath
+                };
+            }
+            catch (TaskCanceledException)
+            {
+                transportResponse = null;
+                LoggingMethod.WriteToLog(Log,
+                    $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: Http request cancelled",
+                    LogVerbosity);
+            }
+            catch (Exception e)
+            {
+                LoggingMethod.WriteToLog(Log,
+                    $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}",
+                    LogVerbosity);
+                transportResponse = new TransportResponse()
+                {
+                    RequestUrl = transportRequest.RequestUrl,
+                    Error = e
+                };
+            }
+
+            return transportResponse;
+        }
+    }
 }
-

@@ -290,7 +290,8 @@ namespace PubnubApi.EndPoint
 				};
 				var subscribeRequestParameter = CreateSubscribeRequestParameter(channels: channels, channelGroups: channelGroups,timetoken: (Convert.ToInt64(timetoken.ToString(), CultureInfo.InvariantCulture) == 0) ? Convert.ToInt64(timetoken.ToString(), CultureInfo.InvariantCulture) : lastTimetoken,region: region,stateJsonValue: channelsJsonState, initialSubscribeUrlParams: initialSubscribeUrlParams, externalQueryParam: externalQueryParam);
 				var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: subscribeRequestParameter, operationType: PNOperationType.PNSubscribeOperation);
-				OngoingSubscriptionCancellationTokenSources[PubnubInstance.InstanceId] = CancellationTokenSource.CreateLinkedTokenSource(transportRequest.CancellationToken);
+				OngoingSubscriptionCancellationTokenSources[PubnubInstance.InstanceId] =
+					transportRequest.CancellationTokenSource;
 				PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ContinueWith( t => {
 					var transportResponse = t.Result;
 					if (transportResponse.Error == null) {

@@ -258,7 +258,7 @@ namespace PubnubApi.EndPoint
 				RequestType = Constants.POST,
 				RequestUrl = generateFileUploadUrlResult.FileUploadRequest.Url,
 				BodyContentBytes = postData,
-				CancellationToken = cts.Token
+				CancellationTokenSource = cts
 			};
 			transportRequest.Headers.Add("Content-Type", contentType);
 			Tuple<string, PNStatus> jsonAndStatusTuple;

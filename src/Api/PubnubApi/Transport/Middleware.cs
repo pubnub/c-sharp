@@ -99,7 +99,7 @@ namespace PubnubApi
 				RequestUrl = urlString,
 				BodyContentString = requestParameter.BodyContentString,
 				FormData = requestParameter.FormData,
-				CancellationToken = cts.Token,
+				CancellationTokenSource = cts,
 			};
 			if(requestParameter.Headers.Count>0) transportRequest.Headers = requestParameter.Headers;
 			return transportRequest;

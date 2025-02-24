@@ -12,7 +12,7 @@ namespace PubnubApi
 		public byte[] FormData { get; set; } = default;
 		public string BodyContentString { get; set; }
 		public byte[] BodyContentBytes { get; set; }
-		public CancellationToken CancellationToken { get; set; } = default;
+		public CancellationTokenSource CancellationTokenSource { get; set; } = default;
 		public TimeSpan? Timeout { get; set; } = null;
 	}
 }
