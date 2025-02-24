@@ -1,13 +1,7 @@
 name: Tests
 
 on:
-  pull_request:
-    branches:
-      - master
-    types:
-      - ready_for_review
-      - synchronize
-      - reopened 
+  push:
   workflow_dispatch:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
