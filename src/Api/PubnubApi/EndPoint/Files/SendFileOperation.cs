@@ -162,10 +162,13 @@ namespace PubnubApi.EndPoint
 				currentCryptoModule = !string.IsNullOrEmpty(currentFileCipherKey) ? new CryptoModule(new LegacyCryptor(currentFileCipherKey, true, pubnubLog), null) : (config.CryptoModule ??= new CryptoModule(new LegacyCryptor(config.CipherKey, true, pubnubLog), null));
 			}
 			byte[] postData = GetMultipartFormData(sendFileByteArray, generateFileUploadUrlResult.FileName, generateFileUploadUrlResult.FileUploadRequest.FormFields, dataBoundary, currentCryptoModule, config, pubnubLog);
+			CancellationTokenSource cts = new CancellationTokenSource();
+			cts.CancelAfter(TimeSpan.FromMinutes(5));
 			var transportRequest = new TransportRequest() {
 				RequestType = Constants.POST,
 				RequestUrl = generateFileUploadUrlResult.FileUploadRequest.Url,
 				BodyContentBytes = postData,
+				CancellationTokenSource = cts
 			};
 			transportRequest.Headers.Add("Content-Type", contentType);
 			PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ContinueWith(t => {
@@ -218,7 +221,7 @@ namespace PubnubApi.EndPoint
 						requestState.PubnubCallback.OnResponse(default, status);
 					}
 				}
-			});
+			}, cts.Token);
 		}
 
 		private async Task<PNResult<PNFileUploadResult>> ProcessFileUpload()
@@ -262,7 +265,7 @@ namespace PubnubApi.EndPoint
 			};
 			transportRequest.Headers.Add("Content-Type", contentType);
 			Tuple<string, PNStatus> jsonAndStatusTuple;
-			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ConfigureAwait(false);
+			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest);
 			if (transportResponse.StatusCode == 204 && transportResponse.Error == null) {
 				var responseString = "{}";
 				PNStatus errStatus = GetStatusIfError<PNFileUploadResult>(requestState, responseString);
