@@ -70,37 +70,14 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
-            var fullAccess = new PNTokenAuthValues()
+            if (string.IsNullOrEmpty(PubnubCommon.GrantToken))
             {
-                Read = true,
-                Write = true,
-                Create = true,
-                Get = true,
-                Delete = true,
-                Join = true,
-                Update = true,
-                Manage = true
-            };
-            var grantResult = await pubnub.GrantToken().TTL(20).AuthorizedUuid(config.UserId).Resources(
-                new PNTokenResources()
-                {
-                    Channels = new Dictionary<string, PNTokenAuthValues>()
-                    {
-                        {
-                            grantChannel, fullAccess
-                        }
-                    }
-                }).ExecuteAsync();
-
-            await Task.Delay(4000);
-
-            authToken = grantResult.Result?.Token;
-
+                await GenerateTestGrantToken(pubnub);
+            }
+            authToken = PubnubCommon.GrantToken;
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Assert.IsTrue(grantResult.Result != null && grantResult.Status.Error == false, 
-                "WhenDetailedHistoryIsRequested Grant access failed.");
         }
 
         [TearDown]
@@ -594,7 +571,7 @@ namespace PubNubMessaging.Tests
             };
             server.RunOnHttps(false);
 
-            pubnub = createPubNubInstance(config);
+            pubnub = createPubNubInstance(config, authToken);
 
             string channel = "hello_my_channel";
             manualResetEventWaitTimeout = (PubnubCommon.EnableStubTest) ? 1000 : 310 * 1000;

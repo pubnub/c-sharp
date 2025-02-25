@@ -82,39 +82,15 @@ namespace PubNubMessaging.Tests
                     .WithParameter("signature", "hc7IKhEB7tyL6ENR3ndOOlHqPIG3RmzxwJMSGpofE6Q=")
                     .WithResponse(expected)
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
-
-            var authValues = new PNTokenAuthValues()
+            if (string.IsNullOrEmpty(PubnubCommon.GrantToken))
             {
-                Read = true,
-                Write = true,
-                Create = true,
-                Get = true,
-                Delete = true,
-                Join = true,
-                Update = true,
-                Manage = true
-            };
-            var grantTokenResult = await pubnub.GrantToken().TTL(20).AuthorizedUuid(config.UserId).Resources(
-                new PNTokenResources() {
-                    Channels = new Dictionary<string, PNTokenAuthValues>() 
-                    { 
-                        {
-                            channel,authValues 
-                        },
-                        {
-                            channel2,authValues
-                        }
-                    }
-                }).ExecuteAsync();
-            await Task.Delay(4000);
-
-            authToken = grantTokenResult.Result?.Token;
+                await GenerateTestGrantToken(pubnub);
+            }
+            authToken = PubnubCommon.GrantToken;
 
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-
-            Assert.IsTrue(grantTokenResult.Status.Error == false && grantTokenResult.Result != null, "WhenSubscribedToAChannel3 Grant access failed.");
         }
 
         [TearDown]
