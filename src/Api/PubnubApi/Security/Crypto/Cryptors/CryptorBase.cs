@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
 using PubnubApi.Security.Crypto.Common;
 
 namespace PubnubApi.Security.Crypto.Cryptors
@@ -39,10 +35,6 @@ namespace PubnubApi.Security.Crypto.Cryptors
             #endif
             return Util.InitializationVector(useDynamicRandomIV, dataOffset);
         }
-        // protected void Log(string message)
-        // {
-        //     _log?.WriteToLog(message);
-        // }
         protected byte[] InternalEncrypt(bool cryptoHeader, byte[] dataBytes, byte[] ivBytes, byte[] keyBytes)
         {
             using (Aes aesAlg = Aes.Create())
