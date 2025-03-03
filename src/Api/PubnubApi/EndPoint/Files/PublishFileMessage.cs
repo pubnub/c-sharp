@@ -144,26 +144,25 @@ namespace PubnubApi.EndPoint
 							int publishStatus;
 							var _ = int.TryParse(result[0].ToString(), out publishStatus);
 							if (publishStatus == 1) {
-								logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 								ProcessResponseCallbacks(result, requestState);
+								logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 							} else {
 								PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(400, result[1].ToString());
 								PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<PNPublishFileMessageResult>(PNOperationType.PNPublishFileMessageOperation, category, requestState, 400, new PNException(responseString));
-								logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 								requestState.PubnubCallback.OnResponse(default, status);
-
+								logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 							}
 						} else {
-							logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 							ProcessResponseCallbacks(result, requestState);
+							logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 						}
 					}
 				} else {
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNPublishFileMessageOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
-					logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 					requestState.PubnubCallback.OnResponse(default, status);
+					logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 				}
 			});
 		}

@@ -120,7 +120,7 @@ namespace PubnubApi.EndPoint
 
             returnValue.Result = result;
             returnValue.Status = status;
-            logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
+            logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status?.StatusCode}");
             return Task.FromResult(returnValue);
         }
 

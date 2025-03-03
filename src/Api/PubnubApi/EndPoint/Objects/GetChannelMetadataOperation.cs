@@ -121,17 +121,17 @@ namespace PubnubApi.EndPoint
                     if (!string.IsNullOrEmpty(responseString))
                     {
                         requestState.GotJsonResponse = true;
-                        logger?.Info(
-                            $"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
                         List<object> result = ProcessJsonResponse(requestState, responseString);
                         ProcessResponseCallbacks(result, requestState);
+                        logger?.Info(
+                            $"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
                     }
                     else
                     {
                         PNStatus errorStatus = GetStatusIfError(requestState, responseString);
-                        logger?.Info(
-                            $"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
                         callback.OnResponse(null, errorStatus);
+                        logger?.Info(
+                            $"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
                     }
                 }
                 else
@@ -142,9 +142,9 @@ namespace PubnubApi.EndPoint
                     PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(
                         PNOperationType.PNGetChannelMetadataOperation, category, requestState, statusCode,
                         new PNException(transportResponse.Error.Message, transportResponse.Error));
+                    requestState.PubnubCallback.OnResponse(default, status);
                     logger?.Info(
-                        $"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
-                    requestState.PubnubCallback.OnResponse(default(PNGetChannelMetadataResult), status);
+                        $"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
                 }
             });
         }

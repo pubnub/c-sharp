@@ -137,7 +137,7 @@ namespace PubnubApi.EndPoint
 				if (!string.IsNullOrEmpty(json))
 				{
 					List<object> result = ProcessJsonResponse(requestState, json);
-					logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+					logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 					ProcessResponseCallbacks(result, requestState);
 				} else {
 					requestState.PubnubCallback.OnResponse(default, errorStatus);
@@ -146,7 +146,7 @@ namespace PubnubApi.EndPoint
 				int statusCode = PNStatusCodeHelper.GetHttpStatusCode(t.Result.Error.Message);
 				PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, t.Result.Error.Message);
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNPublishOperation, category, requestState, statusCode, new PNException(t.Result.Error.Message, t.Result.Error));
-				logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+				logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 				requestState.PubnubCallback.OnResponse(default(PNAddMessageActionResult), status);
 			}
 			CleanUp();

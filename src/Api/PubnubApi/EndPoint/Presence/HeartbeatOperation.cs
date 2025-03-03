@@ -32,11 +32,13 @@ namespace PubnubApi.EndPoint
 
 				if (config.MaintainPresenceState) presenceState = BuildJsonUserState(channels, channelGroups, true);
 
-				RequestState<T> pubnubRequestState = new RequestState<T>();
-				pubnubRequestState.Channels = channels;
-				pubnubRequestState.ChannelGroups = channelGroups;
-				pubnubRequestState.ResponseType = PNOperationType.PNHeartbeatOperation;
-				pubnubRequestState.TimeQueued = DateTime.Now;
+				RequestState<T> pubnubRequestState = new RequestState<T>
+				{
+					Channels = channels,
+					ChannelGroups = channelGroups,
+					ResponseType = PNOperationType.PNHeartbeatOperation,
+					TimeQueued = DateTime.Now
+				};
 
 				var requestParameter = CreateRequestParameter(channels: channels, channelGroups: channelGroups);
 				var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNHeartbeatOperation);
