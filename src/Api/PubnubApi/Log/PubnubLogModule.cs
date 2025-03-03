@@ -28,37 +28,35 @@ public class PubnubLogModule
     private void Log(PubnubLogLevel logLevel, string message)
     {
         if (Loggers == null || Loggers.Count == 0) return;
-        
-        if (logLevel >= MinLogLevel)
+
+        if (logLevel < MinLogLevel) return;
+        try
         {
-            try
+            foreach (var logger in Loggers)
             {
-                foreach (var logger in Loggers)
+                switch (logLevel)
                 {
-                    switch (logLevel)
-                    {
-                        case PubnubLogLevel.Info:
-                            logger.Info(message);
-                            break;
-                        case PubnubLogLevel.Debug:
-                            logger.Debug(message);
-                            break;
-                        case PubnubLogLevel.Error:
-                            logger.Error(message);
-                            break;
-                        case PubnubLogLevel.Trace:
-                            logger.Trace(message);
-                            break;
-                        case PubnubLogLevel.Warn:
-                            logger.Warn(message);
-                            break;
-                    }
+                    case PubnubLogLevel.Info:
+                        logger.Info(message);
+                        break;
+                    case PubnubLogLevel.Debug:
+                        logger.Debug(message);
+                        break;
+                    case PubnubLogLevel.Error:
+                        logger.Error(message);
+                        break;
+                    case PubnubLogLevel.Trace:
+                        logger.Trace(message);
+                        break;
+                    case PubnubLogLevel.Warn:
+                        logger.Warn(message);
+                        break;
                 }
             }
-            catch (Exception e)
-            {
-                System.Diagnostics.Debug.WriteLine($"{DateTime.Now.ToString(CultureInfo.InvariantCulture)} Error while logging {e.Message} \n {e.StackTrace}" );
-            }
+        }
+        catch (Exception e)
+        {
+            System.Diagnostics.Debug.WriteLine($"{DateTime.Now.ToString(CultureInfo.InvariantCulture)} Error while logging {e.Message} \n {e.StackTrace}" );
         }
     }
     
