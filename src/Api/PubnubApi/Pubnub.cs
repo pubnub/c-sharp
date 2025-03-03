@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Reflection;
 using PubnubApi.EndPoint;
 using PubnubApi.EventEngine.Subscribe;
 using PubnubApi.EventEngine.Subscribe.Events;
