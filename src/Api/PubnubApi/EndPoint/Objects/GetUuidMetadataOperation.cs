@@ -21,7 +21,7 @@ namespace PubnubApi.EndPoint
 		private PNCallback<PNGetUuidMetadataResult> savedCallback;
 		private Dictionary<string, object> queryParam;
 
-		public GetUuidMetadataOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
+		public GetUuidMetadataOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
 		{
 			config = pubnubConfig;
 			jsonLibrary = jsonPluggableLibrary;
@@ -49,30 +49,32 @@ namespace PubnubApi.EndPoint
 
 		public GetUuidMetadataOperation IncludeCustom(bool includeCustomData)
 		{
-			this.includeCustom = includeCustomData;
+			includeCustom = includeCustomData;
 			return this;
 		}
 
 		public GetUuidMetadataOperation QueryParam(Dictionary<string, object> customQueryParam)
 		{
-			this.queryParam = customQueryParam;
+			queryParam = customQueryParam;
 			return this;
 		}
 
 		public void Execute(PNCallback<PNGetUuidMetadataResult> callback)
 		{
-			this.savedCallback = callback;
-			GetSingleUuidMetadata(this.uuid, this.includeCustom, this.queryParam, savedCallback);
+			savedCallback = callback;
+			logger.Trace($"{GetType().Name} Execute invoked");
+			GetSingleUuidMetadata(uuid, includeCustom, queryParam, savedCallback);
 		}
 
 		public async Task<PNResult<PNGetUuidMetadataResult>> ExecuteAsync()
 		{
-			return await GetSingleUuidMetadata(this.uuid, this.includeCustom, this.queryParam).ConfigureAwait(false);
+			logger.Trace($"{GetType().Name} ExecuteAsync invoked.");
+			return await GetSingleUuidMetadata(uuid, includeCustom, queryParam).ConfigureAwait(false);
 		}
 
 		internal void Retry()
 		{
-			GetSingleUuidMetadata(this.uuid, this.includeCustom, this.queryParam, savedCallback);
+			GetSingleUuidMetadata(uuid, includeCustom, queryParam, savedCallback);
 		}
 
 		private void GetSingleUuidMetadata(string uuid, bool includeCustom, Dictionary<string, object> externalQueryParam, PNCallback<PNGetUuidMetadataResult> callback)
@@ -83,12 +85,15 @@ namespace PubnubApi.EndPoint
 			if (string.IsNullOrEmpty(uuid)) {
 				this.uuid = config.UserId;
 			}
-			RequestState<PNGetUuidMetadataResult> requestState = new RequestState<PNGetUuidMetadataResult>();
-			requestState.ResponseType = PNOperationType.PNGetUuidMetadataOperation;
-			requestState.PubnubCallback = callback;
-			requestState.UsePostMethod = false;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
+			logger.Debug($"{GetType().Name} parameter validated.");
+			RequestState<PNGetUuidMetadataResult> requestState = new RequestState<PNGetUuidMetadataResult>
+				{
+					ResponseType = PNOperationType.PNGetUuidMetadataOperation,
+					PubnubCallback = callback,
+					UsePostMethod = false,
+					Reconnect = false,
+					EndPointOperation = this
+				};
 
 			var requestParameter = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNGetUuidMetadataOperation);
@@ -98,10 +103,12 @@ namespace PubnubApi.EndPoint
 					var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 					if (!string.IsNullOrEmpty(responseString)) {
                         requestState.GotJsonResponse = true;
+                        logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						List<object> result = ProcessJsonResponse(requestState, responseString);
 						ProcessResponseCallbacks(result, requestState);
 					} else {
 						PNStatus errorStatus = GetStatusIfError(requestState, responseString);
+						logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						callback.OnResponse(null, errorStatus);
 					}
 
@@ -109,6 +116,7 @@ namespace PubnubApi.EndPoint
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNGetUuidMetadataOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
+					logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 					requestState.PubnubCallback.OnResponse(default(PNGetUuidMetadataResult), status);
 				}
 			});
@@ -119,12 +127,15 @@ namespace PubnubApi.EndPoint
 			if (string.IsNullOrEmpty(uuid)) {
 				this.uuid = config.UserId;
 			}
+			logger.Debug($"{GetType().Name} parameter validated.");
 			PNResult<PNGetUuidMetadataResult> returnValue = new PNResult<PNGetUuidMetadataResult>();
-			RequestState<PNGetUuidMetadataResult> requestState = new RequestState<PNGetUuidMetadataResult>();
-			requestState.ResponseType = PNOperationType.PNGetUuidMetadataOperation;
-			requestState.Reconnect = false;
-			requestState.UsePostMethod = false;
-			requestState.EndPointOperation = this;
+			RequestState<PNGetUuidMetadataResult> requestState = new RequestState<PNGetUuidMetadataResult>
+				{
+					ResponseType = PNOperationType.PNGetUuidMetadataOperation,
+					Reconnect = false,
+					UsePostMethod = false,
+					EndPointOperation = this
+				};
 
 			var requestParameter = CreateRequestParameter();
 			Tuple<string, PNStatus> JsonAndStatusTuple;
@@ -156,7 +167,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNGetUuidMetadataOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
-
+			logger.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 

@@ -74,6 +74,7 @@ namespace PubnubApi.EndPoint
 		}
 		public void Execute(PNCallback<PNSetChannelMetadataResult> callback)
 		{
+			logger.Trace($"{GetType().Name} Execute invoked");
 			if (string.IsNullOrEmpty(channelId) || string.IsNullOrEmpty(channelId.Trim())) {
 				throw new ArgumentException("Missing Channel");
 			}
@@ -87,11 +88,13 @@ namespace PubnubApi.EndPoint
 			}
 
 			this.savedCallback = callback;
+			logger.Debug($"{GetType().Name} parameter validated.");
 			SetChannelMetadata(this.channelId, this.includeCustom, this.queryParam, callback);
 		}
 
 		public async Task<PNResult<PNSetChannelMetadataResult>> ExecuteAsync()
 		{
+			logger.Trace($"{GetType().Name} ExecuteAsync invoked.");
 			return await SetChannelMetadata(this.channelId, this.includeCustom, this.queryParam).ConfigureAwait(false);
 		}
 
@@ -102,12 +105,14 @@ namespace PubnubApi.EndPoint
 
 		private void SetChannelMetadata(string channelMetaId, bool includeCustom, Dictionary<string, object> externalQueryParam, PNCallback<PNSetChannelMetadataResult> callback)
 		{
-			RequestState<PNSetChannelMetadataResult> requestState = new RequestState<PNSetChannelMetadataResult>();
-			requestState.ResponseType = PNOperationType.PNSetChannelMetadataOperation;
-			requestState.PubnubCallback = callback;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
-			requestState.UsePatchMethod = true;
+			RequestState<PNSetChannelMetadataResult> requestState = new RequestState<PNSetChannelMetadataResult>
+				{
+					ResponseType = PNOperationType.PNSetChannelMetadataOperation,
+					PubnubCallback = callback,
+					Reconnect = false,
+					EndPointOperation = this,
+					UsePatchMethod = true
+				};
 
 			var requestParameter = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNSetChannelMetadataOperation);
@@ -117,10 +122,12 @@ namespace PubnubApi.EndPoint
 					var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 					if (!string.IsNullOrEmpty(responseString)) {
                         requestState.GotJsonResponse = true;
+                        logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						List<object> result = ProcessJsonResponse(requestState, responseString);
 						ProcessResponseCallbacks(result, requestState);
 					} else {
 						PNStatus errorStatus = GetStatusIfError(requestState, responseString);
+						logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						callback.OnResponse(default, errorStatus);
 					}
 
@@ -128,6 +135,7 @@ namespace PubnubApi.EndPoint
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNSetChannelMetadataOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
+					logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 					requestState.PubnubCallback.OnResponse(default, status);
 				}
 			});
@@ -148,13 +156,14 @@ namespace PubnubApi.EndPoint
 				returnValue.Status = errStatus;
 				return returnValue;
 			}
-
-
-			RequestState<PNSetChannelMetadataResult> requestState = new RequestState<PNSetChannelMetadataResult>();
-			requestState.ResponseType = PNOperationType.PNSetChannelMetadataOperation;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
-			requestState.UsePatchMethod = true;
+			logger.Debug($"{GetType().Name} parameter validated.");
+			RequestState<PNSetChannelMetadataResult> requestState = new RequestState<PNSetChannelMetadataResult>
+				{
+					ResponseType = PNOperationType.PNSetChannelMetadataOperation,
+					Reconnect = false,
+					EndPointOperation = this,
+					UsePatchMethod = true
+				};
 
 			var requestParameter = CreateRequestParameter();
 			Tuple<string, PNStatus> JsonAndStatusTuple;
@@ -186,8 +195,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNSetChannelMetadataOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
-
-
+			logger.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 

@@ -1007,10 +1007,6 @@
     <Folder Include="Security\Crypto\Cryptors\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="System.Console" Version="4.3.0" />
-  </ItemGroup>
-  
   <!--<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.4' ">
     <PackageReference Include="System.Net.Requests" Version="4.0.11" />
     <PackageReference Include="System.Reflection.Primitives" Version="4.3.0" />

@@ -28,7 +28,7 @@ namespace PubnubApi.EndPoint
 		private PNCallback<PNChannelMembersResult> savedCallback;
 		private Dictionary<string, object> queryParam;
 
-		public GetChannelMembersOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
+		public GetChannelMembersOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
 		{
 			config = pubnubConfig;
 			jsonLibrary = jsonPluggableLibrary;
@@ -50,25 +50,25 @@ namespace PubnubApi.EndPoint
 
 		public GetChannelMembersOperation Channel(string channelName)
 		{
-			this.channelId = channelName;
+			channelId = channelName;
 			return this;
 		}
 
 		public GetChannelMembersOperation Page(PNPageObject pageObject)
 		{
-			this.page = pageObject;
+			page = pageObject;
 			return this;
 		}
 
 		public GetChannelMembersOperation Limit(int numberOfObjects)
 		{
-			this.limit = numberOfObjects;
+			limit = numberOfObjects;
 			return this;
 		}
 
 		public GetChannelMembersOperation IncludeCount(bool includeTotalCount)
 		{
-			this.includeCount = includeTotalCount;
+			includeCount = includeTotalCount;
 			return this;
 		}
 
@@ -76,26 +76,26 @@ namespace PubnubApi.EndPoint
 		{
 			if (includeOptions != null) {
 				string[] arrayInclude = includeOptions.Select(x => MapEnumValueToEndpoint(x.ToString())).ToArray();
-				this.commandDelimitedIncludeOptions = string.Join(",", arrayInclude);
+				commandDelimitedIncludeOptions = string.Join(",", arrayInclude);
 			}
 			return this;
 		}
 
 		public GetChannelMembersOperation Filter(string filterExpression)
 		{
-			this.membersFilter = filterExpression;
+			membersFilter = filterExpression;
 			return this;
 		}
 
 		public GetChannelMembersOperation Sort(List<string> sortByField)
 		{
-			this.sortField = sortByField;
+			sortField = sortByField;
 			return this;
 		}
 
 		public GetChannelMembersOperation QueryParam(Dictionary<string, object> customQueryParam)
 		{
-			this.queryParam = customQueryParam;
+			queryParam = customQueryParam;
 			return this;
 		}
 
@@ -105,28 +105,32 @@ namespace PubnubApi.EndPoint
 				throw new ArgumentException("Missing callback");
 			}
 
-			this.savedCallback = callback;
-			GetMembersList(this.channelId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membersFilter, this.sortField, this.queryParam, savedCallback);
+			savedCallback = callback;
+			logger.Trace($"{GetType().Name} Execute invoked");
+			GetMembersList(channelId, page, limit, includeCount, commandDelimitedIncludeOptions, membersFilter, sortField, queryParam, savedCallback);
 		}
 
 		public async Task<PNResult<PNChannelMembersResult>> ExecuteAsync()
 		{
-			return await GetMembersList(this.channelId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membersFilter, this.sortField, this.queryParam).ConfigureAwait(false);
+			logger.Trace($"{GetType().Name} ExecuteAsync invoked.");
+			return await GetMembersList(channelId, page, limit, includeCount, commandDelimitedIncludeOptions, membersFilter, sortField, queryParam).ConfigureAwait(false);
 		}
 
 		internal void Retry()
 		{
-			GetMembersList(this.channelId, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.membersFilter, this.sortField, this.queryParam, savedCallback);
+			GetMembersList(channelId, page, limit, includeCount, commandDelimitedIncludeOptions, membersFilter, sortField, queryParam, savedCallback);
 		}
 
 		private void GetMembersList(string spaceId, PNPageObject page, int limit, bool includeCount, string includeOptions, string filter, List<string> sort, Dictionary<string, object> externalQueryParam, PNCallback<PNChannelMembersResult> callback)
 		{
-			RequestState<PNChannelMembersResult> requestState = new RequestState<PNChannelMembersResult>();
-			requestState.ResponseType = PNOperationType.PNGetChannelMembersOperation;
-			requestState.PubnubCallback = callback;
-			requestState.Reconnect = false;
-			requestState.UsePostMethod = false;
-			requestState.EndPointOperation = this;
+			RequestState<PNChannelMembersResult> requestState = new RequestState<PNChannelMembersResult>
+				{
+					ResponseType = PNOperationType.PNGetChannelMembersOperation,
+					PubnubCallback = callback,
+					Reconnect = false,
+					UsePostMethod = false,
+					EndPointOperation = this
+				};
 
 			var requestParameter = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNGetChannelMembersOperation);
@@ -137,9 +141,11 @@ namespace PubnubApi.EndPoint
 					if (!string.IsNullOrEmpty(responseString)) {
 						requestState.GotJsonResponse = true;
 						List<object> result = ProcessJsonResponse(requestState, responseString);
+						logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						ProcessResponseCallbacks(result, requestState);
 					} else {
 						PNStatus errorStatus = GetStatusIfError(requestState, responseString);
+						logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						callback.OnResponse(null, errorStatus);
 					}
 
@@ -147,6 +153,7 @@ namespace PubnubApi.EndPoint
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNGetChannelMembersOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
+					logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 					requestState.PubnubCallback.OnResponse(default, status);
 				}
 			});
@@ -155,11 +162,13 @@ namespace PubnubApi.EndPoint
 		private async Task<PNResult<PNChannelMembersResult>> GetMembersList(string spaceId, PNPageObject page, int limit, bool includeCount, string includeOptions, string filter, List<string> sort, Dictionary<string, object> externalQueryParam)
 		{
 			PNResult<PNChannelMembersResult> returnValue = new PNResult<PNChannelMembersResult>();
-			RequestState<PNChannelMembersResult> requestState = new RequestState<PNChannelMembersResult>();
-			requestState.ResponseType = PNOperationType.PNGetChannelMembersOperation;
-			requestState.Reconnect = false;
-			requestState.UsePostMethod = false;
-			requestState.EndPointOperation = this;
+			RequestState<PNChannelMembersResult> requestState = new RequestState<PNChannelMembersResult>
+				{
+					ResponseType = PNOperationType.PNGetChannelMembersOperation,
+					Reconnect = false,
+					UsePostMethod = false,
+					EndPointOperation = this
+				};
 
 			var requestParameter = CreateRequestParameter();
 			Tuple<string, PNStatus> JsonAndStatusTuple;
@@ -191,6 +200,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNGetChannelMembersOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
+			logger.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 

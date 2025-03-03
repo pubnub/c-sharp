@@ -54,6 +54,7 @@ namespace PubnubApi.EndPoint
 
 		public void Execute(PNCallback<PNRemoveUuidMetadataResult> callback)
 		{
+			logger.Trace($"{GetType().Name} Execute invoked");
 			if (string.IsNullOrEmpty(config.SubscribeKey) || string.IsNullOrEmpty(config.SubscribeKey.Trim()) || config.SubscribeKey.Length <= 0) {
 				throw new MissingMemberException("Invalid Subscribe key");
 			}
@@ -69,12 +70,12 @@ namespace PubnubApi.EndPoint
 
 		public async Task<PNResult<PNRemoveUuidMetadataResult>> ExecuteAsync()
 		{
+			logger.Trace($"{GetType().Name} ExecuteAsync invoked.");
 			return await RemoveUuidMetadata(this.uuid, this.queryParam).ConfigureAwait(false);
 		}
 
 		internal void Retry()
 		{
-
 			RemoveUuidMetadata(this.uuid, this.queryParam, savedCallback);
 		}
 
@@ -83,11 +84,14 @@ namespace PubnubApi.EndPoint
 			if (string.IsNullOrEmpty(uuid)) {
 				this.uuid = config.UserId;
 			}
-			RequestState<PNRemoveUuidMetadataResult> requestState = new RequestState<PNRemoveUuidMetadataResult>();
-			requestState.ResponseType = PNOperationType.PNDeleteUuidMetadataOperation;
-			requestState.PubnubCallback = callback;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
+			logger.Debug($"{GetType().Name} parameter validated.");
+			RequestState<PNRemoveUuidMetadataResult> requestState = new RequestState<PNRemoveUuidMetadataResult>
+				{
+					ResponseType = PNOperationType.PNDeleteUuidMetadataOperation,
+					PubnubCallback = callback,
+					Reconnect = false,
+					EndPointOperation = this
+				};
 
 			var requestParameter = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNDeleteUuidMetadataOperation);
@@ -97,10 +101,12 @@ namespace PubnubApi.EndPoint
 					var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 					if (!string.IsNullOrEmpty(responseString)) {
                         requestState.GotJsonResponse = true;
+                        logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						List<object> result = ProcessJsonResponse(requestState, responseString);
 						ProcessResponseCallbacks(result, requestState);
 					} else {
 						PNStatus errorStatus = GetStatusIfError(requestState, responseString);
+						logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						callback.OnResponse(default, errorStatus);
 					}
 
@@ -108,6 +114,7 @@ namespace PubnubApi.EndPoint
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNDeleteUuidMetadataOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
+					logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 					requestState.PubnubCallback.OnResponse(default, status);
 				}
 			});
@@ -127,7 +134,7 @@ namespace PubnubApi.EndPoint
 				returnValue.Status = errStatus;
 				return returnValue;
 			}
-
+			logger.Debug($"{GetType().Name} parameter validated.");
 			RequestState<PNRemoveUuidMetadataResult> requestState = new RequestState<PNRemoveUuidMetadataResult>();
 			requestState.ResponseType = PNOperationType.PNDeleteUuidMetadataOperation;
 			requestState.Reconnect = false;
@@ -162,6 +169,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNRemoveMembershipsOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
+			logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 			return returnValue;
 		}
 

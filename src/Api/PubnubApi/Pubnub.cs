@@ -1214,6 +1214,7 @@ namespace PubnubApi
                 config.Logger.Warn(
                     $"The PresenceTimeout cannot be less than 20, defaulting the value to 20. Please update the settings in your code.");
             }
+
             CheckRequiredUserId(config);
             eventEmitter = new EventEmitter(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
                 subscribeCallbackListenerList, JsonPluggableLibrary, tokenManager, pubnubLog, this);
@@ -1253,7 +1254,7 @@ namespace PubnubApi
 
         private PubnubLogModule InitializeLogger(PNConfiguration configuration)
         {
-            var defaultLogger = new PubnubDefaultLogger($"{GetHashCode()}", Console.WriteLine,
+            var defaultLogger = new PubnubDefaultLogger($"{GetHashCode()}",
                 (configuration.LogVerbosity == PNLogVerbosity.BODY && configuration.PubnubLog != null
                     ? configuration.PubnubLog
                     : null));

@@ -29,7 +29,7 @@ namespace PubnubApi.EndPoint
 		private PNCallback<PNMembershipsResult> savedCallback;
 		private Dictionary<string, object> queryParam;
 
-		public ManageMembershipsOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
+		public ManageMembershipsOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
 		{
 			config = pubnubConfig;
 			jsonLibrary = jsonPluggableLibrary;
@@ -51,19 +51,19 @@ namespace PubnubApi.EndPoint
 
 		public ManageMembershipsOperation Uuid(string id)
 		{
-			this.uuid = id;
+			uuid = id;
 			return this;
 		}
 
 		public ManageMembershipsOperation Set(List<PNMembership> membership)
 		{
-			this.addMembership = membership;
+			addMembership = membership;
 			return this;
 		}
 
 		public ManageMembershipsOperation Remove(List<string> channelIdList)
 		{
-			this.delMembership = channelIdList;
+			delMembership = channelIdList;
 			return this;
 		}
 
@@ -71,43 +71,44 @@ namespace PubnubApi.EndPoint
 		{
 			if (includeOptions != null) {
 				string[] arrayInclude = includeOptions.Select(x => UrlParameterConverter.MapEnumValueToEndpoint(x.ToString())).ToArray();
-				this.commandDelimitedIncludeOptions = string.Join(",", arrayInclude);
+				commandDelimitedIncludeOptions = string.Join(",", arrayInclude);
 			}
 			return this;
 		}
 
 		public ManageMembershipsOperation Page(PNPageObject pageObject)
 		{
-			this.page = pageObject;
+			page = pageObject;
 			return this;
 		}
 
 		public ManageMembershipsOperation Limit(int numberOfObjects)
 		{
-			this.limit = numberOfObjects;
+			limit = numberOfObjects;
 			return this;
 		}
 
 		public ManageMembershipsOperation IncludeCount(bool includeTotalCount)
 		{
-			this.includeCount = includeTotalCount;
+			includeCount = includeTotalCount;
 			return this;
 		}
 
 		public ManageMembershipsOperation Sort(List<string> sortByField)
 		{
-			this.sortField = sortByField;
+			sortField = sortByField;
 			return this;
 		}
 
 		public ManageMembershipsOperation QueryParam(Dictionary<string, object> customQueryParam)
 		{
-			this.queryParam = customQueryParam;
+			queryParam = customQueryParam;
 			return this;
 		}
 
 		public void Execute(PNCallback<PNMembershipsResult> callback)
 		{
+			logger.Trace($"{GetType().Name} Execute invoked");
 			if (string.IsNullOrEmpty(config.SubscribeKey) || string.IsNullOrEmpty(config.SubscribeKey.Trim()) || config.SubscribeKey.Length <= 0) {
 				throw new MissingMemberException("Invalid subscribe key");
 			}
@@ -116,18 +117,19 @@ namespace PubnubApi.EndPoint
 				throw new ArgumentException("Missing callback");
 			}
 
-			this.savedCallback = callback;
-			ManageChannelMembershipWithUuid(this.uuid, this.addMembership, this.delMembership, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.sortField, this.queryParam, callback);
+			savedCallback = callback;
+			ManageChannelMembershipWithUuid(uuid, addMembership, delMembership, page, limit, includeCount, commandDelimitedIncludeOptions, sortField, queryParam, callback);
 		}
 
 		public async Task<PNResult<PNMembershipsResult>> ExecuteAsync()
 		{
-			return await ManageChannelMembershipWithUuid(this.uuid, this.addMembership, this.delMembership, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.sortField, this.queryParam).ConfigureAwait(false);
+			logger.Trace($"{GetType().Name} ExecuteAsync invoked.");
+			return await ManageChannelMembershipWithUuid(uuid, addMembership, delMembership, page, limit, includeCount, commandDelimitedIncludeOptions, sortField, queryParam).ConfigureAwait(false);
 		}
 
 		internal void Retry()
 		{
-			ManageChannelMembershipWithUuid(this.uuid, this.addMembership, this.delMembership, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.sortField, this.queryParam, savedCallback);
+			ManageChannelMembershipWithUuid(uuid, addMembership, delMembership, page, limit, includeCount, commandDelimitedIncludeOptions, sortField, queryParam, savedCallback);
 		}
 
 		private void ManageChannelMembershipWithUuid(string uuid, List<PNMembership> setMembership, List<string> removeMembership, PNPageObject page, int limit, bool includeCount, string includeOptions, List<string> sort, Dictionary<string, object> externalQueryParam, PNCallback<PNMembershipsResult> callback)
@@ -135,12 +137,15 @@ namespace PubnubApi.EndPoint
 			if (string.IsNullOrEmpty(uuid)) {
 				this.uuid = config.UserId;
 			}
-			RequestState<PNMembershipsResult> requestState = new RequestState<PNMembershipsResult>();
-			requestState.ResponseType = PNOperationType.PNManageMembershipsOperation;
-			requestState.PubnubCallback = callback;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
-			requestState.UsePatchMethod = true;
+			logger.Debug($"{GetType().Name} parameter validated.");
+			RequestState<PNMembershipsResult> requestState = new RequestState<PNMembershipsResult>
+				{
+					ResponseType = PNOperationType.PNManageMembershipsOperation,
+					PubnubCallback = callback,
+					Reconnect = false,
+					EndPointOperation = this,
+					UsePatchMethod = true
+				};
 
 			var requestParameter = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNManageMembershipsOperation);
@@ -150,10 +155,12 @@ namespace PubnubApi.EndPoint
 					var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 					if (!string.IsNullOrEmpty(responseString)) {
                         requestState.GotJsonResponse = true;
+                        logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						List<object> result = ProcessJsonResponse(requestState, responseString);
 						ProcessResponseCallbacks(result, requestState);
 					} else {
 						PNStatus errorStatus = GetStatusIfError(requestState, responseString);
+						logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						callback.OnResponse(null, errorStatus);
 					}
 
@@ -161,6 +168,7 @@ namespace PubnubApi.EndPoint
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNManageMembershipsOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
+					logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 					requestState.PubnubCallback.OnResponse(default, status);
 				}
 			});
@@ -179,6 +187,7 @@ namespace PubnubApi.EndPoint
 				returnValue.Status = errStatus;
 				return returnValue;
 			}
+			logger.Debug($"{GetType().Name} parameter validated.");
 			RequestState<PNMembershipsResult> requestState = new RequestState<PNMembershipsResult>();
 			requestState.ResponseType = PNOperationType.PNManageMembershipsOperation;
 			requestState.Reconnect = false;
@@ -215,7 +224,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNManageMembershipsOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
-
+			logger.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 

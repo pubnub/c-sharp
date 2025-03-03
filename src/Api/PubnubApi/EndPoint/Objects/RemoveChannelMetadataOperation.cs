@@ -55,6 +55,7 @@ namespace PubnubApi.EndPoint
 
 		public void Execute(PNCallback<PNRemoveChannelMetadataResult> callback)
 		{
+			logger.Trace($"{GetType().Name} Execute invoked");
 			if (string.IsNullOrEmpty(this.channelId) || string.IsNullOrEmpty(this.channelId.Trim())) {
 				throw new ArgumentException("Missing Channel");
 			}
@@ -72,6 +73,7 @@ namespace PubnubApi.EndPoint
 
 		public async Task<PNResult<PNRemoveChannelMetadataResult>> ExecuteAsync()
 		{
+			logger.Trace($"{GetType().Name} ExecuteAsync invoked.");
 			return await RemoveChannelMetadata(this.channelId, this.queryParam).ConfigureAwait(false);
 		}
 
@@ -82,11 +84,14 @@ namespace PubnubApi.EndPoint
 
 		private void RemoveChannelMetadata(string spaceId, Dictionary<string, object> externalQueryParam, PNCallback<PNRemoveChannelMetadataResult> callback)
 		{
-			RequestState<PNRemoveChannelMetadataResult> requestState = new RequestState<PNRemoveChannelMetadataResult>();
-			requestState.ResponseType = PNOperationType.PNDeleteChannelMetadataOperation;
-			requestState.PubnubCallback = callback;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
+			logger.Debug($"{GetType().Name} parameter validated.");
+			RequestState<PNRemoveChannelMetadataResult> requestState = new RequestState<PNRemoveChannelMetadataResult>
+				{
+					ResponseType = PNOperationType.PNDeleteChannelMetadataOperation,
+					PubnubCallback = callback,
+					Reconnect = false,
+					EndPointOperation = this
+				};
 
 			var requestParameter = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNDeleteChannelMetadataOperation);
@@ -96,10 +101,12 @@ namespace PubnubApi.EndPoint
 					var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 					if (!string.IsNullOrEmpty(responseString)) {
                         requestState.GotJsonResponse = true;
+                        logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						List<object> result = ProcessJsonResponse(requestState, responseString);
 						ProcessResponseCallbacks(result, requestState);
 					} else {
 						PNStatus errorStatus = GetStatusIfError(requestState, responseString);
+						logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						callback.OnResponse(default, errorStatus);
 					}
 
@@ -107,6 +114,7 @@ namespace PubnubApi.EndPoint
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNDeleteChannelMetadataOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
+					logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 					requestState.PubnubCallback.OnResponse(default, status);
 				}
 			});
@@ -127,10 +135,13 @@ namespace PubnubApi.EndPoint
 				returnValue.Status = errStatus;
 				return returnValue;
 			}
-			RequestState<PNRemoveChannelMetadataResult> requestState = new RequestState<PNRemoveChannelMetadataResult>();
-			requestState.ResponseType = PNOperationType.PNDeleteChannelMetadataOperation;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
+			logger.Debug($"{GetType().Name} parameter validated.");
+			RequestState<PNRemoveChannelMetadataResult> requestState = new RequestState<PNRemoveChannelMetadataResult>
+				{
+					ResponseType = PNOperationType.PNDeleteChannelMetadataOperation,
+					Reconnect = false,
+					EndPointOperation = this
+				};
 			var requestParameter = CreateRequestParameter();
 			Tuple<string, PNStatus> JsonAndStatusTuple;
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNDeleteChannelMetadataOperation);
@@ -161,6 +172,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNDeleteChannelMetadataOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
+			logger.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 

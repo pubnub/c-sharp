@@ -104,6 +104,7 @@ namespace PubnubApi.EndPoint
 
 		public void Execute(PNCallback<PNSetUuidMetadataResult> callback)
 		{
+			logger.Trace($"{GetType().Name} Execute invoked");
 			if (callback == null) {
 				throw new ArgumentException("Missing callback");
 			}
@@ -114,6 +115,7 @@ namespace PubnubApi.EndPoint
 
 		public async Task<PNResult<PNSetUuidMetadataResult>> ExecuteAsync()
 		{
+			logger.Trace($"{GetType().Name} ExecuteAsync invoked.");
 			return await SetUuidMetadata(this.uuidId, this.includeCustom, this.queryParam).ConfigureAwait(false);
 		}
 
@@ -127,13 +129,15 @@ namespace PubnubApi.EndPoint
 			if (string.IsNullOrEmpty(uuid)) {
 				this.uuidId = config.UserId;
 			}
-
-			RequestState<PNSetUuidMetadataResult> requestState = new RequestState<PNSetUuidMetadataResult>();
-			requestState.ResponseType = PNOperationType.PNSetUuidMetadataOperation;
-			requestState.PubnubCallback = callback;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
-			requestState.UsePatchMethod = true;
+			logger.Debug($"{GetType().Name} parameter validated.");
+			RequestState<PNSetUuidMetadataResult> requestState = new RequestState<PNSetUuidMetadataResult>
+				{
+					ResponseType = PNOperationType.PNSetUuidMetadataOperation,
+					PubnubCallback = callback,
+					Reconnect = false,
+					EndPointOperation = this,
+					UsePatchMethod = true
+				};
 
 			var requestParameter = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNSetUuidMetadataOperation);
@@ -143,10 +147,12 @@ namespace PubnubApi.EndPoint
 					var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 					if (!string.IsNullOrEmpty(responseString)) {
                         requestState.GotJsonResponse = true;
+                        logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						List<object> result = ProcessJsonResponse(requestState, responseString);
 						ProcessResponseCallbacks(result, requestState);
 					} else {
 						PNStatus errorStatus = GetStatusIfError(requestState, responseString);
+						logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						callback.OnResponse(default, errorStatus);
 					}
 
@@ -154,6 +160,7 @@ namespace PubnubApi.EndPoint
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNSetUuidMetadataOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
+					logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 					requestState.PubnubCallback.OnResponse(default, status);
 				}
 			});
@@ -164,14 +171,16 @@ namespace PubnubApi.EndPoint
 			if (string.IsNullOrEmpty(uuid)) {
 				this.uuidId = config.UserId;
 			}
-
+			logger.Debug($"{GetType().Name} parameter validated.");
 			PNResult<PNSetUuidMetadataResult> returnValue = new PNResult<PNSetUuidMetadataResult>();
 
-			RequestState<PNSetUuidMetadataResult> requestState = new RequestState<PNSetUuidMetadataResult>();
-			requestState.ResponseType = PNOperationType.PNSetUuidMetadataOperation;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
-			requestState.UsePatchMethod = true;
+			RequestState<PNSetUuidMetadataResult> requestState = new RequestState<PNSetUuidMetadataResult>
+				{
+					ResponseType = PNOperationType.PNSetUuidMetadataOperation,
+					Reconnect = false,
+					EndPointOperation = this,
+					UsePatchMethod = true
+				};
 
 			var requestParameter = CreateRequestParameter();
 			Tuple<string, PNStatus> JsonAndStatusTuple;
@@ -203,6 +212,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNSetUuidMetadataOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
+			logger.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 

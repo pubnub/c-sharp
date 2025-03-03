@@ -5,27 +5,22 @@ namespace PubnubApi;
 
 public class PubnubDefaultLogger : IPubnubLogger
 {
-    public delegate void LogDelegate(string message);
-    
-    private LogDelegate logFunction;
-
     private IPubnubLog legacyLogger;
     private string Id { get; set; }
 
-    public PubnubDefaultLogger(string id, LogDelegate logFunction, IPubnubLog legacyLogger = null)
+    public PubnubDefaultLogger(string id, IPubnubLog legacyLogger = null)
     {
         Id = id;
-        this.logFunction = logFunction;
         this.legacyLogger = legacyLogger;
     }
     public void Trace(string logMessage)
     {
-        logFunction($"{DateTime.Now.ToString(CultureInfo.InvariantCulture)} PubNub-{Id} Trace {logMessage}");
+        System.Diagnostics.Debug.WriteLine($"{DateTime.Now.ToString(CultureInfo.InvariantCulture)} PubNub-{Id} Trace {logMessage}");
     }
 
     public void Debug(string logMessage)
     {
-        logFunction($"{DateTime.Now.ToString(CultureInfo.InvariantCulture)} PubNub-{Id} Debug {logMessage}");
+        System.Diagnostics.Debug.WriteLine($"{DateTime.Now.ToString(CultureInfo.InvariantCulture)} PubNub-{Id} Debug {logMessage}");
         // Note: This code is temporary to keep backward compatibility till the legacy logger is removed.
         try
         {
@@ -39,16 +34,16 @@ public class PubnubDefaultLogger : IPubnubLogger
 
     public void Info(string logMessage)
     {
-        logFunction($"{DateTime.Now.ToString(CultureInfo.InvariantCulture)} PubNub-{Id} Info {logMessage}");
+        System.Diagnostics.Debug.WriteLine($"{DateTime.Now.ToString(CultureInfo.InvariantCulture)} PubNub-{Id} Info {logMessage}");
     }
 
     public void Warn(string logMessage)
     {
-        logFunction($"{DateTime.Now.ToString(CultureInfo.InvariantCulture)} PubNub-{Id} Warn {logMessage}");
+        System.Diagnostics.Debug.WriteLine($"{DateTime.Now.ToString(CultureInfo.InvariantCulture)} PubNub-{Id} Warn {logMessage}");
     }
 
     public void Error(string logMessage)
     {
-        logFunction($"{DateTime.Now.ToString(CultureInfo.InvariantCulture)} PubNub-{Id} Error {logMessage}");
+        System.Diagnostics.Debug.WriteLine($"{DateTime.Now.ToString(CultureInfo.InvariantCulture)} PubNub-{Id} Error {logMessage}");
     }
 }

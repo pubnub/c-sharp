@@ -91,11 +91,13 @@ namespace PubnubApi.EndPoint
 		public void Execute(PNCallback<PNGetAllChannelMetadataResult> callback)
 		{
 			this.savedCallback = callback;
+			logger.Trace($"{GetType().Name} Execute invoked");
 			GetAllChannelMetadataList(this.page, this.limit, this.includeCount, this.includeCustom, this.channelsFilter, this.sortField, this.queryParam, savedCallback);
 		}
 
 		public async Task<PNResult<PNGetAllChannelMetadataResult>> ExecuteAsync()
 		{
+			logger.Trace($"{GetType().Name} ExecuteAsync invoked.");
 			return await GetAllChannelMetadataList(this.page, this.limit, this.includeCount, this.includeCustom, this.channelsFilter, this.sortField, this.queryParam).ConfigureAwait(false);
 		}
 
@@ -109,13 +111,15 @@ namespace PubnubApi.EndPoint
 			if (callback == null) {
 				throw new ArgumentException("Missing callback");
 			}
-
-			RequestState<PNGetAllChannelMetadataResult> requestState = new RequestState<PNGetAllChannelMetadataResult>();
-			requestState.ResponseType = PNOperationType.PNGetAllChannelMetadataOperation;
-			requestState.PubnubCallback = callback;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
-			requestState.UsePostMethod = false;
+			logger.Debug($"{GetType().Name} parameter validated.");
+			RequestState<PNGetAllChannelMetadataResult> requestState = new RequestState<PNGetAllChannelMetadataResult>
+				{
+					ResponseType = PNOperationType.PNGetAllChannelMetadataOperation,
+					PubnubCallback = callback,
+					Reconnect = false,
+					EndPointOperation = this,
+					UsePostMethod = false
+				};
 			var requestParameter = CreateRequestParameter();
 
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNGetAllChannelMetadataOperation);
@@ -125,6 +129,7 @@ namespace PubnubApi.EndPoint
 					var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 					if (!string.IsNullOrEmpty(responseString)) {
 						requestState.GotJsonResponse = true;
+						logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						List<object> result = ProcessJsonResponse(requestState, responseString);
 						ProcessResponseCallbacks(result, requestState);
 					}
@@ -132,6 +137,7 @@ namespace PubnubApi.EndPoint
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNGetAllChannelMetadataOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
+					logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 					requestState.PubnubCallback.OnResponse(default, status);
 				}
 			});
@@ -140,11 +146,13 @@ namespace PubnubApi.EndPoint
 		private async Task<PNResult<PNGetAllChannelMetadataResult>> GetAllChannelMetadataList(PNPageObject page, int limit, bool includeCount, bool includeCustom, string filter, List<string> sort, Dictionary<string, object> externalQueryParam)
 		{
 			PNResult<PNGetAllChannelMetadataResult> returnValue = new PNResult<PNGetAllChannelMetadataResult>();
-			RequestState<PNGetAllChannelMetadataResult> requestState = new RequestState<PNGetAllChannelMetadataResult>();
-			requestState.ResponseType = PNOperationType.PNGetAllChannelMetadataOperation;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
-			requestState.UsePostMethod = false;
+			RequestState<PNGetAllChannelMetadataResult> requestState = new RequestState<PNGetAllChannelMetadataResult>
+				{
+					ResponseType = PNOperationType.PNGetAllChannelMetadataOperation,
+					Reconnect = false,
+					EndPointOperation = this,
+					UsePostMethod = false
+				};
 			Tuple<string, PNStatus> JsonAndStatusTuple;
 			var requestParameter = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNGetAllChannelMetadataOperation);
@@ -175,7 +183,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNGetAllChannelMetadataOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
-
+			logger.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 
