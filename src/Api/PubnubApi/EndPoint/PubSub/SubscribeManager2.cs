@@ -18,6 +18,7 @@ namespace PubnubApi.EndPoint
 		private Pubnub pubnubInstance;
 		private CancellationTokenSource cancellationTokenSource;
 		private Timer SubscribeHeartbeatCheckTimer;
+		private PubnubLogModule logger;
 		public SubscribeManager2(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance)
 		{
 			config = pubnubConfig;
@@ -25,6 +26,7 @@ namespace PubnubApi.EndPoint
 			unit = pubnubUnit;
 			pubnubLog = log;
 			pubnubInstance = instance;
+			logger = pubnubConfig.Logger;
 		}
 
 		public async Task<Tuple<HandshakeResponse, PNStatus>> HandshakeRequest(PNOperationType responseType, string[] channels, string[] channelGroups, long? timetoken, int? region, Dictionary<string, string> initialSubscribeUrlParams, Dictionary<string, object> externalQueryParam)
@@ -70,12 +72,15 @@ namespace PubnubApi.EndPoint
 				if (cancellationTokenSource != null) {
 					cancellationTokenSource.Cancel();
 					cancellationTokenSource.Dispose();
-				} else {
-					LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] SubscribeManager => HandshakeRequestCancellation. No request to cancel.",  config.LogVerbosity);
+				} else
+				{
+					logger.Trace($" SubscribeManager  HandshakeRequestCancellation. No request to cancel.");
 				}
-				LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] SubscribeManager => HandshakeRequestCancellation. Done.", config.LogVerbosity);
-			} catch (Exception ex) {
-				LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] SubscribeManager => HandshakeRequestCancellation Exception: {ex}", config.LogVerbosity);
+
+				logger.Trace($"SubscribeManager  HandshakeRequestCancellation. Done.");
+			} catch (Exception ex)
+			{
+				logger.Trace($" SubscribeManager  HandshakeRequestCancellation Exception: {ex}");
 			}
 		}
 		internal async Task<Tuple<ReceivingResponse<object>, PNStatus>> ReceiveRequest<T>(PNOperationType responseType, string[] channels, string[] channelGroups, long? timetoken, int? region, Dictionary<string, string> initialSubscribeUrlParams, Dictionary<string, object> externalQueryParam)
@@ -113,8 +118,10 @@ namespace PubnubApi.EndPoint
 					errStatus = GetStatusIfError(pubnubRequestState, responseString);
 				}
 				return new Tuple<ReceivingResponse<object>, PNStatus>(null, errStatus);
-			} catch (Exception ex) {
-				LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] SubscribeManager=> MultiChannelSubscribeInit \n channel(s)={string.Join(",", channels.OrderBy(x => x).ToArray())} \n cg(s)={string.Join(",", channelGroups.OrderBy(x => x).ToArray())} \n Exception Details={ex}", config.LogVerbosity);
+			} catch (Exception ex)
+			{
+				logger.Error(
+					$" SubscribeManager=> MultiChannelSubscribeInit \n channel(s)={string.Join(",", channels.OrderBy(x => x).ToArray())} \n cg(s)={string.Join(",", channelGroups.OrderBy(x => x).ToArray())} \n Exception Details={ex}");
 			}
 			return resp;
 		}
@@ -126,11 +133,12 @@ namespace PubnubApi.EndPoint
 					cancellationTokenSource.Cancel();
 					cancellationTokenSource.Dispose();
 				} else {
-					LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] SubscribeManager => RequestCancellation. No request to cancel.", config.LogVerbosity);
+					logger.Trace($"SubscribeManager  RequestCancellation. No request to cancel.");
 				}
-				LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] SubscribeManager => ReceiveRequestCancellation. Done.", config.LogVerbosity);
-			} catch (Exception ex) {
-				LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: SubscribeManager => ReceiveRequestCancellation Exception: {ex}", config.LogVerbosity);
+				logger.Trace($"SubscribeManager  ReceiveRequestCancellation. Done.");
+			} catch (Exception ex)
+			{
+				logger.Trace($"SubscribeManager  ReceiveRequestCancellation Exception: {ex}");
 			}
 		}
 
@@ -141,11 +149,11 @@ namespace PubnubApi.EndPoint
 					cancellationTokenSource.Cancel();
 					cancellationTokenSource.Dispose();
 				} else {
-					LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] SubscribeManager => ReceiveReconnectRequestCancellation. No request to cancel.", config.LogVerbosity);
+					logger.Trace($"SubscribeManager  ReceiveReconnectRequestCancellation. No request to cancel.");
 				}
-				LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] SubscribeManager => ReceiveReconnectRequestCancellation. Done.",  config.LogVerbosity);
+				logger.Trace($"SubscribeManager  ReceiveReconnectRequestCancellation. Done.");
 			} catch (Exception ex) {
-				LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: SubscribeManager => ReceiveReconnectRequestCancellation Exception: {ex}", config.LogVerbosity);
+				logger.Trace($"SubscribeManager  ReceiveReconnectRequestCancellation Exception: {ex}");
 			}
 		}
 

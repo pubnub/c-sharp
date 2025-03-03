@@ -63,11 +63,13 @@ namespace PubnubApi.EndPoint
 		public void Execute(PNCallback<PNGetStateResult> callback)
 		{
 			this.savedCallback = callback;
+			logger.Trace($"{GetType().Name} Execute invoked");
 			GetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, this.queryParam, callback);
 		}
 
 		public async Task<PNResult<PNGetStateResult>> ExecuteAsync()
 		{
+			logger.Trace($"{GetType().Name} ExecuteAsync invoked.");
 			return await GetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, this.queryParam).ConfigureAwait(false);
 		}
 
@@ -88,13 +90,16 @@ namespace PubnubApi.EndPoint
 			} else {
 				internalUuid = uuid;
 			}
-			RequestState<PNGetStateResult> requestState = new RequestState<PNGetStateResult>();
-			requestState.Channels = channels;
-			requestState.ChannelGroups = channelGroups;
-			requestState.ResponseType = PNOperationType.PNGetStateOperation;
-			requestState.PubnubCallback = callback;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
+			logger.Debug($"{GetType().Name} parameter validated.");
+			RequestState<PNGetStateResult> requestState = new RequestState<PNGetStateResult>
+			{
+				Channels = channels,
+				ChannelGroups = channelGroups,
+				ResponseType = PNOperationType.PNGetStateOperation,
+				PubnubCallback = callback,
+				Reconnect = false,
+				EndPointOperation = this
+			};
 			var requestParameter = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNGetStateOperation);
 			PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ContinueWith(t => {
@@ -104,15 +109,18 @@ namespace PubnubApi.EndPoint
 					requestState.GotJsonResponse = true;
 					if (!string.IsNullOrEmpty(responseString)) {
 						List<object> result = ProcessJsonResponse(requestState, responseString);
+						logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						ProcessResponseCallbacks(result, requestState);
 					} else {
 						PNStatus errorStatus = GetStatusIfError(requestState, responseString);
+						logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						callback.OnResponse(default, errorStatus);
 					}
 				} else {
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNGetStateOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
+					logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 					requestState.PubnubCallback.OnResponse(default, status);
 				}
 			});
@@ -124,6 +132,7 @@ namespace PubnubApi.EndPoint
 						   || (channels != null && channelGroups != null && channels.Length == 0 && channelGroups.Length == 0)) {
 				throw new ArgumentException("Either Channel Or Channel Group or Both should be provided");
 			}
+			logger.Debug($"{GetType().Name} parameter validated.");
 			PNResult<PNGetStateResult> returnValue = new PNResult<PNGetStateResult>();
 
 			string internalUuid;
@@ -132,28 +141,30 @@ namespace PubnubApi.EndPoint
 			} else {
 				internalUuid = uuid;
 			}
-			RequestState<PNGetStateResult> requestState = new RequestState<PNGetStateResult>();
-			requestState.Channels = channels;
-			requestState.ChannelGroups = channelGroups;
-			requestState.ResponseType = PNOperationType.PNGetStateOperation;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
+			RequestState<PNGetStateResult> requestState = new RequestState<PNGetStateResult>
+			{
+				Channels = channels,
+				ChannelGroups = channelGroups,
+				ResponseType = PNOperationType.PNGetStateOperation,
+				Reconnect = false,
+				EndPointOperation = this
+			};
 			var requestParameter = CreateRequestParameter();
-			Tuple<string, PNStatus> JsonAndStatusTuple;
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNGetStateOperation);
 			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ConfigureAwait(false);
 			if (transportResponse.Error == null) {
 				var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
+				Tuple<string, PNStatus> jsonAndStatusTuple;
 				if (errorStatus == null) {
 					requestState.GotJsonResponse = true;
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, (int)HttpStatusCode.OK, null);
-					JsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
+					jsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
 				} else {
-					JsonAndStatusTuple = new Tuple<string, PNStatus>(string.Empty, errorStatus);
+					jsonAndStatusTuple = new Tuple<string, PNStatus>(string.Empty, errorStatus);
 				}
-				returnValue.Status = JsonAndStatusTuple.Item2;
-				string json = JsonAndStatusTuple.Item1;
+				returnValue.Status = jsonAndStatusTuple.Item2;
+				string json = jsonAndStatusTuple.Item1;
 				if (!string.IsNullOrEmpty(json)) {
 					List<object> resultList = ProcessJsonResponse(requestState, json);
 					ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
@@ -168,6 +179,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNGetStateOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
+			logger.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 

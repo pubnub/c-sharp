@@ -21,7 +21,7 @@ namespace PubnubApi.EndPoint
 		private PNCallback<PNRemoveMessageActionResult> savedCallback;
 		private Dictionary<string, object> queryParam;
 
-		public RemoveMessageActionOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
+		public RemoveMessageActionOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
 		{
 			config = pubnubConfig;
 			jsonLibrary = jsonPluggableLibrary;
@@ -80,7 +80,8 @@ namespace PubnubApi.EndPoint
 			if (callback == null) {
 				throw new ArgumentException("Missing userCallback");
 			}
-			RemoveMessageAction(this.channelName, this.messageTimetoken, this.actionTimetoken, this.actionUuid, this.queryParam, callback);
+			logger.Trace($"{GetType().Name} Execute invoked");
+			RemoveMessageAction(channelName, messageTimetoken, actionTimetoken, actionUuid, queryParam, callback);
 		}
 
 		public async Task<PNResult<PNRemoveMessageActionResult>> ExecuteAsync()
@@ -88,29 +89,33 @@ namespace PubnubApi.EndPoint
 			if (config == null || string.IsNullOrEmpty(config.SubscribeKey) || config.SubscribeKey.Trim().Length <= 0) {
 				throw new MissingMemberException("subscribe key is required");
 			}
-
-			return await RemoveMessageAction(this.channelName, this.messageTimetoken, this.actionTimetoken, this.actionUuid, this.queryParam).ConfigureAwait(false);
+			logger.Trace($"{GetType().Name} ExecuteAsync invoked.");
+			return await RemoveMessageAction(channelName, messageTimetoken, actionTimetoken, actionUuid, queryParam).ConfigureAwait(false);
 		}
 
 		internal void Retry()
 		{
-			RemoveMessageAction(this.channelName, this.messageTimetoken, this.actionTimetoken, this.actionUuid, this.queryParam, savedCallback);
+			RemoveMessageAction(channelName, messageTimetoken, actionTimetoken, actionUuid, queryParam, savedCallback);
 		}
 
 		private void RemoveMessageAction(string channel, long messageTimetoken, long actionTimetoken, string messageActionUuid, Dictionary<string, object> externalQueryParam, PNCallback<PNRemoveMessageActionResult> callback)
 		{
 			if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim())) {
-				PNStatus status = new PNStatus();
-				status.Error = true;
-				status.ErrorData = new PNErrorData("Missing Channel or MessageAction", new ArgumentException("Missing Channel or MessageAction"));
+				PNStatus status = new PNStatus
+				{
+					Error = true,
+					ErrorData = new PNErrorData("Missing Channel or MessageAction", new ArgumentException("Missing Channel or MessageAction"))
+				};
 				callback.OnResponse(null, status);
 				return;
 			}
 
 			if (string.IsNullOrEmpty(config.SubscribeKey) || string.IsNullOrEmpty(config.SubscribeKey.Trim()) || config.SubscribeKey.Length <= 0) {
-				PNStatus status = new PNStatus();
-				status.Error = true;
-				status.ErrorData = new PNErrorData("Invalid subscribe key", new MissingMemberException("Invalid subscribe key"));
+				PNStatus status = new PNStatus
+				{
+					Error = true,
+					ErrorData = new PNErrorData("Invalid subscribe key", new MissingMemberException("Invalid subscribe key"))
+				};
 				callback.OnResponse(null, status);
 				return;
 			}
@@ -118,12 +123,15 @@ namespace PubnubApi.EndPoint
 			if (callback == null) {
 				return;
 			}
-			RequestState<PNRemoveMessageActionResult> requestState = new RequestState<PNRemoveMessageActionResult>();
-			requestState.Channels = new[] { channel };
-			requestState.ResponseType = PNOperationType.PNRemoveMessageActionOperation;
-			requestState.PubnubCallback = callback;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
+			logger.Debug($"{GetType().Name} parameter validated.");
+			RequestState<PNRemoveMessageActionResult> requestState = new RequestState<PNRemoveMessageActionResult>
+				{
+					Channels = new[] { channel },
+					ResponseType = PNOperationType.PNRemoveMessageActionOperation,
+					PubnubCallback = callback,
+					Reconnect = false,
+					EndPointOperation = this
+				};
 
 			var requestParameter = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNRemoveMessageActionOperation);
@@ -133,12 +141,14 @@ namespace PubnubApi.EndPoint
 					if (!string.IsNullOrEmpty(responseString)) {
                         requestState.GotJsonResponse = true;
 						List<object> result = ProcessJsonResponse(requestState, responseString);
+						logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						ProcessResponseCallbacks(result, requestState);
 					}
 				} else {
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(t.Result.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, t.Result.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNRemoveMessageActionOperation, category, requestState, statusCode, new PNException(t.Result.Error.Message, t.Result.Error));
+					logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 					requestState.PubnubCallback.OnResponse(default(PNRemoveMessageActionResult), status);
 				}
 				CleanUp();
@@ -150,44 +160,49 @@ namespace PubnubApi.EndPoint
 			PNResult<PNRemoveMessageActionResult> returnValue = new PNResult<PNRemoveMessageActionResult>();
 
 			if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim())) {
-				PNStatus status = new PNStatus();
-				status.Error = true;
-				status.ErrorData = new PNErrorData("Missing Channel or MessageAction", new ArgumentException("Missing Channel or MessageAction"));
+				PNStatus status = new PNStatus
+				{
+					Error = true,
+					ErrorData = new PNErrorData("Missing Channel or MessageAction", new ArgumentException("Missing Channel or MessageAction"))
+				};
 				returnValue.Status = status;
 				return returnValue;
 			}
 
 			if (string.IsNullOrEmpty(config.SubscribeKey) || string.IsNullOrEmpty(config.SubscribeKey.Trim()) || config.SubscribeKey.Length <= 0) {
-				PNStatus status = new PNStatus();
-				status.Error = true;
-				status.ErrorData = new PNErrorData("Invalid subscribe key", new MissingMemberException("Invalid subscribe key"));
+				PNStatus status = new PNStatus
+				{
+					Error = true,
+					ErrorData = new PNErrorData("Invalid subscribe key", new MissingMemberException("Invalid subscribe key"))
+				};
 				returnValue.Status = status;
 				return returnValue;
 			}
-
-			RequestState<PNRemoveMessageActionResult> requestState = new RequestState<PNRemoveMessageActionResult>();
-			Tuple<string, PNStatus> JsonAndStatusTuple;
-			requestState.Channels = new[] { channel };
-			requestState.ResponseType = PNOperationType.PNRemoveMessageActionOperation;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
+			logger.Debug($"{GetType().Name} parameter validated.");
+			RequestState<PNRemoveMessageActionResult> requestState = new RequestState<PNRemoveMessageActionResult>
+				{
+					Channels = new[] { channel },
+					ResponseType = PNOperationType.PNRemoveMessageActionOperation,
+					Reconnect = false,
+					EndPointOperation = this
+				};
 
 			var requestParameter = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNRemoveMessageActionOperation);
 			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ConfigureAwait(false);
-
 			if (transportResponse.Error == null) {
 				string responseString = Encoding.UTF8.GetString(transportResponse.Content);
 				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
+				Tuple<string, PNStatus> jsonAndStatusTuple;
 				if (errorStatus == null) {
 					requestState.GotJsonResponse = true;
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, (int)HttpStatusCode.OK, null);
-					JsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
+					jsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
 				} else {
-					JsonAndStatusTuple = new Tuple<string, PNStatus>("", errorStatus);
+					jsonAndStatusTuple = new Tuple<string, PNStatus>("", errorStatus);
 				}
-				returnValue.Status = JsonAndStatusTuple.Item2;
-				string json = JsonAndStatusTuple.Item1;
+				returnValue.Status = jsonAndStatusTuple.Item2;
+				string json = jsonAndStatusTuple.Item1;
 				if (!string.IsNullOrEmpty(json)) {
 					List<object> resultList = ProcessJsonResponse(requestState, json);
 					ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
@@ -202,12 +217,13 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNRemoveMessageActionOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
+			logger.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 
 		private void CleanUp()
 		{
-			this.savedCallback = null;
+			savedCallback = null;
 		}
 
 		private RequestParameter CreateRequestParameter()

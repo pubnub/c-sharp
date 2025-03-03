@@ -49,11 +49,13 @@ namespace PubnubApi.EndPoint
 		public void Execute(PNCallback<PNChannelGroupsAllChannelsResult> callback)
 		{
 			this.savedCallback = callback;
+			logger.Trace($"{GetType().Name} Execute invoked");
 			GetChannelsForChannelGroup(this.channelGroupName, this.queryParam, callback);
 		}
 
 		public async Task<PNResult<PNChannelGroupsAllChannelsResult>> ExecuteAsync()
 		{
+			logger.Trace($"{GetType().Name} ExecuteAsync invoked.");
 			return await GetChannelsForChannelGroup(this.channelGroupName, this.queryParam).ConfigureAwait(false);
 		}
 
@@ -67,6 +69,7 @@ namespace PubnubApi.EndPoint
 			if (string.IsNullOrEmpty(groupName) || groupName.Trim().Length == 0) {
 				throw new ArgumentException("Missing groupName");
 			}
+			logger.Debug($"{GetType().Name} parameter validated.");
 			var requestParameter = CreateRequestParameter();
 			RequestState<PNChannelGroupsAllChannelsResult> requestState = new RequestState<PNChannelGroupsAllChannelsResult>();
 			requestState.ResponseType = PNOperationType.ChannelGroupGet;
@@ -83,12 +86,14 @@ namespace PubnubApi.EndPoint
 					requestState.GotJsonResponse = true;
 					if (!string.IsNullOrEmpty(responseString)) {
 						List<object> result = ProcessJsonResponse(requestState, responseString);
+						logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						ProcessResponseCallbacks(result, requestState);
 					}
 				} else {
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(t.Result.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, t.Result.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.ChannelGroupGet, category, requestState, statusCode, new PNException(t.Result.Error.Message, t.Result.Error));
+					logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 					requestState.PubnubCallback.OnResponse(default(PNChannelGroupsAllChannelsResult), status);
 				}
 			});
@@ -99,6 +104,7 @@ namespace PubnubApi.EndPoint
 			if (string.IsNullOrEmpty(groupName) || groupName.Trim().Length == 0) {
 				throw new ArgumentException("Missing groupName");
 			}
+			logger.Debug($"{GetType().Name} parameter validated.");
 			PNResult<PNChannelGroupsAllChannelsResult> returnValue = new PNResult<PNChannelGroupsAllChannelsResult>();
 			RequestState<PNChannelGroupsAllChannelsResult> requestState = new RequestState<PNChannelGroupsAllChannelsResult>();
 			requestState.ResponseType = PNOperationType.ChannelGroupGet;
@@ -135,6 +141,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.ChannelGroupGet, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
+			logger.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 

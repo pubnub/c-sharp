@@ -162,7 +162,7 @@ namespace PubnubApi.EventEngine.Common
                 if ((configuration.CryptoModule != null || configuration.CipherKey.Length > 0) && (eventData.MessageType == 0 || eventData.MessageType == 4)) //decrypt the subscriber message if cipherkey is available
                 {
                     string decryptMessage = "";
-                    configuration.CryptoModule ??= new CryptoModule(new AesCbcCryptor(configuration.CipherKey, log), new List<ICryptor>() { new LegacyCryptor(configuration.CipherKey, configuration.UseRandomInitializationVector) });
+                    configuration.CryptoModule ??= new CryptoModule(new AesCbcCryptor(configuration.CipherKey), new List<ICryptor>() { new LegacyCryptor(configuration.CipherKey, configuration.UseRandomInitializationVector) });
                     try
                     {
                         decryptMessage = configuration.CryptoModule.Decrypt(payload.ToString());

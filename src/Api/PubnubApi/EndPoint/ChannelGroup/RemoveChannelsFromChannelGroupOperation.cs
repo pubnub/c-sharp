@@ -56,11 +56,13 @@ namespace PubnubApi.EndPoint
 		public void Execute(PNCallback<PNChannelGroupsRemoveChannelResult> callback)
 		{
 			this.savedCallback = callback;
+			logger.Trace($"{GetType().Name} Execute invoked");
 			RemoveChannelsFromChannelGroup(this.channelNames, "", this.channelGroupName, this.queryParam, callback);
 		}
 
 		public async Task<PNResult<PNChannelGroupsRemoveChannelResult>> ExecuteAsync()
 		{
+			logger.Trace($"{GetType().Name} ExecuteAsync invoked.");
 			return await RemoveChannelsFromChannelGroup(this.channelNames, "", this.channelGroupName, this.queryParam).ConfigureAwait(false);
 		}
 
@@ -82,14 +84,16 @@ namespace PubnubApi.EndPoint
 			if (string.IsNullOrEmpty(groupName) || groupName.Trim().Length == 0) {
 				throw new ArgumentException("Missing groupName");
 			}
-
-			RequestState<PNChannelGroupsRemoveChannelResult> requestState = new RequestState<PNChannelGroupsRemoveChannelResult>();
-			requestState.ResponseType = PNOperationType.PNRemoveChannelsFromGroupOperation;
-			requestState.Channels = new string[] { };
-			requestState.ChannelGroups = new[] { groupName };
-			requestState.PubnubCallback = callback;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
+			logger.Debug($"{GetType().Name} parameter validated.");
+			RequestState<PNChannelGroupsRemoveChannelResult> requestState = new RequestState<PNChannelGroupsRemoveChannelResult>
+				{
+					ResponseType = PNOperationType.PNRemoveChannelsFromGroupOperation,
+					Channels = new string[] { },
+					ChannelGroups = new[] { groupName },
+					PubnubCallback = callback,
+					Reconnect = false,
+					EndPointOperation = this
+				};
 
 			var requestParameter = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNRemoveChannelsFromGroupOperation);
@@ -100,12 +104,14 @@ namespace PubnubApi.EndPoint
 					requestState.GotJsonResponse = true;
 					if (!string.IsNullOrEmpty(responseString)) {
 						List<object> result = ProcessJsonResponse(requestState, responseString);
+						logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						ProcessResponseCallbacks(result, requestState);
 					}
 				} else {
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(t.Result.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, t.Result.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNRemoveChannelsFromGroupOperation, category, requestState, statusCode, new PNException(t.Result.Error.Message, t.Result.Error));
+					logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 					requestState.PubnubCallback.OnResponse(default(PNChannelGroupsRemoveChannelResult), status);
 				}
 			});
@@ -124,20 +130,24 @@ namespace PubnubApi.EndPoint
 			if (string.IsNullOrEmpty(groupName) || groupName.Trim().Length == 0) {
 				throw new ArgumentException("Missing groupName");
 			}
+			
+			logger.Debug($"{GetType().Name} parameter validated.");
 			PNResult<PNChannelGroupsRemoveChannelResult> returnValue = new PNResult<PNChannelGroupsRemoveChannelResult>();
-			RequestState<PNChannelGroupsRemoveChannelResult> requestState = new RequestState<PNChannelGroupsRemoveChannelResult>();
-			requestState.ResponseType = PNOperationType.PNRemoveChannelsFromGroupOperation;
-			requestState.Channels = new string[] { };
-			requestState.ChannelGroups = new[] { groupName };
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
-			Tuple<string, PNStatus> JsonAndStatusTuple;
+			RequestState<PNChannelGroupsRemoveChannelResult> requestState = new RequestState<PNChannelGroupsRemoveChannelResult>
+				{
+					ResponseType = PNOperationType.PNRemoveChannelsFromGroupOperation,
+					Channels = new string[] { },
+					ChannelGroups = new[] { groupName },
+					Reconnect = false,
+					EndPointOperation = this
+				};
 			var requestParameter = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNRemoveChannelsFromGroupOperation);
 			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ConfigureAwait(false);
 			if (transportResponse.Error == null) {
 				var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
+				Tuple<string, PNStatus> JsonAndStatusTuple;
 				if (errorStatus == null) {
 					requestState.GotJsonResponse = true;
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, (int)HttpStatusCode.OK, null);
@@ -161,6 +171,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNRemoveChannelsFromGroupOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
+			logger.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 

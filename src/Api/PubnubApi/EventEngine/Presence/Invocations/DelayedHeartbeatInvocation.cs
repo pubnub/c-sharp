@@ -8,5 +8,10 @@ namespace PubnubApi.EventEngine.Presence.Invocations
 		public int RetryCount { get; set; }
         public PNStatus Reason { get; set; }
         public virtual string Name { get; set; } = "DELAYED_HEARTBEAT";
+        
+        public override string ToString()
+        {
+            return $"Invocation : {Name}";
+        }
     }
 }

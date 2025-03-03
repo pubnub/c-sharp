@@ -47,6 +47,7 @@ namespace PubnubApi.EndPoint
 
         public void Execute()
         {
+            logger.Trace($"{GetType().Name} Execute invoked");
             Unsubscribe(subscribeChannelNames, subscribeChannelGroupNames);
         }
 
@@ -60,7 +61,7 @@ namespace PubnubApi.EndPoint
             string channel = (channels != null) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : "";
             string channelGroup = (channelGroups != null) ? string.Join(",", channelGroups.OrderBy(x => x).ToArray()) : "";
 
-            LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] requested unsubscribe for channel(s)={channel}, cg(s)={channelGroup}", config.LogVerbosity);
+            logger.Debug($"requested unsubscribe for channel(s)={channel}, cg(s)={channelGroup}");
             
             SubscribeManager manager = new SubscribeManager(config, jsonLibrary, unit, pubnubLog, pubnubTokenMgr, PubnubInstance);
             manager.CurrentPubnubInstance(PubnubInstance);

@@ -28,7 +28,7 @@ namespace PubnubApi.EndPoint
 		private bool syncRequest;
 		private Dictionary<string, object> queryParam;
 
-		public PublishOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
+		public PublishOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
 		{
 			config = pubnubConfig;
 			jsonLibrary = jsonPluggableLibrary;
@@ -38,7 +38,7 @@ namespace PubnubApi.EndPoint
 
 		public PublishOperation Message(object message)
 		{
-			this.publishContent = message;
+			publishContent = message;
 			return this;
 		}
 
@@ -50,19 +50,19 @@ namespace PubnubApi.EndPoint
 
 		public PublishOperation ShouldStore(bool store)
 		{
-			this.storeInHistory = store;
+			storeInHistory = store;
 			return this;
 		}
 
 		public PublishOperation Meta(Dictionary<string, object> metadata)
 		{
-			this.userMetadata = metadata;
+			userMetadata = metadata;
 			return this;
 		}
 
 		public PublishOperation UsePOST(bool post)
 		{
-			this.httpPost = post;
+			httpPost = post;
 			return this;
 		}
 
@@ -85,7 +85,7 @@ namespace PubnubApi.EndPoint
 
 		public PublishOperation QueryParam(Dictionary<string, object> customQueryParam)
 		{
-			this.queryParam = customQueryParam;
+			queryParam = customQueryParam;
 			return this;
 		}
 
@@ -97,7 +97,7 @@ namespace PubnubApi.EndPoint
 
 		public void Execute(PNCallback<PNPublishResult> callback)
 		{
-			if (string.IsNullOrEmpty(this.channelName) || string.IsNullOrEmpty(channelName.Trim()) || this.publishContent == null) {
+			if (string.IsNullOrEmpty(channelName) || string.IsNullOrEmpty(channelName.Trim()) || publishContent == null) {
 				throw new ArgumentException("Missing Channel or Message");
 			}
 
@@ -108,31 +108,33 @@ namespace PubnubApi.EndPoint
 			if (callback == null) {
 				throw new ArgumentException("Missing userCallback");
 			}
-			this.savedCallback = callback;
-			Publish(channelName, this.publishContent, this.storeInHistory, this.ttl, this.userMetadata, this.queryParam, callback);
+			savedCallback = callback;
+			logger.Trace($"{GetType().Name} Execute invoked");
+			Publish(channelName, publishContent, storeInHistory, ttl, userMetadata, queryParam, callback);
 		}
 
 		public async Task<PNResult<PNPublishResult>> ExecuteAsync()
 		{
 			syncRequest = false;
-			return await Publish(this.channelName, this.publishContent, this.storeInHistory, this.ttl, this.userMetadata, this.queryParam).ConfigureAwait(false);
+			logger.Trace($"{GetType().Name} ExecuteAsync invoked.");
+			return await Publish(channelName, publishContent, storeInHistory, ttl, userMetadata, queryParam).ConfigureAwait(false);
 		}
 
 		public PNPublishResult Sync()
 		{
-			if (this.publishContent == null) {
+			if (publishContent == null) {
 				throw new ArgumentException("message cannot be null");
 			}
 
 			if (config == null || string.IsNullOrEmpty(config.PublishKey) || config.PublishKey.Trim().Length <= 0) {
 				throw new MissingMemberException("publish key is required");
 			}
-
-			ManualResetEvent syncEvent = new System.Threading.ManualResetEvent(false);
+			logger.Debug($"{GetType().Name} parameter validated.");
+			ManualResetEvent syncEvent = new ManualResetEvent(false);
 			Task<PNPublishResult> task = Task<PNPublishResult>.Factory.StartNew(() => {
 				syncRequest = true;
-				syncEvent = new System.Threading.ManualResetEvent(false);
-				Publish(this.channelName, this.publishContent, this.storeInHistory, this.ttl, this.userMetadata, this.queryParam, new PNPublishResultExt((r, s) => { SyncResult = r; syncEvent.Set(); }));
+				syncEvent = new ManualResetEvent(false);
+				Publish(channelName, publishContent, storeInHistory, ttl, userMetadata, queryParam, new PNPublishResultExt((r, s) => { SyncResult = r; syncEvent.Set(); }));
 				syncEvent.WaitOne(config.NonSubscribeRequestTimeout * 1000);
 
 				return SyncResult;
@@ -144,7 +146,7 @@ namespace PubnubApi.EndPoint
 
 		internal void Retry()
 		{
-			Publish(this.channelName, this.publishContent, this.storeInHistory, this.ttl, this.userMetadata, this.queryParam, savedCallback);
+			Publish(channelName, publishContent, storeInHistory, ttl, userMetadata, queryParam, savedCallback);
 		}
 
 		internal void Publish(string channel, object message, bool storeInHistory, int ttl, Dictionary<string, object> userMetadata, Dictionary<string, object> externalQueryParam, PNCallback<PNPublishResult> callback)
@@ -164,6 +166,7 @@ namespace PubnubApi.EndPoint
 				callback.OnResponse(null, status);
 				return;
 			}
+			logger.Debug($"{GetType().Name} parameter validated.");
 			RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>
 			{
 				Channels = [channel],
@@ -186,15 +189,18 @@ namespace PubnubApi.EndPoint
 						if (result != null && result.Count >= 3) {
 							_ = int.TryParse(result[0].ToString(), out var publishStatus);
 							if (publishStatus == 1) {
+								logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 								ProcessResponseCallbacks(result, requestState);
 							} else {
 								PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(400, result[1].ToString());
 								PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<PNPublishResult>(PNOperationType.PNPublishOperation, category, requestState, 400, new PNException(responseString));
 								if (requestState.PubnubCallback != null) {
+									logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 									requestState.PubnubCallback.OnResponse(default, status);
 								}
 							}
 						} else {
+							logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 							ProcessResponseCallbacks(result, requestState);
 						}
 					}
@@ -202,6 +208,7 @@ namespace PubnubApi.EndPoint
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNPublishOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
+					logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 					requestState.PubnubCallback.OnResponse(default, status);
 				}
 			});
@@ -236,6 +243,7 @@ namespace PubnubApi.EndPoint
 				Reconnect = false,
 				EndPointOperation = this
 			};
+			logger.Debug($"{GetType().Name} parameter validated.");
 			var requestParameter = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNPublishOperation);
 			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest).ConfigureAwait(false);
@@ -287,6 +295,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNPublishOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
+			logger.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 
@@ -309,7 +318,7 @@ namespace PubnubApi.EndPoint
 		{
 			string message = jsonLibrary.SerializeToJsonString(originalMessage);
 			if (config.CryptoModule != null || config.CipherKey.Length > 0) {
-				config.CryptoModule ??= new CryptoModule(new LegacyCryptor(config.CipherKey, config.UseRandomInitializationVector, pubnubLog), null);
+				config.CryptoModule ??= new CryptoModule(new LegacyCryptor(config.CipherKey, config.UseRandomInitializationVector), null);
 				string encryptMessage = config.CryptoModule.Encrypt(message);
 				message = jsonLibrary.SerializeToJsonString(encryptMessage);
 			}
@@ -328,7 +337,7 @@ namespace PubnubApi.EndPoint
 				"0"
 			];
 			if (!httpPost) {
-				urlSegments.Add(PrepareContent(this.publishContent));
+				urlSegments.Add(PrepareContent(publishContent));
 			}
 			Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
 

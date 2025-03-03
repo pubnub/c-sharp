@@ -119,6 +119,7 @@ namespace PubnubApi.EndPoint
 
 		public void Execute(PNCallback<PNFileUploadResult> callback)
 		{
+			logger.Trace($"{GetType().Name} Execute invoked");
 			if (callback == null) {
 				throw new ArgumentException("Missing callback");
 			}
@@ -126,11 +127,13 @@ namespace PubnubApi.EndPoint
 			if (string.IsNullOrEmpty(sendFileName)) {
 				throw new ArgumentException("Missing File");
 			}
+			logger.Debug($"{GetType().Name} parameter validated.");
 			ProcessFileUpload(callback);
 		}
 
 		public async Task<PNResult<PNFileUploadResult>> ExecuteAsync()
 		{
+			logger.Trace($"{GetType().Name} ExecuteAsync invoked.");
 			return await ProcessFileUpload().ConfigureAwait(false);
 		}
 
@@ -147,7 +150,7 @@ namespace PubnubApi.EndPoint
 				}
 				return;
 			}
-			LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] GenerateFileUploadUrl executed.", config.LogVerbosity);
+			logger.Debug($"GenerateFileUploadUrl executed.");
 			RequestState<PNFileUploadResult> requestState = new RequestState<PNFileUploadResult>();
 			requestState.ResponseType = PNOperationType.PNFileUploadOperation;
 			requestState.PubnubCallback = callback;
@@ -159,7 +162,7 @@ namespace PubnubApi.EndPoint
 			string contentType = "multipart/form-data; boundary=" + dataBoundary;
 			CryptoModule currentCryptoModule = null;
 			if (!string.IsNullOrEmpty(currentFileCipherKey) || !string.IsNullOrEmpty(config.CipherKey) || config.CryptoModule != null) {
-				currentCryptoModule = !string.IsNullOrEmpty(currentFileCipherKey) ? new CryptoModule(new LegacyCryptor(currentFileCipherKey, true, pubnubLog), null) : (config.CryptoModule ??= new CryptoModule(new LegacyCryptor(config.CipherKey, true, pubnubLog), null));
+				currentCryptoModule = !string.IsNullOrEmpty(currentFileCipherKey) ? new CryptoModule(new LegacyCryptor(currentFileCipherKey, true), null) : (config.CryptoModule ??= new CryptoModule(new LegacyCryptor(config.CipherKey, true), null));
 			}
 			byte[] postData = GetMultipartFormData(sendFileByteArray, generateFileUploadUrlResult.FileName, generateFileUploadUrlResult.FileUploadRequest.FormFields, dataBoundary, currentCryptoModule, config, pubnubLog);
 			CancellationTokenSource cts = new CancellationTokenSource();
@@ -204,13 +207,14 @@ namespace PubnubApi.EndPoint
 								result.FileName = generateFileUploadUrlResult.FileName;
 								LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Publish file message executed successfully.", config.LogVerbosity);
 								var status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, 200, null);
+								logger.Info($"{GetType().Name} request executed with status code {requestState.Response.StatusCode}");
 								callback.OnResponse(result, status);
 							} else {
 								publishFailed = true;
 								if (currentFileRetryCount == publishFileRetryLimit) {
 									callback.OnResponse(null, publishFileMessageStatus);
 								}
-								LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] PublishFileMessage Failed rety count ={currentFileRetryCount}",  config.LogVerbosity);
+								logger.Debug($"PublishFileMessage Failed rety count ={currentFileRetryCount}");
 							}
 						}
 						while (publishFailed && currentFileRetryCount <= publishFileRetryLimit && !(publishFileMessageStatus?.StatusCode != 400 || publishFileMessageStatus.StatusCode != 403));
@@ -218,6 +222,7 @@ namespace PubnubApi.EndPoint
 						int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse?.Error?.Message);
 						PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse?.Error?.Message);
 						PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNFileUploadOperation, category, requestState, statusCode, new PNException(transportResponse?.Error?.Message, transportResponse?.Error));
+						logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						requestState.PubnubCallback.OnResponse(default, status);
 					}
 				}
@@ -232,6 +237,7 @@ namespace PubnubApi.EndPoint
 				returnValue.Status = errStatus;
 				return returnValue;
 			}
+			logger.Debug($"{GetType().Name} parameter validated.");
 			PNResult<PNGenerateFileUploadUrlResult> generateFileUploadUrl = await GenerateFileUploadUrl().ConfigureAwait(false);
 			PNGenerateFileUploadUrlResult generateFileUploadUrlResult = generateFileUploadUrl.Result;
 			PNStatus generateFileUploadUrlStatus = generateFileUploadUrl.Status;
@@ -239,7 +245,7 @@ namespace PubnubApi.EndPoint
 				returnValue.Status = generateFileUploadUrlStatus;
 				return returnValue;
 			}
-			LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] GenerateFileUploadUrl executed.", config.LogVerbosity);
+			logger.Debug($"GenerateFileUploadUrl executed.");
 			RequestState<PNFileUploadResult> requestState = new RequestState<PNFileUploadResult>
 			{
 				ResponseType = PNOperationType.PNFileUploadOperation,
@@ -252,7 +258,7 @@ namespace PubnubApi.EndPoint
 			string contentType = "multipart/form-data; boundary=" + dataBoundary;
 			CryptoModule currentCryptoModule = null;
 			if (!string.IsNullOrEmpty(currentFileCipherKey) || !string.IsNullOrEmpty(config.CipherKey) || config.CryptoModule != null) {
-				currentCryptoModule = !string.IsNullOrEmpty(currentFileCipherKey) ? new CryptoModule(new LegacyCryptor(currentFileCipherKey, true, pubnubLog), null) : (config.CryptoModule ??= new CryptoModule(new LegacyCryptor(config.CipherKey, true, pubnubLog), null));
+				currentCryptoModule = !string.IsNullOrEmpty(currentFileCipherKey) ? new CryptoModule(new LegacyCryptor(currentFileCipherKey, true), null) : (config.CryptoModule ??= new CryptoModule(new LegacyCryptor(config.CipherKey, true), null));
 			}
 			byte[] postData = GetMultipartFormData(sendFileByteArray, generateFileUploadUrlResult.FileName, generateFileUploadUrlResult.FileUploadRequest.FormFields, dataBoundary, currentCryptoModule, config, pubnubLog);
 			CancellationTokenSource cts = new CancellationTokenSource();
@@ -301,8 +307,7 @@ namespace PubnubApi.EndPoint
 			returnValue.Status = jsonAndStatusTuple.Item2;
 			string json = jsonAndStatusTuple.Item1;
 			if (!string.IsNullOrEmpty(json)) {
-				LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] File upload successfully", config.LogVerbosity);
-
+				logger.Debug($"File content uploaded successfully");
 				Dictionary<string, object> publishPayload = new Dictionary<string, object>();
 				if (publishFileMessageContent != null && !string.IsNullOrEmpty(publishFileMessageContent.ToString())) {
 					publishPayload.Add("message", publishFileMessageContent);
@@ -332,17 +337,17 @@ namespace PubnubApi.EndPoint
 						};
 						returnValue.Result = result;
 						if (returnValue.Status != null) returnValue.Status.Error = false;
-						LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] File message published successfully", config.LogVerbosity);
+						logger.Debug($"File message published successfully");
 					} else {
 						publishFailed = true;
 						returnValue.Status = publishFileMessageStatus;
-						LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] PublishFileMessage Failed. retry count={1}", config.LogVerbosity);
+						logger.Debug($"PublishFileMessage Failed. retry count={currentFileRetryCount}");
 						await Task.Delay(1000);
 					}
 				}
 				while (publishFailed && currentFileRetryCount <= publishFileRetryLimit && !(publishFileMessageStatus?.StatusCode != 400 || publishFileMessageStatus.StatusCode != 403));
 			}
-
+			logger.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 
@@ -391,21 +396,24 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNGenerateFileUploadUrlOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
-
+			logger.Info($"Generate file upload url request executed with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 
 		private async Task<PNResult<PNPublishFileMessageResult>> PublishFileMessage(object message, Dictionary<string, object> externalQueryParam)
 		{
+			logger.Trace("PublishFileMessage executing.");
 			PNResult<PNPublishFileMessageResult> returnValue = new PNResult<PNPublishFileMessageResult>();
 
 			var requestParameter = CreatePublishFileMessageRequestParameter();
-			RequestState<PNPublishFileMessageResult> requestState = new RequestState<PNPublishFileMessageResult>();
-			requestState.Channels = new[] { channelName };
-			requestState.ResponseType = PNOperationType.PNPublishFileMessageOperation;
-			requestState.PubnubCallback = null;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
+			RequestState<PNPublishFileMessageResult> requestState = new RequestState<PNPublishFileMessageResult>
+				{
+					Channels = new[] { channelName },
+					ResponseType = PNOperationType.PNPublishFileMessageOperation,
+					PubnubCallback = null,
+					Reconnect = false,
+					EndPointOperation = this
+				};
 
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNPublishFileMessageOperation);
 			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest).ConfigureAwait(false);
@@ -443,7 +451,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNPublishFileMessageOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
-
+			logger.Info($"PublishFileMessage request executed with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 
@@ -606,7 +614,7 @@ namespace PubnubApi.EndPoint
 		{
 			string message = jsonLibrary.SerializeToJsonString(originalMessage);
 			if (config.CryptoModule != null || config.CipherKey.Length > 0 || currentFileCipherKey != null) {
-				config.CryptoModule ??= new CryptoModule(new LegacyCryptor(currentFileCipherKey ?? config.CipherKey, config.UseRandomInitializationVector, pubnubLog), null);
+				config.CryptoModule ??= new CryptoModule(new LegacyCryptor(currentFileCipherKey ?? config.CipherKey, config.UseRandomInitializationVector), null);
 				string encryptMessage = config.CryptoModule.Encrypt(message);
 				message = jsonLibrary.SerializeToJsonString(encryptMessage);
 			}

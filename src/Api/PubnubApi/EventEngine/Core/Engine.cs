@@ -5,7 +5,6 @@ using System.Collections.Generic;
 namespace PubnubApi.EventEngine.Core {
 	public abstract class Engine {
 		public readonly EventQueue EventQueue = new EventQueue();
-		
 		protected EffectDispatcher dispatcher = new EffectDispatcher();
 		protected State currentState;
 		public State CurrentState => currentState;
@@ -14,6 +13,8 @@ namespace PubnubApi.EventEngine.Core {
 		private Task currentTransitionLoop = Utils.EmptyTask;
 
 		private readonly IEffectInvocation[] emptyInvocationList = new IEffectInvocation[0];
+		
+		protected PubnubLogModule logger;
 		
 		/// <summary>
 		/// Subscribe to receive notification on effect dispatch
@@ -74,13 +75,18 @@ namespace PubnubApi.EventEngine.Core {
 		/// Launch the invocations associated with transitioning between states
 		/// </summary>
 		private async Task ExecuteStateChange(State sourceState, State targetState, IEnumerable<IEffectInvocation> invocations) {
+			logger.Debug($"Exiting state {sourceState}");
 			foreach (var effectInvocation in sourceState.OnExit ?? emptyInvocationList) {
+				logger.Debug($"Dispatching effect: {effectInvocation}");
 				await dispatcher.Dispatch(effectInvocation);
 			}
 			foreach (var effectInvocation in invocations ?? emptyInvocationList) {
+				logger.Debug($"Dispatching effect: {effectInvocation}");
 				await dispatcher.Dispatch(effectInvocation);
 			}
+			logger.Debug($"Entering state {targetState}");
 			foreach (var effectInvocation in targetState.OnEntry ?? emptyInvocationList) {
+				logger.Debug($"Dispatching effect: {effectInvocation}");
 				await dispatcher.Dispatch(effectInvocation);
 			}
 		}

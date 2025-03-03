@@ -44,6 +44,7 @@ namespace PubnubApi
 
         protected Pubnub PubnubInstance { get; set; }
 
+        protected PubnubLogModule logger;
         protected static ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> SubscriptionChannels
         {
             get;
@@ -150,7 +151,7 @@ namespace PubnubApi
             
             if (jsonPluggableLibrary == null)
             {
-                InternalConstructor(pubnubConfiguation, new NewtonsoftJsonDotNet(pubnubConfiguation,log), pubnubUnitTest, log, tokenManager, instance);
+                InternalConstructor(pubnubConfiguation, new NewtonsoftJsonDotNet(pubnubConfiguation), pubnubUnitTest, log, tokenManager, instance);
             }
             else
             {
@@ -167,7 +168,6 @@ namespace PubnubApi
             pubnubLog.AddOrUpdate(instance.InstanceId, log, (k, o) => log);
             PubnubTokenMgrCollection.AddOrUpdate(instance.InstanceId, tokenManager, (k,o)=> tokenManager);
             pubnubSubscribeDuplicationManager = new EndPoint.DuplicationManager(pubnubConfiguation, jsonPluggableLibrary, log);
-
             CurrentUserId.AddOrUpdate(instance.InstanceId, pubnubConfiguation.UserId, (k,o) => pubnubConfiguation.UserId);
             UpdatePubnubNetworkTcpCheckIntervalInSeconds();
             if (pubnubConfiguation.PresenceInterval > 10)
@@ -175,6 +175,7 @@ namespace PubnubApi
                 PubnubLocalHeartbeatCheckIntervalInSeconds = pubnubConfiguation.PresenceInterval;
             }
             enableResumeOnReconnect = pubnubConfiguation.ReconnectionPolicy != PNReconnectionPolicy.NONE;
+            logger = pubnubConfiguation.Logger;
         }
 
 
@@ -623,7 +624,7 @@ namespace PubnubApi
                                         if ((currentConfig.CryptoModule != null || currentConfig.CipherKey.Length > 0) && currentMessage.MessageType != 1) //decrypt the subscriber message if cipherkey is available
                                         {
                                             string decryptMessage = "";
-                                            currentConfig.CryptoModule ??= new CryptoModule(new LegacyCryptor(currentConfig.CipherKey, currentConfig.UseRandomInitializationVector, currentLog), null);
+                                            currentConfig.CryptoModule ??= new CryptoModule(new LegacyCryptor(currentConfig.CipherKey, currentConfig.UseRandomInitializationVector), null);
                                             try
                                             {
                                                 decryptMessage = currentConfig.CryptoModule.Decrypt(payload.ToString());
@@ -1157,7 +1158,7 @@ namespace PubnubApi
                                                 Dictionary<string, object> channelDic = jsonLib.ConvertToDictionaryObject(channelMessageContainer);
                                                 if (channelDic != null && channelDic.Count > 0)
                                                 {
-                                                    result[index] = SecureMessage.Instance(currentConfig, jsonLib, currentLog).FetchHistoryDecodeDecryptLoop(type, channelDic, channels, channelGroups, callback);
+                                                    result[index] = SecureMessage.Instance(currentConfig, jsonLib, currentConfig.Logger).FetchHistoryDecodeDecryptLoop(type, channelDic, channels, channelGroups, callback);
                                                 }
                                             }
                                             else
@@ -1169,7 +1170,7 @@ namespace PubnubApi
                                 }
                                 else
                                 {
-                                    result = SecureMessage.Instance(currentConfig, jsonLib, currentLog).HistoryDecodeDecryptLoop(type, result, channels, channelGroups, callback);
+                                    result = SecureMessage.Instance(currentConfig, jsonLib, currentConfig.Logger).HistoryDecodeDecryptLoop(type, result, channels, channelGroups, callback);
                                 }
                             }
                             result.Add(multiChannel);

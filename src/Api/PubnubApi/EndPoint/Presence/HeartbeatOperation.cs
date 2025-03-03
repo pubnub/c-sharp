@@ -56,7 +56,7 @@ namespace PubnubApi.EndPoint
 					responseStatus = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNHeartbeatOperation, category, pubnubRequestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				}
 			} catch (Exception ex) {
-				LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: Heartbeat request for channel(s)={string.Join(", ", channels.OrderBy(x => x))} \n channelGroup(s)={string.Join(", ", channelGroups.OrderBy(x => x))} \n Exception Details={ex}", config.LogVerbosity);
+				logger.Error($"Heartbeat request for channel(s)={string.Join(", ", channels.OrderBy(x => x))} \n channelGroup(s)={string.Join(", ", channelGroups.OrderBy(x => x))} \n Exception Details={ex}");
 				return new PNStatus(ex, PNOperationType.PNHeartbeatOperation, PNStatusCategory.PNUnknownCategory, channels, channelGroups);
 			}
 			return responseStatus;

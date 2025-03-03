@@ -65,13 +65,15 @@ namespace PubnubApi.EndPoint
 			if (string.IsNullOrEmpty(this.fileName)) {
 				throw new ArgumentException("Missing File Name");
 			}
-
+			logger.Debug($"{GetType().Name} parameter validated.");
 			this.savedCallback = callback;
+			logger.Trace($"{GetType().Name} Execute invoked");
 			ProcessDeleteFileRequest(this.queryParam, savedCallback);
 		}
 
 		public async Task<PNResult<PNDeleteFileResult>> ExecuteAsync()
 		{
+			logger.Trace($"{GetType().Name} ExecuteAsync invoked.");
 			return await ProcessDeleteFileRequest(this.queryParam).ConfigureAwait(false);
 		}
 
@@ -82,12 +84,14 @@ namespace PubnubApi.EndPoint
 
 		private void ProcessDeleteFileRequest(Dictionary<string, object> externalQueryParam, PNCallback<PNDeleteFileResult> callback)
 		{
-			RequestState<PNDeleteFileResult> requestState = new RequestState<PNDeleteFileResult>();
-			requestState.ResponseType = PNOperationType.PNDeleteFileOperation;
-			requestState.PubnubCallback = callback;
-			requestState.UsePostMethod = false;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
+			RequestState<PNDeleteFileResult> requestState = new RequestState<PNDeleteFileResult>
+			{
+				ResponseType = PNOperationType.PNDeleteFileOperation,
+				PubnubCallback = callback,
+				UsePostMethod = false,
+				Reconnect = false,
+				EndPointOperation = this
+			};
 			var requestParameter = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNDeleteFileOperation);
 			PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ContinueWith(t => {
@@ -97,15 +101,18 @@ namespace PubnubApi.EndPoint
 					var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 					if (!string.IsNullOrEmpty(responseString)) {
 						List<object> result = ProcessJsonResponse(requestState, responseString);
+						logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						ProcessResponseCallbacks(result, requestState);
 					} else {
 						PNStatus errorStatus = GetStatusIfError(requestState, responseString);
+						logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						callback.OnResponse(default, errorStatus);
 					}
 				} else {
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNDeleteFileOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
+					logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 					requestState.PubnubCallback.OnResponse(default, status);
 				}
 			});

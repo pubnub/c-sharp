@@ -14,6 +14,7 @@ namespace PubnubApi
 			this.Region = region;
 		}
 
+		public override string ToString() => $"tt= {Timetoken}, region={Region}";
 	}
 }
 

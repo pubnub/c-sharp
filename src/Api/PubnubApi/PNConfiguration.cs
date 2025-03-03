@@ -44,6 +44,8 @@ namespace PubnubApi
         public bool UseRandomInitializationVector { get; set; }
         public CryptoModule CryptoModule { get; set; }
 
+        internal PubnubLogModule Logger { get; set; }
+
         public string AuthKey { get; set; }
 
         [Obsolete("Uuid is deprecated, please use UserId instead.")]
@@ -91,6 +93,8 @@ namespace PubnubApi
         }
 
         public PNLogVerbosity LogVerbosity { get; set; }
+
+        public PubnubLogLevel LogLevel { get; set; }
 
         public IPubnubLog PubnubLog { get; set; }
 
@@ -140,6 +144,7 @@ namespace PubnubApi
                 throw new ArgumentException("Missing or Incorrect uuid value");
             }
             uuidSetFromConstructor = true;
+            Logger = new PubnubLogModule(logLevel: PubnubLogLevel.None);
             ConstructorInit(new UserId(uuid));
         }
 
@@ -175,6 +180,7 @@ namespace PubnubApi
             UseRandomInitializationVector = true;
             FileMessagePublishRetryLimit = 5;
             userId = currentUserId;
+            LogLevel = PubnubLogLevel.None;
             EnableEventEngine = true;
         }
 

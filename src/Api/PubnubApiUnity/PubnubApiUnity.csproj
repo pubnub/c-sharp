@@ -349,6 +349,9 @@
     <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNAccessManagerKeysData.cs">
       <Link>Model\Consumer\AccessManager\PNAccessManagerKeysData.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Log\IPubnubLogger.cs" Link="Log\IPubnubLogger.cs" />
+    <Compile Include="..\PubnubApi\Log\PubnubDefaultLogger.cs" Link="Log\PubnubDefaultLogger.cs" />
+    <Compile Include="..\PubnubApi\Log\PubnubLogModule.cs" Link="Log\PubnubLogModule.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNAccessManagerRevokeTokenResult.cs" Link="Model\Consumer\AccessManager\PNAccessManagerRevokeTokenResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNAccessManagerTokenResult.cs" Link="Model\Consumer\AccessManager\PNAccessManagerTokenResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNTokenAuthValues.cs" Link="Model\Consumer\AccessManager\PNTokenAuthValues.cs" />

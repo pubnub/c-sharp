@@ -96,12 +96,14 @@ namespace PubnubApi.EndPoint
 		{
             this.savedCallback = callback;
             string serializedState = jsonLibrary.SerializeToJsonString(this.userState);
+            logger.Trace($"{GetType().Name} Execute invoked");
             SetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, serializedState, this.queryParam, callback);
 		}
 
 		public async Task<PNResult<PNSetStateResult>> ExecuteAsync()
 		{
 			string serializedState = jsonLibrary.SerializeToJsonString(this.userState);
+			logger.Trace($"{GetType().Name} ExecuteAsync invoked.");
 			return await SetUserState(this.channelNames, this.channelGroupNames, this.channelUUID, serializedState, this.queryParam).ConfigureAwait(false);
 		}
 
@@ -121,7 +123,7 @@ namespace PubnubApi.EndPoint
 			if (string.IsNullOrEmpty(jsonUserState) || string.IsNullOrEmpty(jsonUserState.Trim())) {
 				throw new ArgumentException("Missing User State");
 			}
-
+			logger.Debug($"{GetType().Name} parameter validated.");
 			List<string> channelList = new List<string>();
 			List<string> channelGroupList = new List<string>();
 			string[] filteredChannels = channels;
@@ -196,7 +198,7 @@ namespace PubnubApi.EndPoint
 			if (string.IsNullOrEmpty(jsonUserState) || string.IsNullOrEmpty(jsonUserState.Trim())) {
 				throw new ArgumentException("Missing User State");
 			}
-
+			logger.Debug($"{GetType().Name} parameter validated.");
 			List<string> channelList = new List<string>();
 			List<string> channelGroupList = new List<string>();
 			string[] filteredChannels = channels;
@@ -280,15 +282,18 @@ namespace PubnubApi.EndPoint
 					requestState.GotJsonResponse = true;
 					if (!string.IsNullOrEmpty(responseString)) {
 						List<object> result = ProcessJsonResponse(requestState, responseString);
+						logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						ProcessResponseCallbacks(result, requestState);
 					} else {
 						PNStatus errorStatus = GetStatusIfError(requestState, responseString);
+						logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						callback.OnResponse(default, errorStatus);
 					}
 				} else {
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNSetStateOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
+					logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 					requestState.PubnubCallback.OnResponse(default, status);
 				}
 			});
@@ -297,12 +302,14 @@ namespace PubnubApi.EndPoint
 		private async Task<PNResult<PNSetStateResult>> SharedSetUserState(string[] channels, string[] channelGroups, string uuid, string jsonChannelUserState, string jsonChannelGroupUserState, Dictionary<string, object> externalQueryParam)
 		{
 			PNResult<PNSetStateResult> returnValue = new PNResult<PNSetStateResult>();
-			RequestState<PNSetStateResult> requestState = new RequestState<PNSetStateResult>();
-			requestState.Channels = channelNames;
-			requestState.ChannelGroups = channelGroupNames;
-			requestState.ResponseType = PNOperationType.PNSetStateOperation;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
+			RequestState<PNSetStateResult> requestState = new RequestState<PNSetStateResult>
+			{
+				Channels = channelNames,
+				ChannelGroups = channelGroupNames,
+				ResponseType = PNOperationType.PNSetStateOperation,
+				Reconnect = false,
+				EndPointOperation = this
+			};
 			var requestParameter = CreateRequestParameter();
 			Tuple<string, PNStatus> JsonAndStatusTuple;
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNSetStateOperation);
@@ -334,7 +341,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNSetStateOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
-
+			logger.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 

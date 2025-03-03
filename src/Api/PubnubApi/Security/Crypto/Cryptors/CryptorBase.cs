@@ -13,7 +13,7 @@ namespace PubnubApi.Security.Crypto.Cryptors
         protected const int IV_SIZE = 16;
 
         private readonly bool _useDynamicRandomIV;
-        private readonly IPubnubLog _log;
+        protected readonly PubnubLogModule logger;
         #if DEBUG
         private byte[] constantIV;
         public void SetTestOnlyConstantRandomIV(byte[] iv)
@@ -21,10 +21,10 @@ namespace PubnubApi.Security.Crypto.Cryptors
             constantIV = iv;
         }
         #endif
-        protected CryptorBase(string cipherKey, bool useDynamicRandomIV, IPubnubLog log)
+        protected CryptorBase(string cipherKey, bool useDynamicRandomIV, PubnubLogModule logger)
         {
             _useDynamicRandomIV = useDynamicRandomIV;
-            _log = log;
+            this.logger = logger;
             CipherKey = cipherKey;
         }
         public string CipherKey { get; }
@@ -39,10 +39,10 @@ namespace PubnubApi.Security.Crypto.Cryptors
             #endif
             return Util.InitializationVector(useDynamicRandomIV, dataOffset);
         }
-        protected void Log(string message)
-        {
-            _log?.WriteToLog(message);
-        }
+        // protected void Log(string message)
+        // {
+        //     _log?.WriteToLog(message);
+        // }
         protected byte[] InternalEncrypt(bool cryptoHeader, byte[] dataBytes, byte[] ivBytes, byte[] keyBytes)
         {
             using (Aes aesAlg = Aes.Create())
@@ -61,7 +61,6 @@ namespace PubnubApi.Security.Crypto.Cryptors
                     {
                         CryptorHeader header = new CryptorHeader(Identifier, ivBytes.Length);
                         byte[] headerBytes = header.ToBytes();
-                        Log(string.Format(CultureInfo.InvariantCulture, "DateTime {0} Header = {1}", DateTime.Now.ToString(CultureInfo.InvariantCulture), headerBytes.ToDisplayFormat()));
                         byte[] buffer = new byte[headerBytes.Length + ivBytes.Length + outputBytes.Length];
                         Buffer.BlockCopy(headerBytes, 0, buffer, 0, headerBytes.Length);
                         Buffer.BlockCopy(ivBytes    , 0, buffer, headerBytes.Length, ivBytes.Length);

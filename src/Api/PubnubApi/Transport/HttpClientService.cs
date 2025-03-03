@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Linq;
@@ -12,12 +11,11 @@ namespace PubnubApi
     public class HttpClientService : IHttpClientService
     {
         private readonly HttpClient httpClient;
-        private IPubnubLog Log { get; set; }
-        private PNLogVerbosity LogVerbosity { get; set; }
+        private readonly PubnubLogModule logger;
 
-        public HttpClientService(IWebProxy proxy = default, IPubnubLog pubnubLog = default,
-            PNLogVerbosity verbosity = default)
+        public HttpClientService(IWebProxy proxy, PNConfiguration configuration )
         {
+            logger = configuration.Logger;
             httpClient = new HttpClient()
             {
                 Timeout = Timeout.InfiniteTimeSpan
@@ -29,13 +27,11 @@ namespace PubnubApi
                 UseProxy = true
             });
             httpClient.Timeout = Timeout.InfiniteTimeSpan;
-            Log = pubnubLog;
-            LogVerbosity = verbosity;
         }
 
         public async Task<TransportResponse> GetRequest(TransportRequest transportRequest)
         {
-            TransportResponse response;
+            TransportResponse transportResponse;
             try
             {
                 HttpRequestMessage requestMessage =
@@ -47,38 +43,35 @@ namespace PubnubApi
                         requestMessage.Headers.Add(kvp.Key, kvp.Value);
                     }
                 }
-
+                logger.Debug($"Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl} \n Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}");
                 var httpResult = await httpClient.SendAsync(request: requestMessage,
                     cancellationToken: transportRequest.CancellationTokenSource.Token);
                 var responseContent = await httpResult.Content.ReadAsByteArrayAsync();
-                response = new TransportResponse()
+                transportResponse = new TransportResponse()
                 {
                     StatusCode = (int)httpResult.StatusCode,
                     Content = responseContent,
                     Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
                     RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath
                 };
+                logger.Debug($"Received http response from server with status code {httpResult.StatusCode}, content-length: {transportResponse.Content.Length} bytes, for url {transportRequest.RequestUrl}");
             }
             catch (TaskCanceledException)
             {
-                response = null;
-                LoggingMethod.WriteToLog(Log,
-                    $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: Http request cancelled",
-                    LogVerbosity);
+                logger.Error($"Request is cancelled for url {transportRequest.RequestUrl}");
+                transportResponse = null;
             }
             catch (Exception e)
             {
-                LoggingMethod.WriteToLog(Log,
-                    $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}",
-                    LogVerbosity);
-                response = new TransportResponse()
+                logger.Error($"Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}");
+                transportResponse = new TransportResponse()
                 {
                     RequestUrl = transportRequest.RequestUrl,
                     Error = e
                 };
             }
 
-            return response;
+            return transportResponse;
         }
 
         public async Task<TransportResponse> PostRequest(TransportRequest transportRequest)
@@ -103,7 +96,7 @@ namespace PubnubApi
                 HttpRequestMessage requestMessage =
                     new HttpRequestMessage(method: HttpMethod.Post, requestUri: transportRequest.RequestUrl)
                         { Content = postData };
-
+                logger.Debug($"Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl} \n Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}");
                 var httpResult = await httpClient.SendAsync(request: requestMessage,
                     cancellationToken: transportRequest.CancellationTokenSource.Token);
                 var responseContent = await httpResult.Content.ReadAsByteArrayAsync();
@@ -114,19 +107,16 @@ namespace PubnubApi
                     Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
                     RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath
                 };
+                logger.Debug($"Received http response from server with status code {httpResult.StatusCode}, content-length: {transportResponse.Content.Length} bytes, for url {transportRequest.RequestUrl}");
             }
             catch (TaskCanceledException)
             {
+                logger.Error($"Request is cancelled for url {transportRequest.RequestUrl}");
                 transportResponse = null;
-                LoggingMethod.WriteToLog(Log,
-                    $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: Http request cancelled",
-                    LogVerbosity);
             }
             catch (Exception e)
             {
-                LoggingMethod.WriteToLog(Log,
-                    $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}",
-                    LogVerbosity);
+                logger.Error($"Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}");
                 transportResponse = new TransportResponse()
                 {
                     RequestUrl = transportRequest.RequestUrl,
@@ -167,7 +157,7 @@ namespace PubnubApi
                         requestMessage.Headers.Add(kvp.Key, kvp.Value);
                     }
                 }
-
+                logger.Debug($"Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl} \n Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}");
                 var httpResult = await httpClient.SendAsync(request: requestMessage,
                     cancellationToken: transportRequest.CancellationTokenSource.Token);
                 var responseContent = await httpResult.Content.ReadAsByteArrayAsync();
@@ -178,19 +168,16 @@ namespace PubnubApi
                     Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
                     RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath
                 };
+                logger.Debug($"Received http response from server with status code {httpResult.StatusCode}, content-length: {transportResponse.Content.Length} bytes, for url {transportRequest.RequestUrl}");
             }
             catch (TaskCanceledException)
             {
+                logger.Error($"Request is cancelled for url {transportRequest.RequestUrl}");
                 transportResponse = null;
-                LoggingMethod.WriteToLog(Log,
-                    $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: Http request cancelled",
-                    LogVerbosity);
             }
             catch (Exception e)
             {
-                LoggingMethod.WriteToLog(Log,
-                    $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}",
-                    LogVerbosity);
+                logger.Error($"Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}");
                 transportResponse = new TransportResponse()
                 {
                     RequestUrl = transportRequest.RequestUrl,
@@ -203,7 +190,7 @@ namespace PubnubApi
 
         public async Task<TransportResponse> DeleteRequest(TransportRequest transportRequest)
         {
-            TransportResponse response;
+            TransportResponse transportResponse;
             try
             {
                 if (transportRequest.Timeout.HasValue) httpClient.Timeout = (TimeSpan)transportRequest.Timeout;
@@ -216,38 +203,35 @@ namespace PubnubApi
                         requestMessage.Headers.Add(kvp.Key, kvp.Value);
                     }
                 }
-
+                logger.Debug($"Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl} \n Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}");
                 var httpResult = await httpClient.SendAsync(request: requestMessage,
                     cancellationToken: transportRequest.CancellationTokenSource.Token);
                 var responseContent = await httpResult.Content.ReadAsByteArrayAsync();
-                response = new TransportResponse()
+                transportResponse = new TransportResponse()
                 {
                     StatusCode = (int)httpResult.StatusCode,
                     Content = responseContent,
                     Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
                     RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath
                 };
+                logger.Debug($"Received http response from server with status code {httpResult.StatusCode}, content-length: {transportResponse.Content.Length} bytes, for url {transportRequest.RequestUrl}");
             }
             catch (TaskCanceledException)
             {
-                response = null;
-                LoggingMethod.WriteToLog(Log,
-                    $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: Http request cancelled",
-                    LogVerbosity);
+                logger.Error($"Request is cancelled for url {transportRequest.RequestUrl}");
+                transportResponse = null;
             }
             catch (Exception e)
             {
-                LoggingMethod.WriteToLog(Log,
-                    $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}",
-                    LogVerbosity);
-                response = new TransportResponse()
+                logger.Error($"Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}");
+                transportResponse = new TransportResponse()
                 {
                     RequestUrl = transportRequest.RequestUrl,
                     Error = e
                 };
             }
 
-            return response;
+            return transportResponse;
         }
 
         public async Task<TransportResponse> PatchRequest(TransportRequest transportRequest)
@@ -281,7 +265,7 @@ namespace PubnubApi
                         requestMessage.Headers.Add(kvp.Key, $"\"{kvp.Value}\"");
                     }
                 }
-
+                logger.Debug($"Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl} \n Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}");
                 var httpResult = await httpClient.SendAsync(request: requestMessage,
                     cancellationToken: transportRequest.CancellationTokenSource.Token);
                 var responseContent = await httpResult.Content.ReadAsByteArrayAsync();
@@ -292,26 +276,22 @@ namespace PubnubApi
                     Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
                     RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath
                 };
+                logger.Debug($"Received http response from server with status code {httpResult.StatusCode}, content-length: {transportResponse.Content.Length} bytes, for url {transportRequest.RequestUrl}");
             }
             catch (TaskCanceledException)
             {
+                logger.Error($"Request is cancelled for url {transportRequest.RequestUrl}");
                 transportResponse = null;
-                LoggingMethod.WriteToLog(Log,
-                    $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: Http request cancelled",
-                    LogVerbosity);
             }
             catch (Exception e)
             {
-                LoggingMethod.WriteToLog(Log,
-                    $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}",
-                    LogVerbosity);
+                logger.Error($"Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}");
                 transportResponse = new TransportResponse()
                 {
                     RequestUrl = transportRequest.RequestUrl,
                     Error = e
                 };
             }
-
             return transportResponse;
         }
     }

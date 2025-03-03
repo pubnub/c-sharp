@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using PubnubApi.Security.Crypto.Cryptors;
 
 namespace PubnubApi.Security.Crypto
@@ -32,7 +30,7 @@ namespace PubnubApi.Security.Crypto
                 _decryptors[decryptor.Identifier] = decryptor;
             }
         }
-        public static LegacyCryptor CreateLegacyCryptor(string cipherKey, bool useDynamicIV, IPubnubLog log)
+        public static LegacyCryptor CreateLegacyCryptor(string cipherKey, bool useDynamicIV, PubnubLogModule log)
         {
             return new LegacyCryptor(cipherKey, useDynamicIV, log);
         }
@@ -44,7 +42,7 @@ namespace PubnubApi.Security.Crypto
         {
             return new LegacyCryptor(cipherKey, true);
         }
-        public static AesCbcCryptor CreateAesCbcCryptor(string cipherKey, IPubnubLog log)
+        public static AesCbcCryptor CreateAesCbcCryptor(string cipherKey, PubnubLogModule log)
         {
             return new AesCbcCryptor(cipherKey, log);
         }
