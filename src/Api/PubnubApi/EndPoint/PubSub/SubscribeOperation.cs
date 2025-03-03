@@ -195,7 +195,7 @@ namespace PubnubApi.EndPoint
             string channel = (channels != null) ? string.Join(",", channels.OrderBy(x => x).ToArray()) : "";
             string channelGroup = (channelGroups != null) ? string.Join(",", channelGroups.OrderBy(x => x).ToArray()) : "";
 
-            config.Logger.Debug($"requested subscribe for channel(s)={channel} and channel group(s)={channelGroup}");
+            config.Logger?.Debug($"requested subscribe for channel(s)={channel} and channel group(s)={channelGroup}");
 
             Dictionary<string, string> initialSubscribeUrlParams = new Dictionary<string, string>();
             if (this.subscribeTimetoken >= 0)

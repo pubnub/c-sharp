@@ -109,14 +109,14 @@ namespace PubnubApi.EndPoint
 				throw new ArgumentException("Missing userCallback");
 			}
 			savedCallback = callback;
-			logger.Trace($"{GetType().Name} Execute invoked");
+			logger?.Trace($"{GetType().Name} Execute invoked");
 			Publish(channelName, publishContent, storeInHistory, ttl, userMetadata, queryParam, callback);
 		}
 
 		public async Task<PNResult<PNPublishResult>> ExecuteAsync()
 		{
 			syncRequest = false;
-			logger.Trace($"{GetType().Name} ExecuteAsync invoked.");
+			logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
 			return await Publish(channelName, publishContent, storeInHistory, ttl, userMetadata, queryParam).ConfigureAwait(false);
 		}
 
@@ -129,7 +129,7 @@ namespace PubnubApi.EndPoint
 			if (config == null || string.IsNullOrEmpty(config.PublishKey) || config.PublishKey.Trim().Length <= 0) {
 				throw new MissingMemberException("publish key is required");
 			}
-			logger.Debug($"{GetType().Name} parameter validated.");
+			logger?.Debug($"{GetType().Name} parameter validated.");
 			ManualResetEvent syncEvent = new ManualResetEvent(false);
 			Task<PNPublishResult> task = Task<PNPublishResult>.Factory.StartNew(() => {
 				syncRequest = true;
@@ -166,7 +166,7 @@ namespace PubnubApi.EndPoint
 				callback.OnResponse(null, status);
 				return;
 			}
-			logger.Debug($"{GetType().Name} parameter validated.");
+			logger?.Debug($"{GetType().Name} parameter validated.");
 			RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>
 			{
 				Channels = [channel],
@@ -189,18 +189,18 @@ namespace PubnubApi.EndPoint
 						if (result != null && result.Count >= 3) {
 							_ = int.TryParse(result[0].ToString(), out var publishStatus);
 							if (publishStatus == 1) {
-								logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+								logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 								ProcessResponseCallbacks(result, requestState);
 							} else {
 								PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(400, result[1].ToString());
 								PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<PNPublishResult>(PNOperationType.PNPublishOperation, category, requestState, 400, new PNException(responseString));
 								if (requestState.PubnubCallback != null) {
-									logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+									logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 									requestState.PubnubCallback.OnResponse(default, status);
 								}
 							}
 						} else {
-							logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+							logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 							ProcessResponseCallbacks(result, requestState);
 						}
 					}
@@ -208,7 +208,7 @@ namespace PubnubApi.EndPoint
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNPublishOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
-					logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+					logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 					requestState.PubnubCallback.OnResponse(default, status);
 				}
 			});
@@ -243,7 +243,7 @@ namespace PubnubApi.EndPoint
 				Reconnect = false,
 				EndPointOperation = this
 			};
-			logger.Debug($"{GetType().Name} parameter validated.");
+			logger?.Debug($"{GetType().Name} parameter validated.");
 			var requestParameter = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNPublishOperation);
 			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest).ConfigureAwait(false);
@@ -295,7 +295,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNPublishOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
-			logger.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
+			logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 

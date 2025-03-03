@@ -68,13 +68,13 @@ namespace PubnubApi.EndPoint
 
 		public void Execute(PNCallback<PNHereNowResult> callback)
 		{
-			logger.Trace($"{GetType().Name} Execute invoked");
+			logger?.Trace($"{GetType().Name} Execute invoked");
 			HereNow(this.channelNames, this.channelGroupNames, this.includeChannelUUIDs, this.includeUserState, this.queryParam, callback);
 		}
 
 		public async Task<PNResult<PNHereNowResult>> ExecuteAsync()
 		{
-			logger.Trace($"{GetType().Name} ExecuteAsync invoked.");
+			logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
 			return await HereNow(this.channelNames, this.channelGroupNames, this.includeChannelUUIDs, this.includeUserState, this.queryParam).ConfigureAwait(false);
 		}
 
@@ -104,18 +104,18 @@ namespace PubnubApi.EndPoint
 					if (!string.IsNullOrEmpty(responseString)) {
 						requestState.GotJsonResponse = true;
 						List<object> result = ProcessJsonResponse(requestState, responseString);
-						logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+						logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						ProcessResponseCallbacks(result, requestState);
 					} else {
 						PNStatus errorStatus = GetStatusIfError(requestState, responseString);
-						logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+						logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						callback.OnResponse(default, errorStatus);
 					}
 				} else {
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNHereNowOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
-					logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+					logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 					requestState.PubnubCallback.OnResponse(default, status);
 				}
 			});
@@ -162,7 +162,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNHereNowOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
-			logger.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
+			logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 

@@ -104,7 +104,7 @@ namespace PubnubApi.EndPoint
 
 		public void Execute(PNCallback<PNSetUuidMetadataResult> callback)
 		{
-			logger.Trace($"{GetType().Name} Execute invoked");
+			logger?.Trace($"{GetType().Name} Execute invoked");
 			if (callback == null) {
 				throw new ArgumentException("Missing callback");
 			}
@@ -115,7 +115,7 @@ namespace PubnubApi.EndPoint
 
 		public async Task<PNResult<PNSetUuidMetadataResult>> ExecuteAsync()
 		{
-			logger.Trace($"{GetType().Name} ExecuteAsync invoked.");
+			logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
 			return await SetUuidMetadata(this.uuidId, this.includeCustom, this.queryParam).ConfigureAwait(false);
 		}
 
@@ -129,7 +129,7 @@ namespace PubnubApi.EndPoint
 			if (string.IsNullOrEmpty(uuid)) {
 				this.uuidId = config.UserId;
 			}
-			logger.Debug($"{GetType().Name} parameter validated.");
+			logger?.Debug($"{GetType().Name} parameter validated.");
 			RequestState<PNSetUuidMetadataResult> requestState = new RequestState<PNSetUuidMetadataResult>
 				{
 					ResponseType = PNOperationType.PNSetUuidMetadataOperation,
@@ -147,12 +147,12 @@ namespace PubnubApi.EndPoint
 					var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 					if (!string.IsNullOrEmpty(responseString)) {
                         requestState.GotJsonResponse = true;
-                        logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+                        logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						List<object> result = ProcessJsonResponse(requestState, responseString);
 						ProcessResponseCallbacks(result, requestState);
 					} else {
 						PNStatus errorStatus = GetStatusIfError(requestState, responseString);
-						logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+						logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						callback.OnResponse(default, errorStatus);
 					}
 
@@ -160,7 +160,7 @@ namespace PubnubApi.EndPoint
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNSetUuidMetadataOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
-					logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+					logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 					requestState.PubnubCallback.OnResponse(default, status);
 				}
 			});
@@ -171,7 +171,7 @@ namespace PubnubApi.EndPoint
 			if (string.IsNullOrEmpty(uuid)) {
 				this.uuidId = config.UserId;
 			}
-			logger.Debug($"{GetType().Name} parameter validated.");
+			logger?.Debug($"{GetType().Name} parameter validated.");
 			PNResult<PNSetUuidMetadataResult> returnValue = new PNResult<PNSetUuidMetadataResult>();
 
 			RequestState<PNSetUuidMetadataResult> requestState = new RequestState<PNSetUuidMetadataResult>
@@ -212,7 +212,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNSetUuidMetadataOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
-			logger.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
+			logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 

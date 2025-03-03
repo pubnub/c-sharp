@@ -58,7 +58,7 @@ namespace PubnubApi.EndPoint
 
 		public void Execute()
 		{
-			logger.Trace($"{GetType().Name} Execute invoked");
+			logger?.Trace($"{GetType().Name} Execute invoked");
 			Unsubscribe(subscribeChannelNames, subscribeChannelGroupNames);
 		}
 
@@ -68,7 +68,7 @@ namespace PubnubApi.EndPoint
 				throw new ArgumentException("Either Channel Or Channel Group or Both should be provided.");
 			}
 
-			logger.Trace($" Unsubscribe request for channels: {string.Join(",", channels ?? [])}, channelGroups: {string.Join(",", channelGroups ?? [])} ");
+			logger?.Trace($" Unsubscribe request for channels: {string.Join(",", channels ?? [])}, channelGroups: {string.Join(",", channelGroups ?? [])} ");
 
 			if (subscribeEventEngineFactory.HasEventEngine(instanceId)) {
 				subscribeEventEngine = subscribeEventEngineFactory.GetEventEngine(instanceId);
@@ -136,7 +136,7 @@ namespace PubnubApi.EndPoint
 					}	
 				}
 			} else {
-				logger.Error($"Attempted unsubscribe without event engine");
+				logger?.Error($"Attempted unsubscribe without event engine");
 			}
 
 		}

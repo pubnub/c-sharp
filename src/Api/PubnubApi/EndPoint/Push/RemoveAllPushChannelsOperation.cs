@@ -76,13 +76,13 @@ namespace PubnubApi.EndPoint
 		public void Execute(PNCallback<PNPushRemoveAllChannelsResult> callback)
 		{
 			savedCallback = callback;
-			logger.Trace($"{GetType().Name} Execute invoked");
+			logger?.Trace($"{GetType().Name} Execute invoked");
 			RemoveAllChannelsForDevice(this.pubnubPushType, this.deviceTokenId, this.pushEnvironment, this.deviceTopic, this.queryParam, callback);
 		}
 
 		public async Task<PNResult<PNPushRemoveAllChannelsResult>> ExecuteAsync()
 		{
-			logger.Trace($"{GetType().Name} ExecuteAsync invoked.");
+			logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
 			return await RemoveAllChannelsForDevice(this.pubnubPushType, this.deviceTokenId, this.pushEnvironment, this.deviceTopic, this.queryParam).ConfigureAwait(false);
 		}
 
@@ -100,7 +100,7 @@ namespace PubnubApi.EndPoint
 			if (pushType == PNPushType.APNS2 && string.IsNullOrEmpty(deviceTopic)) {
 				throw new ArgumentException("Missing Topic");
 			}
-			logger.Debug($"{GetType().Name} parameter validated.");
+			logger?.Debug($"{GetType().Name} parameter validated.");
 			RequestState<PNPushRemoveAllChannelsResult> requestState = new RequestState<PNPushRemoveAllChannelsResult>
 				{
 					ResponseType = PNOperationType.PushUnregister,
@@ -117,18 +117,18 @@ namespace PubnubApi.EndPoint
 					requestState.GotJsonResponse = true;
 					if (!string.IsNullOrEmpty(responseString)) {
 						List<object> result = ProcessJsonResponse(requestState, responseString);
-						logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+						logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						ProcessResponseCallbacks(result, requestState);
 					} else {
 						PNStatus errorStatus = GetStatusIfError(requestState, responseString);
-						logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+						logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						callback.OnResponse(default, errorStatus);
 					}
 				} else {
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PushUnregister, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
-					logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+					logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 					requestState.PubnubCallback.OnResponse(default, status);
 				}
 			});
@@ -143,7 +143,7 @@ namespace PubnubApi.EndPoint
 			if (pushType == PNPushType.APNS2 && string.IsNullOrEmpty(deviceTopic)) {
 				throw new ArgumentException("Missing Topic");
 			}
-			logger.Debug($"{GetType().Name} parameter validated.");
+			logger?.Debug($"{GetType().Name} parameter validated.");
 			PNResult<PNPushRemoveAllChannelsResult> returnValue = new PNResult<PNPushRemoveAllChannelsResult>();
 			RequestState<PNPushRemoveAllChannelsResult> requestState = new RequestState<PNPushRemoveAllChannelsResult>();
 			requestState.ResponseType = PNOperationType.PushUnregister;
@@ -179,7 +179,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PushUnregister, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
-			logger.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
+			logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 

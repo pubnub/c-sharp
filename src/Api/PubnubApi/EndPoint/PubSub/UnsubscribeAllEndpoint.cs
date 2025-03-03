@@ -28,9 +28,9 @@ namespace PubnubApi.EndPoint
 
         private void UnsubscribeAll()
         {
-            logger.Trace($"{GetType().Name} Execute invoked");
+            logger?.Trace($"{GetType().Name} Execute invoked");
 			if (subscribeEventEngineFactory.HasEventEngine(instanceId)) {
-                logger.Trace($"EventEngine instance found.");
+                logger?.Trace($"EventEngine instance found.");
 				SubscribeEventEngine subscribeEventEngine = subscribeEventEngineFactory.GetEventEngine(instanceId);
                 subscribeEventEngine.UnsubscribeAll();
 			}

@@ -71,7 +71,7 @@ namespace PubnubApi.EndPoint
 			}
 
 			savedCallback = callback;
-			logger.Trace($"{GetType().Name} Execute invoked");
+			logger?.Trace($"{GetType().Name} Execute invoked");
 			Publish(channelName, messageTimetoken, messageAction, queryParam, callback);
 		}
 
@@ -80,7 +80,7 @@ namespace PubnubApi.EndPoint
 			if (config == null || string.IsNullOrEmpty(config.SubscribeKey) || config.SubscribeKey.Trim().Length <= 0) {
 				throw new MissingMemberException("subscribe key is required");
 			}
-			logger.Trace($"{GetType().Name} ExecuteAsync invoked.");
+			logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
 			return await Publish(this.channelName, this.messageTimetoken, this.messageAction, this.queryParam).ConfigureAwait(false);
 		}
 
@@ -107,7 +107,7 @@ namespace PubnubApi.EndPoint
 				callback.OnResponse(null, status);
 				return;
 			}
-			logger.Debug($"{GetType().Name} parameter validated.");
+			logger?.Debug($"{GetType().Name} parameter validated.");
 			RequestState<PNAddMessageActionResult> requestState = new RequestState<PNAddMessageActionResult>
 				{
 					Channels = new[] { channelName },
@@ -137,7 +137,7 @@ namespace PubnubApi.EndPoint
 				if (!string.IsNullOrEmpty(json))
 				{
 					List<object> result = ProcessJsonResponse(requestState, json);
-					logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+					logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 					ProcessResponseCallbacks(result, requestState);
 				} else {
 					requestState.PubnubCallback.OnResponse(default, errorStatus);
@@ -146,7 +146,7 @@ namespace PubnubApi.EndPoint
 				int statusCode = PNStatusCodeHelper.GetHttpStatusCode(t.Result.Error.Message);
 				PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, t.Result.Error.Message);
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNPublishOperation, category, requestState, statusCode, new PNException(t.Result.Error.Message, t.Result.Error));
-				logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+				logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 				requestState.PubnubCallback.OnResponse(default(PNAddMessageActionResult), status);
 			}
 			CleanUp();
@@ -171,7 +171,7 @@ namespace PubnubApi.EndPoint
 				returnValue.Status = status;
 				return returnValue;
 			}
-			logger.Debug($"{GetType().Name} parameter validated.");
+			logger?.Debug($"{GetType().Name} parameter validated.");
 			RequestState<PNAddMessageActionResult> requestState = new RequestState<PNAddMessageActionResult>
 				{
 					Channels = new[] { channel },
@@ -215,7 +215,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNAddMessageActionOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
-			logger.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
+			logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 

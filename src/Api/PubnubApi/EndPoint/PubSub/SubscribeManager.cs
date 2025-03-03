@@ -182,12 +182,12 @@ namespace PubnubApi.EndPoint
 							PresenceHeartbeatTimer.Dispose();
 							PresenceHeartbeatTimer = null;
 						}
-						logger.Debug($"All channels are Unsubscribed. Further subscription was stopped");
+						logger?.Debug($"All channels are Unsubscribed. Further subscription was stopped");
 					}
 				}
 			} catch (Exception ex)
 			{
-				logger.Error(
+				logger?.Error(
 					$"At SubscribeManager.MultiChannelUnSubscribeInit() \n channel(s)={string.Join(",", validChannels.OrderBy(x => x).ToArray())} \n cg(s)={string.Join(",", validChannelGroups.OrderBy(x => x).ToArray())} \n Exception Details={ex}");
 			}
 		}
@@ -219,7 +219,7 @@ namespace PubnubApi.EndPoint
 					if (channelGroups != null && channelGroups.Length > 0 && (channels == null || channels.Length == 0)) {
 						channelGroupSubscribeOnly = true;
 					}
-					logger.Debug($"MultiChannelSubscribeRequest with tt=0");
+					logger?.Debug($"MultiChannelSubscribeRequest with tt=0");
 					MultiChannelSubscribeRequest<T>(responseType, channels, channelGroups, 0, 0, false, initialSubscribeUrlParams, externalQueryParam);
 
 					if (SubscribeHeartbeatCheckTimer != null) {
@@ -230,7 +230,7 @@ namespace PubnubApi.EndPoint
 				}
 			} catch (Exception ex)
 			{
-				logger.Error($"subscribe initialisation opeartion encountered error {ex.Message}");
+				logger?.Error($"subscribe initialisation opeartion encountered error {ex.Message}");
 			}
 		}
 
@@ -238,17 +238,17 @@ namespace PubnubApi.EndPoint
 		{
 			if (!config.ContainsKey(PubnubInstance.InstanceId))
 			{
-				logger.Trace($"InstanceId Not Available. Exiting MultiChannelSubscribeRequest");
+				logger?.Trace($"InstanceId Not Available. Exiting MultiChannelSubscribeRequest");
 				return;
 			}
 			if (SubscribeDisconnected[PubnubInstance.InstanceId]) {
-				logger.Trace($"SubscribeDisconnected. Exiting MultiChannelSubscribeRequest");
+				logger?.Trace($"SubscribeDisconnected. Exiting MultiChannelSubscribeRequest");
 				return;
 			}
 			//Exit if the channel is unsubscribed
 			if (SubscriptionChannels[PubnubInstance.InstanceId].Count <= 0 && SubscriptionChannelGroups[PubnubInstance.InstanceId].Count <= 0)
 			{
-				logger.Trace($"Zero channels/channelGroups. Further subscription was stopped");
+				logger?.Trace($"Zero channels/channelGroups. Further subscription was stopped");
 				return;
 			}
 			TerminateCurrentSubscriberRequest();
@@ -280,7 +280,7 @@ namespace PubnubApi.EndPoint
 				this.customQueryParam = externalQueryParam;
 				RegisterPresenceHeartbeatTimer<T>(channels, channelGroups);
 				long lastTimetoken = LastSubscribeTimetoken.ContainsKey(PubnubInstance.InstanceId)? LastSubscribeTimetoken[PubnubInstance.InstanceId] : 0;
-				logger.Trace(
+				logger?.Trace(
 					$"Building request for channel(s)={multiChannel}, channelgroup(s)={multiChannelGroup} with timetoken={lastTimetoken}");
 				string channelsJsonState = BuildJsonUserState(channels, channelGroups, false);
 				config[PubnubInstance.InstanceId].UserId = CurrentUserId[PubnubInstance.InstanceId]; // to make sure we capture if UUID is changed
@@ -330,7 +330,7 @@ namespace PubnubApi.EndPoint
 					}
 				});
 			} catch (Exception ex) {
-				logger.Error($"method:_subscribe \n channel={string.Join(",", channels.OrderBy(x => x).ToArray())} \n timetoken={timetoken} \n Exception Details={ex}");
+				logger?.Error($"method:_subscribe \n channel={string.Join(",", channels.OrderBy(x => x).ToArray())} \n timetoken={timetoken} \n Exception Details={ex}");
 				PNStatusCategory errorCategory = PNStatusCategoryHelper.GetPNStatusCategory(ex);
 				PNStatus status = new StatusBuilder(config[PubnubInstance.InstanceId], jsonLibrary).CreateStatusResponse<T>(type, errorCategory, pubnubRequestState, Constants.ResourceNotFoundStatusCode, new PNException(ex));
 				if (channels != null && channels.Length > 0) {
@@ -346,7 +346,7 @@ namespace PubnubApi.EndPoint
 
 		private void MultiplexExceptionHandlerTimerCallback<T>(object state)
 		{
-			logger.Trace($" MultiplexExceptionHandlerTimerCallback");
+			logger?.Trace($" MultiplexExceptionHandlerTimerCallback");
 			RequestState<T> currentState = state as RequestState<T>;
 			if (currentState != null) {
 				MultiplexExceptionHandler<T>(currentState.ResponseType, currentState.Channels, currentState.ChannelGroups, false);
@@ -405,12 +405,12 @@ namespace PubnubApi.EndPoint
 
 				long timetoken = GetTimetokenFromMultiplexResult(message);
 				int region = GetRegionFromMultiplexResult(message);
-				logger.Trace($"MultiplexInternalCallback timetoken = {timetoken}; region = {region}");
-				logger.Trace($"Calling MultiChannelSubscribeRequest tt {timetoken}");
+				logger?.Trace($"MultiplexInternalCallback timetoken = {timetoken}; region = {region}");
+				logger?.Trace($"Calling MultiChannelSubscribeRequest tt {timetoken}");
 				MultiChannelSubscribeRequest<T>(type, channels, channelGroups, timetoken, region, false, null, this.customQueryParam);
 			} else
 			{
-				logger.Error($"Lost Channel Name for resubscribe");
+				logger?.Error($"Lost Channel Name for resubscribe");
 			}
 		}
 
@@ -425,17 +425,17 @@ namespace PubnubApi.EndPoint
 				netState.Region = region;
 				if (!config.ContainsKey(PubnubInstance.InstanceId))
 				{
-					logger.Trace($" InstanceId Not Available. So no reconnect");
+					logger?.Trace($" InstanceId Not Available. So no reconnect");
 				}
 
 				if (SubscribeDisconnected[PubnubInstance.InstanceId]) {
-					logger.Trace($"Subscribe is still Disconnected. So no reconnect");
+					logger?.Trace($"Subscribe is still Disconnected. So no reconnect");
 				} else if (config[PubnubInstance.InstanceId].ReconnectionPolicy != PNReconnectionPolicy.NONE) {
-					logger.Trace($"Subscribe - No internet connection for channel={string.Join(",", channels.OrderBy(x => x).ToArray())} and channelgroup={(channelGroups != null ? string.Join(",", channelGroups) : "")}; networkAvailable={networkAvailable}");
+					logger?.Trace($"Subscribe - No internet connection for channel={string.Join(",", channels.OrderBy(x => x).ToArray())} and channelgroup={(channelGroups != null ? string.Join(",", channelGroups) : "")}; networkAvailable={networkAvailable}");
 					TerminateReconnectTimer();
 					ReconnectNetwork<T>(netState);
 				} else {
-					logger.Warn($"reconnection policy is DISABLED, please handle reconnection manually.");
+					logger?.Warn($"reconnection policy is DISABLED, please handle reconnection manually.");
 					if (!networkAvailable) {
 						PNStatusCategory errorCategory = PNStatusCategory.PNNetworkIssuesCategory;
 						PNStatus status = new StatusBuilder(config[PubnubInstance.InstanceId], jsonLibrary).CreateStatusResponse<T>(type, errorCategory, null, Constants.ResourceNotFoundStatusCode, new PNException("SDK Network related error"));
@@ -458,7 +458,7 @@ namespace PubnubApi.EndPoint
 		private void ReconnectNetwork<T>(ReconnectState<T> netState)
 		{
 			if (netState != null && ((netState.Channels != null && netState.Channels.Length > 0) || (netState.ChannelGroups != null && netState.ChannelGroups.Length > 0))) {
-				logger.Trace($"SubscribeManager ReconnectNetwork interval = {PubnubNetworkTcpCheckIntervalInSeconds} sec");
+				logger?.Trace($"SubscribeManager ReconnectNetwork interval = {PubnubNetworkTcpCheckIntervalInSeconds} sec");
 
 				System.Threading.Timer timer;
 
@@ -498,7 +498,7 @@ namespace PubnubApi.EndPoint
 					networkConnection = CheckInternetConnectionStatus<T>(PubnetSystemActive, PNOperationType.PNSubscribeOperation, null, channels, channelGroups);
 				}
 				if (!networkConnection)  {
-					logger.Warn($" No network for SubscribeManager Manual Reconnect");
+					logger?.Warn($" No network for SubscribeManager Manual Reconnect");
 
 					PNStatusCategory errorCategory = PNStatusCategory.PNNetworkIssuesCategory;
 					PNStatus status = new StatusBuilder(config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId] : null, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNSubscribeOperation, errorCategory, null, Constants.ResourceNotFoundStatusCode, new PNException("SDK Network related error"));
@@ -513,12 +513,12 @@ namespace PubnubApi.EndPoint
 					return false;
 				}
 			} else {
-				logger.Debug($"No channels/channelgroups for SubscribeManager Manual Reconnect");
+				logger?.Debug($"No channels/channelgroups for SubscribeManager Manual Reconnect");
 				return false;
 			}
 
 
-			logger.Trace($"SubscribeManager Manual Reconnect");
+			logger?.Trace($"SubscribeManager Manual Reconnect");
 			SubscribeDisconnected[PubnubInstance.InstanceId] = false;
 
 			Task.Factory.StartNew(() => {
@@ -537,7 +537,7 @@ namespace PubnubApi.EndPoint
 			if (SubscribeDisconnected[PubnubInstance.InstanceId]) {
 				return false;
 			}
-			logger.Trace($"SubscribeManager Manual Disconnect");
+			logger?.Trace($"SubscribeManager Manual Disconnect");
 			SubscribeDisconnected[PubnubInstance.InstanceId] = true;
 			TerminateCurrentSubscriberRequest();
 			TerminatePresenceHeartbeatTimer();
@@ -550,11 +550,11 @@ namespace PubnubApi.EndPoint
 		{
 			try {
 				if (SubscribeDisconnected[PubnubInstance.InstanceId]) {
-					logger.Trace($"SubscribeManager - SubscribeDisconnected. No heartbeat check.");
+					logger?.Trace($"SubscribeManager - SubscribeDisconnected. No heartbeat check.");
 					return;
 				}
 				if (!config.ContainsKey(PubnubInstance.InstanceId)) {
-					logger.Trace($"InstanceId Not Available. So No heartbeat check.");
+					logger?.Trace($"InstanceId Not Available. So No heartbeat check.");
 					return;
 				}
 
@@ -566,9 +566,9 @@ namespace PubnubApi.EndPoint
 					if (networkConnection && PubnubInstance != null && SubscribeRequestTracker.ContainsKey(PubnubInstance.InstanceId)) {
 						DateTime lastSubscribeRequestTime = SubscribeRequestTracker[PubnubInstance.InstanceId];
 						if ((DateTime.Now - lastSubscribeRequestTime).TotalSeconds < config[PubnubInstance.InstanceId].SubscribeTimeout) {
-							logger.Trace($"SubscribeManager: expected subscribe within threshold limit of SubscribeTimeout");
+							logger?.Trace($"SubscribeManager: expected subscribe within threshold limit of SubscribeTimeout");
 						} else if (config != null && (DateTime.Now - lastSubscribeRequestTime).TotalSeconds > 2 * (config[PubnubInstance.InstanceId].SubscribeTimeout - config[PubnubInstance.InstanceId].SubscribeTimeout / 2)) {
-							logger.Trace($"SubscribeManager - **No auto subscribe within threshold limit of SubscribeTimeout. Calling MultiChannelSubscribeRequest");
+							logger?.Trace($"SubscribeManager - **No auto subscribe within threshold limit of SubscribeTimeout. Calling MultiChannelSubscribeRequest");
 							Task.Factory.StartNew(() => {
 								TerminateCurrentSubscriberRequest();
 								MultiChannelSubscribeRequest<T>(PNOperationType.PNSubscribeOperation, channels, chananelGroups, LastSubscribeTimetoken[PubnubInstance.InstanceId], LastSubscribeRegion[PubnubInstance.InstanceId], false, null, this.customQueryParam);
@@ -597,14 +597,14 @@ namespace PubnubApi.EndPoint
 						}
 					}
 				} else {
-					logger.Trace($"SubscribeManager - StartSubscribeHeartbeatCheckCallback - No channels/cgs avaialable");
+					logger?.Trace($"SubscribeManager - StartSubscribeHeartbeatCheckCallback - No channels/cgs avaialable");
 					try {
 						SubscribeHeartbeatCheckTimer.Change(Timeout.Infinite, Timeout.Infinite);
 						TerminateCurrentSubscriberRequest();
 					} catch {  /* ignore */ }
 				}
 			} catch (Exception ex) {
-				logger.Error($" SubscribeManager - StartSubscribeHeartbeatCheckCallback - EXCEPTION: {ex}");
+				logger?.Error($" SubscribeManager - StartSubscribeHeartbeatCheckCallback - EXCEPTION: {ex}");
 			}
 		}
 
@@ -644,7 +644,7 @@ namespace PubnubApi.EndPoint
 							if(!networkConnection){
 								ConnectionErrors++;
 								UpdatePubnubNetworkTcpCheckIntervalInSeconds();
-								logger.Trace(
+								logger?.Trace(
 									$"channel={channel} {netState.ResponseType} reconnectNetworkCallback. Retry");
 								if (netState.Channels != null && netState.Channels.Length > 0) {
 									PNStatus status = new StatusBuilder(config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId] : null, jsonLibrary).CreateStatusResponse<T>(netState.ResponseType, PNStatusCategory.PNNetworkIssuesCategory, null, (int)System.Net.HttpStatusCode.NotFound, new PNException("Internet connection problem. Retrying connection"));
@@ -662,7 +662,7 @@ namespace PubnubApi.EndPoint
 						if (ChannelInternetStatus[PubnubInstance.InstanceId].ContainsKey(channel) && ChannelInternetStatus[PubnubInstance.InstanceId].TryGetValue(channel, out channelInternetFlag) && channelInternetFlag) {
 							if (ChannelReconnectTimer[PubnubInstance.InstanceId].ContainsKey(channel))
 							{
-								logger.Trace($"{channel} {netState.ResponseType} terminating channel reconnect timer");
+								logger?.Trace($"{channel} {netState.ResponseType} terminating channel reconnect timer");
 								TerminateReconnectTimer();
 							}
 
@@ -675,7 +675,7 @@ namespace PubnubApi.EndPoint
 							}
 							Announce(status);
 
-							logger.Trace(
+							logger?.Trace(
 								$"channel={channel} {netState.ResponseType} reconnectNetworkCallback. Internet Available : {channelInternetFlag}");
 							switch (netState.ResponseType) {
 								case PNOperationType.PNSubscribeOperation:
@@ -706,7 +706,7 @@ namespace PubnubApi.EndPoint
 									ChannelInternetStatus[PubnubInstance.InstanceId].AddOrUpdate(channel, networkConnection, (key, oldValue) => networkConnection);
 								}
 
-								logger.Trace(
+								logger?.Trace(
 									$"channelgroup={channelGroup} {netState.ResponseType} reconnectNetworkCallback. Retrying");
 
 								if (netState.ChannelGroups != null && netState.ChannelGroups.Length > 0) {
@@ -725,7 +725,7 @@ namespace PubnubApi.EndPoint
 						if (ChannelGroupInternetStatus[PubnubInstance.InstanceId].TryGetValue(channelGroup, out channelGroupInternetFlag) && channelGroupInternetFlag) {
 							if (ChannelGroupReconnectTimer[PubnubInstance.InstanceId].ContainsKey(channelGroup))
 							{
-								logger.Trace($"{channelGroup} {netState.ResponseType} terminating channel group reconnect timer");
+								logger?.Trace($"{channelGroup} {netState.ResponseType} terminating channel group reconnect timer");
 								TerminateReconnectTimer();
 							}
 
@@ -741,7 +741,7 @@ namespace PubnubApi.EndPoint
 								Announce(status);
 							}
 
-							logger.Trace($" channelgroup={channelGroup} {netState.ResponseType} reconnectNetworkCallback. Internet Available");
+							logger?.Trace($" channelgroup={channelGroup} {netState.ResponseType} reconnectNetworkCallback. Internet Available");
 							switch (netState.ResponseType) {
 								case PNOperationType.PNSubscribeOperation:
 								case PNOperationType.Presence:
@@ -754,7 +754,7 @@ namespace PubnubApi.EndPoint
 					}
 				} else
 				{
-					logger.Trace($"Unknown request state in reconnectNetworkCallback");
+					logger?.Trace($"Unknown request state in reconnectNetworkCallback");
 				}
 			} catch (Exception ex) {
 				if (netState != null) {
@@ -769,7 +769,7 @@ namespace PubnubApi.EndPoint
 					Announce(status);
 				}
 
-				logger.Error($" method:reconnectNetworkCallback \n Exception message = {ex.Message} Details={ex.StackTrace}");
+				logger?.Error($" method:reconnectNetworkCallback \n Exception message = {ex.Message} Details={ex.StackTrace}");
 			}
 		}
 

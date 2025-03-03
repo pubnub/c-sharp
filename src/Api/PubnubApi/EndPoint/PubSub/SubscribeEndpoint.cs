@@ -163,11 +163,11 @@ namespace PubnubApi.EndPoint
                 {
                     attempts = receiveReconnectingState.AttemptedRetries;
                 }
-                config.Logger.Trace($"event engine OnEventQueued : CurrentState: {subscribeEventEngine.CurrentState.GetType().Name}; Event = {@event.GetType().Name}; Attempt = {attempts}");
+                config.Logger?.Trace($"event engine OnEventQueued : CurrentState: {subscribeEventEngine.CurrentState.GetType().Name}; Event = {@event.GetType().Name}; Attempt = {attempts}");
             }
             catch(Exception ex)
             {
-                config.Logger.Error($"event engine OnEventQueued : CurrentState = {subscribeEventEngine.CurrentState.GetType().Name} => EXCEPTION = {ex}");
+                config.Logger?.Error($"event engine OnEventQueued : CurrentState = {subscribeEventEngine.CurrentState.GetType().Name} => EXCEPTION = {ex}");
             }
         }
 
@@ -175,11 +175,11 @@ namespace PubnubApi.EndPoint
         {
             try
             {
-               config.Logger.Trace($"event engine OnStateTransition : CurrentState = {subscribeEventEngine.CurrentState.GetType().Name} => Transition State = {obj?.State.GetType().Name}");
+               config.Logger?.Trace($"event engine OnStateTransition : CurrentState = {subscribeEventEngine.CurrentState.GetType().Name} => Transition State = {obj?.State.GetType().Name}");
             }
             catch(Exception ex)
             {
-	            config.Logger.Error(
+	            config.Logger?.Error(
 		            $"event engine OnStateTransition : CurrentState = {subscribeEventEngine.CurrentState.GetType().Name} => EXCEPTION = {ex}");
             }
         }

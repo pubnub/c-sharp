@@ -119,7 +119,7 @@ namespace PubnubApi.EndPoint
 
 		public void Execute(PNCallback<PNFileUploadResult> callback)
 		{
-			logger.Trace($"{GetType().Name} Execute invoked");
+			logger?.Trace($"{GetType().Name} Execute invoked");
 			if (callback == null) {
 				throw new ArgumentException("Missing callback");
 			}
@@ -127,13 +127,13 @@ namespace PubnubApi.EndPoint
 			if (string.IsNullOrEmpty(sendFileName)) {
 				throw new ArgumentException("Missing File");
 			}
-			logger.Debug($"{GetType().Name} parameter validated.");
+			logger?.Debug($"{GetType().Name} parameter validated.");
 			ProcessFileUpload(callback);
 		}
 
 		public async Task<PNResult<PNFileUploadResult>> ExecuteAsync()
 		{
-			logger.Trace($"{GetType().Name} ExecuteAsync invoked.");
+			logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
 			return await ProcessFileUpload().ConfigureAwait(false);
 		}
 
@@ -150,7 +150,7 @@ namespace PubnubApi.EndPoint
 				}
 				return;
 			}
-			logger.Debug($"GenerateFileUploadUrl executed.");
+			logger?.Debug($"GenerateFileUploadUrl executed.");
 			RequestState<PNFileUploadResult> requestState = new RequestState<PNFileUploadResult>();
 			requestState.ResponseType = PNOperationType.PNFileUploadOperation;
 			requestState.PubnubCallback = callback;
@@ -207,14 +207,14 @@ namespace PubnubApi.EndPoint
 								result.FileName = generateFileUploadUrlResult.FileName;
 								LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Publish file message executed successfully.", config.LogVerbosity);
 								var status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, 200, null);
-								logger.Info($"{GetType().Name} request executed with status code {requestState.Response.StatusCode}");
+								logger?.Info($"{GetType().Name} request executed with status code {requestState.Response.StatusCode}");
 								callback.OnResponse(result, status);
 							} else {
 								publishFailed = true;
 								if (currentFileRetryCount == publishFileRetryLimit) {
 									callback.OnResponse(null, publishFileMessageStatus);
 								}
-								logger.Debug($"PublishFileMessage Failed rety count ={currentFileRetryCount}");
+								logger?.Debug($"PublishFileMessage Failed rety count ={currentFileRetryCount}");
 							}
 						}
 						while (publishFailed && currentFileRetryCount <= publishFileRetryLimit && !(publishFileMessageStatus?.StatusCode != 400 || publishFileMessageStatus.StatusCode != 403));
@@ -222,7 +222,7 @@ namespace PubnubApi.EndPoint
 						int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse?.Error?.Message);
 						PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse?.Error?.Message);
 						PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNFileUploadOperation, category, requestState, statusCode, new PNException(transportResponse?.Error?.Message, transportResponse?.Error));
-						logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+						logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						requestState.PubnubCallback.OnResponse(default, status);
 					}
 				}
@@ -237,7 +237,7 @@ namespace PubnubApi.EndPoint
 				returnValue.Status = errStatus;
 				return returnValue;
 			}
-			logger.Debug($"{GetType().Name} parameter validated.");
+			logger?.Debug($"{GetType().Name} parameter validated.");
 			PNResult<PNGenerateFileUploadUrlResult> generateFileUploadUrl = await GenerateFileUploadUrl().ConfigureAwait(false);
 			PNGenerateFileUploadUrlResult generateFileUploadUrlResult = generateFileUploadUrl.Result;
 			PNStatus generateFileUploadUrlStatus = generateFileUploadUrl.Status;
@@ -245,7 +245,7 @@ namespace PubnubApi.EndPoint
 				returnValue.Status = generateFileUploadUrlStatus;
 				return returnValue;
 			}
-			logger.Debug($"GenerateFileUploadUrl executed.");
+			logger?.Debug($"GenerateFileUploadUrl executed.");
 			RequestState<PNFileUploadResult> requestState = new RequestState<PNFileUploadResult>
 			{
 				ResponseType = PNOperationType.PNFileUploadOperation,
@@ -307,7 +307,7 @@ namespace PubnubApi.EndPoint
 			returnValue.Status = jsonAndStatusTuple.Item2;
 			string json = jsonAndStatusTuple.Item1;
 			if (!string.IsNullOrEmpty(json)) {
-				logger.Debug($"File content uploaded successfully");
+				logger?.Debug($"File content uploaded successfully");
 				Dictionary<string, object> publishPayload = new Dictionary<string, object>();
 				if (publishFileMessageContent != null && !string.IsNullOrEmpty(publishFileMessageContent.ToString())) {
 					publishPayload.Add("message", publishFileMessageContent);
@@ -337,17 +337,17 @@ namespace PubnubApi.EndPoint
 						};
 						returnValue.Result = result;
 						if (returnValue.Status != null) returnValue.Status.Error = false;
-						logger.Debug($"File message published successfully");
+						logger?.Debug($"File message published successfully");
 					} else {
 						publishFailed = true;
 						returnValue.Status = publishFileMessageStatus;
-						logger.Debug($"PublishFileMessage Failed. retry count={currentFileRetryCount}");
+						logger?.Debug($"PublishFileMessage Failed. retry count={currentFileRetryCount}");
 						await Task.Delay(1000);
 					}
 				}
 				while (publishFailed && currentFileRetryCount <= publishFileRetryLimit && !(publishFileMessageStatus?.StatusCode != 400 || publishFileMessageStatus.StatusCode != 403));
 			}
-			logger.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
+			logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 
@@ -396,13 +396,13 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNGenerateFileUploadUrlOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
-			logger.Info($"Generate file upload url request executed with status code {returnValue.Status.StatusCode}");
+			logger?.Info($"Generate file upload url request executed with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 
 		private async Task<PNResult<PNPublishFileMessageResult>> PublishFileMessage(object message, Dictionary<string, object> externalQueryParam)
 		{
-			logger.Trace("PublishFileMessage executing.");
+			logger?.Trace("PublishFileMessage executing.");
 			PNResult<PNPublishFileMessageResult> returnValue = new PNResult<PNPublishFileMessageResult>();
 
 			var requestParameter = CreatePublishFileMessageRequestParameter();
@@ -451,7 +451,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNPublishFileMessageOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
-			logger.Info($"PublishFileMessage request executed with status code {returnValue.Status.StatusCode}");
+			logger?.Info($"PublishFileMessage request executed with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 

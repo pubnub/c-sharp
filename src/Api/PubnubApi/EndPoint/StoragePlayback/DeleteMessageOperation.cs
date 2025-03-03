@@ -76,7 +76,7 @@ namespace PubnubApi.EndPoint
 
 		public void Execute(PNCallback<PNDeleteMessageResult> callback)
 		{
-			logger.Trace($"{GetType().Name} Execute invoked");
+			logger?.Trace($"{GetType().Name} Execute invoked");
 			if (string.IsNullOrEmpty(config.SubscribeKey) || config.SubscribeKey.Trim().Length == 0) {
 				throw new MissingMemberException("Invalid Subscribe Key");
 			}
@@ -86,7 +86,7 @@ namespace PubnubApi.EndPoint
 
 		public async Task<PNResult<PNDeleteMessageResult>> ExecuteAsync()
 		{
-			logger.Trace($"{GetType().Name} ExecuteAsync invoked.");
+			logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
 			if (string.IsNullOrEmpty(config.SubscribeKey) || config.SubscribeKey.Trim().Length == 0) {
 				throw new MissingMemberException("Invalid Subscribe Key");
 			}
@@ -103,7 +103,7 @@ namespace PubnubApi.EndPoint
 			if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim())) {
 				throw new ArgumentException("Missing Channel");
 			}
-			logger.Debug($"{GetType().Name} parameter validated.");
+			logger?.Debug($"{GetType().Name} parameter validated.");
 			RequestState<PNDeleteMessageResult> requestState = new RequestState<PNDeleteMessageResult>();
 			requestState.Channels = new[] { channel };
 			requestState.ResponseType = PNOperationType.PNDeleteMessageOperation;
@@ -120,14 +120,14 @@ namespace PubnubApi.EndPoint
 					if (!string.IsNullOrEmpty(responseString)) {
 						requestState.GotJsonResponse = true;
 						List<object> result = ProcessJsonResponse(requestState, responseString);
-						logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+						logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						ProcessResponseCallbacks(result, requestState);
 					}
 				} else {
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNDeleteMessageOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
-					logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+					logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 					requestState.PubnubCallback.OnResponse(default(PNDeleteMessageResult), status);
 				}
 			});
@@ -138,7 +138,7 @@ namespace PubnubApi.EndPoint
 			if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim())) {
 				throw new ArgumentException("Missing Channel");
 			}
-			logger.Debug($"{GetType().Name} parameter validated.");
+			logger?.Debug($"{GetType().Name} parameter validated.");
 			PNResult<PNDeleteMessageResult> returnValue = new PNResult<PNDeleteMessageResult>();
 			RequestState<PNDeleteMessageResult> requestState = new RequestState<PNDeleteMessageResult>
 				{
@@ -178,7 +178,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNDeleteMessageOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
-			logger.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
+			logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 

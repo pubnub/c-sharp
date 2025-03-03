@@ -74,13 +74,13 @@ namespace PubnubApi.EndPoint
 					cancellationTokenSource.Dispose();
 				} else
 				{
-					logger.Trace($" SubscribeManager  HandshakeRequestCancellation. No request to cancel.");
+					logger?.Trace($" SubscribeManager  HandshakeRequestCancellation. No request to cancel.");
 				}
 
-				logger.Trace($"SubscribeManager  HandshakeRequestCancellation. Done.");
+				logger?.Trace($"SubscribeManager  HandshakeRequestCancellation. Done.");
 			} catch (Exception ex)
 			{
-				logger.Trace($" SubscribeManager  HandshakeRequestCancellation Exception: {ex}");
+				logger?.Trace($" SubscribeManager  HandshakeRequestCancellation Exception: {ex}");
 			}
 		}
 		internal async Task<Tuple<ReceivingResponse<object>, PNStatus>> ReceiveRequest<T>(PNOperationType responseType, string[] channels, string[] channelGroups, long? timetoken, int? region, Dictionary<string, string> initialSubscribeUrlParams, Dictionary<string, object> externalQueryParam)
@@ -120,7 +120,7 @@ namespace PubnubApi.EndPoint
 				return new Tuple<ReceivingResponse<object>, PNStatus>(null, errStatus);
 			} catch (Exception ex)
 			{
-				logger.Error(
+				logger?.Error(
 					$" SubscribeManager=> MultiChannelSubscribeInit \n channel(s)={string.Join(",", channels.OrderBy(x => x).ToArray())} \n cg(s)={string.Join(",", channelGroups.OrderBy(x => x).ToArray())} \n Exception Details={ex}");
 			}
 			return resp;
@@ -133,12 +133,12 @@ namespace PubnubApi.EndPoint
 					cancellationTokenSource.Cancel();
 					cancellationTokenSource.Dispose();
 				} else {
-					logger.Trace($"SubscribeManager  RequestCancellation. No request to cancel.");
+					logger?.Trace($"SubscribeManager  RequestCancellation. No request to cancel.");
 				}
-				logger.Trace($"SubscribeManager  ReceiveRequestCancellation. Done.");
+				logger?.Trace($"SubscribeManager  ReceiveRequestCancellation. Done.");
 			} catch (Exception ex)
 			{
-				logger.Trace($"SubscribeManager  ReceiveRequestCancellation Exception: {ex}");
+				logger?.Trace($"SubscribeManager  ReceiveRequestCancellation Exception: {ex}");
 			}
 		}
 
@@ -149,11 +149,11 @@ namespace PubnubApi.EndPoint
 					cancellationTokenSource.Cancel();
 					cancellationTokenSource.Dispose();
 				} else {
-					logger.Trace($"SubscribeManager  ReceiveReconnectRequestCancellation. No request to cancel.");
+					logger?.Trace($"SubscribeManager  ReceiveReconnectRequestCancellation. No request to cancel.");
 				}
-				logger.Trace($"SubscribeManager  ReceiveReconnectRequestCancellation. Done.");
+				logger?.Trace($"SubscribeManager  ReceiveReconnectRequestCancellation. Done.");
 			} catch (Exception ex) {
-				logger.Trace($"SubscribeManager  ReceiveReconnectRequestCancellation Exception: {ex}");
+				logger?.Trace($"SubscribeManager  ReceiveReconnectRequestCancellation Exception: {ex}");
 			}
 		}
 

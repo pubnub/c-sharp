@@ -46,13 +46,13 @@ namespace PubnubApi.EndPoint
 		public void Execute(PNCallback<PNWhereNowResult> callback)
 		{
 			this.savedCallback = callback;
-			logger.Trace($"{GetType().Name} Execute invoked");
+			logger?.Trace($"{GetType().Name} Execute invoked");
 			WhereNow(this.whereNowUUID, this.queryParam, callback);
 		}
 
 		public async Task<PNResult<PNWhereNowResult>> ExecuteAsync()
 		{
-			logger.Trace($"{GetType().Name} ExecuteAsync invoked.");			
+			logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");			
 			return await WhereNow(this.whereNowUUID, this.queryParam).ConfigureAwait(false);
 		}
 
@@ -66,7 +66,7 @@ namespace PubnubApi.EndPoint
 			if (jsonLibrary == null) {
 				throw new MissingMemberException("Missing Json Pluggable Library for Pubnub Instance");
 			}
-			logger.Debug($"{GetType().Name} parameter validated.");
+			logger?.Debug($"{GetType().Name} parameter validated.");
 			RequestState<PNWhereNowResult> requestState = new RequestState<PNWhereNowResult>
 			{
 				Channels = new[] { whereNowUUID ?? config.UserId },
@@ -84,18 +84,18 @@ namespace PubnubApi.EndPoint
 					if (!string.IsNullOrEmpty(responseString)) {
 						requestState.GotJsonResponse = true;
 						List<object> result = ProcessJsonResponse(requestState, responseString);
-						logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+						logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						ProcessResponseCallbacks(result, requestState);
 					} else {
 						PNStatus errorStatus = GetStatusIfError(requestState, responseString);
-						logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+						logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						callback.OnResponse(default, errorStatus);
 					}
 				} else {
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNWhereNowOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
-					logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+					logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 					requestState.PubnubCallback.OnResponse(default, status);
 				}
 			});
@@ -106,7 +106,7 @@ namespace PubnubApi.EndPoint
 			if (jsonLibrary == null) {
 				throw new MissingMemberException("Missing Json Pluggable Library for Pubnub Instance");
 			}
-			logger.Debug($"{GetType().Name} parameter validated.");
+			logger?.Debug($"{GetType().Name} parameter validated.");
 			PNResult<PNWhereNowResult> returnValue = new PNResult<PNWhereNowResult>();
 			RequestState<PNWhereNowResult> requestState = new RequestState<PNWhereNowResult>
 			{
@@ -146,7 +146,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNWhereNowOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
-			logger.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
+			logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 

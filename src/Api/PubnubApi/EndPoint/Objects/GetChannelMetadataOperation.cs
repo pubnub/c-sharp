@@ -70,7 +70,7 @@ namespace PubnubApi.EndPoint
 
         public void Execute(PNCallback<PNGetChannelMetadataResult> callback)
         {
-            logger.Trace($"{GetType().Name} Execute invoked");
+            logger?.Trace($"{GetType().Name} Execute invoked");
             if (callback == null)
             {
                 throw new ArgumentException("Missing callback");
@@ -81,7 +81,7 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing Channel");
             }
 
-            logger.Debug($"{GetType().Name} parameter validated.");
+            logger?.Debug($"{GetType().Name} parameter validated.");
             this.savedCallback = callback;
             GetSingleChannelMetadata(this.channelId, this.includeCustom, this.queryParam, savedCallback);
         }
@@ -121,7 +121,7 @@ namespace PubnubApi.EndPoint
                     if (!string.IsNullOrEmpty(responseString))
                     {
                         requestState.GotJsonResponse = true;
-                        logger.Info(
+                        logger?.Info(
                             $"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
                         List<object> result = ProcessJsonResponse(requestState, responseString);
                         ProcessResponseCallbacks(result, requestState);
@@ -129,7 +129,7 @@ namespace PubnubApi.EndPoint
                     else
                     {
                         PNStatus errorStatus = GetStatusIfError(requestState, responseString);
-                        logger.Info(
+                        logger?.Info(
                             $"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
                         callback.OnResponse(null, errorStatus);
                     }
@@ -142,7 +142,7 @@ namespace PubnubApi.EndPoint
                     PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(
                         PNOperationType.PNGetChannelMetadataOperation, category, requestState, statusCode,
                         new PNException(transportResponse.Error.Message, transportResponse.Error));
-                    logger.Info(
+                    logger?.Info(
                         $"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
                     requestState.PubnubCallback.OnResponse(default(PNGetChannelMetadataResult), status);
                 }
@@ -165,7 +165,7 @@ namespace PubnubApi.EndPoint
                 return returnValue;
             }
 
-            logger.Debug($"{GetType().Name} parameter validated.");
+            logger?.Debug($"{GetType().Name} parameter validated.");
             RequestState<PNGetChannelMetadataResult> requestState = new RequestState<PNGetChannelMetadataResult>
             {
                 ResponseType = PNOperationType.PNGetChannelMetadataOperation,
@@ -221,7 +221,7 @@ namespace PubnubApi.EndPoint
                 returnValue.Status = status;
             }
 
-            logger.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
+            logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
             return returnValue;
         }
 

@@ -57,7 +57,7 @@ namespace PubnubApi.EndPoint
 
 		public void Execute(PNCallback<PNMessageCountResult> callback)
 		{
-			logger.Trace($"{GetType().Name} Execute invoked");
+			logger?.Trace($"{GetType().Name} Execute invoked");
 			if (string.IsNullOrEmpty(config.SubscribeKey) || config.SubscribeKey.Trim().Length == 0) {
 				throw new MissingMemberException("Invalid Subscribe Key");
 			}
@@ -68,7 +68,7 @@ namespace PubnubApi.EndPoint
 
 		public async Task<PNResult<PNMessageCountResult>> ExecuteAsync()
 		{
-			logger.Trace($"{GetType().Name} ExecuteAsync invoked.");
+			logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
 			if (string.IsNullOrEmpty(config.SubscribeKey) || config.SubscribeKey.Trim().Length == 0) {
 				throw new MissingMemberException("Invalid Subscribe Key");
 			}
@@ -86,7 +86,7 @@ namespace PubnubApi.EndPoint
 			if (channels == null || channels.Length == 0) {
 				throw new ArgumentException("Missing Channel");
 			}
-			logger.Debug($"{GetType().Name} parameter validated.");
+			logger?.Debug($"{GetType().Name} parameter validated.");
 			RequestState<PNMessageCountResult> requestState = new RequestState<PNMessageCountResult>
 			{
 				Channels = channels,
@@ -105,14 +105,14 @@ namespace PubnubApi.EndPoint
 					requestState.GotJsonResponse = true;
 					if (!string.IsNullOrEmpty(responseString)) {
 						List<object> result = ProcessJsonResponse(requestState, responseString);
-						logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+						logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						ProcessResponseCallbacks(result, requestState);
 					}
 				} else {
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNMessageCountsOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
-					logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+					logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 					requestState.PubnubCallback.OnResponse(default(PNMessageCountResult), status);
 				}
 			});
@@ -123,7 +123,7 @@ namespace PubnubApi.EndPoint
 			if (channels == null || channels.Length == 0) {
 				throw new ArgumentException("Missing Channel");
 			}
-			logger.Debug($"{GetType().Name} parameter validated.");
+			logger?.Debug($"{GetType().Name} parameter validated.");
 			PNResult<PNMessageCountResult> returnValue = new PNResult<PNMessageCountResult>();
 			RequestState<PNMessageCountResult> requestState = new RequestState<PNMessageCountResult>();
 			requestState.Channels = channels;
@@ -161,7 +161,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNMessageCountsOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
-			logger.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
+			logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 

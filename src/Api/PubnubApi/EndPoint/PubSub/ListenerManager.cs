@@ -42,20 +42,20 @@ namespace PubnubApi.EndPoint
                             List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
                             callbackList.Add(listener);
                             SubscribeCallbackListenerList[PubnubInstance.InstanceId] = callbackList;
-                            pubnubConfig.Logger.Debug($"AddListener: Listener added");
+                            pubnubConfig.Logger?.Debug($"AddListener: Listener added");
                         }
                         else
                         {
                             List<SubscribeCallback> callbackList = new List<SubscribeCallback>();
                             callbackList.Add(listener);
                             SubscribeCallbackListenerList.GetOrAdd(PubnubInstance.InstanceId, callbackList);
-                            pubnubConfig.Logger.Debug($"AddListener: Listener added");
+                            pubnubConfig.Logger?.Debug($"AddListener: Listener added");
                         }
                         ret = true;
                     }
                     catch (Exception ex)
                     {
-                        pubnubConfig.Logger.Error($"AddListener exception {ex.Message} stack trace: {ex.StackTrace}");
+                        pubnubConfig.Logger?.Error($"AddListener exception {ex.Message} stack trace: {ex.StackTrace}");
                     }
                 }
             }
@@ -80,12 +80,12 @@ namespace PubnubApi.EndPoint
                                 ret = true;
                             }
                             SubscribeCallbackListenerList[PubnubInstance.InstanceId] = callbackList;
-                            pubnubConfig.Logger.Debug($"RemoveListener: Listener removed");
+                            pubnubConfig.Logger?.Debug($"RemoveListener: Listener removed");
                         }
                     }
                     catch (Exception ex)
                     {
-                        pubnubConfig.Logger.Error($"RemoveListener exception {ex.Message} stack trace: {ex.StackTrace}");
+                        pubnubConfig.Logger?.Error($"RemoveListener exception {ex.Message} stack trace: {ex.StackTrace}");
                     }
                 }
             }

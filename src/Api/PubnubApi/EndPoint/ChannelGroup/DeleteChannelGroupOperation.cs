@@ -46,13 +46,13 @@ namespace PubnubApi.EndPoint
 		public void Execute(PNCallback<PNChannelGroupsDeleteGroupResult> callback)
 		{
 			this.savedCallback = callback;
-			logger.Trace($"{GetType().Name} Execute invoked");
+			logger?.Trace($"{GetType().Name} Execute invoked");
 			DeleteChannelGroup(this.channelGroupName, this.queryParam, callback);
 		}
 
 		public async Task<PNResult<PNChannelGroupsDeleteGroupResult>> ExecuteAsync()
 		{
-			logger.Trace($"{GetType().Name} ExecuteAsync invoked.");
+			logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
 			return await DeleteChannelGroup(this.channelGroupName, this.queryParam).ConfigureAwait(false);
 		}
 
@@ -66,7 +66,7 @@ namespace PubnubApi.EndPoint
 			if (string.IsNullOrEmpty(groupName) || groupName.Trim().Length == 0) {
 				throw new ArgumentException("Missing groupName");
 			}
-			logger.Debug($"{GetType().Name} parameter validated.");
+			logger?.Debug($"{GetType().Name} parameter validated.");
 			RequestState<PNChannelGroupsDeleteGroupResult> requestState = new RequestState<PNChannelGroupsDeleteGroupResult>();
 			requestState.ResponseType = PNOperationType.PNRemoveGroupOperation;
 			requestState.Channels = new string[] { };
@@ -84,14 +84,14 @@ namespace PubnubApi.EndPoint
 					requestState.GotJsonResponse = true;
 					if (!string.IsNullOrEmpty(responseString)) {
 						List<object> result = ProcessJsonResponse(requestState, responseString);
-						logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+						logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						ProcessResponseCallbacks(result, requestState);
 					}
 				} else {
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(t.Result.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, t.Result.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNRemoveGroupOperation, category, requestState, statusCode, new PNException(t.Result.Error.Message, t.Result.Error));
-					logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+					logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 					requestState.PubnubCallback.OnResponse(default(PNChannelGroupsDeleteGroupResult), status);
 				}
 			});
@@ -103,7 +103,7 @@ namespace PubnubApi.EndPoint
 				throw new ArgumentException("Missing groupName");
 			}
 			
-			logger.Debug($"{GetType().Name} parameter validated.");
+			logger?.Debug($"{GetType().Name} parameter validated.");
 			PNResult<PNChannelGroupsDeleteGroupResult> returnValue = new PNResult<PNChannelGroupsDeleteGroupResult>();
 			RequestState<PNChannelGroupsDeleteGroupResult> requestState = new RequestState<PNChannelGroupsDeleteGroupResult>();
 			requestState.ResponseType = PNOperationType.PNRemoveGroupOperation;
@@ -142,7 +142,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNRemoveGroupOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
-			logger.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
+			logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 

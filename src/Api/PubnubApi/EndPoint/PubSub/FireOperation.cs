@@ -83,14 +83,14 @@ namespace PubnubApi.EndPoint
 			if (callback == null) {
 				throw new ArgumentException("Missing userCallback");
 			}
-			logger.Trace($"{GetType().Name} Execute invoked");
+			logger?.Trace($"{GetType().Name} Execute invoked");
 			Fire(this.channelName, this.publishContent, false, this.ttl, this.userMetadata, this.queryParam, callback);
 		}
 
 		public async Task<PNResult<PNPublishResult>> ExecuteAsync()
 		{
 			syncRequest = false;
-			logger.Trace($"{GetType().Name} ExecuteAsync invoked.");
+			logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
 			return await Fire(this.channelName, this.publishContent, false, this.ttl, this.userMetadata, this.queryParam).ConfigureAwait(false);
 		}
 
@@ -128,7 +128,7 @@ namespace PubnubApi.EndPoint
 			if (callback == null) {
 				return;
 			}
-			logger.Debug($"{GetType().Name} parameter validated.");
+			logger?.Debug($"{GetType().Name} parameter validated.");
 			RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>
 			{
 				Channels = new[] { channel },
@@ -152,18 +152,18 @@ namespace PubnubApi.EndPoint
 							int publishStatus;
 							var _ = Int32.TryParse(result[0].ToString(), out publishStatus);
 							if (publishStatus == 1) {
-								logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+								logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 								ProcessResponseCallbacks(result, requestState);
 							} else {
 								PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(400, result[1].ToString());
 								PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<PNPublishResult>(PNOperationType.PNFireOperation, category, requestState, 400, new PNException(responseString));
 								if (requestState.PubnubCallback != null) {
-									logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+									logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 									requestState.PubnubCallback.OnResponse(default(PNPublishResult), status);
 								}
 							}
 						} else {
-							logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+							logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 							ProcessResponseCallbacks(result, requestState);
 						}
 					}
@@ -171,7 +171,7 @@ namespace PubnubApi.EndPoint
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNFireOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
-					logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+					logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 					requestState.PubnubCallback.OnResponse(default(PNPublishResult), status);
 				}
 			});
@@ -192,7 +192,7 @@ namespace PubnubApi.EndPoint
 				returnValue.Status = errStatus;
 				return returnValue;
 			}
-			logger.Debug($"{GetType().Name} parameter validated.");
+			logger?.Debug($"{GetType().Name} parameter validated.");
 			RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>
 			{
 				Channels = new[] { channel },
@@ -241,7 +241,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNFireOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
-			logger.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
+			logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 

@@ -68,15 +68,15 @@ namespace PubnubApi.EndPoint
 			if (string.IsNullOrEmpty(currentFileName)) {
 				throw new ArgumentException("Missing File Name");
 			}
-			logger.Debug($"{GetType().Name} parameter validated.");
+			logger?.Debug($"{GetType().Name} parameter validated.");
 			savedCallback = callback ?? throw new ArgumentException("Missing callback");
-			logger.Trace($"{GetType().Name} Execute invoked");
+			logger?.Trace($"{GetType().Name} Execute invoked");
 			ProcessFileDownloadRequest(savedCallback);
 		}
 
 		public async Task<PNResult<PNDownloadFileResult>> ExecuteAsync()
 		{
-			logger.Trace($"{GetType().Name} ExecuteAsync invoked.");
+			logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
 			return await ProcessFileDownloadRequest().ConfigureAwait(false);
 		}
 
@@ -111,9 +111,9 @@ namespace PubnubApi.EndPoint
 							CryptoModule currentCryptoModule = !string.IsNullOrEmpty(currentFileCipherKey) ? new CryptoModule(new LegacyCryptor(currentFileCipherKey, true, config.Logger), null) : (config.CryptoModule ??= new CryptoModule(new LegacyCryptor(config.CipherKey, true), null));
 							try {
 								outputBytes = currentCryptoModule.Decrypt(fileContentBytes);
-								logger.Debug($"Stream length (after Decrypt)= {fileContentBytes.Length}");
+								logger?.Debug($"Stream length (after Decrypt)= {fileContentBytes.Length}");
 							} catch (Exception ex) {
-								logger.Error($" Error while decrypting file content.File might be not encrypted, returning as it is. exception: {ex}");
+								logger?.Error($" Error while decrypting file content.File might be not encrypted, returning as it is. exception: {ex}");
 								outputBytes = fileContentBytes;
 							}
 						}
@@ -123,18 +123,18 @@ namespace PubnubApi.EndPoint
 							FileName = currentFileName
 						};
 						PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, 200, null);
-						logger.Info($"{GetType().Name} request finished with status code {status.StatusCode}");
+						logger?.Info($"{GetType().Name} request finished with status code {status.StatusCode}");
 						callback.OnResponse(result, status);
 					} else {
 						PNStatus errorStatus = GetStatusIfError(requestState, null);
-						logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+						logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						callback.OnResponse(default, errorStatus);
 					}
 				} else {
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNDownloadFileOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
-					logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+					logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 					requestState.PubnubCallback.OnResponse(default, status);
 				}
 			});
@@ -154,7 +154,7 @@ namespace PubnubApi.EndPoint
 				returnValue.Status = errStatus;
 				return returnValue;
 			}
-			logger.Debug($"{GetType().Name} parameter validated.");
+			logger?.Debug($"{GetType().Name} parameter validated.");
 			RequestState<PNDownloadFileResult> requestState = new RequestState<PNDownloadFileResult>
 				{
 					ResponseType = PNOperationType.PNDownloadFileOperation,
@@ -176,9 +176,9 @@ namespace PubnubApi.EndPoint
 						CryptoModule currentCryptoModule = !string.IsNullOrEmpty(currentFileCipherKey) ? new CryptoModule(new LegacyCryptor(currentFileCipherKey, true), null) : (config.CryptoModule ??= new CryptoModule(new LegacyCryptor(config.CipherKey, true), null));
 						try {
 							outputBytes = currentCryptoModule.Decrypt(fileContentBytes);
-							logger.Debug($"Stream length (after Decrypt)= {fileContentBytes.Length}");
+							logger?.Debug($"Stream length (after Decrypt)= {fileContentBytes.Length}");
 						} catch (Exception ex) {
-							logger.Error($" Error while decrypting file content.File might be not encrypted, returning as it is. exception: {ex}");
+							logger?.Error($" Error while decrypting file content.File might be not encrypted, returning as it is. exception: {ex}");
 							outputBytes = fileContentBytes;
 							returnValue.Status = new PNStatus { Error = true, ErrorData = new PNErrorData("Decryption error", ex) };
 						}
@@ -201,7 +201,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNDownloadFileOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
-			logger.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
+			logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 

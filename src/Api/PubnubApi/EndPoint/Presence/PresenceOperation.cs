@@ -38,7 +38,7 @@ namespace PubnubApi.EndPoint
 				unit?.PresenceActivityList.Add(new KeyValuePair<string, string>("event", e?.Name));
 			} catch (Exception ex)
 			{
-				configuration.Logger.Error(
+				configuration.Logger?.Error(
 					$"presence event engine OnEventQueued : CurrentState = {presenceEventEngine.CurrentState.GetType().Name} => EXCEPTION = {ex}");
 			}
 		}
@@ -49,7 +49,7 @@ namespace PubnubApi.EndPoint
 				unit?.PresenceActivityList.Add(new KeyValuePair<string, string>("invocation", invocation?.Name));
 			} catch (Exception ex)
 			{
-				configuration.Logger.Error(
+				configuration.Logger?.Error(
 					$"presence event engine OnEffectDispatch : CurrentState = {presenceEventEngine.CurrentState.GetType().Name} => EXCEPTION = {ex}");
 			}
 		}

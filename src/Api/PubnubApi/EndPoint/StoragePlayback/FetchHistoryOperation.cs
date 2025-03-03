@@ -120,7 +120,7 @@ namespace PubnubApi.EndPoint
 
 		public void Execute(PNCallback<PNFetchHistoryResult> callback)
 		{
-			logger.Trace($"{GetType().Name} Execute invoked");
+			logger?.Trace($"{GetType().Name} Execute invoked");
 			if (string.IsNullOrEmpty(config.SubscribeKey) || config.SubscribeKey.Trim().Length == 0) {
 				throw new MissingMemberException("Invalid Subscribe Key");
 			}
@@ -138,7 +138,7 @@ namespace PubnubApi.EndPoint
 
 		public async Task<PNResult<PNFetchHistoryResult>> ExecuteAsync()
 		{
-			logger.Trace($"{GetType().Name} ExecuteAsync invoked.");
+			logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
 			if (string.IsNullOrEmpty(config.SubscribeKey) || config.SubscribeKey.Trim().Length == 0) {
 				throw new MissingMemberException("Invalid Subscribe Key");
 			}
@@ -165,7 +165,7 @@ namespace PubnubApi.EndPoint
 				throw new ArgumentException("Missing Channel(s)");
 			}
 			string channel = string.Join(",", this.channelNames);
-			logger.Debug($"{GetType().Name} parameter validated.");
+			logger?.Debug($"{GetType().Name} parameter validated.");
 			RequestState<PNFetchHistoryResult> requestState = new RequestState<PNFetchHistoryResult>
 			{
 				Channels = new[] { channel },
@@ -184,14 +184,14 @@ namespace PubnubApi.EndPoint
 					requestState.GotJsonResponse = true;
 					if (!string.IsNullOrEmpty(responseString)) {
 						List<object> result = ProcessJsonResponse(requestState, responseString);
-						logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+						logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						ProcessResponseCallbacks(result, requestState);
 					}
 				} else {
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNFetchHistoryOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
-					logger.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+					logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 					requestState.PubnubCallback.OnResponse(default, status);
 				}
 			});
@@ -202,7 +202,7 @@ namespace PubnubApi.EndPoint
 			if (this.channelNames == null || this.channelNames.Length == 0 || string.IsNullOrEmpty(this.channelNames[0]) || string.IsNullOrEmpty(this.channelNames[0].Trim())) {
 				throw new ArgumentException("Missing Channel(s)");
 			}
-			logger.Debug($"{GetType().Name} parameter validated.");
+			logger?.Debug($"{GetType().Name} parameter validated.");
 			PNResult<PNFetchHistoryResult> returnValue = new PNResult<PNFetchHistoryResult>();
 			string channel = string.Join(",", this.channelNames);
 			RequestState<PNFetchHistoryResult> requestState = new RequestState<PNFetchHistoryResult>
@@ -243,7 +243,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNFetchHistoryOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
-			logger.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
+			logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 
