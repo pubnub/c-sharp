@@ -437,7 +437,8 @@ namespace PubnubApi.EventEngine.Common
                         }
                         catch (Exception ex)
                         {
-                            LoggingMethod.WriteToLog(this.log, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: Listener call back execution encounters error: {ex.Message}\n{ex?.StackTrace}", configuration.LogVerbosity);
+                            configuration.Logger?.Error(
+                                $"Listener call back execution encounters error: {ex.Message}\n{ex?.StackTrace}");
                         }
                     }
 

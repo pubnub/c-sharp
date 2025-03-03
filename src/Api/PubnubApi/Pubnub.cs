@@ -1195,6 +1195,8 @@ namespace PubnubApi
 #if UNITY
             OnCleanupCall += this.UnsubscribeAll<object>;
 #endif
+            logger = InitializeLogger(config);
+            pubnubConfig[InstanceId].Logger = logger;
             pubnubLog = config.PubnubLog;
             savedSdkVerion = Version;
             InstanceId = Guid.NewGuid().ToString();
@@ -1211,7 +1213,7 @@ namespace PubnubApi
             {
                 config.PresenceTimeout = 20;
 
-                config.Logger.Warn(
+                config.Logger?.Warn(
                     $"The PresenceTimeout cannot be less than 20, defaulting the value to 20. Please update the settings in your code.");
             }
 
@@ -1226,7 +1228,7 @@ namespace PubnubApi
             IHttpClientService httpClientService =
                 httpTransportService ?? new HttpClientService(proxy: config.Proxy, configuration: config);
             transportMiddleware = middleware ?? new Middleware(httpClientService, config, this, tokenManager);
-            logger.Debug(GetConfigurationLogString(config));
+            logger?.Debug(GetConfigurationLogString(config));
         }
 
 #if UNITY
@@ -1267,7 +1269,7 @@ namespace PubnubApi
             {
                 if (pubnubLog != null)
                 {
-                    config.Logger.Warn($"PNConfiguration.Uuid or PNConfiguration.UserId is required to use the SDK.");
+                    config.Logger?.Warn($"PNConfiguration.Uuid or PNConfiguration.UserId is required to use the SDK.");
                 }
 
                 throw new MissingMemberException("PNConfiguration.UserId is required to use the SDK");
@@ -1280,7 +1282,7 @@ namespace PubnubApi
         {
             if (config.CryptoModule != null && !string.IsNullOrEmpty(config.CipherKey) && config.CipherKey.Length > 0)
             {
-                config.Logger.Debug($"CryptoModule takes precedence over CipherKey.");
+                config.Logger?.Debug($"CryptoModule takes precedence over CipherKey.");
             }
         }
 

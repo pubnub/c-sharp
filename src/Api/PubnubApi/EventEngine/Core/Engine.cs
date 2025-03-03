@@ -75,18 +75,18 @@ namespace PubnubApi.EventEngine.Core {
 		/// Launch the invocations associated with transitioning between states
 		/// </summary>
 		private async Task ExecuteStateChange(State sourceState, State targetState, IEnumerable<IEffectInvocation> invocations) {
-			logger.Debug($"Exiting state {sourceState}");
+			logger?.Debug($"Exiting state {sourceState}");
 			foreach (var effectInvocation in sourceState.OnExit ?? emptyInvocationList) {
-				logger.Debug($"Dispatching effect: {effectInvocation}");
+				logger?.Debug($"Dispatching effect: {effectInvocation}");
 				await dispatcher.Dispatch(effectInvocation);
 			}
 			foreach (var effectInvocation in invocations ?? emptyInvocationList) {
-				logger.Debug($"Dispatching effect: {effectInvocation}");
+				logger?.Debug($"Dispatching effect: {effectInvocation}");
 				await dispatcher.Dispatch(effectInvocation);
 			}
-			logger.Debug($"Entering state {targetState}");
+			logger?.Debug($"Entering state {targetState}");
 			foreach (var effectInvocation in targetState.OnEntry ?? emptyInvocationList) {
-				logger.Debug($"Dispatching effect: {effectInvocation}");
+				logger?.Debug($"Dispatching effect: {effectInvocation}");
 				await dispatcher.Dispatch(effectInvocation);
 			}
 		}

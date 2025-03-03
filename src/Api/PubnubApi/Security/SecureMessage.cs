@@ -71,7 +71,7 @@ namespace PubnubApi
                             {
                                 status.AffectedChannelGroups.AddRange(channelGroups);
                             }
-                            pubnubLog.Debug("Failed to decrypt message!Message might be not encrypted, Returning the original content as received ");
+                            pubnubLog?.Debug("Failed to decrypt message!Message might be not encrypted, Returning the original content as received ");
                         }
                         
                         object decodedMessage = jsonLib.DeserializeToObject((decryptMessage == "**DECRYPT ERROR**") ? jsonLib.SerializeToJsonString(element) : decryptMessage);
@@ -154,7 +154,7 @@ namespace PubnubApi
                                             {
                                                 status.AffectedChannelGroups.AddRange(channelGroups);
                                             }
-                                            pubnubLog.Debug("Failed to decrypt message!\nMessage might be not encrypted, returning as it is");
+                                            pubnubLog?.Debug("Failed to decrypt message!\nMessage might be not encrypted, returning as it is");
                                             #endregion
                                         }
                                         object decodedMessage = jsonLib.DeserializeToObject((decryptMessage == "**DECRYPT ERROR**") ? jsonLib.SerializeToJsonString(kvpValue.Value) : decryptMessage);
