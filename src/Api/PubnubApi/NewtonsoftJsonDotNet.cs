@@ -238,7 +238,6 @@ namespace PubnubApi
         {
             bool ret = typeof(T).GetTypeInfo().IsGenericType &&
                        typeof(T).GetGenericTypeDefinition() == typeof(PNMessageResult<>);
-            logger?.Trace($"typeof(T).GetGenericTypeDefinition() = {typeof(T).GetGenericTypeDefinition()}");
             return ret;
         }
 
