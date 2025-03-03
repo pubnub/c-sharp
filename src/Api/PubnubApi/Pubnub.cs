@@ -1196,7 +1196,7 @@ namespace PubnubApi
             OnCleanupCall += this.UnsubscribeAll<object>;
 #endif
             logger = InitializeLogger(config);
-            pubnubConfig[InstanceId].Logger = logger;
+            config.Logger = logger;
             pubnubLog = config.PubnubLog;
             savedSdkVerion = Version;
             InstanceId = Guid.NewGuid().ToString();
@@ -1223,8 +1223,6 @@ namespace PubnubApi
             CheckCryptoModuleUsageForLogging(config);
             //Defaulting to DotNet PNSDK source if no custom one is specified
             Version = (ipnsdkSource == default) ? new DotNetPNSDKSource().GetPNSDK() : ipnsdkSource.GetPNSDK();
-            logger = InitializeLogger(config);
-            pubnubConfig[InstanceId].Logger = logger;
             IHttpClientService httpClientService =
                 httpTransportService ?? new HttpClientService(proxy: config.Proxy, configuration: config);
             transportMiddleware = middleware ?? new Middleware(httpClientService, config, this, tokenManager);
@@ -1249,6 +1247,7 @@ namespace PubnubApi
             $"Origin {config?.Origin}\n" +
             $"Is CryptoModule initialised {(config?.CryptoModule == null ? bool.FalseString : bool.TrueString)}\n" +
             $"Is secretKey provided {(string.IsNullOrEmpty(config?.SecretKey) ? bool.FalseString : bool.TrueString)}\n" +
+            $"Is AuthKey provided {(string.IsNullOrEmpty(config?.AuthKey) ? bool.FalseString : bool.TrueString)}" +
             $"Proxy {config.Proxy}\n" +
             $"FilterExpression {config.FilterExpression}\n" +
             $"EnableEventEngine {config.EnableEventEngine}\n" +
