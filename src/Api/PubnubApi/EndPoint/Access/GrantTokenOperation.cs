@@ -173,13 +173,15 @@ namespace PubnubApi.EndPoint
 				throw new MissingMemberException("Invalid TTL value");
 			}
 			logger?.Debug($"{GetType().Name} parameter validated.");
-			RequestState<PNAccessManagerTokenResult> requestState = new RequestState<PNAccessManagerTokenResult>();
-			requestState.Channels = pubnubResources.Channels.Keys.ToArray();
-			requestState.ChannelGroups = pubnubResources.ChannelGroups.Keys.ToArray();
-			requestState.ResponseType = PNOperationType.PNAccessManagerGrantToken;
-			requestState.PubnubCallback = callback;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
+			RequestState<PNAccessManagerTokenResult> requestState = new RequestState<PNAccessManagerTokenResult>
+				{
+					Channels = pubnubResources.Channels.Keys.ToArray(),
+					ChannelGroups = pubnubResources.ChannelGroups.Keys.ToArray(),
+					ResponseType = PNOperationType.PNAccessManagerGrantToken,
+					PubnubCallback = callback,
+					Reconnect = false,
+					EndPointOperation = this
+				};
 
 			var requestParameter = CreateRequestParameter();
 
@@ -191,14 +193,14 @@ namespace PubnubApi.EndPoint
 					requestState.GotJsonResponse = true;
 					if (!string.IsNullOrEmpty(responseString)) {
 						List<object> result = ProcessJsonResponse(requestState, responseString);
-						logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
 						ProcessResponseCallbacks(result, requestState);
+						logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 					}
 				} else {
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNAccessManagerGrantToken, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
-					logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+					logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 					requestState.PubnubCallback.OnResponse(default(PNAccessManagerTokenResult), status);
 				}
 			});

@@ -1138,7 +1138,11 @@ namespace PubnubApi
             byte[] outputBytes = DecryptFile(inputBytes, cipherKey);
             System.IO.File.WriteAllBytes(destinationFile, outputBytes);
         }
-
+        
+        /// <summary>
+        /// Configures a custom logger.
+        /// </summary>
+        /// <param name="logger">The logger to use.</param>
         public void SetLogger(IPubnubLogger logger) => this.logger?.AddLogger(logger);
 
         public void RemoveLogger(IPubnubLogger logger) => this.logger?.RemoveLogger(logger);

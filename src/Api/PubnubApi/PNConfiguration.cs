@@ -92,10 +92,25 @@ namespace PubnubApi
             }
         }
 
+        /// <summary>
+        /// This property is obsolete. Use <see cref="LogLevel"/> instead.
+        /// </summary>
+        /// <remarks>
+        /// LogVerbosity is deprecated. Use LogLevel to enable logging.
+        /// LogLevel provides more granular control and supports different standard logging levels.
+        /// To migrate, replace LogVerbosity = X with LogLevel = (LogLevel)X.
+        /// </remarks>
+        [Obsolete("LogVerbosity is deprecated. Use LogLevel to enable and configure logging.", false)]
         public PNLogVerbosity LogVerbosity { get; set; }
 
         public PubnubLogLevel LogLevel { get; set; }
-
+        /// <summary>
+        /// This property is deprecated. Use <see cref="Pubnub.SetLogger"/> method to configure custom logger.
+        /// </summary>
+        /// <remarks>
+        /// PubnubLog is deprecated. Implement IPubnubLogger and Use SetLogger method to configure custom logger for improved flexibility and control.
+        /// </remarks>
+        [Obsolete("PubnubLog is deprecated. Use SetLogger method to configure custom logger after implementing IPubnubLogger interface.", false)]
         public IPubnubLog PubnubLog { get; set; }
 
         public Proxy Proxy { get; set; }

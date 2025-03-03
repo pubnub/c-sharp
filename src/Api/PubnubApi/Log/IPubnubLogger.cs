@@ -9,4 +9,4 @@ public interface IPubnubLogger
     void Error(string logMessage);
 }
 
-public enum PubnubLogLevel {Trace, Debug, Info, Warn, Error, None };
+public enum PubnubLogLevel {All, Trace, Debug, Info, Warn, Error, None };

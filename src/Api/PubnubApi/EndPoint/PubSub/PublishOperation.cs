@@ -189,18 +189,18 @@ namespace PubnubApi.EndPoint
 						if (result != null && result.Count >= 3) {
 							_ = int.TryParse(result[0].ToString(), out var publishStatus);
 							if (publishStatus == 1) {
-								logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+								logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 								ProcessResponseCallbacks(result, requestState);
 							} else {
 								PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(400, result[1].ToString());
 								PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<PNPublishResult>(PNOperationType.PNPublishOperation, category, requestState, 400, new PNException(responseString));
 								if (requestState.PubnubCallback != null) {
-									logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+									logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 									requestState.PubnubCallback.OnResponse(default, status);
 								}
 							}
 						} else {
-							logger?.Info($"{GetType().Name} request finished with status code {requestState.Response.StatusCode}");
+							logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 							ProcessResponseCallbacks(result, requestState);
 						}
 					}

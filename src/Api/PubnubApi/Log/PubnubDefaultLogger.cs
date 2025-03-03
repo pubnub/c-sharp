@@ -3,16 +3,10 @@ using System.Globalization;
 
 namespace PubnubApi;
 
-public class PubnubDefaultLogger : IPubnubLogger
+public class PubnubDefaultLogger(string id, IPubnubLog legacyLogger = null) : IPubnubLogger
 {
-    private IPubnubLog legacyLogger;
-    private string Id { get; set; }
+    private string Id { get; set; } = id;
 
-    public PubnubDefaultLogger(string id, IPubnubLog legacyLogger = null)
-    {
-        Id = id;
-        this.legacyLogger = legacyLogger;
-    }
     public void Trace(string logMessage)
     {
         System.Diagnostics.Debug.WriteLine($"{DateTime.Now.ToString(CultureInfo.InvariantCulture)} PubNub-{Id} Trace {logMessage}");
