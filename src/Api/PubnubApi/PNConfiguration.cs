@@ -44,7 +44,7 @@ namespace PubnubApi
         public bool UseRandomInitializationVector { get; set; }
         public CryptoModule CryptoModule { get; set; }
 
-        internal PubnubLogModule Logger { get; set; }
+        public PubnubLogModule Logger { get; set; }
 
         public string AuthKey { get; set; }
 
@@ -93,7 +93,7 @@ namespace PubnubApi
         }
 
         /// <summary>
-        /// This property is obsolete. Use <see cref="LogLevel"/> instead.
+        /// This property is obsolete. Use <see cref="PNConfiguration.LogLevel"/> instead.
         /// </summary>
         /// <remarks>
         /// LogVerbosity is deprecated. Use LogLevel to enable logging.

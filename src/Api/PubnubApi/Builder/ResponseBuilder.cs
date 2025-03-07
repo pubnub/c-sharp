@@ -19,18 +19,7 @@ namespace PubnubApi
 
         public T JsonToObject<T>(List<object> result, bool internalObject)
         {
-            T ret;
-
-            if (!internalObject)
-            {
-                ret = jsonLib.DeserializeToObject<T>(result);
-            }
-            else
-            {
-                NewtonsoftJsonDotNet jsonNewtonLib = new NewtonsoftJsonDotNet(config);
-                ret = jsonNewtonLib.DeserializeToObject<T>(result);
-            }
-
+            var ret = jsonLib.DeserializeToObject<T>(result);
             return ret;
         }
 
