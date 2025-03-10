@@ -10,6 +10,14 @@ namespace PubnubApi
         private UserId userId;
         private bool uuidSetFromConstructor;
         private PNReconnectionPolicy reconnectionPolicy;
+        private int subscribeTimeout;
+        private CryptoModule cryptoModule;
+        private string authKey;
+        private string filterExpression;
+        private string subscribeKey;
+        private string publishKey;
+        private string secretKey;
+        private string cipherKey;
 
         internal void ResetUuidSetFromConstructor()
         {
@@ -24,6 +32,7 @@ namespace PubnubApi
             {
                 presenceHeartbeatTimeout = value;
                 SetPresenceTimeoutWithCustomInterval(presenceHeartbeatTimeout, (presenceHeartbeatTimeout / 2) - 1);
+                Logger?.Debug($"PreseceHeartbeatTimeout set to {value}");
             }
         }
 
@@ -31,22 +40,70 @@ namespace PubnubApi
 
         public bool Secure { get; set; }
 
-        public string SubscribeKey { get; set; }
+        public string SubscribeKey
+        {
+            get => subscribeKey;
+            set
+            {
+                subscribeKey = value;
+                Logger?.Debug($"Subscribe Key set to {value}");
+            }
+        }
 
-        public string PublishKey { get; set; }
+        public string PublishKey
+        {
+            get => publishKey;
+            set
+            {
+                publishKey = value;
+                Logger?.Debug($"Publish Key set to {value}");
+            }
+        }
 
-        public string SecretKey { get; set; }
+        public string SecretKey
+        {
+            get => secretKey;
+            set
+            {
+                secretKey = value;
+                Logger?.Debug($"Secret Key value is set.");
+            }
+        }
 
         [Obsolete("CipherKey is deprecated, please use CryptoModule instead.", false)]
-        public string CipherKey { get; set; }
+        public string CipherKey
+        {
+            get => cipherKey;
+            set
+            {
+                cipherKey = value;
+                Logger?.Debug($"CipherKey is set.");
+            }
+        }
 
         [Obsolete("UseRandomInitializationVector is deprecated, please use CryptoModule instead.", false)]
         public bool UseRandomInitializationVector { get; set; }
-        public CryptoModule CryptoModule { get; set; }
+        public CryptoModule CryptoModule
+        {
+            get => cryptoModule;
+            set
+            {
+                cryptoModule = value;
+                Logger?.Debug($"CryptoModule initialised.");
+            }
+        }
 
         public PubnubLogModule Logger { get; set; }
 
-        public string AuthKey { get; set; }
+        public string AuthKey
+        {
+            get => authKey;
+            set
+            {
+                authKey = value;
+                Logger?.Debug($"AuthKey value is set.");
+            }
+        }
 
         [Obsolete("Uuid is deprecated, please use UserId instead.")]
         public string Uuid
@@ -62,6 +119,7 @@ namespace PubnubApi
                 if (value != null && value.Trim().Length > 0)
                 {
                     userId = new UserId(value);
+                    Logger?.Debug($"UserId set to {value}");
                 }
                 else
                 {
@@ -84,6 +142,7 @@ namespace PubnubApi
                 {
                     uuidSetFromConstructor = false;
                     userId = value;
+                    Logger?.Debug($"UserId set to {value}");
                 }
                 else
                 {
@@ -115,13 +174,31 @@ namespace PubnubApi
 
         public Proxy Proxy { get; set; }
 
-        public int SubscribeTimeout { get; set; } = 310;
+        public int SubscribeTimeout
+        {
+            get => subscribeTimeout <= 0 ? 310:subscribeTimeout;
+            set
+            {
+                if (subscribeTimeout >= 0)
+                {
+                    subscribeTimeout = value;
+                    Logger?.Debug($"Subscribe Timeout set to {value}");
+                }
+            }
+        }
 
         public int NonSubscribeRequestTimeout { get; set; } = 15;
 
         public PNHeartbeatNotificationOption HeartbeatNotificationOption { get; set; }
 
-        public string FilterExpression { get; set; }
+        public string FilterExpression {
+            get => filterExpression;
+            set
+            {
+                filterExpression = value;
+                Logger?.Debug($"FilterExpression set to {value}");
+            }
+        }
 
         public bool IncludeInstanceIdentifier { get; set; }
 
@@ -132,6 +209,7 @@ namespace PubnubApi
             set {
                 reconnectionPolicy = value;
                 setDefaultRetryConfigurationFromPolicy(value);
+                Logger?.Debug($"ReconnectionPolicy set to {value}");
             }
         }
 
@@ -216,7 +294,7 @@ namespace PubnubApi
         {
             presenceHeartbeatTimeout = timeout;
             presenceHeartbeatInterval = interval;
-
+            Logger?.Debug($"PresenceTimeoutInterval set to {interval}");
             return this;
         }
 

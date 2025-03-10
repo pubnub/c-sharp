@@ -1241,17 +1241,17 @@ namespace PubnubApi
 #endif
         private string GetConfigurationLogString(PNConfiguration config) =>
             $"Pubnub instance initialised with\n" +
-            $"UserId {config.UserId}" +
+            $"UserId {config.UserId}\n" +
             $"SubscribeKey {config.SubscribeKey}\n" +
             $"PublishKey {config.PublishKey}\n" +
             $"LogLevel {config.LogLevel}\n" +
-            $"ReconnectionPolicy {config.RetryConfiguration.RetryPolicy}" +
+            $"ReconnectionPolicy {config.RetryConfiguration.RetryPolicy}\n" +
             $"PresenceTimeout {config.PresenceTimeout}\n" +
             $"SubscribeTimeout {config.SubscribeTimeout}\n" +
             $"Origin {config?.Origin}\n" +
             $"Is CryptoModule initialised {(config?.CryptoModule == null ? bool.FalseString : bool.TrueString)}\n" +
             $"Is secretKey provided {(string.IsNullOrEmpty(config?.SecretKey) ? bool.FalseString : bool.TrueString)}\n" +
-            $"Is AuthKey provided {(string.IsNullOrEmpty(config?.AuthKey) ? bool.FalseString : bool.TrueString)}" +
+            $"Is AuthKey provided {(string.IsNullOrEmpty(config?.AuthKey) ? bool.FalseString : bool.TrueString)}\n" +
             $"Proxy {config.Proxy}\n" +
             $"FilterExpression {config.FilterExpression}\n" +
             $"EnableEventEngine {config.EnableEventEngine}\n" +
