@@ -1,3 +1,7 @@
+v7.3.0 - March 11 2025
+-----------------------------
+- Modified: implemented new logger for enhanced logging.
+
 v7.2.1 - February 25 2025
 -----------------------------
 - Fixed: implemented enhanced cancellation token management for `HttpClient` to allow graceful termination of HTTP requests.
