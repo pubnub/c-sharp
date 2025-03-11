@@ -101,6 +101,7 @@ namespace PubnubApi.EndPoint
 
 		public void Execute(PNCallback<PNChannelMembersResult> callback)
 		{
+			logger?.Trace($"{GetType().Name} Execute invoked");
 			if (string.IsNullOrEmpty(this.channelId) || string.IsNullOrEmpty(channelId.Trim())) {
 				throw new ArgumentException("Missing Channel");
 			}
@@ -119,6 +120,7 @@ namespace PubnubApi.EndPoint
 
 		public async Task<PNResult<PNChannelMembersResult>> ExecuteAsync()
 		{
+			logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
 			return await ProcessRemoveChannelMembersOperationRequest(this.channelId, this.delMember, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.sortField, this.queryParam).ConfigureAwait(false);
 		}
 
@@ -129,12 +131,15 @@ namespace PubnubApi.EndPoint
 
 		private void ProcessRemoveChannelMembersOperationRequest(string spaceId, List<string> removeMemberList, PNPageObject page, int limit, bool includeCount, string includeOptions, List<string> sort, Dictionary<string, object> externalQueryParam, PNCallback<PNChannelMembersResult> callback)
 		{
-			RequestState<PNChannelMembersResult> requestState = new RequestState<PNChannelMembersResult>();
-			requestState.ResponseType = PNOperationType.PNRemoveChannelMembersOperation;
-			requestState.PubnubCallback = callback;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
-			requestState.UsePatchMethod = true;
+			logger?.Debug($"{GetType().Name} parameter validated.");
+			RequestState<PNChannelMembersResult> requestState = new RequestState<PNChannelMembersResult>
+				{
+					ResponseType = PNOperationType.PNRemoveChannelMembersOperation,
+					PubnubCallback = callback,
+					Reconnect = false,
+					EndPointOperation = this,
+					UsePatchMethod = true
+				};
 			var requestParameter = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNRemoveChannelMembersOperation);
 			PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ContinueWith(t => {
@@ -145,9 +150,11 @@ namespace PubnubApi.EndPoint
                         requestState.GotJsonResponse = true;
 						List<object> result = ProcessJsonResponse(requestState, responseString);
 						ProcessResponseCallbacks(result, requestState);
+						logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 					} else {
 						PNStatus errorStatus = GetStatusIfError(requestState, responseString);
 						callback.OnResponse(default, errorStatus);
+						logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 					}
 
 				} else {
@@ -155,6 +162,7 @@ namespace PubnubApi.EndPoint
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNRemoveChannelMembersOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 					requestState.PubnubCallback.OnResponse(default, status);
+					logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 				}
 			});
 		}
@@ -174,11 +182,14 @@ namespace PubnubApi.EndPoint
 				returnValue.Status = errStatus;
 				return returnValue;
 			}
-			RequestState<PNChannelMembersResult> requestState = new RequestState<PNChannelMembersResult>();
-			requestState.ResponseType = PNOperationType.PNRemoveChannelMembersOperation;
-			requestState.Reconnect = false;
-			requestState.UsePatchMethod = true;
-			requestState.EndPointOperation = this;
+			logger?.Debug($"{GetType().Name} parameter validated.");
+			RequestState<PNChannelMembersResult> requestState = new RequestState<PNChannelMembersResult>
+				{
+					ResponseType = PNOperationType.PNRemoveChannelMembersOperation,
+					Reconnect = false,
+					UsePatchMethod = true,
+					EndPointOperation = this
+				};
 			var requestParameter = CreateRequestParameter();
 			Tuple<string, PNStatus> JsonAndStatusTuple;
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNRemoveChannelMembersOperation);
@@ -209,7 +220,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNRemoveChannelMembersOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
-
+			logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 

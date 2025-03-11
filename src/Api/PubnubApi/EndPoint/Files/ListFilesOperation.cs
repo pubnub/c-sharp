@@ -54,6 +54,7 @@ namespace PubnubApi.EndPoint
 
 		public void Execute(PNCallback<PNListFilesResult> callback)
 		{
+			logger?.Trace($"{GetType().Name} Execute invoked");
 			if (callback == null) {
 				throw new ArgumentException("Missing callback");
 			}
@@ -61,11 +62,13 @@ namespace PubnubApi.EndPoint
 				throw new ArgumentException("Missing Channel Name");
 			}
 			this.savedCallback = callback;
+			logger?.Debug($"{GetType().Name} parameter validated.");
 			ProcessListFilesRequest(savedCallback);
 		}
 
 		public async Task<PNResult<PNListFilesResult>> ExecuteAsync()
 		{
+			logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
 			return await ProcessListFilesRequest().ConfigureAwait(false);
 		}
 
@@ -76,12 +79,14 @@ namespace PubnubApi.EndPoint
 
 		private void ProcessListFilesRequest(PNCallback<PNListFilesResult> callback)
 		{
-			RequestState<PNListFilesResult> requestState = new RequestState<PNListFilesResult>();
-			requestState.ResponseType = PNOperationType.PNListFilesOperation;
-			requestState.PubnubCallback = callback;
-			requestState.UsePostMethod = false;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
+			RequestState<PNListFilesResult> requestState = new RequestState<PNListFilesResult>
+			{
+				ResponseType = PNOperationType.PNListFilesOperation,
+				PubnubCallback = callback,
+				UsePostMethod = false,
+				Reconnect = false,
+				EndPointOperation = this
+			};
 
 			var requestParameter = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNListFilesOperation);
@@ -93,15 +98,18 @@ namespace PubnubApi.EndPoint
 					if (!string.IsNullOrEmpty(responseString)) {
 						List<object> result = ProcessJsonResponse(requestState, responseString);
 						ProcessResponseCallbacks(result, requestState);
+						logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 					} else {
 						PNStatus errorStatus = GetStatusIfError(requestState, responseString);
 						callback.OnResponse(default, errorStatus);
+						logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 					}
 				} else {
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNListFilesOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 					requestState.PubnubCallback.OnResponse(default, status);
+					logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 				}
 			});
 		}
@@ -115,11 +123,14 @@ namespace PubnubApi.EndPoint
 				returnValue.Status = errStatus;
 				return returnValue;
 			}
-			RequestState<PNListFilesResult> requestState = new RequestState<PNListFilesResult>();
-			requestState.ResponseType = PNOperationType.PNListFilesOperation;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
-			requestState.UsePostMethod = false;
+			logger?.Debug($"{GetType().Name} parameter validated.");
+			RequestState<PNListFilesResult> requestState = new RequestState<PNListFilesResult>
+			{
+				ResponseType = PNOperationType.PNListFilesOperation,
+				Reconnect = false,
+				EndPointOperation = this,
+				UsePostMethod = false
+			};
 			var requestParameter = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNListFilesOperation);
 			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ConfigureAwait(false);
@@ -150,6 +161,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNListFilesOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
+			logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status?.StatusCode}");
 			return returnValue;
 		}
 

@@ -47,6 +47,11 @@ namespace PubnubApi
 		{
 			return status.StatusCode != 403 && attemptedRetries < this.maxRetry;
 		}
+
+		public override string ToString()
+		{
+			return $"Policy: Linear Delay: {this.delay}, MaxRetry: {this.maxRetry}";
+		}
 	}
 
 	internal class ExponentialRetryPolicy : IRetryPolicy
@@ -66,13 +71,17 @@ namespace PubnubApi
 		public int GetDelay(int attemptedRetries, PNStatus status, int? retryAfter)
 		{
 			if (status.StatusCode == 429 && retryAfter.HasValue && retryAfter > 0) return (int)retryAfter;
-			if (attemptedRetries == 0) return this.minDelay * 1000 + numGenerator.Next(1000);
-			return Math.Min((int)(Math.Pow(2, attemptedRetries) * 1000 + numGenerator.Next(1000)), this.maxDelay * 1000);
+			if (attemptedRetries == 0) return minDelay * 1000 + numGenerator.Next(1000);
+			return Math.Min((int)(Math.Pow(2, attemptedRetries) * 1000 + numGenerator.Next(1000)), maxDelay * 1000);
 		}
 
 		public bool ShouldRetry(int attemptedRetries, PNStatus status)
 		{
-			return status.StatusCode != 403 && attemptedRetries < this.maxRetry;
+			return status.StatusCode != 403 && attemptedRetries < maxRetry;
+		}
+		public override string ToString()
+		{
+			return $"Policy: Exponential  MinDelay: {minDelay} MaxRetry: {maxRetry}";
 		}
 	}
 }

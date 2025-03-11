@@ -22,7 +22,7 @@ namespace PubnubApi.EndPoint
 		private PNCallback<PNPushAddChannelResult> savedCallback;
 		private Dictionary<string, object> queryParam;
 
-		public AddPushChannelOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
+		public AddPushChannelOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
 		{
 			config = pubnubConfig;
 			jsonLibrary = jsonPluggableLibrary;
@@ -34,19 +34,19 @@ namespace PubnubApi.EndPoint
 
 		public AddPushChannelOperation PushType(PNPushType pushType)
 		{
-			this.pubnubPushType = pushType;
+			pubnubPushType = pushType;
 			return this;
 		}
 
 		public AddPushChannelOperation DeviceId(string deviceId)
 		{
-			this.deviceTokenId = deviceId;
+			deviceTokenId = deviceId;
 			return this;
 		}
 
 		public AddPushChannelOperation Channels(string[] channels)
 		{
-			this.channelNames = channels;
+			channelNames = channels;
 			return this;
 		}
 
@@ -57,7 +57,7 @@ namespace PubnubApi.EndPoint
 		/// <returns></returns>
 		public AddPushChannelOperation Environment(PushEnvironment environment)
 		{
-			this.pushEnvironment = environment;
+			pushEnvironment = environment;
 			return this;
 		}
 
@@ -74,7 +74,7 @@ namespace PubnubApi.EndPoint
 
 		public AddPushChannelOperation QueryParam(Dictionary<string, object> customQueryParam)
 		{
-			this.queryParam = customQueryParam;
+			queryParam = customQueryParam;
 			return this;
 		}
 
@@ -86,18 +86,20 @@ namespace PubnubApi.EndPoint
 
 		public void Execute(PNCallback<PNPushAddChannelResult> callback)
 		{
-			this.savedCallback = callback;
-			RegisterDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, this.pushEnvironment, this.deviceTopic, this.queryParam, callback);
+			savedCallback = callback;
+			logger?.Trace($"{GetType().Name} Execute invoked");
+			RegisterDevice(channelNames, pubnubPushType, deviceTokenId, pushEnvironment, deviceTopic, queryParam, callback);
 		}
 
 		public async Task<PNResult<PNPushAddChannelResult>> ExecuteAsync()
 		{
-			return await RegisterDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, this.pushEnvironment, this.deviceTopic, this.queryParam).ConfigureAwait(false);
+			logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
+			return await RegisterDevice(channelNames, pubnubPushType, deviceTokenId, pushEnvironment, deviceTopic, queryParam).ConfigureAwait(false);
 		}
 
 		internal void Retry()
 		{
-			RegisterDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, this.pushEnvironment, this.deviceTopic, this.queryParam, savedCallback);
+			RegisterDevice(channelNames, pubnubPushType, deviceTokenId, pushEnvironment, deviceTopic, queryParam, savedCallback);
 		}
 
 		internal void RegisterDevice(string[] channels, PNPushType pushType, string pushToken, PushEnvironment environment, string deviceTopic, Dictionary<string, object> externalQueryParam, PNCallback<PNPushAddChannelResult> callback)
@@ -113,13 +115,16 @@ namespace PubnubApi.EndPoint
 			if (pushType == PNPushType.APNS2 && string.IsNullOrEmpty(deviceTopic)) {
 				throw new ArgumentException("Missing Topic");
 			}
+			logger?.Debug($"{GetType().Name} parameter validated.");
 			string channel = string.Join(",", channels.OrderBy(x => x).ToArray());
-			RequestState<PNPushAddChannelResult> requestState = new RequestState<PNPushAddChannelResult>();
-			requestState.Channels = new[] { channel };
-			requestState.ResponseType = PNOperationType.PushRegister;
-			requestState.PubnubCallback = callback;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
+			RequestState<PNPushAddChannelResult> requestState = new RequestState<PNPushAddChannelResult>
+				{
+					Channels = new[] { channel },
+					ResponseType = PNOperationType.PushRegister,
+					PubnubCallback = callback,
+					Reconnect = false,
+					EndPointOperation = this
+				};
 			var requestParameter = CreateRequestParameter();
 
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PushRegister);
@@ -131,12 +136,14 @@ namespace PubnubApi.EndPoint
 					if (!string.IsNullOrEmpty(responseString)) {
 						List<object> result = ProcessJsonResponse(requestState, responseString);
 						ProcessResponseCallbacks(result, requestState);
+						logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 					}
 				} else {
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PushRegister, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 					requestState.PubnubCallback.OnResponse(default(PNPushAddChannelResult), status);
+					logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 				}
 			});
 		}
@@ -154,14 +161,16 @@ namespace PubnubApi.EndPoint
 			if (pushType == PNPushType.APNS2 && string.IsNullOrEmpty(deviceTopic)) {
 				throw new ArgumentException("Missing Topic");
 			}
+			logger?.Debug($"{GetType().Name} parameter validated.");
 			string channel = string.Join(",", channels.OrderBy(x => x).ToArray());
 			PNResult<PNPushAddChannelResult> returnValue = new PNResult<PNPushAddChannelResult>();
-			RequestState<PNPushAddChannelResult> requestState = new RequestState<PNPushAddChannelResult>();
-			requestState.Channels = new[] { channel };
-			requestState.ResponseType = PNOperationType.PushRegister;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
-			Tuple<string, PNStatus> JsonAndStatusTuple;
+			RequestState<PNPushAddChannelResult> requestState = new RequestState<PNPushAddChannelResult>
+				{
+					Channels = new[] { channel },
+					ResponseType = PNOperationType.PushRegister,
+					Reconnect = false,
+					EndPointOperation = this
+				};
 
 			var requestParameter = CreateRequestParameter();
 
@@ -170,6 +179,7 @@ namespace PubnubApi.EndPoint
 			if (transportResponse.Error == null) {
 				var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
+				Tuple<string, PNStatus> JsonAndStatusTuple;
 				if (errorStatus == null) {
 					requestState.GotJsonResponse = true;
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, (int)HttpStatusCode.OK, null);
@@ -193,6 +203,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PushRegister, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
+			logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 

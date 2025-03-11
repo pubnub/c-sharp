@@ -31,7 +31,7 @@ namespace PubnubApi.EndPoint
 		private string[] channelNames;
 		private PNCallback<PNFetchHistoryResult> savedCallback;
 
-		public FetchHistoryOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
+		public FetchHistoryOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
 		{
 			config = pubnubConfig;
 			jsonLibrary = jsonPluggableLibrary;
@@ -60,13 +60,13 @@ namespace PubnubApi.EndPoint
 
 		public FetchHistoryOperation Reverse(bool reverse)
 		{
-			this.reverseOption = reverse;
+			reverseOption = reverse;
 			return this;
 		}
 
 		public FetchHistoryOperation IncludeMeta(bool withMeta)
 		{
-			this.withMetaOption = withMeta;
+			withMetaOption = withMeta;
 			return this;
 		}
 
@@ -90,62 +90,64 @@ namespace PubnubApi.EndPoint
 
 		public FetchHistoryOperation IncludeMessageActions(bool withMessageActions)
 		{
-			this.withMessageActionsOption = withMessageActions;
+			withMessageActionsOption = withMessageActions;
 			return this;
 		}
 
 		public FetchHistoryOperation Start(long start)
 		{
-			this.startTimetoken = start;
+			startTimetoken = start;
 			return this;
 		}
 
 		public FetchHistoryOperation End(long end)
 		{
-			this.endTimetoken = end;
+			endTimetoken = end;
 			return this;
 		}
 
 		public FetchHistoryOperation MaximumPerChannel(int count)
 		{
-			this.perChannelCount = count;
+			perChannelCount = count;
 			return this;
 		}
 
 		public FetchHistoryOperation QueryParam(Dictionary<string, object> customQueryParam)
 		{
-			this.queryParam = customQueryParam;
+			queryParam = customQueryParam;
 			return this;
 		}
 
 		public void Execute(PNCallback<PNFetchHistoryResult> callback)
 		{
+			logger?.Trace($"{GetType().Name} Execute invoked");
 			if (string.IsNullOrEmpty(config.SubscribeKey) || config.SubscribeKey.Trim().Length == 0) {
 				throw new MissingMemberException("Invalid Subscribe Key");
 			}
 
-			if (this.channelNames == null || this.channelNames.Length == 0 || string.IsNullOrEmpty(this.channelNames[0])) {
+			if (channelNames == null || channelNames.Length == 0 || string.IsNullOrEmpty(channelNames[0])) {
 				throw new MissingMemberException("Missing channel name(s)");
 			}
 
-			if (this.withMessageActionsOption && this.channelNames != null && this.channelNames.Length > 1) {
+			if (withMessageActionsOption && channelNames != null && channelNames.Length > 1) {
 				throw new NotSupportedException("Only one channel can be used along with MessageActions");
 			}
-			this.savedCallback = callback;
+			savedCallback = callback;
 			History(callback);
 		}
 
 		public async Task<PNResult<PNFetchHistoryResult>> ExecuteAsync()
 		{
+			logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
 			if (string.IsNullOrEmpty(config.SubscribeKey) || config.SubscribeKey.Trim().Length == 0) {
 				throw new MissingMemberException("Invalid Subscribe Key");
 			}
 
-			if (this.channelNames == null || this.channelNames.Length == 0 || string.IsNullOrEmpty(this.channelNames[0])) {
+			if (channelNames == null || channelNames.Length == 0 || string.IsNullOrEmpty(channelNames[0])) {
 				throw new MissingMemberException("Missing channel name(s)");
 			}
 
-			if (this.withMessageActionsOption && this.channelNames != null && this.channelNames.Length > 1) {
+			if (withMessageActionsOption && channelNames != null && channelNames.Length > 1) {
 				throw new NotSupportedException("Only one channel can be used along with MessageActions");
 			}
 
@@ -159,17 +161,19 @@ namespace PubnubApi.EndPoint
 
 		internal void History(PNCallback<PNFetchHistoryResult> callback)
 		{
-			if (this.channelNames == null || this.channelNames.Length == 0 || string.IsNullOrEmpty(this.channelNames[0]) || string.IsNullOrEmpty(this.channelNames[0].Trim())) {
+			if (channelNames == null || channelNames.Length == 0 || string.IsNullOrEmpty(channelNames[0]) || string.IsNullOrEmpty(channelNames[0].Trim())) {
 				throw new ArgumentException("Missing Channel(s)");
 			}
-			string channel = string.Join(",", this.channelNames);
-
-			RequestState<PNFetchHistoryResult> requestState = new RequestState<PNFetchHistoryResult>();
-			requestState.Channels = new[] { channel };
-			requestState.ResponseType = PNOperationType.PNFetchHistoryOperation;
-			requestState.PubnubCallback = callback;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
+			string channel = string.Join(",", channelNames);
+			logger?.Debug($"{GetType().Name} parameter validated.");
+			RequestState<PNFetchHistoryResult> requestState = new RequestState<PNFetchHistoryResult>
+			{
+				Channels = new[] { channel },
+				ResponseType = PNOperationType.PNFetchHistoryOperation,
+				PubnubCallback = callback,
+				Reconnect = false,
+				EndPointOperation = this
+			};
 			var requestParameter = CreateRequestParameter();
 
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNFetchHistoryOperation);
@@ -181,28 +185,33 @@ namespace PubnubApi.EndPoint
 					if (!string.IsNullOrEmpty(responseString)) {
 						List<object> result = ProcessJsonResponse(requestState, responseString);
 						ProcessResponseCallbacks(result, requestState);
+						logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 					}
 				} else {
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNFetchHistoryOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 					requestState.PubnubCallback.OnResponse(default, status);
+					logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 				}
 			});
 		}
 
 		internal async Task<PNResult<PNFetchHistoryResult>> History()
 		{
-			if (this.channelNames == null || this.channelNames.Length == 0 || string.IsNullOrEmpty(this.channelNames[0]) || string.IsNullOrEmpty(this.channelNames[0].Trim())) {
+			if (channelNames == null || channelNames.Length == 0 || string.IsNullOrEmpty(channelNames[0]) || string.IsNullOrEmpty(channelNames[0].Trim())) {
 				throw new ArgumentException("Missing Channel(s)");
 			}
+			logger?.Debug($"{GetType().Name} parameter validated.");
 			PNResult<PNFetchHistoryResult> returnValue = new PNResult<PNFetchHistoryResult>();
-			string channel = string.Join(",", this.channelNames);
-			RequestState<PNFetchHistoryResult> requestState = new RequestState<PNFetchHistoryResult>();
-			requestState.Channels = new[] { channel };
-			requestState.ResponseType = PNOperationType.PNFetchHistoryOperation;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
+			string channel = string.Join(",", channelNames);
+			RequestState<PNFetchHistoryResult> requestState = new RequestState<PNFetchHistoryResult>
+			{
+				Channels = new[] { channel },
+				ResponseType = PNOperationType.PNFetchHistoryOperation,
+				Reconnect = false,
+				EndPointOperation = this
+			};
 			Tuple<string, PNStatus> JsonAndStatusTuple;
 			var requestParameter = CreateRequestParameter();
 
@@ -234,7 +243,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNFetchHistoryOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
-
+			logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status?.StatusCode}");
 			return returnValue;
 		}
 
@@ -253,7 +262,7 @@ namespace PubnubApi.EndPoint
 
 			Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>
 			{
-				{ "max", (this.perChannelCount <= -1) ? (withMessageActionsOption || (channelNames != null && channelNames.Length > 1) ? "25" : "100") : perChannelCount.ToString(CultureInfo.InvariantCulture) }
+				{ "max", (perChannelCount <= -1) ? (withMessageActionsOption || (channelNames != null && channelNames.Length > 1) ? "25" : "100") : perChannelCount.ToString(CultureInfo.InvariantCulture) }
 			};
 			if (reverseOption) {
 				requestQueryStringParams.Add("reverse", "true");

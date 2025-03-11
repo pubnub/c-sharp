@@ -26,7 +26,7 @@ namespace PubnubApi.EndPoint
         private PNCallback<PNGetAllUuidMetadataResult> savedCallback;
         private Dictionary<string, object> queryParam;
 
-        public GetAllUuidMetadataOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
+        public GetAllUuidMetadataOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
@@ -52,59 +52,61 @@ namespace PubnubApi.EndPoint
 
         public GetAllUuidMetadataOperation Page(PNPageObject pageObject)
         {
-            this.page = pageObject;
+            page = pageObject;
             return this;
         }
 
         public GetAllUuidMetadataOperation Limit(int numberOfUuids)
         {
-            this.limit = numberOfUuids;
+            limit = numberOfUuids;
             return this;
         }
         public GetAllUuidMetadataOperation IncludeCount(bool includeTotalCount)
         {
-            this.includeCount = includeTotalCount;
+            includeCount = includeTotalCount;
             return this;
         }
 
         public GetAllUuidMetadataOperation IncludeCustom(bool includeCustomData)
         {
-            this.includeCustom = includeCustomData;
+            includeCustom = includeCustomData;
             return this;
         }
         public GetAllUuidMetadataOperation Filter(string filterExpression)
         {
-            this.usersFilter = filterExpression;
+            usersFilter = filterExpression;
             return this;
         }
 
         public GetAllUuidMetadataOperation Sort(List<string> sortByField)
         {
-            this.sortField = sortByField;
+            sortField = sortByField;
             return this;
         }
 
         public GetAllUuidMetadataOperation QueryParam(Dictionary<string, object> customQueryParam)
         {
-            this.queryParam = customQueryParam;
+            queryParam = customQueryParam;
             return this;
         }
 
         public void Execute(PNCallback<PNGetAllUuidMetadataResult> callback)
         {
-            this.savedCallback = callback;
-            GetUuidMetadataList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.sortField, this.queryParam, savedCallback);
+            savedCallback = callback;
+            logger?.Trace($"{GetType().Name} Execute invoked");
+            GetUuidMetadataList(page, limit, includeCount, includeCustom, usersFilter, sortField, queryParam, savedCallback);
         }
 
         public async Task<PNResult<PNGetAllUuidMetadataResult>> ExecuteAsync()
         {
-            return await GetUuidMetadataList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.sortField, this.queryParam).ConfigureAwait(false);
+            logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
+            return await GetUuidMetadataList(page, limit, includeCount, includeCustom, usersFilter, sortField, queryParam).ConfigureAwait(false);
         }
 
 
         internal void Retry()
         {
-            GetUuidMetadataList(this.page, this.limit, this.includeCount, this.includeCustom, this.usersFilter, this.sortField, this.queryParam, savedCallback);
+            GetUuidMetadataList(page, limit, includeCount, includeCustom, usersFilter, sortField, queryParam, savedCallback);
         }
 
         private void GetUuidMetadataList(PNPageObject page, int limit, bool includeCount, bool includeCustom, string filter, List<string> sort, Dictionary<string, object> externalQueryParam, PNCallback<PNGetAllUuidMetadataResult> callback)
@@ -113,11 +115,13 @@ namespace PubnubApi.EndPoint
             {
                 throw new ArgumentException("Missing callback");
             }
-            RequestState<PNGetAllUuidMetadataResult> requestState = new RequestState<PNGetAllUuidMetadataResult>();
-            requestState.ResponseType = PNOperationType.PNGetAllUuidMetadataOperation;
-            requestState.PubnubCallback = callback;
-            requestState.Reconnect = false;
-            requestState.EndPointOperation = this;
+            RequestState<PNGetAllUuidMetadataResult> requestState = new RequestState<PNGetAllUuidMetadataResult>
+                {
+                    ResponseType = PNOperationType.PNGetAllUuidMetadataOperation,
+                    PubnubCallback = callback,
+                    Reconnect = false,
+                    EndPointOperation = this
+                };
 
             var requestParameter = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNGetAllUuidMetadataOperation);
@@ -129,12 +133,14 @@ namespace PubnubApi.EndPoint
                         requestState.GotJsonResponse = true;
 						List<object> result = ProcessJsonResponse(requestState, responseString);
 						ProcessResponseCallbacks(result, requestState);
+                        logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 					}
 				} else {
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNGetAllUuidMetadataOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 					requestState.PubnubCallback.OnResponse(default(PNGetAllUuidMetadataResult), status);
+                    logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 				}
 			});
         }
@@ -142,11 +148,13 @@ namespace PubnubApi.EndPoint
         private async Task<PNResult<PNGetAllUuidMetadataResult>> GetUuidMetadataList(PNPageObject page, int limit, bool includeCount, bool includeCustom, string filter, List<string> sort, Dictionary<string, object> externalQueryParam)
         {
             PNResult<PNGetAllUuidMetadataResult> returnValue = new PNResult<PNGetAllUuidMetadataResult>();
-            RequestState<PNGetAllUuidMetadataResult> requestState = new RequestState<PNGetAllUuidMetadataResult>();
-            requestState.ResponseType = PNOperationType.PNGetAllUuidMetadataOperation;
-            requestState.Reconnect = false;
-            requestState.UsePostMethod = false;
-            requestState.EndPointOperation = this;
+            RequestState<PNGetAllUuidMetadataResult> requestState = new RequestState<PNGetAllUuidMetadataResult>
+                {
+                    ResponseType = PNOperationType.PNGetAllUuidMetadataOperation,
+                    Reconnect = false,
+                    UsePostMethod = false,
+                    EndPointOperation = this
+                };
             Tuple<string, PNStatus> JsonAndStatusTuple;
 
             var requestParameter = CreateRequestParameter();
@@ -180,7 +188,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNGetAllUuidMetadataOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
-
+            logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status?.StatusCode}");
             return returnValue;
         }
 
@@ -234,7 +242,6 @@ namespace PubnubApi.EndPoint
                     }
                 }
             }
-            string queryString = UriUtil.BuildQueryString(requestQueryStringParams);
             var requestParameter = new RequestParameter() {
                 RequestType = Constants.GET,
                 PathSegment = pathSegments,

@@ -51,6 +51,7 @@ namespace PubnubApi.EventEngine.Subscribe
 			dispatcher.Register<Invocations.EmitStatusInvocation, Effects.EmitStatusEffectHandler>(emitStatusHandler);
 
 			currentState = new UnsubscribedState();
+			logger = pubnubConfiguration.Logger;
 		}
 		public void Subscribe<T>(string[] channels, string[] channelGroups, SubscriptionCursor cursor)
 		{

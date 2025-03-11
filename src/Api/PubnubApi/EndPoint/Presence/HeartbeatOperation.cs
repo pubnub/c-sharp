@@ -32,11 +32,13 @@ namespace PubnubApi.EndPoint
 
 				if (config.MaintainPresenceState) presenceState = BuildJsonUserState(channels, channelGroups, true);
 
-				RequestState<T> pubnubRequestState = new RequestState<T>();
-				pubnubRequestState.Channels = channels;
-				pubnubRequestState.ChannelGroups = channelGroups;
-				pubnubRequestState.ResponseType = PNOperationType.PNHeartbeatOperation;
-				pubnubRequestState.TimeQueued = DateTime.Now;
+				RequestState<T> pubnubRequestState = new RequestState<T>
+				{
+					Channels = channels,
+					ChannelGroups = channelGroups,
+					ResponseType = PNOperationType.PNHeartbeatOperation,
+					TimeQueued = DateTime.Now
+				};
 
 				var requestParameter = CreateRequestParameter(channels: channels, channelGroups: channelGroups);
 				var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNHeartbeatOperation);
@@ -56,7 +58,7 @@ namespace PubnubApi.EndPoint
 					responseStatus = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNHeartbeatOperation, category, pubnubRequestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				}
 			} catch (Exception ex) {
-				LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: Heartbeat request for channel(s)={string.Join(", ", channels.OrderBy(x => x))} \n channelGroup(s)={string.Join(", ", channelGroups.OrderBy(x => x))} \n Exception Details={ex}", config.LogVerbosity);
+				logger?.Error($"Heartbeat request for channel(s)={string.Join(", ", channels.OrderBy(x => x))} \n channelGroup(s)={string.Join(", ", channelGroups.OrderBy(x => x))} \n Exception Details={ex}");
 				return new PNStatus(ex, PNOperationType.PNHeartbeatOperation, PNStatusCategory.PNUnknownCategory, channels, channelGroups);
 			}
 			return responseStatus;

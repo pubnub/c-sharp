@@ -41,11 +41,13 @@ namespace PubnubApi.EndPoint
 		public void Execute(PNCallback<PNChannelGroupsListAllResult> callback)
 		{
 			this.savedCallback = callback;
+			logger?.Trace($"{GetType().Name} Execute invoked");
 			GetAllChannelGroup(this.queryParam, callback);
 		}
 
 		public async Task<PNResult<PNChannelGroupsListAllResult>> ExecuteAsync()
 		{
+			logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
 			return await GetAllChannelGroup(this.queryParam).ConfigureAwait(false);
 		}
 
@@ -56,11 +58,13 @@ namespace PubnubApi.EndPoint
 
 		internal void GetAllChannelGroup(Dictionary<string, object> externalQueryParam, PNCallback<PNChannelGroupsListAllResult> callback)
 		{
-			RequestState<PNChannelGroupsListAllResult> requestState = new RequestState<PNChannelGroupsListAllResult>();
-			requestState.ResponseType = PNOperationType.ChannelGroupAllGet;
-			requestState.PubnubCallback = callback;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
+			RequestState<PNChannelGroupsListAllResult> requestState = new RequestState<PNChannelGroupsListAllResult>
+				{
+					ResponseType = PNOperationType.ChannelGroupAllGet,
+					PubnubCallback = callback,
+					Reconnect = false,
+					EndPointOperation = this
+				};
 			var requestParameter = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.ChannelGroupAllGet);
 			PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ContinueWith(t => {
@@ -70,6 +74,7 @@ namespace PubnubApi.EndPoint
 					requestState.GotJsonResponse = true;
 					if (!string.IsNullOrEmpty(responseString)) {
 						List<object> result = ProcessJsonResponse(requestState, responseString);
+						logger?.Debug($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 						ProcessResponseCallbacks(result, requestState);
 					}
 				} else {
@@ -77,6 +82,7 @@ namespace PubnubApi.EndPoint
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, t.Result.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.ChannelGroupAllGet, category, requestState, statusCode, new PNException(t.Result.Error.Message, t.Result.Error));
 					requestState.PubnubCallback.OnResponse(default(PNChannelGroupsListAllResult), status);
+					logger?.Debug($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 				}
 			});
 		}
@@ -84,10 +90,12 @@ namespace PubnubApi.EndPoint
 		internal async Task<PNResult<PNChannelGroupsListAllResult>> GetAllChannelGroup(Dictionary<string, object> externalQueryParam)
 		{
 			PNResult<PNChannelGroupsListAllResult> returnValue = new PNResult<PNChannelGroupsListAllResult>();
-			RequestState<PNChannelGroupsListAllResult> requestState = new RequestState<PNChannelGroupsListAllResult>();
-			requestState.ResponseType = PNOperationType.ChannelGroupAllGet;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
+			RequestState<PNChannelGroupsListAllResult> requestState = new RequestState<PNChannelGroupsListAllResult>
+				{
+					ResponseType = PNOperationType.ChannelGroupAllGet,
+					Reconnect = false,
+					EndPointOperation = this
+				};
 
 			Tuple<string, PNStatus> JsonAndStatusTuple;
 
@@ -120,7 +128,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.ChannelGroupAllGet, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
-
+			logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 

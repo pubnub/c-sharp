@@ -71,6 +71,7 @@ namespace PubnubApi.EndPoint
 			}
 
 			savedCallback = callback;
+			logger?.Trace($"{GetType().Name} Execute invoked");
 			Publish(channelName, messageTimetoken, messageAction, queryParam, callback);
 		}
 
@@ -79,7 +80,7 @@ namespace PubnubApi.EndPoint
 			if (config == null || string.IsNullOrEmpty(config.SubscribeKey) || config.SubscribeKey.Trim().Length <= 0) {
 				throw new MissingMemberException("subscribe key is required");
 			}
-
+			logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
 			return await Publish(this.channelName, this.messageTimetoken, this.messageAction, this.queryParam).ConfigureAwait(false);
 		}
 
@@ -106,15 +107,17 @@ namespace PubnubApi.EndPoint
 				callback.OnResponse(null, status);
 				return;
 			}
-
-			RequestState<PNAddMessageActionResult> requestState = new RequestState<PNAddMessageActionResult>();
-			requestState.Channels = new[] { channelName };
-			requestState.ResponseType = PNOperationType.PNAddMessageActionOperation;
-			requestState.PubnubCallback = callback;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
-			requestState.UsePostMethod = true;
-			Tuple<string, PNStatus> JsonAndStatusTuple;
+			logger?.Debug($"{GetType().Name} parameter validated.");
+			RequestState<PNAddMessageActionResult> requestState = new RequestState<PNAddMessageActionResult>
+				{
+					Channels = new[] { channelName },
+					ResponseType = PNOperationType.PNAddMessageActionOperation,
+					PubnubCallback = callback,
+					Reconnect = false,
+					EndPointOperation = this,
+					UsePostMethod = true
+				};
+			Tuple<string, PNStatus> jsonAndStatusTuple;
 
 			var requestParameters = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameters, PNOperationType.PNPublishOperation);
@@ -126,14 +129,15 @@ namespace PubnubApi.EndPoint
 				if (errorStatus == null) {
 					requestState.GotJsonResponse = true;
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, (int)HttpStatusCode.OK, null);
-					JsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
+					jsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
 				} else {
-					JsonAndStatusTuple = new Tuple<string, PNStatus>("", errorStatus);
+					jsonAndStatusTuple = new Tuple<string, PNStatus>("", errorStatus);
 				}
-				string json = JsonAndStatusTuple.Item1;
+				string json = jsonAndStatusTuple.Item1;
 				if (!string.IsNullOrEmpty(json))
 				{
 					List<object> result = ProcessJsonResponse(requestState, json);
+					logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 					ProcessResponseCallbacks(result, requestState);
 				} else {
 					requestState.PubnubCallback.OnResponse(default, errorStatus);
@@ -142,6 +146,7 @@ namespace PubnubApi.EndPoint
 				int statusCode = PNStatusCodeHelper.GetHttpStatusCode(t.Result.Error.Message);
 				PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, t.Result.Error.Message);
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNPublishOperation, category, requestState, statusCode, new PNException(t.Result.Error.Message, t.Result.Error));
+				logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 				requestState.PubnubCallback.OnResponse(default(PNAddMessageActionResult), status);
 			}
 			CleanUp();
@@ -166,12 +171,15 @@ namespace PubnubApi.EndPoint
 				returnValue.Status = status;
 				return returnValue;
 			}
-			RequestState<PNAddMessageActionResult> requestState = new RequestState<PNAddMessageActionResult>();
-			requestState.Channels = new[] { channel };
-			requestState.ResponseType = PNOperationType.PNAddMessageActionOperation;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
-			requestState.UsePostMethod = true;
+			logger?.Debug($"{GetType().Name} parameter validated.");
+			RequestState<PNAddMessageActionResult> requestState = new RequestState<PNAddMessageActionResult>
+				{
+					Channels = new[] { channel },
+					ResponseType = PNOperationType.PNAddMessageActionOperation,
+					Reconnect = false,
+					EndPointOperation = this,
+					UsePostMethod = true
+				};
 
 			Tuple<string, PNStatus> JsonAndStatusTuple;
 
@@ -207,6 +215,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNAddMessageActionOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
+			logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 

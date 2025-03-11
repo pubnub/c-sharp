@@ -99,11 +99,13 @@ namespace PubnubApi.EndPoint
 		public void Execute(PNCallback<PNPushRemoveChannelResult> callback)
 		{
 			this.savedCallback = callback;
+			logger?.Trace($"{GetType().Name} Execute invoked");
 			RemoveChannelForDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, this.pushEnvironment, this.deviceTopic, this.queryParam, callback);
 		}
 
 		public async Task<PNResult<PNPushRemoveChannelResult>> ExecuteAsync()
 		{
+			logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
 			return await RemoveChannelForDevice(this.channelNames, this.pubnubPushType, this.deviceTokenId, this.pushEnvironment, this.deviceTopic, this.queryParam).ConfigureAwait(false);
 		}
 
@@ -125,12 +127,15 @@ namespace PubnubApi.EndPoint
 			if (pushType == PNPushType.APNS2 && string.IsNullOrEmpty(deviceTopic)) {
 				throw new ArgumentException("Missing Topic");
 			}
-			RequestState<PNPushRemoveChannelResult> requestState = new RequestState<PNPushRemoveChannelResult>();
-			requestState.Channels = channels.Select(c => c).ToArray();
-			requestState.ResponseType = PNOperationType.PushRemove;
-			requestState.PubnubCallback = callback;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
+			logger?.Debug($"{GetType().Name} parameter validated.");
+			RequestState<PNPushRemoveChannelResult> requestState = new RequestState<PNPushRemoveChannelResult>
+				{
+					Channels = channels.Select(c => c).ToArray(),
+					ResponseType = PNOperationType.PushRemove,
+					PubnubCallback = callback,
+					Reconnect = false,
+					EndPointOperation = this
+				};
 			var requestParameter = CreateRequestParameter();
 
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PushRemove);
@@ -142,11 +147,13 @@ namespace PubnubApi.EndPoint
 					if (!string.IsNullOrEmpty(responseString)) {
 						List<object> result = ProcessJsonResponse(requestState, responseString);
 						ProcessResponseCallbacks(result, requestState);
+						logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 					}
 				} else {
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PushRemove, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
+					logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 					requestState.PubnubCallback.OnResponse(default(PNPushRemoveChannelResult), status);
 				}
 			});
@@ -165,20 +172,22 @@ namespace PubnubApi.EndPoint
 			if (pushType == PNPushType.APNS2 && string.IsNullOrEmpty(deviceTopic)) {
 				throw new ArgumentException("Missing Topic");
 			}
+			logger?.Debug($"{GetType().Name} parameter validated.");
 			PNResult<PNPushRemoveChannelResult> returnValue = new PNResult<PNPushRemoveChannelResult>();
-			RequestState<PNPushRemoveChannelResult> requestState = new RequestState<PNPushRemoveChannelResult>();
-			requestState.Channels = channels.Select(c => c).ToArray();
-			requestState.ResponseType = PNOperationType.PushRemove;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
-			Tuple<string, PNStatus> JsonAndStatusTuple;
-
+			RequestState<PNPushRemoveChannelResult> requestState = new RequestState<PNPushRemoveChannelResult>
+				{
+					Channels = channels.Select(c => c).ToArray(),
+					ResponseType = PNOperationType.PushRemove,
+					Reconnect = false,
+					EndPointOperation = this
+				};
 			var requestParameter = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PushRemove);
 			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ConfigureAwait(false);
 			if (transportResponse.Error == null) {
 				var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
+				Tuple<string, PNStatus> JsonAndStatusTuple;
 				if (errorStatus == null) {
 					requestState.GotJsonResponse = true;
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, (int)HttpStatusCode.OK, null);
@@ -202,6 +211,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PushRemove, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
+			logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 

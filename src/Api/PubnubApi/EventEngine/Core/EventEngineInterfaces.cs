@@ -36,6 +36,11 @@ namespace PubnubApi.EventEngine.Core
         public abstract Task Run(T invocation);
 
         public abstract bool IsBackground(T invocation);
+
+        public override string ToString()
+        {
+            return GetType().Name;
+        }
     }
 
     /// <summary>
@@ -54,6 +59,11 @@ namespace PubnubApi.EventEngine.Core
         }
 
         public bool IsBackground(T2 invocation) => false;
+        
+        public override string ToString()
+        {
+            return GetType().Name;
+        }
     }
    
 
@@ -76,6 +86,10 @@ namespace PubnubApi.EventEngine.Core
         public abstract Task Run(T2 invocation);
 
         public abstract bool IsBackground(T2 invocation);
+        public override string ToString()
+        {
+            return GetType().Name;
+        }
     }
 
     
@@ -97,6 +111,10 @@ namespace PubnubApi.EventEngine.Core
         }
 
         public bool IsBackground(T3 invocation) => false;
+        public override string ToString()
+        {
+            return GetType().Name;
+        }
     }
     
     /// <summary>
@@ -162,6 +180,11 @@ namespace PubnubApi.EventEngine.Core
         public static implicit operator TransitionResult(State s)
         {
             return new TransitionResult(s);
+        }
+        
+        public override string ToString()
+        {
+            return GetType().Name;
         }
     }
 }

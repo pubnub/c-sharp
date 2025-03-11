@@ -182,11 +182,13 @@ namespace PubnubApi.EndPoint
 							PresenceHeartbeatTimer.Dispose();
 							PresenceHeartbeatTimer = null;
 						}
-						LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] All channels are Unsubscribed. Further subscription was stopped", config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
+						logger?.Debug($"All channels are Unsubscribed. Further subscription was stopped");
 					}
 				}
-			} catch (Exception ex) {
-				LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: At SubscribeManager.MultiChannelUnSubscribeInit() \n channel(s)={string.Join(",", validChannels.OrderBy(x => x).ToArray())} \n cg(s)={string.Join(",", validChannelGroups.OrderBy(x => x).ToArray())} \n Exception Details={ex}", config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
+			} catch (Exception ex)
+			{
+				logger?.Error(
+					$"At SubscribeManager.MultiChannelUnSubscribeInit() \n channel(s)={string.Join(",", validChannels.OrderBy(x => x).ToArray())} \n cg(s)={string.Join(",", validChannelGroups.OrderBy(x => x).ToArray())} \n Exception Details={ex}");
 			}
 		}
 
@@ -217,7 +219,7 @@ namespace PubnubApi.EndPoint
 					if (channelGroups != null && channelGroups.Length > 0 && (channels == null || channels.Length == 0)) {
 						channelGroupSubscribeOnly = true;
 					}
-					LoggingMethod.WriteToLog(pubnubLog,$"MultiChannelSubscribeRequest with tt=0", PNLogVerbosity.BODY);
+					logger?.Debug($"MultiChannelSubscribeRequest with tt=0");
 					MultiChannelSubscribeRequest<T>(responseType, channels, channelGroups, 0, 0, false, initialSubscribeUrlParams, externalQueryParam);
 
 					if (SubscribeHeartbeatCheckTimer != null) {
@@ -226,24 +228,27 @@ namespace PubnubApi.EndPoint
 						} catch {  /* ignore */ }
 					}
 				}
-			} catch (Exception ex) {
-				LoggingMethod.WriteToLog(pubnubLog, $"subscribe initialisation opeartion encountered error {ex.Message}", config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
+			} catch (Exception ex)
+			{
+				logger?.Error($"subscribe initialisation opeartion encountered error {ex.Message}");
 			}
 		}
 
 		private void MultiChannelSubscribeRequest<T>(PNOperationType type, string[] channels, string[] channelGroups, object timetoken, int region, bool reconnect, Dictionary<string, string> initialSubscribeUrlParams, Dictionary<string, object> externalQueryParam)
 		{
-			if (!config.ContainsKey(PubnubInstance.InstanceId)) {
-				LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] InstanceId Not Available. Exiting MultiChannelSubscribeRequest", PNLogVerbosity.BODY);
+			if (!config.ContainsKey(PubnubInstance.InstanceId))
+			{
+				logger?.Trace($"InstanceId Not Available. Exiting MultiChannelSubscribeRequest");
 				return;
 			}
 			if (SubscribeDisconnected[PubnubInstance.InstanceId]) {
-				LoggingMethod.WriteToLog(pubnubLog,$"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] SubscribeDisconnected. Exiting MultiChannelSubscribeRequest", config[PubnubInstance.InstanceId].LogVerbosity);
+				logger?.Trace($"SubscribeDisconnected. Exiting MultiChannelSubscribeRequest");
 				return;
 			}
 			//Exit if the channel is unsubscribed
-			if (SubscriptionChannels[PubnubInstance.InstanceId].Count <= 0 && SubscriptionChannelGroups[PubnubInstance.InstanceId].Count <= 0) {
-				LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Zero channels/channelGroups. Further subscription was stopped", config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
+			if (SubscriptionChannels[PubnubInstance.InstanceId].Count <= 0 && SubscriptionChannelGroups[PubnubInstance.InstanceId].Count <= 0)
+			{
+				logger?.Trace($"Zero channels/channelGroups. Further subscription was stopped");
 				return;
 			}
 			TerminateCurrentSubscriberRequest();
@@ -275,7 +280,8 @@ namespace PubnubApi.EndPoint
 				this.customQueryParam = externalQueryParam;
 				RegisterPresenceHeartbeatTimer<T>(channels, channelGroups);
 				long lastTimetoken = LastSubscribeTimetoken.ContainsKey(PubnubInstance.InstanceId)? LastSubscribeTimetoken[PubnubInstance.InstanceId] : 0;
-				LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Building request for channel(s)={multiChannel}, channelgroup(s)={multiChannelGroup} with timetoken={lastTimetoken}", config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
+				logger?.Trace(
+					$"Building request for channel(s)={multiChannel}, channelgroup(s)={multiChannelGroup} with timetoken={lastTimetoken}");
 				string channelsJsonState = BuildJsonUserState(channels, channelGroups, false);
 				config[PubnubInstance.InstanceId].UserId = CurrentUserId[PubnubInstance.InstanceId]; // to make sure we capture if UUID is changed
 				pubnubRequestState = new RequestState<T>
@@ -324,7 +330,7 @@ namespace PubnubApi.EndPoint
 					}
 				});
 			} catch (Exception ex) {
-				LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] method:_subscribe \n channel={string.Join(",", channels.OrderBy(x => x).ToArray())} \n timetoken={timetoken} \n Exception Details={ex}", config[PubnubInstance.InstanceId].LogVerbosity);
+				logger?.Error($"method:_subscribe \n channel={string.Join(",", channels.OrderBy(x => x).ToArray())} \n timetoken={timetoken} \n Exception Details={ex}");
 				PNStatusCategory errorCategory = PNStatusCategoryHelper.GetPNStatusCategory(ex);
 				PNStatus status = new StatusBuilder(config[PubnubInstance.InstanceId], jsonLibrary).CreateStatusResponse<T>(type, errorCategory, pubnubRequestState, Constants.ResourceNotFoundStatusCode, new PNException(ex));
 				if (channels != null && channels.Length > 0) {
@@ -340,7 +346,7 @@ namespace PubnubApi.EndPoint
 
 		private void MultiplexExceptionHandlerTimerCallback<T>(object state)
 		{
-			LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] MultiplexExceptionHandlerTimerCallback", config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
+			logger?.Trace($" MultiplexExceptionHandlerTimerCallback");
 			RequestState<T> currentState = state as RequestState<T>;
 			if (currentState != null) {
 				MultiplexExceptionHandler<T>(currentState.ResponseType, currentState.Channels, currentState.ChannelGroups, false);
@@ -399,11 +405,12 @@ namespace PubnubApi.EndPoint
 
 				long timetoken = GetTimetokenFromMultiplexResult(message);
 				int region = GetRegionFromMultiplexResult(message);
-				LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] MultiplexInternalCallback timetoken = {timetoken}; region = {region}", config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
-				LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Calling MultiChannelSubscribeRequest tt {timetoken}",PNLogVerbosity.BODY);
+				logger?.Trace($"MultiplexInternalCallback timetoken = {timetoken}; region = {region}");
+				logger?.Trace($"Calling MultiChannelSubscribeRequest tt {timetoken}");
 				MultiChannelSubscribeRequest<T>(type, channels, channelGroups, timetoken, region, false, null, this.customQueryParam);
-			} else {
-				LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: Lost Channel Name for resubscribe", config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
+			} else
+			{
+				logger?.Error($"Lost Channel Name for resubscribe");
 			}
 		}
 
@@ -416,18 +423,19 @@ namespace PubnubApi.EndPoint
 				netState.ResponseType = type;
 				netState.Timetoken = timetoken;
 				netState.Region = region;
-				if (!config.ContainsKey(PubnubInstance.InstanceId)) {
-					LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}], InstanceId Not Available. So no reconnect", PNLogVerbosity.BODY);
+				if (!config.ContainsKey(PubnubInstance.InstanceId))
+				{
+					logger?.Trace($" InstanceId Not Available. So no reconnect");
 				}
 
 				if (SubscribeDisconnected[PubnubInstance.InstanceId]) {
-					LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Subscribe is still Disconnected. So no reconnect", config[PubnubInstance.InstanceId].LogVerbosity);
+					logger?.Trace($"Subscribe is still Disconnected. So no reconnect");
 				} else if (config[PubnubInstance.InstanceId].ReconnectionPolicy != PNReconnectionPolicy.NONE) {
-					LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Subscribe - No internet connection for channel={string.Join(",", channels.OrderBy(x => x).ToArray())} and channelgroup={(channelGroups != null ? string.Join(",", channelGroups) : "")}; networkAvailable={networkAvailable}", config[PubnubInstance.InstanceId].LogVerbosity);
+					logger?.Trace($"Subscribe - No internet connection for channel={string.Join(",", channels.OrderBy(x => x).ToArray())} and channelgroup={(channelGroups != null ? string.Join(",", channelGroups) : "")}; networkAvailable={networkAvailable}");
 					TerminateReconnectTimer();
 					ReconnectNetwork<T>(netState);
 				} else {
-					LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] reconnection policy is DISABLED, please handle reconnection manually.", config[PubnubInstance.InstanceId].LogVerbosity);
+					logger?.Warn($"reconnection policy is DISABLED, please handle reconnection manually.");
 					if (!networkAvailable) {
 						PNStatusCategory errorCategory = PNStatusCategory.PNNetworkIssuesCategory;
 						PNStatus status = new StatusBuilder(config[PubnubInstance.InstanceId], jsonLibrary).CreateStatusResponse<T>(type, errorCategory, null, Constants.ResourceNotFoundStatusCode, new PNException("SDK Network related error"));
@@ -450,7 +458,7 @@ namespace PubnubApi.EndPoint
 		private void ReconnectNetwork<T>(ReconnectState<T> netState)
 		{
 			if (netState != null && ((netState.Channels != null && netState.Channels.Length > 0) || (netState.ChannelGroups != null && netState.ChannelGroups.Length > 0))) {
-				LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] SubscribeManager ReconnectNetwork interval = {PubnubNetworkTcpCheckIntervalInSeconds} sec", config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
+				logger?.Trace($"SubscribeManager ReconnectNetwork interval = {PubnubNetworkTcpCheckIntervalInSeconds} sec");
 
 				System.Threading.Timer timer;
 
@@ -490,7 +498,7 @@ namespace PubnubApi.EndPoint
 					networkConnection = CheckInternetConnectionStatus<T>(PubnetSystemActive, PNOperationType.PNSubscribeOperation, null, channels, channelGroups);
 				}
 				if (!networkConnection)  {
-					LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] No network for SubscribeManager Manual Reconnect", config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
+					logger?.Warn($" No network for SubscribeManager Manual Reconnect");
 
 					PNStatusCategory errorCategory = PNStatusCategory.PNNetworkIssuesCategory;
 					PNStatus status = new StatusBuilder(config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId] : null, jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNSubscribeOperation, errorCategory, null, Constants.ResourceNotFoundStatusCode, new PNException("SDK Network related error"));
@@ -505,12 +513,12 @@ namespace PubnubApi.EndPoint
 					return false;
 				}
 			} else {
-				LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] No channels/channelgroups for SubscribeManager Manual Reconnect", config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
+				logger?.Debug($"No channels/channelgroups for SubscribeManager Manual Reconnect");
 				return false;
 			}
 
 
-			LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] SubscribeManager Manual Reconnect", config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
+			logger?.Trace($"SubscribeManager Manual Reconnect");
 			SubscribeDisconnected[PubnubInstance.InstanceId] = false;
 
 			Task.Factory.StartNew(() => {
@@ -529,7 +537,7 @@ namespace PubnubApi.EndPoint
 			if (SubscribeDisconnected[PubnubInstance.InstanceId]) {
 				return false;
 			}
-			LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] SubscribeManager Manual Disconnect", config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
+			logger?.Trace($"SubscribeManager Manual Disconnect");
 			SubscribeDisconnected[PubnubInstance.InstanceId] = true;
 			TerminateCurrentSubscriberRequest();
 			TerminatePresenceHeartbeatTimer();
@@ -542,11 +550,11 @@ namespace PubnubApi.EndPoint
 		{
 			try {
 				if (SubscribeDisconnected[PubnubInstance.InstanceId]) {
-					LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] SubscribeManager - SubscribeDisconnected. No heartbeat check.", config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
+					logger?.Trace($"SubscribeManager - SubscribeDisconnected. No heartbeat check.");
 					return;
 				}
 				if (!config.ContainsKey(PubnubInstance.InstanceId)) {
-					LoggingMethod.WriteToLog(pubnubLog,$"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] InstanceId Not Available. So No heartbeat check.", config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
+					logger?.Trace($"InstanceId Not Available. So No heartbeat check.");
 					return;
 				}
 
@@ -558,9 +566,9 @@ namespace PubnubApi.EndPoint
 					if (networkConnection && PubnubInstance != null && SubscribeRequestTracker.ContainsKey(PubnubInstance.InstanceId)) {
 						DateTime lastSubscribeRequestTime = SubscribeRequestTracker[PubnubInstance.InstanceId];
 						if ((DateTime.Now - lastSubscribeRequestTime).TotalSeconds < config[PubnubInstance.InstanceId].SubscribeTimeout) {
-							LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] SubscribeManager: expected subscribe within threshold limit of SubscribeTimeout", config[PubnubInstance.InstanceId].LogVerbosity);
-						} else if ((DateTime.Now - lastSubscribeRequestTime).TotalSeconds > 2 * (config[PubnubInstance.InstanceId].SubscribeTimeout - config[PubnubInstance.InstanceId].SubscribeTimeout / 2)) {
-							LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] SubscribeManager - **No auto subscribe within threshold limit of SubscribeTimeout**. Calling MultiChannelSubscribeRequest", config[PubnubInstance.InstanceId].LogVerbosity);
+							logger?.Trace($"SubscribeManager: expected subscribe within threshold limit of SubscribeTimeout");
+						} else if (config != null && (DateTime.Now - lastSubscribeRequestTime).TotalSeconds > 2 * (config[PubnubInstance.InstanceId].SubscribeTimeout - config[PubnubInstance.InstanceId].SubscribeTimeout / 2)) {
+							logger?.Trace($"SubscribeManager - **No auto subscribe within threshold limit of SubscribeTimeout. Calling MultiChannelSubscribeRequest");
 							Task.Factory.StartNew(() => {
 								TerminateCurrentSubscriberRequest();
 								MultiChannelSubscribeRequest<T>(PNOperationType.PNSubscribeOperation, channels, chananelGroups, LastSubscribeTimetoken[PubnubInstance.InstanceId], LastSubscribeRegion[PubnubInstance.InstanceId], false, null, this.customQueryParam);
@@ -589,14 +597,14 @@ namespace PubnubApi.EndPoint
 						}
 					}
 				} else {
-					LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] SubscribeManager - StartSubscribeHeartbeatCheckCallback - No channels/cgs avaialable", config[PubnubInstance.InstanceId].LogVerbosity);
+					logger?.Trace($"SubscribeManager - StartSubscribeHeartbeatCheckCallback - No channels/cgs avaialable");
 					try {
 						SubscribeHeartbeatCheckTimer.Change(Timeout.Infinite, Timeout.Infinite);
 						TerminateCurrentSubscriberRequest();
 					} catch {  /* ignore */ }
 				}
 			} catch (Exception ex) {
-				LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] SubscribeManager - StartSubscribeHeartbeatCheckCallback - EXCEPTION: {ex}", config[PubnubInstance.InstanceId].LogVerbosity);
+				logger?.Error($" SubscribeManager - StartSubscribeHeartbeatCheckCallback - EXCEPTION: {ex}");
 			}
 		}
 
@@ -636,7 +644,8 @@ namespace PubnubApi.EndPoint
 							if(!networkConnection){
 								ConnectionErrors++;
 								UpdatePubnubNetworkTcpCheckIntervalInSeconds();
-								LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] channel={channel} {netState.ResponseType} reconnectNetworkCallback. Retry", config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
+								logger?.Trace(
+									$"channel={channel} {netState.ResponseType} reconnectNetworkCallback. Retry");
 								if (netState.Channels != null && netState.Channels.Length > 0) {
 									PNStatus status = new StatusBuilder(config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId] : null, jsonLibrary).CreateStatusResponse<T>(netState.ResponseType, PNStatusCategory.PNNetworkIssuesCategory, null, (int)System.Net.HttpStatusCode.NotFound, new PNException("Internet connection problem. Retrying connection"));
 									if (netState.Channels != null && netState.Channels.Length > 0) {
@@ -651,8 +660,9 @@ namespace PubnubApi.EndPoint
 						}
 
 						if (ChannelInternetStatus[PubnubInstance.InstanceId].ContainsKey(channel) && ChannelInternetStatus[PubnubInstance.InstanceId].TryGetValue(channel, out channelInternetFlag) && channelInternetFlag) {
-							if (ChannelReconnectTimer[PubnubInstance.InstanceId].ContainsKey(channel)) {
-								LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}], {channel} {netState.ResponseType} terminating ch reconnectimer", config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
+							if (ChannelReconnectTimer[PubnubInstance.InstanceId].ContainsKey(channel))
+							{
+								logger?.Trace($"{channel} {netState.ResponseType} terminating channel reconnect timer");
 								TerminateReconnectTimer();
 							}
 
@@ -665,7 +675,8 @@ namespace PubnubApi.EndPoint
 							}
 							Announce(status);
 
-							LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] channel={channel} {netState.ResponseType} reconnectNetworkCallback. Internet Available : {channelInternetFlag}", config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
+							logger?.Trace(
+								$"channel={channel} {netState.ResponseType} reconnectNetworkCallback. Internet Available : {channelInternetFlag}");
 							switch (netState.ResponseType) {
 								case PNOperationType.PNSubscribeOperation:
 								case PNOperationType.Presence:
@@ -695,7 +706,8 @@ namespace PubnubApi.EndPoint
 									ChannelInternetStatus[PubnubInstance.InstanceId].AddOrUpdate(channel, networkConnection, (key, oldValue) => networkConnection);
 								}
 
-								LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] channelgroup={channelGroup} {netState.ResponseType} reconnectNetworkCallback. Retrying",config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
+								logger?.Trace(
+									$"channelgroup={channelGroup} {netState.ResponseType} reconnectNetworkCallback. Retrying");
 
 								if (netState.ChannelGroups != null && netState.ChannelGroups.Length > 0) {
 									PNStatus status = new StatusBuilder(config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId] : null, jsonLibrary).CreateStatusResponse<T>(netState.ResponseType, PNStatusCategory.PNReconnectedCategory, null, (int)System.Net.HttpStatusCode.NotFound, new PNException("Internet connection problem. Retrying connection"));
@@ -711,8 +723,9 @@ namespace PubnubApi.EndPoint
 						}
 
 						if (ChannelGroupInternetStatus[PubnubInstance.InstanceId].TryGetValue(channelGroup, out channelGroupInternetFlag) && channelGroupInternetFlag) {
-							if (ChannelGroupReconnectTimer[PubnubInstance.InstanceId].ContainsKey(channelGroup)) {
-								LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] {channelGroup} {netState.ResponseType} terminating cg reconnectimer", config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
+							if (ChannelGroupReconnectTimer[PubnubInstance.InstanceId].ContainsKey(channelGroup))
+							{
+								logger?.Trace($"{channelGroup} {netState.ResponseType} terminating channel group reconnect timer");
 								TerminateReconnectTimer();
 							}
 
@@ -728,7 +741,7 @@ namespace PubnubApi.EndPoint
 								Announce(status);
 							}
 
-							LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] channelgroup={channelGroup} {netState.ResponseType} reconnectNetworkCallback. Internet Available", config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
+							logger?.Trace($" channelgroup={channelGroup} {netState.ResponseType} reconnectNetworkCallback. Internet Available");
 							switch (netState.ResponseType) {
 								case PNOperationType.PNSubscribeOperation:
 								case PNOperationType.Presence:
@@ -739,8 +752,9 @@ namespace PubnubApi.EndPoint
 							}
 						}
 					}
-				} else {
-					LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Unknown request state in reconnectNetworkCallback", config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
+				} else
+				{
+					logger?.Trace($"Unknown request state in reconnectNetworkCallback");
 				}
 			} catch (Exception ex) {
 				if (netState != null) {
@@ -755,7 +769,7 @@ namespace PubnubApi.EndPoint
 					Announce(status);
 				}
 
-				LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] method:reconnectNetworkCallback \n Exception Details={1}", config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
+				logger?.Error($" method:reconnectNetworkCallback \n Exception message = {ex.Message} Details={ex.StackTrace}");
 			}
 		}
 

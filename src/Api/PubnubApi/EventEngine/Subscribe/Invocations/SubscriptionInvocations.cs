@@ -11,6 +11,10 @@ namespace PubnubApi.EventEngine.Subscribe.Invocations {
 			this.Cursor = cursor;
 			this.Messages = messages;
 		}
+		public override string ToString()
+		{
+			return $"Invocation : {Name}";
+		}
 	}
 
 	public class EmitStatusInvocation : Core.IEffectInvocation {
@@ -38,6 +42,10 @@ namespace PubnubApi.EventEngine.Subscribe.Invocations {
 				Category = category,
 			};
 		}
+		public override string ToString()
+		{
+			return $"Invocation : {Name}, StatusCode={Status.StatusCode}, Category={StatusCategory}";
+		}
 	}
 
 	public class HandshakeInvocation : Core.IEffectInvocation {
@@ -48,6 +56,11 @@ namespace PubnubApi.EventEngine.Subscribe.Invocations {
 		public Dictionary<string, string> InitialSubscribeQueryParams = new Dictionary<string, string>();
 		public Dictionary<string, object> ExternalQueryParams = new Dictionary<string, object>();
 		public virtual string Name { get; set; } = "HANDSHAKE";
+		
+		public override string ToString()
+		{
+			return $"Invocation : {Name}";
+		}
 	}
 	
 	public class ReceiveMessagesInvocation : Core.IEffectInvocation 
@@ -58,16 +71,28 @@ namespace PubnubApi.EventEngine.Subscribe.Invocations {
 		public Dictionary<string, string> InitialSubscribeQueryParams = new Dictionary<string, string>();
 		public Dictionary<string, object> ExternalQueryParams = new Dictionary<string, object>();
 		public virtual string Name { get; set; } = "RECEIVE_MESSAGES";
+		public override string ToString()
+		{
+			return $"Invocation : {Name}";
+		}
 	}
 	
 	public class CancelReceiveMessagesInvocation : ReceiveMessagesInvocation, Core.IEffectCancelInvocation 
 	{
 		public override string Name { get; set; } = "CANCEL_RECEIVE_MESSAGES";
+		public override string ToString()
+		{
+			return $"Invocation : {Name}";
+		}
 	}
 
 	public class CancelHandshakeInvocation : HandshakeInvocation, Core.IEffectCancelInvocation 
 	{
 		public override string Name { get; set; } = "CANCEL_HANDSHAKE";
+		public override string ToString()
+		{
+			return $"Invocation : {Name}";
+		}
 	}
 
 	public class HandshakeReconnectInvocation: HandshakeInvocation
@@ -75,11 +100,19 @@ namespace PubnubApi.EventEngine.Subscribe.Invocations {
 		public int AttemptedRetries;
 		public PNStatus Reason { get; set; }
 		public override string Name { get; set; } = "HANDSHAKE_RECONNECT";
+		public override string ToString()
+		{
+			return $"Invocation : {Name}";
+		}
 	}
 
 	public class CancelHandshakeReconnectInvocation: HandshakeReconnectInvocation, Core.IEffectCancelInvocation 
 	{ 
 		public override string Name { get; set; } = "CANCEL_HANDSHAKE_RECONNECT";
+		public override string ToString()
+		{
+			return $"Invocation : {Name}";
+		}
 	}
 	
 	public class ReceiveReconnectInvocation: ReceiveMessagesInvocation 
@@ -87,10 +120,18 @@ namespace PubnubApi.EventEngine.Subscribe.Invocations {
 		public int AttemptedRetries;
 		public PNStatus Reason { get; set; }
 		public override string Name { get; set; } = "RECEIVE_RECONNECT";
+		public override string ToString()
+		{
+			return $"Invocation : {Name}";
+		}
 	}
 
 	public class CancelReceiveReconnectInvocation: ReceiveReconnectInvocation, Core.IEffectCancelInvocation 
 	{
 		public override string Name { get; set; } = "CANCEL_RECEIVE_RECONNECT";
+		public override string ToString()
+		{
+			return $"Invocation : {Name}";
+		}
 	}
 }

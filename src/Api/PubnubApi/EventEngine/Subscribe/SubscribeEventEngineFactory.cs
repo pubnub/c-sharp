@@ -10,7 +10,7 @@ namespace PubnubApi.EventEngine.Subscribe
 		private ConcurrentDictionary<string, SubscribeEventEngine> engineInstances { get; set;}
 		internal SubscribeEventEngineFactory()
 		{ 
-			this.engineInstances = new ConcurrentDictionary<string, SubscribeEventEngine>();
+			engineInstances = new ConcurrentDictionary<string, SubscribeEventEngine>();
 		}
 		internal bool HasEventEngine(string instanceId)
 		{
@@ -31,12 +31,15 @@ namespace PubnubApi.EventEngine.Subscribe
 			IJsonPluggableLibrary jsonPluggableLibrary,
 			Action<Pubnub, PNStatus> statusListener = null)
 		{
-			
 			var subscribeEventEngine = new SubscribeEventEngine(pubnubInstance, pubnubConfiguration: pubnubConfiguration, subscribeManager,eventEmitter, jsonPluggableLibrary, statusListener);
-			if (engineInstances.TryAdd(instanceId, subscribeEventEngine)) {
+			try
+			{
+				engineInstances.TryAdd(instanceId, subscribeEventEngine);
 				return subscribeEventEngine;
 			}
-			else {
+			catch (Exception e)
+			{
+				pubnubConfiguration.Logger.Error($"Subscribe Event engine initialisation failed due to exception {e.Message} \n {e.StackTrace}");
 				throw new Exception("Subscribe event engine initialisation failed!");
 			}
 		}

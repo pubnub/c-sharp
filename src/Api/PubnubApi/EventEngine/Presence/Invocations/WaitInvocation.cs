@@ -6,5 +6,9 @@ namespace PubnubApi.EventEngine.Presence.Invocations
     {
         public PresenceInput Input { get; set; }
         public virtual string Name { get; set; } = "WAIT";
+        public override string ToString()
+        {
+            return $"Invocation : {Name}";
+        }
     }
 }

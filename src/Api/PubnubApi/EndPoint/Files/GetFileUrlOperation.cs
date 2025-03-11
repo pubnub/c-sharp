@@ -53,6 +53,7 @@ namespace PubnubApi.EndPoint
 
         public void Execute(PNCallback<PNFileUrlResult> callback)
         {
+            logger?.Trace($"{GetType().Name} Execute invoked");
             if (callback == null)
             {
                 throw new ArgumentException("Missing callback");
@@ -66,11 +67,13 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing File Name");
             }
             this.savedCallback = callback;
+            logger?.Debug($"{GetType().Name} parameter validated.");
             ProcessGetFileUrl(this.queryParam, savedCallback);
         }
 
         public async Task<PNResult<PNFileUrlResult>> ExecuteAsync()
         {
+            logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
             return await ProcessGetFileUrl(this.queryParam).ConfigureAwait(false);
         }
 
@@ -86,6 +89,7 @@ namespace PubnubApi.EndPoint
             var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNFileUrlOperation);
             result.Url = transportRequest.RequestUrl;
             PNStatus status = new PNStatus { Error = false, StatusCode = 200 };
+            logger?.Info($"{GetType().Name} request finished with status code {status.StatusCode}");
             callback.OnResponse(result, status);
         }
 
@@ -116,7 +120,7 @@ namespace PubnubApi.EndPoint
 
             returnValue.Result = result;
             returnValue.Status = status;
-
+            logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status?.StatusCode}");
             return Task.FromResult(returnValue);
         }
 

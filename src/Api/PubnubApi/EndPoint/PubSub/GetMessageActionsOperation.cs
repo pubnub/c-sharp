@@ -82,7 +82,7 @@ namespace PubnubApi.EndPoint
 			if (callback == null) {
 				throw new ArgumentException("Missing userCallback");
 			}
-
+			logger?.Trace($"{GetType().Name} Execute invoked");
 			GetMessageActions(this.messageActionChannelName, this.startTimetoken, this.endTimetoken, this.limit, this.queryParam, callback);
 		}
 
@@ -91,7 +91,7 @@ namespace PubnubApi.EndPoint
 			if (config == null || string.IsNullOrEmpty(config.SubscribeKey) || config.SubscribeKey.Trim().Length <= 0) {
 				throw new MissingMemberException("subscribe key is required");
 			}
-
+			logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
 			return await GetMessageActions(this.messageActionChannelName, this.startTimetoken, this.endTimetoken, this.limit, this.queryParam).ConfigureAwait(false);
 		}
 
@@ -103,17 +103,21 @@ namespace PubnubApi.EndPoint
 		private void GetMessageActions(string channel, long start, long end, int limit, Dictionary<string, object> externalQueryParam, PNCallback<PNGetMessageActionsResult> callback)
 		{
 			if (string.IsNullOrEmpty(messageActionChannelName) || string.IsNullOrEmpty(messageActionChannelName.Trim())) {
-				PNStatus status = new PNStatus();
-				status.Error = true;
-				status.ErrorData = new PNErrorData("Missing Channel or MessageAction", new ArgumentException("Missing Channel or MessageAction"));
+				PNStatus status = new PNStatus
+				{
+					Error = true,
+					ErrorData = new PNErrorData("Missing Channel or MessageAction", new ArgumentException("Missing Channel or MessageAction"))
+				};
 				callback.OnResponse(null, status);
 				return;
 			}
 
 			if (string.IsNullOrEmpty(config.SubscribeKey) || string.IsNullOrEmpty(config.SubscribeKey.Trim()) || config.SubscribeKey.Length <= 0) {
-				PNStatus status = new PNStatus();
-				status.Error = true;
-				status.ErrorData = new PNErrorData("Invalid subscribe key", new MissingMemberException("Invalid subscribe key"));
+				PNStatus status = new PNStatus
+				{
+					Error = true,
+					ErrorData = new PNErrorData("Invalid subscribe key", new MissingMemberException("Invalid subscribe key"))
+				};
 				callback.OnResponse(null, status);
 				return;
 			}
@@ -121,12 +125,15 @@ namespace PubnubApi.EndPoint
 			if (callback == null) {
 				return;
 			}
-			RequestState<PNGetMessageActionsResult> requestState = new RequestState<PNGetMessageActionsResult>();
-			requestState.Channels = new[] { messageActionChannelName };
-			requestState.ResponseType = PNOperationType.PNGetMessageActionsOperation;
-			requestState.PubnubCallback = callback;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
+			logger?.Debug($"{GetType().Name} parameter validated.");
+			RequestState<PNGetMessageActionsResult> requestState = new RequestState<PNGetMessageActionsResult>
+				{
+					Channels = new[] { messageActionChannelName },
+					ResponseType = PNOperationType.PNGetMessageActionsOperation,
+					PubnubCallback = callback,
+					Reconnect = false,
+					EndPointOperation = this
+				};
 			string responseString;
 			var requestParameter = CreateRequestParameter();
 
@@ -138,13 +145,16 @@ namespace PubnubApi.EndPoint
                         requestState.GotJsonResponse = true;
 						List<object> result = ProcessJsonResponse(requestState, responseString);
 						ProcessResponseCallbacks(result, requestState);
+						logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 					} else {
+						logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 						ProcessResponseCallbacks(null, requestState);
 					}
 				} else {
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(t.Result.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, t.Result.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNPublishOperation, category, requestState, statusCode, new PNException(t.Result.Error.Message, t.Result.Error));
+					logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 					requestState.PubnubCallback.OnResponse(default(PNGetMessageActionsResult), status);
 				}
 			});
@@ -156,25 +166,32 @@ namespace PubnubApi.EndPoint
 			PNResult<PNGetMessageActionsResult> returnValue = new PNResult<PNGetMessageActionsResult>();
 
 			if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim())) {
-				PNStatus status = new PNStatus();
-				status.Error = true;
-				status.ErrorData = new PNErrorData("Missing Channel or MessageAction", new ArgumentException("Missing Channel or MessageAction"));
+				PNStatus status = new PNStatus
+				{
+					Error = true,
+					ErrorData = new PNErrorData("Missing Channel or MessageAction", new ArgumentException("Missing Channel or MessageAction"))
+				};
 				returnValue.Status = status;
 				return returnValue;
 			}
 
 			if (string.IsNullOrEmpty(config.SubscribeKey) || string.IsNullOrEmpty(config.SubscribeKey.Trim()) || config.SubscribeKey.Length <= 0) {
-				PNStatus status = new PNStatus();
-				status.Error = true;
-				status.ErrorData = new PNErrorData("Invalid subscribe key", new MissingMemberException("Invalid subscribe key"));
+				PNStatus status = new PNStatus
+				{
+					Error = true,
+					ErrorData = new PNErrorData("Invalid subscribe key", new MissingMemberException("Invalid subscribe key"))
+				};
 				returnValue.Status = status;
 				return returnValue;
 			}
-			RequestState<PNGetMessageActionsResult> requestState = new RequestState<PNGetMessageActionsResult>();
-			requestState.Channels = new[] { channel };
-			requestState.ResponseType = PNOperationType.PNGetMessageActionsOperation;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
+			logger?.Debug($"{GetType().Name} parameter validated.");
+			RequestState<PNGetMessageActionsResult> requestState = new RequestState<PNGetMessageActionsResult>
+				{
+					Channels = new[] { channel },
+					ResponseType = PNOperationType.PNGetMessageActionsOperation,
+					Reconnect = false,
+					EndPointOperation = this
+				};
 			Tuple<string, PNStatus> JsonAndStatusTuple;
 
 			var requestParameter = CreateRequestParameter();
@@ -207,6 +224,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNGetMessageActionsOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
+			logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 

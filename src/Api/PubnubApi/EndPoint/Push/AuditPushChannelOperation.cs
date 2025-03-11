@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace PubnubApi.EndPoint
 {
@@ -20,7 +20,7 @@ namespace PubnubApi.EndPoint
 		private PNCallback<PNPushListProvisionsResult> savedCallback;
 		private Dictionary<string, object> queryParam;
 
-		public AuditPushChannelOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
+		public AuditPushChannelOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
 		{
 			config = pubnubConfig;
 			jsonLibrary = jsonPluggableLibrary;
@@ -30,13 +30,13 @@ namespace PubnubApi.EndPoint
 
 		public AuditPushChannelOperation PushType(PNPushType pushType)
 		{
-			this.pubnubPushType = pushType;
+			pubnubPushType = pushType;
 			return this;
 		}
 
 		public AuditPushChannelOperation DeviceId(string deviceId)
 		{
-			this.deviceTokenId = deviceId;
+			deviceTokenId = deviceId;
 			return this;
 		}
 
@@ -47,7 +47,7 @@ namespace PubnubApi.EndPoint
 		/// <returns></returns>
 		public AuditPushChannelOperation Environment(PushEnvironment environment)
 		{
-			this.pushEnvironment = environment;
+			pushEnvironment = environment;
 			return this;
 		}
 
@@ -64,7 +64,7 @@ namespace PubnubApi.EndPoint
 
 		public AuditPushChannelOperation QueryParam(Dictionary<string, object> customQueryParam)
 		{
-			this.queryParam = customQueryParam;
+			queryParam = customQueryParam;
 			return this;
 		}
 
@@ -76,18 +76,20 @@ namespace PubnubApi.EndPoint
 
 		public void Execute(PNCallback<PNPushListProvisionsResult> callback)
 		{
-			this.savedCallback = callback;
-			GetChannelsForDevice(this.pubnubPushType, this.deviceTokenId, this.pushEnvironment, this.deviceTopic, this.queryParam, callback);
+			savedCallback = callback;
+			logger?.Trace($"{GetType().Name} Execute invoked");
+			GetChannelsForDevice(pubnubPushType, deviceTokenId, pushEnvironment, deviceTopic, queryParam, callback);
 		}
 
 		public async Task<PNResult<PNPushListProvisionsResult>> ExecuteAsync()
 		{
-			return await GetChannelsForDevice(this.pubnubPushType, this.deviceTokenId, this.pushEnvironment, this.deviceTopic, this.queryParam).ConfigureAwait(false);
+			logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
+			return await GetChannelsForDevice(pubnubPushType, deviceTokenId, pushEnvironment, deviceTopic, queryParam).ConfigureAwait(false);
 		}
 
 		internal void Retry()
 		{
-			GetChannelsForDevice(this.pubnubPushType, this.deviceTokenId, this.pushEnvironment, this.deviceTopic, this.queryParam, savedCallback);
+			GetChannelsForDevice(pubnubPushType, deviceTokenId, pushEnvironment, deviceTopic, queryParam, savedCallback);
 		}
 
 		internal void GetChannelsForDevice(PNPushType pushType, string pushToken, PushEnvironment environment, string deviceTopic, Dictionary<string, object> externalQueryParam, PNCallback<PNPushListProvisionsResult> callback)
@@ -99,12 +101,14 @@ namespace PubnubApi.EndPoint
 			if (pushType == PNPushType.APNS2 && string.IsNullOrEmpty(deviceTopic)) {
 				throw new ArgumentException("Missing Topic");
 			}
-			RequestState<PNPushListProvisionsResult> requestState = new RequestState<PNPushListProvisionsResult>();
-			requestState.ResponseType = PNOperationType.PushGet;
-			requestState.PubnubCallback = callback;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
-
+			logger?.Debug($"{GetType().Name} parameter validated.");
+			RequestState<PNPushListProvisionsResult> requestState = new RequestState<PNPushListProvisionsResult>
+				{
+					ResponseType = PNOperationType.PushGet,
+					PubnubCallback = callback,
+					Reconnect = false,
+					EndPointOperation = this
+				};
 			var requestParameter = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PushGet);
 			PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ContinueWith(t => {
@@ -115,11 +119,13 @@ namespace PubnubApi.EndPoint
 					if (!string.IsNullOrEmpty(responseString)) {
 						List<object> result = ProcessJsonResponse(requestState, responseString);
 						ProcessResponseCallbacks(result, requestState);
+						logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 					}
 				} else {
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PushGet, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
+					logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 					requestState.PubnubCallback.OnResponse(default(PNPushListProvisionsResult), status);
 				}
 			});
@@ -134,19 +140,21 @@ namespace PubnubApi.EndPoint
 			if (pushType == PNPushType.APNS2 && string.IsNullOrEmpty(deviceTopic)) {
 				throw new ArgumentException("Missing Topic");
 			}
-			RequestState<PNPushListProvisionsResult> requestState = new RequestState<PNPushListProvisionsResult>();
-			requestState.ResponseType = PNOperationType.PushGet;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
-			Tuple<string, PNStatus> JsonAndStatusTuple;
+			logger?.Debug($"{GetType().Name} parameter validated.");
+			RequestState<PNPushListProvisionsResult> requestState = new RequestState<PNPushListProvisionsResult>
+				{
+					ResponseType = PNOperationType.PushGet,
+					Reconnect = false,
+					EndPointOperation = this
+				};
 			PNResult<PNPushListProvisionsResult> returnValue = new PNResult<PNPushListProvisionsResult>();
-
 			var requestParameter = CreateRequestParameter();
 			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PushGet);
 			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ConfigureAwait(false);
 			if (transportResponse.Error == null) {
 				var responseString = Encoding.UTF8.GetString(transportResponse.Content);
 				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
+				Tuple<string, PNStatus> JsonAndStatusTuple;
 				if (errorStatus == null) {
 					requestState.GotJsonResponse = true;
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, (int)HttpStatusCode.OK, null);
@@ -170,6 +178,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PushGet, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
+			logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status?.StatusCode}");
 			return returnValue;
 		}
 
@@ -217,7 +226,7 @@ namespace PubnubApi.EndPoint
 				}
 			}
 
-			var requestParameter = new RequestParameter() {
+			var requestParameter = new RequestParameter {
 				RequestType = Constants.GET,
 				PathSegment = pathSegments,
 				Query = requestQueryStringParams

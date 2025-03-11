@@ -13,7 +13,7 @@ namespace PubnubApi.EndPoint
 		private readonly IJsonPluggableLibrary jsonLibrary;
 		private readonly IPubnubUnitTest unit;
 		private readonly IPubnubLog pubnubLog;
-
+		
 		private PNTokenResources pubnubResources = new PNTokenResources {
 			Channels = new Dictionary<string, PNTokenAuthValues>(),
 			Spaces = new Dictionary<string, PNTokenAuthValues>(),
@@ -35,7 +35,7 @@ namespace PubnubApi.EndPoint
 		private Dictionary<string, object> grantMeta;
 		private string pubnubAuthorizedUuid = string.Empty;
 		private string pubnubAuthorizedUserId = string.Empty;
-
+		
 		public GrantTokenOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
 		{
 			config = pubnubConfig;
@@ -43,7 +43,6 @@ namespace PubnubApi.EndPoint
 			unit = pubnubUnit;
 			pubnubLog = log;
 			PubnubInstance = instance;
-
 			InitializeDefaultVariableObjectStates();
 		}
 
@@ -149,11 +148,13 @@ namespace PubnubApi.EndPoint
 
 		public void Execute(PNCallback<PNAccessManagerTokenResult> callback)
 		{
+			logger?.Trace($"{GetType().Name} Execute invoked");
 			GrantAccess(callback);
 		}
 
 		public async Task<PNResult<PNAccessManagerTokenResult>> ExecuteAsync()
 		{
+			logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
 			return await GrantAccess().ConfigureAwait(false);
 		}
 
@@ -171,14 +172,16 @@ namespace PubnubApi.EndPoint
 			if (this.grantTTL <= 0) {
 				throw new MissingMemberException("Invalid TTL value");
 			}
-
-			RequestState<PNAccessManagerTokenResult> requestState = new RequestState<PNAccessManagerTokenResult>();
-			requestState.Channels = pubnubResources.Channels.Keys.ToArray();
-			requestState.ChannelGroups = pubnubResources.ChannelGroups.Keys.ToArray();
-			requestState.ResponseType = PNOperationType.PNAccessManagerGrantToken;
-			requestState.PubnubCallback = callback;
-			requestState.Reconnect = false;
-			requestState.EndPointOperation = this;
+			logger?.Debug($"{GetType().Name} parameter validated.");
+			RequestState<PNAccessManagerTokenResult> requestState = new RequestState<PNAccessManagerTokenResult>
+				{
+					Channels = pubnubResources.Channels.Keys.ToArray(),
+					ChannelGroups = pubnubResources.ChannelGroups.Keys.ToArray(),
+					ResponseType = PNOperationType.PNAccessManagerGrantToken,
+					PubnubCallback = callback,
+					Reconnect = false,
+					EndPointOperation = this
+				};
 
 			var requestParameter = CreateRequestParameter();
 
@@ -191,12 +194,14 @@ namespace PubnubApi.EndPoint
 					if (!string.IsNullOrEmpty(responseString)) {
 						List<object> result = ProcessJsonResponse(requestState, responseString);
 						ProcessResponseCallbacks(result, requestState);
+						logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 					}
 				} else {
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNAccessManagerGrantToken, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 					requestState.PubnubCallback.OnResponse(default(PNAccessManagerTokenResult), status);
+					logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 				}
 			});
 		}
@@ -226,6 +231,7 @@ namespace PubnubApi.EndPoint
 			if (this.grantTTL <= 0) {
 				throw new MissingMemberException("Invalid TTL value");
 			}
+			logger?.Debug($"{GetType().Name} parameter validated.");
 			RequestState<PNAccessManagerTokenResult> requestState = new RequestState<PNAccessManagerTokenResult>();
 			requestState.Channels = pubnubResources.Channels.Keys.ToArray();
 			requestState.ChannelGroups = pubnubResources.ChannelGroups.Keys.ToArray();
@@ -268,6 +274,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNAccessManagerGrantToken, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
+			logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 

@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Collections;
-using System.Diagnostics;
-using System.Globalization;
 using System.Net;
 using PubnubApi.Security.Crypto;
 using PubnubApi.Security.Crypto.Cryptors;
@@ -15,14 +12,16 @@ namespace PubnubApi
     {
         private PNConfiguration config;
         private IJsonPluggableLibrary jsonLib;
-        private IPubnubLog pubnubLog;
+        private PubnubLogModule pubnubLog;
 
-        public static SecureMessage Instance(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubLog log)
+        public static SecureMessage Instance(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, PubnubLogModule log)
         {
-            SecureMessage secureMessage = new SecureMessage();
-            secureMessage.config = pubnubConfig;
-            secureMessage.jsonLib = jsonPluggableLibrary;
-            secureMessage.pubnubLog = log;
+            SecureMessage secureMessage = new SecureMessage
+            {
+                config = pubnubConfig,
+                jsonLib = jsonPluggableLibrary,
+                pubnubLog = log
+            };
             return secureMessage;
         }
 
@@ -72,8 +71,7 @@ namespace PubnubApi
                             {
                                 status.AffectedChannelGroups.AddRange(channelGroups);
                             }
-                            
-                            LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Failed to decrypt message!\nMessage might be not encrypted, Returning the original content as received ", config.LogVerbosity);
+                            pubnubLog?.Debug("Failed to decrypt message!Message might be not encrypted, Returning the original content as received ");
                         }
                         
                         object decodedMessage = jsonLib.DeserializeToObject((decryptMessage == "**DECRYPT ERROR**") ? jsonLib.SerializeToJsonString(element) : decryptMessage);
@@ -156,7 +154,7 @@ namespace PubnubApi
                                             {
                                                 status.AffectedChannelGroups.AddRange(channelGroups);
                                             }
-                                            LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Failed to decrypt message!\nMessage might be not encrypted, returning as is...",config.LogVerbosity);
+                                            pubnubLog?.Debug("Failed to decrypt message!\nMessage might be not encrypted, returning as it is");
                                             #endregion
                                         }
                                         object decodedMessage = jsonLib.DeserializeToObject((decryptMessage == "**DECRYPT ERROR**") ? jsonLib.SerializeToJsonString(kvpValue.Value) : decryptMessage);

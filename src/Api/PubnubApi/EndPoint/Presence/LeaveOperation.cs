@@ -52,10 +52,13 @@ namespace PubnubApi.EndPoint
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					responseStatus = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.Leave, category, pubnubRequestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				}
-			} catch (Exception ex) {
-				LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: Presence Leave request for channel(s)={string.Join(", ", channels.OrderBy(x => x))} \n channelGroup(s)={string.Join(", ", channelGroups.OrderBy(x => x))} \n Exception Details={ex}", config.LogVerbosity);
+			} catch (Exception ex)
+			{
+				logger?.Error(
+					$"Presence Leave request for channel(s)={string.Join(", ", channels.OrderBy(x => x))} \n channelGroup(s)={string.Join(", ", channelGroups.OrderBy(x => x))} \n Exception Details={ex}");
 				return new PNStatus(ex, PNOperationType.Leave, PNStatusCategory.PNUnknownCategory, channels, channelGroups);
 			}
+			logger?.Info($"{GetType().Name} request finished with status code {responseStatus.StatusCode}");
 			return responseStatus;
 		}
 		private RequestParameter CreateRequestParameter(string[] channels, string[] channelGroups)
