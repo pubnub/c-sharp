@@ -1142,7 +1142,7 @@ namespace PubnubApi
                             break;
                         case PNOperationType.PNHistoryOperation:
                         case PNOperationType.PNFetchHistoryOperation:
-                            if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig) && pubnubLog.TryGetValue(PubnubInstance.InstanceId, out currentLog))
+                            if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig))
                             {
                                 if (type == PNOperationType.PNFetchHistoryOperation)
                                 {
