@@ -174,9 +174,6 @@
     <Compile Include="..\PubnubApi\ClientNetworkStatus.cs">
       <Link>ClientNetworkStatus.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\ConcurrentDictionary.cs">
-      <Link>ConcurrentDictionary.cs</Link>
-    </Compile>
     <Compile Include="..\PubnubApi\EndPoint\Access\AuditOperation.cs">
       <Link>EndPoint\Access\AuditOperation.cs</Link>
     </Compile>
@@ -703,9 +700,6 @@
     <Compile Include="..\PubnubApi\Properties\AssemblyInfo.cs" Link="Properties\AssemblyInfo.cs" />
     <Compile Include="..\PubnubApi\Proxy\PubnubProxy.cs">
       <Link>Proxy\PubnubProxy.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\EventListener.cs">
-      <Link>EventListener.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\Pubnub.cs">
       <Link>Pubnub.cs</Link>

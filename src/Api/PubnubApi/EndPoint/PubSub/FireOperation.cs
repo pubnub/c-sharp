@@ -15,7 +15,7 @@ namespace PubnubApi.EndPoint
 		private readonly PNConfiguration config;
 		private readonly IJsonPluggableLibrary jsonLibrary;
 		private readonly IPubnubUnitTest unit;
-		private readonly IPubnubLog pubnubLog;
+
 
 		private object publishContent;
 		private string channelName = "";
@@ -26,12 +26,12 @@ namespace PubnubApi.EndPoint
 		private bool syncRequest;
 		private Dictionary<string, object> queryParam;
 
-		public FireOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
+		public FireOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, tokenManager, instance)
 		{
 			config = pubnubConfig;
 			jsonLibrary = jsonPluggableLibrary;
 			unit = pubnubUnit;
-			pubnubLog = log;
+
 		}
 
 		public FireOperation Message(object message)
@@ -226,7 +226,7 @@ namespace PubnubApi.EndPoint
 						if (publishStatus == 1) {
 							List<object> resultList = ProcessJsonResponse(requestState, json);
 							if (resultList != null && resultList.Count > 0) {
-								ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+								ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary);
 								PNPublishResult responseResult = responseBuilder.JsonToObject<PNPublishResult>(resultList, true);
 								if (responseResult != null) {
 									returnValue.Result = responseResult;

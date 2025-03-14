@@ -13,8 +13,7 @@ namespace PubnubApi.EndPoint
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
         private readonly IPubnubUnitTest unit;
-        private readonly IPubnubLog pubnubLog;
-        private readonly EndPoint.TokenManager pubnubTokenMgr;
+        private readonly TokenManager pubnubTokenManager;
 
         private List<string> subscribeChannelNames = new List<string>();
         private List<string> subscribeChannelGroupNames = new List<string>();
@@ -23,13 +22,12 @@ namespace PubnubApi.EndPoint
         private SubscribeManager manager;
         private Dictionary<string, object> queryParam;
 
-        public SubscribeOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
+        public SubscribeOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, tokenManager, instance)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
-            pubnubLog = log;
-            pubnubTokenMgr = tokenManager;
+            pubnubTokenManager = tokenManager;
 
             PubnubInstance = instance;
             if (!MultiChannelSubscribe.ContainsKey(instance.InstanceId))
@@ -113,7 +111,7 @@ namespace PubnubApi.EndPoint
         {
             if (channels != null && channels.Length > 0 && !string.IsNullOrEmpty(channels[0]))
             {
-                this.subscribeChannelNames.AddRange(channels);
+                subscribeChannelNames.AddRange(channels);
             }
             return this;
         }
@@ -122,26 +120,26 @@ namespace PubnubApi.EndPoint
         {
             if (channelGroups != null && channelGroups.Length > 0 && !string.IsNullOrEmpty(channelGroups[0]))
             {
-                this.subscribeChannelGroupNames.AddRange(channelGroups);
+                subscribeChannelGroupNames.AddRange(channelGroups);
             }
             return this;
         }
 
         public ISubscribeOperation<T> WithTimetoken(long timetoken)
         {
-            this.subscribeTimetoken = timetoken;
+            subscribeTimetoken = timetoken;
             return this;
         }
 
         public ISubscribeOperation<T> WithPresence()
         {
-            this.presenceSubscribeEnabled = true;
+            presenceSubscribeEnabled = true;
             return this;
         }
 
         public ISubscribeOperation<T> QueryParam(Dictionary<string, object> customQueryParam)
         {
-            this.queryParam = customQueryParam;
+            queryParam = customQueryParam;
             return this;
         }
 
@@ -151,38 +149,38 @@ namespace PubnubApi.EndPoint
             {
                 throw new MissingMemberException("Invalid Subscribe key");
             }
-            if (this.subscribeChannelNames == null)
+            if (subscribeChannelNames == null)
             {
-                this.subscribeChannelNames = new List<string>();
+                subscribeChannelNames = new List<string>();
             }
 
-            if (this.subscribeChannelGroupNames == null)
+            if (subscribeChannelGroupNames == null)
             {
-                this.subscribeChannelGroupNames = new List<string>();
+                subscribeChannelGroupNames = new List<string>();
             }
 
-            if (this.presenceSubscribeEnabled)
+            if (presenceSubscribeEnabled)
             {
-                List<string> presenceChannelNames = (this.subscribeChannelNames != null && this.subscribeChannelNames.Count > 0 && !string.IsNullOrEmpty(this.subscribeChannelNames[0])) 
-                                                ? this.subscribeChannelNames.Select(c => string.Format(CultureInfo.InvariantCulture, "{0}-pnpres", c)).ToList() : new List<string>();
-                List<string> presenceChannelGroupNames = (this.subscribeChannelGroupNames != null && this.subscribeChannelGroupNames.Count > 0 && !string.IsNullOrEmpty(this.subscribeChannelGroupNames[0])) 
-                                                ? this.subscribeChannelGroupNames.Select(c => string.Format(CultureInfo.InvariantCulture, "{0}-pnpres", c)).ToList() : new List<string>();
+                List<string> presenceChannelNames = (subscribeChannelNames != null && subscribeChannelNames.Count > 0 && !string.IsNullOrEmpty(subscribeChannelNames[0])) 
+                                                ? subscribeChannelNames.Select(c => string.Format(CultureInfo.InvariantCulture, "{0}-pnpres", c)).ToList() : new List<string>();
+                List<string> presenceChannelGroupNames = (subscribeChannelGroupNames != null && subscribeChannelGroupNames.Count > 0 && !string.IsNullOrEmpty(subscribeChannelGroupNames[0])) 
+                                                ? subscribeChannelGroupNames.Select(c => string.Format(CultureInfo.InvariantCulture, "{0}-pnpres", c)).ToList() : new List<string>();
 
-                if (this.subscribeChannelNames != null && presenceChannelNames.Count > 0)
+                if (subscribeChannelNames != null && presenceChannelNames.Count > 0)
                 {
-                    this.subscribeChannelNames.AddRange(presenceChannelNames);
+                    subscribeChannelNames.AddRange(presenceChannelNames);
                 }
 
-                if (this.subscribeChannelGroupNames != null && presenceChannelGroupNames.Count > 0)
+                if (subscribeChannelGroupNames != null && presenceChannelGroupNames.Count > 0)
                 {
-                    this.subscribeChannelGroupNames.AddRange(presenceChannelGroupNames);
+                    subscribeChannelGroupNames.AddRange(presenceChannelGroupNames);
                 }
             }
 
-            string[] channelNames = this.subscribeChannelNames != null ? this.subscribeChannelNames.ToArray() : null;
-            string[] channelGroupNames = this.subscribeChannelGroupNames != null ? this.subscribeChannelGroupNames.ToArray() : null;
+            string[] channelNames = subscribeChannelNames != null ? subscribeChannelNames.ToArray() : null;
+            string[] channelGroupNames = subscribeChannelGroupNames != null ? subscribeChannelGroupNames.ToArray() : null;
 
-            Subscribe(channelNames, channelGroupNames, this.queryParam);
+            Subscribe(channelNames, channelGroupNames, queryParam);
         }
 
         private void Subscribe(string[] channels, string[] channelGroups, Dictionary<string, object> externalQueryParam)
@@ -198,16 +196,16 @@ namespace PubnubApi.EndPoint
             config.Logger?.Debug($"requested subscribe for channel(s)={channel} and channel group(s)={channelGroup}");
 
             Dictionary<string, string> initialSubscribeUrlParams = new Dictionary<string, string>();
-            if (this.subscribeTimetoken >= 0)
+            if (subscribeTimetoken >= 0)
             {
-                initialSubscribeUrlParams.Add("tt", this.subscribeTimetoken.ToString(CultureInfo.InvariantCulture));
+                initialSubscribeUrlParams.Add("tt", subscribeTimetoken.ToString(CultureInfo.InvariantCulture));
             }
             if (!string.IsNullOrEmpty(config.FilterExpression) && config.FilterExpression.Trim().Length > 0)
             {
                 initialSubscribeUrlParams.Add("filter-expr", UriUtil.EncodeUriComponent(config.FilterExpression, PNOperationType.PNSubscribeOperation, false, false, false));
             }
             
-            manager = new SubscribeManager(config, jsonLibrary, unit, pubnubLog, pubnubTokenMgr, PubnubInstance);
+            manager = new SubscribeManager(config, jsonLibrary, unit, pubnubTokenManager, PubnubInstance);
             manager.CurrentPubnubInstance(PubnubInstance);
             manager.MultiChannelSubscribeInit<T>(PNOperationType.PNSubscribeOperation, channels??[], channelGroups??[], initialSubscribeUrlParams, externalQueryParam);
         }

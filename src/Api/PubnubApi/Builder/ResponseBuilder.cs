@@ -6,14 +6,12 @@ namespace PubnubApi
     {
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLib;
-        private readonly IPubnubLog pubnubLog;
         private readonly EventDeserializer eventDeserializer;
 
-        public ResponseBuilder(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubLog log)
+        public ResponseBuilder(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary)
         {
             config = pubnubConfig;
             jsonLib = jsonPluggableLibrary;
-            pubnubLog = log;
             eventDeserializer = new EventDeserializer(jsonLib);
         }
 

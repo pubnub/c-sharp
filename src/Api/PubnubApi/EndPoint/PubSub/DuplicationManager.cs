@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 #if !NET35 && !NET40
 using System.Collections.Concurrent;
@@ -13,14 +11,12 @@ namespace PubnubApi.EndPoint
     {
         private readonly PNConfiguration pubnubConfig;
         private readonly IJsonPluggableLibrary jsonLib;
-        private readonly IPubnubLog pubnubLog;
         private static ConcurrentDictionary<string, long> HashHistory { get; } = new ConcurrentDictionary<string, long>();
 
-        public DuplicationManager(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubLog log)
+        public DuplicationManager(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary)
         {
-            this.pubnubConfig = config;
-            this.jsonLib = jsonPluggableLibrary;
-            this.pubnubLog = log;
+            pubnubConfig = config;
+            jsonLib = jsonPluggableLibrary;
         }
 
         private string GetSubscribeMessageHashKey(SubscribeMessage message)
@@ -30,7 +26,7 @@ namespace PubnubApi.EndPoint
 
         public bool IsDuplicate(SubscribeMessage message)
         {
-            return HashHistory.ContainsKey(this.GetSubscribeMessageHashKey(message));
+            return HashHistory.ContainsKey(GetSubscribeMessageHashKey(message));
         }
 
         public void AddEntry(SubscribeMessage message)
@@ -40,10 +36,10 @@ namespace PubnubApi.EndPoint
                 long keyValue;
                 if (!HashHistory.TryRemove(HashHistory.Aggregate((l,r)=> l.Value < r.Value ? l : r).Key, out keyValue))
                 {
-                    LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] DuplicationManager => AddEntry => TryRemove is false",  PNLogVerbosity.BODY);
+                    pubnubConfig?.Logger?.Debug("DuplicationManager AddEntry TryRemove False");
                 }
             }
-            HashHistory.TryAdd(this.GetSubscribeMessageHashKey(message),Pubnub.TranslateDateTimeToPubnubUnixNanoSeconds(DateTime.UtcNow));
+            HashHistory.TryAdd(GetSubscribeMessageHashKey(message),Pubnub.TranslateDateTimeToPubnubUnixNanoSeconds(DateTime.UtcNow));
         }
 
         public void ClearHistory()

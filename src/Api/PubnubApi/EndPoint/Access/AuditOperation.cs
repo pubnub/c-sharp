@@ -11,20 +11,17 @@ namespace PubnubApi.EndPoint
 		private readonly PNConfiguration config;
 		private readonly IJsonPluggableLibrary jsonLibrary;
 		private readonly IPubnubUnitTest unit;
-		private readonly IPubnubLog pubnubLog;
-
 		private string channelName;
 		private string channelGroupName;
 		private string[] authenticationKeys;
 		private PNCallback<PNAccessManagerAuditResult> savedCallback;
 		private Dictionary<string, object> queryParam;
 
-		public AuditOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, null, instance)
+		public AuditOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, null, instance)
 		{
 			config = pubnubConfig;
 			jsonLibrary = jsonPluggableLibrary;
 			unit = pubnubUnit;
-			pubnubLog = log;
 		}
 
 		public AuditOperation Channel(string channel)
@@ -153,7 +150,7 @@ namespace PubnubApi.EndPoint
 					if (result != null) {
 						List<object> resultList = ProcessJsonResponse(requestState, json);
 						if (resultList != null && resultList.Count > 0) {
-							ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+							ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary);
 							PNAccessManagerAuditResult responseResult = responseBuilder.JsonToObject<PNAccessManagerAuditResult>(resultList, true);
 							if (responseResult != null) {
 								returnValue.Result = responseResult;

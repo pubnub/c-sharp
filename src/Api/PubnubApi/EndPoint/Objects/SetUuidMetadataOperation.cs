@@ -13,7 +13,7 @@ namespace PubnubApi.EndPoint
 		private readonly PNConfiguration config;
 		private readonly IJsonPluggableLibrary jsonLibrary;
 		private readonly IPubnubUnitTest unit;
-		private readonly IPubnubLog pubnubLog;
+
 
 		private string uuidId;
 		private string uuidName;
@@ -27,12 +27,12 @@ namespace PubnubApi.EndPoint
 		private PNCallback<PNSetUuidMetadataResult> savedCallback;
 		private Dictionary<string, object> queryParam;
 
-		public SetUuidMetadataOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
+		public SetUuidMetadataOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, tokenManager, instance)
 		{
 			config = pubnubConfig;
 			jsonLibrary = jsonPluggableLibrary;
 			unit = pubnubUnit;
-			pubnubLog = log;
+
 
 			if (instance != null) {
 				if (!ChannelRequest.ContainsKey(instance.InstanceId)) {
@@ -200,7 +200,7 @@ namespace PubnubApi.EndPoint
 				string json = JsonAndStatusTuple.Item1;
 				if (!string.IsNullOrEmpty(json)) {
 					List<object> resultList = ProcessJsonResponse(requestState, json);
-					ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+					ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary);
 					PNSetUuidMetadataResult responseResult = responseBuilder.JsonToObject<PNSetUuidMetadataResult>(resultList, true);
 					if (responseResult != null) {
 						returnValue.Result = responseResult;

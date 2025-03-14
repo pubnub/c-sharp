@@ -142,7 +142,7 @@ namespace PubnubApi
             set;
         } = new ConcurrentDictionary<string, DateTime>();
         
-        protected PubnubCoreBase(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance)
+        protected PubnubCoreBase(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, EndPoint.TokenManager tokenManager, Pubnub instance)
         {
             if (pubnubConfiguation == null)
             {
@@ -151,23 +151,22 @@ namespace PubnubApi
             
             if (jsonPluggableLibrary == null)
             {
-                InternalConstructor(pubnubConfiguation, new NewtonsoftJsonDotNet(pubnubConfiguation), pubnubUnitTest, log, tokenManager, instance);
+                InternalConstructor(pubnubConfiguation, new NewtonsoftJsonDotNet(pubnubConfiguation), pubnubUnitTest, tokenManager, instance);
             }
             else
             {
-                InternalConstructor(pubnubConfiguation, jsonPluggableLibrary, pubnubUnitTest, log, tokenManager, instance);
+                InternalConstructor(pubnubConfiguation, jsonPluggableLibrary, pubnubUnitTest,tokenManager, instance);
             }
         }
 
-        private void InternalConstructor(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance)
+        private void InternalConstructor(PNConfiguration pubnubConfiguation, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnitTest, EndPoint.TokenManager tokenManager, Pubnub instance)
         {
             PubnubInstance = instance;
             pubnubConfig.AddOrUpdate(instance.InstanceId, pubnubConfiguation, (k,o)=> pubnubConfiguation);
             jsonLib = jsonPluggableLibrary;
             unitTest = pubnubUnitTest;
-            pubnubLog.AddOrUpdate(instance.InstanceId, log, (k, o) => log);
             PubnubTokenMgrCollection.AddOrUpdate(instance.InstanceId, tokenManager, (k,o)=> tokenManager);
-            pubnubSubscribeDuplicationManager = new EndPoint.DuplicationManager(pubnubConfiguation, jsonPluggableLibrary, log);
+            pubnubSubscribeDuplicationManager = new EndPoint.DuplicationManager(pubnubConfiguation, jsonPluggableLibrary);
             CurrentUserId.AddOrUpdate(instance.InstanceId, pubnubConfiguation.UserId, (k,o) => pubnubConfiguation.UserId);
             UpdatePubnubNetworkTcpCheckIntervalInSeconds();
             if (pubnubConfiguation.PresenceInterval > 10)
@@ -686,7 +685,7 @@ namespace PubnubApi
                                     if (currentMessage.MessageType == 1)
                                     {
                                         jsonFields.Add("customMessageType", currentMessage.CustomMessageType);
-                                        ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
+                                        ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib);
                                         PNMessageResult<T> pnMessageResult = responseBuilder.GetEventResultObject<PNMessageResult<T>>(jsonFields);
                                         if (pnMessageResult != null)
                                         {
@@ -705,7 +704,7 @@ namespace PubnubApi
                                     }
                                     else if (currentMessage.MessageType == 2)
                                     {
-                                        ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
+                                        ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib);
                                         PNObjectEventResult objectApiEvent = responseBuilder.GetEventResultObject<PNObjectEventResult>(jsonFields);
                                         if (objectApiEvent != null)
                                         {
@@ -714,7 +713,7 @@ namespace PubnubApi
                                     }
                                     else if (currentMessage.MessageType == 3)
                                     {
-                                        ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
+                                        ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib);
                                         PNMessageActionEventResult messageActionEvent = responseBuilder.GetEventResultObject<PNMessageActionEventResult>(jsonFields);
                                         if (messageActionEvent != null)
                                         {
@@ -724,7 +723,7 @@ namespace PubnubApi
                                     else if (currentMessage.MessageType == 4)
                                     {
                                         jsonFields.Add("customMessageType", currentMessage.CustomMessageType);
-                                        ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
+                                        ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib);
                                         PNMessageResult<object> filesEvent = responseBuilder.GetEventResultObject<PNMessageResult<object>>(jsonFields);
                                         if (filesEvent != null)
                                         {
@@ -767,7 +766,7 @@ namespace PubnubApi
                                     }
                                     else if (currentMessageChannel.Contains("-pnpres"))
                                     {
-                                        ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
+                                        ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib);
                                         PNPresenceEventResult presenceEvent = responseBuilder.GetEventResultObject<PNPresenceEventResult>(jsonFields);
                                         if (presenceEvent != null)
                                         {
@@ -781,7 +780,7 @@ namespace PubnubApi
                                             LoggingMethod.WriteToLog(currentLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] ResponseToUserCallback", currentConfig.LogVerbosity);
                                         }
                                         jsonFields.Add("customMessageType", currentMessage.CustomMessageType);
-                                        ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
+                                        ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib);
                                         PNMessageResult<T> userMessage = responseBuilder.GetEventResultObject<PNMessageResult<T>>(jsonFields);
                                         if (userMessage != null)
                                         {
@@ -855,7 +854,7 @@ namespace PubnubApi
                     case PNOperationType.PNDeleteFileOperation:
                         if (result != null && result.Count > 0)
                         {
-                            ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
+                            ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib);
                             T userResult = responseBuilder.JsonToObject<T>(result, true);
 
                             StatusBuilder statusBuilder = new StatusBuilder(currentConfig, jsonLib);
@@ -870,7 +869,7 @@ namespace PubnubApi
                     case PNOperationType.PNHeartbeatOperation:
                         if (result != null && result.Count > 0)
                         {
-                            ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib, currentLog);
+                            ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib);
                             PNHeartbeatResult userResult = responseBuilder.JsonToObject<PNHeartbeatResult>(result, true);
 
                             if (userResult != null)

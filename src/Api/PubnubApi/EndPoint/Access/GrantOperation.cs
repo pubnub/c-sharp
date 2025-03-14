@@ -12,7 +12,6 @@ namespace PubnubApi.EndPoint
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
         private readonly IPubnubUnitTest unit;
-        private readonly IPubnubLog pubnubLog;
 
         private string[] pubnubChannelNames;
         private string[] pubnubChannelGroupNames;
@@ -29,89 +28,88 @@ namespace PubnubApi.EndPoint
         private PNCallback<PNAccessManagerGrantResult> savedCallback;
         private Dictionary<string, object> queryParam;
 
-        public GrantOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, null, instance)
+        public GrantOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit,Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, null, instance)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
-            pubnubLog = log;
         }
 
         public GrantOperation Channels(string[] channels)
         {
-            this.pubnubChannelNames = channels;
+            pubnubChannelNames = channels;
             return this;
         }
 
         public GrantOperation ChannelGroups(string[] channelGroups)
         {
-            this.pubnubChannelGroupNames = channelGroups;
+            pubnubChannelGroupNames = channelGroups;
             return this;
         }
 
         public GrantOperation Uuids(string[] targetUuids)
         {
-            this.pubnubTargetUuids = targetUuids;
+            pubnubTargetUuids = targetUuids;
             return this;
         }
 
         public GrantOperation AuthKeys(string[] authKeys)
         {
-            this.pamAuthenticationKeys = authKeys;
+            pamAuthenticationKeys = authKeys;
             return this;
         }
 
         public GrantOperation Write(bool write)
         {
-            this.grantWrite = write;
+            grantWrite = write;
             return this;
         }
 
         public GrantOperation Read(bool read)
         {
-            this.grantRead = read;
+            grantRead = read;
             return this;
         }
 
         public GrantOperation Manage(bool manage)
         {
-            this.grantManage = manage;
+            grantManage = manage;
             return this;
         }
 
         public GrantOperation Delete(bool delete)
         {
-            this.grantDelete = delete;
+            grantDelete = delete;
             return this;
         }
 
         public GrantOperation Get(bool get)
         {
-            this.grantGet = get;
+            grantGet = get;
             return this;
         }
 
         public GrantOperation Update(bool update)
         {
-            this.grantUpdate = update;
+            grantUpdate = update;
             return this;
         }
 
         public GrantOperation Join(bool join)
         {
-            this.grantJoin = join;
+            grantJoin = join;
             return this;
         }
 
         public GrantOperation TTL(long ttl)
         {
-            this.grantTTL = ttl;
+            grantTTL = ttl;
             return this;
         }
 
         public GrantOperation QueryParam(Dictionary<string, object> customQueryParam)
         {
-            this.queryParam = customQueryParam;
+            queryParam = customQueryParam;
             return this;
         }
 
@@ -123,25 +121,25 @@ namespace PubnubApi.EndPoint
 
         public void Execute(PNCallback<PNAccessManagerGrantResult> callback)
         {
-            if ((this.pubnubChannelNames != null || this.pubnubChannelGroupNames != null) && this.pubnubTargetUuids != null)
+            if ((pubnubChannelNames != null || pubnubChannelGroupNames != null) && pubnubTargetUuids != null)
             {
                 throw new InvalidOperationException("Both channel/channelgroup and uuid cannot be used in the same request");
             }
-            if (this.pubnubTargetUuids != null && (this.grantRead || this.grantWrite || this.grantManage || this.grantJoin))
+            if (pubnubTargetUuids != null && (grantRead || grantWrite || grantManage || grantJoin))
             {
                 throw new InvalidOperationException("Only Get/Update/Delete permissions are allowed for UUID");
             }
-            this.savedCallback = callback;
+            savedCallback = callback;
             GrantAccess(callback);
         }
 
         public async Task<PNResult<PNAccessManagerGrantResult>> ExecuteAsync()
         {
-            if ((this.pubnubChannelNames != null || this.pubnubChannelGroupNames != null) && this.pubnubTargetUuids != null)
+            if ((pubnubChannelNames != null || pubnubChannelGroupNames != null) && pubnubTargetUuids != null)
             {
                 throw new InvalidOperationException("Both channel/channelgroup and uuid cannot be used in the same request");
             }
-            if (this.pubnubTargetUuids != null && (this.grantRead || this.grantWrite || this.grantManage || this.grantJoin))
+            if (pubnubTargetUuids != null && (grantRead || grantWrite || grantManage || grantJoin))
             {
                 throw new InvalidOperationException("Only Get/Update/Delete permissions are allowed for UUID");
             }
@@ -160,8 +158,8 @@ namespace PubnubApi.EndPoint
                 throw new MissingMemberException("Invalid secret key");
             }
             RequestState<PNAccessManagerGrantResult> requestState = new RequestState<PNAccessManagerGrantResult>();
-            requestState.Channels = this.pubnubChannelNames;
-            requestState.ChannelGroups = this.pubnubChannelGroupNames;
+            requestState.Channels = pubnubChannelNames;
+            requestState.ChannelGroups = pubnubChannelGroupNames;
             requestState.ResponseType = PNOperationType.PNAccessManagerGrant;
             requestState.PubnubCallback = callback;
             requestState.Reconnect = false;
@@ -198,8 +196,8 @@ namespace PubnubApi.EndPoint
 
             PNResult<PNAccessManagerGrantResult> returnValue = new PNResult<PNAccessManagerGrantResult>();
             RequestState<PNAccessManagerGrantResult> requestState = new RequestState<PNAccessManagerGrantResult>();
-            requestState.Channels = this.pubnubChannelNames;
-            requestState.ChannelGroups = this.pubnubChannelGroupNames;
+            requestState.Channels = pubnubChannelNames;
+            requestState.ChannelGroups = pubnubChannelGroupNames;
             requestState.ResponseType = PNOperationType.PNAccessManagerGrant;
             requestState.Reconnect = false;
             requestState.EndPointOperation = this;
@@ -224,7 +222,7 @@ namespace PubnubApi.EndPoint
                     List<object> resultList = ProcessJsonResponse(requestState, json);
                     if (resultList != null && resultList.Count > 0)
                     {
-                        ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+                        ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary);
                         PNAccessManagerGrantResult responseResult = responseBuilder.JsonToObject<PNAccessManagerGrantResult>(resultList, true);
                         if (responseResult != null)
                         {
@@ -253,27 +251,27 @@ namespace PubnubApi.EndPoint
             List<string> uuidList = new List<string>();
             List<string> authList = new List<string>();
 
-            if (this.pubnubChannelNames != null && this.pubnubChannelNames.Length > 0)
+            if (pubnubChannelNames != null && pubnubChannelNames.Length > 0)
             {
-                channelList = new List<string>(this.pubnubChannelNames);
+                channelList = new List<string>(pubnubChannelNames);
                 channelList = channelList.Where(ch => !string.IsNullOrEmpty(ch) && ch.Trim().Length > 0).Distinct<string>().ToList();
             }
 
-            if (this.pubnubChannelGroupNames != null && this.pubnubChannelGroupNames.Length > 0)
+            if (pubnubChannelGroupNames != null && pubnubChannelGroupNames.Length > 0)
             {
-                channelGroupList = new List<string>(this.pubnubChannelGroupNames);
+                channelGroupList = new List<string>(pubnubChannelGroupNames);
                 channelGroupList = channelGroupList.Where(cg => !string.IsNullOrEmpty(cg) && cg.Trim().Length > 0).Distinct<string>().ToList();
             }
 
-            if (this.pubnubTargetUuids != null && this.pubnubTargetUuids.Length > 0)
+            if (pubnubTargetUuids != null && pubnubTargetUuids.Length > 0)
             {
-                uuidList = new List<string>(this.pubnubTargetUuids);
+                uuidList = new List<string>(pubnubTargetUuids);
                 uuidList = uuidList.Where(uuid => !string.IsNullOrEmpty(uuid) && uuid.Trim().Length > 0).Distinct().ToList();
             }
 
-            if (this.pamAuthenticationKeys != null && this.pamAuthenticationKeys.Length > 0)
+            if (pamAuthenticationKeys != null && pamAuthenticationKeys.Length > 0)
             {
-                authList = new List<string>(this.pamAuthenticationKeys);
+                authList = new List<string>(pamAuthenticationKeys);
                 authList = authList.Where(auth => !string.IsNullOrEmpty(auth) && auth.Trim().Length > 0).Distinct<string>().ToList();
             }
 

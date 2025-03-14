@@ -13,11 +13,9 @@ namespace PubnubApi.EndPoint
 		private PNConfiguration configuration;
 		private PresenceEventEngine presenceEventEngine;
 		private IPubnubUnitTest unit;
-		private IPubnubLog pubnubLog;
 
-		public PresenceOperation(Pubnub instance, string instanceId, IPubnubLog pubnubLog, PNConfiguration configuration, TokenManager tokenManager, IPubnubUnitTest unit, PresenceEventEngineFactory presenceEventEngineFactory)
+		public PresenceOperation(Pubnub instance, string instanceId, PNConfiguration configuration, TokenManager tokenManager, IPubnubUnitTest unit, PresenceEventEngineFactory presenceEventEngineFactory)
 		{
-			this.pubnubLog = pubnubLog;
 			this.unit = unit;
 			this.configuration = configuration;
 			this.presenceEventEngineFactory = presenceEventEngineFactory;
@@ -26,7 +24,7 @@ namespace PubnubApi.EndPoint
 			if (this.presenceEventEngineFactory.HasEventEngine(instanceId)) {
 				presenceEventEngine = this.presenceEventEngineFactory.GetEventEngine(instanceId);
 			} else {
-				presenceEventEngine = this.presenceEventEngineFactory.InitializeEventEngine<T>(instanceId, instance, pubnubLog, tokenManager);
+				presenceEventEngine = this.presenceEventEngineFactory.InitializeEventEngine<T>(instanceId, instance, tokenManager);
 				presenceEventEngine.OnEffectDispatch += OnEffectDispatch;
 				presenceEventEngine.OnEventQueued += OnEventQueued;
 			}
