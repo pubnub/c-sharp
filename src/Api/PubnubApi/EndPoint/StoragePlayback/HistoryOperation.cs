@@ -14,7 +14,7 @@ namespace PubnubApi.EndPoint
 		private readonly PNConfiguration config;
 		private readonly IJsonPluggableLibrary jsonLibrary;
 		private readonly IPubnubUnitTest unit;
-		private readonly IPubnubLog pubnubLog;
+
 
 		private bool reverseOption;
 		private bool includeTimetokenOption;
@@ -27,12 +27,12 @@ namespace PubnubApi.EndPoint
 		private string channelName = "";
 		private PNCallback<PNHistoryResult> savedCallback;
 
-		public HistoryOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
+		public HistoryOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, tokenManager, instance)
 		{
 			config = pubnubConfig;
 			jsonLibrary = jsonPluggableLibrary;
 			unit = pubnubUnit;
-			pubnubLog = log;
+
 
 			PubnubInstance = instance;
 
@@ -195,7 +195,7 @@ namespace PubnubApi.EndPoint
 				string json = JsonAndStatusTuple.Item1;
 				if (!string.IsNullOrEmpty(json)) {
 					List<object> resultList = ProcessJsonResponse(requestState, json);
-					ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+					ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary);
 					PNHistoryResult responseResult = responseBuilder.JsonToObject<PNHistoryResult>(resultList, true);
 					if (responseResult != null) {
 						returnValue.Result = responseResult;

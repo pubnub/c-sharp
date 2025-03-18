@@ -9,17 +9,15 @@ namespace PubnubApi.EndPoint
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
         private readonly IPubnubUnitTest unit;
-        private readonly IPubnubLog pubnubLog;
-        private readonly EndPoint.TokenManager pubnubTokenMgr;
+        private readonly TokenManager pubnubTokenManager;
         private Dictionary<string, object> queryParam;
 
-        public UnsubscribeAllOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
+        public UnsubscribeAllOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, tokenManager, instance)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
-            pubnubLog = log;
-            pubnubTokenMgr = tokenManager;
+            pubnubTokenManager = tokenManager;
             CurrentPubnubInstance(instance);
 
             UnsubscribeAll();
@@ -27,16 +25,16 @@ namespace PubnubApi.EndPoint
 
         public UnsubscribeAllOperation<T> QueryParam(Dictionary<string, object> customQueryParam)
         {
-            this.queryParam = customQueryParam;
+            queryParam = customQueryParam;
             return this;
         }
 
         private void UnsubscribeAll()
         {
             logger?.Trace($"{GetType().Name} execution started.");
-            SubscribeManager manager = new SubscribeManager(config, jsonLibrary, unit, pubnubLog, pubnubTokenMgr, PubnubInstance);
+            SubscribeManager manager = new SubscribeManager(config, jsonLibrary, unit, pubnubTokenManager, PubnubInstance);
             manager.CurrentPubnubInstance(PubnubInstance);
-            manager.MultiChannelUnSubscribeAll<T>(PNOperationType.PNUnsubscribeOperation, this.queryParam);
+            manager.MultiChannelUnSubscribeAll<T>(PNOperationType.PNUnsubscribeOperation, queryParam);
         }
 
         internal void CurrentPubnubInstance(Pubnub instance)

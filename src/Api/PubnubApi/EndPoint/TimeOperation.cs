@@ -10,18 +10,18 @@ namespace PubnubApi.EndPoint
 		private readonly PNConfiguration config;
 		private readonly IJsonPluggableLibrary jsonLibrary;
 		private readonly IPubnubUnitTest unit;
-		private readonly IPubnubLog pubnubLog;
+
 
 		private Dictionary<string, object> queryParam;
 
 		private PNCallback<PNTimeResult> savedCallback;
 
-		public TimeOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, null, instance)
+		public TimeOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, null, instance)
 		{
 			config = pubnubConfig;
 			jsonLibrary = jsonPluggableLibrary;
 			unit = pubnubUnit;
-			pubnubLog = log;
+
 		}
 
 		public TimeOperation QueryParam(Dictionary<string, object> customQueryParam)
@@ -110,7 +110,7 @@ namespace PubnubApi.EndPoint
 				if (!string.IsNullOrEmpty(json)) {
 					List<object> resultList = ProcessJsonResponse<PNTimeResult>(requestState, json);
 					if (resultList != null && resultList.Count > 0) {
-						ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+						ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary);
 						PNTimeResult responseResult = responseBuilder.JsonToObject<PNTimeResult>(resultList, true);
 						if (responseResult != null) {
 							returnValue.Result = responseResult;

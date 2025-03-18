@@ -15,7 +15,6 @@ namespace PubnubApi.EndPoint
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
         private readonly IPubnubUnitTest unit;
-        private readonly IPubnubLog pubnubLog;
 
         private object publishContent;
         private string channelName = "";
@@ -29,13 +28,12 @@ namespace PubnubApi.EndPoint
         private Dictionary<string, object> queryParam;
 
         public PublishOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary,
-            IPubnubUnitTest pubnubUnit, IPubnubLog log, TokenManager tokenManager, Pubnub instance) : base(pubnubConfig,
-            jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
+            IPubnubUnitTest pubnubUnit, TokenManager tokenManager, Pubnub instance) : base(pubnubConfig,
+            jsonPluggableLibrary, pubnubUnit,tokenManager, instance)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
-            pubnubLog = log;
         }
 
         public PublishOperation Message(object message)
@@ -339,7 +337,7 @@ namespace PubnubApi.EndPoint
                             List<object> resultList = ProcessJsonResponse(requestState, json);
                             if (resultList is { Count: > 0 })
                             {
-                                ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+                                ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary);
                                 PNPublishResult responseResult =
                                     responseBuilder.JsonToObject<PNPublishResult>(resultList, true);
                                 if (responseResult != null)

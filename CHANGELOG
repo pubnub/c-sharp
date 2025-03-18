@@ -1,3 +1,7 @@
+v7.3.1 - March 18 2025
+-----------------------------
+- Modified: removed old deprecated logger code.
+
 v7.3.0 - March 11 2025
 -----------------------------
 - Modified: implemented new logger for enhanced logging.

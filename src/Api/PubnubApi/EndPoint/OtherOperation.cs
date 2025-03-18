@@ -12,14 +12,12 @@ namespace PubnubApi.EndPoint
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
         private readonly IPubnubUnitTest unit;
-        private readonly IPubnubLog pubnubLog;
 
-        public OtherOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
+        public OtherOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, tokenManager, instance)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
-            pubnubLog = log;
         }
 
         public UserId GetCurrentUserId()

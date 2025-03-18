@@ -8,17 +8,15 @@ namespace PubnubApi.EndPoint
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
         private readonly IPubnubUnitTest unit;
-        private readonly IPubnubLog pubnubLog;
         private readonly SubscribeEventEngineFactory subscribeEventEngineFactory;
         private readonly PresenceEventEngineFactory presenceEventEngineFactory;
         private readonly string instanceId;
 
-		public UnsubscribeAllEndpoint(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager,  SubscribeEventEngineFactory subscribeEventEngineFactory, PresenceEventEngineFactory presenceEventEngineFactory ,Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
+		public UnsubscribeAllEndpoint(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, EndPoint.TokenManager tokenManager,  SubscribeEventEngineFactory subscribeEventEngineFactory, PresenceEventEngineFactory presenceEventEngineFactory ,Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, tokenManager, instance)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
-            pubnubLog = log;
             this.subscribeEventEngineFactory = subscribeEventEngineFactory;
             this.presenceEventEngineFactory = presenceEventEngineFactory;
             instanceId = PubnubInstance.InstanceId;

@@ -11,7 +11,7 @@ namespace PubnubApi.EndPoint
 		private readonly PNConfiguration config;
 		private readonly IJsonPluggableLibrary jsonLibrary;
 		private readonly IPubnubUnitTest unit;
-		private readonly IPubnubLog pubnubLog;
+
 
 		private PNCallback<PNListFilesResult> savedCallback;
 		private Dictionary<string, object> queryParam;
@@ -20,12 +20,12 @@ namespace PubnubApi.EndPoint
 		private string nextFileBatchToken;
 		private int limitFileCount = -1;
 
-		public ListFilesOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
+		public ListFilesOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, tokenManager, instance)
 		{
 			config = pubnubConfig;
 			jsonLibrary = jsonPluggableLibrary;
 			unit = pubnubUnit;
-			pubnubLog = log;
+
 		}
 
 		public ListFilesOperation Channel(string channel)
@@ -149,7 +149,7 @@ namespace PubnubApi.EndPoint
 				string json = jsonAndStatusTuple.Item1;
 				if (!string.IsNullOrEmpty(json)) {
 					List<object> resultList = ProcessJsonResponse(requestState, json);
-					ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+					ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary);
 					PNListFilesResult responseResult = responseBuilder.JsonToObject<PNListFilesResult>(resultList, true);
 					if (responseResult != null) {
 						returnValue.Result = responseResult;

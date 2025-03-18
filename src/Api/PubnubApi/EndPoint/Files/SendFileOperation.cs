@@ -15,8 +15,6 @@ namespace PubnubApi.EndPoint
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
         private readonly IPubnubUnitTest unit;
-        private readonly IPubnubLog pubnubLog;
-
         private Dictionary<string, object> queryParam;
 
         private string channelName;
@@ -32,13 +30,12 @@ namespace PubnubApi.EndPoint
         private string customMessageType;
 
         public SendFileOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary,
-            IPubnubUnitTest pubnubUnit, IPubnubLog log, TokenManager tokenManager, Pubnub instance) : base(pubnubConfig,
-            jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
+            IPubnubUnitTest pubnubUnit, TokenManager tokenManager, Pubnub instance) : base(pubnubConfig,
+            jsonPluggableLibrary, pubnubUnit, tokenManager, instance)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
-            pubnubLog = log;
         }
 
         public SendFileOperation Channel(string channel)
@@ -188,8 +185,7 @@ namespace PubnubApi.EndPoint
             }
 
             byte[] postData = GetMultipartFormData(sendFileByteArray, generateFileUploadUrlResult.FileName,
-                generateFileUploadUrlResult.FileUploadRequest.FormFields, dataBoundary, currentCryptoModule, config,
-                pubnubLog);
+                generateFileUploadUrlResult.FileUploadRequest.FormFields, dataBoundary, currentCryptoModule, config);
             CancellationTokenSource cts = new CancellationTokenSource();
             cts.CancelAfter(TimeSpan.FromMinutes(5));
             var transportRequest = new TransportRequest()
@@ -242,9 +238,7 @@ namespace PubnubApi.EndPoint
                                 result.Timetoken = publishFileMessage.Timetoken;
                                 result.FileId = generateFileUploadUrlResult.FileId;
                                 result.FileName = generateFileUploadUrlResult.FileName;
-                                LoggingMethod.WriteToLog(pubnubLog,
-                                    $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Publish file message executed successfully.",
-                                    config.LogVerbosity);
+                                logger?.Debug("Publish file message executed successfully.");
                                 var status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(
                                     requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState,
                                     200, null);
@@ -327,8 +321,7 @@ namespace PubnubApi.EndPoint
             }
 
             byte[] postData = GetMultipartFormData(sendFileByteArray, generateFileUploadUrlResult.FileName,
-                generateFileUploadUrlResult.FileUploadRequest.FormFields, dataBoundary, currentCryptoModule, config,
-                pubnubLog);
+                generateFileUploadUrlResult.FileUploadRequest.FormFields, dataBoundary, currentCryptoModule, config);
             CancellationTokenSource cts = new CancellationTokenSource();
             cts.CancelAfter(TimeSpan.FromMinutes(5));
             var transportRequest = new TransportRequest()
@@ -493,7 +486,7 @@ namespace PubnubApi.EndPoint
                 if (!string.IsNullOrEmpty(json))
                 {
                     List<object> resultList = ProcessJsonResponse(requestState, json);
-                    ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+                    ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary);
                     PNGenerateFileUploadUrlResult responseResult =
                         responseBuilder.JsonToObject<PNGenerateFileUploadUrlResult>(resultList, true);
                     if (responseResult != null)
@@ -545,7 +538,7 @@ namespace PubnubApi.EndPoint
                 {
                     requestState.GotJsonResponse = true;
                     List<object> result = ProcessJsonResponse(requestState, responseString);
-                    ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+                    ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary);
                     PNPublishFileMessageResult publishResult =
                         responseBuilder.JsonToObject<PNPublishFileMessageResult>(result, true);
                     StatusBuilder statusBuilder = new StatusBuilder(config, jsonLibrary);
@@ -616,7 +609,7 @@ namespace PubnubApi.EndPoint
 
         private static byte[] GetMultipartFormData(byte[] sendFileByteArray, string fileName,
             Dictionary<string, object> formFields, string dataBoundary, CryptoModule currentCryptoModule,
-            PNConfiguration config, IPubnubLog pubnubLog)
+            PNConfiguration config)
         {
             byte[] multipartFormData;
             string fileContentType = "application/octet-stream";

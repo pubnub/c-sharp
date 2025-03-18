@@ -11,20 +11,18 @@ namespace PubnubApi.EndPoint
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
         private readonly IPubnubUnitTest unit;
-        private readonly IPubnubLog pubnubLog;
-        private readonly TokenManager pubnubTokenMgr;
+        private readonly TokenManager pubnubTokenManager;
 
         private string[] subscribeChannelNames;
         private string[] subscribeChannelGroupNames;
         private Dictionary<string, object> queryParam;
 
-        public UnsubscribeOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
+        public UnsubscribeOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, tokenManager, instance)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
-            pubnubLog = log;
-            pubnubTokenMgr = tokenManager;
+            pubnubTokenManager = tokenManager;
         }
 
         public IUnsubscribeOperation<T> Channels(string[] channels)
@@ -63,7 +61,7 @@ namespace PubnubApi.EndPoint
 
             logger?.Debug($"requested unsubscribe for channel(s)={channel}, cg(s)={channelGroup}");
             
-            SubscribeManager manager = new SubscribeManager(config, jsonLibrary, unit, pubnubLog, pubnubTokenMgr, PubnubInstance);
+            SubscribeManager manager = new SubscribeManager(config, jsonLibrary, unit, pubnubTokenManager, PubnubInstance);
             manager.CurrentPubnubInstance(PubnubInstance);
             manager.MultiChannelUnSubscribeInit<T>(PNOperationType.PNUnsubscribeOperation, channel, channelGroup, this.queryParam);
         }

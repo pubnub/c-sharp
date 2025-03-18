@@ -14,12 +14,10 @@ namespace PubnubApi.EndPoint
     {
         private readonly object syncLockSubscribeCallback = new object();
         private readonly PNConfiguration pubnubConfig;
-        private readonly IPubnubLog pubnubLog;
 
-        public ListenerManager(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance) : base(config, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
+        public ListenerManager(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, TokenManager tokenManager, Pubnub instance) : base(config, jsonPluggableLibrary, pubnubUnit, tokenManager, instance)
         {
-            this.pubnubConfig = config;
-            this.pubnubLog = log;
+            pubnubConfig = config;
             PubnubInstance = instance;
         }
 

@@ -14,8 +14,7 @@ namespace PubnubApi.EndPoint
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
         private readonly IPubnubUnitTest unit;
-        private readonly IPubnubLog pubnubLog;
-        private readonly EndPoint.TokenManager pubnubTokenMgr;
+        private readonly TokenManager pubnubTokenMgr;
 
         private List<string> subscribeChannelNames = new List<string>();
         private List<string> subscribeChannelGroupNames = new List<string>();
@@ -35,13 +34,12 @@ namespace PubnubApi.EndPoint
             set;
         } = new List<SubscribeCallback>();
 
-        public SubscribeEndpoint(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager,SubscribeEventEngineFactory subscribeEventEngineFactory, PresenceOperation<T> presenceOperation , string instanceId, Pubnub instance) 
+        public SubscribeEndpoint(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, TokenManager tokenManager,SubscribeEventEngineFactory subscribeEventEngineFactory, PresenceOperation<T> presenceOperation , string instanceId, Pubnub instance) 
         {
             PubnubInstance = instance;
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
             unit = pubnubUnit;
-            pubnubLog = log;
             pubnubTokenMgr = tokenManager;
             this.subscribeEventEngineFactory = subscribeEventEngineFactory;
             this.presenceOperation = presenceOperation;
@@ -124,7 +122,7 @@ namespace PubnubApi.EndPoint
 			if (subscribeEventEngineFactory.HasEventEngine(instanceId)) {
 				subscribeEventEngine = subscribeEventEngineFactory.GetEventEngine(instanceId);
 			} else {
-				var subscribeManager = new SubscribeManager2(config, jsonLibrary, unit, pubnubLog, pubnubTokenMgr, PubnubInstance);
+				var subscribeManager = new SubscribeManager2(config, jsonLibrary, unit, pubnubTokenMgr, PubnubInstance);
 				subscribeEventEngine = subscribeEventEngineFactory.InitializeEventEngine(instanceId, PubnubInstance, config, subscribeManager, this.EventEmitter, jsonLibrary, StatusEmitter);
 				subscribeEventEngine.OnStateTransition += SubscribeEventEngine_OnStateTransition;
 				subscribeEventEngine.OnEventQueued += SubscribeEventEngine_OnEventQueued;

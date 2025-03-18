@@ -18,7 +18,6 @@ namespace PubnubApi.EndPoint
     {
         private readonly PNConfiguration pubnubConfig;
         private readonly IJsonPluggableLibrary jsonLib;
-        private readonly IPubnubLog pubnubLog;
         private readonly string pubnubInstanceId;
         private readonly PubnubLogModule logger;
         private static ConcurrentDictionary<string, string> dToken
@@ -27,10 +26,9 @@ namespace PubnubApi.EndPoint
             set;
         } = new ConcurrentDictionary<string, string>();
 
-        public TokenManager(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubLog log, string instanceId)
+        public TokenManager(PNConfiguration config, IJsonPluggableLibrary jsonPluggableLibrary, string instanceId)
         {
             pubnubConfig = config;
-            pubnubLog = log;
             jsonLib = jsonPluggableLibrary;
             pubnubInstanceId = instanceId;
             logger = config.Logger;

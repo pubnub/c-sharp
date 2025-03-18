@@ -15,7 +15,7 @@ namespace PubnubApi.EndPoint
 		private readonly PNConfiguration config;
 		private readonly IJsonPluggableLibrary jsonLibrary;
 		private readonly IPubnubUnitTest unit;
-		private readonly IPubnubLog pubnubLog;
+
 
 		private string channelId = "";
 		private int limit = -1;
@@ -28,12 +28,12 @@ namespace PubnubApi.EndPoint
 		private PNCallback<PNChannelMembersResult> savedCallback;
 		private Dictionary<string, object> queryParam;
 
-		public GetChannelMembersOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
+		public GetChannelMembersOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, tokenManager, instance)
 		{
 			config = pubnubConfig;
 			jsonLibrary = jsonPluggableLibrary;
 			unit = pubnubUnit;
-			pubnubLog = log;
+
 
 			if (instance != null) {
 				if (!ChannelRequest.ContainsKey(instance.InstanceId)) {
@@ -188,7 +188,7 @@ namespace PubnubApi.EndPoint
 				string json = JsonAndStatusTuple.Item1;
 				if (!string.IsNullOrEmpty(json)) {
 					List<object> resultList = ProcessJsonResponse(requestState, json);
-					ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+					ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary);
 					PNChannelMembersResult responseResult = responseBuilder.JsonToObject<PNChannelMembersResult>(resultList, true);
 					if (responseResult != null) {
 						returnValue.Result = responseResult;

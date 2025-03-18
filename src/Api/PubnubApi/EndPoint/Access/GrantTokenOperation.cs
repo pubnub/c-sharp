@@ -12,7 +12,7 @@ namespace PubnubApi.EndPoint
 		private readonly PNConfiguration config;
 		private readonly IJsonPluggableLibrary jsonLibrary;
 		private readonly IPubnubUnitTest unit;
-		private readonly IPubnubLog pubnubLog;
+
 		
 		private PNTokenResources pubnubResources = new PNTokenResources {
 			Channels = new Dictionary<string, PNTokenAuthValues>(),
@@ -36,12 +36,12 @@ namespace PubnubApi.EndPoint
 		private string pubnubAuthorizedUuid = string.Empty;
 		private string pubnubAuthorizedUserId = string.Empty;
 		
-		public GrantTokenOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
+		public GrantTokenOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, tokenManager, instance)
 		{
 			config = pubnubConfig;
 			jsonLibrary = jsonPluggableLibrary;
 			unit = pubnubUnit;
-			pubnubLog = log;
+
 			PubnubInstance = instance;
 			InitializeDefaultVariableObjectStates();
 		}
@@ -261,7 +261,7 @@ namespace PubnubApi.EndPoint
 				if (!string.IsNullOrEmpty(json)) {
 					List<object> resultList = ProcessJsonResponse(requestState, json);
 					if (resultList != null && resultList.Count > 0) {
-						ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary, pubnubLog);
+						ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary);
 						PNAccessManagerTokenResult responseResult = responseBuilder.JsonToObject<PNAccessManagerTokenResult>(resultList, true);
 						if (responseResult != null) {
 							returnValue.Result = responseResult;
@@ -352,7 +352,7 @@ namespace PubnubApi.EndPoint
 			}
 
 			if (!atleastOnePermission) {
-				LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] At least one permission is needed for at least one or more of uuids/users, channels/spaces or groups", PNLogVerbosity.BODY);
+				config?.Logger?.Warn("GrantToken At least one permission is needed for at least one or more of uuids/users, channels/spaces or groups");
 			}
 
 			Dictionary<string, object> resourcesCollection = new Dictionary<string, object>

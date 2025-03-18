@@ -14,18 +14,16 @@ namespace PubnubApi.EndPoint
 		private static ConcurrentDictionary<string, PNConfiguration> config { get; } = new();
 		private static IJsonPluggableLibrary jsonLibrary;
 		private static IPubnubUnitTest unit;
-		private static IPubnubLog pubnubLog;
-
 		private static Timer SubscribeHeartbeatCheckTimer;
 		private Timer multiplexExceptionTimer;
 		private Dictionary<string, object> customQueryParam;
 
-		public SubscribeManager(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, log, tokenManager, instance)
+		public SubscribeManager(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, tokenManager, instance)
 		{
 			config.AddOrUpdate(instance.InstanceId, pubnubConfig, (k, o) => pubnubConfig);
 			jsonLibrary = jsonPluggableLibrary;
 			unit = pubnubUnit;
-			pubnubLog = log;
+
 		}
 
 
@@ -60,8 +58,9 @@ namespace PubnubApi.EndPoint
 			try {
 				this.customQueryParam = externalQueryParam;
 
-				if (PubnubInstance == null) {
-					LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] PubnubInstance is null. exiting MultiChannelUnSubscribeInit",  config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
+				if (PubnubInstance == null)
+				{
+					logger?.Debug("PubnubInstance is null. exiting MultiChannelUnSubscribeInit");
 					return;
 				}
 
@@ -305,20 +304,22 @@ namespace PubnubApi.EndPoint
 						pubnubRequestState.GotJsonResponse = true;
 						if (!string.IsNullOrEmpty(json)) {
 								List<object> result = ProcessJsonResponse<T>(pubnubRequestState, json);
-								LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] result count of ProcessJsonResponse = {result?.Count ?? -1}", config[PubnubInstance.InstanceId].LogVerbosity);
+								logger?.Trace($"result count of ProcessJsonResponse = {result?.Count ?? -1}");
 
 								ProcessResponseCallbacks<T>(result, pubnubRequestState);
 
 								if ((pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation || pubnubRequestState.ResponseType == PNOperationType.Presence) && (result != null) && (result.Count > 0)) {
 									long jsonTimetoken = GetTimetokenFromMultiplexResult(result);
-									LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] jsonTimetoken = {jsonTimetoken}", config[PubnubInstance.InstanceId].LogVerbosity);
+									logger?.Trace($"jsonTimetoken = {jsonTimetoken}");
 								}
 								if (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation) {
 									MultiplexInternalCallback<T>(pubnubRequestState.ResponseType, result);
 								}
 						} 
-					} else {
-						LoggingMethod.WriteToLog(pubnubLog,$"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: Exception from TransportLayer\n\n transportResponse.Error.Message => {transportResponse.Error.Message} \n\n\n  inner{transportResponse.Error.InnerException?.Message}", config[PubnubInstance.InstanceId].LogVerbosity);
+					} else
+					{
+						logger?.Error(
+							"Exception from TransportLayer\n transportResponse.Error.Message => {transportResponse.Error.Message} \n\n\n  inner{transportResponse.Error.InnerException?.Message}");
 						if (multiplexExceptionTimer != null) {
 							multiplexExceptionTimer.Change(Timeout.Infinite, Timeout.Infinite);
 						}
@@ -573,14 +574,18 @@ namespace PubnubApi.EndPoint
 								TerminateCurrentSubscriberRequest();
 								MultiChannelSubscribeRequest<T>(PNOperationType.PNSubscribeOperation, channels, chananelGroups, LastSubscribeTimetoken[PubnubInstance.InstanceId], LastSubscribeRegion[PubnubInstance.InstanceId], false, null, this.customQueryParam);
 							}, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
-						} else {
-							LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] SubscribeManager - **No auto subscribe within threshold limit of SubscribeTimeout**. Calling TerminateCurrentSubscriberRequest", config[PubnubInstance.InstanceId].LogVerbosity);
+						} else
+						{
+							logger?.Trace(
+								"SubscribeManager - **No auto subscribe within threshold limit of SubscribeTimeout**. Calling TerminateCurrentSubscriberRequest");
 							Task.Factory.StartNew(() => {
 								TerminateCurrentSubscriberRequest();
 							}, CancellationToken.None, TaskCreationOptions.PreferFairness, TaskScheduler.Default).ConfigureAwait(false);
 						}
-					} else {
-						LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] SubscribeManager - StartSubscribeHeartbeatCheckCallback - No network or no pubnub instance mapping", config[PubnubInstance.InstanceId].LogVerbosity);
+					} else
+					{
+						logger?.Trace(
+							"SubscribeManager - StartSubscribeHeartbeatCheckCallback - No network or no pubnub instance mapping");
 						if (PubnubInstance != null && !networkConnection) {
 							PNStatus status = new StatusBuilder(config[PubnubInstance.InstanceId], jsonLibrary).CreateStatusResponse<T>(PNOperationType.PNSubscribeOperation, PNStatusCategory.PNNetworkIssuesCategory, null, (int)System.Net.HttpStatusCode.NotFound, new PNException("Internet connection problem during subscribe heartbeat."));
 							if (channels != null && channels.Length > 0) {

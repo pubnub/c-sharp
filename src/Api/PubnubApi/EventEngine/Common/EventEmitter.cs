@@ -14,17 +14,15 @@ namespace PubnubApi.EventEngine.Common
     {
         private PNConfiguration configuration;
         private List<SubscribeCallback> listeners;
-        private IPubnubLog log;
         private IJsonPluggableLibrary jsonLibrary;
         private Pubnub instance;
         private TokenManager tokenManager;
         private Dictionary<string, List<SubscribeCallback>> channelListenersMap;
         private Dictionary<string, List<SubscribeCallback>> channelGroupListenersMap;
 
-        public EventEmitter(PNConfiguration configuration, List<SubscribeCallback> listenerCallbacks, IJsonPluggableLibrary jsonPluggableLibrary, TokenManager tokenManager, IPubnubLog log, Pubnub instance)
+        public EventEmitter(PNConfiguration configuration, List<SubscribeCallback> listenerCallbacks, IJsonPluggableLibrary jsonPluggableLibrary, TokenManager tokenManager,Pubnub instance)
         {
             this.configuration = configuration;
-            this.log = log;
             this.instance = instance;
             this.tokenManager = tokenManager;
             jsonLibrary = jsonPluggableLibrary;
@@ -170,7 +168,7 @@ namespace PubnubApi.EventEngine.Common
                     catch (Exception ex)
                     {
                         decryptMessage = "**DECRYPT ERROR**";
-                        LoggingMethod.WriteToLog(log, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Failed to decrypt message on channel {currentMessageChannel} due to exception={ex}.\n Message might be not encrypted", configuration.LogVerbosity);
+                        configuration?.Logger?.Error("Failed to decrypt message on channel {currentMessageChannel} due to exception={ex}.\n Message might be not encrypted");
                     }
 
                     object decodeMessage = jsonLibrary.DeserializeToObject((decryptMessage == "**DECRYPT ERROR**") ? jsonLibrary.SerializeToJsonString(payload) : decryptMessage);
@@ -211,7 +209,7 @@ namespace PubnubApi.EventEngine.Common
                 {
                     payloadContainer.Add(eventData.CustomMessageType);
                     jsonFields.Add("customMessageType", eventData.CustomMessageType);
-                    ResponseBuilder responseBuilder = new ResponseBuilder(configuration, jsonLibrary, log);
+                    ResponseBuilder responseBuilder = new ResponseBuilder(configuration, jsonLibrary);
                     PNMessageResult<T> pnMessageResult = responseBuilder.GetEventResultObject<PNMessageResult<T>>(jsonFields);
                     if (pnMessageResult != null)
                     {
@@ -250,7 +248,7 @@ namespace PubnubApi.EventEngine.Common
                 }
                 case 2:
                 {
-                    ResponseBuilder responseBuilder = new ResponseBuilder(configuration, jsonLibrary, log);
+                    ResponseBuilder responseBuilder =new ResponseBuilder(configuration, jsonLibrary);
                     PNObjectEventResult objectApiEvent = responseBuilder.GetEventResultObject<PNObjectEventResult>(jsonFields);
                     if (objectApiEvent != null)
                     {
@@ -280,7 +278,7 @@ namespace PubnubApi.EventEngine.Common
                 }
                 case 3:
                 {
-                    ResponseBuilder responseBuilder = new ResponseBuilder(configuration, jsonLibrary, log);
+                    ResponseBuilder responseBuilder =new ResponseBuilder(configuration, jsonLibrary);
                     PNMessageActionEventResult messageActionEvent = responseBuilder.GetEventResultObject<PNMessageActionEventResult>(jsonFields);
                     if (messageActionEvent != null)
                     {
@@ -311,7 +309,7 @@ namespace PubnubApi.EventEngine.Common
                 case 4:
                 {
                     payloadContainer.Add(eventData.CustomMessageType);
-                    ResponseBuilder responseBuilder = new ResponseBuilder(configuration, jsonLibrary, log);
+                    ResponseBuilder responseBuilder =new ResponseBuilder(configuration, jsonLibrary);
                     PNMessageResult<object> filesEvent = responseBuilder.GetEventResultObject<PNMessageResult<object>>(jsonFields);
                     if (filesEvent != null)
                     {
@@ -378,7 +376,7 @@ namespace PubnubApi.EventEngine.Common
                 {
                     if (currentMessageChannel.Contains("-pnpres"))
                     {
-                        ResponseBuilder responseBuilder = new ResponseBuilder(configuration, jsonLibrary, log);
+                        ResponseBuilder responseBuilder =new ResponseBuilder(configuration, jsonLibrary);
                         PNPresenceEventResult presenceEvent = responseBuilder.GetEventResultObject<PNPresenceEventResult>(jsonFields);
                         if (presenceEvent != null)
                         {
@@ -407,7 +405,7 @@ namespace PubnubApi.EventEngine.Common
                     else
                     {
                         payloadContainer.Add(eventData.CustomMessageType);
-                        ResponseBuilder responseBuilder = new ResponseBuilder(configuration, jsonLibrary, log);
+                        ResponseBuilder responseBuilder =new ResponseBuilder(configuration, jsonLibrary);
                         PNMessageResult<T> userMessage = responseBuilder.GetEventResultObject<PNMessageResult<T>>(jsonFields);
                         try
                         {

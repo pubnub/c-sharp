@@ -14,17 +14,15 @@ namespace PubnubApi.EndPoint
 		private PNConfiguration config;
 		private IJsonPluggableLibrary jsonLibrary;
 		private IPubnubUnitTest unit;
-		private IPubnubLog pubnubLog;
 		private Pubnub pubnubInstance;
 		private CancellationTokenSource cancellationTokenSource;
 		private Timer SubscribeHeartbeatCheckTimer;
 		private PubnubLogModule logger;
-		public SubscribeManager2(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, IPubnubLog log, EndPoint.TokenManager tokenManager, Pubnub instance)
+		public SubscribeManager2(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, EndPoint.TokenManager tokenManager, Pubnub instance)
 		{
 			config = pubnubConfig;
 			jsonLibrary = jsonPluggableLibrary;
 			unit = pubnubUnit;
-			pubnubLog = log;
 			pubnubInstance = instance;
 			logger = pubnubConfig.Logger;
 		}
