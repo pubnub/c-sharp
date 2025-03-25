@@ -1,9 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;netstandard1.3;netstandard1.4;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net6.0;netstandard2.0</TargetFrameworks>
     <LangVersion>default</LangVersion>
-    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>pubnub.snk</AssemblyOriginatorKeyFile>
     <DelaySign>False</DelaySign>
@@ -673,12 +672,19 @@
     <None Include="..\PubnubApi\LICENSE.txt" Link="LICENSE.txt" Pack="true" PackagePath="" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="PeterO.Cbor" Version="4.5.2" />
+  </ItemGroup>
+
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
     <Reference Include="System.Runtime" />
     <PackageReference Include="NETStandard.Library" Version="1.6.1">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1">
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="PeterO.Cbor" Version="4.5.2" />
@@ -720,7 +726,7 @@
     <PackageReference Include="NETStandard.Library" Version="1.6.1">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1">
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="PeterO.Cbor" Version="4.5.2" />
@@ -747,7 +753,55 @@
     <PackageReference Include="NETStandard.Library" Version="1.6.1">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1">
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="PeterO.Cbor" Version="4.5.2" />
+    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.0" />
+    <PackageReference Include="System.Net.Requests" Version="4.0.11">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Reflection.Primitives" Version="4.3.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.3.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Threading.ThreadPool" Version="4.0.10">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Threading.Thread" Version="4.0.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Linq.Queryable" Version="4.0.1">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Text.Encoding" Version="4.3.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Text.Encoding.Extensions" Version="4.3.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Net.Http" Version="4.3.4">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Net.Primitives" Version="4.3.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.ValueTuple" Version="4.4.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.Collections.Concurrent" Version="4.3.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.4' ">
+    <Reference Include="System.Runtime" />
+    <PackageReference Include="NETStandard.Library" Version="1.6.1">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="PeterO.Cbor" Version="4.5.2" />
@@ -790,171 +844,6 @@
     </PackageReference>
   </ItemGroup>
   
-  <!--<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-    <PackageReference Include="System.Net.Requests" Version="4.0.11" />
-    <PackageReference Include="System.Reflection.Primitives" Version="4.3.0" />
-    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.1.0" />
-    <PackageReference Include="System.Threading.ThreadPool" Version="4.0.10" />
-    <PackageReference Include="System.Linq.Queryable" Version="4.0.1" />
-    <PackageReference Include="System.Text.Encoding" Version="4.3.0" />
-    <PackageReference Include="System.Text.Encoding.Extensions" Version="4.0.11" />
-    <PackageReference Include="System.Net.Http" Version="4.3.0" />
-    <PackageReference Include="System.Net.Primitives" Version="4.3.0" />
-  </ItemGroup>-->
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.4' ">
-    <Reference Include="System.Runtime" />
-    <PackageReference Include="NETStandard.Library" Version="1.6.1">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="PeterO.Cbor" Version="4.5.2" />
-    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.0" />
-    <PackageReference Include="System.Net.Requests" Version="4.0.11">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Reflection.Primitives" Version="4.3.0">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.3.0">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Threading.ThreadPool" Version="4.0.10">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Threading.Thread" Version="4.0.0">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Linq.Queryable" Version="4.0.1">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Text.Encoding" Version="4.3.0">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Text.Encoding.Extensions" Version="4.3.0">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Net.Http" Version="4.3.4">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Net.Primitives" Version="4.3.0">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.ValueTuple" Version="4.4.0">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Collections.Concurrent" Version="4.3.0">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <Reference Include="System.Runtime" />
-    <PackageReference Include="NETStandard.Library" Version="1.6.1">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="PeterO.Cbor" Version="4.5.2" />
-    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.0" />
-    <PackageReference Include="System.Net.Requests" Version="4.0.11">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Reflection.Primitives" Version="4.3.0">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.3.0">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Threading.ThreadPool" Version="4.0.10">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Threading.Thread" Version="4.0.0">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Linq.Queryable" Version="4.0.1">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Text.Encoding" Version="4.3.0">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Text.Encoding.Extensions" Version="4.3.0">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Net.Http" Version="4.3.4">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Net.Primitives" Version="4.3.0">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.ValueTuple" Version="4.4.0">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Collections.Concurrent" Version="4.3.0">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
-    <Reference Include="System.Runtime" />
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="PeterO.Cbor" Version="4.5.2" />
-    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.0" />
-    <PackageReference Include="System.Net.Requests" Version="4.0.11">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Reflection.Primitives" Version="4.3.0">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.3.0">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Threading.ThreadPool" Version="4.0.10">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Threading.Timer" Version="4.3.0">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Threading.Thread" Version="4.0.0">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Linq.Queryable" Version="4.0.1">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Text.Encoding" Version="4.3.0">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Text.Encoding.Extensions" Version="4.3.0">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Net.Http" Version="4.3.4">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Net.Primitives" Version="4.3.0">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.IO" Version="4.3.0">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.IO.FileSystem" Version="4.3.0">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.IO.FileSystem.Primitives" Version="4.3.0">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.ValueTuple" Version="4.4.0">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Collections.Concurrent" Version="4.3.0">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
-  </ItemGroup>
-
   <ItemGroup>
     <Folder Include="Builder\" />
     <Folder Include="Callbacks\" />
