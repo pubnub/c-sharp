@@ -272,7 +272,6 @@ namespace PubnubApi.EndPoint
 				}
 				Announce(status);
 			}
-			
 			// Begin recursive subscribe
 			RequestState<T> pubnubRequestState = null;
 			try {
@@ -297,37 +296,48 @@ namespace PubnubApi.EndPoint
 				var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: subscribeRequestParameter, operationType: PNOperationType.PNSubscribeOperation);
 				OngoingSubscriptionCancellationTokenSources[PubnubInstance.InstanceId] =
 					transportRequest.CancellationTokenSource;
-				PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ContinueWith( t => {
-					var transportResponse = t.Result;
-					if (transportResponse.Error == null) {
-						var json = Encoding.UTF8.GetString(transportResponse.Content);
-						pubnubRequestState.GotJsonResponse = true;
-						if (!string.IsNullOrEmpty(json)) {
+				PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ContinueWith(t =>
+				{
+					if (t is { Result: not null })
+					{
+						var transportResponse = t.Result;
+						if (transportResponse.Error == null)
+						{
+							var json = Encoding.UTF8.GetString(transportResponse.Content);
+							pubnubRequestState.GotJsonResponse = true;
+							if (!string.IsNullOrEmpty(json))
+							{
 								List<object> result = ProcessJsonResponse<T>(pubnubRequestState, json);
 								logger?.Trace($"result count of ProcessJsonResponse = {result?.Count ?? -1}");
-
 								ProcessResponseCallbacks<T>(result, pubnubRequestState);
-
-								if ((pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation || pubnubRequestState.ResponseType == PNOperationType.Presence) && (result != null) && (result.Count > 0)) {
+								if ((pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation ||
+								     pubnubRequestState.ResponseType == PNOperationType.Presence) && (result != null) && (result.Count > 0))
+								{
 									long jsonTimetoken = GetTimetokenFromMultiplexResult(result);
 									logger?.Trace($"jsonTimetoken = {jsonTimetoken}");
 								}
-								if (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation) {
+								if (pubnubRequestState.ResponseType == PNOperationType.PNSubscribeOperation)
+								{
 									MultiplexInternalCallback<T>(pubnubRequestState.ResponseType, result);
 								}
-						} 
+							}
+						}
+						else
+						{
+							logger?.Error($"Exception from TransportLayer\n error :{transportResponse.Error.Message} \n  ${transportResponse.Error.InnerException?.Message}");
+							multiplexExceptionTimer?.Change(Timeout.Infinite, Timeout.Infinite);
+							ConnectionErrors++;
+							UpdatePubnubNetworkTcpCheckIntervalInSeconds();
+							multiplexExceptionTimer = new Timer(
+								new TimerCallback(MultiplexExceptionHandlerTimerCallback<T>), pubnubRequestState,
+								(-1 == PubnubNetworkTcpCheckIntervalInSeconds)
+									? Timeout.Infinite
+									: PubnubNetworkTcpCheckIntervalInSeconds * 1000,
+								Timeout.Infinite);
+						}
 					} else
 					{
-						logger?.Error(
-							"Exception from TransportLayer\n transportResponse.Error.Message => {transportResponse.Error.Message} \n\n\n  inner{transportResponse.Error.InnerException?.Message}");
-						if (multiplexExceptionTimer != null) {
-							multiplexExceptionTimer.Change(Timeout.Infinite, Timeout.Infinite);
-						}
-						ConnectionErrors++;
-						UpdatePubnubNetworkTcpCheckIntervalInSeconds();
-						multiplexExceptionTimer = new Timer(new TimerCallback(MultiplexExceptionHandlerTimerCallback<T>), pubnubRequestState,
-							(-1 == PubnubNetworkTcpCheckIntervalInSeconds) ? Timeout.Infinite : PubnubNetworkTcpCheckIntervalInSeconds * 1000,
-							Timeout.Infinite);
+						logger?.Debug("Request cancelled");
 					}
 				});
 			} catch (Exception ex) {
