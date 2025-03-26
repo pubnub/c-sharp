@@ -298,7 +298,7 @@ namespace PubnubApi.EndPoint
 					transportRequest.CancellationTokenSource;
 				PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ContinueWith(t =>
 				{
-					if (t != null)
+					if (t is { Result: not null })
 					{
 						var transportResponse = t.Result;
 						if (transportResponse.Error == null)
