@@ -1138,7 +1138,11 @@ namespace PubnubApi
         /// Configures a custom logger.
         /// </summary>
         /// <param name="logger">The logger to use.</param>
-        public void SetLogger(IPubnubLogger logger) => this.logger?.AddLogger(logger);
+        public void SetLogger(IPubnubLogger logger)
+        {
+            this.logger?.AddLogger(logger);
+            logger?.Debug(GetConfigurationLogString(pubnubConfig[InstanceId]));
+        }
 
         public void RemoveLogger(IPubnubLogger logger) => this.logger?.RemoveLogger(logger);
 
