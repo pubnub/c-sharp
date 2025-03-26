@@ -337,11 +337,12 @@ namespace PubnubApi.EndPoint
 						}
 					} else
 					{
-						logger?.Debug("Request cancelled");
+						logger?.Debug($"Subscribe request cancelled for timetoken {LastSubscribeTimetoken[PubnubInstance.InstanceId]}");
+						MultiChannelSubscribeRequest<T>(type, channels, channelGroups, LastSubscribeTimetoken[PubnubInstance.InstanceId], LastSubscribeRegion[PubnubInstance.InstanceId], false, null, externalQueryParam);
 					}
 				});
 			} catch (Exception ex) {
-				logger?.Error($"method:_subscribe \n channel={string.Join(",", channels.OrderBy(x => x).ToArray())} \n timetoken={timetoken} \n Exception Details={ex}");
+				logger?.Error($"While making subscribe request channel={string.Join(",", channels.OrderBy(x => x).ToArray())} \n timetoken={timetoken} \n Exception Details={ex}");
 				PNStatusCategory errorCategory = PNStatusCategoryHelper.GetPNStatusCategory(ex);
 				PNStatus status = new StatusBuilder(config[PubnubInstance.InstanceId], jsonLibrary).CreateStatusResponse<T>(type, errorCategory, pubnubRequestState, Constants.ResourceNotFoundStatusCode, new PNException(ex));
 				if (channels != null && channels.Length > 0) {
