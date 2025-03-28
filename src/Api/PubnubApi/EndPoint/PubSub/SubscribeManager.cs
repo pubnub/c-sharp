@@ -66,6 +66,7 @@ namespace PubnubApi.EndPoint
         internal void MultiChannelUnSubscribeInit<T>(PNOperationType type, string channel, string channelGroup,
             Dictionary<string, object> externalQueryParam)
         {
+            logger?.Debug("Unsubscription execution getting started through MultiChannelUnSubscribeInit");
             List<string> validChannels = new List<string>();
             List<string> validChannelGroups = new List<string>();
 
@@ -292,6 +293,7 @@ namespace PubnubApi.EndPoint
             string[] rawChannelGroups, Dictionary<string, string> initialSubscribeUrlParams,
             Dictionary<string, object> externalQueryParam)
         {
+            logger?.Debug("INITIAL SUBSCRIBE REQUEST getting executed through MultiChannelSubscribeInit");
             try
             {
                 bool channelGroupSubscribeOnly = false;

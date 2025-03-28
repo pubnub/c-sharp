@@ -46,6 +46,7 @@ namespace PubnubApi.EndPoint
         public void Execute()
         {
             logger?.Trace($"{GetType().Name} Execute invoked");
+            logger?.Debug($"PUBNUB Unsubscribe request Execute() received channels = {string.Join(", ", subscribeChannelNames)}");
             Unsubscribe(subscribeChannelNames, subscribeChannelGroupNames);
         }
 

@@ -145,6 +145,7 @@ namespace PubnubApi.EndPoint
 
         public void Execute()
         {
+            logger?.Debug($"PUBNUB: Subscribe request Execute()received with tt={subscribeTimetoken}, channels = {string.Join(", ", subscribeChannelNames)}");
             if (config == null || string.IsNullOrEmpty(config.SubscribeKey))
             {
                 throw new MissingMemberException("Invalid Subscribe key");
@@ -196,8 +197,9 @@ namespace PubnubApi.EndPoint
             config.Logger?.Debug($"requested subscribe for channel(s)={channel} and channel group(s)={channelGroup}");
 
             Dictionary<string, string> initialSubscribeUrlParams = new Dictionary<string, string>();
-            if (subscribeTimetoken >= 0)
+            if (subscribeTimetoken != -1)
             {
+                logger?.Debug($"SubscribeOperation subscribe timetoken={subscribeTimetoken}");
                 initialSubscribeUrlParams.Add("tt", subscribeTimetoken.ToString(CultureInfo.InvariantCulture));
             }
             if (!string.IsNullOrEmpty(config.FilterExpression) && config.FilterExpression.Trim().Length > 0)
