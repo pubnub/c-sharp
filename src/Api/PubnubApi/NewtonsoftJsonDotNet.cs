@@ -188,27 +188,37 @@ namespace PubnubApi
         public object DeserializeToObject(string jsonString)
         {
             logger?.Debug("JsonNet Deserializing json string data.");
-            object result = JsonConvert.DeserializeObject<object>(jsonString,
-                new JsonSerializerSettings { DateParseHandling = DateParseHandling.None, MaxDepth = 64 });
-            if (result.GetType().ToString() == "Newtonsoft.Json.Linq.JArray")
+            object result = null;
+            try
             {
-                JArray jarrayResult = result as JArray;
-                List<object> objectContainer = jarrayResult.ToObject<List<object>>();
-                if (objectContainer != null && objectContainer.Count > 0)
+                result = JsonConvert.DeserializeObject<object>(jsonString,
+                    new JsonSerializerSettings { DateParseHandling = DateParseHandling.None, MaxDepth = 64 });
+                if (result.GetType().ToString() == "Newtonsoft.Json.Linq.JArray")
                 {
-                    for (int index = 0; index < objectContainer.Count; index++)
+                    JArray jarrayResult = result as JArray;
+                    List<object> objectContainer = jarrayResult.ToObject<List<object>>();
+                    if (objectContainer != null && objectContainer.Count > 0)
                     {
-                        if (objectContainer[index].GetType().ToString() == "Newtonsoft.Json.Linq.JArray")
+                        for (int index = 0; index < objectContainer.Count; index++)
                         {
-                            JArray internalItem = objectContainer[index] as JArray;
-                            objectContainer[index] = internalItem.Select(item => (object)item).ToArray();
+                            if (objectContainer[index].GetType().ToString() == "Newtonsoft.Json.Linq.JArray")
+                            {
+                                JArray internalItem = objectContainer[index] as JArray;
+                                objectContainer[index] = internalItem.Select(item => (object)item).ToArray();
+                            }
                         }
-                    }
 
-                    result = objectContainer;
+                        result = objectContainer;
+                    }
                 }
+                logger?.Debug("JsonNet Deserializer json string data successfully.");
             }
-            logger?.Debug("JsonNet Deserialsed json string data successfully.");
+            catch (Exception e)
+            {
+                logger?.Error($"Deserialize To Object failed with exception {e.Message} stack trace {e.StackTrace} reason: {e?.InnerException?.StackTrace}");
+                // throw;
+            }
+
             return result;
         }
 

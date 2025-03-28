@@ -54,16 +54,20 @@ namespace PubnubApi
                     Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
                     RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath
                 };
-                logger?.Debug($"Received http response from server with status code {httpResult.StatusCode}, content-length: {transportResponse.Content.Length} bytes, for url {transportRequest.RequestUrl}");
+                logger?.Debug($"HttpClient Service:Received http response from server with status code {httpResult.StatusCode}, content-length: {transportResponse.Content.Length} bytes, for url {transportRequest.RequestUrl}");
             }
-            catch (TaskCanceledException)
+            catch (TaskCanceledException taskCanceledException)
             {
-                logger?.Error($"Request is cancelled for url {transportRequest.RequestUrl}");
-                transportResponse = null;
+                logger?.Error($"HttpClient Service: Request is cancelled for url {transportRequest.RequestUrl}");
+                transportResponse = new TransportResponse()
+                {
+                    RequestUrl = transportRequest.RequestUrl,
+                    Error = taskCanceledException
+                };
             }
             catch (Exception e)
             {
-                logger?.Error($"Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}");
+                logger?.Error($"HttpClient Service: Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}");
                 transportResponse = new TransportResponse()
                 {
                     RequestUrl = transportRequest.RequestUrl,

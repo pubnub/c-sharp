@@ -1,3 +1,7 @@
+v7.3.4 - March 28 2025
+-----------------------------
+- Fixed: fixes issue with subscribe loop when mulitple subscription changes happen rapidly.
+
 v7.3.3 - March 26 2025
 -----------------------------
 - Modified: upgrade Cbor library to latest version.

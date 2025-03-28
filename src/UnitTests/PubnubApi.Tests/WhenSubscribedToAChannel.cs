@@ -144,6 +144,64 @@ namespace PubNubMessaging.Tests
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenComplexMessageSubscribeShouldReturnReceivedMessage Failed");
         }
 
+        [Test]
+        public static async Task ThenNonEEMultipleSubscribeCallShouldReturnMessage()
+        {
+            bool receivedSubscribedMessage = false;
+            bool internalReceivedMessage = false;
+            bool receivedErrorMessage = false;
+            var message = "hello_channel4";
+            ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
+            ManualResetEvent subscribeMessageManualEvent = new ManualResetEvent(false);
+            
+            PNConfiguration pubnubConfiguration = new PNConfiguration(new UserId("mytestuuid"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                EnableEventEngine = false
+            };
+            
+            var listener = new SubscribeCallbackExt(
+                (_, messageEvent) =>
+                {
+                    if ((string)messageEvent.Message == message)
+                        subscribeMessageManualEvent.Set();
+                }
+                , (_, _) =>
+                {}
+                , (_, status) => { subscribeManualEvent.Set(); }
+            );
+            
+            pubnub = createPubNubInstance(pubnubConfiguration, authToken);
+            pubnub.AddListener(listener);
+            
+            string channel = "hello_my_channel";
+            string channel1 = "hello_my_channel_1";
+            string channel2 = "hello_my_channel_2";
+            string channel3 = "hello_my_channel_3";
+            string channel4 = "hello_my_channel_4";
+            
+            pubnub.Subscribe<object>().Channels(new string[]{"channel"}).WithPresence().Execute();
+        
+            pubnub.Subscribe<object>().Channels(new string[]{"channel1","channel2"}).Execute();
+            
+            pubnub.Subscribe<object>().Channels(new string[] {"channel3","channel4"}).Execute();
+
+            await Task.Delay(3000);
+
+            await pubnub.Publish().Channel("channel4").Message(message).ExecuteAsync();
+            
+            manualResetEventWaitTimeout = 310 * 1000;
+            
+            subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for Connect Status
+            
+            subscribeMessageManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            pubnub.UnsubscribeAll<object>();
+            pubnub.Destroy();
+        }
+        
         private static void CommonComplexMessageSubscribeShouldReturnReceivedMessageBasedOnParams(string secretKey, string cipherKey, bool ssl, out bool receivedMessage)
         {
             if (PubnubCommon.PAMServerSideRun && string.IsNullOrEmpty(secretKey))
