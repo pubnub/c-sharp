@@ -15,6 +15,7 @@ namespace PubnubApi
 
         public HttpClientService(IWebProxy proxy, PNConfiguration configuration )
         {
+            ServicePointManager.DefaultConnectionLimit = 50;
             logger = configuration.Logger;
             httpClient = new HttpClient()
             {
