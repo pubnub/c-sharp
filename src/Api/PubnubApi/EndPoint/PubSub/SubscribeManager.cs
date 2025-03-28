@@ -489,7 +489,8 @@ namespace PubnubApi.EndPoint
                         {
                             logger?.Error(
                                 $"SubscribeManager received HttpClientService errorMessage :{transportResponse.Error.Message} InnerException  ${transportResponse.Error.InnerException?.Message}");
-                            if (transportResponse.Error.InnerException?.InnerException is SocketException)
+                            var transportExcpetion = transportResponse.Error;
+                            if ( transportExcpetion.InnerException?.InnerException is SocketException)
                             {
                                 multiplexExceptionTimer?.Change(Timeout.Infinite, Timeout.Infinite);
                                 ConnectionErrors++;
@@ -501,7 +502,7 @@ namespace PubnubApi.EndPoint
                                         : PubnubNetworkTcpCheckIntervalInSeconds * 1000,
                                     Timeout.Infinite);
                             }
-                            else if (transportResponse.Error.InnerException is TaskCanceledException)
+                            else if (transportExcpetion is TaskCanceledException && transportExcpetion.InnerException is TaskCanceledException)
                             {
                                 logger?.Debug($"SubscribeManager: Request cancelled due to TaskCancellation request.");
                             }
