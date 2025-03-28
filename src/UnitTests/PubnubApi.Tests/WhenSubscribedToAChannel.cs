@@ -182,11 +182,11 @@ namespace PubNubMessaging.Tests
             string channel3 = "hello_my_channel_3";
             string channel4 = "hello_my_channel_4";
             
-            pubnub.Subscribe<object>().Channels(["channel"]).WithPresence().Execute();
+            pubnub.Subscribe<object>().Channels(new string[]{"channel"}).WithPresence().Execute();
         
-            pubnub.Subscribe<object>().Channels(["channel1","channel2"]).Execute();
+            pubnub.Subscribe<object>().Channels(new string[]{"channel1","channel2"}).Execute();
             
-            pubnub.Subscribe<object>().Channels(["channel3","channel4"]).Execute();
+            pubnub.Subscribe<object>().Channels(new string[] {"channel3","channel4"}).Execute();
 
             await Task.Delay(3000);
 
