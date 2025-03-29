@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
+using System.Net.Sockets;
 
 namespace PubnubApi
 {
@@ -13,21 +14,24 @@ namespace PubnubApi
         private readonly HttpClient httpClient;
         private readonly PubnubLogModule logger;
 
-        public HttpClientService(IWebProxy proxy, PNConfiguration configuration )
+        public HttpClientService(IWebProxy proxy, PNConfiguration configuration)
         {
             ServicePointManager.DefaultConnectionLimit = 50;
             logger = configuration.Logger;
-            httpClient = new HttpClient()
+
+            var handler = new SocketsHttpHandler
+            {
+                PooledConnectionLifetime = TimeSpan.FromMinutes(10),
+                MaxConnectionsPerServer = 50,
+                KeepAlivePolicy = HttpKeepAlivePolicy.WithActiveRequests,
+                UseProxy = proxy != null,
+                Proxy = proxy
+            };
+
+            httpClient = new HttpClient(handler)
             {
                 Timeout = Timeout.InfiniteTimeSpan
             };
-            if (proxy == null) return;
-            httpClient = new HttpClient(new HttpClientHandler()
-            {
-                Proxy = proxy,
-                UseProxy = true
-            });
-            httpClient.Timeout = Timeout.InfiniteTimeSpan;
         }
 
         public async Task<TransportResponse> GetRequest(TransportRequest transportRequest)
