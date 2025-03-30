@@ -5,7 +5,6 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
-using System.Net.Sockets;
 
 namespace PubnubApi
 {
@@ -16,14 +15,11 @@ namespace PubnubApi
 
         public HttpClientService(IWebProxy proxy, PNConfiguration configuration)
         {
-            ServicePointManager.DefaultConnectionLimit = 50;
             logger = configuration.Logger;
 
-            var handler = new SocketsHttpHandler
+            var handler = new HttpClientHandler
             {
-                PooledConnectionLifetime = TimeSpan.FromMinutes(10),
                 MaxConnectionsPerServer = 50,
-                KeepAlivePolicy = HttpKeepAlivePolicy.WithActiveRequests,
                 UseProxy = proxy != null,
                 Proxy = proxy
             };
