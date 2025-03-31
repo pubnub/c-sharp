@@ -44,7 +44,7 @@ namespace PubnubApi
                         requestMessage.Headers.Add(kvp.Key, kvp.Value);
                     }
                 }
-                logger?.Debug($"Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl} \n Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}");
+                logger?.Debug($"HttpClient Service:Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl} \n Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}");
                 var httpResult = await httpClient.SendAsync(request: requestMessage,
                     cancellationToken: transportRequest.CancellationTokenSource.Token);
                 var responseContent = await httpResult.Content.ReadAsByteArrayAsync();
@@ -59,7 +59,7 @@ namespace PubnubApi
             }
             catch (TaskCanceledException taskCanceledException)
             {
-                logger?.Error($"HttpClient Service: Request is cancelled for url {transportRequest.RequestUrl}");
+                logger?.Error($"HttpClient Service: Request is cancelled for url {transportRequest.RequestUrl}\n ex.InnerException: {taskCanceledException?.InnerException}\nex.inner.inner{taskCanceledException.InnerException?.InnerException}");
                 transportResponse = new TransportResponse()
                 {
                     RequestUrl = transportRequest.RequestUrl,

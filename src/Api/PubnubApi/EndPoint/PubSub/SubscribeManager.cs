@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using System.Globalization;
 using System.Text;
 using System.Collections.Concurrent;
+using System.IO;
+using System.Net.Http;
 using System.Net.Sockets;
 
 namespace PubnubApi.EndPoint
@@ -180,7 +182,14 @@ namespace PubnubApi.EndPoint
 
                 if (validChannels.Count > 0 || validChannelGroups.Count > 0)
                 {
-                    TerminateCurrentSubscriberRequest();
+                    if (OngoingSubscriptionCancellationTokenSources.TryGetValue(PubnubInstance.InstanceId, out var tokenSource))
+                    {
+                        if (tokenSource != null)
+                        {
+                            IsCurrentSubscriptionCancellationRequested[PubnubInstance.InstanceId] = true;
+                            TerminateCurrentSubscriberRequest();
+                        }
+                    }
                     if (type == PNOperationType.PNUnsubscribeOperation && config.ContainsKey(PubnubInstance.InstanceId))
                     {
                         var leaveRequestParameter =
@@ -334,7 +343,14 @@ namespace PubnubApi.EndPoint
                     //Retrieve the current channels already subscribed previously and terminate them
                     string[] channels = SubscriptionChannels[PubnubInstance.InstanceId].Keys.ToArray();
                     string[] channelGroups = SubscriptionChannelGroups[PubnubInstance.InstanceId].Keys.ToArray();
-                    TerminateCurrentSubscriberRequest();
+                    if (OngoingSubscriptionCancellationTokenSources.TryGetValue(PubnubInstance.InstanceId, out var tokenSource))
+                    {
+                        if (tokenSource != null)
+                        {
+                            IsCurrentSubscriptionCancellationRequested[PubnubInstance.InstanceId] = true;
+                            TerminateCurrentSubscriberRequest();
+                        }
+                    }
                     if (channelGroups != null && channelGroups.Length > 0 && (channels == null || channels.Length == 0))
                     {
                         channelGroupSubscribeOnly = true;
@@ -343,7 +359,6 @@ namespace PubnubApi.EndPoint
                     logger?.Debug($"MultiChannelSubscribeRequest with tt=0");
                     MultiChannelSubscribeRequest<T>(responseType, channels, channelGroups, 0, 0, false,
                         initialSubscribeUrlParams, externalQueryParam);
-
                     if (SubscribeHeartbeatCheckTimer != null)
                     {
                         try
@@ -387,7 +402,10 @@ namespace PubnubApi.EndPoint
                 return;
             }
 
-            TerminateCurrentSubscriberRequest();
+            if (OngoingSubscriptionCancellationTokenSources.TryGetValue(PubnubInstance.InstanceId, out var tokenSource))
+            {
+                if (tokenSource != null)TerminateCurrentSubscriberRequest();
+            }
             string multiChannel = (channels != null && channels.Length > 0)
                 ? string.Join(",", channels.OrderBy(x => x).ToArray())
                 : ",";
@@ -456,7 +474,8 @@ namespace PubnubApi.EndPoint
                     initialSubscribeUrlParams: initialSubscribeUrlParams, externalQueryParam: externalQueryParam);
                 var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(
                     requestParameter: subscribeRequestParameter, operationType: PNOperationType.PNSubscribeOperation);
-                OngoingSubscriptionCancellationTokenSources[PubnubInstance.InstanceId] =
+                
+                if(pubnubRequestState.Timetoken > 0) OngoingSubscriptionCancellationTokenSources[PubnubInstance.InstanceId] =
                     transportRequest.CancellationTokenSource;
                 PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ContinueWith(t =>
                 {
@@ -489,36 +508,37 @@ namespace PubnubApi.EndPoint
                         }
                         else
                         {
-                            logger?.Error(
-                                $"SubscribeManager received HttpClientService errorMessage :{transportResponse.Error.Message} InnerException  ${transportResponse.Error.InnerException?.Message}");
-                            var transportExcpetion = transportResponse.Error;
-                            if ( transportExcpetion.InnerException?.InnerException is SocketException)
+                            logger?.Error($"SubscribeManager received failed response from transport module :{transportResponse.Error.Message} InnerException: {transportResponse.Error.InnerException?.Message}");
+                            var transportException = transportResponse.Error;
+
+                            if (IsTaskCanceledWithInnerTaskCanceled(transportException) ||
+                                IsTaskCanceledWithNestedObjectDisposedException(transportException) || IsDeeplyNestedSocketException(transportException))
                             {
-                                multiplexExceptionTimer?.Change(Timeout.Infinite, Timeout.Infinite);
-                                ConnectionErrors++;
-                                UpdatePubnubNetworkTcpCheckIntervalInSeconds();
-                                multiplexExceptionTimer = new Timer(
-                                    new TimerCallback(MultiplexExceptionHandlerTimerCallback<T>), pubnubRequestState,
-                                    (-1 == PubnubNetworkTcpCheckIntervalInSeconds)
-                                        ? Timeout.Infinite
-                                        : PubnubNetworkTcpCheckIntervalInSeconds * 1000,
-                                    Timeout.Infinite);
+                                if (!IsCurrentSubscriptionCancellationRequested.ContainsKey(PubnubInstance.InstanceId) && (IsDeeplyNestedSocketException(transportException) || IsTaskCanceledWithNestedObjectDisposedException(transportException)))
+                                {
+                                    HandleNetworkIssueRetry(pubnubRequestState);
+                                }
+                                else
+                                {
+                                    OngoingSubscriptionCancellationTokenSources[PubnubInstance.InstanceId] = null;
+                                    logger?.Debug(
+                                        $"SubscribeManager: Request cancelled due to subscription change.No request retry.");
+                                }
                             }
-                            else if (transportExcpetion is TaskCanceledException && transportExcpetion.InnerException is TaskCanceledException)
+                            else if (transportException is HttpRequestException || IsNestedSocketException(transportException) || IsTaskCanceledWithNestedObjectDisposedException(transportException))
                             {
-                                logger?.Debug($"SubscribeManager: Request cancelled due to TaskCancellation request.");
-                            }
-                            else
-                            {
-                                multiplexExceptionTimer?.Change(Timeout.Infinite, Timeout.Infinite);
-                                ConnectionErrors++;
-                                UpdatePubnubNetworkTcpCheckIntervalInSeconds();
-                                multiplexExceptionTimer = new Timer(
-                                    new TimerCallback(MultiplexExceptionHandlerTimerCallback<T>), pubnubRequestState,
-                                    (-1 == PubnubNetworkTcpCheckIntervalInSeconds)
-                                        ? Timeout.Infinite
-                                        : PubnubNetworkTcpCheckIntervalInSeconds * 1000,
-                                    Timeout.Infinite);
+                                if (!IsCurrentSubscriptionCancellationRequested.TryGetValue(PubnubInstance.InstanceId, out var cancelRequested))
+                                {
+                                    if (IsCurrentSubscriptionCancellationRequested.ContainsKey(
+                                            PubnubInstance.InstanceId))
+                                    {
+                                        IsCurrentSubscriptionCancellationRequested[PubnubInstance.InstanceId] = false;
+                                    }
+                                    HandleNetworkIssueRetry(pubnubRequestState);
+                                } else if (transportException is HttpRequestException)
+                                {
+                                    HandleNetworkIssueRetry(pubnubRequestState);
+                                }
                             }
                         }
                     }
@@ -552,7 +572,20 @@ namespace PubnubApi.EndPoint
                     false, null, externalQueryParam);
             }
         }
-
+        private void HandleNetworkIssueRetry<T>(RequestState<T> pubnubRequestState)
+        {
+            logger?.Debug($"SubscribeManager: Request cancelled due to Network issue. Retry is taking place.");
+            multiplexExceptionTimer?.Change(Timeout.Infinite, Timeout.Infinite);
+            ConnectionErrors++;
+            UpdatePubnubNetworkTcpCheckIntervalInSeconds();
+            multiplexExceptionTimer = new Timer(
+                new TimerCallback(MultiplexExceptionHandlerTimerCallback<T>),
+                pubnubRequestState,
+                (-1 == PubnubNetworkTcpCheckIntervalInSeconds)
+                    ? Timeout.Infinite
+                    : PubnubNetworkTcpCheckIntervalInSeconds * 1000,
+                Timeout.Infinite);
+        }
         private void MultiplexExceptionHandlerTimerCallback<T>(object state)
         {
             logger?.Trace($" MultiplexExceptionHandlerTimerCallback");
@@ -830,7 +863,14 @@ namespace PubnubApi.EndPoint
 
             logger?.Trace($"SubscribeManager Manual Disconnect");
             SubscribeDisconnected[PubnubInstance.InstanceId] = true;
-            TerminateCurrentSubscriberRequest();
+            if (OngoingSubscriptionCancellationTokenSources.TryGetValue(PubnubInstance.InstanceId, out var tokenSource))
+            {
+                if (tokenSource != null)
+                {
+                    IsCurrentSubscriptionCancellationRequested[PubnubInstance.InstanceId] = true;
+                    TerminateCurrentSubscriberRequest();
+                }
+            }
             TerminatePresenceHeartbeatTimer();
             TerminateReconnectTimer();
 
@@ -1531,6 +1571,32 @@ namespace PubnubApi.EndPoint
                 Query = requestQueryStringParams,
             };
             return requestParameter;
+        }
+        
+        private bool IsNestedSocketException(Exception ex)
+        {
+            return ex?.InnerException is SocketException || ex?.InnerException?.InnerException is SocketException;
+        }
+
+        private bool IsDeeplyNestedSocketException(Exception ex)
+        {
+            return ex is TaskCanceledException &&
+                   ex.InnerException is TaskCanceledException &&
+                   ex.InnerException.InnerException is IOException &&
+                   ex.InnerException.InnerException.InnerException is SocketException;
+        }
+
+        private bool IsTaskCanceledWithInnerTaskCanceled(Exception ex)
+        {
+            return ex is TaskCanceledException && ex.InnerException is TaskCanceledException;
+        }
+
+        private bool IsTaskCanceledWithNestedObjectDisposedException(Exception ex)
+        {
+            return ex is TaskCanceledException &&
+                   ex.InnerException is TaskCanceledException &&
+                   ex.InnerException?.InnerException is IOException &&
+                   ex.InnerException?.InnerException?.InnerException is ObjectDisposedException;
         }
 
 

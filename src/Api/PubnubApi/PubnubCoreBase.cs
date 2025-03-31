@@ -40,6 +40,7 @@ namespace PubnubApi
 
         private bool clientNetworkStatusInternetStatus = true;
         protected static ConcurrentDictionary<string, CancellationTokenSource> OngoingSubscriptionCancellationTokenSources { get; } = new();
+        protected static ConcurrentDictionary<string, bool> IsCurrentSubscriptionCancellationRequested { get; } = new();
         protected static ConcurrentDictionary<string, bool> SubscribeDisconnected { get; set; } = new ConcurrentDictionary<string, bool>();
 
         protected Pubnub PubnubInstance { get; set; }
