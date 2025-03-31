@@ -1,3 +1,7 @@
+v7.3.5 - March 31 2025
+-----------------------------
+- Fixed: standardize connection configuration to address inconsistent platform defaults leading to socket exhaustion under high load.
+
 v7.3.4 - March 28 2025
 -----------------------------
 - Fixed: fixes issue with subscribe loop when mulitple subscription changes happen rapidly.

@@ -13,20 +13,21 @@ namespace PubnubApi
         private readonly HttpClient httpClient;
         private readonly PubnubLogModule logger;
 
-        public HttpClientService(IWebProxy proxy, PNConfiguration configuration )
+        public HttpClientService(IWebProxy proxy, PNConfiguration configuration)
         {
             logger = configuration.Logger;
-            httpClient = new HttpClient()
+
+            var handler = new HttpClientHandler
+            {
+                MaxConnectionsPerServer = 50,
+                UseProxy = proxy != null,
+                Proxy = proxy
+            };
+
+            httpClient = new HttpClient(handler)
             {
                 Timeout = Timeout.InfiniteTimeSpan
             };
-            if (proxy == null) return;
-            httpClient = new HttpClient(new HttpClientHandler()
-            {
-                Proxy = proxy,
-                UseProxy = true
-            });
-            httpClient.Timeout = Timeout.InfiniteTimeSpan;
         }
 
         public async Task<TransportResponse> GetRequest(TransportRequest transportRequest)
@@ -43,7 +44,7 @@ namespace PubnubApi
                         requestMessage.Headers.Add(kvp.Key, kvp.Value);
                     }
                 }
-                logger?.Debug($"Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl} \n Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}");
+                logger?.Debug($"HttpClient Service:Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl} \n Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}");
                 var httpResult = await httpClient.SendAsync(request: requestMessage,
                     cancellationToken: transportRequest.CancellationTokenSource.Token);
                 var responseContent = await httpResult.Content.ReadAsByteArrayAsync();
@@ -54,11 +55,11 @@ namespace PubnubApi
                     Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
                     RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath
                 };
-                logger?.Debug($"HttpClient Service:Received http response from server with status code {httpResult.StatusCode}, content-length: {transportResponse.Content.Length} bytes, for url {transportRequest.RequestUrl}");
+                logger?.Debug($"HttpClient Service:Received http response from server with status code {httpResult.StatusCode}, content-length: {transportResponse.Content.Length} bytes, for url \n{transportRequest.RequestUrl}");
             }
             catch (TaskCanceledException taskCanceledException)
             {
-                logger?.Error($"HttpClient Service: Request is cancelled for url {transportRequest.RequestUrl}");
+                logger?.Error($"HttpClient Service: Request is cancelled for url {transportRequest.RequestUrl}\n ex.InnerException: {taskCanceledException?.InnerException}\nex.inner.inner{taskCanceledException.InnerException?.InnerException}");
                 transportResponse = new TransportResponse()
                 {
                     RequestUrl = transportRequest.RequestUrl,

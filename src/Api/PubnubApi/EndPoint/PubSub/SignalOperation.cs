@@ -250,6 +250,7 @@ namespace PubnubApi.EndPoint
                     operationType: PNOperationType.PNPublishOperation);
             var transportResponse =
                 await PubnubInstance.transportMiddleware.Send(transportRequest).ConfigureAwait(false);
+            logger?.Debug($"Signal() got transport response: {transportResponse?.StatusCode}\n error: {transportResponse?.Error?.Message}\nstackTrace: {transportResponse?.Error?.StackTrace}");
             if (transportResponse.Error == null)
             {
                 string responseString = Encoding.UTF8.GetString(transportResponse.Content);
