@@ -55,7 +55,7 @@ namespace PubnubApi
                     Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
                     RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath
                 };
-                logger?.Debug($"HttpClient Service:Received http response from server with status code {httpResult.StatusCode}, content-length: {transportResponse.Content.Length} bytes, for url {transportRequest.RequestUrl}");
+                logger?.Debug($"HttpClient Service:Received http response from server with status code {httpResult.StatusCode}, content-length: {transportResponse.Content.Length} bytes, for url \n{transportRequest.RequestUrl}");
             }
             catch (TaskCanceledException taskCanceledException)
             {
