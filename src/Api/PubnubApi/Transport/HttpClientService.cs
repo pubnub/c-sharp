@@ -44,7 +44,8 @@ namespace PubnubApi
                         requestMessage.Headers.Add(kvp.Key, kvp.Value);
                     }
                 }
-                logger?.Debug($"HttpClient Service:Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl} \n Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}");
+                logger?.Debug($"HttpClient Service: Thread Id: {Thread.CurrentThread.ManagedThreadId} Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl}" + 
+                              (requestMessage.Headers.Any() ? $"\n  Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}" : ""));
                 var httpResult = await httpClient.SendAsync(request: requestMessage,
                     cancellationToken: transportRequest.CancellationTokenSource.Token);
                 var responseContent = await httpResult.Content.ReadAsByteArrayAsync();
@@ -59,7 +60,7 @@ namespace PubnubApi
             }
             catch (TaskCanceledException taskCanceledException)
             {
-                logger?.Error($"HttpClient Service: Request is cancelled for url {transportRequest.RequestUrl}\n ex.InnerException: {taskCanceledException?.InnerException}\nex.inner.inner{taskCanceledException.InnerException?.InnerException}");
+                logger?.Error($"HttpClient Service: Thread Id Thread Id: {Thread.CurrentThread.ManagedThreadId} Request is cancelled for url {transportRequest.RequestUrl}");
                 transportResponse = new TransportResponse()
                 {
                     RequestUrl = transportRequest.RequestUrl,
@@ -101,7 +102,7 @@ namespace PubnubApi
                 HttpRequestMessage requestMessage =
                     new HttpRequestMessage(method: HttpMethod.Post, requestUri: transportRequest.RequestUrl)
                         { Content = postData };
-                logger?.Debug($"Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl} \n Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}");
+                logger?.Debug($"HttpClient Service:Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl}" + (requestMessage.Headers.Any() ? $"\n  Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}" : ""));
                 var httpResult = await httpClient.SendAsync(request: requestMessage,
                     cancellationToken: transportRequest.CancellationTokenSource.Token);
                 var responseContent = await httpResult.Content.ReadAsByteArrayAsync();
@@ -162,7 +163,7 @@ namespace PubnubApi
                         requestMessage.Headers.Add(kvp.Key, kvp.Value);
                     }
                 }
-                logger?.Debug($"Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl} \n Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}");
+                logger?.Debug($"HttpClient Service:Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl}" + (requestMessage.Headers.Any() ? $"\n  Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}" : ""));
                 var httpResult = await httpClient.SendAsync(request: requestMessage,
                     cancellationToken: transportRequest.CancellationTokenSource.Token);
                 var responseContent = await httpResult.Content.ReadAsByteArrayAsync();
@@ -208,7 +209,7 @@ namespace PubnubApi
                         requestMessage.Headers.Add(kvp.Key, kvp.Value);
                     }
                 }
-                logger?.Debug($"Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl} \n Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}");
+                logger?.Debug($"HttpClient Service:Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl}" + (requestMessage.Headers.Any() ? $"\n  Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}" : ""));
                 var httpResult = await httpClient.SendAsync(request: requestMessage,
                     cancellationToken: transportRequest.CancellationTokenSource.Token);
                 var responseContent = await httpResult.Content.ReadAsByteArrayAsync();
@@ -270,7 +271,7 @@ namespace PubnubApi
                         requestMessage.Headers.Add(kvp.Key, $"\"{kvp.Value}\"");
                     }
                 }
-                logger?.Debug($"Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl} \n Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}");
+                logger?.Debug($"HttpClient Service:Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl}" + (requestMessage.Headers.Any() ? $"\n  Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}" : ""));
                 var httpResult = await httpClient.SendAsync(request: requestMessage,
                     cancellationToken: transportRequest.CancellationTokenSource.Token);
                 var responseContent = await httpResult.Content.ReadAsByteArrayAsync();

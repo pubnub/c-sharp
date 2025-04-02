@@ -59,7 +59,10 @@ public class EventDeserializer
                 presenceEvent.Timestamp = presenceTimeStamp;
             }
 
-            presenceEvent.Uuid = presenceDataFields["uuid"]?.ToString();
+            if (presenceDataFields.TryGetValue("uuid", out var uuidValue))
+            {
+                presenceEvent.Uuid = uuidValue?.ToString();
+            }
 
             if (Int32.TryParse(presenceDataFields["occupancy"]?.ToString(), out var presenceOccupany))
             {
@@ -79,16 +82,20 @@ public class EventDeserializer
                 presenceEvent.Timetoken = presenceTimetoken;
             }
 
-            presenceEvent.Channel = jsonFields["channel"]?.ToString();
-            presenceEvent.Channel = presenceEvent.Channel?.Replace("-pnpres", "");
-            
-            presenceEvent.Subscription = jsonFields["channelGroup"]?.ToString();
-            presenceEvent.Subscription = presenceEvent.Subscription?.Replace("-pnpres", "");
-
-
-            if (jsonFields["userMetadata"] != null)
+            if (jsonFields.TryGetValue("channel", out var channelValue))
             {
-                presenceEvent.UserMetadata = jsonFields["userMetadata"];
+                presenceEvent.Channel = channelValue?.ToString()?.Replace("-pnpres", "");
+            }
+            
+            if (jsonFields.TryGetValue("channelGroup", out var subscriptionValue))
+            {
+                presenceEvent.Subscription = subscriptionValue?.ToString()?.Replace("-pnpres", "");
+            }
+
+
+            if (jsonFields.TryGetValue("userMetadata", out object userMetadataValue))
+            {
+                presenceEvent.UserMetadata = userMetadataValue;
             }
 
             if (presenceEvent.Event != null && presenceEvent.Event.ToLowerInvariant() == "interval")
