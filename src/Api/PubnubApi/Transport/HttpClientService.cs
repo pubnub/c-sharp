@@ -44,7 +44,7 @@ namespace PubnubApi
                         requestMessage.Headers.Add(kvp.Key, kvp.Value);
                     }
                 }
-                logger?.Debug($"HttpClient Service: Thread Id: {Thread.CurrentThread.ManagedThreadId} Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl}" + 
+                logger?.Debug($"HttpClient Service: Task Id: {Task.CurrentId} Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl}" + 
                               (requestMessage.Headers.Any() ? $"\n  Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}" : ""));
                 var httpResult = await httpClient.SendAsync(request: requestMessage,
                     cancellationToken: transportRequest.CancellationTokenSource.Token);
@@ -56,11 +56,11 @@ namespace PubnubApi
                     Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
                     RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath
                 };
-                logger?.Debug($"HttpClient Service:Received http response from server with status code {httpResult.StatusCode}, content-length: {transportResponse.Content.Length} bytes, for url \n{transportRequest.RequestUrl}");
+                logger?.Debug($"HttpClient Service: Task Id: {Task.CurrentId} Received http response from server with status code {httpResult.StatusCode}, content-length: {transportResponse.Content.Length} bytes, for url \n{transportRequest.RequestUrl}");
             }
             catch (TaskCanceledException taskCanceledException)
             {
-                logger?.Error($"HttpClient Service: Thread Id Thread Id: {Thread.CurrentThread.ManagedThreadId} Request is cancelled for url {transportRequest.RequestUrl}");
+                logger?.Error($"HttpClient Service: Task Id: {Task.CurrentId} Request is cancelled for url {transportRequest.RequestUrl}");
                 transportResponse = new TransportResponse()
                 {
                     RequestUrl = transportRequest.RequestUrl,
@@ -69,7 +69,7 @@ namespace PubnubApi
             }
             catch (Exception e)
             {
-                logger?.Error($"HttpClient Service: Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}");
+                logger?.Error($"HttpClient Service: Task Id: {Task.CurrentId} Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}");
                 transportResponse = new TransportResponse()
                 {
                     RequestUrl = transportRequest.RequestUrl,
