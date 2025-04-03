@@ -333,7 +333,7 @@ namespace PubnubApi.EndPoint
             };
             transportRequest.Headers.Add("Content-Type", contentType);
             Tuple<string, PNStatus> jsonAndStatusTuple;
-            var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest);
+            var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ConfigureAwait(false);
             if (transportResponse.StatusCode == 204 && transportResponse.Error == null)
             {
                 var responseString = "{}";

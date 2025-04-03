@@ -73,7 +73,7 @@ namespace PubnubApi.EndPoint
 				throw new MissingMemberException("Invalid Subscribe Key");
 			}
 			
-			return await MessageCounts(this.channelNames, this.timetokens, this.queryParam);
+			return await MessageCounts(this.channelNames, this.timetokens, this.queryParam).ConfigureAwait(false);
 		}
 
 		internal void Retry()

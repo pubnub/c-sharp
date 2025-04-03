@@ -47,8 +47,8 @@ namespace PubnubApi
                 logger?.Debug($"HttpClient Service: Task Id: {Task.CurrentId} Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl}" + 
                               (requestMessage.Headers.Any() ? $"\n  Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}" : ""));
                 var httpResult = await httpClient.SendAsync(request: requestMessage,
-                    cancellationToken: transportRequest.CancellationTokenSource.Token);
-                var responseContent = await httpResult.Content.ReadAsByteArrayAsync();
+                    cancellationToken: transportRequest.CancellationTokenSource.Token).ConfigureAwait(false);
+                var responseContent = await httpResult.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
                 transportResponse = new TransportResponse()
                 {
                     StatusCode = (int)httpResult.StatusCode,
@@ -104,8 +104,8 @@ namespace PubnubApi
                         { Content = postData };
                 logger?.Debug($"HttpClient Service:Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl}" + (requestMessage.Headers.Any() ? $"\n  Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}" : ""));
                 var httpResult = await httpClient.SendAsync(request: requestMessage,
-                    cancellationToken: transportRequest.CancellationTokenSource.Token);
-                var responseContent = await httpResult.Content.ReadAsByteArrayAsync();
+                    cancellationToken: transportRequest.CancellationTokenSource.Token).ConfigureAwait(false);
+                var responseContent = await httpResult.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
                 transportResponse = new TransportResponse()
                 {
                     StatusCode = (int)httpResult.StatusCode,
@@ -165,8 +165,8 @@ namespace PubnubApi
                 }
                 logger?.Debug($"HttpClient Service:Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl}" + (requestMessage.Headers.Any() ? $"\n  Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}" : ""));
                 var httpResult = await httpClient.SendAsync(request: requestMessage,
-                    cancellationToken: transportRequest.CancellationTokenSource.Token);
-                var responseContent = await httpResult.Content.ReadAsByteArrayAsync();
+                    cancellationToken: transportRequest.CancellationTokenSource.Token).ConfigureAwait(false);
+                var responseContent = await httpResult.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
                 transportResponse = new TransportResponse()
                 {
                     StatusCode = (int)httpResult.StatusCode,
@@ -211,8 +211,8 @@ namespace PubnubApi
                 }
                 logger?.Debug($"HttpClient Service:Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl}" + (requestMessage.Headers.Any() ? $"\n  Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}" : ""));
                 var httpResult = await httpClient.SendAsync(request: requestMessage,
-                    cancellationToken: transportRequest.CancellationTokenSource.Token);
-                var responseContent = await httpResult.Content.ReadAsByteArrayAsync();
+                    cancellationToken: transportRequest.CancellationTokenSource.Token).ConfigureAwait(false);
+                var responseContent = await httpResult.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
                 transportResponse = new TransportResponse()
                 {
                     StatusCode = (int)httpResult.StatusCode,
@@ -273,8 +273,8 @@ namespace PubnubApi
                 }
                 logger?.Debug($"HttpClient Service:Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl}" + (requestMessage.Headers.Any() ? $"\n  Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}" : ""));
                 var httpResult = await httpClient.SendAsync(request: requestMessage,
-                    cancellationToken: transportRequest.CancellationTokenSource.Token);
-                var responseContent = await httpResult.Content.ReadAsByteArrayAsync();
+                    cancellationToken: transportRequest.CancellationTokenSource.Token).ConfigureAwait(false);
+                var responseContent = await httpResult.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
                 transportResponse = new TransportResponse()
                 {
                     StatusCode = (int)httpResult.StatusCode,
