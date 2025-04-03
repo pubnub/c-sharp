@@ -50,7 +50,7 @@ namespace PubnubApi.EventEngine.Core {
 			transitioning = true;
 			while (q.Count > 0)
 			{
-				await Transition(q.Dequeue());
+				await Transition(q.Dequeue()).ConfigureAwait(false);
 			}
 
 			transitioning = false;

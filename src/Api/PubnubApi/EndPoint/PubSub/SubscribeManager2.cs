@@ -47,6 +47,7 @@ namespace PubnubApi.EndPoint
 
 			if (transportResponse.StatusCode == Constants.HttpRequestSuccessStatusCode && transportResponse.Error == null && transportResponse.Content != null) {
 				var responseJson = Encoding.UTF8.GetString(transportResponse.Content);
+				logger?.Debug($"Handshake Effect received json: {responseJson}");
 				PNStatus status = new PNStatus(null, PNOperationType.PNSubscribeOperation, PNStatusCategory.PNConnectedCategory, channels, channelGroups);
 				HandshakeResponse handshakeResponse = jsonLibrary.DeserializeToObject<HandshakeResponse>(responseJson);
 				return new Tuple<HandshakeResponse, PNStatus>(handshakeResponse, status);
@@ -72,13 +73,13 @@ namespace PubnubApi.EndPoint
 					cancellationTokenSource.Dispose();
 				} else
 				{
-					logger?.Trace($" SubscribeManager  HandshakeRequestCancellation. No request to cancel.");
+					logger?.Trace($" SubscribeManager HandshakeRequestCancellation. No request to cancel.");
 				}
 
-				logger?.Trace($"SubscribeManager  HandshakeRequestCancellation. Done.");
+				logger?.Trace($"SubscribeManager HandshakeRequestCancellation. Done.");
 			} catch (Exception ex)
 			{
-				logger?.Trace($" SubscribeManager  HandshakeRequestCancellation Exception: {ex}");
+				logger?.Trace($" SubscribeManager HandshakeRequestCancellation Exception: {ex}");
 			}
 		}
 		internal async Task<Tuple<ReceivingResponse<object>, PNStatus>> ReceiveRequest<T>(PNOperationType responseType, string[] channels, string[] channelGroups, long? timetoken, int? region, Dictionary<string, string> initialSubscribeUrlParams, Dictionary<string, object> externalQueryParam)
@@ -102,6 +103,7 @@ namespace PubnubApi.EndPoint
 				var transportResponse = await pubnubInstance.transportMiddleware.Send(transportRequest: transportRequest);
 				if (transportResponse.Content != null && transportResponse.Error == null && transportResponse.StatusCode == Constants.HttpRequestSuccessStatusCode) {
 					var responseJson = Encoding.UTF8.GetString(transportResponse.Content);
+					logger?.Debug($"Receiving Effect received json: {responseJson}");
 					PNStatus status = new PNStatus(null, PNOperationType.PNSubscribeOperation, PNStatusCategory.PNConnectedCategory, channels, channelGroups);
 					ReceivingResponse<object> receiveResponse = jsonLibrary.DeserializeToObject<ReceivingResponse<object>>(responseJson);
 					return new Tuple<ReceivingResponse<object>, PNStatus>(receiveResponse, status);
@@ -119,7 +121,7 @@ namespace PubnubApi.EndPoint
 			} catch (Exception ex)
 			{
 				logger?.Error(
-					$" SubscribeManager=> MultiChannelSubscribeInit \n channel(s)={string.Join(",", channels.OrderBy(x => x).ToArray())} \n cg(s)={string.Join(",", channelGroups.OrderBy(x => x).ToArray())} \n Exception Details={ex}");
+					$" Receiving effect exception for \n channel(s)={string.Join(",", channels.OrderBy(x => x).ToArray())} \n cg(s)={string.Join(",", channelGroups.OrderBy(x => x).ToArray())} \n Exception Details={ex}");
 			}
 			return resp;
 		}
@@ -131,12 +133,12 @@ namespace PubnubApi.EndPoint
 					cancellationTokenSource.Cancel();
 					cancellationTokenSource.Dispose();
 				} else {
-					logger?.Trace($"SubscribeManager  RequestCancellation. No request to cancel.");
+					logger?.Trace($"SubscribeManager RequestCancellation. No request to cancel.");
 				}
-				logger?.Trace($"SubscribeManager  ReceiveRequestCancellation. Done.");
+				logger?.Trace($"SubscribeManager ReceiveRequestCancellation. Done.");
 			} catch (Exception ex)
 			{
-				logger?.Trace($"SubscribeManager  ReceiveRequestCancellation Exception: {ex}");
+				logger?.Trace($"SubscribeManager ReceiveRequestCancellation Exception: {ex}");
 			}
 		}
 

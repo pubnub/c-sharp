@@ -35,7 +35,14 @@ namespace PubnubApi.EndPoint
         internal void MultiChannelUnSubscribeAll<T>(PNOperationType type, Dictionary<string, object> externalQueryParam)
         {
             //Retrieve the current channels already subscribed previously and terminate them
-            TerminateCurrentSubscriberRequest();
+            if (OngoingSubscriptionCancellationTokenSources.TryGetValue(PubnubInstance.InstanceId, out var tokenSource))
+            {
+                if (tokenSource != null)
+                {
+                    IsCurrentSubscriptionCancellationRequested[PubnubInstance.InstanceId] = true;
+                    TerminateCurrentSubscriberRequest();
+                }
+            }
             string[] currentChannels = SubscriptionChannels.ContainsKey(PubnubInstance.InstanceId)
                 ? SubscriptionChannels[PubnubInstance.InstanceId].Keys?.ToArray() ?? []
                 : [];
@@ -53,13 +60,18 @@ namespace PubnubApi.EndPoint
                         operationType: PNOperationType.Leave);
                 PubnubInstance.transportMiddleware.Send(transportRequest: leaveTransportRequest).ContinueWith(t =>
                 {
-                    SubscriptionChannels[PubnubInstance.InstanceId]?.Clear();
-                    SubscriptionChannelGroups[PubnubInstance.InstanceId]?.Clear();
+                    try
+                    {
+                        SubscriptionChannels[PubnubInstance.InstanceId]?.Clear();
+                        SubscriptionChannelGroups[PubnubInstance.InstanceId]?.Clear();
+                    }
+                    catch (Exception e)
+                    {
+                        logger?.Debug($"No subscription found.{e.Message}");
+                    }
                 });
             }
-
-            SubscriptionChannels[PubnubInstance.InstanceId]?.Clear();
-            SubscriptionChannelGroups[PubnubInstance.InstanceId]?.Clear();
+            
             TerminateCurrentSubscriberRequest();
             TerminateReconnectTimer();
             TerminatePresenceHeartbeatTimer();
@@ -294,7 +306,7 @@ namespace PubnubApi.EndPoint
             catch (Exception ex)
             {
                 logger?.Error(
-                    $"At SubscribeManager.MultiChannelUnSubscribeInit() \n channel(s)={string.Join(",", validChannels.OrderBy(x => x).ToArray())} \n cg(s)={string.Join(",", validChannelGroups.OrderBy(x => x).ToArray())} \n Exception Details={ex}");
+                    $"SubscribeManager.MultiChannelUnSubscribeInit() \n channel(s)={string.Join(",", validChannels.OrderBy(x => x).ToArray())} \n cg(s)={string.Join(",", validChannelGroups.OrderBy(x => x).ToArray())} \n Exception Details={ex}");
             }
         }
 
@@ -302,7 +314,7 @@ namespace PubnubApi.EndPoint
             string[] rawChannelGroups, Dictionary<string, string> initialSubscribeUrlParams,
             Dictionary<string, object> externalQueryParam)
         {
-            logger?.Debug("INITIAL SUBSCRIBE REQUEST getting executed through MultiChannelSubscribeInit");
+            logger?.Trace("SubscribeManager: MultiChannelSubscribeInit() Invoked");
             try
             {
                 bool channelGroupSubscribeOnly = false;
@@ -355,8 +367,7 @@ namespace PubnubApi.EndPoint
                     {
                         channelGroupSubscribeOnly = true;
                     }
-
-                    logger?.Debug($"MultiChannelSubscribeRequest with tt=0");
+                    
                     MultiChannelSubscribeRequest<T>(responseType, channels, channelGroups, 0, 0, false,
                         initialSubscribeUrlParams, externalQueryParam);
                     if (SubscribeHeartbeatCheckTimer != null)
@@ -451,8 +462,7 @@ namespace PubnubApi.EndPoint
                 long lastTimetoken = LastSubscribeTimetoken.ContainsKey(PubnubInstance.InstanceId)
                     ? LastSubscribeTimetoken[PubnubInstance.InstanceId]
                     : 0;
-                logger?.Trace(
-                    $"Building request for channel(s)={multiChannel}, channelgroup(s)={multiChannelGroup} with timetoken={lastTimetoken}");
+                logger?.Trace($"Building request for channel(s)={multiChannel}, channelgroup(s)={multiChannelGroup} with timetoken={lastTimetoken}");
                 string channelsJsonState = BuildJsonUserState(channels, channelGroups, false);
                 config[PubnubInstance.InstanceId].UserId =
                     CurrentUserId[PubnubInstance.InstanceId]; // to make sure we capture if UUID is changed
@@ -486,6 +496,7 @@ namespace PubnubApi.EndPoint
                         {
                             networkConnection = true;
                             var json = Encoding.UTF8.GetString(transportResponse.Content);
+                            logger?.Debug($"SubscribeManager received response: {json}");
                             pubnubRequestState.GotJsonResponse = true;
                             if (!string.IsNullOrEmpty(json))
                             {

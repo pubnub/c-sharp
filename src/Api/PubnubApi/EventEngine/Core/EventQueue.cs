@@ -45,7 +45,7 @@ namespace PubnubApi.EventEngine.Core
         {
             while (Count > 0)
             {
-                await function(Dequeue());
+                await function(Dequeue()).ConfigureAwait(false);
             }
         }
 
