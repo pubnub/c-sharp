@@ -1,3 +1,7 @@
+v7.3.6 - April 03 2025
+-----------------------------
+- Fixed: reafctor: Removed excess logging from transport module. Removed redundant logging from transport layer and added thread id information for tracking http request.
+
 v7.3.5 - March 31 2025
 -----------------------------
 - Fixed: standardize connection configuration to address inconsistent platform defaults leading to socket exhaustion under high load.
