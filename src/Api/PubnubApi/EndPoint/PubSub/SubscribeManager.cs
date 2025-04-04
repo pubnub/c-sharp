@@ -251,7 +251,7 @@ namespace PubnubApi.EndPoint
                             requestState.ResponseType = PNOperationType.Leave;
                             requestState.Reconnect = false;
 
-                            UrlProcessRequest<T>(request, requestState, false).ContinueWith(r => { }, TaskContinuationOptions.ExecuteSynchronously).Wait(); 
+                            UrlProcessRequest<T>(request, requestState, true).ContinueWith(r => { }, TaskContinuationOptions.ExecuteSynchronously).Wait(); 
                         }
                     }
 
@@ -503,7 +503,17 @@ namespace PubnubApi.EndPoint
                                     }
                                     if (webRequest != null)
                                     {
-                                        TerminatePendingWebRequest(webRequest);
+                                        long tt;
+                                        if (MultiChannelSubscribe[PubnubInstance.InstanceId].ContainsKey(multiChannelName) && MultiChannelSubscribe[PubnubInstance.InstanceId].TryGetValue(multiChannelName, out tt))
+                                            if (tt != null && tt == 0)
+                                            {
+
+                                            }
+                                            else
+                                            {
+                                                TerminatePendingWebRequest(webRequest);
+                                            }
+                                        
                                     }
                                 }
                                 else
@@ -517,7 +527,6 @@ namespace PubnubApi.EndPoint
                             LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0}, Unable to find instance id = {1} from _channelRequest.", DateTime.Now.ToString(CultureInfo.InvariantCulture), PubnubInstance.InstanceId), config.ContainsKey(PubnubInstance.InstanceId) ? config[PubnubInstance.InstanceId].LogVerbosity : PNLogVerbosity.NONE);
                         }
                     }
-
                     TerminateCurrentSubscriberRequest();
 
                     //Add the valid channels to the channels subscribe list for tracking
@@ -544,6 +553,7 @@ namespace PubnubApi.EndPoint
                     }
 
                     RequestState<T> state = new RequestState<T>();
+                    
                     if (ChannelRequest.ContainsKey(PubnubInstance.InstanceId))
                     {
                         if (channelGroupSubscribeOnly)
@@ -632,6 +642,7 @@ namespace PubnubApi.EndPoint
             RequestState<T> pubnubRequestState = null;
             try
             {
+                bool channelGroupSubscribeOnly = false;
                 this.customQueryParam = externalQueryParam;
                 RegisterPresenceHeartbeatTimer<T>(channels, channelGroups);
 
@@ -677,6 +688,23 @@ namespace PubnubApi.EndPoint
                 pubnubRequestState.Timetoken = Convert.ToInt64(timetoken.ToString(), CultureInfo.InvariantCulture);
                 pubnubRequestState.Region = region;
                 pubnubRequestState.TimeQueued = DateTime.Now;
+                
+                if (channelGroups != null && channelGroups.Length > 0 && (channels == null || channels.Length == 0))
+                {
+                    channelGroupSubscribeOnly = true;
+                }
+                
+                if (ChannelRequest.ContainsKey(PubnubInstance.InstanceId))
+                {
+                    if (channelGroupSubscribeOnly)
+                    {
+                        ChannelRequest[PubnubInstance.InstanceId].AddOrUpdate(",", pubnubRequestState.Request, (key, oldValue) => pubnubRequestState.Request);
+                    }
+                    else
+                    {
+                        ChannelRequest[PubnubInstance.InstanceId].AddOrUpdate(string.Join(",", channels.OrderBy(x => x).ToArray()), pubnubRequestState.Request, (key, oldValue) => pubnubRequestState.Request);
+                    }
+                }
 
                 // Wait for message
                 string json = "";

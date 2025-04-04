@@ -1070,7 +1070,6 @@ namespace PubnubApi
 
                 if (PubnubInstance == null)
                 {
-                    System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "DateTime {0}, PubnubInstance is null. Exiting UrlProcessRequest", DateTime.Now.ToString(CultureInfo.InvariantCulture)));
                     return new Tuple<string, PNStatus>("", null);
                 }
 
@@ -1249,7 +1248,6 @@ namespace PubnubApi
 
                 if (PubnubInstance == null)
                 {
-                    System.Diagnostics.Debug.WriteLine(string.Format(CultureInfo.InvariantCulture, "DateTime {0}, PubnubInstance is null. Exiting UrlProcessRequest", DateTime.Now.ToString(CultureInfo.InvariantCulture)));
                     return new Tuple<byte[], PNStatus>(null, null);
                 }
 
@@ -1924,8 +1922,12 @@ namespace PubnubApi
                 try
                 {
                     request.Abort();
+                    LoggingMethod.WriteToLog(null,$"request aborted", PNLogVerbosity.BODY);
                 }
-                catch { /* ignore */ }
+                catch
+                {
+                    LoggingMethod.WriteToLog(null,$"request abort failed", PNLogVerbosity.BODY);
+                }
             }
         }
 

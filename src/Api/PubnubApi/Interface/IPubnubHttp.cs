@@ -22,6 +22,10 @@ namespace PubnubApi
         Task<string> SendRequestAndGetJsonResponseWithPATCH<T>(Uri requestUri, RequestState<T> pubnubRequestState, HttpWebRequest request, byte[] patchData, string contentType);
 
         Task<byte[]> SendRequestAndGetStreamResponse<T>(Uri requestUri, RequestState<T> pubnubRequestState, HttpWebRequest request);
+
+        void CancelOngoinSubscribe();
+        
+        bool IsCurrentSubscribeRequestCancelled();
     }
 
 }

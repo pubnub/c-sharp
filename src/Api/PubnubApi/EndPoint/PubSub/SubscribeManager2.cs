@@ -177,7 +177,7 @@ namespace PubnubApi.EndPoint
                 {
                     return new Tuple<ReceivingResponse<object>, PNStatus>(null, responseTuple.Item2);
                 }
-                return new Tuple<ReceivingResponse<object>, PNStatus>(null, new PNStatus(new Exception("ReceiveRequest failed."), PNOperationType.PNSubscribeOperation, PNStatusCategory.PNUnknownCategory, channels, channelGroups));
+                return new Tuple<ReceivingResponse<object>, PNStatus>(null, null);
             }
             catch(Exception ex)
             {
@@ -188,6 +188,7 @@ namespace PubnubApi.EndPoint
 
         internal void ReceiveRequestCancellation()
         {
+            pubnubHttp.CancelOngoinSubscribe();
             if (httpSubscribe != null)
             {
                 try
@@ -196,7 +197,7 @@ namespace PubnubApi.EndPoint
                     httpSubscribe.CancelPendingRequests();
                     #else
                     httpSubscribe.Abort();
-                    #endif   
+                    #endif
                     httpSubscribe = null;
                     LoggingMethod.WriteToLog(pubnubLog, string.Format(CultureInfo.InvariantCulture, "DateTime {0} SubscribeManager => ReceiveRequestCancellation. Done.", DateTime.Now.ToString(CultureInfo.InvariantCulture)), config.LogVerbosity);
                 }
@@ -213,6 +214,7 @@ namespace PubnubApi.EndPoint
 
         internal void ReceiveReconnectRequestCancellation()
         {
+            pubnubHttp.CancelOngoinSubscribe();
             if (httpSubscribe != null)
             {
                 try
@@ -491,8 +493,18 @@ namespace PubnubApi.EndPoint
         private PNStatus GetStatusIfError<T>(RequestState<T> asyncRequestState, string jsonString)
         {
             PNStatus status = null;
+            if (string.IsNullOrEmpty(jsonString) && asyncRequestState.ResponseType == PNOperationType.PNSubscribeOperation)
+            {
+                if (asyncRequestState.Timeout == false)
+                {
+                    return status;
+                }
+                else
+                {
+                    return new PNStatus(new Exception("network issue"), PNOperationType.PNSubscribeOperation,PNStatusCategory.PNNetworkIssuesCategory, asyncRequestState.Channels, asyncRequestState.ChannelGroups);
+                }
+            }
             if (string.IsNullOrEmpty(jsonString)) { return status;  }
-
             PNConfiguration currentConfig;
             PNOperationType type = PNOperationType.None;
             if (asyncRequestState != null)
