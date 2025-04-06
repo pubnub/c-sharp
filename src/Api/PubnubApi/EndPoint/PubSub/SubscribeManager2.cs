@@ -33,7 +33,6 @@ namespace PubnubApi.EndPoint
 			if (config.MaintainPresenceState) presenceState = BuildJsonUserState(channels, channelGroups, true);
 			var requestParameter = CreateSubscribeRequestParameter(channels: channels, channelGroups: channelGroups, timetoken: timetoken.GetValueOrDefault(), region: region.GetValueOrDefault(), stateJsonValue: presenceState, initialSubscribeUrlParams: initialSubscribeUrlParams, externalQueryParam: externalQueryParam);
 			var transportRequest = pubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNSubscribeOperation);
-			cancellationTokenSource = transportRequest.CancellationTokenSource;
 			RequestState<HandshakeResponse> pubnubRequestState = new RequestState<HandshakeResponse>
 			{
 				Channels = channels,
@@ -44,7 +43,6 @@ namespace PubnubApi.EndPoint
 				TimeQueued = DateTime.Now
 			};
 			var transportResponse = await pubnubInstance.transportMiddleware.Send(transportRequest: transportRequest);
-
 			if (transportResponse.StatusCode == Constants.HttpRequestSuccessStatusCode && transportResponse.Error == null && transportResponse.Content != null) {
 				var responseJson = Encoding.UTF8.GetString(transportResponse.Content);
 				logger?.Debug($"Handshake Effect received json: {responseJson}");
@@ -52,7 +50,6 @@ namespace PubnubApi.EndPoint
 				HandshakeResponse handshakeResponse = jsonLibrary.DeserializeToObject<HandshakeResponse>(responseJson);
 				return new Tuple<HandshakeResponse, PNStatus>(handshakeResponse, status);
 			}
-
 			PNStatus errStatus;
 			if (transportResponse.Error != null) {
 				PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(transportResponse.Error);
@@ -89,7 +86,8 @@ namespace PubnubApi.EndPoint
 				string channelsJsonState = BuildJsonUserState(channels, channelGroups, false);
 				var requestParameter = CreateSubscribeRequestParameter(channels: channels, channelGroups: channelGroups, timetoken: timetoken.GetValueOrDefault(), region: region.GetValueOrDefault(), stateJsonValue: channelsJsonState, initialSubscribeUrlParams: initialSubscribeUrlParams, externalQueryParam: externalQueryParam);
 				var transportRequest = pubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNSubscribeOperation);
-				cancellationTokenSource = transportRequest.CancellationTokenSource;
+				if (timetoken > 0)
+					cancellationTokenSource = transportRequest.CancellationTokenSource;
 				RequestState<ReceivingResponse<object>> pubnubRequestState = new RequestState<ReceivingResponse<object>>
 					{
 						Channels = channels,
@@ -108,6 +106,7 @@ namespace PubnubApi.EndPoint
 					ReceivingResponse<object> receiveResponse = jsonLibrary.DeserializeToObject<ReceivingResponse<object>>(responseJson);
 					return new Tuple<ReceivingResponse<object>, PNStatus>(receiveResponse, status);
 				}
+				if (transportResponse.IsCancelled) return resp;
 				PNStatus errStatus;
 				if (transportResponse.Error != null) {
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(transportResponse.Error);
@@ -132,13 +131,14 @@ namespace PubnubApi.EndPoint
 				if (cancellationTokenSource != null) {
 					cancellationTokenSource.Cancel();
 					cancellationTokenSource.Dispose();
+					cancellationTokenSource = null;
 				} else {
-					logger?.Trace($"SubscribeManager RequestCancellation. No request to cancel.");
+					logger?.Trace($"ReceiveRequestCancellation: No active request found to cancel.");
 				}
-				logger?.Trace($"SubscribeManager ReceiveRequestCancellation. Done.");
+				logger?.Trace($"ReceiveRequestCancellation: Active request found and cancelled.");
 			} catch (Exception ex)
 			{
-				logger?.Trace($"SubscribeManager ReceiveRequestCancellation Exception: {ex}");
+				logger?.Trace($"ReceiveRequestCancellation Exception: {ex}");
 			}
 		}
 
@@ -148,6 +148,7 @@ namespace PubnubApi.EndPoint
 				if (cancellationTokenSource != null) {
 					cancellationTokenSource.Cancel();
 					cancellationTokenSource.Dispose();
+					cancellationTokenSource = null;
 				} else {
 					logger?.Trace($"SubscribeManager  ReceiveReconnectRequestCancellation. No request to cancel.");
 				}
