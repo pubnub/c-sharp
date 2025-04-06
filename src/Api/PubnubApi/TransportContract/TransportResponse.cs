@@ -10,5 +10,9 @@ namespace PubnubApi
 		public Dictionary<string, IEnumerable<string>> Headers { get; set; }
 		public string RequestUrl { get; set; }
 		public Exception Error { get; set; }
+		
+		public bool IsTimeOut {get; set;}
+
+		public bool IsCancelled { get; set; }
 	}
 }
