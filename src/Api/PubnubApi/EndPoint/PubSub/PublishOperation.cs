@@ -204,8 +204,8 @@ namespace PubnubApi.EndPoint
 
             PubnubInstance.transportMiddleware.Send(transportRequest).ContinueWith(t =>
             {
-                var transportResponse = t.Result;
-                if (transportResponse.Error == null)
+                var transportResponse = t?.Result;
+                if (transportResponse is { Error: null })
                 {
                     var responseString = Encoding.UTF8.GetString(transportResponse.Content);
                     if (!string.IsNullOrEmpty(responseString))
@@ -304,7 +304,7 @@ namespace PubnubApi.EndPoint
             var transportResponse =
                 await PubnubInstance.transportMiddleware.Send(transportRequest).ConfigureAwait(false);
             logger?.Debug($"Publish() got transport response: {transportResponse?.StatusCode}\n error: {transportResponse?.Error?.Message}\nstackTrace: {transportResponse?.Error?.StackTrace}");
-            if (transportResponse.Error == null)
+            if (transportResponse is { Error: null, Content: not null })
             {
                 string responseString = Encoding.UTF8.GetString(transportResponse.Content);
                 PNStatus errorStatus = GetStatusIfError<PNPublishResult>(requestState, responseString);
