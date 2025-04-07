@@ -398,12 +398,12 @@ namespace PubnubApi
             if (ctsWithTimeout is { Token.IsCancellationRequested: true } &&
                 !transportRequest.CancellationTokenSource.IsCancellationRequested)
             {
-                logger?.Debug("\n\n\n\n  TASK TIMEOUT NETWORK ERROR \n\n\n\n\n");
+                logger?.Debug("HttpClient Service: Task canceled due to timeout");
                 transportResponse.IsTimeOut = true;
             }
             else
             {
-                logger?.Debug("\n\n\n\n  TASK CANCELLED \n\n\n\n\n");
+                logger?.Debug("HttpClient Service: Task canceled due to cancellation request");
                 transportResponse.IsCancelled = true;
             }
             return transportResponse;
