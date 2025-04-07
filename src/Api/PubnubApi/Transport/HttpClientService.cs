@@ -248,7 +248,6 @@ namespace PubnubApi
             CancellationTokenSource ctsWithTimeout = null;
             try
             {
-                if (transportRequest.Timeout.HasValue) httpClient.Timeout = (TimeSpan)transportRequest.Timeout;
                 HttpRequestMessage requestMessage =
                     new HttpRequestMessage(method: HttpMethod.Delete, requestUri: transportRequest.RequestUrl);
                 if (transportRequest.Headers.Keys.Count > 0)
