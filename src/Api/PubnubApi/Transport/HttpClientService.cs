@@ -154,6 +154,11 @@ namespace PubnubApi
                     Error = e
                 };
             }
+            finally
+            {
+                ctsWithTimeout?.Dispose();
+                transportRequest.CancellationTokenSource?.Dispose();
+            }
 
             return transportResponse;
         }
@@ -228,6 +233,11 @@ namespace PubnubApi
                     Error = e
                 };
             }
+            finally
+            {
+                ctsWithTimeout?.Dispose();
+                transportRequest.CancellationTokenSource?.Dispose();
+            }
 
             return transportResponse;
         }
@@ -286,6 +296,11 @@ namespace PubnubApi
                     RequestUrl = transportRequest.RequestUrl,
                     Error = e
                 };
+            }
+            finally
+            {
+                ctsWithTimeout?.Dispose();
+                transportRequest.CancellationTokenSource?.Dispose();
             }
 
             return transportResponse;
@@ -361,6 +376,11 @@ namespace PubnubApi
                     RequestUrl = transportRequest.RequestUrl,
                     Error = e
                 };
+            }
+            finally
+            {
+                ctsWithTimeout?.Dispose();
+                transportRequest.CancellationTokenSource?.Dispose();
             }
 
             return transportResponse;
