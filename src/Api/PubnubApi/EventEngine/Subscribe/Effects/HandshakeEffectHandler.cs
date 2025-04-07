@@ -27,7 +27,7 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
 
         public override async Task Run(HandshakeInvocation invocation)
         {
-            var response = await MakeHandshakeRequest(invocation);
+            var response = await MakeHandshakeRequest(invocation).ConfigureAwait(false);
             SubscriptionCursor cursor = null;
             if (response.Item1 != null)
             {
@@ -89,7 +89,7 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
                 null,
                 invocation.InitialSubscribeQueryParams,
                 invocation.ExternalQueryParams
-            );
+            ).ConfigureAwait(false);
         }
 
         public override async Task Cancel()
@@ -133,9 +133,9 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
                 else
                 {
                     retryDelay = new Delay(retryConfiguration.RetryPolicy.GetDelay(invocation.AttemptedRetries, invocation.Reason, null));
-                    await retryDelay.Start();
+                    await retryDelay.Start().ConfigureAwait(false);
                     if (!retryDelay.Cancelled)
-                        await handshakeEffectHandler.Run(invocation as HandshakeInvocation);
+                        await handshakeEffectHandler.Run(invocation as HandshakeInvocation).ConfigureAwait(false);
                 }
             }
             catch (Exception ex)
@@ -152,7 +152,7 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
             {
                 retryDelay.Cancel();
             }
-            await handshakeEffectHandler.Cancel();
+            await handshakeEffectHandler.Cancel().ConfigureAwait(false);
         }
     }
 }

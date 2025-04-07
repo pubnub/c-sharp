@@ -24,7 +24,7 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
 
         public override async Task Run(ReceiveMessagesInvocation invocation)
         {
-            var response = await MakeReceiveMessagesRequest(invocation);
+            var response = await MakeReceiveMessagesRequest(invocation).ConfigureAwait(false);
             SubscriptionCursor cursor = null;
             if (response.Item1 is not null) {
                 cursor = new SubscriptionCursor() {
@@ -68,7 +68,7 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
                 invocation.Cursor.Region.Value,
                 invocation.InitialSubscribeQueryParams,
                 invocation.ExternalQueryParams
-            );
+            ).ConfigureAwait(false);
         }
 
         public override async Task Cancel()
@@ -108,8 +108,8 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
             {
                 retryDelay = new Delay(retryConfiguration.RetryPolicy.GetDelay(invocation.AttemptedRetries, invocation.Reason, null));
                 // Run in the background
-                await retryDelay.Start();
-                await receivingEffectHandler.Run(invocation);
+                await retryDelay.Start().ConfigureAwait(false);
+                await receivingEffectHandler.Run(invocation).ConfigureAwait(false);
             }
         }
         
@@ -124,7 +124,7 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
             {
                 retryDelay.Cancel();
             }
-            await receivingEffectHandler.Cancel();
+            await receivingEffectHandler.Cancel().ConfigureAwait(false);
         }
     }
 }

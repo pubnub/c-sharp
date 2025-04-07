@@ -25,7 +25,7 @@ namespace PubnubApi.EventEngine.Presence.Effects
 			var resp = await heartbeatOperation.HeartbeatRequest<string>(
 				invocation.Input.Channels.ToArray(),
 				invocation.Input.ChannelGroups.ToArray()
-			);
+			).ConfigureAwait(false);
 			switch (resp) {
 				case { } when resp.Error:
 					eventQueue.Enqueue(new Events.HeartbeatFailureEvent() { retryCount = 0, Status = resp });

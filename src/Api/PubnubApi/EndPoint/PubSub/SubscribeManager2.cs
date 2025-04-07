@@ -42,7 +42,7 @@ namespace PubnubApi.EndPoint
 				Region = region.GetValueOrDefault(),
 				TimeQueued = DateTime.Now
 			};
-			var transportResponse = await pubnubInstance.transportMiddleware.Send(transportRequest: transportRequest);
+			var transportResponse = await pubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ConfigureAwait(false);
 			if (transportResponse.StatusCode == Constants.HttpRequestSuccessStatusCode && transportResponse.Error == null && transportResponse.Content != null) {
 				var responseJson = Encoding.UTF8.GetString(transportResponse.Content);
 				logger?.Debug($"Handshake Effect received json: {responseJson}");
@@ -98,7 +98,7 @@ namespace PubnubApi.EndPoint
 						TimeQueued = DateTime.Now
 					};
 
-				var transportResponse = await pubnubInstance.transportMiddleware.Send(transportRequest: transportRequest);
+				var transportResponse = await pubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ConfigureAwait(false);
 				if (transportResponse.Content != null && transportResponse.Error == null && transportResponse.StatusCode == Constants.HttpRequestSuccessStatusCode) {
 					var responseJson = Encoding.UTF8.GetString(transportResponse.Content);
 					logger?.Debug($"Receiving Effect received json: {responseJson}");

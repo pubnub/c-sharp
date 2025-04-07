@@ -426,7 +426,7 @@ namespace PubnubApi.EndPoint
                         publishFailed = true;
                         returnValue.Status = publishFileMessageStatus;
                         logger?.Debug($"PublishFileMessage Failed. retry count={currentFileRetryCount}");
-                        await Task.Delay(1000);
+                        await Task.Delay(1000).ConfigureAwait(false);
                     }
                 } while (publishFailed && currentFileRetryCount <= publishFileRetryLimit &&
                          !(publishFileMessageStatus?.StatusCode != 400 || publishFileMessageStatus.StatusCode != 403));

@@ -34,9 +34,9 @@ namespace PubnubApi.EventEngine.Presence.Effects
 				return;
 			}
 			retryDelay = new Delay(retryConfiguration.RetryPolicy.GetDelay(invocation.RetryCount, invocation.Reason, null));
-			await retryDelay.Start();
+			await retryDelay.Start().ConfigureAwait(false);
 			if (!retryDelay.Cancelled)
-				await MakeHeartbeatRequest(invocation);
+				await MakeHeartbeatRequest(invocation).ConfigureAwait(false);
 		}
 
 		private void EnqueueHeartbeatGiveUpEvent()
@@ -49,7 +49,7 @@ namespace PubnubApi.EventEngine.Presence.Effects
 			var resp = await heartbeatOperation.HeartbeatRequest<string>(
 				invocation.Input.Channels.ToArray(),
 				invocation.Input.ChannelGroups.ToArray()
-			);
+			).ConfigureAwait(false);
 			switch (resp) {
 				case { } when resp.Error:
 					eventQueue.Enqueue(new Events.HeartbeatFailureEvent() { retryCount = invocation.RetryCount + 1, Status = resp });
