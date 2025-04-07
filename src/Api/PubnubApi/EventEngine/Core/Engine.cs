@@ -66,7 +66,7 @@ namespace PubnubApi.EventEngine.Core {
 				return;
 			}
 
-			await ExecuteStateChange(currentState, stateInvocationPair.State, stateInvocationPair.Invocations);
+			await ExecuteStateChange(currentState, stateInvocationPair.State, stateInvocationPair.Invocations).ConfigureAwait(false);
 
 			this.currentState = stateInvocationPair.State;
 		}
@@ -78,16 +78,16 @@ namespace PubnubApi.EventEngine.Core {
 			logger?.Debug($"Exiting state {sourceState}");
 			foreach (var effectInvocation in sourceState.OnExit ?? emptyInvocationList) {
 				logger?.Debug($"Dispatching effect: {effectInvocation}");
-				await dispatcher.Dispatch(effectInvocation);
+				await dispatcher.Dispatch(effectInvocation).ConfigureAwait(false);
 			}
 			foreach (var effectInvocation in invocations ?? emptyInvocationList) {
 				logger?.Debug($"Dispatching effect: {effectInvocation}");
-				await dispatcher.Dispatch(effectInvocation);
+				await dispatcher.Dispatch(effectInvocation).ConfigureAwait(false);
 			}
 			logger?.Debug($"Entering state {targetState}");
 			foreach (var effectInvocation in targetState.OnEntry ?? emptyInvocationList) {
 				logger?.Debug($"Dispatching effect: {effectInvocation}");
-				await dispatcher.Dispatch(effectInvocation);
+				await dispatcher.Dispatch(effectInvocation).ConfigureAwait(false);
 			}
 		}
 	}

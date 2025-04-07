@@ -255,7 +255,7 @@ namespace PubnubApi
         {
             Origin = "ps.pndsn.com";
             presenceHeartbeatTimeout = 300;
-            NonSubscribeRequestTimeout = 10;
+            NonSubscribeRequestTimeout = 15;
             SubscribeTimeout = 310;
             LogVerbosity = PNLogVerbosity.NONE;
             CipherKey = "";

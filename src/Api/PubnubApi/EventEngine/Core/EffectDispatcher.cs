@@ -28,7 +28,7 @@ namespace PubnubApi.EventEngine.Core {
 				if (handler.IsBackground(invocation))
 					FireAndForget(handler, invocation);
 				else
-					await handler.Run(invocation);
+					await handler.Run(invocation).ConfigureAwait(false);
 			}
 		}
 

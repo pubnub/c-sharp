@@ -25,7 +25,7 @@ namespace PubnubApi.EventEngine.Presence.Effects
 					await leaveOperation.LeaveRequest<string>(
 						invocation.Input.Channels?.ToArray(),
 						invocation.Input.ChannelGroups?.ToArray()
-					);
+					).ConfigureAwait(false);
 			} catch (Exception) { }
 		}
 

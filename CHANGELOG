@@ -1,3 +1,7 @@
+v7.3.7 - April 07 2025
+-----------------------------
+- Modified: enhance request handling with detailed response interface.
+
 v7.3.6 - April 03 2025
 -----------------------------
 - Fixed: reafctor: Removed excess logging from transport module. Removed redundant logging from transport layer and added thread id information for tracking http request.

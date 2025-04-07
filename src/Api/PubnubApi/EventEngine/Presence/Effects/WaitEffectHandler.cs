@@ -32,7 +32,7 @@ namespace PubnubApi.EventEngine.Presence.Effects
 		public override async Task Run(WaitInvocation invocation)
 		{
 			retryDelay = new Delay((int)(pnConfiguration.PresenceInterval * 1000));
-			await retryDelay.Start();
+			await retryDelay.Start().ConfigureAwait(false);
 			if (!retryDelay.Cancelled)
 				eventQueue.Enqueue(new Events.TimesUpEvent());
 		}

@@ -33,6 +33,7 @@ namespace PubnubApi
         public async Task<TransportResponse> GetRequest(TransportRequest transportRequest)
         {
             TransportResponse transportResponse;
+            CancellationTokenSource ctsWithTimeout = null;
             try
             {
                 HttpRequestMessage requestMessage =
@@ -44,10 +45,20 @@ namespace PubnubApi
                         requestMessage.Headers.Add(kvp.Key, kvp.Value);
                     }
                 }
-                logger?.Debug($"HttpClient Service: Task Id: {Task.CurrentId} Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl}" + 
-                              (requestMessage.Headers.Any() ? $"\n  Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}" : ""));
+                logger?.Debug(
+                    $"HttpClient Service: Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl}" +
+                    (requestMessage.Headers.Any()
+                        ? $"\n  Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}"
+                        : ""));
+                if (transportRequest.Timeout.HasValue)
+                {
+                    ctsWithTimeout =
+                        CancellationTokenSource.CreateLinkedTokenSource(transportRequest.CancellationTokenSource.Token);
+                    ctsWithTimeout.CancelAfter(transportRequest.Timeout.Value);
+                }
+
                 var httpResult = await httpClient.SendAsync(request: requestMessage,
-                    cancellationToken: transportRequest.CancellationTokenSource.Token).ConfigureAwait(false);
+                    cancellationToken:ctsWithTimeout?.Token??transportRequest.CancellationTokenSource.Token).ConfigureAwait(false);
                 var responseContent = await httpResult.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
                 transportResponse = new TransportResponse()
                 {
@@ -56,25 +67,27 @@ namespace PubnubApi
                     Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
                     RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath
                 };
-                logger?.Debug($"HttpClient Service: Task Id: {Task.CurrentId} Received http response from server with status code {httpResult.StatusCode}, content-length: {transportResponse.Content.Length} bytes, for url \n{transportRequest.RequestUrl}");
+                logger?.Debug(
+                    $"HttpClient Service: Received http response from server with status code {httpResult.StatusCode}, content-length: {transportResponse.Content.Length} bytes, for url \n{transportRequest.RequestUrl}");
             }
             catch (TaskCanceledException taskCanceledException)
             {
-                logger?.Error($"HttpClient Service: Task Id: {Task.CurrentId} Request is cancelled for url {transportRequest.RequestUrl}");
-                transportResponse = new TransportResponse()
-                {
-                    RequestUrl = transportRequest.RequestUrl,
-                    Error = taskCanceledException
-                };
+                transportResponse = GetTransportResponseForTaskCancelation(transportRequest, taskCanceledException, ctsWithTimeout);
             }
             catch (Exception e)
             {
-                logger?.Error($"HttpClient Service: Task Id: {Task.CurrentId} Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}");
+                logger?.Error(
+                    $"HttpClient Service: Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}");
                 transportResponse = new TransportResponse()
                 {
                     RequestUrl = transportRequest.RequestUrl,
                     Error = e
                 };
+            }
+            finally
+            {
+                ctsWithTimeout?.Dispose();
+                transportRequest.CancellationTokenSource?.Dispose();
             }
 
             return transportResponse;
@@ -83,6 +96,7 @@ namespace PubnubApi
         public async Task<TransportResponse> PostRequest(TransportRequest transportRequest)
         {
             TransportResponse transportResponse;
+            CancellationTokenSource ctsWithTimeout = null;
             try
             {
                 HttpContent postData = null;
@@ -102,9 +116,19 @@ namespace PubnubApi
                 HttpRequestMessage requestMessage =
                     new HttpRequestMessage(method: HttpMethod.Post, requestUri: transportRequest.RequestUrl)
                         { Content = postData };
-                logger?.Debug($"HttpClient Service:Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl}" + (requestMessage.Headers.Any() ? $"\n  Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}" : ""));
+                logger?.Debug(
+                    $"HttpClient Service:Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl}" +
+                    (requestMessage.Headers.Any()
+                        ? $"\n  Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}"
+                        : ""));
+                if (transportRequest.Timeout.HasValue)
+                {
+                    ctsWithTimeout =
+                        CancellationTokenSource.CreateLinkedTokenSource(transportRequest.CancellationTokenSource.Token);
+                    ctsWithTimeout.CancelAfter(transportRequest.Timeout.Value);
+                }
                 var httpResult = await httpClient.SendAsync(request: requestMessage,
-                    cancellationToken: transportRequest.CancellationTokenSource.Token).ConfigureAwait(false);
+                    cancellationToken: ctsWithTimeout?.Token??transportRequest.CancellationTokenSource.Token).ConfigureAwait(false);
                 var responseContent = await httpResult.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
                 transportResponse = new TransportResponse()
                 {
@@ -113,21 +137,27 @@ namespace PubnubApi
                     Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
                     RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath
                 };
-                logger?.Debug($"Received http response from server with status code {httpResult.StatusCode}, content-length: {transportResponse.Content.Length} bytes, for url {transportRequest.RequestUrl}");
+                logger?.Debug(
+                    $"Received http response from server with status code {httpResult.StatusCode}, content-length: {transportResponse.Content.Length} bytes, for url {transportRequest.RequestUrl}");
             }
-            catch (TaskCanceledException)
+            catch (TaskCanceledException taskCanceledException)
             {
-                logger?.Error($"Request is cancelled for url {transportRequest.RequestUrl}");
-                transportResponse = null;
+                transportResponse = GetTransportResponseForTaskCancelation(transportRequest, taskCanceledException, ctsWithTimeout);
             }
             catch (Exception e)
             {
-                logger?.Error($"Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}");
+                logger?.Error(
+                    $"Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}");
                 transportResponse = new TransportResponse()
                 {
                     RequestUrl = transportRequest.RequestUrl,
                     Error = e
                 };
+            }
+            finally
+            {
+                ctsWithTimeout?.Dispose();
+                transportRequest.CancellationTokenSource?.Dispose();
             }
 
             return transportResponse;
@@ -136,6 +166,7 @@ namespace PubnubApi
         public async Task<TransportResponse> PutRequest(TransportRequest transportRequest)
         {
             TransportResponse transportResponse;
+            CancellationTokenSource ctsWithTimeout = null;
             try
             {
                 HttpContent putData = null;
@@ -163,9 +194,20 @@ namespace PubnubApi
                         requestMessage.Headers.Add(kvp.Key, kvp.Value);
                     }
                 }
-                logger?.Debug($"HttpClient Service:Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl}" + (requestMessage.Headers.Any() ? $"\n  Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}" : ""));
+
+                logger?.Debug(
+                    $"HttpClient Service:Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl}" +
+                    (requestMessage.Headers.Any()
+                        ? $"\n  Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}"
+                        : ""));
+                if (transportRequest.Timeout.HasValue)
+                {
+                    ctsWithTimeout =
+                        CancellationTokenSource.CreateLinkedTokenSource(transportRequest.CancellationTokenSource.Token);
+                    ctsWithTimeout.CancelAfter(transportRequest.Timeout.Value);
+                }
                 var httpResult = await httpClient.SendAsync(request: requestMessage,
-                    cancellationToken: transportRequest.CancellationTokenSource.Token).ConfigureAwait(false);
+                    cancellationToken: ctsWithTimeout?.Token??transportRequest.CancellationTokenSource.Token).ConfigureAwait(false);
                 var responseContent = await httpResult.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
                 transportResponse = new TransportResponse()
                 {
@@ -174,21 +216,27 @@ namespace PubnubApi
                     Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
                     RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath
                 };
-                logger?.Debug($"Received http response from server with status code {httpResult.StatusCode}, content-length: {transportResponse.Content.Length} bytes, for url {transportRequest.RequestUrl}");
+                logger?.Debug(
+                    $"Received http response from server with status code {httpResult.StatusCode}, content-length: {transportResponse.Content.Length} bytes, for url {transportRequest.RequestUrl}");
             }
-            catch (TaskCanceledException)
+            catch (TaskCanceledException taskCanceledException)
             {
-                logger?.Error($"Request is cancelled for url {transportRequest.RequestUrl}");
-                transportResponse = null;
+                transportResponse = GetTransportResponseForTaskCancelation(transportRequest, taskCanceledException, ctsWithTimeout);
             }
             catch (Exception e)
             {
-                logger?.Error($"Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}");
+                logger?.Error(
+                    $"Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}");
                 transportResponse = new TransportResponse()
                 {
                     RequestUrl = transportRequest.RequestUrl,
                     Error = e
                 };
+            }
+            finally
+            {
+                ctsWithTimeout?.Dispose();
+                transportRequest.CancellationTokenSource?.Dispose();
             }
 
             return transportResponse;
@@ -197,9 +245,9 @@ namespace PubnubApi
         public async Task<TransportResponse> DeleteRequest(TransportRequest transportRequest)
         {
             TransportResponse transportResponse;
+            CancellationTokenSource ctsWithTimeout = null;
             try
             {
-                if (transportRequest.Timeout.HasValue) httpClient.Timeout = (TimeSpan)transportRequest.Timeout;
                 HttpRequestMessage requestMessage =
                     new HttpRequestMessage(method: HttpMethod.Delete, requestUri: transportRequest.RequestUrl);
                 if (transportRequest.Headers.Keys.Count > 0)
@@ -209,9 +257,20 @@ namespace PubnubApi
                         requestMessage.Headers.Add(kvp.Key, kvp.Value);
                     }
                 }
-                logger?.Debug($"HttpClient Service:Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl}" + (requestMessage.Headers.Any() ? $"\n  Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}" : ""));
+
+                logger?.Debug(
+                    $"HttpClient Service:Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl}" +
+                    (requestMessage.Headers.Any()
+                        ? $"\n  Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}"
+                        : ""));
+                if (transportRequest.Timeout.HasValue)
+                {
+                    ctsWithTimeout =
+                        CancellationTokenSource.CreateLinkedTokenSource(transportRequest.CancellationTokenSource.Token);
+                    ctsWithTimeout.CancelAfter(transportRequest.Timeout.Value);
+                }
                 var httpResult = await httpClient.SendAsync(request: requestMessage,
-                    cancellationToken: transportRequest.CancellationTokenSource.Token).ConfigureAwait(false);
+                    cancellationToken: ctsWithTimeout?.Token??transportRequest.CancellationTokenSource.Token).ConfigureAwait(false);
                 var responseContent = await httpResult.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
                 transportResponse = new TransportResponse()
                 {
@@ -220,21 +279,27 @@ namespace PubnubApi
                     Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
                     RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath
                 };
-                logger?.Debug($"Received http response from server with status code {httpResult.StatusCode}, content-length: {transportResponse.Content.Length} bytes, for url {transportRequest.RequestUrl}");
+                logger?.Debug(
+                    $"Received http response from server with status code {httpResult.StatusCode}, content-length: {transportResponse.Content.Length} bytes, for url {transportRequest.RequestUrl}");
             }
-            catch (TaskCanceledException)
+            catch (TaskCanceledException taskCanceledException)
             {
-                logger?.Error($"Request is cancelled for url {transportRequest.RequestUrl}");
-                transportResponse = null;
+                transportResponse = GetTransportResponseForTaskCancelation(transportRequest, taskCanceledException, ctsWithTimeout);
             }
             catch (Exception e)
             {
-                logger?.Error($"Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}");
+                logger?.Error(
+                    $"Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}");
                 transportResponse = new TransportResponse()
                 {
                     RequestUrl = transportRequest.RequestUrl,
                     Error = e
                 };
+            }
+            finally
+            {
+                ctsWithTimeout?.Dispose();
+                transportRequest.CancellationTokenSource?.Dispose();
             }
 
             return transportResponse;
@@ -243,6 +308,7 @@ namespace PubnubApi
         public async Task<TransportResponse> PatchRequest(TransportRequest transportRequest)
         {
             TransportResponse transportResponse;
+            CancellationTokenSource ctsWithTimeout = null;
             try
             {
                 HttpContent patchData = null;
@@ -271,9 +337,20 @@ namespace PubnubApi
                         requestMessage.Headers.Add(kvp.Key, $"\"{kvp.Value}\"");
                     }
                 }
-                logger?.Debug($"HttpClient Service:Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl}" + (requestMessage.Headers.Any() ? $"\n  Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}" : ""));
+
+                logger?.Debug(
+                    $"HttpClient Service:Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl}" +
+                    (requestMessage.Headers.Any()
+                        ? $"\n  Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}"
+                        : ""));
+                if (transportRequest.Timeout.HasValue)
+                {
+                    ctsWithTimeout =
+                        CancellationTokenSource.CreateLinkedTokenSource(transportRequest.CancellationTokenSource.Token);
+                    ctsWithTimeout.CancelAfter(transportRequest.Timeout.Value);
+                }
                 var httpResult = await httpClient.SendAsync(request: requestMessage,
-                    cancellationToken: transportRequest.CancellationTokenSource.Token).ConfigureAwait(false);
+                    cancellationToken: ctsWithTimeout?.Token??transportRequest.CancellationTokenSource.Token).ConfigureAwait(false);
                 var responseContent = await httpResult.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
                 transportResponse = new TransportResponse()
                 {
@@ -282,21 +359,52 @@ namespace PubnubApi
                     Headers = httpResult.Headers.ToDictionary(h => h.Key, h => h.Value),
                     RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath
                 };
-                logger?.Debug($"Received http response from server with status code {httpResult.StatusCode}, content-length: {transportResponse.Content.Length} bytes, for url {transportRequest.RequestUrl}");
+                logger?.Debug(
+                    $"Received http response from server with status code {httpResult.StatusCode}, content-length: {transportResponse.Content.Length} bytes, for url {transportRequest.RequestUrl}");
             }
-            catch (TaskCanceledException)
+            catch (TaskCanceledException taskCanceledException)
             {
-                logger?.Error($"Request is cancelled for url {transportRequest.RequestUrl}");
-                transportResponse = null;
+                transportResponse = GetTransportResponseForTaskCancelation(transportRequest, taskCanceledException, ctsWithTimeout);
             }
             catch (Exception e)
             {
-                logger?.Error($"Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}");
+                logger?.Error(
+                    $"Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}");
                 transportResponse = new TransportResponse()
                 {
                     RequestUrl = transportRequest.RequestUrl,
                     Error = e
                 };
+            }
+            finally
+            {
+                ctsWithTimeout?.Dispose();
+                transportRequest.CancellationTokenSource?.Dispose();
+            }
+
+            return transportResponse;
+        }
+        private TransportResponse GetTransportResponseForTaskCancelation(TransportRequest transportRequest,
+            TaskCanceledException taskCanceledException, CancellationTokenSource ctsWithTimeout)
+        {
+            TransportResponse transportResponse;
+            
+            logger?.Error($"HttpClient Service: TaskCanceledException for url {transportRequest.RequestUrl}");
+            transportResponse = new TransportResponse()
+            {
+                RequestUrl = transportRequest.RequestUrl,
+                Error = taskCanceledException,
+            };
+            if (ctsWithTimeout is { Token.IsCancellationRequested: true } &&
+                !transportRequest.CancellationTokenSource.IsCancellationRequested)
+            {
+                logger?.Debug("\n\n\n\n  TASK TIMEOUT NETWORK ERROR \n\n\n\n\n");
+                transportResponse.IsTimeOut = true;
+            }
+            else
+            {
+                logger?.Debug("\n\n\n\n  TASK CANCELLED \n\n\n\n\n");
+                transportResponse.IsCancelled = true;
             }
             return transportResponse;
         }

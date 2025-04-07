@@ -92,7 +92,6 @@ namespace PubnubApi
 			var urlString = $"{(configuration.Secure ? "https://" : "http://")}{configuration.Origin}{pathString}?{UriUtil.BuildQueryString(requestParameter.Query)}";
 
 			var cts = new CancellationTokenSource();
-			cts.CancelAfter(operationType == PNOperationType.PNSubscribeOperation ? configuration.SubscribeTimeout * 1000 : configuration.NonSubscribeRequestTimeout* 1000);
 			var transportRequest = new TransportRequest()
 			{
 				RequestType = requestParameter.RequestType,
@@ -100,8 +99,9 @@ namespace PubnubApi
 				BodyContentString = requestParameter.BodyContentString,
 				FormData = requestParameter.FormData,
 				CancellationTokenSource = cts,
+				Timeout = operationType == PNOperationType.PNSubscribeOperation ? TimeSpan.FromSeconds(configuration.SubscribeTimeout) : TimeSpan.FromSeconds(configuration.NonSubscribeRequestTimeout)
 			};
-			if(requestParameter.Headers.Count>0) transportRequest.Headers = requestParameter.Headers;
+			if (requestParameter.Headers.Count > 0) transportRequest.Headers = requestParameter.Headers;
 			return transportRequest;
 		}
 
