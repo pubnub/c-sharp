@@ -19,8 +19,8 @@ namespace PubnubApi
             this.Error = e != null;
             this.Operation = operationType;
             this.ErrorData = new PNErrorData(e?.Message, e);
-            this.AffectedChannels = affectedChannels?.Where(c => !c.EndsWith("-pnpres")).ToList(); 
-            this.AffectedChannelGroups = affectedChannelGroups?.Where(g => !g.EndsWith("-pnpres")).ToList();
+            this.AffectedChannels = affectedChannels?.ToList(); 
+            this.AffectedChannelGroups = affectedChannelGroups?.ToList();
             this.Category = category;
             this.StatusCode = statusCode ?? 200;
             if (!Error)
