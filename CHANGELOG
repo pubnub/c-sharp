@@ -1,3 +1,7 @@
+v7.3.8 - April 08 2025
+-----------------------------
+- Modified: subscribe with custom timetoken scenario handling improvements.
+
 v7.3.7 - April 07 2025
 -----------------------------
 - Modified: enhance request handling with detailed response interface.
