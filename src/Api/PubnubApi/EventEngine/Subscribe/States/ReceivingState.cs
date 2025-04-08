@@ -42,7 +42,8 @@ namespace PubnubApi.EventEngine.Subscribe.States
                     Channels = subscriptionRestored.Channels,
                     ChannelGroups = subscriptionRestored.ChannelGroups,
                     Cursor = subscriptionRestored.Cursor,
-                },
+                }.With(
+                    new EmitStatusInvocation(new PNStatus(null,PNOperationType.PNSubscribeOperation, PNStatusCategory.PNSubscriptionChangedCategory, subscriptionRestored.Channels?? new string[]{}, subscriptionRestored.ChannelGroups?? new string[]{}, Constants.HttpRequestSuccessStatusCode))),
 
                 Events.DisconnectEvent disconnect => new ReceiveStoppedState()
                 {
