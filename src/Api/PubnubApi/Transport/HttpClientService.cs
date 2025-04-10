@@ -11,12 +11,10 @@ namespace PubnubApi
     public class HttpClientService : IHttpClientService
     {
         private readonly HttpClient httpClient;
-        private readonly PubnubLogModule logger;
+        private PubnubLogModule logger;
 
-        public HttpClientService(IWebProxy proxy, PNConfiguration configuration)
+        public HttpClientService(IWebProxy proxy)
         {
-            logger = configuration.Logger;
-
             var handler = new HttpClientHandler
             {
                 MaxConnectionsPerServer = 50,
@@ -28,6 +26,11 @@ namespace PubnubApi
             {
                 Timeout = Timeout.InfiniteTimeSpan
             };
+        }
+
+        public void SetLogger(PubnubLogModule logger)
+        {
+            this.logger = logger;
         }
 
         public async Task<TransportResponse> GetRequest(TransportRequest transportRequest)

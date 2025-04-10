@@ -9,5 +9,6 @@ namespace PubnubApi
 		Task<TransportResponse> PostRequest(TransportRequest transportRequest);
 		Task<TransportResponse> PatchRequest(TransportRequest transportRequest);
 		Task<TransportResponse> PutRequest(TransportRequest transportRequest);
+		void SetLogger(PubnubLogModule logger);
 	}
 }
