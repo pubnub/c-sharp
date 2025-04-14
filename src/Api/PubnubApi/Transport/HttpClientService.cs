@@ -15,17 +15,17 @@ namespace PubnubApi
 
         public HttpClientService(IWebProxy proxy)
         {
-            var handler = new HttpClientHandler
-            {
-                MaxConnectionsPerServer = 50,
-                UseProxy = proxy != null,
-                Proxy = proxy
-            };
-
-            httpClient = new HttpClient(handler)
+            httpClient = new HttpClient()
             {
                 Timeout = Timeout.InfiniteTimeSpan
             };
+            if (proxy == null) return;
+            httpClient = new HttpClient(new HttpClientHandler()
+            {
+                Proxy = proxy,
+                UseProxy = true
+            });
+            httpClient.Timeout = Timeout.InfiniteTimeSpan;
         }
 
         public void SetLogger(PubnubLogModule logger)
