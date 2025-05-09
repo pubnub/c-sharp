@@ -2152,13 +2152,13 @@ namespace PubNubMessaging.Tests
 
             string channel = "hello_my_channel";
             
-            // Create a large message
-            StringBuilder largeMessageBuilder = new StringBuilder();
+            // Create a large message using string concatenation instead of StringBuilder
+            string loremIpsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. ";
+            string message = "";
             for (int i = 0; i < 1000; i++)
             {
-                largeMessageBuilder.Append("Lorem ipsum dolor sit amet, consectetur adipiscing elit. ");
+                message += loremIpsum;
             }
-            string message = largeMessageBuilder.ToString();
 
             PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {

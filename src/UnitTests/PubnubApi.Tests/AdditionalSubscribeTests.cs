@@ -405,7 +405,6 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(HttpStatusCode.OK);
 
-            request.Callback = () => { requestContainsQueryParams = true; };
             server.AddRequest(request);
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
@@ -617,7 +616,6 @@ namespace PubNubMessaging.Tests
                     .WithResponse(expected)
                     .WithStatusCode(HttpStatusCode.OK);
 
-            secondRequest.Callback = () => { timeTokenReset = true; };
             server.AddRequest(secondRequest);
 
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
