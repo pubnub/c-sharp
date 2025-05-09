@@ -120,7 +120,7 @@ namespace PubnubApi.EndPoint
 			} catch (Exception ex)
 			{
 				logger?.Error(
-					$" Receiving effect exception for \n channel(s)={string.Join(",", channels.OrderBy(x => x).ToArray())} \n cg(s)={string.Join(",", channelGroups.OrderBy(x => x).ToArray())} \n Exception Details={ex}");
+					$" Receiving effect exception for \n channel(s)={string.Join(",", channels.OrderBy(x => x).ToArray())} \n cg(s)={string.Join(",", channelGroups.OrderBy(x => x).ToArray())} \n Exception Details={ex} \n Stack trace={ex.StackTrace}");
 			}
 			return resp;
 		}

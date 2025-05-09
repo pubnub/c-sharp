@@ -93,7 +93,7 @@ namespace PubnubApi
             }
         }
 
-        public PubnubLogModule Logger { get; set; }
+        public PubnubLogModule Logger { get; internal set; }
 
         public string AuthKey
         {
