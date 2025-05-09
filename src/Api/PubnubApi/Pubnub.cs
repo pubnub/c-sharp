@@ -1227,7 +1227,8 @@ namespace PubnubApi
             //Defaulting to DotNet PNSDK source if no custom one is specified
             Version = (ipnsdkSource == default) ? new DotNetPNSDKSource().GetPNSDK() : ipnsdkSource.GetPNSDK();
             IHttpClientService httpClientService =
-                httpTransportService ?? new HttpClientService(proxy: config.Proxy, configuration: config);
+                httpTransportService ?? new HttpClientService(proxy: config.Proxy);
+            httpClientService.SetLogger(logger);
             transportMiddleware = middleware ?? new Middleware(httpClientService, config, this, tokenManager);
             logger?.Debug(GetConfigurationLogString(config));
         }
