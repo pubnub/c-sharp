@@ -1887,5 +1887,547 @@ namespace PubNubMessaging.Tests
 
             Assert.IsTrue(payload != null, "FAILED - IfMobilePayloadThenPublishReturnSuccess");
         }
+
+        [Test]
+        public static void ThenPublishWithTtlShouldReturnSuccessCodeAndInfo()
+        {
+            server.ClearRequests();
+
+            bool receivedPublishMessage = false;
+            long publishTimetoken = 0;
+
+            string channel = "hello_my_channel";
+            string message = messageForUnencryptPublish;
+
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Secure = false,
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authToken) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authToken;
+            }
+            server.RunOnHttps(true);
+            pubnub = createPubNubInstance(config, authToken);
+
+            string expected = "[1,\"Sent\",\"14722484585147754\"]";
+
+            // The request should include a ttl parameter
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/{3}", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel, "%22Pubnub%20Messaging%20API%201%22"))
+                    .WithParameter("ttl", "24")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("uuid", config.UserId)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            manualResetEventWaitTimeout = 310 * 1000;
+
+            ManualResetEvent publishManualEvent = new ManualResetEvent(false);
+            pubnub.Publish().Channel(channel).Message(message).Ttl(24)
+                    .Execute(new PNPublishResultExt((r, s) =>
+                    {
+                        if (r != null && s.StatusCode == 200 && !s.Error)
+                        {
+                            publishTimetoken = r.Timetoken;
+                            receivedPublishMessage = true;
+                        }
+                        publishManualEvent.Set();
+                    }));
+            publishManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+            Assert.IsTrue(receivedPublishMessage, "Publish with TTL Failed");
+        }
+
+        [Test]
+        public static void ThenPublishWithShouldStoreFalseShouldReturnSuccessCodeAndInfo()
+        {
+            server.ClearRequests();
+
+            bool receivedPublishMessage = false;
+            long publishTimetoken = 0;
+
+            string channel = "hello_my_channel";
+            string message = messageForUnencryptPublish;
+
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Secure = false,
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authToken) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authToken;
+            }
+            server.RunOnHttps(true);
+            pubnub = createPubNubInstance(config, authToken);
+
+            string expected = "[1,\"Sent\",\"14722484585147754\"]";
+
+            // The request should include a store parameter with value 0
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/{3}", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel, "%22Pubnub%20Messaging%20API%201%22"))
+                    .WithParameter("store", "0")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("uuid", config.UserId)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            manualResetEventWaitTimeout = 310 * 1000;
+
+            ManualResetEvent publishManualEvent = new ManualResetEvent(false);
+            pubnub.Publish().Channel(channel).Message(message).ShouldStore(false)
+                    .Execute(new PNPublishResultExt((r, s) =>
+                    {
+                        if (r != null && s.StatusCode == 200 && !s.Error)
+                        {
+                            publishTimetoken = r.Timetoken;
+                            receivedPublishMessage = true;
+                        }
+                        publishManualEvent.Set();
+                    }));
+            publishManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+            Assert.IsTrue(receivedPublishMessage, "Publish with ShouldStore false Failed");
+        }
+
+        [Test]
+        public static void ThenPublishWithMetaShouldReturnSuccessCodeAndInfo()
+        {
+            server.ClearRequests();
+
+            bool receivedPublishMessage = false;
+            long publishTimetoken = 0;
+
+            string channel = "hello_my_channel";
+            string message = messageForUnencryptPublish;
+            Dictionary<string, object> metaData = new Dictionary<string, object>
+            {
+                { "sender", "unit-test" },
+                { "timestamp", 12345 }
+            };
+
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Secure = false,
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authToken) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authToken;
+            }
+            server.RunOnHttps(true);
+            pubnub = createPubNubInstance(config, authToken);
+
+            string expected = "[1,\"Sent\",\"14722484585147754\"]";
+
+            // The request should include a meta parameter
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/{3}", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel, "%22Pubnub%20Messaging%20API%201%22"))
+                    .WithParameter("meta", "%7B%22sender%22%3A%22unit-test%22%2C%22timestamp%22%3A12345%7D")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("uuid", config.UserId)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            manualResetEventWaitTimeout = 310 * 1000;
+
+            ManualResetEvent publishManualEvent = new ManualResetEvent(false);
+            pubnub.Publish().Channel(channel).Message(message).Meta(metaData)
+                    .Execute(new PNPublishResultExt((r, s) =>
+                    {
+                        if (r != null && s.StatusCode == 200 && !s.Error)
+                        {
+                            publishTimetoken = r.Timetoken;
+                            receivedPublishMessage = true;
+                        }
+                        publishManualEvent.Set();
+                    }));
+            publishManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+            Assert.IsTrue(receivedPublishMessage, "Publish with Meta Failed");
+        }
+
+        [Test]
+        public static void ThenPublishWithCustomMessageTypeShouldReturnSuccessCodeAndInfo()
+        {
+            server.ClearRequests();
+
+            bool receivedPublishMessage = false;
+            long publishTimetoken = 0;
+
+            string channel = "hello_my_channel";
+            string message = messageForUnencryptPublish;
+            string customType = "custom-type";
+
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Secure = false,
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authToken) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authToken;
+            }
+            server.RunOnHttps(true);
+            pubnub = createPubNubInstance(config, authToken);
+
+            string expected = "[1,\"Sent\",\"14722484585147754\"]";
+
+            // The request should include a custom_message_type parameter
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/{3}", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel, "%22Pubnub%20Messaging%20API%201%22"))
+                    .WithParameter("custom_message_type", customType)
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("uuid", config.UserId)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            manualResetEventWaitTimeout = 310 * 1000;
+
+            ManualResetEvent publishManualEvent = new ManualResetEvent(false);
+            pubnub.Publish().Channel(channel).Message(message).CustomMessageType(customType)
+                    .Execute(new PNPublishResultExt((r, s) =>
+                    {
+                        if (r != null && s.StatusCode == 200 && !s.Error)
+                        {
+                            publishTimetoken = r.Timetoken;
+                            receivedPublishMessage = true;
+                        }
+                        publishManualEvent.Set();
+                    }));
+            publishManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+            Assert.IsTrue(receivedPublishMessage, "Publish with CustomMessageType Failed");
+        }
+
+        [Test]
+        public static void ThenPublishWithAllOptionsShouldReturnSuccessCodeAndInfo()
+        {
+            server.ClearRequests();
+
+            bool receivedPublishMessage = false;
+            long publishTimetoken = 0;
+
+            string channel = "hello_my_channel";
+            string message = messageForUnencryptPublish;
+            string customType = "notification";
+            Dictionary<string, object> metaData = new Dictionary<string, object>
+            {
+                { "sender", "unit-test" },
+                { "priority", "high" }
+            };
+
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Secure = false,
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authToken) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authToken;
+            }
+            server.RunOnHttps(true);
+            pubnub = createPubNubInstance(config, authToken);
+
+            string expected = "[1,\"Sent\",\"14722484585147754\"]";
+
+            // The request should include all parameters
+            server.AddRequest(new Request()
+                    .WithMethod("POST")
+                    .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel))
+                    .WithParameter("store", "0")
+                    .WithParameter("ttl", "10")
+                    .WithParameter("meta", "%7B%22sender%22%3A%22unit-test%22%2C%22priority%22%3A%22high%22%7D")
+                    .WithParameter("custom_message_type", customType)
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("uuid", config.UserId)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            manualResetEventWaitTimeout = 310 * 1000;
+
+            ManualResetEvent publishManualEvent = new ManualResetEvent(false);
+            pubnub.Publish().Channel(channel).Message(message)
+                    .ShouldStore(false)
+                    .Ttl(10)
+                    .Meta(metaData)
+                    .CustomMessageType(customType)
+                    .UsePOST(true)
+                    .Execute(new PNPublishResultExt((r, s) =>
+                    {
+                        if (r != null && s.StatusCode == 200 && !s.Error)
+                        {
+                            publishTimetoken = r.Timetoken;
+                            receivedPublishMessage = true;
+                        }
+                        publishManualEvent.Set();
+                    }));
+            publishManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+            Assert.IsTrue(receivedPublishMessage, "Publish with all options Failed");
+        }
+
+        [Test]
+        public static void ThenPublishWithCustomQueryParamsShouldReturnSuccessCodeAndInfo()
+        {
+            server.ClearRequests();
+
+            bool receivedPublishMessage = false;
+            long publishTimetoken = 0;
+
+            string channel = "hello_my_channel";
+            string message = messageForUnencryptPublish;
+            Dictionary<string, object> queryParams = new Dictionary<string, object>
+            {
+                { "custom_param", "custom_value" },
+                { "numeric_param", 42 }
+            };
+
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Secure = false,
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authToken) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authToken;
+            }
+            server.RunOnHttps(true);
+            pubnub = createPubNubInstance(config, authToken);
+
+            string expected = "[1,\"Sent\",\"14722484585147754\"]";
+
+            // The request should include the custom query parameters
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/{3}", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel, "%22Pubnub%20Messaging%20API%201%22"))
+                    .WithParameter("custom_param", "custom_value")
+                    .WithParameter("numeric_param", "42")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("uuid", config.UserId)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+            manualResetEventWaitTimeout = 310 * 1000;
+
+            ManualResetEvent publishManualEvent = new ManualResetEvent(false);
+            pubnub.Publish().Channel(channel).Message(message).QueryParam(queryParams)
+                    .Execute(new PNPublishResultExt((r, s) =>
+                    {
+                        if (r != null && s.StatusCode == 200 && !s.Error)
+                        {
+                            publishTimetoken = r.Timetoken;
+                            receivedPublishMessage = true;
+                        }
+                        publishManualEvent.Set();
+                    }));
+            publishManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+            Assert.IsTrue(receivedPublishMessage, "Publish with custom query parameters Failed");
+        }
+
+        [Test]
+#if NET40
+        public static void ThenExecuteAsyncWithAllParametersShouldReturnSuccessCodeAndInfo()
+#else
+        public static async Task ThenExecuteAsyncWithAllParametersShouldReturnSuccessCodeAndInfo()
+#endif
+        {
+            server.ClearRequests();
+
+            string channel = "hello_my_channel";
+            string message = messageForUnencryptPublish;
+            string customType = "notification";
+            Dictionary<string, object> metaData = new Dictionary<string, object>
+            {
+                { "sender", "unit-test" },
+                { "priority", "high" }
+            };
+            Dictionary<string, object> queryParams = new Dictionary<string, object>
+            {
+                { "custom_param", "custom_value" }
+            };
+
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Secure = false,
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authToken) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authToken;
+            }
+            server.RunOnHttps(true);
+            pubnub = createPubNubInstance(config, authToken);
+
+            string expected = "[1,\"Sent\",\"14722484585147754\"]";
+
+            // The request should include all parameters
+            server.AddRequest(new Request()
+                    .WithMethod("POST")
+                    .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel))
+                    .WithParameter("store", "0")
+                    .WithParameter("ttl", "10")
+                    .WithParameter("meta", "%7B%22sender%22%3A%22unit-test%22%2C%22priority%22%3A%22high%22%7D")
+                    .WithParameter("custom_message_type", customType)
+                    .WithParameter("custom_param", "custom_value")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("uuid", config.UserId)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+
+#if NET40
+            PNResult<PNPublishResult> result = Task.Factory.StartNew(async () => await pubnub.Publish().Channel(channel).Message(message)
+                .ShouldStore(false)
+                .Ttl(10)
+                .Meta(metaData)
+                .CustomMessageType(customType)
+                .QueryParam(queryParams)
+                .UsePOST(true)
+                .ExecuteAsync()).Result.Result;
+#else
+            PNResult<PNPublishResult> result = await pubnub.Publish().Channel(channel).Message(message)
+                .ShouldStore(false)
+                .Ttl(10)
+                .Meta(metaData)
+                .CustomMessageType(customType)
+                .QueryParam(queryParams)
+                .UsePOST(true)
+                .ExecuteAsync();
+#endif
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+
+            Assert.IsNotNull(result, "Result should not be null");
+            Assert.IsNotNull(result.Result, "Result.Result should not be null");
+            Assert.AreEqual(200, result.Status.StatusCode, "StatusCode should be 200");
+            Assert.IsFalse(result.Status.Error, "Error should be false");
+        }
+
+        [Test]
+        public static void ThenEmptyChannelNameShouldThrowException()
+        {
+            server.ClearRequests();
+
+            string channel = "";
+            string message = messageForUnencryptPublish;
+
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+            };
+            server.RunOnHttps(true);
+            pubnub = createPubNubInstance(config, authToken);
+
+            Assert.Throws<ArgumentException>(() =>
+            {
+                pubnub.Publish()
+                      .Channel(channel)
+                      .Message(message)
+                      .Execute(new PNPublishResultExt((r, s) => { }));
+            });
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
+
+        [Test]
+        public static void ThenNullCallbackShouldThrowException()
+        {
+            server.ClearRequests();
+
+            string channel = "hello_my_channel";
+            string message = messageForUnencryptPublish;
+
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+            };
+            server.RunOnHttps(true);
+            pubnub = createPubNubInstance(config, authToken);
+
+            Assert.Throws<ArgumentException>(() =>
+            {
+                pubnub.Publish()
+                      .Channel(channel)
+                      .Message(message)
+                      .Execute(null);
+            });
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
     }
 }
