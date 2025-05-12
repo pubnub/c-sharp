@@ -132,16 +132,31 @@ namespace PubNubMessaging.Tests
             #region "CreateSpace"
 
             System.Diagnostics.Debug.WriteLine("pubnub.CreateSpace() STARTED");
-            pubnub.SetChannelMetadata().Channel(channelMetadataId).Name("pandu-ut-spname")
+            string initialName = "pandu-ut-spname";
+            string initialDescription = "Initial description";
+            Dictionary<string, object> initialCustomData = new Dictionary<string, object>() { { "type", "test" } };
+            
+            pubnub.SetChannelMetadata()
+                .Channel(channelMetadataId)
+                .Name(initialName)
+                .Description(initialDescription)
+                .Custom(initialCustomData)
                 .Execute(new PNSetChannelMetadataResultExt((r, s) =>
                 {
                     if (r != null && s.StatusCode == 200 && !s.Error)
                     {
-                        pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
-                        if (channelMetadataId == r.Channel)
-                        {
-                            receivedMessage = true;
-                        }
+                        string jsonString = pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
+                        Debug.WriteLine($"CreateSpace Response: {jsonString}");
+                        
+                        // Validate all fields in the response
+                        Assert.AreEqual(channelMetadataId, r.Channel, "Channel ID mismatch");
+                        Assert.AreEqual(initialName, r.Name, "Channel name mismatch");
+                        Assert.AreEqual(initialDescription, r.Description, "Description mismatch");
+                        Assert.IsNotNull(r.Custom, "Custom data should not be null");
+                        Assert.AreEqual("test", r.Custom["type"], "Custom data type value mismatch");
+                        Assert.IsNotNull(r.Updated, "Updated timestamp should not be null");
+                        
+                        receivedMessage = true;
                     }
 
                     manualEvent.Set();
@@ -159,18 +174,31 @@ namespace PubNubMessaging.Tests
                 #region "SetChannelMetadata"
 
                 System.Diagnostics.Debug.WriteLine("pubnub.SetChannelMetadata() STARTED");
-                pubnub.SetChannelMetadata().Channel(channelMetadataId).Name("pandu-ut-spname-upd")
-                    .Description("pandu-ut-spdesc")
-                    .Custom(new Dictionary<string, object>() { { "color", "red" } })
+                Dictionary<string, object> customData = new Dictionary<string, object>() { { "color", "red" } };
+                string expectedName = "pandu-ut-spname-upd";
+                string expectedDescription = "pandu-ut-spdesc";
+                
+                pubnub.SetChannelMetadata()
+                    .Channel(channelMetadataId)
+                    .Name(expectedName)
+                    .Description(expectedDescription)
+                    .Custom(customData)
                     .Execute(new PNSetChannelMetadataResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
-                            pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
-                            if (channelMetadataId == r.Channel)
-                            {
-                                receivedMessage = true;
-                            }
+                            string jsonString = pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
+                            Debug.WriteLine($"SetChannelMetadata Response: {jsonString}");
+                            
+                            // Validate all fields in the response
+                            Assert.AreEqual(channelMetadataId, r.Channel, "Channel ID mismatch");
+                            Assert.AreEqual(expectedName, r.Name, "Channel name mismatch");
+                            Assert.AreEqual(expectedDescription, r.Description, "Description mismatch");
+                            Assert.IsNotNull(r.Custom, "Custom data should not be null");
+                            Assert.AreEqual("red", r.Custom["color"], "Custom data color value mismatch");
+                            Assert.IsNotNull(r.Updated, "Updated timestamp should not be null");
+                            
+                            receivedMessage = true;
                         }
 
                         manualEvent.Set();
@@ -194,11 +222,18 @@ namespace PubNubMessaging.Tests
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
-                            pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
-                            if (channelMetadataId == r.Channel)
-                            {
-                                receivedMessage = true;
-                            }
+                            string jsonString = pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
+                            Debug.WriteLine($"GetChannelMetadata Response: {jsonString}");
+                            
+                            // Validate all fields in the response
+                            Assert.AreEqual(channelMetadataId, r.Channel, "Channel ID mismatch");
+                            Assert.AreEqual("pandu-ut-spname-upd", r.Name, "Channel name mismatch");
+                            Assert.AreEqual("pandu-ut-spdesc", r.Description, "Description mismatch");
+                            Assert.IsNotNull(r.Custom, "Custom data should not be null");
+                            Assert.AreEqual("red", r.Custom["color"], "Custom data color value mismatch");
+                            Assert.IsNotNull(r.Updated, "Updated timestamp should not be null");
+                            
+                            receivedMessage = true;
                         }
 
                         manualEvent.Set();
@@ -222,13 +257,56 @@ namespace PubNubMessaging.Tests
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
-                            pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
-                            List<PNChannelMetadataResult> spaceList = r.Channels;
-                            if (spaceList != null && spaceList.Count > 0 &&
-                                spaceList.Find(x => x.Channel == channelMetadataId) != null)
-                            {
-                                receivedMessage = true;
-                            }
+                            string jsonString = pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
+                            Debug.WriteLine($"GetAllChannelMetadata Response: {jsonString}");
+                            
+                            // Validate all fields in the response
+                            Assert.IsNotNull(r.Channels, "Channels list should not be null");
+                            Assert.Greater(r.Channels.Count, 0, "Channels list should not be empty");
+                            
+                            PNChannelMetadataResult channelMetadata = r.Channels.Find(x => x.Channel == channelMetadataId);
+                            Assert.IsNotNull(channelMetadata, "Channel metadata not found in list");
+                            
+                            // Validate the found channel metadata
+                            Assert.AreEqual(channelMetadataId, channelMetadata.Channel, "Channel ID mismatch");
+                            Assert.AreEqual("pandu-ut-spname-upd", channelMetadata.Name, "Channel name mismatch");
+                            Assert.AreEqual("pandu-ut-spdesc", channelMetadata.Description, "Description mismatch");
+                            Assert.IsNotNull(channelMetadata.Custom, "Custom data should not be null");
+                            Assert.AreEqual("red", channelMetadata.Custom["color"], "Custom data color value mismatch");
+                            Assert.IsNotNull(channelMetadata.Updated, "Updated timestamp should not be null");
+                            
+                            // Validate pagination data
+                            Assert.Greater(r.TotalCount, 0, "Total count should be greater than 0");
+                            
+                            receivedMessage = true;
+                        }
+
+                        manualEvent.Set();
+                    }));
+
+                #endregion
+
+                manualEvent.WaitOne(manualResetEventWaitTimeout);
+            }
+
+            if (receivedMessage)
+            {
+                receivedMessage = false;
+                manualEvent = new ManualResetEvent(false);
+
+                #region "RemoveChannelMetadata"
+
+                System.Diagnostics.Debug.WriteLine("pubnub.RemoveChannelMetadata() STARTED");
+                pubnub.RemoveChannelMetadata().Channel(channelMetadataId)
+                    .Execute(new PNRemoveChannelMetadataResultExt((r, s) =>
+                    {
+                        if (r != null && s.StatusCode == 200 && !s.Error)
+                        {
+                            string jsonString = pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
+                            Debug.WriteLine($"RemoveChannelMetadata Response: {jsonString}");
+                            
+                            // No properties to validate as the response is empty
+                            receivedMessage = true;
                         }
 
                         manualEvent.Set();
@@ -241,7 +319,7 @@ namespace PubNubMessaging.Tests
 
             if (!receivedMessage)
             {
-                Assert.IsTrue(receivedMessage, $"SetChannelMetadata/DeleteChannelMetadataId Failed.");
+                Assert.IsTrue(receivedMessage, $"ChannelMetadata CRUD operations failed.");
             }
 
             pubnub.Destroy();
