@@ -141,6 +141,7 @@ namespace PubNubMessaging.Tests
                 .Name(initialName)
                 .Description(initialDescription)
                 .Custom(initialCustomData)
+                .IncludeCustom(true)
                 .Execute(new PNSetChannelMetadataResultExt((r, s) =>
                 {
                     if (r != null && s.StatusCode == 200 && !s.Error)
@@ -183,6 +184,7 @@ namespace PubNubMessaging.Tests
                     .Name(expectedName)
                     .Description(expectedDescription)
                     .Custom(customData)
+                    .IncludeCustom(true)
                     .Execute(new PNSetChannelMetadataResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
@@ -252,7 +254,7 @@ namespace PubNubMessaging.Tests
                 #region "GetAllChannelMetadata"
 
                 System.Diagnostics.Debug.WriteLine("pubnub.GetAllChannelMetadata() STARTED");
-                pubnub.GetAllChannelMetadata().IncludeCount(true)
+                pubnub.GetAllChannelMetadata().IncludeCount(true).IncludeCustom(true)
                     .Execute(new PNGetAllChannelMetadataResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
