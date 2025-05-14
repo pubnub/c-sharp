@@ -863,7 +863,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public static void ThenRemoveUuidMetadataShouldRemoveAllFields()
+        public static async Task ThenRemoveUuidMetadataShouldRemoveAllFields()
         {
             server.ClearRequests();
 
@@ -894,8 +894,6 @@ namespace PubNubMessaging.Tests
             }
 
             ManualResetEvent manualEvent = new ManualResetEvent(false);
-
-            Debug.WriteLine(0);
             
             // First create with all fields
             pubnub.SetUuidMetadata()
@@ -908,7 +906,6 @@ namespace PubNubMessaging.Tests
                 .IncludeCustom(true)
                 .Execute(new PNSetUuidMetadataResultExt((r, s) =>
                 {
-                    Debug.WriteLine(1);
                     if (r != null && s.StatusCode == 200 && !s.Error)
                     {
                         pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
@@ -921,7 +918,8 @@ namespace PubNubMessaging.Tests
                 }));
 
             manualEvent.WaitOne(manualResetEventWaitTimeout);
-
+            await Task.Delay(2000);
+            
             if (receivedMessage)
             {
                 receivedMessage = false;
@@ -932,7 +930,6 @@ namespace PubNubMessaging.Tests
                     .Uuid(uuidMetadataId)
                     .Execute(new PNRemoveUuidMetadataResultExt((r, s) =>
                     {
-                        Debug.WriteLine(2);
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
                             receivedMessage = true;
@@ -942,6 +939,7 @@ namespace PubNubMessaging.Tests
             }
 
             manualEvent.WaitOne(manualResetEventWaitTimeout);
+            await Task.Delay(2000);
 
             if (receivedMessage)
             {
