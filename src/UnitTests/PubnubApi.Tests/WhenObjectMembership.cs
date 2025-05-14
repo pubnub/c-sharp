@@ -715,15 +715,15 @@ namespace PubNubMessaging.Tests
                     })
                     .Execute(new PNMembershipsResultExt((r, s) =>
                     {
-                        if (r != null && s.StatusCode == 200 && !s.Error)
-                        {
-                            pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
-                            if (r.Memberships != null
-                            && r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null
+                        Assert.IsNotNull(r, "Set memberships result was null");
+                        Assert.AreEqual(s.StatusCode, 200, $"Set memberships status was not 200, status: " +
+                                                           $"\n{pubnub.JsonPluggableLibrary.SerializeToJsonString(s)}");
+                        Assert.False(s.Error, "Set memberships status reported an error, status: " +
+                                              $"\n{pubnub.JsonPluggableLibrary.SerializeToJsonString(s)}");
+                        if (r.Memberships?.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null
                             && r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId2) != null)
-                            {
-                                receivedMessage = true;
-                            }
+                        {
+                            receivedMessage = true;
                         }
                         manualEvent.Set();
                     }));
@@ -748,9 +748,8 @@ namespace PubNubMessaging.Tests
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
                             pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
-                            if (r.Memberships != null
-                            && r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null
-                            && r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId2) != null)
+                            if (r.Memberships?.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null
+                                && r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId2) != null)
                             {
                                 receivedMessage = true;
                             }
@@ -797,8 +796,7 @@ namespace PubNubMessaging.Tests
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
                             pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
-                            if (r.Memberships != null
-                            && r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null)
+                            if (r.Memberships?.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null)
                             {
                                 receivedMessage = true;
                             }

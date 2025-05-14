@@ -133,6 +133,62 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = null;
             pubnub = null;
         }
+        
+        [Test]
+        public static async Task ThenUnsubsribeShouldSucceed()
+        {
+            var channel = "test_unsubscribe_channel";
+            PNConfiguration pubnubConfiguration = new PNConfiguration(new UserId("mytestuuid"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                EnableEventEngine = false
+            };
+            pubnub = createPubNubInstance(pubnubConfiguration, authToken);
+            
+            var receiveReset = new ManualResetEvent(false);
+            var subscribedListener = new SubscribeCallbackExt(
+                (_, messageEvent) =>
+                {
+                    receiveReset.Set();
+                }
+                , (_, _) => {}
+                , (_, status) => {}
+            );
+            pubnub.AddListener(subscribedListener);
+            
+            pubnub.Subscribe<object>().Channels(new []{channel}).WithPresence().Execute();
+            await Task.Delay(3000);
+
+            await pubnub.Publish().Channel(channel).Message("some_message").ExecuteAsync();
+            
+            manualResetEventWaitTimeout = 310 * 1000;
+            var received = receiveReset.WaitOne(manualResetEventWaitTimeout);
+            
+            Assert.True(received, "Didn't receive message when subscribed");
+            
+            var shouldNotReceiveReset = new ManualResetEvent(false);
+            var unsubscribedListener = new SubscribeCallbackExt(
+                (_, messageEvent) =>
+                {
+                    shouldNotReceiveReset.Set();
+                }
+                , (_, _) => {}
+                , (_, status) => {}
+            );
+            pubnub.AddListener(unsubscribedListener);
+            pubnub.Unsubscribe<object>().Channels(new []{channel}).Execute();
+            await Task.Delay(3000);
+            
+            await pubnub.Publish().Channel(channel).Message("some_message").ExecuteAsync();
+            received = shouldNotReceiveReset.WaitOne(5000);
+            
+            Assert.False(received, "Received message even after unsubscribing");
+
+            pubnub.UnsubscribeAll<object>();
+            pubnub.Destroy();
+        }
 
         [Test]
         public static void ThenComplexMessageSubscribeShouldReturnReceivedMessage()

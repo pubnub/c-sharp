@@ -1,8 +1,10 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
 using System.Threading;
 using PubnubApi;
 using MockServer;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PubNubMessaging.Tests
@@ -98,7 +100,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public static void ThenDeleteMessageShouldReturnSuccessMessage()
+        public static async Task ThenDeleteMessageShouldDeleteAndReturnSuccessMessage()
         {
             server.ClearRequests();
 
@@ -117,8 +119,20 @@ namespace PubNubMessaging.Tests
             }
             pubnub = createPubNubInstance(config);
             pubnub.SetAuthToken(authToken);
+            
+            pubnub.Subscribe<string>().Channels(new []{channel}).WithPresence().Execute();
+            await Task.Delay(2000);
 
-            string expected = "{\"status\": 200, \"error\": false, \"error_message\": \"\"}";
+            var randomisedMessage = Guid.NewGuid().ToString();
+            await pubnub.Publish().Message(randomisedMessage).Channel(channel).ExecuteAsync();
+            await Task.Delay(4000);
+            
+            var history = await pubnub.FetchHistory().Channels(new[] { channel }).ExecuteAsync();
+            
+            Assert.True(history.Result.Messages.Any(x => x.Value.Any(y => y.Entry.ToString() == randomisedMessage))
+                , "Message was not present in history after sending");
+
+            var expected = "{\"status\": 200, \"error\": false, \"error_message\": \"\"}";
 
             server.AddRequest(new Request()
                     .WithMethod("DELETE")
@@ -145,11 +159,20 @@ namespace PubNubMessaging.Tests
             }));
             deleteMessageManualEvent.WaitOne(manualResetEventWaitTimeout);
 
+            Assert.IsTrue(receivedMessage, "ThenDeleteMessageShouldReturnSuccessMessage - DeleteMessages Result not expected");
+            
+            await Task.Delay(3000);
+            history = await pubnub.FetchHistory().Channels(new[] { channel }).ExecuteAsync();
+            
+            Assert.True(history.Result?.Messages == null
+                         || !history.Result.Messages.Any(x => x.Value.Any(y => y.Entry.ToString() == randomisedMessage))
+                , "Message was present in history even after deletion");
+            
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
 
-            Assert.IsTrue(receivedMessage, "ThenDeleteMessageShouldReturnSuccessMessage - DeleteMessages Result not expected");
+            
         }
 
         [Test]

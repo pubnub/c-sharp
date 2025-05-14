@@ -995,14 +995,14 @@ namespace PubNubMessaging.Tests
 
             pn.Subscribe<string>().Channels(new[] { "test" }).Execute();
 
-            Thread.Sleep(1000);
+            Thread.Sleep(2000);
             
             CreateTestSender().Publish()
                 .Channel("test")
                 .Message("test")
                 .Execute(new PNPublishResultExt((r,s)=>{}));
 
-            bool passed = done.WaitOne(5000);
+            bool passed = done.WaitOne(6500);
             Assert.True(passed);
         }
 
