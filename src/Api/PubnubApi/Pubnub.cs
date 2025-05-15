@@ -21,7 +21,7 @@ namespace PubnubApi
         private ConcurrentDictionary<string, PNConfiguration> pubnubConfig { get; } =
             new ConcurrentDictionary<string, PNConfiguration>();
 
-        private IPubnubUnitTest pubnubUnitTest; 
+        private IPubnubUnitTest pubnubUnitTest;
         private IPubnubLog pubnubLog;
         private ListenerManager listenerManager;
         private readonly TokenManager tokenManager;
@@ -781,7 +781,7 @@ namespace PubnubApi
                     _ = await heartbeatOperation.HeartbeatRequest<string>(
                         (subscribeEventEngine?.CurrentState as SubscriptionState)?.Channels.ToArray(),
                         (subscribeEventEngine?.CurrentState as SubscriptionState).ChannelGroups.ToArray()
-                    );
+                    ).ConfigureAwait(false);
                 }
             }
             else
@@ -843,7 +843,7 @@ namespace PubnubApi
                     _ = await heartbeatOperation.HeartbeatRequest<string>(
                         (subscribeEventEngine?.CurrentState as SubscriptionState)?.Channels.ToArray(),
                         (subscribeEventEngine?.CurrentState as SubscriptionState).ChannelGroups.ToArray()
-                    );
+                    ).ConfigureAwait(false);
                 }
             }
             else
@@ -893,7 +893,7 @@ namespace PubnubApi
                             JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
                         _ = await leaveOperation.LeaveRequest<string>(
                             (subscribeEventEngine?.CurrentState as SubscriptionState)?.Channels.ToArray(),
-                            (subscribeEventEngine?.CurrentState as SubscriptionState)?.ChannelGroups.ToArray());
+                            (subscribeEventEngine?.CurrentState as SubscriptionState)?.ChannelGroups.ToArray()).ConfigureAwait(false);
                     }
                 }
             }
@@ -1258,7 +1258,7 @@ namespace PubnubApi
             pubnubConfig.AddOrUpdate(InstanceId, config, (k, o) => config);
 
             CheckAndInitializeEmptyStringValues(config);
-            tokenManager = new TokenManager(pubnubConfig[InstanceId], JsonPluggableLibrary, InstanceId);
+            tokenManager = new TokenManager(pubnubConfig[InstanceId], JsonPluggableLibrary,  InstanceId);
 
             JsonPluggableLibrary = new NewtonsoftJsonDotNet(config);
 
