@@ -871,6 +871,219 @@ namespace PubNubMessaging.Tests
 
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscriberShouldBeAbleToReceiveManyMessages Failed");
         }
+        
+        [Test]
+        public static void ThenJoinEventReceived()
+        {
+            int randomNumber = new Random().Next(1000, 10000);
+            string userId = $"testUser-{randomNumber}";
+            bool receivedJoinEvent = false;
+
+            PNConfiguration config = new PNConfiguration(new UserId(userId))
+            {
+                PublishKey = PubnubCommon.NonPAMPublishKey,
+                SubscribeKey = PubnubCommon.NONPAMSubscribeKey,
+            };
+
+            ManualResetEvent joinEvent = new ManualResetEvent(false);
+            var listener = new SubscribeCallbackExt(
+                (pn, messageEvent) => { }
+                , (pn, presenceEvent) =>
+                {
+                    if (presenceEvent.Event == "join" && presenceEvent.Uuid == userId)
+                    {
+                        joinEvent.Set();
+                        receivedJoinEvent = true;
+                    } 
+                }
+                , (_, status) =>
+                {
+                    Console.WriteLine( pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                }
+            );
+            pubnub = createPubNubInstance(config);
+            pubnub.AddListener(listener);
+            manualResetEventWaitTimeout = 310 * 1000;
+            string channel = $"testChannel-{randomNumber}";
+            pubnub.Subscribe<string>().Channels(new [] { channel }).WithPresence().Execute();
+            joinEvent.WaitOne(manualResetEventWaitTimeout); //Wait for Connect Status
+            pubnub.RemoveListener(listener);
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+
+            Assert.IsTrue(receivedJoinEvent, "WhenSubscribedToAChannel --> ThenJoinEvent Received");
+        }
+        
+        [Test]
+        public static async Task ThenJoinEventReceivedForSubsequentSubscribe()
+        {
+            int randomNumber = new Random().Next(1000, 10000);
+            string userId = $"testUser-{randomNumber}";
+            bool receivedJoinEvent = false;
+            bool receivedSecondJoinEvent = false;
+            string channel = $"testChannel-{randomNumber}";
+            string channel2 = $"testChannel-{randomNumber}-1";
+
+            PNConfiguration config = new PNConfiguration(new UserId(userId))
+            {
+                PublishKey = PubnubCommon.NonPAMPublishKey,
+                SubscribeKey = PubnubCommon.NONPAMSubscribeKey,
+            };
+
+            ManualResetEvent joinEvent = new ManualResetEvent(false);
+            ManualResetEvent secondJoinEvent = new ManualResetEvent(false);
+            var listener = new SubscribeCallbackExt(
+                (pn, messageEvent) => { }
+                , (pn, presenceEvent) =>
+                {
+                    if (presenceEvent.Event == "join" && presenceEvent.Uuid == userId && presenceEvent.Channel == channel)
+                    {
+                        joinEvent.Set();
+                        receivedJoinEvent = true;
+                    }
+                    if (presenceEvent.Event == "join" && presenceEvent.Uuid == userId && presenceEvent.Channel == channel2)
+                    {
+                        secondJoinEvent.Set();
+                        receivedSecondJoinEvent = true;
+                    }
+                    
+                }
+                , (_, status) =>
+                {
+                    Console.WriteLine( pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                }
+            );
+            pubnub = createPubNubInstance(config);
+            pubnub.AddListener(listener);
+            manualResetEventWaitTimeout = 310 * 1000;
+
+            pubnub.Subscribe<string>().Channels(new [] { channel }).WithPresence().Execute();
+            joinEvent.WaitOne(manualResetEventWaitTimeout);
+            await Task.Delay(2000);
+            pubnub.Subscribe<string>().Channels(new [] { channel2 }).WithPresence().Execute();
+            secondJoinEvent.WaitOne(manualResetEventWaitTimeout);
+            pubnub.RemoveListener(listener);
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+
+            Assert.IsTrue(receivedJoinEvent&& receivedSecondJoinEvent, "WhenSubscribedToAChannel --> ThenJoinEvent Received");
+        }
+        
+        [Test]
+        public static async Task ThenJoinEventReceivedForSubsequentSubscribeWithPresenceEventEngine()
+        {
+            int randomNumber = new Random().Next(1000, 10000);
+            string userId = $"testUser-{randomNumber}";
+            bool receivedJoinEvent = false;
+            bool receivedSecondJoinEvent = false;
+            string channel = $"testChannel-{randomNumber}";
+            string channel2 = $"testChannel-{randomNumber}-1";
+
+            PNConfiguration config = new PNConfiguration(new UserId(userId))
+            {
+                PublishKey = PubnubCommon.NonPAMPublishKey,
+                SubscribeKey = PubnubCommon.NONPAMSubscribeKey,
+                PresenceTimeout = 310
+            };
+
+            ManualResetEvent joinEvent = new ManualResetEvent(false);
+            ManualResetEvent secondJoinEvent = new ManualResetEvent(false);
+            var listener = new SubscribeCallbackExt(
+                (pn, messageEvent) => { }
+                , (pn, presenceEvent) =>
+                {
+                    if (presenceEvent.Event == "join" && presenceEvent.Uuid == userId && presenceEvent.Channel == channel)
+                    {
+                        joinEvent.Set();
+                        receivedJoinEvent = true;
+                    }
+                    if (presenceEvent.Event == "join" && presenceEvent.Uuid == userId && presenceEvent.Channel == channel2)
+                    {
+                        secondJoinEvent.Set();
+                        receivedSecondJoinEvent = true;
+                    }
+                    
+                }
+                , (_, status) =>
+                {
+                    Console.WriteLine( pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                }
+            );
+            pubnub = createPubNubInstance(config);
+            pubnub.AddListener(listener);
+            manualResetEventWaitTimeout = 310 * 1000;
+
+            pubnub.Subscribe<string>().Channels(new [] { channel }).WithPresence().Execute();
+            joinEvent.WaitOne(manualResetEventWaitTimeout);
+            await Task.Delay(2000);
+            pubnub.Subscribe<string>().Channels(new [] { channel2 }).WithPresence().Execute();
+            secondJoinEvent.WaitOne(manualResetEventWaitTimeout);
+            pubnub.RemoveListener(listener);
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+
+            Assert.IsTrue(receivedJoinEvent&& receivedSecondJoinEvent, "WhenSubscribedToAChannel --> ThenJoinEvent Received");
+        }
+        
+        [Test]
+        public static async Task ThenJoinEventReceivedForSubsequentSubscribeWithZeroPresenceTimeOut()
+        {
+            int randomNumber = new Random().Next(1000, 10000);
+            string userId = $"testUser-{randomNumber}";
+            bool receivedJoinEvent = false;
+            bool receivedSecondJoinEvent = false;
+            string channel = $"testChannel-{randomNumber}";
+            string channel2 = $"testChannel-{randomNumber}-1";
+
+            PNConfiguration config = new PNConfiguration(new UserId(userId))
+            {
+                PublishKey = PubnubCommon.NonPAMPublishKey,
+                SubscribeKey = PubnubCommon.NONPAMSubscribeKey,
+                PresenceTimeout = 0
+            };
+
+            ManualResetEvent joinEvent = new ManualResetEvent(false);
+            ManualResetEvent secondJoinEvent = new ManualResetEvent(false);
+            var listener = new SubscribeCallbackExt(
+                (pn, messageEvent) => { }
+                , (pn, presenceEvent) =>
+                {
+                    if (presenceEvent.Event == "join" && presenceEvent.Uuid == userId && presenceEvent.Channel == channel)
+                    {
+                        joinEvent.Set();
+                        receivedJoinEvent = true;
+                    }
+                    if (presenceEvent.Event == "join" && presenceEvent.Uuid == userId && presenceEvent.Channel == channel2)
+                    {
+                        secondJoinEvent.Set();
+                        receivedSecondJoinEvent = true;
+                    }
+                    
+                }
+                , (_, status) =>
+                {
+                    Console.WriteLine( pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                }
+            );
+            pubnub = createPubNubInstance(config);
+            pubnub.AddListener(listener);
+            manualResetEventWaitTimeout = 310 * 1000;
+
+            pubnub.Subscribe<string>().Channels(new [] { channel }).WithPresence().Execute();
+            joinEvent.WaitOne(manualResetEventWaitTimeout);
+            await Task.Delay(2000);
+            pubnub.Subscribe<string>().Channels(new [] { channel2 }).WithPresence().Execute();
+            secondJoinEvent.WaitOne(manualResetEventWaitTimeout);
+            pubnub.RemoveListener(listener);
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+
+            Assert.IsTrue(receivedJoinEvent&& receivedSecondJoinEvent, "WhenSubscribedToAChannel --> ThenJoinEvent Received");
+        }
 
     }
 }
