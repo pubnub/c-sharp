@@ -2482,5 +2482,46 @@ namespace PubNubMessaging.Tests
             Assert.IsTrue(receivedPresenceMessage, "ThenReceiveCustomObjectPresenceCallback not received");
         }
         
+        [Test]
+        public static async Task ThenWhereNowShouldReturnSubscribedChannel()
+        {
+            string subscribedChannel = "hello_my_channel";
+
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+
+            pubnub = createPubNubInstance(config, authToken);
+
+            pubnub.Subscribe<string>().Channels(new[] { subscribedChannel }).WithPresence().Execute();
+            await Task.Delay(3000);
+
+            ManualResetEvent whereNowManualEvent = new ManualResetEvent(false);
+            PNWhereNowResult whereNowResult = null;
+
+            pubnub.WhereNow().Uuid(config.UserId).Execute(new PNWhereNowResultExt(
+                (r, s) => {
+                    Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(r));
+                    whereNowResult = r;
+                    whereNowManualEvent.Set();
+                }));
+            whereNowManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            Assert.IsNotNull(whereNowResult, "WhereNow result should not be null");
+            Assert.IsNotNull(whereNowResult.Channels, "Channels list should not be null");
+            Assert.Contains(subscribedChannel, whereNowResult.Channels, "Subscribed channel should be in the channels list");
+            
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
+
     }
 }

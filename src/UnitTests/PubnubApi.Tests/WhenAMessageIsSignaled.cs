@@ -661,5 +661,55 @@ namespace PubNubMessaging.Tests
                 Assert.IsTrue(internalReceivedMessage, "WhenSubscribedToAChannel --> ThenWithAsyncIgnoreCipherKeyUnencryptSignalListenerShouldGetMessagae Failed");
             }
         }
+
+        [Test]
+        public static void ThenSignalWithCustomMessageTypeShouldReturnSuccessCodeAndInfo()
+        {
+            string channel = "hello_my_channel";
+            string message = messageForUnencryptSignal;
+            string customType = "custom-type";
+
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authKey;
+            }
+            pubnub = createPubNubInstance(config, authToken);
+
+            manualResetEventWaitTimeout = 310 * 1000;
+
+            ManualResetEvent signalManualEvent = new ManualResetEvent(false);
+            PNPublishResult result = null;
+            PNStatus status = null;
+            
+            pubnub.Signal().Channel(channel).Message(message).CustomMessageType(customType)
+                    .Execute(new PNPublishResultExt((r, s) =>
+                    {
+                        result = r;
+                        status = s;
+                        signalManualEvent.Set();
+                    }));
+            var signalCompleted = signalManualEvent.WaitOne(manualResetEventWaitTimeout);
+
+            Assert.True(signalCompleted, "Singal execution callback was not called");
+            Assert.IsNotNull(result, "Result should not be null");
+            Assert.IsNotNull(status, "Status should not be null");
+            Assert.AreEqual(200, status.StatusCode, "StatusCode should be 200");
+            Assert.IsFalse(status.Error, "Error should be false");
+            Assert.IsTrue(result.Timetoken > 0, "Timetoken should be greater than 0");
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
     }
 }
