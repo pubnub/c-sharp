@@ -59,10 +59,10 @@ namespace PubnubApi
                         pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, tokenManager,
                         pubnubUnitTest, presenceEventengineFactory);
                 }
-
+                var heartbeatOperation = new HeartbeatOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
                 SubscribeEndpoint<T> subscribeOperation = new SubscribeEndpoint<T>(
                     pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                    pubnubUnitTest, tokenManager, subscribeEventEngineFactory, presenceOperation, InstanceId,
+                    pubnubUnitTest, tokenManager, subscribeEventEngineFactory, presenceOperation,heartbeatOperation,InstanceId,
                     this);
                 subscribeOperation.EventEmitter = eventEmitter;
                 subscribeOperation.SubscribeListenerList = subscribeCallbackListenerList;
@@ -83,9 +83,10 @@ namespace PubnubApi
         {
             if (pubnubConfig[InstanceId].EnableEventEngine)
             {
+                var leaveOperation = new LeaveOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
                 UnsubscribeEndpoint<T> unsubscribeOperation = new UnsubscribeEndpoint<T>(
                     pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                    pubnubUnitTest,  tokenManager, subscribeEventEngineFactory, presenceEventengineFactory,
+                    pubnubUnitTest,  tokenManager,leaveOperation ,subscribeEventEngineFactory, presenceEventengineFactory,
                     this);
                 return unsubscribeOperation;
             }
