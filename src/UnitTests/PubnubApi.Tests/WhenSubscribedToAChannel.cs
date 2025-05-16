@@ -899,6 +899,11 @@ namespace PubNubMessaging.Tests
                 }
                 , (_, status) =>
                 {
+                    if (status.Category == PNStatusCategory.PNConnectedCategory)
+                    {
+                        joinEvent.Set();
+                        receivedJoinEvent = true;
+                    }
                 }
             );
             pubnub = createPubNubInstance(config);
