@@ -11,11 +11,6 @@ namespace PubnubApi.EndPoint
 	public class UnsubscribeEndpoint<T> : PubnubCoreBase, IUnsubscribeOperation<T>
 	{
 		private readonly PNConfiguration config;
-		private readonly IJsonPluggableLibrary jsonLibrary;
-		private readonly IPubnubUnitTest unit;
-
-		private readonly EndPoint.TokenManager pubnubTokenMgr;
-
 		private string[] subscribeChannelNames;
 		private string[] subscribeChannelGroupNames;
 		private Dictionary<string, object> queryParam { get; set; }
@@ -23,18 +18,17 @@ namespace PubnubApi.EndPoint
 		private SubscribeEventEngine subscribeEventEngine { get; set; }
 		private SubscribeEventEngineFactory subscribeEventEngineFactory { get; set; }
 		private PresenceEventEngineFactory presenceEventEngineFactory;
-		private string instanceId { get; set; }
+		private LeaveOperation leaveOperation;
+		private string instanceId { get; }
 
-		public UnsubscribeEndpoint(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, EndPoint.TokenManager tokenManager, SubscribeEventEngineFactory subscribeEventEngineFactory, PresenceEventEngineFactory presenceEventEngineFactory, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, tokenManager, instance)
+		public UnsubscribeEndpoint(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, EndPoint.TokenManager tokenManager, LeaveOperation leaveOperation,SubscribeEventEngineFactory subscribeEventEngineFactory, PresenceEventEngineFactory presenceEventEngineFactory, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, tokenManager, instance)
 		{
 			pubnubInstance = instance;
 			config = pubnubConfig;
-			jsonLibrary = jsonPluggableLibrary;
-			unit = pubnubUnit;
 
-			pubnubTokenMgr = tokenManager;
 			this.subscribeEventEngineFactory = subscribeEventEngineFactory;
 			this.presenceEventEngineFactory = presenceEventEngineFactory;
+			this.leaveOperation = leaveOperation;
 			instanceId = instance.InstanceId;
 		}
 
@@ -62,7 +56,7 @@ namespace PubnubApi.EndPoint
 			Unsubscribe(subscribeChannelNames, subscribeChannelGroupNames);
 		}
 
-		private void Unsubscribe(string[] channels, string[] channelGroups)
+		private async void Unsubscribe(string[] channels, string[] channelGroups)
 		{
 			if ((channels == null || channels.Length == 0) && (channelGroups == null || channelGroups.Length == 0)) {
 				throw new ArgumentException("Either Channel Or Channel Group or Both should be provided.");
@@ -119,6 +113,14 @@ namespace PubnubApi.EndPoint
 							Input = new EventEngine.Presence.Common.PresenceInput() 
 								{ Channels = uniqueChannelsToRemove.ToArray(), ChannelGroups = uniqueChannelGroupsToRemove.ToArray() }
 						});
+					}
+					else
+					{
+						if(!config.SuppressLeaveEvents)
+							await leaveOperation.LeaveRequest<string>(
+								uniqueChannelsToRemove.Distinct().ToArray(),
+								uniqueChannelGroupsToRemove.Distinct().ToArray()
+							).ConfigureAwait(false);
 					}
 					if (config.MaintainPresenceState) {
 						if (ChannelLocalUserState.TryGetValue(PubnubInstance.InstanceId, out

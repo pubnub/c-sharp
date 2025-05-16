@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using PubnubApi.EndPoint;
 using PubnubApi.EventEngine.Subscribe;
 using PubnubApi.EventEngine.Subscribe.Events;
@@ -11,6 +10,8 @@ using PubnubApi.Security.Crypto;
 using PubnubApi.Security.Crypto.Cryptors;
 using PubnubApi.EventEngine.Common;
 using System.Collections.Concurrent;
+using System.Linq;
+using System.Threading.Tasks;
 using PubnubApi.PNSDK;
 
 namespace PubnubApi
@@ -30,6 +31,8 @@ namespace PubnubApi
         private PresenceEventEngineFactory presenceEventengineFactory;
         private EventEmitter eventEmitter;
         private PubnubLogModule logger;
+        private HeartbeatOperation heartbeatOperation;
+        private LeaveOperation leaveOperation;
         private List<SubscribeCallback> subscribeCallbackListenerList { get; set; } = new List<SubscribeCallback>();
 
 #if UNITY
@@ -60,9 +63,13 @@ namespace PubnubApi
                         pubnubUnitTest, presenceEventengineFactory);
                 }
 
+                heartbeatOperation ??= new HeartbeatOperation(
+                    pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
+                    JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
                 SubscribeEndpoint<T> subscribeOperation = new SubscribeEndpoint<T>(
                     pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                    pubnubUnitTest, tokenManager, subscribeEventEngineFactory, presenceOperation, InstanceId,
+                    pubnubUnitTest, tokenManager, subscribeEventEngineFactory, presenceOperation, heartbeatOperation,
+                    InstanceId,
                     this);
                 subscribeOperation.EventEmitter = eventEmitter;
                 subscribeOperation.SubscribeListenerList = subscribeCallbackListenerList;
@@ -73,7 +80,7 @@ namespace PubnubApi
             {
                 SubscribeOperation<T> subscribeOperation = new SubscribeOperation<T>(
                     pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                    pubnubUnitTest,  tokenManager, this);
+                    pubnubUnitTest, tokenManager, this);
                 savedSubscribeOperation = subscribeOperation;
                 return subscribeOperation;
             }
@@ -83,9 +90,13 @@ namespace PubnubApi
         {
             if (pubnubConfig[InstanceId].EnableEventEngine)
             {
+                leaveOperation ??=
+                    new LeaveOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
+                        JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
                 UnsubscribeEndpoint<T> unsubscribeOperation = new UnsubscribeEndpoint<T>(
                     pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                    pubnubUnitTest,  tokenManager, subscribeEventEngineFactory, presenceEventengineFactory,
+                    pubnubUnitTest, tokenManager, leaveOperation, subscribeEventEngineFactory,
+                    presenceEventengineFactory,
                     this);
                 return unsubscribeOperation;
             }
@@ -93,7 +104,7 @@ namespace PubnubApi
             {
                 UnsubscribeOperation<T> unsubscribeOperation = new UnsubscribeOperation<T>(
                     pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                    pubnubUnitTest,  tokenManager, this);
+                    pubnubUnitTest, tokenManager, this);
                 unsubscribeOperation.CurrentPubnubInstance(this);
                 return unsubscribeOperation;
             }
@@ -105,7 +116,7 @@ namespace PubnubApi
             {
                 UnsubscribeAllEndpoint<T> unsubscribeAllEndpoint = new UnsubscribeAllEndpoint<T>(
                     pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                    pubnubUnitTest,  tokenManager, subscribeEventEngineFactory, presenceEventengineFactory,
+                    pubnubUnitTest, tokenManager, subscribeEventEngineFactory, presenceEventengineFactory,
                     this);
                 return unsubscribeAllEndpoint;
             }
@@ -114,7 +125,7 @@ namespace PubnubApi
                 UnsubscribeAllOperation<T> unSubscribeAllOperation =
                     new UnsubscribeAllOperation<T>(
                         pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                        pubnubUnitTest,  tokenManager, this);
+                        pubnubUnitTest, tokenManager, this);
                 return unSubscribeAllOperation;
             }
         }
@@ -123,7 +134,7 @@ namespace PubnubApi
         {
             PublishOperation publishOperation = new PublishOperation(
                 pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                pubnubUnitTest,  tokenManager, this);
+                pubnubUnitTest, tokenManager, this);
             publishOperation.CurrentPubnubInstance(this);
             return publishOperation;
         }
@@ -132,7 +143,7 @@ namespace PubnubApi
         {
             FireOperation fireOperation =
                 new FireOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
-                    JsonPluggableLibrary, pubnubUnitTest,  tokenManager, this);
+                    JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
             fireOperation.CurrentPubnubInstance(this);
             return fireOperation;
         }
@@ -141,7 +152,7 @@ namespace PubnubApi
         {
             SignalOperation signalOperation = new SignalOperation(
                 pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                pubnubUnitTest,  tokenManager, this);
+                pubnubUnitTest, tokenManager, this);
             return signalOperation;
         }
 
@@ -149,7 +160,7 @@ namespace PubnubApi
         {
             HistoryOperation historyOperaton = new HistoryOperation(
                 pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                pubnubUnitTest,  tokenManager, this);
+                pubnubUnitTest, tokenManager, this);
             return historyOperaton;
         }
 
@@ -157,7 +168,7 @@ namespace PubnubApi
         {
             FetchHistoryOperation historyOperaton = new FetchHistoryOperation(
                 pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                pubnubUnitTest,  tokenManager, this);
+                pubnubUnitTest, tokenManager, this);
             return historyOperaton;
         }
 
@@ -165,7 +176,7 @@ namespace PubnubApi
         {
             DeleteMessageOperation deleteMessageOperaton = new DeleteMessageOperation(
                 pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                pubnubUnitTest,  tokenManager, this);
+                pubnubUnitTest, tokenManager, this);
             return deleteMessageOperaton;
         }
 
@@ -173,7 +184,7 @@ namespace PubnubApi
         {
             MessageCountsOperation messageCount = new MessageCountsOperation(
                 pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                pubnubUnitTest,  tokenManager, this);
+                pubnubUnitTest, tokenManager, this);
             messageCount.CurrentPubnubInstance(this);
             return messageCount;
         }
@@ -182,7 +193,7 @@ namespace PubnubApi
         {
             HereNowOperation hereNowOperation = new HereNowOperation(
                 pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                pubnubUnitTest,  tokenManager, this);
+                pubnubUnitTest, tokenManager, this);
             hereNowOperation.CurrentPubnubInstance(this);
             return hereNowOperation;
         }
@@ -191,7 +202,7 @@ namespace PubnubApi
         {
             WhereNowOperation whereNowOperation = new WhereNowOperation(
                 pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                pubnubUnitTest,  tokenManager, this);
+                pubnubUnitTest, tokenManager, this);
             whereNowOperation.CurrentPubnubInstance(this);
             return whereNowOperation;
         }
@@ -200,7 +211,7 @@ namespace PubnubApi
         {
             TimeOperation timeOperation =
                 new TimeOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
-                    JsonPluggableLibrary, pubnubUnitTest,  this);
+                    JsonPluggableLibrary, pubnubUnitTest, this);
             timeOperation.CurrentPubnubInstance(this);
             return timeOperation;
         }
@@ -209,7 +220,7 @@ namespace PubnubApi
         {
             AuditOperation auditOperation =
                 new AuditOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
-                    JsonPluggableLibrary, pubnubUnitTest,  this);
+                    JsonPluggableLibrary, pubnubUnitTest, this);
             auditOperation.CurrentPubnubInstance(this);
             return auditOperation;
         }
@@ -218,7 +229,7 @@ namespace PubnubApi
         {
             GrantTokenOperation grantOperation = new GrantTokenOperation(
                 pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                pubnubUnitTest,  tokenManager, this);
+                pubnubUnitTest, tokenManager, this);
             return grantOperation;
         }
 
@@ -226,7 +237,7 @@ namespace PubnubApi
         {
             RevokeTokenOperation revokeTokenOperation = new RevokeTokenOperation(
                 pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                pubnubUnitTest,  tokenManager, this);
+                pubnubUnitTest, tokenManager, this);
             return revokeTokenOperation;
         }
 
@@ -234,7 +245,7 @@ namespace PubnubApi
         {
             GrantOperation grantOperation =
                 new GrantOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
-                    JsonPluggableLibrary, pubnubUnitTest,  this);
+                    JsonPluggableLibrary, pubnubUnitTest, this);
             grantOperation.CurrentPubnubInstance(this);
             return grantOperation;
         }
@@ -243,7 +254,7 @@ namespace PubnubApi
         {
             SetStateOperation setStateOperation = new SetStateOperation(
                 pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                pubnubUnitTest,  tokenManager, this);
+                pubnubUnitTest, tokenManager, this);
             return setStateOperation;
         }
 
@@ -251,7 +262,7 @@ namespace PubnubApi
         {
             GetStateOperation getStateOperation = new GetStateOperation(
                 pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                pubnubUnitTest,  tokenManager, this);
+                pubnubUnitTest, tokenManager, this);
             getStateOperation.CurrentPubnubInstance(this);
             return getStateOperation;
         }
@@ -260,7 +271,7 @@ namespace PubnubApi
         {
             AddPushChannelOperation addPushChannelOperation = new AddPushChannelOperation(
                 pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                pubnubUnitTest,  tokenManager, this);
+                pubnubUnitTest, tokenManager, this);
             return addPushChannelOperation;
         }
 
@@ -268,7 +279,7 @@ namespace PubnubApi
         {
             RemovePushChannelOperation removePushChannelOperation =
                 new RemovePushChannelOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
-                    JsonPluggableLibrary, pubnubUnitTest,  tokenManager, this);
+                    JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
             return removePushChannelOperation;
         }
 
@@ -277,7 +288,7 @@ namespace PubnubApi
             RemoveAllPushChannelsOperation removeAllPushChannelsOperation =
                 new RemoveAllPushChannelsOperation(
                     pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                    pubnubUnitTest,  tokenManager, this);
+                    pubnubUnitTest, tokenManager, this);
             removeAllPushChannelsOperation.CurrentPubnubInstance(this);
             return removeAllPushChannelsOperation;
         }
@@ -286,7 +297,7 @@ namespace PubnubApi
         {
             AuditPushChannelOperation auditPushChannelOperation = new AuditPushChannelOperation(
                 pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                pubnubUnitTest,  tokenManager, this);
+                pubnubUnitTest, tokenManager, this);
             auditPushChannelOperation.CurrentPubnubInstance(this);
             return auditPushChannelOperation;
         }
@@ -295,7 +306,7 @@ namespace PubnubApi
         {
             SetUuidMetadataOperation setUuidMetadataOperation = new SetUuidMetadataOperation(
                 pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                pubnubUnitTest,  tokenManager, this);
+                pubnubUnitTest, tokenManager, this);
             return setUuidMetadataOperation;
         }
 
@@ -303,7 +314,7 @@ namespace PubnubApi
         {
             RemoveUuidMetadataOperation removeUuidMetadataOperation =
                 new RemoveUuidMetadataOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
-                    JsonPluggableLibrary, pubnubUnitTest,  tokenManager, this);
+                    JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
             return removeUuidMetadataOperation;
         }
 
@@ -311,7 +322,7 @@ namespace PubnubApi
         {
             GetAllUuidMetadataOperation getAllUuidMetadataOperation =
                 new GetAllUuidMetadataOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
-                    JsonPluggableLibrary, pubnubUnitTest,  tokenManager, this);
+                    JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
             return getAllUuidMetadataOperation;
         }
 
@@ -319,7 +330,7 @@ namespace PubnubApi
         {
             GetUuidMetadataOperation getUuidMetadataOperation = new GetUuidMetadataOperation(
                 pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                pubnubUnitTest,  tokenManager, this);
+                pubnubUnitTest, tokenManager, this);
             return getUuidMetadataOperation;
         }
 
@@ -327,7 +338,7 @@ namespace PubnubApi
         {
             SetChannelMetadataOperation setChannelMetadataOperation =
                 new SetChannelMetadataOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
-                    JsonPluggableLibrary, pubnubUnitTest,  tokenManager, this);
+                    JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
             return setChannelMetadataOperation;
         }
 
@@ -336,7 +347,7 @@ namespace PubnubApi
             RemoveChannelMetadataOperation removeChannelMetadataOperation =
                 new RemoveChannelMetadataOperation(
                     pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                    pubnubUnitTest,  tokenManager, this);
+                    pubnubUnitTest, tokenManager, this);
             return removeChannelMetadataOperation;
         }
 
@@ -345,7 +356,7 @@ namespace PubnubApi
             GetAllChannelMetadataOperation getAllChannelMetadataOperation =
                 new GetAllChannelMetadataOperation(
                     pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                    pubnubUnitTest,  tokenManager, this);
+                    pubnubUnitTest, tokenManager, this);
             return getAllChannelMetadataOperation;
         }
 
@@ -353,7 +364,7 @@ namespace PubnubApi
         {
             GetChannelMetadataOperation getSingleSpaceOperation =
                 new GetChannelMetadataOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
-                    JsonPluggableLibrary, pubnubUnitTest,  tokenManager, this);
+                    JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
             return getSingleSpaceOperation;
         }
 
@@ -361,7 +372,7 @@ namespace PubnubApi
         {
             GetMembershipsOperation getMembershipOperation = new GetMembershipsOperation(
                 pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                pubnubUnitTest,  tokenManager, this);
+                pubnubUnitTest, tokenManager, this);
             return getMembershipOperation;
         }
 
@@ -369,7 +380,7 @@ namespace PubnubApi
         {
             SetMembershipsOperation setMembershipsOperation = new SetMembershipsOperation(
                 pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                pubnubUnitTest,  tokenManager, this);
+                pubnubUnitTest, tokenManager, this);
             return setMembershipsOperation;
         }
 
@@ -377,7 +388,7 @@ namespace PubnubApi
         {
             RemoveMembershipsOperation removeMembershipsOperation =
                 new RemoveMembershipsOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
-                    JsonPluggableLibrary, pubnubUnitTest,  tokenManager, this);
+                    JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
             return removeMembershipsOperation;
         }
 
@@ -385,7 +396,7 @@ namespace PubnubApi
         {
             ManageMembershipsOperation manageMembershipsOperation =
                 new ManageMembershipsOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
-                    JsonPluggableLibrary, pubnubUnitTest,  tokenManager, this);
+                    JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
             return manageMembershipsOperation;
         }
 
@@ -393,7 +404,7 @@ namespace PubnubApi
         {
             GetChannelMembersOperation getChannelMembersOperation =
                 new GetChannelMembersOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
-                    JsonPluggableLibrary, pubnubUnitTest,  tokenManager, this);
+                    JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
             return getChannelMembersOperation;
         }
 
@@ -401,7 +412,7 @@ namespace PubnubApi
         {
             SetChannelMembersOperation setChannelMembersOperation =
                 new SetChannelMembersOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
-                    JsonPluggableLibrary, pubnubUnitTest,  tokenManager, this);
+                    JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
             return setChannelMembersOperation;
         }
 
@@ -410,7 +421,7 @@ namespace PubnubApi
             RemoveChannelMembersOperation removeChannelMembersOperation =
                 new RemoveChannelMembersOperation(
                     pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                    pubnubUnitTest,  tokenManager, this);
+                    pubnubUnitTest, tokenManager, this);
             return removeChannelMembersOperation;
         }
 
@@ -419,7 +430,7 @@ namespace PubnubApi
             ManageChannelMembersOperation channelMembersOperation =
                 new ManageChannelMembersOperation(
                     pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                    pubnubUnitTest,  tokenManager, this);
+                    pubnubUnitTest, tokenManager, this);
             return channelMembersOperation;
         }
 
@@ -427,7 +438,7 @@ namespace PubnubApi
         {
             AddMessageActionOperation addMessageActionOperation = new AddMessageActionOperation(
                 pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                pubnubUnitTest,  tokenManager, this);
+                pubnubUnitTest, tokenManager, this);
             return addMessageActionOperation;
         }
 
@@ -435,7 +446,7 @@ namespace PubnubApi
         {
             RemoveMessageActionOperation removeMessageActionOperation =
                 new RemoveMessageActionOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
-                    JsonPluggableLibrary, pubnubUnitTest,  tokenManager, this);
+                    JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
             return removeMessageActionOperation;
         }
 
@@ -443,7 +454,7 @@ namespace PubnubApi
         {
             GetMessageActionsOperation getMessageActionsOperation =
                 new GetMessageActionsOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
-                    JsonPluggableLibrary, pubnubUnitTest,  tokenManager, this);
+                    JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
             return getMessageActionsOperation;
         }
 
@@ -456,7 +467,7 @@ namespace PubnubApi
             AddChannelsToChannelGroupOperation addChannelToChannelGroupOperation =
                 new AddChannelsToChannelGroupOperation(
                     pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                    pubnubUnitTest,  tokenManager, this);
+                    pubnubUnitTest, tokenManager, this);
             addChannelToChannelGroupOperation.CurrentPubnubInstance(this);
             return addChannelToChannelGroupOperation;
         }
@@ -466,7 +477,7 @@ namespace PubnubApi
             RemoveChannelsFromChannelGroupOperation removeChannelsFromChannelGroupOperation =
                 new RemoveChannelsFromChannelGroupOperation(
                     pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                    pubnubUnitTest,  tokenManager, this);
+                    pubnubUnitTest, tokenManager, this);
             removeChannelsFromChannelGroupOperation.CurrentPubnubInstance(this);
             return removeChannelsFromChannelGroupOperation;
         }
@@ -475,7 +486,7 @@ namespace PubnubApi
         {
             DeleteChannelGroupOperation deleteChannelGroupOperation =
                 new DeleteChannelGroupOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
-                    JsonPluggableLibrary, pubnubUnitTest,  tokenManager, this);
+                    JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
             deleteChannelGroupOperation.CurrentPubnubInstance(this);
             return deleteChannelGroupOperation;
         }
@@ -485,7 +496,7 @@ namespace PubnubApi
             ListChannelsForChannelGroupOperation listChannelsForChannelGroupOperation =
                 new ListChannelsForChannelGroupOperation(
                     pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                    pubnubUnitTest,  tokenManager, this);
+                    pubnubUnitTest, tokenManager, this);
             listChannelsForChannelGroupOperation.CurrentPubnubInstance(this);
             return listChannelsForChannelGroupOperation;
         }
@@ -494,7 +505,7 @@ namespace PubnubApi
         {
             ListAllChannelGroupOperation listAllChannelGroupOperation =
                 new ListAllChannelGroupOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
-                    JsonPluggableLibrary, pubnubUnitTest,  tokenManager, this);
+                    JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
             listAllChannelGroupOperation.CurrentPubnubInstance(this);
             return listAllChannelGroupOperation;
         }
@@ -512,7 +523,7 @@ namespace PubnubApi
                 {
                     listenerManager =
                         new ListenerManager(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
-                            JsonPluggableLibrary, pubnubUnitTest,  tokenManager, this);
+                            JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
                 }
 
                 return listenerManager.AddListener(listener);
@@ -542,7 +553,7 @@ namespace PubnubApi
         {
             SendFileOperation uploadFileOperation = new SendFileOperation(
                 pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                pubnubUnitTest,  tokenManager, this);
+                pubnubUnitTest, tokenManager, this);
             return uploadFileOperation;
         }
 
@@ -550,7 +561,7 @@ namespace PubnubApi
         {
             GetFileUrlOperation getFileUrlOperation = new GetFileUrlOperation(
                 pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                pubnubUnitTest,  tokenManager, this);
+                pubnubUnitTest, tokenManager, this);
             return getFileUrlOperation;
         }
 
@@ -558,7 +569,7 @@ namespace PubnubApi
         {
             DownloadFileOperation downloadFileOperation = new DownloadFileOperation(
                 pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                pubnubUnitTest,  tokenManager, this);
+                pubnubUnitTest, tokenManager, this);
             return downloadFileOperation;
         }
 
@@ -566,7 +577,7 @@ namespace PubnubApi
         {
             ListFilesOperation listFilesOperation = new ListFilesOperation(
                 pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                pubnubUnitTest,  tokenManager, this);
+                pubnubUnitTest, tokenManager, this);
             return listFilesOperation;
         }
 
@@ -574,7 +585,7 @@ namespace PubnubApi
         {
             DeleteFileOperation deleteFileOperation = new DeleteFileOperation(
                 pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                pubnubUnitTest,  tokenManager, this);
+                pubnubUnitTest, tokenManager, this);
             return deleteFileOperation;
         }
 
@@ -582,7 +593,7 @@ namespace PubnubApi
         {
             PublishFileMessageOperation publshFileMessageOperation =
                 new PublishFileMessageOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
-                    JsonPluggableLibrary, pubnubUnitTest,  tokenManager, this);
+                    JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
             return publshFileMessageOperation;
         }
 
@@ -592,7 +603,7 @@ namespace PubnubApi
         {
             OtherOperation endpoint =
                 new OtherOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
-                    JsonPluggableLibrary, pubnubUnitTest,  tokenManager, this);
+                    JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
             endpoint.CurrentPubnubInstance(this);
             endpoint.TerminateCurrentSubscriberRequest();
         }
@@ -626,13 +637,14 @@ namespace PubnubApi
                 {
                     logger?.Debug($" Error: UserId cannot be null/empty.");
                 }
+
                 throw new MissingMemberException("UserId cannot be null/empty");
             }
 
             PNConfig.UserId = newUserId;
             OtherOperation endPoint =
                 new OtherOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
-                    JsonPluggableLibrary, pubnubUnitTest,  tokenManager, this);
+                    JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
             endPoint.CurrentPubnubInstance(this);
         }
 
@@ -655,7 +667,7 @@ namespace PubnubApi
         {
             OtherOperation endPoint =
                 new OtherOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
-                    JsonPluggableLibrary, pubnubUnitTest,  tokenManager, this);
+                    JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
             endPoint.CurrentPubnubInstance(this);
             return endPoint.GetCurrentUserId();
         }
@@ -669,7 +681,7 @@ namespace PubnubApi
 
             OtherOperation endpoint =
                 new OtherOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
-                    JsonPluggableLibrary, pubnubUnitTest,  tokenManager, this);
+                    JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
             endpoint.CurrentPubnubInstance(this);
             return endpoint.GetSubscribedChannels();
         }
@@ -683,7 +695,7 @@ namespace PubnubApi
 
             OtherOperation endpoint =
                 new OtherOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
-                    JsonPluggableLibrary, pubnubUnitTest,  tokenManager, this);
+                    JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
             endpoint.CurrentPubnubInstance(this);
             return endpoint.GetSubscribedChannelGroups();
         }
@@ -693,7 +705,7 @@ namespace PubnubApi
             savedSubscribeOperation = null;
             OtherOperation endpoint =
                 new OtherOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
-                    JsonPluggableLibrary, pubnubUnitTest,  tokenManager, this);
+                    JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
             endpoint.CurrentPubnubInstance(this);
             endpoint.EndPendingRequests();
         }
@@ -726,14 +738,15 @@ namespace PubnubApi
             }
         }
 
-        public bool Reconnect<T>()
+        public async Task<bool> Reconnect<T>()
         {
             bool ret = false;
+            SubscribeEventEngine subscribeEventEngine = null;
             if (pubnubConfig[InstanceId].EnableEventEngine)
             {
                 if (subscribeEventEngineFactory.HasEventEngine(InstanceId))
                 {
-                    var subscribeEventEngine = subscribeEventEngineFactory.GetEventEngine(InstanceId);
+                    subscribeEventEngine = subscribeEventEngineFactory.GetEventEngine(InstanceId);
 
                     subscribeEventEngine.EventQueue.Enqueue(new ReconnectEvent()
                     {
@@ -752,12 +765,24 @@ namespace PubnubApi
                         Input = new EventEngine.Presence.Common.PresenceInput()
                         {
                             Channels = (presenceEventEngine.CurrentState as EventEngine.Presence.States.APresenceState)
-                                .Input.Channels,
+                                ?.Input.Channels,
                             ChannelGroups =
-                                (presenceEventEngine.CurrentState as EventEngine.Presence.States.APresenceState).Input
+                                (presenceEventEngine.CurrentState as EventEngine.Presence.States.APresenceState)?.Input
                                 .ChannelGroups
                         }
                     });
+                }
+                else
+                {
+                    if (subscribeEventEngine != null)
+                        heartbeatOperation ??= new HeartbeatOperation(
+                            pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
+                            JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
+
+                    await heartbeatOperation.HeartbeatRequest<string>(
+                        (subscribeEventEngine?.CurrentState as SubscriptionState)?.Channels.ToArray(),
+                        (subscribeEventEngine?.CurrentState as SubscriptionState)?.ChannelGroups.ToArray()
+                    ).ConfigureAwait(false);
                 }
             }
             else
@@ -775,21 +800,22 @@ namespace PubnubApi
             return ret;
         }
 
-        public bool Reconnect<T>(bool resetSubscribeTimetoken)
+        public async Task<bool> Reconnect<T>(bool resetSubscribeTimetoken)
         {
             bool ret = false;
+            SubscribeEventEngine subscribeEventEngine = null;
             if (pubnubConfig[InstanceId].EnableEventEngine)
             {
                 if (subscribeEventEngineFactory.HasEventEngine(InstanceId))
                 {
-                    var subscribeEventEngine = subscribeEventEngineFactory.GetEventEngine(InstanceId);
+                    subscribeEventEngine = subscribeEventEngineFactory.GetEventEngine(InstanceId);
                     subscribeEventEngine.EventQueue.Enqueue(new ReconnectEvent()
                     {
-                        Channels = (subscribeEventEngine.CurrentState as SubscriptionState).Channels,
-                        ChannelGroups = (subscribeEventEngine.CurrentState as SubscriptionState).ChannelGroups,
+                        Channels = (subscribeEventEngine.CurrentState as SubscriptionState)?.Channels,
+                        ChannelGroups = (subscribeEventEngine.CurrentState as SubscriptionState)?.ChannelGroups,
                         Cursor = resetSubscribeTimetoken
                             ? null
-                            : (subscribeEventEngine.CurrentState as SubscriptionState).Cursor
+                            : (subscribeEventEngine.CurrentState as SubscriptionState)?.Cursor
                     });
                 }
 
@@ -802,12 +828,23 @@ namespace PubnubApi
                         Input = new EventEngine.Presence.Common.PresenceInput()
                         {
                             Channels = (presenceEventEngine.CurrentState as EventEngine.Presence.States.APresenceState)
-                                .Input.Channels,
+                                ?.Input.Channels,
                             ChannelGroups =
-                                (presenceEventEngine.CurrentState as EventEngine.Presence.States.APresenceState).Input
+                                (presenceEventEngine.CurrentState as EventEngine.Presence.States.APresenceState)?.Input
                                 .ChannelGroups
                         }
                     });
+                }
+                else
+                {
+                    if (subscribeEventEngine != null)
+                        heartbeatOperation ??= new HeartbeatOperation(
+                            pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
+                            JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
+                    await heartbeatOperation.HeartbeatRequest<string>(
+                        (subscribeEventEngine?.CurrentState as SubscriptionState)?.Channels.ToArray(),
+                        (subscribeEventEngine?.CurrentState as SubscriptionState)?.ChannelGroups.ToArray()
+                    ).ConfigureAwait(false);
                 }
             }
             else
@@ -825,18 +862,19 @@ namespace PubnubApi
             return ret;
         }
 
-        public bool Disconnect<T>()
+        public async Task<bool> Disconnect<T>()
         {
             bool ret = false;
+            SubscribeEventEngine subscribeEventEngine = null;
             if (pubnubConfig[InstanceId].EnableEventEngine)
             {
                 if (subscribeEventEngineFactory.HasEventEngine(InstanceId))
                 {
-                    var subscribeEventEngine = subscribeEventEngineFactory.GetEventEngine(InstanceId);
+                    subscribeEventEngine = subscribeEventEngineFactory.GetEventEngine(InstanceId);
                     subscribeEventEngine.EventQueue.Enqueue(new DisconnectEvent()
                     {
-                        Channels = (subscribeEventEngine.CurrentState as SubscriptionState).Channels,
-                        ChannelGroups = (subscribeEventEngine.CurrentState as SubscriptionState).ChannelGroups
+                        Channels = (subscribeEventEngine.CurrentState as SubscriptionState)?.Channels,
+                        ChannelGroups = (subscribeEventEngine.CurrentState as SubscriptionState)?.ChannelGroups
                     });
                 }
 
@@ -845,6 +883,20 @@ namespace PubnubApi
                     var presenceEventEngine = presenceEventengineFactory.GetEventEngine(InstanceId);
 
                     presenceEventEngine.EventQueue.Enqueue(new EventEngine.Presence.Events.DisconnectEvent());
+                }
+                else
+                {
+                    if (subscribeEventEngine != null && !(pubnubConfig.ContainsKey(InstanceId) &&
+                                                          pubnubConfig[InstanceId].SuppressLeaveEvents))
+                    {
+                        leaveOperation ??= new LeaveOperation(
+                            pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
+                            JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
+                        await leaveOperation.LeaveRequest<string>(
+                                (subscribeEventEngine?.CurrentState as SubscriptionState)?.Channels.ToArray(),
+                                (subscribeEventEngine?.CurrentState as SubscriptionState)?.ChannelGroups.ToArray())
+                            .ConfigureAwait(false);
+                    }
                 }
             }
             else
@@ -1133,7 +1185,7 @@ namespace PubnubApi
             byte[] outputBytes = DecryptFile(inputBytes, cipherKey);
             System.IO.File.WriteAllBytes(destinationFile, outputBytes);
         }
-        
+
         /// <summary>
         /// Configures a custom logger.
         /// </summary>

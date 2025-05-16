@@ -26,6 +26,9 @@ namespace PubnubApi.EndPoint
         private SubscribeEventEngine subscribeEventEngine;
         private SubscribeEventEngineFactory subscribeEventEngineFactory;
         private PresenceOperation<T> presenceOperation;
+        private HeartbeatOperation heartbeatOperation;
+        private string[] inputChannels = [];
+        private string[] inputChannelGroups = [];
         private string instanceId { get; set; }
         public EventEmitter EventEmitter { get; set; }
 		public List<SubscribeCallback> SubscribeListenerList
@@ -34,7 +37,7 @@ namespace PubnubApi.EndPoint
             set;
         } = new List<SubscribeCallback>();
 
-        public SubscribeEndpoint(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, TokenManager tokenManager,SubscribeEventEngineFactory subscribeEventEngineFactory, PresenceOperation<T> presenceOperation , string instanceId, Pubnub instance) 
+        public SubscribeEndpoint(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, TokenManager tokenManager,SubscribeEventEngineFactory subscribeEventEngineFactory, PresenceOperation<T> presenceOperation , HeartbeatOperation heartbeatOperation ,string instanceId, Pubnub instance) 
         {
             PubnubInstance = instance;
             config = pubnubConfig;
@@ -44,12 +47,16 @@ namespace PubnubApi.EndPoint
             this.subscribeEventEngineFactory = subscribeEventEngineFactory;
             this.presenceOperation = presenceOperation;
             this.instanceId = instanceId;
+            this.heartbeatOperation = heartbeatOperation;
             if (unit != null) { unit.EventTypeList = new List<KeyValuePair<string, string>>(); }
         }
 
         public ISubscribeOperation<T> Channels(string[] channels)
         {
-            if (channels != null && channels.Length > 0 && !string.IsNullOrEmpty(channels[0]))
+	        inputChannels = channels.ToList<string>()
+		        .Except(subscribeChannelNames)
+		        .Where(c => !c.EndsWith(Constants.Pnpres, StringComparison.OrdinalIgnoreCase)).ToArray();
+            if (channels.Length > 0 && !string.IsNullOrEmpty(channels[0]))
             {
                 this.subscribeChannelNames.AddRange(channels);
             }
@@ -58,7 +65,10 @@ namespace PubnubApi.EndPoint
 
         public ISubscribeOperation<T> ChannelGroups(string[] channelGroups)
         {
-            if (channelGroups != null && channelGroups.Length > 0 && !string.IsNullOrEmpty(channelGroups[0]))
+	        inputChannelGroups = channelGroups.ToList<string>()
+		        .Except(channelGroups)
+		        .Where(cg => !cg.EndsWith(Constants.Pnpres, StringComparison.OrdinalIgnoreCase)).ToArray();
+            if (channelGroups.Length > 0 && !string.IsNullOrEmpty(channelGroups[0]))
             {
                 this.subscribeChannelGroupNames.AddRange(channelGroups);
             }
@@ -113,24 +123,44 @@ namespace PubnubApi.EndPoint
 			Subscribe(channelNames, channelGroupNames, cursor, this.queryParam);
 		}
 
-		private void Subscribe(string[] channels, string[] channelGroups, SubscriptionCursor cursor, Dictionary<string, object> externalQueryParam)
+		private async void Subscribe(string[] channels, string[] channelGroups, SubscriptionCursor cursor, Dictionary<string, object> externalQueryParam)
 		{
-			if ((channels?.Length ?? 0) == 0 && (channelGroups?.Length ?? 0) == 0) {
-				throw new ArgumentException("Either Channel Or Channel Group or Both should be provided.");
-			}
+			try
+			{
+				if ((channels?.Length ?? 0) == 0 && (channelGroups?.Length ?? 0) == 0) {
+					throw new ArgumentException("Either Channel Or Channel Group or Both should be provided.");
+				}
 
-			if (subscribeEventEngineFactory.HasEventEngine(instanceId)) {
-				subscribeEventEngine = subscribeEventEngineFactory.GetEventEngine(instanceId);
-			} else {
-				var subscribeManager = new SubscribeManager2(config, jsonLibrary, unit, pubnubTokenMgr, PubnubInstance);
-				subscribeEventEngine = subscribeEventEngineFactory.InitializeEventEngine(instanceId, PubnubInstance, config, subscribeManager, this.EventEmitter, jsonLibrary, StatusEmitter);
-				subscribeEventEngine.OnStateTransition += SubscribeEventEngine_OnStateTransition;
-				subscribeEventEngine.OnEventQueued += SubscribeEventEngine_OnEventQueued;
-				subscribeEventEngine.OnEffectDispatch += SubscribeEventEngine_OnEffectDispatch;
+				if (subscribeEventEngineFactory.HasEventEngine(instanceId)) {
+					subscribeEventEngine = subscribeEventEngineFactory.GetEventEngine(instanceId);
+				} else {
+					var subscribeManager = new SubscribeManager2(config, jsonLibrary, unit, pubnubTokenMgr, PubnubInstance);
+					subscribeEventEngine = subscribeEventEngineFactory.InitializeEventEngine(instanceId, PubnubInstance, config, subscribeManager, this.EventEmitter, jsonLibrary, StatusEmitter);
+					subscribeEventEngine.OnStateTransition += SubscribeEventEngine_OnStateTransition;
+					subscribeEventEngine.OnEventQueued += SubscribeEventEngine_OnEventQueued;
+					subscribeEventEngine.OnEffectDispatch += SubscribeEventEngine_OnEffectDispatch;
+				}
+				subscribeEventEngine.Subscribe<T>(channels, channelGroups, cursor);
+				if (this.presenceOperation == null)
+				{
+					if (inputChannels.Any() || inputChannelGroups.Any())
+					{
+						await heartbeatOperation.HeartbeatRequest<string>(
+							inputChannels,
+							inputChannelGroups
+						).ConfigureAwait(false);
+					}
+				}
+				if (this.presenceOperation != null) {
+					presenceOperation.Start(channels?.Where(c => !c.EndsWith(Constants.Pnpres)).ToArray(), channelGroups?.Where(cg => !cg.EndsWith(Constants.Pnpres)).ToArray());
+				}
+				// clear incoming entity list to not mix names with subsequent subscribe() calls.
+				inputChannels =[];
+				inputChannelGroups=[];
 			}
-			subscribeEventEngine.Subscribe<T>(channels, channelGroups, cursor);
-			if (this.presenceOperation != null) {
-				presenceOperation.Start(channels?.Where(c => !c.EndsWith(Constants.Pnpres)).ToArray(), channelGroups?.Where(cg => !cg.EndsWith(Constants.Pnpres)).ToArray());
+			catch (Exception e)
+			{
+				config?.Logger?.Error($"Subscribe request encounter error: {e.Message}\n{e.StackTrace}");
 			}
 		}
 
