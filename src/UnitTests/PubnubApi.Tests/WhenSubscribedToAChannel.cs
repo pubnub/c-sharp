@@ -873,7 +873,7 @@ namespace PubNubMessaging.Tests
         }
         
         [Test]
-        public static void ThenJoinEventReceived()
+        public static async Task ThenJoinEventReceived()
         {
             int randomNumber = new Random().Next(1000, 10000);
             string userId = $"testUser{randomNumber}";
@@ -916,7 +916,7 @@ namespace PubNubMessaging.Tests
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            
+            await Task.Delay(2000).ConfigureAwait(false);
             Assert.IsTrue(receivedJoinEvent, "WhenSubscribedToAChannel, Then JoinEvent should be received");
             
         }
@@ -973,6 +973,7 @@ namespace PubNubMessaging.Tests
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
+            await Task.Delay(2000).ConfigureAwait(false);
             Assert.IsTrue(receivedJoinEvent&& receivedSecondJoinEvent, "WhenSubscribedToAChannel, Then JoinEvent should be received for subsequent Subscribe");
         }
         
@@ -984,7 +985,7 @@ namespace PubNubMessaging.Tests
             bool receivedJoinEvent = false;
             bool receivedSecondJoinEvent = false;
             string channel = $"testChannel{randomNumber}";
-            string channel2 = $"testChannel{randomNumber}_2";
+            string channel2 = $"testChannel2{randomNumber}";
 
             PNConfiguration config = new PNConfiguration(new UserId(userId))
             {
@@ -1027,11 +1028,12 @@ namespace PubNubMessaging.Tests
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
+            await Task.Delay(2000).ConfigureAwait(false);
             Assert.IsTrue(receivedJoinEvent&& receivedSecondJoinEvent, "WhenSubscribedToAChannel, Then JoinEvent should be received when presence timeout is set");
         }
         
         [Test]
-        public static async Task ThenJoinEventReceivedForSubsequentSubscribeWithZeroPresenceTimeOut()
+        public static async Task ThenJoinEventReceivedForSubsequentSubscribeWithZeroInterval()
         {
             int randomNumber = new Random().Next(1000, 10000);
             string userId = $"testUser{randomNumber}";
@@ -1044,9 +1046,8 @@ namespace PubNubMessaging.Tests
             {
                 PublishKey = PubnubCommon.NonPAMPublishKey,
                 SubscribeKey = PubnubCommon.NONPAMSubscribeKey,
-                PresenceTimeout = 0
             };
-
+            config.SetPresenceTimeoutWithCustomInterval(300, 0);
             ManualResetEvent joinEvent = new ManualResetEvent(false);
             ManualResetEvent secondJoinEvent = new ManualResetEvent(false);
             var listener = new SubscribeCallbackExt(
@@ -1069,13 +1070,12 @@ namespace PubNubMessaging.Tests
                 {
                 }
             );
-            pubnub = createPubNubInstance(config);
+            pubnub = new Pubnub(config);
             pubnub.AddListener(listener);
             manualResetEventWaitTimeout = 310 * 1000;
 
             pubnub.Subscribe<string>().Channels(new [] { channel }).WithPresence().Execute();
             joinEvent.WaitOne(manualResetEventWaitTimeout);
-            await Task.Delay(2000);
             pubnub.Subscribe<string>().Channels(new [] { channel2 }).WithPresence().Execute();
             secondJoinEvent.WaitOne(manualResetEventWaitTimeout);
             pubnub.RemoveListener(listener);
@@ -1083,7 +1083,7 @@ namespace PubNubMessaging.Tests
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-
+            await Task.Delay(2000).ConfigureAwait(false);
             Assert.IsTrue(receivedJoinEvent&& receivedSecondJoinEvent, "WhenSubscribedToAChannel, Then JoinEvent should be received when presenceTimeout is set to 0");
         }
 
