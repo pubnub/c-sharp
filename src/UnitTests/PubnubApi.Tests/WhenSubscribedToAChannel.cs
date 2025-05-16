@@ -912,10 +912,13 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new [] { randomChannel }).Execute();
             joinEvent.WaitOne(manualResetEventWaitTimeout);
             pubnub.RemoveListener(listener);
+            pubnub.UnsubscribeAll<string>();
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
+            
             Assert.IsTrue(receivedJoinEvent, "WhenSubscribedToAChannel, Then JoinEvent should be received");
+            
         }
         
         [Test]
@@ -926,7 +929,7 @@ namespace PubNubMessaging.Tests
             bool receivedJoinEvent = false;
             bool receivedSecondJoinEvent = false;
             string channel = $"testChannel{randomNumber}";
-            string channel2 = $"testChannel{randomNumber}_1";
+            string channel2 = $"testChannel2{randomNumber}";
 
             PNConfiguration config = new PNConfiguration(new UserId(userId))
             {
@@ -966,6 +969,7 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new [] { channel2 }).WithPresence().Execute();
             secondJoinEvent.WaitOne(manualResetEventWaitTimeout);
             pubnub.RemoveListener(listener);
+            pubnub.UnsubscribeAll<string>();
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
@@ -1019,6 +1023,7 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new [] { channel2 }).WithPresence().Execute();
             secondJoinEvent.WaitOne(manualResetEventWaitTimeout);
             pubnub.RemoveListener(listener);
+            pubnub.UnsubscribeAll<string>();
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
@@ -1074,6 +1079,7 @@ namespace PubNubMessaging.Tests
             pubnub.Subscribe<string>().Channels(new [] { channel2 }).WithPresence().Execute();
             secondJoinEvent.WaitOne(manualResetEventWaitTimeout);
             pubnub.RemoveListener(listener);
+            pubnub.UnsubscribeAll<string>();
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
