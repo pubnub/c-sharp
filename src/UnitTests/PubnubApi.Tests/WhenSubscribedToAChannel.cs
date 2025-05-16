@@ -876,8 +876,9 @@ namespace PubNubMessaging.Tests
         public static void ThenJoinEventReceived()
         {
             int randomNumber = new Random().Next(1000, 10000);
-            string userId = $"testUser-{randomNumber}";
+            string userId = $"testUser{randomNumber}";
             bool receivedJoinEvent = false;
+            string randomChannel = $"testChannel{randomNumber}";
 
             PNConfiguration config = new PNConfiguration(new UserId(userId))
             {
@@ -898,32 +899,29 @@ namespace PubNubMessaging.Tests
                 }
                 , (_, status) =>
                 {
-                    Console.WriteLine( pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
                 }
             );
             pubnub = createPubNubInstance(config);
             pubnub.AddListener(listener);
             manualResetEventWaitTimeout = 310 * 1000;
-            string channel = $"testChannel-{randomNumber}";
-            pubnub.Subscribe<string>().Channels(new [] { channel }).WithPresence().Execute();
-            joinEvent.WaitOne(manualResetEventWaitTimeout); //Wait for Connect Status
+            pubnub.Subscribe<string>().Channels(new [] { randomChannel }).Execute();
+            joinEvent.WaitOne(manualResetEventWaitTimeout);
             pubnub.RemoveListener(listener);
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-
-            Assert.IsTrue(receivedJoinEvent, "WhenSubscribedToAChannel --> ThenJoinEvent Received");
+            Assert.IsTrue(receivedJoinEvent, "WhenSubscribedToAChannel, Then JoinEvent should be received");
         }
         
         [Test]
         public static async Task ThenJoinEventReceivedForSubsequentSubscribe()
         {
             int randomNumber = new Random().Next(1000, 10000);
-            string userId = $"testUser-{randomNumber}";
+            string userId = $"testUser{randomNumber}";
             bool receivedJoinEvent = false;
             bool receivedSecondJoinEvent = false;
-            string channel = $"testChannel-{randomNumber}";
-            string channel2 = $"testChannel-{randomNumber}-1";
+            string channel = $"testChannel{randomNumber}";
+            string channel2 = $"testChannel{randomNumber}_1";
 
             PNConfiguration config = new PNConfiguration(new UserId(userId))
             {
@@ -951,7 +949,6 @@ namespace PubNubMessaging.Tests
                 }
                 , (_, status) =>
                 {
-                    Console.WriteLine( pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
                 }
             );
             pubnub = createPubNubInstance(config);
@@ -967,19 +964,18 @@ namespace PubNubMessaging.Tests
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-
-            Assert.IsTrue(receivedJoinEvent&& receivedSecondJoinEvent, "WhenSubscribedToAChannel --> ThenJoinEvent Received");
+            Assert.IsTrue(receivedJoinEvent&& receivedSecondJoinEvent, "WhenSubscribedToAChannel, Then JoinEvent should be received for subsequent Subscribe");
         }
         
         [Test]
         public static async Task ThenJoinEventReceivedForSubsequentSubscribeWithPresenceEventEngine()
         {
             int randomNumber = new Random().Next(1000, 10000);
-            string userId = $"testUser-{randomNumber}";
+            string userId = $"testUser{randomNumber}";
             bool receivedJoinEvent = false;
             bool receivedSecondJoinEvent = false;
-            string channel = $"testChannel-{randomNumber}";
-            string channel2 = $"testChannel-{randomNumber}-1";
+            string channel = $"testChannel{randomNumber}";
+            string channel2 = $"testChannel{randomNumber}_2";
 
             PNConfiguration config = new PNConfiguration(new UserId(userId))
             {
@@ -1004,17 +1000,14 @@ namespace PubNubMessaging.Tests
                         secondJoinEvent.Set();
                         receivedSecondJoinEvent = true;
                     }
-                    
                 }
                 , (_, status) =>
                 {
-                    Console.WriteLine( pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
                 }
             );
             pubnub = createPubNubInstance(config);
             pubnub.AddListener(listener);
             manualResetEventWaitTimeout = 310 * 1000;
-
             pubnub.Subscribe<string>().Channels(new [] { channel }).WithPresence().Execute();
             joinEvent.WaitOne(manualResetEventWaitTimeout);
             await Task.Delay(2000);
@@ -1024,19 +1017,18 @@ namespace PubNubMessaging.Tests
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-
-            Assert.IsTrue(receivedJoinEvent&& receivedSecondJoinEvent, "WhenSubscribedToAChannel --> ThenJoinEvent Received");
+            Assert.IsTrue(receivedJoinEvent&& receivedSecondJoinEvent, "WhenSubscribedToAChannel, Then JoinEvent should be received when presence timeout is set");
         }
         
         [Test]
         public static async Task ThenJoinEventReceivedForSubsequentSubscribeWithZeroPresenceTimeOut()
         {
             int randomNumber = new Random().Next(1000, 10000);
-            string userId = $"testUser-{randomNumber}";
+            string userId = $"testUser{randomNumber}";
             bool receivedJoinEvent = false;
             bool receivedSecondJoinEvent = false;
-            string channel = $"testChannel-{randomNumber}";
-            string channel2 = $"testChannel-{randomNumber}-1";
+            string channel = $"testChannel{randomNumber}";
+            string channel2 = $"testChannel{randomNumber}_3";
 
             PNConfiguration config = new PNConfiguration(new UserId(userId))
             {
@@ -1065,7 +1057,6 @@ namespace PubNubMessaging.Tests
                 }
                 , (_, status) =>
                 {
-                    Console.WriteLine( pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
                 }
             );
             pubnub = createPubNubInstance(config);
@@ -1082,7 +1073,7 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = null;
             pubnub = null;
 
-            Assert.IsTrue(receivedJoinEvent&& receivedSecondJoinEvent, "WhenSubscribedToAChannel --> ThenJoinEvent Received");
+            Assert.IsTrue(receivedJoinEvent&& receivedSecondJoinEvent, "WhenSubscribedToAChannel, Then JoinEvent should be received when presenceTimeout is set to 0");
         }
 
     }
