@@ -2523,5 +2523,156 @@ namespace PubNubMessaging.Tests
             pubnub = null;
         }
 
+        [Test]
+        public static async Task ThenSetPresenceStateShouldWorkCorrectly()
+        {
+            server.ClearRequests();
+
+            if (PubnubCommon.EnableStubTest)
+            {
+                Assert.Ignore("Ignored ThenSetPresenceStateShouldWorkCorrectly");
+                return;
+            }
+
+            string channel = "hello_my_channel";
+            string channelGroup = "hello_my_group";
+            string customUuid = "mytestuuid";
+
+            PNConfiguration config = new PNConfiguration(new UserId(customUuid))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+
+            pubnub = createPubNubInstance(config);
+            if (!string.IsNullOrEmpty(authToken))
+            {
+                pubnub.SetAuthToken(authToken);
+            }
+
+            // Test 1: Set state for channel
+            Dictionary<string, object> channelState = new Dictionary<string, object>
+            {
+                { "status", "online" },
+                { "lastSeen", DateTime.UtcNow.ToString() }
+            };
+
+            PNResult<PNSetStateResult> setChannelStateResult = await pubnub.SetPresenceState()
+                .Channels(new[] { channel })
+                .State(channelState)
+                .ExecuteAsync();
+
+            Assert.IsNotNull(setChannelStateResult.Result, "Set channel state result should not be null");
+            Assert.AreEqual(200, setChannelStateResult.Status.StatusCode, "Set channel state status code should be 200");
+            Assert.IsFalse(setChannelStateResult.Status.Error, "Set channel state should not have errors");
+            Assert.IsNotNull(setChannelStateResult.Result.State, "State should not be null");
+            Assert.IsTrue(setChannelStateResult.Result.State.ContainsKey("status"), "State should contain status");
+            Assert.AreEqual("online", setChannelStateResult.Result.State["status"].ToString(), "Status should be online");
+
+            // Test 2: Set state for channel group
+            Dictionary<string, object> channelGroupState = new Dictionary<string, object>
+            {
+                { "type", "group" },
+                { "members", 5 }
+            };
+
+            PNResult<PNSetStateResult> setChannelGroupStateResult = await pubnub.SetPresenceState()
+                .ChannelGroups(new[] { channelGroup })
+                .State(channelGroupState)
+                .ExecuteAsync();
+
+            Assert.IsNotNull(setChannelGroupStateResult.Result, "Set channel group state result should not be null");
+            Assert.AreEqual(200, setChannelGroupStateResult.Status.StatusCode, "Set channel group state status code should be 200");
+            Assert.IsFalse(setChannelGroupStateResult.Status.Error, "Set channel group state should not have errors");
+            Assert.IsNotNull(setChannelGroupStateResult.Result.State, "State should not be null");
+            Assert.IsTrue(setChannelGroupStateResult.Result.State.ContainsKey("type"), "State should contain type");
+            Assert.AreEqual("group", setChannelGroupStateResult.Result.State["type"].ToString(), "Type should be group");
+
+            // Test 3: Set state for both channel and channel group
+            Dictionary<string, object> combinedState = new Dictionary<string, object>
+            {
+                { "combined", true },
+                { "timestamp", DateTime.UtcNow.ToString() }
+            };
+
+            PNResult<PNSetStateResult> setCombinedStateResult = await pubnub.SetPresenceState()
+                .Channels(new[] { channel })
+                .ChannelGroups(new[] { channelGroup })
+                .State(combinedState)
+                .ExecuteAsync();
+
+            Assert.IsNotNull(setCombinedStateResult.Result, "Set combined state result should not be null");
+            Assert.AreEqual(200, setCombinedStateResult.Status.StatusCode, "Set combined state status code should be 200");
+            Assert.IsFalse(setCombinedStateResult.Status.Error, "Set combined state should not have errors");
+            Assert.IsNotNull(setCombinedStateResult.Result.State, "State should not be null");
+            Assert.IsTrue(setCombinedStateResult.Result.State.ContainsKey("combined"), "State should contain combined flag");
+            Assert.IsTrue((bool)setCombinedStateResult.Result.State["combined"], "Combined flag should be true");
+
+            // Test 4: Set state with custom UUID
+            Dictionary<string, object> customState = new Dictionary<string, object>
+            {
+                { "customUuid", true },
+                { "timestamp", DateTime.UtcNow.ToString() }
+            };
+
+            PNResult<PNSetStateResult> setCustomUuidStateResult = await pubnub.SetPresenceState()
+                .Channels(new[] { channel })
+                .Uuid(customUuid)
+                .State(customState)
+                .ExecuteAsync();
+
+            Assert.IsNotNull(setCustomUuidStateResult.Result, "Set custom UUID state result should not be null");
+            Assert.AreEqual(200, setCustomUuidStateResult.Status.StatusCode, "Set custom UUID state status code should be 200");
+            Assert.IsFalse(setCustomUuidStateResult.Status.Error, "Set custom UUID state should not have errors");
+            Assert.IsNotNull(setCustomUuidStateResult.Result.State, "State should not be null");
+            Assert.IsTrue(setCustomUuidStateResult.Result.State.ContainsKey("customUuid"), "State should contain customUuid flag");
+            Assert.IsTrue((bool)setCustomUuidStateResult.Result.State["customUuid"], "Custom UUID flag should be true");
+
+            // Test 5: Set state with query parameters
+            Dictionary<string, object> queryParams = new Dictionary<string, object>
+            {
+                { "custom_param", "value" }
+            };
+
+            Dictionary<string, object> queryState = new Dictionary<string, object>
+            {
+                { "hasQueryParams", true }
+            };
+
+            PNResult<PNSetStateResult> setQueryStateResult = await pubnub.SetPresenceState()
+                .Channels(new[] { channel })
+                .State(queryState)
+                .QueryParam(queryParams)
+                .ExecuteAsync();
+
+            Assert.IsNotNull(setQueryStateResult.Result, "Set query state result should not be null");
+            Assert.AreEqual(200, setQueryStateResult.Status.StatusCode, "Set query state status code should be 200");
+            Assert.IsFalse(setQueryStateResult.Status.Error, "Set query state should not have errors");
+            Assert.IsNotNull(setQueryStateResult.Result.State, "State should not be null");
+            Assert.IsTrue(setQueryStateResult.Result.State.ContainsKey("hasQueryParams"), "State should contain hasQueryParams flag");
+            Assert.IsTrue((bool)setQueryStateResult.Result.State["hasQueryParams"], "Has query params flag should be true");
+
+            // Test 6: Verify state persistence with GetPresenceState
+            PNResult<PNGetStateResult> getStateResult = await pubnub.GetPresenceState()
+                .Channels(new[] { channel })
+                .ExecuteAsync();
+
+            Assert.IsNotNull(getStateResult.Result, "Get state result should not be null");
+            Assert.AreEqual(200, getStateResult.Status.StatusCode, "Get state status code should be 200");
+            Assert.IsFalse(getStateResult.Status.Error, "Get state should not have errors");
+            Assert.IsNotNull(getStateResult.Result.StateByUUID, "State by UUID should not be null");
+            Assert.IsTrue(getStateResult.Result.StateByUUID.ContainsKey("hasQueryParams"), "State should contain key \"hasQueryParams\"");
+
+            // Cleanup
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
+
     }
 }
