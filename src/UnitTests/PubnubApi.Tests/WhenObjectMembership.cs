@@ -1,9 +1,11 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
 using System.Threading;
 using PubnubApi;
 using System.Collections.Generic;
 using MockServer;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PubNubMessaging.Tests
@@ -1995,6 +1997,316 @@ namespace PubNubMessaging.Tests
             pubnub.RemoveListener(eventListener);
 
             Assert.IsTrue(receivedDeleteEvent && receivedSetEvent, "With Async Set/Remove Membership events Failed");
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
+
+        [Test]
+        public static async Task ThenSetMembershipsShouldHandleAllFeatures()
+        {
+            server.ClearRequests();
+
+            if (PubnubCommon.EnableStubTest)
+            {
+                Assert.Ignore("Ignored ThenSetMembershipsShouldHandleAllFeatures");
+                return;
+            }
+
+            string uuidMetadataId = "pandu-ut-uid";
+            string channelMetadataId1 = "pandu-ut-sid1";
+            string channelMetadataId2 = "pandu-ut-sid2";
+            string channelMetadataId3 = "pandu-ut-sid2"; // Using existing channel ID since we only have two available
+
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+
+            pubnub = createPubNubInstance(config);
+            if (!string.IsNullOrEmpty(authToken))
+            {
+                pubnub.SetAuthToken(authToken);
+            }
+
+            // First create the UUID metadata
+            PNResult<PNSetUuidMetadataResult> createUserResult = await pubnub.SetUuidMetadata()
+                .Uuid(uuidMetadataId)
+                .Name("pandu-ut-un")
+                .ExecuteAsync();
+
+            Assert.IsNotNull(createUserResult.Result, "UUID metadata creation failed");
+            Assert.AreEqual(200, createUserResult.Status.StatusCode, "UUID metadata creation status code should be 200");
+            Assert.IsFalse(createUserResult.Status.Error, "UUID metadata creation should not have errors");
+
+            // Create channel metadata for all channels
+            PNResult<PNSetChannelMetadataResult> createChannel1Result = await pubnub.SetChannelMetadata()
+                .Channel(channelMetadataId1)
+                .Name("pandu-ut-spname")
+                .ExecuteAsync();
+
+            Assert.IsNotNull(createChannel1Result.Result, "Channel 1 metadata creation failed");
+            Assert.AreEqual(200, createChannel1Result.Status.StatusCode, "Channel 1 metadata creation status code should be 200");
+
+            PNResult<PNSetChannelMetadataResult> createChannel2Result = await pubnub.SetChannelMetadata()
+                .Channel(channelMetadataId2)
+                .Name("pandu-ut-spname")
+                .ExecuteAsync();
+
+            Assert.IsNotNull(createChannel2Result.Result, "Channel 2 metadata creation failed");
+            Assert.AreEqual(200, createChannel2Result.Status.StatusCode, "Channel 2 metadata creation status code should be 200");
+
+            // Test 1: Basic membership setting with custom data
+            var memberships = new List<PNMembership>
+            {
+                new PNMembership 
+                { 
+                    Channel = channelMetadataId1,
+                    Custom = new Dictionary<string, object> { { "role", "admin" } }
+                },
+                new PNMembership 
+                { 
+                    Channel = channelMetadataId2,
+                    Custom = new Dictionary<string, object> { { "role", "member" } }
+                }
+            };
+
+            PNResult<PNMembershipsResult> setMembershipsResult = await pubnub.SetMemberships()
+                .Uuid(uuidMetadataId)
+                .Channels(memberships)
+                .Include(new[] { PNMembershipField.CUSTOM, PNMembershipField.CHANNEL })
+                .Limit(10)
+                .IncludeCount(true)
+                .ExecuteAsync();
+
+            Assert.IsNotNull(setMembershipsResult.Result, "Set memberships result should not be null");
+            Assert.AreEqual(200, setMembershipsResult.Status.StatusCode, "Set memberships status code should be 200");
+            Assert.IsFalse(setMembershipsResult.Status.Error, "Set memberships should not have errors");
+            Assert.IsNotNull(setMembershipsResult.Result.Memberships, "Memberships list should not be null");
+            Assert.AreEqual(2, setMembershipsResult.Result.Memberships.Count, "Should have 2 memberships");
+            Assert.IsTrue(setMembershipsResult.Result.Memberships.Any(m => m.ChannelMetadata.Channel == channelMetadataId1), "Should contain channel 1");
+            Assert.IsTrue(setMembershipsResult.Result.Memberships.Any(m => m.ChannelMetadata.Channel == channelMetadataId2), "Should contain channel 2");
+            Assert.IsTrue(setMembershipsResult.Result.Memberships.Any(m => m.Custom != null && m.Custom.ContainsKey("role")), "Should have custom data");
+
+            // Test 2: Update existing membership and add new one
+            var updatedMemberships = new List<PNMembership>
+            {
+                new PNMembership 
+                { 
+                    Channel = channelMetadataId1,
+                    Custom = new Dictionary<string, object> { { "role", "superadmin" } }
+                },
+                new PNMembership 
+                { 
+                    Channel = channelMetadataId2,
+                    Custom = new Dictionary<string, object> { { "role", "viewer" } }
+                }
+            };
+
+            PNResult<PNMembershipsResult> updateMembershipsResult = await pubnub.SetMemberships()
+                .Uuid(uuidMetadataId)
+                .Channels(updatedMemberships)
+                .Include(new[] { PNMembershipField.CUSTOM, PNMembershipField.CHANNEL })
+                .Limit(10)
+                .IncludeCount(true)
+                .ExecuteAsync();
+
+            Assert.IsNotNull(updateMembershipsResult.Result, "Update memberships result should not be null");
+            Assert.AreEqual(200, updateMembershipsResult.Status.StatusCode, "Update memberships status code should be 200");
+            Assert.IsFalse(updateMembershipsResult.Status.Error, "Update memberships should not have errors");
+            Assert.IsNotNull(updateMembershipsResult.Result.Memberships, "Memberships list should not be null");
+            Assert.IsTrue(updateMembershipsResult.Result.Memberships.Any(m => m.ChannelMetadata.Channel == channelMetadataId1 && 
+                m.Custom != null && m.Custom["role"].ToString() == "superadmin"), "Should have updated channel 1");
+            Assert.IsTrue(updateMembershipsResult.Result.Memberships.Any(m => m.ChannelMetadata.Channel == channelMetadataId2), "Should contain channel 2");
+
+            // Cleanup
+            await pubnub.RemoveUuidMetadata().Uuid(uuidMetadataId).ExecuteAsync();
+            await pubnub.RemoveChannelMetadata().Channel(channelMetadataId1).ExecuteAsync();
+            await pubnub.RemoveChannelMetadata().Channel(channelMetadataId2).ExecuteAsync();
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
+
+        [Test]
+        public static async Task ThenMembershipOperationsShouldWorkCorrectly()
+        {
+            server.ClearRequests();
+
+            if (PubnubCommon.EnableStubTest)
+            {
+                Assert.Ignore("Ignored ThenMembershipOperationsShouldWorkCorrectly");
+                return;
+            }
+
+            string uuidMetadataId = "pandu-ut-uid";
+            string channelMetadataId1 = "pandu-ut-sid1";
+            string channelMetadataId2 = "pandu-ut-sid2";
+
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+
+            pubnub = createPubNubInstance(config);
+            if (!string.IsNullOrEmpty(authToken))
+            {
+                pubnub.SetAuthToken(authToken);
+            }
+
+            // First create the UUID metadata
+            PNResult<PNSetUuidMetadataResult> createUserResult = await pubnub.SetUuidMetadata()
+                .Uuid(uuidMetadataId)
+                .Name("pandu-ut-un")
+                .ExecuteAsync();
+
+            Assert.IsNotNull(createUserResult.Result, "UUID metadata creation failed");
+            Assert.AreEqual(200, createUserResult.Status.StatusCode, "UUID metadata creation status code should be 200");
+            Assert.IsFalse(createUserResult.Status.Error, "UUID metadata creation should not have errors");
+
+            // Create channel metadata for all channels
+            PNResult<PNSetChannelMetadataResult> createChannel1Result = await pubnub.SetChannelMetadata()
+                .Channel(channelMetadataId1)
+                .Name("pandu-ut-spname")
+                .ExecuteAsync();
+
+            Assert.IsNotNull(createChannel1Result.Result, "Channel 1 metadata creation failed");
+            Assert.AreEqual(200, createChannel1Result.Status.StatusCode, "Channel 1 metadata creation status code should be 200");
+
+            PNResult<PNSetChannelMetadataResult> createChannel2Result = await pubnub.SetChannelMetadata()
+                .Channel(channelMetadataId2)
+                .Name("pandu-ut-spname")
+                .ExecuteAsync();
+
+            Assert.IsNotNull(createChannel2Result.Result, "Channel 2 metadata creation failed");
+            Assert.AreEqual(200, createChannel2Result.Status.StatusCode, "Channel 2 metadata creation status code should be 200");
+
+            // Test 1: Set Memberships
+            var memberships = new List<PNMembership>
+            {
+                new PNMembership 
+                { 
+                    Channel = channelMetadataId1,
+                    Custom = new Dictionary<string, object> { { "role", "admin" } }
+                },
+                new PNMembership 
+                { 
+                    Channel = channelMetadataId2,
+                    Custom = new Dictionary<string, object> { { "role", "member" } }
+                }
+            };
+
+            PNResult<PNMembershipsResult> setMembershipsResult = await pubnub.SetMemberships()
+                .Uuid(uuidMetadataId)
+                .Channels(memberships)
+                .Include(new[] { PNMembershipField.CUSTOM, PNMembershipField.CHANNEL })
+                .Limit(10)
+                .IncludeCount(true)
+                .ExecuteAsync();
+
+            Assert.IsNotNull(setMembershipsResult.Result, "Set memberships result should not be null");
+            Assert.AreEqual(200, setMembershipsResult.Status.StatusCode, "Set memberships status code should be 200");
+            Assert.IsFalse(setMembershipsResult.Status.Error, "Set memberships should not have errors");
+            Assert.IsNotNull(setMembershipsResult.Result.Memberships, "Memberships list should not be null");
+            Assert.AreEqual(2, setMembershipsResult.Result.Memberships.Count, "Should have 2 memberships");
+            Assert.IsTrue(setMembershipsResult.Result.Memberships.Any(m => m.ChannelMetadata.Channel == channelMetadataId1), "Should contain channel 1");
+            Assert.IsTrue(setMembershipsResult.Result.Memberships.Any(m => m.ChannelMetadata.Channel == channelMetadataId2), "Should contain channel 2");
+            Assert.IsTrue(setMembershipsResult.Result.Memberships.Any(m => m.Custom != null && m.Custom.ContainsKey("role")), "Should have custom data");
+
+            await Task.Delay(4000);
+
+            // Test 2: Get Memberships
+            PNResult<PNMembershipsResult> getMembershipsResult = await pubnub.GetMemberships()
+                .Uuid(uuidMetadataId)
+                .Include(new[] { PNMembershipField.CUSTOM, PNMembershipField.CHANNEL })
+                .Limit(10)
+                .IncludeCount(true)
+                .ExecuteAsync();
+
+            Assert.IsNotNull(getMembershipsResult.Result, "Get memberships result should not be null");
+            Assert.AreEqual(200, getMembershipsResult.Status.StatusCode, "Get memberships status code should be 200");
+            Assert.IsFalse(getMembershipsResult.Status.Error, "Get memberships should not have errors");
+            Assert.IsNotNull(getMembershipsResult.Result.Memberships, "Memberships list should not be null");
+            Assert.AreEqual(2, getMembershipsResult.Result.Memberships.Count, "Should have 2 memberships");
+            Assert.IsTrue(getMembershipsResult.Result.Memberships.Any(m => m.ChannelMetadata.Channel == channelMetadataId1), "Should contain channel 1");
+            Assert.IsTrue(getMembershipsResult.Result.Memberships.Any(m => m.ChannelMetadata.Channel == channelMetadataId2), "Should contain channel 2");
+
+            // Test 3: Manage Memberships (Update and Remove)
+            var updatedMemberships = new List<PNMembership>
+            {
+                new PNMembership 
+                { 
+                    Channel = channelMetadataId1,
+                    Custom = new Dictionary<string, object> { { "role", "superadmin" } }
+                }
+            };
+
+            PNResult<PNMembershipsResult> manageMembershipsResult = await pubnub.ManageMemberships()
+                .Uuid(uuidMetadataId)
+                .Set(updatedMemberships)
+                .Remove(new List<string> { channelMetadataId2 })
+                .Include(new[] { PNMembershipField.CUSTOM, PNMembershipField.CHANNEL })
+                .Limit(10)
+                .IncludeCount(true)
+                .ExecuteAsync();
+
+            Assert.IsNotNull(manageMembershipsResult.Result, "Manage memberships result should not be null");
+            Assert.AreEqual(200, manageMembershipsResult.Status.StatusCode, "Manage memberships status code should be 200");
+            Assert.IsFalse(manageMembershipsResult.Status.Error, "Manage memberships should not have errors");
+            Assert.IsNotNull(manageMembershipsResult.Result.Memberships, "Memberships list should not be null");
+            Assert.IsTrue(manageMembershipsResult.Result.Memberships.Any(m => m.ChannelMetadata.Channel == channelMetadataId1 && 
+                m.Custom != null && m.Custom["role"].ToString() == "superadmin"), "Should have updated channel 1");
+            Assert.IsFalse(manageMembershipsResult.Result.Memberships.Any(m => m.ChannelMetadata.Channel == channelMetadataId2), "Should not contain channel 2");
+
+            // Test 4: Remove Memberships
+            PNResult<PNMembershipsResult> removeMembershipsResult = await pubnub.RemoveMemberships()
+                .Uuid(uuidMetadataId)
+                .Channels(new List<string> { channelMetadataId1 })
+                .Include(new[] { PNMembershipField.CUSTOM, PNMembershipField.CHANNEL })
+                .Limit(10)
+                .IncludeCount(true)
+                .ExecuteAsync();
+
+            Assert.IsNotNull(removeMembershipsResult.Result, "Remove memberships result should not be null");
+            Assert.AreEqual(200, removeMembershipsResult.Status.StatusCode, "Remove memberships status code should be 200");
+            Assert.IsFalse(removeMembershipsResult.Status.Error, "Remove memberships should not have errors");
+            Assert.IsNotNull(removeMembershipsResult.Result.Memberships, "Memberships list should not be null");
+            Assert.IsFalse(removeMembershipsResult.Result.Memberships.Any(m => m.ChannelMetadata.Channel == channelMetadataId1), "Should not contain channel 1");
+
+            await Task.Delay(4000);
+
+            // Verify final state with Get Memberships
+            PNResult<PNMembershipsResult> finalGetResult = await pubnub.GetMemberships()
+                .Uuid(uuidMetadataId)
+                .Include(new[] { PNMembershipField.CUSTOM, PNMembershipField.CHANNEL })
+                .Limit(10)
+                .IncludeCount(true)
+                .ExecuteAsync();
+
+            Assert.IsNotNull(finalGetResult.Result, "Final get memberships result should not be null");
+            Assert.AreEqual(200, finalGetResult.Status.StatusCode, "Final get memberships status code should be 200");
+            Assert.IsFalse(finalGetResult.Status.Error, "Final get memberships should not have errors");
+            Assert.IsNotNull(finalGetResult.Result.Memberships, "Memberships list should not be null");
+            Assert.AreEqual(0, finalGetResult.Result.Memberships.Count, "Should have no memberships");
+
+            // Cleanup
+            await pubnub.RemoveUuidMetadata().Uuid(uuidMetadataId).ExecuteAsync();
+            await pubnub.RemoveChannelMetadata().Channel(channelMetadataId1).ExecuteAsync();
+            await pubnub.RemoveChannelMetadata().Channel(channelMetadataId2).ExecuteAsync();
 
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
