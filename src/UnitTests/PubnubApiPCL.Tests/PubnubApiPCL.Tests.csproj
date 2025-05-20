@@ -128,6 +128,11 @@
   <ItemGroup>
     <Folder Include="EventEngine\" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="file_large.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="copy $(ProjectDir)fileupload.txt $(ProjectDir)$(OutDir)" />
     <Exec Command="copy $(ProjectDir)fileupload_enc.txt $(ProjectDir)$(OutDir)" />
