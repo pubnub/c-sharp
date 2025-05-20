@@ -1,3 +1,7 @@
+v7.3.11 - May 20 2025
+-----------------------------
+- Fixed: fix missing `heartbeat` and `leave` REST API calls when the event engine is enabled and `presenceTimeout` or `presenceHeartbeatInterval` not set.
+
 v7.3.10 - May 09 2025
 -----------------------------
 - Fixed: specified dependency version for fixing synk reported issues.
