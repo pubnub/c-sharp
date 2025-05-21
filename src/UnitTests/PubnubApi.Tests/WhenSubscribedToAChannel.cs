@@ -929,7 +929,7 @@ namespace PubNubMessaging.Tests
             bool receivedJoinEvent = false;
             bool receivedSecondJoinEvent = false;
             string channel = $"testChannel{randomNumber}";
-            string channel2 = $"testChannel2{randomNumber}";
+            string channel2 = $"testChannel{randomNumber}_2";
 
             PNConfiguration config = new PNConfiguration(new UserId(userId))
             {
@@ -962,10 +962,8 @@ namespace PubNubMessaging.Tests
             pubnub = createPubNubInstance(config);
             pubnub.AddListener(listener);
             manualResetEventWaitTimeout = 310 * 1000;
-
             pubnub.Subscribe<string>().Channels(new [] { channel }).WithPresence().Execute();
             joinEvent.WaitOne(manualResetEventWaitTimeout);
-            await Task.Delay(2000);
             pubnub.Subscribe<string>().Channels(new [] { channel2 }).WithPresence().Execute();
             secondJoinEvent.WaitOne(manualResetEventWaitTimeout);
             pubnub.RemoveListener(listener);
