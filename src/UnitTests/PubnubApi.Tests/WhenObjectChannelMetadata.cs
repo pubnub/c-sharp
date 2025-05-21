@@ -1,10 +1,12 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
 using System.Threading;
 using PubnubApi;
 using System.Collections.Generic;
 using MockServer;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace PubNubMessaging.Tests
 {
@@ -45,38 +47,20 @@ namespace PubNubMessaging.Tests
 
             pubnub = createPubNubInstance(config);
 
-            var grantResult = await pubnub.GrantToken().TTL(20).AuthorizedUuid(config.UserId).Resources(
-                new PNTokenResources()
-                {
-                    Channels = new Dictionary<string, PNTokenAuthValues>()
-                    {
-                        {
-                            channelMetadataId, new PNTokenAuthValues()
-                            {
-                                Read = true,
-                                Write = true,
-                                Create = true,
-                                Get = true,
-                                Delete = true,
-                                Join = true,
-                                Update = true,
-                                Manage = true
-                            }
-                        }
-                    }
-                }).ExecuteAsync();
+            if (string.IsNullOrEmpty(PubnubCommon.GrantToken))
+            {
+                await GenerateTestGrantToken(pubnub);
+            }
+            authToken = PubnubCommon.GrantToken;
+            
             if (!PubnubCommon.EnableStubTest)
             {
                 await Task.Delay(3000);
             }
-
-            authToken = grantResult.Result?.Token;
-
+            
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Assert.IsTrue(grantResult.Result != null && grantResult.Status.Error == false,
-                "WhenObjectChannelMetadata Grant access failed.");
         }
 
         [TearDown]
@@ -771,6 +755,266 @@ namespace PubNubMessaging.Tests
             pubnub.RemoveListener(eventListener);
 
             Assert.IsTrue(receivedDeleteEvent && receivedUpdateEvent, "Space events Failed");
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
+
+        [Test]
+        public static async Task ThenSetChannelMembersShouldReturnSuccess()
+        {
+            string testChannel = $"foo.test_channel_{new Random().Next(1000, 9999)}";
+            string testUuid = "fuu.test-uuid-1";
+            Dictionary<string, object> customData = new Dictionary<string, object> { { "role", "admin" } };
+
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+
+            pubnub = createPubNubInstance(config);
+            pubnub.SetAuthToken(authToken);
+
+            // Create channel member
+            var member = new PNChannelMember
+            {
+                Uuid = testUuid,
+                Custom = customData
+            };
+
+            // Set channel member
+            PNResult<PNChannelMembersResult> setResult = await pubnub.SetChannelMembers()
+                .Channel(testChannel)
+                .Uuids(new List<PNChannelMember> { member })
+                .Include(new[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID })
+                .ExecuteAsync();
+
+            Assert.IsNotNull(setResult, "Set result should not be null");
+            Assert.IsNotNull(setResult.Result, "Set result data should not be null");
+            Assert.IsFalse(setResult.Status.Error, "Set operation should not have errors");
+            Assert.AreEqual(200, setResult.Status.StatusCode, "Set operation should return 200 status code");
+            Assert.IsNotNull(setResult.Result.ChannelMembers, "Members list should not be null");
+            Assert.AreEqual(1, setResult.Result.ChannelMembers.Count, "Should have one member");
+            Assert.AreEqual(testUuid, setResult.Result.ChannelMembers[0].UuidMetadata.Uuid, "Member UUID should match");
+            Assert.IsNotNull(setResult.Result.ChannelMembers[0].Custom, "Member custom data should not be null");
+            Assert.AreEqual("admin", setResult.Result.ChannelMembers[0].Custom["role"], "Member role should be admin");
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
+
+        [Test]
+        public static async Task ThenSetAndGetChannelMembersShouldReturnSuccess()
+        {
+            string testChannel = $"foo.test_channel_{new Random().Next(1000, 9999)}";
+            string testUuid = "fuu.test-uuid-2";
+            Dictionary<string, object> customData = new Dictionary<string, object> { { "role", "user" } };
+
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+
+            pubnub = createPubNubInstance(config);
+            pubnub.SetAuthToken(authToken);
+
+            // Create and set channel member
+            var member = new PNChannelMember
+            {
+                Uuid = testUuid,
+                Custom = customData
+            };
+
+            PNResult<PNChannelMembersResult> setResult = await pubnub.SetChannelMembers()
+                .Channel(testChannel)
+                .Uuids(new List<PNChannelMember> { member })
+                .Include(new[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID })
+                .ExecuteAsync();
+
+            Assert.IsNotNull(setResult, "Set result should not be null");
+            Assert.IsFalse(setResult.Status.Error, "Set operation should not have errors");
+
+            // Get channel members
+            PNResult<PNChannelMembersResult> getResult = await pubnub.GetChannelMembers()
+                .Channel(testChannel)
+                .Include(new[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID })
+                .ExecuteAsync();
+
+            Assert.IsNotNull(getResult, "Get result should not be null");
+            Assert.IsNotNull(getResult.Result, "Get result data should not be null");
+            Assert.IsFalse(getResult.Status.Error, "Get operation should not have errors");
+            Assert.AreEqual(200, getResult.Status.StatusCode, "Get operation should return 200 status code");
+            Assert.IsNotNull(getResult.Result.ChannelMembers, "Members list should not be null");
+            Assert.AreEqual(1, getResult.Result.ChannelMembers.Count, "Should have one member");
+            Assert.AreEqual(testUuid, getResult.Result.ChannelMembers[0].UuidMetadata.Uuid, "Member UUID should match");
+            Assert.IsNotNull(getResult.Result.ChannelMembers[0].Custom, "Member custom data should not be null");
+            Assert.AreEqual("user", getResult.Result.ChannelMembers[0].Custom["role"], "Member role should be user");
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
+
+        [Test]
+        public static async Task ThenSetGetAndRemoveChannelMembersShouldReturnSuccess()
+        {
+            string testChannel = $"foo.test_channel_{new Random().Next(1000, 9999)}";
+            string testUuid = "fuu.test-uuid-3";
+            Dictionary<string, object> customData = new Dictionary<string, object> { { "role", "moderator" } };
+
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+
+            pubnub = createPubNubInstance(config);
+            pubnub.SetAuthToken(authToken);
+
+            // Create and set channel member
+            var member = new PNChannelMember
+            {
+                Uuid = testUuid,
+                Custom = customData
+            };
+
+            PNResult<PNChannelMembersResult> setResult = await pubnub.SetChannelMembers()
+                .Channel(testChannel)
+                .Uuids(new List<PNChannelMember> { member })
+                .Include(new[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID })
+                .ExecuteAsync();
+
+            Assert.IsNotNull(setResult, "Set result should not be null");
+            Assert.IsFalse(setResult.Status.Error, "Set operation should not have errors");
+
+            // Get channel members before removal
+            PNResult<PNChannelMembersResult> getResult = await pubnub.GetChannelMembers()
+                .Channel(testChannel)
+                .Include(new[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID })
+                .ExecuteAsync();
+
+            Assert.IsNotNull(getResult, "Get result should not be null");
+            Assert.IsFalse(getResult.Status.Error, "Get operation should not have errors");
+            Assert.AreEqual(1, getResult.Result.ChannelMembers.Count, "Should have one member before removal");
+
+            // Remove channel member
+            PNResult<PNChannelMembersResult> removeResult = await pubnub.RemoveChannelMembers()
+                .Channel(testChannel)
+                .Uuids(new List<string> { testUuid })
+                .Include(new[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID })
+                .ExecuteAsync();
+
+            Assert.IsNotNull(removeResult, "Remove result should not be null");
+            Assert.IsNotNull(removeResult.Result, "Remove result data should not be null");
+            Assert.IsFalse(removeResult.Status.Error, "Remove operation should not have errors");
+            Assert.AreEqual(200, removeResult.Status.StatusCode, "Remove operation should return 200 status code");
+
+            // Get channel members after removal
+            PNResult<PNChannelMembersResult> getAfterRemoveResult = await pubnub.GetChannelMembers()
+                .Channel(testChannel)
+                .Include(new[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID })
+                .ExecuteAsync();
+
+            Assert.IsNotNull(getAfterRemoveResult, "Get after remove result should not be null");
+            Assert.IsFalse(getAfterRemoveResult.Status.Error, "Get after remove operation should not have errors");
+            Assert.AreEqual(0, getAfterRemoveResult.Result.ChannelMembers.Count, "Should have no members after removal");
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
+
+        [Test]
+        public static async Task ThenSetAndManageChannelMembersShouldReturnSuccess()
+        {
+            string testChannel = $"foo.test_channel_{new Random().Next(1000, 9999)}";
+            string testUuid1 = "fuu.test-uuid-4";
+            string testUuid2 = "fuu.test-uuid-5";
+            Dictionary<string, object> customData1 = new Dictionary<string, object> { { "role", "admin" } };
+            Dictionary<string, object> customData2 = new Dictionary<string, object> { { "role", "user" } };
+
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+
+            pubnub = createPubNubInstance(config);
+            pubnub.SetAuthToken(authToken);
+
+            // Create and set initial channel member
+            var member1 = new PNChannelMember
+            {
+                Uuid = testUuid1,
+                Custom = customData1
+            };
+
+            PNResult<PNChannelMembersResult> setResult = await pubnub.SetChannelMembers()
+                .Channel(testChannel)
+                .Uuids(new List<PNChannelMember> { member1 })
+                .Include(new[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID })
+                .ExecuteAsync();
+
+            Assert.IsNotNull(setResult, "Set result should not be null");
+            Assert.IsFalse(setResult.Status.Error, "Set operation should not have errors");
+
+            // Manage channel members (add new, update existing)
+            var member2 = new PNChannelMember
+            {
+                Uuid = testUuid2,
+                Custom = customData2
+            };
+
+            PNResult<PNChannelMembersResult> manageResult = await pubnub.ManageChannelMembers()
+                .Channel(testChannel)
+                .Set(new List<PNChannelMember> { member1, member2 })
+                .Include(new[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID })
+                .ExecuteAsync();
+
+            Assert.IsNotNull(manageResult, "Manage result should not be null");
+            Assert.IsNotNull(manageResult.Result, "Manage result data should not be null");
+            Assert.IsFalse(manageResult.Status.Error, "Manage operation should not have errors");
+            Assert.AreEqual(200, manageResult.Status.StatusCode, "Manage operation should return 200 status code");
+            Assert.IsNotNull(manageResult.Result.ChannelMembers, "Members list should not be null");
+            Assert.AreEqual(2, manageResult.Result.ChannelMembers.Count, "Should have two members");
+
+            // Get channel members to verify
+            PNResult<PNChannelMembersResult> getResult = await pubnub.GetChannelMembers()
+                .Channel(testChannel)
+                .Include(new[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID })
+                .ExecuteAsync();
+
+            Assert.IsNotNull(getResult, "Get result should not be null");
+            Assert.IsFalse(getResult.Status.Error, "Get operation should not have errors");
+            Assert.AreEqual(2, getResult.Result.ChannelMembers.Count, "Should have two members after manage operation");
+            
+            var members = getResult.Result.ChannelMembers;
+            Assert.IsTrue(members.Any(m => m.UuidMetadata.Uuid == testUuid1 && m.Custom["role"].ToString() == "admin"), "First member should exist with admin role");
+            Assert.IsTrue(members.Any(m => m.UuidMetadata.Uuid == testUuid2 && m.Custom["role"].ToString() == "user"), "Second member should exist with user role");
 
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
