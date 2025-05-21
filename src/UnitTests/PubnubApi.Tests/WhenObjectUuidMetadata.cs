@@ -761,7 +761,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public static void ThenGetAllUuidMetadataShouldSupportAllFields()
+        public static async Task ThenGetAllUuidMetadataShouldSupportAllFields()
         {
             server.ClearRequests();
 
@@ -817,6 +817,7 @@ namespace PubNubMessaging.Tests
                 }));
 
             manualEvent.WaitOne(manualResetEventWaitTimeout);
+            await Task.Delay(2000);
 
             if (receivedMessage)
             {

@@ -93,7 +93,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public static void ThenChannelMetadataCRUDShouldReturnSuccessCodeAndInfo()
+        public static async Task ThenChannelMetadataCRUDShouldReturnSuccessCodeAndInfo()
         {
             server.ClearRequests();
 
@@ -166,6 +166,7 @@ namespace PubNubMessaging.Tests
             #endregion
 
             manualEvent.WaitOne(manualResetEventWaitTimeout);
+            await Task.Delay(2000);
 
             if (receivedMessage)
             {
@@ -210,6 +211,8 @@ namespace PubNubMessaging.Tests
 
                 manualEvent.WaitOne(manualResetEventWaitTimeout);
             }
+            
+            await Task.Delay(2000);
 
             if (receivedMessage)
             {
