@@ -933,8 +933,9 @@ namespace PubNubMessaging.Tests
 
             PNConfiguration config = new PNConfiguration(new UserId(userId))
             {
-                PublishKey = PubnubCommon.NonPAMPublishKey,
-                SubscribeKey = PubnubCommon.NONPAMSubscribeKey,
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey =PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
             };
 
             ManualResetEvent joinEvent = new ManualResetEvent(false);
@@ -959,7 +960,7 @@ namespace PubNubMessaging.Tests
                 {
                 }
             );
-            pubnub = createPubNubInstance(config);
+            pubnub = new Pubnub(config);
             pubnub.AddListener(listener);
             manualResetEventWaitTimeout = 310 * 1000;
             pubnub.Subscribe<string>().Channels(new [] { channel }).WithPresence().Execute();
