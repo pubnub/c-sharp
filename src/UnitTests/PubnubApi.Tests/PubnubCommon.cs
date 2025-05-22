@@ -24,6 +24,9 @@ namespace PubNubMessaging.Tests
         
         public static string GrantToken = "";
 
+        public static readonly string NonPAMPublishKey = Environment.GetEnvironmentVariable("PN_PUB_KEY");
+        public static readonly string NONPAMSubscribeKey = Environment.GetEnvironmentVariable("PN_SUB_KEY");
+        
         static PubnubCommon()
         {
         }
