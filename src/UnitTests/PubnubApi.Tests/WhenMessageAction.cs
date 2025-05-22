@@ -4,6 +4,7 @@ using System.Threading;
 using PubnubApi;
 using MockServer;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace PubNubMessaging.Tests
 {
@@ -873,6 +874,116 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = null;
             pubnub = null;
             Assert.IsTrue(receivedAddEvent && receivedRemoveEvent, "Message Action events Failed");
+        }
+
+        [Test]
+        public static async Task ThenAddMessageActionWithCustomDataAndVerifyShouldReturnSuccess()
+        {
+            string channel = $"foo.test_channel_{new Random().Next(1000, 9999)}";
+            long messageTimetoken = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            string customType = "custom_reaction";
+            string customValue = "thumbs_up";
+
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Secure = false
+            };
+
+            pubnub = createPubNubInstance(config);
+            pubnub.SetAuthToken(authToken);
+
+            // First publish a message to get a valid message timetoken
+            PNResult<PNPublishResult> publishResult = await pubnub.Publish()
+                .Channel(channel)
+                .Message("Test message for action")
+                .ExecuteAsync();
+
+            Assert.IsNotNull(publishResult, "Publish result should not be null");
+            Assert.IsFalse(publishResult.Status.Error, "Publish operation should not have errors");
+            Assert.AreEqual(200, publishResult.Status.StatusCode, "Publish operation should return 200 status code");
+            Assert.IsNotNull(publishResult.Result, "Publish result data should not be null");
+            Assert.IsTrue(publishResult.Result.Timetoken > 0, "Publish result should have a valid timetoken");
+
+            // Use the actual message timetoken from the publish result
+            messageTimetoken = publishResult.Result.Timetoken;
+
+            // Add message action
+            PNMessageAction messageAction = new PNMessageAction
+            {
+                Type = customType,
+                Value = customValue
+            };
+
+            PNResult<PNAddMessageActionResult> addResult = await pubnub.AddMessageAction()
+                .Channel(channel)
+                .MessageTimetoken(messageTimetoken)
+                .Action(messageAction)
+                .ExecuteAsync();
+
+            Assert.IsNotNull(addResult, "Add result should not be null");
+            Assert.IsFalse(addResult.Status.Error, "Add operation should not have errors");
+            Assert.AreEqual(200, addResult.Status.StatusCode, "Add operation should return 200 status code");
+            Assert.IsNotNull(addResult.Result, "Add result data should not be null");
+            Assert.AreEqual(messageTimetoken, addResult.Result.MessageTimetoken, "Message timetoken should match");
+            Assert.IsTrue(addResult.Result.ActionTimetoken > 0, "Action timetoken should be valid");
+            Assert.IsFalse(string.IsNullOrEmpty(addResult.Result.Uuid), "UUID should not be empty");
+
+            // Verify the message action through GetMessageActions
+            PNResult<PNGetMessageActionsResult> getResult = await pubnub.GetMessageActions()
+                .Channel(channel)
+                .ExecuteAsync();
+
+            Assert.IsNotNull(getResult, "Get result should not be null");
+            Assert.IsFalse(getResult.Status.Error, "Get operation should not have errors");
+            Assert.AreEqual(200, getResult.Status.StatusCode, "Get operation should return 200 status code");
+            Assert.IsNotNull(getResult.Result, "Get result data should not be null");
+            Assert.IsNotNull(getResult.Result.MessageActions, "Message actions list should not be null");
+            Assert.IsTrue(getResult.Result.MessageActions.Count > 0, "Should have at least one message action");
+
+            // Find our specific message action
+            PNMessageActionItem foundAction = getResult.Result.MessageActions.Find(
+                x => x.MessageTimetoken == messageTimetoken && 
+                     x.Action.Type == customType && 
+                     x.Action.Value == customValue);
+
+            Assert.IsNotNull(foundAction, "Should find the added message action");
+            Assert.AreEqual(messageTimetoken, foundAction.MessageTimetoken, "Message timetoken should match");
+            Assert.AreEqual(customType, foundAction.Action.Type, "Action type should match");
+            Assert.AreEqual(customValue, foundAction.Action.Value, "Action value should match");
+            Assert.IsTrue(foundAction.ActionTimetoken > 0, "Action timetoken should be valid");
+            Assert.IsFalse(string.IsNullOrEmpty(foundAction.Uuid), "UUID should not be empty");
+
+            // Test edge case: Try to add the same action again
+            PNResult<PNAddMessageActionResult> duplicateAddResult = await pubnub.AddMessageAction()
+                .Channel(channel)
+                .MessageTimetoken(messageTimetoken)
+                .Action(messageAction)
+                .ExecuteAsync();
+
+            Assert.IsNotNull(duplicateAddResult, "Duplicate add result should not be null");
+            Assert.IsTrue(duplicateAddResult.Status.Error, "Duplicate add operation should have an error");
+            Assert.IsNull(duplicateAddResult.Result, "Duplicate add result data should be null");
+            Assert.AreEqual(409, duplicateAddResult.Status.StatusCode, "Duplicate add operation should return 409 status code");
+
+            // Verify we still have the same number of actions
+            PNResult<PNGetMessageActionsResult> verifyResult = await pubnub.GetMessageActions()
+                .Channel(channel)
+                .ExecuteAsync();
+
+            Assert.IsNotNull(verifyResult, "Verify result should not be null");
+            Assert.IsFalse(verifyResult.Status.Error, "Verify operation should not have errors");
+            Assert.AreEqual(200, verifyResult.Status.StatusCode, "Verify operation should return 200 status code");
+            Assert.IsNotNull(verifyResult.Result, "Verify result data should not be null");
+            Assert.IsNotNull(verifyResult.Result.MessageActions, "Message actions list should not be null");
+            Assert.AreEqual(getResult.Result.MessageActions.Count, verifyResult.Result.MessageActions.Count, 
+                "Number of message actions should not change after duplicate add");
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
         }
 
     }

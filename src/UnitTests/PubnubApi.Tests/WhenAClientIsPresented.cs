@@ -2674,5 +2674,96 @@ namespace PubNubMessaging.Tests
             pubnub = null;
         }
 
+        [Test]
+        public static async Task ThenHereNowShouldReturnCorrectUserData()
+        {
+            string channel = $"foo.test_channel_{new Random().Next(1000, 9999)}";
+            string customUuid = $"fuu.test_uuid_{new Random().Next(1000, 9999)}";
+            Dictionary<string, object> userState = new Dictionary<string, object>
+            {
+                { "status", "online" },
+                { "lastSeen", DateTime.UtcNow.ToString() },
+                { "customData", new Dictionary<string, object> { { "key", "value" } } }
+            };
+
+            PNConfiguration config = new PNConfiguration(new UserId(customUuid))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Secure = false
+            };
+
+            pubnub = createPubNubInstance(config);
+            if (!string.IsNullOrEmpty(authToken))
+            {
+                pubnub.SetAuthToken(authToken);
+            }
+
+            // Subscribe to channel
+            pubnub.Subscribe<string>().Channels(new[] { channel }).WithPresence().Execute();
+            await Task.Delay(3000); // Wait for subscription to complete
+
+            // Set user state
+            PNResult<PNSetStateResult> setStateResult = await pubnub.SetPresenceState()
+                .Uuid(customUuid)
+                .Channels(new[] { channel })
+                .State(userState)
+                .ExecuteAsync();
+
+            Assert.IsNotNull(setStateResult.Result, "Set state result should not be null");
+            Assert.IsFalse(setStateResult.Status.Error, "Set state should not have errors");
+            Assert.AreEqual(200, setStateResult.Status.StatusCode, "Set state should return 200 status code");
+
+            // Get HereNow data
+            PNResult<PNHereNowResult> hereNowResult = await pubnub.HereNow()
+                .Channels(new[] { channel })
+                .IncludeState(true)
+                .IncludeUUIDs(true)
+                .ExecuteAsync();
+
+            Assert.IsNotNull(hereNowResult.Result, "HereNow result should not be null");
+            Assert.IsFalse(hereNowResult.Status.Error, "HereNow should not have errors");
+            Assert.AreEqual(200, hereNowResult.Status.StatusCode, "HereNow should return 200 status code");
+
+            // Verify channel data
+            Assert.IsNotNull(hereNowResult.Result.Channels, "Channels should not be null");
+            Assert.IsTrue(hereNowResult.Result.Channels.ContainsKey(channel), "Channel should be present in results");
+            
+            var channelData = hereNowResult.Result.Channels[channel];
+            Assert.IsNotNull(channelData, "Channel data should not be null");
+            Assert.AreEqual(1, channelData.Occupancy, "Channel should have one occupant");
+            Assert.IsNotNull(channelData.Occupants, "Occupants should not be null");
+            Assert.AreEqual(1, channelData.Occupants.Count, "Should have one occupant");
+
+            // Verify user data
+            var occupant = channelData.Occupants[0];
+            Assert.AreEqual(customUuid, occupant.Uuid, "UUID should match");
+            Assert.IsNotNull(occupant.State, "State should not be null");
+            
+            // Cast state to dictionary and verify its contents
+            var stateDict = occupant.State as Dictionary<string, object>;
+            Assert.IsNotNull(stateDict, "State should be castable to Dictionary<string,object>");
+            Assert.IsTrue(stateDict.ContainsKey("status"), "State should contain status key");
+            Assert.AreEqual("online", stateDict["status"].ToString(), "Status should match");
+            Assert.IsTrue(stateDict.ContainsKey("lastSeen"), "State should contain lastSeen key");
+            Assert.IsNotNull(stateDict["lastSeen"], "LastSeen should be present");
+            Assert.IsTrue(stateDict.ContainsKey("customData"), "State should contain customData key");
+            
+            // Verify nested customData dictionary
+            var customData = stateDict["customData"] as Dictionary<string, object>;
+            Assert.IsNotNull(customData, "CustomData should be castable to Dictionary<string,object>");
+            Assert.IsTrue(customData.ContainsKey("key"), "CustomData should contain key");
+            Assert.AreEqual("value", customData["key"].ToString(), "CustomData value should match");
+
+            // Cleanup
+            pubnub.Unsubscribe<string>().Channels(new[] { channel }).Execute();
+            await Task.Delay(1000);
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
+
     }
 }
