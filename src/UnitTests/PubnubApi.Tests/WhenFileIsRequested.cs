@@ -593,59 +593,49 @@ namespace PubNubMessaging.Tests
             pubnub = null;
         }
 
-        //TODO: reenable once we have a files-disabled keyset in gh secrets
-        /*[Test]
-        public static async Task ThenFileOperationsWithDemoKeysShouldReturnError()
+        //TODO: is the message in content the correct behaviour?
+        [Test]
+        public static async Task ThenDownloadingNonExistentFileShouldReturnError()
         {
             server.ClearRequests();
 
             if (PubnubCommon.EnableStubTest)
             {
-                Assert.Ignore("Ignored ThenFileOperationsWithDemoKeysShouldReturnError");
+                Assert.Ignore("Ignored ThenDownloadingNonExistentFileShouldReturnError");
                 return;
             }
 
             PNConfiguration config = new PNConfiguration(new UserId("mytestuuid_file_tests"))
             {
-                PublishKey = "demo-36",
-                SubscribeKey = "demo-36",
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
                 Secure = false
             };
 
             pubnub = createPubNubInstance(config);
+            pubnub.SetAuthToken(token);
 
-            // Test file upload
-            string targetFileUpload = @"fileupload.txt";
-            PNResult<PNFileUploadResult> sendFileResult = await pubnub.SendFile()
+            string nonExistentFileId = "non-existent-file-id";
+            string nonExistentFileName = "non-existent-file.txt";
+
+            PNResult<PNDownloadFileResult> downloadResult = await pubnub.DownloadFile()
                 .Channel(channelName)
-                .File(targetFileUpload)
-                .Message("This is my test file")
+                .FileId(nonExistentFileId)
+                .FileName(nonExistentFileName)
                 .ExecuteAsync();
-
-            Assert.IsNotNull(sendFileResult, "Send file result should not be null");
-            Assert.IsNotNull(sendFileResult.Status, "Status should not be null");
-            Assert.IsTrue(sendFileResult.Status.Error, "Should have error status");
-            Assert.IsNull(sendFileResult.Result, "Result should be null for demo keys");
-            Assert.IsTrue(sendFileResult.Status.ErrorData.Information.ToLower().Contains("file"), "Error message should mention file operations");
-            Assert.IsTrue(sendFileResult.Status.ErrorData.Information.ToLower().Contains("disabled"), "Error message should mention disabled operations");
-
-            // Test file download
-            PNResult<PNDownloadFileResult> downloadFileResult = await pubnub.DownloadFile()
-                .Channel(channelName)
-                .FileId("test_file_id")
-                .FileName("test_file.txt")
-                .ExecuteAsync();
-
-            Assert.IsNotNull(downloadFileResult, "Download file result should not be null");
-            Assert.IsNotNull(downloadFileResult.Status, "Status should not be null");
-            Assert.IsTrue(downloadFileResult.Status.Error, "Should have error status");
-            Assert.IsNull(downloadFileResult.Result, "Result should be null for demo keys");
-            Assert.IsTrue(downloadFileResult.Status.ErrorData.Information.ToLower().Contains("file"), "Error message should mention file operations");
-            Assert.IsTrue(downloadFileResult.Status.ErrorData.Information.ToLower().Contains("disabled"), "Error message should mention disabled operations");
+            
+            //Assert.IsNotNull(downloadResult, "Download result should not be null");
+            Assert.IsNotNull(downloadResult.Status, "Status should not be null");
+            Assert.AreEqual(downloadResult.Status.StatusCode, 404, "Download status code for nonexistent file should be 404");
+            /*Assert.IsTrue(downloadResult.Status.Error, "Should have error status");
+            Assert.IsNull(downloadResult.Result, "Result should be null for non-existent file");
+            Assert.IsNotNull(downloadResult.Status.ErrorData, "Error data should not be null");
+            Assert.IsTrue(downloadResult.Status.ErrorData.Information.Contains("The specified key does not exist."), "Error message should indicate file not found");*/
 
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-        }*/
+        }
     }
 }

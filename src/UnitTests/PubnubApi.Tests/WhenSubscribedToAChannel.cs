@@ -927,5 +927,95 @@ namespace PubNubMessaging.Tests
 
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscriberShouldBeAbleToReceiveManyMessages Failed");
         }
+
+        [Test]
+        public static async Task ThenMultipleListenersShouldReceiveCallbacks()
+        {
+            if (PubnubCommon.EnableStubTest)
+            {
+                Assert.Ignore("Ignored ThenMultipleListenersShouldReceiveCallbacks");
+                return;
+            }
+
+            var firstListenerMessageEvent = new ManualResetEvent(false);
+            var secondListenerMessageEvent = new ManualResetEvent(false);
+            var firstListenerStatusEvent = new ManualResetEvent(false);
+            var secondListenerStatusEvent = new ManualResetEvent(false);
+
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                EnableEventEngine = true
+            };
+
+            pubnub = createPubNubInstance(config, authToken);
+
+            var firstListener = new SubscribeCallbackExt(
+                (_, messageEvent) =>
+                {
+                    if (messageEvent.Message != null)
+                    {
+                        firstListenerMessageEvent.Set();
+                    }
+                },
+                (_, _) => { },
+                (_, status) =>
+                {
+                    if (status.StatusCode == 200 && status.Category == PNStatusCategory.PNConnectedCategory)
+                    {
+                        firstListenerStatusEvent.Set();
+                    }
+                }
+            );
+
+            var secondListener = new SubscribeCallbackExt(
+                (_, messageEvent) =>
+                {
+                    if (messageEvent.Message != null)
+                    {
+                        secondListenerMessageEvent.Set();
+                    }
+                },
+                (_, _) => { },
+                (_, status) =>
+                {
+                    if (status.StatusCode == 200 && status.Category == PNStatusCategory.PNConnectedCategory)
+                    {
+                        secondListenerStatusEvent.Set();
+                    }
+                }
+            );
+
+            pubnub.AddListener(firstListener);
+            pubnub.AddListener(secondListener);
+
+            string channel = "test_multiple_listeners_channel";
+            string message = "test message for multiple listeners";
+
+            pubnub.Subscribe<string>().Channels(new[] { channel }).Execute();
+            
+            // Wait for both listeners to receive connection status
+            bool firstStatusReceived = firstListenerStatusEvent.WaitOne(manualResetEventWaitTimeout);
+            bool secondStatusReceived = secondListenerStatusEvent.WaitOne(manualResetEventWaitTimeout);
+            
+            Assert.IsTrue(firstStatusReceived, "First listener should receive connection status");
+            Assert.IsTrue(secondStatusReceived, "Second listener should receive connection status");
+
+            await pubnub.Publish().Channel(channel).Message(message).ExecuteAsync();
+            
+            // Wait for both listeners to receive the message
+            bool firstMessageReceived = firstListenerMessageEvent.WaitOne(manualResetEventWaitTimeout);
+            bool secondMessageReceived = secondListenerMessageEvent.WaitOne(manualResetEventWaitTimeout);
+            
+            Assert.IsTrue(firstMessageReceived, "First listener should receive message");
+            Assert.IsTrue(secondMessageReceived, "Second listener should receive message");
+
+            pubnub.Unsubscribe<string>().Channels(new[] { channel }).Execute();
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
     }
 }
