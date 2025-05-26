@@ -17,7 +17,7 @@ namespace PubNubMessaging.Tests
         private static Pubnub pubnub;
         private static Server server;
         private static string authToken;
-        private static string channelMetadataId = "pandu-ut-sid";
+        private static string channelMetadataId = "foo.pandu-ut-sid";
 
         [SetUp]
         public static async Task Init()
