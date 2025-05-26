@@ -132,11 +132,9 @@ namespace PubnubApi.EventEngine.Common
             {
                 payload = eventData?.Payload;
             }
-
-            List<object> payloadContainer = new List<object>(); //First item always message
+            
             if (currentMessageChannel.Contains("-pnpres") || currentMessageChannel.Contains(".*-pnpres"))
             {
-                payloadContainer.Add(payload);
                 jsonFields.Add("payload", payload);
             }
             else if (eventData.MessageType == 2) //Objects Simplification events
@@ -150,7 +148,6 @@ namespace PubnubApi.EventEngine.Common
                 {
                     if (objectsVersion.CompareTo(2D) == 0) //Process only version=2 for Objects Simplification. Ignore 1. 
                     {
-                        payloadContainer.Add(payload);
                         jsonFields.Add("payload", payload);
                     }
                 }
@@ -172,7 +169,6 @@ namespace PubnubApi.EventEngine.Common
                     }
 
                     object decodeMessage = jsonLibrary.DeserializeToObject((decryptMessage == "**DECRYPT ERROR**") ? jsonLibrary.SerializeToJsonString(payload) : decryptMessage);
-                    payloadContainer.Add(decodeMessage);
                     jsonFields.Add("payload", decodeMessage);
                 }
                 else
@@ -181,33 +177,27 @@ namespace PubnubApi.EventEngine.Common
                     object payloadJObject = jsonLibrary.BuildJsonObject(payloadJson);
                     if (payloadJObject == null)
                     {
-                        payloadContainer.Add(payload);
                         jsonFields.Add("payload", payload);
                     }
                     else
                     {
-                        payloadContainer.Add(payloadJObject);
                         jsonFields.Add("payload", payloadJObject);
                     }
                 }
             }
 
             var userMetaData = eventData.UserMetadata;
-            payloadContainer.Add(userMetaData); //Second one always user meta data
             jsonFields.Add("userMetadata", userMetaData);
-            payloadContainer.Add(GetTimetokenMetadata(eventData.PublishMetadata).Timetoken); //Third one always Timetoken - 2
             jsonFields.Add("publishTimetoken", GetTimetokenMetadata(eventData.PublishMetadata).Timetoken);
-            payloadContainer.Add(eventData.IssuingClientId); //Fourth one always Publisher
-            jsonFields.Add("userId", eventData.IssuingClientId); // - 3
+            jsonFields.Add("userId", eventData.IssuingClientId);
 
-            payloadContainer.Add(currentMessageChannelGroup);
-            payloadContainer.Add(currentMessageChannel);
+            jsonFields.Add("currentMessageChannelGroup", currentMessageChannelGroup);
+            jsonFields.Add("currentMessageChannel", currentMessageChannel);
 
             switch (eventData.MessageType)
             {
                 case 1:
                 {
-                    payloadContainer.Add(eventData.CustomMessageType);
                     jsonFields.Add("customMessageType", eventData.CustomMessageType);
                     ResponseBuilder responseBuilder = new ResponseBuilder(configuration, jsonLibrary);
                     PNMessageResult<T> pnMessageResult = responseBuilder.GetEventResultObject<PNMessageResult<T>>(jsonFields);
@@ -308,7 +298,7 @@ namespace PubnubApi.EventEngine.Common
                 }
                 case 4:
                 {
-                    payloadContainer.Add(eventData.CustomMessageType);
+                    jsonFields.Add("customMessageType", eventData.CustomMessageType);
                     ResponseBuilder responseBuilder =new ResponseBuilder(configuration, jsonLibrary);
                     PNMessageResult<object> filesEvent = responseBuilder.GetEventResultObject<PNMessageResult<object>>(jsonFields);
                     if (filesEvent != null)
@@ -404,7 +394,7 @@ namespace PubnubApi.EventEngine.Common
                     }
                     else
                     {
-                        payloadContainer.Add(eventData.CustomMessageType);
+                        jsonFields.Add("customMessageType", eventData.CustomMessageType);
                         ResponseBuilder responseBuilder =new ResponseBuilder(configuration, jsonLibrary);
                         PNMessageResult<T> userMessage = responseBuilder.GetEventResultObject<PNMessageResult<T>>(jsonFields);
                         try
