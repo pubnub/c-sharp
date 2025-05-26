@@ -927,6 +927,5 @@ namespace PubNubMessaging.Tests
 
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscriberShouldBeAbleToReceiveManyMessages Failed");
         }
-
     }
 }
