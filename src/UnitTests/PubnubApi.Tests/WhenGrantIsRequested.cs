@@ -1022,7 +1022,9 @@ namespace PubNubMessaging.Tests
                 .TTL(10)
                 .ExecuteAsync();
 #endif
-            Assert.IsNotNull(grantResponse.Result, $"grantResponse.Result should not be null, error data: {grantResponse.Status.ErrorData.Information}");
+            Assert.IsNotNull(grantResponse, "grantResponse should not be null");
+            Assert.IsNotNull(grantResponse.Result, $"grantResponse.Result should not be null, error data: {grantResponse.Status?.ErrorData?.Information}");
+            Assert.IsNotNull(grantResponse.Status, "grantResponse.Status should not be null");
             Assert.IsFalse(grantResponse.Status.Error, "grantResponse.Status.Error should be false");
         }
         

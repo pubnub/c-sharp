@@ -537,6 +537,9 @@ namespace PubNubMessaging.Tests
                     .WithStatusCode(System.Net.HttpStatusCode.OK));
 
             pubnub.Subscribe<string>().Channels(new [] { channel }).Execute();
+            
+            Thread.Sleep(2000);
+            
             subscribeManualEvent.WaitOne(manualResetEventWaitTimeout); //Wait for Connect Status
 
             publishManualEvent = new ManualResetEvent(false);
