@@ -764,7 +764,7 @@ namespace PubNubMessaging.Tests
         [Test]
         public static async Task ThenSetChannelMembersShouldReturnSuccess()
         {
-            string testChannel = $"foo.test_channel_{new Random().Next(1000, 9999)}";
+            string testChannel = $"foo.test_channel_{new Random().Next(0, 99999)}";
             string testUuid = "fuu.test-uuid-1";
             Dictionary<string, object> customData = new Dictionary<string, object> { { "role", "admin" } };
 
