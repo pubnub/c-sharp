@@ -645,13 +645,15 @@ namespace PubNubMessaging.Tests
             pubnub.SetUuidMetadata().Uuid(uuidMetadataId).Name("pandu-ut-un")
                     .Execute(new PNSetUuidMetadataResultExt((r, s) =>
                     {
-                        if (r != null && s.StatusCode == 200 && !s.Error)
+                        Assert.IsNotNull(r, $"Set UUID metadata result was null. Error info: {s.ErrorData?.Information}");
+                        Assert.AreEqual(200, s.StatusCode, $"Set UUID metadata status was not 200, status: " +
+                                                         $"\n{pubnub.JsonPluggableLibrary.SerializeToJsonString(s)}");
+                        Assert.False(s.Error, "Set UUID metadata status reported an error, status: " +
+                                             $"\n{pubnub.JsonPluggableLibrary.SerializeToJsonString(s)}");
+                        Assert.AreEqual(uuidMetadataId, r.Uuid, "UUID metadata ID did not match");
+                        if (uuidMetadataId == r.Uuid)
                         {
-                            pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
-                            if (uuidMetadataId == r.Uuid)
-                            {
-                                receivedMessage = true;
-                            }
+                            receivedMessage = true;
                         }
                         manualEvent.Set();
                     }));
@@ -667,13 +669,15 @@ namespace PubNubMessaging.Tests
                 pubnub.SetChannelMetadata().Channel(channelMetadataId1).Name("pandu-ut-spname")
                         .Execute(new PNSetChannelMetadataResultExt((r, s) =>
                         {
-                            if (r != null && s.StatusCode == 200 && !s.Error)
+                            Assert.IsNotNull(r, $"Set channel 1 metadata result was null. Error info: {s.ErrorData?.Information}");
+                            Assert.AreEqual(200, s.StatusCode, $"Set channel 1 metadata status was not 200, status: " +
+                                                             $"\n{pubnub.JsonPluggableLibrary.SerializeToJsonString(s)}");
+                            Assert.False(s.Error, "Set channel 1 metadata status reported an error, status: " +
+                                                 $"\n{pubnub.JsonPluggableLibrary.SerializeToJsonString(s)}");
+                            Assert.AreEqual(channelMetadataId1, r.Channel, "Channel 1 metadata ID did not match");
+                            if (channelMetadataId1 == r.Channel)
                             {
-                                pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
-                                if (channelMetadataId1 == r.Channel)
-                                {
-                                    receivedMessage = true;
-                                }
+                                receivedMessage = true;
                             }
                             manualEvent.Set();
                         }));
@@ -689,13 +693,15 @@ namespace PubNubMessaging.Tests
                 pubnub.SetChannelMetadata().Channel(channelMetadataId2).Name("pandu-ut-spname")
                         .Execute(new PNSetChannelMetadataResultExt((r, s) =>
                         {
-                            if (r != null && s.StatusCode == 200 && !s.Error)
+                            Assert.IsNotNull(r, $"Set channel 2 metadata result was null. Error info: {s.ErrorData?.Information}");
+                            Assert.AreEqual(200, s.StatusCode, $"Set channel 2 metadata status was not 200, status: " +
+                                                             $"\n{pubnub.JsonPluggableLibrary.SerializeToJsonString(s)}");
+                            Assert.False(s.Error, "Set channel 2 metadata status reported an error, status: " +
+                                                 $"\n{pubnub.JsonPluggableLibrary.SerializeToJsonString(s)}");
+                            Assert.AreEqual(channelMetadataId2, r.Channel, "Channel 2 metadata ID did not match");
+                            if (channelMetadataId2 == r.Channel)
                             {
-                                pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
-                                if (channelMetadataId2 == r.Channel)
-                                {
-                                    receivedMessage = true;
-                                }
+                                receivedMessage = true;
                             }
                             manualEvent.Set();
                         }));
@@ -707,23 +713,29 @@ namespace PubNubMessaging.Tests
             {
                 receivedMessage = false;
                 manualEvent = new ManualResetEvent(false);
-                #region "SetMemberships ADD"
-                System.Diagnostics.Debug.WriteLine("pubnub.SetMemberships() ADD STARTED");
+                #region "SetMemberships Add"
+                System.Diagnostics.Debug.WriteLine("pubnub.SetMemberships() SET STARTED");
                 pubnub.SetMemberships().Uuid(uuidMetadataId)
                     .Channels(new List<PNMembership>()
                             {
-                            new PNMembership() { Channel = channelMetadataId1   },
-                            new PNMembership() { Channel = channelMetadataId2   }
+                            new PNMembership() { Channel = channelMetadataId1  },
+                            new PNMembership() { Channel = channelMetadataId2  }
                     })
                     .Execute(new PNMembershipsResultExt((r, s) =>
                     {
-                        Assert.IsNotNull(r, "Set memberships result was null");
-                        Assert.AreEqual(s.StatusCode, 200, $"Set memberships status was not 200, status: " +
-                                                           $"\n{pubnub.JsonPluggableLibrary.SerializeToJsonString(s)}");
+                        Assert.IsNotNull(r, $"Set memberships result was null. Error info: {s.ErrorData?.Information}");
+                        Assert.AreEqual(200, s.StatusCode, $"Set memberships status was not 200, status: " +
+                                                         $"\n{pubnub.JsonPluggableLibrary.SerializeToJsonString(s)}");
                         Assert.False(s.Error, "Set memberships status reported an error, status: " +
-                                              $"\n{pubnub.JsonPluggableLibrary.SerializeToJsonString(s)}");
-                        if (r.Memberships?.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null
-                            && r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId2) != null)
+                                             $"\n{pubnub.JsonPluggableLibrary.SerializeToJsonString(s)}");
+                        Assert.IsNotNull(r.Memberships, "Memberships list was null");
+                        Assert.IsTrue(r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null, 
+                            "Channel 1 membership not found");
+                        Assert.IsTrue(r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId2) != null, 
+                            "Channel 2 membership not found");
+                        if (r.Memberships != null
+                        && r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null
+                        && r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId2) != null)
                         {
                             receivedMessage = true;
                         }
@@ -742,24 +754,28 @@ namespace PubNubMessaging.Tests
                 pubnub.SetMemberships().Uuid(uuidMetadataId)
                     .Channels(new List<PNMembership>()
                             {
-                            new PNMembership() { Channel = channelMetadataId1 , Custom = new Dictionary<string, object>(){ { "color", "green1" } } },
-                            new PNMembership() { Channel = channelMetadataId2 , Custom = new Dictionary<string, object>(){ { "color", "green2" } } }
+                        new PNMembership() { Channel = channelMetadataId1, Custom = new Dictionary<string, object>(){ { "color", "green1" } } }
                     })
                     .Execute(new PNMembershipsResultExt((r, s) =>
                     {
-                        if (r != null && s.StatusCode == 200 && !s.Error)
+                        Assert.IsNotNull(r, $"Update memberships result was null. Error info: {s.ErrorData?.Information}");
+                        Assert.AreEqual(200, s.StatusCode, $"Update memberships status was not 200, status: " +
+                                                         $"\n{pubnub.JsonPluggableLibrary.SerializeToJsonString(s)}");
+                        Assert.False(s.Error, "Update memberships status reported an error, status: " +
+                                             $"\n{pubnub.JsonPluggableLibrary.SerializeToJsonString(s)}");
+                        Assert.IsNotNull(r.Memberships, "Memberships list was null");
+                        Assert.IsTrue(r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null, 
+                            "Channel 1 membership not found after update");
+                        if (r.Memberships != null
+                        && r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null)
                         {
-                            pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
-                            if (r.Memberships?.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null
-                                && r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId2) != null)
-                            {
-                                receivedMessage = true;
-                            }
+                            receivedMessage = true;
                         }
                         manualEvent.Set();
                     }));
-                #endregion
                 manualEvent.WaitOne(manualResetEventWaitTimeout);
+                
+                #endregion
             }
 
             if (receivedMessage)
@@ -772,13 +788,15 @@ namespace PubNubMessaging.Tests
                     .Channels(new List<string>() { channelMetadataId2 })
                     .Execute(new PNMembershipsResultExt((r, s) =>
                     {
-                        if (r != null && s.StatusCode == 200 && !s.Error)
+                        Assert.IsNotNull(r, $"Remove memberships result was null. Error info: {s.ErrorData?.Information}");
+                        Assert.AreEqual(200, s.StatusCode, $"Remove memberships status was not 200, status: " +
+                                                         $"\n{pubnub.JsonPluggableLibrary.SerializeToJsonString(s)}");
+                        Assert.False(s.Error, "Remove memberships status reported an error, status: " +
+                                             $"\n{pubnub.JsonPluggableLibrary.SerializeToJsonString(s)}");
+                        Assert.IsNotNull(r.Memberships, "Memberships list was null after removal");
+                        if (r.Memberships != null)
                         {
-                            pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
-                            if (r.Memberships != null)
-                            {
-                                receivedMessage = true;
-                            }
+                            receivedMessage = true;
                         }
                         manualEvent.Set();
                     }));
@@ -795,13 +813,17 @@ namespace PubNubMessaging.Tests
                 pubnub.GetMemberships().Uuid(uuidMetadataId)
                     .Execute(new PNMembershipsResultExt((r, s) =>
                     {
-                        if (r != null && s.StatusCode == 200 && !s.Error)
+                        Assert.IsNotNull(r, $"Get memberships result was null. Error info: {s.ErrorData?.Information}");
+                        Assert.AreEqual(200, s.StatusCode, $"Get memberships status was not 200, status: " +
+                                                         $"\n{pubnub.JsonPluggableLibrary.SerializeToJsonString(s)}");
+                        Assert.False(s.Error, "Get memberships status reported an error, status: " +
+                                             $"\n{pubnub.JsonPluggableLibrary.SerializeToJsonString(s)}");
+                        Assert.IsNotNull(r.Memberships, "Memberships list was null after get");
+                        Assert.IsTrue(r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null, 
+                            "Channel 1 membership not found in get result");
+                        if (r.Memberships?.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null)
                         {
-                            pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
-                            if (r.Memberships?.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null)
-                            {
-                                receivedMessage = true;
-                            }
+                            receivedMessage = true;
                         }
                         manualEvent.Set();
                     }));
@@ -947,8 +969,8 @@ namespace PubNubMessaging.Tests
                 PNResult<PNMembershipsResult> manageMbrshipAddResult = Task.Factory.StartNew(async () => await pubnub.SetMemberships().Uuid(uuidMetadataId)
                     .Channels(new List<PNMembership>()
                             {
-                                new PNMembership() { Channel = channelMetadataId1  },
-                                new PNMembership() { Channel = channelMetadataId2  }
+                            new PNMembership() { Channel = channelMetadataId1  },
+                            new PNMembership() { Channel = channelMetadataId2  }
                     })
                     .ExecuteAsync()).Result.Result;
 #else
@@ -1718,15 +1740,21 @@ namespace PubNubMessaging.Tests
                     })
                     .Execute(new PNMembershipsResultExt((r, s) =>
                     {
-                        if (r != null && s.StatusCode == 200 && !s.Error)
+                        Assert.IsNotNull(r, "Set memberships result was null");
+                        Assert.AreEqual(200, s.StatusCode, $"Set memberships status was not 200, status: " +
+                                                         $"\n{pubnub.JsonPluggableLibrary.SerializeToJsonString(s)}");
+                        Assert.False(s.Error, "Set memberships status reported an error, status: " +
+                                             $"\n{pubnub.JsonPluggableLibrary.SerializeToJsonString(s)}");
+                        Assert.IsNotNull(r.Memberships, "Memberships list was null");
+                        Assert.IsTrue(r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null, 
+                            "Channel 1 membership not found");
+                        Assert.IsTrue(r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId2) != null, 
+                            "Channel 2 membership not found");
+                        if (r.Memberships != null
+                        && r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null
+                        && r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId2) != null)
                         {
-                            pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
-                            if (r.Memberships != null
-                            && r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null
-                            && r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId2) != null)
-                            {
-                                receivedMessage = true;
-                            }
+                            receivedMessage = true;
                         }
                         manualEvent.Set();
                     }));
@@ -1749,14 +1777,18 @@ namespace PubNubMessaging.Tests
                         })
                         .Execute(new PNMembershipsResultExt((r, s) =>
                         {
-                            if (r != null && s.StatusCode == 200 && !s.Error)
+                            Assert.IsNotNull(r, "Update memberships result was null");
+                            Assert.AreEqual(200, s.StatusCode, $"Update memberships status was not 200, status: " +
+                                                             $"\n{pubnub.JsonPluggableLibrary.SerializeToJsonString(s)}");
+                            Assert.False(s.Error, "Update memberships status reported an error, status: " +
+                                                 $"\n{pubnub.JsonPluggableLibrary.SerializeToJsonString(s)}");
+                            Assert.IsNotNull(r.Memberships, "Memberships list was null");
+                            Assert.IsTrue(r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null, 
+                                "Channel 1 membership not found after update");
+                            if (r.Memberships != null
+                            && r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null)
                             {
-                                pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
-                                if (r.Memberships != null
-                                && r.Memberships.Find(x => x.ChannelMetadata.Channel == channelMetadataId1) != null)
-                                {
-                                    receivedMessage = true;
-                                }
+                                receivedMessage = true;
                             }
                             manualEvent.Set();
                         }));
@@ -1984,9 +2016,6 @@ namespace PubNubMessaging.Tests
                         pubnub.JsonPluggableLibrary.SerializeToJsonString(manageMbrshipDelResult.Result);
                         receivedMessage = true;
                     }
-                }
-                else
-                {
                 }
                 #endregion
             }
