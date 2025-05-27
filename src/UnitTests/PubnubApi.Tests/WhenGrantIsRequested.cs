@@ -1022,12 +1022,8 @@ namespace PubNubMessaging.Tests
                 .TTL(10)
                 .ExecuteAsync();
 #endif
-            if (grantResponse.Result != null && !grantResponse.Status.Error)
-            {
-                receivedGrantMessage = true;
-            }
-            Assert.IsTrue(receivedGrantMessage, "WhenGrantIsRequested -> ThenWithAsyncGrantTokenShouldReturnSuccess failed.");
-
+            Assert.IsNotNull(grantResponse.Result, $"grantResponse.Result should not be null, error data: {grantResponse.Status.ErrorData.Information}");
+            Assert.IsFalse(grantResponse.Status.Error, "grantResponse.Status.Error should be false");
         }
         
         [Test]
