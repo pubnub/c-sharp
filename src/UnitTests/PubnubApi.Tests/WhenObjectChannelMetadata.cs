@@ -982,6 +982,8 @@ namespace PubNubMessaging.Tests
             Assert.IsNotNull(setResult, "Set result should not be null");
             Assert.IsFalse(setResult.Status.Error, "Set operation should not have errors");
 
+            await Task.Delay(4000);
+
             // Manage channel members (add new, update existing)
             var member2 = new PNChannelMember
             {
