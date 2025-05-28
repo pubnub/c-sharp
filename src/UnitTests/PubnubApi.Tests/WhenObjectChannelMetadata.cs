@@ -906,6 +906,8 @@ namespace PubNubMessaging.Tests
             Assert.IsNotNull(setResult, "Set result should not be null");
             Assert.IsFalse(setResult.Status.Error, "Set operation should not have errors");
 
+            await Task.Delay(6000);
+
             // Get channel members before removal
             PNResult<PNChannelMembersResult> getResult = await pubnub.GetChannelMembers()
                 .Channel(testChannel)
@@ -982,7 +984,7 @@ namespace PubNubMessaging.Tests
             Assert.IsNotNull(setResult, "Set result should not be null");
             Assert.IsFalse(setResult.Status.Error, "Set operation should not have errors");
 
-            await Task.Delay(4000);
+            await Task.Delay(6000);
 
             // Manage channel members (add new, update existing)
             var member2 = new PNChannelMember
