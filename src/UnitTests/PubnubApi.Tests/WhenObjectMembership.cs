@@ -2224,6 +2224,8 @@ namespace PubNubMessaging.Tests
             Assert.IsNotNull(createChannel2Result.Result, "Channel 2 metadata creation failed");
             Assert.AreEqual(200, createChannel2Result.Status.StatusCode, "Channel 2 metadata creation status code should be 200");
 
+            await Task.Delay(5000);
+            
             // Test 1: Set Memberships
             var memberships = new List<PNMembership>
             {
