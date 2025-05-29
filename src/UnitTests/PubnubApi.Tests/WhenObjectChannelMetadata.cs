@@ -1006,6 +1006,8 @@ namespace PubNubMessaging.Tests
             Assert.IsNotNull(manageResult.Result.ChannelMembers, "Members list should not be null");
             Assert.AreEqual(2, manageResult.Result.ChannelMembers.Count, "Should have two members");
 
+            await Task.Delay(5000);
+
             // Get channel members to verify
             PNResult<PNChannelMembersResult> getResult = await pubnub.GetChannelMembers()
                 .Channel(testChannel)
