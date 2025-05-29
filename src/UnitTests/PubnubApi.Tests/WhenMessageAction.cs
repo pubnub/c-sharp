@@ -879,7 +879,7 @@ namespace PubNubMessaging.Tests
         [Test]
         public static async Task ThenAddMessageActionWithCustomDataAndVerifyShouldReturnSuccess()
         {
-            string channel = $"foo.test_channel_{new Random().Next(1000, 9999)}";
+            string channel = $"foo.tc_{Guid.NewGuid()}";
             long messageTimetoken = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             string customType = "custom_reaction";
             string customValue = "thumbs_up";

@@ -764,7 +764,7 @@ namespace PubNubMessaging.Tests
         [Test]
         public static async Task ThenSetChannelMembersShouldReturnSuccess()
         {
-            string testChannel = $"foo.test_channel_{new Random().Next(0, 99999)}";
+            string testChannel = $"foo.tc_{Guid.NewGuid()}";
             string testUuid = "fuu.test-uuid-1";
             Dictionary<string, object> customData = new Dictionary<string, object> { { "role", "admin" } };
 
@@ -814,7 +814,7 @@ namespace PubNubMessaging.Tests
         [Test]
         public static async Task ThenSetAndGetChannelMembersShouldReturnSuccess()
         {
-            string testChannel = $"foo.test_channel_{new Random().Next(1000, 9999)}";
+            string testChannel = $"foo.tc_{Guid.NewGuid()}";
             string testUuid = "fuu.test-uuid-2";
             Dictionary<string, object> customData = new Dictionary<string, object> { { "role", "user" } };
 
@@ -872,7 +872,7 @@ namespace PubNubMessaging.Tests
         [Test]
         public static async Task ThenSetGetAndRemoveChannelMembersShouldReturnSuccess()
         {
-            string testChannel = $"foo.test_channel_{new Random().Next(1000, 9999)}";
+            string testChannel = $"foo.tc_{Guid.NewGuid()}";
             string testUuid = "fuu.test-uuid-3";
             Dictionary<string, object> customData = new Dictionary<string, object> { { "role", "moderator" } };
 
@@ -948,9 +948,9 @@ namespace PubNubMessaging.Tests
         [Test]
         public static async Task ThenSetAndManageChannelMembersShouldReturnSuccess()
         {
-            string testChannel = $"foo.test_channel_{new Random().Next(1000, 9999)}";
-            string testUuid1 = "fuu.test-uuid-4";
-            string testUuid2 = "fuu.test-uuid-5";
+            string testChannel = $"foo.tc_{Guid.NewGuid()}";
+            string testUuid1 = $"fuu.tu_{Guid.NewGuid()}";
+            string testUuid2 = $"fuu.tu_{Guid.NewGuid()}";
             Dictionary<string, object> customData1 = new Dictionary<string, object> { { "role", "admin" } };
             Dictionary<string, object> customData2 = new Dictionary<string, object> { { "role", "user" } };
 

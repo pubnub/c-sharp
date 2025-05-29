@@ -337,7 +337,7 @@ namespace PubNubMessaging.Tests
         [Test]
         public static async Task ThenMessageCountShouldReflectPublishedMessages()
         {
-            string testChannel = $"foo.test_channel_{new Random().Next(1000, 9999)}";
+            string testChannel = $"foo.tc_{Guid.NewGuid()}";
             string customUuid = "mytestuuid";
 
             PNConfiguration config = new PNConfiguration(new UserId(customUuid))

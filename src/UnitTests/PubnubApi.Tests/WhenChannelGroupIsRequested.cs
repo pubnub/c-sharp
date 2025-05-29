@@ -577,10 +577,10 @@ namespace PubNubMessaging.Tests
         [Test]
         public static async Task ThenAddChannelsToChannelGroupAndListShouldReturnSuccess()
         {
-            string testChannelGroup = $"foo.test_group_{new Random().Next(1000, 9999)}";
+            string testChannelGroup = $"foo.tg_{Guid.NewGuid()}";
             string[] testChannels = new[] { 
-                $"foo.test_channel_1_{new Random().Next(1000, 9999)}",
-                $"foo.test_channel_2_{new Random().Next(1000, 9999)}"
+                $"foo.tc_1_{Guid.NewGuid()}",
+                $"foo.tc_2_{Guid.NewGuid()}"
             };
 
             PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
@@ -636,8 +636,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public static async Task ThenAddExistingChannelToChannelGroupShouldReturnSuccess()
         {
-            string testChannelGroup = $"foo.test_group_{new Random().Next(1000, 9999)}";
-            string testChannel = $"foo.test_channel_{new Random().Next(1000, 9999)}";
+            string testChannelGroup = $"foo.tg_{Guid.NewGuid()}";
+            string testChannel = $"foo.tc_{Guid.NewGuid()}";
 
             PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {

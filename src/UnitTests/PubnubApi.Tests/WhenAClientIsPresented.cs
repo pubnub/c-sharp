@@ -2677,8 +2677,8 @@ namespace PubNubMessaging.Tests
         [Test]
         public static async Task ThenHereNowShouldReturnCorrectUserData()
         {
-            string channel = $"foo.test_channel_{new Random().Next(1000, 9999)}";
-            string customUuid = $"fuu.test_uuid_{new Random().Next(1000, 9999)}";
+            string channel = $"foo.tc_{Guid.NewGuid()}";
+            string customUuid = $"fuu.tu_{Guid.NewGuid()}";
             Dictionary<string, object> userState = new Dictionary<string, object>
             {
                 { "status", "online" },
