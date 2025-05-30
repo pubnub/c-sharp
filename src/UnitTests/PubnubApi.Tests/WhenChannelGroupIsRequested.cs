@@ -574,6 +574,120 @@ namespace PubNubMessaging.Tests
 
         }
 
+        [Test]
+        public static async Task ThenAddChannelsToChannelGroupAndListShouldReturnSuccess()
+        {
+            string testChannelGroup = $"foo.tg_{Guid.NewGuid()}";
+            string[] testChannels = new[] { 
+                $"foo.tc_1_{Guid.NewGuid()}",
+                $"foo.tc_2_{Guid.NewGuid()}"
+            };
+
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+
+            pubnub = createPubNubInstance(config);
+            pubnub.SetAuthToken(authToken);
+
+            // Add channels to channel group
+            PNResult<PNChannelGroupsAddChannelResult> addResult = await pubnub.AddChannelsToChannelGroup()
+                .Channels(testChannels)
+                .ChannelGroup(testChannelGroup)
+                .ExecuteAsync();
+
+            Assert.IsNotNull(addResult, "Add result should not be null");
+            Assert.IsNotNull(addResult.Result, "Add result data should not be null");
+            Assert.IsFalse(addResult.Status.Error, "Add operation should not have errors");
+            Assert.AreEqual(200, addResult.Status.StatusCode, "Add operation should return 200 status code");
+
+            // List channels in the channel group to verify
+            PNResult<PNChannelGroupsAllChannelsResult> listResult = await pubnub.ListChannelsForChannelGroup()
+                .ChannelGroup(testChannelGroup)
+                .ExecuteAsync();
+
+            Assert.IsNotNull(listResult, "List result should not be null");
+            Assert.IsNotNull(listResult.Result, "List result data should not be null");
+            Assert.IsFalse(listResult.Status.Error, "List operation should not have errors");
+            Assert.AreEqual(200, listResult.Status.StatusCode, "List operation should return 200 status code");
+            Assert.AreEqual(testChannelGroup, listResult.Result.ChannelGroup, "Channel group name should match");
+            Assert.IsNotNull(listResult.Result.Channels, "Channels list should not be null");
+            Assert.AreEqual(testChannels.Length, listResult.Result.Channels.Count, "Should have correct number of channels");
+            
+            // Verify all test channels are present in the result
+            foreach (string channel in testChannels)
+            {
+                Assert.IsTrue(listResult.Result.Channels.Contains(channel), $"Channel {channel} should be in the list");
+            }
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
+
+        [Test]
+        public static async Task ThenAddExistingChannelToChannelGroupShouldReturnSuccess()
+        {
+            string testChannelGroup = $"foo.tg_{Guid.NewGuid()}";
+            string testChannel = $"foo.tc_{Guid.NewGuid()}";
+
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Secure = false
+            };
+
+            pubnub = createPubNubInstance(config);
+            pubnub.SetAuthToken(authToken);
+
+            // First add the channel to the group
+            PNResult<PNChannelGroupsAddChannelResult> initialAddResult = await pubnub.AddChannelsToChannelGroup()
+                .Channels(new[] { testChannel })
+                .ChannelGroup(testChannelGroup)
+                .ExecuteAsync();
+
+            Assert.IsNotNull(initialAddResult, "Initial add result should not be null");
+            Assert.IsFalse(initialAddResult.Status.Error, "Initial add operation should not have errors");
+            Assert.AreEqual(200, initialAddResult.Status.StatusCode, "Initial add operation should return 200 status code");
+
+            // Try to add the same channel again
+            PNResult<PNChannelGroupsAddChannelResult> duplicateAddResult = await pubnub.AddChannelsToChannelGroup()
+                .Channels(new[] { testChannel })
+                .ChannelGroup(testChannelGroup)
+                .ExecuteAsync();
+
+            Assert.IsNotNull(duplicateAddResult, "Duplicate add result should not be null");
+            Assert.IsFalse(duplicateAddResult.Status.Error, "Duplicate add operation should not have errors");
+            Assert.AreEqual(200, duplicateAddResult.Status.StatusCode, "Duplicate add operation should return 200 status code");
+
+            // Verify the channel group still has exactly one channel
+            PNResult<PNChannelGroupsAllChannelsResult> listResult = await pubnub.ListChannelsForChannelGroup()
+                .ChannelGroup(testChannelGroup)
+                .ExecuteAsync();
+
+            Assert.IsNotNull(listResult, "List result should not be null");
+            Assert.IsFalse(listResult.Status.Error, "List operation should not have errors");
+            Assert.AreEqual(200, listResult.Status.StatusCode, "List operation should return 200 status code");
+            Assert.AreEqual(testChannelGroup, listResult.Result.ChannelGroup, "Channel group name should match");
+            Assert.IsNotNull(listResult.Result.Channels, "Channels list should not be null");
+            Assert.AreEqual(1, listResult.Result.Channels.Count, "Should have exactly one channel");
+            Assert.AreEqual(testChannel, listResult.Result.Channels[0], "Channel should match the added channel");
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
+
         private class GrantResult : PNCallback<PNAccessManagerGrantResult>
         {
             public override void OnResponse(PNAccessManagerGrantResult result, PNStatus status)

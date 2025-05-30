@@ -549,5 +549,93 @@ namespace PubNubMessaging.Tests
             pubnub = null;
             Assert.IsTrue(receivedMessage, "WhenFileIsRequested -> ThenWithAsyncDeleteFileShouldReturnSuccess failed.");
         }
+
+        [Test]
+        public static async Task ThenUploadingLargeFileShouldReturnError()
+        {
+            server.ClearRequests();
+
+            if (PubnubCommon.EnableStubTest)
+            {
+                Assert.Ignore("Ignored ThenUploadingLargeFileShouldReturnError");
+                return;
+            }
+
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid_file_tests"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+
+            pubnub = createPubNubInstance(config);
+            pubnub.SetAuthToken(token);
+
+            string targetFileUpload = @"file_large.png";
+            PNResult<PNFileUploadResult> sendFileResult = await pubnub.SendFile()
+                .Channel(channelName)
+                .File(targetFileUpload)
+                .Message("This is my large file")
+                .ExecuteAsync();
+
+            Assert.IsNotNull(sendFileResult, "Send file result should not be null");
+            Assert.IsNotNull(sendFileResult.Status, "Status should not be null");
+            Assert.IsTrue(sendFileResult.Status.Error, "Should have error status");
+            Assert.IsNull(sendFileResult.Result, "Result should be null for large file");
+            Assert.IsTrue(sendFileResult.Status.ErrorData.Information.Contains("File upload failed: Your proposed upload exceeds the maximum allowed size"), "Error message should be about file size");
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
+
+        //TODO: is the message in content the correct behaviour?
+        [Test]
+        public static async Task ThenDownloadingNonExistentFileShouldReturnError()
+        {
+            server.ClearRequests();
+
+            if (PubnubCommon.EnableStubTest)
+            {
+                Assert.Ignore("Ignored ThenDownloadingNonExistentFileShouldReturnError");
+                return;
+            }
+
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid_file_tests"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Secure = false
+            };
+
+            pubnub = createPubNubInstance(config);
+            pubnub.SetAuthToken(token);
+
+            string nonExistentFileId = "non-existent-file-id";
+            string nonExistentFileName = "non-existent-file.txt";
+
+            PNResult<PNDownloadFileResult> downloadResult = await pubnub.DownloadFile()
+                .Channel(channelName)
+                .FileId(nonExistentFileId)
+                .FileName(nonExistentFileName)
+                .ExecuteAsync();
+            
+            //Assert.IsNotNull(downloadResult, "Download result should not be null");
+            Assert.IsNotNull(downloadResult.Status, "Status should not be null");
+            Assert.AreEqual(downloadResult.Status.StatusCode, 404, "Download status code for nonexistent file should be 404");
+            /*Assert.IsTrue(downloadResult.Status.Error, "Should have error status");
+            Assert.IsNull(downloadResult.Result, "Result should be null for non-existent file");
+            Assert.IsNotNull(downloadResult.Status.ErrorData, "Error data should not be null");
+            Assert.IsTrue(downloadResult.Status.ErrorData.Information.Contains("The specified key does not exist."), "Error message should indicate file not found");*/
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
     }
 }

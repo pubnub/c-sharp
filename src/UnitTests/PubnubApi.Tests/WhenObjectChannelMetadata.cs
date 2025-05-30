@@ -1,10 +1,12 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
 using System.Threading;
 using PubnubApi;
 using System.Collections.Generic;
 using MockServer;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace PubNubMessaging.Tests
 {
@@ -15,7 +17,7 @@ namespace PubNubMessaging.Tests
         private static Pubnub pubnub;
         private static Server server;
         private static string authToken;
-        private static string channelMetadataId = "pandu-ut-sid";
+        private static string channelMetadataId = "foo.pandu-ut-sid";
 
         [SetUp]
         public static async Task Init()
@@ -45,38 +47,20 @@ namespace PubNubMessaging.Tests
 
             pubnub = createPubNubInstance(config);
 
-            var grantResult = await pubnub.GrantToken().TTL(20).AuthorizedUuid(config.UserId).Resources(
-                new PNTokenResources()
-                {
-                    Channels = new Dictionary<string, PNTokenAuthValues>()
-                    {
-                        {
-                            channelMetadataId, new PNTokenAuthValues()
-                            {
-                                Read = true,
-                                Write = true,
-                                Create = true,
-                                Get = true,
-                                Delete = true,
-                                Join = true,
-                                Update = true,
-                                Manage = true
-                            }
-                        }
-                    }
-                }).ExecuteAsync();
+            if (string.IsNullOrEmpty(PubnubCommon.GrantToken))
+            {
+                await GenerateTestGrantToken(pubnub);
+            }
+            authToken = PubnubCommon.GrantToken;
+            
             if (!PubnubCommon.EnableStubTest)
             {
                 await Task.Delay(3000);
             }
-
-            authToken = grantResult.Result?.Token;
-
+            
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
-            Assert.IsTrue(grantResult.Result != null && grantResult.Status.Error == false,
-                "WhenObjectChannelMetadata Grant access failed.");
         }
 
         [TearDown]
@@ -93,7 +77,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public static void ThenChannelMetadataCRUDShouldReturnSuccessCodeAndInfo()
+        public static async Task ThenChannelMetadataCRUDShouldReturnSuccessCodeAndInfo()
         {
             server.ClearRequests();
 
@@ -132,16 +116,32 @@ namespace PubNubMessaging.Tests
             #region "CreateSpace"
 
             System.Diagnostics.Debug.WriteLine("pubnub.CreateSpace() STARTED");
-            pubnub.SetChannelMetadata().Channel(channelMetadataId).Name("pandu-ut-spname")
+            string initialName = "pandu-ut-spname";
+            string initialDescription = "Initial description";
+            Dictionary<string, object> initialCustomData = new Dictionary<string, object>() { { "type", "test" } };
+            
+            pubnub.SetChannelMetadata()
+                .Channel(channelMetadataId)
+                .Name(initialName)
+                .Description(initialDescription)
+                .Custom(initialCustomData)
+                .IncludeCustom(true)
                 .Execute(new PNSetChannelMetadataResultExt((r, s) =>
                 {
                     if (r != null && s.StatusCode == 200 && !s.Error)
                     {
-                        pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
-                        if (channelMetadataId == r.Channel)
-                        {
-                            receivedMessage = true;
-                        }
+                        string jsonString = pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
+                        Debug.WriteLine($"CreateSpace Response: {jsonString}");
+                        
+                        // Validate all fields in the response
+                        Assert.AreEqual(channelMetadataId, r.Channel, "Channel ID mismatch");
+                        Assert.AreEqual(initialName, r.Name, "Channel name mismatch");
+                        Assert.AreEqual(initialDescription, r.Description, "Description mismatch");
+                        Assert.IsNotNull(r.Custom, "Custom data should not be null");
+                        Assert.AreEqual("test", r.Custom["type"], "Custom data type value mismatch");
+                        Assert.IsNotNull(r.Updated, "Updated timestamp should not be null");
+                        
+                        receivedMessage = true;
                     }
 
                     manualEvent.Set();
@@ -150,6 +150,7 @@ namespace PubNubMessaging.Tests
             #endregion
 
             manualEvent.WaitOne(manualResetEventWaitTimeout);
+            await Task.Delay(2000);
 
             if (receivedMessage)
             {
@@ -159,18 +160,32 @@ namespace PubNubMessaging.Tests
                 #region "SetChannelMetadata"
 
                 System.Diagnostics.Debug.WriteLine("pubnub.SetChannelMetadata() STARTED");
-                pubnub.SetChannelMetadata().Channel(channelMetadataId).Name("pandu-ut-spname-upd")
-                    .Description("pandu-ut-spdesc")
-                    .Custom(new Dictionary<string, object>() { { "color", "red" } })
+                Dictionary<string, object> customData = new Dictionary<string, object>() { { "color", "red" } };
+                string expectedName = "pandu-ut-spname-upd";
+                string expectedDescription = "pandu-ut-spdesc";
+                
+                pubnub.SetChannelMetadata()
+                    .Channel(channelMetadataId)
+                    .Name(expectedName)
+                    .Description(expectedDescription)
+                    .Custom(customData)
+                    .IncludeCustom(true)
                     .Execute(new PNSetChannelMetadataResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
-                            pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
-                            if (channelMetadataId == r.Channel)
-                            {
-                                receivedMessage = true;
-                            }
+                            string jsonString = pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
+                            Debug.WriteLine($"SetChannelMetadata Response: {jsonString}");
+                            
+                            // Validate all fields in the response
+                            Assert.AreEqual(channelMetadataId, r.Channel, "Channel ID mismatch");
+                            Assert.AreEqual(expectedName, r.Name, "Channel name mismatch");
+                            Assert.AreEqual(expectedDescription, r.Description, "Description mismatch");
+                            Assert.IsNotNull(r.Custom, "Custom data should not be null");
+                            Assert.AreEqual("red", r.Custom["color"], "Custom data color value mismatch");
+                            Assert.IsNotNull(r.Updated, "Updated timestamp should not be null");
+                            
+                            receivedMessage = true;
                         }
 
                         manualEvent.Set();
@@ -180,6 +195,8 @@ namespace PubNubMessaging.Tests
 
                 manualEvent.WaitOne(manualResetEventWaitTimeout);
             }
+            
+            await Task.Delay(2000);
 
             if (receivedMessage)
             {
@@ -194,11 +211,18 @@ namespace PubNubMessaging.Tests
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
-                            pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
-                            if (channelMetadataId == r.Channel)
-                            {
-                                receivedMessage = true;
-                            }
+                            string jsonString = pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
+                            Debug.WriteLine($"GetChannelMetadata Response: {jsonString}");
+                            
+                            // Validate all fields in the response
+                            Assert.AreEqual(channelMetadataId, r.Channel, "Channel ID mismatch");
+                            Assert.AreEqual("pandu-ut-spname-upd", r.Name, "Channel name mismatch");
+                            Assert.AreEqual("pandu-ut-spdesc", r.Description, "Description mismatch");
+                            Assert.IsNotNull(r.Custom, "Custom data should not be null");
+                            Assert.AreEqual("red", r.Custom["color"], "Custom data color value mismatch");
+                            Assert.IsNotNull(r.Updated, "Updated timestamp should not be null");
+                            
+                            receivedMessage = true;
                         }
 
                         manualEvent.Set();
@@ -217,18 +241,61 @@ namespace PubNubMessaging.Tests
                 #region "GetAllChannelMetadata"
 
                 System.Diagnostics.Debug.WriteLine("pubnub.GetAllChannelMetadata() STARTED");
-                pubnub.GetAllChannelMetadata().IncludeCount(true)
+                pubnub.GetAllChannelMetadata().IncludeCount(true).IncludeCustom(true)
                     .Execute(new PNGetAllChannelMetadataResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
                         {
-                            pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
-                            List<PNChannelMetadataResult> spaceList = r.Channels;
-                            if (spaceList != null && spaceList.Count > 0 &&
-                                spaceList.Find(x => x.Channel == channelMetadataId) != null)
-                            {
-                                receivedMessage = true;
-                            }
+                            string jsonString = pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
+                            Debug.WriteLine($"GetAllChannelMetadata Response: {jsonString}");
+                            
+                            // Validate all fields in the response
+                            Assert.IsNotNull(r.Channels, "Channels list should not be null");
+                            Assert.Greater(r.Channels.Count, 0, "Channels list should not be empty");
+                            
+                            PNChannelMetadataResult channelMetadata = r.Channels.Find(x => x.Channel == channelMetadataId);
+                            Assert.IsNotNull(channelMetadata, "Channel metadata not found in list");
+                            
+                            // Validate the found channel metadata
+                            Assert.AreEqual(channelMetadataId, channelMetadata.Channel, "Channel ID mismatch");
+                            Assert.AreEqual("pandu-ut-spname-upd", channelMetadata.Name, "Channel name mismatch");
+                            Assert.AreEqual("pandu-ut-spdesc", channelMetadata.Description, "Description mismatch");
+                            Assert.IsNotNull(channelMetadata.Custom, "Custom data should not be null");
+                            Assert.AreEqual("red", channelMetadata.Custom["color"], "Custom data color value mismatch");
+                            Assert.IsNotNull(channelMetadata.Updated, "Updated timestamp should not be null");
+                            
+                            // Validate pagination data
+                            Assert.Greater(r.TotalCount, 0, "Total count should be greater than 0");
+                            
+                            receivedMessage = true;
+                        }
+
+                        manualEvent.Set();
+                    }));
+
+                #endregion
+
+                manualEvent.WaitOne(manualResetEventWaitTimeout);
+            }
+
+            if (receivedMessage)
+            {
+                receivedMessage = false;
+                manualEvent = new ManualResetEvent(false);
+
+                #region "RemoveChannelMetadata"
+
+                System.Diagnostics.Debug.WriteLine("pubnub.RemoveChannelMetadata() STARTED");
+                pubnub.RemoveChannelMetadata().Channel(channelMetadataId)
+                    .Execute(new PNRemoveChannelMetadataResultExt((r, s) =>
+                    {
+                        if (r != null && s.StatusCode == 200 && !s.Error)
+                        {
+                            string jsonString = pubnub.JsonPluggableLibrary.SerializeToJsonString(r);
+                            Debug.WriteLine($"RemoveChannelMetadata Response: {jsonString}");
+                            
+                            // No properties to validate as the response is empty
+                            receivedMessage = true;
                         }
 
                         manualEvent.Set();
@@ -241,7 +308,7 @@ namespace PubNubMessaging.Tests
 
             if (!receivedMessage)
             {
-                Assert.IsTrue(receivedMessage, $"SetChannelMetadata/DeleteChannelMetadataId Failed.");
+                Assert.IsTrue(receivedMessage, $"ChannelMetadata CRUD operations failed.");
             }
 
             pubnub.Destroy();
@@ -688,6 +755,272 @@ namespace PubNubMessaging.Tests
             pubnub.RemoveListener(eventListener);
 
             Assert.IsTrue(receivedDeleteEvent && receivedUpdateEvent, "Space events Failed");
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
+
+        [Test]
+        public static async Task ThenSetChannelMembersShouldReturnSuccess()
+        {
+            string testChannel = $"foo.tc_{Guid.NewGuid()}";
+            string testUuid = "fuu.test-uuid-1";
+            Dictionary<string, object> customData = new Dictionary<string, object> { { "role", "admin" } };
+
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+
+            pubnub = createPubNubInstance(config);
+            pubnub.SetAuthToken(authToken);
+
+            // Create channel member
+            var member = new PNChannelMember
+            {
+                Uuid = testUuid,
+                Custom = customData
+            };
+
+            // Set channel member
+            PNResult<PNChannelMembersResult> setResult = await pubnub.SetChannelMembers()
+                .Channel(testChannel)
+                .Uuids(new List<PNChannelMember> { member })
+                .Include(new[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID })
+                .ExecuteAsync();
+
+            Assert.IsNotNull(setResult, "Set result should not be null");
+            Assert.IsNotNull(setResult.Result, "Set result data should not be null");
+            Assert.IsFalse(setResult.Status.Error, "Set operation should not have errors");
+            Assert.AreEqual(200, setResult.Status.StatusCode, "Set operation should return 200 status code");
+            Assert.IsNotNull(setResult.Result.ChannelMembers, "Members list should not be null");
+            Assert.AreEqual(1, setResult.Result.ChannelMembers.Count, "Should have one member");
+            Assert.AreEqual(testUuid, setResult.Result.ChannelMembers[0].UuidMetadata.Uuid, "Member UUID should match");
+            Assert.IsNotNull(setResult.Result.ChannelMembers[0].Custom, "Member custom data should not be null");
+            Assert.AreEqual("admin", setResult.Result.ChannelMembers[0].Custom["role"], "Member role should be admin");
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
+
+        [Test]
+        public static async Task ThenSetAndGetChannelMembersShouldReturnSuccess()
+        {
+            string testChannel = $"foo.tc_{Guid.NewGuid()}";
+            string testUuid = "fuu.test-uuid-2";
+            Dictionary<string, object> customData = new Dictionary<string, object> { { "role", "user" } };
+
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+
+            pubnub = createPubNubInstance(config);
+            pubnub.SetAuthToken(authToken);
+
+            // Create and set channel member
+            var member = new PNChannelMember
+            {
+                Uuid = testUuid,
+                Custom = customData
+            };
+
+            PNResult<PNChannelMembersResult> setResult = await pubnub.SetChannelMembers()
+                .Channel(testChannel)
+                .Uuids(new List<PNChannelMember> { member })
+                .Include(new[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID })
+                .ExecuteAsync();
+
+            Assert.IsNotNull(setResult, "Set result should not be null");
+            Assert.IsFalse(setResult.Status.Error, "Set operation should not have errors");
+
+            // Get channel members
+            PNResult<PNChannelMembersResult> getResult = await pubnub.GetChannelMembers()
+                .Channel(testChannel)
+                .Include(new[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID })
+                .ExecuteAsync();
+
+            Assert.IsNotNull(getResult, "Get result should not be null");
+            Assert.IsNotNull(getResult.Result, "Get result data should not be null");
+            Assert.IsFalse(getResult.Status.Error, "Get operation should not have errors");
+            Assert.AreEqual(200, getResult.Status.StatusCode, "Get operation should return 200 status code");
+            Assert.IsNotNull(getResult.Result.ChannelMembers, "Members list should not be null");
+            Assert.AreEqual(1, getResult.Result.ChannelMembers.Count, "Should have one member");
+            Assert.AreEqual(testUuid, getResult.Result.ChannelMembers[0].UuidMetadata.Uuid, "Member UUID should match");
+            Assert.IsNotNull(getResult.Result.ChannelMembers[0].Custom, "Member custom data should not be null");
+            Assert.AreEqual("user", getResult.Result.ChannelMembers[0].Custom["role"], "Member role should be user");
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
+
+        [Test]
+        public static async Task ThenSetGetAndRemoveChannelMembersShouldReturnSuccess()
+        {
+            string testChannel = $"foo.tc_{Guid.NewGuid()}";
+            string testUuid = "fuu.test-uuid-3";
+            Dictionary<string, object> customData = new Dictionary<string, object> { { "role", "moderator" } };
+
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+
+            pubnub = createPubNubInstance(config);
+            pubnub.SetAuthToken(authToken);
+
+            // Create and set channel member
+            var member = new PNChannelMember
+            {
+                Uuid = testUuid,
+                Custom = customData
+            };
+
+            PNResult<PNChannelMembersResult> setResult = await pubnub.SetChannelMembers()
+                .Channel(testChannel)
+                .Uuids(new List<PNChannelMember> { member })
+                .Include(new[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID })
+                .ExecuteAsync();
+
+            Assert.IsNotNull(setResult, "Set result should not be null");
+            Assert.IsFalse(setResult.Status.Error, "Set operation should not have errors");
+
+            await Task.Delay(6000);
+
+            // Get channel members before removal
+            PNResult<PNChannelMembersResult> getResult = await pubnub.GetChannelMembers()
+                .Channel(testChannel)
+                .Include(new[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID })
+                .ExecuteAsync();
+
+            Assert.IsNotNull(getResult, "Get result should not be null");
+            Assert.IsFalse(getResult.Status.Error, "Get operation should not have errors");
+            Assert.AreEqual(1, getResult.Result.ChannelMembers.Count, "Should have one member before removal");
+
+            // Remove channel member
+            PNResult<PNChannelMembersResult> removeResult = await pubnub.RemoveChannelMembers()
+                .Channel(testChannel)
+                .Uuids(new List<string> { testUuid })
+                .Include(new[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID })
+                .ExecuteAsync();
+
+            Assert.IsNotNull(removeResult, "Remove result should not be null");
+            Assert.IsNotNull(removeResult.Result, "Remove result data should not be null");
+            Assert.IsFalse(removeResult.Status.Error, "Remove operation should not have errors");
+            Assert.AreEqual(200, removeResult.Status.StatusCode, "Remove operation should return 200 status code");
+
+            // Get channel members after removal
+            PNResult<PNChannelMembersResult> getAfterRemoveResult = await pubnub.GetChannelMembers()
+                .Channel(testChannel)
+                .Include(new[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID })
+                .ExecuteAsync();
+
+            Assert.IsNotNull(getAfterRemoveResult, "Get after remove result should not be null");
+            Assert.IsFalse(getAfterRemoveResult.Status.Error, "Get after remove operation should not have errors");
+            Assert.AreEqual(0, getAfterRemoveResult.Result.ChannelMembers.Count, "Should have no members after removal");
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
+
+        [Test]
+        public static async Task ThenSetAndManageChannelMembersShouldReturnSuccess()
+        {
+            string testChannel = $"foo.tc_{Guid.NewGuid()}";
+            string testUuid1 = $"fuu.tu_{Guid.NewGuid()}";
+            string testUuid2 = $"fuu.tu_{Guid.NewGuid()}";
+            Dictionary<string, object> customData1 = new Dictionary<string, object> { { "role", "admin" } };
+            Dictionary<string, object> customData2 = new Dictionary<string, object> { { "role", "user" } };
+
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+
+            pubnub = createPubNubInstance(config);
+            pubnub.SetAuthToken(authToken);
+
+            // Create and set initial channel member
+            var member1 = new PNChannelMember
+            {
+                Uuid = testUuid1,
+                Custom = customData1
+            };
+
+            PNResult<PNChannelMembersResult> setResult = await pubnub.SetChannelMembers()
+                .Channel(testChannel)
+                .Uuids(new List<PNChannelMember> { member1 })
+                .Include(new[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID })
+                .ExecuteAsync();
+
+            Assert.IsNotNull(setResult, "Set result should not be null");
+            Assert.IsFalse(setResult.Status.Error, "Set operation should not have errors");
+
+            await Task.Delay(6000);
+
+            // Manage channel members (add new, update existing)
+            var member2 = new PNChannelMember
+            {
+                Uuid = testUuid2,
+                Custom = customData2
+            };
+
+            PNResult<PNChannelMembersResult> manageResult = await pubnub.ManageChannelMembers()
+                .Channel(testChannel)
+                .Set(new List<PNChannelMember> { member1, member2 })
+                .Include(new[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID })
+                .ExecuteAsync();
+
+            Assert.IsNotNull(manageResult, "Manage result should not be null");
+            Assert.IsNotNull(manageResult.Result, "Manage result data should not be null");
+            Assert.IsFalse(manageResult.Status.Error, "Manage operation should not have errors");
+            Assert.AreEqual(200, manageResult.Status.StatusCode, "Manage operation should return 200 status code");
+            Assert.IsNotNull(manageResult.Result.ChannelMembers, "Members list should not be null");
+            Assert.AreEqual(2, manageResult.Result.ChannelMembers.Count, "Should have two members");
+
+            await Task.Delay(5000);
+
+            // Get channel members to verify
+            PNResult<PNChannelMembersResult> getResult = await pubnub.GetChannelMembers()
+                .Channel(testChannel)
+                .Include(new[] { PNChannelMemberField.CUSTOM, PNChannelMemberField.UUID })
+                .ExecuteAsync();
+
+            Assert.IsNotNull(getResult, "Get result should not be null");
+            Assert.IsFalse(getResult.Status.Error, "Get operation should not have errors");
+            Assert.AreEqual(2, getResult.Result.ChannelMembers.Count, "Should have two members after manage operation");
+            
+            var members = getResult.Result.ChannelMembers;
+            Assert.IsTrue(members.Any(m => m.UuidMetadata.Uuid == testUuid1 && m.Custom["role"].ToString() == "admin"), "First member should exist with admin role");
+            Assert.IsTrue(members.Any(m => m.UuidMetadata.Uuid == testUuid2 && m.Custom["role"].ToString() == "user"), "Second member should exist with user role");
 
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;

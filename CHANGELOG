@@ -1,3 +1,9 @@
+v7.3.12 - May 28 2025
+-----------------------------
+- Added: added new integration tests to better cover all SDK endpoints.
+
+- Fixed: fixed an issue when upon receiving a message with published with a custom type the CustomMessageType  would be null upon receiving.
+
 v7.3.11 - May 20 2025
 -----------------------------
 - Fixed: fix missing `heartbeat` and `leave` REST API calls when the event engine is enabled and `presenceTimeout` or `presenceHeartbeatInterval` not set.

@@ -3,6 +3,7 @@ using System.Threading;
 using PubnubApi;
 using MockServer;
 using System.Threading.Tasks;
+using System;
 
 namespace PubNubMessaging.Tests
 {
@@ -331,6 +332,70 @@ namespace PubNubMessaging.Tests
             pubnub = null;
             Assert.IsTrue(receivedMessage, "WhenMessageCountIsRequested -> ThenWithAsyncChannel2Timetoken2ShouldReturnSuccess failed.");
 
+        }
+
+        [Test]
+        public static async Task ThenMessageCountShouldReflectPublishedMessages()
+        {
+            string testChannel = $"foo.tc_{Guid.NewGuid()}";
+            string customUuid = "mytestuuid";
+
+            PNConfiguration config = new PNConfiguration(new UserId(customUuid))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+
+            pubnub = createPubNubInstance(config);
+
+            // Step 1: Check initial message count (should be 0)
+            PNResult<PNMessageCountResult> initialCountResult = await pubnub.MessageCounts()
+                .Channels(new[] { testChannel })
+                .ChannelsTimetoken(new long[] { DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() * 10000 })
+                .ExecuteAsync();
+
+            Assert.IsNotNull(initialCountResult, "Initial count result should not be null");
+            Assert.IsNotNull(initialCountResult.Result, "Initial count result data should not be null");
+            Assert.IsNotNull(initialCountResult.Result.Channels, "Initial count channels should not be null");
+            Assert.IsTrue(initialCountResult.Result.Channels.ContainsKey(testChannel), "Initial count should include test channel");
+            Assert.AreEqual(0, initialCountResult.Result.Channels[testChannel], "Initial message count should be 0");
+
+            // Step 2: Publish a message
+            long timeToken = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() * 10000;
+            string testMessage = "Test message for counting";
+            PNResult<PNPublishResult> publishResult = await pubnub.Publish()
+                .Channel(testChannel)
+                .Message(testMessage)
+                .ExecuteAsync();
+
+            Assert.IsNotNull(publishResult, "Publish result should not be null");
+            Assert.IsNotNull(publishResult.Result, "Publish result data should not be null");
+            Assert.IsFalse(publishResult.Status.Error, "Publish should not have errors");
+            Assert.IsTrue(publishResult.Result.Timetoken > 0, "Publish should return valid timetoken");
+
+            await Task.Delay(5000);
+
+            // Step 3: Check message count after publishing (should be 1)
+            PNResult<PNMessageCountResult> finalCountResult = await pubnub.MessageCounts()
+                .Channels(new[] { testChannel })
+                .ChannelsTimetoken(new long[] { timeToken })
+                .ExecuteAsync();
+
+            Assert.IsNotNull(finalCountResult, "Final count result should not be null");
+            Assert.IsNotNull(finalCountResult.Result, "Final count result data should not be null");
+            Assert.IsNotNull(finalCountResult.Result.Channels, "Final count channels should not be null");
+            Assert.IsTrue(finalCountResult.Result.Channels.ContainsKey(testChannel), "Final count should include test channel");
+            Assert.AreEqual(1, finalCountResult.Result.Channels[testChannel], "Final message count should be 1");
+
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
         }
     }
 }

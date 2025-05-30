@@ -2429,5 +2429,80 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = null;
             pubnub = null;
         }
+
+        [Test]
+        public static void ThenPublishWithCustomMessageTypeAndSubscribeShouldReceiveCorrectMessageType()
+        {
+            string channel = "hello_my_channel";
+            string message = "some_message_lalala";
+            string customType = "customtype";
+
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+                Secure = false,
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authToken) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authToken;
+            }
+            pubnub = createPubNubInstance(config, authToken);
+
+            manualResetEventWaitTimeout = 310 * 1000;
+
+            // Subscribe to the channel
+            ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
+            pubnub.Subscribe<string>()
+                .Channels(new string[] { channel })
+                .WithPresence()
+                .Execute();
+
+            // Add message listener
+            string receivedCustomMessageType = null;
+            pubnub.AddListener(new SubscribeCallbackExt(
+                (p, m) => {
+                    if (m.Channel.Equals(channel) && m.Message.ToString().Equals(message))
+                    {
+                        receivedCustomMessageType = m.CustomMessageType;
+                        subscribeManualEvent.Set();
+                    }
+                },
+                (p, pnPresenceEventResult) => { },
+                (p, pnSignalResult) => { },
+                (p, pnObjectEventResult) => { },
+                (p, pnMessageActionEventResult) => { },
+                (p, pnFileEventResult) => { },
+                (p, pnStatus) => { }
+            ));
+
+            // Publish the message
+            ManualResetEvent publishManualEvent = new ManualResetEvent(false);
+            pubnub.Publish().Channel(channel).Message(message).CustomMessageType(customType)
+                    .Execute(new PNPublishResultExt((r, s) =>
+                    {
+                        if (r != null && s.StatusCode == 200 && !s.Error)
+                        {
+                            publishManualEvent.Set();
+                        }
+                        
+                    }));
+            var receivedPublishMessage = publishManualEvent.WaitOne(manualResetEventWaitTimeout);
+            Assert.IsTrue(receivedPublishMessage, "Publish with CustomMessageType Failed");
+            
+            // Wait for the subscribe message
+            var receivedSubscribeMessage = subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
+            Assert.IsTrue(receivedSubscribeMessage, "Subscribe message not received");
+            Assert.AreEqual(customType, receivedCustomMessageType, "Custom message type mismatch");
+            
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
     }
 }

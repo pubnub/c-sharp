@@ -24,9 +24,6 @@ namespace PubNubMessaging.Tests
         private static bool receivedGrantMessage = false;
 
         private static int manualResetEventWaitTimeout = 310 * 1000;
-        private static string channel = "hello_my_channel";
-        private static string channel2 = "hello_my_channel_2";
-        private static string[] channelsGrant = { "hello_my_channel", "hello_my_channel1", "hello_my_channel2" };
         private static string authKey = "myauth";
         private static string currentTestCase = "";
         private static string authToken;
@@ -119,6 +116,9 @@ namespace PubNubMessaging.Tests
                 config.AuthKey = authKey;
             }
 
+            var channel = $"foo.{Guid.NewGuid()}";
+            var channel2 = $"foo.{Guid.NewGuid()}";
+            
             var firstChannel = new ManualResetEvent(false);
             var secondChannel = new ManualResetEvent(false);
             SubscribeCallbackExt eventListener = new SubscribeCallbackExt(
@@ -196,6 +196,7 @@ namespace PubNubMessaging.Tests
             subscribeManualEvent = new ManualResetEvent(false);
 
             string expected = "{\"t\":{\"t\":\"14839022442039237\",\"r\":7},\"m\":[]}";
+            var channel = $"foo.{Guid.NewGuid()}";
 
             server.AddRequest(new Request()
                     .WithMethod("GET")
@@ -311,6 +312,7 @@ namespace PubNubMessaging.Tests
             subscribeManualEvent = new ManualResetEvent(false);
 
             string expected = "{\"t\":{\"t\":\"14839022442039237\",\"r\":7},\"m\":[]}";
+            var channel = $"foo.{Guid.NewGuid()}";
 
             server.AddRequest(new Request()
                     .WithMethod("GET")
@@ -500,6 +502,7 @@ namespace PubNubMessaging.Tests
             subscribeManualEvent = new ManualResetEvent(false);
 
             string expected = "{\"t\":{\"t\":\"14839022442039237\",\"r\":7},\"m\":[]}";
+            var channel = $"foo.{Guid.NewGuid()}";
 
             server.AddRequest(new Request()
                     .WithMethod("GET")
@@ -642,52 +645,6 @@ namespace PubNubMessaging.Tests
             currentTestCase = "ThenSubscribeShouldReturnSpecialCharMessageSecretSSL";
             CommonSubscribeShouldReturnSpecialCharMessageBasedOnParams(PubnubCommon.SecretKey, "", true);
             Assert.IsTrue(receivedMessage, "WhenSubscribedToAChannel --> ThenSubscribeShouldReturnSpecialCharMessageSecretSSL Failed");
-        }
-
-        private class UTGrantResult : PNCallback<PNAccessManagerGrantResult>
-        {
-            public override void OnResponse(PNAccessManagerGrantResult result, PNStatus status)
-            {
-                try
-                {
-                    Debug.WriteLine("PNStatus={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-
-                    if (result != null)
-                    {
-                        Debug.WriteLine("PNAccessManagerGrantResult={0}", pubnub.JsonPluggableLibrary.SerializeToJsonString(result));
-                        if (result.Channels != null && result.Channels.Count > 0)
-                        {
-                            foreach (KeyValuePair<string, Dictionary<string, PNAccessManagerKeyData>> channelKP in result.Channels)
-                            {
-                                string channel = channelKP.Key;
-                                if (Array.IndexOf(channelsGrant, channel) > -1)
-                                {
-                                    var read = result.Channels[channel][authKey].ReadEnabled;
-                                    var write = result.Channels[channel][authKey].WriteEnabled;
-                                    if (read && write)
-                                    {
-                                        receivedGrantMessage = true;
-                                    }
-                                    else
-                                    {
-                                        receivedGrantMessage = false;
-                                    }
-                                }
-                                else
-                                {
-                                    receivedGrantMessage = false;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-                catch { /* ignore */ }
-                finally
-                {
-                    grantManualEvent.Set();
-                }
-            }
         }
 
         public class UTSubscribeCallback : SubscribeCallback

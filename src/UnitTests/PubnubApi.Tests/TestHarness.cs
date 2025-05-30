@@ -50,6 +50,8 @@ namespace PubNubMessaging.Tests
             string channel4 = "hello_my_channel_4";
             string group = "hello_my_group";
             string channelPattern = "foo.*";
+            string channelGroupPattern = "foo.*";
+            string uuidPattern = "fuu.*";
             
             var fullAccess = new PNTokenAuthValues()
             {
@@ -116,6 +118,14 @@ namespace PubNubMessaging.Tests
                     {
                         { channelPattern, fullAccess },
                         { channelPattern+"-pnpres", fullAccess }
+                    },
+                    Uuids = new Dictionary<string, PNTokenAuthValues>()
+                    {
+                        {uuidPattern, fullAccess}
+                    },
+                    ChannelGroups = new Dictionary<string, PNTokenAuthValues>()
+                    {
+                        {channelGroupPattern, fullAccess}
                     }
                 })
                 .ExecuteAsync();
