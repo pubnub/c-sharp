@@ -77,7 +77,7 @@ jobs:
         with:
           dotnet-version: 6.0.x
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore /p:BuildWithNetFrameworkHostedCompiler=true
       - name: Build Projects
         run: |
           cd ./UnitTests/AcceptanceTests 
