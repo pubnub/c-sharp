@@ -174,7 +174,7 @@ namespace PubnubApi.EndPoint
                     }
                     
                     //Parsing for AWS errors (httpClient doesn't throw an exception but returns a 4xx status code with error in body)
-                    if (transportResponse.StatusCode == 404)
+                    if (transportResponse.StatusCode is >= 400 and < 500)
                     {
                         var stringResult = System.Text.Encoding.UTF8.GetString(outputBytes);
                         PNStatus errorStatus = GetStatusIfError(requestState, stringResult);
