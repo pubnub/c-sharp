@@ -630,6 +630,7 @@ namespace PubNubMessaging.Tests
             Assert.IsTrue(downloadResult.Status.Error, "Should have error status");
             Assert.IsNull(downloadResult.Result, "Result should be null for non-existent file");
             Assert.IsNotNull(downloadResult.Status.ErrorData, "Error data should not be null");
+            Assert.IsTrue(downloadResult.Status.ErrorData.Information.Contains("NoSuchKey"), "Error message should have the AWS code for file not found");
             Assert.IsTrue(downloadResult.Status.ErrorData.Information.Contains("The specified key does not exist."), "Error message should indicate file not found");
 
             pubnub.Destroy();
