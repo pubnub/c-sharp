@@ -1,3 +1,7 @@
+v7.3.13 - June 06 2025
+-----------------------------
+- Fixed: improved parsing of file download errors to be properly set in operation status ErrorData.
+
 v7.3.12 - May 28 2025
 -----------------------------
 - Added: added new integration tests to better cover all SDK endpoints.
