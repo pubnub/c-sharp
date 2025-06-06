@@ -24,7 +24,7 @@ dotnet pack -o "$RELEASES_PATH\PCL" -c Release
 # Build UWP package.
 echo "Build UWP package"
 cd "$githubWorkspace\src\Api\PubnubApiUWP"
-dotnet restore
+dotnet restore /p:BuildWithNetFrameworkHostedCompiler=true
 msbuild PubnubApiUWP.csproj /t:Pack /p:Configuration=Release /p:PackageOutputPath="$RELEASES_PATH\UWP" /v:n
 
 echo "Copy built packages"

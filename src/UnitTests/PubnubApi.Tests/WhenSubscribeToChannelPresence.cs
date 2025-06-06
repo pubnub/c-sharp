@@ -117,7 +117,7 @@ namespace PubNubMessaging.Tests
                 }
                 , (_, status) => { }
             );
-            pubnub = new Pubnub(config);
+            pubnub = createPubNubInstance(config);
             pubnub.AddListener(listener);
             manualResetEventWaitTimeout = 310 * 1000;
             pubnub.Subscribe<string>().Channels(new[] { channel }).WithPresence().Execute();

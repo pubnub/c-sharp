@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using PubnubApi.Security.Crypto;
 using PubnubApi.Security.Crypto.Cryptors;
 
@@ -91,83 +93,11 @@ namespace PubnubApi.EndPoint
 
         private void ProcessFileDownloadRequest(PNCallback<PNDownloadFileResult> callback)
         {
-            RequestState<PNDownloadFileResult> requestState = new RequestState<PNDownloadFileResult>
+            var processTask = ProcessFileDownloadRequest();
+            processTask.ContinueWith((t) =>
             {
-                ResponseType = PNOperationType.PNDownloadFileOperation,
-                PubnubCallback = callback,
-                Reconnect = false,
-                EndPointOperation = this
-            };
-
-            var requestParameter = CreateRequestParameter();
-            var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(
-                requestParameter: requestParameter, operationType: PNOperationType.PNDownloadFileOperation);
-            PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ContinueWith(t =>
-            {
-                var transportResponse = t.Result;
-                if (transportResponse.Error == null)
-                {
-                    var fileContentBytes = transportResponse.Content;
-                    if (fileContentBytes != null)
-                    {
-                        requestState.GotJsonResponse = true;
-                        byte[] outputBytes;
-                        if (string.IsNullOrEmpty(currentFileCipherKey) && string.IsNullOrEmpty(config.CipherKey) &&
-                            config.CryptoModule == null)
-                        {
-                            outputBytes = fileContentBytes;
-                        }
-                        else
-                        {
-                            CryptoModule currentCryptoModule = !string.IsNullOrEmpty(currentFileCipherKey)
-                                ? new CryptoModule(new LegacyCryptor(currentFileCipherKey, true, config.Logger), null)
-                                : (config.CryptoModule ??=
-                                    new CryptoModule(new LegacyCryptor(config.CipherKey, true), null));
-                            try
-                            {
-                                outputBytes = currentCryptoModule.Decrypt(fileContentBytes);
-                                logger?.Debug($"Stream length (after Decrypt)= {fileContentBytes.Length}");
-                            }
-                            catch (Exception ex)
-                            {
-                                logger?.Error(
-                                    $" Error while decrypting file content.File might be not encrypted, returning as it is. exception: {ex}");
-                                outputBytes = fileContentBytes;
-                            }
-                        }
-
-                        PNDownloadFileResult result = new PNDownloadFileResult
-                        {
-                            FileBytes = outputBytes,
-                            FileName = currentFileName
-                        };
-                        PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(
-                            requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, 200,
-                            null);
-                        callback.OnResponse(result, status);
-                        logger?.Info($"{GetType().Name} request finished with status code {status?.StatusCode}");
-                    }
-                    else
-                    {
-                        PNStatus errorStatus = GetStatusIfError(requestState, null);
-
-                        callback.OnResponse(default, errorStatus);
-                        logger?.Info(
-                            $"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
-                    }
-                }
-                else
-                {
-                    int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
-                    PNStatusCategory category =
-                        PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
-                    PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(
-                        PNOperationType.PNDownloadFileOperation, category, requestState, statusCode,
-                        new PNException(transportResponse.Error.Message, transportResponse.Error));
-                    requestState.PubnubCallback.OnResponse(default, status);
-                    logger?.Info(
-                        $"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
-                }
+                var result = t.Result;
+                callback.OnResponse(result.Result, result.Status);
             });
         }
 
@@ -198,17 +128,18 @@ namespace PubnubApi.EndPoint
             }
 
             logger?.Debug($"{GetType().Name} parameter validated.");
-            RequestState<PNDownloadFileResult> requestState = new RequestState<PNDownloadFileResult>
-            {
-                ResponseType = PNOperationType.PNDownloadFileOperation,
-                Reconnect = false,
-                EndPointOperation = this
-            };
             var requestParameter = CreateRequestParameter();
             var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(
                 requestParameter: requestParameter, operationType: PNOperationType.PNDownloadFileOperation);
             var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest)
                 .ConfigureAwait(false);
+            RequestState<PNDownloadFileResult> requestState = new RequestState<PNDownloadFileResult>
+            {
+                ResponseType = PNOperationType.PNDownloadFileOperation,
+                Response = transportResponse,
+                Reconnect = false,
+                EndPointOperation = this
+            };
             if (transportResponse.Error == null)
             {
                 var fileContentBytes = transportResponse.Content;
@@ -241,17 +172,27 @@ namespace PubnubApi.EndPoint
                                 { Error = true, ErrorData = new PNErrorData("Decryption error", ex) };
                         }
                     }
-
-                    PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(
-                        requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState,
-                        transportResponse.StatusCode, null);
-                    PNDownloadFileResult result = new PNDownloadFileResult
+                    
+                    //Parsing for AWS errors (httpClient doesn't throw an exception but returns a 4xx status code with error in body)
+                    if (transportResponse.StatusCode is >= 400 and < 500)
                     {
-                        FileBytes = outputBytes,
-                        FileName = currentFileName
-                    };
-                    returnValue.Result = result;
-                    returnValue.Status = status;
+                        var stringResult = System.Text.Encoding.UTF8.GetString(outputBytes);
+                        PNStatus errorStatus = GetStatusIfError(requestState, stringResult);
+                        returnValue.Status = errorStatus;
+                    }
+                    else
+                    {
+                        PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(
+                            requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState,
+                            transportResponse.StatusCode, null);
+                        PNDownloadFileResult result = new PNDownloadFileResult
+                        {
+                            FileBytes = outputBytes,
+                            FileName = currentFileName
+                        };
+                        returnValue.Result = result;
+                        returnValue.Status = status;
+                    }
                 }
                 else
                 {

@@ -586,14 +586,13 @@ namespace PubNubMessaging.Tests
             Assert.IsNotNull(sendFileResult.Status, "Status should not be null");
             Assert.IsTrue(sendFileResult.Status.Error, "Should have error status");
             Assert.IsNull(sendFileResult.Result, "Result should be null for large file");
-            Assert.IsTrue(sendFileResult.Status.ErrorData.Information.Contains("File upload failed: Your proposed upload exceeds the maximum allowed size"), "Error message should be about file size");
+            Assert.IsTrue(sendFileResult.Status.ErrorData.Information.Contains("Your proposed upload exceeds the maximum allowed size"), "Error message should be about file size");
 
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
         }
-
-        //TODO: is the message in content the correct behaviour?
+        
         [Test]
         public static async Task ThenDownloadingNonExistentFileShouldReturnError()
         {
@@ -625,13 +624,14 @@ namespace PubNubMessaging.Tests
                 .FileName(nonExistentFileName)
                 .ExecuteAsync();
             
-            //Assert.IsNotNull(downloadResult, "Download result should not be null");
+            Assert.IsNotNull(downloadResult, "Download result should not be null");
             Assert.IsNotNull(downloadResult.Status, "Status should not be null");
             Assert.AreEqual(downloadResult.Status.StatusCode, 404, "Download status code for nonexistent file should be 404");
-            /*Assert.IsTrue(downloadResult.Status.Error, "Should have error status");
+            Assert.IsTrue(downloadResult.Status.Error, "Should have error status");
             Assert.IsNull(downloadResult.Result, "Result should be null for non-existent file");
             Assert.IsNotNull(downloadResult.Status.ErrorData, "Error data should not be null");
-            Assert.IsTrue(downloadResult.Status.ErrorData.Information.Contains("The specified key does not exist."), "Error message should indicate file not found");*/
+            Assert.IsTrue(downloadResult.Status.ErrorData.Information.Contains("NoSuchKey"), "Error message should have the AWS code for file not found");
+            Assert.IsTrue(downloadResult.Status.ErrorData.Information.Contains("The specified key does not exist."), "Error message should indicate file not found");
 
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;

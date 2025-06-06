@@ -13,6 +13,8 @@ using System.Linq;
 using PubnubApi.Security.Crypto;
 using PubnubApi.Security.Crypto.Cryptors;
 using System.Collections.Concurrent;
+using System.Xml.Linq;
+
 #endregion
 
 namespace PubnubApi
@@ -1069,11 +1071,31 @@ namespace PubnubApi
             {
                 if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig))
                 {
-                    string message = ExtractValue(jsonString, "<Message>", "</Message>");
-                    string proposedSize = ExtractValue(jsonString, "<ProposedSize>", "</ProposedSize>");
-                    var errorMessage = string.IsNullOrEmpty((message)) ? jsonString : $"File upload failed: {message}";
-                    errorMessage+= string.IsNullOrEmpty(proposedSize)?"":$", maximum allowed size is {proposedSize}";
-                    status = new StatusBuilder(currentConfig, jsonLib).CreateStatusResponse<T>(type, PNStatusCategory.PNUnknownCategory, asyncRequestState, Constants.HttpRequestEntityTooLargeStatusCode, new PNException(errorMessage));
+                    var parsedXml = XDocument.Parse(jsonString);
+                    var errorElement = parsedXml.Root;
+                    var errorMessage = string.Empty;
+                    if (errorElement?.Name == "Error")
+                    {
+                        var code = errorElement.Element("Code");
+                        if (code != null)
+                        {
+                            errorMessage += $"Code: {code.Value} ";
+                        }
+                        var message = errorElement.Element("Message");
+                        if (message != null)
+                        {
+                            errorMessage += $"Message: {message.Value} ";
+                        }
+                        var proposedSize = errorElement.Element("ProposedSize");
+                        if (proposedSize != null)
+                        {
+                            errorMessage += $"Maximum allowed size is: {proposedSize.Value} ";
+                        }
+                    }
+                    errorMessage = string.IsNullOrEmpty((errorMessage)) ? jsonString : errorMessage;
+                    //TODO: might not always be applicable
+                    var statusCode = asyncRequestState?.Response?.StatusCode ?? Constants.HttpRequestEntityTooLargeStatusCode;
+                    status = new StatusBuilder(currentConfig, jsonLib).CreateStatusResponse<T>(type, PNStatusCategory.PNUnknownCategory, asyncRequestState, statusCode, new PNException(errorMessage));
                 }
             }
 
