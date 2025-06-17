@@ -18,8 +18,6 @@ class AccessManagerSample
         //Create a new PubNub instance
         Pubnub pubnub = new Pubnub(pnConfiguration);
         //snippet.end
-
-        AccessManagerSample.pubnub = pubnub;
     }
     
     static async Task BasicUsage()
@@ -304,7 +302,7 @@ class AccessManagerSample
         //snippet.end
 
         /*
-        //snippet_parse_token_result
+        //snippet.parse_token_result
         {
            "Version":2,
            "Timestamp":1619718521,

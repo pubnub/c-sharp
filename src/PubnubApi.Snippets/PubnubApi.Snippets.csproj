@@ -9,10 +9,7 @@
 
     <ItemGroup>
       <Folder Include="AppContext\" />
-      <Folder Include="ChannelGroup\" />
-      <Folder Include="Configuration\" />
       <Folder Include="Entities\" />
-      <Folder Include="Files\" />
       <Folder Include="History\" />
       <Folder Include="Logging\" />
       <Folder Include="MessageActions\" />
