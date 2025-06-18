@@ -1,6 +1,6 @@
-//snippet.using
+// snippet.using
 using PubnubApi;
-//snippet.end
+// snippet.end
 
 public class AccessManagerV2Sample
 {
@@ -8,7 +8,7 @@ public class AccessManagerV2Sample
 
     static void PubnubInit()
     {
-        //snippet.pubnub_init
+        // snippet.pubnub_init
         //Create configuration
         PNConfiguration pnConfiguration = new PNConfiguration(new UserId("myUniqueUserId"))
         {
@@ -17,12 +17,12 @@ public class AccessManagerV2Sample
         };
         //Create a new PubNub instance
         Pubnub pubnub = new Pubnub(pnConfiguration);
-        //snippet.end
+        // snippet.end
     }
 
     static async Task Grant()
     {
-        //snippet.grant
+        // snippet.grant
         PNResult<PNAccessManagerGrantResult> grantResponse = await pubnub.Grant()
             .Channels(new string[]{
                 //channels to allow grant on
@@ -52,12 +52,12 @@ public class AccessManagerV2Sample
         PNAccessManagerGrantResult grantResult = grantResponse.Result;
         PNStatus status = grantResponse.Status;
         //PNAccessManagerGrantResult is a parsed and abstracted response from server
-        //snippet.end
+        // snippet.end
     }
     
     static void GrantCallback()
     {
-        //snippet.grant_callback
+        // snippet.grant_callback
         pubnub.Grant()
             .Channels(new string[]{
                 //channels to allow grant on
@@ -87,12 +87,12 @@ public class AccessManagerV2Sample
                     //PNAccessManagerGrantResult is a parsed and abstracted response from server
                 }
             ));
-        //snippet.end
+        // snippet.end
     }
     
     static async Task GrantTTL()
     {
-        //snippet.grant_ttl
+        // snippet.grant_ttl
         PNResult<PNAccessManagerGrantResult> grantResponse = await pubnub.Grant()
             .Channels(new string[] {
                 "my_channel"
@@ -109,12 +109,12 @@ public class AccessManagerV2Sample
         PNAccessManagerGrantResult grantResult = grantResponse.Result;
         PNStatus status = grantResponse.Status;
         //PNAccessManagerGrantResult is a parsed and abstracted response from server
-        //snippet.end
+        // snippet.end
     }
     
     static async Task GrantPresence()
     {
-        //snippet.grant_presence
+        // snippet.grant_presence
         PNResult<PNAccessManagerGrantResult> grantResponse = await pubnub.Grant()
             .Channels(new string[] {
                 "my_channel-pnpres"
@@ -127,12 +127,12 @@ public class AccessManagerV2Sample
         PNAccessManagerGrantResult grantResult = grantResponse.Result;
         PNStatus status = grantResponse.Status;
         //PNAccessManagerGrantResult is a parsed and abstracted response from server
-        //snippet.end
+        // snippet.end
     }
     
     static async Task GrantChannelGroup()
     {
-        //snippet.grant_group
+        // snippet.grant_group
         PNResult<PNAccessManagerGrantResult> grantResponse = await pubnub.Grant()
             .ChannelGroups(new string[] {
                 "cg1",
@@ -154,12 +154,12 @@ public class AccessManagerV2Sample
         PNAccessManagerGrantResult grantResult = grantResponse.Result;
         PNStatus status = grantResponse.Status;
         //PNAccessManagerGrantResult is a parsed and abstracted response from server
-        //snippet.end
+        // snippet.end
     }
     
     static async Task GrantWithAuthKey()
     {
-        //snippet.grant_auth_key
+        // snippet.grant_auth_key
         PNResult<PNAccessManagerGrantResult> grantResponse = await pubnub.Grant()
             .Uuids(new string[] {
                 "my_uuid"
@@ -176,12 +176,12 @@ public class AccessManagerV2Sample
         PNAccessManagerGrantResult grantResult = grantResponse.Result;
         PNStatus status = grantResponse.Status;
         //PNAccessManagerGrantResult is a parsed and abstracted response from server
-        //snippet.end
+        // snippet.end
     }
     
     static async Task GrantAppLevel()
     {
-        //snippet.grant_app_level
+        // snippet.grant_app_level
         PNResult<PNAccessManagerGrantResult> grantResponse = await pubnub.Grant()
             .Write(true)
             .Read(true)
@@ -191,12 +191,12 @@ public class AccessManagerV2Sample
         PNAccessManagerGrantResult grantResult = grantResponse.Result;
         PNStatus status = grantResponse.Status;
         //PNAccessManagerGrantResult is a parsed and abstracted response from server
-        //snippet.end
+        // snippet.end
     }
     
     static async Task GrantChannelLevel()
     {
-        //snippet.grant_channel_level
+        // snippet.grant_channel_level
         PNResult<PNAccessManagerGrantResult> grantResponse = await pubnub.Grant()
             .Channels(new string[] {
                 "my_channel"
@@ -209,12 +209,12 @@ public class AccessManagerV2Sample
         PNAccessManagerGrantResult grantResult = grantResponse.Result;
         PNStatus status = grantResponse.Status;
         //PNAccessManagerGrantResult is a parsed and abstracted response from server
-        //snippet.end
+        // snippet.end
     }
     
     static async Task GrantUserLevel()
     {
-        //snippet.grant_user_level
+        // snippet.grant_user_level
         PNResult<PNAccessManagerGrantResult> grantResponse = await pubnub.Grant()
             .Channels(new string[] {
                 "my_channel"
@@ -231,6 +231,6 @@ public class AccessManagerV2Sample
         PNAccessManagerGrantResult grantResult = grantResponse.Result;
         PNStatus status = grantResponse.Status;
         //PNAccessManagerGrantResult is a parsed and abstracted response from server
-        //snippet.end
+        // snippet.end
     }
 }

@@ -1,6 +1,6 @@
-//snippet.using
+// snippet.using
 using PubnubApi;
-//snippet.end
+// snippet.end
 
 public class FilesSample
 {
@@ -8,7 +8,7 @@ public class FilesSample
 
     static void InitSample()
     {
-        //snippet.init
+        // snippet.init
         PNConfiguration pnConfiguration = new PNConfiguration(new UserId("myUniqueUserId"))
         {
             SubscribeKey = "demo",
@@ -17,12 +17,12 @@ public class FilesSample
         };
 
         Pubnub pubnub = new Pubnub(pnConfiguration);
-        //snippet.end
+        // snippet.end
     }
     
     public static async Task SendFileBasicUsage()
     {
-        //snippet.send_file_basic_usage
+        // snippet.send_file_basic_usage
         try
         {
             PNResult<PNFileUploadResult> fileUploadResponse = await pubnub.SendFile()
@@ -48,12 +48,12 @@ public class FilesSample
         {
             Console.WriteLine($"Request cannot be executed due to error: {ex.Message}");
         }
-        //snippet.end
+        // snippet.end
     }
 
     public static async Task ListFilesBasicUsage()
     {
-        //snippet.list_files_basic_usage
+        // snippet.list_files_basic_usage
         PNResult<PNListFilesResult> listFilesResponse = await pubnub.ListFiles()
             .Channel("my_channel")
             .ExecuteAsync();
@@ -67,12 +67,12 @@ public class FilesSample
         {
             Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(listFilesStatus));
         }
-        //snippet.end
+        // snippet.end
     }
 
     public static async Task GetFileUrlBasicUsage()
     {
-        //snippet.get_file_url_basic_usage
+        // snippet.get_file_url_basic_usage
         PNResult<PNFileUrlResult> getFileUrlResponse = await pubnub.GetFileUrl()
             .Channel("my_channel")
             .FileId("d9515cb7-48a7-41a4-9284-f4bf331bc770")
@@ -88,12 +88,12 @@ public class FilesSample
         {
             Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(getFileUrlStatus));
         }
-        //snippet.end
+        // snippet.end
     }
 
     public static async Task DownloadFileBasicUsage(string downloadUrlFileName)
     {
-        //snippet.download_file_basic_usage
+        // snippet.download_file_basic_usage
         PNResult<PNDownloadFileResult> fileDownloadResponse = await pubnub.DownloadFile()
             .Channel("my_channel")
             .FileId("d9515cb7-48a7-41a4-9284-f4bf331bc770")
@@ -110,12 +110,12 @@ public class FilesSample
         {
             Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(fileDownloadStatus));
         }
-        //snippet.end
+        // snippet.end
     }
 
     public static async Task DeleteFileBasicUsage()
     {
-        //snippet.delete_file_basic_usage
+        // snippet.delete_file_basic_usage
         PNResult<PNDeleteFileResult> deleteFileResponse = await pubnub.DeleteFile()
             .Channel("my_channel")
             .FileId("d9515cb7-48a7-41a4-9284-f4bf331bc770")
@@ -131,12 +131,12 @@ public class FilesSample
         {
             Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(deleteFileStatus));
         }
-        //snippet.end
+        // snippet.end
     }
 
     public static async Task PublishFileMessageBasicUsage()
     {
-        //snippet.publish_file_message_basic_usage
+        // snippet.publish_file_message_basic_usage
         PNResult<PNPublishFileMessageResult> publishFileMsgResponse = await pubnub.PublishFileMessage()
             .Channel("my_channel")
             .FileId("d9515cb7-48a7-41a4-9284-f4bf331bc770")
@@ -154,6 +154,6 @@ public class FilesSample
         {
             Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(publishFileMsgStatus));
         }
-        //snippet.end
+        // snippet.end
     }
 }

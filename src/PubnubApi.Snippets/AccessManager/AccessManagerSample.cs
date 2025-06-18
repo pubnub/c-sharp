@@ -1,6 +1,6 @@
-//snippet.using
+// snippet.using
 using PubnubApi;
-//snippet.end
+// snippet.end
 
 class AccessManagerSample
 {
@@ -8,7 +8,7 @@ class AccessManagerSample
 
     static void PubnubInit()
     {
-        //snippet.pubnub_init
+        // snippet.pubnub_init
         //Create configuration
         PNConfiguration pnConfiguration = new PNConfiguration(new UserId("myUniqueUserId"))
         {
@@ -17,12 +17,12 @@ class AccessManagerSample
         };
         //Create a new PubNub instance
         Pubnub pubnub = new Pubnub(pnConfiguration);
-        //snippet.end
+        // snippet.end
     }
     
     static async Task BasicUsage()
     {
-        //snippet.basic_usage
+        // snippet.basic_usage
         try
         {
             //Perform token granting operation
@@ -55,12 +55,12 @@ class AccessManagerSample
         {
             Console.WriteLine($"Request cannot be executed due to error: {ex.Message}");
         }
-        //snippet.end
+        // snippet.end
     }
 
     static async Task GrantTokenComplex()
     {
-        //snippet.grant_token_complex
+        // snippet.grant_token_complex
         PNResult<PNAccessManagerTokenResult> grantTokenResponse = await pubnub.GrantToken()
             .TTL(15)
             .AuthorizedUuid("my-authorized-uuid")
@@ -88,12 +88,12 @@ class AccessManagerSample
         {
             Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(grantTokenStatus));
         }
-        //snippet.end
+        // snippet.end
     }
     
     static async Task GrantTokenWithRegex()
     {
-        //snippet.grant_token_regex
+        // snippet.grant_token_regex
         PNResult<PNAccessManagerTokenResult> grantTokenResponse = await pubnub.GrantToken()
             .TTL(15)
             .AuthorizedUuid("my-authorized-uuid")
@@ -113,12 +113,12 @@ class AccessManagerSample
         {
             Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(grantTokenStatus));
         }
-        //snippet.end
+        // snippet.end
     }
     
     static async Task GrantTokenComplexWithRegex()
     {
-        //snippet.grant_token_complex_with_regex
+        // snippet.grant_token_complex_with_regex
         PNResult<PNAccessManagerTokenResult> grantTokenResponse = await pubnub.GrantToken()
             .TTL(15)
             .AuthorizedUuid("my-authorized-uuid")
@@ -151,12 +151,12 @@ class AccessManagerSample
         {
             Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(grantTokenStatus));
         }
-        //snippet.end
+        // snippet.end
     }
     
     static async Task GrantTokenOldBasicUsage()
     {
-        //snippet.basic_usage_old
+        // snippet.basic_usage_old
         PNResult<PNAccessManagerTokenResult> grantTokenResponse = await pubnub.GrantToken()
             .TTL(15)
             .AuthorizedUserId("my-authorized-userId")
@@ -177,12 +177,12 @@ class AccessManagerSample
         {
             Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(grantTokenStatus));
         }
-        //snippet.end
+        // snippet.end
     }
     
     static async Task GrantTokenOldComplex()
     {
-        //snippet.grant_token_complex_old
+        // snippet.grant_token_complex_old
         PNResult<PNAccessManagerTokenResult> grantTokenResponse = await pubnub.GrantToken()
             .TTL(15)
             .AuthorizedUserId("my-authorized-userId")
@@ -208,12 +208,12 @@ class AccessManagerSample
         {
             Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(grantTokenStatus));
         }
-        //snippet.end
+        // snippet.end
     }
     
     static async Task GrantTokenOldWithRegex()
     {
-        //snippet.grant_token_old_regex
+        // snippet.grant_token_old_regex
         PNResult<PNAccessManagerTokenResult> grantTokenResponse = await pubnub.GrantToken()
             .TTL(15)
             .AuthorizedUserId("my-authorized-userId")
@@ -233,12 +233,12 @@ class AccessManagerSample
         {
             Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(grantTokenStatus));
         }
-        //snippet.end
+        // snippet.end
     }
     
     static async Task GrantTokenOldComplexWithRegex()
     {
-        //snippet.grant_token_complex_old_with_regex
+        // snippet.grant_token_complex_old_with_regex
         PNResult<PNAccessManagerTokenResult> grantTokenResponse = await pubnub.GrantToken()
             .TTL(15)
             .AuthorizedUserId("my-authorized-userId")
@@ -269,12 +269,12 @@ class AccessManagerSample
         {
             Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(grantTokenStatus));
         }
-        //snippet.end
+        // snippet.end
     }
     
     static async Task RevokeTokenBasicUsage()
     {
-        //snippet.revoke_token
+        // snippet.revoke_token
         PNResult<PNAccessManagerRevokeTokenResult> revokeTokenResponse = await pubnub
             .RevokeToken()
             .Token("p0thisAkFl043rhDdHRsCkNDcGF0pERjaGFuoENnctokenVzcqBDc3BjoERtZXRhoENzaWdYIGOAeTyWGJI")
@@ -289,20 +289,20 @@ class AccessManagerSample
         {
             Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(revokeTokenStatus));
         }
-        //snippet.end
+        // snippet.end
     }
     
     static async Task ParseTokenBasicUsage()
     {
-        //snippet.parse_token_usage
+        // snippet.parse_token_usage
         var parsedTokenContent =
             pubnub.ParseToken(
                 "p0thisAkFl043rhDdHRsCkNyZXisRGNoYW6hanNlY3JldAFDZ3Jwsample3KgQ3NwY6BDcGF0pERjaGFuoENnctokenVzcqBDc3BjoERtZXRhoENzaWdYIGOAeTyWGJI");
         var parsedTokenJson = pubnub.JsonPluggableLibrary.SerializeToJsonString(parsedTokenContent);
-        //snippet.end
+        // snippet.end
 
         /*
-        //snippet.parse_token_result
+        // snippet.parse_token_result
         {
            "Version":2,
            "Timestamp":1619718521,
@@ -379,7 +379,7 @@ class AccessManagerSample
               }
            }
         }
-        //snippet.end
+        // snippet.end
         */
     }
 }

@@ -1,6 +1,6 @@
-//snippet.using
+// snippet.using
 using PubnubApi;
-//snippet.end
+// snippet.end
 
 public class ChannelGroupsSample
 {
@@ -8,7 +8,7 @@ public class ChannelGroupsSample
 
     static void PubnubInit()
     {
-        //snippet.pubnub_init
+        // snippet.pubnub_init
         //Create configuration
         PNConfiguration pnConfiguration = new PNConfiguration(new UserId("myUniqueUserId"))
         {
@@ -17,12 +17,12 @@ public class ChannelGroupsSample
         };
         //Create a new PubNub instance
         Pubnub pubnub = new Pubnub(pnConfiguration);
-        //snippet.end
+        // snippet.end
     }
 
     static async Task AddToGroup()
     {
-        //snippet.add_to_group
+        // snippet.add_to_group
         try
         {
             PNResult<PNChannelGroupsAddChannelResult> cgAddChResponse = await pubnub.AddChannelsToChannelGroup()
@@ -46,36 +46,36 @@ public class ChannelGroupsSample
         {
             Console.WriteLine($"Request cannot be executed due to error: {ex.Message}");
         }
-        //snippet.end
+        // snippet.end
     }
     
     static async Task ListFromGroup()
     {
-        //snippet.list
+        // snippet.list
         PNResult<PNChannelGroupsAllChannelsResult> cgListChResponse = await pubnub.ListChannelsForChannelGroup()
             .ChannelGroup("cg1")
             .ExecuteAsync();
-        //snippet.end
+        // snippet.end
     }
     
     static async Task RemoveFromGroup()
     {
-        //snippet.remove
+        // snippet.remove
         PNResult<PNChannelGroupsRemoveChannelResult> rmChFromCgResponse = await pubnub.RemoveChannelsFromChannelGroup()
             .ChannelGroup("family")
             .Channels(new string[] {
                 "son"
             })
             .ExecuteAsync();
-        //snippet.end
+        // snippet.end
     }
     
     static async Task DeleteGroup()
     {
-        //snippet.delete
+        // snippet.delete
         PNResult<PNChannelGroupsDeleteGroupResult> delCgResponse = await pubnub.DeleteChannelGroup()
             .ChannelGroup("family")
             .ExecuteAsync();
-        //snippet.end
+        // snippet.end
     }
 }

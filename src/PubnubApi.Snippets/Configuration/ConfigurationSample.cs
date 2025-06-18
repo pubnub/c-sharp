@@ -1,11 +1,11 @@
-//snippet.using
+// snippet.using
 using PubnubApi;
-//snippet.end
+// snippet.end
 
-//snippet.using_crypto
+// snippet.using_crypto
 using PubnubApi.Security.Crypto;
 using PubnubApi.Security.Crypto.Cryptors;
-//snippet.end
+// snippet.end
 
 public class ConfigurationSample
 {
@@ -13,11 +13,11 @@ public class ConfigurationSample
 
     static void PubnubInit()
     {
-        //snippet.init_config
+        // snippet.init_config
         PNConfiguration pnConfiguration = new PNConfiguration(new UserId("myUniqueUserId"));
-        //snippet.end
+        // snippet.end
         
-        //snippet.crypto
+        // snippet.crypto
         // encrypts using 256-bit AES-CBC cipher (recommended)
         // decrypts data encrypted with the legacy and the 256-bit AES-CBC ciphers
         pnConfiguration.CryptoModule = new CryptoModule(new AesCbcCryptor("enigma"),
@@ -27,16 +27,16 @@ public class ConfigurationSample
         // decrypts data encrypted with the legacy and the 256-bit AES-CBC ciphers
         pnConfiguration.CryptoModule = new CryptoModule(new LegacyCryptor("enigma"),
             new List<ICryptor> { new AesCbcCryptor("enigma") });
-        //snippet.end
+        // snippet.end
         
-        //snippet.new_pubnub
+        // snippet.new_pubnub
         Pubnub pubnub = new Pubnub(pnConfiguration);
-        //snippet.end
+        // snippet.end
     }
 
     static void BasicUsage()
     {
-        //snippet.basic_usage
+        // snippet.basic_usage
         // Create a configuration instance for PubNub
         PNConfiguration pnConfiguration = new PNConfiguration(new UserId("myUniqueUserId"))
         {
@@ -63,54 +63,54 @@ public class ConfigurationSample
 
         // Initialize a new PubNub instance with the created confiiguration
         Pubnub pubnub = new Pubnub(pnConfiguration);
-        //snippet.end
+        // snippet.end
         
-        //snippet.user_id
+        // snippet.user_id
         pnConfiguration.UserId = new UserId("myUserId");
-        //snippet.end
+        // snippet.end
         
-        //snippet.get_user_id
+        // snippet.get_user_id
         UserId currentUserId = pubnub.GetCurrentUserId();
-        //snippet.end
+        // snippet.end
     }
 
     static void ChangeUserId()
     {
-        //snippet.change_user_id
+        // snippet.change_user_id
         //Setting the initial UserId
         PNConfiguration pnConfiguration = new PNConfiguration(new UserId("myUniqueUserId"));
         //Changing to a new UserId
         pnConfiguration.UserId = new UserId("myUserId");
-        //snippet.end
+        // snippet.end
     }
     
     static void SetAndGetAuthKey()
     {
-        //snippet.set_auth_key
+        // snippet.set_auth_key
         PNConfiguration pnConfiguration = new PNConfiguration(new UserId("myUniqueUserId"));
         pnConfiguration.AuthKey = "authKey";
-        //snippet.end
+        // snippet.end
         
-        //snippet.get_auth_key
+        // snippet.get_auth_key
         string sampleAuthKey = pnConfiguration.AuthKey;
-        //snippet.end
+        // snippet.end
     }
 
     static void FilterExpression()
     {
-        //snippet.filter_expression
+        // snippet.filter_expression
         PNConfiguration pnConfiguration = new PNConfiguration(new UserId("myUniqueUserId"));
         pnConfiguration.FilterExpression = "such=wow";
-        //snippet.end
+        // snippet.end
         
-        //snippet.get_filter_expression
+        // snippet.get_filter_expression
         string filterExpression = pnConfiguration.FilterExpression;
-        //snippet.end
+        // snippet.end
     }
 
     static void InitWithUUID()
     {
-        //snippet.init_with_uuid
+        // snippet.init_with_uuid
         // Initialize PubNub using the configuration
         PNConfiguration pnConfiguration = new PNConfiguration(new UserId("myUniqueUserId"))
         {
@@ -121,34 +121,34 @@ public class ConfigurationSample
 
         // Create the PubNub instance with the configuration
         Pubnub pubnub = new Pubnub(pnConfiguration);
-        //snippet.end
+        // snippet.end
     }
     
     static void InitNonSecure()
     {
-        //snippet.init_non_secure
+        // snippet.init_non_secure
         PNConfiguration pnConfiguration = new PNConfiguration(new UserId("myUniqueUserId"));
         pnConfiguration.PublishKey = "my_pubkey";
         pnConfiguration.SubscribeKey = "my_subkey";
         pnConfiguration.Secure = false;
         Pubnub pubnub = new Pubnub(pnConfiguration);
-        //snippet.end
+        // snippet.end
     }
     
     static void InitSecure()
     {
-        //snippet.init_secure
+        // snippet.init_secure
         PNConfiguration pnConfiguration = new PNConfiguration(new UserId("myUniqueUserId"));
         pnConfiguration.PublishKey = "my_pubkey";
         pnConfiguration.SubscribeKey = "my_subkey";
         pnConfiguration.Secure = true;
         Pubnub pubnub = new Pubnub(pnConfiguration);
-        //snippet.end
+        // snippet.end
     }
     
     static void InitSecretKey()
     {
-        //snippet.init_secret_key
+        // snippet.init_secret_key
         PNConfiguration pnConfiguration = new PNConfiguration(new UserId("myUniqueUserId"));
         pnConfiguration.PublishKey = "my_pubkey";
         pnConfiguration.SubscribeKey = "my_subkey";
@@ -156,15 +156,15 @@ public class ConfigurationSample
         pnConfiguration.Secure = true;
 
         Pubnub pubnub = new Pubnub(pnConfiguration);
-        //snippet.end
+        // snippet.end
     }
     
     static void InitReadOnly()
     {
-        //snippet.init_read_only
+        // snippet.init_read_only
         PNConfiguration pnConfiguration = new PNConfiguration(new UserId("myUniqueUserId"));
         pnConfiguration.SubscribeKey = "my_subkey";
         Pubnub pubnub = new Pubnub(pnConfiguration);
-        //snippet.end
+        // snippet.end
     }
 }
