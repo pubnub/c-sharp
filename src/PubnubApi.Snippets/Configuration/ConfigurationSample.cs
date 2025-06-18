@@ -1,5 +1,6 @@
 // snippet.using
 using PubnubApi;
+
 // snippet.end
 
 // snippet.using_crypto
@@ -31,6 +32,7 @@ public class ConfigurationSample
         
         // snippet.new_pubnub
         Pubnub pubnub = new Pubnub(pnConfiguration);
+        
         // snippet.end
     }
 

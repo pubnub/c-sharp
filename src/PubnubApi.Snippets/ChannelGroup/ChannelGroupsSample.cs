@@ -1,5 +1,6 @@
 // snippet.using
 using PubnubApi;
+
 // snippet.end
 
 public class ChannelGroupsSample
@@ -17,6 +18,7 @@ public class ChannelGroupsSample
         };
         //Create a new PubNub instance
         Pubnub pubnub = new Pubnub(pnConfiguration);
+        
         // snippet.end
     }
 

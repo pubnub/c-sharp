@@ -1,5 +1,6 @@
 // snippet.using
 using PubnubApi;
+
 // snippet.end
 
 class AccessManagerSample
@@ -17,6 +18,7 @@ class AccessManagerSample
         };
         //Create a new PubNub instance
         Pubnub pubnub = new Pubnub(pnConfiguration);
+        
         // snippet.end
     }
     
