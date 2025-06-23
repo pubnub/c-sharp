@@ -55,7 +55,6 @@ public class MessageActionsSample
     public static void RemoveMessageActionBasicUsage()
     {
         // snippet.remove_message_action_basic_usage
-        Pubnub pubnub = null; // Assume initialized elsewhere
         pubnub.RemoveMessageAction()
             .Channel("my_channel")
             .MessageTimetoken(15701761818730000)
@@ -71,7 +70,6 @@ public class MessageActionsSample
     public static void GetMessageActionsBasicUsage()
     {
         // snippet.get_message_actions_basic_usage
-        Pubnub pubnub = null; // Assume initialized elsewhere
         pubnub.GetMessageActions()
             .Channel("my_channel")
             .Execute(new PNGetMessageActionsResultExt((result, status) =>
