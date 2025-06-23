@@ -1,7 +1,7 @@
 // snippet.using
 using PubnubApi;
 
-//snippet.end
+// snippet.end
 
 public class MiscSample
 {
@@ -21,7 +21,7 @@ public class MiscSample
         // Initialize PubNub
         Pubnub pubnub = new Pubnub(pnConfiguration);
         
-        //snippet.end
+        // snippet.end
     }
     
     public static void DestroyBasicUsage()

@@ -1,7 +1,7 @@
 // snippet.using
 using PubnubApi;
 
-//snippet.end
+// snippet.end
 
 public class EntitiesSample
 {
