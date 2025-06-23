@@ -293,7 +293,16 @@ class AccessManagerSample
         }
         // snippet.end
     }
-    
+
+    static async Task SetAuthTokenSnippet()
+    {
+        // snippet.set_token
+        pubnub.SetAuthToken(
+            "p0thisAkFl043rhDdHRsCkNyZXisRGNoYW6hanNlY3JldAFDZ3Jwsample3KgQ3NwY6BDcGF0pERjaGFuoENnctokenVzcqBDc3BjoERtZXRhoENzaWdYIGOAeTyWGJI");
+
+        // snippet.end
+    }
+
     static async Task ParseTokenBasicUsage()
     {
         // snippet.parse_token_usage
