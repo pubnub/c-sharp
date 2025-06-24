@@ -8,17 +8,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="AppContext\" />
       <Folder Include="Entities\" />
-      <Folder Include="History\" />
       <Folder Include="Logging\" />
       <Folder Include="MessageActions\" />
       <Folder Include="Misc\" />
       <Folder Include="Presence\" />
       <Folder Include="Publish\" />
-      <Folder Include="PubNub\" />
       <Folder Include="Push\" />
-      <Folder Include="Subscribe\" />
     </ItemGroup>
 
     <ItemGroup>
