@@ -13,7 +13,7 @@ public class LoggingSample
     public class PubnubConsoleLogger : IPubnubLogger
     {
         public void Trace(string traceLog) =>
-            Console.WriteLine($"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] [TRACE] {traceLog}");
+            //Console.WriteLine($"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] [TRACE] {traceLog}");
 
         public void Debug(string debugLog) =>
             Console.WriteLine($"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] [DEBUG] {debugLog}");
