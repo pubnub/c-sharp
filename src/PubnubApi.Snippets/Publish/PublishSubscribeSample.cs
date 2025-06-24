@@ -20,7 +20,7 @@ public class PublishSubscribeSample
 
         // Initialize PubNub
         Pubnub pubnub = new Pubnub(pnConfiguration);
-        
+
         // snippet.end
     }
 
@@ -79,7 +79,8 @@ public class PublishSubscribeSample
             .Channel("my_channel")
             .CustomMessageType("text-message")
             .Execute(new PNPublishResultExt(
-                (result, status) => {
+                (result, status) =>
+                {
                     Console.WriteLine("pub timetoken: " + result.Timetoken.ToString());
                     Console.WriteLine("pub status code : " + status.StatusCode.ToString());
                 }
@@ -90,7 +91,8 @@ public class PublishSubscribeSample
     public static void PublishWithMetadata()
     {
         // snippet.publish_with_metadata
-        string[] arrayMessage = new string[] {
+        string[] arrayMessage = new string[]
+        {
             "hello",
             "there"
         };
@@ -99,11 +101,12 @@ public class PublishSubscribeSample
             .Message(arrayMessage.ToList())
             .Channel("suchChannel")
             .ShouldStore(true)
-            .Meta(new Dictionary<string, object>(){ { "someKey", "someValue" }})
+            .Meta(new Dictionary<string, object>() { { "someKey", "someValue" } })
             .UsePOST(true)
             .CustomMessageType("text-message")
             .Execute(new PNPublishResultExt(
-                (result, status) => {
+                (result, status) =>
+                {
                     // handle publish result, status always present, result if successful
                     // status.Error to see if error happened
                 }
@@ -122,9 +125,9 @@ public class PublishSubscribeSample
             .ExecuteAsync();
         // snippet.end
     }
-    
+
     // snippet.publish_mobile_payload
-    
+
     public class MobilePayload
     {
         public Dictionary<string, object> pn_apns;
@@ -135,7 +138,8 @@ public class PublishSubscribeSample
     public static void PublishMobilePayload()
     {
         Dictionary<string, object> apnsData = new Dictionary<string, object>();
-        apnsData.Add("aps", new Dictionary<string, object>() {
+        apnsData.Add("aps", new Dictionary<string, object>()
+        {
             { "alert", "Game update 49ers touchdown" },
             { "badge", 2 }
         });
@@ -143,15 +147,16 @@ public class PublishSubscribeSample
         apnsData.Add("score", new int[] { 7, 0 });
 
         Dictionary<string, object> gcmData = new Dictionary<string, object>();
-        gcmData.Add("data", new Dictionary<string, object>() {
+        gcmData.Add("data", new Dictionary<string, object>()
+        {
             {
                 "summary", "Game update 49ers touchdown"
             },
             {
-                "teams", new string[]{ "49ers", "raiders"}
+                "teams", new string[] { "49ers", "raiders" }
             },
             {
-                "score", new int[]{ 7, 0}
+                "score", new int[] { 7, 0 }
             },
             {
                 "lastplay", "5yd run up the middle"
@@ -161,9 +166,10 @@ public class PublishSubscribeSample
         MobilePayload mobilePayload = new MobilePayload();
         mobilePayload.pn_apns = apnsData;
         mobilePayload.pn_gcm = gcmData;
-        mobilePayload.full_game = new Dictionary<string, object>() {
-            { "date","2014.05.20" },
-            { "foobar","Data that is not pertinent to devices" }
+        mobilePayload.full_game = new Dictionary<string, object>()
+        {
+            { "date", "2014.05.20" },
+            { "foobar", "Data that is not pertinent to devices" }
         };
 
         pubnub.Publish()
@@ -172,12 +178,17 @@ public class PublishSubscribeSample
             .ShouldStore(true)
             .CustomMessageType("text-message")
             .Execute(new PNPublishResultExt(
-                (result, status) => {
+                (result, status) =>
+                {
                     // Check whether request successfully completed or not.
-                    if (status.Error) {
+                    if (status.Error)
+                    {
                         // something bad happened.
-                        Console.WriteLine($"error while publishing: {pubnub.JsonPluggableLibrary.SerializeToJsonString(status)}");
-                    } else {
+                        Console.WriteLine(
+                            $"error while publishing: {pubnub.JsonPluggableLibrary.SerializeToJsonString(status)}");
+                    }
+                    else
+                    {
                         Console.WriteLine($"published with timetoken: {result.Timetoken}");
                     }
                 }
@@ -188,7 +199,8 @@ public class PublishSubscribeSample
     public static void FireBasicUsage()
     {
         // snippet.fire_basic_usage
-        string[] arrMessage = new string[] {
+        string[] arrMessage = new string[]
+        {
             "hello",
             "there"
         };
@@ -198,10 +210,15 @@ public class PublishSubscribeSample
             .Channel("my-channel")
             .UsePOST(true)
             .Execute(new PNPublishResultExt(
-                (result, status) => {
-                    if (status.Error) {
-                        Console.WriteLine($"error while publishing: {pubnub.JsonPluggableLibrary.SerializeToJsonString(status)}");
-                    } else {
+                (result, status) =>
+                {
+                    if (status.Error)
+                    {
+                        Console.WriteLine(
+                            $"error while publishing: {pubnub.JsonPluggableLibrary.SerializeToJsonString(status)}");
+                    }
+                    else
+                    {
                         Console.WriteLine($"published with timetoken: {result.Timetoken}");
                     }
                 }
@@ -219,10 +236,14 @@ public class PublishSubscribeSample
             .Message(myMessage)
             .Channel("foo")
             .CustomMessageType("text-message")
-            .Execute(new PNPublishResultExt((result, status) => {
-                if (status.Error) {
+            .Execute(new PNPublishResultExt((result, status) =>
+            {
+                if (status.Error)
+                {
                     Console.WriteLine(status.ErrorData.Information);
-                } else {
+                }
+                else
+                {
                     Console.WriteLine(result.Timetoken);
                 }
             }));
@@ -233,11 +254,28 @@ public class PublishSubscribeSample
     {
         // snippet.subscribe_basic_usage
         pubnub.Subscribe<string>()
-            .Channels(new string[] {
+            .Channels(new string[]
+            {
                 // subscribe to channels
                 "my_channel"
-             })
+            })
             .Execute();
+        // snippet.end
+    }
+
+    public static void SubscribeNewBasicUsage()
+    {
+        // snippet.subscribe_basic_usage_new
+        Subscription subscription1 = pubnub.Channel("channelName").Subscription();
+        subscription1.Subscribe<object>();
+
+        SubscriptionSet subscriptionSet = pubnub.SubscriptionSet(
+            new string[] { "channel1", "channel2" },
+            new string[] { "channel_group_1", "channel_group_2" },
+            SubscriptionOptions.ReceivePresenceEvents
+        );
+
+        subscriptionSet.Subscribe<object>();
         // snippet.end
     }
 
@@ -257,7 +295,8 @@ public class PublishSubscribeSample
         Pubnub pubnub = new Pubnub(pnConfiguration);
 
         pubnub.Subscribe<string>()
-            .Channels(new string[] {
+            .Channels(new string[]
+            {
                 // subscribe to channels
                 "my_channel"
             })
@@ -269,7 +308,8 @@ public class PublishSubscribeSample
     {
         // snippet.subscribe_multiple_channels
         pubnub.Subscribe<string>()
-            .Channels(new string[] {
+            .Channels(new string[]
+            {
                 // subscribe to channels information
                 "my_channel1",
                 "my_channel2"
@@ -282,7 +322,8 @@ public class PublishSubscribeSample
     {
         // snippet.subscribe_with_presence
         pubnub.Subscribe<string>()
-            .Channels(new string[] {
+            .Channels(new string[]
+            {
                 // subscribe to channels
                 "my_channel"
             })
@@ -295,10 +336,12 @@ public class PublishSubscribeSample
     {
         // snippet.subscribe_with_state
         pubnub.AddListener(new SubscribeCallbackExt(
-            (pubnubObj, message) => {  },
-            (pubnubObj, presence) => {  },
-            (pubnubObj, status) => {
-                if (status.Category == PNStatusCategory.PNConnectedCategory) {
+            (pubnubObj, message) => { },
+            (pubnubObj, presence) => { },
+            (pubnubObj, status) =>
+            {
+                if (status.Category == PNStatusCategory.PNConnectedCategory)
+                {
                     Dictionary<string, object> data = new Dictionary<string, object>();
                     data.Add("FieldA", "Awesome");
                     data.Add("FieldB", 10);
@@ -308,7 +351,8 @@ public class PublishSubscribeSample
                         .ChannelGroups(new string[] { "awesomeChannelGroup" })
                         .State(data)
                         .Execute(new PNSetStateResultExt(
-                            (r, s) => {
+                            (r, s) =>
+                            {
                                 // handle set state response
                             }
                         ));
@@ -317,7 +361,8 @@ public class PublishSubscribeSample
         ));
 
         pubnub.Subscribe<string>()
-            .Channels(new string[] {
+            .Channels(new string[]
+            {
                 "awesomeChannel"
             })
             .Execute();
@@ -328,12 +373,14 @@ public class PublishSubscribeSample
     {
         // snippet.subscribe_channel_group
         pubnub.Subscribe<string>()
-            .Channels(new string[] {
+            .Channels(new string[]
+            {
                 // subscribe to channels
                 "ch1",
                 "ch2"
             })
-            .ChannelGroups(new string[] {
+            .ChannelGroups(new string[]
+            {
                 // subscribe to channel groups
                 "cg1",
                 "cg2"
@@ -348,7 +395,8 @@ public class PublishSubscribeSample
     {
         // snippet.subscribe_channel_group_presence
         pubnub.Subscribe<string>()
-            .ChannelGroups(new string[] {
+            .ChannelGroups(new string[]
+            {
                 // subscribe to channel groups
                 "cg1",
                 "cg2"
@@ -358,7 +406,7 @@ public class PublishSubscribeSample
             .Execute();
         // snippet.end
     }
-    
+
     // snippet.subscribe_custom_type
     public class Phone
     {
@@ -378,7 +426,8 @@ public class PublishSubscribeSample
 
     public static void SubscribeWithCustomType()
     {
-        Phone myPhone = new Phone() {
+        Phone myPhone = new Phone()
+        {
             Number = "111-222-2222",
             PhoneType = PhoneType.Mobile,
             Extenion = "11"
@@ -389,12 +438,17 @@ public class PublishSubscribeSample
             .Channel("my_channel")
             .ShouldStore(true)
             .Execute(new PNPublishResultExt(
-                (result, status) => {
+                (result, status) =>
+                {
                     // Check whether request successfully completed or not.
-                    if (status.Error) {
+                    if (status.Error)
+                    {
                         // something bad happened.
-                        Console.WriteLine("error happened while publishing: " + pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
-                    } else {
+                        Console.WriteLine("error happened while publishing: " +
+                                          pubnub.JsonPluggableLibrary.SerializeToJsonString(status));
+                    }
+                    else
+                    {
                         Console.WriteLine("publish worked! timetoken: " + result.Timetoken.ToString());
                     }
                 }
@@ -410,9 +464,10 @@ public class PublishSubscribeSample
 
         pubnub.AddListener(objectListenerSubscribeCallack);
         pubnub.Subscribe<Phone>()
-            .Channels(new string[] {
+            .Channels(new string[]
+            {
                 "my_channel" // subscribe to channels
-                })
+            })
             .Execute();
 
         //If you are subscribing to multiple message types, then
@@ -429,9 +484,10 @@ public class PublishSubscribeSample
 
         pubnub.AddListener(stringListenerSubscribeCallack);
         pubnub.Subscribe<string>()
-            .Channels(new string[] {
+            .Channels(new string[]
+            {
                 "my_channel" // subscribe to channels
-                })
+            })
             .Execute();
     }
     // snippet.end
@@ -456,7 +512,8 @@ public class PublishSubscribeSample
     {
         // snippet.wildcard_subscribe
         pubnub.Subscribe<string>()
-            .Channels(new string[] {
+            .Channels(new string[]
+            {
                 // subscribe to channels information
                 "foo.*"
             })
@@ -468,10 +525,11 @@ public class PublishSubscribeSample
     {
         // snippet.unsubscribe_basic_usage
         pubnub.Unsubscribe<string>()
-             .Channels(new string[] {
+            .Channels(new string[]
+            {
                 "my_channel"
-             })
-             .Execute();
+            })
+            .Execute();
         // snippet.end
     }
 
@@ -479,12 +537,14 @@ public class PublishSubscribeSample
     {
         // snippet.unsubscribe_multiple_channels
         pubnub.Unsubscribe<string>()
-            .Channels(new string[] {
+            .Channels(new string[]
+            {
                 "ch1",
                 "ch2",
                 "ch3"
             })
-            .ChannelGroups(new string[] {
+            .ChannelGroups(new string[]
+            {
                 "cg1",
                 "cg2",
                 "cg3"
@@ -497,7 +557,8 @@ public class PublishSubscribeSample
     {
         // snippet.unsubscribe_channel_group
         pubnub.Unsubscribe<string>()
-            .ChannelGroups(new string[] {
+            .ChannelGroups(new string[]
+            {
                 "cg1",
                 "cg2",
                 "cg3"
@@ -513,12 +574,78 @@ public class PublishSubscribeSample
         // snippet.end
     }
 
+    public static void AddListenerBasicUsage()
+    {
+        // snippet.add_listener_basic_usage
+        // Add event-specific listeners
+        // Add a listener to receive Message changes
+        Subscription subscription1 = pubnub.Channel("channelName").Subscription();
+
+        subscription1.onMessage += (Pubnub pn, PNMessageResult<object> messageEvent) =>
+        {
+            Console.WriteLine($"Message received {messageEvent.Message}");
+        };
+
+        subscription1.Subscribe<object>();
+
+
+        // Add multiple listeners
+        SubscribeCallbackExt eventListener = new SubscribeCallbackExt(
+            delegate(Pubnub pn, PNMessageResult<object> messageEvent)
+            {
+                Console.WriteLine($"received message {messageEvent.Message}");
+            },
+            delegate(Pubnub pn, PNPresenceEventResult e) { Console.WriteLine("Presence event"); },
+            delegate(Pubnub pn, PNSignalResult<object> e) { Console.WriteLine("Signal event"); },
+            delegate(Pubnub pn, PNObjectEventResult e) { Console.WriteLine("Object event"); },
+            delegate(Pubnub pn, PNMessageActionEventResult e) { Console.WriteLine("Message Action event"); },
+            delegate(Pubnub pn, PNFileEventResult e) { Console.WriteLine("File event"); }
+        );
+
+        Channel firstChannel = pubnub.Channel("first");
+        var subscription = firstChannel.Subscription(SubscriptionOptions.ReceivePresenceEvents);
+        subscription.AddListener(eventListener);
+        subscription.Subscribe<object>();
+        // snippet.end
+    }
+
+    public static void AddListenersBasicUsage()
+    {
+        // snippet.add_listeners_basic_usage
+        Subscription subscription1 = pubnub.Channel("channelName").Subscription();
+
+        SubscriptionSet subscriptionSet = pubnub.SubscriptionSet(
+            new string[] { "channel1", "channel2" },
+            new string[] { "channel_group_1", "channel_group_2" },
+            SubscriptionOptions.ReceivePresenceEvents
+        );
+
+        SubscribeCallbackExt eventListener = new SubscribeCallbackExt(
+            delegate(Pubnub pn, PNMessageResult<object> messageEvent)
+            {
+                Console.WriteLine($"received message {messageEvent.Message}");
+            },
+            delegate(Pubnub pn, PNPresenceEventResult e) { Console.WriteLine("Presence event"); },
+            delegate(Pubnub pn, PNStatus s) { Console.WriteLine("Status event"); }
+        );
+
+        subscription1.AddListener(eventListener);
+        subscriptionSet.onSignal += (Pubnub pn, PNSignalResult<object> signalEvent) =>
+        {
+            Console.WriteLine($"Message received {signalEvent.Message}");
+        };
+
+        subscription1.Subscribe<object>();
+        subscriptionSet.Subscribe<object>();
+        // snippet.end
+    }
+
     public static void AddListenerMethod1()
     {
         // snippet.add_listener_method1
         // Adding listener.
         pubnub.AddListener(new SubscribeCallbackExt(
-            delegate (Pubnub pnObj, PNMessageResult<object> pubMsg)
+            delegate(Pubnub pnObj, PNMessageResult<object> pubMsg)
             {
                 Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(pubMsg));
                 var channelName = pubMsg.Channel;
@@ -527,46 +654,52 @@ public class PublishSubscribeSample
                 var msg = pubMsg.Message;
                 var publisher = pubMsg.Publisher;
             },
-            delegate (Pubnub pnObj, PNPresenceEventResult presenceEvnt)
+            delegate(Pubnub pnObj, PNPresenceEventResult presenceEvnt)
             {
                 Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(presenceEvnt));
                 var action = presenceEvnt.Event; // Can be join, leave, state-change or timeout
                 var channelName = presenceEvnt.Channel; // The channel for which the message belongs
                 var occupancy = presenceEvnt.Occupancy; // No. of users connected with the channel
                 var state = presenceEvnt.State; // User State
-                var channelGroupName = presenceEvnt.Subscription; //  The channel group or wildcard subscription match (if exists)
+                var channelGroupName =
+                    presenceEvnt.Subscription; //  The channel group or wildcard subscription match (if exists)
                 var publishTime = presenceEvnt.Timestamp; // Publish timetoken
-                var timetoken = presenceEvnt.Timetoken;  // Current timetoken
+                var timetoken = presenceEvnt.Timetoken; // Current timetoken
                 var uuid = presenceEvnt.Uuid; // UUIDs of users who are connected with the channel
             },
-            delegate (Pubnub pnObj, PNSignalResult<object> signalMsg)
+            delegate(Pubnub pnObj, PNSignalResult<object> signalMsg)
             {
                 Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(signalMsg));
                 var channelName = signalMsg.Channel; // The channel for which the signal belongs
-                var channelGroupName = signalMsg.Subscription; // The channel group or wildcard subscription match (if exists)
+                var channelGroupName =
+                    signalMsg.Subscription; // The channel group or wildcard subscription match (if exists)
                 var pubTT = signalMsg.Timetoken; // Publish timetoken
                 var msg = signalMsg.Message; // The Payload
                 var publisher = signalMsg.Publisher; //The Publisher
             },
-            delegate (Pubnub pnObj, PNObjectEventResult objectEventObj)
+            delegate(Pubnub pnObj, PNObjectEventResult objectEventObj)
             {
                 var channelName = objectEventObj.Channel; // Channel
                 var channelMetadata = objectEventObj.ChannelMetadata; //Channel Metadata
                 var uidMetadata = objectEventObj.UuidMetadata; // UUID metadata
                 var evnt = objectEventObj.Event; // Event
                 var type = objectEventObj.Type; // Event type
-                if (objectEventObj.Type == "uuid") {
-                        /* got uuid metadata related event. */
+                if (objectEventObj.Type == "uuid")
+                {
+                    /* got uuid metadata related event. */
                 }
-                else if (objectEventObj.Type == "channel") {
+                else if (objectEventObj.Type == "channel")
+                {
                     /* got channel metadata related event. */
                 }
-                else if (objectEventObj.Type == "membership") {
+                else if (objectEventObj.Type == "membership")
+                {
                     /* got membership related event. */
                 }
+
                 Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(objectEventObj));
             },
-            delegate (Pubnub pnObj, PNMessageActionEventResult msgActionEvent)
+            delegate(Pubnub pnObj, PNMessageActionEventResult msgActionEvent)
             {
                 //handle message action
                 var channelName = msgActionEvent.Channel; // The channel for which the message belongs
@@ -575,7 +708,7 @@ public class PublishSubscribeSample
                 var messageTimetoken = msgActionEvent.MessageTimetoken; // The timetoken of the original message
                 var actionTimetoken = msgActionEvent.ActionTimetoken; //The timetoken of the message action
             },
-            delegate (Pubnub pnObj, PNFileEventResult fileEvent)
+            delegate(Pubnub pnObj, PNFileEventResult fileEvent)
             {
                 //handle file message event
                 var channelName = fileEvent.Channel;
@@ -587,18 +720,51 @@ public class PublishSubscribeSample
                 var filePublisher = fileEvent.Publisher;
                 var filePubTT = fileEvent.Timetoken;
             },
-            delegate (Pubnub pnObj, PNStatus pnStatus)
+            delegate(Pubnub pnObj, PNStatus pnStatus)
             {
                 Console.WriteLine("{0} {1} {2}", pnStatus.Operation, pnStatus.Category, pnStatus.StatusCode);
-                var affectedChannelGroups = pnStatus.AffectedChannelGroups; // The channel groups affected in the operation, of type array.
-                var affectedChannels = pnStatus.AffectedChannels; // The channels affected in the operation, of type array.
+                var affectedChannelGroups =
+                    pnStatus.AffectedChannelGroups; // The channel groups affected in the operation, of type array.
+                var affectedChannels =
+                    pnStatus.AffectedChannels; // The channels affected in the operation, of type array.
                 var category = pnStatus.Category; //Returns PNConnectedCategory
                 var operation = pnStatus.Operation; //Returns PNSubscribeOperation
             }
         ));
+        
+        //Add listener to receive Signal messages
+        SubscribeCallbackExt signalSubscribeCallback = new SubscribeCallbackExt(
+            delegate (Pubnub pubnubObj, PNSignalResult<object> message) {
+                // Handle new signal message stored in message.Message
+            },
+            delegate (Pubnub pubnubObj, PNStatus status)
+            {
+                // the status object returned is always related to subscribe but could contain
+                // information about subscribe, heartbeat, or errors
+            }
+        );
+        pubnub.AddListener(signalSubscribeCallback);
+        
+        //Add listener to receive Events
+        SubscribeCallbackExt eventListener = new SubscribeCallbackExt(
+            delegate (Pubnub pnObj, PNObjectEventResult objectEvent)
+            {
+                string channelMetadataId = objectEvent.Channel; // The channel
+                string uuidMetadataId = objectEvent.UuidMetadata.Uuid; // The UUID
+                string objEvent = objectEvent.Event; // The event name that occurred
+                string eventType = objectEvent.Type; // The event type that occurred
+                PNUuidMetadataResult uuidMetadata = objectEvent.UuidMetadata; // UuidMetadata
+                PNChannelMetadataResult channelMetadata = objectEvent.ChannelMetadata; // ChannelMetadata
+            },
+            delegate (Pubnub pnObj, PNStatus status)
+            {
+
+            }
+        );
+        pubnub.AddListener(eventListener);
         // snippet.end
     }
-    
+
     // snippet.add_listener_method2
     public class DevSubscribeCallback : SubscribeCallback
     {
@@ -625,51 +791,53 @@ public class PublishSubscribeSample
             switch (status.Operation)
             {
                 // let's combine unsubscribe and subscribe handling for ease of use
-            case PNOperationType.PNSubscribeOperation:
-            case PNOperationType.PNUnsubscribeOperation:
-                // note: subscribe statuses never have traditional
-                // errors, they just have categories to represent the
-                // different issues or successes that occur as part of subscribe
-                switch (status.Category)
-                {
-                    case PNStatusCategory.PNConnectedCategory:
-                        // this is expected for a subscribe, this means there is no error or issue whatsoever
-                        break;
-                    case PNStatusCategory.PNReconnectedCategory:
-                        // this usually occurs if subscribe temporarily fails but reconnects. This means
-                        // there was an error but there is no longer any issue
-                        break;
-                    case PNStatusCategory.PNDisconnectedCategory:
-                        // this is the expected category for an unsubscribe. This means there
-                        // was no error in unsubscribing from everything
-                        break;
-                    case PNStatusCategory.PNUnexpectedDisconnectCategory:
-                        // this is usually an issue with the internet connection, this is an error, handle appropriately
-                        break;
-                    case PNStatusCategory.PNAccessDeniedCategory:
-                        // this means that Access Manager does allow this client to subscribe to this
-                        // channel and channel group configuration. This is another explicit error
-                        break;
-                    default:
-                        // More errors can be directly specified by creating explicit cases for other
-                        // error categories of `PNStatusCategory` such as `PNTimeoutCategory` or `PNMalformedFilterExpressionCategory` or `PNDecryptionErrorCategory`
-                        break;
-                }
-                break;
-            case PNOperationType.PNHeartbeatOperation:
-                // heartbeat operations can in fact have errors, so it is important to check first for an error.
-                if (status.Error)
-                {
-                    // There was an error with the heartbeat operation, handle here
-                }
-                else
-                {
-                    // heartbeat operation was successful
-                }
-                break;
-            default:
-                // Encountered unknown status type
-                break;
+                case PNOperationType.PNSubscribeOperation:
+                case PNOperationType.PNUnsubscribeOperation:
+                    // note: subscribe statuses never have traditional
+                    // errors, they just have categories to represent the
+                    // different issues or successes that occur as part of subscribe
+                    switch (status.Category)
+                    {
+                        case PNStatusCategory.PNConnectedCategory:
+                            // this is expected for a subscribe, this means there is no error or issue whatsoever
+                            break;
+                        case PNStatusCategory.PNReconnectedCategory:
+                            // this usually occurs if subscribe temporarily fails but reconnects. This means
+                            // there was an error but there is no longer any issue
+                            break;
+                        case PNStatusCategory.PNDisconnectedCategory:
+                            // this is the expected category for an unsubscribe. This means there
+                            // was no error in unsubscribing from everything
+                            break;
+                        case PNStatusCategory.PNUnexpectedDisconnectCategory:
+                            // this is usually an issue with the internet connection, this is an error, handle appropriately
+                            break;
+                        case PNStatusCategory.PNAccessDeniedCategory:
+                            // this means that Access Manager does allow this client to subscribe to this
+                            // channel and channel group configuration. This is another explicit error
+                            break;
+                        default:
+                            // More errors can be directly specified by creating explicit cases for other
+                            // error categories of `PNStatusCategory` such as `PNTimeoutCategory` or `PNMalformedFilterExpressionCategory` or `PNDecryptionErrorCategory`
+                            break;
+                    }
+
+                    break;
+                case PNOperationType.PNHeartbeatOperation:
+                    // heartbeat operations can in fact have errors, so it is important to check first for an error.
+                    if (status.Error)
+                    {
+                        // There was an error with the heartbeat operation, handle here
+                    }
+                    else
+                    {
+                        // heartbeat operation was successful
+                    }
+
+                    break;
+                default:
+                    // Encountered unknown status type
+                    break;
             }
         }
 
@@ -716,9 +884,7 @@ public class PublishSubscribeSample
     {
         // snippet.add_connection_status_listener
         SubscribeCallbackExt eventListener = new SubscribeCallbackExt(
-            delegate (Pubnub pn, PNStatus e) {
-                Console.WriteLine("Status event");
-            }
+            delegate(Pubnub pn, PNStatus e) { Console.WriteLine("Status event"); }
         );
 
         pubnub.AddListener(eventListener);
@@ -761,4 +927,4 @@ public class PublishSubscribeSample
         pubnub.UnsubscribeAll<object>();
         // snippet.end
     }
-} 
+}
