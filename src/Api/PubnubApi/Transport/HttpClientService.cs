@@ -392,7 +392,7 @@ namespace PubnubApi
         {
             TransportResponse transportResponse;
             
-            logger?.Error($"HttpClient Service: TaskCanceledException for url {transportRequest.RequestUrl}");
+            logger?.Warn($"HttpClient Service: TaskCanceledException for url {transportRequest.RequestUrl}");
             transportResponse = new TransportResponse()
             {
                 RequestUrl = transportRequest.RequestUrl,
