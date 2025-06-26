@@ -79,7 +79,7 @@ namespace PubnubApi
             }
             catch (Exception e)
             {
-                logger?.Error(
+                logger?.Warn(
                     $"HttpClient Service: Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}");
                 transportResponse = new TransportResponse()
                 {
@@ -149,7 +149,7 @@ namespace PubnubApi
             }
             catch (Exception e)
             {
-                logger?.Error(
+                logger?.Warn(
                     $"Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}");
                 transportResponse = new TransportResponse()
                 {
@@ -228,7 +228,7 @@ namespace PubnubApi
             }
             catch (Exception e)
             {
-                logger?.Error(
+                logger?.Warn(
                     $"Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}");
                 transportResponse = new TransportResponse()
                 {
@@ -291,7 +291,7 @@ namespace PubnubApi
             }
             catch (Exception e)
             {
-                logger?.Error(
+                logger?.Warn(
                     $"Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}");
                 transportResponse = new TransportResponse()
                 {
@@ -371,7 +371,7 @@ namespace PubnubApi
             }
             catch (Exception e)
             {
-                logger?.Error(
+                logger?.Warn(
                     $"Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}");
                 transportResponse = new TransportResponse()
                 {
