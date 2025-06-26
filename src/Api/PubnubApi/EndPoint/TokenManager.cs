@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Collections;
 using System.Reflection;
-using Newtonsoft.Json;
+using System.Text.Json;
 using PeterO.Cbor;
 using System.Globalization;
 #if !NET35 && !NET40

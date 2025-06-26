@@ -154,7 +154,7 @@ namespace PubnubApi
             
             if (jsonPluggableLibrary == null)
             {
-                InternalConstructor(pubnubConfiguation, new NewtonsoftJsonDotNet(pubnubConfiguation), pubnubUnitTest, tokenManager, instance);
+                InternalConstructor(pubnubConfiguation, new SystemTextJsonDotNet(pubnubConfiguation), pubnubUnitTest, tokenManager, instance);
             }
             else
             {

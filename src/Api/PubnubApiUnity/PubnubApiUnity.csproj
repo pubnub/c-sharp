@@ -570,8 +570,8 @@
     <Compile Include="..\PubnubApi\Model\Server\TimetokenMetadata.cs">
       <Link>Model\Server\TimetokenMetadata.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\NewtonsoftJsonDotNet.cs">
-      <Link>NewtonsoftJsonDotNet.cs</Link>
+    <Compile Include="..\PubnubApi\SystemTextJsonDotNet.cs">
+      <Link>SystemTextJsonDotNet.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\PNConfiguration.cs">
       <Link>PNConfiguration.cs</Link>
@@ -716,8 +716,8 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="PeterO.Cbor" Version="4.5.5" />
+    <PackageReference Include="System.Text.Json" Version="8.0.5" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
   </ItemGroup>
   
   <!--<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.4' ">

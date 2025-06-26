@@ -3,7 +3,7 @@ using System.Text;
 using System.Collections.Generic;
 using NUnit.Framework;
 using PubnubApi;
-using Newtonsoft.Json;
+using System.Text.Json;
 using System.Diagnostics;
 using PubnubApi.Security.Crypto;
 using PubnubApi.Security.Crypto.Cryptors;
@@ -183,7 +183,7 @@ namespace PubNubMessaging.Tests
 
                 if (pnGrant != null)
                 {
-                    actual = Newtonsoft.Json.JsonConvert.SerializeObject(pnGrant);
+                    actual = JsonSerializer.Serialize(pnGrant);
                 }
                 
                 pubnub.Destroy();
@@ -418,11 +418,11 @@ namespace PubNubMessaging.Tests
             ////Non deserialized string
             string message = "\"Wi24KS4pcTzvyuGOHubiXg==\"";
             ////Deserialize
-            message = JsonConvert.DeserializeObject<string>(message);
+            message = JsonSerializer.Deserialize<string>(message);
             ////decrypt
             string decryptedMessage = cm.Decrypt(message);
             ////deserialize again
-            message = JsonConvert.DeserializeObject<string>(decryptedMessage);
+            message = JsonSerializer.Deserialize<string>(decryptedMessage);
             Assert.AreEqual("yay!", message);
         }
 
@@ -438,7 +438,7 @@ namespace PubNubMessaging.Tests
             ////deserialized string
             string message = "yay!";
             ////serialize the string
-            message = JsonConvert.SerializeObject(message);
+            message = JsonSerializer.Serialize(message);
             Debug.WriteLine(message);
             ////Encrypt
             string enc = cm.Encrypt(message);
@@ -457,7 +457,7 @@ namespace PubNubMessaging.Tests
             ////create an empty array object
             object[] emptyArray = { };
             ////serialize
-            string serializedArray = JsonConvert.SerializeObject(emptyArray);
+            string serializedArray = JsonSerializer.Serialize(emptyArray);
             ////Encrypt
             string encryptedMessage = cm.Encrypt(serializedArray);
 
@@ -480,7 +480,7 @@ namespace PubNubMessaging.Tests
             string decryptedMessage = cm.Decrypt(message);
             ////create a serialized object
             object[] emptyArrayObject = { };
-            string result = JsonConvert.SerializeObject(emptyArrayObject);
+            string result = JsonSerializer.Serialize(emptyArrayObject);
             ////compare the serialized object and the return of the Decrypt method
             Assert.AreEqual(result, decryptedMessage);
         }
@@ -497,7 +497,7 @@ namespace PubNubMessaging.Tests
             ////create an object
             Object obj = new Object();
             ////serialize
-            string serializedObject = JsonConvert.SerializeObject(obj);
+            string serializedObject = JsonSerializer.Serialize(obj);
             ////encrypt
             string encryptedMessage = cm.Encrypt(serializedObject);
 
@@ -521,7 +521,7 @@ namespace PubNubMessaging.Tests
             ////create an object
             Object obj = new Object();
             ////Serialize the object
-            string result = JsonConvert.SerializeObject(obj);
+            string result = JsonSerializer.Serialize(obj);
 
             Assert.AreEqual(result, decryptedMessage);
         }
@@ -538,7 +538,7 @@ namespace PubNubMessaging.Tests
             ////create an object of the custom class
             CustomClass cc = new CustomClass();
             ////serialize it
-            string result = JsonConvert.SerializeObject(cc);
+            string result = JsonSerializer.Serialize(cc);
             ////encrypt it
             string encryptedMessage = cm.Encrypt(result);
 
@@ -561,7 +561,7 @@ namespace PubNubMessaging.Tests
             ////create an object of the custom class
             CustomClass cc = new CustomClass();
             ////Serialize it
-            string result = JsonConvert.SerializeObject(cc);
+            string result = JsonSerializer.Serialize(cc);
 
             Assert.AreEqual(result, decryptedMessage);
         }
@@ -578,7 +578,7 @@ namespace PubNubMessaging.Tests
             ////Deserialized
             string message = "Pubnub Messaging API 2";
             ////serialize the message
-            message = JsonConvert.SerializeObject(message);
+            message = JsonSerializer.Serialize(message);
             ////encrypt
             string encryptedMessage = cm.Encrypt(message);
 
@@ -599,7 +599,7 @@ namespace PubNubMessaging.Tests
             ////Decrypt
             string decryptedMessage = cm.Decrypt(message);
             ////Deserialize
-            message = JsonConvert.DeserializeObject<string>(decryptedMessage);
+            message = JsonSerializer.Deserialize<string>(decryptedMessage);
             Assert.AreEqual("Pubnub Messaging API 2", message);
         }
 
@@ -615,7 +615,7 @@ namespace PubNubMessaging.Tests
             ////non serialized string
             string message = "Pubnub Messaging API 1";
             ////serialize
-            message = JsonConvert.SerializeObject(message);
+            message = JsonSerializer.Serialize(message);
             ////encrypt
             string encryptedMessage = cm.Encrypt(message);
 
@@ -637,7 +637,7 @@ namespace PubNubMessaging.Tests
             string decryptedMessage = cm.Decrypt(message);
             ////deserialize
             message = (decryptedMessage != "**DECRYPT ERROR**")
-                ? JsonConvert.DeserializeObject<string>(decryptedMessage)
+                ? JsonSerializer.Deserialize<string>(decryptedMessage)
                 : "";
             Assert.AreEqual("Pubnub Messaging API 1", message);
         }
@@ -718,7 +718,7 @@ namespace PubNubMessaging.Tests
             CryptoModule cm = new CryptoModule(new LegacyCryptor("enigma", false), null);
             string message = "漢語";
 
-            message = JsonConvert.SerializeObject(message);
+            message = JsonSerializer.Serialize(message);
             Debug.WriteLine(message);
             string encryptedMessage = cm.Encrypt(message);
             Debug.WriteLine(encryptedMessage);
@@ -739,7 +739,7 @@ namespace PubNubMessaging.Tests
             string decryptedMessage = cm.Decrypt(message);
             ////deserialize
             message = (decryptedMessage != "**DECRYPT ERROR**")
-                ? JsonConvert.DeserializeObject<string>(decryptedMessage)
+                ? JsonSerializer.Deserialize<string>(decryptedMessage)
                 : "";
 
             Assert.AreEqual("漢語", message);
@@ -760,7 +760,7 @@ namespace PubNubMessaging.Tests
             string decryptedMessage = cm.Decrypt(message);
             ////deserialize
             message = (decryptedMessage != "**DECRYPT ERROR**")
-                ? JsonConvert.DeserializeObject<string>(decryptedMessage)
+                ? JsonSerializer.Deserialize<string>(decryptedMessage)
                 : "";
 
             Assert.AreEqual("ÜÖ", message);
@@ -776,7 +776,7 @@ namespace PubNubMessaging.Tests
             CryptoModule cm = new CryptoModule(new LegacyCryptor("enigma", false), null);
             string message = "ÜÖ";
 
-            message = JsonConvert.SerializeObject(message);
+            message = JsonSerializer.Serialize(message);
             Debug.WriteLine(message);
             string encryptedMessage = cm.Encrypt(message);
             Debug.WriteLine(encryptedMessage);

@@ -63,9 +63,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3">
-      <PrivateAssets>None</PrivateAssets>
-    </PackageReference>
     <PackageReference Include="PeterO.Cbor" Version="4.5.5" />
   </ItemGroup>
 

@@ -6,7 +6,7 @@ using PubnubApi.EndPoint;
 using PubnubApi.EventEngine.Subscribe.Common;
 using PubnubApi.Security.Crypto;
 using PubnubApi.Security.Crypto.Cryptors;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
 
 namespace PubnubApi.EventEngine.Common
 {
@@ -139,7 +139,8 @@ namespace PubnubApi.EventEngine.Common
             }
             else if (eventData.MessageType == 2) //Objects Simplification events
             {
-                Dictionary<string, object> appContextEventFields = payload as Dictionary<string, object> ?? (payload as JObject)?.ToObject<Dictionary<string, object>>();
+                Dictionary<string, object> appContextEventFields = payload as Dictionary<string, object> ?? 
+                    (payload is JsonElement jsonElement ? jsonLibrary.ConvertToDictionaryObject(jsonElement) : null);
                 if (appContextEventFields != null
                     && appContextEventFields.ContainsKey("source")
                     && appContextEventFields.ContainsKey("version")

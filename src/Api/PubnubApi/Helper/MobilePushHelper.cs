@@ -1,10 +1,9 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace PubnubApi
 {
@@ -266,7 +265,7 @@ namespace PubnubApi
         public string topic { get; set; }
         public List<string> exclude_devices { get; set; }
         
-        [JsonConverter(typeof(StringEnumConverter))]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public Environment environment { get; set; }
     }
 
