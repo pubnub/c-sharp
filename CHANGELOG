@@ -1,3 +1,7 @@
+v7.3.14 - June 25 2025
+-----------------------------
+- Modified: updated log type from Error to Warn for TaskCanceledException.
+
 v7.3.13 - June 06 2025
 -----------------------------
 - Fixed: improved parsing of file download errors to be properly set in operation status ErrorData.
