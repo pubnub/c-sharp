@@ -774,7 +774,7 @@
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.14</Version>
     </PackageReference>
-    <PackageReference Include="PeterO.Cbor" Version="4.5.5" />
+    <PackageReference Include="System.Formats.Cbor" Version="9.0.0" />
     <PackageReference Include="System.Text.Json" Version="4.7.2" />
     <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.0" />
     <PackageReference Include="System.Collections.Concurrent">

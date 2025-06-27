@@ -716,7 +716,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="PeterO.Cbor" Version="4.5.5" />
+    <PackageReference Include="System.Formats.Cbor" Version="9.0.0" />
     <PackageReference Include="System.Text.Json" Version="8.0.5" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
   </ItemGroup>
   
