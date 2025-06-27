@@ -165,7 +165,7 @@ namespace PubnubApi.EventEngine.Common
                     catch (Exception ex)
                     {
                         decryptMessage = "**DECRYPT ERROR**";
-                        configuration?.Logger?.Error("Failed to decrypt message on channel {currentMessageChannel} due to exception={ex}.\n Message might be not encrypted");
+                        configuration?.Logger?.Warn("Failed to decrypt message on channel {currentMessageChannel} due to exception={ex}.\n Message might be not encrypted");
                     }
 
                     object decodeMessage = jsonLibrary.DeserializeToObject((decryptMessage == "**DECRYPT ERROR**") ? jsonLibrary.SerializeToJsonString(payload) : decryptMessage);
