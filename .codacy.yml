@@ -7,4 +7,5 @@ exclude_paths:
   - '**/netstandard2.0/**'
   - '**/Plugins/**'
   - '**/Scripts/PubnubExample.*'
+  - '**/PubnubApi.Snippets/**'
   

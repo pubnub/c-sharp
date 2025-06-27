@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Folder Include="AccessManager\" />
+      <Folder Include="ChannelGroup\" />
+      <Folder Include="Configuration\" />
+      <Folder Include="Entities\" />
+      <Folder Include="Files\" />
+      <Folder Include="GettingStarted\" />
+      <Folder Include="Logging\" />
+      <Folder Include="MessageActions\" />
+      <Folder Include="Misc\" />
+      <Folder Include="Presence\" />
+      <Folder Include="Publish\" />
+      <Folder Include="Push\" />
+      <Folder Include="Storage\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Api\PubnubApi\PubnubApi.csproj" />
+    </ItemGroup>
+
+</Project>

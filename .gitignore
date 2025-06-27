@@ -40,6 +40,15 @@ src/.vs/Pubnub/v15/sqlite3/storage.ide
 /src/Api/PubnubApi/*.user
 /src/Api/PubnubApi/Settings.StyleCop
 
+/src/PubnubApi.Snippets/bin/*
+/src/PubnubApi.Snippets/bin/Debug/*
+/src/PubnubApi.Snippets/obj/Debug/*
+/src/PubnubApi.Snippets/bin/Release/*
+/src/PubnubApi.Snippets/obj/Release/*
+/src/PubnubApi.Snippets/obj/*
+/src/PubnubApi.Snippets/*.user
+/src/PubnubApi.Snippets/Settings.StyleCop
+
 /src/Api/PubnubApiUWP/bin/*
 /src/Api/PubnubApiUWP/bin/Debug/*
 /src/Api/PubnubApiUWP/obj/Debug/*
