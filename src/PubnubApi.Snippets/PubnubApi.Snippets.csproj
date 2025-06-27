@@ -8,13 +8,19 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <Folder Include="AccessManager\" />
+      <Folder Include="ChannelGroup\" />
+      <Folder Include="Configuration\" />
       <Folder Include="Entities\" />
+      <Folder Include="Files\" />
+      <Folder Include="GettingStarted\" />
       <Folder Include="Logging\" />
       <Folder Include="MessageActions\" />
       <Folder Include="Misc\" />
       <Folder Include="Presence\" />
       <Folder Include="Publish\" />
       <Folder Include="Push\" />
+      <Folder Include="Storage\" />
     </ItemGroup>
 
     <ItemGroup>
