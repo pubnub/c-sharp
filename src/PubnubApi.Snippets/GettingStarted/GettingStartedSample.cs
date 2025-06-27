@@ -8,14 +8,14 @@ using PubnubApi;
 
 namespace PubNubGetStarted
 {
-    // snippet.complete_example
     public class Program
     {
         private static Pubnub pubnub;
 
-        // snippet.initialize_pubnub
+        
         public static async Task Main(string[] args)
-        {
+        {   
+            // snippet.initialize_pubnub
             // Configure PubNub
             PNConfiguration pnConfiguration = new PNConfiguration(new UserId("myUniqueUserId")) 
             {
@@ -28,6 +28,8 @@ namespace PubNubGetStarted
             pubnub = new Pubnub(pnConfiguration);
 
             Console.WriteLine("PubNub Initialized!");
+
+            // snippet.end
 
             // Add listeners
             SetupListeners();
@@ -49,7 +51,6 @@ namespace PubNubGetStarted
             pubnub.Destroy();
             Console.WriteLine("PubNub Destroyed.");
         }
-        // snippet.end
 
         // snippet.setup_event_listeners
         // Set up listeners for messages, presence, and status events
@@ -138,5 +139,5 @@ namespace PubNubGetStarted
         }
         // snippet.end
     }
-    // snippet.end
+
 } 
