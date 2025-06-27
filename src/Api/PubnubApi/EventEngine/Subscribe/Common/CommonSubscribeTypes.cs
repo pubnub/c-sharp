@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 
 namespace PubnubApi
@@ -22,79 +22,79 @@ namespace PubnubApi.EventEngine.Subscribe.Common
 {
 	public class HandshakeResponse
 	{
-		[JsonPropertyName("t")]
+		[JsonProperty("t")]
 		public Timetoken Timetoken { get; set; }
 
-        [JsonPropertyName("m")]
+        [JsonProperty("m")]
         public object[] Messages { get; set; }
     }
     public class HandshakeError
     {
-        [JsonPropertyName("status")]
+        [JsonProperty("status")]
         public int Status { get; set; }
 
-        [JsonPropertyName("error")]
+        [JsonProperty("error")]
         public string ErrorMessage { get; set; }
     }
 
     public class Timetoken
     {
-        [JsonPropertyName("t")]
+        [JsonProperty("t")]
         public long Timestamp { get; set; }
 
-        [JsonPropertyName("r")]
+        [JsonProperty("r")]
         public int Region { get; set; }
 
     }
 
 	public class ReceivingResponse<T>
 	{
-		[JsonPropertyName("t")]
+		[JsonProperty("t")]
 		public Timetoken Timetoken { get; set; }
 
-		[JsonPropertyName("m")]
+		[JsonProperty("m")]
 		public Message<T>[] Messages { get; set; }
 	}
 
 	public class Message<T>
 	{
-		[JsonPropertyName("a")]
+		[JsonProperty ("a")]
 		public string Shard { get; set;}
 
-		[JsonPropertyName("b")]
+		[JsonProperty ("b")]
 		public string SubscriptionMatch { get; set;}
 
-		[JsonPropertyName("c")]
+		[JsonProperty("c")]
 		public string Channel { get; set; }
 
-		[JsonPropertyName("d")]
+		[JsonProperty("d")]
 		public T Payload { get; set; }
 
-		[JsonPropertyName("e")]
+		[JsonProperty("e")]
 		public int MessageType { get; set; }
 
-		[JsonPropertyName("f")]
+		[JsonProperty("f")]
 		public string Flags { get; set; }
 
-		[JsonPropertyName("i")]
+		[JsonProperty("i")]
 		public string IssuingClientId { get; set; }
 
-		[JsonPropertyName("k")]
+		[JsonProperty("k")]
 		public string SubscribeKey { get; set; }
 
-		[JsonPropertyName("o")]
+		[JsonProperty("o")]
 		public object OriginatingTimetoken { get; set; }
 
-		[JsonPropertyName("p")]
+		[JsonProperty("p")]
 		public object PublishMetadata { get; set; }
 
-		[JsonPropertyName("s")]
+		[JsonProperty("s")]
 		public long SequenceNumber { get; set; }
 		
-		[JsonPropertyName("u")]
+		[JsonProperty("u")]
 		public object UserMetadata { get; set; }
 
-		[JsonPropertyName("cmt")]
+		[JsonProperty("cmt")]
 		public string CustomMessageType { get; set; }
 	}
 	

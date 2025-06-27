@@ -1260,11 +1260,9 @@ namespace PubnubApi
             pubnubConfig.AddOrUpdate(InstanceId, config, (k, o) => config);
 
             CheckAndInitializeEmptyStringValues(config);
-            
-            // Initialize JSON library with System.Text.Json
-            JsonPluggableLibrary = new SystemTextJsonDotNet(config);
-                
             tokenManager = new TokenManager(pubnubConfig[InstanceId], JsonPluggableLibrary,  InstanceId);
+
+            JsonPluggableLibrary = new NewtonsoftJsonDotNet(config);
 
             if (config.PresenceTimeout < 20)
             {

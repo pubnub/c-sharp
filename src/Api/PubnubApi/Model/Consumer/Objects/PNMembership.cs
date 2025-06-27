@@ -1,5 +1,5 @@
-﻿using System;
-using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,16 +8,16 @@ namespace PubnubApi
 {
     public class PNMembership
     {
-        [JsonPropertyName("channel")]
+        [JsonProperty(PropertyName = "channel")]
         public string Channel { get; set; }
 
-        [JsonPropertyName("custom")]
+        [JsonProperty(PropertyName = "custom", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Dictionary<string, object> Custom { get; set; }
 
-        [JsonPropertyName("status")]
+        [JsonProperty(PropertyName = "status", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string Status { get; set; }
 
-        [JsonPropertyName("type")]
+        [JsonProperty(PropertyName = "type", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string Type { get; set; }
     }
 }

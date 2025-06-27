@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace PubnubApi
 {
@@ -11,10 +11,10 @@ public class PNMessageAction
         this.Value = "";
     }
 
-    [JsonPropertyName("type")]
+    [JsonProperty(PropertyName = "type")]
     public string Type { get; set; }
 
-    [JsonPropertyName("value")]
+    [JsonProperty(PropertyName = "value")]
     public string Value { get; set; }
 }
 }
