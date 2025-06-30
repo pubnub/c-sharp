@@ -38,6 +38,8 @@ jobs:
         env:
           WORKSPACE_PATH: ${{ github.workspace }}
         run: .\\.github\\workflows\\release\\build-packages.ps1
+      - name: Build samples project
+        run: dotnet build .\\src\\PubnubApi.Snippets\\PubnubApi.Snippets.csproj
       - name: Run unit tests
         env: 
           PN_PUB_KEY: ${{ secrets.SDK_PUB_KEY }}
