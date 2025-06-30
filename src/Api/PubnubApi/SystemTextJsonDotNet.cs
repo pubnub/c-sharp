@@ -5,7 +5,6 @@ using System.IO;
 using System.Reflection;
 using System.Globalization;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 
 namespace PubnubApi
 {
@@ -44,37 +43,12 @@ namespace PubnubApi
             bool ret = false;
             try
             {
-                if (operationType == PNOperationType.PNPublishOperation
-                    || operationType == PNOperationType.PNHistoryOperation
-                    || operationType == PNOperationType.PNTimeOperation
-                    || operationType == PNOperationType.PNPublishFileMessageOperation)
-                {
-                    JsonNode.Parse(jsonString);
-                }
-                else
-                {
-                    JsonObject.Parse(jsonString);
-                }
-
+                using var doc = JsonDocument.Parse(jsonString);
                 ret = true;
             }
             catch
             {
-                try
-                {
-                    if (operationType == PNOperationType.PNPublishOperation
-                        || operationType == PNOperationType.PNHistoryOperation
-                        || operationType == PNOperationType.PNTimeOperation
-                        || operationType == PNOperationType.PNPublishFileMessageOperation)
-                    {
-                        JsonObject.Parse(jsonString);
-                        ret = true;
-                    }
-                }
-                catch
-                {
-                    /* ignore */
-                }
+                /* ignore */
             }
 
             return ret;
@@ -86,8 +60,8 @@ namespace PubnubApi
 
             try
             {
-                var node = JsonNode.Parse(jsonString);
-                ret = node;
+                using var doc = JsonDocument.Parse(jsonString);
+                ret = doc.RootElement.Clone();
             }
             catch
             {
@@ -132,13 +106,13 @@ namespace PubnubApi
             try
             {
                 logger?.Debug("SystemTextJson Deserializing object data.");
-                if (rawObject is JsonNode jsonNode)
-                {
-                    return JsonSerializer.Deserialize(jsonNode.ToJsonString(), type, defaultJsonSerializerOptions);
-                }
-                else if (rawObject is JsonElement jsonElement)
+                if (rawObject is JsonElement jsonElement)
                 {
                     return JsonSerializer.Deserialize(jsonElement.GetRawText(), type, defaultJsonSerializerOptions);
+                }
+                else if (rawObject is string jsonString)
+                {
+                    return JsonSerializer.Deserialize(jsonString, type, defaultJsonSerializerOptions);
                 }
                 else
                 {
@@ -244,22 +218,24 @@ namespace PubnubApi
                     userMessage = ConvertToDataType(dataType, userMessage);
                     dataProp.SetValue(message, userMessage, null);
                 }
-                else if (listObject[0] is JsonNode jsonNode)
-                {
-                    if (dataProp.PropertyType == typeof(string))
-                    {
-                        userMessage = jsonNode.ToJsonString();
-                    }
-                    else
-                    {
-                        userMessage = JsonSerializer.Deserialize(jsonNode.ToJsonString(), dataProp.PropertyType, defaultJsonSerializerOptions);
-                    }
-                    dataProp.SetValue(message, userMessage, null);
-                }
                 else if (listObject[0] is string)
                 {
                     userMessage = listObject[0] as string;
                     dataProp.SetValue(message, userMessage, null);
+                }
+                else
+                {
+                    // Fallback: try to serialize and deserialize
+                    try
+                    {
+                        string jsonString = JsonSerializer.Serialize(listObject[0], defaultJsonSerializerOptions);
+                        userMessage = JsonSerializer.Deserialize(jsonString, dataProp.PropertyType, defaultJsonSerializerOptions);
+                        dataProp.SetValue(message, userMessage, null);
+                    }
+                    catch
+                    {
+                        dataProp.SetValue(message, listObject[0], null);
+                    }
                 }
 
                 //Set Time
@@ -318,22 +294,24 @@ namespace PubnubApi
                     userMessage = ConvertToDataType(dataType, userMessage);
                     dataProp.SetValue(message, userMessage, null);
                 }
-                else if (content is JsonNode jsonNode)
-                {
-                    if (dataProp.PropertyType == typeof(string))
-                    {
-                        userMessage = jsonNode.ToJsonString();
-                    }
-                    else
-                    {
-                        userMessage = JsonSerializer.Deserialize(jsonNode.ToJsonString(), dataProp.PropertyType, defaultJsonSerializerOptions);
-                    }
-                    dataProp.SetValue(message, userMessage, null);
-                }
                 else if (content is string)
                 {
                     userMessage = content as string;
                     dataProp.SetValue(message, userMessage, null);
+                }
+                else
+                {
+                    // Fallback: try to serialize and deserialize
+                    try
+                    {
+                        string jsonString = JsonSerializer.Serialize(content, defaultJsonSerializerOptions);
+                        userMessage = JsonSerializer.Deserialize(jsonString, dataProp.PropertyType, defaultJsonSerializerOptions);
+                        dataProp.SetValue(message, userMessage, null);
+                    }
+                    catch
+                    {
+                        dataProp.SetValue(message, content, null);
+                    }
                 }
 
                 PropertyInfo timeProp = specific.GetRuntimeProperty("Timetoken");
@@ -418,11 +396,7 @@ namespace PubnubApi
             {
                 if (localContainer != null)
                 {
-                    if (localContainer is JsonNode jsonNode)
-                    {
-                        ret = ConvertJsonNodeToDictionary(jsonNode);
-                    }
-                    else if (localContainer is JsonElement jsonElement)
+                    if (localContainer is JsonElement jsonElement)
                     {
                         ret = ConvertJsonElementToDictionary(jsonElement);
                     }
@@ -466,11 +440,7 @@ namespace PubnubApi
             {
                 if (localContainer != null)
                 {
-                    if (localContainer is JsonArray jsonArray)
-                    {
-                        ret = jsonArray.Select(ConvertJsonNodeToObject).ToArray();
-                    }
-                    else if (localContainer is JsonElement jsonElement && jsonElement.ValueKind == JsonValueKind.Array)
+                    if (localContainer is JsonElement jsonElement && jsonElement.ValueKind == JsonValueKind.Array)
                     {
                         ret = jsonElement.EnumerateArray().Select(ConvertJsonElementToObject).ToArray();
                     }
@@ -541,27 +511,7 @@ namespace PubnubApi
             }
         }
 
-        private static object ConvertJsonNodeToObject(JsonNode node)
-        {
-            if (node == null) return null;
 
-            switch (node)
-            {
-                case JsonObject jsonObject:
-                    var obj = new Dictionary<string, object>();
-                    foreach (var kvp in jsonObject)
-                    {
-                        obj[kvp.Key] = ConvertJsonNodeToObject(kvp.Value);
-                    }
-                    return obj;
-                case JsonArray jsonArray:
-                    return jsonArray.Select(ConvertJsonNodeToObject).ToList();
-                case JsonValue jsonValue:
-                    return jsonValue.GetValue<object>();
-                default:
-                    return node.ToString();
-            }
-        }
 
         private static Dictionary<string, object> ConvertJsonElementToDictionary(JsonElement element)
         {
@@ -576,18 +526,7 @@ namespace PubnubApi
             return dict;
         }
 
-        private static Dictionary<string, object> ConvertJsonNodeToDictionary(JsonNode node)
-        {
-            var dict = new Dictionary<string, object>();
-            if (node is JsonObject jsonObject)
-            {
-                foreach (var kvp in jsonObject)
-                {
-                    dict[kvp.Key] = ConvertJsonNodeToObject(kvp.Value);
-                }
-            }
-            return dict;
-        }
+
 
         private static object ConvertToDataType(Type dataType, object inputValue)
         {
