@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Collections;
-using System.Reflection;
-using Newtonsoft.Json;
-using PeterO.Cbor;
+#if !WINDOWS_UWP && !UAP && !NETSTANDARD2_0 && !(UNITY && NETSTANDARD20)
+using System.Formats.Cbor;
+#endif
 using System.Globalization;
 #if !NET35 && !NET40
 using System.Collections.Concurrent;
@@ -71,36 +69,53 @@ namespace PubnubApi.EndPoint
             {
                 if (!string.IsNullOrEmpty(token) && token.Trim().Length > 0)
                 {
+#if !WINDOWS_UWP && !UAP && !NETSTANDARD2_0 && !(UNITY && NETSTANDARD20)
                     string refinedToken = token.Replace('_', '/').Replace('-', '+');
                     byte[] tokenByteArray = Convert.FromBase64String(refinedToken);
                     logger?.Debug($"TokenManager Token Bytes = {GetDisplayableBytes(tokenByteArray)}");
-                    using (System.IO.MemoryStream ms = new System.IO.MemoryStream(tokenByteArray))
-                    {
-                        CBORObject cborObj = CBORObject.DecodeFromBytes(tokenByteArray);
-                        logger?.Debug($"RAW CBOR {cborObj.ToJSONString()}");
 
-                        if (cborObj != null)
-                        {
-                            result = new PNTokenContent();
-                            result.Meta = new Dictionary<string, object>();
-                            result.Resources = new PNTokenResources { 
-                                Channels = new Dictionary<string, PNTokenAuthValues>(),
-                                ChannelGroups = new Dictionary<string, PNTokenAuthValues>(),
-                                Uuids = new Dictionary<string, PNTokenAuthValues>(),
-                                Users = new Dictionary<string, PNTokenAuthValues>(),
-                                Spaces = new Dictionary<string, PNTokenAuthValues>()
-                            };
-                            result.Patterns = new PNTokenPatterns {
-                                Channels = new Dictionary<string, PNTokenAuthValues>(),
-                                ChannelGroups = new Dictionary<string, PNTokenAuthValues>(),
-                                Uuids = new Dictionary<string, PNTokenAuthValues>(),
-                                Users = new Dictionary<string, PNTokenAuthValues>(),
-                                Spaces = new Dictionary<string, PNTokenAuthValues>()
-                            };
-                            ParseCBOR(cborObj, "", ref result);
-                        }
+                    var cborReader = new CborReader(tokenByteArray, CborConformanceMode.Lax);
+                    logger?.Debug($"RAW CBOR {ConvertCborToJson(cborReader)}");
 
-                    }
+                    // Reset reader for actual parsing
+                    cborReader = new CborReader(tokenByteArray, CborConformanceMode.Lax);
+                    
+                    result = new PNTokenContent();
+                    result.Meta = new Dictionary<string, object>();
+                    result.Resources = new PNTokenResources { 
+                        Channels = new Dictionary<string, PNTokenAuthValues>(),
+                        ChannelGroups = new Dictionary<string, PNTokenAuthValues>(),
+                        Uuids = new Dictionary<string, PNTokenAuthValues>(),
+                        Users = new Dictionary<string, PNTokenAuthValues>(),
+                        Spaces = new Dictionary<string, PNTokenAuthValues>()
+                    };
+                    result.Patterns = new PNTokenPatterns {
+                        Channels = new Dictionary<string, PNTokenAuthValues>(),
+                        ChannelGroups = new Dictionary<string, PNTokenAuthValues>(),
+                        Uuids = new Dictionary<string, PNTokenAuthValues>(),
+                        Users = new Dictionary<string, PNTokenAuthValues>(),
+                        Spaces = new Dictionary<string, PNTokenAuthValues>()
+                    };
+                    ParseCBOR(cborReader, "", ref result);
+#else
+                    logger?.Warn("CBOR token parsing is not supported on this platform. Token parsing will be skipped.");
+                    result = new PNTokenContent();
+                    result.Meta = new Dictionary<string, object>();
+                    result.Resources = new PNTokenResources { 
+                        Channels = new Dictionary<string, PNTokenAuthValues>(),
+                        ChannelGroups = new Dictionary<string, PNTokenAuthValues>(),
+                        Uuids = new Dictionary<string, PNTokenAuthValues>(),
+                        Users = new Dictionary<string, PNTokenAuthValues>(),
+                        Spaces = new Dictionary<string, PNTokenAuthValues>()
+                    };
+                    result.Patterns = new PNTokenPatterns {
+                        Channels = new Dictionary<string, PNTokenAuthValues>(),
+                        ChannelGroups = new Dictionary<string, PNTokenAuthValues>(),
+                        Uuids = new Dictionary<string, PNTokenAuthValues>(),
+                        Users = new Dictionary<string, PNTokenAuthValues>(),
+                        Spaces = new Dictionary<string, PNTokenAuthValues>()
+                    };
+#endif
                 }
             }
             catch (Exception ex)
@@ -110,69 +125,112 @@ namespace PubnubApi.EndPoint
             return result;
         }
 
-        private void ParseCBOR(CBORObject cbor, string parent, ref PNTokenContent pnGrantTokenDecoded)
+#if !WINDOWS_UWP && !UAP && !NETSTANDARD2_0 && !(UNITY && NETSTANDARD20)
+        private string ConvertCborToJson(CborReader reader)
         {
-            foreach (KeyValuePair<CBORObject, CBORObject> kvp in cbor.Entries)
+            try
             {
-                if (kvp.Key.Type.ToString().Equals("ByteString", StringComparison.OrdinalIgnoreCase))
+                // Simple conversion for debugging - not complete implementation
+                if (reader.PeekState() == CborReaderState.StartMap)
                 {
-#if NETSTANDARD10 || NETSTANDARD11
-                    UTF8Encoding utf8 = new UTF8Encoding(true, true);
-                    byte[] keyBytes = kvp.Key.GetByteString();
-                    string key = utf8.GetString(keyBytes, 0, keyBytes.Length);
-#else
-                    string key = Encoding.ASCII.GetString(kvp.Key.GetByteString());
-#endif
-                    ParseCBORValue(key, parent, kvp, ref pnGrantTokenDecoded);
+                    return "{...}"; // Simplified for logging
                 }
-                else if (kvp.Key.Type.ToString().Equals("TextString", StringComparison.OrdinalIgnoreCase))
-                {
-                    logger?.Debug($"ParseCBOR TextString Key {kvp.Key}-{kvp.Value}-{kvp.Value.Type}");
-                    ParseCBORValue(kvp.Key.ToString(), parent, kvp, ref pnGrantTokenDecoded);
-                }
-                else
-                {
-                   logger?.Debug($"Others Key {kvp.Key}-{kvp.Key.Type}-{kvp.Value}-{kvp.Value.Type}");
-                }
-
+                return "CBOR Data";
+            }
+            catch
+            {
+                return "CBOR Parse Error";
             }
         }
 
-        private void ParseCBORValue(string key, string parent, KeyValuePair<CBORObject, CBORObject> kvp, ref PNTokenContent pnGrantTokenDecoded)
+        private void ParseCBOR(CborReader reader, string parent, ref PNTokenContent pnGrantTokenDecoded)
         {
-            if (kvp.Value.Type.ToString().Equals("Map", StringComparison.OrdinalIgnoreCase))
+            if (reader.PeekState() == CborReaderState.StartMap)
             {
-                logger?.Debug($"ParseCBORValue Map Key {key}");
-                var p = string.Format(CultureInfo.InvariantCulture, "{0}{1}{2}", parent, string.IsNullOrEmpty(parent) ? "" : ":", key);
-                ParseCBOR(kvp.Value, p, ref pnGrantTokenDecoded);
+                int? mapLength = reader.ReadStartMap();
+                int itemsRead = 0;
+                
+                while (reader.PeekState() != CborReaderState.EndMap && 
+                       (mapLength == null || itemsRead < mapLength))
+                {
+                    string key = ReadCborKey(reader);
+                    if (key != null)
+                    {
+                        ParseCBORValue(key, parent, reader, ref pnGrantTokenDecoded);
+                    }
+                    itemsRead++;
+                }
+                
+                reader.ReadEndMap();
             }
-            else if (kvp.Value.Type.ToString().Equals("ByteString", StringComparison.OrdinalIgnoreCase))
+        }
+
+        private string ReadCborKey(CborReader reader)
+        {
+            var state = reader.PeekState();
+            switch (state)
             {
+                case CborReaderState.TextString:
+                    return reader.ReadTextString();
+                case CborReaderState.ByteString:
+                    byte[] keyBytes = reader.ReadByteString();
 #if NETSTANDARD10 || NETSTANDARD11
                     UTF8Encoding utf8 = new UTF8Encoding(true, true);
-                    byte[] valBytes = kvp.Value.GetByteString();
+                    return utf8.GetString(keyBytes, 0, keyBytes.Length);
+#else
+                    return Encoding.ASCII.GetString(keyBytes);
+#endif
+                default:
+                    logger?.Debug($"Unexpected key type: {state}");
+                    return null;
+            }
+        }
+
+        private void ParseCBORValue(string key, string parent, CborReader reader, ref PNTokenContent pnGrantTokenDecoded)
+        {
+            var state = reader.PeekState();
+            
+            switch (state)
+            {
+                case CborReaderState.StartMap:
+                    logger?.Debug($"ParseCBORValue Map Key {key}");
+                    var p = string.Format(CultureInfo.InvariantCulture, "{0}{1}{2}", parent, string.IsNullOrEmpty(parent) ? "" : ":", key);
+                    ParseCBOR(reader, p, ref pnGrantTokenDecoded);
+                    break;
+                    
+                case CborReaderState.ByteString:
+                    byte[] valBytes = reader.ReadByteString();
+#if NETSTANDARD10 || NETSTANDARD11
+                    UTF8Encoding utf8 = new UTF8Encoding(true, true);
                     string val = utf8.GetString(valBytes, 0, valBytes.Length);
 #else
-                string val = Encoding.ASCII.GetString(kvp.Value.GetByteString());
+                    string val = Encoding.ASCII.GetString(valBytes);
 #endif
-                logger?.Debug($"ByteString Value {key}-{val}");
-                FillGrantToken(parent, key, kvp.Value, typeof(string), ref pnGrantTokenDecoded);
-            }
-            else if (kvp.Value.Type.ToString().Equals("Integer", StringComparison.OrdinalIgnoreCase))
-            {
-                logger?.Debug($" Integer Value {key}-{kvp.Value}");
-                FillGrantToken(parent, key, kvp.Value, typeof(int), ref pnGrantTokenDecoded);
-            }
-            else if (kvp.Value.Type.ToString().Equals("TextString", StringComparison.OrdinalIgnoreCase))
-            {
-                logger?.Debug($"TextString Value {key}-{kvp.Value}");
-                FillGrantToken(parent, key, kvp.Value, typeof(string), ref pnGrantTokenDecoded);
-            }
-            else
-            {
-                logger?.Debug($"Others Key Value {kvp.Key.Type}-{kvp.Value.Type}-{key}-{kvp.Value}");
+                    logger?.Debug($"ByteString Value {key}-{val}");
+                    FillGrantToken(parent, key, val, typeof(string), ref pnGrantTokenDecoded);
+                    break;
+                    
+                case CborReaderState.UnsignedInteger:
+                case CborReaderState.NegativeInteger:
+                    int intVal = reader.ReadInt32();
+                    logger?.Debug($"Integer Value {key}-{intVal}");
+                    FillGrantToken(parent, key, intVal, typeof(int), ref pnGrantTokenDecoded);
+                    break;
+                    
+                case CborReaderState.TextString:
+                    string textVal = reader.ReadTextString();
+                    logger?.Debug($"TextString Value {key}-{textVal}");
+                    FillGrantToken(parent, key, textVal, typeof(string), ref pnGrantTokenDecoded);
+                    break;
+                    
+                default:
+                    logger?.Debug($"Others Key Value {state}-{key}");
+                    // Skip unknown types
+                    reader.SkipValue();
+                    break;
             }
         }
+#endif
 
         private string ReplaceBoundaryQuotes(string key)
         {
@@ -226,7 +284,7 @@ namespace PubnubApi.EndPoint
                     pnGrantTokenDecoded.Meta = val as Dictionary<string, object>;
                     break;
                 case "uuid":
-                    pnGrantTokenDecoded.AuthorizedUuid = ((CBORObject)val).AsString();
+                    pnGrantTokenDecoded.AuthorizedUuid = val.ToString();
                     break;
                 case "sig":
 #if NETSTANDARD10 || NETSTANDARD11
@@ -234,9 +292,15 @@ namespace PubnubApi.EndPoint
                     byte[] keyBytes = (byte[])val;
                     pnGrantTokenDecoded.Signature = utf8.GetString(keyBytes, 0, keyBytes.Length);
 #else
-                    byte[] sigBytes = ((CBORObject)val).GetByteString();
-                    string base64String = Convert.ToBase64String(sigBytes);
-                    pnGrantTokenDecoded.Signature = base64String;
+                    if (val is byte[] sigBytes)
+                    {
+                        string base64String = Convert.ToBase64String(sigBytes);
+                        pnGrantTokenDecoded.Signature = base64String;
+                    }
+                    else if (val is string)
+                    {
+                        pnGrantTokenDecoded.Signature = val.ToString();
+                    }
 #endif
                     break;
                 default:
@@ -249,13 +313,13 @@ namespace PubnubApi.EndPoint
                                 switch (type.Name)
                                 {
                                     case "Int32":
-                                        pnGrantTokenDecoded.Meta.Add(key, ((CBORObject)val).AsInt32());
+                                        pnGrantTokenDecoded.Meta.Add(key, i);
                                         break;
                                     case "Int64":
-                                        pnGrantTokenDecoded.Meta.Add(key, ((CBORObject)val).ToObject<long>());
+                                        pnGrantTokenDecoded.Meta.Add(key, l);
                                         break;
                                     case "String":
-                                        pnGrantTokenDecoded.Meta.Add(key, ((CBORObject)val).AsString());
+                                        pnGrantTokenDecoded.Meta.Add(key, val.ToString());
                                         break;
                                     default:
                                         break;

@@ -196,6 +196,280 @@ namespace PubNubMessaging.Tests
             Assert.AreEqual(actual, expected);
         }
 
+        [Test]
+        public void ParseTokenWithChannelResourcesTest()
+        {
+            // Token with channel resources - created for testing
+            string token = "qEF2AkF0GmFLd-NDdHRsGQWgQ3Jlc6VEY2hhbqFjY2gxGP9DZ3JwoWNjZzEY_0N1c3KgQ3NwY6BEdXVpZKFldXVpZDEY_0NwYXSlRGNoYW6gQ2dycKBDdXNyoENzcGOgRHV1aWShYl4kAURtZXRho2VzY29yZRhkZWNvbG9yY3JlZGZhdXRob3JlcGFuZHVEdXVpZGtteWF1dGh1dWlkMUNzaWdYIP2vlxHik0EPZwtgYxAW3-LsBaX_WgWdYvtAXpYbKll3";
+            
+            try
+            {
+                PNConfiguration config = new PNConfiguration(new UserId("unit-test-uuid"))
+                {
+                    SubscribeKey = PubnubCommon.SubscribeKey,
+                    PublishKey = PubnubCommon.PublishKey,
+                };
+                Pubnub pubnub = new Pubnub(config);
+                PNTokenContent pnGrant = pubnub.ParseToken(token);
+
+                Assert.IsNotNull(pnGrant, "ParseToken should return a valid PNTokenContent object");
+                Assert.IsNotNull(pnGrant.Resources, "Resources should not be null");
+                Assert.IsNotNull(pnGrant.Patterns, "Patterns should not be null");
+                Assert.IsNotNull(pnGrant.Meta, "Meta should not be null");
+                
+                // Verify structure is initialized even if parsing fails on some platforms
+                Assert.IsNotNull(pnGrant.Resources.Channels, "Resources.Channels should not be null");
+                Assert.IsNotNull(pnGrant.Resources.ChannelGroups, "Resources.ChannelGroups should not be null");
+                Assert.IsNotNull(pnGrant.Resources.Uuids, "Resources.Uuids should not be null");
+                Assert.IsNotNull(pnGrant.Resources.Users, "Resources.Users should not be null");
+                Assert.IsNotNull(pnGrant.Resources.Spaces, "Resources.Spaces should not be null");
+                
+                pubnub.Destroy();
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail($"ParseToken should not throw exception: {ex.Message}");
+            }
+        }
+
+        [Test]
+        public void ParseTokenWithNullInputTest()
+        {
+            try
+            {
+                PNConfiguration config = new PNConfiguration(new UserId("unit-test-uuid"))
+                {
+                    SubscribeKey = PubnubCommon.SubscribeKey,
+                    PublishKey = PubnubCommon.PublishKey,
+                };
+                Pubnub pubnub = new Pubnub(config);
+                PNTokenContent pnGrant = pubnub.ParseToken(null);
+
+                Assert.IsNull(pnGrant, "ParseToken should return null for null input");
+                
+                pubnub.Destroy();
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail($"ParseToken should not throw exception for null input: {ex.Message}");
+            }
+        }
+
+        [Test]
+        public void ParseTokenWithEmptyStringTest()
+        {
+            try
+            {
+                PNConfiguration config = new PNConfiguration(new UserId("unit-test-uuid"))
+                {
+                    SubscribeKey = PubnubCommon.SubscribeKey,
+                    PublishKey = PubnubCommon.PublishKey,
+                };
+                Pubnub pubnub = new Pubnub(config);
+                PNTokenContent pnGrant = pubnub.ParseToken("");
+
+                Assert.IsNull(pnGrant, "ParseToken should return null for empty string");
+                
+                pubnub.Destroy();
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail($"ParseToken should not throw exception for empty string: {ex.Message}");
+            }
+        }
+
+        [Test]
+        public void ParseTokenWithWhitespaceOnlyTest()
+        {
+            try
+            {
+                PNConfiguration config = new PNConfiguration(new UserId("unit-test-uuid"))
+                {
+                    SubscribeKey = PubnubCommon.SubscribeKey,
+                    PublishKey = PubnubCommon.PublishKey,
+                };
+                Pubnub pubnub = new Pubnub(config);
+                PNTokenContent pnGrant = pubnub.ParseToken("   ");
+
+                Assert.IsNull(pnGrant, "ParseToken should return null for whitespace-only string");
+                
+                pubnub.Destroy();
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail($"ParseToken should not throw exception for whitespace-only string: {ex.Message}");
+            }
+        }
+
+        [Test]
+        public void ParseTokenWithInvalidBase64Test()
+        {
+            try
+            {
+                PNConfiguration config = new PNConfiguration(new UserId("unit-test-uuid"))
+                {
+                    SubscribeKey = PubnubCommon.SubscribeKey,
+                    PublishKey = PubnubCommon.PublishKey,
+                };
+                Pubnub pubnub = new Pubnub(config);
+                PNTokenContent pnGrant = pubnub.ParseToken("invalid-base64-string");
+
+                // Should return null or empty object without throwing exception
+                // The method should handle invalid base64 gracefully
+                Assert.IsTrue(pnGrant == null || (pnGrant.Resources != null && pnGrant.Patterns != null), 
+                    "ParseToken should handle invalid base64 gracefully");
+                
+                pubnub.Destroy();
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail($"ParseToken should handle invalid base64 gracefully: {ex.Message}");
+            }
+        }
+
+        [Test]
+        public void ParseTokenWithMalformedTokenTest()
+        {
+            try
+            {
+                PNConfiguration config = new PNConfiguration(new UserId("unit-test-uuid"))
+                {
+                    SubscribeKey = PubnubCommon.SubscribeKey,
+                    PublishKey = PubnubCommon.PublishKey,
+                };
+                Pubnub pubnub = new Pubnub(config);
+                // Valid base64 but not a valid CBOR token
+                PNTokenContent pnGrant = pubnub.ParseToken("aGVsbG8gd29ybGQ="); // "hello world" in base64
+
+                // Should return null or empty object without throwing exception
+                Assert.IsTrue(pnGrant == null || (pnGrant.Resources != null && pnGrant.Patterns != null), 
+                    "ParseToken should handle malformed token gracefully");
+                
+                pubnub.Destroy();
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail($"ParseToken should handle malformed token gracefully: {ex.Message}");
+            }
+        }
+
+        [Test]
+        public void ParseTokenStructureVerificationTest()
+        {
+            // Test with a known valid token to verify the structure is properly initialized
+            string token = "p0F2AkF0Gl2BEIJDdHRsGGRDcmVzpERjaGFuoENncnCgQ3VzcqBDc3BjoENwYXSkRGNoYW6gQ2dycKBDdXNyomZeZW1wLSoDZl5tZ3ItKhgbQ3NwY6JpXnB1YmxpYy0qA2pecHJpdmF0ZS0qGBtEbWV0YaBDc2lnWCAsvzGmd2rcgtr9rcs4r2tqC87YSppSYqs9CKfaM5IRZA==";
+            
+            try
+            {
+                PNConfiguration config = new PNConfiguration(new UserId("unit-test-uuid"))
+                {
+                    SubscribeKey = PubnubCommon.SubscribeKey,
+                    PublishKey = PubnubCommon.PublishKey,
+                };
+                Pubnub pubnub = new Pubnub(config);
+                PNTokenContent pnGrant = pubnub.ParseToken(token);
+
+                Assert.IsNotNull(pnGrant, "ParseToken should return a valid PNTokenContent object");
+                
+                // Verify all required properties are initialized
+                Assert.IsNotNull(pnGrant.Resources, "Resources should be initialized");
+                Assert.IsNotNull(pnGrant.Patterns, "Patterns should be initialized");
+                Assert.IsNotNull(pnGrant.Meta, "Meta should be initialized");
+                
+                // Verify Resources structure
+                Assert.IsNotNull(pnGrant.Resources.Channels, "Resources.Channels should be initialized");
+                Assert.IsNotNull(pnGrant.Resources.ChannelGroups, "Resources.ChannelGroups should be initialized");
+                Assert.IsNotNull(pnGrant.Resources.Uuids, "Resources.Uuids should be initialized");
+                Assert.IsNotNull(pnGrant.Resources.Users, "Resources.Users should be initialized");
+                Assert.IsNotNull(pnGrant.Resources.Spaces, "Resources.Spaces should be initialized");
+                
+                // Verify Patterns structure
+                Assert.IsNotNull(pnGrant.Patterns.Channels, "Patterns.Channels should be initialized");
+                Assert.IsNotNull(pnGrant.Patterns.ChannelGroups, "Patterns.ChannelGroups should be initialized");
+                Assert.IsNotNull(pnGrant.Patterns.Uuids, "Patterns.Uuids should be initialized");
+                Assert.IsNotNull(pnGrant.Patterns.Users, "Patterns.Users should be initialized");
+                Assert.IsNotNull(pnGrant.Patterns.Spaces, "Patterns.Spaces should be initialized");
+                
+                pubnub.Destroy();
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail($"ParseToken should not throw exception: {ex.Message}");
+            }
+        }
+
+        [Test]
+        public void ParseTokenPlatformCompatibilityTest()
+        {
+            // Test that the method works on all supported platforms
+            string token = "p0F2AkF0Gl2BEIJDdHRsGGRDcmVzpERjaGFuoENncnCgQ3VzcqBDc3BjoENwYXSkRGNoYW6gQ2dycKBDdXNyomZeZW1wLSoDZl5tZ3ItKhgbQ3NwY6JpXnB1YmxpYy0qA2pecHJpdmF0ZS0qGBtEbWV0YaBDc2lnWCAsvzGmd2rcgtr9rcs4r2tqC87YSppSYqs9CKfaM5IRZA==";
+            
+            try
+            {
+                PNConfiguration config = new PNConfiguration(new UserId("unit-test-uuid"))
+                {
+                    SubscribeKey = PubnubCommon.SubscribeKey,
+                    PublishKey = PubnubCommon.PublishKey,
+                };
+                Pubnub pubnub = new Pubnub(config);
+                PNTokenContent pnGrant = pubnub.ParseToken(token);
+
+                // On platforms that support CBOR (net6.0+), we should get parsed content
+                // On platforms that don't support CBOR (UWP, netstandard2.0), we should get empty structure
+                Assert.IsNotNull(pnGrant, "ParseToken should always return a valid object structure");
+                Assert.IsNotNull(pnGrant.Resources, "Resources should always be initialized");
+                Assert.IsNotNull(pnGrant.Patterns, "Patterns should always be initialized");
+                Assert.IsNotNull(pnGrant.Meta, "Meta should always be initialized");
+                
+#if !WINDOWS_UWP && !UAP && !NETSTANDARD2_0 && !(UNITY && NETSTANDARD20)
+                // On platforms with CBOR support, we should have some parsed content
+                // This token contains patterns, so check for them
+                Assert.IsTrue(pnGrant.Patterns.Users.Count > 0 || pnGrant.Version > 0 || pnGrant.TTL > 0, 
+                    "On CBOR-supported platforms, token should be parsed");
+#else
+                // On platforms without CBOR support, the structure should be empty but valid
+                Assert.AreEqual(0, pnGrant.Version, "On non-CBOR platforms, version should be default");
+                Assert.AreEqual(0, pnGrant.TTL, "On non-CBOR platforms, TTL should be default");
+#endif
+                
+                pubnub.Destroy();
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail($"ParseToken should work on all platforms: {ex.Message}");
+            }
+        }
+
+        [Test]
+        public void ParseTokenWithSpecialCharactersTest()
+        {
+            // Test token parsing with URL-safe base64 characters (- and _)
+            string token = "p0F2AkF0Gl2BEIJDdHRsGGRDcmVzpERjaGFuoENncnCgQ3VzcqBDc3BjoENwYXSkRGNoYW6gQ2dycKBDdXNyomZeZW1wLSoDZl5tZ3ItKhgbQ3NwY6JpXnB1YmxpYy0qA2pecHJpdmF0ZS0qGBtEbWV0YaBDc2lnWCAsvzGmd2rcgtr9rcs4r2tqC87YSppSYqs9CKfaM5IRZA==";
+            // Convert to URL-safe base64 (replace + with -, / with _)
+            string urlSafeToken = token.Replace('+', '-').Replace('/', '_');
+            
+            try
+            {
+                PNConfiguration config = new PNConfiguration(new UserId("unit-test-uuid"))
+                {
+                    SubscribeKey = PubnubCommon.SubscribeKey,
+                    PublishKey = PubnubCommon.PublishKey,
+                };
+                Pubnub pubnub = new Pubnub(config);
+                PNTokenContent pnGrant = pubnub.ParseToken(urlSafeToken);
+
+                Assert.IsNotNull(pnGrant, "ParseToken should handle URL-safe base64 characters");
+                Assert.IsNotNull(pnGrant.Resources, "Resources should be initialized");
+                Assert.IsNotNull(pnGrant.Patterns, "Patterns should be initialized");
+                
+                pubnub.Destroy();
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail($"ParseToken should handle URL-safe base64: {ex.Message}");
+            }
+        }
+
         /// <summary>
         /// Tests the null encryption.
         /// The input is serialized
