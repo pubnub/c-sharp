@@ -200,12 +200,21 @@ namespace PubnubApi.EndPoint
                     
                 case CborReaderState.ByteString:
                     byte[] valBytes = reader.ReadByteString();
+                    string val;
+                    // Special handling for signature field - convert to base64
+                    if (key == "sig")
+                    {
+                        val = Convert.ToBase64String(valBytes);
+                    }
+                    else
+                    {
 #if NETSTANDARD10 || NETSTANDARD11
-                    UTF8Encoding utf8 = new UTF8Encoding(true, true);
-                    string val = utf8.GetString(valBytes, 0, valBytes.Length);
+                        UTF8Encoding utf8 = new UTF8Encoding(true, true);
+                        val = utf8.GetString(valBytes, 0, valBytes.Length);
 #else
-                    string val = Encoding.ASCII.GetString(valBytes);
+                        val = Encoding.ASCII.GetString(valBytes);
 #endif
+                    }
                     logger?.Debug($"ByteString Value {key}-{val}");
                     FillGrantToken(parent, key, val, typeof(string), ref pnGrantTokenDecoded);
                     break;
@@ -287,21 +296,8 @@ namespace PubnubApi.EndPoint
                     pnGrantTokenDecoded.AuthorizedUuid = val.ToString();
                     break;
                 case "sig":
-#if NETSTANDARD10 || NETSTANDARD11
-                    UTF8Encoding utf8 = new UTF8Encoding(true, true);
-                    byte[] keyBytes = (byte[])val;
-                    pnGrantTokenDecoded.Signature = utf8.GetString(keyBytes, 0, keyBytes.Length);
-#else
-                    if (val is byte[] sigBytes)
-                    {
-                        string base64String = Convert.ToBase64String(sigBytes);
-                        pnGrantTokenDecoded.Signature = base64String;
-                    }
-                    else if (val is string)
-                    {
-                        pnGrantTokenDecoded.Signature = val.ToString();
-                    }
-#endif
+                    // Signature is already processed as base64 in ParseCBORValue
+                    pnGrantTokenDecoded.Signature = val.ToString();
                     break;
                 default:
                     PNTokenAuthValues rp = GetResourcePermission(i);
