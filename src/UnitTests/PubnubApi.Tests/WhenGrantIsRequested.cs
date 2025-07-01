@@ -917,63 +917,6 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public static void ThenGrantTokenShouldReturnSuccess()
-        {
-            server.ClearRequests();
-
-            currentUnitTestCase = "ThenGrantTokenShouldReturnSuccess";
-
-            receivedGrantMessage = false;
-
-            var config = new PNConfiguration(new UserId("mytestuuid"))
-            {
-                PublishKey = PubnubCommon.PublishKey,
-                SubscribeKey = PubnubCommon.SubscribeKey,
-                SecretKey = PubnubCommon.SecretKey,
-                Secure = false
-            };
-
-            pubnub = createPubNubInstance(config);
-
-            try
-            {
-                grantManualEvent = new ManualResetEvent(false);
-                var grantedResources = new PNTokenResources() 
-                { 
-                    Spaces=new Dictionary<string, PNTokenAuthValues>() {
-                        { "spc1", new PNTokenAuthValues() { Read = true, Write = true, Manage= true, Create = true, Delete=true, Get = true, Update = true, Join = true } } },
-                    Users = new Dictionary<string, PNTokenAuthValues>() {
-                        { "usr1", new PNTokenAuthValues() { Read = true, Write = true, Manage= true, Create = true, Delete=true, Get = true, Update = true, Join = true } } },
-                };
-                pubnub.GrantToken()
-                    .Resources(grantedResources)
-                    .TTL(10)
-                    .Execute(new PNAccessManagerTokenResultExt((result, status) =>
-                    {
-                        Assert.IsNotNull(result, "Grant result was null");
-                        Assert.True(status.StatusCode == 200, $"Grant status was {status.StatusCode}, not 200." +
-                                                              $"\n Status: {pubnub.JsonPluggableLibrary.SerializeToJsonString(status)}");
-
-                        var parsedToken = pubnub.ParseToken(result.Token);
-                        Assert.True(parsedToken.TTL == 10, "Wrong TTL in parsed token.");
-                        Assert.IsNotNull(parsedToken.Resources, "parsedToken.Resources was null");
-                        Assert.True(parsedToken.Resources.Spaces.ContainsKey("spc1"), "parsedToken.Resources.Spaces did not contain expected key");
-                        Assert.True(parsedToken.Resources.Users.ContainsKey("usr1"), "parsedToken.Resources.Users did not contain expected key");
-                        
-                        grantManualEvent.Set();
-                    }));
-            }
-            catch (Exception ex)
-            {
-                Assert.Fail($"Exception when trying to grant token: {ex}");
-            }
-            
-            receivedGrantMessage = grantManualEvent.WaitOne(7000);
-            Assert.True(receivedGrantMessage, "Did not receive grant callback");
-        }
-
-
-        [Test]
 #if NET40
         public static void ThenWithAsyncGrantTokenShouldReturnSuccess()
 #else
