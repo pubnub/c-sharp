@@ -35,11 +35,11 @@ namespace PubnubApi
 				} catch (AggregateException ae) {
 					foreach (var ie in ae.InnerExceptions)
 					{
-						PubnubConfiguation?.Logger?.Error($"AggregateException CheckInternetStatus : {ie.GetType().Name} {ie.Message}");
+						PubnubConfiguation?.Logger?.Warn($"AggregateException CheckInternetStatus : {ie.GetType().Name} {ie.Message}");
 					}
 				} catch (Exception ex)
 				{
-					PubnubConfiguation?.Logger?.Error($"CheckInternetStatus Exception: {ex.Message}");
+					PubnubConfiguation?.Logger?.Warn($"CheckInternetStatus Exception: {ex.Message}");
 				}
 
 				return networkStatus;
