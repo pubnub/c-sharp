@@ -62,6 +62,9 @@
     <Compile Include="..\PubnubApi\Callbacks\SubscribeCallback.cs">
       <Link>Callbacks\SubscribeCallback.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\CBOR.cs">
+      <Link>CBOR.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\ClientNetworkStatus.cs">
       <Link>ClientNetworkStatus.cs</Link>
     </Compile>
@@ -717,7 +720,6 @@
   
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="PeterO.Cbor" Version="4.5.5" />
   </ItemGroup>
   
   <!--<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.4' ">
