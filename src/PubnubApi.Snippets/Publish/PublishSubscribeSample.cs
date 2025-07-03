@@ -927,4 +927,54 @@ public class PublishSubscribeSample
         pubnub.UnsubscribeAll<object>();
         // snippet.end
     }
+    
+    public static void Entities() {
+        // snippet.create_channel
+        var channel = pubnub.Channel("channelName");
+        
+        SubscribeCallbackExt channelListener = new SubscribeCallbackExt(
+            (pubnubObj, message) => { /*Message handling here*/ },
+            (pubnubObj, presence) => { /*Presence handling here*/ },
+            (pubnubObj, status) => { /*Status handling here*/  });
+        
+        channel.Subscription().AddListener(channelListener);
+        channel.Subscription().Subscribe<object>();
+        // snippet.end
+
+        // snippet.create_channel_group
+        var channelGroup = pubnub.ChannelGroup("channelGroupName");
+        
+        SubscribeCallbackExt channelGroupListener = new SubscribeCallbackExt(
+            (pubnubObj, message) => { /*Message handling here*/ },
+            (pubnubObj, presence) => { /*Presence handling here*/ },
+            (pubnubObj, status) => { /*Status handling here*/  });
+        
+        channelGroup.Subscription().AddListener(channelGroupListener);
+        channelGroup.Subscription().Subscribe<object>();
+        // snippet.end
+
+        // snippet.create_channel_metadata
+        var channelMetadata = pubnub.ChannelMetadata("channelMetadata");
+        
+        SubscribeCallbackExt channelMetadataListener = new SubscribeCallbackExt(
+            (pubnubObj, message) => { /*Message handling here*/ },
+            (pubnubObj, presence) => { /*Presence handling here*/ },
+            (pubnubObj, status) => { /*Status handling here*/  });
+        
+        channelMetadata.Subscription().AddListener(channelMetadataListener);
+        channelMetadata.Subscription().Subscribe<object>();
+        // snippet.end
+
+        // snippet.create_user_metadata
+        var userMetadata = pubnub.UserMetadata("userMetadata");
+        
+        SubscribeCallbackExt userMetadataListener = new SubscribeCallbackExt(
+            (pubnubObj, message) => { /*Message handling here*/ },
+            (pubnubObj, presence) => { /*Presence handling here*/ },
+            (pubnubObj, status) => { /*Status handling here*/  });
+        
+        userMetadata.Subscription().AddListener(userMetadataListener);
+        userMetadata.Subscription().Subscribe<object>();
+        // snippet.end
+    }
 }

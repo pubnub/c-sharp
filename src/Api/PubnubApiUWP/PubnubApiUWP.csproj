@@ -16,7 +16,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubUWP</PackageId>
-    <PackageVersion>7.3.14.0</PackageVersion>
+    <PackageVersion>7.3.15.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -24,7 +24,7 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>Updated log type from Error to Warn for TaskCanceledException.</PackageReleaseNotes>
+    <PackageReleaseNotes>Implemented an in-house CBOR solution for ParseToken() handling to reduce total SDK+dependencies size.</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
@@ -170,6 +170,9 @@
     </Compile>
     <Compile Include="..\PubnubApi\Callbacks\SubscribeCallback.cs">
       <Link>Callbacks\SubscribeCallback.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\CBOR.cs">
+      <Link>CBOR.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\ClientNetworkStatus.cs">
       <Link>ClientNetworkStatus.cs</Link>
@@ -777,7 +780,6 @@
     <PackageReference Include="Newtonsoft.Json">
       <Version>13.0.3</Version>
     </PackageReference>
-    <PackageReference Include="PeterO.Cbor" Version="4.5.5" />
     <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.0" />
     <PackageReference Include="System.Collections.Concurrent">
       <Version>4.3.0</Version>

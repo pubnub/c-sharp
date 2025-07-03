@@ -15,7 +15,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubApiUnity</PackageId>
-    <PackageVersion>7.3.14.0</PackageVersion>
+    <PackageVersion>7.3.15.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -61,6 +61,9 @@
     </Compile>
     <Compile Include="..\PubnubApi\Callbacks\SubscribeCallback.cs">
       <Link>Callbacks\SubscribeCallback.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\CBOR.cs">
+      <Link>CBOR.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\ClientNetworkStatus.cs">
       <Link>ClientNetworkStatus.cs</Link>
@@ -717,7 +720,6 @@
   
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="PeterO.Cbor" Version="4.5.5" />
   </ItemGroup>
   
   <!--<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.4' ">
