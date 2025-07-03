@@ -10,7 +10,7 @@ namespace PubnubApi
     /// A simple not-all-covering implementation of CBOR serialisation/deserialisation for internal Pubnub ParseToken() usage
     /// Converted to C# from https://github.com/seba-aln/CBORCodec
     /// </summary>
-    internal class CBOR
+    internal static class CBOR
     {
         private const byte TYPE_MASK = 0b11100000;
         private const byte ADDITIONAL_MASK = 0b00011111;
@@ -21,7 +21,6 @@ namespace PubnubApi
         public const byte TYPE_TEXT_STRING = 0b01100000;
         public const byte TYPE_ARRAY = 0b10000000;
         public const byte TYPE_HASHMAP = 0b10100000;
-        public const byte TYPE_TAG = 0b11000000;
         public const byte TYPE_FLOAT = 0b11100000;
 
         private const byte ADDITIONAL_LENGTH_1B = 24;
@@ -360,8 +359,8 @@ namespace PubnubApi
                 case bool boolValue:
                     return boolValue ? SIMPLE_VALUE_TRUE : SIMPLE_VALUE_FALSE;
 
-                case long longValue:
-                case int intValue:
+                case long:
+                case int:
                     var numValue = Convert.ToInt64(value);
                     var type = TYPE_UNSIGNED_INT;
                     if (numValue < 0)
