@@ -80,7 +80,7 @@ namespace PubNubMessaging.Tests
         [Test]
         public static async Task ThenJoinEventReceivedForSubsequentSubscribe()
         {
-            int randomNumber = new Random().Next(1000, 10000);
+            int randomNumber = new Random().Next(1000, 99999);
             string userId = $"testUser{randomNumber}";
             bool receivedJoinEvent = false;
             bool receivedSecondJoinEvent = false;
