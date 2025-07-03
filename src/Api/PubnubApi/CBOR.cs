@@ -76,7 +76,9 @@ namespace PubnubApi
         private static object ParseData(ref List<string> data)
         {
             if (data.Count == 0)
+            {
                 throw new Exception("Unexpected end of data");
+            }
 
             var byteStr = data[0];
             data.RemoveAt(0);
@@ -263,7 +265,9 @@ namespace PubnubApi
             for (int i = 1; i <= bytes; i++)
             {
                 if (data.Count == 0)
+                {
                     throw new Exception("Unexpected end of data");
+                }
                 result.Append(data[0]);
                 data.RemoveAt(0);
             }
@@ -276,7 +280,9 @@ namespace PubnubApi
             do
             {
                 if (data.Count == 0)
+                {
                     throw new Exception("Unexpected end of data");
+                }
                 var byteStr = data[0];
                 data.RemoveAt(0);
                 if (Convert.ToByte(byteStr, 16) == INDEFINITE_BREAK)
