@@ -15,6 +15,8 @@ namespace PubnubApi.EndPoint
         private readonly IPubnubUnitTest unit;
         private string channelId = "";
         private bool includeCustom;
+        private bool includeStatus;
+        private bool includeType;
 
         private PNCallback<PNGetChannelMetadataResult> savedCallback;
         private Dictionary<string, object> queryParam;
@@ -56,6 +58,17 @@ namespace PubnubApi.EndPoint
         public GetChannelMetadataOperation IncludeCustom(bool includeCustomData)
         {
             this.includeCustom = includeCustomData;
+            return this;
+        }
+        public GetChannelMetadataOperation IncludeStatus(bool includeStatusData)
+        {
+            includeStatus = includeStatusData;
+            return this;
+        }
+
+        public GetChannelMetadataOperation IncludeType(bool includeTypeData)
+        {
+            includeType = includeTypeData;
             return this;
         }
 
@@ -234,9 +247,17 @@ namespace PubnubApi.EndPoint
             };
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
-            if (includeCustom)
+            List<string> includes = new List<string>();
+            if (includeCustom || includeStatus || includeType)
             {
-                requestQueryStringParams.Add("include", "custom");
+                if (includeStatus) includes.Add("status");
+                if (includeType) includes.Add("type");
+                if (includeCustom) includes.Add("custom");
+                var includeQueryString = string.Join(",", includes.ToArray());
+                requestQueryStringParams.Add("include",
+                    UriUtil.EncodeUriComponent(includeQueryString, PNOperationType.PNGetAllChannelMetadataOperation,
+                        false,
+                        false, false));
             }
 
             if (queryParam != null && queryParam.Count > 0)

@@ -75,7 +75,7 @@ namespace PubnubApi.EndPoint
 		public GetChannelMembersOperation Include(PNChannelMemberField[] includeOptions)
 		{
 			if (includeOptions != null) {
-				string[] arrayInclude = includeOptions.Select(x => MapEnumValueToEndpoint(x.ToString())).ToArray();
+				string[] arrayInclude = includeOptions.Select(x => UrlParameterConverter.MapEnumValueToEndpoint(x.ToString())).ToArray();
 				commandDelimitedIncludeOptions = string.Join(",", arrayInclude);
 			}
 			return this;
@@ -202,19 +202,6 @@ namespace PubnubApi.EndPoint
 			}
 			logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status?.StatusCode}");
 			return returnValue;
-		}
-
-		private static string MapEnumValueToEndpoint(string enumValue)
-		{
-			string ret = "";
-			if (enumValue.ToLowerInvariant() == "custom") {
-				ret = "custom";
-			} else if (enumValue.ToLowerInvariant() == "uuid") {
-				ret = "uuid";
-			} else if (enumValue.ToLowerInvariant() == "uuid_custom") {
-				ret = "uuid.custom";
-			}
-			return ret;
 		}
 
 		private RequestParameter CreateRequestParameter()

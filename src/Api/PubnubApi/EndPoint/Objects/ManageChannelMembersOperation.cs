@@ -246,15 +246,24 @@ namespace PubnubApi.EndPoint
             if (setMember != null)
             {
                 List<Dictionary<string, object>> setMemberFormatList = new List<Dictionary<string, object>>();
-                for (int index = 0; index < setMember.Count; index++)
+                foreach (var member in setMember)
                 {
-					Dictionary<string, object> currentMemberFormat = new Dictionary<string, object>
-					{
-						{ "uuid", new Dictionary<string, string> { { "id", setMember[index].Uuid } } }
-					};
-					if (setMember[index].Custom != null)
+                    Dictionary<string, object> currentMemberFormat = new Dictionary<string, object>
                     {
-                        currentMemberFormat.Add("custom", setMember[index].Custom);
+                        { "uuid", new Dictionary<string, string> { { "id", member.Uuid } } }
+                    };
+                    if (member.Custom != null)
+                    {
+                        currentMemberFormat.Add("custom", member.Custom);
+                    }
+                    if (member.Status != null)
+                    {
+                        currentMemberFormat.Add("status", member.Status);
+                    }
+
+                    if (member.Type != null)
+                    {
+                        currentMemberFormat.Add("type", member.Type);
                     }
                     setMemberFormatList.Add(currentMemberFormat);
                 }

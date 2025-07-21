@@ -8,199 +8,273 @@ using System.Collections.Concurrent;
 
 namespace PubnubApi.EndPoint
 {
-	public class GetUuidMetadataOperation : PubnubCoreBase
-	{
-		private readonly PNConfiguration config;
-		private readonly IJsonPluggableLibrary jsonLibrary;
-		private readonly IPubnubUnitTest unit;
+    public class GetUuidMetadataOperation : PubnubCoreBase
+    {
+        private readonly PNConfiguration config;
+        private readonly IJsonPluggableLibrary jsonLibrary;
+        private readonly IPubnubUnitTest unit;
+        private bool includeCustom;
+        private bool includeStatus;
+        private bool includeType;
+        private string uuid = string.Empty;
+        private PNCallback<PNGetUuidMetadataResult> savedCallback;
+        private Dictionary<string, object> queryParam;
+
+        public GetUuidMetadataOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary,
+            IPubnubUnitTest pubnubUnit, TokenManager tokenManager, Pubnub instance) : base(pubnubConfig,
+            jsonPluggableLibrary, pubnubUnit, tokenManager, instance)
+        {
+            config = pubnubConfig;
+            jsonLibrary = jsonPluggableLibrary;
+            unit = pubnubUnit;
 
 
-		private bool includeCustom;
-		private string uuid = string.Empty;
+            if (instance != null)
+            {
+                if (!ChannelRequest.ContainsKey(instance.InstanceId))
+                {
+                    ChannelRequest.GetOrAdd(instance.InstanceId,
+                        new ConcurrentDictionary<string, CancellationTokenSource>());
+                }
 
-		private PNCallback<PNGetUuidMetadataResult> savedCallback;
-		private Dictionary<string, object> queryParam;
+                if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
+                {
+                    ChannelInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+                }
 
-		public GetUuidMetadataOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, tokenManager, instance)
-		{
-			config = pubnubConfig;
-			jsonLibrary = jsonPluggableLibrary;
-			unit = pubnubUnit;
+                if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId))
+                {
+                    ChannelGroupInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+                }
+            }
+        }
 
+        public GetUuidMetadataOperation Uuid(string uuid)
+        {
+            this.uuid = uuid;
+            return this;
+        }
 
-			if (instance != null) {
-				if (!ChannelRequest.ContainsKey(instance.InstanceId)) {
-					ChannelRequest.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, CancellationTokenSource>());
-				}
-				if (!ChannelInternetStatus.ContainsKey(instance.InstanceId)) {
-					ChannelInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
-				}
-				if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId)) {
-					ChannelGroupInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
-				}
-			}
-		}
+        public GetUuidMetadataOperation IncludeCustom(bool includeCustomData)
+        {
+            includeCustom = includeCustomData;
+            return this;
+        }
 
-		public GetUuidMetadataOperation Uuid(string uuid)
-		{
-			this.uuid = uuid;
-			return this;
-		}
+        public GetUuidMetadataOperation IncludeStatus(bool includeStatusData)
+        {
+            includeStatus = includeStatusData;
+            return this;
+        }
 
-		public GetUuidMetadataOperation IncludeCustom(bool includeCustomData)
-		{
-			includeCustom = includeCustomData;
-			return this;
-		}
+        public GetUuidMetadataOperation IncludeType(bool includeTypeData)
+        {
+            includeType = includeTypeData;
+            return this;
+        }
 
-		public GetUuidMetadataOperation QueryParam(Dictionary<string, object> customQueryParam)
-		{
-			queryParam = customQueryParam;
-			return this;
-		}
+        public GetUuidMetadataOperation QueryParam(Dictionary<string, object> customQueryParam)
+        {
+            queryParam = customQueryParam;
+            return this;
+        }
 
-		public void Execute(PNCallback<PNGetUuidMetadataResult> callback)
-		{
-			savedCallback = callback;
-			logger?.Trace($"{GetType().Name} Execute invoked");
-			GetSingleUuidMetadata(uuid, includeCustom, queryParam, savedCallback);
-		}
+        public void Execute(PNCallback<PNGetUuidMetadataResult> callback)
+        {
+            savedCallback = callback;
+            logger?.Trace($"{GetType().Name} Execute invoked");
+            GetSingleUuidMetadata(uuid, includeCustom, queryParam, savedCallback);
+        }
 
-		public async Task<PNResult<PNGetUuidMetadataResult>> ExecuteAsync()
-		{
-			logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
-			return await GetSingleUuidMetadata(uuid, includeCustom, queryParam).ConfigureAwait(false);
-		}
+        public async Task<PNResult<PNGetUuidMetadataResult>> ExecuteAsync()
+        {
+            logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
+            return await GetSingleUuidMetadata(uuid, includeCustom, queryParam).ConfigureAwait(false);
+        }
 
-		internal void Retry()
-		{
-			GetSingleUuidMetadata(uuid, includeCustom, queryParam, savedCallback);
-		}
+        internal void Retry()
+        {
+            GetSingleUuidMetadata(uuid, includeCustom, queryParam, savedCallback);
+        }
 
-		private void GetSingleUuidMetadata(string uuid, bool includeCustom, Dictionary<string, object> externalQueryParam, PNCallback<PNGetUuidMetadataResult> callback)
-		{
-			if (callback == null) {
-				throw new ArgumentException("Missing callback");
-			}
-			if (string.IsNullOrEmpty(uuid)) {
-				this.uuid = config.UserId;
-			}
-			logger?.Debug($"{GetType().Name} parameter validated.");
-			RequestState<PNGetUuidMetadataResult> requestState = new RequestState<PNGetUuidMetadataResult>
-				{
-					ResponseType = PNOperationType.PNGetUuidMetadataOperation,
-					PubnubCallback = callback,
-					UsePostMethod = false,
-					Reconnect = false,
-					EndPointOperation = this
-				};
+        private void GetSingleUuidMetadata(string uuid, bool includeCustom,
+            Dictionary<string, object> externalQueryParam, PNCallback<PNGetUuidMetadataResult> callback)
+        {
+            if (callback == null)
+            {
+                throw new ArgumentException("Missing callback");
+            }
 
-			var requestParameter = CreateRequestParameter();
-			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNGetUuidMetadataOperation);
-			PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ContinueWith(t => {
-				var transportResponse = t.Result;
-				if (transportResponse.Error == null) {
-					var responseString = Encoding.UTF8.GetString(transportResponse.Content);
-					if (!string.IsNullOrEmpty(responseString)) {
+            if (string.IsNullOrEmpty(uuid))
+            {
+                this.uuid = config.UserId;
+            }
+
+            logger?.Debug($"{GetType().Name} parameter validated.");
+            RequestState<PNGetUuidMetadataResult> requestState = new RequestState<PNGetUuidMetadataResult>
+            {
+                ResponseType = PNOperationType.PNGetUuidMetadataOperation,
+                PubnubCallback = callback,
+                UsePostMethod = false,
+                Reconnect = false,
+                EndPointOperation = this
+            };
+
+            var requestParameter = CreateRequestParameter();
+            var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(
+                requestParameter: requestParameter, operationType: PNOperationType.PNGetUuidMetadataOperation);
+            PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ContinueWith(t =>
+            {
+                var transportResponse = t.Result;
+                if (transportResponse.Error == null)
+                {
+                    var responseString = Encoding.UTF8.GetString(transportResponse.Content);
+                    if (!string.IsNullOrEmpty(responseString))
+                    {
                         requestState.GotJsonResponse = true;
-						List<object> result = ProcessJsonResponse(requestState, responseString);
-						ProcessResponseCallbacks(result, requestState);
-						logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
-					} else {
-						PNStatus errorStatus = GetStatusIfError(requestState, responseString);
-						callback.OnResponse(null, errorStatus);
-						logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
-					}
+                        List<object> result = ProcessJsonResponse(requestState, responseString);
+                        ProcessResponseCallbacks(result, requestState);
+                        logger?.Info(
+                            $"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
+                    }
+                    else
+                    {
+                        PNStatus errorStatus = GetStatusIfError(requestState, responseString);
+                        callback.OnResponse(null, errorStatus);
+                        logger?.Info(
+                            $"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
+                    }
+                }
+                else
+                {
+                    int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
+                    PNStatusCategory category =
+                        PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
+                    PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(
+                        PNOperationType.PNGetUuidMetadataOperation, category, requestState, statusCode,
+                        new PNException(transportResponse.Error.Message, transportResponse.Error));
+                    requestState.PubnubCallback.OnResponse(default(PNGetUuidMetadataResult), status);
+                    logger?.Info(
+                        $"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
+                }
+            });
+        }
 
-				} else {
-					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
-					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
-					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNGetUuidMetadataOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
-					requestState.PubnubCallback.OnResponse(default(PNGetUuidMetadataResult), status);
-					logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
-				}
-			});
-		}
+        private async Task<PNResult<PNGetUuidMetadataResult>> GetSingleUuidMetadata(string uuid, bool includeCustom,
+            Dictionary<string, object> externalQueryParam)
+        {
+            if (string.IsNullOrEmpty(uuid))
+            {
+                this.uuid = config.UserId;
+            }
 
-		private async Task<PNResult<PNGetUuidMetadataResult>> GetSingleUuidMetadata(string uuid, bool includeCustom, Dictionary<string, object> externalQueryParam)
-		{
-			if (string.IsNullOrEmpty(uuid)) {
-				this.uuid = config.UserId;
-			}
-			logger?.Debug($"{GetType().Name} parameter validated.");
-			PNResult<PNGetUuidMetadataResult> returnValue = new PNResult<PNGetUuidMetadataResult>();
-			RequestState<PNGetUuidMetadataResult> requestState = new RequestState<PNGetUuidMetadataResult>
-				{
-					ResponseType = PNOperationType.PNGetUuidMetadataOperation,
-					Reconnect = false,
-					UsePostMethod = false,
-					EndPointOperation = this
-				};
+            logger?.Debug($"{GetType().Name} parameter validated.");
+            PNResult<PNGetUuidMetadataResult> returnValue = new PNResult<PNGetUuidMetadataResult>();
+            RequestState<PNGetUuidMetadataResult> requestState = new RequestState<PNGetUuidMetadataResult>
+            {
+                ResponseType = PNOperationType.PNGetUuidMetadataOperation,
+                Reconnect = false,
+                UsePostMethod = false,
+                EndPointOperation = this
+            };
 
-			var requestParameter = CreateRequestParameter();
-			Tuple<string, PNStatus> JsonAndStatusTuple;
-			var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNGetUuidMetadataOperation);
-			var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ConfigureAwait(false);
-			if (transportResponse.Error == null) {
-				var responseString = Encoding.UTF8.GetString(transportResponse.Content);
-				PNStatus errorStatus = GetStatusIfError(requestState, responseString);
-				if (errorStatus == null && transportResponse.StatusCode == Constants.HttpRequestSuccessStatusCode) {
-					requestState.GotJsonResponse = true;
-					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, (int)HttpStatusCode.OK, null);
-					JsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
-				} else {
-					JsonAndStatusTuple = new Tuple<string, PNStatus>(string.Empty, errorStatus);
-				}
-				returnValue.Status = JsonAndStatusTuple.Item2;
-				string json = JsonAndStatusTuple.Item1;
-				if (!string.IsNullOrEmpty(json)) {
-					List<object> resultList = ProcessJsonResponse(requestState, json);
-					ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary);
-					PNGetUuidMetadataResult responseResult = responseBuilder.JsonToObject<PNGetUuidMetadataResult>(resultList, true);
-					if (responseResult != null) {
-						returnValue.Result = responseResult;
-					}
-				}
-			} else {
-				int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
-				PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
-				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNGetUuidMetadataOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
-				returnValue.Status = status;
-			}
-			logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status?.StatusCode}");
-			return returnValue;
-		}
+            var requestParameter = CreateRequestParameter();
+            Tuple<string, PNStatus> JsonAndStatusTuple;
+            var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(
+                requestParameter: requestParameter, operationType: PNOperationType.PNGetUuidMetadataOperation);
+            var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest)
+                .ConfigureAwait(false);
+            if (transportResponse.Error == null)
+            {
+                var responseString = Encoding.UTF8.GetString(transportResponse.Content);
+                PNStatus errorStatus = GetStatusIfError(requestState, responseString);
+                if (errorStatus == null && transportResponse.StatusCode == Constants.HttpRequestSuccessStatusCode)
+                {
+                    requestState.GotJsonResponse = true;
+                    PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(
+                        requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState,
+                        (int)HttpStatusCode.OK, null);
+                    JsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
+                }
+                else
+                {
+                    JsonAndStatusTuple = new Tuple<string, PNStatus>(string.Empty, errorStatus);
+                }
 
-		private RequestParameter CreateRequestParameter()
-		{
-			List<string> pathSegments = new List<string>
-			{
-				"v2",
-				"objects",
-				config.SubscribeKey,
-				"uuids",
-				string.IsNullOrEmpty(uuid) ? string.Empty : uuid
-			};
+                returnValue.Status = JsonAndStatusTuple.Item2;
+                string json = JsonAndStatusTuple.Item1;
+                if (!string.IsNullOrEmpty(json))
+                {
+                    List<object> resultList = ProcessJsonResponse(requestState, json);
+                    ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary);
+                    PNGetUuidMetadataResult responseResult =
+                        responseBuilder.JsonToObject<PNGetUuidMetadataResult>(resultList, true);
+                    if (responseResult != null)
+                    {
+                        returnValue.Result = responseResult;
+                    }
+                }
+            }
+            else
+            {
+                int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
+                PNStatusCategory category =
+                    PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
+                PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(
+                    PNOperationType.PNGetUuidMetadataOperation, category, requestState, statusCode,
+                    new PNException(transportResponse.Error.Message, transportResponse.Error));
+                returnValue.Status = status;
+            }
 
-			Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
-			if (includeCustom) {
-				requestQueryStringParams.Add("include", "custom");
-			}
+            logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status?.StatusCode}");
+            return returnValue;
+        }
 
-			if (queryParam != null && queryParam.Count > 0) {
-				foreach (KeyValuePair<string, object> kvp in queryParam) {
-					if (!requestQueryStringParams.ContainsKey(kvp.Key)) {
-						requestQueryStringParams.Add(kvp.Key, UriUtil.EncodeUriComponent(kvp.Value.ToString(), PNOperationType.PNGetUuidMetadataOperation, false, false, false));
-					}
-				}
-			}
+        private RequestParameter CreateRequestParameter()
+        {
+            List<string> pathSegments = new List<string>
+            {
+                "v2",
+                "objects",
+                config.SubscribeKey,
+                "uuids",
+                string.IsNullOrEmpty(uuid) ? string.Empty : uuid
+            };
 
-			var requestParameter = new RequestParameter() {
-				RequestType = Constants.GET,
-				PathSegment = pathSegments,
-				Query = requestQueryStringParams
-			};
-			return requestParameter;
-		}
-	}
+            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
+            List<string> includes = new List<string>();
+            if (includeCustom || includeStatus || includeType)
+            {
+                if (includeStatus) includes.Add("status");
+                if (includeType) includes.Add("type");
+                if (includeCustom) includes.Add("custom");
+                var includeQueryString = string.Join(",", includes.ToArray());
+                requestQueryStringParams.Add("include",
+                    UriUtil.EncodeUriComponent(includeQueryString, PNOperationType.PNGetAllChannelMetadataOperation,
+                        false,
+                        false, false));
+            }
+
+            if (queryParam != null && queryParam.Count > 0)
+            {
+                foreach (KeyValuePair<string, object> kvp in queryParam)
+                {
+                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    {
+                        requestQueryStringParams.Add(kvp.Key,
+                            UriUtil.EncodeUriComponent(kvp.Value.ToString(), PNOperationType.PNGetUuidMetadataOperation,
+                                false, false, false));
+                    }
+                }
+            }
+
+            var requestParameter = new RequestParameter()
+            {
+                RequestType = Constants.GET,
+                PathSegment = pathSegments,
+                Query = requestQueryStringParams
+            };
+            return requestParameter;
+        }
+    }
 }
