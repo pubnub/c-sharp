@@ -1026,5 +1026,116 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = null;
             pubnub = null;
         }
+        
+        [Test]
+        public static async Task ThenChannelMetadataShouldSupportStatusAndTypeFields()
+        {
+            var r = new Random();
+            string channelMetadataId = $"channel{r.Next(100, 1000)}";
+            string status = $"status{r.Next(100, 1000)}";
+            string type = $"type{r.Next(100, 1000)}";
+            string name = $"name{r.Next(100, 1000)}";
+            string description = $"description{r.Next(100, 1000)}";
+            
+            PNConfiguration configuration = new PNConfiguration(new UserId($"user{r.Next(100,1000)}"))
+            {
+                PublishKey = PubnubCommon.NonPAMPublishKey,
+                SubscribeKey = PubnubCommon.NONPAMSubscribeKey
+            };
+            pubnub = createPubNubInstance(configuration);
+            
+            bool receivedSetEvent = false;
+            ManualResetEvent setEventManualEvent = new ManualResetEvent(false);
+            
+            var channelSubscription = pubnub.Channel(channelMetadataId).Subscription();
+            channelSubscription.onObject += (_, appContextEvent) =>
+            {
+                var eventType = appContextEvent.Type;
+                // check event type to be 'channel'
+                Assert.That(eventType.ToLowerInvariant(), Is.EqualTo("channel"), "Event type should be 'channel'");
+                
+                if (appContextEvent.Event.ToLowerInvariant() == "set")
+                {
+                    receivedSetEvent = true;
+                    // check value of status and type to match set value
+                    Assert.That(appContextEvent.ChannelMetadata, Is.Not.Null, "ChannelMetadata should not be null for set event");
+                    Assert.That(appContextEvent.ChannelMetadata.Status, Is.EqualTo(status), "Status should match the set value");
+                    Assert.That(appContextEvent.ChannelMetadata.Type, Is.EqualTo(type), "Type should match the set value");
+                    Assert.That(appContextEvent.ChannelMetadata.Name, Is.EqualTo(name), "Name should match the set value");
+                    Assert.That(appContextEvent.ChannelMetadata.Description, Is.EqualTo(description), "Description should match the set value");
+                    Assert.That(appContextEvent.ChannelMetadata.Custom, Is.Not.Null, "Custom should not be null");
+                    Assert.That(appContextEvent.ChannelMetadata.Custom.ContainsKey("key"), Is.True, "Custom should contain 'key'");
+                    Assert.That(appContextEvent.ChannelMetadata.Custom["key"].ToString(), Is.EqualTo("value"), "Custom key value should match");
+                    setEventManualEvent.Set();
+                }
+            };
+            channelSubscription.Subscribe<object>();
+            
+            await Task.Delay(2000);
+            // now set the Channel metadata.
+            
+            var setChannelMetadata = await pubnub.SetChannelMetadata()
+                .Channel(channelMetadataId)
+                .Status(status)
+                .Name(name)
+                .Type(type)
+                .Description(description)
+                .Custom(new Dictionary<string, object> { { "key", "value" } })
+                .ExecuteAsync();
+            
+            // check channel metadata return status and type., Custom also?
+            Assert.That(setChannelMetadata.Result, Is.Not.Null, "SetChannelMetadata result should not be null");
+            Assert.That(setChannelMetadata.Status.StatusCode, Is.EqualTo(200), "SetChannelMetadata status code should be 200");
+            Assert.That(setChannelMetadata.Status.Error, Is.False, "SetChannelMetadata should not indicate error");
+            Assert.That(setChannelMetadata.Result.Channel, Is.EqualTo(channelMetadataId), "Channel should match");
+            Assert.That(setChannelMetadata.Result.Name, Is.EqualTo(name), "Name should match");
+            Assert.That(setChannelMetadata.Result.Status, Is.EqualTo(status), "Status should match");
+            Assert.That(setChannelMetadata.Result.Type, Is.EqualTo(type), "Type should match");
+            Assert.That(setChannelMetadata.Result.Description, Is.EqualTo(description), "Description should match");
+            Assert.That(setChannelMetadata.Result.Custom, Is.Not.Null, "Custom should not be null");
+            Assert.That(setChannelMetadata.Result.Custom.ContainsKey("key"), Is.True, "Custom should contain 'key'");
+            Assert.That(setChannelMetadata.Result.Custom["key"].ToString(), Is.EqualTo("value"), "Custom key value should match");
+            
+            await Task.Delay(2000);
+
+            var getChannelMetadata = await pubnub.GetChannelMetadata()
+                .Channel(channelMetadataId)
+                .IncludeStatus(true)
+                .IncludeType(true)
+                .IncludeCustom(true)
+                .ExecuteAsync();
+            
+            // check channel data should contain status, type and custom fields using Assert.
+            Assert.That(getChannelMetadata.Result, Is.Not.Null, "GetChannelMetadata result should not be null");
+            Assert.That(getChannelMetadata.Status.StatusCode, Is.EqualTo(200), "GetChannelMetadata status code should be 200");
+            Assert.That(getChannelMetadata.Status.Error, Is.False, "GetChannelMetadata should not indicate error");
+            Assert.That(getChannelMetadata.Result.Channel, Is.EqualTo(channelMetadataId), "Channel should match");
+            Assert.That(getChannelMetadata.Result.Name, Is.EqualTo(name), "Name should match");
+            Assert.That(getChannelMetadata.Result.Status, Is.EqualTo(status), "Status should match");
+            Assert.That(getChannelMetadata.Result.Type, Is.EqualTo(type), "Type should match");
+            Assert.That(getChannelMetadata.Result.Description, Is.EqualTo(description), "Description should match");
+            Assert.That(getChannelMetadata.Result.Custom, Is.Not.Null, "Custom should not be null");
+            Assert.That(getChannelMetadata.Result.Custom.ContainsKey("key"), Is.True, "Custom should contain 'key'");
+            Assert.That(getChannelMetadata.Result.Custom["key"].ToString(), Is.EqualTo("value"), "Custom key value should match");
+            
+            // Wait for subscription events
+            setEventManualEvent.WaitOne(3000);
+            Assert.That(receivedSetEvent, Is.True, "Should have received set event via subscription");
+            
+            // As a part of cleanup delete the channelMetadata
+            var removeChannelMetadata = await pubnub.RemoveChannelMetadata().Channel(channelMetadataId).ExecuteAsync();
+            Assert.That(removeChannelMetadata.Result, Is.Not.Null, "RemoveChannelMetadata result should not be null");
+            Assert.That(removeChannelMetadata.Status.StatusCode, Is.EqualTo(200), "RemoveChannelMetadata status code should be 200");
+            Assert.That(removeChannelMetadata.Status.Error, Is.False, "RemoveChannelMetadata should not indicate error");
+            
+            // Wait for delete event
+            await Task.Delay(2000);
+            
+            // Cleanup
+            channelSubscription.Unsubscribe<object>();
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
     }
 }

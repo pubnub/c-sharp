@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
 using System.Threading;
 using PubnubApi;
 using System.Collections.Generic;
@@ -966,6 +967,104 @@ namespace PubNubMessaging.Tests
 
             Assert.IsTrue(receivedMessage, "UuidMetadata removal test failed");
 
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
+
+        [Test]
+        public static async Task ThenUuidMetadataShouldSupportStatusAndTypeFields()
+        {
+            var r = new Random();
+            string uuidMetadataId = $"uuid{r.Next(100, 1000)}";
+            string status = $"status{r.Next(100, 1000)}";
+            string type = $"type{r.Next(100, 1000)}";
+            string name =  $"name{r.Next(100, 1000)}";
+            PNConfiguration configuration = new PNConfiguration(new UserId($"user{r.Next(100,1000)}"))
+            {
+                PublishKey = PubnubCommon.NonPAMPublishKey,
+                SubscribeKey = PubnubCommon.NONPAMSubscribeKey
+            };
+            pubnub = createPubNubInstance(configuration);
+            
+            bool receivedSetEvent = false;
+            ManualResetEvent setEventManualEvent = new ManualResetEvent(false);
+            
+            var channelSubscription = pubnub.Channel(uuidMetadataId).Subscription();
+            channelSubscription.onObject += (_, appContextEvent) =>
+            {
+                var eventType = appContextEvent.Type;
+                // check event type to be 'set'
+                Assert.That(eventType.ToLowerInvariant(), Is.EqualTo("uuid"), "Event type should be 'uuid'");
+                
+                if (appContextEvent.Event.ToLowerInvariant() == "set")
+                {
+                    receivedSetEvent = true;
+                    // check value of status and type to match set value
+                    Assert.That(appContextEvent.UuidMetadata, Is.Not.Null, "UuidMetadata should not be null for set event");
+                    Assert.That(appContextEvent.UuidMetadata.Status, Is.EqualTo(status), "Status should match the set value");
+                    Assert.That(appContextEvent.UuidMetadata.Type, Is.EqualTo(type), "Type should match the set value");
+                    Assert.That(appContextEvent.UuidMetadata.Name, Is.EqualTo(name), "Name should match the set value");
+                    Assert.That(appContextEvent.UuidMetadata.Custom, Is.Not.Null, "Custom should not be null");
+                    Assert.That(appContextEvent.UuidMetadata.Custom.ContainsKey("key"), Is.True, "Custom should contain 'key'");
+                    Assert.That(appContextEvent.UuidMetadata.Custom["key"].ToString(), Is.EqualTo("value"), "Custom key value should match");
+                    setEventManualEvent.Set();
+                }
+            };
+            channelSubscription.Subscribe<object>();
+            
+            await Task.Delay(2000);
+            // now set the UUID metadata.
+            
+            var setUuidMetadata =  await pubnub.SetUuidMetadata().
+                Uuid(uuidMetadataId).
+                Status(status).
+                Name(name).
+                Type(type).
+                Custom(new Dictionary<string, object>{ {"key", "value"}}).
+                ExecuteAsync();
+            
+            // check uuid metadata return status and type., Custom also?
+            Assert.That(setUuidMetadata.Result, Is.Not.Null, "SetUuidMetadata result should not be null");
+            Assert.That(setUuidMetadata.Status.StatusCode, Is.EqualTo(200), "SetUuidMetadata status code should be 200");
+            Assert.That(setUuidMetadata.Status.Error, Is.False, "SetUuidMetadata should not indicate error");
+            Assert.That(setUuidMetadata.Result.Uuid, Is.EqualTo(uuidMetadataId), "UUID should match");
+            Assert.That(setUuidMetadata.Result.Name, Is.EqualTo(name), "Name should match");
+            Assert.That(setUuidMetadata.Result.Status, Is.EqualTo(status), "Status should match");
+            Assert.That(setUuidMetadata.Result.Type, Is.EqualTo(type), "Type should match");
+            Assert.That(setUuidMetadata.Result.Custom, Is.Not.Null, "Custom should not be null");
+            Assert.That(setUuidMetadata.Result.Custom.ContainsKey("key"), Is.True, "Custom should contain 'key'");
+            Assert.That(setUuidMetadata.Result.Custom["key"].ToString(), Is.EqualTo("value"), "Custom key value should match");
+            
+            await Task.Delay(2000);
+
+            var getUuidMetadata =
+                await pubnub.GetUuidMetadata().Uuid(uuidMetadataId).IncludeStatus(true).IncludeType(true).IncludeCustom(true).ExecuteAsync();
+            
+            // check uuid data should contain status, type and custom fields using Assert.
+            Assert.That(getUuidMetadata.Result, Is.Not.Null, "GetUuidMetadata result should not be null");
+            Assert.That(getUuidMetadata.Status.StatusCode, Is.EqualTo(200), "GetUuidMetadata status code should be 200");
+            Assert.That(getUuidMetadata.Status.Error, Is.False, "GetUuidMetadata should not indicate error");
+            Assert.That(getUuidMetadata.Result.Uuid, Is.EqualTo(uuidMetadataId), "UUID should match");
+            Assert.That(getUuidMetadata.Result.Name, Is.EqualTo(name), "Name should match");
+            Assert.That(getUuidMetadata.Result.Status, Is.EqualTo(status), "Status should match");
+            Assert.That(getUuidMetadata.Result.Type, Is.EqualTo(type), "Type should match");
+            Assert.That(getUuidMetadata.Result.Custom, Is.Not.Null, "Custom should not be null");
+            Assert.That(getUuidMetadata.Result.Custom.ContainsKey("key"), Is.True, "Custom should contain 'key'");
+            Assert.That(getUuidMetadata.Result.Custom["key"].ToString(), Is.EqualTo("value"), "Custom key value should match");
+            
+            // Wait for subscription events
+            setEventManualEvent.WaitOne(3000);
+            Assert.That(receivedSetEvent, Is.True, "Should have received set event via subscription");
+            
+            // As a part of cleanup delete the uuidMetadata
+            var removeUuidMetadata = await pubnub.RemoveUuidMetadata().Uuid(uuidMetadataId).ExecuteAsync();
+            
+            // Wait for delete event
+            await Task.Delay(1000);
+            
+            // Cleanup
+            channelSubscription.Unsubscribe<object>();
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
