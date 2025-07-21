@@ -2,40 +2,25 @@ using System;
 
 namespace PubnubApi.EndPoint
 {
-
     internal static class UrlParameterConverter
     {
         public static string MapEnumValueToEndpoint(string enumValue)
         {
-            string endpointParameterName = String.Empty;
-            if (enumValue.ToLowerInvariant() == "custom")
+            string endpointParameterName = enumValue.ToLowerInvariant() switch
             {
-                endpointParameterName = "custom";
-            }
-            else if (enumValue.ToLowerInvariant() == "uuid")
-            {
-                endpointParameterName = "uuid";
-            }
-            else if (enumValue.ToLowerInvariant() == "channel")
-            {
-                endpointParameterName = "channel";
-            }
-            else if (enumValue.ToLowerInvariant() == "channel_custom")
-            {
-                endpointParameterName = "channel.custom";
-            }
-            else if (enumValue.ToLowerInvariant() == "uuid_custom")
-            {
-                endpointParameterName = "uuid.custom";
-            }
-            else if (enumValue.ToLowerInvariant() == "status")
-            {
-                endpointParameterName = "status";
-            }
-            else if (enumValue.ToLowerInvariant() == "type")
-            {
-                endpointParameterName = "type";
-            }
+                "custom" => "custom",
+                "uuid" => "uuid",
+                "channel" => "channel",
+                "channel_custom" => "channel.custom",
+                "uuid_custom" => "uuid.custom",
+                "status" => "status",
+                "type" => "type",
+                "channel_status" => "channel.status",
+                "channel_type" => "channel.type",
+                "uuid_status" => "uuid.status",
+                "uuid_type" => "uuid.type",
+                _ => String.Empty
+            };
 
             return endpointParameterName;
         }

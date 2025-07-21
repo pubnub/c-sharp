@@ -50,11 +50,17 @@ namespace PubnubApi
                                                 ProfileUrl = (uuidMetadataDic.ContainsKey("profileUrl") && uuidMetadataDic["profileUrl"] != null) ? uuidMetadataDic["profileUrl"].ToString() : "",
                                                 Email = (uuidMetadataDic.ContainsKey("email") && uuidMetadataDic["email"] != null) ? uuidMetadataDic["email"].ToString() : "",
                                                 Updated = (uuidMetadataDic.ContainsKey("updated") && uuidMetadataDic["updated"] != null) ? uuidMetadataDic["updated"].ToString() : "",
-                                                Custom = (uuidMetadataDic.ContainsKey("custom") && uuidMetadataDic["custom"] != null) ? jsonPlug.ConvertToDictionaryObject(uuidMetadataDic["custom"]) : null
+                                                Custom = (uuidMetadataDic.ContainsKey("custom") && uuidMetadataDic["custom"] != null) ? jsonPlug.ConvertToDictionaryObject(uuidMetadataDic["custom"]) : null,
+                                                Status = (uuidMetadataDic.ContainsKey("status") && uuidMetadataDic["status"] != null) ? uuidMetadataDic["status"].ToString() : null,
+                                                Type = (uuidMetadataDic.ContainsKey("type") && uuidMetadataDic["type"] != null) ? uuidMetadataDic["id"].ToString() : null,
                                             };
                                             mbrItem.UuidMetadata = uuidMetadataResult;
                                         }
                                     }
+                                    mbrItem.Status =
+                                        (getMbrItemDataDic.ContainsKey("status") && getMbrItemDataDic["status"] != null) ? getMbrItemDataDic["status"]?.ToString() : null;
+                                    mbrItem.Type =
+                                        (getMbrItemDataDic.ContainsKey("type") && getMbrItemDataDic["type"] != null) ? getMbrItemDataDic["type"]?.ToString() : null;
                                     result.ChannelMembers.Add(mbrItem);
                                 }
                             }

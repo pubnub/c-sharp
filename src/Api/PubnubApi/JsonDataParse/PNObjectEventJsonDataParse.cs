@@ -44,6 +44,8 @@ namespace PubnubApi
                                 ExternalId = (dataFields.ContainsKey("externalId") && dataFields["externalId"] != null) ? dataFields["externalId"].ToString() : null,
                                 ProfileUrl = (dataFields.ContainsKey("profileUrl") && dataFields["profileUrl"] != null) ? dataFields["profileUrl"].ToString() : null,
                                 Email = (dataFields.ContainsKey("email") && dataFields["email"] != null) ? dataFields["email"].ToString() : null,
+                                Status = (dataFields.ContainsKey("status") && dataFields["status"] != null) ? dataFields["status"].ToString() : null,
+                                Type = (dataFields.ContainsKey("type") && dataFields["type"] != null) ? dataFields["type"].ToString() : null,
                                 Custom = (dataFields.ContainsKey("custom") && dataFields["custom"] != null) ? jsonPlug.ConvertToDictionaryObject(dataFields["custom"]) : null,
                                 Updated = (dataFields.ContainsKey("updated") && dataFields["updated"] != null) ? dataFields["updated"].ToString() : null
                             };
@@ -55,6 +57,8 @@ namespace PubnubApi
                                 Channel = dataFields["id"]?.ToString(),
                                 Name = (dataFields.ContainsKey("name") && dataFields["name"] != null) ? dataFields["name"].ToString() : null,
                                 Description = (dataFields.ContainsKey("description") && dataFields["description"] != null) ? dataFields["description"].ToString() : null,
+                                Status = (dataFields.ContainsKey("status") && dataFields["status"] != null) ? dataFields["status"].ToString() : null,
+                                Type = (dataFields.ContainsKey("type") && dataFields["type"] != null) ? dataFields["type"].ToString() : null,
                                 Custom = (dataFields.ContainsKey("custom") && dataFields["custom"] != null) ? jsonPlug.ConvertToDictionaryObject(dataFields["custom"]) : null,
                                 Updated = (dataFields.ContainsKey("updated") && dataFields["updated"] != null) ? dataFields["updated"].ToString() : null
                             };

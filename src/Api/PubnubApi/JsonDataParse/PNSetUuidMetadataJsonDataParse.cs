@@ -20,6 +20,8 @@ namespace PubnubApi
                     result.ExternalId = setUuidDataDic.ContainsKey("externalId") && setUuidDataDic["externalId"] != null ? setUuidDataDic["externalId"].ToString() : null;
                     result.ProfileUrl = setUuidDataDic.ContainsKey("profileUrl") && setUuidDataDic["profileUrl"] != null ? setUuidDataDic["profileUrl"].ToString() : null;
                     result.Email = setUuidDataDic.ContainsKey("email") && setUuidDataDic["email"] != null ? setUuidDataDic["email"].ToString() : null;
+                    result.Status = setUuidDataDic.ContainsKey("status") && setUuidDataDic["status"] != null ? setUuidDataDic["status"].ToString() : null;
+                    result.Type = setUuidDataDic.ContainsKey("type") && setUuidDataDic["type"] != null ? setUuidDataDic["type"].ToString() : null;
                     result.Updated = setUuidDataDic.ContainsKey("updated") && setUuidDataDic["updated"] != null ? setUuidDataDic["updated"].ToString() : "";
                     if (setUuidDataDic.ContainsKey("custom"))
                     {
