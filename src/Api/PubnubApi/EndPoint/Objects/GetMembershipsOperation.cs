@@ -95,29 +95,24 @@ namespace PubnubApi.EndPoint
             }
 
             this.savedCallback = callback;
-            GetMembershipsList(this.uuid, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions,
-                this.membershipsFilter, this.sortField, this.queryParam, savedCallback);
+            GetMembershipsList(savedCallback);
         }
 
         public async Task<PNResult<PNMembershipsResult>> ExecuteAsync()
         {
             logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
-            return await GetMembershipsList(this.uuid, this.page, this.limit, this.includeCount,
-                    this.commandDelimitedIncludeOptions, this.membershipsFilter, this.sortField, this.queryParam)
+            return await GetMembershipsList()
                 .ConfigureAwait(false);
         }
 
         internal void Retry()
         {
-            GetMembershipsList(this.uuid, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions,
-                this.membershipsFilter, this.sortField, this.queryParam, savedCallback);
+            GetMembershipsList(savedCallback);
         }
 
-        private void GetMembershipsList(string uuid, PNPageObject page, int limit, bool includeCount,
-            string includeOptions, string filter, List<string> sort, Dictionary<string, object> externalQueryParam,
-            PNCallback<PNMembershipsResult> callback)
+        private void GetMembershipsList(PNCallback<PNMembershipsResult> callback)
         {
-            if (string.IsNullOrEmpty(uuid))
+            if (string.IsNullOrEmpty(this.uuid))
             {
                 this.uuid = config.UserId;
             }
@@ -174,13 +169,11 @@ namespace PubnubApi.EndPoint
             });
         }
 
-        private async Task<PNResult<PNMembershipsResult>> GetMembershipsList(string uuid, PNPageObject page, int limit,
-            bool includeCount, string includeOptions, string filter, List<string> sort,
-            Dictionary<string, object> externalQueryParam)
+        private async Task<PNResult<PNMembershipsResult>> GetMembershipsList()
         {
             PNResult<PNMembershipsResult> returnValue = new PNResult<PNMembershipsResult>();
 
-            if (string.IsNullOrEmpty(uuid))
+            if (string.IsNullOrEmpty(this.uuid))
             {
                 this.uuid = config.UserId;
             }

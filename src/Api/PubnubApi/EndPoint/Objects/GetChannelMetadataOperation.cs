@@ -91,24 +91,23 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing Channel");
             }
 
-            logger?.Debug($"{GetType().Name} parameter validated.");
-            this.savedCallback = callback;
-            GetSingleChannelMetadata(this.channelId, this.includeCustom, this.queryParam, savedCallback);
+                    logger?.Debug($"{GetType().Name} parameter validated.");
+        this.savedCallback = callback;
+        GetSingleChannelMetadata(savedCallback);
         }
 
         public async Task<PNResult<PNGetChannelMetadataResult>> ExecuteAsync()
         {
-            return await GetSingleChannelMetadata(this.channelId, this.includeCustom, this.queryParam)
+            return await GetSingleChannelMetadata()
                 .ConfigureAwait(false);
         }
 
         internal void Retry()
         {
-            GetSingleChannelMetadata(this.channelId, this.includeCustom, this.queryParam, savedCallback);
+            GetSingleChannelMetadata(savedCallback);
         }
 
-        private void GetSingleChannelMetadata(string spaceId, bool includeCustom,
-            Dictionary<string, object> externalQueryParam, PNCallback<PNGetChannelMetadataResult> callback)
+        private void GetSingleChannelMetadata(PNCallback<PNGetChannelMetadataResult> callback)
         {
             RequestState<PNGetChannelMetadataResult> requestState = new RequestState<PNGetChannelMetadataResult>
             {
@@ -159,8 +158,7 @@ namespace PubnubApi.EndPoint
             });
         }
 
-        private async Task<PNResult<PNGetChannelMetadataResult>> GetSingleChannelMetadata(string spaceId,
-            bool includeCustom, Dictionary<string, object> externalQueryParam)
+        private async Task<PNResult<PNGetChannelMetadataResult>> GetSingleChannelMetadata()
         {
             PNResult<PNGetChannelMetadataResult> returnValue = new PNResult<PNGetChannelMetadataResult>();
 

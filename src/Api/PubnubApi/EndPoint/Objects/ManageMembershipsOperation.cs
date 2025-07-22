@@ -118,23 +118,23 @@ namespace PubnubApi.EndPoint
 			}
 
 			savedCallback = callback;
-			ManageChannelMembershipWithUuid(uuid, addMembership, delMembership, page, limit, includeCount, commandDelimitedIncludeOptions, sortField, queryParam, callback);
+			ManageChannelMembershipWithUuid(callback);
 		}
 
 		public async Task<PNResult<PNMembershipsResult>> ExecuteAsync()
 		{
 			logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
-			return await ManageChannelMembershipWithUuid(uuid, addMembership, delMembership, page, limit, includeCount, commandDelimitedIncludeOptions, sortField, queryParam).ConfigureAwait(false);
+			return await ManageChannelMembershipWithUuid().ConfigureAwait(false);
 		}
 
 		internal void Retry()
 		{
-			ManageChannelMembershipWithUuid(uuid, addMembership, delMembership, page, limit, includeCount, commandDelimitedIncludeOptions, sortField, queryParam, savedCallback);
+			ManageChannelMembershipWithUuid(savedCallback);
 		}
 
-		private void ManageChannelMembershipWithUuid(string uuid, List<PNMembership> setMembership, List<string> removeMembership, PNPageObject page, int limit, bool includeCount, string includeOptions, List<string> sort, Dictionary<string, object> externalQueryParam, PNCallback<PNMembershipsResult> callback)
+		private void ManageChannelMembershipWithUuid(PNCallback<PNMembershipsResult> callback)
 		{
-			if (string.IsNullOrEmpty(uuid)) {
+			if (string.IsNullOrEmpty(this.uuid)) {
 				this.uuid = config.UserId;
 			}
 			logger?.Debug($"{GetType().Name} parameter validated.");
@@ -174,11 +174,11 @@ namespace PubnubApi.EndPoint
 			});
 		}
 
-		private async Task<PNResult<PNMembershipsResult>> ManageChannelMembershipWithUuid(string uuid, List<PNMembership> setMembership, List<string> removeMembership, PNPageObject page, int limit, bool includeCount, string includeOptions, List<string> sort, Dictionary<string, object> externalQueryParam)
+		private async Task<PNResult<PNMembershipsResult>> ManageChannelMembershipWithUuid()
 		{
 			PNResult<PNMembershipsResult> returnValue = new PNResult<PNMembershipsResult>();
 
-			if (string.IsNullOrEmpty(uuid)) {
+			if (string.IsNullOrEmpty(this.uuid)) {
 				this.uuid = config.UserId;
 			}
 

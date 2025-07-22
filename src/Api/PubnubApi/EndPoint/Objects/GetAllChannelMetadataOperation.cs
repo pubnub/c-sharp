@@ -25,300 +25,261 @@ namespace PubnubApi.EndPoint
         private PNCallback<PNGetAllChannelMetadataResult> savedCallback;
         private Dictionary<string, object> queryParam;
 
-        public GetAllChannelMetadataOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary,
-            IPubnubUnitTest pubnubUnit, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig,
-            jsonPluggableLibrary, pubnubUnit, tokenManager, instance)
+    public GetAllChannelMetadataOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary,
+        IPubnubUnitTest pubnubUnit, TokenManager tokenManager, Pubnub instance) : base(pubnubConfig,
+        jsonPluggableLibrary, pubnubUnit, tokenManager, instance)
+    {
+        config = pubnubConfig;
+        jsonLibrary = jsonPluggableLibrary;
+        unit = pubnubUnit;
+
+
+        if (instance != null)
         {
-            config = pubnubConfig;
-            jsonLibrary = jsonPluggableLibrary;
-            unit = pubnubUnit;
+            if (!ChannelRequest.ContainsKey(instance.InstanceId))
+                ChannelRequest.GetOrAdd(instance.InstanceId,
+                    new ConcurrentDictionary<string, CancellationTokenSource>());
 
+            if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
+                ChannelInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
 
-            if (instance != null)
-            {
-                if (!ChannelRequest.ContainsKey(instance.InstanceId))
-                {
-                    ChannelRequest.GetOrAdd(instance.InstanceId,
-                        new ConcurrentDictionary<string, CancellationTokenSource>());
-                }
-
-                if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
-                {
-                    ChannelInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
-                }
-
-                if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId))
-                {
-                    ChannelGroupInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
-                }
-            }
+            if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId))
+                ChannelGroupInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
         }
+    }
 
-        public GetAllChannelMetadataOperation Page(PNPageObject pageObject)
+    public GetAllChannelMetadataOperation Page(PNPageObject pageObject)
+    {
+        page = pageObject;
+        return this;
+    }
+
+    public GetAllChannelMetadataOperation Limit(int numberOfChannels)
+    {
+        limit = numberOfChannels;
+        return this;
+    }
+
+    public GetAllChannelMetadataOperation IncludeCount(bool includeTotalCount)
+    {
+        includeCount = includeTotalCount;
+        return this;
+    }
+
+    public GetAllChannelMetadataOperation IncludeCustom(bool includeCustomData)
+    {
+        includeCustom = includeCustomData;
+        return this;
+    }
+
+    public GetAllChannelMetadataOperation IncludeStatus(bool includeStatusData)
+    {
+        includeStatus = includeStatusData;
+        return this;
+    }
+
+    public GetAllChannelMetadataOperation IncludeType(bool includeTypeData)
+    {
+        includeType = includeTypeData;
+        return this;
+    }
+
+    public GetAllChannelMetadataOperation Filter(string filterExpression)
+    {
+        channelsFilter = filterExpression;
+        return this;
+    }
+
+    public GetAllChannelMetadataOperation Sort(List<string> sortByField)
+    {
+        sortField = sortByField;
+        return this;
+    }
+
+    public GetAllChannelMetadataOperation QueryParam(Dictionary<string, object> customQueryParam)
+    {
+        queryParam = customQueryParam;
+        return this;
+    }
+
+    public void Execute(PNCallback<PNGetAllChannelMetadataResult> callback)
+    {
+        savedCallback = callback;
+        logger?.Trace($"{GetType().Name} Execute invoked");
+        GetAllChannelMetadataList(savedCallback);
+    }
+
+    public async Task<PNResult<PNGetAllChannelMetadataResult>> ExecuteAsync()
+    {
+        logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
+        return await GetAllChannelMetadataList().ConfigureAwait(false);
+    }
+
+    internal void Retry()
+    {
+        GetAllChannelMetadataList(savedCallback);
+    }
+
+    private void GetAllChannelMetadataList(PNCallback<PNGetAllChannelMetadataResult> callback)
+    {
+        if (callback == null) throw new ArgumentException("Missing callback");
+
+        logger?.Debug($"{GetType().Name} parameter validated.");
+        var requestState = new RequestState<PNGetAllChannelMetadataResult>
         {
-            this.page = pageObject;
-            return this;
-        }
+            ResponseType = PNOperationType.PNGetAllChannelMetadataOperation,
+            PubnubCallback = callback,
+            Reconnect = false,
+            EndPointOperation = this,
+            UsePostMethod = false
+        };
+        var requestParameter = CreateRequestParameter();
 
-        public GetAllChannelMetadataOperation Limit(int numberOfChannels)
+        var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(
+            requestParameter, PNOperationType.PNGetAllChannelMetadataOperation);
+        PubnubInstance.transportMiddleware.Send(transportRequest).ContinueWith(t =>
         {
-            this.limit = numberOfChannels;
-            return this;
-        }
-
-        public GetAllChannelMetadataOperation IncludeCount(bool includeTotalCount)
-        {
-            this.includeCount = includeTotalCount;
-            return this;
-        }
-
-        public GetAllChannelMetadataOperation IncludeCustom(bool includeCustomData)
-        {
-            this.includeCustom = includeCustomData;
-            return this;
-        }
-
-        public GetAllChannelMetadataOperation IncludeStatus(bool includeStatusData)
-        {
-            includeStatus = includeStatusData;
-            return this;
-        }
-
-        public GetAllChannelMetadataOperation IncludeType(bool includeTypeData)
-        {
-            includeType = includeTypeData;
-            return this;
-        }
-
-        public GetAllChannelMetadataOperation Filter(string filterExpression)
-        {
-            this.channelsFilter = filterExpression;
-            return this;
-        }
-
-        public GetAllChannelMetadataOperation Sort(List<string> sortByField)
-        {
-            this.sortField = sortByField;
-            return this;
-        }
-
-        public GetAllChannelMetadataOperation QueryParam(Dictionary<string, object> customQueryParam)
-        {
-            this.queryParam = customQueryParam;
-            return this;
-        }
-
-        public void Execute(PNCallback<PNGetAllChannelMetadataResult> callback)
-        {
-            this.savedCallback = callback;
-            logger?.Trace($"{GetType().Name} Execute invoked");
-            GetAllChannelMetadataList(this.page, this.limit, this.includeCount, this.includeCustom, this.channelsFilter,
-                this.sortField, this.queryParam, savedCallback);
-        }
-
-        public async Task<PNResult<PNGetAllChannelMetadataResult>> ExecuteAsync()
-        {
-            logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
-            return await GetAllChannelMetadataList(this.page, this.limit, this.includeCount, this.includeCustom,
-                this.channelsFilter, this.sortField, this.queryParam).ConfigureAwait(false);
-        }
-
-        internal void Retry()
-        {
-            GetAllChannelMetadataList(this.page, this.limit, this.includeCount, this.includeCustom, this.channelsFilter,
-                this.sortField, this.queryParam, savedCallback);
-        }
-
-        private void GetAllChannelMetadataList(PNPageObject page, int limit, bool includeCount, bool includeCustom,
-            string filter, List<string> sort, Dictionary<string, object> externalQueryParam,
-            PNCallback<PNGetAllChannelMetadataResult> callback)
-        {
-            if (callback == null)
-            {
-                throw new ArgumentException("Missing callback");
-            }
-
-            logger?.Debug($"{GetType().Name} parameter validated.");
-            RequestState<PNGetAllChannelMetadataResult> requestState = new RequestState<PNGetAllChannelMetadataResult>
-            {
-                ResponseType = PNOperationType.PNGetAllChannelMetadataOperation,
-                PubnubCallback = callback,
-                Reconnect = false,
-                EndPointOperation = this,
-                UsePostMethod = false
-            };
-            var requestParameter = CreateRequestParameter();
-
-            var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(
-                requestParameter: requestParameter, operationType: PNOperationType.PNGetAllChannelMetadataOperation);
-            PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ContinueWith(t =>
-            {
-                var transportResponse = t.Result;
-                if (transportResponse.Error == null)
-                {
-                    var responseString = Encoding.UTF8.GetString(transportResponse.Content);
-                    if (!string.IsNullOrEmpty(responseString))
-                    {
-                        requestState.GotJsonResponse = true;
-                        List<object> result = ProcessJsonResponse(requestState, responseString);
-                        ProcessResponseCallbacks(result, requestState);
-                        logger?.Info(
-                            $"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
-                    }
-                }
-                else
-                {
-                    int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
-                    PNStatusCategory category =
-                        PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
-                    PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(
-                        PNOperationType.PNGetAllChannelMetadataOperation, category, requestState, statusCode,
-                        new PNException(transportResponse.Error.Message, transportResponse.Error));
-                    requestState.PubnubCallback.OnResponse(default, status);
-                    logger?.Info(
-                        $"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
-                }
-            });
-        }
-
-        private async Task<PNResult<PNGetAllChannelMetadataResult>> GetAllChannelMetadataList(PNPageObject page,
-            int limit, bool includeCount, bool includeCustom, string filter, List<string> sort,
-            Dictionary<string, object> externalQueryParam)
-        {
-            PNResult<PNGetAllChannelMetadataResult> returnValue = new PNResult<PNGetAllChannelMetadataResult>();
-            RequestState<PNGetAllChannelMetadataResult> requestState = new RequestState<PNGetAllChannelMetadataResult>
-            {
-                ResponseType = PNOperationType.PNGetAllChannelMetadataOperation,
-                Reconnect = false,
-                EndPointOperation = this,
-                UsePostMethod = false
-            };
-            Tuple<string, PNStatus> JsonAndStatusTuple;
-            var requestParameter = CreateRequestParameter();
-            var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(
-                requestParameter: requestParameter, operationType: PNOperationType.PNGetAllChannelMetadataOperation);
-            var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest)
-                .ConfigureAwait(false);
+            var transportResponse = t.Result;
             if (transportResponse.Error == null)
             {
                 var responseString = Encoding.UTF8.GetString(transportResponse.Content);
-                PNStatus errorStatus = GetStatusIfError(requestState, responseString);
-                if (errorStatus == null && transportResponse.StatusCode == Constants.HttpRequestSuccessStatusCode)
+                if (!string.IsNullOrEmpty(responseString))
                 {
                     requestState.GotJsonResponse = true;
-                    PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(
-                        requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState,
-                        (int)HttpStatusCode.OK, null);
-                    JsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
-                }
-                else
-                {
-                    JsonAndStatusTuple = new Tuple<string, PNStatus>(string.Empty, errorStatus);
-                }
-
-                returnValue.Status = JsonAndStatusTuple.Item2;
-                string json = JsonAndStatusTuple.Item1;
-                if (!string.IsNullOrEmpty(json))
-                {
-                    List<object> resultList = ProcessJsonResponse(requestState, json);
-                    ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary);
-                    PNGetAllChannelMetadataResult responseResult =
-                        responseBuilder.JsonToObject<PNGetAllChannelMetadataResult>(resultList, true);
-                    if (responseResult != null)
-                    {
-                        returnValue.Result = responseResult;
-                    }
+                    var result = ProcessJsonResponse(requestState, responseString);
+                    ProcessResponseCallbacks(result, requestState);
+                    logger?.Info(
+                        $"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
                 }
             }
             else
             {
-                int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
-                PNStatusCategory category =
+                var statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
+                var category =
                     PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
-                PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(
+                var status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(
                     PNOperationType.PNGetAllChannelMetadataOperation, category, requestState, statusCode,
                     new PNException(transportResponse.Error.Message, transportResponse.Error));
-                returnValue.Status = status;
+                requestState.PubnubCallback.OnResponse(default, status);
+                logger?.Info(
+                    $"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
+            }
+        });
+    }
+
+    private async Task<PNResult<PNGetAllChannelMetadataResult>> GetAllChannelMetadataList()
+    {
+        var returnValue = new PNResult<PNGetAllChannelMetadataResult>();
+        var requestState = new RequestState<PNGetAllChannelMetadataResult>
+        {
+            ResponseType = PNOperationType.PNGetAllChannelMetadataOperation,
+            Reconnect = false,
+            EndPointOperation = this,
+            UsePostMethod = false
+        };
+        Tuple<string, PNStatus> JsonAndStatusTuple;
+        var requestParameter = CreateRequestParameter();
+        var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(
+            requestParameter, PNOperationType.PNGetAllChannelMetadataOperation);
+        var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest)
+            .ConfigureAwait(false);
+        if (transportResponse.Error == null)
+        {
+            var responseString = Encoding.UTF8.GetString(transportResponse.Content);
+            var errorStatus = GetStatusIfError(requestState, responseString);
+            if (errorStatus == null && transportResponse.StatusCode == Constants.HttpRequestSuccessStatusCode)
+            {
+                requestState.GotJsonResponse = true;
+                var status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(
+                    requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState,
+                    (int)HttpStatusCode.OK, null);
+                JsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
+            }
+            else
+            {
+                JsonAndStatusTuple = new Tuple<string, PNStatus>(string.Empty, errorStatus);
             }
 
-            logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status?.StatusCode}");
-            return returnValue;
+            returnValue.Status = JsonAndStatusTuple.Item2;
+            var json = JsonAndStatusTuple.Item1;
+            if (!string.IsNullOrEmpty(json))
+            {
+                var resultList = ProcessJsonResponse(requestState, json);
+                var responseBuilder = new ResponseBuilder(config, jsonLibrary);
+                var responseResult =
+                    responseBuilder.JsonToObject<PNGetAllChannelMetadataResult>(resultList, true);
+                if (responseResult != null) returnValue.Result = responseResult;
+            }
+        }
+        else
+        {
+            var statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
+            var category =
+                PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
+            var status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(
+                PNOperationType.PNGetAllChannelMetadataOperation, category, requestState, statusCode,
+                new PNException(transportResponse.Error.Message, transportResponse.Error));
+            returnValue.Status = status;
         }
 
-        private RequestParameter CreateRequestParameter()
+        logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status?.StatusCode}");
+        return returnValue;
+    }
+
+    private RequestParameter CreateRequestParameter()
+    {
+        var pathSegments = new List<string>
         {
-            List<string> pathSegments = new List<string>
-            {
-                "v2",
-                "objects",
-                config.SubscribeKey,
-                "channels"
-            };
+            "v2",
+            "objects",
+            config.SubscribeKey,
+            "channels"
+        };
 
-            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
-            if (!string.IsNullOrEmpty(page?.Next))
-            {
-                requestQueryStringParams.Add("start",
-                    UriUtil.EncodeUriComponent(page.Next, PNOperationType.PNGetAllChannelMetadataOperation, false,
-                        false, false));
-            }
+        var requestQueryStringParams = new Dictionary<string, string>();
+        if (!string.IsNullOrEmpty(page?.Next))
+            requestQueryStringParams.Add("start",
+                UriUtil.EncodeUriComponent(page.Next, PNOperationType.PNGetAllChannelMetadataOperation, false,
+                    false, false));
 
-            if (!string.IsNullOrEmpty(page?.Prev))
-            {
-                requestQueryStringParams.Add("end",
-                    UriUtil.EncodeUriComponent(page.Prev, PNOperationType.PNGetAllChannelMetadataOperation, false,
-                        false, false));
-            }
+        if (!string.IsNullOrEmpty(page?.Prev))
+            requestQueryStringParams.Add("end",
+                UriUtil.EncodeUriComponent(page.Prev, PNOperationType.PNGetAllChannelMetadataOperation, false,
+                    false, false));
 
-            if (limit >= 0)
-            {
-                requestQueryStringParams.Add("limit", limit.ToString(CultureInfo.InvariantCulture));
-            }
+        if (limit >= 0) requestQueryStringParams.Add("limit", limit.ToString(CultureInfo.InvariantCulture));
 
-            if (includeCount)
-            {
-                requestQueryStringParams.Add("count", "true");
-            }
+        if (includeCount) requestQueryStringParams.Add("count", "true");
 
-            List<string> includes = new List<string>();
-            if (includeCustom || includeStatus || includeType)
-            {
-                if (includeStatus) includes.Add("status");
-                if (includeType) includes.Add("type");
-                if (includeCustom) includes.Add("custom");
-                var includeQueryString = string.Join(",", includes.ToArray());
-                requestQueryStringParams.Add("include",
-                    UriUtil.EncodeUriComponent(includeQueryString, PNOperationType.PNGetAllChannelMetadataOperation,
-                        false,
-                        false, false));
-            }
+        var includes = new List<string>();
+        if (includeCustom || includeStatus || includeType)
+        {
+            if (includeStatus) includes.Add("status");
+            if (includeType) includes.Add("type");
+            if (includeCustom) includes.Add("custom");
+            var includeQueryString = string.Join(",", includes.ToArray());
+            requestQueryStringParams.Add("include",
+                UriUtil.EncodeUriComponent(includeQueryString, PNOperationType.PNGetAllChannelMetadataOperation,
+                    false,
+                    false, false));
+        }
 
-            if (!string.IsNullOrEmpty(channelsFilter))
-            {
-                requestQueryStringParams.Add("filter",
-                    UriUtil.EncodeUriComponent(channelsFilter, PNOperationType.PNGetAllChannelMetadataOperation, false,
-                        false, false));
-            }
+        if (!string.IsNullOrEmpty(channelsFilter))
+            requestQueryStringParams.Add("filter",
+                UriUtil.EncodeUriComponent(channelsFilter, PNOperationType.PNGetAllChannelMetadataOperation, false,
+                    false, false));
 
-            if (sortField != null && sortField.Count > 0)
-            {
-                requestQueryStringParams.Add("sort",
-                    UriUtil.EncodeUriComponent(string.Join(",", sortField.ToArray()),
-                        PNOperationType.PNGetAllChannelMetadataOperation, false, false, false));
-            }
+        if (sortField != null && sortField.Count > 0)
+            requestQueryStringParams.Add("sort",
+                UriUtil.EncodeUriComponent(string.Join(",", sortField.ToArray()),
+                    PNOperationType.PNGetAllChannelMetadataOperation, false, false, false));
 
-            if (queryParam != null && queryParam.Count > 0)
-            {
-                foreach (KeyValuePair<string, object> kvp in queryParam)
-                {
-                    if (!requestQueryStringParams.ContainsKey(kvp.Key))
-                    {
-                        requestQueryStringParams.Add(kvp.Key,
-                            UriUtil.EncodeUriComponent(kvp.Value.ToString(),
-                                PNOperationType.PNGetAllChannelMetadataOperation, false, false, false));
-                    }
-                }
-            }
+        if (queryParam != null && queryParam.Count > 0)
+            foreach (var kvp in queryParam)
+                if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    requestQueryStringParams.Add(kvp.Key,
+                        UriUtil.EncodeUriComponent(kvp.Value.ToString(),
+                            PNOperationType.PNGetAllChannelMetadataOperation, false, false, false));
 
             var requestParameter = new RequestParameter()
             {

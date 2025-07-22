@@ -10,24 +10,24 @@ namespace PubnubApi.EndPoint
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
         private readonly IPubnubUnitTest unit;
+        private string channelDescription;
 
 
         private string channelId = string.Empty;
         private string channelName;
-        private string channelDescription;
         private string channelStatus;
         private string channelType;
         private Dictionary<string, object> custom;
+
+        private string ifMatchesEtag;
         private bool includeCustom = true;
         private bool includeStatus = true;
         private bool includeType = true;
-
-        private string ifMatchesEtag = null;
-        private PNCallback<PNSetChannelMetadataResult> savedCallback;
         private Dictionary<string, object> queryParam;
+        private PNCallback<PNSetChannelMetadataResult> savedCallback;
 
         public SetChannelMetadataOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary,
-            IPubnubUnitTest pubnubUnit, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig,
+            IPubnubUnitTest pubnubUnit, TokenManager tokenManager, Pubnub instance) : base(pubnubConfig,
             jsonPluggableLibrary, pubnubUnit, tokenManager, instance)
         {
             config = pubnubConfig;
@@ -37,19 +37,19 @@ namespace PubnubApi.EndPoint
 
         public SetChannelMetadataOperation Channel(string channelName)
         {
-            this.channelId = channelName;
+            channelId = channelName;
             return this;
         }
 
         public SetChannelMetadataOperation Name(string channelMetadataName)
         {
-            this.channelName = channelMetadataName;
+            channelName = channelMetadataName;
             return this;
         }
 
         public SetChannelMetadataOperation Description(string channelMetadataDescription)
         {
-            this.channelDescription = channelMetadataDescription;
+            channelDescription = channelMetadataDescription;
             return this;
         }
 
@@ -67,13 +67,13 @@ namespace PubnubApi.EndPoint
 
         public SetChannelMetadataOperation Custom(Dictionary<string, object> channelMetadataCustomObject)
         {
-            this.custom = channelMetadataCustomObject;
+            custom = channelMetadataCustomObject;
             return this;
         }
 
         public SetChannelMetadataOperation IncludeCustom(bool includeCustomData)
         {
-            this.includeCustom = includeCustomData;
+            includeCustom = includeCustomData;
             return this;
         }
 
@@ -91,13 +91,13 @@ namespace PubnubApi.EndPoint
 
         public SetChannelMetadataOperation QueryParam(Dictionary<string, object> customQueryParam)
         {
-            this.queryParam = customQueryParam;
+            queryParam = customQueryParam;
             return this;
         }
 
         public SetChannelMetadataOperation IfMatchesEtag(string etag)
         {
-            this.ifMatchesEtag = etag;
+            ifMatchesEtag = etag;
             return this;
         }
 
@@ -120,26 +120,25 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing userCallback");
             }
 
-            this.savedCallback = callback;
+            savedCallback = callback;
             logger?.Debug($"{GetType().Name} parameter validated.");
-            SetChannelMetadata(this.channelId, this.includeCustom, this.queryParam, callback);
+            SetChannelMetadata(callback);
         }
 
         public async Task<PNResult<PNSetChannelMetadataResult>> ExecuteAsync()
         {
             logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
-            return await SetChannelMetadata(this.channelId, this.includeCustom, this.queryParam).ConfigureAwait(false);
+            return await SetChannelMetadata().ConfigureAwait(false);
         }
 
         internal void Retry()
         {
-            SetChannelMetadata(this.channelId, this.includeCustom, this.queryParam, savedCallback);
+            SetChannelMetadata(savedCallback);
         }
 
-        private void SetChannelMetadata(string channelMetaId, bool includeCustom,
-            Dictionary<string, object> externalQueryParam, PNCallback<PNSetChannelMetadataResult> callback)
+        private void SetChannelMetadata(PNCallback<PNSetChannelMetadataResult> callback)
         {
-            RequestState<PNSetChannelMetadataResult> requestState = new RequestState<PNSetChannelMetadataResult>
+            var requestState = new RequestState<PNSetChannelMetadataResult>
             {
                 ResponseType = PNOperationType.PNSetChannelMetadataOperation,
                 PubnubCallback = callback,
@@ -150,8 +149,8 @@ namespace PubnubApi.EndPoint
 
             var requestParameter = CreateRequestParameter();
             var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(
-                requestParameter: requestParameter, operationType: PNOperationType.PNSetChannelMetadataOperation);
-            PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ContinueWith(t =>
+                requestParameter, PNOperationType.PNSetChannelMetadataOperation);
+            PubnubInstance.transportMiddleware.Send(transportRequest).ContinueWith(t =>
             {
                 var transportResponse = t.Result;
                 if (transportResponse.Error == null)
@@ -160,14 +159,14 @@ namespace PubnubApi.EndPoint
                     if (!string.IsNullOrEmpty(responseString))
                     {
                         requestState.GotJsonResponse = true;
-                        List<object> result = ProcessJsonResponse(requestState, responseString);
+                        var result = ProcessJsonResponse(requestState, responseString);
                         ProcessResponseCallbacks(result, requestState);
                         logger?.Info(
                             $"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
                     }
                     else
                     {
-                        PNStatus errorStatus = GetStatusIfError(requestState, responseString);
+                        var errorStatus = GetStatusIfError(requestState, responseString);
                         callback.OnResponse(default, errorStatus);
                         logger?.Info(
                             $"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
@@ -175,10 +174,10 @@ namespace PubnubApi.EndPoint
                 }
                 else
                 {
-                    int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
-                    PNStatusCategory category =
+                    var statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
+                    var category =
                         PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
-                    PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(
+                    var status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(
                         PNOperationType.PNSetChannelMetadataOperation, category, requestState, statusCode,
                         new PNException(transportResponse.Error.Message, transportResponse.Error));
                     requestState.PubnubCallback.OnResponse(default, status);
@@ -188,14 +187,13 @@ namespace PubnubApi.EndPoint
             });
         }
 
-        private async Task<PNResult<PNSetChannelMetadataResult>> SetChannelMetadata(string channelMetaId,
-            bool includeCustom, Dictionary<string, object> externalQueryParam)
+        private async Task<PNResult<PNSetChannelMetadataResult>> SetChannelMetadata()
         {
-            PNResult<PNSetChannelMetadataResult> returnValue = new PNResult<PNSetChannelMetadataResult>();
+            var returnValue = new PNResult<PNSetChannelMetadataResult>();
 
-            if (string.IsNullOrEmpty(channelMetaId) || string.IsNullOrEmpty(channelMetaId.Trim()))
+            if (string.IsNullOrEmpty(channelId) || string.IsNullOrEmpty(channelId.Trim()))
             {
-                PNStatus errStatus = new PNStatus
+                var errStatus = new PNStatus
                 {
                     Error = true,
                     ErrorData = new PNErrorData("Missing Channel", new ArgumentException("Missing Channel"))
@@ -207,7 +205,7 @@ namespace PubnubApi.EndPoint
             if (string.IsNullOrEmpty(config.SubscribeKey) || string.IsNullOrEmpty(config.SubscribeKey.Trim()) ||
                 config.SubscribeKey.Length <= 0)
             {
-                PNStatus errStatus = new PNStatus
+                var errStatus = new PNStatus
                 {
                     Error = true,
                     ErrorData = new PNErrorData("Invalid Subscribe key", new ArgumentException("Invalid Subscribe key"))
@@ -217,7 +215,7 @@ namespace PubnubApi.EndPoint
             }
 
             logger?.Debug($"{GetType().Name} parameter validated.");
-            RequestState<PNSetChannelMetadataResult> requestState = new RequestState<PNSetChannelMetadataResult>
+            var requestState = new RequestState<PNSetChannelMetadataResult>
             {
                 ResponseType = PNOperationType.PNSetChannelMetadataOperation,
                 Reconnect = false,
@@ -228,17 +226,17 @@ namespace PubnubApi.EndPoint
             var requestParameter = CreateRequestParameter();
             Tuple<string, PNStatus> JsonAndStatusTuple;
             var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(
-                requestParameter: requestParameter, operationType: PNOperationType.PNSetChannelMetadataOperation);
-            var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest)
+                requestParameter, PNOperationType.PNSetChannelMetadataOperation);
+            var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest)
                 .ConfigureAwait(false);
             if (transportResponse.Error == null)
             {
                 var responseString = Encoding.UTF8.GetString(transportResponse.Content);
-                PNStatus errorStatus = GetStatusIfError(requestState, responseString);
+                var errorStatus = GetStatusIfError(requestState, responseString);
                 if (errorStatus == null && transportResponse.StatusCode == Constants.HttpRequestSuccessStatusCode)
                 {
                     requestState.GotJsonResponse = true;
-                    PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(
+                    var status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(
                         requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, 200, null);
                     JsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
                 }
@@ -248,25 +246,22 @@ namespace PubnubApi.EndPoint
                 }
 
                 returnValue.Status = JsonAndStatusTuple.Item2;
-                string json = JsonAndStatusTuple.Item1;
+                var json = JsonAndStatusTuple.Item1;
                 if (!string.IsNullOrEmpty(json))
                 {
-                    List<object> resultList = ProcessJsonResponse(requestState, json);
-                    ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary);
-                    PNSetChannelMetadataResult responseResult =
+                    var resultList = ProcessJsonResponse(requestState, json);
+                    var responseBuilder = new ResponseBuilder(config, jsonLibrary);
+                    var responseResult =
                         responseBuilder.JsonToObject<PNSetChannelMetadataResult>(resultList, true);
-                    if (responseResult != null)
-                    {
-                        returnValue.Result = responseResult;
-                    }
+                    if (responseResult != null) returnValue.Result = responseResult;
                 }
             }
             else
             {
-                int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
-                PNStatusCategory category =
+                var statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
+                var category =
                     PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
-                PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(
+                var status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(
                     PNOperationType.PNSetChannelMetadataOperation, category, requestState, statusCode,
                     new PNException(transportResponse.Error.Message, transportResponse.Error));
                 returnValue.Status = status;
@@ -278,35 +273,21 @@ namespace PubnubApi.EndPoint
 
         private RequestParameter CreateRequestParameter()
         {
-            Dictionary<string, object> messageEnvelope = new Dictionary<string, object>();
-            if (this.channelName != null)
-            {
-                messageEnvelope.Add("name", channelName);
-            }
+            var messageEnvelope = new Dictionary<string, object>();
+            if (channelName != null) messageEnvelope.Add("name", channelName);
 
-            if (this.channelDescription != null)
-            {
-                messageEnvelope.Add("description", channelDescription);
-            }
+            if (channelDescription != null) messageEnvelope.Add("description", channelDescription);
 
-            if (this.custom != null)
-            {
-                messageEnvelope.Add("custom", custom);
-            }
+            if (custom != null) messageEnvelope.Add("custom", custom);
 
             if (channelStatus != null && !string.IsNullOrEmpty(channelStatus))
-            {
                 messageEnvelope.Add("status", channelStatus);
-            }
 
-            if (channelType != null && !string.IsNullOrEmpty(channelType))
-            {
-                messageEnvelope.Add("type", channelType);
-            }
+            if (channelType != null && !string.IsNullOrEmpty(channelType)) messageEnvelope.Add("type", channelType);
 
-            string patchMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
+            var patchMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
 
-            List<string> pathSegments = new List<string>
+            var pathSegments = new List<string>
             {
                 "v2",
                 "objects",
@@ -315,8 +296,8 @@ namespace PubnubApi.EndPoint
                 string.IsNullOrEmpty(channelId) ? string.Empty : channelId
             };
 
-            Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
-            List<string> includes = new List<string>();
+            var requestQueryStringParams = new Dictionary<string, string>();
+            var includes = new List<string>();
             if (includeCustom || includeStatus || includeType)
             {
                 if (includeStatus) includes.Add("status");
@@ -329,29 +310,20 @@ namespace PubnubApi.EndPoint
             }
 
             if (queryParam is { Count: > 0 })
-            {
-                foreach (KeyValuePair<string, object> kvp in queryParam)
-                {
+                foreach (var kvp in queryParam)
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
-                    {
                         requestQueryStringParams.Add(kvp.Key,
                             UriUtil.EncodeUriComponent(kvp.Value.ToString(),
                                 PNOperationType.PNSetChannelMetadataOperation, false, false, false));
-                    }
-                }
-            }
 
-            var requestParameter = new RequestParameter()
+            var requestParameter = new RequestParameter
             {
                 RequestType = Constants.PATCH,
                 PathSegment = pathSegments,
                 Query = requestQueryStringParams,
                 BodyContentString = patchMessage
             };
-            if (!string.IsNullOrEmpty(ifMatchesEtag))
-            {
-                requestParameter.Headers.Add("If-Match", ifMatchesEtag);
-            }
+            if (!string.IsNullOrEmpty(ifMatchesEtag)) requestParameter.Headers.Add("If-Match", ifMatchesEtag);
 
             return requestParameter;
         }

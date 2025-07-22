@@ -99,28 +99,23 @@ namespace PubnubApi.EndPoint
             }
 
             savedCallback = callback;
-            SetChannelMembershipWithUuid(uuid, addMembership, page, limit, includeCount, commandDelimitedIncludeOptions,
-                sortField, queryParam, callback);
+            SetChannelMembershipWithUuid(callback);
         }
 
         public async Task<PNResult<PNMembershipsResult>> ExecuteAsync()
         {
             logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
-            return await SetChannelMembershipWithUuid(uuid, addMembership, page, limit, includeCount,
-                commandDelimitedIncludeOptions, sortField, queryParam).ConfigureAwait(false);
+            return await SetChannelMembershipWithUuid().ConfigureAwait(false);
         }
 
         internal void Retry()
         {
-            SetChannelMembershipWithUuid(uuid, addMembership, page, limit, includeCount, commandDelimitedIncludeOptions,
-                sortField, queryParam, savedCallback);
+            SetChannelMembershipWithUuid(savedCallback);
         }
 
-        private void SetChannelMembershipWithUuid(string uuid, List<PNMembership> setMembership, PNPageObject page,
-            int limit, bool includeCount, string includeOptions, List<string> sort,
-            Dictionary<string, object> externalQueryParam, PNCallback<PNMembershipsResult> callback)
+        private void SetChannelMembershipWithUuid(PNCallback<PNMembershipsResult> callback)
         {
-            if (string.IsNullOrEmpty(uuid))
+            if (string.IsNullOrEmpty(this.uuid))
             {
                 this.uuid = config.UserId;
             }
@@ -173,13 +168,11 @@ namespace PubnubApi.EndPoint
             });
         }
 
-        private async Task<PNResult<PNMembershipsResult>> SetChannelMembershipWithUuid(string uuid,
-            List<PNMembership> setMembership, PNPageObject page, int limit, bool includeCount, string includeOptions,
-            List<string> sort, Dictionary<string, object> externalQueryParam)
+        private async Task<PNResult<PNMembershipsResult>> SetChannelMembershipWithUuid()
         {
             PNResult<PNMembershipsResult> returnValue = new PNResult<PNMembershipsResult>();
 
-            if (string.IsNullOrEmpty(uuid))
+            if (string.IsNullOrEmpty(this.uuid))
             {
                 this.uuid = config.UserId;
             }

@@ -107,21 +107,21 @@ namespace PubnubApi.EndPoint
 
 			savedCallback = callback;
 			logger?.Trace($"{GetType().Name} Execute invoked");
-			GetMembersList(channelId, page, limit, includeCount, commandDelimitedIncludeOptions, membersFilter, sortField, queryParam, savedCallback);
+			GetMembersList(savedCallback);
 		}
 
 		public async Task<PNResult<PNChannelMembersResult>> ExecuteAsync()
 		{
 			logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
-			return await GetMembersList(channelId, page, limit, includeCount, commandDelimitedIncludeOptions, membersFilter, sortField, queryParam).ConfigureAwait(false);
+			return await GetMembersList().ConfigureAwait(false);
 		}
 
 		internal void Retry()
 		{
-			GetMembersList(channelId, page, limit, includeCount, commandDelimitedIncludeOptions, membersFilter, sortField, queryParam, savedCallback);
+			GetMembersList(savedCallback);
 		}
 
-		private void GetMembersList(string spaceId, PNPageObject page, int limit, bool includeCount, string includeOptions, string filter, List<string> sort, Dictionary<string, object> externalQueryParam, PNCallback<PNChannelMembersResult> callback)
+		private void GetMembersList(PNCallback<PNChannelMembersResult> callback)
 		{
 			RequestState<PNChannelMembersResult> requestState = new RequestState<PNChannelMembersResult>
 				{
@@ -159,7 +159,7 @@ namespace PubnubApi.EndPoint
 			});
 		}
 
-		private async Task<PNResult<PNChannelMembersResult>> GetMembersList(string spaceId, PNPageObject page, int limit, bool includeCount, string includeOptions, string filter, List<string> sort, Dictionary<string, object> externalQueryParam)
+		private async Task<PNResult<PNChannelMembersResult>> GetMembersList()
 		{
 			PNResult<PNChannelMembersResult> returnValue = new PNResult<PNChannelMembersResult>();
 			RequestState<PNChannelMembersResult> requestState = new RequestState<PNChannelMembersResult>

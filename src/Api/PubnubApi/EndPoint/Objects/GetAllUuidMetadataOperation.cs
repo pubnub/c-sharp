@@ -104,22 +104,22 @@ namespace PubnubApi.EndPoint
         {
             savedCallback = callback;
             logger?.Trace($"{GetType().Name} Execute invoked");
-            GetUuidMetadataList(page, limit, includeCount, includeCustom, usersFilter, sortField, queryParam, savedCallback);
+            GetUuidMetadataList(savedCallback);
         }
 
         public async Task<PNResult<PNGetAllUuidMetadataResult>> ExecuteAsync()
         {
             logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
-            return await GetUuidMetadataList(page, limit, includeCount, includeCustom, usersFilter, sortField, queryParam).ConfigureAwait(false);
+            return await GetUuidMetadataList().ConfigureAwait(false);
         }
 
 
         internal void Retry()
         {
-            GetUuidMetadataList(page, limit, includeCount, includeCustom, usersFilter, sortField, queryParam, savedCallback);
+            GetUuidMetadataList(savedCallback);
         }
 
-        private void GetUuidMetadataList(PNPageObject page, int limit, bool includeCount, bool includeCustom, string filter, List<string> sort, Dictionary<string, object> externalQueryParam, PNCallback<PNGetAllUuidMetadataResult> callback)
+        private void GetUuidMetadataList(PNCallback<PNGetAllUuidMetadataResult> callback)
         {
             if (callback == null)
             {
@@ -155,7 +155,7 @@ namespace PubnubApi.EndPoint
 			});
         }
 
-        private async Task<PNResult<PNGetAllUuidMetadataResult>> GetUuidMetadataList(PNPageObject page, int limit, bool includeCount, bool includeCustom, string filter, List<string> sort, Dictionary<string, object> externalQueryParam)
+        private async Task<PNResult<PNGetAllUuidMetadataResult>> GetUuidMetadataList()
         {
             PNResult<PNGetAllUuidMetadataResult> returnValue = new PNResult<PNGetAllUuidMetadataResult>();
             RequestState<PNGetAllUuidMetadataResult> requestState = new RequestState<PNGetAllUuidMetadataResult>

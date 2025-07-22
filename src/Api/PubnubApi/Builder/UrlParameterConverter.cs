@@ -1,12 +1,11 @@
-using System;
-
 namespace PubnubApi.EndPoint
 {
+
     internal static class UrlParameterConverter
     {
         public static string MapEnumValueToEndpoint(string enumValue)
         {
-            string endpointParameterName = enumValue.ToLowerInvariant() switch
+            var endpointParameterName = enumValue.ToLowerInvariant() switch
             {
                 "custom" => "custom",
                 "uuid" => "uuid",
@@ -19,7 +18,7 @@ namespace PubnubApi.EndPoint
                 "channel_type" => "channel.type",
                 "uuid_status" => "uuid.status",
                 "uuid_type" => "uuid.type",
-                _ => String.Empty
+                _ => string.Empty
             };
 
             return endpointParameterName;
