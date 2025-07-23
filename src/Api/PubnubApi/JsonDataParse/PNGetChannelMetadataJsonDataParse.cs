@@ -20,7 +20,9 @@ namespace PubnubApi
                         Channel = (getChMetadataDataDic.ContainsKey("id") && getChMetadataDataDic["id"] != null) ? getChMetadataDataDic["id"].ToString() : null,
                         Name = (getChMetadataDataDic.ContainsKey("name") && getChMetadataDataDic["name"] != null) ? getChMetadataDataDic["name"].ToString() : null,
                         Description = (getChMetadataDataDic.ContainsKey("description") && getChMetadataDataDic["description"] != null) ? getChMetadataDataDic["description"].ToString() : null,
-                        Updated = (getChMetadataDataDic.ContainsKey("updated") && getChMetadataDataDic["updated"] != null) ? getChMetadataDataDic["updated"].ToString() : null
+                        Updated = (getChMetadataDataDic.ContainsKey("updated") && getChMetadataDataDic["updated"] != null) ? getChMetadataDataDic["updated"].ToString() : null,
+                        Status = (getChMetadataDataDic.ContainsKey("status") && getChMetadataDataDic["status"] != null) ? getChMetadataDataDic["status"].ToString() : null,
+                        Type = (getChMetadataDataDic.ContainsKey("type") && getChMetadataDataDic["type"] != null) ? getChMetadataDataDic["type"].ToString() : null,
                     };
                     if (getChMetadataDataDic.ContainsKey("custom"))
                     {

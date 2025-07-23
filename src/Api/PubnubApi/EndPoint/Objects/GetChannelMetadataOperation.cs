@@ -15,6 +15,8 @@ namespace PubnubApi.EndPoint
         private readonly IPubnubUnitTest unit;
         private string channelId = "";
         private bool includeCustom;
+        private bool includeStatus;
+        private bool includeType;
 
         private PNCallback<PNGetChannelMetadataResult> savedCallback;
         private Dictionary<string, object> queryParam;
@@ -58,6 +60,17 @@ namespace PubnubApi.EndPoint
             this.includeCustom = includeCustomData;
             return this;
         }
+        public GetChannelMetadataOperation IncludeStatus(bool includeStatusData)
+        {
+            includeStatus = includeStatusData;
+            return this;
+        }
+
+        public GetChannelMetadataOperation IncludeType(bool includeTypeData)
+        {
+            includeType = includeTypeData;
+            return this;
+        }
 
         public GetChannelMetadataOperation QueryParam(Dictionary<string, object> customQueryParam)
         {
@@ -78,24 +91,23 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing Channel");
             }
 
-            logger?.Debug($"{GetType().Name} parameter validated.");
-            this.savedCallback = callback;
-            GetSingleChannelMetadata(this.channelId, this.includeCustom, this.queryParam, savedCallback);
+                    logger?.Debug($"{GetType().Name} parameter validated.");
+        this.savedCallback = callback;
+        GetSingleChannelMetadata(savedCallback);
         }
 
         public async Task<PNResult<PNGetChannelMetadataResult>> ExecuteAsync()
         {
-            return await GetSingleChannelMetadata(this.channelId, this.includeCustom, this.queryParam)
+            return await GetSingleChannelMetadata()
                 .ConfigureAwait(false);
         }
 
         internal void Retry()
         {
-            GetSingleChannelMetadata(this.channelId, this.includeCustom, this.queryParam, savedCallback);
+            GetSingleChannelMetadata(savedCallback);
         }
 
-        private void GetSingleChannelMetadata(string spaceId, bool includeCustom,
-            Dictionary<string, object> externalQueryParam, PNCallback<PNGetChannelMetadataResult> callback)
+        private void GetSingleChannelMetadata(PNCallback<PNGetChannelMetadataResult> callback)
         {
             RequestState<PNGetChannelMetadataResult> requestState = new RequestState<PNGetChannelMetadataResult>
             {
@@ -146,8 +158,7 @@ namespace PubnubApi.EndPoint
             });
         }
 
-        private async Task<PNResult<PNGetChannelMetadataResult>> GetSingleChannelMetadata(string spaceId,
-            bool includeCustom, Dictionary<string, object> externalQueryParam)
+        private async Task<PNResult<PNGetChannelMetadataResult>> GetSingleChannelMetadata()
         {
             PNResult<PNGetChannelMetadataResult> returnValue = new PNResult<PNGetChannelMetadataResult>();
 
@@ -234,9 +245,26 @@ namespace PubnubApi.EndPoint
             };
 
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
-            if (includeCustom)
+            List<string> includes = new List<string>();
+            if (includeCustom || includeStatus || includeType)
             {
-                requestQueryStringParams.Add("include", "custom");
+                if (includeStatus) 
+                {
+                    includes.Add("status");
+                }
+                if (includeType) 
+                {
+                    includes.Add("type");
+                }
+                if (includeCustom) 
+                {
+                    includes.Add("custom");
+                }
+                var includeQueryString = string.Join(",", includes.ToArray());
+                requestQueryStringParams.Add("include",
+                    UriUtil.EncodeUriComponent(includeQueryString, PNOperationType.PNGetAllChannelMetadataOperation,
+                        false,
+                        false, false));
             }
 
             if (queryParam != null && queryParam.Count > 0)

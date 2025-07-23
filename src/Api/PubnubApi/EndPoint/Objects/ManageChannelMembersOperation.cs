@@ -127,21 +127,21 @@ namespace PubnubApi.EndPoint
             }
             logger?.Debug($"{GetType().Name} parameter validated.");
             this.savedCallback = callback;
-            ProcessMembersOperationRequest(this.channelId, this.setMember, this.delMember, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.sortField, this.queryParam, callback);
+            ProcessMembersOperationRequest(callback);
         }
 
         public async Task<PNResult<PNChannelMembersResult>> ExecuteAsync()
         {
             logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
-            return await ProcessMembersOperationRequest(this.channelId, this.setMember, this.delMember, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.sortField, this.queryParam).ConfigureAwait(false);
+            return await ProcessMembersOperationRequest().ConfigureAwait(false);
         }
 
         internal void Retry()
         {
-            ProcessMembersOperationRequest(this.channelId, this.setMember, this.delMember, this.page, this.limit, this.includeCount, this.commandDelimitedIncludeOptions, this.sortField, this.queryParam, savedCallback);
+            ProcessMembersOperationRequest(savedCallback);
         }
 
-        private void ProcessMembersOperationRequest(string spaceId, List<PNChannelMember> setMemberList, List<string> removeMemberList, PNPageObject page, int limit, bool includeCount, string includeOptions, List<string> sort, Dictionary<string, object> externalQueryParam, PNCallback<PNChannelMembersResult> callback)
+        private void ProcessMembersOperationRequest(PNCallback<PNChannelMembersResult> callback)
         {
             RequestState<PNChannelMembersResult> requestState = new RequestState<PNChannelMembersResult>
                 {
@@ -179,11 +179,11 @@ namespace PubnubApi.EndPoint
 			});
         }
 
-        private async Task<PNResult<PNChannelMembersResult>> ProcessMembersOperationRequest(string channel, List<PNChannelMember> setMemberList, List<string> removeMemberList, PNPageObject page, int limit, bool includeCount, string includeOptions, List<string> sort, Dictionary<string, object> externalQueryParam)
+        private async Task<PNResult<PNChannelMembersResult>> ProcessMembersOperationRequest()
         {
             PNResult<PNChannelMembersResult> returnValue = new PNResult<PNChannelMembersResult>();
 
-            if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(channel.Trim()))
+            if (string.IsNullOrEmpty(this.channelId) || string.IsNullOrEmpty(this.channelId.Trim()))
             {
                 PNStatus errStatus = new PNStatus { Error = true, ErrorData = new PNErrorData("Missing Channel", new ArgumentException("Missing Channel")) };
                 returnValue.Status = errStatus;
@@ -246,15 +246,24 @@ namespace PubnubApi.EndPoint
             if (setMember != null)
             {
                 List<Dictionary<string, object>> setMemberFormatList = new List<Dictionary<string, object>>();
-                for (int index = 0; index < setMember.Count; index++)
+                foreach (var member in setMember)
                 {
-					Dictionary<string, object> currentMemberFormat = new Dictionary<string, object>
-					{
-						{ "uuid", new Dictionary<string, string> { { "id", setMember[index].Uuid } } }
-					};
-					if (setMember[index].Custom != null)
+                    Dictionary<string, object> currentMemberFormat = new Dictionary<string, object>
                     {
-                        currentMemberFormat.Add("custom", setMember[index].Custom);
+                        { "uuid", new Dictionary<string, string> { { "id", member.Uuid } } }
+                    };
+                    if (member.Custom != null)
+                    {
+                        currentMemberFormat.Add("custom", member.Custom);
+                    }
+                    if (member.Status != null)
+                    {
+                        currentMemberFormat.Add("status", member.Status);
+                    }
+
+                    if (member.Type != null)
+                    {
+                        currentMemberFormat.Add("type", member.Type);
                     }
                     setMemberFormatList.Add(currentMemberFormat);
                 }

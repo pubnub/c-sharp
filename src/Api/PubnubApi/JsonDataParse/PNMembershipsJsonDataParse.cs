@@ -48,7 +48,9 @@ namespace PubnubApi
                                                 Name = (channelMetadataDic.ContainsKey("name") && channelMetadataDic["name"] != null) ? channelMetadataDic["name"].ToString() : null,
                                                 Description = (channelMetadataDic.ContainsKey("description") && channelMetadataDic["description"] != null) ? channelMetadataDic["description"].ToString() : null,
                                                 Updated = (channelMetadataDic.ContainsKey("updated") && channelMetadataDic["updated"] != null) ? channelMetadataDic["updated"].ToString() : null,
-                                                Custom = (channelMetadataDic.ContainsKey("custom") && channelMetadataDic["custom"] != null) ? jsonPlug.ConvertToDictionaryObject(channelMetadataDic["custom"]) : null
+                                                Custom = (channelMetadataDic.ContainsKey("custom") && channelMetadataDic["custom"] != null) ? jsonPlug.ConvertToDictionaryObject(channelMetadataDic["custom"]) : null,
+                                                Status = (channelMetadataDic.ContainsKey("status") && channelMetadataDic["status"] != null) ? channelMetadataDic["status"].ToString() : null,
+                                                Type = (channelMetadataDic.ContainsKey("type") && channelMetadataDic["type"] != null) ? channelMetadataDic["type"].ToString() : null,
                                             };
                                             mbrshipItem.ChannelMetadata = channelMetadataResult;
                                         }

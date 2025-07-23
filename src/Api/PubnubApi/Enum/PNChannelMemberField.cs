@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace PubnubApi
+﻿namespace PubnubApi
 {
     public enum PNChannelMemberField
     {
         CUSTOM,
+        STATUS,
+        TYPE,
         UUID,
-        UUID_CUSTOM
+        UUID_CUSTOM,
+        UUID_STATUS,
+        UUID_TYPE
     }
 }

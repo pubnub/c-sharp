@@ -17,6 +17,8 @@ namespace PubnubApi.EndPoint
         private int limit = -1;
         private bool includeCount;
         private bool includeCustom;
+        private bool includeStatus;
+        private bool includeType;
         private string usersFilter;
         private PNPageObject page = new PNPageObject();
         private List<string> sortField;
@@ -69,6 +71,17 @@ namespace PubnubApi.EndPoint
             includeCustom = includeCustomData;
             return this;
         }
+        public GetAllUuidMetadataOperation IncludeStatus(bool includeStatusData)
+        {
+            includeStatus = includeStatusData;
+            return this;
+        }
+
+        public GetAllUuidMetadataOperation IncludeType(bool includeTypeData)
+        {
+            includeType = includeTypeData;
+            return this;
+        }
         public GetAllUuidMetadataOperation Filter(string filterExpression)
         {
             usersFilter = filterExpression;
@@ -91,22 +104,22 @@ namespace PubnubApi.EndPoint
         {
             savedCallback = callback;
             logger?.Trace($"{GetType().Name} Execute invoked");
-            GetUuidMetadataList(page, limit, includeCount, includeCustom, usersFilter, sortField, queryParam, savedCallback);
+            GetUuidMetadataList(savedCallback);
         }
 
         public async Task<PNResult<PNGetAllUuidMetadataResult>> ExecuteAsync()
         {
             logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
-            return await GetUuidMetadataList(page, limit, includeCount, includeCustom, usersFilter, sortField, queryParam).ConfigureAwait(false);
+            return await GetUuidMetadataList().ConfigureAwait(false);
         }
 
 
         internal void Retry()
         {
-            GetUuidMetadataList(page, limit, includeCount, includeCustom, usersFilter, sortField, queryParam, savedCallback);
+            GetUuidMetadataList(savedCallback);
         }
 
-        private void GetUuidMetadataList(PNPageObject page, int limit, bool includeCount, bool includeCustom, string filter, List<string> sort, Dictionary<string, object> externalQueryParam, PNCallback<PNGetAllUuidMetadataResult> callback)
+        private void GetUuidMetadataList(PNCallback<PNGetAllUuidMetadataResult> callback)
         {
             if (callback == null)
             {
@@ -142,7 +155,7 @@ namespace PubnubApi.EndPoint
 			});
         }
 
-        private async Task<PNResult<PNGetAllUuidMetadataResult>> GetUuidMetadataList(PNPageObject page, int limit, bool includeCount, bool includeCustom, string filter, List<string> sort, Dictionary<string, object> externalQueryParam)
+        private async Task<PNResult<PNGetAllUuidMetadataResult>> GetUuidMetadataList()
         {
             PNResult<PNGetAllUuidMetadataResult> returnValue = new PNResult<PNGetAllUuidMetadataResult>();
             RequestState<PNGetAllUuidMetadataResult> requestState = new RequestState<PNGetAllUuidMetadataResult>
@@ -216,9 +229,26 @@ namespace PubnubApi.EndPoint
             {
                 requestQueryStringParams.Add("count", "true");
             }
-            if (includeCustom)
+            List<string> includes = new List<string>();
+            if (includeCustom || includeStatus || includeType)
             {
-                requestQueryStringParams.Add("include", "custom");
+                if (includeStatus) 
+                {
+                    includes.Add("status");
+                }
+                if (includeType) 
+                {
+                    includes.Add("type");
+                }
+                if (includeCustom) 
+                {
+                    includes.Add("custom");
+                }
+                var includeQueryString = string.Join(",", includes.ToArray());
+                requestQueryStringParams.Add("include",
+                    UriUtil.EncodeUriComponent(includeQueryString, PNOperationType.PNGetAllChannelMetadataOperation,
+                        false,
+                        false, false));
             }
             if (!string.IsNullOrEmpty(usersFilter))
             {

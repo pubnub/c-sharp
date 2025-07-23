@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
 using System.Threading;
 using PubnubApi;
 using System.Collections.Generic;
@@ -2037,6 +2038,144 @@ namespace PubNubMessaging.Tests
 
             Assert.IsTrue(receivedDeleteEvent && receivedSetEvent, "Async Set/Remove ChannelMembers events Failed");
 
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
+
+        [Test]
+        public static async Task ThenGetChannelMembersShouldReturnMembershipWithStatusTypeAndCustomFields()
+        {
+            var r = new Random();
+            string channelMetadataId = $"channel{r.Next(100, 1000)}";
+            string uuidMetadataId = $"uuid{r.Next(100, 1000)}";
+            string membershipStatus = $"membershipstatus{r.Next(100, 1000)}";
+            string membershipType = $"membershiptype{r.Next(100, 1000)}";
+            string uuidName = $"uuidname{r.Next(100, 1000)}";
+            string channelName = $"channelname{r.Next(100, 1000)}";
+            
+            PNConfiguration configuration = new PNConfiguration(new UserId($"user{r.Next(100,1000)}"))
+            {
+                PublishKey = PubnubCommon.NonPAMPublishKey,
+                SubscribeKey = PubnubCommon.NONPAMSubscribeKey
+            };
+            pubnub = createPubNubInstance(configuration);
+            
+            bool receivedMembershipSetEvent = false;
+            ManualResetEvent membershipSetEventManualEvent = new ManualResetEvent(false);
+            
+            var channelSubscription = pubnub.Channel(channelMetadataId).Subscription();
+            channelSubscription.onObject += (_, appContextEvent) =>
+            {
+                var eventType = appContextEvent.Type;
+                
+                // Only validate membership events, ignore channel and uuid events
+                if (eventType.ToLowerInvariant() == "membership" && appContextEvent.Event.ToLowerInvariant() == "set")
+                {
+                    receivedMembershipSetEvent = true;
+                    membershipSetEventManualEvent.Set();
+                }
+            };
+            channelSubscription.Subscribe<object>();
+            
+            await Task.Delay(2000);
+            
+            // 1. Set UUIDMetadata for random user
+            var setUuidMetadata = await pubnub.SetUuidMetadata()
+                .Uuid(uuidMetadataId)
+                .Name(uuidName)
+                .ExecuteAsync();
+            
+            // 2. Set ChannelMetadata for random channel
+            var setChannelMetadata = await pubnub.SetChannelMetadata()
+                .Channel(channelMetadataId)
+                .Name(channelName)
+                .ExecuteAsync();
+            
+            await Task.Delay(2000);
+            
+            // 3. Set Membership for those given UUID and channel metadata with status, custom and type
+            var setMembership = await pubnub.SetChannelMembers()
+                .Channel(channelMetadataId)
+                .Uuids(new List<PNChannelMember>()
+                {
+                    new PNChannelMember() 
+                    { 
+                        Uuid = uuidMetadataId,
+                        Status = membershipStatus,
+                        Type = membershipType,
+                        Custom = new Dictionary<string, object> { { "membership_key", "membership_value" } }
+                    }
+                })
+                .Include(new PNChannelMemberField[] { 
+                    PNChannelMemberField.CUSTOM, 
+                    PNChannelMemberField.UUID, 
+                    PNChannelMemberField.UUID_CUSTOM,
+                    PNChannelMemberField.STATUS,
+                    PNChannelMemberField.TYPE
+                })
+                .IncludeCount(true)
+                .ExecuteAsync();
+            
+            Assert.That(setMembership.Result, Is.Not.Null, "SetMembership result should not be null");
+            Assert.That(setMembership.Status.StatusCode, Is.EqualTo(200), "SetMembership status code should be 200");
+            Assert.That(setMembership.Status.Error, Is.False, "SetMembership should not indicate error");
+            
+            await Task.Delay(2000);
+            
+            // 4. Use API GetChannelMembers() and check the result
+            var getChannelMembers = await pubnub.GetChannelMembers()
+                .Channel(channelMetadataId)
+                .Include(new PNChannelMemberField[] { 
+                    PNChannelMemberField.CUSTOM, 
+                    PNChannelMemberField.UUID, 
+                    PNChannelMemberField.UUID_CUSTOM,
+                    PNChannelMemberField.STATUS,
+                    PNChannelMemberField.TYPE
+                })
+                .IncludeCount(true)
+                .ExecuteAsync();
+            
+            // Assertions relevant to GetMembers
+            Assert.That(getChannelMembers.Result, Is.Not.Null, "GetChannelMembers result should not be null");
+            Assert.That(getChannelMembers.Status.StatusCode, Is.EqualTo(200), "GetChannelMembers status code should be 200");
+            Assert.That(getChannelMembers.Status.Error, Is.False, "GetChannelMembers should not indicate error");
+            Assert.That(getChannelMembers.Result.ChannelMembers, Is.Not.Null, "ChannelMembers list should not be null");
+            Assert.That(getChannelMembers.Result.ChannelMembers.Count, Is.EqualTo(1), "Should find exactly one member");
+            Assert.That(getChannelMembers.Result.TotalCount, Is.EqualTo(1), "Total count should be 1");
+            
+            var member = getChannelMembers.Result.ChannelMembers[0];
+            Assert.That(member.UuidMetadata, Is.Not.Null, "UuidMetadata should not be null");
+            Assert.That(member.UuidMetadata.Uuid, Is.EqualTo(uuidMetadataId), "Member UUID should match");
+            Assert.That(member.UuidMetadata.Name, Is.EqualTo(uuidName), "Member name should match");
+            Assert.That(member.Status, Is.EqualTo(membershipStatus), "Membership status should match");
+            Assert.That(member.Type, Is.EqualTo(membershipType), "Membership type should match");
+            Assert.That(member.Custom, Is.Not.Null, "Membership custom should not be null");
+            Assert.That(member.Custom.ContainsKey("membership_key"), Is.True, "Membership custom should contain 'membership_key'");
+            Assert.That(member.Custom["membership_key"].ToString(), Is.EqualTo("membership_value"), "Membership custom value should match");
+            
+            // Wait for subscription events
+            membershipSetEventManualEvent.WaitOne(3000);
+            Assert.That(receivedMembershipSetEvent, Is.True, "Should have received membership set event via subscription");
+            
+            // Cleanup: Remove membership, then UUID and channel metadata
+            await pubnub.RemoveChannelMembers()
+                .Channel(channelMetadataId)
+                .Uuids(new List<string>() { uuidMetadataId })
+                .ExecuteAsync();
+            
+            await Task.Delay(2000);
+            
+            await pubnub.RemoveUuidMetadata()
+                .Uuid(uuidMetadataId)
+                .ExecuteAsync();
+            
+            await pubnub.RemoveChannelMetadata()
+                .Channel(channelMetadataId)
+                .ExecuteAsync();
+            
+            // Cleanup
+            // channelSubscription.Unsubscribe<object>();
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;

@@ -118,23 +118,23 @@ namespace PubnubApi.EndPoint
 			}
 
 			savedCallback = callback;
-			ManageChannelMembershipWithUuid(uuid, addMembership, delMembership, page, limit, includeCount, commandDelimitedIncludeOptions, sortField, queryParam, callback);
+			ManageChannelMembershipWithUuid(callback);
 		}
 
 		public async Task<PNResult<PNMembershipsResult>> ExecuteAsync()
 		{
 			logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
-			return await ManageChannelMembershipWithUuid(uuid, addMembership, delMembership, page, limit, includeCount, commandDelimitedIncludeOptions, sortField, queryParam).ConfigureAwait(false);
+			return await ManageChannelMembershipWithUuid().ConfigureAwait(false);
 		}
 
 		internal void Retry()
 		{
-			ManageChannelMembershipWithUuid(uuid, addMembership, delMembership, page, limit, includeCount, commandDelimitedIncludeOptions, sortField, queryParam, savedCallback);
+			ManageChannelMembershipWithUuid(savedCallback);
 		}
 
-		private void ManageChannelMembershipWithUuid(string uuid, List<PNMembership> setMembership, List<string> removeMembership, PNPageObject page, int limit, bool includeCount, string includeOptions, List<string> sort, Dictionary<string, object> externalQueryParam, PNCallback<PNMembershipsResult> callback)
+		private void ManageChannelMembershipWithUuid(PNCallback<PNMembershipsResult> callback)
 		{
-			if (string.IsNullOrEmpty(uuid)) {
+			if (string.IsNullOrEmpty(this.uuid)) {
 				this.uuid = config.UserId;
 			}
 			logger?.Debug($"{GetType().Name} parameter validated.");
@@ -174,11 +174,11 @@ namespace PubnubApi.EndPoint
 			});
 		}
 
-		private async Task<PNResult<PNMembershipsResult>> ManageChannelMembershipWithUuid(string uuid, List<PNMembership> setMembership, List<string> removeMembership, PNPageObject page, int limit, bool includeCount, string includeOptions, List<string> sort, Dictionary<string, object> externalQueryParam)
+		private async Task<PNResult<PNMembershipsResult>> ManageChannelMembershipWithUuid()
 		{
 			PNResult<PNMembershipsResult> returnValue = new PNResult<PNMembershipsResult>();
 
-			if (string.IsNullOrEmpty(uuid)) {
+			if (string.IsNullOrEmpty(this.uuid)) {
 				this.uuid = config.UserId;
 			}
 
@@ -235,11 +235,20 @@ namespace PubnubApi.EndPoint
 			Dictionary<string, object> messageEnvelope = new Dictionary<string, object>();
 			if (addMembership != null) {
 				List<Dictionary<string, object>> setMembershipFormatList = new List<Dictionary<string, object>>();
-				for (int index = 0; index < addMembership.Count; index++) {
+				foreach (var membership in addMembership)
+				{
 					Dictionary<string, object> currentMembershipFormat = new Dictionary<string, object>();
-					currentMembershipFormat.Add("channel", new Dictionary<string, string> { { "id", addMembership[index].Channel } });
-					if (addMembership[index].Custom != null) {
-						currentMembershipFormat.Add("custom", addMembership[index].Custom);
+					currentMembershipFormat.Add("channel", new Dictionary<string, string> { { "id", membership.Channel } });
+					if (membership.Custom != null) {
+						currentMembershipFormat.Add("custom", membership.Custom);
+					}
+					if (membership.Status != null)
+					{
+						currentMembershipFormat.Add("status", membership.Status);
+					}
+					if (membership.Type != null)
+					{
+						currentMembershipFormat.Add("type", membership.Type);
 					}
 					setMembershipFormatList.Add(currentMembershipFormat);
 				}

@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace PubnubApi
+﻿namespace PubnubApi
 {
     public enum PNMembershipField
     {
         CUSTOM,
+        STATUS,
+        TYPE,
         CHANNEL,
         CHANNEL_CUSTOM,
-        STATUS,
-        TYPE
+        CHANNEL_STATUS,
+        CHANNEL_TYPE
     }
 }
