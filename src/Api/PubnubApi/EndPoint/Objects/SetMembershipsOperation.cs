@@ -15,7 +15,6 @@ namespace PubnubApi.EndPoint
         private readonly IPubnubUnitTest unit;
         private string uuid = "";
         private List<PNMembership> addMembership;
-        private string commandDelimitedIncludeOptions = "";
         private PNPageObject page = new PNPageObject();
         private int limit = -1;
         private bool includeCount;
@@ -328,7 +327,7 @@ namespace PubnubApi.EndPoint
             {
                 string[] arrayInclude = includeFields
                     .Select(x => UrlParameterConverter.MapEnumValueToEndpoint(x.ToString())).ToArray();
-                commandDelimitedIncludeOptions = string.Join(",", arrayInclude);
+                var commandDelimitedIncludeOptions = string.Join(",", arrayInclude);
                 requestQueryStringParams.Add("include",
                     UriUtil.EncodeUriComponent(commandDelimitedIncludeOptions,
                         PNOperationType.PNSetMembershipsOperation, false, false, false));

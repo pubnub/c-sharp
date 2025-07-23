@@ -250,14 +250,18 @@ namespace PubnubApi.EndPoint
 
         var requestQueryStringParams = new Dictionary<string, string>();
         if (!string.IsNullOrEmpty(page?.Next))
+        {
             requestQueryStringParams.Add("start",
                 UriUtil.EncodeUriComponent(page.Next, PNOperationType.PNGetAllChannelMetadataOperation, false,
                     false, false));
+        }
 
         if (!string.IsNullOrEmpty(page?.Prev))
+        {
             requestQueryStringParams.Add("end",
                 UriUtil.EncodeUriComponent(page.Prev, PNOperationType.PNGetAllChannelMetadataOperation, false,
                     false, false));
+        }
 
         if (limit >= 0)
         {

@@ -30,14 +30,20 @@ public class GetUuidMetadataOperation : PubnubCoreBase
         if (instance != null)
         {
             if (!ChannelRequest.ContainsKey(instance.InstanceId))
+            {
                 ChannelRequest.GetOrAdd(instance.InstanceId,
                     new ConcurrentDictionary<string, CancellationTokenSource>());
+            }
 
             if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
+            {
                 ChannelInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+            }
 
             if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId))
+            {
                 ChannelGroupInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+            }
         }
     }
 
@@ -153,7 +159,7 @@ public class GetUuidMetadataOperation : PubnubCoreBase
 
     private async Task<PNResult<PNGetUuidMetadataResult>> GetSingleUuidMetadata()
     {
-        if (string.IsNullOrEmpty(this.uuid)) this.uuid = config.UserId;
+        if (string.IsNullOrEmpty(this.uuid)) { this.uuid = config.UserId;}
 
         logger?.Debug($"{GetType().Name} parameter validated.");
         var returnValue = new PNResult<PNGetUuidMetadataResult>();

@@ -355,7 +355,10 @@ namespace PubnubApi.EndPoint
                 Query = requestQueryStringParams,
                 BodyContentString = patchMessage
             };
-            if (!string.IsNullOrEmpty(ifMatchesEtag)) requestParameter.Headers.Add("If-Match", ifMatchesEtag);
+            if (!string.IsNullOrEmpty(ifMatchesEtag))
+            {
+                requestParameter.Headers.Add("If-Match", ifMatchesEtag);
+            }
 
             return requestParameter;
         }

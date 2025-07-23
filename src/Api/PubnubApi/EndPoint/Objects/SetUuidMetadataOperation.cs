@@ -42,14 +42,20 @@ namespace PubnubApi.EndPoint
             if (instance != null)
             {
                 if (!ChannelRequest.ContainsKey(instance.InstanceId))
+                {
                     ChannelRequest.GetOrAdd(instance.InstanceId,
                         new ConcurrentDictionary<string, CancellationTokenSource>());
+                }
 
                 if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
+                {
                     ChannelInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+                }
 
                 if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId))
+                {
                     ChannelGroupInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+                }
             }
         }
 
@@ -372,7 +378,10 @@ namespace PubnubApi.EndPoint
                 Query = requestQueryStringParams,
                 BodyContentString = patchMessage
             };
-            if (!string.IsNullOrEmpty(ifMatchesEtag)) requestParameter.Headers.Add("If-Match", ifMatchesEtag);
+            if (!string.IsNullOrEmpty(ifMatchesEtag))
+            {
+                requestParameter.Headers.Add("If-Match", ifMatchesEtag);
+            }
 
             return requestParameter;
         }
