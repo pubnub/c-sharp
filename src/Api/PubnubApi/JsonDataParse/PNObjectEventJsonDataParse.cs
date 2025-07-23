@@ -17,14 +17,20 @@ internal static class PNObjectEventJsonDataParse
             result = new PNObjectEventResult();
 
             if (objectEventDicObj.ContainsKey("event") && objectEventDicObj["event"] != null)
+            {
                 result.Event = objectEventDicObj["event"].ToString();
+            }
 
             if (long.TryParse(jsonFields["publishTimetoken"]?.ToString(), out var objectEventTimeStamp))
+            {
                 result.Timestamp = objectEventTimeStamp;
+            }
 
 
             if (objectEventDicObj.ContainsKey("type") && objectEventDicObj["type"] != null)
+            {
                 result.Type = objectEventDicObj["type"].ToString();
+            }
 
             if (objectEventDicObj.ContainsKey("data") && objectEventDicObj["data"] != null)
             {
@@ -68,17 +74,21 @@ internal static class PNObjectEventJsonDataParse
                     {
                         var userMetadataFields = dataFields["uuid"] as Dictionary<string, object>;
                         if (userMetadataFields != null && userMetadataFields.ContainsKey("id"))
+                        {
                             result.UuidMetadata = new PNUuidMetadataResult
                             {
                                 Uuid = userMetadataFields["id"]?.ToString()
                             };
+                        }
 
                         var channelMetadataFields = dataFields["channel"] as Dictionary<string, object>;
                         if (channelMetadataFields != null && channelMetadataFields.ContainsKey("id"))
+                        {
                             result.ChannelMetadata = new PNChannelMetadataResult
                             {
                                 Channel = channelMetadataFields["id"]?.ToString()
                             };
+                        }
                     }
                 }
             }

@@ -37,14 +37,20 @@ namespace PubnubApi.EndPoint
         if (instance != null)
         {
             if (!ChannelRequest.ContainsKey(instance.InstanceId))
+            {
                 ChannelRequest.GetOrAdd(instance.InstanceId,
                     new ConcurrentDictionary<string, CancellationTokenSource>());
+            }
 
             if (!ChannelInternetStatus.ContainsKey(instance.InstanceId))
+            {
                 ChannelInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+            }
 
             if (!ChannelGroupInternetStatus.ContainsKey(instance.InstanceId))
+            {
                 ChannelGroupInternetStatus.GetOrAdd(instance.InstanceId, new ConcurrentDictionary<string, bool>());
+            }
         }
     }
 
@@ -122,7 +128,10 @@ namespace PubnubApi.EndPoint
 
     private void GetAllChannelMetadataList(PNCallback<PNGetAllChannelMetadataResult> callback)
     {
-        if (callback == null) throw new ArgumentException("Missing callback");
+        if (callback == null)
+        {
+            throw new ArgumentException("Missing callback");
+        }
 
         logger?.Debug($"{GetType().Name} parameter validated.");
         var requestState = new RequestState<PNGetAllChannelMetadataResult>
@@ -208,7 +217,10 @@ namespace PubnubApi.EndPoint
                 var responseBuilder = new ResponseBuilder(config, jsonLibrary);
                 var responseResult =
                     responseBuilder.JsonToObject<PNGetAllChannelMetadataResult>(resultList, true);
-                if (responseResult != null) returnValue.Result = responseResult;
+                if (responseResult != null)
+                {
+                    returnValue.Result = responseResult;
+                }
             }
         }
         else
@@ -247,16 +259,31 @@ namespace PubnubApi.EndPoint
                 UriUtil.EncodeUriComponent(page.Prev, PNOperationType.PNGetAllChannelMetadataOperation, false,
                     false, false));
 
-        if (limit >= 0) requestQueryStringParams.Add("limit", limit.ToString(CultureInfo.InvariantCulture));
+        if (limit >= 0)
+        {
+            requestQueryStringParams.Add("limit", limit.ToString(CultureInfo.InvariantCulture));
+        }
 
-        if (includeCount) requestQueryStringParams.Add("count", "true");
+        if (includeCount)
+        {
+            requestQueryStringParams.Add("count", "true");
+        }
 
         var includes = new List<string>();
         if (includeCustom || includeStatus || includeType)
         {
-            if (includeStatus) includes.Add("status");
-            if (includeType) includes.Add("type");
-            if (includeCustom) includes.Add("custom");
+            if (includeStatus)
+            {
+                includes.Add("status");
+            }
+            if (includeType)
+            {
+                includes.Add("type");
+            }
+            if (includeCustom)
+            {
+                includes.Add("custom");
+            }
             var includeQueryString = string.Join(",", includes.ToArray());
             requestQueryStringParams.Add("include",
                 UriUtil.EncodeUriComponent(includeQueryString, PNOperationType.PNGetAllChannelMetadataOperation,
@@ -265,21 +292,31 @@ namespace PubnubApi.EndPoint
         }
 
         if (!string.IsNullOrEmpty(channelsFilter))
+        {
             requestQueryStringParams.Add("filter",
                 UriUtil.EncodeUriComponent(channelsFilter, PNOperationType.PNGetAllChannelMetadataOperation, false,
                     false, false));
+        }
 
         if (sortField != null && sortField.Count > 0)
+        {
             requestQueryStringParams.Add("sort",
                 UriUtil.EncodeUriComponent(string.Join(",", sortField.ToArray()),
                     PNOperationType.PNGetAllChannelMetadataOperation, false, false, false));
+        }
 
         if (queryParam != null && queryParam.Count > 0)
+        {
             foreach (var kvp in queryParam)
+            {
                 if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                {
                     requestQueryStringParams.Add(kvp.Key,
                         UriUtil.EncodeUriComponent(kvp.Value.ToString(),
                             PNOperationType.PNGetAllChannelMetadataOperation, false, false, false));
+                }
+            }
+        }
 
             var requestParameter = new RequestParameter()
             {

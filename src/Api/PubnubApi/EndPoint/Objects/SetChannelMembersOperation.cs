@@ -126,27 +126,22 @@ namespace PubnubApi.EndPoint
             }
 
             this.savedCallback = callback;
-            ProcessMembersOperationRequest(this.channelId, this.setMember, this.page, this.limit, this.includeCount,
-                this.commandDelimitedIncludeOptions, this.sortField, this.queryParam, callback);
+            ProcessMembersOperationRequest(callback);
         }
 
         public async Task<PNResult<PNChannelMembersResult>> ExecuteAsync()
         {
             logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
-            return await ProcessMembersOperationRequest(this.channelId, this.setMember, this.page, this.limit,
-                    this.includeCount, this.commandDelimitedIncludeOptions, this.sortField, this.queryParam)
+            return await ProcessMembersOperationRequest(this.channelId)
                 .ConfigureAwait(false);
         }
 
         internal void Retry()
         {
-            ProcessMembersOperationRequest(this.channelId, this.setMember, this.page, this.limit, this.includeCount,
-                this.commandDelimitedIncludeOptions, this.sortField, this.queryParam, savedCallback);
+            ProcessMembersOperationRequest(savedCallback);
         }
 
-        private void ProcessMembersOperationRequest(string spaceId, List<PNChannelMember> setMemberList,
-            PNPageObject page, int limit, bool includeCount, string includeOptions, List<string> sort,
-            Dictionary<string, object> externalQueryParam, PNCallback<PNChannelMembersResult> callback)
+        private void ProcessMembersOperationRequest(PNCallback<PNChannelMembersResult> callback)
         {
             logger?.Debug($"{GetType().Name} parameter validated.");
             RequestState<PNChannelMembersResult> requestState = new RequestState<PNChannelMembersResult>
@@ -197,9 +192,7 @@ namespace PubnubApi.EndPoint
             });
         }
 
-        private async Task<PNResult<PNChannelMembersResult>> ProcessMembersOperationRequest(string channel,
-            List<PNChannelMember> setMemberList, PNPageObject page, int limit, bool includeCount, string includeOptions,
-            List<string> sort, Dictionary<string, object> externalQueryParam)
+        private async Task<PNResult<PNChannelMembersResult>> ProcessMembersOperationRequest(string channel)
         {
             PNResult<PNChannelMembersResult> returnValue = new PNResult<PNChannelMembersResult>();
 

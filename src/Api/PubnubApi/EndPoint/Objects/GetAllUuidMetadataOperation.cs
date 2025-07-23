@@ -232,9 +232,18 @@ namespace PubnubApi.EndPoint
             List<string> includes = new List<string>();
             if (includeCustom || includeStatus || includeType)
             {
-                if (includeStatus) includes.Add("status");
-                if (includeType) includes.Add("type");
-                if (includeCustom) includes.Add("custom");
+                if (includeStatus) 
+                {
+                    includes.Add("status");
+                }
+                if (includeType) 
+                {
+                    includes.Add("type");
+                }
+                if (includeCustom) 
+                {
+                    includes.Add("custom");
+                }
                 var includeQueryString = string.Join(",", includes.ToArray());
                 requestQueryStringParams.Add("include",
                     UriUtil.EncodeUriComponent(includeQueryString, PNOperationType.PNGetAllChannelMetadataOperation,

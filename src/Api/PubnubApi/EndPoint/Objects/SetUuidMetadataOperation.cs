@@ -260,7 +260,10 @@ namespace PubnubApi.EndPoint
                     var responseBuilder = new ResponseBuilder(config, jsonLibrary);
                     var responseResult =
                         responseBuilder.JsonToObject<PNSetUuidMetadataResult>(resultList, true);
-                    if (responseResult != null) returnValue.Result = responseResult;
+                    if (responseResult != null)
+                    {
+                        returnValue.Result = responseResult;
+                    }
                 }
             }
             else
@@ -281,19 +284,40 @@ namespace PubnubApi.EndPoint
         private RequestParameter CreateRequestParameter()
         {
             var messageEnvelope = new Dictionary<string, object>();
-            if (uuidName != null) messageEnvelope.Add("name", uuidName);
+            if (uuidName != null)
+            {
+                messageEnvelope.Add("name", uuidName);
+            }
 
-            if (uuidExternalId != null) messageEnvelope.Add("externalId", uuidExternalId);
+            if (uuidExternalId != null)
+            {
+                messageEnvelope.Add("externalId", uuidExternalId);
+            }
 
-            if (uuidProfileUrl != null) messageEnvelope.Add("profileUrl", uuidProfileUrl);
+            if (uuidProfileUrl != null)
+            {
+                messageEnvelope.Add("profileUrl", uuidProfileUrl);
+            }
 
-            if (uuidEmail != null) messageEnvelope.Add("email", uuidEmail);
+            if (uuidEmail != null)
+            {
+                messageEnvelope.Add("email", uuidEmail);
+            }
 
-            if (uuidCustom != null) messageEnvelope.Add("custom", uuidCustom);
+            if (uuidCustom != null)
+            {
+                messageEnvelope.Add("custom", uuidCustom);
+            }
 
-            if (uuidStatus != null && !string.IsNullOrEmpty(uuidStatus)) messageEnvelope.Add("status", uuidStatus);
+            if (uuidStatus != null && !string.IsNullOrEmpty(uuidStatus))
+            {
+                messageEnvelope.Add("status", uuidStatus);
+            }
 
-            if (uuidType != null && !string.IsNullOrEmpty(uuidType)) messageEnvelope.Add("type", uuidType);
+            if (uuidType != null && !string.IsNullOrEmpty(uuidType))
+            {
+                messageEnvelope.Add("type", uuidType);
+            }
 
             var patchMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
 
@@ -310,9 +334,18 @@ namespace PubnubApi.EndPoint
             var includes = new List<string>();
             if (includeCustom || includeStatus || includeType)
             {
-                if (includeStatus) includes.Add("status");
-                if (includeType) includes.Add("type");
-                if (includeCustom) includes.Add("custom");
+                if (includeStatus)
+                {
+                    includes.Add("status");
+                }
+                if (includeType)
+                {
+                    includes.Add("type");
+                }
+                if (includeCustom)
+                {
+                    includes.Add("custom");
+                }
                 var includeQueryString = string.Join(",", includes.ToArray());
                 requestQueryStringParams.Add("include",
                     UriUtil.EncodeUriComponent(includeQueryString, PNOperationType.PNSetUuidMetadataOperation, false,
@@ -320,11 +353,17 @@ namespace PubnubApi.EndPoint
             }
 
             if (queryParam is { Count: > 0 })
+            {
                 foreach (var kvp in queryParam)
+                {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    {
                         requestQueryStringParams.Add(kvp.Key,
                             UriUtil.EncodeUriComponent(kvp.Value.ToString(), PNOperationType.PNSetUuidMetadataOperation,
                                 false, false, false));
+                    }
+                }
+            }
 
             var requestParameter = new RequestParameter
             {

@@ -253,7 +253,10 @@ namespace PubnubApi.EndPoint
                     var responseBuilder = new ResponseBuilder(config, jsonLibrary);
                     var responseResult =
                         responseBuilder.JsonToObject<PNSetChannelMetadataResult>(resultList, true);
-                    if (responseResult != null) returnValue.Result = responseResult;
+                    if (responseResult != null)
+                    {
+                        returnValue.Result = responseResult;
+                    }
                 }
             }
             else
@@ -274,16 +277,30 @@ namespace PubnubApi.EndPoint
         private RequestParameter CreateRequestParameter()
         {
             var messageEnvelope = new Dictionary<string, object>();
-            if (channelName != null) messageEnvelope.Add("name", channelName);
+            if (channelName != null)
+            {
+                messageEnvelope.Add("name", channelName);
+            }
 
-            if (channelDescription != null) messageEnvelope.Add("description", channelDescription);
+            if (channelDescription != null)
+            {
+                messageEnvelope.Add("description", channelDescription);
+            }
 
-            if (custom != null) messageEnvelope.Add("custom", custom);
+            if (custom != null)
+            {
+                messageEnvelope.Add("custom", custom);
+            }
 
             if (channelStatus != null && !string.IsNullOrEmpty(channelStatus))
+            {
                 messageEnvelope.Add("status", channelStatus);
+            }
 
-            if (channelType != null && !string.IsNullOrEmpty(channelType)) messageEnvelope.Add("type", channelType);
+            if (channelType != null && !string.IsNullOrEmpty(channelType))
+            {
+                messageEnvelope.Add("type", channelType);
+            }
 
             var patchMessage = jsonLibrary.SerializeToJsonString(messageEnvelope);
 
@@ -300,9 +317,18 @@ namespace PubnubApi.EndPoint
             var includes = new List<string>();
             if (includeCustom || includeStatus || includeType)
             {
-                if (includeStatus) includes.Add("status");
-                if (includeType) includes.Add("type");
-                if (includeCustom) includes.Add("custom");
+                if (includeStatus)
+                {
+                    includes.Add("status");
+                }
+                if (includeType)
+                {
+                    includes.Add("type");
+                }
+                if (includeCustom)
+                {
+                    includes.Add("custom");
+                }
                 var includeQueryString = string.Join(",", includes.ToArray());
                 requestQueryStringParams.Add("include",
                     UriUtil.EncodeUriComponent(includeQueryString, PNOperationType.PNSetChannelMetadataOperation, false,
@@ -310,11 +336,17 @@ namespace PubnubApi.EndPoint
             }
 
             if (queryParam is { Count: > 0 })
+            {
                 foreach (var kvp in queryParam)
+                {
                     if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                    {
                         requestQueryStringParams.Add(kvp.Key,
                             UriUtil.EncodeUriComponent(kvp.Value.ToString(),
                                 PNOperationType.PNSetChannelMetadataOperation, false, false, false));
+                    }
+                }
+            }
 
             var requestParameter = new RequestParameter
             {

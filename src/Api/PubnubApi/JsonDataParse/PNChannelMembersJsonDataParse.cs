@@ -12,13 +12,17 @@ internal static class PNChannelMembersJsonDataParse
             var dicObj = jsonPlug.ConvertToDictionaryObject(listObject[listIndex]);
             if (dicObj != null && dicObj.Count > 0)
             {
-                if (result == null) result = new PNChannelMembersResult();
+                if (result == null) 
+                {
+                    result = new PNChannelMembersResult();
+                }
                 if (dicObj.ContainsKey("data") && dicObj["data"] != null)
                 {
                     result.ChannelMembers = new List<PNChannelMembersItemResult>();
 
                     var userArray = jsonPlug.ConvertToObjectArray(dicObj["data"]);
                     if (userArray != null && userArray.Length > 0)
+                    {
                         for (var index = 0; index < userArray.Length; index++)
                         {
                             var getMbrItemDataDic = jsonPlug.ConvertToDictionaryObject(userArray[index]);
@@ -32,7 +36,9 @@ internal static class PNChannelMembersJsonDataParse
                                         : ""
                                 };
                                 if (getMbrItemDataDic.ContainsKey("custom"))
+                                {
                                     mbrItem.Custom = jsonPlug.ConvertToDictionaryObject(getMbrItemDataDic["custom"]);
+                                }
                                 if (getMbrItemDataDic.ContainsKey("uuid"))
                                 {
                                     var uuidMetadataDic = jsonPlug.ConvertToDictionaryObject(getMbrItemDataDic["uuid"]);
@@ -93,21 +99,21 @@ internal static class PNChannelMembersJsonDataParse
                                 result.ChannelMembers.Add(mbrItem);
                             }
                         }
+                    }
                 }
                 else if (dicObj.ContainsKey("totalCount") && dicObj["totalCount"] != null)
                 {
-                    int usersCount;
-                    var _ = int.TryParse(dicObj["totalCount"].ToString(), out usersCount);
+                    _ = int.TryParse(dicObj["totalCount"].ToString(), out var usersCount);
                     result.TotalCount = usersCount;
                 }
                 else if (dicObj.ContainsKey("next") && dicObj["next"] != null)
                 {
-                    if (result.Page == null) result.Page = new PNPageObject();
+                    result.Page ??= new PNPageObject();
                     result.Page.Next = dicObj["next"].ToString();
                 }
                 else if (dicObj.ContainsKey("prev") && dicObj["prev"] != null)
                 {
-                    if (result.Page == null) result.Page = new PNPageObject();
+                    result.Page ??= new PNPageObject();
                     result.Page.Prev = dicObj["prev"].ToString();
                 }
             }

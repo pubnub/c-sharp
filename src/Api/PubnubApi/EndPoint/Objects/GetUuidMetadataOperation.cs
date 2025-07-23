@@ -91,9 +91,15 @@ public class GetUuidMetadataOperation : PubnubCoreBase
 
     private void GetSingleUuidMetadata(PNCallback<PNGetUuidMetadataResult> callback)
     {
-        if (callback == null) throw new ArgumentException("Missing callback");
+        if (callback == null) 
+        {
+            throw new ArgumentException("Missing callback");
+        }
 
-        if (string.IsNullOrEmpty(this.uuid)) this.uuid = config.UserId;
+        if (string.IsNullOrEmpty(this.uuid)) 
+        {
+            this.uuid = config.UserId;
+        }
 
         logger?.Debug($"{GetType().Name} parameter validated.");
         var requestState = new RequestState<PNGetUuidMetadataResult>
@@ -190,7 +196,10 @@ public class GetUuidMetadataOperation : PubnubCoreBase
                 var responseBuilder = new ResponseBuilder(config, jsonLibrary);
                 var responseResult =
                     responseBuilder.JsonToObject<PNGetUuidMetadataResult>(resultList, true);
-                if (responseResult != null) returnValue.Result = responseResult;
+                if (responseResult != null) 
+                {
+                    returnValue.Result = responseResult;
+                }
             }
         }
         else
@@ -223,9 +232,18 @@ public class GetUuidMetadataOperation : PubnubCoreBase
         var includes = new List<string>();
         if (includeCustom || includeStatus || includeType)
         {
-            if (includeStatus) includes.Add("status");
-            if (includeType) includes.Add("type");
-            if (includeCustom) includes.Add("custom");
+            if (includeStatus) 
+            {
+                includes.Add("status");
+            }
+            if (includeType) 
+            {
+                includes.Add("type");
+            }
+            if (includeCustom) 
+            {
+                includes.Add("custom");
+            }
             var includeQueryString = string.Join(",", includes.ToArray());
             requestQueryStringParams.Add("include",
                 UriUtil.EncodeUriComponent(includeQueryString, PNOperationType.PNGetAllChannelMetadataOperation,
@@ -234,11 +252,17 @@ public class GetUuidMetadataOperation : PubnubCoreBase
         }
 
         if (queryParam != null && queryParam.Count > 0)
+        {
             foreach (var kvp in queryParam)
+            {
                 if (!requestQueryStringParams.ContainsKey(kvp.Key))
+                {
                     requestQueryStringParams.Add(kvp.Key,
                         UriUtil.EncodeUriComponent(kvp.Value.ToString(), PNOperationType.PNGetUuidMetadataOperation,
                             false, false, false));
+                }
+            }
+        }
 
         var requestParameter = new RequestParameter
         {
