@@ -226,6 +226,9 @@
     <Compile Include="..\PubnubApi\JsonDataParse\DeserializeToInternalObjectUtility.cs">
       <Link>JsonDataParse\DeserializeToInternalObjectUtility.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNMembershipMetadataResult.cs">
+      <Link>Model\Consumer\Objects\PNMembershipMetadataResult.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\PNSDK\DotNetPNSDKSource.cs">
       <Link>PNSDK\DotNetPNSDKSource.cs</Link>
     </Compile>
