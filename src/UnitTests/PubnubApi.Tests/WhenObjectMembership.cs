@@ -2792,7 +2792,7 @@ namespace PubNubMessaging.Tests
             //Clean previous memberships
             await pubnub.RemoveMemberships().Channels(new List<string>() { channelMetadataId }).Uuid(uuidMetadataId)
                 .ExecuteAsync();
-            await Task.Delay(3000);
+            await Task.Delay(4000);
 
             var setReset = new ManualResetEvent(false);
             SubscribeCallbackExt eventListener = new SubscribeCallbackExt(
@@ -2853,6 +2853,12 @@ namespace PubNubMessaging.Tests
 
             var set = setReset.WaitOne(20000);
             Assert.True(set, "Didn't receive objects callback after setting memberships.");
+            
+            //Cleanup
+            await pubnub.RemoveMemberships().Channels(new List<string>() { channelMetadataId }).Uuid(uuidMetadataId)
+                .ExecuteAsync();
+            pubnub.RemoveListener(eventListener);
+            pubnub.Destroy();
         }
         
     }

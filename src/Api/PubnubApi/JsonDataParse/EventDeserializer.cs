@@ -95,7 +95,7 @@ public class EventDeserializer
 
             if (jsonFields.TryGetValue("userMetadata", out object userMetadataValue))
             {
-                presenceEvent.UserMetadata = userMetadataValue;
+                presenceEvent.UserMetadata = jsonLibrary.ConvertToDictionaryObject(userMetadataValue);
             }
 
             if (presenceEvent.Event != null && presenceEvent.Event.ToLowerInvariant() == "interval")
