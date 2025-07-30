@@ -2078,7 +2078,7 @@ namespace PubNubMessaging.Tests
             };
             channelSubscription.Subscribe<object>();
             
-            await Task.Delay(2500);
+            await Task.Delay(2000);
             
             // 1. Set UUIDMetadata for random user
             var setUuidMetadata = await pubnub.SetUuidMetadata()
