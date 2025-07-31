@@ -23,7 +23,7 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
     <PackageReleaseNotes>Added MembershipMetadata container inside PNObjectEventResult to correctly parse and forward data when object event type is `membership`.
-Fixed issue where some result objects like PNMessageResult had UserMetadata declared as an object instead of the standard Dictionary<string, object> format for metadata.</PackageReleaseNotes>
+Fixed issue where some result objects like PNMessageResult had UserMetadata declared as an object instead of the standard Dictionary format for metadata.</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
