@@ -7,7 +7,7 @@ changelog:
     version: v7.4.1
     changes:
       - type: bug
-        text: "Added MembershipMetadata container inside PNObjectEventResult to correctly parse and forward data when object event type is "membership"."
+        text: "Added MembershipMetadata container inside PNObjectEventResult to correctly parse and forward data when object event type is `membership`."
       - type: bug
         text: "Fixed issue where some result objects like PNMessageResult had UserMetadata declared as an object instead of the standard Dictionary<string, object> format for metadata."
   - date: 2025-07-23
