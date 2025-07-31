@@ -2078,6 +2078,79 @@ namespace PubNubMessaging.Tests
             pubnub = null;
             Assert.IsTrue(receivedPublishMessage, "Publish with Meta Failed");
         }
+        
+        [Test]
+        public static async Task ThenPublishWithMetaCallbackShouldHaveData()
+        {
+            bool receivedPublishMessage = false;
+            long publishTimetoken = 0;
+
+            string channel = "hello_my_channel";
+            string message = messageForUnencryptPublish;
+            Dictionary<string, object> metaData = new Dictionary<string, object>
+            {
+                { "sender", "unit-test" },
+                { "timestamp", 12345 }
+            };
+
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Secure = false,
+            };
+            if (PubnubCommon.PAMServerSideRun)
+            {
+                config.SecretKey = PubnubCommon.SecretKey;
+            }
+            else if (!string.IsNullOrEmpty(authToken) && !PubnubCommon.SuppressAuthKey)
+            {
+                config.AuthKey = authToken;
+            }
+            pubnub = createPubNubInstance(config, authToken);
+            
+            PNMessageResult<object> messageResult = null;
+            var callbackReset = new ManualResetEvent(false);
+            SubscribeCallbackExt listener = new SubscribeCallbackExt(
+                delegate(Pubnub pn, PNMessageResult<object> m)
+                {
+                    messageResult = m;
+                    callbackReset.Set();
+                }, delegate(Pubnub pn, PNStatus status)
+                {
+                });
+
+            pubnub.AddListener(listener);
+            pubnub.Subscribe<object>().Channels(new []{channel}).Execute();
+
+            await Task.Delay(3000);
+            
+            var result = await pubnub.Publish().Channel(channel).Message(message).Meta(metaData)
+                .ExecuteAsync();
+
+            if (result.Status.Error)
+            {
+                Assert.Fail($"Publish with meta failed with error: {result.Status.ErrorData.Information}");
+            }
+            
+            manualResetEventWaitTimeout = 310 * 1000;
+            var gotCallback = callbackReset.WaitOne(manualResetEventWaitTimeout);
+
+            Assert.IsTrue(gotCallback, "Never received message callback for publish with metadata");
+            if (gotCallback)
+            {
+                Assert.IsNotNull(messageResult.UserMetadata, "PNMessageResult.UserMetadata should not be null");
+                Assert.IsTrue(messageResult.UserMetadata is Dictionary<string, object>, "PNMessageResult.UserMetadata should be a Dictionary<string, object>");
+                Assert.IsTrue(messageResult.UserMetadata.ContainsKey("sender"), "PNMessageResult.UserMetadata doesn't contain expected key");
+                Assert.IsTrue(messageResult.UserMetadata["sender"].ToString() == "unit-test", "PNMessageResult.UserMetadata has unexpected value");
+                Assert.IsTrue(messageResult.UserMetadata.ContainsKey("timestamp"), "PNMessageResult.UserMetadata doesn't contain expected key");
+                Assert.IsTrue(Convert.ToInt32(messageResult.UserMetadata["timestamp"]) == 12345, "PNMessageResult.UserMetadata has unexpected value");
+            }
+            
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
 
         [Test]
         public static void ThenPublishWithCustomMessageTypeShouldReturnSuccessCodeAndInfo()

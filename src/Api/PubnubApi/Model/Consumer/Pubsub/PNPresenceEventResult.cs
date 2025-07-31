@@ -23,7 +23,7 @@ namespace PubnubApi
         public string Subscription { get; internal set; }
 
         public long Timetoken { get; internal set; }
-        public object UserMetadata { get; internal set; }
+        public Dictionary<string, object> UserMetadata { get; internal set; }
         public string[] Join { get; internal set; }
         public string[] Timeout { get; internal set; }
         public string[] Leave { get; internal set; }

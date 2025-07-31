@@ -193,7 +193,7 @@ namespace PubnubApi
 
                     if (listObject[1] != null)
                     {
-                        ack.UserMetadata = listObject[1];
+                        ack.UserMetadata = jsonPlug.ConvertToDictionaryObject(listObject[1]);
                     }
 
                     if (ack.Event != null && ack.Event.ToLowerInvariant() == "interval")

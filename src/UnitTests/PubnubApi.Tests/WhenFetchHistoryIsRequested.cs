@@ -386,72 +386,67 @@ namespace PubNubMessaging.Tests
             if (publishResult.Result != null && publishResult.Status.StatusCode == 200 && !publishResult.Status.Error)
             {
                 publishTimetoken = publishResult.Result.Timetoken;
-                receivedMessage = true;
-            }
-
-            if (!receivedMessage)
-            {
-                Assert.IsTrue(receivedMessage, "Encrypted message Publish Failed");
             }
             else
             {
-                receivedMessage = false;
+                Assert.Fail($"Failed to publish message, error: {publishResult.Status.ErrorData.Information}");
+            }
+            
+            Thread.Sleep(1000);
 
-                Thread.Sleep(1000);
-
-                expected = "[[{\"message\":\"f42pIQcWZ9zbTbH8cyLwByD/GsviOE0vcREIEVPARR0=\",\"timetoken\":14715322883933786}],14834460344901569,14834460344901569]";
-                server.AddRequest(new Request()
-                        .WithMethod("GET")
-                        .WithPath(String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
-                        .WithParameter("count", "1")
-                        .WithParameter("end", "14715322883933786")
-                        .WithParameter("include_token", "true")
-                        .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
-                        .WithParameter("requestid", "myRequestId")
-                        .WithParameter("start", "14715322883933785")
-                        .WithParameter("uuid", config.UserId)
-                        .WithResponse(expected)
-                        .WithStatusCode(System.Net.HttpStatusCode.OK));
+            expected = "[[{\"message\":\"f42pIQcWZ9zbTbH8cyLwByD/GsviOE0vcREIEVPARR0=\",\"timetoken\":14715322883933786}],14834460344901569,14834460344901569]";
+            server.AddRequest(new Request()
+                    .WithMethod("GET")
+                    .WithPath(String.Format("/v2/history/sub-key/{0}/channel/{1}", PubnubCommon.SubscribeKey, channel))
+                    .WithParameter("count", "1")
+                    .WithParameter("end", "14715322883933786")
+                    .WithParameter("include_token", "true")
+                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
+                    .WithParameter("requestid", "myRequestId")
+                    .WithParameter("start", "14715322883933785")
+                    .WithParameter("uuid", config.UserId)
+                    .WithResponse(expected)
+                    .WithStatusCode(System.Net.HttpStatusCode.OK));
 
 #if NET40
-                PNResult<PNFetchHistoryResult> fetchHistResult = Task.Factory.StartNew(async () => await pubnub.FetchHistory()
-                    .Channels(new string[] { channel })
-                    .Start(publishTimetoken - 1)
-                    .End(publishTimetoken)
-                    .MaximumPerChannel(1)
-                    .Reverse(false)
-                    .IncludeMeta(false)
-                    .ExecuteAsync()).Result.Result;
+            PNResult<PNFetchHistoryResult> fetchHistResult = Task.Factory.StartNew(async () => await pubnub.FetchHistory()
+                .Channels(new string[] { channel })
+                .Start(publishTimetoken - 1)
+                .End(publishTimetoken)
+                .MaximumPerChannel(1)
+                .Reverse(false)
+                .IncludeMeta(false)
+                .ExecuteAsync()).Result.Result;
 #else
-                PNResult<PNFetchHistoryResult> fetchHistResult = await pubnub.FetchHistory()
-                    .Channels(new string[] { channel })
-                    .Start(publishTimetoken - 1)
-                    .End(publishTimetoken)
-                    .MaximumPerChannel(1)
-                    .Reverse(false)
-                    .IncludeMeta(false)
-                    .ExecuteAsync();
+            PNResult<PNFetchHistoryResult> fetchHistResult = await pubnub.FetchHistory()
+                .Channels(new string[] { channel })
+                .Start(publishTimetoken - 1)
+                .End(publishTimetoken)
+                .MaximumPerChannel(1)
+                .Reverse(false)
+                .IncludeMeta(false)
+                .ExecuteAsync();
 #endif
-                if (fetchHistResult.Result != null && fetchHistResult.Status.StatusCode == 200 && !fetchHistResult.Status.Error 
-                    && fetchHistResult.Result.Messages != null && fetchHistResult.Result.Messages.ContainsKey(channel) 
-                    && fetchHistResult.Result.Messages[channel].Count > 0)
+            if (fetchHistResult.Result != null && fetchHistResult.Status.StatusCode == 200 && !fetchHistResult.Status.Error 
+                && fetchHistResult.Result.Messages != null && fetchHistResult.Result.Messages.ContainsKey(channel) 
+                && fetchHistResult.Result.Messages[channel].Count > 0)
+            {
+                foreach (KeyValuePair<string, List<PNHistoryItemResult>> channelItem in fetchHistResult.Result.Messages)
                 {
-                    foreach (KeyValuePair<string, List<PNHistoryItemResult>> channelItem in fetchHistResult.Result.Messages)
+                    List<PNHistoryItemResult> itemList = channelItem.Value;
+                    foreach (PNHistoryItemResult item in itemList)
                     {
-                        List<PNHistoryItemResult> itemList = channelItem.Value;
-                        foreach (PNHistoryItemResult item in itemList)
+                        if (item.Entry != null && item.Entry.ToString() == messageForPublish && item.Timetoken == publishTimetoken)
                         {
-                            if (item.Entry != null && item.Entry.ToString() == messageForPublish && item.Timetoken == publishTimetoken)
-                            {
-                                receivedMessage = true;
-                                break;
-                            }
+                            receivedMessage = true;
+                            break;
                         }
                     }
                 }
-
-                Assert.IsTrue(receivedMessage, "Encrypted message not showed up in history");
             }
+
+            Assert.IsTrue(receivedMessage, "Encrypted message not showed up in history");
+            
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;

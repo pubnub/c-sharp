@@ -37,6 +37,14 @@ internal static class PNObjectEventJsonDataParse
                 var dataFields = objectEventDicObj["data"] as Dictionary<string, object>;
                 if (dataFields != null)
                 {
+                    //Common fields
+                    var custom = dataFields.ContainsKey("custom") && dataFields["custom"] != null
+                        ? jsonPlug.ConvertToDictionaryObject(dataFields["custom"])
+                        : null;
+                    var status = GetStringValue(dataFields, "status");
+                    var type = GetStringValue(dataFields, "type");
+                    var updated = GetStringValue(dataFields, "updated");
+                    
                     if (result.Type?.ToLowerInvariant() == "uuid" && dataFields.ContainsKey("id"))
                     {
                         result.UuidMetadata = new PNUuidMetadataResult
@@ -46,12 +54,10 @@ internal static class PNObjectEventJsonDataParse
                             ExternalId = GetStringValue(dataFields, "externalId"),
                             ProfileUrl = GetStringValue(dataFields, "profileUrl"),
                             Email = GetStringValue(dataFields, "email"),
-                            Status = GetStringValue(dataFields, "status"),
-                            Type = GetStringValue(dataFields, "type"),
-                            Custom = dataFields.ContainsKey("custom") && dataFields["custom"] != null
-                                ? jsonPlug.ConvertToDictionaryObject(dataFields["custom"])
-                                : null,
-                            Updated = GetStringValue(dataFields, "updated")
+                            Status = status,
+                            Type = type,
+                            Custom = custom,
+                            Updated = updated
                         };
                     }
                     else if (result.Type.ToLowerInvariant() == "channel" && dataFields.ContainsKey("id"))
@@ -61,33 +67,31 @@ internal static class PNObjectEventJsonDataParse
                             Channel = dataFields["id"]?.ToString(),
                             Name = GetStringValue(dataFields, "name"),
                             Description = GetStringValue(dataFields, "description"),
-                            Status = GetStringValue(dataFields, "status"),
-                            Type = GetStringValue(dataFields, "type"),
-                            Custom = dataFields.ContainsKey("custom") && dataFields["custom"] != null
-                                ? jsonPlug.ConvertToDictionaryObject(dataFields["custom"])
-                                : null,
-                            Updated = GetStringValue(dataFields, "updated")
+                            Status = status,
+                            Type = type,
+                            Custom = custom,
+                            Updated = updated
                         };
                     }
                     else if (result.Type.ToLowerInvariant() == "membership" && dataFields.ContainsKey("uuid") &&
                              dataFields.ContainsKey("channel"))
                     {
+                        result.MembershipMetadata = new PNMembershipMetadataResult()
+                        {
+                            Custom = custom,
+                            Status = status,
+                            Type = type,
+                            Updated = updated
+                        };
                         var userMetadataFields = dataFields["uuid"] as Dictionary<string, object>;
                         if (userMetadataFields != null && userMetadataFields.ContainsKey("id"))
                         {
-                            result.UuidMetadata = new PNUuidMetadataResult
-                            {
-                                Uuid = userMetadataFields["id"]?.ToString()
-                            };
+                            result.MembershipMetadata.Uuid = userMetadataFields["id"]?.ToString();
                         }
-
                         var channelMetadataFields = dataFields["channel"] as Dictionary<string, object>;
                         if (channelMetadataFields != null && channelMetadataFields.ContainsKey("id"))
                         {
-                            result.ChannelMetadata = new PNChannelMetadataResult
-                            {
-                                Channel = channelMetadataFields["id"]?.ToString()
-                            };
+                            result.MembershipMetadata.Channel = channelMetadataFields["id"]?.ToString();
                         }
                     }
                 }

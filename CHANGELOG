@@ -1,3 +1,8 @@
+v7.4.1 - July 30 2025
+-----------------------------
+- Fixed: added MembershipMetadata container inside PNObjectEventResult to correctly parse and forward data when object event type is "membership".
+- Fixed: fixed issue where some result objects like PNMessageResult had UserMetadata declared as an object instead of the standard Dictionary<string, object> format for metadata.
+
 v7.4.0 - July 23 2025
 -----------------------------
 - Added: added support for `status` and `type` fields for uuid, channel and members app context apis.

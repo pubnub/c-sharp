@@ -400,7 +400,7 @@ namespace PubnubApi
                 if (jsonFields["userMetadata"] != null)
                 {
                     PropertyInfo userMetadataProp = specific.GetRuntimeProperty("UserMetadata");
-                    userMetadataProp.SetValue(message, jsonFields["userMetadata"], null);
+                    userMetadataProp.SetValue(message, ConvertToDictionaryObject(jsonFields["userMetadata"]), null);
                 }
                 
 

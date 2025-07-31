@@ -14,7 +14,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubPCL</PackageId>
-    <PackageVersion>7.4.0.0</PackageVersion>
+    <PackageVersion>7.4.1.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -22,7 +22,8 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>Added support for `status` and `type` fields for uuid, channel and members app context apis.</PackageReleaseNotes>
+    <PackageReleaseNotes>Added MembershipMetadata container inside PNObjectEventResult to correctly parse and forward data when object event type is `membership`.
+Fixed issue where some result objects like PNMessageResult had UserMetadata declared as an object instead of the standard Dictionary format for metadata.</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
@@ -379,6 +380,9 @@
     <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNGetChannelMetadataResult.cs" Link="Model\Consumer\Objects\PNGetChannelMetadataResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNGetUuidMetadataResult.cs" Link="Model\Consumer\Objects\PNGetUuidMetadataResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNMembership.cs" Link="Model\Consumer\Objects\PNMembership.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNMembershipMetadataResult.cs">
+      <Link>Model\Consumer\Objects\PNMembershipMetadataResult.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNMembershipsItemResult.cs" Link="Model\Consumer\Objects\PNMembershipsItemResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNMembershipsResult.cs" Link="Model\Consumer\Objects\PNMembershipsResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNPage.cs" Link="Model\Consumer\Objects\PNPage.cs" />
