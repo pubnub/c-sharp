@@ -290,11 +290,31 @@ namespace PubnubApi
             }
         }
 
+        /// <summary>
+        /// Set presence timeout with custom heartbeat interval.
+        /// Note: The presence/heartbeat interval cannot be set to less than 3 seconds.
+        /// If an interval less than 3 seconds is provided, it will be automatically 
+        /// reset to 3 seconds and a warning will be logged.
+        /// </summary>
+        /// <param name="timeout">Presence timeout in seconds</param>
+        /// <param name="interval">Presence heartbeat interval in seconds (minimum 3 seconds)</param>
+        /// <returns>PNConfiguration instance for method chaining</returns>
         public PNConfiguration SetPresenceTimeoutWithCustomInterval(int timeout, int interval)
         {
             presenceHeartbeatTimeout = timeout;
-            presenceHeartbeatInterval = interval;
-            Logger?.Debug($"PresenceTimeoutInterval set to {interval}");
+            
+            // Validate minimum interval of 3 seconds
+            if (interval < 3)
+            {
+                Logger?.Warn($"The presence/heartbeat interval cannot be set to less than 3 seconds. Provided value {interval} has been reset to 3 seconds. Please update your configuration.");
+                presenceHeartbeatInterval = 3;
+            }
+            else
+            {
+                presenceHeartbeatInterval = interval;
+            }
+            
+            Logger?.Debug($"PresenceTimeoutInterval set to {presenceHeartbeatInterval}");
             return this;
         }
 
