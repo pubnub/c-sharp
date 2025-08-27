@@ -55,7 +55,7 @@ namespace PubnubApi
 
                             if (dicMessageTimetoken.ContainsKey("meta"))
                             {
-                                result.Meta = dicMessageTimetoken["meta"];
+                                result.Meta = jsonPlug.ConvertToDictionaryObject(dicMessageTimetoken["meta"]);
                             }
                             if (dicMessageTimetoken.ContainsKey("uuid") && dicMessageTimetoken["uuid"] != null)
                             {

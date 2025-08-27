@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace PubnubApi
 {
@@ -9,8 +6,8 @@ namespace PubnubApi
     {
         public long Timetoken { get; internal set; }
         public object Entry { get; internal set; }
-        public object Meta { get; internal set; }
-        public object Actions { get; internal set; }
+        public Dictionary<string, object> Meta { get; internal set; }
+        public Dictionary<string, List<PNMessageActionItem>> Actions { get; internal set; }
         public string Uuid { get; internal set; }
         public int MessageType { get; internal set; }
         

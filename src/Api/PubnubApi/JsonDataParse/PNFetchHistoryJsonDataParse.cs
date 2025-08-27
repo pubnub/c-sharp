@@ -46,12 +46,41 @@ namespace PubnubApi
 
                                         if (messagesContainer.ContainsKey("meta"))
                                         {
-                                            result.Meta = messagesContainer["meta"];
+                                            result.Meta = jsonPlug.ConvertToDictionaryObject(messagesContainer["meta"]);
                                         }
 
                                         if (messagesContainer.ContainsKey("actions"))
                                         {
-                                            result.Actions = messagesContainer["actions"];
+                                            var actions = new Dictionary<string, List<PNMessageActionItem>>();
+                                            var actionsRaw = messagesContainer["actions"] as Dictionary<string, object>;
+                                            foreach (var rawAction in actionsRaw)
+                                            {
+                                                var actionItems = new List<PNMessageActionItem>();
+                                                var actionType = rawAction.Key;
+                                                var rawActionValues = rawAction.Value as Dictionary<string, object>;
+                                                foreach (var rawActionValue in rawActionValues)
+                                                {
+                                                    var actionValue = rawActionValue.Key;
+                                                    var entries = rawActionValue.Value as List<object>;
+                                                    foreach (var entry in entries)
+                                                    {
+                                                        var entryDict = entry as Dictionary<string, object>;
+                                                        actionItems.Add(new PNMessageActionItem()
+                                                        {
+                                                            ActionTimetoken = long.Parse(entryDict["actionTimetoken"].ToString()),
+                                                            Uuid = entryDict["uuid"].ToString(),
+                                                            Action = new PNMessageAction()
+                                                            {
+                                                                Type = actionType,
+                                                                Value = actionValue
+                                                            },
+                                                            MessageTimetoken = result.Timetoken
+                                                        });
+                                                    }
+                                                }
+                                                actions[actionType] = actionItems;
+                                            }
+                                            result.Actions = actions;
                                         }
                                         if (messagesContainer.ContainsKey("uuid") && messagesContainer["uuid"] != null)
                                         {

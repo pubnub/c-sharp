@@ -2927,5 +2927,59 @@ namespace PubNubMessaging.Tests
             pubnub = null;
             Assert.IsTrue(receivedMessage, "Fetch History with Message Actions Async Failed");
         }
+
+        [Test]
+        public static async Task FetchHistoryShouldContainFormattedActionsAndMeta()
+        {
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Secure = false
+            };
+            if (PubnubCommon.PAMServerSideRun) {
+                config.SecretKey = PubnubCommon.SecretKey;
+            } else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey) {
+                config.AuthKey = authKey;
+            }
+
+            pubnub = createPubNubInstance(config, authToken);
+            var testChannel = $"foo.{Guid.NewGuid()}";
+            
+            var listener = new SubscribeCallbackExt(
+                async (_, messageEvent) =>
+                {
+                    await pubnub.AddMessageAction()
+                        .Action(new PNMessageAction() { Type = "edited", Value = "some_value" })
+                        .Channel(messageEvent.Channel).MessageTimetoken(messageEvent.Timetoken).ExecuteAsync();
+                }
+                , (_, _) => {}
+                , (_, _) => {}
+            );
+            pubnub.AddListener(listener);
+            pubnub.Subscribe<string>().Channels(new []{testChannel}).Execute();
+
+            await Task.Delay(3500);
+            
+            await pubnub.Publish().Channel(testChannel).Message("some_message").Meta(new Dictionary<string, object>()
+            {
+                {"some_meta_key", "some_meta_value"}
+            }).ExecuteAsync();
+            
+            await Task.Delay(10000);
+
+            var history = await pubnub.FetchHistory().Channels(new[] { testChannel }).IncludeMessageActions(true).IncludeMeta(true)
+                .Start(99999999999999999).End(00000000000000000).ExecuteAsync();
+
+            Assert.False(history.Status.Error, $"FetchHistory() resulted in an error: {history.Status.ErrorData?.Information}");
+            Assert.True(history.Result != null, "FetchHistory() Result was null");
+            Assert.True(history.Result.Messages.Count == 1, "Wrong history channels count");
+            Assert.True(history.Result.Messages[testChannel].Count == 1, "Wrong history messages on channel count");
+            var historyItem = history.Result.Messages[testChannel][0];
+            Assert.True(historyItem.Meta.TryGetValue("some_meta_key", out var metaValue) && metaValue.ToString() == "some_meta_value", "History Item Meta didn't contain expected value.");
+            Assert.True(historyItem.Actions.TryGetValue("edited", out var action), "History Item Actions didn't contain expected key.");
+            Assert.True(action.Count == 1, "History Item Actions contained wrong amount of action entries");
+            Assert.True(action[0].Action.Type == "edited" && action[0].Action.Value == "some_value", "History Item Action value was wrong.");
+        }
     }
 }
