@@ -1013,7 +1013,7 @@ namespace PubNubMessaging.Tests
             };
             channelSubscription.Subscribe<object>();
             
-            await Task.Delay(2000);
+            await Task.Delay(4000);
             // now set the UUID metadata.
             
             var setUuidMetadata =  await pubnub.SetUuidMetadata().
@@ -1036,7 +1036,7 @@ namespace PubNubMessaging.Tests
             Assert.That(setUuidMetadata.Result.Custom.ContainsKey("key"), Is.True, "Custom should contain 'key'");
             Assert.That(setUuidMetadata.Result.Custom["key"].ToString(), Is.EqualTo("value"), "Custom key value should match");
             
-            await Task.Delay(2000);
+            await Task.Delay(4000);
 
             var getUuidMetadata =
                 await pubnub.GetUuidMetadata().Uuid(uuidMetadataId).IncludeStatus(true).IncludeType(true).IncludeCustom(true).ExecuteAsync();
@@ -1061,7 +1061,7 @@ namespace PubNubMessaging.Tests
             var removeUuidMetadata = await pubnub.RemoveUuidMetadata().Uuid(uuidMetadataId).ExecuteAsync();
             
             // Wait for delete event
-            await Task.Delay(1000);
+            await Task.Delay(4000);
             
             // Cleanup
             channelSubscription.Unsubscribe<object>();
