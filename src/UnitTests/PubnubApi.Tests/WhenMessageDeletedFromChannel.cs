@@ -229,5 +229,29 @@ namespace PubNubMessaging.Tests
 
             Assert.IsTrue(receivedMessage, "ThenWithAsyncDeleteMessageShouldReturnSuccessMessage - DeleteMessages Result not expected");
         }
+        [Test]
+        public static async Task ThenWithAsyncDeleteMessageShouldReturnSuccessWithSecretKey()
+        {
+            currentTestCase = "ThenWithAsyncDeleteMessageShouldReturnSuccessMessage";
+            var id = $"test_{new Random().Next(1000, 10000)}";
+            string channel = $"channel_{id}";
+            PNConfiguration config = new PNConfiguration(new UserId($"user_{id}"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+            };
+            pubnub = createPubNubInstance(config);
+            PNResult<PNDeleteMessageResult> deleteMessagesResponse = await pubnub.DeleteMessages().Channel(channel).ExecuteAsync();
+            if (deleteMessagesResponse.Result != null && deleteMessagesResponse.Status.StatusCode == 200 && !deleteMessagesResponse.Status.Error)
+            {
+                receivedMessage = true;
+            }
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+
+            Assert.IsTrue(receivedMessage, "ThenWithAsyncDeleteMessageShouldReturnSuccessMessage - DeleteMessages Result not expected");
+        }
     }
 }
