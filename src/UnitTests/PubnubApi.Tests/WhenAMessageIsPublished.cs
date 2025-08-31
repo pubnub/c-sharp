@@ -2549,7 +2549,7 @@ namespace PubNubMessaging.Tests
             manualResetEventWaitTimeout = 310 * 1000;
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
             pubnub.Subscribe<string>()
-                .Channels([channel])
+                .Channels(new string[] { channel })
                 .WithPresence()
                 .Execute();
             string receivedMessage = null;
@@ -2619,7 +2619,7 @@ namespace PubNubMessaging.Tests
             manualResetEventWaitTimeout = 310 * 1000;
             ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
             pubnub.Subscribe<string>()
-                .Channels([channel])
+                .Channels(new string[] { channel })
                 .WithPresence()
                 .Execute();
             string receivedMessage = null;
