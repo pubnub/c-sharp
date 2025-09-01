@@ -2792,18 +2792,14 @@ namespace PubNubMessaging.Tests
                 .ExecuteAsync();
             await Task.Delay(4000);
 
+            PNObjectEventResult eventResult = null;
             var setReset = new ManualResetEvent(false);
             SubscribeCallbackExt eventListener = new SubscribeCallbackExt(
-                delegate(Pubnub pnObj, PNObjectEventResult eventResult)
+                delegate(Pubnub pnObj, PNObjectEventResult ojectEventResult)
                 {
                     Debug.WriteLine("PNObjectEventResult JSON:" +
                                     pubnub.JsonPluggableLibrary.SerializeToJsonString(eventResult));
-                    Assert.IsNotNull(eventResult.MembershipMetadata, "eventResult.MembershipMetadata should not be null");
-                    Assert.AreEqual(eventResult.MembershipMetadata.Channel, channelMetadataId, "Wrong Channel ID in object event result");
-                    Assert.AreEqual(eventResult.MembershipMetadata.Uuid, uuidMetadataId, "Wrong User ID in object event result");
-                    Assert.AreEqual(eventResult.MembershipMetadata.Status, "active", "Wrong Status in object event result");
-                    Assert.AreEqual(eventResult.MembershipMetadata.Type, "membership", "Wrong Type in object event result");
-
+                    eventResult = ojectEventResult;
                     setReset.Set();
                 },
                 delegate(Pubnub pnObj, PNStatus status)
@@ -2851,6 +2847,11 @@ namespace PubNubMessaging.Tests
 
             var set = setReset.WaitOne(20000);
             Assert.True(set, "Didn't receive objects callback after setting memberships.");
+            Assert.IsNotNull(eventResult.MembershipMetadata, "eventResult.MembershipMetadata should not be null");
+            Assert.AreEqual(eventResult.MembershipMetadata.Channel, channelMetadataId, "Wrong Channel ID in object event result");
+            Assert.AreEqual(eventResult.MembershipMetadata.Uuid, uuidMetadataId, "Wrong User ID in object event result");
+            Assert.AreEqual(eventResult.MembershipMetadata.Status, "active", "Wrong Status in object event result");
+            Assert.AreEqual(eventResult.MembershipMetadata.Type, "membership", "Wrong Type in object event result");
             
             //Cleanup
             await pubnub.RemoveMemberships().Channels(new List<string>() { channelMetadataId }).Uuid(uuidMetadataId)
