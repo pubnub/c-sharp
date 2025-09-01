@@ -1700,15 +1700,7 @@ namespace PubNubMessaging.Tests
                 SecretKey = PubnubCommon.SecretKey,
                 IncludeRequestIdentifier = false,
             };
-            if (PubnubCommon.PAMServerSideRun)
-            {
-                config.SecretKey = PubnubCommon.SecretKey;
-            }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
-            pubnub = createPubNubInstance(config, authToken);
+            pubnub = createPubNubInstance(config);
 
             manualResetEventWaitTimeout = 310 * 1000;
 
@@ -1753,7 +1745,7 @@ namespace PubNubMessaging.Tests
                 SecretKey = PubnubCommon.SecretKey,
                 IncludeRequestIdentifier = false,
             };
-            pubnub = createPubNubInstance(config, authToken);
+            pubnub = createPubNubInstance(config);
             manualResetEventWaitTimeout = 310 * 1000;
 
             ManualResetEvent publishManualEvent = new ManualResetEvent(false);
