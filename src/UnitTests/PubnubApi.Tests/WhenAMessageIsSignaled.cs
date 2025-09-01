@@ -702,7 +702,7 @@ namespace PubNubMessaging.Tests
 
             Assert.True(signalCompleted, "Singal execution callback was not called");
             Assert.IsNotNull(status, "Status should not be null");
-            Assert.IsFalse(status.Error, $"Error should be false, error was: {status.ErrorData.Information}");
+            Assert.IsFalse(status.Error, $"Error should be false, error was: {status.ErrorData?.Information}");
             Assert.AreEqual(200, status.StatusCode, "StatusCode should be 200");
             Assert.IsNotNull(result, "Result should not be null");
             Assert.IsTrue(result.Timetoken > 0, "Timetoken should be greater than 0");
