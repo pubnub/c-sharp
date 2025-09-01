@@ -1139,5 +1139,82 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = null;
             pubnub = null;
         }
+        [Test]
+        public static async Task ThenChannelMetadataSetShouldWorkWithSecretKey()
+        {
+            var r = new Random();
+            string channelMetadataId = $"channel{r.Next(100, 1000)}";
+            string status = $"status{r.Next(100, 1000)}";
+            string type = $"type{r.Next(100, 1000)}";
+            string name =  $"name{r.Next(100, 1000)}";
+            PNConfiguration configuration = new PNConfiguration(new UserId($"user{r.Next(100,1000)}"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+            };
+            pubnub = createPubNubInstance(configuration);
+            var channelMetadata =  await pubnub.SetChannelMetadata().
+                Channel(channelMetadataId).
+                Status(status).
+                Name(name).
+                Type(type).
+                Custom(new Dictionary<string, object>{ {"key", "value"}}).
+                ExecuteAsync();
+            Assert.That(channelMetadata.Result, Is.Not.Null);
+            Assert.AreEqual(channelMetadata.Status.StatusCode, 200);
+            pubnub.Destroy();
+            pubnub =  null;
+        }
+        
+        [Test]
+        public static async Task ThenChannelMetadataSetShouldWorkWithToken()
+        {
+            var r = new Random();
+            string channelMetadataId = $"channel{r.Next(100, 1000)}";
+            string status = $"status{r.Next(100, 1000)}";
+            string type = $"type{r.Next(100, 1000)}";
+            string name =  $"name{r.Next(100, 1000)}";
+            var id = $"test_{new Random().Next(1000, 10000)}";
+            PNConfiguration configuration = new PNConfiguration(new UserId($"user_{id}"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+            };
+            pubnub = createPubNubInstance(configuration);
+            PNResult<PNAccessManagerTokenResult> grantTokenResponse = await pubnub.GrantToken()
+                .TTL(15)
+                .AuthorizedUuid($"user_{id}")
+                .Resources(new PNTokenResources
+                {
+                    Uuids = new Dictionary<string, PNTokenAuthValues>
+                    {
+                        { channelMetadataId, new PNTokenAuthValues { Read = true, Write = true, Join = true, Manage = true} }
+                    }
+                })
+                .ExecuteAsync();
+            var token =  grantTokenResponse.Result.Token;
+            Assert.NotNull(token, "token should not be null for uuid setter");
+            // wait after grant token to be effective
+            await Task.Delay(1000);
+            PNConfiguration channelMetadataSetterConfiguration = new PNConfiguration(new UserId($"user_{id}"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+            };
+            var channelMetadataSetter = createPubNubInstance(channelMetadataSetterConfiguration, token);
+            var setChannelMetadata =  await pubnub.SetChannelMetadata().
+                Channel(channelMetadataId).
+                Status(status).
+                Name(name).
+                Type(type).
+                Custom(new Dictionary<string, object>{ {"key", "value"}}).
+                ExecuteAsync();
+            Assert.That(setChannelMetadata.Result, Is.Not.Null);
+            Assert.AreEqual(setChannelMetadata.Status.StatusCode, 200);
+            pubnub.Destroy();
+            channelMetadataSetter.Destroy();
+        }
     }
 }

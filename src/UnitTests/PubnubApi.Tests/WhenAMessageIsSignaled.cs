@@ -711,5 +711,58 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = null;
             pubnub = null;
         }
+
+        [Test]
+        public static async Task ThenAwaitedSiganlWithSecretKeySuccess()
+        {
+            var id = $"test_{new Random().Next(1000, 10000)}";
+            string channel = $"channel_{id}";
+            string message =$"message_{id}";
+            string customType = $"customtype_{id}";
+
+            PNConfiguration config = new PNConfiguration(new UserId($"user_{id}"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+            };
+            pubnub = createPubNubInstance(config, authToken);
+            manualResetEventWaitTimeout = 310 * 1000;
+            ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
+            pubnub.Subscribe<string>()
+                .Channels(new string[] { channel })
+                .WithPresence()
+                .Execute();
+            string receivedSignalEvent = null;
+            pubnub.AddListener(new SubscribeCallbackExt(
+                (p, m) => {
+
+                },
+                (p, pnPresenceEventResult) => { },
+                (p, s) =>
+                {
+                    if (s.Channel.Equals(channel) )
+                    {
+                        receivedSignalEvent = $"{s.Message}";
+                        subscribeManualEvent.Set();
+                    }
+                },
+                (p, pnObjectEventResult) => { },
+                (p, pnMessageActionEventResult) => { },
+                (p, pnFileEventResult) => { },
+                (p, pnStatus) => { }
+            ));
+
+            // Publish the message
+            ManualResetEvent publishManualEvent = new ManualResetEvent(false);
+             await pubnub.Signal().Channel(channel).Message(message).CustomMessageType(customType)
+                .ExecuteAsync();
+            var receivedSubscribeMessage = subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
+            Assert.IsTrue(receivedSubscribeMessage, "Subscribe message not received");
+            Assert.AreEqual(receivedSignalEvent, message, "signal event message not matched");
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
     }
 }

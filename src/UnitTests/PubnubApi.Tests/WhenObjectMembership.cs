@@ -2779,8 +2779,6 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 SecretKey = PubnubCommon.SecretKey,
-                Secure = false,
-                LogLevel = PubnubLogLevel.All
             };
 
             pubnub = createPubNubInstance(config);

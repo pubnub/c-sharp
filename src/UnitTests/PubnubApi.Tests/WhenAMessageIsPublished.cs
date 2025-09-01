@@ -1680,15 +1680,10 @@ namespace PubNubMessaging.Tests
         [Test]
         public static void IfSecretKeyWithoutAuthThenPostMessageWithSpecialCharsReturnSuccess()
         {
-            server.ClearRequests();
-            if (!PubnubCommon.PAMServerSideRun)
-            {
-                Assert.Ignore("Ignored due to no secret key at client side");
-            }
             bool receivedPublishMessage = false;
             long publishTimetoken = 0;
 
-            string channel = "hello_my_channel ~!@#$%^&()+=[]{}|;\"<>?-_.aA1©®€™₹😜🎉";
+            string channel = "hello_my_channel!@#$%^&()+=[]{}|;\"<>?-_.aA1©®€™₹😜🎉";
             //string channel = "hello_my_channel";
             string message = " !~`@#$%^&*()+=[]\\{}|;':\",/<>?-_.aA1©®€™₹😜🎉";
             //string message = " !~";
@@ -1702,32 +1697,10 @@ namespace PubNubMessaging.Tests
             {
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
-                Secure = false,
+                SecretKey = PubnubCommon.SecretKey,
                 IncludeRequestIdentifier = false,
             };
-            if (PubnubCommon.PAMServerSideRun)
-            {
-                config.SecretKey = PubnubCommon.SecretKey;
-            }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
-
-            server.RunOnHttps(false);
-
-            pubnub = createPubNubInstance(config, authToken);
-
-            string expected = "[1,\"Sent\",\"14722484585147754\"]";
-
-            server.AddRequest(new Request()
-                    .WithMethod("GET")
-                    .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/%22%21%22", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel))
-                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
-                    .WithParameter("requestid", "myRequestId")
-                    .WithParameter("uuid", config.UserId)
-                    .WithResponse(expected)
-                    .WithStatusCode(System.Net.HttpStatusCode.OK));
+            pubnub = createPubNubInstance(config);
 
             manualResetEventWaitTimeout = 310 * 1000;
 
@@ -1749,7 +1722,6 @@ namespace PubNubMessaging.Tests
                         publishManualEvent.Set();
                     }));
             publishManualEvent.WaitOne(manualResetEventWaitTimeout);
-
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
@@ -1759,15 +1731,10 @@ namespace PubNubMessaging.Tests
         [Test]
         public static void IfSecretKeyCipherKeyWithoutAuthThenPostMessageWithSpecialCharsReturnSuccess()
         {
-            server.ClearRequests();
-            if (!PubnubCommon.PAMServerSideRun)
-            {
-                Assert.Ignore("Ignored due to no secret key at client side");
-            }
             bool receivedPublishMessage = false;
             long publishTimetoken = 0;
 
-            string channel = "hello_my_channel ~!@#$%^&()+=[]{}|;\"<>?-_.aA1©®€™₹😜🎉";
+            string channel = "hello_my_channel!@#$%^&()+=[]{}|;\"<>?-_.aA1©®€™₹😜🎉";
             string message = " ~`!@#$%^&*()+=[]\\{}|;':\",/<>?-_.aA1©®€™₹😜🎉";
 
             PNConfiguration config = new PNConfiguration(new UserId("my ~`!@#$%^&*()+=[]\\{}|;':\",/<>?-_.aA1©®€™₹😜🎉uuid"))
@@ -1775,33 +1742,10 @@ namespace PubNubMessaging.Tests
                 PublishKey = PubnubCommon.PublishKey,
                 SubscribeKey = PubnubCommon.SubscribeKey,
                 CryptoModule = new CryptoModule(new LegacyCryptor("enigma"), null),
-                Secure = false,
+                SecretKey = PubnubCommon.SecretKey,
                 IncludeRequestIdentifier = false,
             };
-            if (PubnubCommon.PAMServerSideRun)
-            {
-                config.SecretKey = PubnubCommon.SecretKey;
-            }
-            else if (!string.IsNullOrEmpty(authKey) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authKey;
-            }
-
-            server.RunOnHttps(false);
-
-            pubnub = createPubNubInstance(config, authToken);
-
-            string expected = "[1,\"Sent\",\"14722484585147754\"]";
-
-            server.AddRequest(new Request()
-                    .WithMethod("GET")
-                    .WithPath(String.Format("/publish/{0}/{1}/0/{2}/0/%22%21%22", PubnubCommon.PublishKey, PubnubCommon.SubscribeKey, channel))
-                    .WithParameter("pnsdk", PubnubCommon.EncodedSDK)
-                    .WithParameter("requestid", "myRequestId")
-                    .WithParameter("uuid", config.UserId)
-                    .WithResponse(expected)
-                    .WithStatusCode(System.Net.HttpStatusCode.OK));
-
+            pubnub = createPubNubInstance(config);
             manualResetEventWaitTimeout = 310 * 1000;
 
             ManualResetEvent publishManualEvent = new ManualResetEvent(false);
@@ -2576,6 +2520,128 @@ namespace PubNubMessaging.Tests
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
+        }
+        
+        [Test]
+        public static async Task ThenAwaitedPublishPostWithSecretKeySuccess()
+        {
+            var id = $"test_{new Random().Next(1000, 10000)}";
+            string channel = $"channel_{id}";
+            string message =$"message_{id}";
+            string customType = $"customtype_{id}";
+
+            PNConfiguration config = new PNConfiguration(new UserId($"user_{id}"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+            };
+            pubnub = createPubNubInstance(config, authToken);
+            manualResetEventWaitTimeout = 310 * 1000;
+            ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
+            pubnub.Subscribe<string>()
+                .Channels(new string[] { channel })
+                .WithPresence()
+                .Execute();
+            string receivedMessage = null;
+            pubnub.AddListener(new SubscribeCallbackExt(
+                (p, m) => {
+                    if (m.Channel.Equals(channel) )
+                    {
+                        receivedMessage = $"{m.Message}";
+                        subscribeManualEvent.Set();
+                    }
+                },
+                (p, pnPresenceEventResult) => { },
+                (p, pnSignalResult) => { },
+                (p, pnObjectEventResult) => { },
+                (p, pnMessageActionEventResult) => { },
+                (p, pnFileEventResult) => { },
+                (p, pnStatus) => { }
+            ));
+
+            // Publish the message
+            ManualResetEvent publishManualEvent = new ManualResetEvent(false);
+             await pubnub.Publish().Channel(channel).Message(message).UsePOST(true).CustomMessageType(customType)
+                .ExecuteAsync();
+            var receivedSubscribeMessage = subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
+            Assert.IsTrue(receivedSubscribeMessage, "Subscribe message not received");
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+        }
+        
+        [Test]
+        public static async Task ThenAwaitedPublishPostWithTokenSuccess()
+        {
+            var id = $"test_{new Random().Next(1000, 10000)}";
+            string channel = $"channel_{id}";
+            string message =$"message_{id}";
+            string customType = $"customtype_{id}";
+
+            PNConfiguration config = new PNConfiguration(new UserId($"user_{id}"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+            };
+            pubnub = createPubNubInstance(config, authToken);
+            PNResult<PNAccessManagerTokenResult> grantTokenResponse = await pubnub.GrantToken()
+                .TTL(15)
+                .AuthorizedUuid($"user_{id}")
+                .Resources(new PNTokenResources
+                {
+                    Channels = new Dictionary<string, PNTokenAuthValues>
+                    {
+                        { channel, new PNTokenAuthValues { Read = true, Write = true, Join = true, Manage = true} }
+                    }
+                })
+                .ExecuteAsync();
+            var token =  grantTokenResponse.Result.Token;
+            Assert.NotNull(token, "token should not be null for publisher");
+            // wait after grant token to be effective
+            await Task.Delay(1000);
+            PNConfiguration publsherConfiguration = new PNConfiguration(new UserId($"user_{id}"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+            };
+            var publisher = createPubNubInstance(publsherConfiguration, token);
+            manualResetEventWaitTimeout = 310 * 1000;
+            ManualResetEvent subscribeManualEvent = new ManualResetEvent(false);
+            pubnub.Subscribe<string>()
+                .Channels(new string[] { channel })
+                .WithPresence()
+                .Execute();
+            string receivedMessage = null;
+            pubnub.AddListener(new SubscribeCallbackExt(
+                (p, m) => {
+                    if (m.Channel.Equals(channel) )
+                    {
+                        receivedMessage = $"{m.Message}";
+                        subscribeManualEvent.Set();
+                    }
+                },
+                (p, pnPresenceEventResult) => { },
+                (p, pnSignalResult) => { },
+                (p, pnObjectEventResult) => { },
+                (p, pnMessageActionEventResult) => { },
+                (p, pnFileEventResult) => { },
+                (p, pnStatus) => { }
+            ));
+
+            // Publish the message
+            ManualResetEvent publishManualEvent = new ManualResetEvent(false);
+             await publisher.Publish().Channel(channel).Message(message).UsePOST(true).CustomMessageType(customType)
+                .ExecuteAsync();
+            var receivedSubscribeMessage = subscribeManualEvent.WaitOne(manualResetEventWaitTimeout);
+            Assert.IsTrue(receivedSubscribeMessage, "Subscribe message not received");
+            pubnub.Destroy();
+            pubnub.PubnubUnitTest = null;
+            pubnub = null;
+            publisher.Destroy();
+            publisher.PubnubUnitTest = null;
+            publisher = null;
         }
     }
 }
