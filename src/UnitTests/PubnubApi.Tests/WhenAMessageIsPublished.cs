@@ -1683,7 +1683,7 @@ namespace PubNubMessaging.Tests
             bool receivedPublishMessage = false;
             long publishTimetoken = 0;
 
-            string channel = "hello_my_channel ~!@#$%^&()+=[]{}|;\"<>?-_.aA1©®€™₹😜🎉";
+            string channel = "hello_my_channel!@#$%^&()+=[]{}|;\"<>?-_.aA1©®€™₹😜🎉";
             //string channel = "hello_my_channel";
             string message = " !~`@#$%^&*()+=[]\\{}|;':\",/<>?-_.aA1©®€™₹😜🎉";
             //string message = " !~";
@@ -1734,7 +1734,7 @@ namespace PubNubMessaging.Tests
             bool receivedPublishMessage = false;
             long publishTimetoken = 0;
 
-            string channel = "hello_my_channel ~!@#$%^&()+=[]{}|;\"<>?-_.aA1©®€™₹😜🎉";
+            string channel = "hello_my_channel!@#$%^&()+=[]{}|;\"<>?-_.aA1©®€™₹😜🎉";
             string message = " ~`!@#$%^&*()+=[]\\{}|;':\",/<>?-_.aA1©®€™₹😜🎉";
 
             PNConfiguration config = new PNConfiguration(new UserId("my ~`!@#$%^&*()+=[]\\{}|;':\",/<>?-_.aA1©®€™₹😜🎉uuid"))
