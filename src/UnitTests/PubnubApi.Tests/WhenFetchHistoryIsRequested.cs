@@ -2977,7 +2977,7 @@ namespace PubNubMessaging.Tests
             Assert.True(history.Result.Messages[testChannel].Count == 1, "Wrong history messages on channel count");
             var historyItem = history.Result.Messages[testChannel][0];
             Assert.True(historyItem.Meta.TryGetValue("some_meta_key", out var metaValue) && metaValue.ToString() == "some_meta_value", "History Item Meta didn't contain expected value.");
-            Assert.True(historyItem.Actions.TryGetValue("edited", out var action), "History Item Actions didn't contain expected key.");
+            Assert.True(historyItem.ActionItems.TryGetValue("edited", out var action), "History Item Actions didn't contain expected key.");
             Assert.True(action.Count == 1, "History Item Actions contained wrong amount of action entries");
             Assert.True(action[0].Action.Type == "edited" && action[0].Action.Value == "some_value", "History Item Action value was wrong.");
         }

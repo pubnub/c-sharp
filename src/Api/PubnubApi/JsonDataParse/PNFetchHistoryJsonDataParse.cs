@@ -51,7 +51,8 @@ namespace PubnubApi
 
                                         if (messagesContainer.ContainsKey("actions"))
                                         {
-                                            var actions = new Dictionary<string, List<PNMessageActionItem>>();
+                                            result.Actions = messagesContainer["actions"];
+                                            var formattedActions = new Dictionary<string, List<PNMessageActionItem>>();
                                             var actionsRaw = messagesContainer["actions"] as Dictionary<string, object>;
                                             foreach (var rawAction in actionsRaw)
                                             {
@@ -78,9 +79,9 @@ namespace PubnubApi
                                                         });
                                                     }
                                                 }
-                                                actions[actionType] = actionItems;
+                                                formattedActions[actionType] = actionItems;
                                             }
-                                            result.Actions = actions;
+                                            result.ActionItems = formattedActions;
                                         }
                                         if (messagesContainer.ContainsKey("uuid") && messagesContainer["uuid"] != null)
                                         {
