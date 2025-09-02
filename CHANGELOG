@@ -1,3 +1,8 @@
+v7.5.0 - September 01 2025
+-----------------------------
+- Fixed: fixed types of Meta and Actions in PNHistoryItemResult to not be objects but properly formatted Dictionaries.
+- Fixed: fixed issue of getting Forbidden error while using publish with POST type along with PAM enabled keyset.
+
 v7.4.1 - July 30 2025
 -----------------------------
 - Fixed: added MembershipMetadata container inside PNObjectEventResult to correctly parse and forward data when object event type is "membership".

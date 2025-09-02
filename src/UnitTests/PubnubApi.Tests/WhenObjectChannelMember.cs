@@ -2056,8 +2056,9 @@ namespace PubNubMessaging.Tests
             
             PNConfiguration configuration = new PNConfiguration(new UserId($"user{r.Next(100,1000)}"))
             {
-                PublishKey = PubnubCommon.NonPAMPublishKey,
-                SubscribeKey = PubnubCommon.NONPAMSubscribeKey
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
             };
             pubnub = createPubNubInstance(configuration);
             

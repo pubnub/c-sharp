@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace PubnubApi
 {
@@ -9,8 +7,10 @@ namespace PubnubApi
     {
         public long Timetoken { get; internal set; }
         public object Entry { get; internal set; }
-        public object Meta { get; internal set; }
+        public Dictionary<string, object> Meta { get; internal set; }
+        [Obsolete("Uses old data format, please use ActionItems instead")]
         public object Actions { get; internal set; }
+        public Dictionary<string, List<PNMessageActionItem>> ActionItems { get; internal set; }
         public string Uuid { get; internal set; }
         public int MessageType { get; internal set; }
         

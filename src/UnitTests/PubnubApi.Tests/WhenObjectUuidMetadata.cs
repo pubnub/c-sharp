@@ -1013,7 +1013,7 @@ namespace PubNubMessaging.Tests
             };
             channelSubscription.Subscribe<object>();
             
-            await Task.Delay(2000);
+            await Task.Delay(4000);
             // now set the UUID metadata.
             
             var setUuidMetadata =  await pubnub.SetUuidMetadata().
@@ -1036,7 +1036,7 @@ namespace PubNubMessaging.Tests
             Assert.That(setUuidMetadata.Result.Custom.ContainsKey("key"), Is.True, "Custom should contain 'key'");
             Assert.That(setUuidMetadata.Result.Custom["key"].ToString(), Is.EqualTo("value"), "Custom key value should match");
             
-            await Task.Delay(2000);
+            await Task.Delay(4000);
 
             var getUuidMetadata =
                 await pubnub.GetUuidMetadata().Uuid(uuidMetadataId).IncludeStatus(true).IncludeType(true).IncludeCustom(true).ExecuteAsync();
@@ -1061,13 +1061,91 @@ namespace PubNubMessaging.Tests
             var removeUuidMetadata = await pubnub.RemoveUuidMetadata().Uuid(uuidMetadataId).ExecuteAsync();
             
             // Wait for delete event
-            await Task.Delay(1000);
+            await Task.Delay(4000);
             
             // Cleanup
             channelSubscription.Unsubscribe<object>();
             pubnub.Destroy();
             pubnub.PubnubUnitTest = null;
             pubnub = null;
+        }
+
+        [Test]
+        public static async Task ThenUuidMetadataSetShouldWorkWithSecretKey()
+        {
+            var r = new Random();
+            string uuidMetadataId = $"uuid{r.Next(100, 1000)}";
+            string status = $"status{r.Next(100, 1000)}";
+            string type = $"type{r.Next(100, 1000)}";
+            string name =  $"name{r.Next(100, 1000)}";
+            PNConfiguration configuration = new PNConfiguration(new UserId($"user{r.Next(100,1000)}"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+            };
+            pubnub = createPubNubInstance(configuration);
+            var setUuidMetadata =  await pubnub.SetUuidMetadata().
+                Uuid(uuidMetadataId).
+                Status(status).
+                Name(name).
+                Type(type).
+                Custom(new Dictionary<string, object>{ {"key", "value"}}).
+                ExecuteAsync();
+            Assert.That(setUuidMetadata.Result, Is.Not.Null);
+            Assert.AreEqual(setUuidMetadata.Status.StatusCode, 200);
+            pubnub.Destroy();
+            pubnub =  null;
+        }
+        
+        [Test]
+        public static async Task ThenUuideMetadataSetShouldWorkWithToken()
+        {
+            var r = new Random();
+            string uuidMetadataId = $"uuid{r.Next(100, 1000)}";
+            string status = $"status{r.Next(100, 1000)}";
+            string type = $"type{r.Next(100, 1000)}";
+            string name =  $"name{r.Next(100, 1000)}";
+            var id = $"test_{new Random().Next(1000, 10000)}";
+            PNConfiguration configuration = new PNConfiguration(new UserId($"user_{id}"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                SecretKey = PubnubCommon.SecretKey,
+            };
+            pubnub = createPubNubInstance(configuration);
+            PNResult<PNAccessManagerTokenResult> grantTokenResponse = await pubnub.GrantToken()
+                .TTL(15)
+                .AuthorizedUuid($"user_{id}")
+                .Resources(new PNTokenResources
+                {
+                    Uuids = new Dictionary<string, PNTokenAuthValues>
+                    {
+                        { uuidMetadataId, new PNTokenAuthValues { Read = true, Write = true, Join = true, Manage = true} }
+                    }
+                })
+                .ExecuteAsync();
+            var token =  grantTokenResponse.Result.Token;
+            Assert.NotNull(token, "token should not be null for uuid setter");
+            // wait after grant token to be effective
+            await Task.Delay(1000);
+            PNConfiguration uuidSetterConfiguration = new PNConfiguration(new UserId($"user_{id}"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+            };
+            var uuidSetter = createPubNubInstance(uuidSetterConfiguration, token);
+            var setUuidMetadata =  await pubnub.SetUuidMetadata().
+                Uuid(uuidMetadataId).
+                Status(status).
+                Name(name).
+                Type(type).
+                Custom(new Dictionary<string, object>{ {"key", "value"}}).
+                ExecuteAsync();
+            Assert.That(setUuidMetadata.Result, Is.Not.Null);
+            Assert.AreEqual(setUuidMetadata.Status.StatusCode, 200);
+            pubnub.Destroy();
+            uuidSetter.Destroy();
         }
     }
 }
