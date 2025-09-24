@@ -99,6 +99,7 @@
     <Compile Include="..\PubnubApi.Tests\WhenUnsubscribedToAChannelGroup.cs" Link="WhenUnsubscribedToAChannelGroup.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenUserIdInPNConfig.cs" Link="WhenUserIdInPNConfig.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenSubscribeToChannelPresence.cs" Link="WhenSubscribeToChannelPresence.cs" />
+    <Compile Include="..\PubnubApi.Tests\PublishOverloadTests.cs" Link="PublishOverloadTests.cs" />
   </ItemGroup>
 
   <ItemGroup>

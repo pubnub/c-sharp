@@ -470,6 +470,8 @@
       <Link>Model\Consumer\Push\PNPushRemoveChannelResult.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\Model\Consumer\UserId.cs" Link="Model\Consumer\UserId.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\PublishRequest.cs" Link="Model\RequestResponse\PublishRequest.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\PublishResponse.cs" Link="Model\RequestResponse\PublishResponse.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\AccessManager\PNAccessManagerAuditResultExt.cs">
       <Link>Model\Derived\AccessManager\PNAccessManagerAuditResultExt.cs</Link>
     </Compile>

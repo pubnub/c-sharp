@@ -579,6 +579,8 @@ Fixed issue of getting Forbidden error while using publish with POST type along 
       <Link>Model\Consumer\Push\PNPushRemoveChannelResult.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\Model\Consumer\UserId.cs" Link="Model\Consumer\UserId.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\PublishRequest.cs" Link="Model\RequestResponse\PublishRequest.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\PublishResponse.cs" Link="Model\RequestResponse\PublishResponse.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\AccessManager\PNAccessManagerAuditResultExt.cs">
       <Link>Model\Derived\AccessManager\PNAccessManagerAuditResultExt.cs</Link>
     </Compile>
@@ -809,6 +811,7 @@ Fixed issue of getting Forbidden error while using publish with POST type along 
     <Folder Include="Model\Consumer\DeleteMessage\" />
     <Folder Include="Model\Consumer\Files\" />
     <Folder Include="Model\Consumer\Objects\" />
+    <Folder Include="Model\RequestResponse\" />
     <Folder Include="Model\Derived\DeleteMessage\" />
     <Folder Include="Model\Derived\Files\" />
     <Folder Include="Model\Derived\Objects\" />

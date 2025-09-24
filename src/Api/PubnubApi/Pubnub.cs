@@ -12,6 +12,7 @@ using PubnubApi.EventEngine.Common;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Threading;
 using PubnubApi.PNSDK;
 
 namespace PubnubApi
@@ -138,6 +139,7 @@ namespace PubnubApi
             publishOperation.CurrentPubnubInstance(this);
             return publishOperation;
         }
+
 
         public FireOperation Fire()
         {
@@ -1348,6 +1350,112 @@ namespace PubnubApi
             config.SecretKey = string.IsNullOrEmpty(config.SecretKey) ? string.Empty : config.SecretKey;
             config.CipherKey = string.IsNullOrEmpty(config.CipherKey) ? string.Empty : config.CipherKey;
         }
+
+        #endregion
+
+        #region "Alternative Request/Response API Methods"
+
+        /// <summary>
+        /// Publishes a message using the async request/response API pattern.
+        /// This overload provides an alternative to the builder pattern for publishing messages.
+        /// </summary>
+        /// <param name="request">The publish request containing message and channel information</param>
+        /// <param name="cancellationToken">Cancellation token to cancel the operation</param>
+        /// <returns>A PublishResponse containing the result of the publish operation</returns>
+        /// <exception cref="ArgumentException">Thrown when request validation fails</exception>
+        /// <exception cref="PNException">Thrown when PubNub API errors occur</exception>
+        /// <exception cref="InvalidOperationException">Thrown when configuration is invalid</exception>
+        public async Task<PublishResponse> Publish(PublishRequest request, CancellationToken cancellationToken = default)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request), "PublishRequest cannot be null");
+            }
+
+            // Validate the request
+            request.Validate();
+
+            // Validate PubNub configuration
+            var config = pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null;
+            if (config == null || string.IsNullOrEmpty(config.PublishKey?.Trim()))
+            {
+                throw new InvalidOperationException("PublishKey is required for publish operations");
+            }
+
+            try
+            {
+                // Create a publish operation using the existing implementation
+                var publishOperation = new PublishOperation(config, JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
+                publishOperation.CurrentPubnubInstance(this);
+
+                // Configure the operation with request parameters
+                publishOperation
+                    .Message(request.Message)
+                    .Channel(request.Channel)
+                    .ShouldStore(request.StoreInHistory)
+                    .UsePOST(request.UsePost);
+
+                if (request.Ttl != -1)
+                {
+                    publishOperation.Ttl(request.Ttl);
+                }
+
+                if (request.Metadata != null)
+                {
+                    publishOperation.Meta(request.Metadata);
+                }
+
+                if (!string.IsNullOrEmpty(request.CustomMessageType))
+                {
+                    publishOperation.CustomMessageType(request.CustomMessageType);
+                }
+
+                if (request.QueryParameters != null)
+                {
+                    publishOperation.QueryParam(request.QueryParameters);
+                }
+
+                // Execute the operation asynchronously
+                var result = await publishOperation.ExecuteAsync().ConfigureAwait(false);
+
+                // Handle the result and convert to PublishResponse
+                if (result?.Status?.Error == true)
+                {
+                    // Extract error information
+                    var errorMessage = result.Status.ErrorData?.Information ?? "Publish operation failed";
+                    var statusCode = result.Status.StatusCode > 0 ? result.Status.StatusCode : 400;
+
+                    // Create detailed error message with status code
+                    var detailedErrorMessage = $"Publish failed (Status: {statusCode}): {errorMessage}";
+
+                    throw new PNException(detailedErrorMessage, result.Status.ErrorData?.Throwable);
+                }
+
+                if (result?.Result != null)
+                {
+                    return PublishResponse.CreateSuccess(
+                        result.Result.Timetoken,
+                        request.Channel,
+                        result.Status?.StatusCode ?? 200
+                    );
+                }
+
+                // Fallback error case
+                throw new PNException("Publish operation completed but no result was returned");
+            }
+            catch (PNException)
+            {
+                // Re-throw PNException as-is
+                throw;
+            }
+            catch (Exception ex)
+            {
+                // Wrap other exceptions in PNException
+                throw new PNException($"Publish operation failed: {ex.Message}", ex);
+            }
+        }
+
+        // TODO: Add other request/response API methods here as needed
 
         #endregion
     }
