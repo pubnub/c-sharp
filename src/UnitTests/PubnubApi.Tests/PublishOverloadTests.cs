@@ -135,11 +135,19 @@ namespace PubNubMessaging.Tests
         public void PublishOverload_WithNullRequest_ShouldThrowArgumentNullException()
         {
             // Act & Assert
-            var ex = Assert.ThrowsAsync<ArgumentNullException>(async () =>
-                await pubnub.Publish(null));
-
-            Assert.AreEqual("request", ex.ParamName);
-            Assert.That(ex.Message, Does.Contain("PublishRequest cannot be null"));
+            try
+            {
+                var task = pubnub.Publish(null);
+                task.Wait();
+                Assert.Fail("Expected ArgumentNullException was not thrown");
+            }
+            catch (AggregateException aggEx)
+            {
+                var ex = aggEx.InnerException as ArgumentNullException;
+                Assert.IsNotNull(ex);
+                Assert.AreEqual("request", ex.ParamName);
+                Assert.IsTrue(ex.Message.Contains("PublishRequest cannot be null"));
+            }
         }
 
         [Test]
@@ -160,10 +168,18 @@ namespace PubNubMessaging.Tests
             };
 
             // Act & Assert
-            var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
-                await invalidPubnub.Publish(request));
-
-            Assert.That(ex.Message, Does.Contain("PublishKey is required"));
+            try
+            {
+                var task = invalidPubnub.Publish(request);
+                task.Wait();
+                Assert.Fail("Expected InvalidOperationException was not thrown");
+            }
+            catch (AggregateException aggEx)
+            {
+                var ex = aggEx.InnerException as InvalidOperationException;
+                Assert.IsNotNull(ex);
+                Assert.IsTrue(ex.Message.Contains("PublishKey is required"));
+            }
 
             invalidPubnub.Destroy();
         }

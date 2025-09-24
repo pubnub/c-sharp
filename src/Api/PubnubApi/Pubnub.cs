@@ -1455,6 +1455,105 @@ namespace PubnubApi
             }
         }
 
+        /// <summary>
+        /// Subscribes to channels and/or channel groups using the request/response API pattern.
+        /// This overload provides an alternative API with event-based message handling.
+        /// Like the builder pattern, this starts a persistent connection and returns immediately.
+        /// </summary>
+        /// <param name="request">The subscription request containing channels, groups, and optional callbacks</param>
+        /// <returns>An ISubscription interface for managing the active subscription</returns>
+        /// <exception cref="ArgumentNullException">Thrown when request is null</exception>
+        /// <exception cref="ArgumentException">Thrown when request validation fails</exception>
+        /// <exception cref="InvalidOperationException">Thrown when configuration is invalid</exception>
+        public ISubscription Subscribe(SubscribeRequest request)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request), "SubscribeRequest cannot be null");
+            }
+
+            // Validate the request
+            request.Validate();
+
+            // Validate PubNub configuration
+            var config = pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null;
+            if (config == null || string.IsNullOrEmpty(config.SubscribeKey?.Trim()))
+            {
+                throw new InvalidOperationException("SubscribeKey is required for subscribe operations");
+            }
+
+            // Create the appropriate subscribe operation based on configuration
+            ISubscribeOperation<object> subscribeOperation;
+
+            if (config.EnableEventEngine)
+            {
+                // Use event engine-based subscription
+                PresenceOperation<object> presenceOperation = null;
+                if (config.PresenceInterval > 0)
+                {
+                    presenceOperation = new PresenceOperation<object>(this, InstanceId, config, tokenManager, pubnubUnitTest, presenceEventengineFactory);
+                }
+
+                heartbeatOperation ??= new HeartbeatOperation(config, JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
+
+                var subscribeEndpoint = new SubscribeEndpoint<object>(
+                    config, JsonPluggableLibrary, pubnubUnitTest, tokenManager,
+                    subscribeEventEngineFactory, presenceOperation, heartbeatOperation, InstanceId, this);
+
+                subscribeEndpoint.EventEmitter = eventEmitter;
+                subscribeEndpoint.SubscribeListenerList = subscribeCallbackListenerList;
+                subscribeOperation = subscribeEndpoint;
+            }
+            else
+            {
+                // Use legacy subscription
+                subscribeOperation = new SubscribeOperation<object>(config, JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
+            }
+
+            // Configure the operation with request parameters
+            if (request.Channels != null && request.Channels.Length > 0)
+            {
+                subscribeOperation.Channels(request.Channels);
+            }
+
+            if (request.ChannelGroups != null && request.ChannelGroups.Length > 0)
+            {
+                subscribeOperation.ChannelGroups(request.ChannelGroups);
+            }
+
+            if (request.Timetoken >= 0)
+            {
+                subscribeOperation.WithTimetoken(request.Timetoken);
+            }
+
+            if (request.WithPresence)
+            {
+                subscribeOperation.WithPresence();
+            }
+
+            if (request.QueryParameters != null && request.QueryParameters.Count > 0)
+            {
+                subscribeOperation.QueryParam(request.QueryParameters);
+            }
+
+            // Create the subscription wrapper
+            var subscription = new SubscriptionImpl(this, request, subscribeOperation);
+
+            // Execute the subscription (non-blocking, like existing builder pattern)
+            try
+            {
+                subscribeOperation.Execute();
+            }
+            catch (Exception ex)
+            {
+                // Clean up on failure
+                subscription.Dispose();
+                throw new PNException($"Subscribe operation failed: {ex.Message}", ex);
+            }
+
+            return subscription;
+        }
+
         // TODO: Add other request/response API methods here as needed
 
         #endregion

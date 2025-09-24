@@ -452,6 +452,9 @@ Fixed issue of getting Forbidden error while using publish with POST type along 
     <Compile Include="..\PubnubApi\Model\Consumer\UserId.cs" Link="Model\Consumer\UserId.cs" />
     <Compile Include="..\PubnubApi\Model\RequestResponse\PublishRequest.cs" Link="Model\RequestResponse\PublishRequest.cs" />
     <Compile Include="..\PubnubApi\Model\RequestResponse\PublishResponse.cs" Link="Model\RequestResponse\PublishResponse.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\SubscribeRequest.cs" Link="Model\RequestResponse\SubscribeRequest.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\ISubscription.cs" Link="Model\RequestResponse\ISubscription.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\SubscriptionImpl.cs" Link="Model\RequestResponse\SubscriptionImpl.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\AccessManager\PNAccessManagerAuditResultExt.cs">
       <Link>Model\Derived\AccessManager\PNAccessManagerAuditResultExt.cs</Link>
     </Compile>
