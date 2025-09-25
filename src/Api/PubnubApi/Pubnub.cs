@@ -1554,7 +1554,657 @@ namespace PubnubApi
             return subscription;
         }
 
-        // TODO: Add other request/response API methods here as needed
+        /// <summary>
+        /// Fetches message history from channels using the request/response API pattern.
+        /// This overload provides an alternative to the builder pattern API.
+        /// </summary>
+        /// <param name="request">The fetch history request containing channels and filtering options</param>
+        /// <param name="cancellationToken">Optional cancellation token for the async operation</param>
+        /// <returns>A task containing the fetch history response with messages</returns>
+        /// <exception cref="ArgumentNullException">Thrown when request is null</exception>
+        /// <exception cref="ArgumentException">Thrown when request validation fails</exception>
+        /// <exception cref="PNException">Thrown when PubNub API errors occur</exception>
+        /// <exception cref="InvalidOperationException">Thrown when configuration is invalid</exception>
+        public async Task<FetchHistoryResponse> FetchHistory(FetchHistoryRequest request, CancellationToken cancellationToken = default)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request), "FetchHistoryRequest cannot be null");
+            }
+
+            // Validate the request
+            request.Validate();
+
+            // Validate PubNub configuration
+            var config = pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null;
+            if (config == null || string.IsNullOrEmpty(config.SubscribeKey?.Trim()))
+            {
+                throw new InvalidOperationException("SubscribeKey is required for fetch history operations");
+            }
+
+            try
+            {
+                // Create a FetchHistoryOperation using the existing builder pattern
+                var fetchHistoryOperation = new FetchHistoryOperation(config, JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
+
+                // Configure channels
+                fetchHistoryOperation.Channels(request.Channels);
+
+                // Configure optional parameters
+                if (request.Start.HasValue)
+                {
+                    fetchHistoryOperation.Start(request.Start.Value);
+                }
+
+                if (request.End.HasValue)
+                {
+                    fetchHistoryOperation.End(request.End.Value);
+                }
+
+                // Set maximum per channel - use the effective value from the request
+                fetchHistoryOperation.MaximumPerChannel(request.GetEffectiveMaximumPerChannel());
+
+                if (request.Reverse)
+                {
+                    fetchHistoryOperation.Reverse(request.Reverse);
+                }
+
+                if (request.IncludeMeta)
+                {
+                    fetchHistoryOperation.IncludeMeta(request.IncludeMeta);
+                }
+
+                if (request.IncludeMessageActions)
+                {
+                    fetchHistoryOperation.IncludeMessageActions(request.IncludeMessageActions);
+                }
+
+                fetchHistoryOperation.IncludeUuid(request.IncludeUuid);
+                fetchHistoryOperation.IncludeMessageType(request.IncludeMessageType);
+                fetchHistoryOperation.IncludeCustomMessageType(request.IncludeCustomMessageType);
+
+                if (request.QueryParameters != null && request.QueryParameters.Count > 0)
+                {
+                    fetchHistoryOperation.QueryParam(request.QueryParameters);
+                }
+
+                // Execute the operation asynchronously
+                var result = await fetchHistoryOperation.ExecuteAsync().ConfigureAwait(false);
+
+                // Handle the result and convert to FetchHistoryResponse
+                if (result?.Status?.Error == true)
+                {
+                    // Extract error information
+                    var errorMessage = result.Status.ErrorData?.Information ?? "Fetch history operation failed";
+                    var statusCode = result.Status.StatusCode > 0 ? result.Status.StatusCode : 400;
+
+                    // Create detailed error message with status code
+                    var detailedErrorMessage = $"Fetch history failed (Status: {statusCode}): {errorMessage}";
+
+                    throw new PNException(detailedErrorMessage, result.Status.ErrorData?.Throwable);
+                }
+
+                if (result?.Result != null)
+                {
+                    return FetchHistoryResponse.CreateSuccess(
+                        result.Result,
+                        result.Status?.StatusCode ?? 200
+                    );
+                }
+
+                // Fallback error case
+                throw new PNException("Fetch history operation completed but no result was returned");
+            }
+            catch (PNException)
+            {
+                // Re-throw PNException as-is
+                throw;
+            }
+            catch (Exception ex)
+            {
+                // Wrap other exceptions in PNException
+                throw new PNException($"Fetch history operation failed: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets message counts for channels using the request/response API pattern.
+        /// This overload provides an alternative to the builder pattern API.
+        /// </summary>
+        /// <param name="request">The message counts request containing channels and timetoken information</param>
+        /// <param name="cancellationToken">Optional cancellation token for the async operation</param>
+        /// <returns>A task containing the message counts response with channel message counts</returns>
+        /// <exception cref="ArgumentNullException">Thrown when request is null</exception>
+        /// <exception cref="ArgumentException">Thrown when request validation fails</exception>
+        /// <exception cref="PNException">Thrown when PubNub API errors occur</exception>
+        /// <exception cref="InvalidOperationException">Thrown when configuration is invalid</exception>
+        public async Task<MessageCountsResponse> MessageCounts(MessageCountsRequest request, CancellationToken cancellationToken = default)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request), "MessageCountsRequest cannot be null");
+            }
+
+            // Validate the request
+            request.Validate();
+
+            // Validate PubNub configuration
+            var config = pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null;
+            if (config == null || string.IsNullOrEmpty(config.SubscribeKey?.Trim()))
+            {
+                throw new InvalidOperationException("SubscribeKey is required for message counts operations");
+            }
+
+            try
+            {
+                // Create a MessageCountsOperation using the existing builder pattern
+                var messageCountsOperation = new MessageCountsOperation(config, JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
+                messageCountsOperation.CurrentPubnubInstance(this);
+
+                // Configure channels
+                messageCountsOperation.Channels(request.Channels);
+
+                // Configure channel timetokens if provided
+                if (request.ChannelTimetokens != null && request.ChannelTimetokens.Length > 0)
+                {
+                    messageCountsOperation.ChannelsTimetoken(request.ChannelTimetokens);
+                }
+
+                // Configure query parameters if provided
+                if (request.QueryParameters != null && request.QueryParameters.Count > 0)
+                {
+                    messageCountsOperation.QueryParam(request.QueryParameters);
+                }
+
+                // Execute the operation asynchronously
+                var result = await messageCountsOperation.ExecuteAsync().ConfigureAwait(false);
+
+                // Handle the result and convert to MessageCountsResponse
+                if (result?.Status?.Error == true)
+                {
+                    // Extract error information
+                    var errorMessage = result.Status.ErrorData?.Information ?? "Message counts operation failed";
+                    var statusCode = result.Status.StatusCode > 0 ? result.Status.StatusCode : 400;
+
+                    // Create detailed error message with status code
+                    var detailedErrorMessage = $"Message counts failed (Status: {statusCode}): {errorMessage}";
+
+                    throw new PNException(detailedErrorMessage, result.Status.ErrorData?.Throwable);
+                }
+
+                if (result?.Result != null)
+                {
+                    return MessageCountsResponse.CreateSuccess(result.Result);
+                }
+
+                // Return empty response if no result (shouldn't normally happen)
+                return MessageCountsResponse.CreateEmpty();
+            }
+            catch (MissingMemberException ex)
+            {
+                // Re-throw configuration errors as InvalidOperationException
+                throw new InvalidOperationException(ex.Message, ex);
+            }
+            catch (ArgumentException)
+            {
+                // Re-throw validation errors as-is
+                throw;
+            }
+            catch (PNException)
+            {
+                // Re-throw PubNub errors as-is
+                throw;
+            }
+            catch (Exception ex)
+            {
+                // Wrap other exceptions in PNException
+                throw new PNException($"Message counts operation failed: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// Deletes messages from a channel using the request/response API pattern.
+        /// This overload provides an alternative to the builder pattern API.
+        /// </summary>
+        /// <param name="request">The delete message request containing channel and optional timetoken range</param>
+        /// <param name="cancellationToken">Optional cancellation token for the async operation</param>
+        /// <returns>A task containing the delete message response indicating success</returns>
+        /// <exception cref="ArgumentNullException">Thrown when request is null</exception>
+        /// <exception cref="ArgumentException">Thrown when request validation fails</exception>
+        /// <exception cref="PNException">Thrown when PubNub API errors occur</exception>
+        /// <exception cref="InvalidOperationException">Thrown when configuration is invalid</exception>
+        public async Task<DeleteMessageResponse> DeleteMessage(DeleteMessageRequest request, CancellationToken cancellationToken = default)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request), "DeleteMessageRequest cannot be null");
+            }
+
+            // Validate the request
+            request.Validate();
+
+            // Validate PubNub configuration
+            var config = pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null;
+            if (config == null || string.IsNullOrEmpty(config.SubscribeKey?.Trim()))
+            {
+                throw new InvalidOperationException("SubscribeKey is required for delete message operations");
+            }
+
+            try
+            {
+                // Create a DeleteMessageOperation using the existing builder pattern
+                var deleteOperation = new DeleteMessageOperation(config, JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
+
+                // Configure channel (required)
+                deleteOperation.Channel(request.Channel);
+
+                // Configure start timetoken if provided
+                if (request.Start.HasValue)
+                {
+                    deleteOperation.Start(request.Start.Value);
+                }
+
+                // Configure end timetoken if provided
+                if (request.End.HasValue)
+                {
+                    deleteOperation.End(request.End.Value);
+                }
+
+                // Configure query parameters if provided
+                if (request.QueryParameters != null && request.QueryParameters.Count > 0)
+                {
+                    deleteOperation.QueryParam(request.QueryParameters);
+                }
+
+                // Execute the operation asynchronously
+                var result = await deleteOperation.ExecuteAsync().ConfigureAwait(false);
+
+                // Handle the result and convert to DeleteMessageResponse
+                if (result?.Status?.Error == true)
+                {
+                    // Extract error information
+                    var errorMessage = result.Status.ErrorData?.Information ?? "Delete message operation failed";
+                    var statusCode = result.Status.StatusCode > 0 ? result.Status.StatusCode : 400;
+
+                    // Create detailed error message with status code
+                    var detailedErrorMessage = $"Delete message failed (Status: {statusCode}): {errorMessage}";
+
+                    throw new PNException(detailedErrorMessage, result.Status.ErrorData?.Throwable);
+                }
+
+                // Create successful response
+                // Note: PNDeleteMessageResult is currently empty, so we just indicate success
+                return DeleteMessageResponse.CreateSuccess(
+                    request.Channel,
+                    result?.Status?.StatusCode ?? 200,
+                    request.Start,
+                    request.End
+                );
+            }
+            catch (MissingMemberException ex)
+            {
+                // Re-throw configuration errors as InvalidOperationException
+                throw new InvalidOperationException(ex.Message, ex);
+            }
+            catch (ArgumentException)
+            {
+                // Re-throw validation errors as-is
+                throw;
+            }
+            catch (PNException)
+            {
+                // Re-throw PubNub errors as-is
+                throw;
+            }
+            catch (Exception ex)
+            {
+                // Wrap other exceptions in PNException
+                throw new PNException($"Delete message operation failed: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// Adds channels to a channel group asynchronously
+        /// </summary>
+        /// <param name="request">The request containing channels and channel group</param>
+        /// <param name="cancellationToken">Cancellation token for the operation</param>
+        /// <returns>The response indicating success or failure</returns>
+        /// <exception cref="ArgumentNullException">Thrown when request is null</exception>
+        /// <exception cref="ArgumentException">Thrown when request validation fails</exception>
+        /// <exception cref="InvalidOperationException">Thrown when configuration is invalid</exception>
+        public async Task<AddChannelsToChannelGroupResponse> AddChannelsToChannelGroup(AddChannelsToChannelGroupRequest request, CancellationToken cancellationToken = default)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request), "AddChannelsToChannelGroupRequest cannot be null");
+            }
+
+            // Validate the request
+            request.Validate();
+
+            // Validate PubNub configuration
+            var config = pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null;
+            if (config == null || string.IsNullOrEmpty(config.SubscribeKey?.Trim()))
+            {
+                throw new InvalidOperationException("SubscribeKey is required for channel group operations");
+            }
+
+            try
+            {
+                // Create an AddChannelsToChannelGroupOperation using the existing builder pattern
+                var operation = new AddChannelsToChannelGroupOperation(config, JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
+
+                // Configure the operation
+                operation.ChannelGroup(request.ChannelGroup);
+                operation.Channels(request.Channels);
+
+                // Execute the operation asynchronously
+                var result = await operation.ExecuteAsync().ConfigureAwait(false);
+
+                // Handle the result and convert to response
+                if (result?.Status?.Error == true)
+                {
+                    var errorMessage = result.Status.ErrorData?.Information ?? "Operation failed";
+                    throw new PNException(errorMessage);
+                }
+
+                if (result?.Result != null)
+                {
+                    return AddChannelsToChannelGroupResponse.CreateSuccess(result.Result);
+                }
+
+                // Return success even if result is null (operation succeeded but no data)
+                return AddChannelsToChannelGroupResponse.CreateSuccess(new PNChannelGroupsAddChannelResult());
+            }
+            catch (ArgumentException)
+            {
+                // Re-throw validation errors as-is
+                throw;
+            }
+            catch (PNException)
+            {
+                // Re-throw PubNub errors as-is
+                throw;
+            }
+            catch (Exception ex)
+            {
+                // Wrap other exceptions in PNException
+                throw new PNException($"Add channels to channel group operation failed: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// Removes channels from a channel group asynchronously
+        /// </summary>
+        /// <param name="request">The request containing channels and channel group</param>
+        /// <param name="cancellationToken">Cancellation token for the operation</param>
+        /// <returns>The response indicating success or failure</returns>
+        /// <exception cref="ArgumentNullException">Thrown when request is null</exception>
+        /// <exception cref="ArgumentException">Thrown when request validation fails</exception>
+        /// <exception cref="InvalidOperationException">Thrown when configuration is invalid</exception>
+        public async Task<RemoveChannelsFromChannelGroupResponse> RemoveChannelsFromChannelGroup(RemoveChannelsFromChannelGroupRequest request, CancellationToken cancellationToken = default)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request), "RemoveChannelsFromChannelGroupRequest cannot be null");
+            }
+
+            // Validate the request
+            request.Validate();
+
+            // Validate PubNub configuration
+            var config = pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null;
+            if (config == null || string.IsNullOrEmpty(config.SubscribeKey?.Trim()))
+            {
+                throw new InvalidOperationException("SubscribeKey is required for channel group operations");
+            }
+
+            try
+            {
+                // Create a RemoveChannelsFromChannelGroupOperation using the existing builder pattern
+                var operation = new RemoveChannelsFromChannelGroupOperation(config, JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
+
+                // Configure the operation
+                operation.ChannelGroup(request.ChannelGroup);
+                operation.Channels(request.Channels);
+
+                // Execute the operation asynchronously
+                var result = await operation.ExecuteAsync().ConfigureAwait(false);
+
+                // Handle the result and convert to response
+                if (result?.Status?.Error == true)
+                {
+                    var errorMessage = result.Status.ErrorData?.Information ?? "Operation failed";
+                    throw new PNException(errorMessage);
+                }
+
+                if (result?.Result != null)
+                {
+                    return RemoveChannelsFromChannelGroupResponse.CreateSuccess(result.Result);
+                }
+
+                // Return success even if result is null (operation succeeded but no data)
+                return RemoveChannelsFromChannelGroupResponse.CreateSuccess(new PNChannelGroupsRemoveChannelResult());
+            }
+            catch (ArgumentException)
+            {
+                // Re-throw validation errors as-is
+                throw;
+            }
+            catch (PNException)
+            {
+                // Re-throw PubNub errors as-is
+                throw;
+            }
+            catch (Exception ex)
+            {
+                // Wrap other exceptions in PNException
+                throw new PNException($"Remove channels from channel group operation failed: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// Deletes a channel group asynchronously
+        /// </summary>
+        /// <param name="request">The request containing the channel group to delete</param>
+        /// <param name="cancellationToken">Cancellation token for the operation</param>
+        /// <returns>The response indicating success or failure</returns>
+        /// <exception cref="ArgumentNullException">Thrown when request is null</exception>
+        /// <exception cref="ArgumentException">Thrown when request validation fails</exception>
+        /// <exception cref="InvalidOperationException">Thrown when configuration is invalid</exception>
+        public async Task<DeleteChannelGroupResponse> DeleteChannelGroup(DeleteChannelGroupRequest request, CancellationToken cancellationToken = default)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request), "DeleteChannelGroupRequest cannot be null");
+            }
+
+            // Validate the request
+            request.Validate();
+
+            // Validate PubNub configuration
+            var config = pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null;
+            if (config == null || string.IsNullOrEmpty(config.SubscribeKey?.Trim()))
+            {
+                throw new InvalidOperationException("SubscribeKey is required for channel group operations");
+            }
+
+            try
+            {
+                // Create a DeleteChannelGroupOperation using the existing builder pattern
+                var operation = new DeleteChannelGroupOperation(config, JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
+
+                // Configure the operation
+                operation.ChannelGroup(request.ChannelGroup);
+
+                // Execute the operation asynchronously
+                var result = await operation.ExecuteAsync().ConfigureAwait(false);
+
+                // Handle the result and convert to response
+                if (result?.Status?.Error == true)
+                {
+                    var errorMessage = result.Status.ErrorData?.Information ?? "Operation failed";
+                    throw new PNException(errorMessage);
+                }
+
+                if (result?.Result != null)
+                {
+                    return DeleteChannelGroupResponse.CreateSuccess(result.Result);
+                }
+
+                // Return success even if result is null (operation succeeded but no data)
+                return DeleteChannelGroupResponse.CreateSuccess(new PNChannelGroupsDeleteGroupResult());
+            }
+            catch (ArgumentException)
+            {
+                // Re-throw validation errors as-is
+                throw;
+            }
+            catch (PNException)
+            {
+                // Re-throw PubNub errors as-is
+                throw;
+            }
+            catch (Exception ex)
+            {
+                // Wrap other exceptions in PNException
+                throw new PNException($"Delete channel group operation failed: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// Lists channels for a channel group asynchronously
+        /// </summary>
+        /// <param name="request">The request containing the channel group</param>
+        /// <param name="cancellationToken">Cancellation token for the operation</param>
+        /// <returns>The response containing the list of channels</returns>
+        /// <exception cref="ArgumentNullException">Thrown when request is null</exception>
+        /// <exception cref="ArgumentException">Thrown when request validation fails</exception>
+        /// <exception cref="InvalidOperationException">Thrown when configuration is invalid</exception>
+        public async Task<ListChannelsForChannelGroupResponse> ListChannelsForChannelGroup(ListChannelsForChannelGroupRequest request, CancellationToken cancellationToken = default)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request), "ListChannelsForChannelGroupRequest cannot be null");
+            }
+
+            // Validate the request
+            request.Validate();
+
+            // Validate PubNub configuration
+            var config = pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null;
+            if (config == null || string.IsNullOrEmpty(config.SubscribeKey?.Trim()))
+            {
+                throw new InvalidOperationException("SubscribeKey is required for channel group operations");
+            }
+
+            try
+            {
+                // Create a ListChannelsForChannelGroupOperation using the existing builder pattern
+                var operation = new ListChannelsForChannelGroupOperation(config, JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
+
+                // Configure the operation
+                operation.ChannelGroup(request.ChannelGroup);
+
+                // Execute the operation asynchronously
+                var result = await operation.ExecuteAsync().ConfigureAwait(false);
+
+                // Handle the result and convert to response
+                if (result?.Status?.Error == true)
+                {
+                    var errorMessage = result.Status.ErrorData?.Information ?? "Operation failed";
+                    throw new PNException(errorMessage);
+                }
+
+                if (result?.Result != null)
+                {
+                    return ListChannelsForChannelGroupResponse.CreateSuccess(result.Result);
+                }
+
+                // Return empty list if no result
+                return ListChannelsForChannelGroupResponse.CreateSuccess(new PNChannelGroupsAllChannelsResult());
+            }
+            catch (ArgumentException)
+            {
+                // Re-throw validation errors as-is
+                throw;
+            }
+            catch (PNException)
+            {
+                // Re-throw PubNub errors as-is
+                throw;
+            }
+            catch (Exception ex)
+            {
+                // Wrap other exceptions in PNException
+                throw new PNException($"List channels for channel group operation failed: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// Lists all channel groups asynchronously
+        /// </summary>
+        /// <param name="request">The request (no parameters needed)</param>
+        /// <param name="cancellationToken">Cancellation token for the operation</param>
+        /// <returns>The response containing the list of channel groups</returns>
+        /// <exception cref="ArgumentNullException">Thrown when request is null</exception>
+        /// <exception cref="InvalidOperationException">Thrown when configuration is invalid</exception>
+        public async Task<ListChannelGroupsResponse> ListChannelGroups(ListChannelGroupsRequest request, CancellationToken cancellationToken = default)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request), "ListChannelGroupsRequest cannot be null");
+            }
+
+            // Validate the request (no parameters to validate)
+            request.Validate();
+
+            // Validate PubNub configuration
+            var config = pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null;
+            if (config == null || string.IsNullOrEmpty(config.SubscribeKey?.Trim()))
+            {
+                throw new InvalidOperationException("SubscribeKey is required for channel group operations");
+            }
+
+            try
+            {
+                // Create a ListAllChannelGroupOperation using the existing builder pattern
+                var operation = new ListAllChannelGroupOperation(config, JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
+
+                // Execute the operation asynchronously
+                var result = await operation.ExecuteAsync().ConfigureAwait(false);
+
+                // Handle the result and convert to response
+                if (result?.Status?.Error == true)
+                {
+                    var errorMessage = result.Status.ErrorData?.Information ?? "Operation failed";
+                    throw new PNException(errorMessage);
+                }
+
+                if (result?.Result != null)
+                {
+                    return ListChannelGroupsResponse.CreateSuccess(result.Result);
+                }
+
+                // Return empty list if no result
+                return ListChannelGroupsResponse.CreateSuccess(new PNChannelGroupsListAllResult());
+            }
+            catch (ArgumentException)
+            {
+                // Re-throw validation errors as-is
+                throw;
+            }
+            catch (PNException)
+            {
+                // Re-throw PubNub errors as-is
+                throw;
+            }
+            catch (Exception ex)
+            {
+                // Wrap other exceptions in PNException
+                throw new PNException($"List channel groups operation failed: {ex.Message}", ex);
+            }
+        }
 
         #endregion
     }

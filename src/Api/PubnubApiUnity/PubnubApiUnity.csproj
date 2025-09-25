@@ -475,6 +475,22 @@
     <Compile Include="..\PubnubApi\Model\RequestResponse\SubscribeRequest.cs" Link="Model\RequestResponse\SubscribeRequest.cs" />
     <Compile Include="..\PubnubApi\Model\RequestResponse\ISubscription.cs" Link="Model\RequestResponse\ISubscription.cs" />
     <Compile Include="..\PubnubApi\Model\RequestResponse\SubscriptionImpl.cs" Link="Model\RequestResponse\SubscriptionImpl.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\FetchHistoryRequest.cs" Link="Model\RequestResponse\FetchHistoryRequest.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\FetchHistoryResponse.cs" Link="Model\RequestResponse\FetchHistoryResponse.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\MessageCountsRequest.cs" Link="Model\RequestResponse\MessageCountsRequest.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\MessageCountsResponse.cs" Link="Model\RequestResponse\MessageCountsResponse.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\DeleteMessageRequest.cs" Link="Model\RequestResponse\DeleteMessageRequest.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\DeleteMessageResponse.cs" Link="Model\RequestResponse\DeleteMessageResponse.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\AddChannelsToChannelGroupRequest.cs" Link="Model\RequestResponse\AddChannelsToChannelGroupRequest.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\AddChannelsToChannelGroupResponse.cs" Link="Model\RequestResponse\AddChannelsToChannelGroupResponse.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\RemoveChannelsFromChannelGroupRequest.cs" Link="Model\RequestResponse\RemoveChannelsFromChannelGroupRequest.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\RemoveChannelsFromChannelGroupResponse.cs" Link="Model\RequestResponse\RemoveChannelsFromChannelGroupResponse.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\DeleteChannelGroupRequest.cs" Link="Model\RequestResponse\DeleteChannelGroupRequest.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\DeleteChannelGroupResponse.cs" Link="Model\RequestResponse\DeleteChannelGroupResponse.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\ListChannelsForChannelGroupRequest.cs" Link="Model\RequestResponse\ListChannelsForChannelGroupRequest.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\ListChannelsForChannelGroupResponse.cs" Link="Model\RequestResponse\ListChannelsForChannelGroupResponse.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\ListChannelGroupsRequest.cs" Link="Model\RequestResponse\ListChannelGroupsRequest.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\ListChannelGroupsResponse.cs" Link="Model\RequestResponse\ListChannelGroupsResponse.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\AccessManager\PNAccessManagerAuditResultExt.cs">
       <Link>Model\Derived\AccessManager\PNAccessManagerAuditResultExt.cs</Link>
     </Compile>
