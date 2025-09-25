@@ -350,7 +350,8 @@ Fixed issue of getting Forbidden error while using publish with POST type along 
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\Effects\HandshakeEffectHandler.cs" Link="EventEngine\Subscribe\Effects\HandshakeEffectHandler.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\Effects\ReceivingEffectHandler.cs" Link="EventEngine\Subscribe\Effects\ReceivingEffectHandler.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\Effects\EmitStatusEffectHandler.cs" Link="EventEngine\Subscribe\Effects\EmitStatusEffectHandler.cs" />
-    <Compile Include="..\PubnubApi\EventEngine\Subscribe\Events\SubscriptionEvents.cs" Link="EventEngine\Subscribe\Events\SubscriptionEvents.cs" />    <Compile Include="..\PubnubApi\EventEngine\Subscribe\Invocations\SubscriptionInvocations.cs" Link="EventEngine\Subscribe\Invocations\SubscriptionInvocations.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Subscribe\Events\SubscriptionEvents.cs" Link="EventEngine\Subscribe\Events\SubscriptionEvents.cs" />
+    <Compile Include="..\PubnubApi\EventEngine\Subscribe\Invocations\SubscriptionInvocations.cs" Link="EventEngine\Subscribe\Invocations\SubscriptionInvocations.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\States\HandshakeFailedState.cs" Link="EventEngine\Subscribe\States\HandshakeFailedState.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\States\HandshakeReconnectingState.cs" Link="EventEngine\Subscribe\States\HandshakeReconnectingState.cs" />
     <Compile Include="..\PubnubApi\EventEngine\Subscribe\States\HandshakeStoppedState.cs" Link="EventEngine\Subscribe\States\HandshakeStoppedState.cs" />
@@ -579,6 +580,27 @@ Fixed issue of getting Forbidden error while using publish with POST type along 
       <Link>Model\Consumer\Push\PNPushRemoveChannelResult.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\Model\Consumer\UserId.cs" Link="Model\Consumer\UserId.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\PublishRequest.cs" Link="Model\RequestResponse\PublishRequest.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\PublishResponse.cs" Link="Model\RequestResponse\PublishResponse.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\SubscribeRequest.cs" Link="Model\RequestResponse\SubscribeRequest.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\ISubscription.cs" Link="Model\RequestResponse\ISubscription.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\SubscriptionImpl.cs" Link="Model\RequestResponse\SubscriptionImpl.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\FetchHistoryRequest.cs" Link="Model\RequestResponse\FetchHistoryRequest.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\FetchHistoryResponse.cs" Link="Model\RequestResponse\FetchHistoryResponse.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\MessageCountsRequest.cs" Link="Model\RequestResponse\MessageCountsRequest.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\MessageCountsResponse.cs" Link="Model\RequestResponse\MessageCountsResponse.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\DeleteMessageRequest.cs" Link="Model\RequestResponse\DeleteMessageRequest.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\DeleteMessageResponse.cs" Link="Model\RequestResponse\DeleteMessageResponse.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\AddChannelsToChannelGroupRequest.cs" Link="Model\RequestResponse\AddChannelsToChannelGroupRequest.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\AddChannelsToChannelGroupResponse.cs" Link="Model\RequestResponse\AddChannelsToChannelGroupResponse.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\RemoveChannelsFromChannelGroupRequest.cs" Link="Model\RequestResponse\RemoveChannelsFromChannelGroupRequest.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\RemoveChannelsFromChannelGroupResponse.cs" Link="Model\RequestResponse\RemoveChannelsFromChannelGroupResponse.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\DeleteChannelGroupRequest.cs" Link="Model\RequestResponse\DeleteChannelGroupRequest.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\DeleteChannelGroupResponse.cs" Link="Model\RequestResponse\DeleteChannelGroupResponse.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\ListChannelsForChannelGroupRequest.cs" Link="Model\RequestResponse\ListChannelsForChannelGroupRequest.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\ListChannelsForChannelGroupResponse.cs" Link="Model\RequestResponse\ListChannelsForChannelGroupResponse.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\ListChannelGroupsRequest.cs" Link="Model\RequestResponse\ListChannelGroupsRequest.cs" />
+    <Compile Include="..\PubnubApi\Model\RequestResponse\ListChannelGroupsResponse.cs" Link="Model\RequestResponse\ListChannelGroupsResponse.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\AccessManager\PNAccessManagerAuditResultExt.cs">
       <Link>Model\Derived\AccessManager\PNAccessManagerAuditResultExt.cs</Link>
     </Compile>
@@ -809,6 +831,7 @@ Fixed issue of getting Forbidden error while using publish with POST type along 
     <Folder Include="Model\Consumer\DeleteMessage\" />
     <Folder Include="Model\Consumer\Files\" />
     <Folder Include="Model\Consumer\Objects\" />
+    <Folder Include="Model\RequestResponse\" />
     <Folder Include="Model\Derived\DeleteMessage\" />
     <Folder Include="Model\Derived\Files\" />
     <Folder Include="Model\Derived\Objects\" />

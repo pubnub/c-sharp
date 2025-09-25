@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <!--<Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />-->
   <PropertyGroup>
-    <TargetFrameworks>net6.0</TargetFrameworks>
+    <TargetFrameworks>net9.0</TargetFrameworks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -99,6 +99,8 @@
     <Compile Include="..\PubnubApi.Tests\WhenUnsubscribedToAChannelGroup.cs" Link="WhenUnsubscribedToAChannelGroup.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenUserIdInPNConfig.cs" Link="WhenUserIdInPNConfig.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenSubscribeToChannelPresence.cs" Link="WhenSubscribeToChannelPresence.cs" />
+    <Compile Include="..\PubnubApi.Tests\PublishOverloadTests.cs" Link="PublishOverloadTests.cs" />
+    <Compile Include="..\PubnubApi.Tests\SubscribeApiCoexistenceTests.cs" Link="SubscribeApiCoexistenceTests.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -75,6 +75,7 @@
     <ProjectReference Include="..\MockServerPubnubApi\MockServerPubnubApi.csproj" />
   </ItemGroup>
 
+
   <ItemGroup>
     <Compile Update="Resource.Designer.cs">
       <DependentUpon>Resource.resx</DependentUpon>
