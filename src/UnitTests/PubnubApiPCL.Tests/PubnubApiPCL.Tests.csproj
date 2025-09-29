@@ -67,6 +67,9 @@
     <Compile Include="..\PubnubApi.Tests\EventEngine\Presence\ReconnectingState.cs" Link="EventEngine\Presence\ReconnectingState.cs" />
     <Compile Include="..\PubnubApi.Tests\EventEngine\Presence\StoppedState.cs" Link="EventEngine\Presence\StoppedState.cs" />
     <Compile Include="..\PubnubApi.Tests\GenerateSampleGrant.cs" Link="GenerateSampleGrant.cs" />
+    <Compile Include="..\PubnubApi.Tests\JsonV2Tests.cs">
+      <Link>JsonV2Tests.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi.Tests\PubnubCommon.cs" Link="PubnubCommon.cs" />
     <Compile Include="..\PubnubApi.Tests\PubnubUnitTest.cs" Link="PubnubUnitTest.cs" />
     <Compile Include="..\PubnubApi.Tests\TestHarness.cs" Link="TestHarness.cs" />

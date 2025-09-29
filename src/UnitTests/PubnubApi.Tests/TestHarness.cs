@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using PubnubApi.JsonV2;
 
 namespace PubNubMessaging.Tests
 {
@@ -38,6 +39,7 @@ namespace PubNubMessaging.Tests
             {
                 pubnub.SetAuthToken(authToken);
             }
+            pubnub.SetJsonPluggableLibrary(new NewtonsoftJsonDotNetV2(pnConfiguration));
             return pubnub;
         }
 

@@ -311,6 +311,36 @@ Fixed issue of getting Forbidden error while using publish with POST type along 
     <Compile Include="..\PubnubApi\JsonDataParse\PNRevokeTokenJsonDataParse.cs" Link="JsonDataParse\PNRevokeTokenJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNSetChannelMetadataJsonDataParse.cs" Link="JsonDataParse\PNSetChannelMetadataJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNSetUuidMetadataJsonDataParse.cs" Link="JsonDataParse\PNSetUuidMetadataJsonDataParse.cs" />
+    <Compile Include="..\PubnubApi\JsonV2\IJsonPluggableLibraryV2.cs">
+      <Link>JsonV2\IJsonPluggableLibraryV2.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\JsonV2\NewtonsoftJsonDotNetV2.cs">
+      <Link>JsonV2\NewtonsoftJsonDotNetV2.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\JsonV2\Parsers\IModernJsonParser.cs">
+      <Link>JsonV2\Parsers\IModernJsonParser.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\JsonV2\Parsers\MetadataObjectParser.cs">
+      <Link>JsonV2\Parsers\MetadataObjectParser.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\JsonV2\Parsers\PNSetChannelMetadataResultParser.cs">
+      <Link>JsonV2\Parsers\PNSetChannelMetadataResultParser.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\JsonV2\Parsers\PNSetUuidMetadataResultParser.cs">
+      <Link>JsonV2\Parsers\PNSetUuidMetadataResultParser.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\JsonV2\Parsers\SharedParsingHelpers.cs">
+      <Link>JsonV2\Parsers\SharedParsingHelpers.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\JsonV2\Parsers\PNHistoryResultParser.cs">
+      <Link>JsonV2\Parsers\PNHistoryResultParser.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\JsonV2\Parsers\AccessManagerHelpers.cs">
+      <Link>JsonV2\Parsers\AccessManagerHelpers.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\JsonV2\Parsers\PNAccessManagerGrantResultParser.cs">
+      <Link>JsonV2\Parsers\PNAccessManagerGrantResultParser.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\Log\LoggingMethod.cs">
       <Link>Log\LoggingMethod.cs</Link>
     </Compile>

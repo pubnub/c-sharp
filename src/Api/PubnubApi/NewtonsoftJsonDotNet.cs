@@ -13,7 +13,7 @@ namespace PubnubApi
     {
         private readonly PNConfiguration config;
         private readonly JsonSerializerSettings defaultJsonSerializerSettings;
-        private readonly PubnubLogModule logger;
+        protected readonly PubnubLogModule logger;
 
         #region "IL2CPP workarounds"
 
@@ -332,7 +332,7 @@ namespace PubnubApi
             return ret;
         }
 
-        public T DeserializeToObject<T>(IDictionary<string, object> jsonFields)
+        public virtual T DeserializeToObject<T>(IDictionary<string, object> jsonFields)
         {
             T response = default(T);
             Type dataType = typeof(T).GetTypeInfo().GenericTypeArguments[0];
