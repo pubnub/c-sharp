@@ -3,6 +3,7 @@ namespace PubnubApi
 {
     public enum PNPushType
     {
+        [System.Obsolete("GCM is decommissioned by Google. Please use FCM instead.", false)]
         GCM,
         FCM,
         APNS,
