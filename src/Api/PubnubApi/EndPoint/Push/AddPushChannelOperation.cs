@@ -230,7 +230,7 @@ namespace PubnubApi.EndPoint
 				requestQueryStringParams.Add("environment", pushEnvironment.ToString().ToLowerInvariant());
 				requestQueryStringParams.Add("topic", UriUtil.EncodeUriComponent(deviceTopic, PNOperationType.PushRegister, false, false, false));
 			} else {
-				requestQueryStringParams.Add("type", pubnubPushType.ToString().ToLowerInvariant());
+				requestQueryStringParams.Add("type", pubnubPushType.ToUrlString());
 			}
 			requestQueryStringParams.Add("add", UriUtil.EncodeUriComponent(string.Join(",", channelNames.OrderBy(x => x).ToArray()), PNOperationType.PushRegister, false, false, false));
 

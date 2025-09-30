@@ -215,7 +215,7 @@ namespace PubnubApi.EndPoint
 				requestQueryStringParams.Add("environment", pushEnvironment.ToString().ToLowerInvariant());
 				requestQueryStringParams.Add("topic", UriUtil.EncodeUriComponent(deviceTopic, PNOperationType.PushUnregister, false, false, false));
 			} else {
-				requestQueryStringParams.Add("type", pubnubPushType.ToString().ToLowerInvariant());
+				requestQueryStringParams.Add("type", pubnubPushType.ToUrlString());
 			}
 
 			if (queryParam != null && queryParam.Count > 0) {

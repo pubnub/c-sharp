@@ -992,5 +992,22 @@ namespace PubNubMessaging.Tests
             pubnub = null;
             Assert.IsTrue(receivedMessage, "ThenWithAsyncAPNS2RemoveDeviceFromPushShouldReturnSuccess Failed");
         }
+
+        [Test]
+        public static void ThenGCMToUrlStringShouldReturnFcm()
+        {
+            // Test that GCM enum converts to 'fcm' string for URL compatibility
+            string gcmUrlString = PNPushType.GCM.ToUrlString();
+            Assert.AreEqual("fcm", gcmUrlString, "GCM should convert to 'fcm' for URL compatibility");
+            
+            // Test that FCM also returns 'fcm'
+            string fcmUrlString = PNPushType.FCM.ToUrlString();
+            Assert.AreEqual("fcm", fcmUrlString, "FCM should return 'fcm'");
+            
+            // Test other push types return correct lowercase values
+            Assert.AreEqual("apns", PNPushType.APNS.ToUrlString(), "APNS should return 'apns'");
+            Assert.AreEqual("mpns", PNPushType.MPNS.ToUrlString(), "MPNS should return 'mpns'");
+            Assert.AreEqual("apns2", PNPushType.APNS2.ToUrlString(), "APNS2 should return 'apns2'");
+        }
     }
 }
