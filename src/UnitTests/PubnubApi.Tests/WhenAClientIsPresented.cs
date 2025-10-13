@@ -2867,7 +2867,7 @@ namespace PubNubMessaging.Tests
         }
 
         [Test]
-        public static async Task ThenHereNowForMultipleChannelShouldSupportLimitAndOffset()
+        public static async Task ThenHereNowForMultipleChannelsShouldSupportLimitAndOffset()
         {
             string channel1 = $"presence_{Guid.NewGuid()}";
             string channel2 = $"presence_{Guid.NewGuid()}";
@@ -2940,7 +2940,7 @@ namespace PubNubMessaging.Tests
                 "hereNow with limit 1 and more elements to be fetched, nextOffset should be 1");
             
             // Case 4: Callback style API support.
-            pubnub.HereNow()
+            pubnub2.HereNow()
                 .Channels(new string[] { channel1, channel2 })
                 .Limit(1)
                 .Execute(new PNHereNowResultEx((response, status) =>
@@ -2948,7 +2948,7 @@ namespace PubNubMessaging.Tests
                     Assert.AreEqual(200, status.StatusCode);
                     Assert.AreEqual(1, response.NextOffset);
                 })); 
-            pubnub.HereNow()
+            pubnub2.HereNow()
                 .Channels(new string[] { channel1, channel2 })
                 .Execute(new PNHereNowResultEx((response, status) =>
                 {
