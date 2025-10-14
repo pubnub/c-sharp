@@ -22,7 +22,7 @@ namespace PubnubApi.EndPoint
 		private PNCallback<PNHereNowResult> savedCallback;
 		private Dictionary<string, object> queryParam;
 		private int limit = 1000;
-		private int offset = 0;
+		private int offset;
 
 		public HereNowOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, tokenManager, instance)
 		{
@@ -101,26 +101,26 @@ namespace PubnubApi.EndPoint
 		public void Execute(PNCallback<PNHereNowResult> callback)
 		{
 			logger?.Trace($"{GetType().Name} Execute invoked");
-			HereNow(this.channelNames, this.channelGroupNames, this.includeChannelUUIDs, this.includeUserState, this.queryParam, callback);
+			HereNow( callback);
 		}
 
 		public async Task<PNResult<PNHereNowResult>> ExecuteAsync()
 		{
 			logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
-			return await HereNow(this.channelNames, this.channelGroupNames, this.includeChannelUUIDs, this.includeUserState, this.queryParam).ConfigureAwait(false);
+			return await HereNow().ConfigureAwait(false);
 		}
 
 
 		internal void Retry()
 		{
-			HereNow(this.channelNames, this.channelGroupNames, this.includeChannelUUIDs, this.includeUserState, this.queryParam, savedCallback);
+			HereNow( savedCallback);
 		}
 
-		private void HereNow(string[] channels, string[] channelGroups, bool showUUIDList, bool includeUserState, Dictionary<string, object> externalQueryParam, PNCallback<PNHereNowResult> callback)
+		private void HereNow(PNCallback<PNHereNowResult> callback)
 		{
 			RequestState<PNHereNowResult> requestState = new RequestState<PNHereNowResult> {
-				Channels = channels,
-				ChannelGroups = channelGroups,
+				Channels = channelNames,
+				ChannelGroups = channelGroupNames,
 				ResponseType = PNOperationType.PNHereNowOperation,
 				Reconnect = false,
 				PubnubCallback = callback,
@@ -156,13 +156,13 @@ namespace PubnubApi.EndPoint
 			});
 		}
 
-		private async Task<PNResult<PNHereNowResult>> HereNow(string[] channels, string[] channelGroups, bool showUUIDList, bool includeUserState, Dictionary<string, object> externalQueryParam)
+		private async Task<PNResult<PNHereNowResult>> HereNow()
 		{
 			PNResult<PNHereNowResult> returnValue = new PNResult<PNHereNowResult>();
 
 			RequestState<PNHereNowResult> requestState = new RequestState<PNHereNowResult> {
-				Channels = channels,
-				ChannelGroups = channelGroups,
+				Channels = channelNames,
+				ChannelGroups = channelGroupNames,
 				ResponseType = PNOperationType.PNHereNowOperation,
 				Reconnect = false,
 				EndPointOperation = this
