@@ -241,7 +241,7 @@ namespace PubNubMessaging.Tests
                 #region "GetAllChannelMetadata"
 
                 System.Diagnostics.Debug.WriteLine("pubnub.GetAllChannelMetadata() STARTED");
-                pubnub.GetAllChannelMetadata().IncludeCount(true).IncludeCustom(true)
+                pubnub.GetAllChannelMetadata().IncludeCount(true).Sort(new List<string>(){"updated:desc"}).IncludeCustom(true)
                     .Execute(new PNGetAllChannelMetadataResultExt((r, s) =>
                     {
                         if (r != null && s.StatusCode == 200 && !s.Error)
@@ -451,7 +451,7 @@ namespace PubNubMessaging.Tests
  Task.Factory.StartNew(async () => await pubnub.GetAllChannelMetadata().IncludeCount(true).ExecuteAsync()).Result.Result;
 #else
                 PNResult<PNGetAllChannelMetadataResult> getSpacesResult =
-                    await pubnub.GetAllChannelMetadata().IncludeCount(true).ExecuteAsync();
+                    await pubnub.GetAllChannelMetadata().IncludeCount(true).Sort(new List<string>(){"updated:desc"}).ExecuteAsync();
 #endif
                 if (getSpacesResult.Result != null && getSpacesResult.Status.StatusCode == 200 &&
                     !getSpacesResult.Status.Error)
