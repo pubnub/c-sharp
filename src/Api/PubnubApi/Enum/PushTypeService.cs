@@ -6,6 +6,7 @@ namespace PubnubApi
         [System.Obsolete("GCM is decommissioned by Google. Please use FCM instead.", false)]
         GCM,
         FCM,
+        [System.Obsolete("APNs is deprecated by Apple.", false)]
         APNS,
         APNS2
     }
