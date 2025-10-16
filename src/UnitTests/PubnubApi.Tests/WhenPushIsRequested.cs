@@ -1006,7 +1006,6 @@ namespace PubNubMessaging.Tests
             
             // Test other push types return correct lowercase values
             Assert.AreEqual("apns", PNPushType.APNS.ToUrlString(), "APNS should return 'apns'");
-            Assert.AreEqual("mpns", PNPushType.MPNS.ToUrlString(), "MPNS should return 'mpns'");
             Assert.AreEqual("apns2", PNPushType.APNS2.ToUrlString(), "APNS2 should return 'apns2'");
         }
     }

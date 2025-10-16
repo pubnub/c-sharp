@@ -7,7 +7,6 @@ namespace PubnubApi
         GCM,
         FCM,
         APNS,
-        MPNS, //MicrosoftPushNotificationService,
         APNS2
     }
 
@@ -29,7 +28,6 @@ namespace PubnubApi
                 PNPushType.GCM => "fcm",  // GCM is deprecated, use FCM
                 PNPushType.FCM => "fcm",
                 PNPushType.APNS => "apns",
-                PNPushType.MPNS => "mpns",
                 PNPushType.APNS2 => "apns2",
                 _ => pushType.ToString().ToLowerInvariant()
             };
