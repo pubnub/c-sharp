@@ -931,6 +931,7 @@ namespace PubNubMessaging.Tests
             Assert.IsNotNull(removeResult.Result, "Remove result data should not be null");
             Assert.IsFalse(removeResult.Status.Error, "Remove operation should not have errors");
             Assert.AreEqual(200, removeResult.Status.StatusCode, "Remove operation should return 200 status code");
+            await Task.Delay(500); 
 
             // Get channel members after removal
             PNResult<PNChannelMembersResult> getAfterRemoveResult = await pubnub.GetChannelMembers()
