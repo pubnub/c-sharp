@@ -404,31 +404,6 @@ namespace PubnubApi
                                             hereNowResult.Channels.Add(channel, channelData);
                                         }
                                     }
-                                    // Calculate NextOffset for pagination if needed
-                                    if (hereNowResult.Channels.Count > 0 && listObject.Count > 2)
-                                    {
-                                        if (listObject.Last() is Dictionary<string, int> paginationParams && paginationParams.TryGetValue("offset", out var currentOffset))
-                                        {
-                                            // Find the maximum occupancy count among all returned channels
-                                            // NOTE: Can not use LINQ MaxBy() as it is not supported in .NET Standard 2.0
-                                            int maxOccupancy = 0;
-                                            PNHereNowChannelData channelWithMaxOccupancyCount = new PNHereNowChannelData();
-                                            foreach (var channelEntry in hereNowResult.Channels.Values)
-                                            {
-                                                if (channelEntry.Occupancy > maxOccupancy)
-                                                {
-                                                    maxOccupancy = channelEntry.Occupancy;
-                                                    channelWithMaxOccupancyCount = channelEntry;
-                                                }
-                                            }
-                                            int fetchedOccupancyCount =
-                                                channelWithMaxOccupancyCount.Occupants.Count;
-                                            if (fetchedOccupancyCount + currentOffset < maxOccupancy)
-                                            {
-                                                hereNowResult.NextOffset = currentOffset + fetchedOccupancyCount;
-                                            }
-                                        }
-                                    }
                                 }
                             }
                         }
@@ -479,16 +454,6 @@ namespace PubnubApi
 
                                 hereNowResult.Channels.Add(hereNowChannelName, channelData);
                                 hereNowResult.TotalChannels = hereNowResult.Channels.Count;
-                                // Calculate NextOffset for pagination if needed
-                                if (listObject.Last() is Dictionary<string, int> paginationParams &&
-                                    paginationParams.TryGetValue("offset", out var currentOffset))
-                                {
-                                    var fetchedOccupancyCount = channelData.Occupants.Count;
-                                    if ((fetchedOccupancyCount + currentOffset) < channelData.Occupancy)
-                                    {
-                                        hereNowResult.NextOffset = currentOffset + fetchedOccupancyCount;
-                                    }
-                                }
                             }
                         }
                         else

@@ -136,10 +136,6 @@ namespace PubnubApi.EndPoint
 					if (!string.IsNullOrEmpty(responseString)) {
 						requestState.GotJsonResponse = true;
 						List<object> result = ProcessJsonResponse(requestState, responseString);
-						result.Add(new Dictionary<string, int>()
-						{
-							{"offset", offset}
-						});
 						ProcessResponseCallbacks(result, requestState);
 					} else {
 						PNStatus errorStatus = GetStatusIfError(requestState, responseString);
@@ -188,38 +184,6 @@ namespace PubnubApi.EndPoint
 					ResponseBuilder responseBuilder = new ResponseBuilder(config, jsonLibrary);
 					PNHereNowResult responseResult = responseBuilder.JsonToObject<PNHereNowResult>(resultList, true);
 					if (responseResult != null) {
-						if (responseResult.Channels.Count == 1)
-						{
-							var channelData = responseResult.Channels.FirstOrDefault().Value;
-							var currentFetchedOccupancies = channelData.Occupants.Count;
-							var totalChannelOccupancies = channelData.Occupancy;
-							if (currentFetchedOccupancies + offset < totalChannelOccupancies)
-							{
-								responseResult.NextOffset = currentFetchedOccupancies + offset;
-							}
-						} else if (responseResult.Channels.Count > 1)
-						{
-							int maxOccupancy=0;
-							PNHereNowChannelData maxOccupancyChannel =  new PNHereNowChannelData();
-
-							// Find the channel data with maximum occupancy count
-							// NOTE: LINQ MaxBy() not available in netstandard 2.0. Due to that this loop approach is implemented.
-							// to find the channel data with maximum occupancy among the returned channels data.
-							foreach (var channel in responseResult.Channels)
-							{
-								var hereNowChannelData = channel.Value;
-								if (hereNowChannelData.Occupancy > maxOccupancy)
-								{
-									maxOccupancy = hereNowChannelData.Occupancy;
-									maxOccupancyChannel = hereNowChannelData;
-								}
-							}
-							var currentFetchedMaxOccupantCount = maxOccupancyChannel.Occupants.Count;
-							if (currentFetchedMaxOccupantCount + offset < maxOccupancy)
-							{
-								responseResult.NextOffset = currentFetchedMaxOccupantCount + offset;
-							}
-						}
 						returnValue.Result = responseResult;
 					}
 				}
