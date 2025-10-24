@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <!--<Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />-->
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFrameworks>net6.0</TargetFrameworks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -136,8 +136,8 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-<!--  <Target Name="PostBuild" AfterTargets="PostBuildEvent">-->
-<!--    <Exec Command="copy $(ProjectDir)fileupload.txt $(ProjectDir)$(OutDir)" />-->
-<!--    <Exec Command="copy $(ProjectDir)fileupload_enc.txt $(ProjectDir)$(OutDir)" />-->
-<!--  </Target>-->
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy $(ProjectDir)fileupload.txt $(ProjectDir)$(OutDir)" />
+    <Exec Command="copy $(ProjectDir)fileupload_enc.txt $(ProjectDir)$(OutDir)" />
+  </Target>
  </Project>

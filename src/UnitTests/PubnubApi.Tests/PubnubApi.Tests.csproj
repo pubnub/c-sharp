@@ -11,8 +11,8 @@
     <AssemblyName>PubnubApi.Tests</AssemblyName>-->
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <TargetFramework>net9.0</TargetFramework>
-    <LangVersion>latest</LangVersion>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>10</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net35' ">
     <DefineConstants>$(DefineConstants);NET35</DefineConstants>
@@ -98,8 +98,8 @@
     </None>
   </ItemGroup>
 
-<!--  <Target Name="PostBuild" AfterTargets="PostBuildEvent">-->
-<!--    <Exec Command="copy $(ProjectDir)fileupload.txt $(ProjectDir)$(OutDir)" />-->
-<!--    <Exec Command="copy $(ProjectDir)fileupload_enc.txt $(ProjectDir)$(OutDir)" />-->
-<!--  </Target>-->
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy $(ProjectDir)fileupload.txt $(ProjectDir)$(OutDir)" />
+    <Exec Command="copy $(ProjectDir)fileupload_enc.txt $(ProjectDir)$(OutDir)" />
+  </Target>
  </Project>
