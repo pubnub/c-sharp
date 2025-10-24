@@ -11,8 +11,8 @@
     <AssemblyName>PubnubApi.Tests</AssemblyName>-->
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <TargetFramework>net6.0</TargetFramework>
-    <LangVersion>10</LangVersion>
+    <TargetFramework>net9.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net35' ">
     <DefineConstants>$(DefineConstants);NET35</DefineConstants>
@@ -41,9 +41,10 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
-    <PackageReference Include="NUnit" Version="2.6.1" />
-    <PackageReference Include="NUnitTestAdapter" Version="2.2.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="NUnit" Version="3.14.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
+    <PackageReference Include="WireMock.Net" Version="1.5.58" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net35'">
@@ -97,8 +98,8 @@
     </None>
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy $(ProjectDir)fileupload.txt $(ProjectDir)$(OutDir)" />
-    <Exec Command="copy $(ProjectDir)fileupload_enc.txt $(ProjectDir)$(OutDir)" />
-  </Target>
+<!--  <Target Name="PostBuild" AfterTargets="PostBuildEvent">-->
+<!--    <Exec Command="copy $(ProjectDir)fileupload.txt $(ProjectDir)$(OutDir)" />-->
+<!--    <Exec Command="copy $(ProjectDir)fileupload_enc.txt $(ProjectDir)$(OutDir)" />-->
+<!--  </Target>-->
  </Project>
