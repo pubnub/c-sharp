@@ -27,6 +27,7 @@ namespace PubNubMessaging.Tests
             // Configure all required mocks
             SetupSubscribeMocks();
             SetupHeartbeatMocks();
+            SetupLeaveMocks();
 
             // Create PubNub instance
             var config = new PNConfiguration(new UserId("csharp"))
@@ -43,9 +44,43 @@ namespace PubNubMessaging.Tests
         }
 
         [TearDown]
-        public void TearDown()
+        public async Task TearDown()
         {
-            _pubnub?.Destroy();
+            // Properly unsubscribe all channels before destroying to prevent collection modification errors
+            if (_pubnub != null)
+            {
+                try
+                {
+                    // Get all subscribed channels and channel groups
+                    var subscribedChannels = _pubnub.GetSubscribedChannels();
+                    var subscribedChannelGroups = _pubnub.GetSubscribedChannelGroups();
+
+                    // Unsubscribe all if any subscriptions exist
+                    if ((subscribedChannels != null && subscribedChannels.Count > 0) || 
+                        (subscribedChannelGroups != null && subscribedChannelGroups.Count > 0))
+                    {
+                        // UnsubscribeAll constructor automatically performs unsubscribe
+                        _pubnub.UnsubscribeAll<object>();
+                        
+                        // Wait for unsubscribe and event engine to finish processing
+                        await Task.Delay(TimeSpan.FromSeconds(1));
+                    }
+                }
+                catch
+                {
+                    // Ignore errors during cleanup
+                }
+                
+                try
+                {
+                    _pubnub.Destroy();
+                }
+                catch
+                {
+                    // Ignore errors during destroy
+                }
+            }
+            
             _mockServer?.Stop();
             _mockServer?.Dispose();
         }
@@ -166,12 +201,6 @@ namespace PubNubMessaging.Tests
                 .Where(e => e.RequestMessage.Path.Contains("/v2/subscribe/demo/"))
                 .ToList();
 
-            Console.WriteLine($"Total subscribe requests: {subscribeRequests.Count}");
-            foreach (var req in subscribeRequests)
-            {
-                Console.WriteLine($"  Subscribe: {req.RequestMessage.Path}");
-            }
-
             // With EventEngine enabled, changing channels triggers new subscription
             // Should have at least one request for initial c1
             var c1OnlyRequests = subscribeRequests
@@ -187,21 +216,11 @@ namespace PubNubMessaging.Tests
             var c1c2Requests = subscribeRequests
                 .Where(r => r.RequestMessage.Path.Contains("/c1,c2/0"))
                 .ToList();
-
-            // SDK behavior: With EventEngine, it may continue existing subscription
-            // and not make a new handshake request for channel additions
-            Console.WriteLine($"Requests for c1,c2: {c1c2Requests.Count}");
             
             // Verify heartbeats reflect the channel change
             var heartbeatRequests = _mockServer.LogEntries
                 .Where(e => e.RequestMessage.Path.Contains("/heartbeat"))
                 .ToList();
-
-            Console.WriteLine($"Total heartbeat requests: {heartbeatRequests.Count}");
-            foreach (var req in heartbeatRequests)
-            {
-                Console.WriteLine($"  Heartbeat: {req.RequestMessage.Path}");
-            }
 
             // At minimum, we should have heartbeats
             Assert.That(heartbeatRequests.Count, Is.GreaterThanOrEqualTo(1),
@@ -408,6 +427,26 @@ namespace PubNubMessaging.Tests
                     .WithDelay(TimeSpan.FromMilliseconds(50)));
         }
 
+        private void SetupLeaveMocks()
+        {
+            // Mock leave/unsubscribe requests with wildcard for any channel combination
+            _mockServer
+                .Given(Request.Create()
+                    .WithPath(new RegexMatcher(@"/v2/presence/sub_key/demo/channel/.*/leave"))
+                    .UsingGet())
+                .RespondWith(Response.Create()
+                    .WithStatusCode(200)
+                    .WithHeader("Content-Type", "application/json")
+                    .WithBodyAsJson(new
+                    {
+                        status = 200,
+                        message = "OK",
+                        action = "leave",
+                        service = "Presence"
+                    })
+                    .WithDelay(TimeSpan.FromMilliseconds(50)));
+        }
+
         private bool HasQueryParameter(WireMock.Logging.LogEntry entry, string key, string value)
         {
             if (entry.RequestMessage.Query == null) return false;
@@ -428,8 +467,6 @@ namespace PubNubMessaging.Tests
             var heartbeatC1 = heartbeatRequests
                 .Where(r => r.RequestMessage.Path.Contains("/channel/c1/heartbeat"))
                 .ToList();
-
-            Console.WriteLine($"Heartbeats for c1: {heartbeatC1.Count}");
             Assert.That(heartbeatC1.Count, Is.GreaterThan(0),
                 "Should have at least one heartbeat request for c1");
 
@@ -437,20 +474,8 @@ namespace PubNubMessaging.Tests
             var heartbeatWithDuplicates = heartbeatRequests
                 .Where(r => r.RequestMessage.Path.Contains("/channel/c1,c1/heartbeat"))
                 .ToList();
-
-            Console.WriteLine($"Heartbeats with duplicates (should be 0): {heartbeatWithDuplicates.Count}");
             Assert.That(heartbeatWithDuplicates.Count, Is.EqualTo(0),
                 "Should have NO heartbeat requests with duplicate channels - SDK deduplicates");
-        }
-
-        private void PrintAllRequests()
-        {
-            Console.WriteLine("\n=== All Requests ===");
-            foreach (var entry in _mockServer.LogEntries)
-            {
-                Console.WriteLine($"[{entry.RequestMessage.DateTime:HH:mm:ss.fff}] {entry.RequestMessage.Method} {entry.RequestMessage.Path}?{entry.RequestMessage.Query}");
-            }
-            Console.WriteLine("===================\n");
         }
     }
 }
