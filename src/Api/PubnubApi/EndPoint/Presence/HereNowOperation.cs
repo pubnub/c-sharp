@@ -74,8 +74,11 @@ namespace PubnubApi.EndPoint
             }
 
             if (limit > 1000)
+            {
                 logger.Debug(
                     "Provided 'limit' value exceeds the maximum allowed (1000). The value has been capped to 1000.");
+            }
+
             return this;
         }
 
