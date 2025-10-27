@@ -169,7 +169,7 @@ namespace PubnubApi.EndPoint
                 uuidId = config.UserId;
             }
 
-            logger?.Debug($"{GetType().Name} parameter validated.");
+            logger?.Trace($"{GetType().Name} parameter validated.");
             var requestState = new RequestState<PNSetUuidMetadataResult>
             {
                 ResponseType = PNOperationType.PNSetUuidMetadataOperation,
@@ -225,7 +225,7 @@ namespace PubnubApi.EndPoint
                 uuidId = config.UserId;
             }
 
-            logger?.Debug($"{GetType().Name} parameter validated.");
+            logger?.Trace($"{GetType().Name} parameter validated.");
             var returnValue = new PNResult<PNSetUuidMetadataResult>();
 
             var requestState = new RequestState<PNSetUuidMetadataResult>
@@ -283,7 +283,7 @@ namespace PubnubApi.EndPoint
                 returnValue.Status = status;
             }
 
-            logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status?.StatusCode}");
+            logger?.Trace($"{GetType().Name} request finished with status code {returnValue.Status?.StatusCode}");
             return returnValue;
         }
 

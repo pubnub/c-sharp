@@ -107,7 +107,7 @@ public class GetUuidMetadataOperation : PubnubCoreBase
             this.uuid = config.UserId;
         }
 
-        logger?.Debug($"{GetType().Name} parameter validated.");
+        logger?.Trace($"{GetType().Name} parameter validated.");
         var requestState = new RequestState<PNGetUuidMetadataResult>
         {
             ResponseType = PNOperationType.PNGetUuidMetadataOperation,
@@ -161,7 +161,7 @@ public class GetUuidMetadataOperation : PubnubCoreBase
     {
         if (string.IsNullOrEmpty(this.uuid)) { this.uuid = config.UserId;}
 
-        logger?.Debug($"{GetType().Name} parameter validated.");
+        logger?.Trace($"{GetType().Name} parameter validated.");
         var returnValue = new PNResult<PNGetUuidMetadataResult>();
         var requestState = new RequestState<PNGetUuidMetadataResult>
         {
@@ -219,7 +219,7 @@ public class GetUuidMetadataOperation : PubnubCoreBase
             returnValue.Status = status;
         }
 
-        logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status?.StatusCode}");
+            logger?.Trace($"{GetType().Name} request finished with status code {returnValue.Status?.StatusCode}");
         return returnValue;
     }
 

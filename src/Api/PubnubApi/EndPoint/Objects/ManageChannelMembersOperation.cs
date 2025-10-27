@@ -125,7 +125,7 @@ namespace PubnubApi.EndPoint
             {
                 throw new ArgumentException("Missing callback");
             }
-            logger?.Debug($"{GetType().Name} parameter validated.");
+            logger?.Trace($"{GetType().Name} parameter validated.");
             this.savedCallback = callback;
             ProcessMembersOperationRequest(callback);
         }
@@ -196,7 +196,7 @@ namespace PubnubApi.EndPoint
                 returnValue.Status = errStatus;
                 return returnValue;
             }
-            logger?.Debug($"{GetType().Name} parameter validated.");
+            logger?.Trace($"{GetType().Name} parameter validated.");
             RequestState<PNChannelMembersResult> requestState = new RequestState<PNChannelMembersResult>
                 {
                     ResponseType = PNOperationType.PNManageChannelMembersOperation,
@@ -236,7 +236,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNManageChannelMembersOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
-            logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
+            logger?.Trace($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
             return returnValue;
         }
 

@@ -137,7 +137,7 @@ namespace PubnubApi.EndPoint
                 throw new MissingMemberException("publish key is required");
             }
 
-            logger?.Debug($"{GetType().Name} parameter validated.");
+            logger?.Trace($"{GetType().Name} parameter validated.");
             ManualResetEvent syncEvent = new ManualResetEvent(false);
             Task<PNPublishResult> task = Task<PNPublishResult>.Factory.StartNew(() =>
             {
@@ -188,7 +188,7 @@ namespace PubnubApi.EndPoint
                 return;
             }
 
-            logger?.Debug($"{GetType().Name} parameter validated.");
+            logger?.Trace($"{GetType().Name} parameter validated.");
             RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>
             {
                 Channels = [channel],
@@ -296,7 +296,7 @@ namespace PubnubApi.EndPoint
                 Reconnect = false,
                 EndPointOperation = this
             };
-            logger?.Debug($"{GetType().Name} parameter validated.");
+            logger?.Trace($"{GetType().Name} parameter validated.");
             var requestParameter = CreateRequestParameter();
             var transportRequest =
                 PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter,
@@ -371,7 +371,7 @@ namespace PubnubApi.EndPoint
                 returnValue.Status = status;
             }
 
-            logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
+            logger?.Trace($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
             return returnValue;
         }
 

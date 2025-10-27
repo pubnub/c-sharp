@@ -128,7 +128,7 @@ namespace PubnubApi.EndPoint
                 return;
             }
 
-            logger?.Debug($"{GetType().Name} parameter validated.");
+            logger?.Trace($"{GetType().Name} parameter validated.");
             RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>
             {
                 Channels = new[] { channel },
@@ -236,7 +236,7 @@ namespace PubnubApi.EndPoint
                 return returnValue;
             }
 
-            logger?.Debug($"{GetType().Name} parameter validated.");
+            logger?.Trace($"{GetType().Name} parameter validated.");
             RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>
             {
                 Channels = new[] { channel },
@@ -318,7 +318,7 @@ namespace PubnubApi.EndPoint
                 returnValue.Status = status;
             }
 
-            logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
+            logger?.Trace($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
             return returnValue;
         }
 

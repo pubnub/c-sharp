@@ -142,7 +142,7 @@ namespace PubnubApi.EndPoint
 
         private void ProcessMembersOperationRequest(PNCallback<PNChannelMembersResult> callback)
         {
-            logger?.Debug($"{GetType().Name} parameter validated.");
+            logger?.Trace($"{GetType().Name} parameter validated.");
             RequestState<PNChannelMembersResult> requestState = new RequestState<PNChannelMembersResult>
             {
                 ResponseType = PNOperationType.PNSetChannelMembersOperation,
@@ -218,7 +218,7 @@ namespace PubnubApi.EndPoint
                 return returnValue;
             }
 
-            logger?.Debug($"{GetType().Name} parameter validated.");
+            logger?.Trace($"{GetType().Name} parameter validated.");
             RequestState<PNChannelMembersResult> requestState = new RequestState<PNChannelMembersResult>
             {
                 ResponseType = PNOperationType.PNSetChannelMembersOperation,
@@ -274,7 +274,7 @@ namespace PubnubApi.EndPoint
                 returnValue.Status = status;
             }
 
-            logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
+            logger?.Trace($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
             return returnValue;
         }
 

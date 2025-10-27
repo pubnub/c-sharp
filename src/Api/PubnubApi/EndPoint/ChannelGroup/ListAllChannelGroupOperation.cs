@@ -74,7 +74,7 @@ namespace PubnubApi.EndPoint
 					requestState.GotJsonResponse = true;
 					if (!string.IsNullOrEmpty(responseString)) {
 						List<object> result = ProcessJsonResponse(requestState, responseString);
-						logger?.Debug($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
+						logger?.Trace($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 						ProcessResponseCallbacks(result, requestState);
 					}
 				} else {
@@ -82,7 +82,7 @@ namespace PubnubApi.EndPoint
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, t.Result.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.ChannelGroupAllGet, category, requestState, statusCode, new PNException(t.Result.Error.Message, t.Result.Error));
 					requestState.PubnubCallback.OnResponse(default(PNChannelGroupsListAllResult), status);
-					logger?.Debug($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
+					logger?.Trace($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 				}
 			});
 		}
@@ -128,7 +128,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.ChannelGroupAllGet, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
-			logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
+			logger?.Trace($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 

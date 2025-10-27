@@ -61,7 +61,7 @@ namespace PubnubApi.EndPoint
 				throw new MissingMemberException("Invalid secret key");
 			}
 
-			logger?.Debug($"{GetType().Name} parameter validated.");
+			logger?.Trace($"{GetType().Name} parameter validated.");
 			RequestState<PNAccessManagerRevokeTokenResult> requestState = new RequestState<PNAccessManagerRevokeTokenResult>
 				{
 					ResponseType = PNOperationType.PNAccessManagerRevokeToken,
@@ -80,14 +80,14 @@ namespace PubnubApi.EndPoint
 					if (!string.IsNullOrEmpty(responseString)) {
 						List<object> result = ProcessJsonResponse(requestState, responseString);
 						ProcessResponseCallbacks(result, requestState);
-						logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
+						logger?.Trace($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 					}
 				} else {
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(t.Result.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, t.Result.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNAccessManagerRevokeToken, category, requestState, statusCode, new PNException(t.Result.Error.Message, t.Result.Error));
 					requestState.PubnubCallback.OnResponse(default(PNAccessManagerRevokeTokenResult), status);
-					logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
+					logger?.Trace($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 				}
 			});
 		}
@@ -97,7 +97,7 @@ namespace PubnubApi.EndPoint
 			if (string.IsNullOrEmpty(config.SecretKey) || string.IsNullOrEmpty(config.SecretKey.Trim()) || config.SecretKey.Length <= 0) {
 				throw new MissingMemberException("Invalid secret key");
 			}
-			logger?.Debug($"{GetType().Name} parameter validated.");
+			logger?.Trace($"{GetType().Name} parameter validated.");
 			PNResult<PNAccessManagerRevokeTokenResult> returnValue = new PNResult<PNAccessManagerRevokeTokenResult>();
 			RequestState<PNAccessManagerRevokeTokenResult> requestState = new RequestState<PNAccessManagerRevokeTokenResult>();
 			requestState.ResponseType = PNOperationType.PNAccessManagerRevokeToken;
@@ -133,10 +133,10 @@ namespace PubnubApi.EndPoint
 			} else {
 				int statusCode = PNStatusCodeHelper.GetHttpStatusCode(transportResponse.Error.Message);
 				PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
-				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNAccessManagerRevokeToken, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));logger?.Debug($"{GetType().Name} request finished with status code {statusCode}");
+				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNAccessManagerRevokeToken, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));logger?.Trace($"{GetType().Name} request finished with status code {statusCode}");
 				returnValue.Status = status;
 			}
-			logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
+			logger?.Trace($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 

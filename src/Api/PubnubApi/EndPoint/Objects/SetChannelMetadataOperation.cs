@@ -121,7 +121,7 @@ namespace PubnubApi.EndPoint
             }
 
             savedCallback = callback;
-            logger?.Debug($"{GetType().Name} parameter validated.");
+            logger?.Trace($"{GetType().Name} parameter validated.");
             SetChannelMetadata(callback);
         }
 
@@ -214,7 +214,7 @@ namespace PubnubApi.EndPoint
                 return returnValue;
             }
 
-            logger?.Debug($"{GetType().Name} parameter validated.");
+            logger?.Trace($"{GetType().Name} parameter validated.");
             var requestState = new RequestState<PNSetChannelMetadataResult>
             {
                 ResponseType = PNOperationType.PNSetChannelMetadataOperation,
@@ -270,7 +270,7 @@ namespace PubnubApi.EndPoint
                 returnValue.Status = status;
             }
 
-            logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
+            logger?.Trace($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
             return returnValue;
         }
 

@@ -66,7 +66,7 @@ namespace PubnubApi.EndPoint
 			if (string.IsNullOrEmpty(this.fileName)) {
 				throw new ArgumentException("Missing File Name");
 			}
-			logger?.Debug($"{GetType().Name} parameter validated.");
+			logger?.Trace($"{GetType().Name} parameter validated.");
 			this.savedCallback = callback;
 			ProcessDeleteFileRequest(this.queryParam, savedCallback);
 		}
@@ -102,10 +102,10 @@ namespace PubnubApi.EndPoint
 					if (!string.IsNullOrEmpty(responseString)) {
 						List<object> result = ProcessJsonResponse(requestState, responseString);
 						ProcessResponseCallbacks(result, requestState);
-						logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
+						logger?.Trace($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 					} else {
 						PNStatus errorStatus = GetStatusIfError(requestState, responseString);
-						logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
+						logger?.Trace($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 						callback.OnResponse(default, errorStatus);
 					}
 				} else {
@@ -113,7 +113,7 @@ namespace PubnubApi.EndPoint
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNDeleteFileOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 					requestState.PubnubCallback.OnResponse(default, status);
-					logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
+					logger?.Trace($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 				}
 			});
 		}

@@ -107,7 +107,7 @@ namespace PubnubApi.EndPoint
 				callback.OnResponse(null, status);
 				return;
 			}
-			logger?.Debug($"{GetType().Name} parameter validated.");
+			logger?.Trace($"{GetType().Name} parameter validated.");
 			RequestState<PNAddMessageActionResult> requestState = new RequestState<PNAddMessageActionResult>
 				{
 					Channels = new[] { channelName },
@@ -137,7 +137,7 @@ namespace PubnubApi.EndPoint
 				if (!string.IsNullOrEmpty(json))
 				{
 					List<object> result = ProcessJsonResponse(requestState, json);
-					logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
+					logger?.Trace($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 					ProcessResponseCallbacks(result, requestState);
 				} else {
 					requestState.PubnubCallback.OnResponse(default, errorStatus);
@@ -171,7 +171,7 @@ namespace PubnubApi.EndPoint
 				returnValue.Status = status;
 				return returnValue;
 			}
-			logger?.Debug($"{GetType().Name} parameter validated.");
+			logger?.Trace($"{GetType().Name} parameter validated.");
 			RequestState<PNAddMessageActionResult> requestState = new RequestState<PNAddMessageActionResult>
 				{
 					Channels = new[] { channel },
@@ -215,7 +215,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNAddMessageActionOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
-			logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
+			logger?.Trace($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 

@@ -91,7 +91,7 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing Channel");
             }
 
-                    logger?.Debug($"{GetType().Name} parameter validated.");
+                    logger?.Trace($"{GetType().Name} parameter validated.");
         this.savedCallback = callback;
         GetSingleChannelMetadata(savedCallback);
         }
@@ -173,7 +173,7 @@ namespace PubnubApi.EndPoint
                 return returnValue;
             }
 
-            logger?.Debug($"{GetType().Name} parameter validated.");
+            logger?.Trace($"{GetType().Name} parameter validated.");
             RequestState<PNGetChannelMetadataResult> requestState = new RequestState<PNGetChannelMetadataResult>
             {
                 ResponseType = PNOperationType.PNGetChannelMetadataOperation,
@@ -229,7 +229,7 @@ namespace PubnubApi.EndPoint
                 returnValue.Status = status;
             }
 
-            logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
+            logger?.Trace($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
             return returnValue;
         }
 

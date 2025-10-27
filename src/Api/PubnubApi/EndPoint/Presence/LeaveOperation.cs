@@ -56,7 +56,7 @@ namespace PubnubApi.EndPoint
 					$"Presence Leave request for channel(s)={string.Join(", ", channels.OrderBy(x => x))} \n channelGroup(s)={string.Join(", ", channelGroups.OrderBy(x => x))} \n Exception Details={ex}");
 				return new PNStatus(ex, PNOperationType.Leave, PNStatusCategory.PNUnknownCategory, channels, channelGroups);
 			}
-			logger?.Info($"{GetType().Name} request finished with status code {responseStatus.StatusCode}");
+			logger?.Trace($"{GetType().Name} request finished with status code {responseStatus.StatusCode}");
 			return responseStatus;
 		}
 		private RequestParameter CreateRequestParameter(string[] channels, string[] channelGroups)

@@ -117,7 +117,7 @@ namespace PubnubApi.EndPoint
                 this.uuid = config.UserId;
             }
 
-            logger?.Debug($"{GetType().Name} parameter validated.");
+            logger?.Trace($"{GetType().Name} parameter validated.");
             RequestState<PNMembershipsResult> requestState = new RequestState<PNMembershipsResult>
             {
                 ResponseType = PNOperationType.PNGetMembershipsOperation,
@@ -178,7 +178,7 @@ namespace PubnubApi.EndPoint
                 this.uuid = config.UserId;
             }
 
-            logger?.Debug($"{GetType().Name} parameter validated.");
+            logger?.Trace($"{GetType().Name} parameter validated.");
             RequestState<PNMembershipsResult> requestState = new RequestState<PNMembershipsResult>
             {
                 ResponseType = PNOperationType.PNGetMembershipsOperation,
@@ -234,7 +234,7 @@ namespace PubnubApi.EndPoint
                 returnValue.Status = status;
             }
 
-            logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status?.StatusCode}");
+            logger?.Trace($"{GetType().Name} request finished with status code {returnValue.Status?.StatusCode}");
             return returnValue;
         }
 

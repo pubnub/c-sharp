@@ -82,7 +82,7 @@ namespace PubnubApi.EndPoint
 			if (string.IsNullOrEmpty(groupName) || groupName.Trim().Length == 0) {
 				throw new ArgumentException("Missing groupName");
 			}
-			logger?.Debug($"{GetType().Name} parameter validated.");
+			logger?.Trace($"{GetType().Name} parameter validated.");
 			RequestState<PNChannelGroupsAddChannelResult> requestState = new RequestState<PNChannelGroupsAddChannelResult>();
 			requestState.ResponseType = PNOperationType.PNAddChannelsToGroupOperation;
 			requestState.Channels = new string[] { };
@@ -101,14 +101,14 @@ namespace PubnubApi.EndPoint
 					if (!string.IsNullOrEmpty(responseString)) {
 						List<object> result = ProcessJsonResponse(requestState, responseString);
 						ProcessResponseCallbacks(result, requestState);
-						logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
+						logger?.Trace($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 					}
 				} else {
 					int statusCode = PNStatusCodeHelper.GetHttpStatusCode(t.Result.Error.Message);
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, t.Result.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNAddChannelsToGroupOperation, category, requestState, statusCode, new PNException(t.Result.Error.Message, t.Result.Error));
 					requestState.PubnubCallback.OnResponse(default(PNChannelGroupsAddChannelResult), status);
-					logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
+					logger?.Trace($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 				}
 			});
 		}
@@ -126,7 +126,7 @@ namespace PubnubApi.EndPoint
 			if (string.IsNullOrEmpty(groupName) || groupName.Trim().Length == 0) {
 				throw new ArgumentException("Missing groupName");
 			}
-			logger?.Debug($"{GetType().Name} parameter validated.");
+			logger?.Trace($"{GetType().Name} parameter validated.");
 			PNResult<PNChannelGroupsAddChannelResult> returnValue = new PNResult<PNChannelGroupsAddChannelResult>();
 			RequestState<PNChannelGroupsAddChannelResult> requestState = new RequestState<PNChannelGroupsAddChannelResult>();
 			requestState.ResponseType = PNOperationType.PNAddChannelsToGroupOperation;
@@ -165,7 +165,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNAccessManagerRevokeToken, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
-			logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
+			logger?.Trace($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 

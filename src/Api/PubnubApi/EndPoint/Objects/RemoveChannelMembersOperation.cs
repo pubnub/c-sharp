@@ -131,7 +131,7 @@ namespace PubnubApi.EndPoint
 
 		private void ProcessRemoveChannelMembersOperationRequest(string spaceId, List<string> removeMemberList, PNPageObject page, int limit, bool includeCount, string includeOptions, List<string> sort, Dictionary<string, object> externalQueryParam, PNCallback<PNChannelMembersResult> callback)
 		{
-			logger?.Debug($"{GetType().Name} parameter validated.");
+			logger?.Trace($"{GetType().Name} parameter validated.");
 			RequestState<PNChannelMembersResult> requestState = new RequestState<PNChannelMembersResult>
 				{
 					ResponseType = PNOperationType.PNRemoveChannelMembersOperation,
@@ -150,11 +150,11 @@ namespace PubnubApi.EndPoint
                         requestState.GotJsonResponse = true;
 						List<object> result = ProcessJsonResponse(requestState, responseString);
 						ProcessResponseCallbacks(result, requestState);
-						logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
+						logger?.Trace($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 					} else {
 						PNStatus errorStatus = GetStatusIfError(requestState, responseString);
 						callback.OnResponse(default, errorStatus);
-						logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
+						logger?.Trace($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 					}
 
 				} else {
@@ -162,7 +162,7 @@ namespace PubnubApi.EndPoint
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNRemoveChannelMembersOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 					requestState.PubnubCallback.OnResponse(default, status);
-					logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
+					logger?.Trace($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 				}
 			});
 		}
@@ -182,7 +182,7 @@ namespace PubnubApi.EndPoint
 				returnValue.Status = errStatus;
 				return returnValue;
 			}
-			logger?.Debug($"{GetType().Name} parameter validated.");
+			logger?.Trace($"{GetType().Name} parameter validated.");
 			RequestState<PNChannelMembersResult> requestState = new RequestState<PNChannelMembersResult>
 				{
 					ResponseType = PNOperationType.PNRemoveChannelMembersOperation,
@@ -220,7 +220,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNRemoveChannelMembersOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
-			logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
+			logger?.Trace($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 

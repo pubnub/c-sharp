@@ -133,7 +133,7 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing File");
             }
 
-            logger?.Debug($"{GetType().Name} parameter validated.");
+            logger?.Trace($"{GetType().Name} parameter validated.");
             ProcessFileUpload(callback);
         }
 
@@ -289,7 +289,7 @@ namespace PubnubApi.EndPoint
                 return returnValue;
             }
 
-            logger?.Debug($"{GetType().Name} parameter validated.");
+            logger?.Trace($"{GetType().Name} parameter validated.");
             PNResult<PNGenerateFileUploadUrlResult> generateFileUploadUrl =
                 await GenerateFileUploadUrl().ConfigureAwait(false);
             PNGenerateFileUploadUrlResult generateFileUploadUrlResult = generateFileUploadUrl.Result;
@@ -432,7 +432,7 @@ namespace PubnubApi.EndPoint
                          !(publishFileMessageStatus?.StatusCode != 400 || publishFileMessageStatus.StatusCode != 403));
             }
 
-            logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status?.StatusCode}");
+            logger?.Trace($"{GetType().Name} request finished with status code {returnValue.Status?.StatusCode}");
             return returnValue;
         }
 

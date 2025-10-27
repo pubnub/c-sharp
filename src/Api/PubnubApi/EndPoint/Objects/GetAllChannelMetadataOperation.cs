@@ -133,7 +133,7 @@ namespace PubnubApi.EndPoint
             throw new ArgumentException("Missing callback");
         }
 
-        logger?.Debug($"{GetType().Name} parameter validated.");
+        logger?.Trace($"{GetType().Name} parameter validated.");
         var requestState = new RequestState<PNGetAllChannelMetadataResult>
         {
             ResponseType = PNOperationType.PNGetAllChannelMetadataOperation,
@@ -234,7 +234,7 @@ namespace PubnubApi.EndPoint
             returnValue.Status = status;
         }
 
-        logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status?.StatusCode}");
+            logger?.Trace($"{GetType().Name} request finished with status code {returnValue.Status?.StatusCode}");
         return returnValue;
     }
 
