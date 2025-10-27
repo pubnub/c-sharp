@@ -1,3 +1,11 @@
+v8.0.0 - October 27 2025
+-----------------------------
+- Added: bREAKING CHANGES: The HereNow method will return a maximum of 1000 occupants per channel. Previously, it was returning all occupants without limit parameter support. Use pagination through offset when more than 1000 occupants present in channel.
+
+- Fixed: discard use of gcm and replaced with fcm for push notification service type of google. Removed mpns support.
+
+- Modified: added new tests for duplicate subscribe requests.
+
 v7.5.0 - September 01 2025
 -----------------------------
 - Fixed: fixed types of Meta and Actions in PNHistoryItemResult to not be objects but properly formatted Dictionaries.
