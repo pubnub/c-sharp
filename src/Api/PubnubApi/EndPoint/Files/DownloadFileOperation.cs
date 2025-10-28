@@ -75,7 +75,7 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing File Name");
             }
 
-            logger?.Debug($"{GetType().Name} parameter validated.");
+            logger?.Trace($"{GetType().Name} parameter validated.");
             savedCallback = callback ?? throw new ArgumentException("Missing callback");
             ProcessFileDownloadRequest(savedCallback);
         }
@@ -127,7 +127,7 @@ namespace PubnubApi.EndPoint
                 return returnValue;
             }
 
-            logger?.Debug($"{GetType().Name} parameter validated.");
+            logger?.Trace($"{GetType().Name} parameter validated.");
             var requestParameter = CreateRequestParameter();
             var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(
                 requestParameter: requestParameter, operationType: PNOperationType.PNDownloadFileOperation);
@@ -210,7 +210,7 @@ namespace PubnubApi.EndPoint
                     new PNException(transportResponse.Error.Message, transportResponse.Error));
                 returnValue.Status = status;
             }
-            logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status?.StatusCode}");
+            logger?.Trace($"{GetType().Name} request finished with status code {returnValue.Status?.StatusCode}");
             return returnValue;
         }
 

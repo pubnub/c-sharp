@@ -99,15 +99,17 @@
     <Compile Include="..\PubnubApi.Tests\WhenUnsubscribedToAChannelGroup.cs" Link="WhenUnsubscribedToAChannelGroup.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenUserIdInPNConfig.cs" Link="WhenUserIdInPNConfig.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenSubscribeToChannelPresence.cs" Link="WhenSubscribeToChannelPresence.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenSubscribeWithDuplicateChannels.cs" Link="WhenSubscribeWithDuplicateChannels.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
-    <PackageReference Include="NUnit" Version="3.12.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="5.1.0-alpha.3" />
+      <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+      <PackageReference Include="NUnit" Version="3.14.0" />
+      <PackageReference Include="NUnit3TestAdapter" Version="5.2.0" />
+      <PackageReference Include="WireMock.Net" Version="1.15.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Api\PubnubApiPCL\PubnubApiPCL.csproj" />

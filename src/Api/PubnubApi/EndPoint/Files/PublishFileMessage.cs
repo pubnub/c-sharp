@@ -123,7 +123,7 @@ namespace PubnubApi.EndPoint
 				callback.OnResponse(null, status);
 				return;
 			}
-			logger?.Debug($"{GetType().Name} parameter validated.");
+			logger?.Trace($"{GetType().Name} parameter validated.");
 			RequestState<PNPublishFileMessageResult> requestState = new RequestState<PNPublishFileMessageResult>
 				{
 					ResponseType = PNOperationType.PNPublishFileMessageOperation,
@@ -145,16 +145,16 @@ namespace PubnubApi.EndPoint
 							var _ = int.TryParse(result[0].ToString(), out publishStatus);
 							if (publishStatus == 1) {
 								ProcessResponseCallbacks(result, requestState);
-								logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
+								logger?.Trace($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 							} else {
 								PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(400, result[1].ToString());
 								PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse<PNPublishFileMessageResult>(PNOperationType.PNPublishFileMessageOperation, category, requestState, 400, new PNException(responseString));
 								requestState.PubnubCallback.OnResponse(default, status);
-								logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
+								logger?.Trace($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 							}
 						} else {
 							ProcessResponseCallbacks(result, requestState);
-							logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
+							logger?.Trace($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 						}
 					}
 				} else {
@@ -162,7 +162,7 @@ namespace PubnubApi.EndPoint
 					PNStatusCategory category = PNStatusCategoryHelper.GetPNStatusCategory(statusCode, transportResponse.Error.Message);
 					PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNPublishFileMessageOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 					requestState.PubnubCallback.OnResponse(default, status);
-					logger?.Info($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
+					logger?.Trace($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 				}
 			});
 		}
@@ -180,7 +180,7 @@ namespace PubnubApi.EndPoint
 				returnValue.Status = errStatus;
 				return returnValue;
 			}
-			logger?.Debug($"{GetType().Name} parameter validated.");
+			logger?.Trace($"{GetType().Name} parameter validated.");
 			var requestParameter = CreateRequestParameter();
 			RequestState<PNPublishFileMessageResult> requestState = new RequestState<PNPublishFileMessageResult>
 				{
@@ -226,7 +226,7 @@ namespace PubnubApi.EndPoint
 				PNStatus status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(PNOperationType.PNPublishFileMessageOperation, category, requestState, statusCode, new PNException(transportResponse.Error.Message, transportResponse.Error));
 				returnValue.Status = status;
 			}
-			logger?.Info($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
+			logger?.Trace($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
 			return returnValue;
 		}
 

@@ -168,7 +168,7 @@ namespace PubnubApi
         {
             try
             {
-                logger?.Debug("JsonNet Deserializing object data.");
+                logger?.Trace("JsonNet Deserializing object data.");
                 if (rawObject is JObject jObject)
                 {
                     return jObject.ToObject(type);
@@ -187,7 +187,7 @@ namespace PubnubApi
 
         public object DeserializeToObject(string jsonString)
         {
-            logger?.Debug("JsonNet Deserializing json string data.");
+            logger?.Trace("JsonNet Deserializing json string data.");
             object result = null;
             try
             {
@@ -211,7 +211,7 @@ namespace PubnubApi
                         result = objectContainer;
                     }
                 }
-                logger?.Debug("JsonNet Deserializer json string data successfully.");
+                logger?.Trace("JsonNet Deserializer json string data successfully.");
             }
             catch (Exception e)
             {
@@ -253,7 +253,7 @@ namespace PubnubApi
 
         private T DeserializeMessageToObjectBasedOnPlatform<T>(List<object> listObject)
         {
-            logger?.Debug("JsonNet Deserializing Messages data.");
+            logger?.Trace("JsonNet Deserializing Messages data.");
             T ret = default(T);
             Type dataType = typeof(T).GetTypeInfo().GenericTypeArguments[0];
             Type generic = typeof(PNMessageResult<>);
@@ -328,7 +328,7 @@ namespace PubnubApi
 
                 ret = (T)Convert.ChangeType(message, specific, CultureInfo.InvariantCulture);
             }
-            logger?.Debug("JsonNet Deserialized Messages successfully.");
+            logger?.Trace("JsonNet Deserialized Messages successfully.");
             return ret;
         }
 

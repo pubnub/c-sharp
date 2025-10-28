@@ -112,14 +112,6 @@ namespace PubnubApi
                         ret.Add("pn_gcm", pnFcm);
                     }
                 }
-                else if (pushType == PNPushType.MPNS)
-                {
-                    Dictionary<string, object> pnMpns = BuildMpnsPayload(pushType);
-                    if (pnMpns != null)
-                    {
-                        ret.Add("pn_mpns", pnMpns);
-                    }
-                }
             }
 
             return ret;

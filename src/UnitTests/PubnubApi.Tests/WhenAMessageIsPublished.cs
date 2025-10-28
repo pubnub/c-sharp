@@ -1809,16 +1809,10 @@ namespace PubNubMessaging.Tests
                                     {"score", new int[] { 7, 0 } },
                                     {"lastplay", "5yd run up the middle" }
                                 });
-            pushTypeCustomData.Add(PNPushType.MPNS, new Dictionary<string, object> 
-                                {
-                                    {"type", "flip" },
-                                    {"back_title", "Back Tile" },
-                                    {"back_content", "Back message" }
-                                });
 
             Dictionary<string, object> payload =
                 new MobilePushHelper()
-                .PushTypeSupport(new PNPushType[] { PNPushType.APNS2, PNPushType.FCM, PNPushType.MPNS })
+                .PushTypeSupport(new PNPushType[] { PNPushType.APNS2, PNPushType.FCM })
                 .Title("Game update 49ers touchdown")
                 .Badge(2)
                 .Apns2Data(new List<Apns2Data>() { apns2Data })

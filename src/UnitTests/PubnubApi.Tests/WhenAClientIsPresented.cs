@@ -2764,6 +2764,140 @@ namespace PubNubMessaging.Tests
             pubnub.PubnubUnitTest = null;
             pubnub = null;
         }
+        
+        [Test]
+        public static async Task ThenHereNowShouldProvideCorrectNextOffsetForSingleChannel()
+        {
+            string channel = $"presence_{Guid.NewGuid()}";
+            string userId1 = $"user1_{Guid.NewGuid()}";
+            string userId2 = $"user2_{Guid.NewGuid()}";
+            PNConfiguration configuration1 = new PNConfiguration(new UserId(userId1))
+            {
+                PublishKey = PubnubCommon.NonPAMPublishKey,
+                SubscribeKey = PubnubCommon.NONPAMSubscribeKey,
+            };
+            var pubnub1 = createPubNubInstance(configuration1);
+            PNConfiguration configuration2 = new PNConfiguration(new UserId(userId2))
+            {
+                PublishKey = PubnubCommon.NonPAMPublishKey,
+                SubscribeKey = PubnubCommon.NONPAMSubscribeKey,
+            };
+            var pubnub2 = createPubNubInstance(configuration2);
 
+            var subscription1 = pubnub1.Channel(channel).Subscription();
+            subscription1.Subscribe<object>();
+            
+            var subscription2 = pubnub2.Channel(channel).Subscription();
+            subscription2.Subscribe<object>();
+            
+            await Task.Delay(1000);
+
+            var response = await pubnub1.HereNow().Channels(new string[] { channel }).ExecuteAsync();
+            var channelOccupants = response.Result.Channels.FirstOrDefault().Value.Occupants.Select(u=>u.Uuid).ToList();
+            Assert.AreEqual(2, response.Result.TotalOccupancy);
+            Assert.Contains(userId1, channelOccupants);
+            Assert.Contains(userId2, channelOccupants);
+        
+            pubnub1.Destroy();
+            pubnub1.PubnubUnitTest = null;
+
+            pubnub2.Destroy();
+            pubnub2.PubnubUnitTest = null;
+        }
+        [Test]
+        public static async Task ThenHereNowWithLimitShouldProvideCorrectNextOffsetForSingleChannel()
+        {
+            string channel = $"presence_{Guid.NewGuid()}";
+            string userId1 = $"user1_{Guid.NewGuid()}";
+            string userId2 = $"user2_{Guid.NewGuid()}";
+            PNConfiguration configuration1 = new PNConfiguration(new UserId(userId1))
+            {
+                PublishKey = PubnubCommon.NonPAMPublishKey,
+                SubscribeKey = PubnubCommon.NONPAMSubscribeKey,
+            };
+            var pubnub1 = createPubNubInstance(configuration1);
+            PNConfiguration configuration2 = new PNConfiguration(new UserId(userId2))
+            {
+                PublishKey = PubnubCommon.NonPAMPublishKey,
+                SubscribeKey = PubnubCommon.NONPAMSubscribeKey,
+            };
+            var pubnub2 = createPubNubInstance(configuration2);
+
+            var subscription1 = pubnub1.Channel(channel).Subscription();
+            subscription1.Subscribe<object>();
+            
+            var subscription2 = pubnub2.Channel(channel).Subscription();
+            subscription2.Subscribe<object>();
+            
+            await Task.Delay(1000);
+
+            var response = await pubnub1.HereNow().Channels(new string[] { channel }).Limit(1).ExecuteAsync();
+            var channelOccupants = response.Result.Channels.FirstOrDefault().Value.Occupants.Select(u=>u.Uuid).ToList();
+            Assert.AreEqual(2, response.Result.TotalOccupancy);
+            
+            // test callback style API support 
+            pubnub2.HereNow()
+                .Channels(new string[] { channel })
+                .Limit(1)
+                .Execute(new PNHereNowResultEx((hereNowResult, status) =>
+                {
+                    Assert.AreEqual(200, status.StatusCode);
+                    Assert.AreEqual(1, response.Result.Channels.FirstOrDefault().Value.Occupants.Count());
+                }));
+            pubnub1.Destroy();
+            pubnub1.PubnubUnitTest = null;
+
+            pubnub2.Destroy();
+            pubnub2.PubnubUnitTest = null;
+        }
+        [Test]
+        public static async Task ThenHereNowWithMultipleChannelsWithoutLimitOffsetWorks()
+        {
+            string channel1 = $"presence_{Guid.NewGuid()}";
+            string channel2 = $"presence_{Guid.NewGuid()}";
+            
+            string userId1 = $"user1_{Guid.NewGuid()}";
+            string userId2 = $"user2_{Guid.NewGuid()}";
+            
+            PNConfiguration configuration1 = new PNConfiguration(new UserId(userId1))
+            {
+                PublishKey = PubnubCommon.NonPAMPublishKey,
+                SubscribeKey = PubnubCommon.NONPAMSubscribeKey,
+            };
+            var pubnub1 = createPubNubInstance(configuration1);
+            PNConfiguration configuration2 = new PNConfiguration(new UserId(userId2))
+            {
+                PublishKey = PubnubCommon.NonPAMPublishKey,
+                SubscribeKey = PubnubCommon.NONPAMSubscribeKey,
+            };
+            var pubnub2 = createPubNubInstance(configuration2);
+            
+            var subscription1 = pubnub1.Channel(channel1).Subscription();
+            subscription1.Subscribe<object>();
+            
+            var subscription2 = pubnub2.Channel(channel1).Subscription();
+            subscription2.Subscribe<object>();
+            
+            var subscription12 = pubnub1.Channel(channel2).Subscription();
+            subscription12.Subscribe<object>();
+            
+            var subscription22 = pubnub2.Channel(channel2).Subscription();
+            subscription22.Subscribe<object>();
+
+            await Task.Delay(1000);
+            
+            var hereNowResponse = await pubnub1
+                .HereNow()
+                .Channels(new string[] { channel1, channel2 })
+                .ExecuteAsync();
+            
+            Assert.AreEqual(4, hereNowResponse.Result.TotalOccupancy);
+            var channel1Occupants = hereNowResponse.Result.Channels[channel1].Occupants.Select(u=>u.Uuid).ToList();
+            Assert.Contains(userId1, channel1Occupants, "user1 not found in hereNow list for channel1");
+            Assert.Contains(userId2, channel1Occupants, "user2 not found in hereNow list for channel1");
+            var channel2Occupants = hereNowResponse.Result.Channels[channel2].Occupants.Select(u=>u.Uuid).ToList();
+            Assert.Contains(userId1, channel2Occupants, "user1 not found in hereNow list for channel2");
+            Assert.Contains(userId2, channel2Occupants, "user2 not found in hereNow list for channel2");
+        }
     }
 }
