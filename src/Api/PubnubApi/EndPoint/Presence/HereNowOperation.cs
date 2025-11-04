@@ -10,18 +10,18 @@ namespace PubnubApi.EndPoint
 {
     public class HereNowOperation : PubnubCoreBase
     {
+        private const int DefaultLimit = 1000;
+        
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
         private readonly IPubnubUnitTest unit;
-
-
         private string[] channelNames;
         private string[] channelGroupNames;
         private bool includeUserState;
         private bool includeChannelUUIDs = true;
         private PNCallback<PNHereNowResult> savedCallback;
         private Dictionary<string, object> queryParam;
-        private int limit = 1000;
+        private int limit = DefaultLimit;
         private int offset;
 
         public HereNowOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary,
@@ -59,26 +59,13 @@ namespace PubnubApi.EndPoint
 
         /// <summary>
         /// limit number of users details to be returned.
-        /// maximum value of limit parameter is 1000.
         /// default value is 1000.
-        /// Note: value can not be greater than 1000.
-        /// If provided value more than 1000, It will be capped to 1000.
         /// </summary>
         /// <param name="limit"></param>
         /// <returns></returns>
         public HereNowOperation Limit(int limit)
         {
-            if (limit < 1000)
-            {
-                this.limit = limit;
-            }
-
-            if (limit > 1000)
-            {
-                logger.Debug(
-                    "Provided 'limit' value exceeds the maximum allowed (1000). The value has been capped to 1000.");
-            }
-
+            this.limit = limit;
             return this;
         }
 

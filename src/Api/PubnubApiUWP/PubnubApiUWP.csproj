@@ -16,7 +16,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubUWP</PackageId>
-    <PackageVersion>8.0.0.0</PackageVersion>
+    <PackageVersion>8.0.1.0</PackageVersion>
     <Title>PubNub C# .NET - Web Data Push API</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -24,9 +24,7 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>Discard use of gcm and replaced with fcm for push notification service type of google. Removed mpns support.
-BREAKING CHANGES: The HereNow method will return a maximum of 1000 occupants per channel. Previously, it was returning all occupants without limit parameter support. Use pagination through offset when more than 1000 occupants present in channel.
-Added new tests for duplicate subscribe requests.</PackageReleaseNotes>
+    <PackageReleaseNotes>Removed `limit` value clamp for HereNow API. Server will perform validation for limit parameter value.</PackageReleaseNotes>
     <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
     <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
     <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
