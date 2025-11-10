@@ -216,7 +216,14 @@ namespace PubnubApi.EndPoint
 		{
 			foreach (var listener in SubscribeListenerList)
             {
-				listener?.Message(pubnubInstance, messageResult);
+				try
+				{
+					listener?.Message(pubnubInstance, messageResult);
+				}
+				catch (Exception ex)
+				{
+					config.Logger?.Error($"error during event handler function, {ex.Message}");
+				}
 			}
 		}
 
@@ -224,7 +231,14 @@ namespace PubnubApi.EndPoint
         {
             foreach (var listener in SubscribeListenerList)
             {
-                listener?.Status(pubnubInstance, status);
+                try
+                {
+                    listener?.Status(pubnubInstance, status);
+                }
+                catch (Exception ex)
+                {
+                    config.Logger?.Error($"error during event handler function, {ex.Message}");
+                }
             }
         }
 

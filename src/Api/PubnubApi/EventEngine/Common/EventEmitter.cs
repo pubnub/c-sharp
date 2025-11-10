@@ -31,6 +31,32 @@ namespace PubnubApi.EventEngine.Common
             channelListenersMap = new Dictionary<string, List<SubscribeCallback>>();
         }
 
+        /// <summary>
+        /// Safely invokes a listener callback with exception handling to prevent listener exceptions from affecting SDK operations.
+        /// </summary>
+        /// <param name="listenerAction">The listener callback action to invoke.</param>
+        /// <param name="eventType">The type of event being processed (for logging purposes).</param>
+        /// <remarks>
+        /// This method ensures that exceptions thrown by user-provided listener callbacks do not crash the SDK
+        /// or prevent other listeners from receiving events. All exceptions are logged at Warning level.
+        /// </remarks>
+        private void SafeInvokeListener(Action listenerAction, string eventType)
+        {
+            if (listenerAction == null)
+            {
+                return;
+            }
+
+            try
+            {
+                listenerAction.Invoke();
+            }
+            catch (Exception ex)
+            {
+                configuration?.Logger?.Warn($"Exception in listener callback execution for {eventType}: {ex.Message}");
+            }
+        }
+
         private TimetokenMetadata GetTimetokenMetadata(object t)
         {
             Dictionary<string, object> ttOriginMetaData = jsonLibrary.ConvertToDictionaryObject(t);
@@ -214,14 +240,14 @@ namespace PubnubApi.EventEngine.Common
                         };
                         foreach (var listener in listeners)
                         {
-                            listener?.Signal(instance, signalMessage);
+                            SafeInvokeListener(() => listener?.Signal(instance, signalMessage), "Signal");
                         }
 
                         if (!string.IsNullOrEmpty(signalMessage.Channel) && channelListenersMap.ContainsKey(signalMessage.Channel))
                         {
                             foreach (var l in channelListenersMap[signalMessage.Channel])
                             {
-                                l?.Signal(instance, signalMessage);
+                                SafeInvokeListener(() => l?.Signal(instance, signalMessage), "Signal");
                             }
                         }
 
@@ -229,7 +255,7 @@ namespace PubnubApi.EventEngine.Common
                         {
                             foreach (var l in channelGroupListenersMap[signalMessage.Subscription])
                             {
-                                l?.Signal(instance, signalMessage);
+                                SafeInvokeListener(() => l?.Signal(instance, signalMessage), "Signal");
                             }
                         }
                     }
@@ -244,14 +270,14 @@ namespace PubnubApi.EventEngine.Common
                     {
                         foreach (var listener in listeners)
                         {
-                            listener?.ObjectEvent(instance, objectApiEvent);
+                            SafeInvokeListener(() => listener?.ObjectEvent(instance, objectApiEvent), "ObjectEvent");
                         }
 
                         if (!string.IsNullOrEmpty(objectApiEvent.Channel) && channelListenersMap.ContainsKey(objectApiEvent.Channel))
                         {
                             foreach (var l in channelListenersMap[objectApiEvent.Channel])
                             {
-                                l?.ObjectEvent(instance, objectApiEvent);
+                                SafeInvokeListener(() => l?.ObjectEvent(instance, objectApiEvent), "ObjectEvent");
                             }
                         }
 
@@ -259,7 +285,7 @@ namespace PubnubApi.EventEngine.Common
                         {
                             foreach (var l in channelGroupListenersMap[objectApiEvent.Subscription])
                             {
-                                l?.ObjectEvent(instance, objectApiEvent);
+                                SafeInvokeListener(() => l?.ObjectEvent(instance, objectApiEvent), "ObjectEvent");
                             }
                         }
                     }
@@ -274,14 +300,14 @@ namespace PubnubApi.EventEngine.Common
                     {
                         foreach (var listener in listeners)
                         {
-                            listener?.MessageAction(instance, messageActionEvent);
+                            SafeInvokeListener(() => listener?.MessageAction(instance, messageActionEvent), "MessageAction");
                         }
 
                         if (!string.IsNullOrEmpty(messageActionEvent.Channel) && channelListenersMap.ContainsKey(messageActionEvent.Channel))
                         {
                             foreach (var l in channelListenersMap[messageActionEvent.Channel])
                             {
-                                l?.MessageAction(instance, messageActionEvent);
+                                SafeInvokeListener(() => l?.MessageAction(instance, messageActionEvent), "MessageAction");
                             }
                         }
 
@@ -289,7 +315,7 @@ namespace PubnubApi.EventEngine.Common
                         {
                             foreach (var l in channelGroupListenersMap[messageActionEvent.Subscription])
                             {
-                                l?.MessageAction(instance, messageActionEvent);
+                                SafeInvokeListener(() => l?.MessageAction(instance, messageActionEvent), "MessageAction");
                             }
                         }
                     }
@@ -340,14 +366,14 @@ namespace PubnubApi.EventEngine.Common
 
                         foreach (var listener in listeners)
                         {
-                            listener?.File(instance, fileMessage);
+                            SafeInvokeListener(() => listener?.File(instance, fileMessage), "File");
                         }
 
                         if (!string.IsNullOrEmpty(fileMessage.Channel) && channelListenersMap.ContainsKey(fileMessage.Channel))
                         {
                             foreach (var l in channelListenersMap[fileMessage.Channel])
                             {
-                                l?.File(instance, fileMessage);
+                                SafeInvokeListener(() => l?.File(instance, fileMessage), "File");
                             }
                         }
 
@@ -355,7 +381,7 @@ namespace PubnubApi.EventEngine.Common
                         {
                             foreach (var l in channelGroupListenersMap[fileMessage.Subscription])
                             {
-                                l?.File(instance, fileMessage);
+                                SafeInvokeListener(() => l?.File(instance, fileMessage), "File");
                             }
                         }
                     }
@@ -372,14 +398,14 @@ namespace PubnubApi.EventEngine.Common
                         {
                             foreach (var listener in listeners)
                             {
-                                listener?.Presence(instance, presenceEvent);
+                                SafeInvokeListener(() => listener?.Presence(instance, presenceEvent), "Presence");
                             }
 
                             if (!string.IsNullOrEmpty(presenceEvent.Channel) && channelListenersMap.ContainsKey(presenceEvent.Channel))
                             {
                                 foreach (var l in channelListenersMap[presenceEvent.Channel])
                                 {
-                                    l?.Presence(instance, presenceEvent);
+                                    SafeInvokeListener(() => l?.Presence(instance, presenceEvent), "Presence");
                                 }
                             }
 
@@ -387,7 +413,7 @@ namespace PubnubApi.EventEngine.Common
                             {
                                 foreach (var l in channelGroupListenersMap[presenceEvent.Subscription])
                                 {
-                                    l?.Presence(instance, presenceEvent);
+                                    SafeInvokeListener(() => l?.Presence(instance, presenceEvent), "Presence");
                                 }
                             }
                         }
@@ -397,36 +423,28 @@ namespace PubnubApi.EventEngine.Common
                         jsonFields.Add("customMessageType", eventData.CustomMessageType);
                         ResponseBuilder responseBuilder =new ResponseBuilder(configuration, jsonLibrary);
                         PNMessageResult<T> userMessage = responseBuilder.GetEventResultObject<PNMessageResult<T>>(jsonFields);
-                        try
+                        if (userMessage != null)
                         {
-                            if (userMessage != null)
+                            foreach (var listener in listeners)
                             {
-                                foreach (var listener in listeners)
-                                {
-                                    listener?.Message(instance, userMessage);
-                                }
+                                SafeInvokeListener(() => listener?.Message(instance, userMessage), "Message");
+                            }
 
-                                if (!string.IsNullOrEmpty(userMessage.Channel) && channelListenersMap.ContainsKey(userMessage.Channel))
+                            if (!string.IsNullOrEmpty(userMessage.Channel) && channelListenersMap.ContainsKey(userMessage.Channel))
+                            {
+                                foreach (var l in channelListenersMap[userMessage.Channel])
                                 {
-                                    foreach (var l in channelListenersMap[userMessage.Channel])
-                                    {
-                                        l?.Message(instance, userMessage);
-                                    }
-                                }
-
-                                if (!string.IsNullOrEmpty(userMessage.Subscription) && channelGroupListenersMap.ContainsKey(userMessage.Subscription))
-                                {
-                                    foreach (var l in channelGroupListenersMap[userMessage.Subscription])
-                                    {
-                                        l?.Message(instance, userMessage);
-                                    }
+                                    SafeInvokeListener(() => l?.Message(instance, userMessage), "Message");
                                 }
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            configuration.Logger?.Error(
-                                $"Listener call back execution encounters error: {ex.Message}\n{ex?.StackTrace}");
+
+                            if (!string.IsNullOrEmpty(userMessage.Subscription) && channelGroupListenersMap.ContainsKey(userMessage.Subscription))
+                            {
+                                foreach (var l in channelGroupListenersMap[userMessage.Subscription])
+                                {
+                                    SafeInvokeListener(() => l?.Message(instance, userMessage), "Message");
+                                }
+                            }
                         }
                     }
 

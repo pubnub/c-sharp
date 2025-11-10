@@ -93,13 +93,14 @@
     <Compile Include="..\PubnubApi.Tests\WhenSubscribedToAChannel.cs" Link="WhenSubscribedToAChannel.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenSubscribedToAChannel2.cs" Link="WhenSubscribedToAChannel2.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenSubscribedToAChannel3.cs" Link="WhenSubscribedToAChannel3.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenSubscribedToAChannelComprehensive.cs" Link="WhenSubscribedToAChannelComprehensive.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenSubscribedToAChannelGroup.cs" Link="WhenSubscribedToAChannelGroup.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenSubscribedToWildcardChannel.cs" Link="WhenSubscribedToWildcardChannel.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenSubscribeToChannelPresence.cs" Link="WhenSubscribeToChannelPresence.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenSubscribeWithDuplicateChannels.cs" Link="WhenSubscribeWithDuplicateChannels.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenUnsubscribedToAChannel.cs" Link="WhenUnsubscribedToAChannel.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenUnsubscribedToAChannelGroup.cs" Link="WhenUnsubscribedToAChannelGroup.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenUserIdInPNConfig.cs" Link="WhenUserIdInPNConfig.cs" />
-    <Compile Include="..\PubnubApi.Tests\WhenSubscribeToChannelPresence.cs" Link="WhenSubscribeToChannelPresence.cs" />
-    <Compile Include="..\PubnubApi.Tests\WhenSubscribeWithDuplicateChannels.cs" Link="WhenSubscribeWithDuplicateChannels.cs" />
   </ItemGroup>
 
   <ItemGroup>
