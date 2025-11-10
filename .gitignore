@@ -184,6 +184,10 @@ src/PNEventEngine/obj/*
 src/PNEventEngineUWP/bin/*
 src/PNEventEngineUWP/obj/*
 
+CLAUDE.md
+.claude/*
+.cursor/*
+
 # GitHub Actions #
 ##################
 .github/.release
