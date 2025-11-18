@@ -1886,10 +1886,17 @@ namespace PubnubApi
                 List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
                 for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
                 {
-                    callbackList[listenerIndex].Status(PubnubInstance, status);
+                    try
+                    {
+                        callbackList[listenerIndex].Status(PubnubInstance, status);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger?.Error($"error during event handler function, {ex.Message}");
+                    }
                 }
             }
-            
+
         }
 
         internal void Announce<T>(PNMessageResult<T> message)
@@ -1899,7 +1906,14 @@ namespace PubnubApi
                 List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
                 for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
                 {
-                    callbackList[listenerIndex].Message(PubnubInstance, message);
+                    try
+                    {
+                        callbackList[listenerIndex].Message(PubnubInstance, message);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger?.Error($"error during event handler function, {ex.Message}");
+                    }
                 }
             }
         }
@@ -1911,7 +1925,14 @@ namespace PubnubApi
                 List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
                 for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
                 {
-                    callbackList[listenerIndex].Signal(PubnubInstance, message);
+                    try
+                    {
+                        callbackList[listenerIndex].Signal(PubnubInstance, message);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger?.Error($"error during event handler function, {ex.Message}");
+                    }
                 }
             }
         }
@@ -1923,7 +1944,14 @@ namespace PubnubApi
                 List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
                 for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
                 {
-                    callbackList[listenerIndex].File(PubnubInstance, message);
+                    try
+                    {
+                        callbackList[listenerIndex].File(PubnubInstance, message);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger?.Error($"error during event handler function, {ex.Message}");
+                    }
                 }
             }
         }
@@ -1935,7 +1963,14 @@ namespace PubnubApi
                 List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
                 for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
                 {
-                    callbackList[listenerIndex].Presence(PubnubInstance, presence);
+                    try
+                    {
+                        callbackList[listenerIndex].Presence(PubnubInstance, presence);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger?.Error($"error during event handler function, {ex.Message}");
+                    }
                 }
             }
         }
@@ -1947,7 +1982,14 @@ namespace PubnubApi
                 List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
                 for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
                 {
-                    callbackList[listenerIndex].ObjectEvent(PubnubInstance, objectApiEvent);
+                    try
+                    {
+                        callbackList[listenerIndex].ObjectEvent(PubnubInstance, objectApiEvent);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger?.Error($"error during event handler function, {ex.Message}");
+                    }
                 }
             }
         }
@@ -1959,7 +2001,14 @@ namespace PubnubApi
                 List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
                 for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
                 {
-                    callbackList[listenerIndex].MessageAction(PubnubInstance, messageActionEvent);
+                    try
+                    {
+                        callbackList[listenerIndex].MessageAction(PubnubInstance, messageActionEvent);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger?.Error($"error during event handler function, {ex.Message}");
+                    }
                 }
             }
         }
