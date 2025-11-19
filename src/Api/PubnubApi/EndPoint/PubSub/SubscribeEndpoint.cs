@@ -229,18 +229,24 @@ namespace PubnubApi.EndPoint
 
 		private void StatusEmitter(Pubnub pubnubInstance, PNStatus status)
         {
-            foreach (var listener in SubscribeListenerList)
+            try
             {
-                try
+                foreach (var listener in SubscribeListenerList.ToArray())
                 {
-                    listener?.Status(pubnubInstance, status);
-                }
-                catch (Exception ex)
-                {
-                    config.Logger?.Error($"error during event handler function, {ex.Message}");
+                    try
+                    {
+                        listener?.Status(pubnubInstance, status);
+                    }
+                    catch (Exception ex)
+                    {
+                        config.Logger?.Warn($"error in status event handler function, {ex.Message}");
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                config.Logger?.Warn($"Emit Status encounter error: {ex.Message}");
+            }
         }
-
 	}
 }
