@@ -6,6 +6,8 @@ using System.Linq;
 using System;
 using PubnubApi.EventEngine.Subscribe.Events;
 using PubnubApi.EventEngine.Common;
+using PubnubApi.EventEngine.Subscribe.Effects;
+using PubnubApi.EventEngine.Subscribe.Invocations;
 
 namespace PubnubApi.EventEngine.Subscribe
 {
@@ -18,6 +20,7 @@ namespace PubnubApi.EventEngine.Subscribe
 
 		public List<string> Channels { get; } = [];
 		public List<string> ChannelGroups { get; } = [];
+		private EmitStatusEffectHandler emitStatusHandler = null; 
 
 		internal SubscribeEventEngine(Pubnub pubnubInstance,
 			PNConfiguration pubnubConfiguration,
@@ -28,33 +31,37 @@ namespace PubnubApi.EventEngine.Subscribe
 		{
 			this.subscribeManager = subscribeManager;
 			this.jsonPluggableLibrary = jsonPluggableLibrary;
-			var handshakeHandler = new Effects.HandshakeEffectHandler(subscribeManager, EventQueue);
-			var handshakeReconnectHandler = new Effects.HandshakeReconnectEffectHandler(pubnubConfiguration, EventQueue, handshakeHandler);
+			var handshakeHandler = new HandshakeEffectHandler(subscribeManager, EventQueue);
+			var handshakeReconnectHandler = new HandshakeReconnectEffectHandler(pubnubConfiguration, EventQueue, handshakeHandler);
 
-			dispatcher.Register<Invocations.HandshakeInvocation, Effects.HandshakeEffectHandler>(handshakeHandler);
-			dispatcher.Register<Invocations.CancelHandshakeInvocation, Effects.HandshakeEffectHandler>(handshakeHandler);
-			dispatcher.Register<Invocations.HandshakeReconnectInvocation, Effects.HandshakeReconnectEffectHandler>(handshakeReconnectHandler);
-			dispatcher.Register<Invocations.CancelHandshakeReconnectInvocation, Effects.HandshakeReconnectEffectHandler>(handshakeReconnectHandler);
+			dispatcher.Register<HandshakeInvocation, HandshakeEffectHandler>(handshakeHandler);
+			dispatcher.Register<CancelHandshakeInvocation, HandshakeEffectHandler>(handshakeHandler);
+			dispatcher.Register<HandshakeReconnectInvocation, HandshakeReconnectEffectHandler>(handshakeReconnectHandler);
+			dispatcher.Register<CancelHandshakeReconnectInvocation, HandshakeReconnectEffectHandler>(handshakeReconnectHandler);
 
-			var receiveHandler = new Effects.ReceivingEffectHandler(subscribeManager, EventQueue);
-			var receiveReconnectHandler = new Effects.ReceivingReconnectEffectHandler(pubnubConfiguration, EventQueue, receiveHandler);
+			var receiveHandler = new ReceivingEffectHandler(subscribeManager, EventQueue);
+			var receiveReconnectHandler = new ReceivingReconnectEffectHandler(pubnubConfiguration, EventQueue, receiveHandler);
 
-			dispatcher.Register<Invocations.ReceiveMessagesInvocation, Effects.ReceivingEffectHandler>(receiveHandler);
-			dispatcher.Register<Invocations.CancelReceiveMessagesInvocation, Effects.ReceivingEffectHandler>(receiveHandler);
-			dispatcher.Register<Invocations.ReceiveReconnectInvocation, Effects.ReceivingReconnectEffectHandler>(receiveReconnectHandler);
-			dispatcher.Register<Invocations.CancelReceiveReconnectInvocation, Effects.ReceivingReconnectEffectHandler>(receiveReconnectHandler);
+			dispatcher.Register<ReceiveMessagesInvocation, ReceivingEffectHandler>(receiveHandler);
+			dispatcher.Register<CancelReceiveMessagesInvocation, ReceivingEffectHandler>(receiveHandler);
+			dispatcher.Register<ReceiveReconnectInvocation, ReceivingReconnectEffectHandler>(receiveReconnectHandler);
+			dispatcher.Register<CancelReceiveReconnectInvocation, ReceivingReconnectEffectHandler>(receiveReconnectHandler);
 
-			var emitMessageHandler = new Effects.EmitMessagesHandler(eventEmitter, jsonPluggableLibrary, channelTypeMap, channelGroupTypeMap);
-			dispatcher.Register<Invocations.EmitMessagesInvocation, Effects.EmitMessagesHandler>(emitMessageHandler);
+			var emitMessageHandler = new EmitMessagesHandler(eventEmitter, jsonPluggableLibrary, channelTypeMap, channelGroupTypeMap);
+			dispatcher.Register<EmitMessagesInvocation, EmitMessagesHandler>(emitMessageHandler);
 
-			var emitStatusHandler = new Effects.EmitStatusEffectHandler(pubnubInstance, statusListener);
-			dispatcher.Register<Invocations.EmitStatusInvocation, Effects.EmitStatusEffectHandler>(emitStatusHandler);
+			emitStatusHandler = new EmitStatusEffectHandler(pubnubInstance, statusListener);
+			dispatcher.Register<EmitStatusInvocation, EmitStatusEffectHandler>(emitStatusHandler);
 
 			currentState = new UnsubscribedState();
 			logger = pubnubConfiguration.Logger;
 		}
 		public void Subscribe<T>(string[] channels, string[] channelGroups, SubscriptionCursor cursor)
 		{
+			bool allChannelsExist = channels.All(c => Channels.Contains(c));
+			bool allChannelGroupsExist = channelGroups.All(cg => ChannelGroups.Contains(cg));
+			bool isNewSubscription = !(allChannelsExist && allChannelGroupsExist);
+			
 			Channels.AddRange(channels);
 			ChannelGroups.AddRange(channelGroups);
 
@@ -71,10 +78,16 @@ namespace PubnubApi.EventEngine.Subscribe
 					Cursor = cursor
 				});
 			} else {
-				EventQueue.Enqueue(new SubscriptionChangedEvent() {
-					Channels = Channels.Distinct(),
-					ChannelGroups = ChannelGroups.Distinct()
-				});
+				if (isNewSubscription) {
+					EventQueue.Enqueue(new SubscriptionChangedEvent() {
+						Channels = Channels.Distinct(),
+						ChannelGroups = ChannelGroups.Distinct()
+					});
+				} else {
+					var status = new PNStatus(null, PNOperationType.PNSubscribeOperation, PNStatusCategory.PNSubscriptionChangedCategory, Channels, ChannelGroups, Constants.HttpRequestSuccessStatusCode);
+					var invocation = new EmitStatusInvocation(status);
+					_ = emitStatusHandler.Run(invocation);
+				}
 			}
 		}
 
