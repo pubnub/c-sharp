@@ -1,3 +1,7 @@
+v8.0.3 - November 20 2025
+-----------------------------
+- Modified: refactor EmitStatus to prevent concurrent modification issue resulting InvalidOperationException.
+
 v8.0.2 - November 17 2025
 -----------------------------
 - Fixed: fixes issue of subscription loop breaking when a listener callback throws exception.
