@@ -20,7 +20,7 @@ namespace PubnubApi.EventEngine.Subscribe
 
 		public List<string> Channels { get; } = [];
 		public List<string> ChannelGroups { get; } = [];
-		private EmitStatusEffectHandler emitStatusHandler = null; 
+		private readonly EmitStatusEffectHandler emitStatusHandler;
 
 		internal SubscribeEventEngine(Pubnub pubnubInstance,
 			PNConfiguration pubnubConfiguration,
