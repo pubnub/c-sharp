@@ -1780,21 +1780,22 @@ namespace PubNubMessaging.Tests
             {
                 collapseId = "sample collapse id",
                 expiration = "xyzexpiration",
+                authMethod = APNS2AuthMethod.TOKEN,
                 targets = new List<PushTarget>()
-                                                        {
-                                                            new PushTarget()
-                                                            {
-                                                                environment= PubnubApi.Environment.Development,
-                                                                exclude_devices = new List<string>(){ "excl_d1", "excl_d2" },
-                                                                topic = "sample dev topic"
-                                                            },
-                                                            new PushTarget()
-                                                            {
-                                                                environment= PubnubApi.Environment.Production,
-                                                                exclude_devices = new List<string>(){ "excl_d3", "excl_d4" },
-                                                                topic = "sample prod topic"
-                                                            }
-                                                        }
+                    {
+                        new PushTarget()
+                        {
+                            environment= PubnubApi.Environment.Development,
+                            exclude_devices = new List<string>(){ "excl_d1", "excl_d2" },
+                            topic = "sample dev topic"
+                        },
+                        new PushTarget()
+                        {
+                            environment= PubnubApi.Environment.Production,
+                            exclude_devices = new List<string>(){ "excl_d3", "excl_d4" },
+                            topic = "sample prod topic"
+                        }
+                    }
             };
 
             Dictionary<PNPushType, Dictionary<string, object>> pushTypeCustomData = new Dictionary<PNPushType, Dictionary<string, object>>();
@@ -1824,6 +1825,9 @@ namespace PubNubMessaging.Tests
             System.Diagnostics.Debug.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(payload));
 
             Assert.IsTrue(payload != null, "FAILED - IfMobilePayloadThenPublishReturnSuccess");
+            Assert.True(payload.ContainsKey("pn_apns"), "FAILED - Push Payload should contain apns key");
+            Assert.True(payload.ContainsKey("pn_fcm"), "FAILED - Push Payload should contain fcm key");
+            Assert.False(payload.ContainsKey("pn_gcm"), "FAILED - Push Payload should NOT contain gcm key");
         }
 
         [Test]

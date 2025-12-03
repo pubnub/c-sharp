@@ -109,7 +109,7 @@ namespace PubnubApi
                     Dictionary<string, object> pnFcm = BuildFcmPayload(pushType);
                     if (pnFcm != null)
                     {
-                        ret.Add("pn_gcm", pnFcm);
+                        ret.Add("pn_fcm", pnFcm);
                     }
                 }
             }
@@ -248,6 +248,10 @@ namespace PubnubApi
     {
         public string collapseId { get; set; }
         public string expiration { get; set; }
+        
+        [JsonConverter(typeof(StringEnumConverter))]
+        public APNS2AuthMethod authMethod { get; set; }
+        
         public List<PushTarget> targets { get; set; }
 
         public string version { get; } = "v2";
@@ -260,6 +264,16 @@ namespace PubnubApi
         
         [JsonConverter(typeof(StringEnumConverter))]
         public Environment environment { get; set; }
+    }
+
+    public enum APNS2AuthMethod
+    {
+        [EnumMember(Value = "token")]
+        TOKEN,
+        [EnumMember(Value = "cert")]
+        CERT,
+        [EnumMember(Value = "certificate")]
+        CERTIFICATE
     }
 
     public enum Environment
