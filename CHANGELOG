@@ -1,3 +1,7 @@
+v8.0.4 - December 04 2025
+-----------------------------
+- Modified: prevent resubscribe to previously subscribed entities.
+
 v8.0.3 - November 20 2025
 -----------------------------
 - Modified: refactor EmitStatus to prevent concurrent modification issue resulting InvalidOperationException.

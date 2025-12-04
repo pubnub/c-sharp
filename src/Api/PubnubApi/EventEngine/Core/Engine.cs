@@ -66,6 +66,12 @@ namespace PubnubApi.EventEngine.Core {
 				return;
 			}
 
+			if (stateInvocationPair.State is null)
+			{
+				logger?.Warn($"TransitionResult returned null State for event {e?.GetType()?.Name}. Ignoring transition.");
+				return;
+			}
+
 			await ExecuteStateChange(currentState, stateInvocationPair.State, stateInvocationPair.Invocations).ConfigureAwait(false);
 
 			this.currentState = stateInvocationPair.State;

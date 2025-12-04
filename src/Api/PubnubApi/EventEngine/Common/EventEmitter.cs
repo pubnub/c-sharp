@@ -158,21 +158,25 @@ namespace PubnubApi.EventEngine.Common
             {
                 payload = eventData?.Payload;
             }
-            
+
             if (currentMessageChannel.Contains("-pnpres") || currentMessageChannel.Contains(".*-pnpres"))
             {
                 jsonFields.Add("payload", payload);
             }
             else if (eventData.MessageType == 2) //Objects Simplification events
             {
-                Dictionary<string, object> appContextEventFields = payload as Dictionary<string, object> ?? (payload as JObject)?.ToObject<Dictionary<string, object>>();
+                Dictionary<string, object> appContextEventFields = payload as Dictionary<string, object> ??
+                                                                   (payload as JObject)
+                                                                   ?.ToObject<Dictionary<string, object>>();
                 if (appContextEventFields != null
                     && appContextEventFields.ContainsKey("source")
                     && appContextEventFields.ContainsKey("version")
                     && appContextEventFields["source"].ToString() == "objects"
-                    && Double.TryParse(appContextEventFields["version"]?.ToString()?.Trim(), NumberStyles.Number, CultureInfo.InvariantCulture, out var objectsVersion))
+                    && Double.TryParse(appContextEventFields["version"]?.ToString()?.Trim(), NumberStyles.Number,
+                        CultureInfo.InvariantCulture, out var objectsVersion))
                 {
-                    if (objectsVersion.CompareTo(2D) == 0) //Process only version=2 for Objects Simplification. Ignore 1. 
+                    if (objectsVersion.CompareTo(2D) ==
+                        0) //Process only version=2 for Objects Simplification. Ignore 1. 
                     {
                         jsonFields.Add("payload", payload);
                     }
@@ -180,10 +184,16 @@ namespace PubnubApi.EventEngine.Common
             }
             else
             {
-                if ((configuration.CryptoModule != null || configuration.CipherKey.Length > 0) && (eventData.MessageType == 0 || eventData.MessageType == 4)) //decrypt the subscriber message if cipherkey is available
+                if ((configuration.CryptoModule != null || configuration.CipherKey.Length > 0) &&
+                    (eventData.MessageType == 0 ||
+                     eventData.MessageType == 4)) //decrypt the subscriber message if cipherkey is available
                 {
                     string decryptMessage = "";
-                    configuration.CryptoModule ??= new CryptoModule(new AesCbcCryptor(configuration.CipherKey), new List<ICryptor>() { new LegacyCryptor(configuration.CipherKey, configuration.UseRandomInitializationVector) });
+                    configuration.CryptoModule ??= new CryptoModule(new AesCbcCryptor(configuration.CipherKey),
+                        new List<ICryptor>()
+                        {
+                            new LegacyCryptor(configuration.CipherKey, configuration.UseRandomInitializationVector)
+                        });
                     try
                     {
                         decryptMessage = configuration.CryptoModule.Decrypt(payload.ToString());
@@ -191,10 +201,13 @@ namespace PubnubApi.EventEngine.Common
                     catch (Exception ex)
                     {
                         decryptMessage = "**DECRYPT ERROR**";
-                        configuration?.Logger?.Warn("Failed to decrypt message on channel {currentMessageChannel} due to exception={ex}.\n Message might be not encrypted");
+                        configuration?.Logger?.Warn(
+                            "Failed to decrypt message on channel {currentMessageChannel} due to exception={ex}.\n Message might be not encrypted");
                     }
 
-                    object decodeMessage = jsonLibrary.DeserializeToObject((decryptMessage == "**DECRYPT ERROR**") ? jsonLibrary.SerializeToJsonString(payload) : decryptMessage);
+                    object decodeMessage = jsonLibrary.DeserializeToObject((decryptMessage == "**DECRYPT ERROR**")
+                        ? jsonLibrary.SerializeToJsonString(payload)
+                        : decryptMessage);
                     jsonFields.Add("payload", decodeMessage);
                 }
                 else
@@ -219,237 +232,275 @@ namespace PubnubApi.EventEngine.Common
 
             jsonFields.Add("currentMessageChannelGroup", currentMessageChannelGroup);
             jsonFields.Add("currentMessageChannel", currentMessageChannel);
-
-            switch (eventData.MessageType)
+            try
             {
-                case 1:
+                switch (eventData.MessageType)
                 {
-                    jsonFields.Add("customMessageType", eventData.CustomMessageType);
-                    ResponseBuilder responseBuilder = new ResponseBuilder(configuration, jsonLibrary);
-                    PNMessageResult<T> pnMessageResult = responseBuilder.GetEventResultObject<PNMessageResult<T>>(jsonFields);
-                    if (pnMessageResult != null)
+                    case 1:
                     {
-                        PNSignalResult<T> signalMessage = new PNSignalResult<T>
+                        jsonFields.Add("customMessageType", eventData.CustomMessageType);
+                        ResponseBuilder responseBuilder = new ResponseBuilder(configuration, jsonLibrary);
+                        PNMessageResult<T> pnMessageResult =
+                            responseBuilder.GetEventResultObject<PNMessageResult<T>>(jsonFields);
+                        if (pnMessageResult != null)
                         {
-                            Channel = pnMessageResult.Channel,
-                            Message = pnMessageResult.Message,
-                            Subscription = pnMessageResult.Subscription,
-                            Timetoken = pnMessageResult.Timetoken,
-                            UserMetadata = pnMessageResult.UserMetadata,
-                            Publisher = pnMessageResult.Publisher
-                        };
-                        foreach (var listener in listeners)
-                        {
-                            SafeInvokeListener(() => listener?.Signal(instance, signalMessage), "Signal");
-                        }
-
-                        if (!string.IsNullOrEmpty(signalMessage.Channel) && channelListenersMap.ContainsKey(signalMessage.Channel))
-                        {
-                            foreach (var l in channelListenersMap[signalMessage.Channel])
+                            PNSignalResult<T> signalMessage = new PNSignalResult<T>
                             {
-                                SafeInvokeListener(() => l?.Signal(instance, signalMessage), "Signal");
-                            }
-                        }
-
-                        if (!string.IsNullOrEmpty(signalMessage.Subscription) && channelGroupListenersMap.ContainsKey(signalMessage.Subscription))
-                        {
-                            foreach (var l in channelGroupListenersMap[signalMessage.Subscription])
+                                Channel = pnMessageResult.Channel,
+                                Message = pnMessageResult.Message,
+                                Subscription = pnMessageResult.Subscription,
+                                Timetoken = pnMessageResult.Timetoken,
+                                UserMetadata = pnMessageResult.UserMetadata,
+                                Publisher = pnMessageResult.Publisher
+                            };
+                            foreach (var listener in listeners)
                             {
-                                SafeInvokeListener(() => l?.Signal(instance, signalMessage), "Signal");
-                            }
-                        }
-                    }
-
-                    break;
-                }
-                case 2:
-                {
-                    ResponseBuilder responseBuilder =new ResponseBuilder(configuration, jsonLibrary);
-                    PNObjectEventResult objectApiEvent = responseBuilder.GetEventResultObject<PNObjectEventResult>(jsonFields);
-                    if (objectApiEvent != null)
-                    {
-                        foreach (var listener in listeners)
-                        {
-                            SafeInvokeListener(() => listener?.ObjectEvent(instance, objectApiEvent), "ObjectEvent");
-                        }
-
-                        if (!string.IsNullOrEmpty(objectApiEvent.Channel) && channelListenersMap.ContainsKey(objectApiEvent.Channel))
-                        {
-                            foreach (var l in channelListenersMap[objectApiEvent.Channel])
-                            {
-                                SafeInvokeListener(() => l?.ObjectEvent(instance, objectApiEvent), "ObjectEvent");
-                            }
-                        }
-
-                        if (!string.IsNullOrEmpty(objectApiEvent.Subscription) && channelGroupListenersMap.ContainsKey(objectApiEvent.Subscription))
-                        {
-                            foreach (var l in channelGroupListenersMap[objectApiEvent.Subscription])
-                            {
-                                SafeInvokeListener(() => l?.ObjectEvent(instance, objectApiEvent), "ObjectEvent");
-                            }
-                        }
-                    }
-
-                    break;
-                }
-                case 3:
-                {
-                    ResponseBuilder responseBuilder =new ResponseBuilder(configuration, jsonLibrary);
-                    PNMessageActionEventResult messageActionEvent = responseBuilder.GetEventResultObject<PNMessageActionEventResult>(jsonFields);
-                    if (messageActionEvent != null)
-                    {
-                        foreach (var listener in listeners)
-                        {
-                            SafeInvokeListener(() => listener?.MessageAction(instance, messageActionEvent), "MessageAction");
-                        }
-
-                        if (!string.IsNullOrEmpty(messageActionEvent.Channel) && channelListenersMap.ContainsKey(messageActionEvent.Channel))
-                        {
-                            foreach (var l in channelListenersMap[messageActionEvent.Channel])
-                            {
-                                SafeInvokeListener(() => l?.MessageAction(instance, messageActionEvent), "MessageAction");
-                            }
-                        }
-
-                        if (!string.IsNullOrEmpty(messageActionEvent.Subscription) && channelGroupListenersMap.ContainsKey(messageActionEvent.Subscription))
-                        {
-                            foreach (var l in channelGroupListenersMap[messageActionEvent.Subscription])
-                            {
-                                SafeInvokeListener(() => l?.MessageAction(instance, messageActionEvent), "MessageAction");
-                            }
-                        }
-                    }
-
-                    break;
-                }
-                case 4:
-                {
-                    jsonFields.Add("customMessageType", eventData.CustomMessageType);
-                    ResponseBuilder responseBuilder =new ResponseBuilder(configuration, jsonLibrary);
-                    PNMessageResult<object> filesEvent = responseBuilder.GetEventResultObject<PNMessageResult<object>>(jsonFields);
-                    if (filesEvent != null)
-                    {
-                        PNFileEventResult fileMessage = new PNFileEventResult
-                        {
-                            Channel = filesEvent.Channel,
-                            Subscription = filesEvent.Subscription,
-                            Timetoken = filesEvent.Timetoken,
-                            Publisher = filesEvent.Publisher,
-                            CustomMessageType = filesEvent.CustomMessageType,
-                        };
-                        Dictionary<string, object> fileEventMessageField = jsonLibrary.ConvertToDictionaryObject(filesEvent.Message);
-                        if (fileEventMessageField is { Count: > 0 })
-                        {
-                            if (fileEventMessageField.ContainsKey("message") && fileEventMessageField["message"] != null)
-                            {
-                                fileMessage.Message = fileEventMessageField["message"];
+                                SafeInvokeListener(() => listener?.Signal(instance, signalMessage), "Signal");
                             }
 
-                            if (fileEventMessageField.TryGetValue("file", out var fileField))
+                            if (!string.IsNullOrEmpty(signalMessage.Channel) &&
+                                channelListenersMap.ContainsKey(signalMessage.Channel))
                             {
-                                Dictionary<string, object> fileDetailFields = jsonLibrary.ConvertToDictionaryObject(fileField);
-                                if (fileDetailFields != null && fileDetailFields.ContainsKey("id") && fileDetailFields.ContainsKey("name"))
+                                foreach (var l in channelListenersMap[signalMessage.Channel])
                                 {
-                                    fileMessage.File = new PNFile { Id = fileDetailFields["id"].ToString(), Name = fileDetailFields["name"].ToString() };
-                                    fileMessage.File.Url = UriUtil.GetFileUrl(fileName: fileMessage.File.Name, fileId: fileMessage.File.Id, channel: fileMessage.Channel,
-                                        pnConfiguration: configuration, pubnub: instance, tokenmanager: tokenManager);
+                                    SafeInvokeListener(() => l?.Signal(instance, signalMessage), "Signal");
+                                }
+                            }
+
+                            if (!string.IsNullOrEmpty(signalMessage.Subscription) &&
+                                channelGroupListenersMap.ContainsKey(signalMessage.Subscription))
+                            {
+                                foreach (var l in channelGroupListenersMap[signalMessage.Subscription])
+                                {
+                                    SafeInvokeListener(() => l?.Signal(instance, signalMessage), "Signal");
+                                }
+                            }
+                        }
+
+                        break;
+                    }
+                    case 2:
+                    {
+                        ResponseBuilder responseBuilder = new ResponseBuilder(configuration, jsonLibrary);
+                        PNObjectEventResult objectApiEvent =
+                            responseBuilder.GetEventResultObject<PNObjectEventResult>(jsonFields);
+                        if (objectApiEvent != null)
+                        {
+                            foreach (var listener in listeners)
+                            {
+                                SafeInvokeListener(() => listener?.ObjectEvent(instance, objectApiEvent),
+                                    "ObjectEvent");
+                            }
+
+                            if (!string.IsNullOrEmpty(objectApiEvent.Channel) &&
+                                channelListenersMap.ContainsKey(objectApiEvent.Channel))
+                            {
+                                foreach (var l in channelListenersMap[objectApiEvent.Channel])
+                                {
+                                    SafeInvokeListener(() => l?.ObjectEvent(instance, objectApiEvent), "ObjectEvent");
+                                }
+                            }
+
+                            if (!string.IsNullOrEmpty(objectApiEvent.Subscription) &&
+                                channelGroupListenersMap.ContainsKey(objectApiEvent.Subscription))
+                            {
+                                foreach (var l in channelGroupListenersMap[objectApiEvent.Subscription])
+                                {
+                                    SafeInvokeListener(() => l?.ObjectEvent(instance, objectApiEvent), "ObjectEvent");
+                                }
+                            }
+                        }
+
+                        break;
+                    }
+                    case 3:
+                    {
+                        ResponseBuilder responseBuilder = new ResponseBuilder(configuration, jsonLibrary);
+                        PNMessageActionEventResult messageActionEvent =
+                            responseBuilder.GetEventResultObject<PNMessageActionEventResult>(jsonFields);
+                        if (messageActionEvent != null)
+                        {
+                            foreach (var listener in listeners)
+                            {
+                                SafeInvokeListener(() => listener?.MessageAction(instance, messageActionEvent),
+                                    "MessageAction");
+                            }
+
+                            if (!string.IsNullOrEmpty(messageActionEvent.Channel) &&
+                                channelListenersMap.ContainsKey(messageActionEvent.Channel))
+                            {
+                                foreach (var l in channelListenersMap[messageActionEvent.Channel])
+                                {
+                                    SafeInvokeListener(() => l?.MessageAction(instance, messageActionEvent),
+                                        "MessageAction");
+                                }
+                            }
+
+                            if (!string.IsNullOrEmpty(messageActionEvent.Subscription) &&
+                                channelGroupListenersMap.ContainsKey(messageActionEvent.Subscription))
+                            {
+                                foreach (var l in channelGroupListenersMap[messageActionEvent.Subscription])
+                                {
+                                    SafeInvokeListener(() => l?.MessageAction(instance, messageActionEvent),
+                                        "MessageAction");
+                                }
+                            }
+                        }
+
+                        break;
+                    }
+                    case 4:
+                    {
+                        jsonFields.Add("customMessageType", eventData.CustomMessageType);
+                        ResponseBuilder responseBuilder = new ResponseBuilder(configuration, jsonLibrary);
+                        PNMessageResult<object> filesEvent =
+                            responseBuilder.GetEventResultObject<PNMessageResult<object>>(jsonFields);
+                        if (filesEvent != null)
+                        {
+                            PNFileEventResult fileMessage = new PNFileEventResult
+                            {
+                                Channel = filesEvent.Channel,
+                                Subscription = filesEvent.Subscription,
+                                Timetoken = filesEvent.Timetoken,
+                                Publisher = filesEvent.Publisher,
+                                CustomMessageType = filesEvent.CustomMessageType,
+                            };
+                            Dictionary<string, object> fileEventMessageField =
+                                jsonLibrary.ConvertToDictionaryObject(filesEvent.Message);
+                            if (fileEventMessageField is { Count: > 0 })
+                            {
+                                if (fileEventMessageField.ContainsKey("message") &&
+                                    fileEventMessageField["message"] != null)
+                                {
+                                    fileMessage.Message = fileEventMessageField["message"];
+                                }
+
+                                if (fileEventMessageField.TryGetValue("file", out var fileField))
+                                {
+                                    Dictionary<string, object> fileDetailFields =
+                                        jsonLibrary.ConvertToDictionaryObject(fileField);
+                                    if (fileDetailFields != null && fileDetailFields.ContainsKey("id") &&
+                                        fileDetailFields.ContainsKey("name"))
+                                    {
+                                        fileMessage.File = new PNFile
+                                        {
+                                            Id = fileDetailFields["id"].ToString(),
+                                            Name = fileDetailFields["name"].ToString()
+                                        };
+                                        fileMessage.File.Url = UriUtil.GetFileUrl(fileName: fileMessage.File.Name,
+                                            fileId: fileMessage.File.Id, channel: fileMessage.Channel,
+                                            pnConfiguration: configuration, pubnub: instance,
+                                            tokenmanager: tokenManager);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (filesEvent.Message != null)
+                                {
+                                    fileMessage.Message = filesEvent.Message;
+                                }
+                            }
+
+                            foreach (var listener in listeners)
+                            {
+                                SafeInvokeListener(() => listener?.File(instance, fileMessage), "File");
+                            }
+
+                            if (!string.IsNullOrEmpty(fileMessage.Channel) &&
+                                channelListenersMap.ContainsKey(fileMessage.Channel))
+                            {
+                                foreach (var l in channelListenersMap[fileMessage.Channel])
+                                {
+                                    SafeInvokeListener(() => l?.File(instance, fileMessage), "File");
+                                }
+                            }
+
+                            if (!string.IsNullOrEmpty(fileMessage.Subscription) &&
+                                channelGroupListenersMap.ContainsKey(fileMessage.Subscription))
+                            {
+                                foreach (var l in channelGroupListenersMap[fileMessage.Subscription])
+                                {
+                                    SafeInvokeListener(() => l?.File(instance, fileMessage), "File");
+                                }
+                            }
+                        }
+
+                        break;
+                    }
+                    default:
+                    {
+                        if (currentMessageChannel.Contains("-pnpres"))
+                        {
+                            ResponseBuilder responseBuilder = new ResponseBuilder(configuration, jsonLibrary);
+                            PNPresenceEventResult presenceEvent =
+                                responseBuilder.GetEventResultObject<PNPresenceEventResult>(jsonFields);
+                            if (presenceEvent != null)
+                            {
+                                foreach (var listener in listeners)
+                                {
+                                    SafeInvokeListener(() => listener?.Presence(instance, presenceEvent), "Presence");
+                                }
+
+                                if (!string.IsNullOrEmpty(presenceEvent.Channel) &&
+                                    channelListenersMap.ContainsKey(presenceEvent.Channel))
+                                {
+                                    foreach (var l in channelListenersMap[presenceEvent.Channel])
+                                    {
+                                        SafeInvokeListener(() => l?.Presence(instance, presenceEvent), "Presence");
+                                    }
+                                }
+
+                                if (!string.IsNullOrEmpty(presenceEvent.Subscription) &&
+                                    channelGroupListenersMap.ContainsKey(presenceEvent.Subscription))
+                                {
+                                    foreach (var l in channelGroupListenersMap[presenceEvent.Subscription])
+                                    {
+                                        SafeInvokeListener(() => l?.Presence(instance, presenceEvent), "Presence");
+                                    }
                                 }
                             }
                         }
                         else
                         {
-                            if (filesEvent.Message != null)
+                            jsonFields.Add("customMessageType", eventData.CustomMessageType);
+                            ResponseBuilder responseBuilder = new ResponseBuilder(configuration, jsonLibrary);
+                            PNMessageResult<T> userMessage =
+                                responseBuilder.GetEventResultObject<PNMessageResult<T>>(jsonFields);
+                            if (userMessage != null)
                             {
-                                fileMessage.Message = filesEvent.Message;
+                                foreach (var listener in listeners)
+                                {
+                                    SafeInvokeListener(() => listener?.Message(instance, userMessage), "Message");
+                                }
+
+                                if (!string.IsNullOrEmpty(userMessage.Channel) &&
+                                    channelListenersMap.ContainsKey(userMessage.Channel))
+                                {
+                                    foreach (var l in channelListenersMap[userMessage.Channel])
+                                    {
+                                        SafeInvokeListener(() => l?.Message(instance, userMessage), "Message");
+                                    }
+                                }
+
+                                if (!string.IsNullOrEmpty(userMessage.Subscription) &&
+                                    channelGroupListenersMap.ContainsKey(userMessage.Subscription))
+                                {
+                                    foreach (var l in channelGroupListenersMap[userMessage.Subscription])
+                                    {
+                                        SafeInvokeListener(() => l?.Message(instance, userMessage), "Message");
+                                    }
+                                }
                             }
                         }
 
-                        foreach (var listener in listeners)
-                        {
-                            SafeInvokeListener(() => listener?.File(instance, fileMessage), "File");
-                        }
-
-                        if (!string.IsNullOrEmpty(fileMessage.Channel) && channelListenersMap.ContainsKey(fileMessage.Channel))
-                        {
-                            foreach (var l in channelListenersMap[fileMessage.Channel])
-                            {
-                                SafeInvokeListener(() => l?.File(instance, fileMessage), "File");
-                            }
-                        }
-
-                        if (!string.IsNullOrEmpty(fileMessage.Subscription) && channelGroupListenersMap.ContainsKey(fileMessage.Subscription))
-                        {
-                            foreach (var l in channelGroupListenersMap[fileMessage.Subscription])
-                            {
-                                SafeInvokeListener(() => l?.File(instance, fileMessage), "File");
-                            }
-                        }
+                        break;
                     }
-
-                    break;
                 }
-                default:
-                {
-                    if (currentMessageChannel.Contains("-pnpres"))
-                    {
-                        ResponseBuilder responseBuilder =new ResponseBuilder(configuration, jsonLibrary);
-                        PNPresenceEventResult presenceEvent = responseBuilder.GetEventResultObject<PNPresenceEventResult>(jsonFields);
-                        if (presenceEvent != null)
-                        {
-                            foreach (var listener in listeners)
-                            {
-                                SafeInvokeListener(() => listener?.Presence(instance, presenceEvent), "Presence");
-                            }
-
-                            if (!string.IsNullOrEmpty(presenceEvent.Channel) && channelListenersMap.ContainsKey(presenceEvent.Channel))
-                            {
-                                foreach (var l in channelListenersMap[presenceEvent.Channel])
-                                {
-                                    SafeInvokeListener(() => l?.Presence(instance, presenceEvent), "Presence");
-                                }
-                            }
-
-                            if (!string.IsNullOrEmpty(presenceEvent.Subscription) && channelGroupListenersMap.ContainsKey(presenceEvent.Subscription))
-                            {
-                                foreach (var l in channelGroupListenersMap[presenceEvent.Subscription])
-                                {
-                                    SafeInvokeListener(() => l?.Presence(instance, presenceEvent), "Presence");
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        jsonFields.Add("customMessageType", eventData.CustomMessageType);
-                        ResponseBuilder responseBuilder =new ResponseBuilder(configuration, jsonLibrary);
-                        PNMessageResult<T> userMessage = responseBuilder.GetEventResultObject<PNMessageResult<T>>(jsonFields);
-                        if (userMessage != null)
-                        {
-                            foreach (var listener in listeners)
-                            {
-                                SafeInvokeListener(() => listener?.Message(instance, userMessage), "Message");
-                            }
-
-                            if (!string.IsNullOrEmpty(userMessage.Channel) && channelListenersMap.ContainsKey(userMessage.Channel))
-                            {
-                                foreach (var l in channelListenersMap[userMessage.Channel])
-                                {
-                                    SafeInvokeListener(() => l?.Message(instance, userMessage), "Message");
-                                }
-                            }
-
-                            if (!string.IsNullOrEmpty(userMessage.Subscription) && channelGroupListenersMap.ContainsKey(userMessage.Subscription))
-                            {
-                                foreach (var l in channelGroupListenersMap[userMessage.Subscription])
-                                {
-                                    SafeInvokeListener(() => l?.Message(instance, userMessage), "Message");
-                                }
-                            }
-                        }
-                    }
-
-                    break;
-                }
+            }
+            catch (Exception ex)
+            {
+                configuration?.Logger.Warn($"Emit Event failed: {ex.Message}");
             }
         }
     }
