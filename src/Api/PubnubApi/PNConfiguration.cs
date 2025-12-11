@@ -50,6 +50,14 @@ namespace PubnubApi
             }
         }
 
+        /// <summary>
+        /// When enabled single multi-channel subscriptions will internally be changed into multiple single-channel ones.
+        /// Enable this option if your keyset has channel-based sharding enabled.
+        /// This option requires Event Engine to be enabled (it's on by default).
+        /// <para><b>WARNING: Enabling this option will disable subscribing to channel groups!</b></para>
+        /// </summary>
+        public bool SplitSubscribeCalls { get; set; } = false;
+
         public string PublishKey
         {
             get => publishKey;

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using PubnubApi.EndPoint;
 using PubnubApi.EventEngine.Common;
 
@@ -21,6 +23,16 @@ namespace PubnubApi.EventEngine.Subscribe
 			SubscribeEventEngine subscribeEventEngine;
 			engineInstances.TryGetValue(instanceId, out subscribeEventEngine);
 			return subscribeEventEngine;
+		}
+
+		internal List<SubscribeEventEngine> GetAllEngineInstances()
+		{
+			var engines = new List<SubscribeEventEngine>();
+			foreach (var key in engineInstances.Keys)
+			{
+				engines.Add(engineInstances[key]);
+			}
+			return engines;
 		}
 
 		internal SubscribeEventEngine InitializeEventEngine(string instanceId,

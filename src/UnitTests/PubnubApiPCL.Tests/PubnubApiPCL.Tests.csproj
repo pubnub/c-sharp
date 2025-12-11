@@ -98,6 +98,9 @@
     <Compile Include="..\PubnubApi.Tests\WhenSubscribedToWildcardChannel.cs" Link="WhenSubscribedToWildcardChannel.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenSubscribeToChannelPresence.cs" Link="WhenSubscribeToChannelPresence.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenSubscribeWithDuplicateChannels.cs" Link="WhenSubscribeWithDuplicateChannels.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenSubscriptionSplittingIsEnabled.cs">
+      <Link>WhenSubscriptionSplittingIsEnabled.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi.Tests\WhenUnsubscribedToAChannel.cs" Link="WhenUnsubscribedToAChannel.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenUnsubscribedToAChannelGroup.cs" Link="WhenUnsubscribedToAChannelGroup.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenUserIdInPNConfig.cs" Link="WhenUserIdInPNConfig.cs" />

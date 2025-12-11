@@ -674,9 +674,23 @@ namespace PubnubApi
 
         public List<string> GetSubscribedChannels()
         {
-            if (pubnubConfig[InstanceId].EnableEventEngine)
+            var config = pubnubConfig[InstanceId];
+            if (config.EnableEventEngine)
             {
-                return this.subscribeEventEngineFactory.GetEventEngine(InstanceId).Channels;
+                if (config.SplitSubscribeCalls)
+                {
+                    var allEngines = this.subscribeEventEngineFactory.GetAllEngineInstances();
+                    var channels = new List<string>();
+                    foreach (var engine in allEngines)
+                    {
+                        channels.AddRange(engine.Channels);
+                    }
+                    return channels;
+                }
+                else
+                {
+                    return this.subscribeEventEngineFactory.GetEventEngine(InstanceId).Channels;
+                }
             }
 
             OtherOperation endpoint =
@@ -688,11 +702,17 @@ namespace PubnubApi
 
         public List<string> GetSubscribedChannelGroups()
         {
-            if (pubnubConfig[InstanceId].EnableEventEngine)
+            var config = pubnubConfig[InstanceId];
+            //Can't subscribe to channel groups with split subscribing
+            if (config.SplitSubscribeCalls)
+            {
+                config.Logger?.Warn("Subscribing to channel groups is disabled when PNConfiguration.SplitSubscribeCalls = true!");
+                return new List<string>();
+            }
+            if (config.EnableEventEngine)
             {
                 return this.subscribeEventEngineFactory.GetEventEngine(InstanceId).ChannelGroups;
             }
-
             OtherOperation endpoint =
                 new OtherOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
                     JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
