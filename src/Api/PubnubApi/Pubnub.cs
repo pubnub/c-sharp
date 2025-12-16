@@ -679,7 +679,7 @@ namespace PubnubApi
             {
                 if (config.SplitSubscribeCalls)
                 {
-                    var allEngines = this.subscribeEventEngineFactory.GetAllEngineInstances();
+                    var allEngines = this.subscribeEventEngineFactory.GetAllEngineInstances(InstanceId);
                     var channels = new List<string>();
                     foreach (var engine in allEngines)
                     {
@@ -758,24 +758,34 @@ namespace PubnubApi
             }
         }
 
-        public async Task<bool> Reconnect<T>()
+        public async Task<bool> Reconnect<T>(bool resetSubscribeTimetoken = false)
         {
             bool ret = false;
-            SubscribeEventEngine subscribeEventEngine = null;
-            if (pubnubConfig[InstanceId].EnableEventEngine)
+            var subscribeEventEngines = new List<SubscribeEventEngine>();
+            var config = pubnubConfig[InstanceId];
+            if (config.EnableEventEngine)
             {
-                if (subscribeEventEngineFactory.HasEventEngine(InstanceId))
+                if (config.SplitSubscribeCalls)
                 {
-                    subscribeEventEngine = subscribeEventEngineFactory.GetEventEngine(InstanceId);
+                    subscribeEventEngines = subscribeEventEngineFactory.GetAllEngineInstances(InstanceId);
+                }
+                else if(subscribeEventEngineFactory.HasEventEngine(InstanceId))
+                {
+                    subscribeEventEngines = [subscribeEventEngineFactory.GetEventEngine(InstanceId)];
+                }
 
+                foreach (var subscribeEventEngine in subscribeEventEngines)
+                {
                     subscribeEventEngine.EventQueue.Enqueue(new ReconnectEvent()
                     {
                         Channels = (subscribeEventEngine.CurrentState as SubscriptionState).Channels,
                         ChannelGroups = (subscribeEventEngine.CurrentState as SubscriptionState).ChannelGroups,
-                        Cursor = (subscribeEventEngine.CurrentState as SubscriptionState).Cursor
+                        Cursor = resetSubscribeTimetoken
+                            ? null
+                            : (subscribeEventEngine.CurrentState as SubscriptionState)?.Cursor
                     });
                 }
-
+                
                 if (presenceEventengineFactory.HasEventEngine(InstanceId))
                 {
                     var presenceEventEngine = presenceEventengineFactory.GetEventEngine(InstanceId);
@@ -794,15 +804,18 @@ namespace PubnubApi
                 }
                 else
                 {
-                    if (subscribeEventEngine != null)
-                        heartbeatOperation ??= new HeartbeatOperation(
-                            pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
-                            JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
+                    foreach (var subscribeEventEngine in subscribeEventEngines)
+                    {
+                        if (subscribeEventEngine != null)
+                            heartbeatOperation ??= new HeartbeatOperation(
+                                pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
+                                JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
 
-                    await heartbeatOperation.HeartbeatRequest<string>(
-                        (subscribeEventEngine?.CurrentState as SubscriptionState)?.Channels.ToArray(),
-                        (subscribeEventEngine?.CurrentState as SubscriptionState)?.ChannelGroups.ToArray()
-                    ).ConfigureAwait(false);
+                        await heartbeatOperation.HeartbeatRequest<string>(
+                            (subscribeEventEngine?.CurrentState as SubscriptionState)?.Channels.ToArray(),
+                            (subscribeEventEngine?.CurrentState as SubscriptionState)?.ChannelGroups.ToArray()
+                        ).ConfigureAwait(false);   
+                    }
                 }
             }
             else
@@ -820,83 +833,30 @@ namespace PubnubApi
             return ret;
         }
 
-        public async Task<bool> Reconnect<T>(bool resetSubscribeTimetoken)
-        {
-            bool ret = false;
-            SubscribeEventEngine subscribeEventEngine = null;
-            if (pubnubConfig[InstanceId].EnableEventEngine)
-            {
-                if (subscribeEventEngineFactory.HasEventEngine(InstanceId))
-                {
-                    subscribeEventEngine = subscribeEventEngineFactory.GetEventEngine(InstanceId);
-                    subscribeEventEngine.EventQueue.Enqueue(new ReconnectEvent()
-                    {
-                        Channels = (subscribeEventEngine.CurrentState as SubscriptionState)?.Channels,
-                        ChannelGroups = (subscribeEventEngine.CurrentState as SubscriptionState)?.ChannelGroups,
-                        Cursor = resetSubscribeTimetoken
-                            ? null
-                            : (subscribeEventEngine.CurrentState as SubscriptionState)?.Cursor
-                    });
-                }
-
-                if (presenceEventengineFactory.HasEventEngine(InstanceId))
-                {
-                    var presenceEventEngine = presenceEventengineFactory.GetEventEngine(InstanceId);
-
-                    presenceEventEngine.EventQueue.Enqueue(new EventEngine.Presence.Events.ReconnectEvent()
-                    {
-                        Input = new EventEngine.Presence.Common.PresenceInput()
-                        {
-                            Channels = (presenceEventEngine.CurrentState as EventEngine.Presence.States.APresenceState)
-                                ?.Input.Channels,
-                            ChannelGroups =
-                                (presenceEventEngine.CurrentState as EventEngine.Presence.States.APresenceState)?.Input
-                                .ChannelGroups
-                        }
-                    });
-                }
-                else
-                {
-                    if (subscribeEventEngine != null)
-                        heartbeatOperation ??= new HeartbeatOperation(
-                            pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
-                            JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
-                    await heartbeatOperation.HeartbeatRequest<string>(
-                        (subscribeEventEngine?.CurrentState as SubscriptionState)?.Channels.ToArray(),
-                        (subscribeEventEngine?.CurrentState as SubscriptionState)?.ChannelGroups.ToArray()
-                    ).ConfigureAwait(false);
-                }
-            }
-            else
-            {
-                if (savedSubscribeOperation is SubscribeOperation<T>)
-                {
-                    SubscribeOperation<T> subscibeOperationInstance = savedSubscribeOperation as SubscribeOperation<T>;
-                    if (subscibeOperationInstance != null)
-                    {
-                        ret = subscibeOperationInstance.Retry(true, resetSubscribeTimetoken);
-                    }
-                }
-            }
-
-            return ret;
-        }
-
         public async Task<bool> Disconnect<T>()
         {
             bool ret = false;
-            SubscribeEventEngine subscribeEventEngine = null;
+            var subscribeEventEngines = new List<SubscribeEventEngine>();
+            var config = pubnubConfig[InstanceId];
             if (pubnubConfig[InstanceId].EnableEventEngine)
             {
-                if (subscribeEventEngineFactory.HasEventEngine(InstanceId))
+                if (config.SplitSubscribeCalls)
                 {
-                    subscribeEventEngine = subscribeEventEngineFactory.GetEventEngine(InstanceId);
+                    subscribeEventEngines = subscribeEventEngineFactory.GetAllEngineInstances(InstanceId);
+                }else if (subscribeEventEngineFactory.HasEventEngine(InstanceId))
+                {
+                    subscribeEventEngines = [subscribeEventEngineFactory.GetEventEngine(InstanceId)];
+                }
+
+                foreach (var subscribeEventEngine in subscribeEventEngines)
+                {
                     subscribeEventEngine.EventQueue.Enqueue(new DisconnectEvent()
                     {
                         Channels = (subscribeEventEngine.CurrentState as SubscriptionState)?.Channels,
                         ChannelGroups = (subscribeEventEngine.CurrentState as SubscriptionState)?.ChannelGroups
                     });
                 }
+                
 
                 if (presenceEventengineFactory.HasEventEngine(InstanceId))
                 {
@@ -906,16 +866,19 @@ namespace PubnubApi
                 }
                 else
                 {
-                    if (subscribeEventEngine != null && !(pubnubConfig.ContainsKey(InstanceId) &&
-                                                          pubnubConfig[InstanceId].SuppressLeaveEvents))
+                    foreach (var subscribeEventEngine in subscribeEventEngines)
                     {
-                        leaveOperation ??= new LeaveOperation(
-                            pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
-                            JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
-                        await leaveOperation.LeaveRequest<string>(
-                                (subscribeEventEngine?.CurrentState as SubscriptionState)?.Channels.ToArray(),
-                                (subscribeEventEngine?.CurrentState as SubscriptionState)?.ChannelGroups.ToArray())
-                            .ConfigureAwait(false);
+                        if (subscribeEventEngine != null && !(pubnubConfig.ContainsKey(InstanceId) &&
+                                                              pubnubConfig[InstanceId].SuppressLeaveEvents))
+                        {
+                            leaveOperation ??= new LeaveOperation(
+                                pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
+                                JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
+                            await leaveOperation.LeaveRequest<string>(
+                                    (subscribeEventEngine?.CurrentState as SubscriptionState)?.Channels.ToArray(),
+                                    (subscribeEventEngine?.CurrentState as SubscriptionState)?.ChannelGroups.ToArray())
+                                .ConfigureAwait(false);
+                        }   
                     }
                 }
             }

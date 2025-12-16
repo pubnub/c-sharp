@@ -163,7 +163,7 @@ namespace PubnubApi.EndPoint
 					}
 					foreach (var channel in channels)
 					{
-						var subscribeEventEngine = InitSubscribeEvenEngine(channel);
+						var subscribeEventEngine = InitSubscribeEvenEngine($"{instanceId}-{channel}");
 						var channelSubscriptionCursor = cursor == null ? null : new SubscriptionCursor(cursor.Timetoken, cursor.Region);
 						subscribeEventEngine.Subscribe<T>(new []{channel}, new string[]{}, channelSubscriptionCursor);
 					}

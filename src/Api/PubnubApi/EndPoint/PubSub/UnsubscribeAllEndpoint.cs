@@ -30,7 +30,7 @@ namespace PubnubApi.EndPoint
 
             if (config.SplitSubscribeCalls)
             {
-                var allEngines = subscribeEventEngineFactory.GetAllEngineInstances();
+                var allEngines = subscribeEventEngineFactory.GetAllEngineInstances(instanceId);
                 foreach (var engine in allEngines)
                 {
                     engine.UnsubscribeAll();

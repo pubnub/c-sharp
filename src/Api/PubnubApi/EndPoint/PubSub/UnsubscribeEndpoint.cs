@@ -142,9 +142,10 @@ namespace PubnubApi.EndPoint
 			{
 				foreach (var channel in channels)
 				{
-					if (subscribeEventEngineFactory.HasEventEngine(channel)) {
-						var subscribeEventEngine = subscribeEventEngineFactory.GetEventEngine(channel);
-						UnsubscribeInSubscribeEventEngineInstance(subscribeEventEngine, channels, channelGroups);
+					var id = $"{instanceId}-{channel}";
+					if (subscribeEventEngineFactory.HasEventEngine(id)) {
+						var subscribeEventEngine = subscribeEventEngineFactory.GetEventEngine(id);
+						UnsubscribeInSubscribeEventEngineInstance(subscribeEventEngine, new []{channel}, channelGroups);
 					} else {
 						logger?.Error($"Attempted unsubscribe without event engine instance for this channel");
 					}

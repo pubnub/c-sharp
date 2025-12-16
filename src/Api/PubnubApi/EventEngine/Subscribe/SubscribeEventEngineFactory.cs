@@ -25,12 +25,15 @@ namespace PubnubApi.EventEngine.Subscribe
 			return subscribeEventEngine;
 		}
 
-		internal List<SubscribeEventEngine> GetAllEngineInstances()
+		internal List<SubscribeEventEngine> GetAllEngineInstances(string instanceId)
 		{
 			var engines = new List<SubscribeEventEngine>();
 			foreach (var key in engineInstances.Keys)
 			{
-				engines.Add(engineInstances[key]);
+				if (key.Contains(instanceId))
+				{
+					engines.Add(engineInstances[key]);
+				}
 			}
 			return engines;
 		}
