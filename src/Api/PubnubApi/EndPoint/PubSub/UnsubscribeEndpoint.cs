@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace PubnubApi.EndPoint
 {
@@ -55,7 +56,7 @@ namespace PubnubApi.EndPoint
 			Unsubscribe(subscribeChannelNames, subscribeChannelGroupNames);
 		}
 
-		private async void UnsubscribeInSubscribeEventEngineInstance(SubscribeEventEngine subscribeEventEngine, string[] channels, string[] channelGroups)
+		private async Task UnsubscribeInSubscribeEventEngineInstance(SubscribeEventEngine subscribeEventEngine, string[] channels, string[] channelGroups)
 		{
 			channels ??= [];
 			channelGroups ??= [];
@@ -145,7 +146,7 @@ namespace PubnubApi.EndPoint
 					var id = $"{instanceId}-{channel}";
 					if (subscribeEventEngineFactory.HasEventEngine(id)) {
 						var subscribeEventEngine = subscribeEventEngineFactory.GetEventEngine(id);
-						UnsubscribeInSubscribeEventEngineInstance(subscribeEventEngine, new []{channel}, channelGroups);
+						await UnsubscribeInSubscribeEventEngineInstance(subscribeEventEngine, new []{channel}, channelGroups);
 					} else {
 						logger?.Error($"Attempted unsubscribe without event engine instance for this channel");
 					}
@@ -155,7 +156,7 @@ namespace PubnubApi.EndPoint
 			{
 				if (subscribeEventEngineFactory.HasEventEngine(instanceId)) {
 					var subscribeEventEngine = subscribeEventEngineFactory.GetEventEngine(instanceId);
-					UnsubscribeInSubscribeEventEngineInstance(subscribeEventEngine, channels, channelGroups);
+					await UnsubscribeInSubscribeEventEngineInstance(subscribeEventEngine, channels, channelGroups);
 				} else {
 					logger?.Error($"Attempted unsubscribe without event engine");
 				}
