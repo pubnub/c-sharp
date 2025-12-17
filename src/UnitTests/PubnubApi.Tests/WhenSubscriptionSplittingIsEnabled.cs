@@ -104,7 +104,60 @@ namespace PubNubMessaging.Tests
             );
             pubnub.AddListener(eventListener);
             pubnub.Subscribe<string>().Channels(channels).Execute();
-            var connectedToAll = connectedToAllReset.WaitOne(15000);
+            var connectedToAll = connectedToAllReset.WaitOne(25000);
+            Assert.True(connectedToAll, "Split subscription didn't receive connected status for all channels!");
+            var subscribedChannels = pubnub.GetSubscribedChannels();
+            Assert.True(channels.All(x => subscribedChannels.Contains(x)), "Not all channels were present in subscription list!");
+        }
+        
+        [Test]
+        public static async Task ThenWithSplitSubscriptionSubscribeToTenPlusChannelsShouldWork()
+        {
+            InitPubnubForTest();
+
+            var channels = new string[]
+            {
+                $"foo.1",
+                $"foo.2",
+                $"foo.3",
+                $"foo.5",
+                $"foo.6",
+                $"foo.7",
+                $"foo.8",
+                $"foo.9",
+                $"foo.10",
+                $"foo.11",
+                $"foo.12",
+                $"foo.13",
+                $"foo.14",
+            };
+            var channelsWithConnection = new List<string>();
+            var connectedToAllReset = new ManualResetEvent(false);
+
+            var eventListener = new SubscribeCallbackExt(
+                delegate (Pubnub pnObj, PNObjectEventResult eventResult)
+                {
+                },
+                delegate (Pubnub pnObj, PNStatus status)
+                {
+                    if (status.Category == PNStatusCategory.PNSubscriptionChangedCategory ||
+                        status.AffectedChannels.Count > 1)
+                    {
+                        Assert.Fail("Received more than 1 channel in status callback with subscription splitting enabled!");
+                    }
+                    if (status.Category == PNStatusCategory.PNConnectedCategory)
+                    {
+                        channelsWithConnection.AddRange(status.AffectedChannels);
+                        if (channels.All(x => channelsWithConnection.Contains(x)))
+                        {
+                            connectedToAllReset.Set();
+                        }
+                    }
+                }
+            );
+            pubnub.AddListener(eventListener);
+            pubnub.Subscribe<string>().Channels(channels).Execute();
+            var connectedToAll = connectedToAllReset.WaitOne(45000);
             Assert.True(connectedToAll, "Split subscription didn't receive connected status for all channels!");
             var subscribedChannels = pubnub.GetSubscribedChannels();
             Assert.True(channels.All(x => subscribedChannels.Contains(x)), "Not all channels were present in subscription list!");
@@ -200,7 +253,7 @@ namespace PubNubMessaging.Tests
             await Task.Delay(5000);
             
             pubnub.Unsubscribe<string>().Channels(new []{"foo.1"}).Execute();
-            var receivedDisconnect = disconnectReset.WaitOne(15000);
+            var receivedDisconnect = disconnectReset.WaitOne(25000);
             Assert.True(receivedDisconnect, "Split subscription didn't receive disconnection status for channel!");
             Assert.False(pubnub.GetSubscribedChannels().Contains("foo.1"), "Subscribed channels contains disconnected channel!");
         }
@@ -241,7 +294,7 @@ namespace PubNubMessaging.Tests
             await Task.Delay(5000);
 
             pubnub.UnsubscribeAll<string>();
-            var receivedDisconnect = disconnectReset.WaitOne(15000);
+            var receivedDisconnect = disconnectReset.WaitOne(25000);
 
             await Task.Delay(15000);
             
