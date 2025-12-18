@@ -299,35 +299,55 @@ namespace PubnubApi
 
                 //Set Time
                 PropertyInfo timeProp = specific.GetRuntimeProperty("Timetoken");
-                long timetoken;
-                Int64.TryParse(listObject[2].ToString(), out timetoken);
-                timeProp.SetValue(message, timetoken, null);
+                if (timeProp != null)
+                {
+                    long timetoken;
+                    Int64.TryParse(listObject[2].ToString(), out timetoken);
+                    timeProp.SetValue(message, timetoken, null);
+                }
 
                 //Set Publisher
                 PropertyInfo publisherProp = specific.GetRuntimeProperty("Publisher");
-                string publisherValue = (listObject[3] != null) ? listObject[3].ToString() : "";
-                publisherProp.SetValue(message, publisherValue, null);
+                if (publisherProp != null)
+                {
+                    string publisherValue = (listObject[3] != null) ? listObject[3].ToString() : "";
+                    publisherProp.SetValue(message, publisherValue, null);
+                }
 
                 // Set ChannelName
                 PropertyInfo channelNameProp = specific.GetRuntimeProperty("Channel");
-                channelNameProp.SetValue(message, listObject[5]?.ToString(), null);
+                if (channelNameProp != null)
+                {
+                    channelNameProp.SetValue(message, listObject[5]?.ToString(), null);
+                }
 
                 // Set ChannelGroup
                 PropertyInfo subsciptionProp = specific.GetRuntimeProperty("Subscription");
-                subsciptionProp.SetValue(message, listObject[4]?.ToString(), null);
-                
+                if (subsciptionProp != null)
+                {
+                    subsciptionProp.SetValue(message, listObject[4]?.ToString(), null);
+                }
+
                 PropertyInfo customMessageType = specific.GetRuntimeProperty("CustomMessageType");
-                customMessageType.SetValue(message, listObject[6], null);
+                if (customMessageType != null)
+                {
+                    customMessageType.SetValue(message, listObject[6], null);
+                }
+
                 //Set Metadata list second position, index=1
                 if (listObject[1] != null)
                 {
                     PropertyInfo userMetadataProp = specific.GetRuntimeProperty("UserMetadata");
-                    userMetadataProp.SetValue(message, listObject[1], null);
+                    if (userMetadataProp != null)
+                    {
+                        userMetadataProp.SetValue(message, listObject[1], null);
+                    }
                 }
-                
+
 
                 ret = (T)Convert.ChangeType(message, specific, CultureInfo.InvariantCulture);
             }
+
             logger?.Trace("JsonNet Deserialized Messages successfully.");
             return ret;
         }
@@ -377,32 +397,63 @@ namespace PubnubApi
                 }
 
                 PropertyInfo timeProp = specific.GetRuntimeProperty("Timetoken");
-                long timetoken;
-                Int64.TryParse(jsonFields["publishTimetoken"].ToString(), out timetoken);
-                timeProp.SetValue(message, timetoken, null);
+                if (timeProp != null)
+                {
+                    long timetoken = 0;
+                    if (jsonFields.ContainsKey("publishTimetoken") && jsonFields["publishTimetoken"] != null)
+                    {
+                        Int64.TryParse(jsonFields["publishTimetoken"].ToString(), out timetoken);
+                    }
+
+                    timeProp.SetValue(message, timetoken, null);
+                }
 
                 PropertyInfo publisherProp = specific.GetRuntimeProperty("Publisher");
-                string publisherValue = (jsonFields["userId"] != null) ? jsonFields["userId"].ToString() : "";
-                publisherProp.SetValue(message, publisherValue, null);
+                if (publisherProp != null)
+                {
+                    string publisherValue = (jsonFields.ContainsKey("userId") && jsonFields["userId"] != null)
+                        ? jsonFields["userId"].ToString()
+                        : "";
+                    publisherProp.SetValue(message, publisherValue, null);
+                }
 
                 PropertyInfo channelNameProp = specific.GetRuntimeProperty("Channel");
-                channelNameProp.SetValue(message, jsonFields["channel"]?.ToString(), null);
+                if (channelNameProp != null)
+                {
+                    string channelValue = (jsonFields.ContainsKey("channel") && jsonFields["channel"] != null)
+                        ? jsonFields["channel"].ToString()
+                        : null;
+                    channelNameProp.SetValue(message, channelValue, null);
+                }
 
                 PropertyInfo subsciptionProp = specific.GetRuntimeProperty("Subscription");
-                subsciptionProp.SetValue(message, jsonFields["channelGroup"]?.ToString(), null);
+                if (subsciptionProp != null)
+                {
+                    string subscriptionValue =
+                        (jsonFields.ContainsKey("channelGroup") && jsonFields["channelGroup"] != null)
+                            ? jsonFields["channelGroup"].ToString()
+                            : null;
+                    subsciptionProp.SetValue(message, subscriptionValue, null);
+                }
 
                 if (jsonFields.ContainsKey("customMessageType"))
                 {
                     PropertyInfo customMessageType = specific.GetRuntimeProperty("CustomMessageType");
-                    customMessageType.SetValue(message, jsonFields["customMessageType"], null);
+                    if (customMessageType != null)
+                    {
+                        customMessageType.SetValue(message, jsonFields["customMessageType"], null);
+                    }
                 }
 
-                if (jsonFields["userMetadata"] != null)
+                if (jsonFields.ContainsKey("userMetadata") && jsonFields["userMetadata"] != null)
                 {
                     PropertyInfo userMetadataProp = specific.GetRuntimeProperty("UserMetadata");
-                    userMetadataProp.SetValue(message, ConvertToDictionaryObject(jsonFields["userMetadata"]), null);
+                    if (userMetadataProp != null)
+                    {
+                        userMetadataProp.SetValue(message, ConvertToDictionaryObject(jsonFields["userMetadata"]), null);
+                    }
                 }
-                
+
 
                 response = (T)Convert.ChangeType(message, specific, CultureInfo.InvariantCulture);
             }

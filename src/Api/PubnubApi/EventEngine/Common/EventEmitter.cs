@@ -227,7 +227,20 @@ namespace PubnubApi.EventEngine.Common
 
             var userMetaData = eventData.UserMetadata;
             jsonFields.Add("userMetadata", userMetaData);
-            jsonFields.Add("publishTimetoken", GetTimetokenMetadata(eventData.PublishMetadata).Timetoken);
+
+            var timetokenMetadata = GetTimetokenMetadata(eventData.PublishMetadata);
+            long publishTimetoken = 0L;
+            if (timetokenMetadata != null)
+            {
+                publishTimetoken = timetokenMetadata.Timetoken;
+            }
+            else
+            {
+                configuration?.Logger?.Warn(
+                    $"GetTimetokenMetadata returned null for channel {currentMessageChannel}. Using default timetoken=0.");
+            }
+
+            jsonFields.Add("publishTimetoken", publishTimetoken);
             jsonFields.Add("userId", eventData.IssuingClientId);
 
             jsonFields.Add("currentMessageChannelGroup", currentMessageChannelGroup);

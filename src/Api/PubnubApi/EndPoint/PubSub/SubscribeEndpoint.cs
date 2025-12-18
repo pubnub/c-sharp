@@ -23,7 +23,6 @@ namespace PubnubApi.EndPoint
         private SubscribeManager2 manager;
         private Dictionary<string, object> queryParam;
         private Pubnub PubnubInstance;
-        private SubscribeEventEngine subscribeEventEngine;
         private SubscribeEventEngineFactory subscribeEventEngineFactory;
         private PresenceOperation<T> presenceOperation;
         private HeartbeatOperation heartbeatOperation;
@@ -100,17 +99,24 @@ namespace PubnubApi.EndPoint
 			subscribeChannelGroupNames ??= new List<string>();
 
 			if (presenceSubscribeEnabled) {
-				List<string> presenceChannelNames = (this.subscribeChannelNames != null && this.subscribeChannelNames.Count > 0 && !string.IsNullOrEmpty(this.subscribeChannelNames[0]))
-												? this.subscribeChannelNames.Select(c => string.Format(CultureInfo.InvariantCulture, "{0}-pnpres", c)).ToList() : new List<string>();
-				List<string> presenceChannelGroupNames = (this.subscribeChannelGroupNames != null && this.subscribeChannelGroupNames.Count > 0 && !string.IsNullOrEmpty(this.subscribeChannelGroupNames[0]))
-												? this.subscribeChannelGroupNames.Select(c => string.Format(CultureInfo.InvariantCulture, "{0}-pnpres", c)).ToList() : new List<string>();
-
-				if (this.subscribeChannelNames != null && presenceChannelNames.Count > 0) {
-					this.subscribeChannelNames.AddRange(presenceChannelNames);
+				if (config.SplitSubscribeCalls)
+				{
+					config?.Logger.Error("Presence subscription is disabled when SplitSubscribeCalls = true!");
 				}
+				else
+				{
+					List<string> presenceChannelNames = (this.subscribeChannelNames != null && this.subscribeChannelNames.Count > 0 && !string.IsNullOrEmpty(this.subscribeChannelNames[0]))
+						? this.subscribeChannelNames.Select(c => string.Format(CultureInfo.InvariantCulture, "{0}-pnpres", c)).ToList() : new List<string>();
+					List<string> presenceChannelGroupNames = (this.subscribeChannelGroupNames != null && this.subscribeChannelGroupNames.Count > 0 && !string.IsNullOrEmpty(this.subscribeChannelGroupNames[0]))
+						? this.subscribeChannelGroupNames.Select(c => string.Format(CultureInfo.InvariantCulture, "{0}-pnpres", c)).ToList() : new List<string>();
 
-				if (this.subscribeChannelGroupNames != null && presenceChannelGroupNames.Count > 0) {
-					this.subscribeChannelGroupNames.AddRange(presenceChannelGroupNames);
+					if (this.subscribeChannelNames != null && presenceChannelNames.Count > 0) {
+						this.subscribeChannelNames.AddRange(presenceChannelNames);
+					}
+
+					if (this.subscribeChannelGroupNames != null && presenceChannelGroupNames.Count > 0) {
+						this.subscribeChannelGroupNames.AddRange(presenceChannelGroupNames);
+					}
 				}
 			}
 
@@ -123,6 +129,31 @@ namespace PubnubApi.EndPoint
 			Subscribe(channelNames, channelGroupNames, cursor, this.queryParam);
 		}
 
+		private SubscribeEventEngine InitSubscribeEvenEngine(string id)
+		{
+			SubscribeEventEngine subscribeEventEngine;
+			if (subscribeEventEngineFactory.HasEventEngine(id))
+			{
+				subscribeEventEngine = subscribeEventEngineFactory.GetEventEngine(id);
+			} else {
+				var subscribeManager = new SubscribeManager2(config, jsonLibrary, unit, pubnubTokenMgr, PubnubInstance);
+				subscribeEventEngine = subscribeEventEngineFactory.InitializeEventEngine(id, PubnubInstance, config, subscribeManager, this.EventEmitter, jsonLibrary, StatusEmitter);
+				subscribeEventEngine.OnStateTransition += (transitionResult) =>
+				{
+					SubscribeEventEngine_OnStateTransition(subscribeEventEngine, transitionResult);
+				};
+				subscribeEventEngine.OnEventQueued += (@event) =>
+				{
+					SubscribeEventEngine_OnEventQueued(subscribeEventEngine, @event);
+				};
+				subscribeEventEngine.OnEffectDispatch += (invocation) =>
+				{
+					SubscribeEventEngine_OnEffectDispatch(subscribeEventEngine, invocation);
+				};
+			}
+			return subscribeEventEngine;
+		}
+
 		private async void Subscribe(string[] channels, string[] channelGroups, SubscriptionCursor cursor, Dictionary<string, object> externalQueryParam)
 		{
 			try
@@ -131,16 +162,24 @@ namespace PubnubApi.EndPoint
 					throw new ArgumentException("Either Channel Or Channel Group or Both should be provided.");
 				}
 
-				if (subscribeEventEngineFactory.HasEventEngine(instanceId)) {
-					subscribeEventEngine = subscribeEventEngineFactory.GetEventEngine(instanceId);
-				} else {
-					var subscribeManager = new SubscribeManager2(config, jsonLibrary, unit, pubnubTokenMgr, PubnubInstance);
-					subscribeEventEngine = subscribeEventEngineFactory.InitializeEventEngine(instanceId, PubnubInstance, config, subscribeManager, this.EventEmitter, jsonLibrary, StatusEmitter);
-					subscribeEventEngine.OnStateTransition += SubscribeEventEngine_OnStateTransition;
-					subscribeEventEngine.OnEventQueued += SubscribeEventEngine_OnEventQueued;
-					subscribeEventEngine.OnEffectDispatch += SubscribeEventEngine_OnEffectDispatch;
+				if (config.SplitSubscribeCalls)
+				{
+					if (channelGroups is { Length: > 0 })
+					{
+						config.Logger?.Warn("Subscribing to channel groups is disabled when PNConfiguration.SplitSubscribeCalls = true!");
+					}
+					foreach (var channel in channels)
+					{
+						var subscribeEventEngine = InitSubscribeEvenEngine($"{instanceId}-{channel}");
+						var channelSubscriptionCursor = cursor == null ? null : new SubscriptionCursor(cursor.Timetoken, cursor.Region);
+						subscribeEventEngine.Subscribe<T>(new []{channel}, new string[]{}, channelSubscriptionCursor);
+					}
 				}
-				subscribeEventEngine.Subscribe<T>(channels, channelGroups, cursor);
+				else
+				{
+					var subscribeEventEngine = InitSubscribeEvenEngine(instanceId);
+					subscribeEventEngine.Subscribe<T>(channels, channelGroups, cursor);
+				}
 				if (this.presenceOperation == null)
 				{
 					if (inputChannels.Any() || inputChannelGroups.Any())
@@ -164,7 +203,7 @@ namespace PubnubApi.EndPoint
 			}
 		}
 
-		private void SubscribeEventEngine_OnEffectDispatch(IEffectInvocation obj)
+		private void SubscribeEventEngine_OnEffectDispatch(SubscribeEventEngine subscribeEventEngine, IEffectInvocation obj)
         {
             try
             {
@@ -177,7 +216,7 @@ namespace PubnubApi.EndPoint
             }
         }
 
-        private void SubscribeEventEngine_OnEventQueued(IEvent @event)
+        private void SubscribeEventEngine_OnEventQueued(SubscribeEventEngine subscribeEventEngine, IEvent @event)
         {
             try
             {
@@ -199,7 +238,7 @@ namespace PubnubApi.EndPoint
             }
         }
 
-        private void SubscribeEventEngine_OnStateTransition(EventEngine.Core.TransitionResult obj)
+        private void SubscribeEventEngine_OnStateTransition(SubscribeEventEngine subscribeEventEngine, EventEngine.Core.TransitionResult obj)
         {
             try
             {

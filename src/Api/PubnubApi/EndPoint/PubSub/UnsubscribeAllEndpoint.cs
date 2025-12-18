@@ -27,11 +27,23 @@ namespace PubnubApi.EndPoint
         private void UnsubscribeAll()
         {
             logger?.Trace($"{GetType().Name} Execute invoked");
-			if (subscribeEventEngineFactory.HasEventEngine(instanceId)) {
-                logger?.Trace($"EventEngine instance found.");
-				SubscribeEventEngine subscribeEventEngine = subscribeEventEngineFactory.GetEventEngine(instanceId);
-                subscribeEventEngine.UnsubscribeAll();
-			}
+
+            if (config.SplitSubscribeCalls)
+            {
+                var allEngines = subscribeEventEngineFactory.GetAllEngineInstances(instanceId);
+                foreach (var engine in allEngines)
+                {
+                    engine.UnsubscribeAll();
+                }
+            }
+            else
+            {
+                if (subscribeEventEngineFactory.HasEventEngine(instanceId)) {
+                    logger?.Trace($"EventEngine instance found.");
+                    SubscribeEventEngine subscribeEventEngine = subscribeEventEngineFactory.GetEventEngine(instanceId);
+                    subscribeEventEngine.UnsubscribeAll();
+                }
+            }
 
             if (config.PresenceInterval > 0 && presenceEventEngineFactory.HasEventEngine(instanceId)) {
                 PresenceEventEngine presenceEventEngine = presenceEventEngineFactory.GetEventEngine(instanceId);
