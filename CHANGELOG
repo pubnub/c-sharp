@@ -1,3 +1,7 @@
+v8.1.0 - December 18 2025
+-----------------------------
+- Added: added a config option to split multi-channel subscribes for keysets with channel sharding enabled.
+
 v8.0.4 - December 04 2025
 -----------------------------
 - Modified: prevent resubscribe to previously subscribed entities.
