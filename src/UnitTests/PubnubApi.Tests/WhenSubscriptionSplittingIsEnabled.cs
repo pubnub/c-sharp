@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -105,6 +106,7 @@ namespace PubNubMessaging.Tests
             pubnub.AddListener(eventListener);
             pubnub.Subscribe<string>().Channels(channels).Execute();
             var connectedToAll = connectedToAllReset.WaitOne(25000);
+            pubnub.RemoveListener(eventListener);
             Assert.True(connectedToAll, "Split subscription didn't receive connected status for all channels!");
             var subscribedChannels = pubnub.GetSubscribedChannels();
             Assert.True(channels.All(x => subscribedChannels.Contains(x)), "Not all channels were present in subscription list!");
@@ -131,7 +133,7 @@ namespace PubNubMessaging.Tests
                 $"foo.13",
                 $"foo.14",
             };
-            var channelsWithConnection = new List<string>();
+            var channelsWithConnection = new ConcurrentBag<string>();
             var connectedToAllReset = new ManualResetEvent(false);
 
             var eventListener = new SubscribeCallbackExt(
@@ -147,7 +149,15 @@ namespace PubNubMessaging.Tests
                     }
                     if (status.Category == PNStatusCategory.PNConnectedCategory)
                     {
-                        channelsWithConnection.AddRange(status.AffectedChannels);
+                        if (string.IsNullOrEmpty(status.AffectedChannels[0]))
+                        {
+                            ;
+                        }
+                        channelsWithConnection.Add(status.AffectedChannels[0]);
+                        if (channelsWithConnection.Any(string.IsNullOrEmpty))
+                        {
+                            ;
+                        }
                         if (channels.All(x => channelsWithConnection.Contains(x)))
                         {
                             connectedToAllReset.Set();
@@ -157,62 +167,9 @@ namespace PubNubMessaging.Tests
             );
             pubnub.AddListener(eventListener);
             pubnub.Subscribe<string>().Channels(channels).Execute();
-            var connectedToAll = connectedToAllReset.WaitOne(45000);
+            var connectedToAll = connectedToAllReset.WaitOne(50000);
+            pubnub.RemoveListener(eventListener);
             Assert.True(connectedToAll, "Split subscription didn't receive connected status for all channels!");
-            var subscribedChannels = pubnub.GetSubscribedChannels();
-            Assert.True(channels.All(x => subscribedChannels.Contains(x)), "Not all channels were present in subscription list!");
-        }
-        
-        [Test]
-        public static async Task ThenWithSplitSubscriptionSubscribeToMultipleWithPresenceShouldWork()
-        {
-            InitPubnubForTest();
-
-            var channels = new string[]
-            {
-                $"foo.{Guid.NewGuid()}",
-                $"foo.{Guid.NewGuid()}",
-                $"foo.{Guid.NewGuid()}",
-                $"foo.{Guid.NewGuid()}",
-            };
-            var channelsWithConnection = new List<string>();
-            var channelsWithPresenceJoin = new List<string>();
-            var connectedToAllReset = new ManualResetEvent(false);
-
-            var eventListener = new SubscribeCallbackExt(
-                (pn, messageEvent) => { }
-                ,(pn, presenceEvent) =>
-                {
-                    if (presenceEvent.Event == "join" && presenceEvent.Uuid == "mytestuuid")
-                    {
-                        channelsWithPresenceJoin.Add(presenceEvent.Channel);
-                        if (channels.All(x => channelsWithConnection.Contains(x) && channelsWithPresenceJoin.Contains(x)))
-                        {
-                            connectedToAllReset.Set();
-                        }
-                    }
-                }
-                ,delegate (Pubnub pnObj, PNStatus status)
-                {
-                    if (status.Category == PNStatusCategory.PNSubscriptionChangedCategory ||
-                        status.AffectedChannels.Count > 1)
-                    {
-                        Assert.Fail("Received more than 1 channel in status callback with subscription splitting enabled!");
-                    }
-                    if (status.Category == PNStatusCategory.PNConnectedCategory)
-                    {
-                        channelsWithConnection.AddRange(status.AffectedChannels);
-                        if (channels.All(x => channelsWithConnection.Contains(x) && channelsWithPresenceJoin.Contains(x)))
-                        {
-                            connectedToAllReset.Set();
-                        }
-                    }
-                }
-            );
-            pubnub.AddListener(eventListener);
-            pubnub.Subscribe<string>().Channels(channels).WithPresence().Execute();
-            var connectedToAll = connectedToAllReset.WaitOne(25000);
-            Assert.True(connectedToAll, "Split subscription didn't receive connected status and join event for all channels!");
             var subscribedChannels = pubnub.GetSubscribedChannels();
             Assert.True(channels.All(x => subscribedChannels.Contains(x)), "Not all channels were present in subscription list!");
         }
@@ -254,6 +211,7 @@ namespace PubNubMessaging.Tests
             
             pubnub.Unsubscribe<string>().Channels(new []{"foo.1"}).Execute();
             var receivedDisconnect = disconnectReset.WaitOne(25000);
+            pubnub.RemoveListener(eventListener);
             Assert.True(receivedDisconnect, "Split subscription didn't receive disconnection status for channel!");
             Assert.False(pubnub.GetSubscribedChannels().Contains("foo.1"), "Subscribed channels contains disconnected channel!");
         }
@@ -296,8 +254,7 @@ namespace PubNubMessaging.Tests
             pubnub.UnsubscribeAll<string>();
             var receivedDisconnect = disconnectReset.WaitOne(25000);
 
-            await Task.Delay(15000);
-            
+            pubnub.RemoveListener(eventListener);
             Assert.True(receivedDisconnect, "Split subscription didn't receive disconnection status for channel!");
         }
     }

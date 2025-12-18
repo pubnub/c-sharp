@@ -54,8 +54,10 @@ namespace PubnubApi
         /// When enabled single multi-channel subscriptions will internally be changed into multiple single-channel ones.
         /// Enable this option if your keyset has channel-based sharding enabled.
         /// This option requires Event Engine to be enabled (it's on by default).
-        /// <para><b>WARNING: Enabling this option disables subscribing to channel groups and creates additional subscription calls
-        /// (especially with Presence enabled subscriptions), which may increase your cost.</b></para>
+        /// <para><b>WARNING: Enabling this option will also:</b>
+        /// <li><b>Disable subscribing to channel groups</b></li>
+        /// <li><b>Disable subscribing with WithPresence() (you can still explicitly subscribe to *-pnpres channels directly)</b></li>
+        /// <li><b>Generate more server requests, potentially increasing costs</b></li></para>
         /// </summary>
         public bool SplitSubscribeCalls { get; set; } = false;
 
