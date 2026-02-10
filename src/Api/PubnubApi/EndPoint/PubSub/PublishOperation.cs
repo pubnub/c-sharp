@@ -15,7 +15,9 @@ namespace PubnubApi.EndPoint
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
         private readonly IPubnubUnitTest unit;
-
+        
+        private const int MaxPublishRequestSizeBytes = 32 * 1024;
+        private const int PostBodyFramingOverheadBytes = 2;
         private object publishContent;
         private string channelName = "";
         private bool storeInHistory = true;
@@ -412,20 +414,7 @@ namespace PubnubApi.EndPoint
 
         private RequestParameter CreateRequestParameter()
         {
-            List<string> urlSegments =
-            [
-                "publish",
-                config.PublishKey ?? "",
-                config.SubscribeKey ?? "",
-                "0",
-                channelName,
-                "0"
-            ];
-            if (!httpPost)
-            {
-                urlSegments.Add(PrepareContent(publishContent));
-            }
-
+            var messageContent = PrepareContent(publishContent);
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
 
             if (userMetadata != null)
@@ -463,19 +452,98 @@ namespace PubnubApi.EndPoint
                 }
             }
 
-            var requestParam = new RequestParameter()
+            // Determine whether to use v2/publish endpoint and HTTP method.
+            var endpointInfo = ResolvePublishEndpoint(messageContent, requestQueryStringParams);
+            bool useV2Endpoint = endpointInfo.UseV2Endpoint;
+            bool usePost = endpointInfo.UsePost;
+
+            // Build URL path segments
+            var pathSegments = new List<string>();
+            if (useV2Endpoint)
             {
-                RequestType = httpPost ? Constants.POST : Constants.GET,
-                PathSegment = urlSegments,
+                pathSegments.Add("v2");
+            }
+            pathSegments.AddRange(["publish", config.PublishKey ?? "", config.SubscribeKey ?? "", "0", channelName, "0"]);
+
+            if (!usePost)
+            {
+                pathSegments.Add(messageContent);
+            }
+
+            var requestParam = new RequestParameter
+            {
+                RequestType = usePost ? Constants.POST : Constants.GET,
+                PathSegment = pathSegments,
                 Query = requestQueryStringParams
             };
-            if (httpPost)
+            requestParam.Headers.Add("Expect", "100-continue");
+
+            if (usePost)
             {
-                string postMessage = PrepareContent(publishContent);
-                requestParam.BodyContentString = postMessage;
+                requestParam.BodyContentString = messageContent;
             }
 
             return requestParam;
+        }
+        
+        private PublishEndpointInfo ResolvePublishEndpoint(
+            string messageContent,
+            Dictionary<string, string> queryParams)
+        {
+            int messageSizeBytes = Encoding.UTF8.GetByteCount(messageContent);
+
+            if (httpPost)
+            {
+                bool exceedsPostLimit = messageSizeBytes >= MaxPublishRequestSizeBytes - PostBodyFramingOverheadBytes;
+                return new PublishEndpointInfo { UseV2Endpoint = exceedsPostLimit, UsePost = true };
+            }
+            int urlSizeWithoutMessage = EstimateUrlSizeWithoutMessage(queryParams);
+            int availableForMessage = MaxPublishRequestSizeBytes - urlSizeWithoutMessage;
+
+            if (messageSizeBytes >= availableForMessage)
+            {
+                // Message too large for URL; switch to v2/publish with POST body
+                return new PublishEndpointInfo { UseV2Endpoint = true, UsePost = true };
+            }
+
+            return new PublishEndpointInfo { UseV2Endpoint = false, UsePost = false };
+        }
+        private struct PublishEndpointInfo
+        {
+            public bool UseV2Endpoint;
+            public bool UsePost;
+        }
+        
+        /// Estimates the total URL byte size excluding the message content.
+        /// Accounts for base URL components, path segments, user-specified query parameters,
+        /// and parameters injected later by the transport middleware
+        /// (uuid, pnsdk, requestid, instanceid, timestamp, auth, signature).
+        private int EstimateUrlSizeWithoutMessage(Dictionary<string, string> queryParams)
+        {
+            // 155 bytes covers the fixed overhead from base URL components and
+            // middleware-injected query params: scheme, origin, path separators,
+            // uuid, pnsdk, requestid, instanceid, and timestamp.
+            int estimatedSize = 155;
+
+            // Auth key adds "&auth={value}" — 5 bytes for the key portion plus the value length
+            if (config.AuthKey?.Length > 0)
+            {
+                estimatedSize += 5 + config.AuthKey.Length;
+            }
+
+            // Secret key triggers HMAC signature: "&signature=v2.{base64}" ≈ 80 bytes
+            if (!string.IsNullOrEmpty(config.SecretKey))
+            {
+                estimatedSize += 80;
+            }
+
+            // Add encoded size of the user-specified query parameters
+            estimatedSize += UriUtil.EncodeUriComponent(
+                UriUtil.BuildQueryString(queryParams),
+                PNOperationType.PNPublishOperation, false, false, false
+            ).Length;
+
+            return estimatedSize;
         }
 
         private void CleanUp()
