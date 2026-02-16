@@ -115,10 +115,17 @@ namespace PubnubApi
                         postData.Headers.Add(transportRequestHeader.Key, transportRequestHeader.Value);
                     }
                 }
-
                 HttpRequestMessage requestMessage =
                     new HttpRequestMessage(method: HttpMethod.Post, requestUri: transportRequest.RequestUrl)
                         { Content = postData };
+                // Set Http Request header, When the header is not a payload content header.
+                if (transportRequest.Headers.Keys.Count > 0 && transportRequest.BodyContentBytes == null)
+                {
+                    foreach (var kvp in transportRequest.Headers)
+                    {
+                        requestMessage.Headers.Add(kvp.Key, kvp.Value);
+                    }
+                }
                 logger?.Debug(
                     $"HttpClient Service:Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl}" +
                     (requestMessage.Headers.Any()

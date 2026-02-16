@@ -476,7 +476,6 @@ namespace PubnubApi.EndPoint
                 PathSegment = pathSegments,
                 Query = requestQueryStringParams
             };
-            requestParam.Headers.Add("Expect", "100-continue");
 
             if (usePost)
             {
