@@ -85,8 +85,11 @@ namespace PubnubApi
 				stringToSign.AppendFormat(CultureInfo.InvariantCulture, "{0}\n", configuration.PublishKey);
 				stringToSign.AppendFormat(CultureInfo.InvariantCulture, "{0}\n", pathString);
 				stringToSign.AppendFormat(CultureInfo.InvariantCulture, "{0}\n", queryString);
-				if (!string.IsNullOrEmpty(requestParameter.BodyContentString) && 
-				    !isPublishGET(requestParameter.PathSegment)) stringToSign.Append(requestParameter.BodyContentString);
+				if (!string.IsNullOrEmpty(requestParameter.BodyContentString) &&
+				    !isPublishGET(requestParameter.PathSegment))
+				{
+					stringToSign.Append(requestParameter.BodyContentString);
+				}
 				signature = Util.PubnubAccessManagerSign(configuration.SecretKey, stringToSign.ToString());
 				signature = string.Format(CultureInfo.InvariantCulture, "v2.{0}", signature.TrimEnd(new[] { '=' }));
 				requestParameter.Query.Add("signature", signature);
