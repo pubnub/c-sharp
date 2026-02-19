@@ -982,7 +982,7 @@ supported-platforms:
       - Windows 10 and up
       - Windows Server 2008 and up
     frameworks:
-      - .Net Framework 6.0+
+      - .Net Framework 4.5+
   -
     version: PubnubPCL 'C#' 8.1.0
     platforms:
@@ -994,7 +994,7 @@ supported-platforms:
       - Mac OS X 10 and up
       - Windows Server 2008 and up
     frameworks:
-      - .Net 6.0+
+      - .Net 4.5+
   -
     version: PubnubUWP 'C#' 8.1.0
     platforms:
@@ -1024,7 +1024,7 @@ sdks:
             requires:
               -
                 name: ".Net"
-                min-version: "6 or higher"
+                min-version: "4.5 or higher"
                 license: "MS-EULA"
                 license-url: "https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm"
                 location: "Should be installed on computer"
@@ -1142,7 +1142,7 @@ sdks:
             requires:
               -
                 name: ".Net"
-                min-version: "6 or higher"
+                min-version: "4.5 or higher"
                 license: "MS-EULA"
                 license-url: "https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm"
                 location: "Should be installed on computer"
@@ -1265,7 +1265,7 @@ sdks:
             requires:
               -
                 name: ".Net"
-                min-version: "6 or higher"
+                min-version: "4.5 or higher"
                 license: "MS-EULA"
                 license-url: "https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm"
                 location: "Should be installed on computer"
@@ -1288,9 +1288,9 @@ sdks:
                 supported-operating-systems:
                   Android:
                     runtime-version:
-                      - .NET 6.x Equivalent
+                      - .NET 4.5+ Equivalent
                     api-compatibility:
-                      - .NET 6.x
+                      - .NET 4.5+
                     target-api-level:
                       - 11
                     minimum-api-level:
@@ -1307,9 +1307,9 @@ sdks:
                       - ARMv7 (Cortex) CPU with NEON support
                   iOS:
                     runtime-version:
-                      - .NET 6.x Equivalent
+                      - .NET 4.5+ Equivalent
                     api-compatibility:
-                      - .NET 6.x
+                      - .NET 4.5+
                     minimum-os-version:
                       - iOS 9.0
                     maximum-os-version:
@@ -1323,9 +1323,9 @@ sdks:
                     target-architecture:
                       - x86-64
                     runtime-version:
-                      - .NET 6.x Equivalent
+                      - .NET 4.5+ Equivalent
                     api-compatibility:
-                      - .NET 6.x
+                      - .NET 4.5+
                     minimum-os-version:
                       - Windows 10 Home
                       - Windows 10 Pro
@@ -1402,9 +1402,9 @@ sdks:
                     target-architecture:
                       - x86-64
                     runtime-version:
-                      - .NET 6.x Equivalent
+                      - .NET 4.5+ Equivalent
                     api-compatibility:
-                      - .NET 6.x
+                      - .NET 4.5+
                     maximum-os-version:
                       - Ubuntu 20.04 LTS
                     minimum-os-version:
@@ -1413,9 +1413,9 @@ sdks:
                     target-architecture:
                       - x86-64
                     runtime-version:
-                      - .NET 6.x Equivalent
+                      - .NET 4.5+ Equivalent
                     api-compatibility:
-                      - .NET 6.x
+                      - .NET 4.5+
                     minimum-os-version:
                       - Mac OS X 10.8
                     maximum-os-version:
@@ -1439,7 +1439,7 @@ sdks:
             requires:
               -
                 name: ".Net"
-                min-version: "6 or higher"
+                min-version: "4.5 or higher"
                 license: "MS-EULA"
                 license-url: "https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm"
                 location: "Should be installed on computer"
@@ -1462,9 +1462,9 @@ sdks:
                 supported-operating-systems:
                   Android:
                     runtime-version:
-                      - .NET 6.x Equivalent
+                      - .NET 4.5+ Equivalent
                     api-compatibility:
-                      - .NET 6.x
+                      - .NET 4.5+
                     target-api-level:
                       - 11
                     minimum-api-level:
@@ -1481,9 +1481,9 @@ sdks:
                       - ARMv7 (Cortex) CPU with NEON support
                   iOS:
                     runtime-version:
-                      - .NET 6.x Equivalent
+                      - .NET 4.5+ Equivalent
                     api-compatibility:
-                      - .NET 6.x
+                      - .NET 4.5+
                     minimum-os-version:
                       - iOS 9.0
                     maximum-os-version:
@@ -1497,9 +1497,9 @@ sdks:
                     target-architecture:
                       - x86-64
                     runtime-version:
-                      - .NET 6.x Equivalent
+                      - .NET 4.5+ Equivalent
                     api-compatibility:
-                      - .NET 6.x
+                      - .NET 4.5+
                     minimum-os-version:
                       - Windows 10 Home
                       - Windows 10 Pro
@@ -1576,9 +1576,9 @@ sdks:
                     target-architecture:
                       - x86-64
                     runtime-version:
-                      - .NET 6.x Equivalent
+                      - .NET 4.5+ Equivalent
                     api-compatibility:
-                      - .NET 6.x
+                      - .NET 4.5+
                     maximum-os-version:
                       - Ubuntu 20.04 LTS
                     minimum-os-version:
@@ -1587,9 +1587,9 @@ sdks:
                     target-architecture:
                       - x86-64
                     runtime-version:
-                      - .NET 6.x Equivalent
+                      - .NET 4.5+ Equivalent
                     api-compatibility:
-                      - .NET 6.x
+                      - .NET 4.5+
                     minimum-os-version:
                       - Mac OS X 10.8
                     maximum-os-version:
