@@ -982,11 +982,7 @@ supported-platforms:
       - Windows 10 and up
       - Windows Server 2008 and up
     frameworks:
-      - .Net Framework 3.5
-      - .Net Framework 4.0
-      - .Net Framework 4.5
-      - .Net Framework 4.6.1+
-      - .Net Framework 6.0
+      - .Net Framework 6.0+
   -
     version: PubnubPCL 'C#' 8.1.0
     platforms:
@@ -998,15 +994,7 @@ supported-platforms:
       - Mac OS X 10 and up
       - Windows Server 2008 and up
     frameworks:
-      - Mono 4.8.0
-      - .Net Standard 1.0
-      - .Net Standard 1.1
-      - .Net Standard 1.3
-      - .Net Standard 1.4
-      - .Net Standard 2.0
-      - .Net Standard 2.1
-      - .Net Core
-      - .Net 6.0
+      - .Net 6.0+
   -
     version: PubnubUWP 'C#' 8.1.0
     platforms:
@@ -1055,27 +1043,6 @@ sdks:
                 license-url: "https://www.nuget.org/packages/PeterO.Cbor/4.5.2"
                 location: "External"
                 is-required: "Required"
-              -
-                name: "AsyncBridge.Net35"
-                min-version: "0.2.0"
-                license: "MIT"
-                license-url: "https://www.nuget.org/packages/AsyncBridge.Net35/0.2.0"
-                location: "External"
-                is-required: "Optional, only required for .NET 3.5"
-              -
-                name: "TaskParallelLibrary"
-                min-version: "1.0.2856"
-                license: "MS-EULA"
-                license-url: "https://go.microsoft.com/fwlink/?LinkID=186234"
-                location: "External"
-                is-required: "Optional, only required for .NET 3.5"
-              -
-                name: "AsyncBridge.JetBrains"
-                min-version: "0.1.1"
-                license: "GNU General Public License v3.0"
-                license-url: "https://libraries.io/nuget/AsyncBridge.JetBrains"
-                location: "External"
-                is-required: "Optional, only required for .NET 4.0"
             supported-platforms:
                 supported-operating-systems:
                   Windows:
@@ -1194,27 +1161,6 @@ sdks:
                 license-url: "https://www.nuget.org/packages/PeterO.Cbor/4.5.2"
                 location: "External"
                 is-required: "Required"
-              -
-                name: "AsyncBridge.Net35"
-                min-version: "0.2.0"
-                license: "MIT"
-                license-url: "https://www.nuget.org/packages/AsyncBridge.Net35/0.2.0"
-                location: "External"
-                is-required: "Optional, only required for .NET 3.5"
-              -
-                name: "TaskParallelLibrary"
-                min-version: "1.0.2856"
-                license: "MS-EULA"
-                license-url: "https://go.microsoft.com/fwlink/?LinkID=186234"
-                location: "External"
-                is-required: "Optional, only required for .NET 3.5"
-              -
-                name: "AsyncBridge.JetBrains"
-                min-version: "0.1.1"
-                license: "GNU General Public License v3.0"
-                license-url: "https://libraries.io/nuget/AsyncBridge.JetBrains"
-                location: "External"
-                is-required: "Optional, only required for .NET 4.0"
             supported-platforms:
                 supported-operating-systems:
                   Windows:
@@ -1318,8 +1264,8 @@ sdks:
             location: https://github.com/pubnub/c-sharp/releases/tag/v8.1.0
             requires:
               -
-                name: ".Net Core"
-                min-version: "1.x or higher"
+                name: ".Net"
+                min-version: "6 or higher"
                 license: "MS-EULA"
                 license-url: "https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm"
                 location: "Should be installed on computer"
@@ -1344,7 +1290,6 @@ sdks:
                     runtime-version:
                       - .NET 6.x Equivalent
                     api-compatibility:
-                      - .NET Core 2
                       - .NET 6.x
                     target-api-level:
                       - 11
@@ -1364,7 +1309,6 @@ sdks:
                     runtime-version:
                       - .NET 6.x Equivalent
                     api-compatibility:
-                      - .NET Core 2
                       - .NET 6.x
                     minimum-os-version:
                       - iOS 9.0
@@ -1381,7 +1325,6 @@ sdks:
                     runtime-version:
                       - .NET 6.x Equivalent
                     api-compatibility:
-                      - .NET Core 2
                       - .NET 6.x
                     minimum-os-version:
                       - Windows 10 Home
@@ -1461,7 +1404,7 @@ sdks:
                     runtime-version:
                       - .NET 6.x Equivalent
                     api-compatibility:
-                      - .NET Core 2
+                      - .NET 6.x
                     maximum-os-version:
                       - Ubuntu 20.04 LTS
                     minimum-os-version:
@@ -1472,7 +1415,6 @@ sdks:
                     runtime-version:
                       - .NET 6.x Equivalent
                     api-compatibility:
-                      - .NET Core 2
                       - .NET 6.x
                     minimum-os-version:
                       - Mac OS X 10.8
@@ -1496,8 +1438,8 @@ sdks:
             location: https://www.nuget.org/packages/PubnubPCL/
             requires:
               -
-                name: ".Net Core"
-                min-version: "1.x or higher"
+                name: ".Net"
+                min-version: "6 or higher"
                 license: "MS-EULA"
                 license-url: "https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm"
                 location: "Should be installed on computer"
@@ -1522,7 +1464,7 @@ sdks:
                     runtime-version:
                       - .NET 6.x Equivalent
                     api-compatibility:
-                      - .NET Core 2
+                      - .NET 6.x
                     target-api-level:
                       - 11
                     minimum-api-level:
@@ -1541,7 +1483,6 @@ sdks:
                     runtime-version:
                       - .NET 6.x Equivalent
                     api-compatibility:
-                      - .NET Core 2
                       - .NET 6.x
                     minimum-os-version:
                       - iOS 9.0
@@ -1558,7 +1499,6 @@ sdks:
                     runtime-version:
                       - .NET 6.x Equivalent
                     api-compatibility:
-                      - .NET Core 2
                       - .NET 6.x
                     minimum-os-version:
                       - Windows 10 Home
@@ -1638,7 +1578,6 @@ sdks:
                     runtime-version:
                       - .NET 6.x Equivalent
                     api-compatibility:
-                      - .NET Core 2
                       - .NET 6.x
                     maximum-os-version:
                       - Ubuntu 20.04 LTS
@@ -1650,7 +1589,6 @@ sdks:
                     runtime-version:
                       - .NET 6.x Equivalent
                     api-compatibility:
-                      - .NET Core 2
                       - .NET 6.x
                     minimum-os-version:
                       - Mac OS X 10.8
