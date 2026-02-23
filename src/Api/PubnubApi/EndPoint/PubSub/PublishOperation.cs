@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;
@@ -16,9 +16,11 @@ namespace PubnubApi.EndPoint
         private readonly IJsonPluggableLibrary jsonLibrary;
         private readonly IPubnubUnitTest unit;
         
-        private const int MaxPublishRequestSizeBytes = 32 * 1024;
+        private const int MaxPublishRequestSizeBytes = 32768;
+        private const int MaxMessageContentSizeBytes = 2097152;
         private const int PostBodyFramingOverheadBytes = 2;
         private object publishContent;
+        private string preparedMessageContent;
         private string channelName = "";
         private bool storeInHistory = true;
         private bool httpPost;
@@ -41,6 +43,7 @@ namespace PubnubApi.EndPoint
         public PublishOperation Message(object message)
         {
             publishContent = message;
+            preparedMessageContent = PrepareContent(message);
             return this;
         }
 
@@ -114,6 +117,8 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing userCallback");
             }
 
+            ValidateMessageContentSize();
+
             savedCallback = callback;
             logger?.Trace($"{GetType().Name} Execute invoked");
             Publish(channelName, publishContent, storeInHistory, ttl, userMetadata, queryParam, callback);
@@ -121,6 +126,7 @@ namespace PubnubApi.EndPoint
 
         public async Task<PNResult<PNPublishResult>> ExecuteAsync()
         {
+            ValidateMessageContentSize();
             syncRequest = false;
             logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
             return await Publish(channelName, publishContent, storeInHistory, ttl, userMetadata, queryParam)
@@ -138,6 +144,8 @@ namespace PubnubApi.EndPoint
             {
                 throw new MissingMemberException("publish key is required");
             }
+
+            ValidateMessageContentSize();
 
             logger?.Trace($"{GetType().Name} parameter validated.");
             ManualResetEvent syncEvent = new ManualResetEvent(false);
@@ -398,6 +406,15 @@ namespace PubnubApi.EndPoint
             }
         }
 
+        private void ValidateMessageContentSize()
+        {
+            if (preparedMessageContent != null
+                && Encoding.UTF8.GetByteCount(preparedMessageContent) > MaxMessageContentSizeBytes)
+            {
+                throw new ArgumentException("Message content size exceeds the maximum permissible size of 2 MiB.");
+            }
+        }
+
         private string PrepareContent(object originalMessage)
         {
             string message = jsonLibrary.SerializeToJsonString(originalMessage);
@@ -414,7 +431,7 @@ namespace PubnubApi.EndPoint
 
         private RequestParameter CreateRequestParameter()
         {
-            var messageContent = PrepareContent(publishContent);
+            var messageContent = preparedMessageContent;
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
 
             if (userMetadata != null)
@@ -476,6 +493,11 @@ namespace PubnubApi.EndPoint
                 PathSegment = pathSegments,
                 Query = requestQueryStringParams
             };
+
+            if (useV2Endpoint)
+            {
+                requestParam.Headers.Add("Expect", "100-continue");
+            }
 
             if (usePost)
             {

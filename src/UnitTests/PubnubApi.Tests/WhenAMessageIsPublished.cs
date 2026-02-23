@@ -2658,6 +2658,9 @@ namespace PubNubMessaging.Tests
     ///   <item>Regular publish (GET): message in URL path, total URL must stay under 32 KB.</item>
     ///   <item>Regular publish (POST): body must be less than 32*1024 − 2 = 32 766 bytes.</item>
     ///   <item>v2/publish (POST): used when regular limits are exceeded; server rejects bodies ≥ 2*1024*1024 − 2 bytes with 413.</item>
+    ///   <item>Client-side validation: prepared message content (including encryption overhead)
+    ///         exceeding 2*1024*1024 − 2 bytes throws <see cref="ArgumentException"/> before
+    ///         any HTTP request is made.</item>
     /// </list>
     /// </summary>
     [TestFixture]
@@ -2681,8 +2684,10 @@ namespace PubNubMessaging.Tests
         private const int PostBodyBoundaryBytes = 32 * 1024 - 2; // 32 766
 
         /// <summary>
-        /// Server-side body limit for v2/publish.
-        /// PubNub servers return HTTP 413 for payloads at or above this size.
+        /// Maximum permitted size for the prepared message content (2 MiB − 2 bytes).
+        /// The SDK throws <see cref="ArgumentException"/> client-side for payloads
+        /// strictly exceeding this value. Payloads exactly at this size are sent to
+        /// the server, which returns HTTP 413.
         /// </summary>
         private const int TwoMbBoundaryBytes = 2 * 1024 * 1024 - 2; // 2 097 150
 
@@ -2722,6 +2727,25 @@ namespace PubNubMessaging.Tests
                 SubscribeKey = SubKey,
                 Origin = $"localhost:{_server.Port}",
                 Secure = false
+            };
+            _pubnub = new Pubnub(config);
+            return _pubnub;
+        }
+
+        /// <summary>
+        /// Creates a Pubnub instance with CryptoModule configured using LegacyCryptor.
+        /// Encryption adds overhead (AES-CBC IV, PKCS7 padding, Base64 encoding, JSON wrapping),
+        /// so the final serialized payload will be larger than the original plaintext.
+        /// </summary>
+        private Pubnub CreatePubnubWithCrypto()
+        {
+            var config = new PNConfiguration(new UserId("test-uuid"))
+            {
+                PublishKey = PubKey,
+                SubscribeKey = SubKey,
+                Origin = $"localhost:{_server.Port}",
+                Secure = false,
+                CryptoModule = new CryptoModule(new LegacyCryptor("enigma"), null)
             };
             _pubnub = new Pubnub(config);
             return _pubnub;
@@ -2979,12 +3003,14 @@ namespace PubNubMessaging.Tests
 
         #endregion
 
-        #region 2 MB server-side boundary — HTTP 413 Request Entity Too Large
+        #region 2 MB boundary — client-side ArgumentException and server-side HTTP 413
 
         [Test]
-        public async Task ThenPayload_Above2MBBoundary_UsesV2PublishAndServerReturns413()
+        public async Task ThenPayload_AtTwoMBBoundary_UsesV2PublishAndServerReturns413()
         {
-            // Arrange — override the default mock so v2/publish returns 413
+            // Arrange — message is exactly at TwoMbBoundaryBytes (2,097,150 bytes).
+            // This passes the client-side validation (> check, not >=) but the server
+            // rejects it with 413.
             _server.Reset();
             _server
                 .Given(WireMockRequest.Create()
@@ -3039,6 +3065,126 @@ namespace PubNubMessaging.Tests
             Assert.That(result.Status.Error, Is.False,
                 "Payload one byte below the 2 MB boundary should succeed.");
             AssertV2PublishEndpoint();
+        }
+
+        [Test]
+        public void ThenPayload_AboveTwoMBBoundary_ThrowsArgumentException()
+        {
+            // Arrange — message is one byte above the max permitted content size.
+            // The SDK must throw ArgumentException before making any HTTP request.
+            var pubnub = CreatePubnub();
+            var message = CreateMessageOfSerializedSize(TwoMbBoundaryBytes + 1);
+
+            // Act & Assert
+            var ex = Assert.ThrowsAsync<ArgumentException>(async () =>
+            {
+                await pubnub.Publish()
+                    .Channel(Channel)
+                    .Message(message)
+                    .UsePOST(true)
+                    .ExecuteAsync();
+            });
+
+            Assert.That(ex!.Message, Does.Contain("Message content size exceeds"),
+                "Exception message should describe the size violation.");
+            Assert.That(_server.LogEntries.Count(), Is.EqualTo(0),
+                "No HTTP request should be made when the message exceeds the size limit.");
+        }
+
+        #endregion
+
+        #region 2 MB server-side boundary with CryptoModule — encrypted payload near limit
+
+        [Test]
+        public async Task ThenEncryptedPayload_JustBelowTwoMBBoundary_WithCryptoModule_UsesV2PublishAndSucceeds()
+        {
+            // Arrange
+            //
+            // When CryptoModule is configured, the SDK encrypts the message before publishing.
+            // The encryption pipeline in PrepareContent is:
+            //   1. JSON-serialize the plaintext         → adds 2 bytes (surrounding quotes)
+            //   2. AES-256-CBC encrypt with PKCS7 pad   → rounds up to next 16-byte block
+            //   3. Prepend 16-byte random IV             → +16 bytes
+            //   4. Base64-encode the encrypted bytes     → ~33 % expansion (4/3 ratio)
+            //   5. JSON-serialize the Base64 string      → adds 2 bytes (surrounding quotes)
+            //
+            // For a plaintext of 1,572,829 ASCII characters the sizes are:
+            //   Step 1 → 1,572,831 bytes   (1,572,829 + 2)
+            //   Step 2 → 1,572,832 bytes   (1,572,831 + 1 byte PKCS7 padding)
+            //   Step 3 → 1,572,848 bytes   (1,572,832 + 16)
+            //   Step 4 → 2,097,132 bytes   (ceil(1,572,848 / 3) × 4 = 524,283 × 4)
+            //   Step 5 → 2,097,134 bytes   (2,097,132 + 2)
+            //
+            // 2,097,134 < 2,097,150 (TwoMbBoundaryBytes), so this payload fits just under
+            // the 2 MB − 2 server-side limit.  Due to AES block alignment and Base64 step
+            // quantization, this is the largest achievable encrypted payload below the limit.
+            const int plaintextLength = 1_572_829;
+
+            var pubnub = CreatePubnubWithCrypto();
+            var message = new string('a', plaintextLength);
+
+            // Act
+            var result = await pubnub.Publish()
+                .Channel(Channel)
+                .Message(message)
+                .UsePOST(true)
+                .ExecuteAsync();
+
+            // Assert — publish succeeded via v2/publish
+            Assert.That(result.Result, Is.Not.Null, "Publish result should not be null.");
+            Assert.That(result.Status.Error, Is.False,
+                "Encrypted payload just below the 2 MB − 2 boundary should publish successfully.");
+            AssertV2PublishEndpoint();
+
+            // Assert — verify the message body is encrypted (no plaintext leakage)
+            var entry = _server.LogEntries.Last();
+            var bodyString = entry.RequestMessage.Body;
+            Assert.That(bodyString, Is.Not.Null.And.Not.Empty,
+                "v2/publish POST body should contain the encrypted message.");
+            Assert.That(bodyString, Does.Not.Contain(new string('a', 100)),
+                "POST body should contain encrypted data, not the original plaintext.");
+
+            // Assert — verify the encrypted payload is under the 2 MB − 2 server limit
+            Assert.That(System.Text.Encoding.UTF8.GetByteCount(bodyString!),
+                Is.LessThan(TwoMbBoundaryBytes),
+                "Encrypted payload byte size should be below the 2 MB − 2 server-side limit.");
+        }
+
+        [Test]
+        public void ThenEncryptedPayload_AboveTwoMBBoundary_WithCryptoModule_ThrowsArgumentException()
+        {
+            // Arrange
+            //
+            // A plaintext of 1,572,830 ASCII chars encrypts to 2,097,154 bytes — 4 bytes
+            // above MaxMessageContentSizeBytes (2,097,150).  The client-side validation
+            // must reject this before any HTTP request is made.
+            //
+            // Encryption size breakdown for 1,572,830 chars:
+            //   JSON serialize       → 1,572,832 bytes  (plaintext + 2 quote bytes)
+            //   AES-CBC + PKCS7 pad  → 1,572,848 bytes  (1,572,832 is a 16-byte multiple,
+            //                                             so PKCS7 appends a full 16-byte block)
+            //   Prepend 16-byte IV   → 1,572,864 bytes
+            //   Base64 encode        → 2,097,152 bytes  (1,572,864 / 3 × 4 = 524,288 × 4)
+            //   JSON wrap (quotes)   → 2,097,154 bytes  (> 2,097,150 = TwoMbBoundaryBytes)
+            const int plaintextLength = 1_572_830;
+
+            var pubnub = CreatePubnubWithCrypto();
+            var message = new string('a', plaintextLength);
+
+            // Act & Assert
+            var ex = Assert.ThrowsAsync<ArgumentException>(async () =>
+            {
+                await pubnub.Publish()
+                    .Channel(Channel)
+                    .Message(message)
+                    .UsePOST(true)
+                    .ExecuteAsync();
+            });
+
+            Assert.That(ex!.Message, Does.Contain("Message content size exceeds"),
+                "Exception message should describe the size violation.");
+            Assert.That(_server.LogEntries.Count(), Is.EqualTo(0),
+                "No HTTP request should be made when the encrypted message exceeds the size limit.");
         }
 
         #endregion

@@ -198,7 +198,7 @@ namespace PubnubApi
             }
         }
 
-        public int NonSubscribeRequestTimeout { get; set; } = 15;
+        public int NonSubscribeRequestTimeout { get; set; } = 120;
 
         public PNHeartbeatNotificationOption HeartbeatNotificationOption { get; set; }
 
@@ -266,7 +266,7 @@ namespace PubnubApi
         {
             Origin = "ps.pndsn.com";
             presenceHeartbeatTimeout = 300;
-            NonSubscribeRequestTimeout = 15;
+            NonSubscribeRequestTimeout = 120;
             SubscribeTimeout = 310;
             LogVerbosity = PNLogVerbosity.NONE;
             CipherKey = "";
