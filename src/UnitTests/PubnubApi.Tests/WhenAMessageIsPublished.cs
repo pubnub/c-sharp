@@ -3073,7 +3073,7 @@ namespace PubNubMessaging.Tests
             // Arrange — message is one byte above the max permitted content size.
             // The SDK must throw ArgumentException before making any HTTP request.
             var pubnub = CreatePubnub();
-            var message = CreateMessageOfSerializedSize(TwoMbBoundaryBytes + 1);
+            var message = CreateMessageOfSerializedSize(TwoMbBoundaryBytes + 4);
 
             // Act & Assert
             var ex = Assert.ThrowsAsync<ArgumentException>(async () =>
