@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Linq;
@@ -105,7 +105,13 @@ namespace PubnubApi
                 HttpContent postData = null;
                 if (!string.IsNullOrEmpty(transportRequest.BodyContentString))
                 {
-                    postData = new StringContent(transportRequest.BodyContentString, Encoding.UTF8, "application/json");
+                    var contentType = "application/json";
+                    if (transportRequest.Headers.TryGetValue("Content-Type", out var ct))
+                    {
+                        contentType = ct;
+                    }
+                    postData = new StringContent(transportRequest.BodyContentString, Encoding.UTF8);
+                    postData.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse(contentType);
                 }
                 else if (transportRequest.BodyContentBytes != null)
                 {
@@ -119,6 +125,13 @@ namespace PubnubApi
                 HttpRequestMessage requestMessage =
                     new HttpRequestMessage(method: HttpMethod.Post, requestUri: transportRequest.RequestUrl)
                         { Content = postData };
+                foreach (var kvp in transportRequest.Headers)
+                {
+                    if (!string.Equals(kvp.Key, "Content-Type", StringComparison.OrdinalIgnoreCase))
+                    {
+                        requestMessage.Headers.Add(kvp.Key, kvp.Value);
+                    }
+                }
                 logger?.Debug(
                     $"HttpClient Service:Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl}" +
                     (requestMessage.Headers.Any()
@@ -176,7 +189,13 @@ namespace PubnubApi
 
                 if (!string.IsNullOrEmpty(transportRequest.BodyContentString))
                 {
-                    putData = new StringContent(transportRequest.BodyContentString, Encoding.UTF8, "application/json");
+                    var contentType = "application/json";
+                    if (transportRequest.Headers.TryGetValue("Content-Type", out var ct))
+                    {
+                        contentType = ct;
+                    }
+                    putData = new StringContent(transportRequest.BodyContentString, Encoding.UTF8);
+                    putData.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse(contentType);
                 }
                 else if (transportRequest.BodyContentBytes != null)
                 {
@@ -190,9 +209,9 @@ namespace PubnubApi
                 HttpRequestMessage requestMessage =
                     new HttpRequestMessage(method: HttpMethod.Put, requestUri: transportRequest.RequestUrl)
                         { Content = putData };
-                if (transportRequest.Headers.Keys.Count > 0)
+                foreach (var kvp in transportRequest.Headers)
                 {
-                    foreach (var kvp in transportRequest.Headers)
+                    if (!string.Equals(kvp.Key, "Content-Type", StringComparison.OrdinalIgnoreCase))
                     {
                         requestMessage.Headers.Add(kvp.Key, kvp.Value);
                     }
@@ -318,8 +337,13 @@ namespace PubnubApi
 
                 if (!string.IsNullOrEmpty(transportRequest.BodyContentString))
                 {
-                    patchData = new StringContent(transportRequest.BodyContentString, Encoding.UTF8,
-                        "application/json");
+                    var contentType = "application/json";
+                    if (transportRequest.Headers.TryGetValue("Content-Type", out var ct))
+                    {
+                        contentType = ct;
+                    }
+                    patchData = new StringContent(transportRequest.BodyContentString, Encoding.UTF8);
+                    patchData.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse(contentType);
                 }
                 else if (transportRequest.BodyContentBytes != null)
                 {
@@ -333,11 +357,11 @@ namespace PubnubApi
                 HttpRequestMessage requestMessage =
                     new HttpRequestMessage(new HttpMethod("PATCH"), requestUri: transportRequest.RequestUrl)
                         { Content = patchData };
-                if (transportRequest.Headers.Keys.Count > 0)
+                foreach (var kvp in transportRequest.Headers)
                 {
-                    foreach (var kvp in transportRequest.Headers)
+                    if (!string.Equals(kvp.Key, "Content-Type", StringComparison.OrdinalIgnoreCase))
                     {
-                        requestMessage.Headers.Add(kvp.Key, $"\"{kvp.Value}\"");
+                        requestMessage.Headers.Add(kvp.Key, kvp.Value);
                     }
                 }
 

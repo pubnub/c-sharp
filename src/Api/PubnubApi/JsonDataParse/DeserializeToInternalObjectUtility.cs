@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using PubnubApi.EndPoint;
 
 namespace PubnubApi
 {
@@ -966,6 +967,24 @@ namespace PubnubApi
 
                 PNDeleteFileResult ack = new PNDeleteFileResult();
                 ret = (T)Convert.ChangeType(ack, typeof(PNDeleteFileResult), CultureInfo.InvariantCulture);
+
+                #endregion
+            }
+            else if (typeof(T) == typeof(PNDataSyncEntityResult))
+            {
+                #region "PNCreateEntityResult"
+
+                PNDataSyncEntityResult result = PNDataSyncEntityResultJsonDataParse.GetObject(jsonPlug, listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNDataSyncEntityResult), CultureInfo.InvariantCulture);
+
+                #endregion
+            }
+            else if (typeof(T) == typeof(PNDataSyncEntitiesListResult))
+            {
+                #region "PNCreateEntityResult"
+
+                PNDataSyncEntitiesListResult result = PNDataSyncEntitiesListResultJsonDataParse.GetObject(jsonPlug, listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNDataSyncEntitiesListResult), CultureInfo.InvariantCulture);
 
                 #endregion
             }

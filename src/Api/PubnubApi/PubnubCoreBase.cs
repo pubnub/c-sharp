@@ -1055,6 +1055,20 @@ namespace PubnubApi
                         }
                     }
                 }
+                else if (deserializeStatus.TryGetValue("errors", out var errorListObject))
+                {
+                    var aggregateErrorsString = errorListObject.ToString();
+                    if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig))
+                    {
+                        statusCode = asyncRequestState?.Response?.StatusCode ?? 500;
+                        status = new StatusBuilder(currentConfig, jsonLib).CreateStatusResponse<T>(
+                            type, 
+                            PNStatusCategory.PNUnknownCategory,
+                            asyncRequestState, 
+                            statusCode, 
+                            new PNException(aggregateErrorsString));
+                    }
+                }
 
             }
             else if (jsonString.ToLowerInvariant().TrimStart().IndexOf("<head", StringComparison.CurrentCultureIgnoreCase) == 0

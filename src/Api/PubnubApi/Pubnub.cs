@@ -1185,6 +1185,8 @@ namespace PubnubApi
 
         #region "Properties"
 
+        public DataSync DataSync { get; }
+        
         public IPubnubUnitTest PubnubUnitTest
         {
             get => pubnubUnitTest;
@@ -1265,6 +1267,7 @@ namespace PubnubApi
                 httpTransportService ?? new HttpClientService(proxy: config.Proxy);
             httpClientService.SetLogger(logger);
             transportMiddleware = middleware ?? new Middleware(httpClientService, config, this, tokenManager);
+            DataSync = new DataSync(this, pubnubUnitTest, tokenManager);
             logger?.Debug(GetConfigurationLogString(config));
         }
 

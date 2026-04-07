@@ -133,6 +133,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="..\PubnubApi.Tests\DataSync\">
+      <Link>DataSync</Link>
+    </Folder>
     <Folder Include="EventEngine\" />
   </ItemGroup>
   <ItemGroup>

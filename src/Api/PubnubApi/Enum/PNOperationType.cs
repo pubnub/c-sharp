@@ -76,6 +76,13 @@ namespace PubnubApi
         PNFileUrlOperation,
         PNDownloadFileOperation,
         PNListFilesOperation,
-        PNDeleteFileOperation
+        PNDeleteFileOperation,
+        
+        PNDataSyncCreateEntity,
+        PNDataSyncGetEntity,
+        PNDataSyncGetEntities,
+        PNDataSyncUpdateEntity,
+        PNDataSyncDeleteEntity,
+        PNDataSyncPatchEntity
     }
 }

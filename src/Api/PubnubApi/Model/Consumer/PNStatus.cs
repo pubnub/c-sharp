@@ -521,6 +521,66 @@ namespace PubnubApi
                             }
                         }
                         break;
+                    case PNOperationType.PNDataSyncCreateEntity:
+                        if (savedEndpointOperation is CreateEntityOperation)
+                        {
+                            CreateEntityOperation endpoint = savedEndpointOperation as CreateEntityOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
+                    case PNOperationType.PNDataSyncGetEntity:
+                        if (savedEndpointOperation is GetEntityOperation)
+                        {
+                            GetEntityOperation endpoint = savedEndpointOperation as GetEntityOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
+                    case PNOperationType.PNDataSyncGetEntities:
+                        if (savedEndpointOperation is GetEntitiesOperation)
+                        {
+                            GetEntitiesOperation endpoint = savedEndpointOperation as GetEntitiesOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
+                    case PNOperationType.PNDataSyncUpdateEntity:
+                        if (savedEndpointOperation is UpdateEntityOperation)
+                        {
+                            UpdateEntityOperation endpoint = savedEndpointOperation as UpdateEntityOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
+                    case PNOperationType.PNDataSyncPatchEntity:
+                        if (savedEndpointOperation is PatchEntityOperation)
+                        {
+                            PatchEntityOperation endpoint = savedEndpointOperation as PatchEntityOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
+                    case PNOperationType.PNDataSyncDeleteEntity:
+                        if (savedEndpointOperation is DeleteEntityOperation)
+                        {
+                            DeleteEntityOperation endpoint = savedEndpointOperation as DeleteEntityOperation;
+                            if (endpoint != null)
+                            {
+                                endpoint.Retry();
+                            }
+                        }
+                        break;
                     default:
                         break;
                 }
