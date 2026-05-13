@@ -1,0 +1,2145 @@
+openapi: 3.0.3
+info:
+  title: Object Management API
+  version: 4.0.0
+paths:
+  /subkeys/{subKey}/relationships:
+    get:
+      tags:
+        - relationship
+      operationId: getRelationships
+      summary: Get relationships by entity_a_id or entity_b_id
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - name: relationship_class
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Relationship class name
+        - name: entity_a_id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter relationships by entity A ID
+        - name: entity_b_id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter relationships by entity B ID
+        - name: relationship_class_version
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+          description: Schema version of the relationship class (if not provided latest version will be used)
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Filter"
+        - $ref: "#/components/parameters/FilterAdvanced"
+        - $ref: "#/components/parameters/Sort"
+      responses:
+        "200":
+          $ref: "#/components/responses/RelationshipsResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+    post:
+      tags:
+        - relationship
+      summary: Create a new relationship
+      operationId: createRelationship
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/vnd.pubnub.objects.relationship+json;version=1:
+            schema:
+              $ref: "#/components/schemas/CreateRelationshipRequest"
+      responses:
+        "201":
+          $ref: "#/components/responses/CreateRelationshipResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaTypeResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+  /subkeys/{subKey}/relationships/{relationshipId}:
+    get:
+      tags:
+        - relationship
+      operationId: getRelationship
+      summary: Get relationship by ID
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - name: relationshipId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of a relationship
+      responses:
+        "200":
+          $ref: "#/components/responses/RelationshipResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+    patch:
+      tags:
+        - relationship
+      operationId: patchRelationship
+      summary: Patch Relationship using Json Patch RFC-6902
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - name: relationshipId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of a relationship
+        - $ref: "#/components/parameters/IfMatch"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        x-codegen-request-body-name: patch
+        content:
+          application/json-patch+json:
+            schema:
+              $ref: "#/components/schemas/JsonPatch"
+            example:
+              - op: replace
+                path: /status
+                value: moderator
+              - op: add
+                path: /custom/role
+                value: admin
+      responses:
+        "200":
+          $ref: "#/components/responses/RelationshipResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "412":
+          $ref: "#/components/responses/PreconditionFailedResponse"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaTypeResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+    delete:
+      tags:
+        - relationship
+      operationId: deleteRelationship
+      summary: Delete relationship by ID
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - name: relationshipId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of a relationship
+      responses:
+        "200":
+          $ref: "#/components/responses/DeleteSuccessResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+    put:
+      tags:
+        - relationship
+      operationId: updateRelationship
+      summary: Update relationship with complete resource replacement
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - name: relationshipId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of a relationship
+        - $ref: "#/components/parameters/IfMatch"
+      requestBody:
+        required: true
+        x-codegen-request-body-name: updateRequest
+        content:
+          application/vnd.pubnub.objects.relationship+json;version=1:
+            schema:
+              $ref: "#/components/schemas/UpdateRelationshipRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/RelationshipResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "412":
+          $ref: "#/components/responses/PreconditionFailedResponse"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaTypeResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+  /subkeys/{subKey}/entities:
+    get:
+      tags:
+        - entity
+      operationId: getEntities
+      summary: Get entities
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - name: entity_class
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Name of entity class
+        - name: entity_class_version
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+          description: Schema version of the entity class (if not provided latest version will be used)
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Filter"
+        - $ref: "#/components/parameters/FilterAdvanced"
+        - $ref: "#/components/parameters/Sort"
+      responses:
+        "200":
+          $ref: "#/components/responses/EntitiesResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+    post:
+      tags:
+        - entity
+      summary: Create a new entity
+      operationId: createEntity
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/vnd.pubnub.objects.entity+json;version=1:
+            schema:
+              $ref: "#/components/schemas/CreateEntityRequest"
+      responses:
+        "201":
+          $ref: "#/components/responses/CreateEntityResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaTypeResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+  /subkeys/{subKey}/entities/{entityId}:
+    get:
+      tags:
+        - entity
+      operationId: getEntity
+      summary: Get entity by ID
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - name: entityId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of a entity
+      responses:
+        "200":
+          $ref: "#/components/responses/EntityResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+    patch:
+      tags:
+        - entity
+      operationId: patchEntity
+      summary: Patch Entity using Json Patch RFC-6902
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - name: entityId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of a entity
+        - $ref: "#/components/parameters/IfMatch"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        x-codegen-request-body-name: patch
+        content:
+          application/json-patch+json:
+            schema:
+              $ref: "#/components/schemas/JsonPatch"
+            example:
+              - op: replace
+                path: /status
+                value: moderator
+              - op: add
+                path: /custom/role
+                value: admin
+      responses:
+        "200":
+          $ref: "#/components/responses/EntityResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "412":
+          $ref: "#/components/responses/PreconditionFailedResponse"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaTypeResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+    delete:
+      tags:
+        - entity
+      operationId: deleteEntity
+      summary: Delete entity by ID
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - name: entityId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of a entity
+        - $ref: "#/components/parameters/IfMatch"
+      responses:
+        "200":
+          $ref: "#/components/responses/DeleteSuccessResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "412":
+          $ref: "#/components/responses/PreconditionFailedResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+    put:
+      tags:
+        - entity
+      operationId: updateEntity
+      summary: Update entity with complete resource replacement
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - name: entityId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of a entity
+        - $ref: "#/components/parameters/IfMatch"
+      requestBody:
+        required: true
+        x-codegen-request-body-name: updateRequest
+        content:
+          application/vnd.pubnub.objects.entity+json;version=1:
+            schema:
+              $ref: "#/components/schemas/UpdateEntityRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/EntityResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "412":
+          $ref: "#/components/responses/PreconditionFailedResponse"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaTypeResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+  /subkeys/{subKey}/users:
+    get:
+      tags:
+        - user
+      operationId: getUsers
+      summary: Get users
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - name: entity_class_version
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+          description: Schema version of the entity class (if not provided latest version will be used)
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Filter"
+        - $ref: "#/components/parameters/FilterAdvanced"
+        - $ref: "#/components/parameters/Sort"
+      responses:
+        "200":
+          $ref: "#/components/responses/UsersResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+    post:
+      tags:
+        - user
+      summary: Create a new user
+      operationId: createUser
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/vnd.pubnub.objects.user+json;version=1:
+            schema:
+              $ref: "#/components/schemas/CreateUserRequest"
+      responses:
+        "201":
+          $ref: "#/components/responses/CreateUserResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaTypeResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+  /subkeys/{subKey}/users/{userId}:
+    get:
+      tags:
+        - user
+      operationId: getUser
+      summary: Get user by ID
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of a user
+      responses:
+        "200":
+          $ref: "#/components/responses/UserResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+    patch:
+      tags:
+        - user
+      operationId: patchUser
+      summary: Patch User using Json Patch RFC-6902
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of a user
+        - $ref: "#/components/parameters/IfMatch"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        x-codegen-request-body-name: patch
+        content:
+          application/json-patch+json:
+            schema:
+              $ref: "#/components/schemas/JsonPatch"
+      responses:
+        "200":
+          $ref: "#/components/responses/UserResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "412":
+          $ref: "#/components/responses/PreconditionFailedResponse"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaTypeResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+    delete:
+      tags:
+        - user
+      operationId: deleteUser
+      summary: Delete user by ID
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of a user
+      responses:
+        "200":
+          $ref: "#/components/responses/DeleteSuccessResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+    put:
+      tags:
+        - user
+      operationId: updateUser
+      summary: Update user with complete resource replacement
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of a user
+        - $ref: "#/components/parameters/IfMatch"
+      requestBody:
+        required: true
+        x-codegen-request-body-name: updateRequest
+        content:
+          application/vnd.pubnub.objects.user+json;version=1:
+            schema:
+              $ref: "#/components/schemas/UpdateUserRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/UserResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "412":
+          $ref: "#/components/responses/PreconditionFailedResponse"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaTypeResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+  /subkeys/{subKey}/channels:
+    get:
+      tags:
+        - channel
+      operationId: getChannels
+      summary: Get channels
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - name: entity_class_version
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+          description: Schema version of the entity class (if not provided latest version will be used)
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Filter"
+        - $ref: "#/components/parameters/FilterAdvanced"
+        - $ref: "#/components/parameters/Sort"
+      responses:
+        "200":
+          $ref: "#/components/responses/ChannelsResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+    post:
+      tags:
+        - channel
+      summary: Create a new channel
+      operationId: createChannel
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/vnd.pubnub.objects.channel+json;version=1:
+            schema:
+              $ref: "#/components/schemas/CreateChannelRequest"
+      responses:
+        "201":
+          $ref: "#/components/responses/CreateChannelResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaTypeResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+  /subkeys/{subKey}/channels/{channelId}:
+    get:
+      tags:
+        - channel
+      operationId: getChannel
+      summary: Get channel by ID
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - name: channelId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of a channel
+      responses:
+        "200":
+          $ref: "#/components/responses/ChannelResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+    patch:
+      tags:
+        - channel
+      operationId: patchChannel
+      summary: Patch Channel using Json Patch RFC-6902
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - name: channelId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of a channel
+        - $ref: "#/components/parameters/IfMatch"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        x-codegen-request-body-name: patch
+        content:
+          application/json-patch+json:
+            schema:
+              $ref: "#/components/schemas/JsonPatch"
+      responses:
+        "200":
+          $ref: "#/components/responses/ChannelResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "412":
+          $ref: "#/components/responses/PreconditionFailedResponse"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaTypeResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+    delete:
+      tags:
+        - channel
+      operationId: deleteChannel
+      summary: Delete channel by ID
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - name: channelId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of a channel
+      responses:
+        "200":
+          $ref: "#/components/responses/DeleteSuccessResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+    put:
+      tags:
+        - channel
+      operationId: updateChannel
+      summary: Update channel with complete resource replacement
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - name: channelId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of a channel
+        - $ref: "#/components/parameters/IfMatch"
+      requestBody:
+        required: true
+        x-codegen-request-body-name: updateRequest
+        content:
+          application/vnd.pubnub.objects.channel+json;version=1:
+            schema:
+              $ref: "#/components/schemas/UpdateChannelRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/ChannelResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "412":
+          $ref: "#/components/responses/PreconditionFailedResponse"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaTypeResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+  /subkeys/{subKey}/memberships:
+    get:
+      tags:
+        - membership
+      operationId: getMemberships
+      summary: Get memberships by user_id or channel_id
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - name: user_id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter memberships by user ID
+        - name: channel_id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter memberships by channel ID
+        - name: relationship_class_version
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+          description: Schema version of the relationship class (if not provided latest version will be used)
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Filter"
+        - $ref: "#/components/parameters/FilterAdvanced"
+        - $ref: "#/components/parameters/Sort"
+      responses:
+        "200":
+          $ref: "#/components/responses/MembershipsResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+    post:
+      tags:
+        - membership
+      summary: Create a new membership
+      operationId: createMembership
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/vnd.pubnub.objects.membership+json;version=1:
+            schema:
+              $ref: "#/components/schemas/CreateMembershipRequest"
+      responses:
+        "201":
+          $ref: "#/components/responses/CreateMembershipResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaTypeResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+  /subkeys/{subKey}/memberships/{membershipId}:
+    get:
+      tags:
+        - membership
+      operationId: getMembership
+      summary: Get membership by ID
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - name: membershipId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of a membership
+      responses:
+        "200":
+          $ref: "#/components/responses/MembershipResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+    patch:
+      tags:
+        - membership
+      operationId: patchMembership
+      summary: Patch Membership using Json Patch RFC-6902
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - name: membershipId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of a membership
+        - $ref: "#/components/parameters/IfMatch"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        x-codegen-request-body-name: patch
+        content:
+          application/json-patch+json:
+            schema:
+              $ref: "#/components/schemas/JsonPatch"
+      responses:
+        "200":
+          $ref: "#/components/responses/MembershipResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "412":
+          $ref: "#/components/responses/PreconditionFailedResponse"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaTypeResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+    delete:
+      tags:
+        - membership
+      operationId: deleteMembership
+      summary: Delete membership by ID
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - name: membershipId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of a membership
+      responses:
+        "200":
+          $ref: "#/components/responses/DeleteSuccessResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+    put:
+      tags:
+        - membership
+      operationId: updateMembership
+      summary: Update membership with complete resource replacement
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - name: membershipId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of a membership
+        - $ref: "#/components/parameters/IfMatch"
+      requestBody:
+        required: true
+        x-codegen-request-body-name: updateRequest
+        content:
+          application/vnd.pubnub.objects.membership+json;version=1:
+            schema:
+              $ref: "#/components/schemas/UpdateMembershipRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/MembershipResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "412":
+          $ref: "#/components/responses/PreconditionFailedResponse"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaTypeResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+components:
+  responses:
+    RelationshipsResponse:
+      description: Successful response
+      content:
+        application/vnd.pubnub.objects.relationship+json;version=1:
+          schema:
+            $ref: "#/components/schemas/RelationshipsEnvelope"
+    RelationshipResponse:
+      description: Successful response
+      content:
+        application/vnd.pubnub.objects.relationship+json;version=1:
+          schema:
+            $ref: "#/components/schemas/RelationshipEnvelope"
+    CreateRelationshipResponse:
+      description: Relationship created successfully
+      headers:
+        Location:
+          schema:
+            type: string
+          description: URI of the created relationship
+      content:
+        application/vnd.pubnub.objects.relationship+json;version=1:
+          schema:
+            $ref: "#/components/schemas/RelationshipEnvelope"
+    EntitiesResponse:
+      description: Successful response
+      content:
+        application/vnd.pubnub.objects.entity+json;version=1:
+          schema:
+            $ref: "#/components/schemas/EntitiesEnvelope"
+    EntityResponse:
+      description: Successful response
+      content:
+        application/vnd.pubnub.objects.entity+json;version=1:
+          schema:
+            $ref: "#/components/schemas/EntityEnvelope"
+    CreateEntityResponse:
+      description: Entity created successfully
+      headers:
+        Location:
+          schema:
+            type: string
+          description: URI of the created entity
+      content:
+        application/vnd.pubnub.objects.entity+json;version=1:
+          schema:
+            $ref: "#/components/schemas/EntityEnvelope"
+    UsersResponse:
+      description: Successful response
+      content:
+        application/vnd.pubnub.objects.user+json;version=1:
+          schema:
+            $ref: "#/components/schemas/UsersEnvelope"
+    UserResponse:
+      description: Successful response
+      content:
+        application/vnd.pubnub.objects.user+json;version=1:
+          schema:
+            $ref: "#/components/schemas/UserEnvelope"
+    CreateUserResponse:
+      description: User created successfully
+      headers:
+        Location:
+          schema:
+            type: string
+          description: URI of the created user
+      content:
+        application/vnd.pubnub.objects.user+json;version=1:
+          schema:
+            $ref: "#/components/schemas/UserEnvelope"
+    ChannelsResponse:
+      description: Successful response
+      content:
+        application/vnd.pubnub.objects.channel+json;version=1:
+          schema:
+            $ref: "#/components/schemas/ChannelsEnvelope"
+    ChannelResponse:
+      description: Successful response
+      content:
+        application/vnd.pubnub.objects.channel+json;version=1:
+          schema:
+            $ref: "#/components/schemas/ChannelEnvelope"
+    CreateChannelResponse:
+      description: Channel created successfully
+      headers:
+        Location:
+          schema:
+            type: string
+          description: URI of the created channel
+      content:
+        application/vnd.pubnub.objects.channel+json;version=1:
+          schema:
+            $ref: "#/components/schemas/ChannelEnvelope"
+    MembershipsResponse:
+      description: Successful response
+      content:
+        application/vnd.pubnub.objects.membership+json;version=1:
+          schema:
+            $ref: "#/components/schemas/MembershipsEnvelope"
+    MembershipResponse:
+      description: Successful response
+      content:
+        application/vnd.pubnub.objects.membership+json;version=1:
+          schema:
+            $ref: "#/components/schemas/MembershipEnvelope"
+    CreateMembershipResponse:
+      description: Membership created successfully
+      headers:
+        Location:
+          schema:
+            type: string
+          description: URI of the created membership
+      content:
+        application/vnd.pubnub.objects.membership+json;version=1:
+          schema:
+            $ref: "#/components/schemas/MembershipEnvelope"
+    DeleteSuccessResponse:
+      description: Resource deleted successfully
+    BadRequestResponse:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    UnauthorizedResponse:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFoundResponse:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    ConflictResponse:
+      description: Conflict - resource already exists
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    InternalServerErrorResponse:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    ForbiddenResponse:
+      description: Forbidden - authorization provided but access denied
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    UnsupportedMediaTypeResponse:
+      description: Unsupported Media Type - payload format not supported
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    TooManyRequestsResponse:
+      description: Too Many Requests - rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotAcceptableResponse:
+      description: Not Acceptable - Accept header doesn't contain supported value
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    PreconditionFailedResponse:
+      description: Precondition Failed - ETag doesn't match current resource version
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    ServiceUnavailableResponse:
+      description: Service Unavailable - service not available
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+  parameters:
+    IfMatch:
+      $ref: 'common.yaml#/components/parameters/IfMatch'
+    Cursor:
+      $ref: 'common.yaml#/components/parameters/Cursor'
+    Limit:
+      $ref: 'common.yaml#/components/parameters/Limit'
+    Filter:
+      $ref: 'common.yaml#/components/parameters/Filter'
+    FilterAdvanced:
+      name: filter_advanced
+      in: query
+      required: false
+      schema:
+        type: string
+      description: |
+        Advanced filter expression for complex queries supporting logical operators and nested conditions.
+        Extends the basic filter parameter with more sophisticated query capabilities.
+        Allows combining multiple filter conditions using logical operators (AND, OR, NOT).
+        Use this for complex filtering scenarios that cannot be expressed with the simple filter parameter.
+    Sort:
+      $ref: 'common.yaml#/components/parameters/Sort'
+    IdempotencyKey:
+      $ref: 'common.yaml#/components/parameters/IdempotencyKey'
+
+  schemas:
+    ErrorResponse:
+      $ref: 'common.yaml#/components/schemas/ErrorResponse'
+    ErrorItem:
+      $ref: 'common.yaml#/components/schemas/ErrorItem'
+
+    Meta:
+      $ref: 'common.yaml#/components/schemas/Meta'
+    Links:
+      $ref: 'common.yaml#/components/schemas/Links'
+
+    RequestEnvelope:
+      $ref: 'common.yaml#/components/schemas/RequestEnvelope'
+    ResponseEnvelope:
+      $ref: 'common.yaml#/components/schemas/ResponseEnvelope'
+
+    RelationshipsEnvelope:
+      description: Enveloped list of relationships
+      allOf:
+        - $ref: "#/components/schemas/ResponseEnvelope"
+        - type: object
+          required:
+            - data
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/RelationshipResource"
+
+    RelationshipEnvelope:
+      description: Enveloped single relationship
+      allOf:
+        - $ref: "#/components/schemas/ResponseEnvelope"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/RelationshipResource"
+
+    RelationshipResource:
+      description: Complete Relationship resource representation (read-only fields + writable properties)
+      allOf:
+        - $ref: "#/components/schemas/DefaultProperties"
+        - $ref: "#/components/schemas/RelationshipProperties"
+
+    CreateRelationshipRequest:
+      description: Request body for creating a relationship
+      allOf:
+        - $ref: "#/components/schemas/RequestEnvelope"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/CreateRelationshipRequestData"
+
+    UpdateRelationshipRequest:
+      description: Request body for updating a relationship with partial resource replacement
+      allOf:
+        - $ref: "#/components/schemas/RequestEnvelope"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/UpdateRelationshipProperties"
+
+    UpdateRelationshipProperties:
+      description: Properties that can be updated on a Relationship (excludes immutable fields like entityAId, entityBId, relationshipClass)
+      allOf:
+        - $ref: "#/components/schemas/Payload"
+        - type: object
+          required: ["relationshipClassVersion"]
+          properties:
+            relationshipClassVersion:
+              type: integer
+              minimum: 1
+              description: Version of the relationship class
+            status:
+              type: string
+              minLength: 1
+              maxLength: 100
+              description: Relationship status
+      example:
+        status: active
+        relationshipClassVersion: 2
+        payload:
+          custom: fields
+
+    EntitiesEnvelope:
+      description: Enveloped list of entities
+      allOf:
+        - $ref: "#/components/schemas/ResponseEnvelope"
+        - type: object
+          required:
+            - data
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/EntityResource"
+
+    EntityEnvelope:
+      description: Enveloped single entity
+      allOf:
+        - $ref: "#/components/schemas/ResponseEnvelope"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/EntityResource"
+
+    EntityResource:
+      description: Complete Entity resource representation (read-only fields + writable properties)
+      allOf:
+        - $ref: "#/components/schemas/DefaultProperties"
+        - $ref: "#/components/schemas/EntityProperties"
+
+    UpdateEntityRequest:
+      description: Request body for updating an entity with complete resource replacement
+      allOf:
+        - $ref: "#/components/schemas/RequestEnvelope"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/UpdateEntityProperties"
+
+    UpdateEntityProperties:
+      description: Properties that can be updated on an Entity (excludes entityClass which is immutable)
+      allOf:
+        - $ref: "#/components/schemas/Payload"
+        - type: object
+          required: ["entityClassVersion"]
+          properties:
+            entityClassVersion:
+              type: integer
+              minimum: 1
+              description: Schema version of the entity payload
+            status:
+              type: string
+              minLength: 1
+              maxLength: 100
+              description: Entity status
+      example:
+        status: active
+        entityClassVersion: 2
+        payload:
+          custom: fields
+
+    CreateEntityRequest:
+      description: Request body for creating an entity
+      allOf:
+        - $ref: "#/components/schemas/RequestEnvelope"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/CreateEntityRequestData"
+
+    UsersEnvelope:
+      description: Enveloped list of users
+      allOf:
+        - $ref: "#/components/schemas/ResponseEnvelope"
+        - type: object
+          required:
+            - data
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/EntityResource"
+
+    UserEnvelope:
+      description: Enveloped single user
+      allOf:
+        - $ref: "#/components/schemas/ResponseEnvelope"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/EntityResource"
+
+    UpdateUserRequest:
+      description: Request body for updating a user
+      allOf:
+        - $ref: "#/components/schemas/RequestEnvelope"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/UpdateEntityProperties"
+
+    CreateUserRequest:
+      description: Request body for creating a user
+      allOf:
+        - $ref: "#/components/schemas/RequestEnvelope"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/CreateUserRequestData"
+
+    ChannelsEnvelope:
+      description: Enveloped list of channels
+      allOf:
+        - $ref: "#/components/schemas/ResponseEnvelope"
+        - type: object
+          required:
+            - data
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/EntityResource"
+
+    ChannelEnvelope:
+      description: Enveloped single channel
+      allOf:
+        - $ref: "#/components/schemas/ResponseEnvelope"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/EntityResource"
+
+    UpdateChannelRequest:
+      description: Request body for updating a channel
+      allOf:
+        - $ref: "#/components/schemas/RequestEnvelope"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/UpdateEntityProperties"
+
+    CreateChannelRequest:
+      description: Request body for creating a channel
+      allOf:
+        - $ref: "#/components/schemas/RequestEnvelope"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/CreateChannelRequestData"
+
+    MembershipsEnvelope:
+      description: Enveloped list of memberships
+      allOf:
+        - $ref: "#/components/schemas/ResponseEnvelope"
+        - type: object
+          required:
+            - data
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/RelationshipResource"
+
+    MembershipEnvelope:
+      description: Enveloped single membership
+      allOf:
+        - $ref: "#/components/schemas/ResponseEnvelope"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/RelationshipResource"
+
+    UpdateMembershipRequest:
+      description: Request body for updating a membership
+      allOf:
+        - $ref: "#/components/schemas/RequestEnvelope"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/UpdateRelationshipProperties"
+
+    CreateMembershipRequest:
+      description: Request body for creating a membership
+      allOf:
+        - $ref: "#/components/schemas/RequestEnvelope"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/CreateMembershipRequestData"
+
+    CreateUserRequestData:
+      description: Data payload for creating a user
+      allOf:
+        - $ref: "#/components/schemas/Payload"
+        - type: object
+          required: ["entityClassVersion"]
+          properties:
+            id:
+              type: string
+              minLength: 1
+              maxLength: 255
+              description: User identifier (optional - server generates if not provided)
+            entityClassVersion:
+              type: integer
+              minimum: 1
+              description: Version of the entity class
+            status:
+              type: string
+              minLength: 1
+              maxLength: 100
+              description: User status
+
+    CreateChannelRequestData:
+      description: Data payload for creating a channel
+      allOf:
+        - $ref: "#/components/schemas/Payload"
+        - type: object
+          required: ["entityClassVersion"]
+          properties:
+            id:
+              type: string
+              minLength: 1
+              maxLength: 255
+              description: Channel identifier (optional - server generates if not provided)
+            entityClassVersion:
+              type: integer
+              minimum: 1
+              description: Version of the entity class
+            status:
+              type: string
+              minLength: 1
+              maxLength: 100
+              description: Channel status
+
+    CreateMembershipRequestData:
+      description: Data payload for creating a membership
+      allOf:
+        - $ref: "#/components/schemas/Payload"
+        - type: object
+          required: ["channelId", "userId", "relationshipClassVersion"]
+          properties:
+            id:
+              type: string
+              minLength: 1
+              maxLength: 255
+              description: Membership identifier (optional - server generates if not provided)
+            channelId:
+              type: string
+              minLength: 1
+              maxLength: 255
+              description: Channel ID reference (maps to entityAId)
+            userId:
+              type: string
+              minLength: 1
+              maxLength: 255
+              description: User ID reference (maps to entityBId)
+            relationshipClassVersion:
+              type: integer
+              minimum: 1
+              description: Version of the Membership relationship class
+            status:
+              type: string
+              minLength: 1
+              maxLength: 100
+              description: Membership status
+
+    CreateEntityRequestData:
+      description: Data payload for creating an entity (includes optional id field)
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              minLength: 1
+              maxLength: 255
+              description: Entity identifier (optional - server generates if not provided)
+        - $ref: "#/components/schemas/EntityProperties"
+
+    CreateRelationshipRequestData:
+      description: Data payload for creating a relationship
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              minLength: 1
+              maxLength: 255
+              description: Relationship identifier (optional - server generates if not provided)
+        - $ref: "#/components/schemas/RelationshipProperties"
+
+    DefaultProperties:
+      allOf:
+        - $ref: 'common.yaml#/components/schemas/DefaultProperties'
+        - type: object
+          properties:
+            expiresAt:
+              type: string
+              format: date-time
+              description: Date and time when the entity expires (will be deleted automatically).
+          example:
+            expiresAt: "2021-01-01T00:00:00.000Z"
+
+    Payload:
+      description: User-defined custom properties.
+      type: object
+      properties:
+        payload:
+          format: objectNode
+          type: object
+
+    LegacyCustom:
+      description: Legacy user-defined custom properties
+      type: object
+      properties:
+        custom:
+          type: object
+          additionalProperties: true
+
+    UserProperties:
+      description: Writable properties for User resource
+      allOf:
+        - $ref: "#/components/schemas/LegacyCustom"
+        - type: object
+          properties:
+            name:
+              type: string
+              minLength: 1
+              maxLength: 255
+              description: User's display name
+            externalId:
+              type: string
+              minLength: 1
+              maxLength: 255
+              description: External system identifier for the user
+            profileUrl:
+              type: string
+              format: uri
+              description: URL to the user's profile
+            email:
+              type: string
+              format: email
+              description: User's email address
+            type:
+              type: string
+              description: User type
+            status:
+              type: string
+              minLength: 1
+              maxLength: 100
+              description: User status
+      example:
+        name: John Doe
+        externalId: ext-user-789
+        profileUrl: https://example.com/users/johndoe
+        email: johndoe@example.com
+        type: admin
+        status: active
+        custom:
+          key: value
+          but:
+            canbe: better
+
+    ChannelProperties:
+      description: Writable properties for Channel resource
+      allOf:
+        - $ref: "#/components/schemas/LegacyCustom"
+        - type: object
+          properties:
+            name:
+              type: string
+              minLength: 1
+              maxLength: 255
+              description: Channel name
+            description:
+              type: string
+              maxLength: 1000
+              description: Channel description
+            type:
+              type: string
+              description: Channel type
+            status:
+              type: string
+              minLength: 1
+              maxLength: 100
+              description: Channel status
+      example:
+        name: General Chat
+        type: 1to1
+        description: A channel for general discussions
+        status: active
+        custom:
+          category: general
+          topic: announcements
+
+    MembershipProperties:
+      description: Writable properties for Membership resource
+      allOf:
+        - $ref: "#/components/schemas/LegacyCustom"
+        - type: object
+          required: ["userId", "channelId"]
+          properties:
+            userId:
+              type: string
+              minLength: 1
+              maxLength: 255
+              description: User ID reference
+            channelId:
+              type: string
+              minLength: 1
+              maxLength: 255
+              description: Channel ID reference
+            status:
+              type: string
+              minLength: 1
+              maxLength: 100
+              description: Membership status
+      example:
+        userId: u456
+        channelId: c789
+        status: active
+        custom:
+          role: moderator
+          permissions: read-write
+
+    EntityProperties:
+      description: Writable properties for Entity resource
+      allOf:
+        - $ref: "#/components/schemas/Payload"
+        - type: object
+          required: ["entityClass", "entityClassVersion"]
+          properties:
+            entityClass:
+              type: string
+              minLength: 1
+              description: Entity class identifier
+            entityClassVersion:
+              type: integer
+              minimum: 1
+              description: Version of an Entity Class
+            status:
+              type: string
+              minLength: 1
+              maxLength: 100
+              description: Entity status
+      example:
+        status: active
+        entityClass: user
+        entityClassVersion: 1
+        payload:
+          custom: fields
+
+    RelationshipProperties:
+      description: Writable properties for Relationship resource
+      allOf:
+        - $ref: "#/components/schemas/Payload"
+        - type: object
+          required: ["entityAId", "entityBId", "relationshipClass", "relationshipClassVersion"]
+          properties:
+            entityAId:
+              type: string
+              minLength: 1
+              maxLength: 255
+              description: First entity ID
+            entityBId:
+              type: string
+              minLength: 1
+              maxLength: 255
+              description: Second entity ID
+            relationshipClass:
+              type: string
+              minLength: 1
+              description: Relationship class identifier
+            relationshipClassVersion:
+              type: integer
+              minimum: 1
+              description: Version of the relationship class
+            status:
+              type: string
+              minLength: 1
+              maxLength: 100
+              description: Relationship status
+      example:
+        entityAId: u123
+        entityBId: s456
+        relationshipClass: ProductOwner
+        relationshipClassVersion: 1
+        status: active
+        payload:
+          custom: fields
+
+    JsonPatchOperation:
+      $ref: 'common.yaml#/components/schemas/JsonPatchOperation'
+    JsonPatch:
+      $ref: 'common.yaml#/components/schemas/JsonPatch'

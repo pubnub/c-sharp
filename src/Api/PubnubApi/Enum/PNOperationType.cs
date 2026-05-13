@@ -83,6 +83,13 @@ namespace PubnubApi
         PNDataSyncGetEntities,
         PNDataSyncUpdateEntity,
         PNDataSyncDeleteEntity,
-        PNDataSyncPatchEntity
+        PNDataSyncPatchEntity,
+
+        PNDataSyncCreateRelationship,
+        PNDataSyncGetRelationship,
+        PNDataSyncGetRelationships,
+        PNDataSyncUpdateRelationship,
+        PNDataSyncDeleteRelationship,
+        PNDataSyncPatchRelationship
     }
 }

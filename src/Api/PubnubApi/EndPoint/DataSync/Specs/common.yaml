@@ -1,0 +1,271 @@
+openapi: 3.0.3
+info:
+  title: Common Schemas for Object Management API
+  version: 4.0.0
+  description: |
+    Shared components (parameters and schemas) used across multiple Object Management APIs.
+    This file contains no paths - only reusable components.
+
+paths: {}
+
+components:
+  parameters:
+    IfMatch:
+      name: If-Match
+      in: header
+      required: false
+      schema:
+        type: string
+      description: ETag value for optimistic concurrency control. If provided, the update will only succeed if the current resource ETag matches this value.
+
+    Cursor:
+      name: cursor
+      in: query
+      required: false
+      schema:
+        type: string
+      description: |
+        Opaque cursor for pagination. Base64-encoded token representing the position
+        in the result set. Omit or pass null for the first page. Use the cursor values
+        from `meta.next_cursor` or `meta.prev_cursor` in the response to navigate
+        to subsequent or previous pages.
+      example: "TjA="
+
+    Limit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+      description: Maximum number of items to return per page (default 20, max 100)
+
+    Filter:
+      name: filter
+      in: query
+      schema:
+        type: string
+        externalDocs:
+          url: https://www.pubnub.com/docs/general/metadata/filtering
+          description: AppContext Query Language
+      description: Filter expression using AppContext Query Language
+
+    Sort:
+      name: sort
+      in: query
+      schema:
+        type: string
+        example: +id,-createdAt
+      description: Comma-separated list of fields to sort. To indicate sorting direction, fields may be prefixed with + (ascending) or - (descending, default)
+
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: UUIDv4 to ensure idempotency of non-idempotent POST requests
+
+  schemas:
+    ErrorResponse:
+      description: Error response envelope
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: "#/components/schemas/ErrorItem"
+
+    ErrorItem:
+      description: Error object
+      type: object
+      required:
+        - errorCode
+        - message
+      properties:
+        errorCode:
+          type: string
+          description: A machine-readable error code
+          example: SYN_1004
+        message:
+          type: string
+          description: An informative message about the error
+          example: Invalid request
+        path:
+          type: string
+          description: The path of the request payload that resulted in the error
+          example: /entity_a_id
+
+    Meta:
+      description: Cursor-based pagination metadata
+      type: object
+      required:
+        - has_next
+        - has_prev
+      properties:
+        next_cursor:
+          type: string
+          nullable: true
+          description: |
+            Opaque cursor for the next page. Base64-encoded token.
+            Use this value in the `cursor` query parameter to fetch the next page.
+            Null if there are no more results (has_next is false).
+          example: "TjIw"
+        prev_cursor:
+          type: string
+          nullable: true
+          description: |
+            Opaque cursor for the previous page. Base64-encoded token.
+            Use this value in the `cursor` query parameter to fetch the previous page.
+            Null if this is the first page (has_prev is false).
+          example: "TjA="
+        has_next:
+          type: boolean
+          description: Indicates whether there are more results after this page
+          example: true
+        has_prev:
+          type: boolean
+          description: Indicates whether there are results before this page
+          example: false
+        limit:
+          type: integer
+          description: The limit applied to this page (may differ from requested limit)
+          example: 20
+
+    Links:
+      description: |
+        HATEOAS links for navigation. Provides hypermedia controls for pagination.
+        May contain additional links beyond the standard pagination links for related resources.
+      type: object
+      required:
+        - self
+      additionalProperties:
+        type: string
+      properties:
+        self:
+          type: string
+          description: Link to current page with all query parameters
+          example: /subkeys/demo/relationships?cursor=TjIw&limit=20&sort=-createdAt
+        next:
+          type: string
+          nullable: true
+          description: |
+            Link to next page (if available). Includes the next_cursor value.
+            Null if there are no more results.
+          example: /subkeys/demo/relationships?cursor=TjQw&limit=20&sort=-createdAt
+        prev:
+          type: string
+          nullable: true
+          description: |
+            Link to previous page (if available). Includes the prev_cursor value.
+            Null if this is the first page.
+          example: /subkeys/demo/relationships?cursor=TjA=&limit=20&sort=-createdAt
+
+    RequestEnvelope:
+      description: Base request envelope (data only)
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          type: object
+          description: Request data (specific type defined in extending schemas)
+
+    ResponseEnvelope:
+      description: Base response envelope (data + links + meta)
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          type: object
+          description: Response data (specific type defined in extending schemas)
+        links:
+          $ref: "#/components/schemas/Links"
+        meta:
+          $ref: "#/components/schemas/Meta"
+
+    DefaultProperties:
+      description: Properties included in all entities that are returned in responses.
+      type: object
+      required:
+        - id
+        - createdAt
+        - updatedAt
+        - eTag
+      properties:
+        id:
+          type: string
+          minLength: 1
+          maxLength: 255
+        createdAt:
+          type: string
+          format: date-time
+          description: Date and time the entity was created.
+        updatedAt:
+          type: string
+          format: date-time
+          description: Date and time the entity was last updated.
+        eTag:
+          type: string
+          description: The entity's content fingerprint used in conditional requests.
+        status:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Entity status
+      example:
+        id: i789
+        updatedAt: "2021-01-01T00:00:00.000Z"
+        createdAt: "2021-01-01T00:00:00.000Z"
+        eTag: "1"
+        status: "active"
+
+    JsonPointer:
+      type: string
+      description: |-
+        JSON Pointer (RFC 6901) to a location within a JSON document.
+        Must be either empty string "" (refers to whole document) or start with "/" followed by reference tokens.
+      pattern: '^(/[^/]*)*$'
+      example: "/address/city"
+
+    JsonPatchOperation:
+      description: A JSON Patch operation as defined by RFC 6902
+      type: object
+      required:
+        - op
+        - path
+      properties:
+        op:
+          type: string
+          enum:
+            - add
+            - remove
+            - replace
+            - move
+            - copy
+            - test
+          description: The operation to perform
+        path:
+          $ref: 'common.yaml#/components/schemas/JsonPointer'
+        value:
+          description: The value to add, replace, or test (required for add, replace, test operations)
+        from:
+          $ref: 'common.yaml#/components/schemas/JsonPointer'
+
+    JsonPatch:
+      description: JSON Patch document as defined by RFC 6902
+      type: array
+      items:
+        $ref: "#/components/schemas/JsonPatchOperation"
+      minItems: 1
+      example:
+        - op: replace
+          path: /status
+          value: active
+        - op: add
+          path: /custom/role
+          value: moderator

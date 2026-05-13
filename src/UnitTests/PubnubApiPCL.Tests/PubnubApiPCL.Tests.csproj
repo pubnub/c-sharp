@@ -50,6 +50,15 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\PubnubApi.Tests\CleanupGrant.cs" Link="CleanupGrant.cs" />
+    <Compile Include="..\PubnubApi.Tests\DataSync\WhenCreateGenericEntity.cs">
+      <Link>DataSync\WhenCreateGenericEntity.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi.Tests\DataSync\WhenDataSyncEntityIsRequested.cs">
+      <Link>DataSync\WhenDataSyncEntityIsRequested.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi.Tests\DataSync\WhenDataSyncRelationshipIsRequested.cs">
+      <Link>DataSync\WhenDataSyncRelationshipIsRequested.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi.Tests\EncryptionTests.cs" Link="EncryptionTests.cs" />
     <Compile Include="..\PubnubApi.Tests\EventEngine\HandshakeFailedStateTransition.cs" Link="EventEngine\HandshakeFailedStateTransition.cs" />
     <Compile Include="..\PubnubApi.Tests\EventEngine\HandshakeReconnectingStateTransition.cs" Link="EventEngine\HandshakeReconnectingStateTransition.cs" />
@@ -133,9 +142,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="..\PubnubApi.Tests\DataSync\">
-      <Link>DataSync</Link>
-    </Folder>
     <Folder Include="EventEngine\" />
   </ItemGroup>
   <ItemGroup>

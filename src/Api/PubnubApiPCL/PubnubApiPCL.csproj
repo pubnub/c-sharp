@@ -79,50 +79,92 @@
     <Compile Include="..\PubnubApi\EndPoint\ChannelGroup\RemoveChannelsFromChannelGroupOperation.cs">
       <Link>EndPoint\ChannelGroup\RemoveChannelsFromChannelGroupOperation.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\EndPoint\DataSync\CreateEntityOperation.cs">
-      <Link>EndPoint\DataSync\CreateEntityOperation.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi\EndPoint\DataSync\CreateEntityParameters.cs">
-      <Link>EndPoint\DataSync\CreateEntityParameters.cs</Link>
-    </Compile>
     <Compile Include="..\PubnubApi\EndPoint\DataSync\DataSync.cs">
       <Link>EndPoint\DataSync\DataSync.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\EndPoint\DataSync\DeleteEntityOperation.cs">
-      <Link>EndPoint\DataSync\DeleteEntityOperation.cs</Link>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Entity\CreateEntityOperation.cs">
+      <Link>EndPoint\DataSync\Entity\CreateEntityOperation.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\EndPoint\DataSync\DeleteEntityParameters.cs">
-      <Link>EndPoint\DataSync\DeleteEntityParameters.cs</Link>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Entity\CreateEntityParameters.cs">
+      <Link>EndPoint\DataSync\Entity\CreateEntityParameters.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\EndPoint\DataSync\GetEntitiesOperation.cs">
-      <Link>EndPoint\DataSync\GetEntitiesOperation.cs</Link>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Entity\DeleteEntityOperation.cs">
+      <Link>EndPoint\DataSync\Entity\DeleteEntityOperation.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\EndPoint\DataSync\GetEntitiesParameters.cs">
-      <Link>EndPoint\DataSync\GetEntitiesParameters.cs</Link>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Entity\DeleteEntityParameters.cs">
+      <Link>EndPoint\DataSync\Entity\DeleteEntityParameters.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\EndPoint\DataSync\GetEntityOperation.cs">
-      <Link>EndPoint\DataSync\GetEntityOperation.cs</Link>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Entity\GetEntitiesOperation.cs">
+      <Link>EndPoint\DataSync\Entity\GetEntitiesOperation.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\EndPoint\DataSync\GetEntityParameters.cs">
-      <Link>EndPoint\DataSync\GetEntityParameters.cs</Link>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Entity\GetEntitiesParameters.cs">
+      <Link>EndPoint\DataSync\Entity\GetEntitiesParameters.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\EndPoint\DataSync\PatchEntityOperation.cs">
-      <Link>EndPoint\DataSync\PatchEntityOperation.cs</Link>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Entity\GetEntityOperation.cs">
+      <Link>EndPoint\DataSync\Entity\GetEntityOperation.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\EndPoint\DataSync\PatchEntityParameters.cs">
-      <Link>EndPoint\DataSync\PatchEntityParameters.cs</Link>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Entity\GetEntityParameters.cs">
+      <Link>EndPoint\DataSync\Entity\GetEntityParameters.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\EndPoint\DataSync\PNDataSyncDeleteEntityResult.cs">
-      <Link>EndPoint\DataSync\PNDataSyncDeleteEntityResult.cs</Link>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Entity\PatchEntityOperation.cs">
+      <Link>EndPoint\DataSync\Entity\PatchEntityOperation.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\EndPoint\DataSync\PNDataSyncEntityResult.cs">
-      <Link>EndPoint\DataSync\PNDataSyncEntityResult.cs</Link>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Entity\PatchEntityParameters.cs">
+      <Link>EndPoint\DataSync\Entity\PatchEntityParameters.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\EndPoint\DataSync\UpdateEntityOperation.cs">
-      <Link>EndPoint\DataSync\UpdateEntityOperation.cs</Link>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Entity\PNDataSyncDeleteEntityResult.cs">
+      <Link>EndPoint\DataSync\Entity\PNDataSyncDeleteEntityResult.cs</Link>
     </Compile>
-    <Compile Include="..\PubnubApi\EndPoint\DataSync\UpdateEntityParameters.cs">
-      <Link>EndPoint\DataSync\UpdateEntityParameters.cs</Link>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Entity\PNDataSyncEntityResult.cs">
+      <Link>EndPoint\DataSync\Entity\PNDataSyncEntityResult.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Entity\UpdateEntityOperation.cs">
+      <Link>EndPoint\DataSync\Entity\UpdateEntityOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Entity\UpdateEntityParameters.cs">
+      <Link>EndPoint\DataSync\Entity\UpdateEntityParameters.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Relationship\CreateRelationshipOperation.cs">
+      <Link>EndPoint\DataSync\Relationship\CreateRelationshipOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Relationship\CreateRelationshipParameters.cs">
+      <Link>EndPoint\DataSync\Relationship\CreateRelationshipParameters.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Relationship\DeleteRelationshipOperation.cs">
+      <Link>EndPoint\DataSync\Relationship\DeleteRelationshipOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Relationship\DeleteRelationshipParameters.cs">
+      <Link>EndPoint\DataSync\Relationship\DeleteRelationshipParameters.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Relationship\GetRelationshipOperation.cs">
+      <Link>EndPoint\DataSync\Relationship\GetRelationshipOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Relationship\GetRelationshipParameters.cs">
+      <Link>EndPoint\DataSync\Relationship\GetRelationshipParameters.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Relationship\GetRelationshipsOperation.cs">
+      <Link>EndPoint\DataSync\Relationship\GetRelationshipsOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Relationship\GetRelationshipsParameters.cs">
+      <Link>EndPoint\DataSync\Relationship\GetRelationshipsParameters.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Relationship\PatchRelationshipOperation.cs">
+      <Link>EndPoint\DataSync\Relationship\PatchRelationshipOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Relationship\PatchRelationshipParameters.cs">
+      <Link>EndPoint\DataSync\Relationship\PatchRelationshipParameters.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Relationship\PNDataSyncDeleteRelationshipResult.cs">
+      <Link>EndPoint\DataSync\Relationship\PNDataSyncDeleteRelationshipResult.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Relationship\PNDataSyncRelationshipResult.cs">
+      <Link>EndPoint\DataSync\Relationship\PNDataSyncRelationshipResult.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Relationship\UpdateRelationshipOperation.cs">
+      <Link>EndPoint\DataSync\Relationship\UpdateRelationshipOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Relationship\UpdateRelationshipParameters.cs">
+      <Link>EndPoint\DataSync\Relationship\UpdateRelationshipParameters.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\EndPoint\Files\DeleteFileOperation.cs" Link="EndPoint\Files\DeleteFileOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\Files\DownloadFileOperation.cs" Link="EndPoint\Files\DownloadFileOperation.cs" />
@@ -342,6 +384,12 @@
     <Compile Include="..\PubnubApi\JsonDataParse\PNDataSyncEntityResultJsonDataParse.cs">
       <Link>JsonDataParse\PNDataSyncEntityResultJsonDataParse.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\JsonDataParse\PNDataSyncRelationshipResultJsonDataParse.cs">
+      <Link>JsonDataParse\PNDataSyncRelationshipResultJsonDataParse.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\JsonDataParse\PNDataSyncRelationshipsListResultJsonDataParse.cs">
+      <Link>JsonDataParse\PNDataSyncRelationshipsListResultJsonDataParse.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\JsonDataParse\PNFetchHistoryJsonDataParse.cs" Link="JsonDataParse\PNFetchHistoryJsonDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNGenerateFileUploadUrlDataParse.cs" Link="JsonDataParse\PNGenerateFileUploadUrlDataParse.cs" />
     <Compile Include="..\PubnubApi\JsonDataParse\PNGetAllChannelMetadataJsonDataParse.cs" Link="JsonDataParse\PNGetAllChannelMetadataJsonDataParse.cs" />
@@ -526,11 +574,20 @@
     <Compile Include="..\PubnubApi\Model\Derived\DataSync\PNDataSyncDeleteEntityResultExt.cs">
       <Link>Model\Derived\DataSync\PNDataSyncDeleteEntityResultExt.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\DataSync\PNDataSyncDeleteRelationshipResultExt.cs">
+      <Link>Model\Derived\DataSync\PNDataSyncDeleteRelationshipResultExt.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\Model\Derived\DataSync\PNDataSyncEntitiesListResultExt.cs">
       <Link>Model\Derived\DataSync\PNDataSyncEntitiesListResultExt.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\Model\Derived\DataSync\PNDataSyncEntityResultExt.cs">
       <Link>Model\Derived\DataSync\PNDataSyncEntityResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\DataSync\PNDataSyncRelationshipResultExt.cs">
+      <Link>Model\Derived\DataSync\PNDataSyncRelationshipResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\DataSync\PNDataSyncRelationshipsListResultExt.cs">
+      <Link>Model\Derived\DataSync\PNDataSyncRelationshipsListResultExt.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\Model\Derived\DeleteMessage\PNDeleteMessageResultExt.cs" Link="Model\Derived\DeleteMessage\PNDeleteMessageResultExt.cs" />
     <Compile Include="..\PubnubApi\Model\Derived\Files\PNDeleteFileResultExt.cs" Link="Model\Derived\Files\PNDeleteFileResultExt.cs" />
@@ -757,26 +814,23 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Content Include="..\PubnubApi\EndPoint\DataSync\C# - DXD data sync Entity API.md">
-      <Link>EndPoint\DataSync\C# - DXD data sync Entity API.md</Link>
+    <Content Include="..\PubnubApi\EndPoint\DataSync\Entity\C# - DXD data sync Entity API.md">
+      <Link>EndPoint\DataSync\Entity\C# - DXD data sync Entity API.md</Link>
     </Content>
-    <Content Include="..\PubnubApi\EndPoint\DataSync\C# - DXD data sync Entity Class API.md">
-      <Link>EndPoint\DataSync\C# - DXD data sync Entity Class API.md</Link>
+    <Content Include="..\PubnubApi\EndPoint\DataSync\Relationship\C# - DXD data sync Relationship API.md">
+      <Link>EndPoint\DataSync\Relationship\C# - DXD data sync Relationship API.md</Link>
     </Content>
-    <Content Include="..\PubnubApi\EndPoint\DataSync\C# - DXD data sync User API.md">
-      <Link>EndPoint\DataSync\C# - DXD data sync User API.md</Link>
+    <Content Include="..\PubnubApi\EndPoint\DataSync\Specs\common.yaml">
+      <Link>EndPoint\DataSync\Specs\common.yaml</Link>
     </Content>
-    <Content Include="..\PubnubApi\EndPoint\DataSync\common.yaml">
-      <Link>EndPoint\DataSync\common.yaml</Link>
+    <Content Include="..\PubnubApi\EndPoint\DataSync\Specs\v4-data.yaml">
+      <Link>EndPoint\DataSync\Specs\v4-data.yaml</Link>
+    </Content>
+    <Content Include="..\PubnubApi\EndPoint\DataSync\Specs\v4-metadata.yaml">
+      <Link>EndPoint\DataSync\Specs\v4-metadata.yaml</Link>
     </Content>
     <Content Include="..\PubnubApi\EndPoint\DataSync\test-entity-api.ps1">
       <Link>EndPoint\DataSync\test-entity-api.ps1</Link>
-    </Content>
-    <Content Include="..\PubnubApi\EndPoint\DataSync\v4-data.yaml">
-      <Link>EndPoint\DataSync\v4-data.yaml</Link>
-    </Content>
-    <Content Include="..\PubnubApi\EndPoint\DataSync\v4-metadata.yaml">
-      <Link>EndPoint\DataSync\v4-metadata.yaml</Link>
     </Content>
   </ItemGroup>
 

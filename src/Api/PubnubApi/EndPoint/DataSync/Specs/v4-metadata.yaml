@@ -1,0 +1,949 @@
+openapi: 3.0.3
+info:
+  title: Object Management API
+  version: 4.0.0
+paths:
+  /subkeys/{subKey}/entity-classes:
+    get:
+      operationId: listEntityClasses
+      summary: Get all entity class entries
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Filter'
+        - $ref: '#/components/parameters/Sort'
+      responses:
+        '200':
+          $ref: '#/components/responses/EntityClassesResponse'
+      tags:
+        - Entity Class
+
+  /subkeys/{subKey}/entity-classes/{entityClassName}/versions/{entityClassVersion}:
+    post:
+      operationId: createEntityClass
+      summary: Create a new entity class
+      description: |
+        Creates a new entity class with its registry configuration, property definitions.
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: "#/components/parameters/IdempotencyKey"
+        - $ref: "#/components/parameters/entityClassName"
+        - $ref: "#/components/parameters/entityClassVersion"
+      tags:
+        - Entity Class
+      requestBody:
+        required: true
+        content:
+          application/vnd.pubnub.objects.entity-class+json;version=1:
+            schema:
+              $ref: '#/components/schemas/CreateEntityClassRequest'
+      responses:
+        '201':
+          $ref: "#/components/responses/CreateEntityClassResponse"
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaTypeResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailableResponse'
+
+    get:
+      tags:
+        - Entity Class
+      operationId: getEntityClass
+      summary: Get entity class by ID
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - $ref: "#/components/parameters/entityClassName"
+        - $ref: "#/components/parameters/entityClassVersion"
+      responses:
+        "200":
+          $ref: "#/components/responses/EntityClassResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+    patch:
+      tags:
+        - Entity Class
+      operationId: patchEntityClass
+      summary: Patch entity class using Json Patch RFC-6902
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - $ref: "#/components/parameters/entityClassName"
+        - $ref: "#/components/parameters/entityClassVersion"
+        - $ref: "#/components/parameters/IfMatch"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        x-codegen-request-body-name: patch
+        content:
+          application/json-patch+json:
+            schema:
+              $ref: "#/components/schemas/JsonPatch"
+            example:
+              - op: replace
+                path: /status
+                value: moderator
+              - op: add
+                path: /custom/role
+                value: admin
+      responses:
+        "200":
+          $ref: "#/components/responses/EntityClassResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "412":
+          $ref: "#/components/responses/PreconditionFailedResponse"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaTypeResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+    delete:
+      tags:
+        - Entity Class
+      operationId: deleteEntityClass
+      summary: Delete entity class by ID
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - $ref: "#/components/parameters/entityClassName"
+        - $ref: "#/components/parameters/entityClassVersion"
+        - $ref: "#/components/parameters/IfMatch"
+      responses:
+        "200":
+          $ref: "#/components/responses/DeleteSuccessResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "412":
+          $ref: "#/components/responses/PreconditionFailedResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+    put:
+      tags:
+        - Entity Class
+      operationId: updateEntityClass
+      summary: Update entity class with complete resource replacement
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - $ref: "#/components/parameters/entityClassName"
+        - $ref: "#/components/parameters/entityClassVersion"
+        - $ref: "#/components/parameters/IfMatch"
+      requestBody:
+        required: true
+        x-codegen-request-body-name: updateRequest
+        content:
+          application/vnd.pubnub.objects.entity-class+json;version=1:
+            schema:
+              $ref: "#/components/schemas/UpdateEntityClassRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/EntityClassResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "412":
+          $ref: "#/components/responses/PreconditionFailedResponse"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaTypeResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+  # Relationship Class endpoints
+  /subkeys/{subKey}/relationship-classes:
+    get:
+      summary: Get all relationship classes
+      operationId: listRelationshipClasses
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/RelationshipClassesResponse'
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+      tags:
+        - Relationship Class
+
+  /subkeys/{subKey}/relationship-classes/{relationshipClassName}/versions/{relationshipClassVersion}:
+    post:
+      operationId: createRelationshipClass
+      summary: Create a new relationship class
+      description: |
+        Creates a new relationship class that defines a type of relationship between entities.
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: "#/components/parameters/IdempotencyKey"
+        - $ref: "#/components/parameters/RelationshipClassName"
+        - $ref: "#/components/parameters/RelationshipClassVersion"
+      tags:
+        - Relationship Class
+      requestBody:
+        required: true
+        content:
+          application/vnd.pubnub.objects.relationship-class+json;version=1:
+            schema:
+              $ref: '#/components/schemas/CreateRelationshipClassRequest'
+      responses:
+        '201':
+          $ref: "#/components/responses/CreateRelationshipClassResponse"
+        '400':
+          $ref: '#/components/responses/BadRequestResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        '409':
+          $ref: '#/components/responses/ConflictResponse'
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaTypeResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailableResponse'
+
+    get:
+      tags:
+        - Relationship Class
+      operationId: getRelationshipClass
+      summary: Get relationship class by name and version
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - $ref: "#/components/parameters/RelationshipClassName"
+        - $ref: "#/components/parameters/RelationshipClassVersion"
+      responses:
+        "200":
+          $ref: "#/components/responses/RelationshipClassResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+    put:
+      tags:
+        - Relationship Class
+      operationId: updateRelationshipClass
+      summary: Update relationship class with complete resource replacement
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - $ref: "#/components/parameters/RelationshipClassName"
+        - $ref: "#/components/parameters/RelationshipClassVersion"
+        - $ref: "#/components/parameters/IfMatch"
+      requestBody:
+        required: true
+        x-codegen-request-body-name: updateRequest
+        content:
+          application/vnd.pubnub.objects.relationship-class+json;version=1:
+            schema:
+              $ref: "#/components/schemas/UpdateRelationshipClassRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/RelationshipClassResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "412":
+          $ref: "#/components/responses/PreconditionFailedResponse"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaTypeResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+    delete:
+      tags:
+        - Relationship Class
+      operationId: deleteRelationshipClass
+      summary: Delete relationship class by name and version
+      parameters:
+        - name: subKey
+          in: path
+          required: true
+          schema:
+            type: string
+          description: PubNub subkey
+        - $ref: "#/components/parameters/RelationshipClassName"
+        - $ref: "#/components/parameters/RelationshipClassVersion"
+        - $ref: "#/components/parameters/IfMatch"
+      responses:
+        "200":
+          $ref: "#/components/responses/DeleteSuccessResponse"
+        "400":
+          $ref: "#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "#/components/responses/ForbiddenResponse"
+        "404":
+          $ref: "#/components/responses/NotFoundResponse"
+        "406":
+          $ref: "#/components/responses/NotAcceptableResponse"
+        "412":
+          $ref: "#/components/responses/PreconditionFailedResponse"
+        "429":
+          $ref: "#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailableResponse"
+
+components:
+  responses:
+    DeleteSuccessResponse:
+      description: Resource deleted successfully
+    EntityClassesResponse:
+      description: Successful response
+      content:
+        application/vnd.pubnub.objects.entity-class+json;version=1:
+          schema:
+            $ref: '#/components/schemas/EntityClassesEnvelope'
+    CreateEntityClassResponse:
+      description: Entity class created successfully
+      headers:
+        Location:
+          schema:
+            type: string
+          description: URI of the created entity class
+      content:
+        application/vnd.pubnub.objects.entity-class+json;version=1:
+          schema:
+            $ref: '#/components/schemas/EntityClassEnvelope'
+    EntityClassResponse:
+      description: Successful response
+      content:
+        application/vnd.pubnub.objects.entity-class+json;version=1:
+          schema:
+            $ref: '#/components/schemas/EntityClassEnvelope'
+    RelationshipClassesResponse:
+      description: Successful response
+      content:
+        application/vnd.pubnub.objects.relationship-class+json;version=1:
+          schema:
+            $ref: '#/components/schemas/RelationshipClassesEnvelope'
+    CreateRelationshipClassResponse:
+      description: Relationship class created successfully
+      headers:
+        Location:
+          schema:
+            type: string
+          description: URI of the created relationship class
+      content:
+        application/vnd.pubnub.objects.relationship-class+json;version=1:
+          schema:
+            $ref: '#/components/schemas/RelationshipClassEnvelope'
+    RelationshipClassResponse:
+      description: Successful response
+      content:
+        application/vnd.pubnub.objects.relationship-class+json;version=1:
+          schema:
+            $ref: '#/components/schemas/RelationshipClassEnvelope'
+    BadRequestResponse:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: 'common.yaml#/components/schemas/ErrorResponse'
+    UnauthorizedResponse:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: 'common.yaml#/components/schemas/ErrorResponse'
+    NotFoundResponse:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: 'common.yaml#/components/schemas/ErrorResponse'
+    ConflictResponse:
+      description: Conflict - resource already exists
+      content:
+        application/json:
+          schema:
+            $ref: 'common.yaml#/components/schemas/ErrorResponse'
+    InternalServerErrorResponse:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: 'common.yaml#/components/schemas/ErrorResponse'
+    ForbiddenResponse:
+      description: Forbidden - authorization provided but access denied
+      content:
+        application/json:
+          schema:
+            $ref: 'common.yaml#/components/schemas/ErrorResponse'
+    UnsupportedMediaTypeResponse:
+      description: Unsupported Media Type - payload format not supported
+      content:
+        application/json:
+          schema:
+            $ref: 'common.yaml#/components/schemas/ErrorResponse'
+    TooManyRequestsResponse:
+      description: Too Many Requests - rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: 'common.yaml#/components/schemas/ErrorResponse'
+    NotAcceptableResponse:
+      description: Not Acceptable - Accept header doesn't contain supported value
+      content:
+        application/json:
+          schema:
+            $ref: 'common.yaml#/components/schemas/ErrorResponse'
+    PreconditionFailedResponse:
+      description: Precondition Failed - ETag doesn't match current resource version
+      content:
+        application/json:
+          schema:
+            $ref: 'common.yaml#/components/schemas/ErrorResponse'
+    ServiceUnavailableResponse:
+      description: Service Unavailable - service not available
+      content:
+        application/json:
+          schema:
+            $ref: 'common.yaml#/components/schemas/ErrorResponse'
+
+  parameters:
+    IfMatch:
+      $ref: 'common.yaml#/components/parameters/IfMatch'
+    Cursor:
+      $ref: 'common.yaml#/components/parameters/Cursor'
+    Limit:
+      $ref: 'common.yaml#/components/parameters/Limit'
+    Filter:
+      $ref: 'common.yaml#/components/parameters/Filter'
+    Sort:
+      $ref: 'common.yaml#/components/parameters/Sort'
+    IdempotencyKey:
+      $ref: 'common.yaml#/components/parameters/IdempotencyKey'
+    entityClassName:
+      name: entityClassName
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Name of an entity class
+    entityClassVersion:
+      name: entityClassVersion
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Version of an entity class
+    RelationshipClassName:
+      name: relationshipClassName
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Name of a relationship class
+    RelationshipClassVersion:
+      name: relationshipClassVersion
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Version of a relationship class
+
+  schemas:
+    CreateEntityClassRequest:
+      description: Request body for creating an entity class
+      allOf:
+        - $ref: "#/components/schemas/RequestEnvelope"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/EntityClassProperties"
+
+    UpdateEntityClassRequest:
+      description: Request body for updating an entity class
+      allOf:
+        - $ref: "#/components/schemas/RequestEnvelope"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/EntityClassProperties"
+
+    UpdateRelationshipClassRequest:
+      description: Request body for updating a relationship class
+      allOf:
+        - $ref: "#/components/schemas/RequestEnvelope"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/RelationshipClassUpdateProperties"
+
+    RelationshipClassUpdateProperties:
+      description: Updatable properties for a relationship class
+      type: object
+      properties:
+        description:
+          type: string
+          description: Optional description of the relationship class
+        schema:
+          $ref: '#/components/schemas/ClassPropertiesSchema'
+        filterableFields:
+          type: array
+          items:
+            $ref: "#/components/schemas/FilterableField"
+          description: List of filterable fields (replaces existing fields on update)
+
+    FilterableField:
+      type: object
+      required: [path, valueKind, name]
+      properties:
+        name:
+          type: string
+          description: |
+            Unique semantic identifier for the property.
+        path:
+          $ref: 'common.yaml#/components/schemas/JsonPointer'
+        valueKind:
+          type: string
+          enum: [string, number, boolean, date, datetime]
+          description: |
+            Data type of the property value.
+        enabledAdvancedFiltering:
+          type: boolean
+          description: Whether the property should be indexed for full-text search.
+          default: false
+        isNullable:
+          type: boolean
+          description: Whether the property can have null values.
+          default: true
+
+    ErrorResponse:
+      $ref: 'common.yaml#/components/schemas/ErrorResponse'
+    ErrorItem:
+      $ref: 'common.yaml#/components/schemas/ErrorItem'
+
+    Meta:
+      $ref: 'common.yaml#/components/schemas/Meta'
+    Links:
+      $ref: 'common.yaml#/components/schemas/Links'
+    RequestEnvelope:
+      $ref: 'common.yaml#/components/schemas/RequestEnvelope'
+    ResponseEnvelope:
+      $ref: 'common.yaml#/components/schemas/ResponseEnvelope'
+
+    EntityClassesEnvelope:
+      description: List of entity classes
+      allOf:
+        - $ref: '#/components/schemas/ResponseEnvelope'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/EntityClassResource'
+
+    EntityClassEnvelope:
+      description: Single entity class
+      allOf:
+        - $ref: '#/components/schemas/ResponseEnvelope'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/EntityClassResource'
+
+    EntityClassResource:
+      allOf:
+        - $ref: '#/components/schemas/EntityClassResourceProperties'
+        - $ref: '#/components/schemas/EntityClassProperties'
+
+    EntityClassResourceProperties:
+      description: Default properties for entity class responses (without id, since name is the identifier)
+      type: object
+      required:
+        - createdAt
+        - updatedAt
+        - eTag
+        - version
+      properties:
+        name:
+          type: string
+          description: |
+            Unique semantic identifier for the entity class.
+        createdAt:
+          type: string
+          format: date-time
+          description: Date and time the entity class was created.
+        updatedAt:
+          type: string
+          format: date-time
+          description: Date and time the entity class was last updated.
+        eTag:
+          type: string
+          description: The entity's content fingerprint used in conditional requests.
+        version:
+          type: integer
+          description: Version of an entity class
+
+    EntityClassProperties:
+      type: object
+      required: [config]
+      properties:
+
+        description:
+          type: string
+          maxLength: 1000
+          description: Human-readable description documenting semantic intent and ownership scope.
+
+        schema:
+          $ref: '#/components/schemas/ClassPropertiesSchema'
+
+        config:
+          $ref: '#/components/schemas/EntityClassConfig'
+
+        filterableFields:
+          type: array
+          items:
+            $ref: '#/components/schemas/FilterableField'
+          description: |
+            Optional list of filterable fields for indexed/queryable 
+            properties. If omitted, payload is treated as opaque JSON.
+      example:
+        name: "user-profile"
+        description: "Entity class for storing user profile information including basic details and preferences"
+        version: 1
+        schema:
+          $schema: "http://json-schema.org/draft/2020-12/schema"
+          type: object
+          properties:
+            username:
+              type: string
+              minLength: 3
+              maxLength: 50
+            email:
+              type: string
+              format: email
+            dateOfBirth:
+              type: string
+              format: date
+            isActive:
+              type: boolean
+            score:
+              type: number
+              minimum: 0
+              maximum: 100
+          required:
+            - username
+            - email
+        config:
+          ttlSec: 86400
+        filterableFields:
+          - name: "username"
+            path: "/username"
+            valueKind: "string"
+            enabledAdvancedFiltering: true
+          - name: "email"
+            path: "/email"
+            valueKind: "string"
+            enabledAdvancedFiltering: false
+            isNullable: true
+          - name: "dateOfBirth"
+            path: "/dateOfBirth"
+            valueKind: "date"
+            enabledAdvancedFiltering: false
+          - name: "isActive"
+            path: "/isActive"
+            valueKind: "boolean"
+            enabledAdvancedFiltering: false
+          - name: "score"
+            path: "/score"
+            valueKind: "number"
+            enabledAdvancedFiltering: false
+
+    ClassPropertiesSchema:
+      type: object
+      description: Json Schema draft 2020-12 for validating user-defined payload.
+      properties:
+        $schema:
+          type: string
+          enum: ["http://json-schema.org/draft/2020-12/schema"]
+
+    EntityClassConfig:
+      type: object
+      required: [ttlSec]
+      properties:
+        ttlSec:
+          type: integer
+          minimum: -1
+          description: |
+            Time-to-live in seconds for entities of this class.
+            -1 indicates entities never expire. Default is 1 year
+          default: 31536000
+
+    DefaultProperties:
+      $ref: 'common.yaml#/components/schemas/DefaultProperties'
+
+    JsonPatchOperation:
+      $ref: 'common.yaml#/components/schemas/JsonPatchOperation'
+    JsonPatch:
+      $ref: 'common.yaml#/components/schemas/JsonPatch'
+
+    # Relationship Class schemas
+    CreateRelationshipClassRequest:
+      description: Request body for creating a relationship class
+      allOf:
+        - $ref: "#/components/schemas/RequestEnvelope"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/RelationshipClassProperties"
+
+    RelationshipClassesEnvelope:
+      description: List of relationship classes
+      allOf:
+        - $ref: '#/components/schemas/ResponseEnvelope'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/RelationshipClassResource'
+
+    RelationshipClassEnvelope:
+      description: Single relationship class
+      allOf:
+        - $ref: '#/components/schemas/ResponseEnvelope'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/RelationshipClassResource'
+
+    RelationshipClassResource:
+      allOf:
+        - $ref: '#/components/schemas/RelationshipClassResourceProperties'
+        - $ref: '#/components/schemas/RelationshipClassProperties'
+
+    RelationshipClassResourceProperties:
+      description: Default properties for relationship class responses
+      type: object
+      required:
+        - name
+        - createdAt
+        - updatedAt
+        - eTag
+        - version
+      properties:
+        name:
+          type: string
+          description: |
+            Unique semantic identifier for the relationship class
+        createdAt:
+          type: string
+          format: date-time
+          description: Date and time the relationship class was created
+        updatedAt:
+          type: string
+          format: date-time
+          description: Date and time the relationship class was last updated
+        eTag:
+          type: string
+          description: The relationship's content fingerprint used in conditional requests
+        version:
+          type: integer
+          description: Version number of the relationship class
+
+    RelationshipClassProperties:
+      type: object
+      required: [directed, cardinality]
+      properties:
+        description:
+          type: string
+          maxLength: 1000
+          description: Human-readable description documenting the relationship class purpose
+        schema:
+          $ref: '#/components/schemas/ClassPropertiesSchema'
+        directed:
+          type: boolean
+          description: |
+            Defines whether the relationship has a direction.
+            `true` when source → target matters.
+        cardinality:
+          $ref: '#/components/schemas/RelationshipClassCardinality'
+        entityAClass:
+          type: string
+          description: |
+            Name of the entity class for the source (A) side of the relationship.
+            If omitted, any entity class can be used as the source.
+        entityBClass:
+          type: string
+          description: |
+            Name of the entity class for the target (B) side of the relationship.
+            If omitted, any entity class can be used as the target.
+        filterableFields:
+          type: array
+          items:
+            $ref: '#/components/schemas/FilterableField'
+          description: |
+            Optional list of filterable fields for indexed/queryable
+            properties on relationships of this class.
+      example:
+        description: "Represents a parent-child relationship between entities"
+        directed: true
+        cardinality: "one-to-many"
+        entityAClass: "Parent"
+        entityBClass: "Child"
+        filterableFields:
+          - name: "role"
+            path: "/role"
+            valueKind: "string"
+            enabledAdvancedFiltering: true
+
+    RelationshipClassCardinality:
+      type: string
+      enum: [one-to-one, one-to-many, many-to-many]
+      description: |
+        Defines multiplicity constraints for the relationship.
+        - `one-to-one`: Each entity can participate in at most one relationship of this type
+        - `one-to-many`: An entity is bound to the side it first appears on
+        - `many-to-many`: No side constraints
+  

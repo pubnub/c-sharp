@@ -988,6 +988,24 @@ namespace PubnubApi
 
                 #endregion
             }
+            else if (typeof(T) == typeof(PNDataSyncRelationshipResult))
+            {
+                #region "PNDataSyncRelationshipResult"
+
+                PNDataSyncRelationshipResult result = PNDataSyncRelationshipResultJsonDataParse.GetObject(jsonPlug, listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNDataSyncRelationshipResult), CultureInfo.InvariantCulture);
+
+                #endregion
+            }
+            else if (typeof(T) == typeof(PNDataSyncRelationshipsListResult))
+            {
+                #region "PNDataSyncRelationshipsListResult"
+
+                PNDataSyncRelationshipsListResult result = PNDataSyncRelationshipsListResultJsonDataParse.GetObject(jsonPlug, listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNDataSyncRelationshipsListResult), CultureInfo.InvariantCulture);
+
+                #endregion
+            }
             else
             {
                 System.Diagnostics.Debug.WriteLine("DeserializeToObject<T>(list) => NO MATCH");
