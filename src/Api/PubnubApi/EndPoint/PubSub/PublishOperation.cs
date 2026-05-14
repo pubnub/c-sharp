@@ -515,56 +515,55 @@ namespace PubnubApi.EndPoint
 
             if (httpPost)
             {
-                bool exceedsPostLimit = messageSizeBytes >= MaxPublishRequestSizeBytes - PostBodyFramingOverheadBytes;
-                return new PublishEndpointInfo { UseV2Endpoint = exceedsPostLimit, UsePost = true };
+                bool exceedsPostLimit = messageSizeBytes > MaxPublishRequestSizeBytes - PostBodyFramingOverheadBytes;
+                return new PublishEndpointInfo(useV2Endpoint: exceedsPostLimit, usePost: true);
             }
-            int urlSizeWithoutMessage = EstimateUrlSizeWithoutMessage(queryParams);
-            int availableForMessage = MaxPublishRequestSizeBytes - urlSizeWithoutMessage;
 
-            if (messageSizeBytes >= availableForMessage)
+            int estimatedGetUrlSizeBytes = EstimateGetPublishUrlSizeBytes(messageContent, queryParams);
+            if (estimatedGetUrlSizeBytes > MaxPublishRequestSizeBytes)
             {
                 // Message too large for URL; switch to v2/publish with POST body
-                return new PublishEndpointInfo { UseV2Endpoint = true, UsePost = true };
+                return new PublishEndpointInfo(useV2Endpoint: true, usePost: true);
             }
 
-            return new PublishEndpointInfo { UseV2Endpoint = false, UsePost = false };
+            return new PublishEndpointInfo(useV2Endpoint: false, usePost: false);
         }
-        private struct PublishEndpointInfo
+
+        private struct PublishEndpointInfo(bool useV2Endpoint, bool usePost)
         {
-            public bool UseV2Endpoint;
-            public bool UsePost;
+            public bool UseV2Endpoint = useV2Endpoint;
+            public bool UsePost = usePost;
         }
-        
-        /// Estimates the total URL byte size excluding the message content.
-        /// Accounts for base URL components, path segments, user-specified query parameters,
-        /// and parameters injected later by the transport middleware
-        /// (uuid, pnsdk, requestid, instanceid, timestamp, auth, signature).
-        private int EstimateUrlSizeWithoutMessage(Dictionary<string, string> queryParams)
+
+        /// Estimates final URL size for regular publish GET using the same middleware path
+        /// and query construction used for actual requests.
+        private int EstimateGetPublishUrlSizeBytes(string messageContent, Dictionary<string, string> queryParams)
         {
-            // 155 bytes covers the fixed overhead from base URL components and
-            // middleware-injected query params: scheme, origin, path separators,
-            // uuid, pnsdk, requestid, instanceid, and timestamp.
-            int estimatedSize = 155;
-
-            // Auth key adds "&auth={value}" — 5 bytes for the key portion plus the value length
-            if (config.AuthKey?.Length > 0)
+            var getPathSegments = new List<string>
             {
-                estimatedSize += 5 + config.AuthKey.Length;
-            }
+                "publish",
+                config.PublishKey ?? "",
+                config.SubscribeKey ?? "",
+                "0",
+                channelName,
+                "0",
+                messageContent
+            };
 
-            // Secret key triggers HMAC signature: "&signature=v2.{base64}" ≈ 80 bytes
-            if (!string.IsNullOrEmpty(config.SecretKey))
+            var requestParam = new RequestParameter
             {
-                estimatedSize += 80;
-            }
+                RequestType = Constants.GET,
+                PathSegment = getPathSegments,
+                Query = queryParams == null
+                    ? new Dictionary<string, string>()
+                    : new Dictionary<string, string>(queryParams)
+            };
 
-            // Add encoded size of the user-specified query parameters
-            estimatedSize += UriUtil.EncodeUriComponent(
-                UriUtil.BuildQueryString(queryParams),
-                PNOperationType.PNPublishOperation, false, false, false
-            ).Length;
+            var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(
+                requestParameter: requestParam,
+                operationType: PNOperationType.PNPublishOperation);
 
-            return estimatedSize;
+            return Encoding.UTF8.GetByteCount(transportRequest.RequestUrl ?? string.Empty);
         }
 
         private void CleanUp()

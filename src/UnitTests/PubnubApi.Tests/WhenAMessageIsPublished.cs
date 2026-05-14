@@ -2866,6 +2866,26 @@ namespace PubNubMessaging.Tests
         #region 32 KB POST-body boundary — v2/publish activation
 
         [Test]
+        public async Task ThenPostBody_MoreThanBoundary_32766Bytes_UsesV2PublishEndpoint()
+        {
+            // Arrange — serialized message is more than at the 32 766-byte boundary
+            var pubnub = CreatePubnub();
+            var message = CreateMessageOfSerializedSize(PostBodyBoundaryBytes +1);
+
+            // Act
+            var result = await pubnub.Publish()
+                .Channel(Channel)
+                .Message(message)
+                .UsePOST(true)
+                .ExecuteAsync();
+
+            // Assert
+            Assert.That(result.Result, Is.Not.Null, "Publish result should not be null.");
+            Assert.That(result.Status.Error, Is.False, "Publish should succeed.");
+            AssertV2PublishEndpoint();
+        }
+        
+        [Test]
         public async Task ThenPostBody_ExactlyAtBoundary_32766Bytes_UsesV2PublishEndpoint()
         {
             // Arrange — serialized message is exactly at the 32 766-byte boundary
@@ -2882,7 +2902,7 @@ namespace PubNubMessaging.Tests
             // Assert
             Assert.That(result.Result, Is.Not.Null, "Publish result should not be null.");
             Assert.That(result.Status.Error, Is.False, "Publish should succeed.");
-            AssertV2PublishEndpoint();
+            AssertRegularPublishEndpoint("POST");
         }
 
         [Test]
@@ -3185,6 +3205,34 @@ namespace PubNubMessaging.Tests
                 "Exception message should describe the size violation.");
             Assert.That(_server.LogEntries.Count(), Is.EqualTo(0),
                 "No HTTP request should be made when the encrypted message exceeds the size limit.");
+        }
+
+        #endregion
+
+        #region Publish 2 MB size message using prod server 
+
+        [Test]
+        public async Task Then_2MB_Size_Message_Published_to_Prod_server()
+        {
+            // Arrange — message is one byte above the max permitted content size.
+            // The SDK must throw ArgumentException before making any HTTP request.
+            var pubnub = new Pubnub(new PNConfiguration(new UserId("test-user"))
+            {
+                PublishKey = PubnubCommon.NonPAMPublishKey,
+                SubscribeKey = PubnubCommon.NONPAMSubscribeKey
+            });
+            var message = CreateMessageOfSerializedSize(TwoMbBoundaryBytes - 4);
+            var publishResponseFor2MbMessage = await pubnub.Publish()
+                    .Channel(Channel)
+                    .Message(message)
+                    .ExecuteAsync();
+
+            Assert.That(publishResponseFor2MbMessage.Status.Error, Is.False ,
+                "2MB size message publish response should not have error");
+            Assert.That(publishResponseFor2MbMessage.Result, Is.Not.Null,
+                "2MB size message publish result should not be null.");
+            Assert.That(publishResponseFor2MbMessage.Result.Timetoken, Is.Not.Null, 
+                "2MB size message publish response should contain valid time token");
         }
 
         #endregion
