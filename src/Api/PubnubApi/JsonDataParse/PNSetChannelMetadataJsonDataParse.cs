@@ -29,6 +29,9 @@ namespace PubnubApi
                     result.Type = (getSetChMetadataDataDic.ContainsKey("type") && getSetChMetadataDataDic["type"] != null)
                         ? getSetChMetadataDataDic["type"].ToString()
                         : null;
+                    result.ETag = (getSetChMetadataDataDic.ContainsKey("eTag") && getSetChMetadataDataDic["eTag"] != null)
+                        ? getSetChMetadataDataDic["eTag"].ToString()
+                        : null;
                     if (getSetChMetadataDataDic.ContainsKey("custom"))
                     {
                         result.Custom = jsonPlug.ConvertToDictionaryObject(getSetChMetadataDataDic["custom"]);
