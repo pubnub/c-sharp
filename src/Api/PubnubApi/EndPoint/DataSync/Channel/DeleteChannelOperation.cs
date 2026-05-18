@@ -150,8 +150,10 @@ namespace PubnubApi.EndPoint
 
         private RequestParameter CreateRequestParameter()
         {
-            var pathSegments = new List<string>
+             var pathSegments = new List<string>
             {
+                "v1",
+                "datasync",
                 "subkeys",
                 config.SubscribeKey,
                 "channels",

@@ -214,8 +214,8 @@ namespace PubnubApi.EndPoint
 
             var pathSegments = new List<string>
             {
-                //"v1",
-                //"datasync",
+                "v1",
+                "datasync",
                 "subkeys",
                 config.SubscribeKey,
                 "entities"

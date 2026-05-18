@@ -198,8 +198,10 @@ namespace PubnubApi.EndPoint
 
             var postBody = jsonLibrary.SerializeToJsonString(requestEnvelope);
 
-            var pathSegments = new List<string>
+             var pathSegments = new List<string>
             {
+                "v1",
+                "datasync",
                 "subkeys",
                 config.SubscribeKey,
                 "users"

@@ -1,4 +1,4 @@
-$BASE = "http://objekts.core.az1.pdx1.aws.int.ps.pn/subkeys/sub-c-bd4cd136-8eca-45c2-b5db-73d3b43d6552"
+$BASE = "http://objekts.core.az1.pdx1.aws.int.ps.pn/v1/datasync/subkeys/sub-c-bd4cd136-8eca-45c2-b5db-73d3b43d6552"
 
 # ========================
 # 0. CREATE ENTITY CLASS (prerequisite)
@@ -59,17 +59,24 @@ $BASE = "http://objekts.core.az1.pdx1.aws.int.ps.pn/subkeys/sub-c-bd4cd136-8eca-
 # ========================
 # 2. GET ENTITY BY ID
 # ========================
-Write-Host "`n`n=== 2. GET ENTITY BY ID ===" -ForegroundColor Cyan
-curl.exe -X GET `
-  "$BASE/entities/JOHN"
-
-
-# ========================
-# 3. GET ENTITIES (LIST)
-# ========================
-#Write-Host "`n`n=== 3. GET ENTITIES (LIST) ===" -ForegroundColor Cyan
+#Write-Host "`n`n=== 2. GET ENTITY BY ID ===" -ForegroundColor Cyan
 #curl.exe -X GET `
-#  "$BASE/entities?entity_class=capybara&entity_class_version=1&limit=10&sort=-createdAt"
+#  "$BASE/entities/JOHN"
+
+
+# ========================
+# 1. GET ENTITIES (LIST)
+# ========================
+Write-Host "`n`n=== 1. GET ENTITIES (LIST) ===" -ForegroundColor Cyan
+curl.exe -X GET `
+  "$BASE/entities?entity_class=capybara&entity_class_version=1&limit=10&sort=-createdAt"
+  
+# ========================
+# 2. GET RELATIONSHIPS (LIST)
+# ========================
+Write-Host "`n`n=== 2. GET RELATIONSHIPS (LIST) ===" -ForegroundColor Cyan
+curl.exe -X GET `
+  "$BASE/relationships?relationship_class=integration-test-ownership&entity_class_version=1&limit=10&sort=-createdAt"
 
 
 # ========================

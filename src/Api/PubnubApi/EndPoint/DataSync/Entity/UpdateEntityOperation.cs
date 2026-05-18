@@ -193,8 +193,10 @@ namespace PubnubApi.EndPoint
 
             var putBody = jsonLibrary.SerializeToJsonString(requestEnvelope);
 
-            var pathSegments = new List<string>
+             var pathSegments = new List<string>
             {
+                "v1",
+                "datasync",
                 "subkeys",
                 config.SubscribeKey,
                 "entities",
@@ -213,7 +215,7 @@ namespace PubnubApi.EndPoint
 
             if (!string.IsNullOrEmpty(parameters.IfMatch))
             {
-                requestParameter.Headers.Add("If-Match", $"\"{parameters.IfMatch}\"");
+                requestParameter.Headers.Add("If-Match", parameters.IfMatch);
             }
 
             return requestParameter;

@@ -1,11 +1,7 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=67aae4db_002D80ba_002D4d99_002D8149_002D8f2e0ef4a489/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Playground" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;NUnit3x::E71580C3-AF9E-4F06-A015-27D05F129D09::net6.0::PubnubApi.Tests.DataSync.WhenCreateGenericEntity.PlaygroundGet&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;NUnit3x::E71580C3-AF9E-4F06-A015-27D05F129D09::net6.0::PubnubApi.Tests.DataSync.WhenCreateGenericEntity.PlaygroundGetList&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;NUnit3x::E71580C3-AF9E-4F06-A015-27D05F129D09::net6.0::PubnubApi.Tests.DataSync.WhenCreateGenericEntity.PlaygroundUpdateEntity&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;NUnit3x::E71580C3-AF9E-4F06-A015-27D05F129D09::net6.0::PubnubApi.Tests.DataSync.WhenCreateGenericEntity.PlaygroundCreate&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;NUnit3x::E71580C3-AF9E-4F06-A015-27D05F129D09::net6.0::PubnubApi.Tests.DataSync.WhenCreateGenericEntity.PlaygroundDeleteEntity&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;NUnit3x::E71580C3-AF9E-4F06-A015-27D05F129D09::net6.0::PubnubApi.Tests.DataSync.WhenCreateGenericEntity.PlaygroundPatchEntity&lt;/TestId&gt;&#xD;
-  &lt;/TestAncestor&gt;&#xD;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=7e406e57_002D8797_002D4000_002D9ca4_002D6d65da80aeb5/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="WhenDataSyncEntityIsRequested" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;And&gt;&#xD;
+    &lt;Namespace&gt;PubnubApi.Tests.DataSync&lt;/Namespace&gt;&#xD;
+    &lt;Project Location="C:\Users\jakub.grzesiowski\Projects\c-sharp\src\UnitTests\PubnubApi.Tests" Presentation="&amp;lt;UnitTests&amp;gt;\&amp;lt;PubnubApi.Tests&amp;gt;" /&gt;&#xD;
+  &lt;/And&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

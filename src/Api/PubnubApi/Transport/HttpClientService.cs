@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Net;
@@ -41,13 +43,7 @@ namespace PubnubApi
             {
                 HttpRequestMessage requestMessage =
                     new HttpRequestMessage(method: HttpMethod.Get, requestUri: transportRequest.RequestUrl);
-                if (transportRequest.Headers.Keys.Count > 0)
-                {
-                    foreach (var kvp in transportRequest.Headers)
-                    {
-                        requestMessage.Headers.Add(kvp.Key, kvp.Value);
-                    }
-                }
+                ApplyHeaders(requestMessage.Headers, transportRequest.Headers);
                 logger?.Debug(
                     $"HttpClient Service: Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl}" +
                     (requestMessage.Headers.Any()
@@ -116,22 +112,13 @@ namespace PubnubApi
                 else if (transportRequest.BodyContentBytes != null)
                 {
                     postData = new ByteArrayContent(transportRequest.BodyContentBytes);
-                    foreach (var transportRequestHeader in transportRequest.Headers)
-                    {
-                        postData.Headers.Add(transportRequestHeader.Key, transportRequestHeader.Value);
-                    }
+                    ApplyHeaders(postData.Headers, transportRequest.Headers);
                 }
 
                 HttpRequestMessage requestMessage =
                     new HttpRequestMessage(method: HttpMethod.Post, requestUri: transportRequest.RequestUrl)
                         { Content = postData };
-                foreach (var kvp in transportRequest.Headers)
-                {
-                    if (!string.Equals(kvp.Key, "Content-Type", StringComparison.OrdinalIgnoreCase))
-                    {
-                        requestMessage.Headers.Add(kvp.Key, kvp.Value);
-                    }
-                }
+                ApplyHeaders(requestMessage.Headers, transportRequest.Headers, excludeKey: "Content-Type");
                 logger?.Debug(
                     $"HttpClient Service:Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl}" +
                     (requestMessage.Headers.Any()
@@ -200,22 +187,13 @@ namespace PubnubApi
                 else if (transportRequest.BodyContentBytes != null)
                 {
                     putData = new ByteArrayContent(transportRequest.FormData);
-                    foreach (var transportRequestHeader in transportRequest.Headers)
-                    {
-                        putData.Headers.Add(transportRequestHeader.Key, transportRequestHeader.Value);
-                    }
+                    ApplyHeaders(putData.Headers, transportRequest.Headers);
                 }
 
                 HttpRequestMessage requestMessage =
                     new HttpRequestMessage(method: HttpMethod.Put, requestUri: transportRequest.RequestUrl)
                         { Content = putData };
-                foreach (var kvp in transportRequest.Headers)
-                {
-                    if (!string.Equals(kvp.Key, "Content-Type", StringComparison.OrdinalIgnoreCase))
-                    {
-                        requestMessage.Headers.Add(kvp.Key, kvp.Value);
-                    }
-                }
+                ApplyHeaders(requestMessage.Headers, transportRequest.Headers, excludeKey: "Content-Type");
 
                 logger?.Debug(
                     $"HttpClient Service:Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl}" +
@@ -272,13 +250,7 @@ namespace PubnubApi
             {
                 HttpRequestMessage requestMessage =
                     new HttpRequestMessage(method: HttpMethod.Delete, requestUri: transportRequest.RequestUrl);
-                if (transportRequest.Headers.Keys.Count > 0)
-                {
-                    foreach (var kvp in transportRequest.Headers)
-                    {
-                        requestMessage.Headers.Add(kvp.Key, kvp.Value);
-                    }
-                }
+                ApplyHeaders(requestMessage.Headers, transportRequest.Headers);
 
                 logger?.Debug(
                     $"HttpClient Service:Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl}" +
@@ -348,22 +320,13 @@ namespace PubnubApi
                 else if (transportRequest.BodyContentBytes != null)
                 {
                     patchData = new ByteArrayContent(transportRequest.FormData);
-                    foreach (var transportRequestHeader in transportRequest.Headers)
-                    {
-                        patchData.Headers.Add(transportRequestHeader.Key, transportRequestHeader.Value);
-                    }
+                    ApplyHeaders(patchData.Headers, transportRequest.Headers);
                 }
 
                 HttpRequestMessage requestMessage =
                     new HttpRequestMessage(new HttpMethod("PATCH"), requestUri: transportRequest.RequestUrl)
                         { Content = patchData };
-                foreach (var kvp in transportRequest.Headers)
-                {
-                    if (!string.Equals(kvp.Key, "Content-Type", StringComparison.OrdinalIgnoreCase))
-                    {
-                        requestMessage.Headers.Add(kvp.Key, kvp.Value);
-                    }
-                }
+                ApplyHeaders(requestMessage.Headers, transportRequest.Headers, excludeKey: "Content-Type");
 
                 logger?.Debug(
                     $"HttpClient Service:Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl}" +
@@ -411,6 +374,34 @@ namespace PubnubApi
 
             return transportResponse;
         }
+        
+        //This is because server returns eTag in the "someetag" format instead of "\"someetag\"" which is technically wrong,
+        //meaning that HttpHeaders.Add will throw a System.FormattingException, necessitating the usage of TryAddWithoutValidation() in these cases
+        private static readonly HashSet<string> HeadersWithRelaxedValidation = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "If-Match",
+            "If-None-Match"
+        };
+        private static void ApplyHeaders(HttpHeaders target, Dictionary<string, string> source, string excludeKey = null)
+        {
+            foreach (var kvp in source)
+            {
+                if (excludeKey != null && string.Equals(kvp.Key, excludeKey, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                if (HeadersWithRelaxedValidation.Contains(kvp.Key))
+                {
+                    target.TryAddWithoutValidation(kvp.Key, kvp.Value);
+                }
+                else
+                {
+                    target.Add(kvp.Key, kvp.Value);
+                }
+            }
+        }
+
         private TransportResponse GetTransportResponseForTaskCancelation(TransportRequest transportRequest,
             TaskCanceledException taskCanceledException, CancellationTokenSource ctsWithTimeout)
         {

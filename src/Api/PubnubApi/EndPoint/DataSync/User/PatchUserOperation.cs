@@ -216,8 +216,10 @@ namespace PubnubApi.EndPoint
 
             var patchBody = jsonLibrary.SerializeToJsonString(patchArray);
 
-            var pathSegments = new List<string>
+             var pathSegments = new List<string>
             {
+                "v1",
+                "datasync",
                 "subkeys",
                 config.SubscribeKey,
                 "users",
@@ -236,7 +238,7 @@ namespace PubnubApi.EndPoint
 
             if (!string.IsNullOrEmpty(parameters.IfMatch))
             {
-                requestParameter.Headers.Add("If-Match", $"\"{parameters.IfMatch}\"");
+                requestParameter.Headers.Add("If-Match", parameters.IfMatch);
             }
 
             return requestParameter;
