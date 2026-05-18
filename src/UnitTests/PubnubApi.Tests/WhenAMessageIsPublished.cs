@@ -2453,26 +2453,17 @@ namespace PubNubMessaging.Tests
         [Test]
         public static void ThenPublishWithCustomMessageTypeAndSubscribeShouldReceiveCorrectMessageType()
         {
-            string channel = "hello_my_channel";
-            string message = "some_message_lalala";
+            var randomiser = new Random();
+            string channel = $"hello_my_channel_{randomiser.Next(1000, 10000)}";
+            string message = $"some_message_{randomiser.Next(1000, 10000)}";
             string customType = "customtype";
 
             PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
-                PublishKey = PubnubCommon.PublishKey,
-                SubscribeKey = PubnubCommon.SubscribeKey,
-                SecretKey = PubnubCommon.SecretKey,
-                Secure = false,
+                PublishKey = PubnubCommon.NonPAMPublishKey,
+                SubscribeKey = PubnubCommon.NONPAMSubscribeKey,
             };
-            if (PubnubCommon.PAMServerSideRun)
-            {
-                config.SecretKey = PubnubCommon.SecretKey;
-            }
-            else if (!string.IsNullOrEmpty(authToken) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authToken;
-            }
-            pubnub = createPubNubInstance(config, authToken);
+            pubnub = createPubNubInstance(config);
 
             manualResetEventWaitTimeout = 310 * 1000;
 
