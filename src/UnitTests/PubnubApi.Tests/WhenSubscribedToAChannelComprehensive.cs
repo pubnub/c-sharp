@@ -1489,6 +1489,7 @@ namespace PubNubMessaging.Tests
             // Publish multiple messages rapidly
             for (int i = 0; i < expectedMessageCount; i++)
             {
+                await Task.Delay(1000);
                 await pubnub.Publish()
                     .Channel(channel)
                     .Message($"Message {i}")

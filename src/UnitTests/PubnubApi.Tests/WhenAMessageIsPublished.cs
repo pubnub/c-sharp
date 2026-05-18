@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Linq;
 using NUnit.Framework;
 using System.Threading;
 using PubnubApi;
@@ -13,6 +14,10 @@ using PubnubApi.Tests;
 #endif
 using PubnubApi.Security.Crypto;
 using PubnubApi.Security.Crypto.Cryptors;
+using WireMock.Server;
+using WireMock.Matchers;
+using WireMockRequest = WireMock.RequestBuilders.Request;
+using WireMockResponse = WireMock.ResponseBuilders.Response;
 
 namespace PubNubMessaging.Tests
 {
@@ -2448,26 +2453,17 @@ namespace PubNubMessaging.Tests
         [Test]
         public static void ThenPublishWithCustomMessageTypeAndSubscribeShouldReceiveCorrectMessageType()
         {
-            string channel = "hello_my_channel";
-            string message = "some_message_lalala";
+            var randomiser = new Random();
+            string channel = $"hello_my_channel_{randomiser.Next(1000, 10000)}";
+            string message = $"some_message_{randomiser.Next(1000, 10000)}";
             string customType = "customtype";
 
             PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
             {
-                PublishKey = PubnubCommon.PublishKey,
-                SubscribeKey = PubnubCommon.SubscribeKey,
-                SecretKey = PubnubCommon.SecretKey,
-                Secure = false,
+                PublishKey = PubnubCommon.NonPAMPublishKey,
+                SubscribeKey = PubnubCommon.NONPAMSubscribeKey,
             };
-            if (PubnubCommon.PAMServerSideRun)
-            {
-                config.SecretKey = PubnubCommon.SecretKey;
-            }
-            else if (!string.IsNullOrEmpty(authToken) && !PubnubCommon.SuppressAuthKey)
-            {
-                config.AuthKey = authToken;
-            }
-            pubnub = createPubNubInstance(config, authToken);
+            pubnub = createPubNubInstance(config);
 
             manualResetEventWaitTimeout = 310 * 1000;
 
@@ -2641,5 +2637,595 @@ namespace PubNubMessaging.Tests
             publisher.PubnubUnitTest = null;
             publisher = null;
         }
+    }
+
+    /// <summary>
+    /// Tests for the v2/publish endpoint selection logic based on message payload size.
+    /// Verifies that the SDK correctly chooses between the regular publish endpoint and
+    /// the v2/publish endpoint depending on serialized message size and the UsePOST flag.
+    ///
+    /// Boundary rules under test:
+    /// <list type="bullet">
+    ///   <item>Regular publish (GET): message in URL path, total URL must stay under 32 KB.</item>
+    ///   <item>Regular publish (POST): body must be less than 32*1024 − 2 = 32 766 bytes.</item>
+    ///   <item>v2/publish (POST): used when regular limits are exceeded; server rejects bodies ≥ 2*1024*1024 − 2 bytes with 413.</item>
+    ///   <item>Client-side validation: prepared message content (including encryption overhead)
+    ///         exceeding 2*1024*1024 − 2 bytes throws <see cref="ArgumentException"/> before
+    ///         any HTTP request is made.</item>
+    /// </list>
+    /// </summary>
+    [TestFixture]
+    public class WhenLargeMessageIsPublished
+    {
+        private WireMockServer _server;
+        private Pubnub _pubnub;
+
+        private const string Channel = "test_channel";
+        private const string PubKey = "demo";
+        private const string SubKey = "demo";
+        private const string PublishSuccessResponse = "[1,\"Sent\",\"14715278266153304\"]";
+        private const string Publish413Response =
+            "{\"status\":413,\"service\":\"Balancer\",\"error\":true,\"message\":\"Request Entity Too Large\"}";
+
+        /// <summary>
+        /// POST body boundary for the regular publish endpoint.
+        /// Matches <c>PublishOperation.MaxPublishRequestSizeBytes − PostBodyFramingOverheadBytes</c>.
+        /// At or above this size the SDK must switch to v2/publish.
+        /// </summary>
+        private const int PostBodyBoundaryBytes = 32 * 1024 - 2; // 32 766
+
+        /// <summary>
+        /// Maximum permitted size for the prepared message content (2 MiB − 2 bytes).
+        /// The SDK throws <see cref="ArgumentException"/> client-side for payloads
+        /// strictly exceeding this value. Payloads exactly at this size are sent to
+        /// the server, which returns HTTP 413.
+        /// </summary>
+        private const int TwoMbBoundaryBytes = 2 * 1024 * 1024 - 2; // 2 097 150
+
+        [SetUp]
+        public void Setup()
+        {
+            _server = WireMockServer.Start();
+            SetupDefaultPublishSuccessMock();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            _pubnub?.Destroy();
+            _server?.Stop();
+            _server?.Dispose();
+        }
+
+        /// <summary>
+        /// Registers a catch-all mock that responds with a standard publish success
+        /// regardless of path or HTTP method. Individual tests override as needed.
+        /// </summary>
+        private void SetupDefaultPublishSuccessMock()
+        {
+            _server
+                .Given(WireMockRequest.Create().UsingAnyMethod())
+                .RespondWith(WireMockResponse.Create()
+                    .WithStatusCode(200)
+                    .WithBody(PublishSuccessResponse));
+        }
+
+        private Pubnub CreatePubnub()
+        {
+            var config = new PNConfiguration(new UserId("test-uuid"))
+            {
+                PublishKey = PubKey,
+                SubscribeKey = SubKey,
+                Origin = $"localhost:{_server.Port}",
+                Secure = false
+            };
+            _pubnub = new Pubnub(config);
+            return _pubnub;
+        }
+
+        /// <summary>
+        /// Creates a Pubnub instance with CryptoModule configured using LegacyCryptor.
+        /// Encryption adds overhead (AES-CBC IV, PKCS7 padding, Base64 encoding, JSON wrapping),
+        /// so the final serialized payload will be larger than the original plaintext.
+        /// </summary>
+        private Pubnub CreatePubnubWithCrypto()
+        {
+            var config = new PNConfiguration(new UserId("test-uuid"))
+            {
+                PublishKey = PubKey,
+                SubscribeKey = SubKey,
+                Origin = $"localhost:{_server.Port}",
+                Secure = false,
+                CryptoModule = new CryptoModule(new LegacyCryptor("enigma"), null)
+            };
+            _pubnub = new Pubnub(config);
+            return _pubnub;
+        }
+
+        /// <summary>
+        /// Creates a plain ASCII string that, when JSON-serialized by Newtonsoft.Json,
+        /// produces exactly <paramref name="targetSerializedBytes"/> bytes.
+        /// JSON serialization of a simple string adds 2 bytes for the surrounding double-quotes.
+        /// </summary>
+        private static string CreateMessageOfSerializedSize(int targetSerializedBytes)
+        {
+            // 'a' is a single UTF-8 byte that requires no JSON escaping.
+            // Serialized form: "aaa...a" → (targetSerializedBytes − 2) chars + 2 quote bytes.
+            return new string('a', targetSerializedBytes - 2);
+        }
+
+        /// <summary>
+        /// Expected URL path prefix for the regular publish endpoint.
+        /// Format: <c>/publish/{pubKey}/{subKey}/0/{channel}/0</c>.
+        /// For GET, the encoded message is appended after this prefix.
+        /// </summary>
+        private static readonly string RegularPublishPathBase =
+            $"/publish/{PubKey}/{SubKey}/0/{Channel}/0";
+
+        /// <summary>
+        /// Expected URL path for the v2/publish endpoint (no message in path).
+        /// Format: <c>/v2/publish/{pubKey}/{subKey}/0/{channel}/0</c>.
+        /// </summary>
+        private static readonly string V2PublishPath =
+            $"/v2/publish/{PubKey}/{SubKey}/0/{Channel}/0";
+
+        /// <summary>
+        /// Asserts that the last HTTP request used the regular publish endpoint
+        /// with the expected method, correct path structure, and no v2 prefix.
+        /// </summary>
+        private void AssertRegularPublishEndpoint(string expectedMethod)
+        {
+            var entry = _server.LogEntries.Last();
+            Assert.That(entry.RequestMessage.Method, Is.EqualTo(expectedMethod),
+                $"Expected HTTP method {expectedMethod}.");
+            Assert.That(entry.RequestMessage.Path, Does.StartWith(RegularPublishPathBase),
+                $"Path should follow the regular publish structure: {RegularPublishPathBase}");
+            Assert.That(entry.RequestMessage.Path, Does.Not.StartWith("/v2/"),
+                "Should NOT use the /v2/publish/ endpoint.");
+        }
+
+        /// <summary>
+        /// Asserts that the last HTTP request used the v2/publish endpoint
+        /// with POST method and the correct path structure.
+        /// </summary>
+        private void AssertV2PublishEndpoint()
+        {
+            var entry = _server.LogEntries.Last();
+            Assert.That(entry.RequestMessage.Method, Is.EqualTo("POST"),
+                "v2/publish always uses POST.");
+            Assert.That(entry.RequestMessage.Path, Is.EqualTo(V2PublishPath),
+                $"Path should exactly match the v2/publish structure: {V2PublishPath}");
+        }
+
+        #region Small payload — regular publish endpoint respects UsePOST flag
+
+        [Test]
+        public async Task ThenSmallPayload_GetMode_UsesRegularPublishGetEndpoint()
+        {
+            // Arrange
+            var pubnub = CreatePubnub();
+
+            // Act
+            var result = await pubnub.Publish()
+                .Channel(Channel)
+                .Message("Hello")
+                .ExecuteAsync();
+
+            // Assert — publish succeeded
+            Assert.That(result.Result, Is.Not.Null, "Publish result should not be null.");
+            Assert.That(result.Status.Error, Is.False, "Publish should succeed.");
+            Assert.That(result.Result.Timetoken, Is.GreaterThan(0), "Timetoken should be set.");
+            AssertRegularPublishEndpoint("GET");
+
+            // Assert — for GET, message is in the URL path, not in the body
+            var entry = _server.LogEntries.Last();
+            Assert.That(entry.RequestMessage.Path, Does.Contain("Hello"),
+                "GET publish should include the message in the URL path.");
+            Assert.That(entry.RequestMessage.Body, Is.Null.Or.Empty,
+                "GET publish should not have a request body.");
+        }
+
+        [Test]
+        public async Task ThenSmallPayload_PostMode_UsesRegularPublishPostEndpoint()
+        {
+            // Arrange
+            var pubnub = CreatePubnub();
+
+            // Act
+            var result = await pubnub.Publish()
+                .Channel(Channel)
+                .Message("Hello")
+                .UsePOST(true)
+                .ExecuteAsync();
+
+            // Assert — publish succeeded
+            Assert.That(result.Result, Is.Not.Null, "Publish result should not be null.");
+            Assert.That(result.Status.Error, Is.False, "Publish should succeed.");
+            Assert.That(result.Result.Timetoken, Is.GreaterThan(0), "Timetoken should be set.");
+            AssertRegularPublishEndpoint("POST");
+
+            // Assert — for POST, message is in the body and the path ends at /0
+            var entry = _server.LogEntries.Last();
+            Assert.That(entry.RequestMessage.Body, Does.Contain("Hello"),
+                "POST publish should include the message in the request body.");
+            Assert.That(entry.RequestMessage.Path, Is.EqualTo(RegularPublishPathBase),
+                "Regular POST path should not contain the message.");
+        }
+
+        #endregion
+
+        #region 32 KB POST-body boundary — v2/publish activation
+
+        [Test]
+        public async Task ThenPostBody_MoreThanBoundary_32766Bytes_UsesV2PublishEndpoint()
+        {
+            // Arrange — serialized message is more than at the 32 766-byte boundary
+            var pubnub = CreatePubnub();
+            var message = CreateMessageOfSerializedSize(PostBodyBoundaryBytes +1);
+
+            // Act
+            var result = await pubnub.Publish()
+                .Channel(Channel)
+                .Message(message)
+                .UsePOST(true)
+                .ExecuteAsync();
+
+            // Assert
+            Assert.That(result.Result, Is.Not.Null, "Publish result should not be null.");
+            Assert.That(result.Status.Error, Is.False, "Publish should succeed.");
+            AssertV2PublishEndpoint();
+        }
+        
+        [Test]
+        public async Task ThenPostBody_ExactlyAtBoundary_32766Bytes_UsesV2PublishEndpoint()
+        {
+            // Arrange — serialized message is exactly at the 32 766-byte boundary
+            var pubnub = CreatePubnub();
+            var message = CreateMessageOfSerializedSize(PostBodyBoundaryBytes);
+
+            // Act
+            var result = await pubnub.Publish()
+                .Channel(Channel)
+                .Message(message)
+                .UsePOST(true)
+                .ExecuteAsync();
+
+            // Assert
+            Assert.That(result.Result, Is.Not.Null, "Publish result should not be null.");
+            Assert.That(result.Status.Error, Is.False, "Publish should succeed.");
+            AssertRegularPublishEndpoint("POST");
+        }
+
+        [Test]
+        public async Task ThenPostBody_OneBelowBoundary_32765Bytes_UsesRegularPublishEndpoint()
+        {
+            // Arrange — serialized message is one byte below the boundary
+            var pubnub = CreatePubnub();
+            var message = CreateMessageOfSerializedSize(PostBodyBoundaryBytes - 1);
+
+            // Act
+            var result = await pubnub.Publish()
+                .Channel(Channel)
+                .Message(message)
+                .UsePOST(true)
+                .ExecuteAsync();
+
+            // Assert
+            Assert.That(result.Result, Is.Not.Null, "Publish result should not be null.");
+            Assert.That(result.Status.Error, Is.False, "Publish should succeed.");
+            AssertRegularPublishEndpoint("POST");
+        }
+
+        #endregion
+
+        #region Large payload — v2/publish forced regardless of UsePOST flag
+
+        [Test]
+        public async Task ThenLargePayload_GetMode_FallsBackToV2PublishPostEndpoint()
+        {
+            // Arrange — 40 KB message, well above the 32 KB URL limit; UsePOST not set
+            var pubnub = CreatePubnub();
+            var message = CreateMessageOfSerializedSize(40_000);
+
+            // Act
+            var result = await pubnub.Publish()
+                .Channel(Channel)
+                .Message(message)
+                .ExecuteAsync();
+
+            // Assert — SDK should auto-switch to v2/publish with POST
+            Assert.That(result.Result, Is.Not.Null, "Publish result should not be null.");
+            Assert.That(result.Status.Error, Is.False, "Publish should succeed.");
+            AssertV2PublishEndpoint();
+        }
+
+        [Test]
+        public async Task ThenLargePayload_PostMode_AboveBoundary_UsesV2PublishEndpoint()
+        {
+            // Arrange — 100 bytes above the POST-body boundary, with UsePOST(true)
+            var pubnub = CreatePubnub();
+            var message = CreateMessageOfSerializedSize(PostBodyBoundaryBytes + 100);
+
+            // Act
+            var result = await pubnub.Publish()
+                .Channel(Channel)
+                .Message(message)
+                .UsePOST(true)
+                .ExecuteAsync();
+
+            // Assert
+            Assert.That(result.Result, Is.Not.Null, "Publish result should not be null.");
+            Assert.That(result.Status.Error, Is.False, "Publish should succeed.");
+            AssertV2PublishEndpoint();
+        }
+
+        [Test]
+        public async Task ThenLargePayload_ExplicitGetMode_StillForcedToV2PublishPost()
+        {
+            // Arrange — explicitly set UsePOST(false) with a large message.
+            // The SDK must override this and use v2/publish with POST.
+            var pubnub = CreatePubnub();
+            var message = CreateMessageOfSerializedSize(40_000);
+
+            // Act
+            var result = await pubnub.Publish()
+                .Channel(Channel)
+                .Message(message)
+                .UsePOST(false)
+                .ExecuteAsync();
+
+            // Assert — UsePOST(false) should be overridden for large payloads
+            Assert.That(result.Result, Is.Not.Null, "Publish result should not be null.");
+            Assert.That(result.Status.Error, Is.False, "Publish should succeed.");
+            AssertV2PublishEndpoint();
+
+            // Assert — message is in the body, not in the URL path
+            var entry = _server.LogEntries.Last();
+            Assert.That(entry.RequestMessage.Body, Is.Not.Null.And.Not.Empty,
+                "v2/publish should carry the message in the request body.");
+        }
+
+        #endregion
+
+        #region Non-string payload — JSON object endpoint selection
+
+        [Test]
+        public async Task ThenLargeJsonObjectPayload_GetMode_UsesV2PublishEndpoint()
+        {
+            // Arrange — a large dictionary that serializes to > 32 KB of JSON
+            var pubnub = CreatePubnub();
+            var largeObject = new Dictionary<string, string>();
+            for (int i = 0; i < 500; i++)
+            {
+                largeObject[$"key_{i:D4}"] = new string('x', 100);
+            }
+
+            // Act — no UsePOST, so GET mode is attempted first
+            var result = await pubnub.Publish()
+                .Channel(Channel)
+                .Message(largeObject)
+                .ExecuteAsync();
+
+            // Assert — large JSON object should trigger v2/publish with POST
+            Assert.That(result.Result, Is.Not.Null, "Publish result should not be null.");
+            Assert.That(result.Status.Error, Is.False, "Publish should succeed.");
+            AssertV2PublishEndpoint();
+        }
+
+        #endregion
+
+        #region 2 MB boundary — client-side ArgumentException and server-side HTTP 413
+
+        [Test]
+        public async Task ThenPayload_AtTwoMBBoundary_UsesV2PublishAndServerReturns413()
+        {
+            // Arrange — message is exactly at TwoMbBoundaryBytes (2,097,150 bytes).
+            // This passes the client-side validation (> check, not >=) but the server
+            // rejects it with 413.
+            _server.Reset();
+            _server
+                .Given(WireMockRequest.Create()
+                    .WithPath(new WildcardMatcher("/v2/publish/*"))
+                    .UsingPost())
+                .RespondWith(WireMockResponse.Create()
+                    .WithStatusCode(413)
+                    .WithBody(Publish413Response));
+
+            var pubnub = CreatePubnub();
+            var message = CreateMessageOfSerializedSize(TwoMbBoundaryBytes);
+
+            // Act
+            var result = await pubnub.Publish()
+                .Channel(Channel)
+                .Message(message)
+                .UsePOST(true)
+                .ExecuteAsync();
+
+            // Assert — verify the request went to v2/publish
+            Assert.That(_server.LogEntries.Count(), Is.GreaterThanOrEqualTo(1),
+                "At least one request should have been made.");
+            var entry = _server.LogEntries.Last();
+            Assert.That(entry.RequestMessage.Method, Is.EqualTo("POST"));
+            Assert.That(entry.RequestMessage.Path, Does.StartWith("/v2/publish/"),
+                "Payload at the 2 MB boundary should use v2/publish.");
+
+            // Assert — verify the 413 error was surfaced through the SDK
+            Assert.That(result.Result, Is.Null,
+                "Publish should not return a result when the server rejects with 413.");
+            Assert.That(result.Status, Is.Not.Null, "Status should always be set.");
+            Assert.That(result.Status.Error, Is.True,
+                "Server 413 rejection should be reported as an error.");
+        }
+
+        [Test]
+        public async Task ThenPayload_JustBelow2MBBoundary_UsesV2PublishAndSucceeds()
+        {
+            // Arrange — one byte below the 2 MB boundary; default success mock handles it
+            var pubnub = CreatePubnub();
+            var message = CreateMessageOfSerializedSize(TwoMbBoundaryBytes - 1);
+
+            // Act
+            var result = await pubnub.Publish()
+                .Channel(Channel)
+                .Message(message)
+                .UsePOST(true)
+                .ExecuteAsync();
+
+            // Assert
+            Assert.That(result.Result, Is.Not.Null, "Publish result should not be null.");
+            Assert.That(result.Status.Error, Is.False,
+                "Payload one byte below the 2 MB boundary should succeed.");
+            AssertV2PublishEndpoint();
+        }
+
+        [Test]
+        public void ThenPayload_AboveTwoMBBoundary_ThrowsArgumentException()
+        {
+            // Arrange — message is one byte above the max permitted content size.
+            // The SDK must throw ArgumentException before making any HTTP request.
+            var pubnub = CreatePubnub();
+            var message = CreateMessageOfSerializedSize(TwoMbBoundaryBytes + 4);
+
+            // Act & Assert
+            var ex = Assert.ThrowsAsync<ArgumentException>(async () =>
+            {
+                await pubnub.Publish()
+                    .Channel(Channel)
+                    .Message(message)
+                    .UsePOST(true)
+                    .ExecuteAsync();
+            });
+
+            Assert.That(ex!.Message, Does.Contain("Message content size exceeds"),
+                "Exception message should describe the size violation.");
+            Assert.That(_server.LogEntries.Count(), Is.EqualTo(0),
+                "No HTTP request should be made when the message exceeds the size limit.");
+        }
+
+        #endregion
+
+        #region 2 MB server-side boundary with CryptoModule — encrypted payload near limit
+
+        [Test]
+        public async Task ThenEncryptedPayload_JustBelowTwoMBBoundary_WithCryptoModule_UsesV2PublishAndSucceeds()
+        {
+            // Arrange
+            //
+            // When CryptoModule is configured, the SDK encrypts the message before publishing.
+            // The encryption pipeline in PrepareContent is:
+            //   1. JSON-serialize the plaintext         → adds 2 bytes (surrounding quotes)
+            //   2. AES-256-CBC encrypt with PKCS7 pad   → rounds up to next 16-byte block
+            //   3. Prepend 16-byte random IV             → +16 bytes
+            //   4. Base64-encode the encrypted bytes     → ~33 % expansion (4/3 ratio)
+            //   5. JSON-serialize the Base64 string      → adds 2 bytes (surrounding quotes)
+            //
+            // For a plaintext of 1,572,829 ASCII characters the sizes are:
+            //   Step 1 → 1,572,831 bytes   (1,572,829 + 2)
+            //   Step 2 → 1,572,832 bytes   (1,572,831 + 1 byte PKCS7 padding)
+            //   Step 3 → 1,572,848 bytes   (1,572,832 + 16)
+            //   Step 4 → 2,097,132 bytes   (ceil(1,572,848 / 3) × 4 = 524,283 × 4)
+            //   Step 5 → 2,097,134 bytes   (2,097,132 + 2)
+            //
+            // 2,097,134 < 2,097,150 (TwoMbBoundaryBytes), so this payload fits just under
+            // the 2 MB − 2 server-side limit.  Due to AES block alignment and Base64 step
+            // quantization, this is the largest achievable encrypted payload below the limit.
+            const int plaintextLength = 1_572_829;
+
+            var pubnub = CreatePubnubWithCrypto();
+            var message = new string('a', plaintextLength);
+
+            // Act
+            var result = await pubnub.Publish()
+                .Channel(Channel)
+                .Message(message)
+                .UsePOST(true)
+                .ExecuteAsync();
+
+            // Assert — publish succeeded via v2/publish
+            Assert.That(result.Result, Is.Not.Null, "Publish result should not be null.");
+            Assert.That(result.Status.Error, Is.False,
+                "Encrypted payload just below the 2 MB − 2 boundary should publish successfully.");
+            AssertV2PublishEndpoint();
+
+            // Assert — verify the message body is encrypted (no plaintext leakage)
+            var entry = _server.LogEntries.Last();
+            var bodyString = entry.RequestMessage.Body;
+            Assert.That(bodyString, Is.Not.Null.And.Not.Empty,
+                "v2/publish POST body should contain the encrypted message.");
+            Assert.That(bodyString, Does.Not.Contain(new string('a', 100)),
+                "POST body should contain encrypted data, not the original plaintext.");
+
+            // Assert — verify the encrypted payload is under the 2 MB − 2 server limit
+            Assert.That(System.Text.Encoding.UTF8.GetByteCount(bodyString!),
+                Is.LessThan(TwoMbBoundaryBytes),
+                "Encrypted payload byte size should be below the 2 MB − 2 server-side limit.");
+        }
+
+        [Test]
+        public void ThenEncryptedPayload_AboveTwoMBBoundary_WithCryptoModule_ThrowsArgumentException()
+        {
+            // Arrange
+            //
+            // A plaintext of 1,572,830 ASCII chars encrypts to 2,097,154 bytes — 4 bytes
+            // above MaxMessageContentSizeBytes (2,097,150).  The client-side validation
+            // must reject this before any HTTP request is made.
+            //
+            // Encryption size breakdown for 1,572,830 chars:
+            //   JSON serialize       → 1,572,832 bytes  (plaintext + 2 quote bytes)
+            //   AES-CBC + PKCS7 pad  → 1,572,848 bytes  (1,572,832 is a 16-byte multiple,
+            //                                             so PKCS7 appends a full 16-byte block)
+            //   Prepend 16-byte IV   → 1,572,864 bytes
+            //   Base64 encode        → 2,097,152 bytes  (1,572,864 / 3 × 4 = 524,288 × 4)
+            //   JSON wrap (quotes)   → 2,097,154 bytes  (> 2,097,150 = TwoMbBoundaryBytes)
+            const int plaintextLength = 1_572_830;
+
+            var pubnub = CreatePubnubWithCrypto();
+            var message = new string('a', plaintextLength);
+
+            // Act & Assert
+            var ex = Assert.ThrowsAsync<ArgumentException>(async () =>
+            {
+                await pubnub.Publish()
+                    .Channel(Channel)
+                    .Message(message)
+                    .UsePOST(true)
+                    .ExecuteAsync();
+            });
+
+            Assert.That(ex!.Message, Does.Contain("Message content size exceeds"),
+                "Exception message should describe the size violation.");
+            Assert.That(_server.LogEntries.Count(), Is.EqualTo(0),
+                "No HTTP request should be made when the encrypted message exceeds the size limit.");
+        }
+
+        #endregion
+
+        #region Publish 2 MB size message using prod server 
+
+        [Test]
+        public async Task Then_2MB_Size_Message_Published_to_Prod_server()
+        {
+            // Arrange — message is one byte above the max permitted content size.
+            // The SDK must throw ArgumentException before making any HTTP request.
+            var pubnub = new Pubnub(new PNConfiguration(new UserId("test-user"))
+            {
+                PublishKey = PubnubCommon.NonPAMPublishKey,
+                SubscribeKey = PubnubCommon.NONPAMSubscribeKey
+            });
+            var message = CreateMessageOfSerializedSize(TwoMbBoundaryBytes - 4);
+            var publishResponseFor2MbMessage = await pubnub.Publish()
+                    .Channel(Channel)
+                    .Message(message)
+                    .ExecuteAsync();
+
+            Assert.That(publishResponseFor2MbMessage.Status.Error, Is.False ,
+                "2MB size message publish response should not have error");
+            Assert.That(publishResponseFor2MbMessage.Result, Is.Not.Null,
+                "2MB size message publish result should not be null.");
+            Assert.That(publishResponseFor2MbMessage.Result.Timetoken, Is.Not.Null, 
+                "2MB size message publish response should contain valid time token");
+        }
+
+        #endregion
     }
 }

@@ -1217,5 +1217,97 @@ namespace PubNubMessaging.Tests
             pubnub.Destroy();
             channelMetadataSetter.Destroy();
         }
+
+        [Test]
+        public static async Task ThenSetChannelMetadataShouldReturnETagAndAcceptItForIfMatch()
+        {
+            if (PubnubCommon.EnableStubTest)
+            {
+                Assert.Ignore("Ignored ThenSetChannelMetadataShouldReturnETagAndAcceptItForIfMatch");
+                return;
+            }
+
+            var r = new Random();
+            string channelMetadataId = $"channel{r.Next(100, 1000)}";
+            string name = $"name{r.Next(100, 1000)}";
+            string updatedName = $"name{r.Next(1000, 2000)}";
+
+            PNConfiguration configuration = new PNConfiguration(new UserId($"user{r.Next(100, 1000)}"))
+            {
+                PublishKey = PubnubCommon.NonPAMPublishKey,
+                SubscribeKey = PubnubCommon.NONPAMSubscribeKey,
+            };
+            pubnub = createPubNubInstance(configuration);
+
+            await pubnub.RemoveChannelMetadata().Channel(channelMetadataId).ExecuteAsync();
+
+            var createResult = await pubnub.SetChannelMetadata()
+                .Channel(channelMetadataId)
+                .Name(name)
+                .ExecuteAsync();
+
+            Assert.That(createResult.Result, Is.Not.Null, "Create result should not be null");
+            Assert.That(createResult.Status.StatusCode, Is.EqualTo(200), "Create should succeed with 200");
+            Assert.That(createResult.Result.ETag, Is.Not.Null.And.Not.Empty, "ETag should be present in response");
+
+            string capturedETag = createResult.Result.ETag;
+
+            var updateResult = await pubnub.SetChannelMetadata()
+                .Channel(channelMetadataId)
+                .Name(updatedName)
+                .IfMatchesEtag(capturedETag)
+                .ExecuteAsync();
+
+            Assert.That(updateResult.Result, Is.Not.Null, "Update result should not be null");
+            Assert.That(updateResult.Status.StatusCode, Is.EqualTo(200), "Update with matching eTag should succeed");
+            Assert.That(updateResult.Result.Name, Is.EqualTo(updatedName), "Name should be updated");
+            Assert.That(updateResult.Result.ETag, Is.Not.Null.And.Not.Empty, "Update response should also include ETag");
+
+            await pubnub.RemoveChannelMetadata().Channel(channelMetadataId).ExecuteAsync();
+            pubnub.Destroy();
+            pubnub = null;
+        }
+
+        [Test]
+        public static async Task ThenSetChannelMetadataWithInvalidETagShouldReturn412()
+        {
+            if (PubnubCommon.EnableStubTest)
+            {
+                Assert.Ignore("Ignored ThenSetChannelMetadataWithInvalidETagShouldReturn412");
+                return;
+            }
+
+            var r = new Random();
+            string channelMetadataId = $"channel{r.Next(100, 1000)}";
+            string name = $"name{r.Next(100, 1000)}";
+
+            PNConfiguration configuration = new PNConfiguration(new UserId($"user{r.Next(100, 1000)}"))
+            {
+                PublishKey = PubnubCommon.NonPAMPublishKey,
+                SubscribeKey = PubnubCommon.NONPAMSubscribeKey,
+            };
+            pubnub = createPubNubInstance(configuration);
+
+            await pubnub.RemoveChannelMetadata().Channel(channelMetadataId).ExecuteAsync();
+
+            var createResult = await pubnub.SetChannelMetadata()
+                .Channel(channelMetadataId)
+                .Name(name)
+                .ExecuteAsync();
+            Assert.That(createResult.Status.StatusCode, Is.EqualTo(200), "Create should succeed");
+
+            var updateResult = await pubnub.SetChannelMetadata()
+                .Channel(channelMetadataId)
+                .Name(name + "-updated")
+                .IfMatchesEtag("invalid-etag-value")
+                .ExecuteAsync();
+
+            Assert.That(updateResult.Status.Error, Is.True, "Status should indicate error for mismatched eTag");
+            Assert.That(updateResult.Status.StatusCode, Is.EqualTo(412), "Status code should be 412 Precondition Failed");
+
+            await pubnub.RemoveChannelMetadata().Channel(channelMetadataId).ExecuteAsync();
+            pubnub.Destroy();
+            pubnub = null;
+        }
     }
 }
