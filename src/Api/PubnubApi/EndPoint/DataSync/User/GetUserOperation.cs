@@ -5,20 +5,20 @@ using System.Threading.Tasks;
 
 namespace PubnubApi.EndPoint
 {
-    public class DeleteEntityOperation : PubnubCoreBase
+    public class GetUserOperation : PubnubCoreBase
     {
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
         private readonly IPubnubUnitTest unit;
-        private readonly DeleteEntityParameters parameters;
+        private readonly GetUserParameters parameters;
 
-        private PNCallback<PNDataSyncDeleteEntityResult> savedCallback;
+        private PNCallback<PNDataSyncUserResult> savedCallback;
 
-        private const PNOperationType OperationType = PNOperationType.PNDataSyncDeleteEntity;
+        private const PNOperationType OperationType = PNOperationType.PNDataSyncGetUser;
 
-        public DeleteEntityOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary,
+        public GetUserOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary,
             IPubnubUnitTest pubnubUnit, TokenManager tokenManager, Pubnub instance,
-            DeleteEntityParameters parameters) : base(pubnubConfig,
+            GetUserParameters parameters) : base(pubnubConfig,
             jsonPluggableLibrary, pubnubUnit, tokenManager, instance)
         {
             config = pubnubConfig;
@@ -27,7 +27,7 @@ namespace PubnubApi.EndPoint
             this.parameters = parameters ?? throw new ArgumentNullException(nameof(parameters));
         }
 
-        public void Execute(PNCallback<PNDataSyncDeleteEntityResult> callback)
+        public void Execute(PNCallback<PNDataSyncUserResult> callback)
         {
             if (callback == null)
             {
@@ -54,10 +54,10 @@ namespace PubnubApi.EndPoint
             });
         }
 
-        public async Task<PNResult<PNDataSyncDeleteEntityResult>> ExecuteAsync()
+        public async Task<PNResult<PNDataSyncUserResult>> ExecuteAsync()
         {
             logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
-            return await DeleteEntityAsync().ConfigureAwait(false);
+            return await GetUserAsync().ConfigureAwait(false);
         }
 
         internal void Retry()
@@ -68,17 +68,17 @@ namespace PubnubApi.EndPoint
             }
         }
 
-        private async Task<PNResult<PNDataSyncDeleteEntityResult>> DeleteEntityAsync()
+        private async Task<PNResult<PNDataSyncUserResult>> GetUserAsync()
         {
-            var returnValue = new PNResult<PNDataSyncDeleteEntityResult>();
-            
+            var returnValue = new PNResult<PNDataSyncUserResult>();
+
             if (string.IsNullOrEmpty(parameters.Id) || string.IsNullOrEmpty(parameters.Id.Trim()))
             {
                 var errStatus = new PNStatus
                 {
                     Error = true,
-                    ErrorData = new PNErrorData("Missing Entity Id",
-                        new ArgumentException("Missing Entity Id"))
+                    ErrorData = new PNErrorData("Missing User Id",
+                        new ArgumentException("Missing User Id"))
                 };
                 returnValue.Status = errStatus;
                 return returnValue;
@@ -98,7 +98,7 @@ namespace PubnubApi.EndPoint
             }
 
             logger?.Trace($"{GetType().Name} parameter validated.");
-            var requestState = new RequestState<object>
+            var requestState = new RequestState<PNDataSyncUserResult>
             {
                 ResponseType = OperationType,
                 Reconnect = false,
@@ -116,9 +116,8 @@ namespace PubnubApi.EndPoint
                 var responseString = Encoding.UTF8.GetString(transportResponse.Content);
                 var errorStatus = GetStatusIfError(requestState, responseString);
                 Tuple<string, PNStatus> JsonAndStatusTuple;
-                if (transportResponse.StatusCode == Constants.HttpRequestSuccessStatusCode)
+                if (errorStatus == null && transportResponse.StatusCode == Constants.HttpRequestSuccessStatusCode)
                 {
-                    logger?.Trace($"{GetType().Name} request finished with status code {transportResponse.StatusCode}");
                     requestState.GotJsonResponse = true;
                     var status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(
                         requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState,
@@ -129,9 +128,20 @@ namespace PubnubApi.EndPoint
                 {
                     JsonAndStatusTuple = new Tuple<string, PNStatus>(string.Empty, errorStatus);
                 }
-                
+
                 returnValue.Status = JsonAndStatusTuple.Item2;
-                returnValue.Result = new PNDataSyncDeleteEntityResult();
+                var json = JsonAndStatusTuple.Item1;
+                if (!string.IsNullOrEmpty(json))
+                {
+                    var resultList = ProcessJsonResponse(requestState, json);
+                    var responseBuilder = new ResponseBuilder(config, jsonLibrary);
+                    var responseResult =
+                        responseBuilder.JsonToObject<PNDataSyncUserResult>(resultList, true);
+                    if (responseResult != null)
+                    {
+                        returnValue.Result = responseResult;
+                    }
+                }
             }
             else
             {
@@ -143,7 +153,7 @@ namespace PubnubApi.EndPoint
                     new PNException(transportResponse.Error.Message, transportResponse.Error));
                 returnValue.Status = status;
             }
-            
+
             logger?.Trace($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
             return returnValue;
         }
@@ -154,20 +164,15 @@ namespace PubnubApi.EndPoint
             {
                 "subkeys",
                 config.SubscribeKey,
-                "entities",
+                "users",
                 parameters.Id
             };
 
             var requestParameter = new RequestParameter
             {
-                RequestType = Constants.DELETE,
+                RequestType = Constants.GET,
                 PathSegment = pathSegments
             };
-
-            if (!string.IsNullOrEmpty(parameters.IfMatch))
-            {
-                requestParameter.Headers.Add("If-Match", $"\"{parameters.IfMatch}\"");
-            }
 
             return requestParameter;
         }

@@ -5,20 +5,20 @@ using System.Threading.Tasks;
 
 namespace PubnubApi.EndPoint
 {
-    public class DeleteEntityOperation : PubnubCoreBase
+    public class GetDataSyncMembershipsOperation : PubnubCoreBase
     {
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
         private readonly IPubnubUnitTest unit;
-        private readonly DeleteEntityParameters parameters;
+        private readonly GetMembershipsParameters parameters;
 
-        private PNCallback<PNDataSyncDeleteEntityResult> savedCallback;
+        private PNCallback<PNDataSyncMembershipsListResult> savedCallback;
 
-        private const PNOperationType OperationType = PNOperationType.PNDataSyncDeleteEntity;
+        private const PNOperationType OperationType = PNOperationType.PNDataSyncGetMemberships;
 
-        public DeleteEntityOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary,
+        public GetDataSyncMembershipsOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary,
             IPubnubUnitTest pubnubUnit, TokenManager tokenManager, Pubnub instance,
-            DeleteEntityParameters parameters) : base(pubnubConfig,
+            GetMembershipsParameters parameters) : base(pubnubConfig,
             jsonPluggableLibrary, pubnubUnit, tokenManager, instance)
         {
             config = pubnubConfig;
@@ -27,7 +27,7 @@ namespace PubnubApi.EndPoint
             this.parameters = parameters ?? throw new ArgumentNullException(nameof(parameters));
         }
 
-        public void Execute(PNCallback<PNDataSyncDeleteEntityResult> callback)
+        public void Execute(PNCallback<PNDataSyncMembershipsListResult> callback)
         {
             if (callback == null)
             {
@@ -54,10 +54,10 @@ namespace PubnubApi.EndPoint
             });
         }
 
-        public async Task<PNResult<PNDataSyncDeleteEntityResult>> ExecuteAsync()
+        public async Task<PNResult<PNDataSyncMembershipsListResult>> ExecuteAsync()
         {
             logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
-            return await DeleteEntityAsync().ConfigureAwait(false);
+            return await GetMembershipsAsync().ConfigureAwait(false);
         }
 
         internal void Retry()
@@ -68,21 +68,9 @@ namespace PubnubApi.EndPoint
             }
         }
 
-        private async Task<PNResult<PNDataSyncDeleteEntityResult>> DeleteEntityAsync()
+        private async Task<PNResult<PNDataSyncMembershipsListResult>> GetMembershipsAsync()
         {
-            var returnValue = new PNResult<PNDataSyncDeleteEntityResult>();
-            
-            if (string.IsNullOrEmpty(parameters.Id) || string.IsNullOrEmpty(parameters.Id.Trim()))
-            {
-                var errStatus = new PNStatus
-                {
-                    Error = true,
-                    ErrorData = new PNErrorData("Missing Entity Id",
-                        new ArgumentException("Missing Entity Id"))
-                };
-                returnValue.Status = errStatus;
-                return returnValue;
-            }
+            var returnValue = new PNResult<PNDataSyncMembershipsListResult>();
 
             if (string.IsNullOrEmpty(config.SubscribeKey) || string.IsNullOrEmpty(config.SubscribeKey.Trim()) ||
                 config.SubscribeKey.Length <= 0)
@@ -98,7 +86,7 @@ namespace PubnubApi.EndPoint
             }
 
             logger?.Trace($"{GetType().Name} parameter validated.");
-            var requestState = new RequestState<object>
+            var requestState = new RequestState<PNDataSyncMembershipsListResult>
             {
                 ResponseType = OperationType,
                 Reconnect = false,
@@ -116,9 +104,8 @@ namespace PubnubApi.EndPoint
                 var responseString = Encoding.UTF8.GetString(transportResponse.Content);
                 var errorStatus = GetStatusIfError(requestState, responseString);
                 Tuple<string, PNStatus> JsonAndStatusTuple;
-                if (transportResponse.StatusCode == Constants.HttpRequestSuccessStatusCode)
+                if (errorStatus == null && transportResponse.StatusCode == Constants.HttpRequestSuccessStatusCode)
                 {
-                    logger?.Trace($"{GetType().Name} request finished with status code {transportResponse.StatusCode}");
                     requestState.GotJsonResponse = true;
                     var status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(
                         requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState,
@@ -129,9 +116,20 @@ namespace PubnubApi.EndPoint
                 {
                     JsonAndStatusTuple = new Tuple<string, PNStatus>(string.Empty, errorStatus);
                 }
-                
+
                 returnValue.Status = JsonAndStatusTuple.Item2;
-                returnValue.Result = new PNDataSyncDeleteEntityResult();
+                var json = JsonAndStatusTuple.Item1;
+                if (!string.IsNullOrEmpty(json))
+                {
+                    var resultList = ProcessJsonResponse(requestState, json);
+                    var responseBuilder = new ResponseBuilder(config, jsonLibrary);
+                    var responseResult =
+                        responseBuilder.JsonToObject<PNDataSyncMembershipsListResult>(resultList, true);
+                    if (responseResult != null)
+                    {
+                        returnValue.Result = responseResult;
+                    }
+                }
             }
             else
             {
@@ -143,7 +141,7 @@ namespace PubnubApi.EndPoint
                     new PNException(transportResponse.Error.Message, transportResponse.Error));
                 returnValue.Status = status;
             }
-            
+
             logger?.Trace($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
             return returnValue;
         }
@@ -154,20 +152,71 @@ namespace PubnubApi.EndPoint
             {
                 "subkeys",
                 config.SubscribeKey,
-                "entities",
-                parameters.Id
+                "memberships"
             };
+
+            var requestQueryStringParams = new Dictionary<string, string>();
+
+            if (!string.IsNullOrEmpty(parameters.UserId))
+            {
+                requestQueryStringParams.Add("user_id",
+                    UriUtil.EncodeUriComponent(parameters.UserId,
+                        OperationType, false, false, false));
+            }
+
+            if (!string.IsNullOrEmpty(parameters.ChannelId))
+            {
+                requestQueryStringParams.Add("channel_id",
+                    UriUtil.EncodeUriComponent(parameters.ChannelId,
+                        OperationType, false, false, false));
+            }
+
+            if (parameters.RelationshipClassVersion.HasValue)
+            {
+                requestQueryStringParams.Add("relationship_class_version",
+                    parameters.RelationshipClassVersion.Value.ToString());
+            }
+
+            if (!string.IsNullOrEmpty(parameters.Cursor))
+            {
+                requestQueryStringParams.Add("cursor",
+                    UriUtil.EncodeUriComponent(parameters.Cursor,
+                        OperationType, false, false, false));
+            }
+
+            if (parameters.Limit.HasValue)
+            {
+                requestQueryStringParams.Add("limit",
+                    parameters.Limit.Value.ToString());
+            }
+
+            if (!string.IsNullOrEmpty(parameters.Filter))
+            {
+                requestQueryStringParams.Add("filter",
+                    UriUtil.EncodeUriComponent(parameters.Filter,
+                        OperationType, false, false, false));
+            }
+
+            if (!string.IsNullOrEmpty(parameters.FilterAdvanced))
+            {
+                requestQueryStringParams.Add("filter_advanced",
+                    UriUtil.EncodeUriComponent(parameters.FilterAdvanced,
+                        OperationType, false, false, false));
+            }
+
+            if (!string.IsNullOrEmpty(parameters.Sort))
+            {
+                requestQueryStringParams.Add("sort",
+                    UriUtil.EncodeUriComponent(parameters.Sort,
+                        OperationType, false, false, false));
+            }
 
             var requestParameter = new RequestParameter
             {
-                RequestType = Constants.DELETE,
-                PathSegment = pathSegments
+                RequestType = Constants.GET,
+                PathSegment = pathSegments,
+                Query = requestQueryStringParams
             };
-
-            if (!string.IsNullOrEmpty(parameters.IfMatch))
-            {
-                requestParameter.Headers.Add("If-Match", $"\"{parameters.IfMatch}\"");
-            }
 
             return requestParameter;
         }

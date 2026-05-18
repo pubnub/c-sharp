@@ -5,20 +5,20 @@ using System.Threading.Tasks;
 
 namespace PubnubApi.EndPoint
 {
-    public class DeleteEntityOperation : PubnubCoreBase
+    public class CreateUserOperation : PubnubCoreBase
     {
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
         private readonly IPubnubUnitTest unit;
-        private readonly DeleteEntityParameters parameters;
+        private readonly CreateUserParameters parameters;
 
-        private PNCallback<PNDataSyncDeleteEntityResult> savedCallback;
+        private PNCallback<PNDataSyncUserResult> savedCallback;
+        
+        private const PNOperationType OperationType = PNOperationType.PNDataSyncCreateUser;
 
-        private const PNOperationType OperationType = PNOperationType.PNDataSyncDeleteEntity;
-
-        public DeleteEntityOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary,
+        public CreateUserOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary,
             IPubnubUnitTest pubnubUnit, TokenManager tokenManager, Pubnub instance,
-            DeleteEntityParameters parameters) : base(pubnubConfig,
+            CreateUserParameters parameters) : base(pubnubConfig,
             jsonPluggableLibrary, pubnubUnit, tokenManager, instance)
         {
             config = pubnubConfig;
@@ -27,7 +27,7 @@ namespace PubnubApi.EndPoint
             this.parameters = parameters ?? throw new ArgumentNullException(nameof(parameters));
         }
 
-        public void Execute(PNCallback<PNDataSyncDeleteEntityResult> callback)
+        public void Execute(PNCallback<PNDataSyncUserResult> callback)
         {
             if (callback == null)
             {
@@ -54,10 +54,10 @@ namespace PubnubApi.EndPoint
             });
         }
 
-        public async Task<PNResult<PNDataSyncDeleteEntityResult>> ExecuteAsync()
+        public async Task<PNResult<PNDataSyncUserResult>> ExecuteAsync()
         {
             logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
-            return await DeleteEntityAsync().ConfigureAwait(false);
+            return await CreateUserAsync().ConfigureAwait(false);
         }
 
         internal void Retry()
@@ -68,17 +68,29 @@ namespace PubnubApi.EndPoint
             }
         }
 
-        private async Task<PNResult<PNDataSyncDeleteEntityResult>> DeleteEntityAsync()
+        private async Task<PNResult<PNDataSyncUserResult>> CreateUserAsync()
         {
-            var returnValue = new PNResult<PNDataSyncDeleteEntityResult>();
-            
-            if (string.IsNullOrEmpty(parameters.Id) || string.IsNullOrEmpty(parameters.Id.Trim()))
+            var returnValue = new PNResult<PNDataSyncUserResult>();
+
+            if (parameters.EntityClassVersion < 1)
             {
                 var errStatus = new PNStatus
                 {
                     Error = true,
-                    ErrorData = new PNErrorData("Missing Entity Id",
-                        new ArgumentException("Missing Entity Id"))
+                    ErrorData = new PNErrorData("EntityClassVersion must be >= 1",
+                        new ArgumentException("EntityClassVersion must be >= 1"))
+                };
+                returnValue.Status = errStatus;
+                return returnValue;
+            }
+
+            if (string.IsNullOrEmpty(parameters.IdempotencyKey) || string.IsNullOrEmpty(parameters.IdempotencyKey.Trim()))
+            {
+                var errStatus = new PNStatus
+                {
+                    Error = true,
+                    ErrorData = new PNErrorData("Missing IdempotencyKey",
+                        new ArgumentException("Missing IdempotencyKey"))
                 };
                 returnValue.Status = errStatus;
                 return returnValue;
@@ -98,15 +110,16 @@ namespace PubnubApi.EndPoint
             }
 
             logger?.Trace($"{GetType().Name} parameter validated.");
-            var requestState = new RequestState<object>
+            var requestState = new RequestState<PNDataSyncUserResult>
             {
                 ResponseType = OperationType,
                 Reconnect = false,
                 EndPointOperation = this,
-                UsePostMethod = false
+                UsePostMethod = true
             };
 
             var requestParameter = CreateRequestParameter();
+            Tuple<string, PNStatus> JsonAndStatusTuple;
             var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(
                 requestParameter, OperationType);
             var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest)
@@ -115,23 +128,32 @@ namespace PubnubApi.EndPoint
             {
                 var responseString = Encoding.UTF8.GetString(transportResponse.Content);
                 var errorStatus = GetStatusIfError(requestState, responseString);
-                Tuple<string, PNStatus> JsonAndStatusTuple;
-                if (transportResponse.StatusCode == Constants.HttpRequestSuccessStatusCode)
+                if (errorStatus == null && transportResponse.StatusCode == 201)
                 {
-                    logger?.Trace($"{GetType().Name} request finished with status code {transportResponse.StatusCode}");
                     requestState.GotJsonResponse = true;
                     var status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(
-                        requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState,
-                        Constants.HttpRequestSuccessStatusCode, null);
+                        requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState, 201,
+                        null);
                     JsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
                 }
                 else
                 {
                     JsonAndStatusTuple = new Tuple<string, PNStatus>(string.Empty, errorStatus);
                 }
-                
+
                 returnValue.Status = JsonAndStatusTuple.Item2;
-                returnValue.Result = new PNDataSyncDeleteEntityResult();
+                var json = JsonAndStatusTuple.Item1;
+                if (!string.IsNullOrEmpty(json))
+                {
+                    var resultList = ProcessJsonResponse(requestState, json);
+                    var responseBuilder = new ResponseBuilder(config, jsonLibrary);
+                    var responseResult =
+                        responseBuilder.JsonToObject<PNDataSyncUserResult>(resultList, true);
+                    if (responseResult != null)
+                    {
+                        returnValue.Result = responseResult;
+                    }
+                }
             }
             else
             {
@@ -143,31 +165,56 @@ namespace PubnubApi.EndPoint
                     new PNException(transportResponse.Error.Message, transportResponse.Error));
                 returnValue.Status = status;
             }
-            
+
             logger?.Trace($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
             return returnValue;
         }
 
         private RequestParameter CreateRequestParameter()
         {
+            var dataProperties = new Dictionary<string, object>();
+
+            if (!string.IsNullOrEmpty(parameters.Id))
+            {
+                dataProperties.Add("id", parameters.Id);
+            }
+
+            dataProperties.Add("entityClassVersion", parameters.EntityClassVersion);
+
+            if (!string.IsNullOrEmpty(parameters.Status))
+            {
+                dataProperties.Add("status", parameters.Status);
+            }
+
+            if (parameters.Payload != null)
+            {
+                dataProperties.Add("payload", parameters.Payload);
+            }
+
+            var requestEnvelope = new Dictionary<string, object>
+            {
+                { "data", dataProperties }
+            };
+
+            var postBody = jsonLibrary.SerializeToJsonString(requestEnvelope);
+
             var pathSegments = new List<string>
             {
                 "subkeys",
                 config.SubscribeKey,
-                "entities",
-                parameters.Id
+                "users"
             };
 
             var requestParameter = new RequestParameter
             {
-                RequestType = Constants.DELETE,
-                PathSegment = pathSegments
+                RequestType = Constants.POST,
+                PathSegment = pathSegments,
+                BodyContentString = postBody
             };
 
-            if (!string.IsNullOrEmpty(parameters.IfMatch))
-            {
-                requestParameter.Headers.Add("If-Match", $"\"{parameters.IfMatch}\"");
-            }
+            requestParameter.Headers.Add("Content-Type",
+                "application/vnd.pubnub.objects.user+json;version=1");
+            requestParameter.Headers.Add("Idempotency-Key", parameters.IdempotencyKey);
 
             return requestParameter;
         }

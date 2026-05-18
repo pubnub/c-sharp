@@ -5,20 +5,26 @@ using System.Threading.Tasks;
 
 namespace PubnubApi.EndPoint
 {
-    public class DeleteEntityOperation : PubnubCoreBase
+    public class PatchChannelOperation : PubnubCoreBase
     {
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
         private readonly IPubnubUnitTest unit;
-        private readonly DeleteEntityParameters parameters;
+        private readonly PatchChannelParameters parameters;
 
-        private PNCallback<PNDataSyncDeleteEntityResult> savedCallback;
+        private PNCallback<PNDataSyncChannelResult> savedCallback;
 
-        private const PNOperationType OperationType = PNOperationType.PNDataSyncDeleteEntity;
+        private const PNOperationType OperationType = PNOperationType.PNDataSyncPatchChannel;
 
-        public DeleteEntityOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary,
+        private static readonly HashSet<JsonPatchOperationType> OpsRequiringValue =
+            new () { JsonPatchOperationType.Add, JsonPatchOperationType.Replace, JsonPatchOperationType.Test };
+
+        private static readonly HashSet<JsonPatchOperationType> OpsRequiringFrom =
+            new () { JsonPatchOperationType.Move, JsonPatchOperationType.Copy };
+
+        public PatchChannelOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary,
             IPubnubUnitTest pubnubUnit, TokenManager tokenManager, Pubnub instance,
-            DeleteEntityParameters parameters) : base(pubnubConfig,
+            PatchChannelParameters parameters) : base(pubnubConfig,
             jsonPluggableLibrary, pubnubUnit, tokenManager, instance)
         {
             config = pubnubConfig;
@@ -27,7 +33,7 @@ namespace PubnubApi.EndPoint
             this.parameters = parameters ?? throw new ArgumentNullException(nameof(parameters));
         }
 
-        public void Execute(PNCallback<PNDataSyncDeleteEntityResult> callback)
+        public void Execute(PNCallback<PNDataSyncChannelResult> callback)
         {
             if (callback == null)
             {
@@ -54,10 +60,10 @@ namespace PubnubApi.EndPoint
             });
         }
 
-        public async Task<PNResult<PNDataSyncDeleteEntityResult>> ExecuteAsync()
+        public async Task<PNResult<PNDataSyncChannelResult>> ExecuteAsync()
         {
             logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
-            return await DeleteEntityAsync().ConfigureAwait(false);
+            return await PatchChannelAsync().ConfigureAwait(false);
         }
 
         internal void Retry()
@@ -68,17 +74,42 @@ namespace PubnubApi.EndPoint
             }
         }
 
-        private async Task<PNResult<PNDataSyncDeleteEntityResult>> DeleteEntityAsync()
+        private async Task<PNResult<PNDataSyncChannelResult>> PatchChannelAsync()
         {
-            var returnValue = new PNResult<PNDataSyncDeleteEntityResult>();
-            
+            var returnValue = new PNResult<PNDataSyncChannelResult>();
+
             if (string.IsNullOrEmpty(parameters.Id) || string.IsNullOrEmpty(parameters.Id.Trim()))
             {
                 var errStatus = new PNStatus
                 {
                     Error = true,
-                    ErrorData = new PNErrorData("Missing Entity Id",
-                        new ArgumentException("Missing Entity Id"))
+                    ErrorData = new PNErrorData("Missing Channel Id",
+                        new ArgumentException("Missing Channel Id"))
+                };
+                returnValue.Status = errStatus;
+                return returnValue;
+            }
+
+            if (parameters.Operations == null || parameters.Operations.Count == 0)
+            {
+                var errStatus = new PNStatus
+                {
+                    Error = true,
+                    ErrorData = new PNErrorData("Operations list must contain at least one operation",
+                        new ArgumentException("Operations list must contain at least one operation"))
+                };
+                returnValue.Status = errStatus;
+                return returnValue;
+            }
+
+            if (string.IsNullOrEmpty(parameters.IdempotencyKey) ||
+                string.IsNullOrEmpty(parameters.IdempotencyKey.Trim()))
+            {
+                var errStatus = new PNStatus
+                {
+                    Error = true,
+                    ErrorData = new PNErrorData("Missing IdempotencyKey",
+                        new ArgumentException("Missing IdempotencyKey"))
                 };
                 returnValue.Status = errStatus;
                 return returnValue;
@@ -98,7 +129,7 @@ namespace PubnubApi.EndPoint
             }
 
             logger?.Trace($"{GetType().Name} parameter validated.");
-            var requestState = new RequestState<object>
+            var requestState = new RequestState<PNDataSyncChannelResult>
             {
                 ResponseType = OperationType,
                 Reconnect = false,
@@ -107,6 +138,7 @@ namespace PubnubApi.EndPoint
             };
 
             var requestParameter = CreateRequestParameter();
+            Tuple<string, PNStatus> JsonAndStatusTuple;
             var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(
                 requestParameter, OperationType);
             var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest)
@@ -115,10 +147,8 @@ namespace PubnubApi.EndPoint
             {
                 var responseString = Encoding.UTF8.GetString(transportResponse.Content);
                 var errorStatus = GetStatusIfError(requestState, responseString);
-                Tuple<string, PNStatus> JsonAndStatusTuple;
-                if (transportResponse.StatusCode == Constants.HttpRequestSuccessStatusCode)
+                if (errorStatus == null && transportResponse.StatusCode == Constants.HttpRequestSuccessStatusCode)
                 {
-                    logger?.Trace($"{GetType().Name} request finished with status code {transportResponse.StatusCode}");
                     requestState.GotJsonResponse = true;
                     var status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(
                         requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState,
@@ -129,9 +159,20 @@ namespace PubnubApi.EndPoint
                 {
                     JsonAndStatusTuple = new Tuple<string, PNStatus>(string.Empty, errorStatus);
                 }
-                
+
                 returnValue.Status = JsonAndStatusTuple.Item2;
-                returnValue.Result = new PNDataSyncDeleteEntityResult();
+                var json = JsonAndStatusTuple.Item1;
+                if (!string.IsNullOrEmpty(json))
+                {
+                    var resultList = ProcessJsonResponse(requestState, json);
+                    var responseBuilder = new ResponseBuilder(config, jsonLibrary);
+                    var responseResult =
+                        responseBuilder.JsonToObject<PNDataSyncChannelResult>(resultList, true);
+                    if (responseResult != null)
+                    {
+                        returnValue.Result = responseResult;
+                    }
+                }
             }
             else
             {
@@ -143,26 +184,55 @@ namespace PubnubApi.EndPoint
                     new PNException(transportResponse.Error.Message, transportResponse.Error));
                 returnValue.Status = status;
             }
-            
+
             logger?.Trace($"{GetType().Name} request finished with status code {returnValue.Status.StatusCode}");
             return returnValue;
         }
 
         private RequestParameter CreateRequestParameter()
         {
+            var patchArray = new List<Dictionary<string, object>>();
+
+            foreach (var op in parameters.Operations)
+            {
+                var entry = new Dictionary<string, object>
+                {
+                    { "op", op.Op.ToString().ToLowerInvariant() },
+                    { "path", op.Path }
+                };
+
+                if (OpsRequiringValue.Contains(op.Op))
+                {
+                    entry["value"] = op.Value;
+                }
+
+                if (OpsRequiringFrom.Contains(op.Op) && !string.IsNullOrEmpty(op.From))
+                {
+                    entry["from"] = op.From;
+                }
+
+                patchArray.Add(entry);
+            }
+
+            var patchBody = jsonLibrary.SerializeToJsonString(patchArray);
+
             var pathSegments = new List<string>
             {
                 "subkeys",
                 config.SubscribeKey,
-                "entities",
+                "channels",
                 parameters.Id
             };
 
             var requestParameter = new RequestParameter
             {
-                RequestType = Constants.DELETE,
-                PathSegment = pathSegments
+                RequestType = Constants.PATCH,
+                PathSegment = pathSegments,
+                BodyContentString = patchBody
             };
+
+            requestParameter.Headers.Add("Content-Type", "application/json-patch+json");
+            requestParameter.Headers.Add("Idempotency-Key", parameters.IdempotencyKey);
 
             if (!string.IsNullOrEmpty(parameters.IfMatch))
             {

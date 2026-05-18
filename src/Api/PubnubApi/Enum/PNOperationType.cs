@@ -90,6 +90,27 @@ namespace PubnubApi
         PNDataSyncGetRelationships,
         PNDataSyncUpdateRelationship,
         PNDataSyncDeleteRelationship,
-        PNDataSyncPatchRelationship
+        PNDataSyncPatchRelationship,
+
+        PNDataSyncCreateUser,
+        PNDataSyncGetUser,
+        PNDataSyncGetUsers,
+        PNDataSyncUpdateUser,
+        PNDataSyncDeleteUser,
+        PNDataSyncPatchUser,
+
+        PNDataSyncCreateChannel,
+        PNDataSyncGetChannel,
+        PNDataSyncGetChannels,
+        PNDataSyncUpdateChannel,
+        PNDataSyncDeleteChannel,
+        PNDataSyncPatchChannel,
+
+        PNDataSyncCreateMembership,
+        PNDataSyncGetMembership,
+        PNDataSyncGetMemberships,
+        PNDataSyncUpdateMembership,
+        PNDataSyncDeleteMembership,
+        PNDataSyncPatchMembership
     }
 }

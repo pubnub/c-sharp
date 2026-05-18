@@ -357,7 +357,7 @@ namespace PubnubApi.EndPoint
             };
             if (!string.IsNullOrEmpty(ifMatchesEtag))
             {
-                requestParameter.Headers.Add("If-Match", ifMatchesEtag);
+                requestParameter.Headers.Add("If-Match", $"\"{ifMatchesEtag}\"");
             }
 
             return requestParameter;

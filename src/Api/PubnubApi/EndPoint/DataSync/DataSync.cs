@@ -161,4 +161,226 @@ public class DataSync
         new DeleteRelationshipOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
             parameters).Execute(callback);
     }
+
+    // User operations
+
+    public async Task<PNResult<PNDataSyncUserResult>> CreateUser(CreateUserParameters parameters)
+    {
+        return await new CreateUserOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).ExecuteAsync();
+    }
+
+    public void CreateUser(CreateUserParameters parameters, PNDataSyncUserResultExt callback)
+    {
+        new CreateUserOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).Execute(callback);
+    }
+
+    public async Task<PNResult<PNDataSyncUserResult>> GetUser(GetUserParameters parameters)
+    {
+        return await new GetUserOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).ExecuteAsync();
+    }
+
+    public void GetUser(GetUserParameters parameters, PNDataSyncUserResultExt callback)
+    {
+        new GetUserOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).Execute(callback);
+    }
+
+    public async Task<PNResult<PNDataSyncUsersListResult>> GetUsers(GetUsersParameters parameters)
+    {
+        return await new GetUsersOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).ExecuteAsync();
+    }
+
+    public void GetUsers(GetUsersParameters parameters, PNDataSyncUsersListResultExt callback)
+    {
+        new GetUsersOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).Execute(callback);
+    }
+
+    public async Task<PNResult<PNDataSyncUserResult>> UpdateUser(UpdateUserParameters parameters)
+    {
+        return await new UpdateUserOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).ExecuteAsync();
+    }
+
+    public void UpdateUser(UpdateUserParameters parameters, PNDataSyncUserResultExt callback)
+    {
+        new UpdateUserOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).Execute(callback);
+    }
+
+    public async Task<PNResult<PNDataSyncUserResult>> PatchUser(PatchUserParameters parameters)
+    {
+        return await new PatchUserOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).ExecuteAsync();
+    }
+
+    public void PatchUser(PatchUserParameters parameters, PNDataSyncUserResultExt callback)
+    {
+        new PatchUserOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).Execute(callback);
+    }
+
+    public async Task<PNResult<PNDataSyncDeleteUserResult>> DeleteUser(DeleteUserParameters parameters)
+    {
+        return await new DeleteUserOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).ExecuteAsync();
+    }
+
+    public void DeleteUser(DeleteUserParameters parameters, PNDataSyncDeleteUserResultExt callback)
+    {
+        new DeleteUserOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).Execute(callback);
+    }
+
+    // Channel operations
+
+    public async Task<PNResult<PNDataSyncChannelResult>> CreateChannel(CreateChannelParameters parameters)
+    {
+        return await new CreateChannelOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).ExecuteAsync();
+    }
+
+    public void CreateChannel(CreateChannelParameters parameters, PNDataSyncChannelResultExt callback)
+    {
+        new CreateChannelOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).Execute(callback);
+    }
+
+    public async Task<PNResult<PNDataSyncChannelResult>> GetChannel(GetChannelParameters parameters)
+    {
+        return await new GetChannelOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).ExecuteAsync();
+    }
+
+    public void GetChannel(GetChannelParameters parameters, PNDataSyncChannelResultExt callback)
+    {
+        new GetChannelOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).Execute(callback);
+    }
+
+    public async Task<PNResult<PNDataSyncChannelsListResult>> GetChannels(GetChannelsParameters parameters)
+    {
+        return await new GetChannelsOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).ExecuteAsync();
+    }
+
+    public void GetChannels(GetChannelsParameters parameters, PNDataSyncChannelsListResultExt callback)
+    {
+        new GetChannelsOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).Execute(callback);
+    }
+
+    public async Task<PNResult<PNDataSyncChannelResult>> UpdateChannel(UpdateChannelParameters parameters)
+    {
+        return await new UpdateChannelOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).ExecuteAsync();
+    }
+
+    public void UpdateChannel(UpdateChannelParameters parameters, PNDataSyncChannelResultExt callback)
+    {
+        new UpdateChannelOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).Execute(callback);
+    }
+
+    public async Task<PNResult<PNDataSyncChannelResult>> PatchChannel(PatchChannelParameters parameters)
+    {
+        return await new PatchChannelOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).ExecuteAsync();
+    }
+
+    public void PatchChannel(PatchChannelParameters parameters, PNDataSyncChannelResultExt callback)
+    {
+        new PatchChannelOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).Execute(callback);
+    }
+
+    public async Task<PNResult<PNDataSyncDeleteChannelResult>> DeleteChannel(DeleteChannelParameters parameters)
+    {
+        return await new DeleteChannelOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).ExecuteAsync();
+    }
+
+    public void DeleteChannel(DeleteChannelParameters parameters, PNDataSyncDeleteChannelResultExt callback)
+    {
+        new DeleteChannelOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).Execute(callback);
+    }
+
+    // Membership operations
+
+    public async Task<PNResult<PNDataSyncMembershipResult>> CreateMembership(CreateMembershipParameters parameters)
+    {
+        return await new CreateMembershipOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).ExecuteAsync();
+    }
+
+    public void CreateMembership(CreateMembershipParameters parameters, PNDataSyncMembershipResultExt callback)
+    {
+        new CreateMembershipOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).Execute(callback);
+    }
+
+    public async Task<PNResult<PNDataSyncMembershipResult>> GetMembership(GetMembershipParameters parameters)
+    {
+        return await new GetMembershipOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).ExecuteAsync();
+    }
+
+    public void GetMembership(GetMembershipParameters parameters, PNDataSyncMembershipResultExt callback)
+    {
+        new GetMembershipOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).Execute(callback);
+    }
+
+    public async Task<PNResult<PNDataSyncMembershipsListResult>> GetMemberships(GetMembershipsParameters parameters)
+    {
+        return await new GetDataSyncMembershipsOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).ExecuteAsync();
+    }
+
+    public void GetMemberships(GetMembershipsParameters parameters, PNDataSyncMembershipsListResultExt callback)
+    {
+        new GetDataSyncMembershipsOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).Execute(callback);
+    }
+
+    public async Task<PNResult<PNDataSyncMembershipResult>> UpdateMembership(UpdateMembershipParameters parameters)
+    {
+        return await new UpdateMembershipOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).ExecuteAsync();
+    }
+
+    public void UpdateMembership(UpdateMembershipParameters parameters, PNDataSyncMembershipResultExt callback)
+    {
+        new UpdateMembershipOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).Execute(callback);
+    }
+
+    public async Task<PNResult<PNDataSyncMembershipResult>> PatchMembership(PatchMembershipParameters parameters)
+    {
+        return await new PatchMembershipOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).ExecuteAsync();
+    }
+
+    public void PatchMembership(PatchMembershipParameters parameters, PNDataSyncMembershipResultExt callback)
+    {
+        new PatchMembershipOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).Execute(callback);
+    }
+
+    public async Task<PNResult<PNDataSyncDeleteMembershipResult>> DeleteMembership(DeleteMembershipParameters parameters)
+    {
+        return await new DeleteMembershipOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).ExecuteAsync();
+    }
+
+    public void DeleteMembership(DeleteMembershipParameters parameters, PNDataSyncDeleteMembershipResultExt callback)
+    {
+        new DeleteMembershipOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).Execute(callback);
+    }
 }

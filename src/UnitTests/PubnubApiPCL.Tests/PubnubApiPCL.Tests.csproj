@@ -53,11 +53,20 @@
     <Compile Include="..\PubnubApi.Tests\DataSync\WhenCreateGenericEntity.cs">
       <Link>DataSync\WhenCreateGenericEntity.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi.Tests\DataSync\WhenDataSyncChannelIsRequested.cs">
+      <Link>DataSync\WhenDataSyncChannelIsRequested.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi.Tests\DataSync\WhenDataSyncEntityIsRequested.cs">
       <Link>DataSync\WhenDataSyncEntityIsRequested.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi.Tests\DataSync\WhenDataSyncMembershipIsRequested.cs">
+      <Link>DataSync\WhenDataSyncMembershipIsRequested.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi.Tests\DataSync\WhenDataSyncRelationshipIsRequested.cs">
       <Link>DataSync\WhenDataSyncRelationshipIsRequested.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi.Tests\DataSync\WhenDataSyncUserIsRequested.cs">
+      <Link>DataSync\WhenDataSyncUserIsRequested.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi.Tests\EncryptionTests.cs" Link="EncryptionTests.cs" />
     <Compile Include="..\PubnubApi.Tests\EventEngine\HandshakeFailedStateTransition.cs" Link="EventEngine\HandshakeFailedStateTransition.cs" />

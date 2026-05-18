@@ -5,20 +5,20 @@ using System.Threading.Tasks;
 
 namespace PubnubApi.EndPoint
 {
-    public class DeleteEntityOperation : PubnubCoreBase
+    public class DeleteChannelOperation : PubnubCoreBase
     {
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
         private readonly IPubnubUnitTest unit;
-        private readonly DeleteEntityParameters parameters;
+        private readonly DeleteChannelParameters parameters;
 
-        private PNCallback<PNDataSyncDeleteEntityResult> savedCallback;
+        private PNCallback<PNDataSyncDeleteChannelResult> savedCallback;
 
-        private const PNOperationType OperationType = PNOperationType.PNDataSyncDeleteEntity;
+        private const PNOperationType OperationType = PNOperationType.PNDataSyncDeleteChannel;
 
-        public DeleteEntityOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary,
+        public DeleteChannelOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary,
             IPubnubUnitTest pubnubUnit, TokenManager tokenManager, Pubnub instance,
-            DeleteEntityParameters parameters) : base(pubnubConfig,
+            DeleteChannelParameters parameters) : base(pubnubConfig,
             jsonPluggableLibrary, pubnubUnit, tokenManager, instance)
         {
             config = pubnubConfig;
@@ -27,7 +27,7 @@ namespace PubnubApi.EndPoint
             this.parameters = parameters ?? throw new ArgumentNullException(nameof(parameters));
         }
 
-        public void Execute(PNCallback<PNDataSyncDeleteEntityResult> callback)
+        public void Execute(PNCallback<PNDataSyncDeleteChannelResult> callback)
         {
             if (callback == null)
             {
@@ -54,10 +54,10 @@ namespace PubnubApi.EndPoint
             });
         }
 
-        public async Task<PNResult<PNDataSyncDeleteEntityResult>> ExecuteAsync()
+        public async Task<PNResult<PNDataSyncDeleteChannelResult>> ExecuteAsync()
         {
             logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
-            return await DeleteEntityAsync().ConfigureAwait(false);
+            return await DeleteChannelAsync().ConfigureAwait(false);
         }
 
         internal void Retry()
@@ -68,17 +68,17 @@ namespace PubnubApi.EndPoint
             }
         }
 
-        private async Task<PNResult<PNDataSyncDeleteEntityResult>> DeleteEntityAsync()
+        private async Task<PNResult<PNDataSyncDeleteChannelResult>> DeleteChannelAsync()
         {
-            var returnValue = new PNResult<PNDataSyncDeleteEntityResult>();
+            var returnValue = new PNResult<PNDataSyncDeleteChannelResult>();
             
             if (string.IsNullOrEmpty(parameters.Id) || string.IsNullOrEmpty(parameters.Id.Trim()))
             {
                 var errStatus = new PNStatus
                 {
                     Error = true,
-                    ErrorData = new PNErrorData("Missing Entity Id",
-                        new ArgumentException("Missing Entity Id"))
+                    ErrorData = new PNErrorData("Missing Channel Id",
+                        new ArgumentException("Missing Channel Id"))
                 };
                 returnValue.Status = errStatus;
                 return returnValue;
@@ -131,7 +131,7 @@ namespace PubnubApi.EndPoint
                 }
                 
                 returnValue.Status = JsonAndStatusTuple.Item2;
-                returnValue.Result = new PNDataSyncDeleteEntityResult();
+                returnValue.Result = new PNDataSyncDeleteChannelResult();
             }
             else
             {
@@ -154,7 +154,7 @@ namespace PubnubApi.EndPoint
             {
                 "subkeys",
                 config.SubscribeKey,
-                "entities",
+                "channels",
                 parameters.Id
             };
 
@@ -163,11 +163,6 @@ namespace PubnubApi.EndPoint
                 RequestType = Constants.DELETE,
                 PathSegment = pathSegments
             };
-
-            if (!string.IsNullOrEmpty(parameters.IfMatch))
-            {
-                requestParameter.Headers.Add("If-Match", $"\"{parameters.IfMatch}\"");
-            }
 
             return requestParameter;
         }

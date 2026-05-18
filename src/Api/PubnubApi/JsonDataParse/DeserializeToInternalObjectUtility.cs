@@ -1006,6 +1006,60 @@ namespace PubnubApi
 
                 #endregion
             }
+            else if (typeof(T) == typeof(PNDataSyncUserResult))
+            {
+                #region "PNDataSyncUserResult"
+
+                PNDataSyncUserResult result = PNDataSyncUserResultJsonDataParse.GetObject(jsonPlug, listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNDataSyncUserResult), CultureInfo.InvariantCulture);
+
+                #endregion
+            }
+            else if (typeof(T) == typeof(PNDataSyncUsersListResult))
+            {
+                #region "PNDataSyncUsersListResult"
+
+                PNDataSyncUsersListResult result = PNDataSyncUsersListResultJsonDataParse.GetObject(jsonPlug, listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNDataSyncUsersListResult), CultureInfo.InvariantCulture);
+
+                #endregion
+            }
+            else if (typeof(T) == typeof(PNDataSyncChannelResult))
+            {
+                #region "PNDataSyncChannelResult"
+
+                PNDataSyncChannelResult result = PNDataSyncChannelResultJsonDataParse.GetObject(jsonPlug, listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNDataSyncChannelResult), CultureInfo.InvariantCulture);
+
+                #endregion
+            }
+            else if (typeof(T) == typeof(PNDataSyncChannelsListResult))
+            {
+                #region "PNDataSyncChannelsListResult"
+
+                PNDataSyncChannelsListResult result = PNDataSyncChannelsListResultJsonDataParse.GetObject(jsonPlug, listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNDataSyncChannelsListResult), CultureInfo.InvariantCulture);
+
+                #endregion
+            }
+            else if (typeof(T) == typeof(PNDataSyncMembershipResult))
+            {
+                #region "PNDataSyncMembershipResult"
+
+                PNDataSyncMembershipResult result = PNDataSyncMembershipResultJsonDataParse.GetObject(jsonPlug, listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNDataSyncMembershipResult), CultureInfo.InvariantCulture);
+
+                #endregion
+            }
+            else if (typeof(T) == typeof(PNDataSyncMembershipsListResult))
+            {
+                #region "PNDataSyncMembershipsListResult"
+
+                PNDataSyncMembershipsListResult result = PNDataSyncMembershipsListResultJsonDataParse.GetObject(jsonPlug, listObject);
+                ret = (T)Convert.ChangeType(result, typeof(PNDataSyncMembershipsListResult), CultureInfo.InvariantCulture);
+
+                #endregion
+            }
             else
             {
                 System.Diagnostics.Debug.WriteLine("DeserializeToObject<T>(list) => NO MATCH");

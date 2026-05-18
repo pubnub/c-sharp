@@ -5,20 +5,20 @@ using System.Threading.Tasks;
 
 namespace PubnubApi.EndPoint
 {
-    public class DeleteEntityOperation : PubnubCoreBase
+    public class DeleteMembershipOperation : PubnubCoreBase
     {
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
         private readonly IPubnubUnitTest unit;
-        private readonly DeleteEntityParameters parameters;
+        private readonly DeleteMembershipParameters parameters;
 
-        private PNCallback<PNDataSyncDeleteEntityResult> savedCallback;
+        private PNCallback<PNDataSyncDeleteMembershipResult> savedCallback;
 
-        private const PNOperationType OperationType = PNOperationType.PNDataSyncDeleteEntity;
+        private const PNOperationType OperationType = PNOperationType.PNDataSyncDeleteMembership;
 
-        public DeleteEntityOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary,
+        public DeleteMembershipOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary,
             IPubnubUnitTest pubnubUnit, TokenManager tokenManager, Pubnub instance,
-            DeleteEntityParameters parameters) : base(pubnubConfig,
+            DeleteMembershipParameters parameters) : base(pubnubConfig,
             jsonPluggableLibrary, pubnubUnit, tokenManager, instance)
         {
             config = pubnubConfig;
@@ -27,7 +27,7 @@ namespace PubnubApi.EndPoint
             this.parameters = parameters ?? throw new ArgumentNullException(nameof(parameters));
         }
 
-        public void Execute(PNCallback<PNDataSyncDeleteEntityResult> callback)
+        public void Execute(PNCallback<PNDataSyncDeleteMembershipResult> callback)
         {
             if (callback == null)
             {
@@ -54,10 +54,10 @@ namespace PubnubApi.EndPoint
             });
         }
 
-        public async Task<PNResult<PNDataSyncDeleteEntityResult>> ExecuteAsync()
+        public async Task<PNResult<PNDataSyncDeleteMembershipResult>> ExecuteAsync()
         {
             logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
-            return await DeleteEntityAsync().ConfigureAwait(false);
+            return await DeleteMembershipAsync().ConfigureAwait(false);
         }
 
         internal void Retry()
@@ -68,17 +68,17 @@ namespace PubnubApi.EndPoint
             }
         }
 
-        private async Task<PNResult<PNDataSyncDeleteEntityResult>> DeleteEntityAsync()
+        private async Task<PNResult<PNDataSyncDeleteMembershipResult>> DeleteMembershipAsync()
         {
-            var returnValue = new PNResult<PNDataSyncDeleteEntityResult>();
+            var returnValue = new PNResult<PNDataSyncDeleteMembershipResult>();
             
             if (string.IsNullOrEmpty(parameters.Id) || string.IsNullOrEmpty(parameters.Id.Trim()))
             {
                 var errStatus = new PNStatus
                 {
                     Error = true,
-                    ErrorData = new PNErrorData("Missing Entity Id",
-                        new ArgumentException("Missing Entity Id"))
+                    ErrorData = new PNErrorData("Missing Membership Id",
+                        new ArgumentException("Missing Membership Id"))
                 };
                 returnValue.Status = errStatus;
                 return returnValue;
@@ -131,7 +131,7 @@ namespace PubnubApi.EndPoint
                 }
                 
                 returnValue.Status = JsonAndStatusTuple.Item2;
-                returnValue.Result = new PNDataSyncDeleteEntityResult();
+                returnValue.Result = new PNDataSyncDeleteMembershipResult();
             }
             else
             {
@@ -154,7 +154,7 @@ namespace PubnubApi.EndPoint
             {
                 "subkeys",
                 config.SubscribeKey,
-                "entities",
+                "memberships",
                 parameters.Id
             };
 
@@ -163,11 +163,6 @@ namespace PubnubApi.EndPoint
                 RequestType = Constants.DELETE,
                 PathSegment = pathSegments
             };
-
-            if (!string.IsNullOrEmpty(parameters.IfMatch))
-            {
-                requestParameter.Headers.Add("If-Match", $"\"{parameters.IfMatch}\"");
-            }
 
             return requestParameter;
         }

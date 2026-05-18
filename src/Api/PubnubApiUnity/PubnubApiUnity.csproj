@@ -91,6 +91,48 @@
     <Compile Include="..\PubnubApi\EndPoint\ChannelGroup\RemoveChannelsFromChannelGroupOperation.cs">
       <Link>EndPoint\ChannelGroup\RemoveChannelsFromChannelGroupOperation.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Channel\CreateChannelOperation.cs">
+      <Link>EndPoint\DataSync\Channel\CreateChannelOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Channel\CreateChannelParameters.cs">
+      <Link>EndPoint\DataSync\Channel\CreateChannelParameters.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Channel\DeleteChannelOperation.cs">
+      <Link>EndPoint\DataSync\Channel\DeleteChannelOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Channel\DeleteChannelParameters.cs">
+      <Link>EndPoint\DataSync\Channel\DeleteChannelParameters.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Channel\GetChannelOperation.cs">
+      <Link>EndPoint\DataSync\Channel\GetChannelOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Channel\GetChannelParameters.cs">
+      <Link>EndPoint\DataSync\Channel\GetChannelParameters.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Channel\GetChannelsOperation.cs">
+      <Link>EndPoint\DataSync\Channel\GetChannelsOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Channel\GetChannelsParameters.cs">
+      <Link>EndPoint\DataSync\Channel\GetChannelsParameters.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Channel\PatchChannelOperation.cs">
+      <Link>EndPoint\DataSync\Channel\PatchChannelOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Channel\PatchChannelParameters.cs">
+      <Link>EndPoint\DataSync\Channel\PatchChannelParameters.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Channel\PNDataSyncChannelResult.cs">
+      <Link>EndPoint\DataSync\Channel\PNDataSyncChannelResult.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Channel\PNDataSyncDeleteChannelResult.cs">
+      <Link>EndPoint\DataSync\Channel\PNDataSyncDeleteChannelResult.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Channel\UpdateChannelOperation.cs">
+      <Link>EndPoint\DataSync\Channel\UpdateChannelOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Channel\UpdateChannelParameters.cs">
+      <Link>EndPoint\DataSync\Channel\UpdateChannelParameters.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\EndPoint\DataSync\DataSync.cs">
       <Link>EndPoint\DataSync\DataSync.cs</Link>
     </Compile>
@@ -136,6 +178,48 @@
     <Compile Include="..\PubnubApi\EndPoint\DataSync\Entity\UpdateEntityParameters.cs">
       <Link>EndPoint\DataSync\Entity\UpdateEntityParameters.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Membership\CreateMembershipOperation.cs">
+      <Link>EndPoint\DataSync\Membership\CreateMembershipOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Membership\CreateMembershipParameters.cs">
+      <Link>EndPoint\DataSync\Membership\CreateMembershipParameters.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Membership\DeleteMembershipOperation.cs">
+      <Link>EndPoint\DataSync\Membership\DeleteMembershipOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Membership\DeleteMembershipParameters.cs">
+      <Link>EndPoint\DataSync\Membership\DeleteMembershipParameters.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Membership\GetMembershipOperation.cs">
+      <Link>EndPoint\DataSync\Membership\GetMembershipOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Membership\GetMembershipParameters.cs">
+      <Link>EndPoint\DataSync\Membership\GetMembershipParameters.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Membership\GetMembershipsOperation.cs">
+      <Link>EndPoint\DataSync\Membership\GetMembershipsOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Membership\GetMembershipsParameters.cs">
+      <Link>EndPoint\DataSync\Membership\GetMembershipsParameters.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Membership\PatchMembershipOperation.cs">
+      <Link>EndPoint\DataSync\Membership\PatchMembershipOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Membership\PatchMembershipParameters.cs">
+      <Link>EndPoint\DataSync\Membership\PatchMembershipParameters.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Membership\PNDataSyncDeleteMembershipResult.cs">
+      <Link>EndPoint\DataSync\Membership\PNDataSyncDeleteMembershipResult.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Membership\PNDataSyncMembershipResult.cs">
+      <Link>EndPoint\DataSync\Membership\PNDataSyncMembershipResult.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Membership\UpdateMembershipOperation.cs">
+      <Link>EndPoint\DataSync\Membership\UpdateMembershipOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Membership\UpdateMembershipParameters.cs">
+      <Link>EndPoint\DataSync\Membership\UpdateMembershipParameters.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\EndPoint\DataSync\Relationship\CreateRelationshipOperation.cs">
       <Link>EndPoint\DataSync\Relationship\CreateRelationshipOperation.cs</Link>
     </Compile>
@@ -177,6 +261,48 @@
     </Compile>
     <Compile Include="..\PubnubApi\EndPoint\DataSync\Relationship\UpdateRelationshipParameters.cs">
       <Link>EndPoint\DataSync\Relationship\UpdateRelationshipParameters.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\User\CreateUserOperation.cs">
+      <Link>EndPoint\DataSync\User\CreateUserOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\User\CreateUserParameters.cs">
+      <Link>EndPoint\DataSync\User\CreateUserParameters.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\User\DeleteUserOperation.cs">
+      <Link>EndPoint\DataSync\User\DeleteUserOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\User\DeleteUserParameters.cs">
+      <Link>EndPoint\DataSync\User\DeleteUserParameters.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\User\GetUserOperation.cs">
+      <Link>EndPoint\DataSync\User\GetUserOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\User\GetUserParameters.cs">
+      <Link>EndPoint\DataSync\User\GetUserParameters.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\User\GetUsersOperation.cs">
+      <Link>EndPoint\DataSync\User\GetUsersOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\User\GetUsersParameters.cs">
+      <Link>EndPoint\DataSync\User\GetUsersParameters.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\User\PatchUserOperation.cs">
+      <Link>EndPoint\DataSync\User\PatchUserOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\User\PatchUserParameters.cs">
+      <Link>EndPoint\DataSync\User\PatchUserParameters.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\User\PNDataSyncDeleteUserResult.cs">
+      <Link>EndPoint\DataSync\User\PNDataSyncDeleteUserResult.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\User\PNDataSyncUserResult.cs">
+      <Link>EndPoint\DataSync\User\PNDataSyncUserResult.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\User\UpdateUserOperation.cs">
+      <Link>EndPoint\DataSync\User\UpdateUserOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\User\UpdateUserParameters.cs">
+      <Link>EndPoint\DataSync\User\UpdateUserParameters.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\EndPoint\Files\DeleteFileOperation.cs" Link="EndPoint\Files\DeleteFileOperation.cs" />
     <Compile Include="..\PubnubApi\EndPoint\Files\DownloadFileOperation.cs" Link="EndPoint\Files\DownloadFileOperation.cs" />
@@ -313,11 +439,23 @@
     <Compile Include="..\PubnubApi\JsonDataParse\DeserializeToInternalObjectUtility.cs">
       <Link>JsonDataParse\DeserializeToInternalObjectUtility.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\JsonDataParse\PNDataSyncChannelResultJsonDataParse.cs">
+      <Link>JsonDataParse\PNDataSyncChannelResultJsonDataParse.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\JsonDataParse\PNDataSyncChannelsListResultJsonDataParse.cs">
+      <Link>JsonDataParse\PNDataSyncChannelsListResultJsonDataParse.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\JsonDataParse\PNDataSyncEntitiesListResultJsonDataParse.cs">
       <Link>JsonDataParse\PNDataSyncEntitiesListResultJsonDataParse.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\JsonDataParse\PNDataSyncEntityResultJsonDataParse.cs">
       <Link>JsonDataParse\PNDataSyncEntityResultJsonDataParse.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\JsonDataParse\PNDataSyncMembershipResultJsonDataParse.cs">
+      <Link>JsonDataParse\PNDataSyncMembershipResultJsonDataParse.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\JsonDataParse\PNDataSyncMembershipsListResultJsonDataParse.cs">
+      <Link>JsonDataParse\PNDataSyncMembershipsListResultJsonDataParse.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\JsonDataParse\PNDataSyncRelationshipResultJsonDataParse.cs">
       <Link>JsonDataParse\PNDataSyncRelationshipResultJsonDataParse.cs</Link>
@@ -325,14 +463,35 @@
     <Compile Include="..\PubnubApi\JsonDataParse\PNDataSyncRelationshipsListResultJsonDataParse.cs">
       <Link>JsonDataParse\PNDataSyncRelationshipsListResultJsonDataParse.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\JsonDataParse\PNDataSyncUserResultJsonDataParse.cs">
+      <Link>JsonDataParse\PNDataSyncUserResultJsonDataParse.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\JsonDataParse\PNDataSyncUsersListResultJsonDataParse.cs">
+      <Link>JsonDataParse\PNDataSyncUsersListResultJsonDataParse.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNMembershipMetadataResult.cs">
       <Link>Model\Consumer\Objects\PNMembershipMetadataResult.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\DataSync\PNDataSyncChannelResultExt.cs">
+      <Link>Model\Derived\DataSync\PNDataSyncChannelResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\DataSync\PNDataSyncChannelsListResultExt.cs">
+      <Link>Model\Derived\DataSync\PNDataSyncChannelsListResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\DataSync\PNDataSyncDeleteChannelResultExt.cs">
+      <Link>Model\Derived\DataSync\PNDataSyncDeleteChannelResultExt.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\Model\Derived\DataSync\PNDataSyncDeleteEntityResultExt.cs">
       <Link>Model\Derived\DataSync\PNDataSyncDeleteEntityResultExt.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\DataSync\PNDataSyncDeleteMembershipResultExt.cs">
+      <Link>Model\Derived\DataSync\PNDataSyncDeleteMembershipResultExt.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\Model\Derived\DataSync\PNDataSyncDeleteRelationshipResultExt.cs">
       <Link>Model\Derived\DataSync\PNDataSyncDeleteRelationshipResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\DataSync\PNDataSyncDeleteUserResultExt.cs">
+      <Link>Model\Derived\DataSync\PNDataSyncDeleteUserResultExt.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\Model\Derived\DataSync\PNDataSyncEntitiesListResultExt.cs">
       <Link>Model\Derived\DataSync\PNDataSyncEntitiesListResultExt.cs</Link>
@@ -340,11 +499,23 @@
     <Compile Include="..\PubnubApi\Model\Derived\DataSync\PNDataSyncEntityResultExt.cs">
       <Link>Model\Derived\DataSync\PNDataSyncEntityResultExt.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\DataSync\PNDataSyncMembershipResultExt.cs">
+      <Link>Model\Derived\DataSync\PNDataSyncMembershipResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\DataSync\PNDataSyncMembershipsListResultExt.cs">
+      <Link>Model\Derived\DataSync\PNDataSyncMembershipsListResultExt.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\Model\Derived\DataSync\PNDataSyncRelationshipResultExt.cs">
       <Link>Model\Derived\DataSync\PNDataSyncRelationshipResultExt.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\Model\Derived\DataSync\PNDataSyncRelationshipsListResultExt.cs">
       <Link>Model\Derived\DataSync\PNDataSyncRelationshipsListResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\DataSync\PNDataSyncUserResultExt.cs">
+      <Link>Model\Derived\DataSync\PNDataSyncUserResultExt.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Derived\DataSync\PNDataSyncUsersListResultExt.cs">
+      <Link>Model\Derived\DataSync\PNDataSyncUsersListResultExt.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\PNSDK\DotNetPNSDKSource.cs">
       <Link>PNSDK\DotNetPNSDKSource.cs</Link>
@@ -794,6 +965,7 @@
 
   <ItemGroup>
     <None Include="..\PubnubApi\LICENSE.txt" Link="LICENSE.txt" Pack="true" PackagePath="" />
+    <None Remove="EndPoint\DataSync\**" />
   </ItemGroup>
   
   <ItemGroup>
@@ -843,11 +1015,17 @@
   </ItemGroup>
   
   <ItemGroup>
+    <Content Include="..\PubnubApi\EndPoint\DataSync\C# DXD - DataSync Users, Channels, and Memberships.md">
+      <Link>EndPoint\DataSync\C# DXD - DataSync Users, Channels, and Memberships.md</Link>
+    </Content>
     <Content Include="..\PubnubApi\EndPoint\DataSync\Entity\C# - DXD data sync Entity API.md">
       <Link>EndPoint\DataSync\Entity\C# - DXD data sync Entity API.md</Link>
     </Content>
     <Content Include="..\PubnubApi\EndPoint\DataSync\Relationship\C# - DXD data sync Relationship API.md">
       <Link>EndPoint\DataSync\Relationship\C# - DXD data sync Relationship API.md</Link>
+    </Content>
+    <Content Include="..\PubnubApi\EndPoint\DataSync\setup-integration-test-classes.ps1">
+      <Link>EndPoint\DataSync\setup-integration-test-classes.ps1</Link>
     </Content>
     <Content Include="..\PubnubApi\EndPoint\DataSync\Specs\common.yaml">
       <Link>EndPoint\DataSync\Specs\common.yaml</Link>
@@ -861,6 +1039,13 @@
     <Content Include="..\PubnubApi\EndPoint\DataSync\test-entity-api.ps1">
       <Link>EndPoint\DataSync\test-entity-api.ps1</Link>
     </Content>
+    <Content Include="..\PubnubApi\EndPoint\DataSync\test-user-membership-api.ps1">
+      <Link>EndPoint\DataSync\test-user-membership-api.ps1</Link>
+    </Content>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <EmbeddedResource Remove="EndPoint\DataSync\**" />
   </ItemGroup>
   
   <!--<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.4' ">

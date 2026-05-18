@@ -213,7 +213,7 @@ namespace PubnubApi.EndPoint
 
             if (!string.IsNullOrEmpty(parameters.IfMatch))
             {
-                requestParameter.Headers.Add("If-Match", parameters.IfMatch);
+                requestParameter.Headers.Add("If-Match", $"\"{parameters.IfMatch}\"");
             }
 
             return requestParameter;
