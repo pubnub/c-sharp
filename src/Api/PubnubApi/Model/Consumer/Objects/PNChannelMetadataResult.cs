@@ -13,5 +13,6 @@ namespace PubnubApi
         public string Type { get; internal set; }
         public Dictionary<string, object> Custom { get; internal set; }
         public string Updated { get; internal set; }
+        public string ETag { get; internal set; }
     }
 }

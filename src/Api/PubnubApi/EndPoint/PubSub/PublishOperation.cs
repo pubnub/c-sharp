@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;
@@ -15,8 +15,12 @@ namespace PubnubApi.EndPoint
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
         private readonly IPubnubUnitTest unit;
-
+        
+        private const int MaxPublishRequestSizeBytes = 32768;
+        private const int MaxMessageContentSizeBytes = 2097152;
+        private const int PostBodyFramingOverheadBytes = 2;
         private object publishContent;
+        private string preparedMessageContent;
         private string channelName = "";
         private bool storeInHistory = true;
         private bool httpPost;
@@ -39,6 +43,7 @@ namespace PubnubApi.EndPoint
         public PublishOperation Message(object message)
         {
             publishContent = message;
+            preparedMessageContent = PrepareContent(message);
             return this;
         }
 
@@ -112,6 +117,8 @@ namespace PubnubApi.EndPoint
                 throw new ArgumentException("Missing userCallback");
             }
 
+            ValidateMessageContentSize();
+
             savedCallback = callback;
             logger?.Trace($"{GetType().Name} Execute invoked");
             Publish(channelName, publishContent, storeInHistory, ttl, userMetadata, queryParam, callback);
@@ -119,6 +126,7 @@ namespace PubnubApi.EndPoint
 
         public async Task<PNResult<PNPublishResult>> ExecuteAsync()
         {
+            ValidateMessageContentSize();
             syncRequest = false;
             logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
             return await Publish(channelName, publishContent, storeInHistory, ttl, userMetadata, queryParam)
@@ -136,6 +144,8 @@ namespace PubnubApi.EndPoint
             {
                 throw new MissingMemberException("publish key is required");
             }
+
+            ValidateMessageContentSize();
 
             logger?.Trace($"{GetType().Name} parameter validated.");
             ManualResetEvent syncEvent = new ManualResetEvent(false);
@@ -396,6 +406,15 @@ namespace PubnubApi.EndPoint
             }
         }
 
+        private void ValidateMessageContentSize()
+        {
+            if (preparedMessageContent != null
+                && Encoding.UTF8.GetByteCount(preparedMessageContent) > MaxMessageContentSizeBytes)
+            {
+                throw new ArgumentException("Message content size exceeds the maximum permissible size of 2 MiB.");
+            }
+        }
+
         private string PrepareContent(object originalMessage)
         {
             string message = jsonLibrary.SerializeToJsonString(originalMessage);
@@ -412,20 +431,7 @@ namespace PubnubApi.EndPoint
 
         private RequestParameter CreateRequestParameter()
         {
-            List<string> urlSegments =
-            [
-                "publish",
-                config.PublishKey ?? "",
-                config.SubscribeKey ?? "",
-                "0",
-                channelName,
-                "0"
-            ];
-            if (!httpPost)
-            {
-                urlSegments.Add(PrepareContent(publishContent));
-            }
-
+            var messageContent = preparedMessageContent;
             Dictionary<string, string> requestQueryStringParams = new Dictionary<string, string>();
 
             if (userMetadata != null)
@@ -463,19 +469,101 @@ namespace PubnubApi.EndPoint
                 }
             }
 
-            var requestParam = new RequestParameter()
+            // Determine whether to use v2/publish endpoint and HTTP method.
+            var endpointInfo = ResolvePublishEndpoint(messageContent, requestQueryStringParams);
+            bool useV2Endpoint = endpointInfo.UseV2Endpoint;
+            bool usePost = endpointInfo.UsePost;
+
+            // Build URL path segments
+            var pathSegments = new List<string>();
+            if (useV2Endpoint)
             {
-                RequestType = httpPost ? Constants.POST : Constants.GET,
-                PathSegment = urlSegments,
+                pathSegments.Add("v2");
+            }
+            pathSegments.AddRange(["publish", config.PublishKey ?? "", config.SubscribeKey ?? "", "0", channelName, "0"]);
+
+            if (!usePost)
+            {
+                pathSegments.Add(messageContent);
+            }
+
+            var requestParam = new RequestParameter
+            {
+                RequestType = usePost ? Constants.POST : Constants.GET,
+                PathSegment = pathSegments,
                 Query = requestQueryStringParams
             };
-            if (httpPost)
+
+            if (useV2Endpoint)
             {
-                string postMessage = PrepareContent(publishContent);
-                requestParam.BodyContentString = postMessage;
+                requestParam.Headers.Add("Expect", "100-continue");
+            }
+
+            if (usePost)
+            {
+                requestParam.BodyContentString = messageContent;
             }
 
             return requestParam;
+        }
+        
+        private PublishEndpointInfo ResolvePublishEndpoint(
+            string messageContent,
+            Dictionary<string, string> queryParams)
+        {
+            int messageSizeBytes = Encoding.UTF8.GetByteCount(messageContent);
+
+            if (httpPost)
+            {
+                bool exceedsPostLimit = messageSizeBytes > MaxPublishRequestSizeBytes - PostBodyFramingOverheadBytes;
+                return new PublishEndpointInfo(useV2Endpoint: exceedsPostLimit, usePost: true);
+            }
+
+            int estimatedGetUrlSizeBytes = EstimateGetPublishUrlSizeBytes(messageContent, queryParams);
+            if (estimatedGetUrlSizeBytes > MaxPublishRequestSizeBytes)
+            {
+                // Message too large for URL; switch to v2/publish with POST body
+                return new PublishEndpointInfo(useV2Endpoint: true, usePost: true);
+            }
+
+            return new PublishEndpointInfo(useV2Endpoint: false, usePost: false);
+        }
+
+        private struct PublishEndpointInfo(bool useV2Endpoint, bool usePost)
+        {
+            public bool UseV2Endpoint = useV2Endpoint;
+            public bool UsePost = usePost;
+        }
+
+        /// Estimates final URL size for regular publish GET using the same middleware path
+        /// and query construction used for actual requests.
+        private int EstimateGetPublishUrlSizeBytes(string messageContent, Dictionary<string, string> queryParams)
+        {
+            var getPathSegments = new List<string>
+            {
+                "publish",
+                config.PublishKey ?? "",
+                config.SubscribeKey ?? "",
+                "0",
+                channelName,
+                "0",
+                messageContent
+            };
+
+            var requestParam = new RequestParameter
+            {
+                RequestType = Constants.GET,
+                PathSegment = getPathSegments,
+                Query = queryParams == null
+                    ? new Dictionary<string, string>()
+                    : new Dictionary<string, string>(queryParams)
+            };
+
+            var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(
+                requestParameter: requestParam,
+                operationType: PNOperationType.PNPublishOperation);
+
+            return Encoding.UTF8.GetByteCount(transportRequest.RequestUrl ?? string.Empty);
         }
 
         private void CleanUp()

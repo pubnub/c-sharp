@@ -114,11 +114,12 @@ namespace PubnubApi
                     postData = new ByteArrayContent(transportRequest.BodyContentBytes);
                     ApplyHeaders(postData.Headers, transportRequest.Headers);
                 }
-
                 HttpRequestMessage requestMessage =
                     new HttpRequestMessage(method: HttpMethod.Post, requestUri: transportRequest.RequestUrl)
                         { Content = postData };
+
                 ApplyHeaders(requestMessage.Headers, transportRequest.Headers, excludeKey: "Content-Type");
+
                 logger?.Debug(
                     $"HttpClient Service:Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl}" +
                     (requestMessage.Headers.Any()

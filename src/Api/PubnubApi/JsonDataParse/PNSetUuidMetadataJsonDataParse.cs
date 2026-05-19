@@ -23,6 +23,7 @@ namespace PubnubApi
                     result.Status = setUuidDataDic.ContainsKey("status") && setUuidDataDic["status"] != null ? setUuidDataDic["status"].ToString() : null;
                     result.Type = setUuidDataDic.ContainsKey("type") && setUuidDataDic["type"] != null ? setUuidDataDic["type"].ToString() : null;
                     result.Updated = setUuidDataDic.ContainsKey("updated") && setUuidDataDic["updated"] != null ? setUuidDataDic["updated"].ToString() : "";
+                    result.ETag = setUuidDataDic.ContainsKey("eTag") && setUuidDataDic["eTag"] != null ? setUuidDataDic["eTag"].ToString() : null;
                     if (setUuidDataDic.ContainsKey("custom"))
                     {
                         result.Custom = jsonPlug.ConvertToDictionaryObject(setUuidDataDic["custom"]);
