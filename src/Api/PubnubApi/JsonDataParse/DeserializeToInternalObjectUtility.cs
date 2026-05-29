@@ -419,10 +419,10 @@ namespace PubnubApi
                         hereNowResult.Channels = new Dictionary<string, PNHereNowChannelData>();
                         if (herenowDicObj.ContainsKey("uuids"))
                         {
+                            List<PNHereNowOccupantData> uuidDataList = new List<PNHereNowOccupantData>();
                             object[] uuidArray = jsonPlug.ConvertToObjectArray(herenowDicObj["uuids"]);
                             if (uuidArray != null && uuidArray.Length > 0)
                             {
-                                List<PNHereNowOccupantData> uuidDataList = new List<PNHereNowOccupantData>();
                                 for (int index = 0; index < uuidArray.Length; index++)
                                 {
                                     Dictionary<string, object> hereNowChannelItemUuidsDic =
@@ -446,15 +446,15 @@ namespace PubnubApi
                                         uuidDataList.Add(uuidData);
                                     }
                                 }
-
-                                PNHereNowChannelData channelData = new PNHereNowChannelData();
-                                channelData.ChannelName = hereNowChannelName;
-                                channelData.Occupants = uuidDataList;
-                                channelData.Occupancy = hereNowResult.TotalOccupancy;
-
-                                hereNowResult.Channels.Add(hereNowChannelName, channelData);
-                                hereNowResult.TotalChannels = hereNowResult.Channels.Count;
                             }
+
+                            PNHereNowChannelData channelData = new PNHereNowChannelData();
+                            channelData.ChannelName = hereNowChannelName;
+                            channelData.Occupants = uuidDataList;
+                            channelData.Occupancy = hereNowResult.TotalOccupancy;
+
+                            hereNowResult.Channels.Add(hereNowChannelName, channelData);
+                            hereNowResult.TotalChannels = hereNowResult.Channels.Count;
                         }
                         else
                         {
@@ -464,7 +464,8 @@ namespace PubnubApi
                             foreach (string channel in arrChannel)
                             {
                                 PNHereNowChannelData channelData = new PNHereNowChannelData();
-                                channelData.Occupancy = 1;
+                                channelData.ChannelName = channel;
+                                channelData.Occupancy = hereNowResult.TotalOccupancy;
                                 hereNowResult.Channels.Add(channel, channelData);
                                 totalChannels++;
                             }
