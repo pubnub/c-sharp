@@ -1,8 +1,15 @@
 name: c-sharp
-version: "8.2.0"
+version: "8.2.1"
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog:
+  - date: 2026-05-29
+    version: v8.2.1
+    changes:
+      - type: bug
+        text: "Fixes issue of hereNow returning incorrect Occupancy when Occupancy count value is omitted from the response of single channel hereNow call."
+      - type: bug
+        text: "Fix for `HereNow` omitting the channel entry for an empty channel when UUIDs are included."
   - date: 2026-05-18
     version: v8.2.0
     changes:
@@ -982,14 +989,14 @@ features:
     - QUERY-PARAM
 supported-platforms:
   -
-    version: Pubnub 'C#' 8.2.0
+    version: Pubnub 'C#' 8.2.1
     platforms:
       - Windows 10 and up
       - Windows Server 2008 and up
     frameworks:
       - .Net Framework 4.5+
   -
-    version: PubnubPCL 'C#' 8.2.0
+    version: PubnubPCL 'C#' 8.2.1
     platforms:
       - Xamarin.Android
       - Xamarin.iOS
@@ -1001,7 +1008,7 @@ supported-platforms:
     frameworks:
       - .Net 4.5+
   -
-    version: PubnubUWP 'C#' 8.2.0
+    version: PubnubUWP 'C#' 8.2.1
     platforms:
       - Windows Phone 10
       - Universal Windows Apps
@@ -1025,7 +1032,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: Pubnub
-            location: https://github.com/pubnub/c-sharp/releases/tag/v8.2.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v8.2.1
             requires:
               -
                 name: ".Net"
@@ -1266,7 +1273,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: PubNubPCL
-            location: https://github.com/pubnub/c-sharp/releases/tag/v8.2.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v8.2.1
             requires:
               -
                 name: ".Net"
@@ -1617,7 +1624,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: PubnubUWP
-            location: https://github.com/pubnub/c-sharp/releases/tag/v8.2.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v8.2.1
             requires:
               -
                 name: "Universal Windows Platform Development"
