@@ -417,12 +417,21 @@ namespace PubnubApi
                         }
 
                         hereNowResult.Channels = new Dictionary<string, PNHereNowChannelData>();
+                        // This block handles the "compact" here_now response shape that the server returns
+                        // ONLY for a single-channel request (no "payload" wrapper, just a flat "occupancy" plus
+                        // an optional "uuids" list). The channel name itself is not in the body, so it is taken
+                        // from listObject[1] (hereNowChannelName).
                         if (herenowDicObj.ContainsKey("uuids"))
                         {
+                            // Case: single channel requested WITH uuids (disable_uuids=0).
+                            // The channel entry is built and added unconditionally below — even when "uuids" is an
+                            // empty array (i.e. an empty channel with occupancy 0). Previously the channel was only
+                            // added when the array was non-empty, which silently dropped empty channels from the
+                            // result; callers doing Channels.TryGetValue(channel, ...) would then get a false miss.
+                            List<PNHereNowOccupantData> uuidDataList = new List<PNHereNowOccupantData>();
                             object[] uuidArray = jsonPlug.ConvertToObjectArray(herenowDicObj["uuids"]);
                             if (uuidArray != null && uuidArray.Length > 0)
                             {
-                                List<PNHereNowOccupantData> uuidDataList = new List<PNHereNowOccupantData>();
                                 for (int index = 0; index < uuidArray.Length; index++)
                                 {
                                     Dictionary<string, object> hereNowChannelItemUuidsDic =
@@ -446,25 +455,34 @@ namespace PubnubApi
                                         uuidDataList.Add(uuidData);
                                     }
                                 }
-
-                                PNHereNowChannelData channelData = new PNHereNowChannelData();
-                                channelData.ChannelName = hereNowChannelName;
-                                channelData.Occupants = uuidDataList;
-                                channelData.Occupancy = hereNowResult.TotalOccupancy;
-
-                                hereNowResult.Channels.Add(hereNowChannelName, channelData);
-                                hereNowResult.TotalChannels = hereNowResult.Channels.Count;
                             }
+
+                            PNHereNowChannelData channelData = new PNHereNowChannelData();
+                            channelData.ChannelName = hereNowChannelName;
+                            channelData.Occupants = uuidDataList;
+                            channelData.Occupancy = hereNowResult.TotalOccupancy;
+
+                            hereNowResult.Channels.Add(hereNowChannelName, channelData);
+                            hereNowResult.TotalChannels = hereNowResult.Channels.Count;
                         }
                         else
                         {
+                            // Case: single channel requested WITHOUT uuids (disable_uuids=1).
+                            // The response carries only the total "occupancy" and no per-uuid list, so each
+                            // channel's Occupancy is set from TotalOccupancy (the response's "occupancy" value).
+                            // This compact shape is only ever returned for a SINGLE channel, so arrChannel has
+                            // exactly one element and assigning TotalOccupancy to it is correct. (Multi-channel
+                            // requests instead return the "payload" shape handled in the branch above, where each
+                            // channel has its own occupancy.) Previously Occupancy here was hardcoded to 1, which
+                            // reported the wrong count whenever the real occupancy was not 1 (e.g. 3 users -> 1).
                             string channels = listObject[1].ToString();
                             string[] arrChannel = channels.Split(',');
                             int totalChannels = 0;
                             foreach (string channel in arrChannel)
                             {
                                 PNHereNowChannelData channelData = new PNHereNowChannelData();
-                                channelData.Occupancy = 1;
+                                channelData.ChannelName = channel;
+                                channelData.Occupancy = hereNowResult.TotalOccupancy;
                                 hereNowResult.Channels.Add(channel, channelData);
                                 totalChannels++;
                             }
