@@ -82,6 +82,12 @@
     <Compile Include="..\PubnubApi.Tests\WhenGetRequestServerTime.cs" Link="WhenGetRequestServerTime.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenGetRequestServerTimeMultiInstance.cs" Link="WhenGetRequestServerTimeMultiInstance.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenGrantIsRequested.cs" Link="WhenGrantIsRequested.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenHttp2IsConfigured.cs">
+      <Link>WhenHttp2IsConfigured.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi.Tests\WhenHttp2OriginIsUsed.cs">
+      <Link>WhenHttp2OriginIsUsed.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi.Tests\WhenMessageAction.cs" Link="WhenMessageAction.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenMessageCountIsRequested.cs" Link="WhenMessageCountIsRequested.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenMessageDeletedFromChannel.cs" Link="WhenMessageDeletedFromChannel.cs" />
