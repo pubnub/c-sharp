@@ -1,3 +1,8 @@
+v8.2.1 - May 29 2026
+-----------------------------
+- Fixed: fixes issue of hereNow returning incorrect Occupancy when Occupancy count value is omitted from the response of single channel hereNow call.
+- Fixed: fix for `HereNow` omitting the channel entry for an empty channel when UUIDs are included.
+
 v8.2.0 - May 18 2026
 -----------------------------
 - Added: added support for the publish v2 endpoint, allowing feature-enabled keysets to publish messages of size up to 2MB.
