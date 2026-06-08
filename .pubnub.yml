@@ -1,8 +1,13 @@
 name: c-sharp
-version: "8.2.1"
+version: "8.3.0"
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog:
+  - date: 2026-06-08
+    version: v8.3.0
+    changes:
+      - type: feature
+        text: "Added a EnableHttp2 flag to the config which if set to true (the default value) will make all calls in the HttpClientService request Http/2 by default and fall back to Http/1.1 if not available on the origin."
   - date: 2026-05-29
     version: v8.2.1
     changes:
@@ -989,14 +994,14 @@ features:
     - QUERY-PARAM
 supported-platforms:
   -
-    version: Pubnub 'C#' 8.2.1
+    version: Pubnub 'C#' 8.3.0
     platforms:
       - Windows 10 and up
       - Windows Server 2008 and up
     frameworks:
       - .Net Framework 4.5+
   -
-    version: PubnubPCL 'C#' 8.2.1
+    version: PubnubPCL 'C#' 8.3.0
     platforms:
       - Xamarin.Android
       - Xamarin.iOS
@@ -1008,7 +1013,7 @@ supported-platforms:
     frameworks:
       - .Net 4.5+
   -
-    version: PubnubUWP 'C#' 8.2.1
+    version: PubnubUWP 'C#' 8.3.0
     platforms:
       - Windows Phone 10
       - Universal Windows Apps
@@ -1032,7 +1037,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: Pubnub
-            location: https://github.com/pubnub/c-sharp/releases/tag/v8.2.1
+            location: https://github.com/pubnub/c-sharp/releases/tag/v8.3.0
             requires:
               -
                 name: ".Net"
@@ -1273,7 +1278,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: PubNubPCL
-            location: https://github.com/pubnub/c-sharp/releases/tag/v8.2.1
+            location: https://github.com/pubnub/c-sharp/releases/tag/v8.3.0
             requires:
               -
                 name: ".Net"
@@ -1624,7 +1629,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: PubnubUWP
-            location: https://github.com/pubnub/c-sharp/releases/tag/v8.2.1
+            location: https://github.com/pubnub/c-sharp/releases/tag/v8.3.0
             requires:
               -
                 name: "Universal Windows Platform Development"
