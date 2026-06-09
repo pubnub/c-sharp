@@ -1,3 +1,7 @@
+v8.3.0 - June 08 2026
+-----------------------------
+- Added: added a EnableHttp2 flag to the config which if set to true (the default value) will make all calls in the HttpClientService request Http/2 by default and fall back to Http/1.1 if not available on the origin.
+
 v8.2.1 - May 29 2026
 -----------------------------
 - Fixed: fixes issue of hereNow returning incorrect Occupancy when Occupancy count value is omitted from the response of single channel hereNow call.
