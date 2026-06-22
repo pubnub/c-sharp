@@ -23,14 +23,14 @@ namespace PubnubApi
         /// Builds a "&lt;name&gt; with parameters:" block from ordered key/value pairs.
         /// Pairs with a null value are rendered as "null" (matching cross-SDK behavior).
         /// </summary>
-        public static string Parameters(string name, params (string Key, object Value)[] parameters) =>
+        public static string Parameters(string name, params (string, object)[] parameters) =>
             Block($"{name} with parameters:", parameters);
 
         /// <summary>
         /// Builds an aligned key/value block under an explicit header line, e.g.
         /// "Create with configuration:".
         /// </summary>
-        public static string Block(string header, params (string Key, object Value)[] parameters)
+        public static string Block(string header, params (string, object)[] parameters)
         {
             var map = new OrderedMap();
             foreach (var (key, value) in parameters)
