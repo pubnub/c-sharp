@@ -53,17 +53,32 @@
     <Compile Include="..\PubnubApi.Tests\DataSync\WhenCreateGenericEntity.cs">
       <Link>DataSync\WhenCreateGenericEntity.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi.Tests\DataSync\WhenDataSyncChannelEventIsReceived.cs">
+      <Link>DataSync\WhenDataSyncChannelEventIsReceived.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi.Tests\DataSync\WhenDataSyncChannelIsRequested.cs">
       <Link>DataSync\WhenDataSyncChannelIsRequested.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi.Tests\DataSync\WhenDataSyncEntityEventIsReceived.cs">
+      <Link>DataSync\WhenDataSyncEntityEventIsReceived.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi.Tests\DataSync\WhenDataSyncEntityIsRequested.cs">
       <Link>DataSync\WhenDataSyncEntityIsRequested.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi.Tests\DataSync\WhenDataSyncMembershipEventIsReceived.cs">
+      <Link>DataSync\WhenDataSyncMembershipEventIsReceived.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi.Tests\DataSync\WhenDataSyncMembershipIsRequested.cs">
       <Link>DataSync\WhenDataSyncMembershipIsRequested.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi.Tests\DataSync\WhenDataSyncRelationshipEventIsReceived.cs">
+      <Link>DataSync\WhenDataSyncRelationshipEventIsReceived.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi.Tests\DataSync\WhenDataSyncRelationshipIsRequested.cs">
       <Link>DataSync\WhenDataSyncRelationshipIsRequested.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi.Tests\DataSync\WhenDataSyncUserEventIsReceived.cs">
+      <Link>DataSync\WhenDataSyncUserEventIsReceived.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi.Tests\DataSync\WhenDataSyncUserIsRequested.cs">
       <Link>DataSync\WhenDataSyncUserIsRequested.cs</Link>

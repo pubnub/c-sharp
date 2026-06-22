@@ -645,6 +645,9 @@
     <Compile Include="..\PubnubApi\JsonDataParse\PNDataSyncEntityResultJsonDataParse.cs">
       <Link>JsonDataParse\PNDataSyncEntityResultJsonDataParse.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\JsonDataParse\PNDataSyncEventJsonDataParse.cs">
+      <Link>JsonDataParse\PNDataSyncEventJsonDataParse.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\JsonDataParse\PNDataSyncMembershipResultJsonDataParse.cs">
       <Link>JsonDataParse\PNDataSyncMembershipResultJsonDataParse.cs</Link>
     </Compile>
@@ -791,6 +794,9 @@
       <Link>Model\Consumer\Presence\PNWhereNowResult.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\Model\Consumer\Pubsub\PNAddMessageActionResult.cs" Link="Model\Consumer\Pubsub\PNAddMessageActionResult.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\Pubsub\PNDataSyncEventResult.cs">
+      <Link>Model\Consumer\Pubsub\PNDataSyncEventResult.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\Model\Consumer\Pubsub\PNGetMessageActionsResult.cs" Link="Model\Consumer\Pubsub\PNGetMessageActionsResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Pubsub\PNMessageAction.cs" Link="Model\Consumer\Pubsub\PNMessageAction.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\Pubsub\PNMessageActionEventResult.cs" Link="Model\Consumer\Pubsub\PNMessageActionEventResult.cs" />
