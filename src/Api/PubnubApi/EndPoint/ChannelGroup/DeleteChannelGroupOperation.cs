@@ -67,6 +67,9 @@ namespace PubnubApi.EndPoint
 				throw new ArgumentException("Missing groupName");
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("DeleteChannelGroup",
+				("channelGroup", groupName),
+				("queryParam", externalQueryParam)));
 			RequestState<PNChannelGroupsDeleteGroupResult> requestState = new RequestState<PNChannelGroupsDeleteGroupResult>();
 			requestState.ResponseType = PNOperationType.PNRemoveGroupOperation;
 			requestState.Channels = new string[] { };
@@ -104,6 +107,9 @@ namespace PubnubApi.EndPoint
 			}
 			
 			logger?.Trace($"{GetType().Name} parameter validated.");
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("DeleteChannelGroup",
+				("channelGroup", groupName),
+				("queryParam", externalQueryParam)));
 			PNResult<PNChannelGroupsDeleteGroupResult> returnValue = new PNResult<PNChannelGroupsDeleteGroupResult>();
 			RequestState<PNChannelGroupsDeleteGroupResult> requestState = new RequestState<PNChannelGroupsDeleteGroupResult>();
 			requestState.ResponseType = PNOperationType.PNRemoveGroupOperation;

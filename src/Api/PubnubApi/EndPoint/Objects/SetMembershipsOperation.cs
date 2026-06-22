@@ -120,6 +120,15 @@ namespace PubnubApi.EndPoint
             }
 
             logger?.Trace($"{GetType().Name} parameter validated.");
+            logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("SetMemberships",
+                ("uuid", uuid),
+                ("channels", addMembership),
+                ("limit", limit),
+                ("includeCount", includeCount),
+                ("include", includeFields),
+                ("page", page),
+                ("sort", sortField),
+                ("queryParam", queryParam)));
             RequestState<PNMembershipsResult> requestState = new RequestState<PNMembershipsResult>();
             requestState.ResponseType = PNOperationType.PNSetMembershipsOperation;
             requestState.PubnubCallback = callback;
@@ -177,6 +186,15 @@ namespace PubnubApi.EndPoint
             }
 
             logger?.Trace($"{GetType().Name} parameter validated.");
+            logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("SetMemberships",
+                ("uuid", uuid),
+                ("channels", addMembership),
+                ("limit", limit),
+                ("includeCount", includeCount),
+                ("include", includeFields),
+                ("page", page),
+                ("sort", sortField),
+                ("queryParam", queryParam)));
             if (string.IsNullOrEmpty(config.SubscribeKey) || string.IsNullOrEmpty(config.SubscribeKey.Trim()) ||
                 config.SubscribeKey.Length <= 0)
             {

@@ -83,6 +83,11 @@ namespace PubnubApi.EndPoint
 				throw new ArgumentException("Missing groupName");
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("AddChannelsToChannelGroup",
+				("channelGroup", groupName),
+				("channels", channels),
+				("nameSpace", nameSpace),
+				("queryParam", externalQueryParam)));
 			RequestState<PNChannelGroupsAddChannelResult> requestState = new RequestState<PNChannelGroupsAddChannelResult>();
 			requestState.ResponseType = PNOperationType.PNAddChannelsToGroupOperation;
 			requestState.Channels = new string[] { };
@@ -127,6 +132,11 @@ namespace PubnubApi.EndPoint
 				throw new ArgumentException("Missing groupName");
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("AddChannelsToChannelGroup",
+				("channelGroup", groupName),
+				("channels", channels),
+				("nameSpace", nameSpace),
+				("queryParam", externalQueryParam)));
 			PNResult<PNChannelGroupsAddChannelResult> returnValue = new PNResult<PNChannelGroupsAddChannelResult>();
 			RequestState<PNChannelGroupsAddChannelResult> requestState = new RequestState<PNChannelGroupsAddChannelResult>();
 			requestState.ResponseType = PNOperationType.PNAddChannelsToGroupOperation;

@@ -132,6 +132,15 @@ namespace PubnubApi.EndPoint
 		private void ProcessRemoveChannelMembersOperationRequest(string spaceId, List<string> removeMemberList, PNPageObject page, int limit, bool includeCount, string includeOptions, List<string> sort, Dictionary<string, object> externalQueryParam, PNCallback<PNChannelMembersResult> callback)
 		{
 			logger?.Trace($"{GetType().Name} parameter validated.");
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("RemoveChannelMembers",
+				("channel", spaceId),
+				("uuids", removeMemberList),
+				("limit", limit),
+				("includeCount", includeCount),
+				("include", includeOptions),
+				("page", page),
+				("sort", sort),
+				("queryParam", externalQueryParam)));
 			RequestState<PNChannelMembersResult> requestState = new RequestState<PNChannelMembersResult>
 				{
 					ResponseType = PNOperationType.PNRemoveChannelMembersOperation,
@@ -183,6 +192,15 @@ namespace PubnubApi.EndPoint
 				return returnValue;
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("RemoveChannelMembers",
+				("channel", channel),
+				("uuids", removeMemberList),
+				("limit", limit),
+				("includeCount", includeCount),
+				("include", includeOptions),
+				("page", page),
+				("sort", sort),
+				("queryParam", externalQueryParam)));
 			RequestState<PNChannelMembersResult> requestState = new RequestState<PNChannelMembersResult>
 				{
 					ResponseType = PNOperationType.PNRemoveChannelMembersOperation,

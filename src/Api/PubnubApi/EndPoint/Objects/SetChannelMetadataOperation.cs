@@ -138,6 +138,18 @@ namespace PubnubApi.EndPoint
 
         private void SetChannelMetadata(PNCallback<PNSetChannelMetadataResult> callback)
         {
+            logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("SetChannelMetadata",
+                ("channel", channelId),
+                ("name", channelName),
+                ("description", channelDescription),
+                ("status", channelStatus),
+                ("type", channelType),
+                ("custom", custom),
+                ("includeCustom", includeCustom),
+                ("includeStatus", includeStatus),
+                ("includeType", includeType),
+                ("ifMatchesEtag", ifMatchesEtag),
+                ("queryParam", queryParam)));
             var requestState = new RequestState<PNSetChannelMetadataResult>
             {
                 ResponseType = PNOperationType.PNSetChannelMetadataOperation,
@@ -215,6 +227,18 @@ namespace PubnubApi.EndPoint
             }
 
             logger?.Trace($"{GetType().Name} parameter validated.");
+            logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("SetChannelMetadata",
+                ("channel", channelId),
+                ("name", channelName),
+                ("description", channelDescription),
+                ("status", channelStatus),
+                ("type", channelType),
+                ("custom", custom),
+                ("includeCustom", includeCustom),
+                ("includeStatus", includeStatus),
+                ("includeType", includeType),
+                ("ifMatchesEtag", ifMatchesEtag),
+                ("queryParam", queryParam)));
             var requestState = new RequestState<PNSetChannelMetadataResult>
             {
                 ResponseType = PNOperationType.PNSetChannelMetadataOperation,

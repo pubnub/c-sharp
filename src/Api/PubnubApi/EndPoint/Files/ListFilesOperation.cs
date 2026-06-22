@@ -79,6 +79,11 @@ namespace PubnubApi.EndPoint
 
 		private void ProcessListFilesRequest(PNCallback<PNListFilesResult> callback)
 		{
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("ListFiles",
+				("channel", channelName),
+				("limit", limitFileCount),
+				("next", nextFileBatchToken),
+				("queryParam", queryParam)));
 			RequestState<PNListFilesResult> requestState = new RequestState<PNListFilesResult>
 			{
 				ResponseType = PNOperationType.PNListFilesOperation,
@@ -124,6 +129,11 @@ namespace PubnubApi.EndPoint
 				return returnValue;
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("ListFiles",
+				("channel", channelName),
+				("limit", limitFileCount),
+				("next", nextFileBatchToken),
+				("queryParam", queryParam)));
 			RequestState<PNListFilesResult> requestState = new RequestState<PNListFilesResult>
 			{
 				ResponseType = PNOperationType.PNListFilesOperation,

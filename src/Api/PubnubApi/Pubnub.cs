@@ -1265,7 +1265,7 @@ namespace PubnubApi
                 httpTransportService ?? new HttpClientService(proxy: config.Proxy, enableHttp2: config.EnableHttp2);
             httpClientService.SetLogger(logger);
             transportMiddleware = middleware ?? new Middleware(httpClientService, config, this, tokenManager);
-            logger?.Debug(GetConfigurationLogString(config));
+            logger?.Debug(() => GetConfigurationLogString(config));
         }
 
 #if UNITY
@@ -1275,22 +1275,24 @@ namespace PubnubApi
         }
 #endif
         private string GetConfigurationLogString(PNConfiguration config) =>
-            $"Pubnub instance initialised with\n" +
-            $"UserId {config.UserId}\n" +
-            $"SubscribeKey {config.SubscribeKey}\n" +
-            $"PublishKey {config.PublishKey}\n" +
-            $"LogLevel {config.LogLevel}\n" +
-            $"ReconnectionPolicy {config.RetryConfiguration.RetryPolicy}\n" +
-            $"PresenceTimeout {config.PresenceTimeout}\n" +
-            $"SubscribeTimeout {config.SubscribeTimeout}\n" +
-            $"Origin {config?.Origin}\n" +
-            $"Is CryptoModule initialised {(config?.CryptoModule == null ? bool.FalseString : bool.TrueString)}\n" +
-            $"Is secretKey provided {(string.IsNullOrEmpty(config?.SecretKey) ? bool.FalseString : bool.TrueString)}\n" +
-            $"Is AuthKey provided {(string.IsNullOrEmpty(config?.AuthKey) ? bool.FalseString : bool.TrueString)}\n" +
-            $"Proxy {config.Proxy}\n" +
-            $"FilterExpression {config.FilterExpression}\n" +
-            $"EnableEventEngine {config.EnableEventEngine}\n" +
-            $"MaintainPresenceState {config.MaintainPresenceState}\n";
+            "PubNub " + PubnubLogFormatter.Block("Create with configuration:",
+                ("userId", config.UserId),
+                ("subscribeKey", config.SubscribeKey),
+                ("publishKey", config.PublishKey),
+                ("logLevel", config.LogLevel),
+                ("reconnectionPolicy", config.RetryConfiguration?.RetryPolicy),
+                ("presenceTimeout", config.PresenceTimeout),
+                ("subscribeTimeout", config.SubscribeTimeout),
+                ("origin", config?.Origin),
+                ("ssl", config?.Secure),
+                ("enableHttp2", config?.EnableHttp2),
+                ("cryptoModuleInitialised", config?.CryptoModule != null),
+                ("secretKeyProvided", !string.IsNullOrEmpty(config?.SecretKey)),
+                ("authKeyProvided", !string.IsNullOrEmpty(config?.AuthKey)),
+                ("proxy", config.Proxy),
+                ("filterExpression", config.FilterExpression),
+                ("enableEventEngine", config.EnableEventEngine),
+                ("maintainPresenceState", config.MaintainPresenceState));
 
         private PubnubLogModule InitializeLogger(PNConfiguration configuration)
         {

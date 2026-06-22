@@ -166,6 +166,14 @@ namespace PubnubApi.EndPoint
 			}
 			string channel = string.Join(",", channelNames);
 			logger?.Trace($"{GetType().Name} parameter validated.");
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("FetchHistory",
+				("channels", channelNames),
+				("start", startTimetoken),
+				("end", endTimetoken),
+				("count", perChannelCount),
+				("reverse", reverseOption),
+				("includeMeta", withMetaOption),
+				("includeMessageActions", withMessageActionsOption)));
 			RequestState<PNFetchHistoryResult> requestState = new RequestState<PNFetchHistoryResult>
 			{
 				Channels = new[] { channel },
@@ -205,6 +213,14 @@ namespace PubnubApi.EndPoint
 			logger?.Trace($"{GetType().Name} parameter validated.");
 			PNResult<PNFetchHistoryResult> returnValue = new PNResult<PNFetchHistoryResult>();
 			string channel = string.Join(",", channelNames);
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("FetchHistory",
+				("channels", channelNames),
+				("start", startTimetoken),
+				("end", endTimetoken),
+				("count", perChannelCount),
+				("reverse", reverseOption),
+				("includeMeta", withMetaOption),
+				("includeMessageActions", withMessageActionsOption)));
 			RequestState<PNFetchHistoryResult> requestState = new RequestState<PNFetchHistoryResult>
 			{
 				Channels = new[] { channel },

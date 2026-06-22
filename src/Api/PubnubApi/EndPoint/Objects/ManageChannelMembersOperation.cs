@@ -143,6 +143,16 @@ namespace PubnubApi.EndPoint
 
         private void ProcessMembersOperationRequest(PNCallback<PNChannelMembersResult> callback)
         {
+            logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("ManageChannelMembers",
+                ("channel", channelId),
+                ("set", setMember),
+                ("remove", delMember),
+                ("limit", limit),
+                ("includeCount", includeCount),
+                ("include", commandDelimitedIncludeOptions),
+                ("page", page),
+                ("sort", sortField),
+                ("queryParam", queryParam)));
             RequestState<PNChannelMembersResult> requestState = new RequestState<PNChannelMembersResult>
                 {
                     ResponseType = PNOperationType.PNManageChannelMembersOperation,
@@ -197,6 +207,16 @@ namespace PubnubApi.EndPoint
                 return returnValue;
             }
             logger?.Trace($"{GetType().Name} parameter validated.");
+            logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("ManageChannelMembers",
+                ("channel", channelId),
+                ("set", setMember),
+                ("remove", delMember),
+                ("limit", limit),
+                ("includeCount", includeCount),
+                ("include", commandDelimitedIncludeOptions),
+                ("page", page),
+                ("sort", sortField),
+                ("queryParam", queryParam)));
             RequestState<PNChannelMembersResult> requestState = new RequestState<PNChannelMembersResult>
                 {
                     ResponseType = PNOperationType.PNManageChannelMembersOperation,

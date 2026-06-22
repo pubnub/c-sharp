@@ -101,7 +101,6 @@ namespace PubnubApi.EndPoint
 				var transportResponse = await pubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ConfigureAwait(false);
 				if (transportResponse.Content != null && transportResponse.Error == null && transportResponse.StatusCode == Constants.HttpRequestSuccessStatusCode) {
 					var responseJson = Encoding.UTF8.GetString(transportResponse.Content);
-					logger?.Debug($"Receiving Effect received json: {responseJson}");
 					PNStatus status = new PNStatus(null, PNOperationType.PNSubscribeOperation, PNStatusCategory.PNConnectedCategory, channels, channelGroups);
 					ReceivingResponse<object> receiveResponse = jsonLibrary.DeserializeToObject<ReceivingResponse<object>>(responseJson);
 					return new Tuple<ReceivingResponse<object>, PNStatus>(receiveResponse, status);

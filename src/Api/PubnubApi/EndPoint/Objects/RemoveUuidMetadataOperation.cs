@@ -85,6 +85,9 @@ namespace PubnubApi.EndPoint
 				this.uuid = config.UserId;
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("RemoveUuidMetadata",
+				("uuid", this.uuid),
+				("queryParam", externalQueryParam)));
 			RequestState<PNRemoveUuidMetadataResult> requestState = new RequestState<PNRemoveUuidMetadataResult>
 				{
 					ResponseType = PNOperationType.PNDeleteUuidMetadataOperation,
@@ -135,6 +138,9 @@ namespace PubnubApi.EndPoint
 				return returnValue;
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("RemoveUuidMetadata",
+				("uuid", this.uuid),
+				("queryParam", externalQueryParam)));
 			RequestState<PNRemoveUuidMetadataResult> requestState = new RequestState<PNRemoveUuidMetadataResult>
 				{
 					ResponseType = PNOperationType.PNDeleteUuidMetadataOperation,

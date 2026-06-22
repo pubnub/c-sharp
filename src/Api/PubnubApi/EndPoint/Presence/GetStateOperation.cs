@@ -14,8 +14,6 @@ namespace PubnubApi.EndPoint
 		private readonly PNConfiguration config;
 		private readonly IJsonPluggableLibrary jsonLibrary;
 		private readonly IPubnubUnitTest unit;
-
-
 		private string[] channelNames;
 		private string[] channelGroupNames;
 		private string channelUUID = "";
@@ -27,7 +25,6 @@ namespace PubnubApi.EndPoint
 			config = pubnubConfig;
 			jsonLibrary = jsonPluggableLibrary;
 			unit = pubnubUnit;
-
 		}
 
 		public GetStateOperation Channels(string[] channels)
@@ -91,6 +88,11 @@ namespace PubnubApi.EndPoint
 				internalUuid = uuid;
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("GetState",
+				("channels", channels),
+				("channelGroups", channelGroups),
+				("uuid", uuid),
+				("queryParam", externalQueryParam)));
 			RequestState<PNGetStateResult> requestState = new RequestState<PNGetStateResult>
 			{
 				Channels = channels,
@@ -133,6 +135,11 @@ namespace PubnubApi.EndPoint
 				throw new ArgumentException("Either Channel Or Channel Group or Both should be provided");
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("GetState",
+				("channels", channels),
+				("channelGroups", channelGroups),
+				("uuid", uuid),
+				("queryParam", externalQueryParam)));
 			PNResult<PNGetStateResult> returnValue = new PNResult<PNGetStateResult>();
 
 			string internalUuid;

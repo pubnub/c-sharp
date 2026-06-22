@@ -134,6 +134,16 @@ namespace PubnubApi.EndPoint
         }
 
         logger?.Trace($"{GetType().Name} parameter validated.");
+        logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("GetAllChannelMetadata",
+            ("limit", limit),
+            ("includeCount", includeCount),
+            ("includeCustom", includeCustom),
+            ("includeStatus", includeStatus),
+            ("includeType", includeType),
+            ("filter", channelsFilter),
+            ("page", page),
+            ("sort", sortField),
+            ("queryParam", queryParam)));
         var requestState = new RequestState<PNGetAllChannelMetadataResult>
         {
             ResponseType = PNOperationType.PNGetAllChannelMetadataOperation,
@@ -179,6 +189,16 @@ namespace PubnubApi.EndPoint
     private async Task<PNResult<PNGetAllChannelMetadataResult>> GetAllChannelMetadataList()
     {
         var returnValue = new PNResult<PNGetAllChannelMetadataResult>();
+        logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("GetAllChannelMetadata",
+            ("limit", limit),
+            ("includeCount", includeCount),
+            ("includeCustom", includeCustom),
+            ("includeStatus", includeStatus),
+            ("includeType", includeType),
+            ("filter", channelsFilter),
+            ("page", page),
+            ("sort", sortField),
+            ("queryParam", queryParam)));
         var requestState = new RequestState<PNGetAllChannelMetadataResult>
         {
             ResponseType = PNOperationType.PNGetAllChannelMetadataOperation,

@@ -102,6 +102,12 @@ namespace PubnubApi.EndPoint
 				throw new ArgumentException("Missing Topic");
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("AuditPushChannel",
+				("pushType", pushType),
+				("deviceId", pushToken),
+				("environment", environment),
+				("topic", deviceTopic),
+				("queryParam", externalQueryParam)));
 			RequestState<PNPushListProvisionsResult> requestState = new RequestState<PNPushListProvisionsResult>
 				{
 					ResponseType = PNOperationType.PushGet,
@@ -141,6 +147,12 @@ namespace PubnubApi.EndPoint
 				throw new ArgumentException("Missing Topic");
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("AuditPushChannel",
+				("pushType", pushType),
+				("deviceId", pushToken),
+				("environment", environment),
+				("topic", deviceTopic),
+				("queryParam", externalQueryParam)));
 			RequestState<PNPushListProvisionsResult> requestState = new RequestState<PNPushListProvisionsResult>
 				{
 					ResponseType = PNOperationType.PushGet,
