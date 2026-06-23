@@ -20,22 +20,32 @@ namespace PubnubApi
         private const int MaxDepth = 10;
 
         /// <summary>
-        /// Builds a "&lt;name&gt; with parameters:" block from ordered key/value pairs.
-        /// Pairs with a null value are rendered as "null" (matching cross-SDK behavior).
+        /// Builds a "&lt;name&gt; with parameters:" block from alternating key/value
+        /// arguments (key1, value1, key2, value2, ...). Pairs with a null value are
+        /// rendered as "null" (matching cross-SDK behavior).
         /// </summary>
-        public static string Parameters(string name, params (string, object)[] parameters) =>
-            Block($"{name} with parameters:", parameters);
+        /// <remarks>
+        /// Uses a flat <c>object[]</c> instead of value tuples so the API compiles on
+        /// targets (e.g. UWP) whose reference assemblies do not provide
+        /// <c>System.ValueTuple</c>.
+        /// </remarks>
+        public static string Parameters(string name, params object[] keyValues) =>
+            Block($"{name} with parameters:", keyValues);
 
         /// <summary>
         /// Builds an aligned key/value block under an explicit header line, e.g.
-        /// "Create with configuration:".
+        /// "Create with configuration:", from alternating key/value arguments
+        /// (key1, value1, key2, value2, ...).
         /// </summary>
-        public static string Block(string header, params (string, object)[] parameters)
+        public static string Block(string header, params object[] keyValues)
         {
             var map = new OrderedMap();
-            foreach (var (key, value) in parameters)
+            if (keyValues != null)
             {
-                map.Add(key, value);
+                for (int i = 0; i + 1 < keyValues.Length; i += 2)
+                {
+                    map.Add(Convert.ToString(keyValues[i], CultureInfo.InvariantCulture), keyValues[i + 1]);
+                }
             }
             var sb = new StringBuilder();
             sb.Append(header);

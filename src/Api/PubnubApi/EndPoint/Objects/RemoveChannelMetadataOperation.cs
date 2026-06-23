@@ -86,8 +86,8 @@ namespace PubnubApi.EndPoint
 		{
 			logger?.Trace($"{GetType().Name} parameter validated.");
 			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("RemoveChannelMetadata",
-				("channel", channelId),
-				("queryParam", externalQueryParam)));
+				"channel", channelId,
+				"queryParam", externalQueryParam));
 			RequestState<PNRemoveChannelMetadataResult> requestState = new RequestState<PNRemoveChannelMetadataResult>
 				{
 					ResponseType = PNOperationType.PNDeleteChannelMetadataOperation,
@@ -140,8 +140,8 @@ namespace PubnubApi.EndPoint
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
 			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("RemoveChannelMetadata",
-				("channel", channelId),
-				("queryParam", externalQueryParam)));
+				"channel", channelId,
+				"queryParam", externalQueryParam));
 			RequestState<PNRemoveChannelMetadataResult> requestState = new RequestState<PNRemoveChannelMetadataResult>
 				{
 					ResponseType = PNOperationType.PNDeleteChannelMetadataOperation,

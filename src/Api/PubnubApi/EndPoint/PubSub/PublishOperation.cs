@@ -200,12 +200,12 @@ namespace PubnubApi.EndPoint
 
             logger?.Trace($"{GetType().Name} parameter validated.");
             logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("Publish",
-                ("channel", channel),
-                ("messageSizeBytes", Encoding.UTF8.GetByteCount(jsonLibrary.SerializeToJsonString(message))),
-                ("storeInHistory", storeInHistory),
-                ("ttl", ttl),
-                ("meta", userMetadata),
-                ("queryParam", externalQueryParam)));
+                "channel", channel,
+                "messageSizeBytes", Encoding.UTF8.GetByteCount(jsonLibrary.SerializeToJsonString(message)),
+                "storeInHistory", storeInHistory,
+                "ttl", ttl,
+                "meta", userMetadata,
+                "queryParam", externalQueryParam));
             RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>
             {
                 Channels = [channel],
@@ -315,12 +315,12 @@ namespace PubnubApi.EndPoint
             };
             logger?.Trace($"{GetType().Name} parameter validated.");
             logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("Publish",
-                ("channel", channel),
-                ("messageSizeBytes", Encoding.UTF8.GetByteCount(jsonLibrary.SerializeToJsonString(message))),
-                ("storeInHistory", storeInHistory),
-                ("ttl", ttl),
-                ("meta", metaData),
-                ("queryParam", externalQueryParam)));
+                "channel", channel,
+                "messageSizeBytes", Encoding.UTF8.GetByteCount(jsonLibrary.SerializeToJsonString(message)),
+                "storeInHistory", storeInHistory,
+                "ttl", ttl,
+                "meta", metaData,
+                "queryParam", externalQueryParam));
             var requestParameter = CreateRequestParameter();
             var transportRequest =
                 PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter,

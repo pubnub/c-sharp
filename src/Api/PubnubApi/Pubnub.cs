@@ -1276,23 +1276,23 @@ namespace PubnubApi
 #endif
         private string GetConfigurationLogString(PNConfiguration config) =>
             "PubNub " + PubnubLogFormatter.Block("Create with configuration:",
-                ("userId", config.UserId),
-                ("subscribeKey", config.SubscribeKey),
-                ("publishKey", config.PublishKey),
-                ("logLevel", config.LogLevel),
-                ("reconnectionPolicy", config.RetryConfiguration?.RetryPolicy),
-                ("presenceTimeout", config.PresenceTimeout),
-                ("subscribeTimeout", config.SubscribeTimeout),
-                ("origin", config?.Origin),
-                ("ssl", config?.Secure),
-                ("enableHttp2", config?.EnableHttp2),
-                ("cryptoModuleInitialised", config?.CryptoModule != null),
-                ("secretKeyProvided", !string.IsNullOrEmpty(config?.SecretKey)),
-                ("authKeyProvided", !string.IsNullOrEmpty(config?.AuthKey)),
-                ("proxy", config.Proxy),
-                ("filterExpression", config.FilterExpression),
-                ("enableEventEngine", config.EnableEventEngine),
-                ("maintainPresenceState", config.MaintainPresenceState));
+                "userId", config.UserId,
+                "subscribeKey", config.SubscribeKey,
+                "publishKey", config.PublishKey,
+                "logLevel", config.LogLevel,
+                "reconnectionPolicy", config.RetryConfiguration?.RetryPolicy,
+                "presenceTimeout", config.PresenceTimeout,
+                "subscribeTimeout", config.SubscribeTimeout,
+                "origin", config?.Origin,
+                "ssl", config?.Secure,
+                "enableHttp2", config?.EnableHttp2,
+                "cryptoModuleInitialised", config?.CryptoModule != null,
+                "secretKeyProvided", !string.IsNullOrEmpty(config?.SecretKey),
+                "authKeyProvided", !string.IsNullOrEmpty(config?.AuthKey),
+                "proxy", config.Proxy,
+                "filterExpression", config.FilterExpression,
+                "enableEventEngine", config.EnableEventEngine,
+                "maintainPresenceState", config.MaintainPresenceState);
 
         private PubnubLogModule InitializeLogger(PNConfiguration configuration)
         {

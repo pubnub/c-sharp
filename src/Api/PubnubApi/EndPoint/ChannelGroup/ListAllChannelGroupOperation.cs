@@ -59,7 +59,7 @@ namespace PubnubApi.EndPoint
 		internal void GetAllChannelGroup(Dictionary<string, object> externalQueryParam, PNCallback<PNChannelGroupsListAllResult> callback)
 		{
 			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("ListAllChannelGroup",
-				("queryParam", externalQueryParam)));
+				"queryParam", externalQueryParam));
 			RequestState<PNChannelGroupsListAllResult> requestState = new RequestState<PNChannelGroupsListAllResult>
 				{
 					ResponseType = PNOperationType.ChannelGroupAllGet,
@@ -92,7 +92,7 @@ namespace PubnubApi.EndPoint
 		internal async Task<PNResult<PNChannelGroupsListAllResult>> GetAllChannelGroup(Dictionary<string, object> externalQueryParam)
 		{
 			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("ListAllChannelGroup",
-				("queryParam", externalQueryParam)));
+				"queryParam", externalQueryParam));
 			PNResult<PNChannelGroupsListAllResult> returnValue = new PNResult<PNChannelGroupsListAllResult>();
 			RequestState<PNChannelGroupsListAllResult> requestState = new RequestState<PNChannelGroupsListAllResult>
 				{

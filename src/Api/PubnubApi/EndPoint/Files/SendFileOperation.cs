@@ -167,9 +167,9 @@ namespace PubnubApi.EndPoint
 
             logger?.Debug($"GenerateFileUploadUrl executed.");
             logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("SendFile",
-                ("channel", channelName),
-                ("fileName", sendFileName),
-                ("queryParam", queryParam)));
+                "channel", channelName,
+                "fileName", sendFileName,
+                "queryParam", queryParam));
             RequestState<PNFileUploadResult> requestState = new RequestState<PNFileUploadResult>();
             requestState.ResponseType = PNOperationType.PNFileUploadOperation;
             requestState.PubnubCallback = callback;
@@ -295,9 +295,9 @@ namespace PubnubApi.EndPoint
 
             logger?.Trace($"{GetType().Name} parameter validated.");
             logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("SendFile",
-                ("channel", channelName),
-                ("fileName", sendFileName),
-                ("queryParam", queryParam)));
+                "channel", channelName,
+                "fileName", sendFileName,
+                "queryParam", queryParam));
             PNResult<PNGenerateFileUploadUrlResult> generateFileUploadUrl =
                 await GenerateFileUploadUrl().ConfigureAwait(false);
             PNGenerateFileUploadUrlResult generateFileUploadUrlResult = generateFileUploadUrl.Result;

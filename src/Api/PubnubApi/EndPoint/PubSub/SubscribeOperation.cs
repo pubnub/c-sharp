@@ -195,11 +195,11 @@ namespace PubnubApi.EndPoint
             string channelGroup = (channelGroups != null) ? string.Join(",", channelGroups.OrderBy(x => x).ToArray()) : "";
 
             logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("Subscribe",
-                ("channels", channels),
-                ("channelGroups", channelGroups),
-                ("timetoken", subscribeTimetoken),
-                ("filterExpression", config.FilterExpression),
-                ("queryParam", externalQueryParam)));
+                "channels", channels,
+                "channelGroups", channelGroups,
+                "timetoken", subscribeTimetoken,
+                "filterExpression", config.FilterExpression,
+                "queryParam", externalQueryParam));
 
             Dictionary<string, string> initialSubscribeUrlParams = new Dictionary<string, string>();
             if (subscribeTimetoken >= 0)

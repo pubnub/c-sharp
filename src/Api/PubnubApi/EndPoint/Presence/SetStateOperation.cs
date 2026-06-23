@@ -123,11 +123,11 @@ namespace PubnubApi.EndPoint
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
 			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("SetState",
-				("channels", channels),
-				("channelGroups", channelGroups),
-				("uuid", uuid),
-				("state", jsonUserState),
-				("queryParam", externalQueryParam)));
+				"channels", channels,
+				"channelGroups", channelGroups,
+				"uuid", uuid,
+				"state", jsonUserState,
+				"queryParam", externalQueryParam));
 			List<string> channelList = new List<string>();
 			List<string> channelGroupList = new List<string>();
 			string[] filteredChannels = channels;
@@ -204,11 +204,11 @@ namespace PubnubApi.EndPoint
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
 			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("SetState",
-				("channels", channels),
-				("channelGroups", channelGroups),
-				("uuid", uuid),
-				("state", jsonUserState),
-				("queryParam", externalQueryParam)));
+				"channels", channels,
+				"channelGroups", channelGroups,
+				"uuid", uuid,
+				"state", jsonUserState,
+				"queryParam", externalQueryParam));
 			List<string> channelList = new List<string>();
 			List<string> channelGroupList = new List<string>();
 			string[] filteredChannels = channels;

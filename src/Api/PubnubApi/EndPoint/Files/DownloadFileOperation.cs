@@ -129,10 +129,10 @@ namespace PubnubApi.EndPoint
 
             logger?.Trace($"{GetType().Name} parameter validated.");
             logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("DownloadFile",
-                ("channel", channelName),
-                ("fileId", currentFileId),
-                ("fileName", currentFileName),
-                ("queryParam", queryParam)));
+                "channel", channelName,
+                "fileId", currentFileId,
+                "fileName", currentFileName,
+                "queryParam", queryParam));
             var requestParameter = CreateRequestParameter();
             var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(
                 requestParameter: requestParameter, operationType: PNOperationType.PNDownloadFileOperation);

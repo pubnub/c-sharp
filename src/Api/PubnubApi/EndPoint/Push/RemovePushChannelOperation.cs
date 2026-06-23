@@ -129,12 +129,12 @@ namespace PubnubApi.EndPoint
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
 			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("RemovePushChannel",
-				("channels", channels),
-				("pushType", pushType),
-				("deviceId", pushToken),
-				("environment", environment),
-				("topic", deviceTopic),
-				("queryParam", externalQueryParam)));
+				"channels", channels,
+				"pushType", pushType,
+				"deviceId", pushToken,
+				"environment", environment,
+				"topic", deviceTopic,
+				"queryParam", externalQueryParam));
 			RequestState<PNPushRemoveChannelResult> requestState = new RequestState<PNPushRemoveChannelResult>
 				{
 					Channels = channels.Select(c => c).ToArray(),
@@ -181,12 +181,12 @@ namespace PubnubApi.EndPoint
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
 			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("RemovePushChannel",
-				("channels", channels),
-				("pushType", pushType),
-				("deviceId", pushToken),
-				("environment", environment),
-				("topic", deviceTopic),
-				("queryParam", externalQueryParam)));
+				"channels", channels,
+				"pushType", pushType,
+				"deviceId", pushToken,
+				"environment", environment,
+				"topic", deviceTopic,
+				"queryParam", externalQueryParam));
 			PNResult<PNPushRemoveChannelResult> returnValue = new PNResult<PNPushRemoveChannelResult>();
 			RequestState<PNPushRemoveChannelResult> requestState = new RequestState<PNPushRemoveChannelResult>
 				{

@@ -171,19 +171,19 @@ namespace PubnubApi.EndPoint
 
             logger?.Trace($"{GetType().Name} parameter validated.");
             logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("SetUuidMetadata",
-                ("uuid", uuidId),
-                ("name", uuidName),
-                ("email", uuidEmail),
-                ("externalId", uuidExternalId),
-                ("profileUrl", uuidProfileUrl),
-                ("status", uuidStatus),
-                ("type", uuidType),
-                ("custom", uuidCustom),
-                ("includeCustom", includeCustom),
-                ("includeStatus", includeStatus),
-                ("includeType", includeType),
-                ("ifMatchesEtag", ifMatchesEtag),
-                ("queryParam", queryParam)));
+                "uuid", uuidId,
+                "name", uuidName,
+                "email", uuidEmail,
+                "externalId", uuidExternalId,
+                "profileUrl", uuidProfileUrl,
+                "status", uuidStatus,
+                "type", uuidType,
+                "custom", uuidCustom,
+                "includeCustom", includeCustom,
+                "includeStatus", includeStatus,
+                "includeType", includeType,
+                "ifMatchesEtag", ifMatchesEtag,
+                "queryParam", queryParam));
             var requestState = new RequestState<PNSetUuidMetadataResult>
             {
                 ResponseType = PNOperationType.PNSetUuidMetadataOperation,
@@ -241,19 +241,19 @@ namespace PubnubApi.EndPoint
 
             logger?.Trace($"{GetType().Name} parameter validated.");
             logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("SetUuidMetadata",
-                ("uuid", uuidId),
-                ("name", uuidName),
-                ("email", uuidEmail),
-                ("externalId", uuidExternalId),
-                ("profileUrl", uuidProfileUrl),
-                ("status", uuidStatus),
-                ("type", uuidType),
-                ("custom", uuidCustom),
-                ("includeCustom", includeCustom),
-                ("includeStatus", includeStatus),
-                ("includeType", includeType),
-                ("ifMatchesEtag", ifMatchesEtag),
-                ("queryParam", queryParam)));
+                "uuid", uuidId,
+                "name", uuidName,
+                "email", uuidEmail,
+                "externalId", uuidExternalId,
+                "profileUrl", uuidProfileUrl,
+                "status", uuidStatus,
+                "type", uuidType,
+                "custom", uuidCustom,
+                "includeCustom", includeCustom,
+                "includeStatus", includeStatus,
+                "includeType", includeType,
+                "ifMatchesEtag", ifMatchesEtag,
+                "queryParam", queryParam));
             var returnValue = new PNResult<PNSetUuidMetadataResult>();
 
             var requestState = new RequestState<PNSetUuidMetadataResult>

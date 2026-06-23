@@ -119,14 +119,14 @@ namespace PubnubApi.EndPoint
 
             logger?.Trace($"{GetType().Name} parameter validated.");
             logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("GetMemberships",
-                ("uuid", uuid),
-                ("limit", limit),
-                ("includeCount", includeCount),
-                ("include", commandDelimitedIncludeOptions),
-                ("filter", membershipsFilter),
-                ("page", page),
-                ("sort", sortField),
-                ("queryParam", queryParam)));
+                "uuid", uuid,
+                "limit", limit,
+                "includeCount", includeCount,
+                "include", commandDelimitedIncludeOptions,
+                "filter", membershipsFilter,
+                "page", page,
+                "sort", sortField,
+                "queryParam", queryParam));
             RequestState<PNMembershipsResult> requestState = new RequestState<PNMembershipsResult>
             {
                 ResponseType = PNOperationType.PNGetMembershipsOperation,
@@ -189,14 +189,14 @@ namespace PubnubApi.EndPoint
 
             logger?.Trace($"{GetType().Name} parameter validated.");
             logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("GetMemberships",
-                ("uuid", uuid),
-                ("limit", limit),
-                ("includeCount", includeCount),
-                ("include", commandDelimitedIncludeOptions),
-                ("filter", membershipsFilter),
-                ("page", page),
-                ("sort", sortField),
-                ("queryParam", queryParam)));
+                "uuid", uuid,
+                "limit", limit,
+                "includeCount", includeCount,
+                "include", commandDelimitedIncludeOptions,
+                "filter", membershipsFilter,
+                "page", page,
+                "sort", sortField,
+                "queryParam", queryParam));
             RequestState<PNMembershipsResult> requestState = new RequestState<PNMembershipsResult>
             {
                 ResponseType = PNOperationType.PNGetMembershipsOperation,

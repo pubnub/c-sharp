@@ -39,9 +39,9 @@ namespace PubnubApi.EndPoint
 				};
 
 				logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("Heartbeat",
-					("channels", channels),
-					("channelGroups", channelGroups),
-					("heartbeat", config.PresenceTimeout)));
+					"channels", channels,
+					"channelGroups", channelGroups,
+					"heartbeat", config.PresenceTimeout));
 				var requestParameter = CreateRequestParameter(channels: channels, channelGroups: channelGroups);
 				var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNHeartbeatOperation);
 				var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest: transportRequest).ConfigureAwait(false);

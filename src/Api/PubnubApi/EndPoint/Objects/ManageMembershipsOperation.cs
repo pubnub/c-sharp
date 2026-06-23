@@ -139,15 +139,15 @@ namespace PubnubApi.EndPoint
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
 			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("ManageMemberships",
-				("uuid", uuid),
-				("set", addMembership),
-				("remove", delMembership),
-				("limit", limit),
-				("includeCount", includeCount),
-				("include", commandDelimitedIncludeOptions),
-				("page", page),
-				("sort", sortField),
-				("queryParam", queryParam)));
+				"uuid", uuid,
+				"set", addMembership,
+				"remove", delMembership,
+				"limit", limit,
+				"includeCount", includeCount,
+				"include", commandDelimitedIncludeOptions,
+				"page", page,
+				"sort", sortField,
+				"queryParam", queryParam));
 			RequestState<PNMembershipsResult> requestState = new RequestState<PNMembershipsResult>
 				{
 					ResponseType = PNOperationType.PNManageMembershipsOperation,
@@ -199,15 +199,15 @@ namespace PubnubApi.EndPoint
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
 			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("ManageMemberships",
-				("uuid", uuid),
-				("set", addMembership),
-				("remove", delMembership),
-				("limit", limit),
-				("includeCount", includeCount),
-				("include", commandDelimitedIncludeOptions),
-				("page", page),
-				("sort", sortField),
-				("queryParam", queryParam)));
+				"uuid", uuid,
+				"set", addMembership,
+				"remove", delMembership,
+				"limit", limit,
+				"includeCount", includeCount,
+				"include", commandDelimitedIncludeOptions,
+				"page", page,
+				"sort", sortField,
+				"queryParam", queryParam));
 			RequestState<PNMembershipsResult> requestState = new RequestState<PNMembershipsResult>
 				{
 					ResponseType = PNOperationType.PNManageMembershipsOperation,

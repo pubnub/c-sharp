@@ -27,8 +27,8 @@ namespace PubnubApi.EndPoint
 			PNStatus responseStatus = null;
 			try {
 				logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("Leave",
-					("channels", channels),
-					("channelGroups", channelGroups)));
+					"channels", channels,
+					"channelGroups", channelGroups));
 
 				RequestState<T> pubnubRequestState = new RequestState<T>();
 				pubnubRequestState.Channels = channels;

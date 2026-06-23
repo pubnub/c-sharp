@@ -109,10 +109,10 @@ namespace PubnubApi.EndPoint
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
 			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("AddMessageAction",
-				("channelName", channel),
-				("messageTimetoken", messageTimetoken),
-				("messageAction", messageAction),
-				("queryParam", externalQueryParam)));
+				"channelName", channel,
+				"messageTimetoken", messageTimetoken,
+				"messageAction", messageAction,
+				"queryParam", externalQueryParam));
 			RequestState<PNAddMessageActionResult> requestState = new RequestState<PNAddMessageActionResult>
 				{
 					Channels = new[] { channelName },
@@ -178,10 +178,10 @@ namespace PubnubApi.EndPoint
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
 			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("AddMessageAction",
-				("channelName", channel),
-				("messageTimetoken", messageTimetoken),
-				("messageAction", messageAction),
-				("queryParam", externalQueryParam)));
+				"channelName", channel,
+				"messageTimetoken", messageTimetoken,
+				"messageAction", messageAction,
+				"queryParam", externalQueryParam));
 			RequestState<PNAddMessageActionResult> requestState = new RequestState<PNAddMessageActionResult>
 				{
 					Channels = new[] { channel },

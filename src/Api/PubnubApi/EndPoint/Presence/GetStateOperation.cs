@@ -89,10 +89,10 @@ namespace PubnubApi.EndPoint
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
 			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("GetState",
-				("channels", channels),
-				("channelGroups", channelGroups),
-				("uuid", uuid),
-				("queryParam", externalQueryParam)));
+				"channels", channels,
+				"channelGroups", channelGroups,
+				"uuid", uuid,
+				"queryParam", externalQueryParam));
 			RequestState<PNGetStateResult> requestState = new RequestState<PNGetStateResult>
 			{
 				Channels = channels,
@@ -136,10 +136,10 @@ namespace PubnubApi.EndPoint
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
 			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("GetState",
-				("channels", channels),
-				("channelGroups", channelGroups),
-				("uuid", uuid),
-				("queryParam", externalQueryParam)));
+				"channels", channels,
+				"channelGroups", channelGroups,
+				"uuid", uuid,
+				"queryParam", externalQueryParam));
 			PNResult<PNGetStateResult> returnValue = new PNResult<PNGetStateResult>();
 
 			string internalUuid;

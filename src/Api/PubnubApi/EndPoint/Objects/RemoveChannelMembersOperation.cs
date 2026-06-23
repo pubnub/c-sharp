@@ -133,14 +133,14 @@ namespace PubnubApi.EndPoint
 		{
 			logger?.Trace($"{GetType().Name} parameter validated.");
 			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("RemoveChannelMembers",
-				("channel", spaceId),
-				("uuids", removeMemberList),
-				("limit", limit),
-				("includeCount", includeCount),
-				("include", includeOptions),
-				("page", page),
-				("sort", sort),
-				("queryParam", externalQueryParam)));
+				"channel", spaceId,
+				"uuids", removeMemberList,
+				"limit", limit,
+				"includeCount", includeCount,
+				"include", includeOptions,
+				"page", page,
+				"sort", sort,
+				"queryParam", externalQueryParam));
 			RequestState<PNChannelMembersResult> requestState = new RequestState<PNChannelMembersResult>
 				{
 					ResponseType = PNOperationType.PNRemoveChannelMembersOperation,
@@ -193,14 +193,14 @@ namespace PubnubApi.EndPoint
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
 			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("RemoveChannelMembers",
-				("channel", channel),
-				("uuids", removeMemberList),
-				("limit", limit),
-				("includeCount", includeCount),
-				("include", includeOptions),
-				("page", page),
-				("sort", sort),
-				("queryParam", externalQueryParam)));
+				"channel", channel,
+				"uuids", removeMemberList,
+				"limit", limit,
+				"includeCount", includeCount,
+				"include", includeOptions,
+				"page", page,
+				"sort", sort,
+				"queryParam", externalQueryParam));
 			RequestState<PNChannelMembersResult> requestState = new RequestState<PNChannelMembersResult>
 				{
 					ResponseType = PNOperationType.PNRemoveChannelMembersOperation,

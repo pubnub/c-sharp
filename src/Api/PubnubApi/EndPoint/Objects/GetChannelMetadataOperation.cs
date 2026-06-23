@@ -93,11 +93,11 @@ namespace PubnubApi.EndPoint
 
                     logger?.Trace($"{GetType().Name} parameter validated.");
         logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("GetChannelMetadata",
-            ("channel", channelId),
-            ("includeCustom", includeCustom),
-            ("includeStatus", includeStatus),
-            ("includeType", includeType),
-            ("queryParam", queryParam)));
+            "channel", channelId,
+            "includeCustom", includeCustom,
+            "includeStatus", includeStatus,
+            "includeType", includeType,
+            "queryParam", queryParam));
         this.savedCallback = callback;
         GetSingleChannelMetadata(savedCallback);
         }
@@ -181,11 +181,11 @@ namespace PubnubApi.EndPoint
 
             logger?.Trace($"{GetType().Name} parameter validated.");
             logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("GetChannelMetadata",
-                ("channel", channelId),
-                ("includeCustom", includeCustom),
-                ("includeStatus", includeStatus),
-                ("includeType", includeType),
-                ("queryParam", queryParam)));
+                "channel", channelId,
+                "includeCustom", includeCustom,
+                "includeStatus", includeStatus,
+                "includeType", includeType,
+                "queryParam", queryParam));
             RequestState<PNGetChannelMetadataResult> requestState = new RequestState<PNGetChannelMetadataResult>
             {
                 ResponseType = PNOperationType.PNGetChannelMetadataOperation,

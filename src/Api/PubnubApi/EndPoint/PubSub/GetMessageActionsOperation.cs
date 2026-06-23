@@ -127,11 +127,11 @@ namespace PubnubApi.EndPoint
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
 			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("GetMessageActions",
-				("channelName", channel),
-				("start", start),
-				("end", end),
-				("limit", limit),
-				("queryParam", externalQueryParam)));
+				"channelName", channel,
+				"start", start,
+				"end", end,
+				"limit", limit,
+				"queryParam", externalQueryParam));
 			RequestState<PNGetMessageActionsResult> requestState = new RequestState<PNGetMessageActionsResult>
 				{
 					Channels = new[] { messageActionChannelName },
@@ -192,11 +192,11 @@ namespace PubnubApi.EndPoint
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
 			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("GetMessageActions",
-				("channelName", channel),
-				("start", start),
-				("end", end),
-				("limit", limit),
-				("queryParam", externalQueryParam)));
+				"channelName", channel,
+				"start", start,
+				"end", end,
+				"limit", limit,
+				"queryParam", externalQueryParam));
 			RequestState<PNGetMessageActionsResult> requestState = new RequestState<PNGetMessageActionsResult>
 				{
 					Channels = new[] { channel },

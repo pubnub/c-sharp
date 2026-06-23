@@ -105,10 +105,10 @@ namespace PubnubApi.EndPoint
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
 			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("DeleteMessage",
-				("channelName", channel),
-				("start", start),
-				("end", end),
-				("queryParam", externalQueryParam)));
+				"channelName", channel,
+				"start", start,
+				"end", end,
+				"queryParam", externalQueryParam));
 			RequestState<PNDeleteMessageResult> requestState = new RequestState<PNDeleteMessageResult>();
 			requestState.Channels = new[] { channel };
 			requestState.ResponseType = PNOperationType.PNDeleteMessageOperation;
@@ -145,10 +145,10 @@ namespace PubnubApi.EndPoint
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
 			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("DeleteMessage",
-				("channelName", channel),
-				("start", start),
-				("end", end),
-				("queryParam", externalQueryParam)));
+				"channelName", channel,
+				"start", start,
+				"end", end,
+				"queryParam", externalQueryParam));
 			PNResult<PNDeleteMessageResult> returnValue = new PNResult<PNDeleteMessageResult>();
 			RequestState<PNDeleteMessageResult> requestState = new RequestState<PNDeleteMessageResult>
 				{

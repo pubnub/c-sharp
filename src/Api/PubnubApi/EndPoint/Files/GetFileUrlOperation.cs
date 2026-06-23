@@ -82,10 +82,10 @@ namespace PubnubApi.EndPoint
         private void ProcessGetFileUrl(Dictionary<string, object> externalQueryParam, PNCallback<PNFileUrlResult> callback)
         {
             logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("GetFileUrl",
-                ("channel", channelName),
-                ("fileId", currentFileId),
-                ("fileName", currentFileName),
-                ("queryParam", externalQueryParam)));
+                "channel", channelName,
+                "fileId", currentFileId,
+                "fileName", currentFileName,
+                "queryParam", externalQueryParam));
             var requestParameter = CreateRequestParameter();
             PNFileUrlResult result = new PNFileUrlResult();
             var transportRequest = PubnubInstance.transportMiddleware.PreapareTransportRequest(requestParameter: requestParameter, operationType: PNOperationType.PNFileUrlOperation);
@@ -116,10 +116,10 @@ namespace PubnubApi.EndPoint
             }
 
             logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("GetFileUrl",
-                ("channel", channelName),
-                ("fileId", currentFileId),
-                ("fileName", currentFileName),
-                ("queryParam", externalQueryParam)));
+                "channel", channelName,
+                "fileId", currentFileId,
+                "fileName", currentFileName,
+                "queryParam", externalQueryParam));
             PNFileUrlResult result = new PNFileUrlResult();
             result.Url = transportRequest.RequestUrl;
 

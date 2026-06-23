@@ -115,10 +115,10 @@ namespace PubnubApi.EndPoint
         private void HereNow(PNCallback<PNHereNowResult> callback)
         {
             logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("HereNow",
-                ("channels", channelNames),
-                ("channelGroups", channelGroupNames),
-                ("includeUUIDs", includeChannelUUIDs),
-                ("includeState", includeUserState)));
+                "channels", channelNames,
+                "channelGroups", channelGroupNames,
+                "includeUUIDs", includeChannelUUIDs,
+                "includeState", includeUserState));
             RequestState<PNHereNowResult> requestState = new RequestState<PNHereNowResult>
             {
                 Channels = channelNames,
@@ -174,10 +174,10 @@ namespace PubnubApi.EndPoint
             PNResult<PNHereNowResult> returnValue = new PNResult<PNHereNowResult>();
 
             logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("HereNow",
-                ("channels", channelNames),
-                ("channelGroups", channelGroupNames),
-                ("includeUUIDs", includeChannelUUIDs),
-                ("includeState", includeUserState)));
+                "channels", channelNames,
+                "channelGroups", channelGroupNames,
+                "includeUUIDs", includeChannelUUIDs,
+                "includeState", includeUserState));
             RequestState<PNHereNowResult> requestState = new RequestState<PNHereNowResult>
             {
                 Channels = channelNames,

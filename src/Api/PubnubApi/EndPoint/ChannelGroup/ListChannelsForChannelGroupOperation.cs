@@ -71,8 +71,8 @@ namespace PubnubApi.EndPoint
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
 			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("ListChannelsForChannelGroup",
-				("channelGroup", groupName),
-				("queryParam", externalQueryParam)));
+				"channelGroup", groupName,
+				"queryParam", externalQueryParam));
 			var requestParameter = CreateRequestParameter();
 			RequestState<PNChannelGroupsAllChannelsResult> requestState = new RequestState<PNChannelGroupsAllChannelsResult>();
 			requestState.ResponseType = PNOperationType.ChannelGroupGet;
@@ -109,8 +109,8 @@ namespace PubnubApi.EndPoint
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
 			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("ListChannelsForChannelGroup",
-				("channelGroup", groupName),
-				("queryParam", externalQueryParam)));
+				"channelGroup", groupName,
+				"queryParam", externalQueryParam));
 			PNResult<PNChannelGroupsAllChannelsResult> returnValue = new PNResult<PNChannelGroupsAllChannelsResult>();
 			RequestState<PNChannelGroupsAllChannelsResult> requestState = new RequestState<PNChannelGroupsAllChannelsResult>();
 			requestState.ResponseType = PNOperationType.ChannelGroupGet;

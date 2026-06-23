@@ -102,11 +102,11 @@ namespace PubnubApi.EndPoint
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
 			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("RemoveAllPushChannels",
-				("pushType", pushType),
-				("deviceId", pushToken),
-				("environment", environment),
-				("topic", deviceTopic),
-				("queryParam", externalQueryParam)));
+				"pushType", pushType,
+				"deviceId", pushToken,
+				"environment", environment,
+				"topic", deviceTopic,
+				"queryParam", externalQueryParam));
 			RequestState<PNPushRemoveAllChannelsResult> requestState = new RequestState<PNPushRemoveAllChannelsResult>
 				{
 					ResponseType = PNOperationType.PushUnregister,
@@ -151,11 +151,11 @@ namespace PubnubApi.EndPoint
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
 			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("RemoveAllPushChannels",
-				("pushType", pushType),
-				("deviceId", pushToken),
-				("environment", environment),
-				("topic", deviceTopic),
-				("queryParam", externalQueryParam)));
+				"pushType", pushType,
+				"deviceId", pushToken,
+				"environment", environment,
+				"topic", deviceTopic,
+				"queryParam", externalQueryParam));
 			PNResult<PNPushRemoveAllChannelsResult> returnValue = new PNResult<PNPushRemoveAllChannelsResult>();
 			RequestState<PNPushRemoveAllChannelsResult> requestState = new RequestState<PNPushRemoveAllChannelsResult>();
 			requestState.ResponseType = PNOperationType.PushUnregister;
