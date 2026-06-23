@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace PubnubApi
@@ -151,7 +152,7 @@ namespace PubnubApi
         }
 
         private static bool IsScalar(object value) =>
-            value == null || value is string || value is bool || value.GetType().IsPrimitive
+            value == null || value is string || value is bool || value.GetType().GetTypeInfo().IsPrimitive
             || value is decimal || value is Enum;
 
         private static void AppendObject(StringBuilder sb, OrderedMap map, int level)
