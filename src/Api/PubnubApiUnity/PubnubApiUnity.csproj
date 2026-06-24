@@ -472,6 +472,12 @@
     <Compile Include="..\PubnubApi\JsonDataParse\PNDataSyncUsersListResultJsonDataParse.cs">
       <Link>JsonDataParse\PNDataSyncUsersListResultJsonDataParse.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNDataSyncProjections.cs">
+      <Link>Model\Consumer\AccessManager\PNDataSyncProjections.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNDataSyncTokenScopes.cs">
+      <Link>Model\Consumer\AccessManager\PNDataSyncTokenScopes.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\Model\Consumer\Objects\PNMembershipMetadataResult.cs">
       <Link>Model\Consumer\Objects\PNMembershipMetadataResult.cs</Link>
     </Compile>
@@ -989,7 +995,6 @@
     <Folder Include="HttpUtility\" />
     <Folder Include="Interface\" />
     <Folder Include="Log\" />
-    <Folder Include="Model\Consumer\AccessManager\" />
     <Folder Include="Model\Consumer\ChannelGroup\" />
     <Folder Include="Model\Consumer\History\" />
     <Folder Include="Model\Consumer\DeleteMessage\" />

@@ -19,6 +19,11 @@ namespace PubnubApi
 
         public Dictionary<string, object> Meta { get; set; }
 
+        /// <summary>
+        /// Data Sync projection assignments decoded from the token's meta "pn-projections" section.
+        /// </summary>
+        public PNDataSyncProjections Projections { get; set; }
+
         public string AuthorizedUuid { get; set; }
 
         public string Signature { get; set; }

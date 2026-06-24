@@ -579,6 +579,12 @@
     <Compile Include="..\PubnubApi\Log\PubnubLogModule.cs" Link="Log\PubnubLogModule.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNAccessManagerRevokeTokenResult.cs" Link="Model\Consumer\AccessManager\PNAccessManagerRevokeTokenResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNAccessManagerTokenResult.cs" Link="Model\Consumer\AccessManager\PNAccessManagerTokenResult.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNDataSyncProjections.cs">
+      <Link>Model\Consumer\AccessManager\PNDataSyncProjections.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNDataSyncTokenScopes.cs">
+      <Link>Model\Consumer\AccessManager\PNDataSyncTokenScopes.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNTokenAuthValues.cs" Link="Model\Consumer\AccessManager\PNTokenAuthValues.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNTokenContent.cs" Link="Model\Consumer\AccessManager\PNTokenContent.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNTokenPermissionMappingBase.cs" Link="Model\Consumer\AccessManager\PNTokenPermissionMappingBase.cs" />
@@ -964,7 +970,6 @@
     <Folder Include="HttpUtility\" />
     <Folder Include="Interface\" />
     <Folder Include="Log\" />
-    <Folder Include="Model\Consumer\AccessManager\" />
     <Folder Include="Model\Consumer\ChannelGroup\" />
     <Folder Include="Model\Consumer\History\" />
     <Folder Include="Model\Consumer\DeleteMessage\" />

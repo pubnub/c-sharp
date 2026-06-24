@@ -78,7 +78,8 @@ namespace PubnubApi.EndPoint
                             ChannelGroups = new Dictionary<string, PNTokenAuthValues>(),
                             Uuids = new Dictionary<string, PNTokenAuthValues>(),
                             Users = new Dictionary<string, PNTokenAuthValues>(),
-                            Spaces = new Dictionary<string, PNTokenAuthValues>()
+                            Spaces = new Dictionary<string, PNTokenAuthValues>(),
+                            DataSync = NewDataSyncScopes()
                         };
                         result.Patterns = new PNTokenPatterns
                         {
@@ -86,7 +87,8 @@ namespace PubnubApi.EndPoint
                             ChannelGroups = new Dictionary<string, PNTokenAuthValues>(),
                             Uuids = new Dictionary<string, PNTokenAuthValues>(),
                             Users = new Dictionary<string, PNTokenAuthValues>(),
-                            Spaces = new Dictionary<string, PNTokenAuthValues>()
+                            Spaces = new Dictionary<string, PNTokenAuthValues>(),
+                            DataSync = NewDataSyncScopes()
                         };
                         ParseCBOR(cborDict, ref result);
                     }
@@ -151,6 +153,24 @@ namespace PubnubApi.EndPoint
                                 permissionMapping.ChannelGroups.Add(resourceId, resourcePermission);
                             }
                             break;
+                        case "datasync:entities":
+                            if (!permissionMapping.DataSync.Entities.ContainsKey(resourceId))
+                            {
+                                permissionMapping.DataSync.Entities.Add(resourceId, resourcePermission);
+                            }
+                            break;
+                        case "datasync:relationships":
+                            if (!permissionMapping.DataSync.Relationships.ContainsKey(resourceId))
+                            {
+                                permissionMapping.DataSync.Relationships.Add(resourceId, resourcePermission);
+                            }
+                            break;
+                        case "datasync:memberships":
+                            if (!permissionMapping.DataSync.Memberships.ContainsKey(resourceId))
+                            {
+                                permissionMapping.DataSync.Memberships.Add(resourceId, resourcePermission);
+                            }
+                            break;
                         default:
                             logger?.Error($"Unidentified resource ID when parsing permission mappings! {resourceId}");
                             break;
@@ -177,6 +197,10 @@ namespace PubnubApi.EndPoint
                         break;
                     case "meta":
                         pnGrantTokenDecoded.Meta = (kvp.Value as Dictionary<object, object>).ToDictionary(x => ByteToString(x.Key), y => y.Value);
+                        if (pnGrantTokenDecoded.Meta.TryGetValue("pn-projections", out var projectionsValue))
+                        {
+                            pnGrantTokenDecoded.Projections = DecodeProjections(projectionsValue as Dictionary<object, object>);
+                        }
                         break;
                     case "uuid":
                         pnGrantTokenDecoded.AuthorizedUuid = ByteToString(kvp.Value);
@@ -197,6 +221,99 @@ namespace PubnubApi.EndPoint
                         break;
                 }
             }
+        }
+
+        private static PNDataSyncTokenScopes NewDataSyncScopes()
+        {
+            return new PNDataSyncTokenScopes
+            {
+                Entities = new Dictionary<string, PNTokenAuthValues>(),
+                Relationships = new Dictionary<string, PNTokenAuthValues>(),
+                Memberships = new Dictionary<string, PNTokenAuthValues>()
+            };
+        }
+
+        private PNDataSyncProjections DecodeProjections(Dictionary<object, object> projections)
+        {
+            if (projections == null)
+            {
+                return null;
+            }
+
+            var result = new PNDataSyncProjections();
+            foreach (var kvp in projections)
+            {
+                var scopeKey = ByteToString(kvp.Key);
+                var scope = DecodeProjectionScope(kvp.Value as Dictionary<object, object>);
+                switch (scopeKey)
+                {
+                    case "res":
+                        result.Resources = scope;
+                        break;
+                    case "pat":
+                        result.Patterns = scope;
+                        break;
+                    default:
+                        logger?.Error($"Unidentified projection scope key when parsing token! {scopeKey}");
+                        break;
+                }
+            }
+            return result;
+        }
+
+        private PNDataSyncProjectionScope DecodeProjectionScope(Dictionary<object, object> scopeValues)
+        {
+            var scope = new PNDataSyncProjectionScope
+            {
+                Entities = new Dictionary<string, string>(),
+                Relationships = new Dictionary<string, string>(),
+                Memberships = new Dictionary<string, string>()
+            };
+            if (scopeValues == null)
+            {
+                return scope;
+            }
+
+            foreach (var kvp in scopeValues)
+            {
+                // Flat composite key, e.g. "datasync:entities:user.A" -> projection name.
+                var compositeKey = ByteToString(kvp.Key);
+                var projectionName = ByteToString(kvp.Value);
+
+                const string prefix = "datasync:";
+                if (!compositeKey.StartsWith(prefix, StringComparison.Ordinal))
+                {
+                    logger?.Error($"Unidentified projection key when parsing token! {compositeKey}");
+                    continue;
+                }
+
+                var remainder = compositeKey.Substring(prefix.Length);
+                var separatorIndex = remainder.IndexOf(':');
+                if (separatorIndex <= 0 || separatorIndex >= remainder.Length - 1)
+                {
+                    logger?.Error($"Malformed projection key when parsing token! {compositeKey}");
+                    continue;
+                }
+
+                var type = remainder.Substring(0, separatorIndex);
+                var resourceId = remainder.Substring(separatorIndex + 1);
+                switch (type)
+                {
+                    case "entities":
+                        scope.Entities[resourceId] = projectionName;
+                        break;
+                    case "relationships":
+                        scope.Relationships[resourceId] = projectionName;
+                        break;
+                    case "memberships":
+                        scope.Memberships[resourceId] = projectionName;
+                        break;
+                    default:
+                        logger?.Error($"Unidentified projection resource type when parsing token! {type}");
+                        break;
+                }
+            }
+            return scope;
         }
 
         public void SetAuthToken(string token)
