@@ -216,18 +216,18 @@ namespace PubnubApi
 
         private static bool IsEmptyCollection(object value)
         {
-            if (value is IDictionary d) return d.Count == 0;
-            if (value is OrderedMap m) return m.Count == 0;
-            if (value is IEnumerable e && !(value is string)) return !e.Cast<object>().Any();
+            if (value is IDictionary d) {return d.Count == 0;}
+            if (value is OrderedMap m) {return m.Count == 0;}
+            if (value is IEnumerable e && !(value is string)){ return !e.Cast<object>().Any();}
             return false;
         }
 
         // Non-collection, non-scalar values that have a meaningful ToString are printed inline.
         private static bool HasInlineToString(object value)
         {
-            if (value == null) return false;
-            if (value is IDictionary || value is OrderedMap) return false;
-            if (value is IEnumerable && !(value is string)) return false;
+            if (value == null) {return false;}
+            if (value is IDictionary || value is OrderedMap) {return false;}
+            if (value is IEnumerable && !(value is string)) {return false;}
             return true;
         }
 
@@ -243,7 +243,7 @@ namespace PubnubApi
 
             public void Add(string key, object value)
             {
-                if (!values.ContainsKey(key)) keys.Add(key);
+                if (!values.ContainsKey(key)) {keys.Add(key);}
                 values[key] = value;
             }
         }

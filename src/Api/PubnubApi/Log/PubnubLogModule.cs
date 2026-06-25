@@ -67,7 +67,7 @@ public class PubnubLogModule
     // (e.g. a user object with a throwing ToString) can never crash the calling operation.
     private void Log(PubnubLogLevel logLevel, Func<string> messageFactory)
     {
-        if (!IsEnabled(logLevel)) return;
+        if (!IsEnabled(logLevel)) {return;}
         string message;
         try
         {
