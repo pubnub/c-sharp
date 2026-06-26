@@ -125,6 +125,16 @@ namespace PubnubApi.EndPoint
             {
                 throw new ArgumentException("Missing callback");
             }
+            logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("GetAllUuidMetadata",
+                "limit", limit,
+                "includeCount", includeCount,
+                "includeCustom", includeCustom,
+                "includeStatus", includeStatus,
+                "includeType", includeType,
+                "filter", usersFilter,
+                "page", page,
+                "sort", sortField,
+                "queryParam", queryParam));
             RequestState<PNGetAllUuidMetadataResult> requestState = new RequestState<PNGetAllUuidMetadataResult>
                 {
                     ResponseType = PNOperationType.PNGetAllUuidMetadataOperation,
@@ -158,6 +168,16 @@ namespace PubnubApi.EndPoint
         private async Task<PNResult<PNGetAllUuidMetadataResult>> GetUuidMetadataList()
         {
             PNResult<PNGetAllUuidMetadataResult> returnValue = new PNResult<PNGetAllUuidMetadataResult>();
+            logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("GetAllUuidMetadata",
+                "limit", limit,
+                "includeCount", includeCount,
+                "includeCustom", includeCustom,
+                "includeStatus", includeStatus,
+                "includeType", includeType,
+                "filter", usersFilter,
+                "page", page,
+                "sort", sortField,
+                "queryParam", queryParam));
             RequestState<PNGetAllUuidMetadataResult> requestState = new RequestState<PNGetAllUuidMetadataResult>
                 {
                     ResponseType = PNOperationType.PNGetAllUuidMetadataOperation,

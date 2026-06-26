@@ -129,6 +129,11 @@ namespace PubnubApi.EndPoint
             }
 
             logger?.Trace($"{GetType().Name} parameter validated.");
+            logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("Signal",
+                "channel", channel,
+                "message", message,
+                "meta", metaData,
+                "queryParam", externalQueryParam));
             RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>
             {
                 Channels = new[] { channel },
@@ -237,6 +242,11 @@ namespace PubnubApi.EndPoint
             }
 
             logger?.Trace($"{GetType().Name} parameter validated.");
+            logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("Signal",
+                "channel", channel,
+                "message", message,
+                "meta", metaData,
+                "queryParam", externalQueryParam));
             RequestState<PNPublishResult> requestState = new RequestState<PNPublishResult>
             {
                 Channels = new[] { channel },

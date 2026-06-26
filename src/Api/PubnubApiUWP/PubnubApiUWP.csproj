@@ -459,6 +459,7 @@
     <Compile Include="..\PubnubApi\Log\IPubnubLogger.cs" Link="Log\IPubnubLogger.cs" />
     <Compile Include="..\PubnubApi\Log\PubnubDefaultLogger.cs" Link="Log\PubnubDefaultLogger.cs" />
     <Compile Include="..\PubnubApi\Log\PubnubLogModule.cs" Link="Log\PubnubLogModule.cs" />
+    <Compile Include="..\PubnubApi\Log\PubnubLogFormatter.cs" Link="Log\PubnubLogFormatter.cs" />
 	<Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNAccessManagerTokenResult.cs" Link="Model\Consumer\AccessManager\PNAccessManagerTokenResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNAccessManagerRevokeTokenResult.cs" Link="Model\Consumer\AccessManager\PNAccessManagerRevokeTokenResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNTokenAuthValues.cs" Link="Model\Consumer\AccessManager\PNTokenAuthValues.cs" />
@@ -631,6 +632,7 @@
       <Link>PNSDK\IPNSDKSource.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\Transport\HttpClientService.cs" Link="Transport\HttpClientService.cs" />
+    <Compile Include="..\PubnubApi\Transport\TransportLogger.cs" Link="Transport\TransportLogger.cs" />
     <Compile Include="..\PubnubApi\Transport\Middleware.cs" Link="Transport\Middleware.cs" />
     <Compile Include="..\PubnubApi\Transport\RequestParameter.cs" Link="Transport\RequestParameter.cs" />
     <Compile Include="..\PubnubApi\TransportContract\IHttpClientService.cs" Link="TransportContract\IHttpClientService.cs" />

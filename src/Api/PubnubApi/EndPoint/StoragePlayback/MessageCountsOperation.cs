@@ -87,6 +87,10 @@ namespace PubnubApi.EndPoint
 				throw new ArgumentException("Missing Channel");
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("MessageCounts",
+				"channels", channels,
+				"channelsTimetoken", timetokens,
+				"queryParam", externalQueryParam));
 			RequestState<PNMessageCountResult> requestState = new RequestState<PNMessageCountResult>
 			{
 				Channels = channels,
@@ -124,6 +128,10 @@ namespace PubnubApi.EndPoint
 				throw new ArgumentException("Missing Channel");
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("MessageCounts",
+				"channels", channels,
+				"channelsTimetoken", timetokens,
+				"queryParam", externalQueryParam));
 			PNResult<PNMessageCountResult> returnValue = new PNResult<PNMessageCountResult>();
 			RequestState<PNMessageCountResult> requestState = new RequestState<PNMessageCountResult>();
 			requestState.Channels = channels;

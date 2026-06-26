@@ -84,6 +84,11 @@ namespace PubnubApi.EndPoint
 
 		private void ProcessDeleteFileRequest(Dictionary<string, object> externalQueryParam, PNCallback<PNDeleteFileResult> callback)
 		{
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("DeleteFile",
+				"channel", channelName,
+				"fileId", fileId,
+				"fileName", fileName,
+				"queryParam", externalQueryParam));
 			RequestState<PNDeleteFileResult> requestState = new RequestState<PNDeleteFileResult>
 			{
 				ResponseType = PNOperationType.PNDeleteFileOperation,
@@ -138,6 +143,11 @@ namespace PubnubApi.EndPoint
 				returnValue.Status = errStatus;
 				return returnValue;
 			}
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("DeleteFile",
+				"channel", channelName,
+				"fileId", fileId,
+				"fileName", fileName,
+				"queryParam", externalQueryParam));
 			var requestParameter = CreateRequestParameter();
 			RequestState<PNDeleteFileResult> requestState = new RequestState<PNDeleteFileResult>();
 			requestState.ResponseType = PNOperationType.PNDeleteFileOperation;

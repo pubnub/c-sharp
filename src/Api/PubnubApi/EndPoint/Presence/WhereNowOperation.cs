@@ -67,6 +67,9 @@ namespace PubnubApi.EndPoint
 				throw new MissingMemberException("Missing Json Pluggable Library for Pubnub Instance");
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("WhereNow",
+				"uuid", uuid ?? config.UserId.ToString(),
+				"queryParam", externalQueryParam));
 			RequestState<PNWhereNowResult> requestState = new RequestState<PNWhereNowResult>
 			{
 				Channels = new[] { whereNowUUID ?? config.UserId },
@@ -107,6 +110,9 @@ namespace PubnubApi.EndPoint
 				throw new MissingMemberException("Missing Json Pluggable Library for Pubnub Instance");
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("WhereNow",
+				"uuid", uuid ?? config.UserId.ToString(),
+				"queryParam", externalQueryParam));
 			PNResult<PNWhereNowResult> returnValue = new PNResult<PNWhereNowResult>();
 			RequestState<PNWhereNowResult> requestState = new RequestState<PNWhereNowResult>
 			{

@@ -12,7 +12,7 @@ namespace PubnubApi
     {
         private readonly HttpClient httpClient;
         private readonly bool enableHttp2;
-        private PubnubLogModule logger;
+        private TransportLogger transportLogger;
 
         public HttpClientService(IWebProxy proxy) : this(proxy, true)
         {
@@ -69,7 +69,7 @@ namespace PubnubApi
 
         public void SetLogger(PubnubLogModule logger)
         {
-            this.logger = logger;
+            this.transportLogger = new TransportLogger(logger);
         }
 
         public async Task<TransportResponse> GetRequest(TransportRequest transportRequest)
@@ -88,11 +88,7 @@ namespace PubnubApi
                         requestMessage.Headers.Add(kvp.Key, kvp.Value);
                     }
                 }
-                logger?.Debug(
-                    $"HttpClient Service: Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl}" +
-                    (requestMessage.Headers.Any()
-                        ? $"\n  Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}"
-                        : ""));
+                transportLogger?.Request(transportRequest);
                 if (transportRequest.Timeout.HasValue)
                 {
                     ctsWithTimeout =
@@ -111,10 +107,7 @@ namespace PubnubApi
                     RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath,
                     NegotiatedProtocolVersion = httpResult.Version
                 };
-                logger?.Debug(
-                    $"PubNub request completed: operation={transportRequest.OperationType} protocol=HTTP/{httpResult.Version}");
-                logger?.Debug(
-                    $"HttpClient Service: Received http response from server with status code {httpResult.StatusCode}, content-length: {transportResponse.Content.Length} bytes, for url \n{transportRequest.RequestUrl}");
+                transportLogger?.Response(transportRequest, transportResponse, httpResult.Version);
             }
             catch (TaskCanceledException taskCanceledException)
             {
@@ -122,8 +115,7 @@ namespace PubnubApi
             }
             catch (Exception e)
             {
-                logger?.Warn(
-                    $"HttpClient Service: Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}");
+                transportLogger?.Exception(transportRequest, e);
                 transportResponse = new TransportResponse()
                 {
                     RequestUrl = transportRequest.RequestUrl,
@@ -170,11 +162,7 @@ namespace PubnubApi
                         requestMessage.Headers.Add(kvp.Key, kvp.Value);
                     }
                 }
-                logger?.Debug(
-                    $"HttpClient Service:Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl}" +
-                    (requestMessage.Headers.Any()
-                        ? $"\n  Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}"
-                        : ""));
+                transportLogger?.Request(transportRequest);
                 if (transportRequest.Timeout.HasValue)
                 {
                     ctsWithTimeout =
@@ -192,10 +180,7 @@ namespace PubnubApi
                     RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath,
                     NegotiatedProtocolVersion = httpResult.Version
                 };
-                logger?.Debug(
-                    $"PubNub request completed: operation={transportRequest.OperationType} protocol=HTTP/{httpResult.Version}");
-                logger?.Debug(
-                    $"Received http response from server with status code {httpResult.StatusCode}, content-length: {transportResponse.Content.Length} bytes, for url {transportRequest.RequestUrl}");
+                transportLogger?.Response(transportRequest, transportResponse, httpResult.Version);
             }
             catch (TaskCanceledException taskCanceledException)
             {
@@ -203,8 +188,7 @@ namespace PubnubApi
             }
             catch (Exception e)
             {
-                logger?.Warn(
-                    $"Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}");
+                transportLogger?.Exception(transportRequest, e);
                 transportResponse = new TransportResponse()
                 {
                     RequestUrl = transportRequest.RequestUrl,
@@ -253,11 +237,7 @@ namespace PubnubApi
                     }
                 }
 
-                logger?.Debug(
-                    $"HttpClient Service:Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl}" +
-                    (requestMessage.Headers.Any()
-                        ? $"\n  Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}"
-                        : ""));
+                transportLogger?.Request(transportRequest);
                 if (transportRequest.Timeout.HasValue)
                 {
                     ctsWithTimeout =
@@ -275,10 +255,7 @@ namespace PubnubApi
                     RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath,
                     NegotiatedProtocolVersion = httpResult.Version
                 };
-                logger?.Debug(
-                    $"PubNub request completed: operation={transportRequest.OperationType} protocol=HTTP/{httpResult.Version}");
-                logger?.Debug(
-                    $"Received http response from server with status code {httpResult.StatusCode}, content-length: {transportResponse.Content.Length} bytes, for url {transportRequest.RequestUrl}");
+                transportLogger?.Response(transportRequest, transportResponse, httpResult.Version);
             }
             catch (TaskCanceledException taskCanceledException)
             {
@@ -286,8 +263,7 @@ namespace PubnubApi
             }
             catch (Exception e)
             {
-                logger?.Warn(
-                    $"Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}");
+                transportLogger?.Exception(transportRequest, e);
                 transportResponse = new TransportResponse()
                 {
                     RequestUrl = transportRequest.RequestUrl,
@@ -320,11 +296,7 @@ namespace PubnubApi
                     }
                 }
 
-                logger?.Debug(
-                    $"HttpClient Service:Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl}" +
-                    (requestMessage.Headers.Any()
-                        ? $"\n  Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}"
-                        : ""));
+                transportLogger?.Request(transportRequest);
                 if (transportRequest.Timeout.HasValue)
                 {
                     ctsWithTimeout =
@@ -342,10 +314,7 @@ namespace PubnubApi
                     RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath,
                     NegotiatedProtocolVersion = httpResult.Version
                 };
-                logger?.Debug(
-                    $"PubNub request completed: operation={transportRequest.OperationType} protocol=HTTP/{httpResult.Version}");
-                logger?.Debug(
-                    $"Received http response from server with status code {httpResult.StatusCode}, content-length: {transportResponse.Content.Length} bytes, for url {transportRequest.RequestUrl}");
+                transportLogger?.Response(transportRequest, transportResponse, httpResult.Version);
             }
             catch (TaskCanceledException taskCanceledException)
             {
@@ -353,8 +322,7 @@ namespace PubnubApi
             }
             catch (Exception e)
             {
-                logger?.Warn(
-                    $"Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}");
+                transportLogger?.Exception(transportRequest, e);
                 transportResponse = new TransportResponse()
                 {
                     RequestUrl = transportRequest.RequestUrl,
@@ -404,11 +372,7 @@ namespace PubnubApi
                     }
                 }
 
-                logger?.Debug(
-                    $"HttpClient Service:Sending http request {transportRequest.RequestType} to {transportRequest.RequestUrl}" +
-                    (requestMessage.Headers.Any()
-                        ? $"\n  Header {string.Join(", ", requestMessage.Headers.Select(kv => $"{kv.Key}: {kv.Value}"))}"
-                        : ""));
+                transportLogger?.Request(transportRequest);
                 if (transportRequest.Timeout.HasValue)
                 {
                     ctsWithTimeout =
@@ -426,10 +390,7 @@ namespace PubnubApi
                     RequestUrl = httpResult.RequestMessage?.RequestUri?.AbsolutePath,
                     NegotiatedProtocolVersion = httpResult.Version
                 };
-                logger?.Debug(
-                    $"PubNub request completed: operation={transportRequest.OperationType} protocol=HTTP/{httpResult.Version}");
-                logger?.Debug(
-                    $"Received http response from server with status code {httpResult.StatusCode}, content-length: {transportResponse.Content.Length} bytes, for url {transportRequest.RequestUrl}");
+                transportLogger?.Response(transportRequest, transportResponse, httpResult.Version);
             }
             catch (TaskCanceledException taskCanceledException)
             {
@@ -437,8 +398,7 @@ namespace PubnubApi
             }
             catch (Exception e)
             {
-                logger?.Warn(
-                    $"Exception for http call url {transportRequest.RequestUrl}, exception message: {e.Message}, stacktrace: {e.StackTrace}");
+                transportLogger?.Exception(transportRequest, e);
                 transportResponse = new TransportResponse()
                 {
                     RequestUrl = transportRequest.RequestUrl,
@@ -458,7 +418,7 @@ namespace PubnubApi
         {
             TransportResponse transportResponse;
             
-            logger?.Warn($"HttpClient Service: TaskCanceledException for url {transportRequest.RequestUrl}");
+            transportLogger?.TaskCanceled(transportRequest);
             transportResponse = new TransportResponse()
             {
                 RequestUrl = transportRequest.RequestUrl,
@@ -467,12 +427,12 @@ namespace PubnubApi
             if (ctsWithTimeout is { Token.IsCancellationRequested: true } &&
                 !transportRequest.CancellationTokenSource.IsCancellationRequested)
             {
-                logger?.Debug("HttpClient Service: Task canceled due to timeout");
+                transportLogger?.CanceledByTimeout();
                 transportResponse.IsTimeOut = true;
             }
             else
             {
-                logger?.Debug("HttpClient Service: Task canceled due to cancellation request");
+                transportLogger?.CanceledByRequest();
                 transportResponse.IsCancelled = true;
             }
             return transportResponse;

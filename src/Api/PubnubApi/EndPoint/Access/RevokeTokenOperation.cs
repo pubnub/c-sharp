@@ -62,6 +62,9 @@ namespace PubnubApi.EndPoint
 			}
 
 			logger?.Trace($"{GetType().Name} parameter validated.");
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("RevokeToken",
+				"token", pnToken,
+				"queryParam", queryParam));
 			RequestState<PNAccessManagerRevokeTokenResult> requestState = new RequestState<PNAccessManagerRevokeTokenResult>
 				{
 					ResponseType = PNOperationType.PNAccessManagerRevokeToken,
@@ -98,6 +101,9 @@ namespace PubnubApi.EndPoint
 				throw new MissingMemberException("Invalid secret key");
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("RevokeToken",
+				"token", pnToken,
+				"queryParam", queryParam));
 			PNResult<PNAccessManagerRevokeTokenResult> returnValue = new PNResult<PNAccessManagerRevokeTokenResult>();
 			RequestState<PNAccessManagerRevokeTokenResult> requestState = new RequestState<PNAccessManagerRevokeTokenResult>();
 			requestState.ResponseType = PNOperationType.PNAccessManagerRevokeToken;

@@ -129,6 +129,15 @@ namespace PubnubApi.EndPoint
 				this.uuid = config.UserId;
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("RemoveMemberships",
+				"uuid", uuid,
+				"channels", removeMembership,
+				"limit", limit,
+				"includeCount", includeCount,
+				"include", includeOptions,
+				"page", page,
+				"sort", sort,
+				"queryParam", externalQueryParam));
 			RequestState<PNMembershipsResult> requestState = new RequestState<PNMembershipsResult>
 				{
 					ResponseType = PNOperationType.PNRemoveMembershipsOperation,
@@ -173,6 +182,15 @@ namespace PubnubApi.EndPoint
 				this.uuid = config.UserId;
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("RemoveMemberships",
+				"uuid", uuid,
+				"channels", removeMembership,
+				"limit", limit,
+				"includeCount", includeCount,
+				"include", includeOptions,
+				"page", page,
+				"sort", sort,
+				"queryParam", externalQueryParam));
 			if (string.IsNullOrEmpty(config.SubscribeKey) || string.IsNullOrEmpty(config.SubscribeKey.Trim()) || config.SubscribeKey.Length <= 0) {
 				PNStatus errStatus = new PNStatus { Error = true, ErrorData = new PNErrorData("Invalid Subscribe key", new ArgumentException("Invalid Subscribe key")) };
 				returnValue.Status = errStatus;

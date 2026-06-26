@@ -133,6 +133,14 @@ namespace PubnubApi.EndPoint
 				throw new ArgumentException("Missing Channel");
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("History",
+				"channel", channelName,
+				"start", startTimetoken,
+				"end", endTimetoken,
+				"count", historyCount,
+				"reverse", reverseOption,
+				"includeTimetoken", includeTimetokenOption,
+				"includeMeta", withMetaOption));
 			RequestState<PNHistoryResult> requestState = new RequestState<PNHistoryResult>();
 			requestState.Channels = new[] { this.channelName };
 			requestState.ResponseType = PNOperationType.PNHistoryOperation;
@@ -168,6 +176,14 @@ namespace PubnubApi.EndPoint
 				throw new ArgumentException("Missing Channel");
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("History",
+				"channel", channelName,
+				"start", startTimetoken,
+				"end", endTimetoken,
+				"count", historyCount,
+				"reverse", reverseOption,
+				"includeTimetoken", includeTimetokenOption,
+				"includeMeta", withMetaOption));
 			RequestState<PNHistoryResult> requestState = new RequestState<PNHistoryResult>
 			{
 				Channels = new[] { this.channelName },
