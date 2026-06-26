@@ -36,11 +36,11 @@ internal static class PNDataSyncMembershipsListResultJsonDataParse
                         Id = dataEntryDictionary.ContainsKey("id") && dataEntryDictionary["id"] != null
                             ? dataEntryDictionary["id"].ToString()
                             : null,
-                        ChannelId = dataEntryDictionary.ContainsKey("entityAId") && dataEntryDictionary["entityAId"] != null
-                            ? dataEntryDictionary["entityAId"].ToString()
+                        ChannelId = dataEntryDictionary.ContainsKey("channelId") && dataEntryDictionary["channelId"] != null
+                            ? dataEntryDictionary["channelId"].ToString()
                             : null,
-                        UserId = dataEntryDictionary.ContainsKey("entityBId") && dataEntryDictionary["entityBId"] != null
-                            ? dataEntryDictionary["entityBId"].ToString()
+                        UserId = dataEntryDictionary.ContainsKey("userId") && dataEntryDictionary["userId"] != null
+                            ? dataEntryDictionary["userId"].ToString()
                             : null,
                         RelationshipClassVersion = dataEntryDictionary.ContainsKey("relationshipClassVersion") && dataEntryDictionary["relationshipClassVersion"] != null
                             ? (int)(long)dataEntryDictionary["relationshipClassVersion"]
