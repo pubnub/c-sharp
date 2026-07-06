@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace PubnubApi.EventEngine.Core {
 	public abstract class Engine {
 		public readonly EventQueue EventQueue = new EventQueue();
-		protected EffectDispatcher dispatcher = new EffectDispatcher();
+		protected EffectDispatcher dispatcher;
 		protected State currentState;
 		public State CurrentState => currentState;
 		private bool transitioning = false;

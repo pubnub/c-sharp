@@ -8,7 +8,14 @@ namespace PubnubApi.EventEngine.Core {
 		private readonly Dictionary<System.Type, IEffectHandler> effectInvocationHandlerMap =
 			new Dictionary<System.Type, IEffectHandler>();
 
+		private PubnubLogModule logger;
+		
 		public event System.Action<IEffectInvocation> OnEffectDispatch;
+
+		public EffectDispatcher(PubnubLogModule logModule)
+		{
+			logger = logModule;
+		}
 
 		/// <summary>
 		/// Dispatch an invocation i.e. call a registered effect handler.
@@ -34,7 +41,13 @@ namespace PubnubApi.EventEngine.Core {
 
 		void FireAndForget(IEffectHandler handler, IEffectInvocation invocation)
 		{
-			handler.Run(invocation);
+			handler.Run(invocation).ContinueWith(t =>
+			{
+				if (t.Exception != null)
+				{
+					logger.Error($"Error occured when trying to run effect handler: {t.Exception.Message}");
+				}
+			}, TaskContinuationOptions.OnlyOnFaulted);
 		}
 
 		/// <summary>

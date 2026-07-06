@@ -34,6 +34,8 @@ namespace PubnubApi.EventEngine.Subscribe
 			var handshakeHandler = new HandshakeEffectHandler(subscribeManager, EventQueue);
 			var handshakeReconnectHandler = new HandshakeReconnectEffectHandler(pubnubConfiguration, EventQueue, handshakeHandler);
 
+			dispatcher = new EffectDispatcher(pubnubConfiguration.Logger);
+			
 			dispatcher.Register<HandshakeInvocation, HandshakeEffectHandler>(handshakeHandler);
 			dispatcher.Register<CancelHandshakeInvocation, HandshakeEffectHandler>(handshakeHandler);
 			dispatcher.Register<HandshakeReconnectInvocation, HandshakeReconnectEffectHandler>(handshakeReconnectHandler);

@@ -10,13 +10,7 @@ namespace PubnubApi.Security.Crypto.Cryptors
 
         private readonly bool _useDynamicRandomIV;
         protected readonly PubnubLogModule logger;
-        #if DEBUG
-        private byte[] constantIV;
-        public void SetTestOnlyConstantRandomIV(byte[] iv)
-        {
-            constantIV = iv;
-        }
-        #endif
+
         protected CryptorBase(string cipherKey, bool useDynamicRandomIV, PubnubLogModule logger)
         {
             _useDynamicRandomIV = useDynamicRandomIV;
@@ -27,12 +21,6 @@ namespace PubnubApi.Security.Crypto.Cryptors
         protected byte[] GenerateRandomIV(bool useDynamicRandomIV)
         {
             int dataOffset = useDynamicRandomIV ? IV_SIZE : 0;
-            #if DEBUG
-            if (constantIV != null && constantIV.Length == 16)
-            {
-                return constantIV;
-            }
-            #endif
             return Util.InitializationVector(useDynamicRandomIV, dataOffset);
         }
         protected byte[] InternalEncrypt(bool cryptoHeader, byte[] dataBytes, byte[] ivBytes, byte[] keyBytes)
