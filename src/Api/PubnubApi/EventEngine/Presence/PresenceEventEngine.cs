@@ -7,6 +7,8 @@ namespace PubnubApi.EventEngine.Presence
 	{
 		public PresenceEventEngine(PNConfiguration pnConfiguration, HeartbeatOperation heartbeatOperation, LeaveOperation leaveOperation)
 		{
+			dispatcher = new EffectDispatcher(pnConfiguration.Logger);
+			
 			var heartbeatEffectHandler = new Effects.HeartbeatEffectHandler(heartbeatOperation, EventQueue);
 			dispatcher.Register<Invocations.HeartbeatInvocation, Effects.HeartbeatEffectHandler>(heartbeatEffectHandler);
 
