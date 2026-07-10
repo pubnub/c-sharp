@@ -72,9 +72,6 @@ namespace PubnubApi
                 //encrypt
                 if (dynamicIV)
                 {
-#if NETSTANDARD10 || NETSTANDARD11
-                    new Random().NextBytes(ivBytes);
-#else
                     var rng = RandomNumberGenerator.Create();
                     
                     try
@@ -89,7 +86,6 @@ namespace PubnubApi
                             disposable.Dispose();
                         }
                     }
-#endif
                 }
                 else
                 {

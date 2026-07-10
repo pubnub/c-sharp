@@ -32,6 +32,8 @@ namespace PubnubApi.EndPoint
         private void UnsubscribeAll()
         {
             logger?.Trace($"{GetType().Name} execution started.");
+            logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("UnsubscribeAll",
+                "queryParam", queryParam));
             SubscribeManager manager = new SubscribeManager(config, jsonLibrary, unit, pubnubTokenManager, PubnubInstance);
             manager.CurrentPubnubInstance(PubnubInstance);
             manager.MultiChannelUnSubscribeAll<T>(PNOperationType.PNUnsubscribeOperation, queryParam);

@@ -124,6 +124,12 @@ namespace PubnubApi.EndPoint
 				return;
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("RemoveMessageAction",
+				"channelName", channel,
+				"messageTimetoken", messageTimetoken,
+				"actionTimetoken", actionTimetoken,
+				"uuid", messageActionUuid,
+				"queryParam", externalQueryParam));
 			RequestState<PNRemoveMessageActionResult> requestState = new RequestState<PNRemoveMessageActionResult>
 				{
 					Channels = new[] { channel },
@@ -179,6 +185,12 @@ namespace PubnubApi.EndPoint
 				return returnValue;
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("RemoveMessageAction",
+				"channelName", channel,
+				"messageTimetoken", messageTimetoken,
+				"actionTimetoken", actionTimetoken,
+				"uuid", messageActionUuid,
+				"queryParam", externalQueryParam));
 			RequestState<PNRemoveMessageActionResult> requestState = new RequestState<PNRemoveMessageActionResult>
 				{
 					Channels = new[] { channel },

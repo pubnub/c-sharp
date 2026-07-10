@@ -123,6 +123,15 @@ namespace PubnubApi.EndPoint
 
 		private void GetMembersList(PNCallback<PNChannelMembersResult> callback)
 		{
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("GetChannelMembers",
+				"channel", channelId,
+				"limit", limit,
+				"includeCount", includeCount,
+				"include", commandDelimitedIncludeOptions,
+				"filter", membersFilter,
+				"page", page,
+				"sort", sortField,
+				"queryParam", queryParam));
 			RequestState<PNChannelMembersResult> requestState = new RequestState<PNChannelMembersResult>
 				{
 					ResponseType = PNOperationType.PNGetChannelMembersOperation,
@@ -162,6 +171,15 @@ namespace PubnubApi.EndPoint
 		private async Task<PNResult<PNChannelMembersResult>> GetMembersList()
 		{
 			PNResult<PNChannelMembersResult> returnValue = new PNResult<PNChannelMembersResult>();
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("GetChannelMembers",
+				"channel", channelId,
+				"limit", limit,
+				"includeCount", includeCount,
+				"include", commandDelimitedIncludeOptions,
+				"filter", membersFilter,
+				"page", page,
+				"sort", sortField,
+				"queryParam", queryParam));
 			RequestState<PNChannelMembersResult> requestState = new RequestState<PNChannelMembersResult>
 				{
 					ResponseType = PNOperationType.PNGetChannelMembersOperation,

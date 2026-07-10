@@ -116,6 +116,13 @@ namespace PubnubApi.EndPoint
 				throw new ArgumentException("Missing Topic");
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("AddPushChannel",
+				"channels", channels,
+				"pushType", pushType,
+				"deviceId", pushToken,
+				"environment", environment,
+				"topic", deviceTopic,
+				"queryParam", externalQueryParam));
 			string channel = string.Join(",", channels.OrderBy(x => x).ToArray());
 			RequestState<PNPushAddChannelResult> requestState = new RequestState<PNPushAddChannelResult>
 				{
@@ -162,6 +169,13 @@ namespace PubnubApi.EndPoint
 				throw new ArgumentException("Missing Topic");
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("AddPushChannel",
+				"channels", channels,
+				"pushType", pushType,
+				"deviceId", pushToken,
+				"environment", environment,
+				"topic", deviceTopic,
+				"queryParam", externalQueryParam));
 			string channel = string.Join(",", channels.OrderBy(x => x).ToArray());
 			PNResult<PNPushAddChannelResult> returnValue = new PNResult<PNPushAddChannelResult>();
 			RequestState<PNPushAddChannelResult> requestState = new RequestState<PNPushAddChannelResult>

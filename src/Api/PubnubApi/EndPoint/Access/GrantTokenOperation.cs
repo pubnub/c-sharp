@@ -185,6 +185,14 @@ namespace PubnubApi.EndPoint
 				throw new MissingMemberException("Invalid TTL value");
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("GrantToken",
+				"resources", pubnubResources,
+				"patterns", pubnubPatterns,
+				"ttl", grantTTL,
+				"authorizedUuid", pubnubAuthorizedUuid,
+				"authorizedUserId", pubnubAuthorizedUserId,
+				"meta", grantMeta,
+				"queryParam", queryParam));
 			RequestState<PNAccessManagerTokenResult> requestState = new RequestState<PNAccessManagerTokenResult>
 				{
 					Channels = pubnubResources.Channels.Keys.ToArray(),
@@ -308,6 +316,14 @@ namespace PubnubApi.EndPoint
 				throw new MissingMemberException("Invalid TTL value");
 			}
 			logger?.Trace($"{GetType().Name} parameter validated.");
+			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("GrantToken",
+				"resources", pubnubResources,
+				"patterns", pubnubPatterns,
+				"ttl", grantTTL,
+				"authorizedUuid", pubnubAuthorizedUuid,
+				"authorizedUserId", pubnubAuthorizedUserId,
+				"meta", grantMeta,
+				"queryParam", queryParam));
 			RequestState<PNAccessManagerTokenResult> requestState = new RequestState<PNAccessManagerTokenResult>();
 			requestState.Channels = pubnubResources.Channels.Keys.ToArray();
 			requestState.ChannelGroups = pubnubResources.ChannelGroups.Keys.ToArray();

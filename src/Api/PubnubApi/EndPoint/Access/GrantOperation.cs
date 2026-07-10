@@ -157,6 +157,20 @@ namespace PubnubApi.EndPoint
             {
                 throw new MissingMemberException("Invalid secret key");
             }
+            logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("Grant",
+                "channels", pubnubChannelNames,
+                "channelGroups", pubnubChannelGroupNames,
+                "uuids", pubnubTargetUuids,
+                "authKeys", pamAuthenticationKeys,
+                "read", grantRead,
+                "write", grantWrite,
+                "manage", grantManage,
+                "delete", grantDelete,
+                "get", grantGet,
+                "update", grantUpdate,
+                "join", grantJoin,
+                "ttl", grantTTL,
+                "queryParam", queryParam));
             RequestState<PNAccessManagerGrantResult> requestState = new RequestState<PNAccessManagerGrantResult>();
             requestState.Channels = pubnubChannelNames;
             requestState.ChannelGroups = pubnubChannelGroupNames;
@@ -194,6 +208,20 @@ namespace PubnubApi.EndPoint
                 throw new MissingMemberException("Invalid secret key");
             }
 
+            logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("Grant",
+                "channels", pubnubChannelNames,
+                "channelGroups", pubnubChannelGroupNames,
+                "uuids", pubnubTargetUuids,
+                "authKeys", pamAuthenticationKeys,
+                "read", grantRead,
+                "write", grantWrite,
+                "manage", grantManage,
+                "delete", grantDelete,
+                "get", grantGet,
+                "update", grantUpdate,
+                "join", grantJoin,
+                "ttl", grantTTL,
+                "queryParam", queryParam));
             PNResult<PNAccessManagerGrantResult> returnValue = new PNResult<PNAccessManagerGrantResult>();
             RequestState<PNAccessManagerGrantResult> requestState = new RequestState<PNAccessManagerGrantResult>();
             requestState.Channels = pubnubChannelNames;

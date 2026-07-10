@@ -240,6 +240,18 @@ namespace PubnubApi
 
         public int FileMessagePublishRetryLimit { get; set; }
 
+        /// <summary>
+        /// When enabled (default), each outbound request negotiates HTTP/2 using
+        /// <see cref="System.Net.Http.HttpRequestMessage.Version"/> / VersionPolicy, with
+        /// automatic fallback to HTTP/1.1. HTTP/2 only takes effect against an HTTP/2-capable
+        /// (customer-enabled) PubNub origin; otherwise requests transparently use HTTP/1.1.
+        /// The negotiated protocol is re-evaluated on new connections (natural reconnect or
+        /// Pubnub client recreation); the SDK does not pin or proactively probe for HTTP/2.
+        /// On target frameworks without VersionPolicy support (netstandard2.0/.NET Framework),
+        /// only the request version is set as a best-effort hint.
+        /// </summary>
+        public bool EnableHttp2 { get; set; } = true;
+
         [Obsolete("PNConfiguration(string uuid) is deprecated, please use PNConfiguration(UserId userId) instead.")]
         public PNConfiguration(string uuid)
         {
@@ -286,6 +298,7 @@ namespace PubnubApi
             userId = currentUserId;
             LogLevel = PubnubLogLevel.None;
             EnableEventEngine = true;
+            EnableHttp2 = true;
         }
 
         private void setDefaultRetryConfigurationFromPolicy(PNReconnectionPolicy policy)

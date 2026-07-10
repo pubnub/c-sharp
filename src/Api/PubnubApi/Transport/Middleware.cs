@@ -100,6 +100,7 @@ namespace PubnubApi
 			var transportRequest = new TransportRequest()
 			{
 				RequestType = requestParameter.RequestType,
+				OperationType = operationType,
 				RequestUrl = urlString,
 				BodyContentString = requestParameter.BodyContentString,
 				FormData = requestParameter.FormData,

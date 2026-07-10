@@ -626,6 +626,119 @@ namespace PubNubMessaging.Tests
         }
 
 
+        // Parses a raw here_now server response through the same deserializer the SDK uses,
+        // bypassing the network so occupancy parsing can be asserted deterministically.
+        private static PNHereNowResult ParseHereNowResponse(string serverResponse, string channelArg)
+        {
+            PNConfiguration config = new PNConfiguration(new UserId("mytestuuid"))
+            {
+                PublishKey = PubnubCommon.PublishKey,
+                SubscribeKey = PubnubCommon.SubscribeKey,
+                Secure = false
+            };
+            Pubnub pn = createPubNubInstance(config, authToken);
+            try
+            {
+                List<object> listObject = new List<object>
+                {
+                    pn.JsonPluggableLibrary.DeserializeToObject(serverResponse),
+                    channelArg
+                };
+                return DeserializeToInternalObjectUtility
+                    .DeserializeToInternalObject<PNHereNowResult>(pn.JsonPluggableLibrary, listObject);
+            }
+            finally
+            {
+                pn.Destroy();
+                pn.PubnubUnitTest = null;
+            }
+        }
+
+        [Test]
+        public static void IfHereNowWithoutUUIDsIsCalledThenChannelOccupancyShouldMatchTotalOccupancy()
+        {
+            string channel = "mocha";
+            // Single channel + disable_uuids returns the compact format: occupancy present, no payload wrapper, no uuids array.
+            string serverResponse = "{\"status\": 200, \"message\": \"OK\", \"service\": \"Presence\", \"occupancy\": 3}";
+
+            PNHereNowResult result = ParseHereNowResponse(serverResponse, channel);
+
+            Assert.IsNotNull(result, "here_now result not parsed");
+            Assert.AreEqual(3, result.TotalOccupancy, "TotalOccupancy mismatch");
+            Assert.IsTrue(result.Channels.TryGetValue(channel, out var channelData), "channel data missing");
+            Assert.AreEqual(channel, channelData.ChannelName, "ChannelName not populated");
+            Assert.AreEqual(3, channelData.Occupancy, "channel Occupancy should match total occupancy, not be hardcoded to 1");
+        }
+
+        [Test]
+        public static void IfHereNowWithoutUUIDsIsCalledOnEmptyChannelThenOccupancyShouldBeZero()
+        {
+            string channel = "mocha";
+            // Empty single channel + disable_uuids: occupancy 0, no uuids array.
+            string serverResponse = "{\"status\": 200, \"message\": \"OK\", \"service\": \"Presence\", \"occupancy\": 0}";
+
+            PNHereNowResult result = ParseHereNowResponse(serverResponse, channel);
+
+            Assert.IsNotNull(result, "here_now result not parsed");
+            Assert.AreEqual(0, result.TotalOccupancy, "TotalOccupancy mismatch");
+            Assert.IsTrue(result.Channels.TryGetValue(channel, out var channelData), "channel data missing");
+            Assert.AreEqual(channel, channelData.ChannelName, "ChannelName not populated");
+            Assert.AreEqual(0, channelData.Occupancy, "empty channel occupancy should be 0, not hardcoded to 1");
+        }
+
+        [Test]
+        public static void IfHereNowWithUUIDsIsCalledThenChannelOccupancyShouldMatchTotalOccupancy()
+        {
+            string channel = "mocha";
+            // Single channel + include uuids: uuids array present alongside occupancy.
+            string serverResponse = "{\"status\": 200, \"message\": \"OK\", \"service\": \"Presence\", \"uuids\": [\"u1\", \"u2\", \"u3\"], \"occupancy\": 3}";
+
+            PNHereNowResult result = ParseHereNowResponse(serverResponse, channel);
+
+            Assert.IsNotNull(result, "here_now result not parsed");
+            Assert.AreEqual(3, result.TotalOccupancy, "TotalOccupancy mismatch");
+            Assert.IsTrue(result.Channels.TryGetValue(channel, out var channelData), "channel data missing");
+            Assert.AreEqual(channel, channelData.ChannelName, "ChannelName not populated");
+            Assert.AreEqual(3, channelData.Occupancy, "channel Occupancy should match total occupancy");
+            Assert.AreEqual(3, channelData.Occupants.Count, "occupant count mismatch");
+        }
+
+        [Test]
+        public static void IfHereNowWithUUIDsIsCalledOnEmptyChannelThenChannelEntryShouldStillExist()
+        {
+            string channel = "mocha";
+            // Empty single channel with uuids requested: uuids array present but empty, occupancy 0.
+            string serverResponse = "{\"status\": 200, \"message\": \"OK\", \"service\": \"Presence\", \"uuids\": [], \"occupancy\": 0}";
+
+            PNHereNowResult result = ParseHereNowResponse(serverResponse, channel);
+
+            Assert.IsNotNull(result, "here_now result not parsed");
+            Assert.AreEqual(0, result.TotalOccupancy, "TotalOccupancy mismatch");
+            Assert.IsTrue(result.Channels.TryGetValue(channel, out var channelData), "channel entry should exist even when empty");
+            Assert.AreEqual(channel, channelData.ChannelName, "ChannelName not populated");
+            Assert.AreEqual(0, channelData.Occupancy, "empty channel occupancy should be 0");
+            Assert.IsNotNull(channelData.Occupants, "Occupants should be an empty list, not null");
+            Assert.AreEqual(0, channelData.Occupants.Count, "empty channel should have no occupants");
+        }
+
+        [Test]
+        public static void IfHereNowWithoutUUIDsIsCalledOnMultipleChannelsThenEachOccupancyShouldBeCorrect()
+        {
+            // Multiple channels always return the payload format with per-channel occupancy, even with disable_uuids.
+            string serverResponse = "{\"status\": 200, \"message\": \"OK\", \"payload\": {\"channels\": {\"mocha\": {\"occupancy\": 3}, \"chabc\": {\"occupancy\": 5}}, \"total_channels\": 2, \"total_occupancy\": 8}, \"service\": \"Presence\"}";
+
+            PNHereNowResult result = ParseHereNowResponse(serverResponse, "mocha,chabc");
+
+            Assert.IsNotNull(result, "here_now result not parsed");
+            Assert.AreEqual(8, result.TotalOccupancy, "TotalOccupancy mismatch");
+            Assert.AreEqual(2, result.TotalChannels, "TotalChannels mismatch");
+            Assert.IsTrue(result.Channels.TryGetValue("mocha", out var mochaData), "mocha channel data missing");
+            Assert.AreEqual(3, mochaData.Occupancy, "mocha occupancy mismatch");
+            Assert.IsTrue(result.Channels.TryGetValue("chabc", out var chabcData), "chabc channel data missing");
+            Assert.AreEqual(5, chabcData.Occupancy, "chabc occupancy mismatch");
+        }
+
+
         [Test]
         public static void IfHereNowIsCalledThenItShouldReturnInfoCipher()
         {
