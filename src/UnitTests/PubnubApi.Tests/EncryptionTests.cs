@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 using System.Collections.Generic;
 using NUnit.Framework;
@@ -1303,6 +1304,87 @@ namespace PubNubMessaging.Tests
 
             bool passed = done.WaitOne(500000);
             Assert.True(passed);
+        }
+
+        /// <summary>
+        /// Padding-oracle hardening regression test.
+        /// Bad-padding and wrong-length ciphertexts must produce the exact same generic error,
+        /// with no distinguishing message, exception type, or inner (native) exception.
+        /// </summary>
+        [Test]
+        public void TestDecryptFailureModesAreIndistinguishable()
+        {
+            LegacyCryptor legacy = new LegacyCryptor("enigma", false);
+            AesCbcCryptor aes = new AesCbcCryptor("enigma");
+
+            // Legacy (static IV): 24 raw bytes are never block-aligned -> "wrong final block length".
+            PNException legacyWrongLength = CaptureDecryptFailure(() =>
+                legacy.Decrypt(Convert.ToBase64String(RandomBytes(24))));
+            // Legacy (static IV): a block-aligned input that fails PKCS7 unpadding -> "bad decrypt".
+            PNException legacyBadPadding = CaptureDecryptFailure(() =>
+                legacy.Decrypt(FindLegacyBadPaddingInput(legacy)));
+
+            // AES-CBC: tamper a valid ciphertext produced via round-trip encryption.
+            string validAes = aes.Encrypt("hello world - a message spanning more than one block");
+            byte[] validAesBytes = Convert.FromBase64String(validAes);
+            // Drop 5 trailing bytes so the ciphertext body is no longer block-aligned.
+            string aesWrongLengthInput = Convert.ToBase64String(validAesBytes.Take(validAesBytes.Length - 5).ToArray());
+            PNException aesWrongLength = CaptureDecryptFailure(() => aes.Decrypt(aesWrongLengthInput));
+            PNException aesBadPadding = CaptureDecryptFailure(() => aes.Decrypt(FindAesBadPaddingInput(aes, validAesBytes)));
+
+            foreach (var ex in new[] { legacyWrongLength, legacyBadPadding, aesWrongLength, aesBadPadding })
+            {
+                Assert.AreEqual("Decrypt Error", ex.Message, "Decrypt error message must be generic");
+                Assert.IsNull(ex.InnerException, "Native crypto exception must not be surfaced as inner exception");
+                StringAssert.DoesNotContain("Padding", ex.ToString());
+                StringAssert.DoesNotContain("block", ex.ToString());
+            }
+
+            // The whole point: bad padding and wrong length are not distinguishable at the call site.
+            Assert.AreEqual(legacyBadPadding.Message, legacyWrongLength.Message);
+            Assert.AreEqual(aesBadPadding.Message, aesWrongLength.Message);
+            Assert.AreEqual(legacyBadPadding.GetType(), legacyWrongLength.GetType());
+            Assert.AreEqual(aesBadPadding.GetType(), aesWrongLength.GetType());
+        }
+
+        private static PNException CaptureDecryptFailure(TestDelegate act)
+        {
+            return Assert.Throws<PNException>(act);
+        }
+
+        private static byte[] RandomBytes(int count)
+        {
+            byte[] buffer = new byte[count];
+            new Random().NextBytes(buffer);
+            return buffer;
+        }
+
+        private static string FindLegacyBadPaddingInput(LegacyCryptor legacy)
+        {
+            for (int attempt = 0; attempt < 2000; attempt++)
+            {
+                string candidate = Convert.ToBase64String(RandomBytes(16));
+                try { legacy.Decrypt(candidate); }
+                catch (PNException) { return candidate; }
+            }
+            Assert.Fail("Could not construct a block-aligned legacy input that fails unpadding");
+            return null;
+        }
+
+        private static string FindAesBadPaddingInput(AesCbcCryptor aes, byte[] validAesBytes)
+        {
+            Random rng = new Random();
+            for (int attempt = 0; attempt < 2000; attempt++)
+            {
+                byte[] tampered = (byte[])validAesBytes.Clone();
+                // Corrupt the final ciphertext byte so the last plaintext block's padding is (almost always) invalid.
+                tampered[tampered.Length - 1] ^= (byte)(rng.Next(1, 256));
+                string candidate = Convert.ToBase64String(tampered);
+                try { aes.Decrypt(candidate); }
+                catch (PNException) { return candidate; }
+            }
+            Assert.Fail("Could not construct an AES-CBC input that fails unpadding");
+            return null;
         }
 
         private PNConfiguration CreateTestConfig()
