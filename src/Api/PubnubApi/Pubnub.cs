@@ -776,29 +776,39 @@ namespace PubnubApi
 
                 foreach (var subscribeEventEngine in subscribeEventEngines)
                 {
+                    IEnumerable<string> channels = [];
+                    IEnumerable<string> channelGroups = [];
+                    SubscriptionCursor cursor = null;
+                    if (subscribeEventEngine.CurrentState is SubscriptionState state)
+                    {
+                        channels = state.Channels ?? channels;
+                        channelGroups = state.ChannelGroups ?? channelGroups;
+                        cursor = state.Cursor;
+                    }
                     subscribeEventEngine.EventQueue.Enqueue(new ReconnectEvent()
                     {
-                        Channels = (subscribeEventEngine.CurrentState as SubscriptionState).Channels,
-                        ChannelGroups = (subscribeEventEngine.CurrentState as SubscriptionState).ChannelGroups,
-                        Cursor = resetSubscribeTimetoken
-                            ? null
-                            : (subscribeEventEngine.CurrentState as SubscriptionState)?.Cursor
+                        Channels = channels,
+                        ChannelGroups = channelGroups,
+                        Cursor = resetSubscribeTimetoken ? null : cursor
                     });
                 }
                 
                 if (presenceEventengineFactory.HasEventEngine(InstanceId))
                 {
                     var presenceEventEngine = presenceEventengineFactory.GetEventEngine(InstanceId);
-
+                    IEnumerable<string> channels = [];
+                    IEnumerable<string> channelGroups = [];
+                    if (presenceEventEngine.CurrentState is EventEngine.Presence.States.APresenceState state)
+                    {
+                        channels = state.Input?.Channels ?? channels;
+                        channelGroups = state.Input?.ChannelGroups ?? channelGroups;
+                    }
                     presenceEventEngine.EventQueue.Enqueue(new EventEngine.Presence.Events.ReconnectEvent()
                     {
                         Input = new EventEngine.Presence.Common.PresenceInput()
                         {
-                            Channels = (presenceEventEngine.CurrentState as EventEngine.Presence.States.APresenceState)
-                                ?.Input.Channels,
-                            ChannelGroups =
-                                (presenceEventEngine.CurrentState as EventEngine.Presence.States.APresenceState)?.Input
-                                .ChannelGroups
+                            Channels = channels,
+                            ChannelGroups = channelGroups
                         }
                     });
                 }
@@ -807,13 +817,21 @@ namespace PubnubApi
                     foreach (var subscribeEventEngine in subscribeEventEngines)
                     {
                         if (subscribeEventEngine != null)
+                        {
                             heartbeatOperation ??= new HeartbeatOperation(
                                 pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
                                 JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
-
+                        }
+                        IEnumerable<string> channels = [];
+                        IEnumerable<string> channelGroups = [];
+                        if (subscribeEventEngine?.CurrentState is SubscriptionState state)
+                        {
+                            channels = state.Channels ?? channels;
+                            channelGroups = state.ChannelGroups ?? channelGroups;
+                        }
                         await heartbeatOperation.HeartbeatRequest<string>(
-                            (subscribeEventEngine?.CurrentState as SubscriptionState)?.Channels.ToArray(),
-                            (subscribeEventEngine?.CurrentState as SubscriptionState)?.ChannelGroups.ToArray()
+                            channels.ToArray(),
+                            channelGroups.ToArray()
                         ).ConfigureAwait(false);   
                     }
                 }
