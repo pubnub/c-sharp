@@ -80,8 +80,7 @@ namespace PubnubApi.Tests.DataSync
                 Id = ChannelId,
                 EntityClassVersion = EntityClassVersion,
                 Status = "active",
-                Payload = new Dictionary<string, object> { { "name", "adopters-channel" } },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                Payload = new Dictionary<string, object> { { "name", "adopters-channel" } }
             }),
             res => $"Id={Show(res.Id)}, Status={Show(res.Status)}");
 
@@ -100,8 +99,7 @@ namespace PubnubApi.Tests.DataSync
                 UserId = MembershipUserId,
                 RelationshipClassVersion = RelationshipClassVersion,
                 Status = "active",
-                Payload = new Dictionary<string, object> { { "role", "member" } },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                Payload = new Dictionary<string, object> { { "role", "member" } }
             }),
             res => $"Id={Show(res.Id)}, UserId={Show(res.UserId)}, ChannelId={Show(res.ChannelId)}");
         }

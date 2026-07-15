@@ -20,7 +20,7 @@ namespace PubnubApi.Tests.DataSync
         private const int SubscribeSettleMs = 3000;
 
         [SetUp]
-        public void Init()
+        public async Task Init()
         {
             var config = new PNConfiguration(new UserId($"ds-test-{Guid.NewGuid():N}".Substring(0, 30)))
             {
@@ -28,6 +28,7 @@ namespace PubnubApi.Tests.DataSync
             };
             pubnub = createPubNubInstance(config);
             config.Origin = PubnubCommon.DataSyncOrigin;
+            await GenerateDataSyncTestToken(pubnub);
             createdUserIds.Clear();
         }
 
@@ -66,7 +67,7 @@ namespace PubnubApi.Tests.DataSync
                 EntityClassVersion = TestEntityClassVersion,
                 Status = status,
                 Payload = payload ?? new Dictionary<string, object> { { "name", $"user-{id}" } },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
 
             Assert.That(result.Status.Error, Is.False,
@@ -137,7 +138,7 @@ namespace PubnubApi.Tests.DataSync
                         EntityClassVersion = TestEntityClassVersion,
                         Status = "active",
                         Payload = new Dictionary<string, object> { { "name", "Alice" } },
-                        IdempotencyKey = Guid.NewGuid().ToString()
+                        
                     });
                     Assert.That(response.Status.Error, Is.False,
                         $"CreateUser failed: {response.Status.ErrorData?.Information}");
@@ -206,7 +207,7 @@ namespace PubnubApi.Tests.DataSync
                                 Value = "patched"
                             }
                         },
-                        IdempotencyKey = Guid.NewGuid().ToString()
+                        
                     });
                     Assert.That(response.Status.Error, Is.False,
                         $"PatchUser failed: {response.Status.ErrorData?.Information}");

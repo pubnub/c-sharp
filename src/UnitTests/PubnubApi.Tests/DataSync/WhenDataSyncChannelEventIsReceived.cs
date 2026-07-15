@@ -20,7 +20,7 @@ namespace PubnubApi.Tests.DataSync
         private const int SubscribeSettleMs = 3000;
 
         [SetUp]
-        public void Init()
+        public async Task Init()
         {
             var config = new PNConfiguration(new UserId($"ds-test-{Guid.NewGuid():N}".Substring(0, 30)))
             {
@@ -28,6 +28,7 @@ namespace PubnubApi.Tests.DataSync
             };
             pubnub = createPubNubInstance(config);
             config.Origin = PubnubCommon.DataSyncOrigin;
+            await GenerateDataSyncTestToken(pubnub);
             createdChannelIds.Clear();
         }
 
@@ -65,8 +66,7 @@ namespace PubnubApi.Tests.DataSync
                 Id = id,
                 EntityClassVersion = TestEntityClassVersion,
                 Status = status,
-                Payload = payload ?? new Dictionary<string, object> { { "name", $"channel-{id}" } },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                Payload = payload ?? new Dictionary<string, object> { { "name", $"channel-{id}" } }
             });
 
             Assert.That(result.Status.Error, Is.False,
@@ -100,7 +100,10 @@ namespace PubnubApi.Tests.DataSync
                         eventReceived.Set();
                     }
                 },
-                (Pubnub _, PNStatus _) => { });
+                (Pubnub _, PNStatus s) =>
+                {
+                    ;
+                });
 
             pubnub.AddListener(listener);
             pubnub.Subscribe<object>().Channels(new[] { channel }).Execute();
@@ -136,8 +139,7 @@ namespace PubnubApi.Tests.DataSync
                         Id = channelId,
                         EntityClassVersion = TestEntityClassVersion,
                         Status = "active",
-                        Payload = new Dictionary<string, object> { { "name", "General" } },
-                        IdempotencyKey = Guid.NewGuid().ToString()
+                        Payload = new Dictionary<string, object> { { "name", "General" } }
                     });
                     Assert.That(response.Status.Error, Is.False,
                         $"CreateChannel failed: {response.Status.ErrorData?.Information}");
@@ -205,8 +207,7 @@ namespace PubnubApi.Tests.DataSync
                                 Path = "/status",
                                 Value = "patched"
                             }
-                        },
-                        IdempotencyKey = Guid.NewGuid().ToString()
+                        }
                     });
                     Assert.That(response.Status.Error, Is.False,
                         $"PatchChannel failed: {response.Status.ErrorData?.Information}");

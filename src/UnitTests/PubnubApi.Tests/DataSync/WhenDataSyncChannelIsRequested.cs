@@ -18,7 +18,7 @@ namespace PubnubApi.Tests.DataSync
         private const int TestEntityClassVersion = 1;
 
         [SetUp]
-        public void Init()
+        public async Task Init()
         {
             var config = new PNConfiguration(new UserId($"ds-test-{Guid.NewGuid():N}".Substring(0, 30)))
             {
@@ -26,6 +26,7 @@ namespace PubnubApi.Tests.DataSync
             };
             pubnub = createPubNubInstance(config);
             config.Origin = PubnubCommon.DataSyncOrigin;
+            await GenerateDataSyncTestToken(pubnub);
             createdChannelIds.Clear();
         }
 
@@ -68,8 +69,7 @@ namespace PubnubApi.Tests.DataSync
                     { "name", "General Chat" },
                     { "description", "A general discussion channel" },
                     { "maxMembers", 100 }
-                },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                }
             });
 
             Assert.That(result.Status.Error, Is.False,
@@ -105,8 +105,7 @@ namespace PubnubApi.Tests.DataSync
                 Id = channelId,
                 EntityClassVersion = TestEntityClassVersion,
                 Status = "active",
-                Payload = payload,
-                IdempotencyKey = Guid.NewGuid().ToString()
+                Payload = payload
             });
 
             Assert.That(response.Status.Error, Is.False);
@@ -129,8 +128,7 @@ namespace PubnubApi.Tests.DataSync
             {
                 EntityClassVersion = TestEntityClassVersion,
                 Status = "active",
-                Payload = new Dictionary<string, object> { { "key", "value" } },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                Payload = new Dictionary<string, object> { { "key", "value" } }
             });
 
             Assert.That(response.Status.Error, Is.False);
@@ -146,8 +144,7 @@ namespace PubnubApi.Tests.DataSync
         {
             var response = await pubnub.DataSync.CreateChannel(new CreateChannelParameters
             {
-                EntityClassVersion = TestEntityClassVersion,
-                IdempotencyKey = Guid.NewGuid().ToString()
+                EntityClassVersion = TestEntityClassVersion
             });
 
             Assert.That(response.Status.Error, Is.False);
@@ -462,8 +459,7 @@ namespace PubnubApi.Tests.DataSync
                         Path = "/status",
                         Value = "archived"
                     }
-                },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                }
             });
 
             Assert.That(response.Status.Error, Is.False);
@@ -488,7 +484,7 @@ namespace PubnubApi.Tests.DataSync
                         Value = "engineering"
                     }
                 },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
 
             Assert.That(response.Status.Error, Is.False);
@@ -517,7 +513,7 @@ namespace PubnubApi.Tests.DataSync
                         }
                     }
                 },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
 
             Assert.That(response.Status.Error, Is.False);
@@ -544,7 +540,7 @@ namespace PubnubApi.Tests.DataSync
                         Path = "/payload/fieldToRemove"
                     }
                 },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
 
             Assert.That(response.Status.Error, Is.False);
@@ -572,7 +568,7 @@ namespace PubnubApi.Tests.DataSync
                         From = "/payload/original"
                     }
                 },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
 
             Assert.That(response.Status.Error, Is.False);
@@ -600,7 +596,7 @@ namespace PubnubApi.Tests.DataSync
                         From = "/payload/source"
                     }
                 },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
 
             Assert.That(response.Status.Error, Is.False);
@@ -644,7 +640,7 @@ namespace PubnubApi.Tests.DataSync
                         Value = "modified"
                     }
                 },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
 
             Assert.That(response.Status.Error, Is.False);
@@ -676,7 +672,7 @@ namespace PubnubApi.Tests.DataSync
                         Value = "confirmed"
                     }
                 },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
 
             Assert.That(response.Status.Error, Is.False);
@@ -701,7 +697,7 @@ namespace PubnubApi.Tests.DataSync
                     }
                 },
                 IfMatch = created.ETag,
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
 
             Assert.That(response.Status.Error, Is.False);
@@ -725,7 +721,7 @@ namespace PubnubApi.Tests.DataSync
                         Value = "first-patch"
                     }
                 },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
 
             var response = await pubnub.DataSync.PatchChannel(new PatchChannelParameters
@@ -741,7 +737,7 @@ namespace PubnubApi.Tests.DataSync
                     }
                 },
                 IfMatch = created.ETag,
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
 
             Assert.That(response.Status.Error, Is.True);
@@ -781,7 +777,7 @@ namespace PubnubApi.Tests.DataSync
                         Value = true
                     }
                 },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
 
             Assert.That(response.Status.Error, Is.False);
@@ -857,7 +853,7 @@ namespace PubnubApi.Tests.DataSync
                     { "name", "Integration Test Channel" },
                     { "version", 1 }
                 },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
             Assert.That(createResponse.Status.Error, Is.False);
             var created = createResponse.Result;
@@ -905,7 +901,7 @@ namespace PubnubApi.Tests.DataSync
                         Value = "hello"
                     }
                 },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
             Assert.That(patchResponse.Status.Error, Is.False);
             Assert.That(patchResponse.Result.Status, Is.EqualTo("patched"));
@@ -920,7 +916,8 @@ namespace PubnubApi.Tests.DataSync
             // LIST - verify channel in listing
             var listResponse = await pubnub.DataSync.GetChannels(new GetChannelsParameters
             {
-                EntityClassVersion = TestEntityClassVersion
+                EntityClassVersion = TestEntityClassVersion,
+                //Filter = $"name LIKE \"{channelId}*\""
             });
             Assert.That(listResponse.Status.Error, Is.False);
             Assert.That(listResponse.Result.Data.Any(c => c.Id == channelId), Is.True);
@@ -970,7 +967,7 @@ namespace PubnubApi.Tests.DataSync
                     }
                 },
                 IfMatch = etag2,
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
             Assert.That(patchResponse.Status.Error, Is.False);
             var etag3 = patchResponse.Result.ETag;

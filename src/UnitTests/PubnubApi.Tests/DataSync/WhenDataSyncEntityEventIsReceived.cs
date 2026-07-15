@@ -14,14 +14,12 @@ namespace PubnubApi.Tests.DataSync
     {
         private Pubnub pubnub;
         private readonly List<string> createdEntityIds = new();
-
-        private const string TestEntityClass = "integration-test-vehicle";
-        private const int TestEntityClassVersion = 1;
+        
         private const int EventWaitTimeoutMs = 30 * 1000;
         private const int SubscribeSettleMs = 3000;
 
         [SetUp]
-        public void Init()
+        public async Task Init()
         {
             var config = new PNConfiguration(new UserId($"ds-test-{Guid.NewGuid():N}".Substring(0, 30)))
             {
@@ -29,6 +27,7 @@ namespace PubnubApi.Tests.DataSync
             };
             pubnub = createPubNubInstance(config);
             config.Origin = PubnubCommon.DataSyncOrigin;
+            await GenerateDataSyncTestToken(pubnub);
             createdEntityIds.Clear();
         }
 
@@ -64,8 +63,8 @@ namespace PubnubApi.Tests.DataSync
             var result = await pubnub.DataSync.CreateEntity(new CreateEntityParameters
             {
                 Id = id,
-                EntityClass = TestEntityClass,
-                EntityClassVersion = TestEntityClassVersion,
+                EntityClass = DataSyncCommon.IntegrationTestEntityClass,
+                EntityClassVersion = DataSyncCommon.EntityClassVersion,
                 Status = status,
                 Payload = payload ?? new Dictionary<string, object>
                 {
@@ -73,7 +72,7 @@ namespace PubnubApi.Tests.DataSync
                     { "model", "Camry" },
                     { "year", 2025 }
                 },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
 
             Assert.That(result.Status.Error, Is.False,
@@ -140,8 +139,8 @@ namespace PubnubApi.Tests.DataSync
                     var response = await pubnub.DataSync.CreateEntity(new CreateEntityParameters
                     {
                         Id = entityId,
-                        EntityClass = TestEntityClass,
-                        EntityClassVersion = TestEntityClassVersion,
+                        EntityClass = DataSyncCommon.IntegrationTestEntityClass,
+                        EntityClassVersion = DataSyncCommon.EntityClassVersion,
                         Status = "active",
                         Payload = new Dictionary<string, object>
                         {
@@ -149,7 +148,7 @@ namespace PubnubApi.Tests.DataSync
                             { "model", "Camry" },
                             { "year", 2025 }
                         },
-                        IdempotencyKey = Guid.NewGuid().ToString()
+                        
                     });
                     Assert.That(response.Status.Error, Is.False,
                         $"CreateEntity failed: {response.Status.ErrorData?.Information}");
@@ -179,7 +178,7 @@ namespace PubnubApi.Tests.DataSync
                     var response = await pubnub.DataSync.UpdateEntity(new UpdateEntityParameters
                     {
                         Id = created.Id,
-                        EntityClassVersion = TestEntityClassVersion,
+                        EntityClassVersion = DataSyncCommon.EntityClassVersion,
                         Status = "updated",
                         Payload = new Dictionary<string, object>
                         {
@@ -222,7 +221,7 @@ namespace PubnubApi.Tests.DataSync
                                 Value = "patched"
                             }
                         },
-                        IdempotencyKey = Guid.NewGuid().ToString()
+                        
                     });
                     Assert.That(response.Status.Error, Is.False,
                         $"PatchEntity failed: {response.Status.ErrorData?.Information}");

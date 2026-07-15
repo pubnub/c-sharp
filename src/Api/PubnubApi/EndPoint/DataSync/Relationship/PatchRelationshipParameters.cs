@@ -22,11 +22,5 @@ namespace PubnubApi.EndPoint
         /// the patch when the current resource version does not match (HTTP 412).
         /// </summary>
         public string IfMatch { get; set; }
-
-        /// <summary>
-        /// Idempotency key (UUIDv4) to ensure the request is processed exactly once.
-        /// Required for PATCH requests.
-        /// </summary>
-        public string IdempotencyKey { get; set; }
     }
 }

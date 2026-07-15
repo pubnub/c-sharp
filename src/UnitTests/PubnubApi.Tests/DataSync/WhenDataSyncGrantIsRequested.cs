@@ -8,71 +8,44 @@ using PubNubMessaging.Tests;
 
 namespace PubnubApi.Tests.DataSync
 {
-    /// <summary>
-    /// Server-hitting integration tests for the Data Sync PAM extension.
-    /// These require a PAM-enabled Data Sync keyset and a valid <c>PubnubCommon.DataSyncSecretKey</c>.
-    /// When the secret key is not configured the fixture skips so the suite stays green.
-    /// </summary>
     [TestFixture]
     public class WhenDataSyncGrantIsRequested : TestHarness
     {
-        private const string TestEntityClass = "integration-test-vehicle";
-        private const int TestEntityClassVersion = 1;
         private const string AdminUserId = "ds-pam-admin";
+        private const string EntityCreatorId = "ds-pam-creator";
         private const string ClientUserId = "ds-pam-client";
 
         private Pubnub admin;
+        private Pubnub creator;
         private readonly List<Pubnub> clients = new();
         private readonly List<string> createdEntityIds = new();
 
         [SetUp]
         public async Task Init()
         {
-            var config = new PNConfiguration(new UserId(AdminUserId))
+            var adminConfig = new PNConfiguration(new UserId(AdminUserId))
             {
+                SecretKey = PubnubCommon.DataSyncSecretKey,
                 SubscribeKey = PubnubCommon.DataSyncSubscribeKey,
                 PublishKey = PubnubCommon.DataSyncPublishKey,
-                SecretKey = PubnubCommon.DataSyncSecretKey,
+                Origin = PubnubCommon.DataSyncOrigin
             };
-            admin = createPubNubInstance(config);
-            config.Origin = PubnubCommon.DataSyncOrigin;
+            admin = new Pubnub(adminConfig);
 
+            var creatorConfig = new PNConfiguration(new UserId(EntityCreatorId))
+            {
+                SubscribeKey = PubnubCommon.DataSyncSubscribeKey,
+                Origin = PubnubCommon.DataSyncOrigin
+            };
+            creator = new Pubnub(creatorConfig);
+            
             clients.Clear();
             createdEntityIds.Clear();
 
-            // The Data Sync service enforces PAM via tokens, so the admin client must hold a
-            // token granting full rights before it can create/manage the test fixtures.
-            var adminGrant = await admin.GrantToken()
-                .TTL(60)
-                .AuthorizedUserId(new UserId(AdminUserId))
-                .Patterns(new PNTokenPatterns
-                {
-                    DataSync = new PNDataSyncTokenScopes
-                    {
-                        Entities = new Dictionary<string, PNTokenAuthValues> { { ".*", FullPermissions() } },
-                        Relationships = new Dictionary<string, PNTokenAuthValues> { { ".*", FullPermissions() } },
-                        Memberships = new Dictionary<string, PNTokenAuthValues> { { ".*", FullPermissions() } }
-                    }
-                })
-                .ExecuteAsync();
-            Assert.That(adminGrant.Status.Error, Is.False,
-                $"Admin grant failed: {adminGrant.Status.ErrorData?.Information}");
-
-            admin.SetAuthToken(adminGrant.Result.Token);
+            await GenerateDataSyncTestToken(creator);
+            
             await Task.Delay(1000); // allow token propagation
         }
-
-        private static PNTokenAuthValues FullPermissions() => new PNTokenAuthValues
-        {
-            Read = true,
-            Write = true,
-            Manage = true,
-            Delete = true,
-            Create = true,
-            Get = true,
-            Update = true,
-            Join = true
-        };
 
         [TearDown]
         public async Task Cleanup()
@@ -81,7 +54,7 @@ namespace PubnubApi.Tests.DataSync
             {
                 try
                 {
-                    await admin.DataSync.DeleteEntity(new DeleteEntityParameters { Id = id });
+                    await creator.DataSync.DeleteEntity(new DeleteEntityParameters { Id = id });
                 }
                 catch
                 {
@@ -99,6 +72,11 @@ namespace PubnubApi.Tests.DataSync
             {
                 admin.Destroy();
                 admin = null;
+            }
+            if (creator != null)
+            {
+                creator.Destroy();
+                creator = null;
             }
         }
 
@@ -120,14 +98,14 @@ namespace PubnubApi.Tests.DataSync
 
         private async Task<string> CreateEntityAsync(string id)
         {
-            var result = await admin.DataSync.CreateEntity(new CreateEntityParameters
+            var result = await creator.DataSync.CreateEntity(new CreateEntityParameters
             {
                 Id = id,
-                EntityClass = TestEntityClass,
-                EntityClassVersion = TestEntityClassVersion,
+                EntityClass = DataSyncCommon.IntegrationTestEntityClass,
+                EntityClassVersion = DataSyncCommon.EntityClassVersion,
                 Status = "active",
                 Payload = new Dictionary<string, object> { { "make", "Toyota" } },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
             Assert.That(result.Status.Error, Is.False, result.Status.ErrorData?.Information);
             createdEntityIds.Add(result.Result.Id);
@@ -227,7 +205,7 @@ namespace PubnubApi.Tests.DataSync
             var update = await client.DataSync.UpdateEntity(new UpdateEntityParameters
             {
                 Id = entityId,
-                EntityClassVersion = TestEntityClassVersion,
+                EntityClassVersion = DataSyncCommon.EntityClassVersion,
                 Status = "updated",
                 Payload = new Dictionary<string, object> { { "make", "Honda" } }
             });

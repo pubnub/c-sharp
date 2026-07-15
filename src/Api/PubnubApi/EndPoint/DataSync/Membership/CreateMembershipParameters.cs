@@ -36,11 +36,5 @@ namespace PubnubApi.EndPoint
         /// User-defined custom properties. Supports arbitrarily nested objects.
         /// </summary>
         public Dictionary<string, object> Payload { get; set; }
-
-        /// <summary>
-        /// Idempotency key (UUIDv4) to ensure the request is processed exactly once.
-        /// Required for POST requests.
-        /// </summary>
-        public string IdempotencyKey { get; set; }
     }
 }

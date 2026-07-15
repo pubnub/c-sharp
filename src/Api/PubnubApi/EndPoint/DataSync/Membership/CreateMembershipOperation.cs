@@ -108,18 +108,6 @@ namespace PubnubApi.EndPoint
                 return returnValue;
             }
 
-            if (string.IsNullOrEmpty(parameters.IdempotencyKey) || string.IsNullOrEmpty(parameters.IdempotencyKey.Trim()))
-            {
-                var errStatus = new PNStatus
-                {
-                    Error = true,
-                    ErrorData = new PNErrorData("Missing IdempotencyKey",
-                        new ArgumentException("Missing IdempotencyKey"))
-                };
-                returnValue.Status = errStatus;
-                return returnValue;
-            }
-
             if (string.IsNullOrEmpty(config.SubscribeKey) || string.IsNullOrEmpty(config.SubscribeKey.Trim()) ||
                 config.SubscribeKey.Length <= 0)
             {
@@ -242,7 +230,6 @@ namespace PubnubApi.EndPoint
 
             requestParameter.Headers.Add("Content-Type",
                 "application/vnd.pubnub.objects.membership+json;version=1");
-            requestParameter.Headers.Add("Idempotency-Key", parameters.IdempotencyKey);
 
             return requestParameter;
         }

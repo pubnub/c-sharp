@@ -23,7 +23,7 @@ namespace PubnubApi.Tests.DataSync
         private const int SubscribeSettleMs = 3000;
 
         [SetUp]
-        public void Init()
+        public async Task Init()
         {
             var config = new PNConfiguration(new UserId($"ds-test-{Guid.NewGuid():N}".Substring(0, 30)))
             {
@@ -31,6 +31,7 @@ namespace PubnubApi.Tests.DataSync
             };
             pubnub = createPubNubInstance(config);
             config.Origin = PubnubCommon.DataSyncOrigin;
+            await GenerateDataSyncTestToken(pubnub);
             createdMembershipIds.Clear();
             createdUserIds.Clear();
             createdChannelIds.Clear();
@@ -93,7 +94,7 @@ namespace PubnubApi.Tests.DataSync
                 EntityClassVersion = TestEntityClassVersion,
                 Status = "active",
                 Payload = new Dictionary<string, object> { { "name", $"user-{id}" } },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
 
             Assert.That(result.Status.Error, Is.False,
@@ -111,7 +112,7 @@ namespace PubnubApi.Tests.DataSync
                 EntityClassVersion = TestEntityClassVersion,
                 Status = "active",
                 Payload = new Dictionary<string, object> { { "name", $"channel-{id}" } },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
 
             Assert.That(result.Status.Error, Is.False,
@@ -140,7 +141,7 @@ namespace PubnubApi.Tests.DataSync
                     { "role", "member" },
                     { "joinedAt", "2025-01-01" }
                 },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
 
             Assert.That(result.Status.Error, Is.False,
@@ -219,7 +220,7 @@ namespace PubnubApi.Tests.DataSync
                             { "role", "member" },
                             { "joinedAt", "2025-01-01" }
                         },
-                        IdempotencyKey = Guid.NewGuid().ToString()
+                        
                     });
                     Assert.That(response.Status.Error, Is.False,
                         $"CreateMembership failed: {response.Status.ErrorData?.Information}");
@@ -295,7 +296,7 @@ namespace PubnubApi.Tests.DataSync
                                 Value = "patched"
                             }
                         },
-                        IdempotencyKey = Guid.NewGuid().ToString()
+                        
                     });
                     Assert.That(response.Status.Error, Is.False,
                         $"PatchMembership failed: {response.Status.ErrorData?.Information}");

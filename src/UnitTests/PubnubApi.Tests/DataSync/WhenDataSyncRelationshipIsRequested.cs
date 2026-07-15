@@ -16,13 +16,8 @@ namespace PubnubApi.Tests.DataSync
         private readonly List<string> createdRelationshipIds = new();
         private readonly List<string> createdEntityIds = new();
 
-        private const string TestRelationshipClass = "integration-test-ownership";
-        private const int TestRelationshipClassVersion = 1;
-        private const string TestEntityClass = "integration-test-vehicle";
-        private const int TestEntityClassVersion = 1;
-
         [SetUp]
-        public void Init()
+        public async Task Init()
         {
             var config = new PNConfiguration(new UserId($"ds-test-{Guid.NewGuid():N}".Substring(0, 30)))
             {
@@ -30,6 +25,7 @@ namespace PubnubApi.Tests.DataSync
             };
             pubnub = createPubNubInstance(config);
             config.Origin = PubnubCommon.DataSyncOrigin;
+            await GenerateDataSyncTestToken(pubnub);
             createdRelationshipIds.Clear();
             createdEntityIds.Clear();
         }
@@ -76,11 +72,11 @@ namespace PubnubApi.Tests.DataSync
             var result = await pubnub.DataSync.CreateEntity(new CreateEntityParameters
             {
                 Id = id,
-                EntityClass = TestEntityClass,
-                EntityClassVersion = TestEntityClassVersion,
+                EntityClass = DataSyncCommon.IntegrationTestEntityClass,
+                EntityClassVersion = DataSyncCommon.EntityClassVersion,
                 Status = "active",
                 Payload = new Dictionary<string, object> { { "name", $"entity-{id}" } },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
 
             Assert.That(result.Status.Error, Is.False,
@@ -111,15 +107,15 @@ namespace PubnubApi.Tests.DataSync
             {
                 EntityAId = entityAId,
                 EntityBId = entityBId,
-                RelationshipClass = TestRelationshipClass,
-                RelationshipClassVersion = TestRelationshipClassVersion,
+                RelationshipClass = DataSyncCommon.IntegrationTestRelationshipClass,
+                RelationshipClassVersion = DataSyncCommon.RelationshipClassVersion,
                 Status = status,
                 Payload = payload ?? new Dictionary<string, object>
                 {
                     { "role", "owner" },
                     { "since", "2025-01-01" }
                 },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
 
             Assert.That(result.Status.Error, Is.False,
@@ -153,11 +149,11 @@ namespace PubnubApi.Tests.DataSync
             {
                 EntityAId = entityA.Id,
                 EntityBId = entityB.Id,
-                RelationshipClass = TestRelationshipClass,
-                RelationshipClassVersion = TestRelationshipClassVersion,
+                RelationshipClass = DataSyncCommon.IntegrationTestRelationshipClass,
+                RelationshipClassVersion = DataSyncCommon.RelationshipClassVersion,
                 Status = "active",
                 Payload = payload,
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
 
             Assert.That(response.Status.Error, Is.False);
@@ -166,8 +162,8 @@ namespace PubnubApi.Tests.DataSync
             Assert.That(relationship.Id, Is.Not.Null.And.Not.Empty);
             Assert.That(relationship.EntityAId, Is.EqualTo(entityA.Id));
             Assert.That(relationship.EntityBId, Is.EqualTo(entityB.Id));
-            Assert.That(relationship.RelationshipClass, Is.EqualTo(TestRelationshipClass));
-            Assert.That(relationship.RelationshipClassVersion, Is.EqualTo(TestRelationshipClassVersion));
+            Assert.That(relationship.RelationshipClass, Is.EqualTo(DataSyncCommon.IntegrationTestRelationshipClass));
+            Assert.That(relationship.RelationshipClassVersion, Is.EqualTo(DataSyncCommon.RelationshipClassVersion));
             Assert.That(relationship.Status, Is.EqualTo("active"));
             Assert.That(relationship.Payload, Is.Not.Null);
             Assert.That(relationship.CreatedAt, Is.Not.Null.And.Not.Empty);
@@ -188,11 +184,11 @@ namespace PubnubApi.Tests.DataSync
                 Id = relationshipId,
                 EntityAId = entityA.Id,
                 EntityBId = entityB.Id,
-                RelationshipClass = TestRelationshipClass,
-                RelationshipClassVersion = TestRelationshipClassVersion,
+                RelationshipClass = DataSyncCommon.IntegrationTestRelationshipClass,
+                RelationshipClassVersion = DataSyncCommon.RelationshipClassVersion,
                 Status = "active",
                 Payload = new Dictionary<string, object> { { "key", "value" } },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
 
             Assert.That(response.Status.Error, Is.False);
@@ -212,17 +208,17 @@ namespace PubnubApi.Tests.DataSync
             {
                 EntityAId = entityA.Id,
                 EntityBId = entityB.Id,
-                RelationshipClass = TestRelationshipClass,
-                RelationshipClassVersion = TestRelationshipClassVersion,
+                RelationshipClass = DataSyncCommon.IntegrationTestRelationshipClass,
+                RelationshipClassVersion = DataSyncCommon.RelationshipClassVersion,
                 Payload = new Dictionary<string, object> { { "key", "value" } },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
 
             Assert.That(response.Status.Error, Is.False);
             var relationship = response.Result;
             Assert.That(relationship, Is.Not.Null);
             Assert.That(relationship.Id, Is.Not.Null.And.Not.Empty);
-            Assert.That(relationship.RelationshipClass, Is.EqualTo(TestRelationshipClass));
+            Assert.That(relationship.RelationshipClass, Is.EqualTo(DataSyncCommon.IntegrationTestRelationshipClass));
 
             createdRelationshipIds.Add(relationship.Id);
         }
@@ -237,15 +233,15 @@ namespace PubnubApi.Tests.DataSync
             {
                 EntityAId = entityA.Id,
                 EntityBId = entityB.Id,
-                RelationshipClass = TestRelationshipClass,
-                RelationshipClassVersion = TestRelationshipClassVersion,
-                IdempotencyKey = Guid.NewGuid().ToString()
+                RelationshipClass = DataSyncCommon.IntegrationTestRelationshipClass,
+                RelationshipClassVersion = DataSyncCommon.RelationshipClassVersion,
+                
             });
 
             Assert.That(response.Status.Error, Is.False);
             Assert.That(response.Result, Is.Not.Null);
-            Assert.That(response.Result.RelationshipClass, Is.EqualTo(TestRelationshipClass));
-            Assert.That(response.Result.RelationshipClassVersion, Is.EqualTo(TestRelationshipClassVersion));
+            Assert.That(response.Result.RelationshipClass, Is.EqualTo(DataSyncCommon.IntegrationTestRelationshipClass));
+            Assert.That(response.Result.RelationshipClassVersion, Is.EqualTo(DataSyncCommon.RelationshipClassVersion));
 
             createdRelationshipIds.Add(response.Result.Id);
         }
@@ -340,14 +336,14 @@ namespace PubnubApi.Tests.DataSync
 
             var response = await pubnub.DataSync.GetRelationships(new GetRelationshipsParameters
             {
-                RelationshipClass = TestRelationshipClass
+                RelationshipClass = DataSyncCommon.IntegrationTestRelationshipClass
             });
 
             Assert.That(response.Status.Error, Is.False);
             Assert.That(response.Result, Is.Not.Null);
             Assert.That(response.Result.Data, Is.Not.Null);
             Assert.That(response.Result.Data.Count, Is.GreaterThanOrEqualTo(2));
-            Assert.That(response.Result.Data.All(r => r.RelationshipClass == TestRelationshipClass), Is.True);
+            Assert.That(response.Result.Data.All(r => r.RelationshipClass == DataSyncCommon.IntegrationTestRelationshipClass), Is.True);
         }
 
         [Test]
@@ -359,7 +355,7 @@ namespace PubnubApi.Tests.DataSync
 
             var response = await pubnub.DataSync.GetRelationships(new GetRelationshipsParameters
             {
-                RelationshipClass = TestRelationshipClass,
+                RelationshipClass = DataSyncCommon.IntegrationTestRelationshipClass,
                 EntityAId = entityA.Id
             });
 
@@ -379,7 +375,7 @@ namespace PubnubApi.Tests.DataSync
 
             var response = await pubnub.DataSync.GetRelationships(new GetRelationshipsParameters
             {
-                RelationshipClass = TestRelationshipClass,
+                RelationshipClass = DataSyncCommon.IntegrationTestRelationshipClass,
                 EntityBId = entityB.Id
             });
 
@@ -399,7 +395,7 @@ namespace PubnubApi.Tests.DataSync
 
             var response = await pubnub.DataSync.GetRelationships(new GetRelationshipsParameters
             {
-                RelationshipClass = TestRelationshipClass,
+                RelationshipClass = DataSyncCommon.IntegrationTestRelationshipClass,
                 Limit = 2
             });
 
@@ -418,7 +414,7 @@ namespace PubnubApi.Tests.DataSync
 
             var firstPage = await pubnub.DataSync.GetRelationships(new GetRelationshipsParameters
             {
-                RelationshipClass = TestRelationshipClass,
+                RelationshipClass = DataSyncCommon.IntegrationTestRelationshipClass,
                 Limit = 1
             });
 
@@ -429,7 +425,7 @@ namespace PubnubApi.Tests.DataSync
             {
                 var secondPage = await pubnub.DataSync.GetRelationships(new GetRelationshipsParameters
                 {
-                    RelationshipClass = TestRelationshipClass,
+                    RelationshipClass = DataSyncCommon.IntegrationTestRelationshipClass,
                     Limit = 1,
                     Cursor = firstPage.Result.Meta.NextCursor
                 });
@@ -448,7 +444,7 @@ namespace PubnubApi.Tests.DataSync
 
             var response = await pubnub.DataSync.GetRelationships(new GetRelationshipsParameters
             {
-                RelationshipClass = TestRelationshipClass,
+                RelationshipClass = DataSyncCommon.IntegrationTestRelationshipClass,
                 Limit = 1
             });
 
@@ -466,7 +462,7 @@ namespace PubnubApi.Tests.DataSync
 
             var response = await pubnub.DataSync.GetRelationships(new GetRelationshipsParameters
             {
-                RelationshipClass = TestRelationshipClass,
+                RelationshipClass = DataSyncCommon.IntegrationTestRelationshipClass,
                 Sort = "-createdAt"
             });
 
@@ -500,7 +496,7 @@ namespace PubnubApi.Tests.DataSync
             var response = await pubnub.DataSync.UpdateRelationship(new UpdateRelationshipParameters
             {
                 Id = created.Id,
-                RelationshipClassVersion = TestRelationshipClassVersion,
+                RelationshipClassVersion = DataSyncCommon.RelationshipClassVersion,
                 Status = "updated",
                 Payload = newPayload
             });
@@ -522,7 +518,7 @@ namespace PubnubApi.Tests.DataSync
             var response = await pubnub.DataSync.UpdateRelationship(new UpdateRelationshipParameters
             {
                 Id = created.Id,
-                RelationshipClassVersion = TestRelationshipClassVersion,
+                RelationshipClassVersion = DataSyncCommon.RelationshipClassVersion,
                 Status = "updated-with-etag",
                 Payload = new Dictionary<string, object> { { "key", "new-value" } },
                 IfMatch = created.ETag
@@ -541,7 +537,7 @@ namespace PubnubApi.Tests.DataSync
             await pubnub.DataSync.UpdateRelationship(new UpdateRelationshipParameters
             {
                 Id = created.Id,
-                RelationshipClassVersion = TestRelationshipClassVersion,
+                RelationshipClassVersion = DataSyncCommon.RelationshipClassVersion,
                 Status = "first-update",
                 Payload = new Dictionary<string, object> { { "v", 1 } }
             });
@@ -549,7 +545,7 @@ namespace PubnubApi.Tests.DataSync
             var response = await pubnub.DataSync.UpdateRelationship(new UpdateRelationshipParameters
             {
                 Id = created.Id,
-                RelationshipClassVersion = TestRelationshipClassVersion,
+                RelationshipClassVersion = DataSyncCommon.RelationshipClassVersion,
                 Status = "second-update",
                 Payload = new Dictionary<string, object> { { "v", 2 } },
                 IfMatch = created.ETag
@@ -568,7 +564,7 @@ namespace PubnubApi.Tests.DataSync
             await pubnub.DataSync.UpdateRelationship(new UpdateRelationshipParameters
             {
                 Id = created.Id,
-                RelationshipClassVersion = TestRelationshipClassVersion,
+                RelationshipClassVersion = DataSyncCommon.RelationshipClassVersion,
                 Status = "after",
                 Payload = new Dictionary<string, object> { { "replaced", true } }
             });
@@ -603,7 +599,7 @@ namespace PubnubApi.Tests.DataSync
                         Value = "inactive"
                     }
                 },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
 
             Assert.That(response.Status.Error, Is.False);
@@ -628,7 +624,7 @@ namespace PubnubApi.Tests.DataSync
                         Value = "high"
                     }
                 },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
 
             Assert.That(response.Status.Error, Is.False);
@@ -657,7 +653,7 @@ namespace PubnubApi.Tests.DataSync
                         }
                     }
                 },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
 
             Assert.That(response.Status.Error, Is.False);
@@ -684,7 +680,7 @@ namespace PubnubApi.Tests.DataSync
                         Path = "/payload/fieldToRemove"
                     }
                 },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
 
             Assert.That(response.Status.Error, Is.False);
@@ -712,7 +708,7 @@ namespace PubnubApi.Tests.DataSync
                         From = "/payload/original"
                     }
                 },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
 
             Assert.That(response.Status.Error, Is.False);
@@ -740,7 +736,7 @@ namespace PubnubApi.Tests.DataSync
                         From = "/payload/source"
                     }
                 },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
 
             Assert.That(response.Status.Error, Is.False);
@@ -784,7 +780,7 @@ namespace PubnubApi.Tests.DataSync
                         Value = "modified"
                     }
                 },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
 
             Assert.That(response.Status.Error, Is.False);
@@ -816,7 +812,7 @@ namespace PubnubApi.Tests.DataSync
                         Value = "confirmed"
                     }
                 },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
 
             Assert.That(response.Status.Error, Is.False);
@@ -841,7 +837,7 @@ namespace PubnubApi.Tests.DataSync
                     }
                 },
                 IfMatch = created.ETag,
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
 
             Assert.That(response.Status.Error, Is.False);
@@ -865,7 +861,7 @@ namespace PubnubApi.Tests.DataSync
                         Value = "first-patch"
                     }
                 },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
 
             var response = await pubnub.DataSync.PatchRelationship(new PatchRelationshipParameters
@@ -881,7 +877,7 @@ namespace PubnubApi.Tests.DataSync
                     }
                 },
                 IfMatch = created.ETag,
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
 
             Assert.That(response.Status.Error, Is.True);
@@ -951,15 +947,15 @@ namespace PubnubApi.Tests.DataSync
             {
                 EntityAId = entityA.Id,
                 EntityBId = entityB.Id,
-                RelationshipClass = TestRelationshipClass,
-                RelationshipClassVersion = TestRelationshipClassVersion,
+                RelationshipClass = DataSyncCommon.IntegrationTestRelationshipClass,
+                RelationshipClassVersion = DataSyncCommon.RelationshipClassVersion,
                 Status = "new",
                 Payload = new Dictionary<string, object>
                 {
                     { "role", "member" },
                     { "joinedAt", "2025-01-01" }
                 },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
             Assert.That(createResponse.Status.Error, Is.False);
             var created = createResponse.Result;
@@ -979,7 +975,7 @@ namespace PubnubApi.Tests.DataSync
             var updateResponse = await pubnub.DataSync.UpdateRelationship(new UpdateRelationshipParameters
             {
                 Id = created.Id,
-                RelationshipClassVersion = TestRelationshipClassVersion,
+                RelationshipClassVersion = DataSyncCommon.RelationshipClassVersion,
                 Status = "updated",
                 Payload = new Dictionary<string, object>
                 {
@@ -1009,7 +1005,7 @@ namespace PubnubApi.Tests.DataSync
                         Value = "hello"
                     }
                 },
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
             Assert.That(patchResponse.Status.Error, Is.False);
             Assert.That(patchResponse.Result.Status, Is.EqualTo("patched"));
@@ -1024,7 +1020,7 @@ namespace PubnubApi.Tests.DataSync
             // LIST - verify relationship in listing
             var listResponse = await pubnub.DataSync.GetRelationships(new GetRelationshipsParameters
             {
-                RelationshipClass = TestRelationshipClass,
+                RelationshipClass = DataSyncCommon.IntegrationTestRelationshipClass,
                 EntityAId = entityA.Id
             });
             Assert.That(listResponse.Status.Error, Is.False);
@@ -1052,7 +1048,7 @@ namespace PubnubApi.Tests.DataSync
             var updateResponse = await pubnub.DataSync.UpdateRelationship(new UpdateRelationshipParameters
             {
                 Id = created.Id,
-                RelationshipClassVersion = TestRelationshipClassVersion,
+                RelationshipClassVersion = DataSyncCommon.RelationshipClassVersion,
                 Status = "v2",
                 Payload = new Dictionary<string, object> { { "step", 2 } },
                 IfMatch = etag1
@@ -1075,7 +1071,7 @@ namespace PubnubApi.Tests.DataSync
                     }
                 },
                 IfMatch = etag2,
-                IdempotencyKey = Guid.NewGuid().ToString()
+                
             });
             Assert.That(patchResponse.Status.Error, Is.False);
             var etag3 = patchResponse.Result.ETag;
@@ -1085,7 +1081,7 @@ namespace PubnubApi.Tests.DataSync
             var staleResponse = await pubnub.DataSync.UpdateRelationship(new UpdateRelationshipParameters
             {
                 Id = created.Id,
-                RelationshipClassVersion = TestRelationshipClassVersion,
+                RelationshipClassVersion = DataSyncCommon.RelationshipClassVersion,
                 Status = "should-fail",
                 IfMatch = etag1
             });

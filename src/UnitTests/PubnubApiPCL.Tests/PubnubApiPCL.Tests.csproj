@@ -50,11 +50,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\PubnubApi.Tests\CleanupGrant.cs" Link="CleanupGrant.cs" />
-    <Compile Include="..\PubnubApi.Tests\DataSync\DiscoverDataSyncCborKeys.cs">
-      <Link>DataSync\DiscoverDataSyncCborKeys.cs</Link>
-    </Compile>
-    <Compile Include="..\PubnubApi.Tests\DataSync\WhenCreateGenericEntity.cs">
-      <Link>DataSync\WhenCreateGenericEntity.cs</Link>
+    <Compile Include="..\PubnubApi.Tests\DataSync\DataSyncCommon.cs">
+      <Link>DataSync\DataSyncCommon.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi.Tests\DataSync\WhenDataSyncChannelEventIsReceived.cs">
       <Link>DataSync\WhenDataSyncChannelEventIsReceived.cs</Link>
