@@ -23,8 +23,8 @@ namespace PubnubApi.EventEngine.Subscribe.States
                 
                 Events.ReconnectEvent reconnect => new HandshakingState()
                 {
-                    Channels = reconnect.Channels,
-                    ChannelGroups = reconnect.ChannelGroups,
+                    Channels = reconnect.Channels?? Enumerable.Empty<string>(),
+                    ChannelGroups = reconnect.ChannelGroups??Enumerable.Empty<string>(),
                     Cursor = reconnect.Cursor,
                 },
                 
