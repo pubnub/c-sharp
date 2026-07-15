@@ -921,6 +921,21 @@ namespace PubnubApi.Tests.DataSync
         }
 
         [Test]
+        public async Task ThenDeleteWithValidIfMatchShouldSucceed()
+        {
+            var created = await CreateTestRelationship();
+
+            var response = await pubnub.DataSync.DeleteRelationship(new DeleteRelationshipParameters
+            {
+                Id = created.Id,
+                IfMatch = created.ETag
+            });
+
+            Assert.That(response.Status.Error, Is.False);
+            createdRelationshipIds.Remove(created.Id);
+        }
+
+        [Test]
         public async Task ThenDeleteNonExistentRelationshipShouldReturnError()
         {
             var response = await pubnub.DataSync.DeleteRelationship(new DeleteRelationshipParameters

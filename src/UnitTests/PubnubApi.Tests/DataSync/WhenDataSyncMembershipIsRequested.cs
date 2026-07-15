@@ -935,6 +935,21 @@ namespace PubnubApi.Tests.DataSync
         }
 
         [Test]
+        public async Task ThenDeleteWithValidIfMatchShouldSucceed()
+        {
+            var created = await CreateTestMembership();
+
+            var response = await pubnub.DataSync.DeleteMembership(new DeleteMembershipParameters
+            {
+                Id = created.Id,
+                IfMatch = created.ETag
+            });
+
+            Assert.That(response.Status.Error, Is.False);
+            createdMembershipIds.Remove(created.Id);
+        }
+
+        [Test]
         public async Task ThenDeleteNonExistentMembershipShouldReturnError()
         {
             var response = await pubnub.DataSync.DeleteMembership(new DeleteMembershipParameters

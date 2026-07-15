@@ -824,6 +824,21 @@ namespace PubnubApi.Tests.DataSync
         }
 
         [Test]
+        public async Task ThenDeleteWithValidIfMatchShouldSucceed()
+        {
+            var created = await CreateTestChannel();
+
+            var response = await pubnub.DataSync.DeleteChannel(new DeleteChannelParameters
+            {
+                Id = created.Id,
+                IfMatch = created.ETag
+            });
+
+            Assert.That(response.Status.Error, Is.False);
+            createdChannelIds.Remove(created.Id);
+        }
+
+        [Test]
         public async Task ThenDeleteNonExistentChannelShouldReturnError()
         {
             var response = await pubnub.DataSync.DeleteChannel(new DeleteChannelParameters
