@@ -1,3 +1,7 @@
+v8.3.2 - July 15 2026
+-----------------------------
+- Fixed: added additional checks to ensure that post-reconnection handshaking doesn't start with null values of Channels and ChannelGroups.
+
 v8.3.1 - July 06 2026
 -----------------------------
 - Fixed: implemented minor fixes to error handling, logging, and cryptor logic.

@@ -58,8 +58,8 @@ namespace PubnubApi.EventEngine.Subscribe.States
 				}.With(new EmitStatusInvocation(handshakeReconnectSuccess.Status)),
 
 				Events.SubscriptionRestoredEvent subscriptionRestored => new HandshakingState() {
-					Channels = subscriptionRestored.Channels,
-					ChannelGroups = subscriptionRestored.ChannelGroups,
+					Channels = subscriptionRestored.Channels?? Enumerable.Empty<string>(),
+					ChannelGroups = subscriptionRestored.ChannelGroups??Enumerable.Empty<string>(),
 					Cursor = subscriptionRestored.Cursor,
 
 				},
