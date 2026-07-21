@@ -66,8 +66,10 @@ namespace PubnubApi
             {
                 ret = PNStatusCategory.PNNetworkIssuesCategory;
             }
-            else if (errorType == "System.Security.Cryptography.CryptographicException" && errorMessage == "Padding is invalid and cannot be removed.")
+            else if (errorType == "PubnubApi.PNException" && errorMessage == "Decrypt Error")
             {
+                // All crypto failure modes now surface as a single generic "Decrypt Error" so that
+                // bad padding and wrong block length map to the same category (no padding-oracle bit).
                 ret = PNStatusCategory.PNDecryptionErrorCategory;
             }
             else if (errorType == "System.Runtime.InteropServices.SEHException" && errorMessage == "External component has thrown an exception.")

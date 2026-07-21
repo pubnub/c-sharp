@@ -100,7 +100,7 @@ namespace PubnubApi.Security.Crypto.Cryptors
             catch(Exception ex)
             {
                 logger?.Error($"AesCbcCryptor Error while decrypting string data. ErrorMessage {ex.Message}, StackTrace {ex.StackTrace}");
-                throw new PNException("Decrypt Error", ex);
+                throw new PNException("Decrypt Error");
             }
         }
         public override byte[] Decrypt(byte[] encryptedData)
@@ -139,7 +139,7 @@ namespace PubnubApi.Security.Crypto.Cryptors
             catch (Exception ex)
             {
                 logger?.Error($"AesCbcCryptor Error while decrypting bytes. ErrorMessage {ex.Message}, StackTrace {ex.StackTrace}");
-                throw new PNException("Decrypt Error", ex);
+                throw new PNException("Decrypt Error");
             }
         }
 

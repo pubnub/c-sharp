@@ -1,3 +1,7 @@
+v8.3.3 - July 20 2026
+-----------------------------
+- Added: obscure exceptions thrown by cryptors to be available in logs only.
+
 v8.3.2 - July 15 2026
 -----------------------------
 - Fixed: added additional checks to ensure that post-reconnection handshaking doesn't start with null values of Channels and ChannelGroups.
