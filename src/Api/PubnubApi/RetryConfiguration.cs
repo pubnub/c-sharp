@@ -72,7 +72,7 @@ namespace PubnubApi
 		{
 			if (status.StatusCode == 429 && retryAfter.HasValue && retryAfter > 0) return (int)retryAfter;
 			if (attemptedRetries == 0) return minDelay * 1000 + numGenerator.Next(1000);
-			return Math.Min((int)(Math.Pow(2, attemptedRetries) * 1000 + numGenerator.Next(1000)), maxDelay * 1000);
+			return (int)Math.Min(Math.Pow(2, attemptedRetries) * 1000 + numGenerator.Next(1000), maxDelay * 1000.0);
 		}
 
 		public bool ShouldRetry(int attemptedRetries, PNStatus status)
