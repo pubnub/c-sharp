@@ -70,7 +70,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
                     Cursor = this.Cursor,
                     AttemptedRetries = this.AttemptedRetries + 1,
                     Reason = receiveReconnectFailure.Status
-				}.With(new EmitStatusInvocation(PNStatusCategory.PNUnexpectedDisconnectCategory)),
+				},
 
                 Events.ReceiveReconnectGiveUpEvent receiveReconnectGiveUp => new ReceiveFailedState()
                 {
@@ -82,8 +82,7 @@ namespace PubnubApi.EventEngine.Subscribe.States
                     ChannelGroups = this.ChannelGroups,
                     Cursor = this.Cursor,
 
-				}.With(new EmitStatusInvocation(receiveReconnectGiveUp.Status)),
-
+				}.With(new EmitStatusInvocation(PNStatusCategory.PNUnexpectedDisconnectCategory)),
                 _ => null
             };
         }

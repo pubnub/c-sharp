@@ -153,7 +153,28 @@ namespace PubnubApi.Tests.EventEngine
             Assert.AreEqual(expectedState.Cursor.Region, ((ReceiveFailedState)result.State).Cursor.Region);
             Assert.AreEqual(expectedState.Cursor.Timetoken, ((ReceiveFailedState)result.State).Cursor.Timetoken);
             Assert.IsInstanceOf<EmitStatusInvocation>(result.Invocations.ElementAt(0));
-            Assert.AreEqual(PNStatusCategory.PNUnknownCategory, ((EmitStatusInvocation)result.Invocations.ElementAt(0)).StatusCategory);
+            Assert.AreEqual(PNStatusCategory.PNUnexpectedDisconnectCategory, ((EmitStatusInvocation)result.Invocations.ElementAt(0)).StatusCategory);
+        }
+
+        [Test]
+        public void ReceiveReconnectingState_OnReceiveReconnectGiveupEvent_EmitsUnexpectedDisconnectStatus()
+        {
+            // The give-up transition always emits a PNUnexpectedDisconnectCategory status,
+            // regardless of the category carried on the give-up event's own Status.
+            //Arrange
+            var currentState = CreateReceiveReconnectingState();
+            var eventToTriggerTransition = new ReceiveReconnectGiveUpEvent()
+            {
+                Status = new PNStatus(null, PNOperationType.PNSubscribeOperation, PNStatusCategory.PNUnknownCategory)
+            };
+
+            //Act
+            var result = currentState.Transition(eventToTriggerTransition);
+
+            //Assert
+            Assert.IsInstanceOf<ReceiveFailedState>(result.State);
+            Assert.IsInstanceOf<EmitStatusInvocation>(result.Invocations.ElementAt(0));
+            Assert.AreEqual(PNStatusCategory.PNUnexpectedDisconnectCategory, ((EmitStatusInvocation)result.Invocations.ElementAt(0)).StatusCategory);
         }
 
         [Test]
