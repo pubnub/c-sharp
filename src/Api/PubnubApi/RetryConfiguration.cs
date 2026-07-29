@@ -32,7 +32,7 @@ namespace PubnubApi
 		public LinearRetryPolicy(int delay, int maxRetry)
 		{
 			this.delay = Math.Max(2, delay);
-			this.maxRetry = Math.Min(10, maxRetry);
+			this.maxRetry = maxRetry;
 		}
 
 
@@ -65,7 +65,7 @@ namespace PubnubApi
 		{
 			this.minDelay = Math.Max(2, minDelay);
 			this.maxDelay = Math.Min(150, maxDelay);
-			this.maxRetry = Math.Min(6, maxRetry);
+			this.maxRetry = maxRetry;
 		}
 
 		public int GetDelay(int attemptedRetries, PNStatus status, int? retryAfter)
