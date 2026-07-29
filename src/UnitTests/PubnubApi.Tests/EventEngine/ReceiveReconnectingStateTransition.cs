@@ -153,7 +153,61 @@ namespace PubnubApi.Tests.EventEngine
             Assert.AreEqual(expectedState.Cursor.Region, ((ReceiveFailedState)result.State).Cursor.Region);
             Assert.AreEqual(expectedState.Cursor.Timetoken, ((ReceiveFailedState)result.State).Cursor.Timetoken);
             Assert.IsInstanceOf<EmitStatusInvocation>(result.Invocations.ElementAt(0));
-            Assert.AreEqual(PNStatusCategory.PNUnknownCategory, ((EmitStatusInvocation)result.Invocations.ElementAt(0)).StatusCategory);
+            Assert.AreEqual(PNStatusCategory.PNUnexpectedDisconnectCategory, ((EmitStatusInvocation)result.Invocations.ElementAt(0)).StatusCategory);
+        }
+
+        [Test]
+        public void ReceiveReconnectingState_OnReceiveReconnectGiveupEvent_EmitsUnexpectedDisconnectStatus()
+        {
+            // The give-up transition always emits a PNUnexpectedDisconnectCategory status,
+            // regardless of the category carried on the give-up event's own Status.
+            //Arrange
+            var currentState = CreateReceiveReconnectingState();
+            var eventToTriggerTransition = new ReceiveReconnectGiveUpEvent()
+            {
+                Status = new PNStatus(null, PNOperationType.PNSubscribeOperation, PNStatusCategory.PNUnknownCategory)
+            };
+
+            //Act
+            var result = currentState.Transition(eventToTriggerTransition);
+
+            //Assert
+            Assert.IsInstanceOf<ReceiveFailedState>(result.State);
+            Assert.IsInstanceOf<EmitStatusInvocation>(result.Invocations.ElementAt(0));
+            Assert.AreEqual(PNStatusCategory.PNUnexpectedDisconnectCategory, ((EmitStatusInvocation)result.Invocations.ElementAt(0)).StatusCategory);
+        }
+
+        [Test]
+        public void ReceiveReconnectingState_OnReceiveReconnectGiveupEventWithEmptyEventData_TransitionToReceiveFailedStatePreservingStateData()
+        {
+            // Regression: the give-up event enqueued by ReceivingReconnectEffectHandler only sets
+            // Status; its Channels/ChannelGroups/Cursor are null. The failed state must therefore
+            // carry the reconnecting state's own channels/groups/cursor so that a subsequent
+            // Reconnect() can restore the subscription and resume from the last timetoken.
+            //Arrange
+            var currentState = CreateReceiveReconnectingState();
+            var eventToTriggerTransition = new ReceiveReconnectGiveUpEvent()
+            {
+                // Channels, ChannelGroups and Cursor intentionally left null, mirroring the real event.
+                Status = new PNStatus(null, PNOperationType.PNSubscribeOperation, PNStatusCategory.PNUnexpectedDisconnectCategory)
+            };
+            var expectedState = new ReceiveFailedState()
+            {
+                Channels = new string[] { "ch1", "ch2" },
+                ChannelGroups = new string[] { "cg1", "cg2" },
+                Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 }
+            };
+
+            //Act
+            var result = currentState.Transition(eventToTriggerTransition);
+
+            //Assert
+            Assert.IsInstanceOf<ReceiveFailedState>(result.State);
+            CollectionAssert.AreEqual(expectedState.Channels, ((ReceiveFailedState)result.State).Channels);
+            CollectionAssert.AreEqual(expectedState.ChannelGroups, ((ReceiveFailedState)result.State).ChannelGroups);
+            Assert.IsNotNull(((ReceiveFailedState)result.State).Cursor);
+            Assert.AreEqual(expectedState.Cursor.Region, ((ReceiveFailedState)result.State).Cursor.Region);
+            Assert.AreEqual(expectedState.Cursor.Timetoken, ((ReceiveFailedState)result.State).Cursor.Timetoken);
         }
 
         [Test]

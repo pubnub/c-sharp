@@ -70,16 +70,19 @@ namespace PubnubApi.EventEngine.Subscribe.States
                     Cursor = this.Cursor,
                     AttemptedRetries = this.AttemptedRetries + 1,
                     Reason = receiveReconnectFailure.Status
-				}.With(new EmitStatusInvocation(PNStatusCategory.PNUnexpectedDisconnectCategory)),
+				},
 
                 Events.ReceiveReconnectGiveUpEvent receiveReconnectGiveUp => new ReceiveFailedState()
                 {
-                    Channels = receiveReconnectGiveUp.Channels,
-                    ChannelGroups = receiveReconnectGiveUp.ChannelGroups,
-                    Cursor = receiveReconnectGiveUp.Cursor,
-					
-				}.With(new EmitStatusInvocation(receiveReconnectGiveUp.Status)),
+                    // Read from the current state, not the give-up event: the event is enqueued
+                    // by ReceivingReconnectEffectHandler with only Status set (channels/groups/cursor
+                    // are null), whereas 'this' preserves them across every retry. Carrying them here
+                    // lets Reconnect() restore the subscription and resume from the last timetoken.
+                    Channels = this.Channels,
+                    ChannelGroups = this.ChannelGroups,
+                    Cursor = this.Cursor,
 
+				}.With(new EmitStatusInvocation(PNStatusCategory.PNUnexpectedDisconnectCategory)),
                 _ => null
             };
         }

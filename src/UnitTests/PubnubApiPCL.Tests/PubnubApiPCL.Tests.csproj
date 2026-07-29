@@ -59,6 +59,7 @@
     <Compile Include="..\PubnubApi.Tests\EventEngine\ReceiveReconnectingStateTransition.cs" Link="EventEngine\ReceiveReconnectingStateTransition.cs" />
     <Compile Include="..\PubnubApi.Tests\EventEngine\ReceiveStoppedStateTransition.cs" Link="EventEngine\ReceiveStoppedStateTransition.cs" />
     <Compile Include="..\PubnubApi.Tests\EventEngine\ReceivingStateTransition.cs" Link="EventEngine\ReceivingStateTransition.cs" />
+    <Compile Include="..\PubnubApi.Tests\EventEngine\RetryConfigurationTest.cs" Link="EventEngine\RetryConfigurationTest.cs" />
     <Compile Include="..\PubnubApi.Tests\EventEngine\UnsubscribedStateTransition.cs" Link="EventEngine\UnsubscribedStateTransition.cs" />
     <Compile Include="..\PubnubApi.Tests\EventEngine\Presence\CooldownState.cs" Link="EventEngine\Presence\CooldownState.cs" />
     <Compile Include="..\PubnubApi.Tests\EventEngine\Presence\FailedState.cs" Link="EventEngine\Presence\FailedState.cs" />

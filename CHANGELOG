@@ -1,3 +1,10 @@
+v8.3.4 - July 29 2026
+-----------------------------
+- Fixed: fixed issue related to Reconnect to retain subscription state.
+
+- Modified: removed value cap from maxRetry in Linear/Exponential policies.
+- Modified: emit status PNUnexpectedDisconnectCategory when retry attempts exhausted. Instead every retry attempt failures.
+
 v8.3.3 - July 20 2026
 -----------------------------
 - Added: obscure exceptions thrown by cryptors to be available in logs only.
