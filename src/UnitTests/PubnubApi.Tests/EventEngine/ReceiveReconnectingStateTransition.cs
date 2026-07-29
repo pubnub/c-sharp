@@ -157,6 +157,39 @@ namespace PubnubApi.Tests.EventEngine
         }
 
         [Test]
+        public void ReceiveReconnectingState_OnReceiveReconnectGiveupEventWithEmptyEventData_TransitionToReceiveFailedStatePreservingStateData()
+        {
+            // Regression: the give-up event enqueued by ReceivingReconnectEffectHandler only sets
+            // Status; its Channels/ChannelGroups/Cursor are null. The failed state must therefore
+            // carry the reconnecting state's own channels/groups/cursor so that a subsequent
+            // Reconnect() can restore the subscription and resume from the last timetoken.
+            //Arrange
+            var currentState = CreateReceiveReconnectingState();
+            var eventToTriggerTransition = new ReceiveReconnectGiveUpEvent()
+            {
+                // Channels, ChannelGroups and Cursor intentionally left null, mirroring the real event.
+                Status = new PNStatus(null, PNOperationType.PNSubscribeOperation, PNStatusCategory.PNUnexpectedDisconnectCategory)
+            };
+            var expectedState = new ReceiveFailedState()
+            {
+                Channels = new string[] { "ch1", "ch2" },
+                ChannelGroups = new string[] { "cg1", "cg2" },
+                Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 }
+            };
+
+            //Act
+            var result = currentState.Transition(eventToTriggerTransition);
+
+            //Assert
+            Assert.IsInstanceOf<ReceiveFailedState>(result.State);
+            CollectionAssert.AreEqual(expectedState.Channels, ((ReceiveFailedState)result.State).Channels);
+            CollectionAssert.AreEqual(expectedState.ChannelGroups, ((ReceiveFailedState)result.State).ChannelGroups);
+            Assert.IsNotNull(((ReceiveFailedState)result.State).Cursor);
+            Assert.AreEqual(expectedState.Cursor.Region, ((ReceiveFailedState)result.State).Cursor.Region);
+            Assert.AreEqual(expectedState.Cursor.Timetoken, ((ReceiveFailedState)result.State).Cursor.Timetoken);
+        }
+
+        [Test]
         public void ReceiveReconnectingState_OnUnsubscribeAllEvent_TransitionToUnsubscribedState()
         {
             //Arrange

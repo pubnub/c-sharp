@@ -47,11 +47,43 @@ namespace PubnubApi.Tests.EventEngine
 
         private HandshakeReconnectingState CreateHandshakeReconnectingState()
         {
-            return new HandshakeReconnectingState() 
-            { 
-                Channels = new string[] { "ch1", "ch2" }, 
+            return new HandshakeReconnectingState()
+            {
+                Channels = new string[] { "ch1", "ch2" },
                 ChannelGroups = new string[] { "cg1", "cg2" } ,
             };
+        }
+
+        [Test]
+        public void HandshakeReconnectingState_OnHandshakeReconnectGiveupEvent_PreservesCursorInHandshakeFailedState()
+        {
+            // Regression: the cursor must survive give-up so a Reconnect() after handshake retries
+            // are exhausted resumes from the last known timetoken instead of dropping it.
+            //Arrange
+            var currentState = new HandshakeReconnectingState()
+            {
+                Channels = new string[] { "ch1", "ch2" },
+                ChannelGroups = new string[] { "cg1", "cg2" },
+                Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 }
+            };
+            var eventToTriggerTransition = new HandshakeReconnectGiveUpEvent() { };
+            var expectedState = new HandshakeFailedState()
+            {
+                Channels = new string[] { "ch1", "ch2" },
+                ChannelGroups = new string[] { "cg1", "cg2" },
+                Cursor = new SubscriptionCursor() { Region = 1, Timetoken = 1234567890 }
+            };
+
+            //Act
+            var result = currentState.Transition(@eventToTriggerTransition);
+
+            //Assert
+            Assert.IsInstanceOf<HandshakeFailedState>(result.State);
+            CollectionAssert.AreEqual(expectedState.Channels, ((HandshakeFailedState)result.State).Channels);
+            CollectionAssert.AreEqual(expectedState.ChannelGroups, ((HandshakeFailedState)result.State).ChannelGroups);
+            Assert.IsNotNull(((HandshakeFailedState)result.State).Cursor);
+            Assert.AreEqual(expectedState.Cursor.Region, ((HandshakeFailedState)result.State).Cursor.Region);
+            Assert.AreEqual(expectedState.Cursor.Timetoken, ((HandshakeFailedState)result.State).Cursor.Timetoken);
         }
 
         [Test]
