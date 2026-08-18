@@ -5,26 +5,20 @@ using System.Threading.Tasks;
 
 namespace PubnubApi.EndPoint
 {
-    public class PatchUserOperation : PubnubCoreBase
+    public class SetMembershipOperation : PubnubCoreBase
     {
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
         private readonly IPubnubUnitTest unit;
-        private readonly PatchUserParameters parameters;
+        private readonly UpdateMembershipParameters parameters;
 
-        private PNCallback<PNDataSyncUserResult> savedCallback;
+        private PNCallback<PNDataSyncMembershipResult> savedCallback;
 
-        private const PNOperationType OperationType = PNOperationType.PNDataSyncPatchUser;
+        private const PNOperationType OperationType = PNOperationType.PNDataSyncUpdateMembership;
 
-        private static readonly HashSet<JsonPatchOperationType> OpsRequiringValue =
-            new () { JsonPatchOperationType.Add, JsonPatchOperationType.Replace, JsonPatchOperationType.Test };
-
-        private static readonly HashSet<JsonPatchOperationType> OpsRequiringFrom =
-            new () { JsonPatchOperationType.Move, JsonPatchOperationType.Copy };
-
-        public PatchUserOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary,
+        public SetMembershipOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary,
             IPubnubUnitTest pubnubUnit, TokenManager tokenManager, Pubnub instance,
-            PatchUserParameters parameters) : base(pubnubConfig,
+            UpdateMembershipParameters parameters) : base(pubnubConfig,
             jsonPluggableLibrary, pubnubUnit, tokenManager, instance)
         {
             config = pubnubConfig;
@@ -33,7 +27,7 @@ namespace PubnubApi.EndPoint
             this.parameters = parameters ?? throw new ArgumentNullException(nameof(parameters));
         }
 
-        public void Execute(PNCallback<PNDataSyncUserResult> callback)
+        public void Execute(PNCallback<PNDataSyncMembershipResult> callback)
         {
             if (callback == null)
             {
@@ -60,10 +54,10 @@ namespace PubnubApi.EndPoint
             });
         }
 
-        public async Task<PNResult<PNDataSyncUserResult>> ExecuteAsync()
+        public async Task<PNResult<PNDataSyncMembershipResult>> ExecuteAsync()
         {
             logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
-            return await PatchUserAsync().ConfigureAwait(false);
+            return await UpdateMembershipAsync().ConfigureAwait(false);
         }
 
         internal void Retry()
@@ -74,29 +68,29 @@ namespace PubnubApi.EndPoint
             }
         }
 
-        private async Task<PNResult<PNDataSyncUserResult>> PatchUserAsync()
+        private async Task<PNResult<PNDataSyncMembershipResult>> UpdateMembershipAsync()
         {
-            var returnValue = new PNResult<PNDataSyncUserResult>();
+            var returnValue = new PNResult<PNDataSyncMembershipResult>();
 
             if (string.IsNullOrEmpty(parameters.Id) || string.IsNullOrEmpty(parameters.Id.Trim()))
             {
                 var errStatus = new PNStatus
                 {
                     Error = true,
-                    ErrorData = new PNErrorData("Missing User Id",
-                        new ArgumentException("Missing User Id"))
+                    ErrorData = new PNErrorData("Missing Membership Id",
+                        new ArgumentException("Missing Membership Id"))
                 };
                 returnValue.Status = errStatus;
                 return returnValue;
             }
 
-            if (parameters.Operations == null || parameters.Operations.Count == 0)
+            if (parameters.RelationshipClassVersion < 1)
             {
                 var errStatus = new PNStatus
                 {
                     Error = true,
-                    ErrorData = new PNErrorData("Operations list must contain at least one operation",
-                        new ArgumentException("Operations list must contain at least one operation"))
+                    ErrorData = new PNErrorData("RelationshipClassVersion must be >= 1",
+                        new ArgumentException("RelationshipClassVersion must be >= 1"))
                 };
                 returnValue.Status = errStatus;
                 return returnValue;
@@ -116,7 +110,7 @@ namespace PubnubApi.EndPoint
             }
 
             logger?.Trace($"{GetType().Name} parameter validated.");
-            var requestState = new RequestState<PNDataSyncUserResult>
+            var requestState = new RequestState<PNDataSyncMembershipResult>
             {
                 ResponseType = OperationType,
                 Reconnect = false,
@@ -154,7 +148,7 @@ namespace PubnubApi.EndPoint
                     var resultList = ProcessJsonResponse(requestState, json);
                     var responseBuilder = new ResponseBuilder(config, jsonLibrary);
                     var responseResult =
-                        responseBuilder.JsonToObject<PNDataSyncUserResult>(resultList, true);
+                        responseBuilder.JsonToObject<PNDataSyncMembershipResult>(resultList, true);
                     if (responseResult != null)
                     {
                         returnValue.Result = responseResult;
@@ -178,30 +172,26 @@ namespace PubnubApi.EndPoint
 
         private RequestParameter CreateRequestParameter()
         {
-            var patchArray = new List<Dictionary<string, object>>();
+            var dataProperties = new Dictionary<string, object>();
 
-            foreach (var op in parameters.Operations)
+            dataProperties.Add("relationshipClassVersion", parameters.RelationshipClassVersion);
+
+            if (!string.IsNullOrEmpty(parameters.Status))
             {
-                var entry = new Dictionary<string, object>
-                {
-                    { "op", op.Op.ToString().ToLowerInvariant() },
-                    { "path", op.Path }
-                };
-
-                if (OpsRequiringValue.Contains(op.Op))
-                {
-                    entry["value"] = op.Value;
-                }
-
-                if (OpsRequiringFrom.Contains(op.Op) && !string.IsNullOrEmpty(op.From))
-                {
-                    entry["from"] = op.From;
-                }
-
-                patchArray.Add(entry);
+                dataProperties.Add("status", parameters.Status);
             }
 
-            var patchBody = jsonLibrary.SerializeToJsonString(patchArray);
+            if (parameters.Payload != null)
+            {
+                dataProperties.Add("payload", parameters.Payload);
+            }
+
+            var requestEnvelope = new Dictionary<string, object>
+            {
+                { "data", dataProperties }
+            };
+
+            var putBody = jsonLibrary.SerializeToJsonString(requestEnvelope);
 
              var pathSegments = new List<string>
             {
@@ -209,18 +199,19 @@ namespace PubnubApi.EndPoint
                 "datasync",
                 "subkeys",
                 config.SubscribeKey,
-                "users",
+                "memberships",
                 parameters.Id
             };
 
             var requestParameter = new RequestParameter
             {
-                RequestType = Constants.PATCH,
+                RequestType = Constants.PUT,
                 PathSegment = pathSegments,
-                BodyContentString = patchBody
+                BodyContentString = putBody
             };
 
-            requestParameter.Headers.Add("Content-Type", "application/json-patch+json");
+            requestParameter.Headers.Add("Content-Type",
+                "application/vnd.pubnub.objects.membership+json;version=1");
 
             if (!string.IsNullOrEmpty(parameters.IfMatch))
             {

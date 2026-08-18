@@ -166,6 +166,15 @@ namespace PubNubMessaging.Tests
                         Memberships = new Dictionary<string, PNTokenAuthValues> { { ".*", fullAccess } }
                     }
                 })
+                .DataSyncProjections(new PNDataSyncProjections
+                {
+                    Patterns = new PNDataSyncProjectionScope
+                    {
+                        Entities = new Dictionary<string, string> { { ".*", "admin" } },
+                        Relationships = new Dictionary<string, string> { { ".*", "admin" } },
+                        Memberships = new Dictionary<string, string> { { ".*", "admin" } }
+                    }
+                })
                 .ExecuteAsync();
             Assert.That(grant.Status.Error, Is.False,
                 $"Admin grant failed: {grant.Status.ErrorData?.Information}");

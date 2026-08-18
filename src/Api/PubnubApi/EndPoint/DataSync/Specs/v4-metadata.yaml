@@ -3,41 +3,42 @@ info:
   title: Object Management API
   version: 4.0.0
 paths:
-  /subkeys/{subKey}/entity-classes:
+  /datasync/subkeys/{subKey}/entity-classes:
     get:
       operationId: listEntityClasses
       summary: Get all entity class entries
       parameters:
-        - name: subKey
-          in: path
-          required: true
-          schema:
-            type: string
-        - $ref: '#/components/parameters/Cursor'
-        - $ref: '#/components/parameters/Limit'
-        - $ref: '#/components/parameters/Filter'
-        - $ref: '#/components/parameters/Sort'
+        - $ref: "common.yaml#/components/parameters/SubKeyPath"
       responses:
-        '200':
-          $ref: '#/components/responses/EntityClassesResponse'
+        "200":
+          $ref: "#/components/responses/EntityClassesResponse"
+        "400":
+          $ref: "common.yaml#/components/responses/BadRequestResponse"
+        "401":
+          $ref: "common.yaml#/components/responses/UnauthorizedResponse"
+        "403":
+          $ref: "common.yaml#/components/responses/ForbiddenResponse"
+        "406":
+          $ref: "common.yaml#/components/responses/NotAcceptableResponse"
+        "429":
+          $ref: "common.yaml#/components/responses/TooManyRequestsResponse"
+        "500":
+          $ref: "common.yaml#/components/responses/InternalServerErrorResponse"
+        "503":
+          $ref: "common.yaml#/components/responses/ServiceUnavailableResponse"
       tags:
         - Entity Class
 
-  /subkeys/{subKey}/entity-classes/{entityClassName}/versions/{entityClassVersion}:
+  /datasync/subkeys/{subKey}/entity-classes/{entityClass}/versions/{entityClassVersion}:
     post:
       operationId: createEntityClass
       summary: Create a new entity class
       description: |
         Creates a new entity class with its registry configuration, property definitions.
       parameters:
-        - name: subKey
-          in: path
-          required: true
-          schema:
-            type: string
-        - $ref: "#/components/parameters/IdempotencyKey"
-        - $ref: "#/components/parameters/entityClassName"
-        - $ref: "#/components/parameters/entityClassVersion"
+        - $ref: "common.yaml#/components/parameters/SubKeyPath"
+        - $ref: "#/components/parameters/EntityClassPath"
+        - $ref: "#/components/parameters/EntityClassVersionPath"
       tags:
         - Entity Class
       requestBody:
@@ -50,23 +51,23 @@ paths:
         '201':
           $ref: "#/components/responses/CreateEntityClassResponse"
         '400':
-          $ref: '#/components/responses/BadRequestResponse'
+          $ref: 'common.yaml#/components/responses/BadRequestResponse'
         '401':
-          $ref: '#/components/responses/UnauthorizedResponse'
+          $ref: 'common.yaml#/components/responses/UnauthorizedResponse'
         '403':
-          $ref: '#/components/responses/ForbiddenResponse'
+          $ref: 'common.yaml#/components/responses/ForbiddenResponse'
         "406":
-          $ref: "#/components/responses/NotAcceptableResponse"
+          $ref: "common.yaml#/components/responses/NotAcceptableResponse"
         '409':
-          $ref: '#/components/responses/ConflictResponse'
+          $ref: 'common.yaml#/components/responses/ConflictResponse'
         "415":
-          $ref: "#/components/responses/UnsupportedMediaTypeResponse"
+          $ref: "common.yaml#/components/responses/UnsupportedMediaTypeResponse"
         "429":
-          $ref: "#/components/responses/TooManyRequestsResponse"
+          $ref: "common.yaml#/components/responses/TooManyRequestsResponse"
         '500':
-          $ref: '#/components/responses/InternalServerErrorResponse'
+          $ref: 'common.yaml#/components/responses/InternalServerErrorResponse'
         '503':
-          $ref: '#/components/responses/ServiceUnavailableResponse'
+          $ref: 'common.yaml#/components/responses/ServiceUnavailableResponse'
 
     get:
       tags:
@@ -74,33 +75,29 @@ paths:
       operationId: getEntityClass
       summary: Get entity class by ID
       parameters:
-        - name: subKey
-          in: path
-          required: true
-          schema:
-            type: string
-          description: PubNub subkey
-        - $ref: "#/components/parameters/entityClassName"
-        - $ref: "#/components/parameters/entityClassVersion"
+        - $ref: "common.yaml#/components/parameters/SubKeyPath"
+        - $ref: "#/components/parameters/EntityClassPath"
+        - $ref: "#/components/parameters/EntityClassVersionPath"
+        - $ref: "common.yaml#/components/parameters/EntityClassLevelQuery"
       responses:
         "200":
           $ref: "#/components/responses/EntityClassResponse"
         "400":
-          $ref: "#/components/responses/BadRequestResponse"
+          $ref: "common.yaml#/components/responses/BadRequestResponse"
         "401":
-          $ref: "#/components/responses/UnauthorizedResponse"
+          $ref: "common.yaml#/components/responses/UnauthorizedResponse"
         "403":
-          $ref: "#/components/responses/ForbiddenResponse"
+          $ref: "common.yaml#/components/responses/ForbiddenResponse"
         "404":
-          $ref: "#/components/responses/NotFoundResponse"
+          $ref: "common.yaml#/components/responses/NotFoundResponse"
         "406":
-          $ref: "#/components/responses/NotAcceptableResponse"
+          $ref: "common.yaml#/components/responses/NotAcceptableResponse"
         "429":
-          $ref: "#/components/responses/TooManyRequestsResponse"
+          $ref: "common.yaml#/components/responses/TooManyRequestsResponse"
         "500":
-          $ref: "#/components/responses/InternalServerErrorResponse"
+          $ref: "common.yaml#/components/responses/InternalServerErrorResponse"
         "503":
-          $ref: "#/components/responses/ServiceUnavailableResponse"
+          $ref: "common.yaml#/components/responses/ServiceUnavailableResponse"
 
     patch:
       tags:
@@ -108,23 +105,17 @@ paths:
       operationId: patchEntityClass
       summary: Patch entity class using Json Patch RFC-6902
       parameters:
-        - name: subKey
-          in: path
-          required: true
-          schema:
-            type: string
-          description: PubNub subkey
-        - $ref: "#/components/parameters/entityClassName"
-        - $ref: "#/components/parameters/entityClassVersion"
-        - $ref: "#/components/parameters/IfMatch"
-        - $ref: "#/components/parameters/IdempotencyKey"
+        - $ref: "common.yaml#/components/parameters/SubKeyPath"
+        - $ref: "#/components/parameters/EntityClassPath"
+        - $ref: "#/components/parameters/EntityClassVersionPath"
+        - $ref: "common.yaml#/components/parameters/IfMatchHeader"
       requestBody:
         required: true
         x-codegen-request-body-name: patch
         content:
           application/json-patch+json:
             schema:
-              $ref: "#/components/schemas/JsonPatch"
+              $ref: "common.yaml#/components/schemas/JsonPatch"
             example:
               - op: replace
                 path: /status
@@ -136,25 +127,25 @@ paths:
         "200":
           $ref: "#/components/responses/EntityClassResponse"
         "400":
-          $ref: "#/components/responses/BadRequestResponse"
+          $ref: "common.yaml#/components/responses/BadRequestResponse"
         "401":
-          $ref: "#/components/responses/UnauthorizedResponse"
+          $ref: "common.yaml#/components/responses/UnauthorizedResponse"
         "403":
-          $ref: "#/components/responses/ForbiddenResponse"
+          $ref: "common.yaml#/components/responses/ForbiddenResponse"
         "404":
-          $ref: "#/components/responses/NotFoundResponse"
+          $ref: "common.yaml#/components/responses/NotFoundResponse"
         "406":
-          $ref: "#/components/responses/NotAcceptableResponse"
+          $ref: "common.yaml#/components/responses/NotAcceptableResponse"
         "412":
-          $ref: "#/components/responses/PreconditionFailedResponse"
+          $ref: "common.yaml#/components/responses/PreconditionFailedResponse"
         "415":
-          $ref: "#/components/responses/UnsupportedMediaTypeResponse"
+          $ref: "common.yaml#/components/responses/UnsupportedMediaTypeResponse"
         "429":
-          $ref: "#/components/responses/TooManyRequestsResponse"
+          $ref: "common.yaml#/components/responses/TooManyRequestsResponse"
         "500":
-          $ref: "#/components/responses/InternalServerErrorResponse"
+          $ref: "common.yaml#/components/responses/InternalServerErrorResponse"
         "503":
-          $ref: "#/components/responses/ServiceUnavailableResponse"
+          $ref: "common.yaml#/components/responses/ServiceUnavailableResponse"
 
     delete:
       tags:
@@ -162,36 +153,31 @@ paths:
       operationId: deleteEntityClass
       summary: Delete entity class by ID
       parameters:
-        - name: subKey
-          in: path
-          required: true
-          schema:
-            type: string
-          description: PubNub subkey
-        - $ref: "#/components/parameters/entityClassName"
-        - $ref: "#/components/parameters/entityClassVersion"
-        - $ref: "#/components/parameters/IfMatch"
+        - $ref: "common.yaml#/components/parameters/SubKeyPath"
+        - $ref: "#/components/parameters/EntityClassPath"
+        - $ref: "#/components/parameters/EntityClassVersionPath"
+        - $ref: "common.yaml#/components/parameters/IfMatchHeader"
       responses:
         "200":
-          $ref: "#/components/responses/DeleteSuccessResponse"
+          $ref: "common.yaml#/components/responses/DeleteSuccessResponse"
         "400":
-          $ref: "#/components/responses/BadRequestResponse"
+          $ref: "common.yaml#/components/responses/BadRequestResponse"
         "401":
-          $ref: "#/components/responses/UnauthorizedResponse"
+          $ref: "common.yaml#/components/responses/UnauthorizedResponse"
         "403":
-          $ref: "#/components/responses/ForbiddenResponse"
+          $ref: "common.yaml#/components/responses/ForbiddenResponse"
         "404":
-          $ref: "#/components/responses/NotFoundResponse"
+          $ref: "common.yaml#/components/responses/NotFoundResponse"
         "406":
-          $ref: "#/components/responses/NotAcceptableResponse"
+          $ref: "common.yaml#/components/responses/NotAcceptableResponse"
         "412":
-          $ref: "#/components/responses/PreconditionFailedResponse"
+          $ref: "common.yaml#/components/responses/PreconditionFailedResponse"
         "429":
-          $ref: "#/components/responses/TooManyRequestsResponse"
+          $ref: "common.yaml#/components/responses/TooManyRequestsResponse"
         "500":
-          $ref: "#/components/responses/InternalServerErrorResponse"
+          $ref: "common.yaml#/components/responses/InternalServerErrorResponse"
         "503":
-          $ref: "#/components/responses/ServiceUnavailableResponse"
+          $ref: "common.yaml#/components/responses/ServiceUnavailableResponse"
 
     put:
       tags:
@@ -199,15 +185,10 @@ paths:
       operationId: updateEntityClass
       summary: Update entity class with complete resource replacement
       parameters:
-        - name: subKey
-          in: path
-          required: true
-          schema:
-            type: string
-          description: PubNub subkey
-        - $ref: "#/components/parameters/entityClassName"
-        - $ref: "#/components/parameters/entityClassVersion"
-        - $ref: "#/components/parameters/IfMatch"
+        - $ref: "common.yaml#/components/parameters/SubKeyPath"
+        - $ref: "#/components/parameters/EntityClassPath"
+        - $ref: "#/components/parameters/EntityClassVersionPath"
+        - $ref: "common.yaml#/components/parameters/IfMatchHeader"
       requestBody:
         required: true
         x-codegen-request-body-name: updateRequest
@@ -219,72 +200,63 @@ paths:
         "200":
           $ref: "#/components/responses/EntityClassResponse"
         "400":
-          $ref: "#/components/responses/BadRequestResponse"
+          $ref: "common.yaml#/components/responses/BadRequestResponse"
         "401":
-          $ref: "#/components/responses/UnauthorizedResponse"
+          $ref: "common.yaml#/components/responses/UnauthorizedResponse"
         "403":
-          $ref: "#/components/responses/ForbiddenResponse"
+          $ref: "common.yaml#/components/responses/ForbiddenResponse"
         "404":
-          $ref: "#/components/responses/NotFoundResponse"
+          $ref: "common.yaml#/components/responses/NotFoundResponse"
         "406":
-          $ref: "#/components/responses/NotAcceptableResponse"
+          $ref: "common.yaml#/components/responses/NotAcceptableResponse"
         "412":
-          $ref: "#/components/responses/PreconditionFailedResponse"
+          $ref: "common.yaml#/components/responses/PreconditionFailedResponse"
         "415":
-          $ref: "#/components/responses/UnsupportedMediaTypeResponse"
+          $ref: "common.yaml#/components/responses/UnsupportedMediaTypeResponse"
         "429":
-          $ref: "#/components/responses/TooManyRequestsResponse"
+          $ref: "common.yaml#/components/responses/TooManyRequestsResponse"
         "500":
-          $ref: "#/components/responses/InternalServerErrorResponse"
+          $ref: "common.yaml#/components/responses/InternalServerErrorResponse"
         "503":
-          $ref: "#/components/responses/ServiceUnavailableResponse"
+          $ref: "common.yaml#/components/responses/ServiceUnavailableResponse"
 
   # Relationship Class endpoints
-  /subkeys/{subKey}/relationship-classes:
+  /datasync/subkeys/{subKey}/relationship-classes:
     get:
       summary: Get all relationship classes
       operationId: listRelationshipClasses
       parameters:
-        - name: subKey
-          in: path
-          required: true
-          schema:
-            type: string
+        - $ref: "common.yaml#/components/parameters/SubKeyPath"
       responses:
         '200':
           $ref: '#/components/responses/RelationshipClassesResponse'
         "400":
-          $ref: "#/components/responses/BadRequestResponse"
+          $ref: "common.yaml#/components/responses/BadRequestResponse"
         "401":
-          $ref: "#/components/responses/UnauthorizedResponse"
+          $ref: "common.yaml#/components/responses/UnauthorizedResponse"
         "403":
-          $ref: "#/components/responses/ForbiddenResponse"
+          $ref: "common.yaml#/components/responses/ForbiddenResponse"
         "406":
-          $ref: "#/components/responses/NotAcceptableResponse"
+          $ref: "common.yaml#/components/responses/NotAcceptableResponse"
         "429":
-          $ref: "#/components/responses/TooManyRequestsResponse"
+          $ref: "common.yaml#/components/responses/TooManyRequestsResponse"
         "500":
-          $ref: "#/components/responses/InternalServerErrorResponse"
+          $ref: "common.yaml#/components/responses/InternalServerErrorResponse"
         "503":
-          $ref: "#/components/responses/ServiceUnavailableResponse"
+          $ref: "common.yaml#/components/responses/ServiceUnavailableResponse"
       tags:
         - Relationship Class
 
-  /subkeys/{subKey}/relationship-classes/{relationshipClassName}/versions/{relationshipClassVersion}:
+  /datasync/subkeys/{subKey}/relationship-classes/{relationshipClass}/versions/{relationshipClassVersion}:
     post:
       operationId: createRelationshipClass
       summary: Create a new relationship class
       description: |
         Creates a new relationship class that defines a type of relationship between entities.
       parameters:
-        - name: subKey
-          in: path
-          required: true
-          schema:
-            type: string
-        - $ref: "#/components/parameters/IdempotencyKey"
-        - $ref: "#/components/parameters/RelationshipClassName"
-        - $ref: "#/components/parameters/RelationshipClassVersion"
+        - $ref: "common.yaml#/components/parameters/SubKeyPath"
+        - $ref: "#/components/parameters/RelationshipClassPath"
+        - $ref: "#/components/parameters/RelationshipClassVersionPath"
       tags:
         - Relationship Class
       requestBody:
@@ -297,23 +269,23 @@ paths:
         '201':
           $ref: "#/components/responses/CreateRelationshipClassResponse"
         '400':
-          $ref: '#/components/responses/BadRequestResponse'
+          $ref: 'common.yaml#/components/responses/BadRequestResponse'
         '401':
-          $ref: '#/components/responses/UnauthorizedResponse'
+          $ref: 'common.yaml#/components/responses/UnauthorizedResponse'
         '403':
-          $ref: '#/components/responses/ForbiddenResponse'
+          $ref: 'common.yaml#/components/responses/ForbiddenResponse'
         "406":
-          $ref: "#/components/responses/NotAcceptableResponse"
+          $ref: "common.yaml#/components/responses/NotAcceptableResponse"
         '409':
-          $ref: '#/components/responses/ConflictResponse'
+          $ref: 'common.yaml#/components/responses/ConflictResponse'
         "415":
-          $ref: "#/components/responses/UnsupportedMediaTypeResponse"
+          $ref: "common.yaml#/components/responses/UnsupportedMediaTypeResponse"
         "429":
-          $ref: "#/components/responses/TooManyRequestsResponse"
+          $ref: "common.yaml#/components/responses/TooManyRequestsResponse"
         '500':
-          $ref: '#/components/responses/InternalServerErrorResponse'
+          $ref: 'common.yaml#/components/responses/InternalServerErrorResponse'
         '503':
-          $ref: '#/components/responses/ServiceUnavailableResponse'
+          $ref: 'common.yaml#/components/responses/ServiceUnavailableResponse'
 
     get:
       tags:
@@ -321,33 +293,28 @@ paths:
       operationId: getRelationshipClass
       summary: Get relationship class by name and version
       parameters:
-        - name: subKey
-          in: path
-          required: true
-          schema:
-            type: string
-          description: PubNub subkey
-        - $ref: "#/components/parameters/RelationshipClassName"
-        - $ref: "#/components/parameters/RelationshipClassVersion"
+        - $ref: "common.yaml#/components/parameters/SubKeyPath"
+        - $ref: "#/components/parameters/RelationshipClassPath"
+        - $ref: "#/components/parameters/RelationshipClassVersionPath"
       responses:
         "200":
           $ref: "#/components/responses/RelationshipClassResponse"
         "400":
-          $ref: "#/components/responses/BadRequestResponse"
+          $ref: "common.yaml#/components/responses/BadRequestResponse"
         "401":
-          $ref: "#/components/responses/UnauthorizedResponse"
+          $ref: "common.yaml#/components/responses/UnauthorizedResponse"
         "403":
-          $ref: "#/components/responses/ForbiddenResponse"
+          $ref: "common.yaml#/components/responses/ForbiddenResponse"
         "404":
-          $ref: "#/components/responses/NotFoundResponse"
+          $ref: "common.yaml#/components/responses/NotFoundResponse"
         "406":
-          $ref: "#/components/responses/NotAcceptableResponse"
+          $ref: "common.yaml#/components/responses/NotAcceptableResponse"
         "429":
-          $ref: "#/components/responses/TooManyRequestsResponse"
+          $ref: "common.yaml#/components/responses/TooManyRequestsResponse"
         "500":
-          $ref: "#/components/responses/InternalServerErrorResponse"
+          $ref: "common.yaml#/components/responses/InternalServerErrorResponse"
         "503":
-          $ref: "#/components/responses/ServiceUnavailableResponse"
+          $ref: "common.yaml#/components/responses/ServiceUnavailableResponse"
 
     put:
       tags:
@@ -355,15 +322,10 @@ paths:
       operationId: updateRelationshipClass
       summary: Update relationship class with complete resource replacement
       parameters:
-        - name: subKey
-          in: path
-          required: true
-          schema:
-            type: string
-          description: PubNub subkey
-        - $ref: "#/components/parameters/RelationshipClassName"
-        - $ref: "#/components/parameters/RelationshipClassVersion"
-        - $ref: "#/components/parameters/IfMatch"
+        - $ref: "common.yaml#/components/parameters/SubKeyPath"
+        - $ref: "#/components/parameters/RelationshipClassPath"
+        - $ref: "#/components/parameters/RelationshipClassVersionPath"
+        - $ref: "common.yaml#/components/parameters/IfMatchHeader"
       requestBody:
         required: true
         x-codegen-request-body-name: updateRequest
@@ -375,25 +337,25 @@ paths:
         "200":
           $ref: "#/components/responses/RelationshipClassResponse"
         "400":
-          $ref: "#/components/responses/BadRequestResponse"
+          $ref: "common.yaml#/components/responses/BadRequestResponse"
         "401":
-          $ref: "#/components/responses/UnauthorizedResponse"
+          $ref: "common.yaml#/components/responses/UnauthorizedResponse"
         "403":
-          $ref: "#/components/responses/ForbiddenResponse"
+          $ref: "common.yaml#/components/responses/ForbiddenResponse"
         "404":
-          $ref: "#/components/responses/NotFoundResponse"
+          $ref: "common.yaml#/components/responses/NotFoundResponse"
         "406":
-          $ref: "#/components/responses/NotAcceptableResponse"
+          $ref: "common.yaml#/components/responses/NotAcceptableResponse"
         "412":
-          $ref: "#/components/responses/PreconditionFailedResponse"
+          $ref: "common.yaml#/components/responses/PreconditionFailedResponse"
         "415":
-          $ref: "#/components/responses/UnsupportedMediaTypeResponse"
+          $ref: "common.yaml#/components/responses/UnsupportedMediaTypeResponse"
         "429":
-          $ref: "#/components/responses/TooManyRequestsResponse"
+          $ref: "common.yaml#/components/responses/TooManyRequestsResponse"
         "500":
-          $ref: "#/components/responses/InternalServerErrorResponse"
+          $ref: "common.yaml#/components/responses/InternalServerErrorResponse"
         "503":
-          $ref: "#/components/responses/ServiceUnavailableResponse"
+          $ref: "common.yaml#/components/responses/ServiceUnavailableResponse"
 
     delete:
       tags:
@@ -401,41 +363,34 @@ paths:
       operationId: deleteRelationshipClass
       summary: Delete relationship class by name and version
       parameters:
-        - name: subKey
-          in: path
-          required: true
-          schema:
-            type: string
-          description: PubNub subkey
-        - $ref: "#/components/parameters/RelationshipClassName"
-        - $ref: "#/components/parameters/RelationshipClassVersion"
-        - $ref: "#/components/parameters/IfMatch"
+        - $ref: "common.yaml#/components/parameters/SubKeyPath"
+        - $ref: "#/components/parameters/RelationshipClassPath"
+        - $ref: "#/components/parameters/RelationshipClassVersionPath"
+        - $ref: "common.yaml#/components/parameters/IfMatchHeader"
       responses:
         "200":
-          $ref: "#/components/responses/DeleteSuccessResponse"
+          $ref: "common.yaml#/components/responses/DeleteSuccessResponse"
         "400":
-          $ref: "#/components/responses/BadRequestResponse"
+          $ref: "common.yaml#/components/responses/BadRequestResponse"
         "401":
-          $ref: "#/components/responses/UnauthorizedResponse"
+          $ref: "common.yaml#/components/responses/UnauthorizedResponse"
         "403":
-          $ref: "#/components/responses/ForbiddenResponse"
+          $ref: "common.yaml#/components/responses/ForbiddenResponse"
         "404":
-          $ref: "#/components/responses/NotFoundResponse"
+          $ref: "common.yaml#/components/responses/NotFoundResponse"
         "406":
-          $ref: "#/components/responses/NotAcceptableResponse"
+          $ref: "common.yaml#/components/responses/NotAcceptableResponse"
         "412":
-          $ref: "#/components/responses/PreconditionFailedResponse"
+          $ref: "common.yaml#/components/responses/PreconditionFailedResponse"
         "429":
-          $ref: "#/components/responses/TooManyRequestsResponse"
+          $ref: "common.yaml#/components/responses/TooManyRequestsResponse"
         "500":
-          $ref: "#/components/responses/InternalServerErrorResponse"
+          $ref: "common.yaml#/components/responses/InternalServerErrorResponse"
         "503":
-          $ref: "#/components/responses/ServiceUnavailableResponse"
+          $ref: "common.yaml#/components/responses/ServiceUnavailableResponse"
 
 components:
   responses:
-    DeleteSuccessResponse:
-      description: Resource deleted successfully
     EntityClassesResponse:
       description: Successful response
       content:
@@ -482,120 +437,43 @@ components:
         application/vnd.pubnub.objects.relationship-class+json;version=1:
           schema:
             $ref: '#/components/schemas/RelationshipClassEnvelope'
-    BadRequestResponse:
-      description: Bad request
-      content:
-        application/json:
-          schema:
-            $ref: 'common.yaml#/components/schemas/ErrorResponse'
-    UnauthorizedResponse:
-      description: Unauthorized
-      content:
-        application/json:
-          schema:
-            $ref: 'common.yaml#/components/schemas/ErrorResponse'
-    NotFoundResponse:
-      description: Not found
-      content:
-        application/json:
-          schema:
-            $ref: 'common.yaml#/components/schemas/ErrorResponse'
-    ConflictResponse:
-      description: Conflict - resource already exists
-      content:
-        application/json:
-          schema:
-            $ref: 'common.yaml#/components/schemas/ErrorResponse'
-    InternalServerErrorResponse:
-      description: Internal server error
-      content:
-        application/json:
-          schema:
-            $ref: 'common.yaml#/components/schemas/ErrorResponse'
-    ForbiddenResponse:
-      description: Forbidden - authorization provided but access denied
-      content:
-        application/json:
-          schema:
-            $ref: 'common.yaml#/components/schemas/ErrorResponse'
-    UnsupportedMediaTypeResponse:
-      description: Unsupported Media Type - payload format not supported
-      content:
-        application/json:
-          schema:
-            $ref: 'common.yaml#/components/schemas/ErrorResponse'
-    TooManyRequestsResponse:
-      description: Too Many Requests - rate limit exceeded
-      content:
-        application/json:
-          schema:
-            $ref: 'common.yaml#/components/schemas/ErrorResponse'
-    NotAcceptableResponse:
-      description: Not Acceptable - Accept header doesn't contain supported value
-      content:
-        application/json:
-          schema:
-            $ref: 'common.yaml#/components/schemas/ErrorResponse'
-    PreconditionFailedResponse:
-      description: Precondition Failed - ETag doesn't match current resource version
-      content:
-        application/json:
-          schema:
-            $ref: 'common.yaml#/components/schemas/ErrorResponse'
-    ServiceUnavailableResponse:
-      description: Service Unavailable - service not available
-      content:
-        application/json:
-          schema:
-            $ref: 'common.yaml#/components/schemas/ErrorResponse'
-
   parameters:
-    IfMatch:
-      $ref: 'common.yaml#/components/parameters/IfMatch'
-    Cursor:
-      $ref: 'common.yaml#/components/parameters/Cursor'
-    Limit:
-      $ref: 'common.yaml#/components/parameters/Limit'
-    Filter:
-      $ref: 'common.yaml#/components/parameters/Filter'
-    Sort:
-      $ref: 'common.yaml#/components/parameters/Sort'
-    IdempotencyKey:
-      $ref: 'common.yaml#/components/parameters/IdempotencyKey'
-    entityClassName:
-      name: entityClassName
+    EntityClassPath:
+      name: entityClass
       in: path
       required: true
       schema:
-        type: string
+        $ref: "common.yaml#/components/schemas/ClassName"
       description: Name of an entity class
-    entityClassVersion:
+    EntityClassVersionPath:
       name: entityClassVersion
       in: path
       required: true
       schema:
         type: integer
+        minimum: 1
       description: Version of an entity class
-    RelationshipClassName:
-      name: relationshipClassName
+    RelationshipClassPath:
+      name: relationshipClass
       in: path
       required: true
       schema:
-        type: string
+        $ref: "common.yaml#/components/schemas/ClassName"
       description: Name of a relationship class
-    RelationshipClassVersion:
+    RelationshipClassVersionPath:
       name: relationshipClassVersion
       in: path
       required: true
       schema:
         type: integer
+        minimum: 1
       description: Version of a relationship class
 
   schemas:
     CreateEntityClassRequest:
       description: Request body for creating an entity class
       allOf:
-        - $ref: "#/components/schemas/RequestEnvelope"
+        - $ref: "common.yaml#/components/schemas/RequestEnvelope"
         - type: object
           properties:
             data:
@@ -604,7 +482,7 @@ components:
     UpdateEntityClassRequest:
       description: Request body for updating an entity class
       allOf:
-        - $ref: "#/components/schemas/RequestEnvelope"
+        - $ref: "common.yaml#/components/schemas/RequestEnvelope"
         - type: object
           properties:
             data:
@@ -613,7 +491,7 @@ components:
     UpdateRelationshipClassRequest:
       description: Request body for updating a relationship class
       allOf:
-        - $ref: "#/components/schemas/RequestEnvelope"
+        - $ref: "common.yaml#/components/schemas/RequestEnvelope"
         - type: object
           properties:
             data:
@@ -628,13 +506,13 @@ components:
           description: Optional description of the relationship class
         schema:
           $ref: '#/components/schemas/ClassPropertiesSchema'
-        filterableFields:
+        properties:
           type: array
           items:
-            $ref: "#/components/schemas/FilterableField"
-          description: List of filterable fields (replaces existing fields on update)
+            $ref: "#/components/schemas/Property"
+          description: List of class properties (replaces existing properties on update)
 
-    FilterableField:
+    Property:
       type: object
       required: [path, valueKind, name]
       properties:
@@ -643,39 +521,53 @@ components:
           description: |
             Unique semantic identifier for the property.
         path:
-          $ref: 'common.yaml#/components/schemas/JsonPointer'
+          allOf:
+            - $ref: 'common.yaml#/components/schemas/JsonPointer'
+          description: |
+            Pointer to the property value within the record. User-defined
+            values live under `/payload/`, so a payload field named `username`
+            has the path `/payload/username`.
+          example: "/payload/username"
         valueKind:
           type: string
           enum: [string, number, boolean, date, datetime]
           description: |
             Data type of the property value.
-        enabledAdvancedFiltering:
-          type: boolean
-          description: Whether the property should be indexed for full-text search.
-          default: false
+        filtering:
+          type: string
+          nullable: true
+          enum: [none, simple, full]
+          description: |
+            Controls search indexing for this property.
+            - none: not searchable (default)
+            - simple: stored in DB for SQL-based filter and sort
+            - full: stored in DB and indexed for full-text search
         isNullable:
           type: boolean
           description: Whether the property can have null values.
           default: true
-
-    ErrorResponse:
-      $ref: 'common.yaml#/components/schemas/ErrorResponse'
-    ErrorItem:
-      $ref: 'common.yaml#/components/schemas/ErrorItem'
-
-    Meta:
-      $ref: 'common.yaml#/components/schemas/Meta'
-    Links:
-      $ref: 'common.yaml#/components/schemas/Links'
-    RequestEnvelope:
-      $ref: 'common.yaml#/components/schemas/RequestEnvelope'
-    ResponseEnvelope:
-      $ref: 'common.yaml#/components/schemas/ResponseEnvelope'
+        projections:
+          type: array
+          items:
+            type: object
+            required: [name]
+            properties:
+              name:
+                type: string
+                maxLength: 64
+                pattern: '^(__default__|[a-zA-Z0-9][a-zA-Z0-9_-]*)$'
+                description: |
+                  Projection name. Must be alphanumeric with hyphens/underscores allowed.
+                  The reserved name "__default__" is the only value permitted to start with "__".
+          description: |
+            Projections this field belongs to. Defaults to [{name: "__default__"}].
+            Remove __default__ to restrict the field to named projections only.
+            Max 3 distinct projection names per class.
 
     EntityClassesEnvelope:
       description: List of entity classes
       allOf:
-        - $ref: '#/components/schemas/ResponseEnvelope'
+        - $ref: 'common.yaml#/components/schemas/ResponseEnvelope'
         - type: object
           properties:
             data:
@@ -686,7 +578,7 @@ components:
     EntityClassEnvelope:
       description: Single entity class
       allOf:
-        - $ref: '#/components/schemas/ResponseEnvelope'
+        - $ref: 'common.yaml#/components/schemas/ResponseEnvelope'
         - type: object
           properties:
             data:
@@ -698,18 +590,24 @@ components:
         - $ref: '#/components/schemas/EntityClassProperties'
 
     EntityClassResourceProperties:
-      description: Default properties for entity class responses (without id, since name is the identifier)
+      description: Default properties for entity class responses (without id, since
+        name is the identifier)
       type: object
       required:
         - createdAt
         - updatedAt
         - eTag
         - version
+        - level
       properties:
         name:
-          type: string
-          description: |
-            Unique semantic identifier for the entity class.
+          allOf:
+            - $ref: "common.yaml#/components/schemas/ClassName"
+            - description: Unique semantic identifier for the entity class.
+        level:
+          allOf:
+            - $ref: "common.yaml#/components/schemas/ClassLevel"
+          description: The level at which this class is defined.
         createdAt:
           type: string
           format: date-time
@@ -733,7 +631,8 @@ components:
         description:
           type: string
           maxLength: 1000
-          description: Human-readable description documenting semantic intent and ownership scope.
+          description: Human-readable description documenting semantic intent and
+            ownership scope.
 
         schema:
           $ref: '#/components/schemas/ClassPropertiesSchema'
@@ -741,16 +640,20 @@ components:
         config:
           $ref: '#/components/schemas/EntityClassConfig'
 
-        filterableFields:
+        extends:
+          $ref: '#/components/schemas/Extends'
+
+        properties:
           type: array
           items:
-            $ref: '#/components/schemas/FilterableField'
+            $ref: '#/components/schemas/Property'
           description: |
-            Optional list of filterable fields for indexed/queryable 
+            Optional list of properties for searchable
             properties. If omitted, payload is treated as opaque JSON.
       example:
         name: "user-profile"
-        description: "Entity class for storing user profile information including basic details and preferences"
+        description: "Entity class for storing user profile information including basic
+          details and preferences"
         version: 1
         schema:
           $schema: "http://json-schema.org/draft/2020-12/schema"
@@ -776,29 +679,41 @@ components:
             - username
             - email
         config:
-          ttlSec: 86400
-        filterableFields:
+          ttlSec: 2678400
+        properties:
           - name: "username"
-            path: "/username"
+            path: "/payload/username"
             valueKind: "string"
-            enabledAdvancedFiltering: true
+            filtering: "full"
           - name: "email"
-            path: "/email"
+            path: "/payload/email"
             valueKind: "string"
-            enabledAdvancedFiltering: false
+            filtering: "simple"
             isNullable: true
           - name: "dateOfBirth"
-            path: "/dateOfBirth"
+            path: "/payload/dateOfBirth"
             valueKind: "date"
-            enabledAdvancedFiltering: false
+            filtering: "simple"
           - name: "isActive"
-            path: "/isActive"
+            path: "/payload/isActive"
             valueKind: "boolean"
-            enabledAdvancedFiltering: false
+            filtering: "simple"
           - name: "score"
-            path: "/score"
+            path: "/payload/score"
             valueKind: "number"
-            enabledAdvancedFiltering: false
+            filtering: "simple"
+
+    Extends:
+      type: object
+      description: Reference to the parent class this class extends.
+      required: [name, version]
+      properties:
+        name:
+          type: string
+          description: Name of the parent class.
+        version:
+          type: integer
+          description: Version of the parent class.
 
     ClassPropertiesSchema:
       type: object
@@ -814,25 +729,18 @@ components:
       properties:
         ttlSec:
           type: integer
-          minimum: -1
+          minimum: 0
+          maximum: 315569260
           description: |
             Time-to-live in seconds for entities of this class.
-            -1 indicates entities never expire. Default is 1 year
-          default: 31536000
-
-    DefaultProperties:
-      $ref: 'common.yaml#/components/schemas/DefaultProperties'
-
-    JsonPatchOperation:
-      $ref: 'common.yaml#/components/schemas/JsonPatchOperation'
-    JsonPatch:
-      $ref: 'common.yaml#/components/schemas/JsonPatch'
+            Default is 31 days, maximum is 10 years
+          default: 2678400
 
     # Relationship Class schemas
     CreateRelationshipClassRequest:
       description: Request body for creating a relationship class
       allOf:
-        - $ref: "#/components/schemas/RequestEnvelope"
+        - $ref: "common.yaml#/components/schemas/RequestEnvelope"
         - type: object
           properties:
             data:
@@ -841,7 +749,7 @@ components:
     RelationshipClassesEnvelope:
       description: List of relationship classes
       allOf:
-        - $ref: '#/components/schemas/ResponseEnvelope'
+        - $ref: 'common.yaml#/components/schemas/ResponseEnvelope'
         - type: object
           properties:
             data:
@@ -852,7 +760,7 @@ components:
     RelationshipClassEnvelope:
       description: Single relationship class
       allOf:
-        - $ref: '#/components/schemas/ResponseEnvelope'
+        - $ref: 'common.yaml#/components/schemas/ResponseEnvelope'
         - type: object
           properties:
             data:
@@ -874,9 +782,9 @@ components:
         - version
       properties:
         name:
-          type: string
-          description: |
-            Unique semantic identifier for the relationship class
+          allOf:
+            - $ref: "common.yaml#/components/schemas/ClassName"
+            - description: Unique semantic identifier for the relationship class
         createdAt:
           type: string
           format: date-time
@@ -894,7 +802,7 @@ components:
 
     RelationshipClassProperties:
       type: object
-      required: [directed, cardinality]
+      required: [cardinality]
       properties:
         description:
           type: string
@@ -902,11 +810,6 @@ components:
           description: Human-readable description documenting the relationship class purpose
         schema:
           $ref: '#/components/schemas/ClassPropertiesSchema'
-        directed:
-          type: boolean
-          description: |
-            Defines whether the relationship has a direction.
-            `true` when source → target matters.
         cardinality:
           $ref: '#/components/schemas/RelationshipClassCardinality'
         entityAClass:
@@ -914,17 +817,29 @@ components:
           description: |
             Name of the entity class for the source (A) side of the relationship.
             If omitted, any entity class can be used as the source.
+        entityAClassLevel:
+          allOf:
+            - $ref: "common.yaml#/components/schemas/ClassLevel"
+          description: |
+            Class level to resolve entityAClass at. Defaults to standard resolution
+            (SubKey → Global) if not specified.
         entityBClass:
           type: string
           description: |
             Name of the entity class for the target (B) side of the relationship.
             If omitted, any entity class can be used as the target.
-        filterableFields:
+        entityBClassLevel:
+          allOf:
+            - $ref: "common.yaml#/components/schemas/ClassLevel"
+          description: |
+            Class level to resolve entityBClass at. Defaults to standard resolution
+            (SubKey → Global) if not specified.
+        properties:
           type: array
           items:
-            $ref: '#/components/schemas/FilterableField'
+            $ref: '#/components/schemas/Property'
           description: |
-            Optional list of filterable fields for indexed/queryable
+            Optional list of properties for searchable
             properties on relationships of this class.
       example:
         description: "Represents a parent-child relationship between entities"
@@ -932,11 +847,11 @@ components:
         cardinality: "one-to-many"
         entityAClass: "Parent"
         entityBClass: "Child"
-        filterableFields:
+        properties:
           - name: "role"
-            path: "/role"
+            path: "/payload/role"
             valueKind: "string"
-            enabledAdvancedFiltering: true
+            filtering: "full"
 
     RelationshipClassCardinality:
       type: string
@@ -946,4 +861,3 @@ components:
         - `one-to-one`: Each entity can participate in at most one relationship of this type
         - `one-to-many`: An entity is bound to the side it first appears on
         - `many-to-many`: No side constraints
-  

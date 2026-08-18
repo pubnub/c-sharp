@@ -165,7 +165,7 @@ namespace PubnubApi.Tests.DataSync
                      && e.EntityData?.Id == created.Id,
                 async () =>
                 {
-                    var response = await pubnub.DataSync.UpdateUser(new UpdateUserParameters
+                    var response = await pubnub.DataSync.SetUser(new SetUserParameters
                     {
                         Id = created.Id,
                         EntityClassVersion = TestEntityClassVersion,
@@ -195,7 +195,7 @@ namespace PubnubApi.Tests.DataSync
                      && e.EntityData?.Id == created.Id,
                 async () =>
                 {
-                    var response = await pubnub.DataSync.PatchUser(new PatchUserParameters
+                    var response = await pubnub.DataSync.UpdateUser(new UpdateUserParameters
                     {
                         Id = created.Id,
                         Operations = new List<JsonPatchOperation>

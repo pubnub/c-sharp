@@ -493,7 +493,7 @@ namespace PubnubApi.Tests.DataSync
                 { "promoted", true }
             };
 
-            var response = await pubnub.DataSync.UpdateRelationship(new UpdateRelationshipParameters
+            var response = await pubnub.DataSync.SetRelationship(new SetRelationshipParameters
             {
                 Id = created.Id,
                 RelationshipClassVersion = DataSyncCommon.RelationshipClassVersion,
@@ -515,7 +515,7 @@ namespace PubnubApi.Tests.DataSync
         {
             var created = await CreateTestRelationship();
 
-            var response = await pubnub.DataSync.UpdateRelationship(new UpdateRelationshipParameters
+            var response = await pubnub.DataSync.SetRelationship(new SetRelationshipParameters
             {
                 Id = created.Id,
                 RelationshipClassVersion = DataSyncCommon.RelationshipClassVersion,
@@ -534,7 +534,7 @@ namespace PubnubApi.Tests.DataSync
         {
             var created = await CreateTestRelationship();
 
-            await pubnub.DataSync.UpdateRelationship(new UpdateRelationshipParameters
+            await pubnub.DataSync.SetRelationship(new SetRelationshipParameters
             {
                 Id = created.Id,
                 RelationshipClassVersion = DataSyncCommon.RelationshipClassVersion,
@@ -542,7 +542,7 @@ namespace PubnubApi.Tests.DataSync
                 Payload = new Dictionary<string, object> { { "v", 1 } }
             });
 
-            var response = await pubnub.DataSync.UpdateRelationship(new UpdateRelationshipParameters
+            var response = await pubnub.DataSync.SetRelationship(new SetRelationshipParameters
             {
                 Id = created.Id,
                 RelationshipClassVersion = DataSyncCommon.RelationshipClassVersion,
@@ -561,7 +561,7 @@ namespace PubnubApi.Tests.DataSync
                 status: "before",
                 payload: new Dictionary<string, object> { { "original", true } });
 
-            await pubnub.DataSync.UpdateRelationship(new UpdateRelationshipParameters
+            await pubnub.DataSync.SetRelationship(new SetRelationshipParameters
             {
                 Id = created.Id,
                 RelationshipClassVersion = DataSyncCommon.RelationshipClassVersion,
@@ -587,7 +587,7 @@ namespace PubnubApi.Tests.DataSync
         {
             var created = await CreateTestRelationship(status: "active");
 
-            var response = await pubnub.DataSync.PatchRelationship(new PatchRelationshipParameters
+            var response = await pubnub.DataSync.UpdateRelationship(new UpdateRelationshipParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -612,7 +612,7 @@ namespace PubnubApi.Tests.DataSync
         {
             var created = await CreateTestRelationship();
 
-            var response = await pubnub.DataSync.PatchRelationship(new PatchRelationshipParameters
+            var response = await pubnub.DataSync.UpdateRelationship(new UpdateRelationshipParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -637,7 +637,7 @@ namespace PubnubApi.Tests.DataSync
         {
             var created = await CreateTestRelationship();
 
-            var response = await pubnub.DataSync.PatchRelationship(new PatchRelationshipParameters
+            var response = await pubnub.DataSync.UpdateRelationship(new UpdateRelationshipParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -669,7 +669,7 @@ namespace PubnubApi.Tests.DataSync
                 { "fieldToKeep", "keep" }
             });
 
-            var response = await pubnub.DataSync.PatchRelationship(new PatchRelationshipParameters
+            var response = await pubnub.DataSync.UpdateRelationship(new UpdateRelationshipParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -696,7 +696,7 @@ namespace PubnubApi.Tests.DataSync
                 { "original", "test-value" }
             });
 
-            var response = await pubnub.DataSync.PatchRelationship(new PatchRelationshipParameters
+            var response = await pubnub.DataSync.UpdateRelationship(new UpdateRelationshipParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -724,7 +724,7 @@ namespace PubnubApi.Tests.DataSync
                 { "source", "move-me" }
             });
 
-            var response = await pubnub.DataSync.PatchRelationship(new PatchRelationshipParameters
+            var response = await pubnub.DataSync.UpdateRelationship(new UpdateRelationshipParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -756,7 +756,7 @@ namespace PubnubApi.Tests.DataSync
                     { "since", "2025-01-01" }
                 });
 
-            var response = await pubnub.DataSync.PatchRelationship(new PatchRelationshipParameters
+            var response = await pubnub.DataSync.UpdateRelationship(new UpdateRelationshipParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -794,7 +794,7 @@ namespace PubnubApi.Tests.DataSync
         {
             var created = await CreateTestRelationship(status: "active");
 
-            var response = await pubnub.DataSync.PatchRelationship(new PatchRelationshipParameters
+            var response = await pubnub.DataSync.UpdateRelationship(new UpdateRelationshipParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -824,7 +824,7 @@ namespace PubnubApi.Tests.DataSync
         {
             var created = await CreateTestRelationship(status: "active");
 
-            var response = await pubnub.DataSync.PatchRelationship(new PatchRelationshipParameters
+            var response = await pubnub.DataSync.UpdateRelationship(new UpdateRelationshipParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -849,7 +849,7 @@ namespace PubnubApi.Tests.DataSync
         {
             var created = await CreateTestRelationship(status: "active");
 
-            await pubnub.DataSync.PatchRelationship(new PatchRelationshipParameters
+            await pubnub.DataSync.UpdateRelationship(new UpdateRelationshipParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -864,7 +864,7 @@ namespace PubnubApi.Tests.DataSync
                 
             });
 
-            var response = await pubnub.DataSync.PatchRelationship(new PatchRelationshipParameters
+            var response = await pubnub.DataSync.UpdateRelationship(new UpdateRelationshipParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -987,7 +987,7 @@ namespace PubnubApi.Tests.DataSync
             Assert.That(getResponse.Result.EntityBId, Is.EqualTo(entityB.Id));
 
             // UPDATE (full replace)
-            var updateResponse = await pubnub.DataSync.UpdateRelationship(new UpdateRelationshipParameters
+            var updateResponse = await pubnub.DataSync.SetRelationship(new SetRelationshipParameters
             {
                 Id = created.Id,
                 RelationshipClassVersion = DataSyncCommon.RelationshipClassVersion,
@@ -1002,7 +1002,7 @@ namespace PubnubApi.Tests.DataSync
             Assert.That(updateResponse.Result.Status, Is.EqualTo("updated"));
 
             // PATCH
-            var patchResponse = await pubnub.DataSync.PatchRelationship(new PatchRelationshipParameters
+            var patchResponse = await pubnub.DataSync.UpdateRelationship(new UpdateRelationshipParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -1060,7 +1060,7 @@ namespace PubnubApi.Tests.DataSync
             var etag1 = created.ETag;
             Assert.That(etag1, Is.Not.Null.And.Not.Empty);
 
-            var updateResponse = await pubnub.DataSync.UpdateRelationship(new UpdateRelationshipParameters
+            var updateResponse = await pubnub.DataSync.SetRelationship(new SetRelationshipParameters
             {
                 Id = created.Id,
                 RelationshipClassVersion = DataSyncCommon.RelationshipClassVersion,
@@ -1073,7 +1073,7 @@ namespace PubnubApi.Tests.DataSync
             Assert.That(etag2, Is.Not.Null.And.Not.Empty);
             Assert.That(etag2, Is.Not.EqualTo(etag1));
 
-            var patchResponse = await pubnub.DataSync.PatchRelationship(new PatchRelationshipParameters
+            var patchResponse = await pubnub.DataSync.UpdateRelationship(new UpdateRelationshipParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -1093,7 +1093,7 @@ namespace PubnubApi.Tests.DataSync
             Assert.That(etag3, Is.Not.EqualTo(etag2));
 
             // Using a stale ETag should fail
-            var staleResponse = await pubnub.DataSync.UpdateRelationship(new UpdateRelationshipParameters
+            var staleResponse = await pubnub.DataSync.SetRelationship(new SetRelationshipParameters
             {
                 Id = created.Id,
                 RelationshipClassVersion = DataSyncCommon.RelationshipClassVersion,

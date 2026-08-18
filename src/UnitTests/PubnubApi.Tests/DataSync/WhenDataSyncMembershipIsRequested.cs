@@ -507,7 +507,7 @@ namespace PubnubApi.Tests.DataSync
                 { "promoted", true }
             };
 
-            var response = await pubnub.DataSync.UpdateMembership(new UpdateMembershipParameters
+            var response = await pubnub.DataSync.SetMembership(new UpdateMembershipParameters
             {
                 Id = created.Id,
                 RelationshipClassVersion = TestRelationshipClassVersion,
@@ -529,7 +529,7 @@ namespace PubnubApi.Tests.DataSync
         {
             var created = await CreateTestMembership();
 
-            var response = await pubnub.DataSync.UpdateMembership(new UpdateMembershipParameters
+            var response = await pubnub.DataSync.SetMembership(new UpdateMembershipParameters
             {
                 Id = created.Id,
                 RelationshipClassVersion = TestRelationshipClassVersion,
@@ -548,7 +548,7 @@ namespace PubnubApi.Tests.DataSync
         {
             var created = await CreateTestMembership();
 
-            await pubnub.DataSync.UpdateMembership(new UpdateMembershipParameters
+            await pubnub.DataSync.SetMembership(new UpdateMembershipParameters
             {
                 Id = created.Id,
                 RelationshipClassVersion = TestRelationshipClassVersion,
@@ -556,7 +556,7 @@ namespace PubnubApi.Tests.DataSync
                 Payload = new Dictionary<string, object> { { "v", 1 } }
             });
 
-            var response = await pubnub.DataSync.UpdateMembership(new UpdateMembershipParameters
+            var response = await pubnub.DataSync.SetMembership(new UpdateMembershipParameters
             {
                 Id = created.Id,
                 RelationshipClassVersion = TestRelationshipClassVersion,
@@ -575,7 +575,7 @@ namespace PubnubApi.Tests.DataSync
                 status: "before",
                 payload: new Dictionary<string, object> { { "original", true } });
 
-            await pubnub.DataSync.UpdateMembership(new UpdateMembershipParameters
+            await pubnub.DataSync.SetMembership(new UpdateMembershipParameters
             {
                 Id = created.Id,
                 RelationshipClassVersion = TestRelationshipClassVersion,
@@ -601,7 +601,7 @@ namespace PubnubApi.Tests.DataSync
         {
             var created = await CreateTestMembership(status: "active");
 
-            var response = await pubnub.DataSync.PatchMembership(new PatchMembershipParameters
+            var response = await pubnub.DataSync.UpdateMembership(new PatchMembershipParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -626,7 +626,7 @@ namespace PubnubApi.Tests.DataSync
         {
             var created = await CreateTestMembership();
 
-            var response = await pubnub.DataSync.PatchMembership(new PatchMembershipParameters
+            var response = await pubnub.DataSync.UpdateMembership(new PatchMembershipParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -651,7 +651,7 @@ namespace PubnubApi.Tests.DataSync
         {
             var created = await CreateTestMembership();
 
-            var response = await pubnub.DataSync.PatchMembership(new PatchMembershipParameters
+            var response = await pubnub.DataSync.UpdateMembership(new PatchMembershipParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -683,7 +683,7 @@ namespace PubnubApi.Tests.DataSync
                 { "fieldToKeep", "keep" }
             });
 
-            var response = await pubnub.DataSync.PatchMembership(new PatchMembershipParameters
+            var response = await pubnub.DataSync.UpdateMembership(new PatchMembershipParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -710,7 +710,7 @@ namespace PubnubApi.Tests.DataSync
                 { "original", "test-value" }
             });
 
-            var response = await pubnub.DataSync.PatchMembership(new PatchMembershipParameters
+            var response = await pubnub.DataSync.UpdateMembership(new PatchMembershipParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -738,7 +738,7 @@ namespace PubnubApi.Tests.DataSync
                 { "source", "move-me" }
             });
 
-            var response = await pubnub.DataSync.PatchMembership(new PatchMembershipParameters
+            var response = await pubnub.DataSync.UpdateMembership(new PatchMembershipParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -770,7 +770,7 @@ namespace PubnubApi.Tests.DataSync
                     { "joinedAt", "2025-01-01" }
                 });
 
-            var response = await pubnub.DataSync.PatchMembership(new PatchMembershipParameters
+            var response = await pubnub.DataSync.UpdateMembership(new PatchMembershipParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -808,7 +808,7 @@ namespace PubnubApi.Tests.DataSync
         {
             var created = await CreateTestMembership(status: "active");
 
-            var response = await pubnub.DataSync.PatchMembership(new PatchMembershipParameters
+            var response = await pubnub.DataSync.UpdateMembership(new PatchMembershipParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -838,7 +838,7 @@ namespace PubnubApi.Tests.DataSync
         {
             var created = await CreateTestMembership(status: "active");
 
-            var response = await pubnub.DataSync.PatchMembership(new PatchMembershipParameters
+            var response = await pubnub.DataSync.UpdateMembership(new PatchMembershipParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -863,7 +863,7 @@ namespace PubnubApi.Tests.DataSync
         {
             var created = await CreateTestMembership(status: "active");
 
-            await pubnub.DataSync.PatchMembership(new PatchMembershipParameters
+            await pubnub.DataSync.UpdateMembership(new PatchMembershipParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -878,7 +878,7 @@ namespace PubnubApi.Tests.DataSync
                 
             });
 
-            var response = await pubnub.DataSync.PatchMembership(new PatchMembershipParameters
+            var response = await pubnub.DataSync.UpdateMembership(new PatchMembershipParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -1000,7 +1000,7 @@ namespace PubnubApi.Tests.DataSync
             Assert.That(getResponse.Result.UserId, Is.EqualTo(user.Id));
 
             // UPDATE (full replace)
-            var updateResponse = await pubnub.DataSync.UpdateMembership(new UpdateMembershipParameters
+            var updateResponse = await pubnub.DataSync.SetMembership(new UpdateMembershipParameters
             {
                 Id = created.Id,
                 RelationshipClassVersion = TestRelationshipClassVersion,
@@ -1015,7 +1015,7 @@ namespace PubnubApi.Tests.DataSync
             Assert.That(updateResponse.Result.Status, Is.EqualTo("updated"));
 
             // PATCH
-            var patchResponse = await pubnub.DataSync.PatchMembership(new PatchMembershipParameters
+            var patchResponse = await pubnub.DataSync.UpdateMembership(new PatchMembershipParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -1072,7 +1072,7 @@ namespace PubnubApi.Tests.DataSync
             var etag1 = created.ETag;
             Assert.That(etag1, Is.Not.Null.And.Not.Empty);
 
-            var updateResponse = await pubnub.DataSync.UpdateMembership(new UpdateMembershipParameters
+            var updateResponse = await pubnub.DataSync.SetMembership(new UpdateMembershipParameters
             {
                 Id = created.Id,
                 RelationshipClassVersion = TestRelationshipClassVersion,
@@ -1085,7 +1085,7 @@ namespace PubnubApi.Tests.DataSync
             Assert.That(etag2, Is.Not.Null.And.Not.Empty);
             Assert.That(etag2, Is.Not.EqualTo(etag1));
 
-            var patchResponse = await pubnub.DataSync.PatchMembership(new PatchMembershipParameters
+            var patchResponse = await pubnub.DataSync.UpdateMembership(new PatchMembershipParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -1105,7 +1105,7 @@ namespace PubnubApi.Tests.DataSync
             Assert.That(etag3, Is.Not.EqualTo(etag2));
 
             // Using a stale ETag should fail
-            var staleResponse = await pubnub.DataSync.UpdateMembership(new UpdateMembershipParameters
+            var staleResponse = await pubnub.DataSync.SetMembership(new UpdateMembershipParameters
             {
                 Id = created.Id,
                 RelationshipClassVersion = TestRelationshipClassVersion,

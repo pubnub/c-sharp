@@ -14,7 +14,13 @@ namespace PubnubApi.EndPoint
 
         private PNCallback<PNDataSyncRelationshipResult> savedCallback;
 
-        private const PNOperationType OperationType = PNOperationType.PNDataSyncUpdateRelationship;
+        private const PNOperationType OperationType = PNOperationType.PNDataSyncPatchRelationship;
+
+        private static readonly HashSet<JsonPatchOperationType> OpsRequiringValue =
+            new () { JsonPatchOperationType.Add, JsonPatchOperationType.Replace, JsonPatchOperationType.Test };
+
+        private static readonly HashSet<JsonPatchOperationType> OpsRequiringFrom =
+            new () { JsonPatchOperationType.Move, JsonPatchOperationType.Copy };
 
         public UpdateRelationshipOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary,
             IPubnubUnitTest pubnubUnit, TokenManager tokenManager, Pubnub instance,
@@ -57,7 +63,7 @@ namespace PubnubApi.EndPoint
         public async Task<PNResult<PNDataSyncRelationshipResult>> ExecuteAsync()
         {
             logger?.Trace($"{GetType().Name} ExecuteAsync invoked.");
-            return await UpdateRelationshipAsync().ConfigureAwait(false);
+            return await PatchRelationshipAsync().ConfigureAwait(false);
         }
 
         internal void Retry()
@@ -68,7 +74,7 @@ namespace PubnubApi.EndPoint
             }
         }
 
-        private async Task<PNResult<PNDataSyncRelationshipResult>> UpdateRelationshipAsync()
+        private async Task<PNResult<PNDataSyncRelationshipResult>> PatchRelationshipAsync()
         {
             var returnValue = new PNResult<PNDataSyncRelationshipResult>();
 
@@ -84,13 +90,13 @@ namespace PubnubApi.EndPoint
                 return returnValue;
             }
 
-            if (parameters.RelationshipClassVersion < 1)
+            if (parameters.Operations == null || parameters.Operations.Count == 0)
             {
                 var errStatus = new PNStatus
                 {
                     Error = true,
-                    ErrorData = new PNErrorData("RelationshipClassVersion must be >= 1",
-                        new ArgumentException("RelationshipClassVersion must be >= 1"))
+                    ErrorData = new PNErrorData("Operations list must contain at least one operation",
+                        new ArgumentException("Operations list must contain at least one operation"))
                 };
                 returnValue.Status = errStatus;
                 return returnValue;
@@ -172,26 +178,30 @@ namespace PubnubApi.EndPoint
 
         private RequestParameter CreateRequestParameter()
         {
-            var dataProperties = new Dictionary<string, object>();
+            var patchArray = new List<Dictionary<string, object>>();
 
-            dataProperties.Add("relationshipClassVersion", parameters.RelationshipClassVersion);
-
-            if (!string.IsNullOrEmpty(parameters.Status))
+            foreach (var op in parameters.Operations)
             {
-                dataProperties.Add("status", parameters.Status);
+                var entry = new Dictionary<string, object>
+                {
+                    { "op", op.Op.ToString().ToLowerInvariant() },
+                    { "path", op.Path }
+                };
+
+                if (OpsRequiringValue.Contains(op.Op))
+                {
+                    entry["value"] = op.Value;
+                }
+
+                if (OpsRequiringFrom.Contains(op.Op) && !string.IsNullOrEmpty(op.From))
+                {
+                    entry["from"] = op.From;
+                }
+
+                patchArray.Add(entry);
             }
 
-            if (parameters.Payload != null)
-            {
-                dataProperties.Add("payload", parameters.Payload);
-            }
-
-            var requestEnvelope = new Dictionary<string, object>
-            {
-                { "data", dataProperties }
-            };
-
-            var putBody = jsonLibrary.SerializeToJsonString(requestEnvelope);
+            var patchBody = jsonLibrary.SerializeToJsonString(patchArray);
 
              var pathSegments = new List<string>
             {
@@ -205,13 +215,12 @@ namespace PubnubApi.EndPoint
 
             var requestParameter = new RequestParameter
             {
-                RequestType = Constants.PUT,
+                RequestType = Constants.PATCH,
                 PathSegment = pathSegments,
-                BodyContentString = putBody
+                BodyContentString = patchBody
             };
 
-            requestParameter.Headers.Add("Content-Type",
-                "application/vnd.pubnub.objects.relationship+json;version=1");
+            requestParameter.Headers.Add("Content-Type", "application/json-patch+json");
 
             if (!string.IsNullOrEmpty(parameters.IfMatch))
             {

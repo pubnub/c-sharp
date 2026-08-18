@@ -22,9 +22,15 @@ internal static class PNDataSyncChannelResultJsonDataParse
                 result.Id = dataDictionary.ContainsKey("id") && dataDictionary["id"] != null
                     ? dataDictionary["id"].ToString()
                     : null;
+                result.EntityClass = dataDictionary.ContainsKey("entityClass") && dataDictionary["entityClass"] != null
+                    ? dataDictionary["entityClass"].ToString()
+                    : null;
                 result.EntityClassVersion = dataDictionary.ContainsKey("entityClassVersion") && dataDictionary["entityClassVersion"] != null
                     ? (int)(long)dataDictionary["entityClassVersion"]
                     : 1;
+                result.EntityClassLevel = dataDictionary.ContainsKey("entityClassLevel") && dataDictionary["entityClassLevel"] != null
+                    ? dataDictionary["entityClassLevel"].ToString()
+                    : null;
                 result.Status = dataDictionary.ContainsKey("status") && dataDictionary["status"] != null
                     ? dataDictionary["status"].ToString()
                     : null;

@@ -552,9 +552,9 @@ namespace PubnubApi
                         }
                         break;
                     case PNOperationType.PNDataSyncUpdateEntity:
-                        if (savedEndpointOperation is UpdateEntityOperation)
+                        if (savedEndpointOperation is SetEntityOperation)
                         {
-                            UpdateEntityOperation endpoint = savedEndpointOperation as UpdateEntityOperation;
+                            SetEntityOperation endpoint = savedEndpointOperation as SetEntityOperation;
                             if (endpoint != null)
                             {
                                 endpoint.Retry();
@@ -562,9 +562,9 @@ namespace PubnubApi
                         }
                         break;
                     case PNOperationType.PNDataSyncPatchEntity:
-                        if (savedEndpointOperation is PatchEntityOperation)
+                        if (savedEndpointOperation is UpdateEntityOperation)
                         {
-                            PatchEntityOperation endpoint = savedEndpointOperation as PatchEntityOperation;
+                            UpdateEntityOperation endpoint = savedEndpointOperation as UpdateEntityOperation;
                             if (endpoint != null)
                             {
                                 endpoint.Retry();

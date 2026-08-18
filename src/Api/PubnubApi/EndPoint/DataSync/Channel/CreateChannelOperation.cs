@@ -167,7 +167,17 @@ namespace PubnubApi.EndPoint
                 dataProperties.Add("id", parameters.Id);
             }
 
+            if (!string.IsNullOrEmpty(parameters.EntityClass))
+            {
+                dataProperties.Add("entityClass", parameters.EntityClass);
+            }
+
             dataProperties.Add("entityClassVersion", parameters.EntityClassVersion);
+
+            if (!string.IsNullOrEmpty(parameters.EntityClassLevel))
+            {
+                dataProperties.Add("entityClassLevel", parameters.EntityClassLevel);
+            }
 
             if (!string.IsNullOrEmpty(parameters.Status))
             {

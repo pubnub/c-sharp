@@ -358,7 +358,7 @@ namespace PubnubApi.Tests.DataSync
                 { "age", 30 }
             };
 
-            var response = await pubnub.DataSync.UpdateUser(new UpdateUserParameters
+            var response = await pubnub.DataSync.SetUser(new SetUserParameters
             {
                 Id = created.Id,
                 EntityClassVersion = TestEntityClassVersion,
@@ -380,7 +380,7 @@ namespace PubnubApi.Tests.DataSync
         {
             var created = await CreateTestUser();
 
-            var response = await pubnub.DataSync.UpdateUser(new UpdateUserParameters
+            var response = await pubnub.DataSync.SetUser(new SetUserParameters
             {
                 Id = created.Id,
                 EntityClassVersion = TestEntityClassVersion,
@@ -399,7 +399,7 @@ namespace PubnubApi.Tests.DataSync
         {
             var created = await CreateTestUser();
 
-            await pubnub.DataSync.UpdateUser(new UpdateUserParameters
+            await pubnub.DataSync.SetUser(new SetUserParameters
             {
                 Id = created.Id,
                 EntityClassVersion = TestEntityClassVersion,
@@ -407,7 +407,7 @@ namespace PubnubApi.Tests.DataSync
                 Payload = new Dictionary<string, object> { { "v", 1 } }
             });
 
-            var response = await pubnub.DataSync.UpdateUser(new UpdateUserParameters
+            var response = await pubnub.DataSync.SetUser(new SetUserParameters
             {
                 Id = created.Id,
                 EntityClassVersion = TestEntityClassVersion,
@@ -426,7 +426,7 @@ namespace PubnubApi.Tests.DataSync
                 status: "before",
                 payload: new Dictionary<string, object> { { "original", true } });
 
-            await pubnub.DataSync.UpdateUser(new UpdateUserParameters
+            await pubnub.DataSync.SetUser(new SetUserParameters
             {
                 Id = created.Id,
                 EntityClassVersion = TestEntityClassVersion,
@@ -452,7 +452,7 @@ namespace PubnubApi.Tests.DataSync
         {
             var created = await CreateTestUser(status: "active");
 
-            var response = await pubnub.DataSync.PatchUser(new PatchUserParameters
+            var response = await pubnub.DataSync.UpdateUser(new UpdateUserParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -477,7 +477,7 @@ namespace PubnubApi.Tests.DataSync
         {
             var created = await CreateTestUser();
 
-            var response = await pubnub.DataSync.PatchUser(new PatchUserParameters
+            var response = await pubnub.DataSync.UpdateUser(new UpdateUserParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -502,7 +502,7 @@ namespace PubnubApi.Tests.DataSync
         {
             var created = await CreateTestUser();
 
-            var response = await pubnub.DataSync.PatchUser(new PatchUserParameters
+            var response = await pubnub.DataSync.UpdateUser(new UpdateUserParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -534,7 +534,7 @@ namespace PubnubApi.Tests.DataSync
                 { "fieldToKeep", "keep" }
             });
 
-            var response = await pubnub.DataSync.PatchUser(new PatchUserParameters
+            var response = await pubnub.DataSync.UpdateUser(new UpdateUserParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -561,7 +561,7 @@ namespace PubnubApi.Tests.DataSync
                 { "original", "test-value" }
             });
 
-            var response = await pubnub.DataSync.PatchUser(new PatchUserParameters
+            var response = await pubnub.DataSync.UpdateUser(new UpdateUserParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -589,7 +589,7 @@ namespace PubnubApi.Tests.DataSync
                 { "source", "move-me" }
             });
 
-            var response = await pubnub.DataSync.PatchUser(new PatchUserParameters
+            var response = await pubnub.DataSync.UpdateUser(new UpdateUserParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -621,7 +621,7 @@ namespace PubnubApi.Tests.DataSync
                     { "age", 25 }
                 });
 
-            var response = await pubnub.DataSync.PatchUser(new PatchUserParameters
+            var response = await pubnub.DataSync.UpdateUser(new UpdateUserParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -659,7 +659,7 @@ namespace PubnubApi.Tests.DataSync
         {
             var created = await CreateTestUser(status: "active");
 
-            var response = await pubnub.DataSync.PatchUser(new PatchUserParameters
+            var response = await pubnub.DataSync.UpdateUser(new UpdateUserParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -689,7 +689,7 @@ namespace PubnubApi.Tests.DataSync
         {
             var created = await CreateTestUser(status: "active");
 
-            var response = await pubnub.DataSync.PatchUser(new PatchUserParameters
+            var response = await pubnub.DataSync.UpdateUser(new UpdateUserParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -714,7 +714,7 @@ namespace PubnubApi.Tests.DataSync
         {
             var created = await CreateTestUser(status: "active");
 
-            await pubnub.DataSync.PatchUser(new PatchUserParameters
+            await pubnub.DataSync.UpdateUser(new UpdateUserParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -729,7 +729,7 @@ namespace PubnubApi.Tests.DataSync
                 
             });
 
-            var response = await pubnub.DataSync.PatchUser(new PatchUserParameters
+            var response = await pubnub.DataSync.UpdateUser(new UpdateUserParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -758,7 +758,7 @@ namespace PubnubApi.Tests.DataSync
                 { "isVerified", false }
             });
 
-            var response = await pubnub.DataSync.PatchUser(new PatchUserParameters
+            var response = await pubnub.DataSync.UpdateUser(new UpdateUserParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -888,7 +888,7 @@ namespace PubnubApi.Tests.DataSync
             Assert.That(getResponse.Result.Status, Is.EqualTo("new"));
 
             // UPDATE (full replace)
-            var updateResponse = await pubnub.DataSync.UpdateUser(new UpdateUserParameters
+            var updateResponse = await pubnub.DataSync.SetUser(new SetUserParameters
             {
                 Id = userId,
                 EntityClassVersion = TestEntityClassVersion,
@@ -903,7 +903,7 @@ namespace PubnubApi.Tests.DataSync
             Assert.That(updateResponse.Result.Status, Is.EqualTo("updated"));
 
             // PATCH
-            var patchResponse = await pubnub.DataSync.PatchUser(new PatchUserParameters
+            var patchResponse = await pubnub.DataSync.UpdateUser(new UpdateUserParameters
             {
                 Id = userId,
                 Operations = new List<JsonPatchOperation>
@@ -960,7 +960,7 @@ namespace PubnubApi.Tests.DataSync
             var etag1 = created.ETag;
             Assert.That(etag1, Is.Not.Null.And.Not.Empty);
 
-            var updateResponse = await pubnub.DataSync.UpdateUser(new UpdateUserParameters
+            var updateResponse = await pubnub.DataSync.SetUser(new SetUserParameters
             {
                 Id = created.Id,
                 EntityClassVersion = TestEntityClassVersion,
@@ -973,7 +973,7 @@ namespace PubnubApi.Tests.DataSync
             Assert.That(etag2, Is.Not.Null.And.Not.Empty);
             Assert.That(etag2, Is.Not.EqualTo(etag1));
 
-            var patchResponse = await pubnub.DataSync.PatchUser(new PatchUserParameters
+            var patchResponse = await pubnub.DataSync.UpdateUser(new UpdateUserParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -993,7 +993,7 @@ namespace PubnubApi.Tests.DataSync
             Assert.That(etag3, Is.Not.EqualTo(etag2));
 
             // Using a stale ETag should fail
-            var staleResponse = await pubnub.DataSync.UpdateUser(new UpdateUserParameters
+            var staleResponse = await pubnub.DataSync.SetUser(new SetUserParameters
             {
                 Id = created.Id,
                 EntityClassVersion = TestEntityClassVersion,

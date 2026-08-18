@@ -36,9 +36,15 @@ internal static class PNDataSyncChannelsListResultJsonDataParse
                         Id = dataEntryDictionary.ContainsKey("id") && dataEntryDictionary["id"] != null
                             ? dataEntryDictionary["id"].ToString()
                             : null,
+                        EntityClass = dataEntryDictionary.ContainsKey("entityClass") && dataEntryDictionary["entityClass"] != null
+                            ? dataEntryDictionary["entityClass"].ToString()
+                            : null,
                         EntityClassVersion = dataEntryDictionary.ContainsKey("entityClassVersion") && dataEntryDictionary["entityClassVersion"] != null
                             ? (int)(long)dataEntryDictionary["entityClassVersion"]
                             : 1,
+                        EntityClassLevel = dataEntryDictionary.ContainsKey("entityClassLevel") && dataEntryDictionary["entityClassLevel"] != null
+                            ? dataEntryDictionary["entityClassLevel"].ToString()
+                            : null,
                         Status = dataEntryDictionary.ContainsKey("status") && dataEntryDictionary["status"] != null
                             ? dataEntryDictionary["status"].ToString()
                             : null,
@@ -100,7 +106,7 @@ internal static class PNDataSyncChannelsListResultJsonDataParse
             }
             else if (objectDictionary.TryGetValue("links", out var linksObject) && linksObject != null)
             {
-                var linksDictionary = jsonPlug.ConvertToDictionaryObject(listObject);
+                var linksDictionary = jsonPlug.ConvertToDictionaryObject(linksObject);
                 if (linksDictionary == null || !linksDictionary.Any())
                 {
                     continue;

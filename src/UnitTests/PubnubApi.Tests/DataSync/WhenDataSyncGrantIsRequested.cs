@@ -202,7 +202,7 @@ namespace PubnubApi.Tests.DataSync
             await Task.Delay(1000);
 
             var read = await client.DataSync.GetEntity(new GetEntityParameters { Id = entityId });
-            var update = await client.DataSync.UpdateEntity(new UpdateEntityParameters
+            var update = await client.DataSync.SetEntity(new SetEntityParameters
             {
                 Id = entityId,
                 EntityClassVersion = DataSyncCommon.EntityClassVersion,

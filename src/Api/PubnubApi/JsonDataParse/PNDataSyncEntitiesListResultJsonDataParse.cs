@@ -42,6 +42,9 @@ public class PNDataSyncEntitiesListResultJsonDataParse
                         EntityClassVersion = dataEntryDictionary.ContainsKey("entityClassVersion") && dataEntryDictionary["entityClassVersion"] != null
                             ? (int)(long)dataEntryDictionary["entityClassVersion"]
                             : 1,
+                        EntityClassLevel = dataEntryDictionary.ContainsKey("entityClassLevel") && dataEntryDictionary["entityClassLevel"] != null
+                            ? dataEntryDictionary["entityClassLevel"].ToString()
+                            : null,
                         Status = dataEntryDictionary.ContainsKey("status") && dataEntryDictionary["status"] != null
                             ? dataEntryDictionary["status"].ToString()
                             : null,
@@ -103,7 +106,7 @@ public class PNDataSyncEntitiesListResultJsonDataParse
             }
             else if (objectDictionary.TryGetValue("links", out var linksObject) && linksObject != null)
             {
-                var linksDictionary = jsonPlug.ConvertToDictionaryObject(listObject);
+                var linksDictionary = jsonPlug.ConvertToDictionaryObject(linksObject);
                 if (linksDictionary == null || !linksDictionary.Any())
                 {
                     continue;

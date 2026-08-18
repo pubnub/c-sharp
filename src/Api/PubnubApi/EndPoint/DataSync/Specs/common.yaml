@@ -9,8 +9,87 @@ info:
 paths: {}
 
 components:
+  responses:
+    DeleteSuccessResponse:
+      description: Resource deleted successfully
+    BadRequestResponse:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    UnauthorizedResponse:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    ForbiddenResponse:
+      description: Forbidden - authorization provided but access denied
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFoundResponse:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotAcceptableResponse:
+      description: Not Acceptable - Accept header doesn't contain supported value
+      content:
+        text/plain:
+          schema:
+            type: string
+            example: "Accept header value is not acceptable. Supported values are [application/json]"
+    ConflictResponse:
+      description: Conflict - resource already exists
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    PreconditionFailedResponse:
+      description: Precondition Failed - ETag doesn't match current resource version
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    UnsupportedMediaTypeResponse:
+      description: Unsupported Media Type - payload format not supported
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    TooManyRequestsResponse:
+      description: Too Many Requests - rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    InternalServerErrorResponse:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    ServiceUnavailableResponse:
+      description: Service Unavailable - service not available
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
   parameters:
-    IfMatch:
+    SubKeyPath:
+      name: subKey
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Subscribe key identifying the keyset.
+
+    IfMatchHeader:
       name: If-Match
       in: header
       required: false
@@ -18,58 +97,32 @@ components:
         type: string
       description: ETag value for optimistic concurrency control. If provided, the update will only succeed if the current resource ETag matches this value.
 
-    Cursor:
-      name: cursor
+    EntityClassLevelQuery:
+      name: entity_class_level
       in: query
       required: false
       schema:
-        type: string
-      description: |
-        Opaque cursor for pagination. Base64-encoded token representing the position
-        in the result set. Omit or pass null for the first page. Use the cursor values
-        from `meta.next_cursor` or `meta.prev_cursor` in the response to navigate
-        to subsequent or previous pages.
-      example: "TjA="
-
-    Limit:
-      name: limit
-      in: query
-      required: false
-      schema:
-        type: integer
-        minimum: 1
-        maximum: 100
-        default: 20
-      description: Maximum number of items to return per page (default 20, max 100)
-
-    Filter:
-      name: filter
-      in: query
-      schema:
-        type: string
-        externalDocs:
-          url: https://www.pubnub.com/docs/general/metadata/filtering
-          description: AppContext Query Language
-      description: Filter expression using AppContext Query Language
-
-    Sort:
-      name: sort
-      in: query
-      schema:
-        type: string
-        example: +id,-createdAt
-      description: Comma-separated list of fields to sort. To indicate sorting direction, fields may be prefixed with + (ascending) or - (descending, default)
-
-    IdempotencyKey:
-      name: Idempotency-Key
-      in: header
-      required: true
-      schema:
-        type: string
-        format: uuid
-      description: UUIDv4 to ensure idempotency of non-idempotent POST requests
+        $ref: "#/components/schemas/ClassLevel"
+      description: Level of the entity class.
 
   schemas:
+    ClassLevel:
+      type: string
+      enum: [Global, SubKey]
+      description: The level at which a class is defined.
+
+    ClassCategory:
+      type: string
+      enum: [Entity, Relationship]
+      description: Category of a class.
+
+    ClassName:
+      type: string
+      minLength: 1
+      maxLength: 128
+      pattern: '^[a-zA-Z][a-zA-Z0-9_-]*$'
+      x-pattern-message: "Class name must start with a letter and contain only letters, digits, hyphens, and underscores"
+
     ErrorResponse:
       description: Error response envelope
       type: object
@@ -104,7 +157,6 @@ components:
       type: object
       required:
         - has_next
-        - has_prev
       properties:
         next_cursor:
           type: string
@@ -114,22 +166,10 @@ components:
             Use this value in the `cursor` query parameter to fetch the next page.
             Null if there are no more results (has_next is false).
           example: "TjIw"
-        prev_cursor:
-          type: string
-          nullable: true
-          description: |
-            Opaque cursor for the previous page. Base64-encoded token.
-            Use this value in the `cursor` query parameter to fetch the previous page.
-            Null if this is the first page (has_prev is false).
-          example: "TjA="
         has_next:
           type: boolean
           description: Indicates whether there are more results after this page
           example: true
-        has_prev:
-          type: boolean
-          description: Indicates whether there are results before this page
-          example: false
         limit:
           type: integer
           description: The limit applied to this page (may differ from requested limit)
@@ -156,13 +196,6 @@ components:
             Link to next page (if available). Includes the next_cursor value.
             Null if there are no more results.
           example: /subkeys/demo/relationships?cursor=TjQw&limit=20&sort=-createdAt
-        prev:
-          type: string
-          nullable: true
-          description: |
-            Link to previous page (if available). Includes the prev_cursor value.
-            Null if this is the first page.
-          example: /subkeys/demo/relationships?cursor=TjA=&limit=20&sort=-createdAt
 
     RequestEnvelope:
       description: Base request envelope (data only)

@@ -2,9 +2,6 @@ using System.Collections.Generic;
 
 namespace PubnubApi.EndPoint
 {
-    /// <summary>
-    /// Parameters for updating an entity with complete resource replacement (PUT) via DataSync.
-    /// </summary>
     public class UpdateEntityParameters
     {
         /// <summary>
@@ -13,26 +10,51 @@ namespace PubnubApi.EndPoint
         public string Id { get; set; }
 
         /// <summary>
-        /// Schema version of the entity class. Required. Must be >= 1.
-        /// Note: entityClass is immutable and cannot be changed after creation.
+        /// List of JSON Patch operations (RFC 6902) to apply. Required; must contain at least one operation.
         /// </summary>
-        public int EntityClassVersion { get; set; }
-
-        /// <summary>
-        /// Entity status (e.g., "active", "inactive"). 1–100 characters.
-        /// </summary>
-        public string Status { get; set; }
-
-        /// <summary>
-        /// User-defined custom properties. Supports arbitrarily nested objects.
-        /// Replaces the entire payload — omitted fields are removed.
-        /// </summary>
-        public Dictionary<string, object> Payload { get; set; }
+        public List<JsonPatchOperation> Operations { get; set; }
 
         /// <summary>
         /// ETag for optimistic concurrency control. If provided, the server rejects
-        /// the update when the current resource version does not match (HTTP 412).
+        /// the patch when the current resource version does not match (HTTP 412).
         /// </summary>
         public string IfMatch { get; set; }
+    }
+
+    public enum JsonPatchOperationType
+    {
+        Add,
+        Remove,
+        Replace,
+        Move,
+        Copy,
+        Test
+    }
+
+    /// <summary>
+    /// A single JSON Patch operation as defined by RFC 6902.
+    /// </summary>
+    public class JsonPatchOperation
+    {
+        /// <summary>
+        /// The operation to perform: "add", "remove", "replace", "move", "copy", or "test".
+        /// </summary>
+        public JsonPatchOperationType Op { get; set; }
+
+        /// <summary>
+        /// JSON Pointer (RFC 6901) to the target location.
+        /// </summary>
+        public string Path { get; set; }
+
+        /// <summary>
+        /// The value to apply. Required for "add", "replace", and "test" operations.
+        /// Can be any JSON-serializable value including null.
+        /// </summary>
+        public object Value { get; set; }
+
+        /// <summary>
+        /// Source location (JSON Pointer). Required for "move" and "copy" operations.
+        /// </summary>
+        public string From { get; set; }
     }
 }

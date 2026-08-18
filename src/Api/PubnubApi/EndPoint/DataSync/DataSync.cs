@@ -54,6 +54,18 @@ public class DataSync
             parameters).Execute(callback);
     }
     
+    public async Task<PNResult<PNDataSyncEntityResult>> SetEntity(SetEntityParameters parameters)
+    {
+        return await new SetEntityOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).ExecuteAsync();
+    }
+    
+    public void SetEntity(SetEntityParameters parameters, PNDataSyncEntityResultExt callback)
+    {
+        new SetEntityOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).Execute(callback);
+    }
+    
     public async Task<PNResult<PNDataSyncEntityResult>> UpdateEntity(UpdateEntityParameters parameters)
     {
         return await new UpdateEntityOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
@@ -63,18 +75,6 @@ public class DataSync
     public void UpdateEntity(UpdateEntityParameters parameters, PNDataSyncEntityResultExt callback)
     {
         new UpdateEntityOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).Execute(callback);
-    }
-    
-    public async Task<PNResult<PNDataSyncEntityResult>> PatchEntity(PatchEntityParameters parameters)
-    {
-        return await new PatchEntityOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).ExecuteAsync();
-    }
-    
-    public void PatchEntity(PatchEntityParameters parameters, PNDataSyncEntityResultExt callback)
-    {
-        new PatchEntityOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
             parameters).Execute(callback);
     }
 
@@ -126,6 +126,18 @@ public class DataSync
             parameters).Execute(callback);
     }
 
+    public async Task<PNResult<PNDataSyncRelationshipResult>> SetRelationship(SetRelationshipParameters parameters)
+    {
+        return await new SetRelationshipOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).ExecuteAsync();
+    }
+
+    public void SetRelationship(SetRelationshipParameters parameters, PNDataSyncRelationshipResultExt callback)
+    {
+        new SetRelationshipOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).Execute(callback);
+    }
+
     public async Task<PNResult<PNDataSyncRelationshipResult>> UpdateRelationship(UpdateRelationshipParameters parameters)
     {
         return await new UpdateRelationshipOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
@@ -135,18 +147,6 @@ public class DataSync
     public void UpdateRelationship(UpdateRelationshipParameters parameters, PNDataSyncRelationshipResultExt callback)
     {
         new UpdateRelationshipOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).Execute(callback);
-    }
-
-    public async Task<PNResult<PNDataSyncRelationshipResult>> PatchRelationship(PatchRelationshipParameters parameters)
-    {
-        return await new PatchRelationshipOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).ExecuteAsync();
-    }
-
-    public void PatchRelationship(PatchRelationshipParameters parameters, PNDataSyncRelationshipResultExt callback)
-    {
-        new PatchRelationshipOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
             parameters).Execute(callback);
     }
 
@@ -200,6 +200,18 @@ public class DataSync
             parameters).Execute(callback);
     }
 
+    public async Task<PNResult<PNDataSyncUserResult>> SetUser(SetUserParameters parameters)
+    {
+        return await new SetUserOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).ExecuteAsync();
+    }
+
+    public void SetUser(SetUserParameters parameters, PNDataSyncUserResultExt callback)
+    {
+        new SetUserOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).Execute(callback);
+    }
+
     public async Task<PNResult<PNDataSyncUserResult>> UpdateUser(UpdateUserParameters parameters)
     {
         return await new UpdateUserOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
@@ -209,18 +221,6 @@ public class DataSync
     public void UpdateUser(UpdateUserParameters parameters, PNDataSyncUserResultExt callback)
     {
         new UpdateUserOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).Execute(callback);
-    }
-
-    public async Task<PNResult<PNDataSyncUserResult>> PatchUser(PatchUserParameters parameters)
-    {
-        return await new PatchUserOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).ExecuteAsync();
-    }
-
-    public void PatchUser(PatchUserParameters parameters, PNDataSyncUserResultExt callback)
-    {
-        new PatchUserOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
             parameters).Execute(callback);
     }
 
@@ -274,6 +274,18 @@ public class DataSync
             parameters).Execute(callback);
     }
 
+    public async Task<PNResult<PNDataSyncChannelResult>> SetChannel(SetChannelParameters parameters)
+    {
+        return await new SetChannelOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).ExecuteAsync();
+    }
+
+    public void SetChannel(SetChannelParameters parameters, PNDataSyncChannelResultExt callback)
+    {
+        new SetChannelOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).Execute(callback);
+    }
+
     public async Task<PNResult<PNDataSyncChannelResult>> UpdateChannel(UpdateChannelParameters parameters)
     {
         return await new UpdateChannelOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
@@ -283,18 +295,6 @@ public class DataSync
     public void UpdateChannel(UpdateChannelParameters parameters, PNDataSyncChannelResultExt callback)
     {
         new UpdateChannelOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).Execute(callback);
-    }
-
-    public async Task<PNResult<PNDataSyncChannelResult>> PatchChannel(PatchChannelParameters parameters)
-    {
-        return await new PatchChannelOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).ExecuteAsync();
-    }
-
-    public void PatchChannel(PatchChannelParameters parameters, PNDataSyncChannelResultExt callback)
-    {
-        new PatchChannelOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
             parameters).Execute(callback);
     }
 
@@ -348,27 +348,27 @@ public class DataSync
             parameters).Execute(callback);
     }
 
-    public async Task<PNResult<PNDataSyncMembershipResult>> UpdateMembership(UpdateMembershipParameters parameters)
+    public async Task<PNResult<PNDataSyncMembershipResult>> SetMembership(UpdateMembershipParameters parameters)
+    {
+        return await new SetMembershipOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).ExecuteAsync();
+    }
+
+    public void SetMembership(UpdateMembershipParameters parameters, PNDataSyncMembershipResultExt callback)
+    {
+        new SetMembershipOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
+            parameters).Execute(callback);
+    }
+
+    public async Task<PNResult<PNDataSyncMembershipResult>> UpdateMembership(PatchMembershipParameters parameters)
     {
         return await new UpdateMembershipOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
             parameters).ExecuteAsync();
     }
 
-    public void UpdateMembership(UpdateMembershipParameters parameters, PNDataSyncMembershipResultExt callback)
+    public void UpdateMembership(PatchMembershipParameters parameters, PNDataSyncMembershipResultExt callback)
     {
         new UpdateMembershipOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).Execute(callback);
-    }
-
-    public async Task<PNResult<PNDataSyncMembershipResult>> PatchMembership(PatchMembershipParameters parameters)
-    {
-        return await new PatchMembershipOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).ExecuteAsync();
-    }
-
-    public void PatchMembership(PatchMembershipParameters parameters, PNDataSyncMembershipResultExt callback)
-    {
-        new PatchMembershipOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
             parameters).Execute(callback);
     }
 

@@ -5,7 +5,9 @@ namespace PubnubApi.EndPoint;
 public class PNDataSyncUserResult
 {
     public string Id { get; internal set; }
+    public string EntityClass { get; internal set; }
     public int EntityClassVersion { get; internal set; }
+    public string EntityClassLevel { get; internal set; }
     public string Status { get; internal set; }
     public Dictionary<string, object> Payload { get; internal set; }
     public string CreatedAt { get; internal set; }

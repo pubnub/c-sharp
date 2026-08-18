@@ -166,7 +166,7 @@ namespace PubnubApi.Tests.DataSync
                      && e.EntityData?.Id == created.Id,
                 async () =>
                 {
-                    var response = await pubnub.DataSync.UpdateChannel(new UpdateChannelParameters
+                    var response = await pubnub.DataSync.SetChannel(new SetChannelParameters
                     {
                         Id = created.Id,
                         EntityClassVersion = TestEntityClassVersion,
@@ -196,7 +196,7 @@ namespace PubnubApi.Tests.DataSync
                      && e.EntityData?.Id == created.Id,
                 async () =>
                 {
-                    var response = await pubnub.DataSync.PatchChannel(new PatchChannelParameters
+                    var response = await pubnub.DataSync.UpdateChannel(new UpdateChannelParameters
                     {
                         Id = created.Id,
                         Operations = new List<JsonPatchOperation>

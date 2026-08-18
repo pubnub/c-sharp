@@ -106,7 +106,7 @@ internal static class PNDataSyncMembershipsListResultJsonDataParse
             }
             else if (objectDictionary.TryGetValue("links", out var linksObject) && linksObject != null)
             {
-                var linksDictionary = jsonPlug.ConvertToDictionaryObject(listObject);
+                var linksDictionary = jsonPlug.ConvertToDictionaryObject(linksObject);
                 if (linksDictionary == null || !linksDictionary.Any())
                 {
                     continue;

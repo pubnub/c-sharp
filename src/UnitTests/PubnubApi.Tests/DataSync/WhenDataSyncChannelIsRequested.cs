@@ -354,7 +354,7 @@ namespace PubnubApi.Tests.DataSync
                 { "maxMembers", 500 }
             };
 
-            var response = await pubnub.DataSync.UpdateChannel(new UpdateChannelParameters
+            var response = await pubnub.DataSync.SetChannel(new SetChannelParameters
             {
                 Id = created.Id,
                 EntityClassVersion = TestEntityClassVersion,
@@ -376,7 +376,7 @@ namespace PubnubApi.Tests.DataSync
         {
             var created = await CreateTestChannel();
 
-            var response = await pubnub.DataSync.UpdateChannel(new UpdateChannelParameters
+            var response = await pubnub.DataSync.SetChannel(new SetChannelParameters
             {
                 Id = created.Id,
                 EntityClassVersion = TestEntityClassVersion,
@@ -395,7 +395,7 @@ namespace PubnubApi.Tests.DataSync
         {
             var created = await CreateTestChannel();
 
-            await pubnub.DataSync.UpdateChannel(new UpdateChannelParameters
+            await pubnub.DataSync.SetChannel(new SetChannelParameters
             {
                 Id = created.Id,
                 EntityClassVersion = TestEntityClassVersion,
@@ -403,7 +403,7 @@ namespace PubnubApi.Tests.DataSync
                 Payload = new Dictionary<string, object> { { "v", 1 } }
             });
 
-            var response = await pubnub.DataSync.UpdateChannel(new UpdateChannelParameters
+            var response = await pubnub.DataSync.SetChannel(new SetChannelParameters
             {
                 Id = created.Id,
                 EntityClassVersion = TestEntityClassVersion,
@@ -422,7 +422,7 @@ namespace PubnubApi.Tests.DataSync
                 status: "before",
                 payload: new Dictionary<string, object> { { "original", true } });
 
-            await pubnub.DataSync.UpdateChannel(new UpdateChannelParameters
+            await pubnub.DataSync.SetChannel(new SetChannelParameters
             {
                 Id = created.Id,
                 EntityClassVersion = TestEntityClassVersion,
@@ -448,7 +448,7 @@ namespace PubnubApi.Tests.DataSync
         {
             var created = await CreateTestChannel(status: "active");
 
-            var response = await pubnub.DataSync.PatchChannel(new PatchChannelParameters
+            var response = await pubnub.DataSync.UpdateChannel(new UpdateChannelParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -472,7 +472,7 @@ namespace PubnubApi.Tests.DataSync
         {
             var created = await CreateTestChannel();
 
-            var response = await pubnub.DataSync.PatchChannel(new PatchChannelParameters
+            var response = await pubnub.DataSync.UpdateChannel(new UpdateChannelParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -497,7 +497,7 @@ namespace PubnubApi.Tests.DataSync
         {
             var created = await CreateTestChannel();
 
-            var response = await pubnub.DataSync.PatchChannel(new PatchChannelParameters
+            var response = await pubnub.DataSync.UpdateChannel(new UpdateChannelParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -529,7 +529,7 @@ namespace PubnubApi.Tests.DataSync
                 { "fieldToKeep", "keep" }
             });
 
-            var response = await pubnub.DataSync.PatchChannel(new PatchChannelParameters
+            var response = await pubnub.DataSync.UpdateChannel(new UpdateChannelParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -556,7 +556,7 @@ namespace PubnubApi.Tests.DataSync
                 { "original", "test-value" }
             });
 
-            var response = await pubnub.DataSync.PatchChannel(new PatchChannelParameters
+            var response = await pubnub.DataSync.UpdateChannel(new UpdateChannelParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -584,7 +584,7 @@ namespace PubnubApi.Tests.DataSync
                 { "source", "move-me" }
             });
 
-            var response = await pubnub.DataSync.PatchChannel(new PatchChannelParameters
+            var response = await pubnub.DataSync.UpdateChannel(new UpdateChannelParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -616,7 +616,7 @@ namespace PubnubApi.Tests.DataSync
                     { "type", "group" }
                 });
 
-            var response = await pubnub.DataSync.PatchChannel(new PatchChannelParameters
+            var response = await pubnub.DataSync.UpdateChannel(new UpdateChannelParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -654,7 +654,7 @@ namespace PubnubApi.Tests.DataSync
         {
             var created = await CreateTestChannel(status: "active");
 
-            var response = await pubnub.DataSync.PatchChannel(new PatchChannelParameters
+            var response = await pubnub.DataSync.UpdateChannel(new UpdateChannelParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -684,7 +684,7 @@ namespace PubnubApi.Tests.DataSync
         {
             var created = await CreateTestChannel(status: "active");
 
-            var response = await pubnub.DataSync.PatchChannel(new PatchChannelParameters
+            var response = await pubnub.DataSync.UpdateChannel(new UpdateChannelParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -709,7 +709,7 @@ namespace PubnubApi.Tests.DataSync
         {
             var created = await CreateTestChannel(status: "active");
 
-            await pubnub.DataSync.PatchChannel(new PatchChannelParameters
+            await pubnub.DataSync.UpdateChannel(new UpdateChannelParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -724,7 +724,7 @@ namespace PubnubApi.Tests.DataSync
                 
             });
 
-            var response = await pubnub.DataSync.PatchChannel(new PatchChannelParameters
+            var response = await pubnub.DataSync.UpdateChannel(new UpdateChannelParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -753,7 +753,7 @@ namespace PubnubApi.Tests.DataSync
                 { "isPublic", false }
             });
 
-            var response = await pubnub.DataSync.PatchChannel(new PatchChannelParameters
+            var response = await pubnub.DataSync.UpdateChannel(new UpdateChannelParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -883,7 +883,7 @@ namespace PubnubApi.Tests.DataSync
             Assert.That(getResponse.Result.Status, Is.EqualTo("new"));
 
             // UPDATE (full replace)
-            var updateResponse = await pubnub.DataSync.UpdateChannel(new UpdateChannelParameters
+            var updateResponse = await pubnub.DataSync.SetChannel(new SetChannelParameters
             {
                 Id = channelId,
                 EntityClassVersion = TestEntityClassVersion,
@@ -898,7 +898,7 @@ namespace PubnubApi.Tests.DataSync
             Assert.That(updateResponse.Result.Status, Is.EqualTo("updated"));
 
             // PATCH
-            var patchResponse = await pubnub.DataSync.PatchChannel(new PatchChannelParameters
+            var patchResponse = await pubnub.DataSync.UpdateChannel(new UpdateChannelParameters
             {
                 Id = channelId,
                 Operations = new List<JsonPatchOperation>
@@ -956,7 +956,7 @@ namespace PubnubApi.Tests.DataSync
             var etag1 = created.ETag;
             Assert.That(etag1, Is.Not.Null.And.Not.Empty);
 
-            var updateResponse = await pubnub.DataSync.UpdateChannel(new UpdateChannelParameters
+            var updateResponse = await pubnub.DataSync.SetChannel(new SetChannelParameters
             {
                 Id = created.Id,
                 EntityClassVersion = TestEntityClassVersion,
@@ -969,7 +969,7 @@ namespace PubnubApi.Tests.DataSync
             Assert.That(etag2, Is.Not.Null.And.Not.Empty);
             Assert.That(etag2, Is.Not.EqualTo(etag1));
 
-            var patchResponse = await pubnub.DataSync.PatchChannel(new PatchChannelParameters
+            var patchResponse = await pubnub.DataSync.UpdateChannel(new UpdateChannelParameters
             {
                 Id = created.Id,
                 Operations = new List<JsonPatchOperation>
@@ -989,7 +989,7 @@ namespace PubnubApi.Tests.DataSync
             Assert.That(etag3, Is.Not.EqualTo(etag2));
 
             // Using a stale ETag should fail
-            var staleResponse = await pubnub.DataSync.UpdateChannel(new UpdateChannelParameters
+            var staleResponse = await pubnub.DataSync.SetChannel(new SetChannelParameters
             {
                 Id = created.Id,
                 EntityClassVersion = TestEntityClassVersion,

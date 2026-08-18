@@ -115,8 +115,14 @@
     <Compile Include="..\PubnubApi\EndPoint\DataSync\Channel\PNDataSyncDeleteChannelResult.cs">
       <Link>EndPoint\DataSync\Channel\PNDataSyncDeleteChannelResult.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Channel\SetChannelOperation.cs">
+      <Link>EndPoint\DataSync\Channel\SetChannelOperation.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\EndPoint\DataSync\Channel\UpdateChannelOperation.cs">
       <Link>EndPoint\DataSync\Channel\UpdateChannelOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Channel\SetChannelParameters.cs">
+      <Link>EndPoint\DataSync\Channel\SetChannelParameters.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\EndPoint\DataSync\Channel\UpdateChannelParameters.cs">
       <Link>EndPoint\DataSync\Channel\UpdateChannelParameters.cs</Link>
@@ -160,6 +166,12 @@
     <Compile Include="..\PubnubApi\EndPoint\DataSync\Entity\PNDataSyncEntityResult.cs">
       <Link>EndPoint\DataSync\Entity\PNDataSyncEntityResult.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Entity\SetEntityOperation.cs">
+      <Link>EndPoint\DataSync\Entity\SetEntityOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Entity\SetEntityParameters.cs">
+      <Link>EndPoint\DataSync\Entity\SetEntityParameters.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\EndPoint\DataSync\Entity\UpdateEntityOperation.cs">
       <Link>EndPoint\DataSync\Entity\UpdateEntityOperation.cs</Link>
     </Compile>
@@ -201,6 +213,12 @@
     </Compile>
     <Compile Include="..\PubnubApi\EndPoint\DataSync\Membership\PNDataSyncMembershipResult.cs">
       <Link>EndPoint\DataSync\Membership\PNDataSyncMembershipResult.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Membership\SetMembershipOperation.cs">
+      <Link>EndPoint\DataSync\Membership\SetMembershipOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Membership\SetMembershipParameters.cs">
+      <Link>EndPoint\DataSync\Membership\SetMembershipParameters.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\EndPoint\DataSync\Membership\UpdateMembershipOperation.cs">
       <Link>EndPoint\DataSync\Membership\UpdateMembershipOperation.cs</Link>
@@ -244,6 +262,12 @@
     <Compile Include="..\PubnubApi\EndPoint\DataSync\Relationship\PNDataSyncRelationshipResult.cs">
       <Link>EndPoint\DataSync\Relationship\PNDataSyncRelationshipResult.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Relationship\SetRelationshipOperation.cs">
+      <Link>EndPoint\DataSync\Relationship\SetRelationshipOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\Relationship\SetRelationshipParameters.cs">
+      <Link>EndPoint\DataSync\Relationship\SetRelationshipParameters.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\EndPoint\DataSync\Relationship\UpdateRelationshipOperation.cs">
       <Link>EndPoint\DataSync\Relationship\UpdateRelationshipOperation.cs</Link>
     </Compile>
@@ -285,6 +309,12 @@
     </Compile>
     <Compile Include="..\PubnubApi\EndPoint\DataSync\User\PNDataSyncUserResult.cs">
       <Link>EndPoint\DataSync\User\PNDataSyncUserResult.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\User\SetUserOperation.cs">
+      <Link>EndPoint\DataSync\User\SetUserOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\EndPoint\DataSync\User\SetUserParameters.cs">
+      <Link>EndPoint\DataSync\User\SetUserParameters.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\EndPoint\DataSync\User\UpdateUserOperation.cs">
       <Link>EndPoint\DataSync\User\UpdateUserOperation.cs</Link>
@@ -1000,6 +1030,12 @@
   <ItemGroup>
     <Content Include="..\PubnubApi\EndPoint\DataSync\C# DXD - DataSync Users, Channels, and Memberships.md">
       <Link>EndPoint\DataSync\C# DXD - DataSync Users, Channels, and Memberships.md</Link>
+    </Content>
+    <Content Include="..\PubnubApi\EndPoint\DataSync\create-api-key.ps1">
+      <Link>EndPoint\DataSync\create-api-key.ps1</Link>
+    </Content>
+    <Content Include="..\PubnubApi\EndPoint\DataSync\create-classes.ps1">
+      <Link>EndPoint\DataSync\create-classes.ps1</Link>
     </Content>
     <Content Include="..\PubnubApi\EndPoint\DataSync\Entity\C# - DXD data sync Entity API.md">
       <Link>EndPoint\DataSync\Entity\C# - DXD data sync Entity API.md</Link>

@@ -29,6 +29,9 @@ internal static class PNDataSyncEntityResultJsonDataParse
                 result.EntityClassVersion = dataDictionary.ContainsKey("entityClassVersion") && dataDictionary["entityClassVersion"] != null
                     ? (int)(long)dataDictionary["entityClassVersion"]
                     : 1;
+                result.EntityClassLevel = dataDictionary.ContainsKey("entityClassLevel") && dataDictionary["entityClassLevel"] != null
+                    ? dataDictionary["entityClassLevel"].ToString()
+                    : null;
                 result.Status = dataDictionary.ContainsKey("status") && dataDictionary["status"] != null
                     ? dataDictionary["status"].ToString()
                     : null;
