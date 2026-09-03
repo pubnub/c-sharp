@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using PubnubApi.EndPoint;
 
 namespace PubnubApi;
@@ -30,8 +29,8 @@ internal static class PNDataSyncEventJsonDataParse
             result.Event = GetStringValue(metadata, "event");
             result.Source = GetStringValue(metadata, "source");
             result.Type = GetStringValue(metadata, "type");
-            //Splitting here to extract the class name and skip classes it's inheriting from
-            result.ClassName = GetStringValue(metadata, "className").Split(':').Last();
+            result.ClassName = GetStringValue(metadata, "className");
+            result.ClassLevel = GetStringValue(metadata, "classLevel");
             if (int.TryParse(GetStringValue(metadata, "classVersion"), out var classVersion))
             {
                 result.ClassVersion = classVersion;

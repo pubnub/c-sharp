@@ -309,6 +309,11 @@ namespace PubnubApi.Tests.DataSync
             Assert.That(dataSyncEvent.Source, Is.EqualTo("data-sync"));
             Assert.That(dataSyncEvent.Type, Is.EqualTo("entity").IgnoreCase);
             Assert.That(dataSyncEvent.Channel, Is.EqualTo(entityId));
+            // The service sends a bare class name; it must be surfaced unchanged.
+            Assert.That(dataSyncEvent.ClassName, Is.EqualTo(DataSyncCommon.IntegrationTestEntityClass));
+            Assert.That(dataSyncEvent.ClassVersion, Is.EqualTo(DataSyncCommon.EntityClassVersion));
+            // ClassLevel distinguishes a developer-defined class from a built-in of the same name.
+            Assert.That(dataSyncEvent.ClassLevel, Is.Not.Null.And.Not.Empty);
             Assert.That(dataSyncEvent.EntityData, Is.Not.Null);
             Assert.That(dataSyncEvent.EntityData.Id, Is.EqualTo(entityId));
             Assert.That(dataSyncEvent.EntityData.Payload, Is.Not.Null);

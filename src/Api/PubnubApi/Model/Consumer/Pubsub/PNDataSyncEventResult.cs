@@ -8,6 +8,7 @@ namespace PubnubApi
         public string Type { get; internal set; } = ""; //values = entity/relationship
         public string ClassName { get; internal set; } = "";
         public int ClassVersion { get; internal set; }
+        public string ClassLevel { get; internal set; } = ""; //values = Global/SubKey; distinguishes built-in classes from developer-defined ones of the same name
         public PubnubApi.EndPoint.PNDataSyncEntityResult EntityData { get; internal set; } //Populated when Type = entity (create/update)
         public PubnubApi.EndPoint.PNDataSyncRelationshipResult RelationshipData { get; internal set; } //Populated when Type = relationship (create/update)
         public string Id { get; internal set; } //Populated for delete events

@@ -42,6 +42,9 @@ internal static class PNDataSyncMembershipsListResultJsonDataParse
                         UserId = dataEntryDictionary.ContainsKey("userId") && dataEntryDictionary["userId"] != null
                             ? dataEntryDictionary["userId"].ToString()
                             : null,
+                        RelationshipClass = dataEntryDictionary.ContainsKey("relationshipClass") && dataEntryDictionary["relationshipClass"] != null
+                            ? dataEntryDictionary["relationshipClass"].ToString()
+                            : null,
                         RelationshipClassVersion = dataEntryDictionary.ContainsKey("relationshipClassVersion") && dataEntryDictionary["relationshipClassVersion"] != null
                             ? (int)(long)dataEntryDictionary["relationshipClassVersion"]
                             : 1,
@@ -82,19 +85,9 @@ internal static class PNDataSyncMembershipsListResultJsonDataParse
                     meta.NextCursor = nextCursor.ToString();
                 }
 
-                if (metaDictionary.TryGetValue("prev_cursor", out var prevCursor) && prevCursor != null)
-                {
-                    meta.PrevCursor = prevCursor.ToString();
-                }
-
                 if (metaDictionary.TryGetValue("has_next", out var hasNext) && hasNext != null)
                 {
                     meta.HasNext = (bool)hasNext;
-                }
-
-                if (metaDictionary.TryGetValue("has_prev", out var hasPrev) && hasPrev != null)
-                {
-                    meta.HasPrev = (bool)hasPrev;
                 }
 
                 if (metaDictionary.TryGetValue("limit", out var limit) && limit != null)
@@ -103,32 +96,6 @@ internal static class PNDataSyncMembershipsListResultJsonDataParse
                 }
 
                 result.Meta = meta;
-            }
-            else if (objectDictionary.TryGetValue("links", out var linksObject) && linksObject != null)
-            {
-                var linksDictionary = jsonPlug.ConvertToDictionaryObject(linksObject);
-                if (linksDictionary == null || !linksDictionary.Any())
-                {
-                    continue;
-                }
-
-                var links = new PaginationLinks();
-                if (linksDictionary.TryGetValue("self", out var self) && self != null)
-                {
-                    links.Self = self.ToString();
-                }
-
-                if (linksDictionary.TryGetValue("next", out var next) && next != null)
-                {
-                    links.Next = next.ToString();
-                }
-
-                if (linksDictionary.TryGetValue("prev", out var prev) && prev != null)
-                {
-                    links.Prev = prev.ToString();
-                }
-
-                result.Links = links;
             }
         }
 

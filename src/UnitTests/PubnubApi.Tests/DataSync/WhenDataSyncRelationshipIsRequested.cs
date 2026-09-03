@@ -347,6 +347,39 @@ namespace PubnubApi.Tests.DataSync
         }
 
         [Test]
+        public async Task ThenListFilteredByRelationshipClassVersionShouldReturnMatchingResults()
+        {
+            await CreateTestRelationship();
+
+            var response = await pubnub.DataSync.GetRelationships(new GetRelationshipsParameters
+            {
+                RelationshipClass = DataSyncCommon.IntegrationTestRelationshipClass,
+                RelationshipClassVersion = DataSyncCommon.RelationshipClassVersion
+            });
+
+            Assert.That(response.Status.Error, Is.False);
+            Assert.That(response.Result.Data, Is.Not.Null);
+            Assert.That(response.Result.Data.Count, Is.GreaterThanOrEqualTo(1));
+            Assert.That(
+                response.Result.Data.All(r =>
+                    r.RelationshipClassVersion == DataSyncCommon.RelationshipClassVersion),
+                Is.True);
+        }
+
+        [Test]
+        public async Task ThenListWithRelationshipClassVersionBelowOneShouldReturnError()
+        {
+            var response = await pubnub.DataSync.GetRelationships(new GetRelationshipsParameters
+            {
+                RelationshipClass = DataSyncCommon.IntegrationTestRelationshipClass,
+                RelationshipClassVersion = 0
+            });
+
+            Assert.That(response.Status.Error, Is.True);
+            Assert.That(response.Status.ErrorData.Information, Does.Contain("RelationshipClassVersion"));
+        }
+
+        [Test]
         public async Task ThenListFilteredByEntityAIdShouldReturnMatchingResults()
         {
             var entityA = await CreateTestEntity();

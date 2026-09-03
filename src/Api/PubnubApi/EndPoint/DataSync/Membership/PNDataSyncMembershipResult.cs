@@ -7,6 +7,7 @@ public class PNDataSyncMembershipResult
     public string Id { get; internal set; }
     public string ChannelId { get; internal set; }
     public string UserId { get; internal set; }
+    public string RelationshipClass { get; internal set; }
     public int RelationshipClassVersion { get; internal set; }
     public string Status { get; internal set; }
     public Dictionary<string, object> Payload { get; internal set; }

@@ -29,6 +29,14 @@ namespace PubnubApi.EndPoint
 			Users = new Dictionary<string, PNTokenAuthValues>()
 		};
 
+		private const string UuidsUsersConflictMessage = "Either Uuids or Users can be used. Not both.";
+
+		// Channels/Spaces and Uuids/Users are alternative names for the same token scopes, so a
+		// token can only carry one name from each pair. When both are supplied across Resources
+		// and Patterns the classic name wins and the alternative is left out of the request.
+		private const string SpacesIgnoredMessage = "GrantToken: Spaces permissions were supplied together with Channels permissions, so the Spaces permissions were ignored and are NOT included in the token. Channels and Spaces are alternative names for the same scope - supply only one of them across Resources and Patterns.";
+		private const string UsersIgnoredMessage = "GrantToken: Users permissions were supplied together with Uuids permissions, so the Users permissions were ignored and are NOT included in the token. Uuids and Users are alternative names for the same scope - supply only one of them across Resources and Patterns.";
+
 		private int grantTTL = -1;
 		private PNCallback<PNAccessManagerTokenResult> savedCallbackGrantToken;
 		private Dictionary<string, object> queryParam;
@@ -72,9 +80,8 @@ namespace PubnubApi.EndPoint
 					resources.Spaces != null && resources.Spaces.Count > 0) {
 					throw new ArgumentException("Either Channels or Spaces can be used. Not both.");
 				}
-				if (resources.Uuids != null && resources.Uuids.Count > 0 &&
-					resources.Users != null && resources.Users.Count > 0) {
-					throw new ArgumentException("Either Uuids or Users can be used. Not both.");
+				if (HasEntries(resources.Uuids) && HasEntries(resources.Users)) {
+					throw new ArgumentException(UuidsUsersConflictMessage);
 				}
 				pubnubResources = resources;
 				if (pubnubResources.Channels == null) {
@@ -103,9 +110,8 @@ namespace PubnubApi.EndPoint
 					patterns.Spaces != null && patterns.Spaces.Count > 0) {
 					throw new ArgumentException("Either Channels or Spaces can be used. Not both.");
 				}
-				if (patterns.Uuids != null && patterns.Uuids.Count > 0 &&
-					patterns.Users != null && patterns.Users.Count > 0) {
-					throw new ArgumentException("Either Uuids or Users can be used. Not both.");
+				if (HasEntries(patterns.Uuids) && HasEntries(patterns.Users)) {
+					throw new ArgumentException(UuidsUsersConflictMessage);
 				}
 
 				pubnubPatterns = patterns;
@@ -224,6 +230,11 @@ namespace PubnubApi.EndPoint
 					logger?.Trace($"{GetType().Name} request finished with status code {requestState.Response?.StatusCode}");
 				}
 			});
+		}
+
+		private static bool HasEntries(Dictionary<string, PNTokenAuthValues> perms)
+		{
+			return perms != null && perms.Count > 0;
 		}
 
 		private bool FillPermissionMappingWithMaskValues(Dictionary<string, PNTokenAuthValues> dPerms, bool currentAtleastOnePermission, out Dictionary<string, int> dPermsWithMaskValues)
@@ -417,6 +428,9 @@ namespace PubnubApi.EndPoint
 				atleastOnePermission = FillPermissionMappingWithMaskValues(this.pubnubResources.Spaces, atleastOnePermission, out spBitmaskPermCollection);
 				atleastOnePermission = FillPermissionMappingWithMaskValues(this.pubnubPatterns.Spaces, atleastOnePermission, out spPatternBitmaskPermCollection);
 			} else {
+				if (HasEntries(pubnubResources.Spaces) || HasEntries(pubnubPatterns.Spaces)) {
+					config?.Logger?.Warn(SpacesIgnoredMessage);
+				}
 				spBitmaskPermCollection = new Dictionary<string, int>();
 				spPatternBitmaskPermCollection = new Dictionary<string, int>();
 			}
@@ -439,6 +453,9 @@ namespace PubnubApi.EndPoint
 				atleastOnePermission = FillPermissionMappingWithMaskValues(this.pubnubResources.Users, atleastOnePermission, out userBitmaskPermCollection);
 				atleastOnePermission = FillPermissionMappingWithMaskValues(this.pubnubPatterns.Users, atleastOnePermission, out userPatternBitmaskPermCollection);
 			} else {
+				if (HasEntries(pubnubResources.Users) || HasEntries(pubnubPatterns.Users)) {
+					config?.Logger?.Warn(UsersIgnoredMessage);
+				}
 				userBitmaskPermCollection = new Dictionary<string, int>();
 				userPatternBitmaskPermCollection = new Dictionary<string, int>();
 			}

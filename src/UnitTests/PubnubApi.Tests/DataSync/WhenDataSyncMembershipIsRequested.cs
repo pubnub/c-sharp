@@ -319,6 +319,8 @@ namespace PubnubApi.Tests.DataSync
             Assert.That(membership.Id, Is.EqualTo(created.Id));
             Assert.That(membership.ChannelId, Is.EqualTo(created.ChannelId));
             Assert.That(membership.UserId, Is.EqualTo(created.UserId));
+            Assert.That(membership.RelationshipClass, Is.Not.Null.And.Not.Empty);
+            Assert.That(membership.RelationshipClass, Is.EqualTo(created.RelationshipClass));
             Assert.That(membership.RelationshipClassVersion, Is.EqualTo(created.RelationshipClassVersion));
             Assert.That(membership.Status, Is.EqualTo(created.Status));
             Assert.That(membership.ETag, Is.Not.Null.And.Not.Empty);
@@ -365,6 +367,23 @@ namespace PubnubApi.Tests.DataSync
             Assert.That(response.Result, Is.Not.Null);
             Assert.That(response.Result.Data, Is.Not.Null);
             Assert.That(response.Result.Data.Count, Is.GreaterThanOrEqualTo(2));
+        }
+
+        [Test]
+        public async Task ThenListShouldReturnRelationshipClassAndVersion()
+        {
+            await CreateTestMembership();
+
+            var response = await pubnub.DataSync.GetMemberships(new GetMembershipsParameters());
+
+            Assert.That(response.Status.Error, Is.False);
+            Assert.That(response.Result.Data, Is.Not.Empty);
+            Assert.That(
+                response.Result.Data.All(m => !string.IsNullOrEmpty(m.RelationshipClass)),
+                Is.True);
+            Assert.That(
+                response.Result.Data.All(m => m.RelationshipClassVersion >= 1),
+                Is.True);
         }
 
         [Test]

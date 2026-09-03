@@ -154,9 +154,10 @@ namespace PubnubApi.Tests.DataSync
 
         /// <summary>
         /// Subscribes to the given channel, runs the trigger action, and waits for a DataSync
-        /// event matching the predicate. Events for a membership are published on a channel named
-        /// after the membership id. Memberships are modeled as DataSync relationships, so
-        /// create/update events populate <see cref="PNDataSyncEventResult.RelationshipData"/>.
+        /// event matching the predicate. Events for a membership are published on channels named
+        /// after the channel and user it links (entityAId and entityBId), not the membership's
+        /// own id. Memberships are modeled as DataSync relationships, so create/update events
+        /// populate <see cref="PNDataSyncEventResult.RelationshipData"/>.
         /// </summary>
         private async Task<PNDataSyncEventResult> CaptureEventAsync(
             string channel,

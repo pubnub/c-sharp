@@ -30,52 +30,43 @@ namespace PubnubApi.EndPoint
         public int? Limit { get; set; }
 
         /// <summary>
-        /// Filter expression using AppContext Query Language (e.g., "status == 'active'").
+        /// Filter expression using AppContext Query Language, evaluated against strongly
+        /// consistent storage. Supports a limited number of conditions.
+        /// Example: "status == 'active'".
+        /// </summary>
+        public string FilterFast { get; set; }
+
+        /// <summary>
+        /// Filter expression using AppContext Query Language, evaluated against eventually
+        /// consistent storage. Supports logical operators and nested conditions.
         /// </summary>
         public string Filter { get; set; }
 
         /// <summary>
-        /// Advanced filter expression supporting logical operators and nested conditions.
-        /// </summary>
-        public string FilterAdvanced { get; set; }
-
-        /// <summary>
-        /// Comma-separated list of fields to sort by. Prefix with + for ascending
-        /// or - for descending (default). Example: "-createdAt,+id".
+        /// Comma-separated list of fields to sort by, each optionally suffixed with
+        /// :desc (ascending by default). Example: "createdAt:desc,id".
         /// </summary>
         public string Sort { get; set; }
     }
 
     /// <summary>
     /// Result returned by GetEntities (list) containing an array of entities
-    /// plus cursor-based pagination metadata and HATEOAS links.
+    /// plus cursor-based pagination metadata.
     /// </summary>
     public class PNDataSyncEntitiesListResult
     {
         public List<PNDataSyncEntityResult> Data { get; internal set; } = new();
         public PaginationMeta Meta { get; internal set; }
-        public PaginationLinks Links { get; internal set; }
     }
 
     /// <summary>
     /// Cursor-based pagination metadata returned in list responses.
+    /// DataSync pagination is forward-only.
     /// </summary>
     public class PaginationMeta
     {
         public string NextCursor { get; internal set; }
-        public string PrevCursor { get; internal set; }
         public bool HasNext { get; internal set; }
-        public bool HasPrev { get; internal set; }
         public int? Limit { get; internal set; }
-    }
-
-    /// <summary>
-    /// HATEOAS navigation links returned in list responses.
-    /// </summary>
-    public class PaginationLinks
-    {
-        public string Self { get; internal set; }
-        public string Next { get; internal set; }
-        public string Prev { get; internal set; }
     }
 }

@@ -122,8 +122,9 @@ namespace PubnubApi.Tests.DataSync
 
         /// <summary>
         /// Subscribes to the given channel, runs the trigger action, and waits for a DataSync
-        /// event matching the predicate. Events for a relationship are published on a channel
-        /// named after the relationship id.
+        /// event matching the predicate. Events for a relationship are published on channels
+        /// named after the entities it connects (entityAId and entityBId), not the
+        /// relationship's own id.
         /// </summary>
         private async Task<PNDataSyncEventResult> CaptureEventAsync(
             string channel,

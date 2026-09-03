@@ -84,6 +84,18 @@ namespace PubnubApi.EndPoint
                 return returnValue;
             }
 
+            if (parameters.RelationshipClassVersion.HasValue && parameters.RelationshipClassVersion.Value < 1)
+            {
+                var errStatus = new PNStatus
+                {
+                    Error = true,
+                    ErrorData = new PNErrorData("RelationshipClassVersion must be >= 1",
+                        new ArgumentException("RelationshipClassVersion must be >= 1"))
+                };
+                returnValue.Status = errStatus;
+                return returnValue;
+            }
+
             if (string.IsNullOrEmpty(config.SubscribeKey) || string.IsNullOrEmpty(config.SubscribeKey.Trim()) ||
                 config.SubscribeKey.Length <= 0)
             {
@@ -189,6 +201,12 @@ namespace PubnubApi.EndPoint
                         OperationType, false, false, false));
             }
 
+            if (parameters.RelationshipClassVersion.HasValue)
+            {
+                requestQueryStringParams.Add("relationship_class_version",
+                    parameters.RelationshipClassVersion.Value.ToString());
+            }
+
             if (!string.IsNullOrEmpty(parameters.Cursor))
             {
                 requestQueryStringParams.Add("cursor",
@@ -202,17 +220,17 @@ namespace PubnubApi.EndPoint
                     parameters.Limit.Value.ToString());
             }
 
+            if (!string.IsNullOrEmpty(parameters.FilterFast))
+            {
+                requestQueryStringParams.Add("filter_fast",
+                    UriUtil.EncodeUriComponent(parameters.FilterFast,
+                        OperationType, false, false, false));
+            }
+
             if (!string.IsNullOrEmpty(parameters.Filter))
             {
                 requestQueryStringParams.Add("filter",
                     UriUtil.EncodeUriComponent(parameters.Filter,
-                        OperationType, false, false, false));
-            }
-
-            if (!string.IsNullOrEmpty(parameters.FilterAdvanced))
-            {
-                requestQueryStringParams.Add("filter_advanced",
-                    UriUtil.EncodeUriComponent(parameters.FilterAdvanced,
                         OperationType, false, false, false));
             }
 

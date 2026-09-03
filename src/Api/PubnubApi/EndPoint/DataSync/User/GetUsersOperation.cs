@@ -178,17 +178,17 @@ namespace PubnubApi.EndPoint
                     parameters.Limit.Value.ToString());
             }
 
+            if (!string.IsNullOrEmpty(parameters.FilterFast))
+            {
+                requestQueryStringParams.Add("filter_fast",
+                    UriUtil.EncodeUriComponent(parameters.FilterFast,
+                        OperationType, false, false, false));
+            }
+
             if (!string.IsNullOrEmpty(parameters.Filter))
             {
                 requestQueryStringParams.Add("filter",
                     UriUtil.EncodeUriComponent(parameters.Filter,
-                        OperationType, false, false, false));
-            }
-
-            if (!string.IsNullOrEmpty(parameters.FilterAdvanced))
-            {
-                requestQueryStringParams.Add("filter_advanced",
-                    UriUtil.EncodeUriComponent(parameters.FilterAdvanced,
                         OperationType, false, false, false));
             }
 

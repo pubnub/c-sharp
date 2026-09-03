@@ -28,6 +28,9 @@ internal static class PNDataSyncMembershipResultJsonDataParse
                 result.UserId = dataDictionary.ContainsKey("userId") && dataDictionary["userId"] != null
                     ? dataDictionary["userId"].ToString()
                     : null;
+                result.RelationshipClass = dataDictionary.ContainsKey("relationshipClass") && dataDictionary["relationshipClass"] != null
+                    ? dataDictionary["relationshipClass"].ToString()
+                    : null;
                 result.RelationshipClassVersion = dataDictionary.ContainsKey("relationshipClassVersion") && dataDictionary["relationshipClassVersion"] != null
                     ? (int)(long)dataDictionary["relationshipClassVersion"]
                     : 1;
