@@ -17,9 +17,8 @@ namespace PubnubApi.Tests.DataSync
         
         private const int EventWaitTimeoutMs = 30 * 1000;
         private const int SubscribeSettleMs = 3000;
-
-        [SetUp]
-        public async Task Init()
+        
+        public async Task InitWithoutProjections()
         {
             var config = new PNConfiguration(new UserId($"ds-test-{Guid.NewGuid():N}".Substring(0, 30)))
             {
@@ -28,6 +27,18 @@ namespace PubnubApi.Tests.DataSync
             pubnub = createPubNubInstance(config);
             config.Origin = PubnubCommon.DataSyncOrigin;
             await GenerateDataSyncTestToken(pubnub);
+            createdEntityIds.Clear();
+        }
+        
+        public async Task InitWithProjections()
+        {
+            var config = new PNConfiguration(new UserId($"ds-test-{Guid.NewGuid():N}".Substring(0, 30)))
+            {
+                SubscribeKey = PubnubCommon.DataSyncSubscribeKey,
+            };
+            pubnub = createPubNubInstance(config);
+            config.Origin = PubnubCommon.DataSyncOrigin;
+            await GenerateDataSyncTestToken(pubnub, true);
             createdEntityIds.Clear();
         }
 
@@ -246,9 +257,8 @@ namespace PubnubApi.Tests.DataSync
             var result = await pubnub.DataSync.CreateEntity(new CreateEntityParameters
             {
                 Id = id,
-                EntityClass = DataSyncCommon.IntegrationTestEntityClass,
+                EntityClass = DataSyncCommon.IntegrationTestEntityClassWithProjections,
                 EntityClassVersion = DataSyncCommon.EntityClassVersion,
-                Status = "active",
                 Payload = new Dictionary<string, object>
                 {
                     { "model", "Camry" },
@@ -266,6 +276,8 @@ namespace PubnubApi.Tests.DataSync
         [Test]
         public async Task ThenCreatingEntityShouldDeliverCreateEvent()
         {
+            await InitWithoutProjections();
+            
             var entityId = UniqueId();
 
             var dataSyncEvent = await CaptureEventAsync(
@@ -305,6 +317,8 @@ namespace PubnubApi.Tests.DataSync
         [Test]
         public async Task ThenUpdatingEntityShouldDeliverUpdateEvent()
         {
+            await InitWithoutProjections();
+            
             var created = await CreateTestEntity(status: "active");
 
             var dataSyncEvent = await CaptureEventAsync(
@@ -339,6 +353,8 @@ namespace PubnubApi.Tests.DataSync
         [Test]
         public async Task ThenPatchingEntityShouldDeliverUpdateEvent()
         {
+            await InitWithoutProjections();
+            
             var created = await CreateTestEntity(status: "active");
 
             var dataSyncEvent = await CaptureEventAsync(
@@ -375,6 +391,8 @@ namespace PubnubApi.Tests.DataSync
         [Test]
         public async Task ThenDeletingEntityShouldDeliverDeleteEvent()
         {
+            await InitWithoutProjections();
+            
             var created = await CreateTestEntity(status: "active");
 
             var dataSyncEvent = await CaptureEventAsync(
@@ -403,6 +421,8 @@ namespace PubnubApi.Tests.DataSync
         [Test]
         public async Task ThenDefaultProjectionUpdateEventShouldContainOnlyDefaultFields()
         {
+            await InitWithProjections();
+            
             var created = await CreateProjectedVehicleAsync(UniqueId());
 
             var admin = BuildAdmin();
@@ -427,7 +447,6 @@ namespace PubnubApi.Tests.DataSync
                         {
                             Id = created.Id,
                             EntityClassVersion = DataSyncCommon.EntityClassVersion,
-                            Status = "updated",
                             Payload = new Dictionary<string, object>
                             {
                                 { "model", "Focus" },
@@ -458,6 +477,8 @@ namespace PubnubApi.Tests.DataSync
         [Test]
         public async Task ThenAdminProjectionUpdateEventShouldContainAllFields()
         {
+            await InitWithProjections();
+            
             var created = await CreateProjectedVehicleAsync(UniqueId());
 
             var admin = BuildAdmin();
@@ -482,7 +503,6 @@ namespace PubnubApi.Tests.DataSync
                         {
                             Id = created.Id,
                             EntityClassVersion = DataSyncCommon.EntityClassVersion,
-                            Status = "updated",
                             Payload = new Dictionary<string, object>
                             {
                                 { "model", "Focus" },
@@ -515,6 +535,8 @@ namespace PubnubApi.Tests.DataSync
         [Test]
         public async Task ThenDefaultProjectionCreateEventShouldContainOnlyDefaultFields()
         {
+            await InitWithProjections();
+            
             var entityId = UniqueId();
 
             var admin = BuildAdmin();

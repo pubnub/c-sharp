@@ -22,42 +22,29 @@ paths:
       tags:
         - relationship
       operationId: getRelationships
-      summary: Get relationships by entity_a_id or entity_b_id
+      summary: List relationships of a class, optionally filtered by entity_a_id or entity_b_id
       parameters:
         - $ref: "common.yaml#/components/parameters/SubKeyPath"
-        - name: relationship_class
-          in: query
-          required: true
-          schema:
-            $ref: "common.yaml#/components/schemas/ClassName"
-          description: Relationship class name
-        - name: entity_a_id
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Filter relationships by entity A ID
-        - name: entity_b_id
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Filter relationships by entity B ID
+        - $ref: "#/components/parameters/RelationshipClassRequiredQuery"
+        - $ref: "#/components/parameters/EntityAIdQuery"
+        - $ref: "#/components/parameters/EntityBIdQuery"
         - $ref: "#/components/parameters/RelationshipClassVersionQuery"
         - $ref: "#/components/parameters/CursorQuery"
         - $ref: "#/components/parameters/LimitQuery"
+        - $ref: "#/components/parameters/FilterFastQuery"
         - $ref: "#/components/parameters/FilterQuery"
-        - $ref: "#/components/parameters/FilterAdvancedQuery"
         - $ref: "#/components/parameters/SortQuery"
       responses:
         "200":
           $ref: "#/components/responses/RelationshipsResponse"
         "400":
-          $ref: "common.yaml#/components/responses/BadRequestResponse"
+          $ref: "common.yaml#/components/responses/BadRequestListResponse"
         "401":
           $ref: "common.yaml#/components/responses/UnauthorizedResponse"
         "403":
           $ref: "common.yaml#/components/responses/ForbiddenResponse"
+        "404":
+          $ref: "common.yaml#/components/responses/NotFoundResponse"
         "406":
           $ref: "common.yaml#/components/responses/NotAcceptableResponse"
         "429":
@@ -84,15 +71,17 @@ paths:
         "201":
           $ref: "#/components/responses/CreateRelationshipResponse"
         "400":
-          $ref: "common.yaml#/components/responses/BadRequestResponse"
+          $ref: "common.yaml#/components/responses/BadRequestRelationshipCreateResponse"
         "401":
           $ref: "common.yaml#/components/responses/UnauthorizedResponse"
         "403":
           $ref: "common.yaml#/components/responses/ForbiddenResponse"
+        "404":
+          $ref: "common.yaml#/components/responses/NotFoundResponse"
         "406":
           $ref: "common.yaml#/components/responses/NotAcceptableResponse"
         "409":
-          $ref: "common.yaml#/components/responses/ConflictResponse"
+          $ref: "common.yaml#/components/responses/ConflictRelationshipCreateResponse"
         "415":
           $ref: "common.yaml#/components/responses/UnsupportedMediaTypeResponse"
         "429":
@@ -110,12 +99,7 @@ paths:
       summary: Get relationship by ID
       parameters:
         - $ref: "common.yaml#/components/parameters/SubKeyPath"
-        - name: relationshipId
-          in: path
-          required: true
-          schema:
-            type: string
-          description: ID of a relationship
+        - $ref: "#/components/parameters/RelationshipIdPath"
       responses:
         "200":
           $ref: "#/components/responses/RelationshipResponse"
@@ -143,12 +127,7 @@ paths:
       summary: Patch Relationship using Json Patch RFC-6902
       parameters:
         - $ref: "common.yaml#/components/parameters/SubKeyPath"
-        - name: relationshipId
-          in: path
-          required: true
-          schema:
-            type: string
-          description: ID of a relationship
+        - $ref: "#/components/parameters/RelationshipIdPath"
         - $ref: "common.yaml#/components/parameters/IfMatchHeader"
       requestBody:
         required: true
@@ -168,7 +147,7 @@ paths:
         "200":
           $ref: "#/components/responses/RelationshipResponse"
         "400":
-          $ref: "common.yaml#/components/responses/BadRequestResponse"
+          $ref: "common.yaml#/components/responses/BadRequestPatchResponse"
         "401":
           $ref: "common.yaml#/components/responses/UnauthorizedResponse"
         "403":
@@ -195,12 +174,7 @@ paths:
       summary: Delete relationship by ID
       parameters:
         - $ref: "common.yaml#/components/parameters/SubKeyPath"
-        - name: relationshipId
-          in: path
-          required: true
-          schema:
-            type: string
-          description: ID of a relationship
+        - $ref: "#/components/parameters/RelationshipIdPath"
         - $ref: "common.yaml#/components/parameters/IfMatchHeader"
       responses:
         "200":
@@ -231,12 +205,7 @@ paths:
       summary: Update relationship with complete resource replacement
       parameters:
         - $ref: "common.yaml#/components/parameters/SubKeyPath"
-        - name: relationshipId
-          in: path
-          required: true
-          schema:
-            type: string
-          description: ID of a relationship
+        - $ref: "#/components/parameters/RelationshipIdPath"
         - $ref: "common.yaml#/components/parameters/IfMatchHeader"
       requestBody:
         required: true
@@ -249,7 +218,7 @@ paths:
         "200":
           $ref: "#/components/responses/RelationshipResponse"
         "400":
-          $ref: "common.yaml#/components/responses/BadRequestResponse"
+          $ref: "common.yaml#/components/responses/BadRequestWriteResponse"
         "401":
           $ref: "common.yaml#/components/responses/UnauthorizedResponse"
         "403":
@@ -275,30 +244,28 @@ paths:
         - entity
       operationId: getEntities
       summary: Get entities
+      description: Lists entities.
       parameters:
         - $ref: "common.yaml#/components/parameters/SubKeyPath"
-        - name: entity_class
-          in: query
-          required: true
-          schema:
-            $ref: "common.yaml#/components/schemas/ClassName"
-          description: Name of entity class
+        - $ref: "#/components/parameters/EntityClassRequiredQuery"
         - $ref: "#/components/parameters/EntityClassVersionQuery"
         - $ref: "common.yaml#/components/parameters/EntityClassLevelQuery"
         - $ref: "#/components/parameters/CursorQuery"
         - $ref: "#/components/parameters/LimitQuery"
+        - $ref: "#/components/parameters/FilterFastQuery"
         - $ref: "#/components/parameters/FilterQuery"
-        - $ref: "#/components/parameters/FilterAdvancedQuery"
         - $ref: "#/components/parameters/SortQuery"
       responses:
         "200":
           $ref: "#/components/responses/EntitiesResponse"
         "400":
-          $ref: "common.yaml#/components/responses/BadRequestResponse"
+          $ref: "common.yaml#/components/responses/BadRequestListResponse"
         "401":
           $ref: "common.yaml#/components/responses/UnauthorizedResponse"
         "403":
           $ref: "common.yaml#/components/responses/ForbiddenResponse"
+        "404":
+          $ref: "common.yaml#/components/responses/NotFoundResponse"
         "406":
           $ref: "common.yaml#/components/responses/NotAcceptableResponse"
         "429":
@@ -325,11 +292,13 @@ paths:
         "201":
           $ref: "#/components/responses/CreateEntityResponse"
         "400":
-          $ref: "common.yaml#/components/responses/BadRequestResponse"
+          $ref: "common.yaml#/components/responses/BadRequestWriteResponse"
         "401":
           $ref: "common.yaml#/components/responses/UnauthorizedResponse"
         "403":
           $ref: "common.yaml#/components/responses/ForbiddenResponse"
+        "404":
+          $ref: "common.yaml#/components/responses/NotFoundResponse"
         "406":
           $ref: "common.yaml#/components/responses/NotAcceptableResponse"
         "409":
@@ -351,12 +320,7 @@ paths:
       summary: Get entity by ID
       parameters:
         - $ref: "common.yaml#/components/parameters/SubKeyPath"
-        - name: entityId
-          in: path
-          required: true
-          schema:
-            type: string
-          description: ID of a entity
+        - $ref: "#/components/parameters/EntityIdPath"
       responses:
         "200":
           $ref: "#/components/responses/EntityResponse"
@@ -384,12 +348,7 @@ paths:
       summary: Patch Entity using Json Patch RFC-6902
       parameters:
         - $ref: "common.yaml#/components/parameters/SubKeyPath"
-        - name: entityId
-          in: path
-          required: true
-          schema:
-            type: string
-          description: ID of a entity
+        - $ref: "#/components/parameters/EntityIdPath"
         - $ref: "common.yaml#/components/parameters/IfMatchHeader"
       requestBody:
         required: true
@@ -409,7 +368,7 @@ paths:
         "200":
           $ref: "#/components/responses/EntityResponse"
         "400":
-          $ref: "common.yaml#/components/responses/BadRequestResponse"
+          $ref: "common.yaml#/components/responses/BadRequestPatchResponse"
         "401":
           $ref: "common.yaml#/components/responses/UnauthorizedResponse"
         "403":
@@ -436,12 +395,7 @@ paths:
       summary: Delete entity by ID
       parameters:
         - $ref: "common.yaml#/components/parameters/SubKeyPath"
-        - name: entityId
-          in: path
-          required: true
-          schema:
-            type: string
-          description: ID of a entity
+        - $ref: "#/components/parameters/EntityIdPath"
         - $ref: "common.yaml#/components/parameters/IfMatchHeader"
       responses:
         "200":
@@ -472,12 +426,7 @@ paths:
       summary: Update entity with complete resource replacement
       parameters:
         - $ref: "common.yaml#/components/parameters/SubKeyPath"
-        - name: entityId
-          in: path
-          required: true
-          schema:
-            type: string
-          description: ID of a entity
+        - $ref: "#/components/parameters/EntityIdPath"
         - $ref: "common.yaml#/components/parameters/IfMatchHeader"
       requestBody:
         required: true
@@ -490,7 +439,7 @@ paths:
         "200":
           $ref: "#/components/responses/EntityResponse"
         "400":
-          $ref: "common.yaml#/components/responses/BadRequestResponse"
+          $ref: "common.yaml#/components/responses/BadRequestWriteResponse"
         "401":
           $ref: "common.yaml#/components/responses/UnauthorizedResponse"
         "403":
@@ -516,26 +465,22 @@ paths:
         - user
       operationId: getUsers
       summary: Get users
+      description: Lists users.
       parameters:
         - $ref: "common.yaml#/components/parameters/SubKeyPath"
-        - name: entity_class
-          in: query
-          required: false
-          schema:
-            $ref: "common.yaml#/components/schemas/ClassName"
-          description: Filter results to entities of this class (must be User or a subclass of User)
+        - $ref: "#/components/parameters/EntityClassQuery"
         - $ref: "#/components/parameters/EntityClassVersionQuery"
         - $ref: "common.yaml#/components/parameters/EntityClassLevelQuery"
         - $ref: "#/components/parameters/CursorQuery"
         - $ref: "#/components/parameters/LimitQuery"
+        - $ref: "#/components/parameters/FilterFastQuery"
         - $ref: "#/components/parameters/FilterQuery"
-        - $ref: "#/components/parameters/FilterAdvancedQuery"
         - $ref: "#/components/parameters/SortQuery"
       responses:
         "200":
           $ref: "#/components/responses/UsersResponse"
         "400":
-          $ref: "common.yaml#/components/responses/BadRequestResponse"
+          $ref: "common.yaml#/components/responses/BadRequestListResponse"
         "401":
           $ref: "common.yaml#/components/responses/UnauthorizedResponse"
         "403":
@@ -566,7 +511,7 @@ paths:
         "201":
           $ref: "#/components/responses/CreateUserResponse"
         "400":
-          $ref: "common.yaml#/components/responses/BadRequestResponse"
+          $ref: "common.yaml#/components/responses/BadRequestWriteResponse"
         "401":
           $ref: "common.yaml#/components/responses/UnauthorizedResponse"
         "403":
@@ -592,12 +537,7 @@ paths:
       summary: Get user by ID
       parameters:
         - $ref: "common.yaml#/components/parameters/SubKeyPath"
-        - name: userId
-          in: path
-          required: true
-          schema:
-            type: string
-          description: ID of a user
+        - $ref: "#/components/parameters/UserIdPath"
       responses:
         "200":
           $ref: "#/components/responses/UserResponse"
@@ -625,12 +565,7 @@ paths:
       summary: Patch User using Json Patch RFC-6902
       parameters:
         - $ref: "common.yaml#/components/parameters/SubKeyPath"
-        - name: userId
-          in: path
-          required: true
-          schema:
-            type: string
-          description: ID of a user
+        - $ref: "#/components/parameters/UserIdPath"
         - $ref: "common.yaml#/components/parameters/IfMatchHeader"
       requestBody:
         required: true
@@ -643,7 +578,7 @@ paths:
         "200":
           $ref: "#/components/responses/UserResponse"
         "400":
-          $ref: "common.yaml#/components/responses/BadRequestResponse"
+          $ref: "common.yaml#/components/responses/BadRequestPatchResponse"
         "401":
           $ref: "common.yaml#/components/responses/UnauthorizedResponse"
         "403":
@@ -670,12 +605,7 @@ paths:
       summary: Delete user by ID
       parameters:
         - $ref: "common.yaml#/components/parameters/SubKeyPath"
-        - name: userId
-          in: path
-          required: true
-          schema:
-            type: string
-          description: ID of a user
+        - $ref: "#/components/parameters/UserIdPath"
         - $ref: "common.yaml#/components/parameters/IfMatchHeader"
       responses:
         "200":
@@ -706,12 +636,7 @@ paths:
       summary: Update user with complete resource replacement
       parameters:
         - $ref: "common.yaml#/components/parameters/SubKeyPath"
-        - name: userId
-          in: path
-          required: true
-          schema:
-            type: string
-          description: ID of a user
+        - $ref: "#/components/parameters/UserIdPath"
         - $ref: "common.yaml#/components/parameters/IfMatchHeader"
       requestBody:
         required: true
@@ -724,7 +649,7 @@ paths:
         "200":
           $ref: "#/components/responses/UserResponse"
         "400":
-          $ref: "common.yaml#/components/responses/BadRequestResponse"
+          $ref: "common.yaml#/components/responses/BadRequestWriteResponse"
         "401":
           $ref: "common.yaml#/components/responses/UnauthorizedResponse"
         "403":
@@ -750,26 +675,22 @@ paths:
         - channel
       operationId: getChannels
       summary: Get channels
+      description: Lists channels.
       parameters:
         - $ref: "common.yaml#/components/parameters/SubKeyPath"
-        - name: entity_class
-          in: query
-          required: false
-          schema:
-            $ref: "common.yaml#/components/schemas/ClassName"
-          description: Filter results to entities of this class (must be Channel or a subclass of Channel)
+        - $ref: "#/components/parameters/EntityClassQuery"
         - $ref: "#/components/parameters/EntityClassVersionQuery"
         - $ref: "common.yaml#/components/parameters/EntityClassLevelQuery"
         - $ref: "#/components/parameters/CursorQuery"
         - $ref: "#/components/parameters/LimitQuery"
+        - $ref: "#/components/parameters/FilterFastQuery"
         - $ref: "#/components/parameters/FilterQuery"
-        - $ref: "#/components/parameters/FilterAdvancedQuery"
         - $ref: "#/components/parameters/SortQuery"
       responses:
         "200":
           $ref: "#/components/responses/ChannelsResponse"
         "400":
-          $ref: "common.yaml#/components/responses/BadRequestResponse"
+          $ref: "common.yaml#/components/responses/BadRequestListResponse"
         "401":
           $ref: "common.yaml#/components/responses/UnauthorizedResponse"
         "403":
@@ -800,7 +721,7 @@ paths:
         "201":
           $ref: "#/components/responses/CreateChannelResponse"
         "400":
-          $ref: "common.yaml#/components/responses/BadRequestResponse"
+          $ref: "common.yaml#/components/responses/BadRequestWriteResponse"
         "401":
           $ref: "common.yaml#/components/responses/UnauthorizedResponse"
         "403":
@@ -826,12 +747,7 @@ paths:
       summary: Get channel by ID
       parameters:
         - $ref: "common.yaml#/components/parameters/SubKeyPath"
-        - name: channelId
-          in: path
-          required: true
-          schema:
-            type: string
-          description: ID of a channel
+        - $ref: "#/components/parameters/ChannelIdPath"
       responses:
         "200":
           $ref: "#/components/responses/ChannelResponse"
@@ -859,12 +775,7 @@ paths:
       summary: Patch Channel using Json Patch RFC-6902
       parameters:
         - $ref: "common.yaml#/components/parameters/SubKeyPath"
-        - name: channelId
-          in: path
-          required: true
-          schema:
-            type: string
-          description: ID of a channel
+        - $ref: "#/components/parameters/ChannelIdPath"
         - $ref: "common.yaml#/components/parameters/IfMatchHeader"
       requestBody:
         required: true
@@ -877,7 +788,7 @@ paths:
         "200":
           $ref: "#/components/responses/ChannelResponse"
         "400":
-          $ref: "common.yaml#/components/responses/BadRequestResponse"
+          $ref: "common.yaml#/components/responses/BadRequestPatchResponse"
         "401":
           $ref: "common.yaml#/components/responses/UnauthorizedResponse"
         "403":
@@ -904,12 +815,7 @@ paths:
       summary: Delete channel by ID
       parameters:
         - $ref: "common.yaml#/components/parameters/SubKeyPath"
-        - name: channelId
-          in: path
-          required: true
-          schema:
-            type: string
-          description: ID of a channel
+        - $ref: "#/components/parameters/ChannelIdPath"
         - $ref: "common.yaml#/components/parameters/IfMatchHeader"
       responses:
         "200":
@@ -940,12 +846,7 @@ paths:
       summary: Update channel with complete resource replacement
       parameters:
         - $ref: "common.yaml#/components/parameters/SubKeyPath"
-        - name: channelId
-          in: path
-          required: true
-          schema:
-            type: string
-          description: ID of a channel
+        - $ref: "#/components/parameters/ChannelIdPath"
         - $ref: "common.yaml#/components/parameters/IfMatchHeader"
       requestBody:
         required: true
@@ -958,7 +859,7 @@ paths:
         "200":
           $ref: "#/components/responses/ChannelResponse"
         "400":
-          $ref: "common.yaml#/components/responses/BadRequestResponse"
+          $ref: "common.yaml#/components/responses/BadRequestWriteResponse"
         "401":
           $ref: "common.yaml#/components/responses/UnauthorizedResponse"
         "403":
@@ -986,29 +887,19 @@ paths:
       summary: Get memberships by user_id or channel_id
       parameters:
         - $ref: "common.yaml#/components/parameters/SubKeyPath"
-        - name: user_id
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Filter memberships by user ID
-        - name: channel_id
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Filter memberships by channel ID
+        - $ref: "#/components/parameters/UserIdQuery"
+        - $ref: "#/components/parameters/ChannelIdQuery"
         - $ref: "#/components/parameters/RelationshipClassVersionQuery"
         - $ref: "#/components/parameters/CursorQuery"
         - $ref: "#/components/parameters/LimitQuery"
+        - $ref: "#/components/parameters/FilterFastQuery"
         - $ref: "#/components/parameters/FilterQuery"
-        - $ref: "#/components/parameters/FilterAdvancedQuery"
         - $ref: "#/components/parameters/SortQuery"
       responses:
         "200":
           $ref: "#/components/responses/MembershipsResponse"
         "400":
-          $ref: "common.yaml#/components/responses/BadRequestResponse"
+          $ref: "common.yaml#/components/responses/BadRequestListResponse"
         "401":
           $ref: "common.yaml#/components/responses/UnauthorizedResponse"
         "403":
@@ -1039,7 +930,7 @@ paths:
         "201":
           $ref: "#/components/responses/CreateMembershipResponse"
         "400":
-          $ref: "common.yaml#/components/responses/BadRequestResponse"
+          $ref: "common.yaml#/components/responses/BadRequestRelationshipCreateResponse"
         "401":
           $ref: "common.yaml#/components/responses/UnauthorizedResponse"
         "403":
@@ -1065,12 +956,7 @@ paths:
       summary: Get membership by ID
       parameters:
         - $ref: "common.yaml#/components/parameters/SubKeyPath"
-        - name: membershipId
-          in: path
-          required: true
-          schema:
-            type: string
-          description: ID of a membership
+        - $ref: "#/components/parameters/MembershipIdPath"
       responses:
         "200":
           $ref: "#/components/responses/MembershipResponse"
@@ -1098,12 +984,7 @@ paths:
       summary: Patch Membership using Json Patch RFC-6902
       parameters:
         - $ref: "common.yaml#/components/parameters/SubKeyPath"
-        - name: membershipId
-          in: path
-          required: true
-          schema:
-            type: string
-          description: ID of a membership
+        - $ref: "#/components/parameters/MembershipIdPath"
         - $ref: "common.yaml#/components/parameters/IfMatchHeader"
       requestBody:
         required: true
@@ -1116,7 +997,7 @@ paths:
         "200":
           $ref: "#/components/responses/MembershipResponse"
         "400":
-          $ref: "common.yaml#/components/responses/BadRequestResponse"
+          $ref: "common.yaml#/components/responses/BadRequestPatchResponse"
         "401":
           $ref: "common.yaml#/components/responses/UnauthorizedResponse"
         "403":
@@ -1143,12 +1024,7 @@ paths:
       summary: Delete membership by ID
       parameters:
         - $ref: "common.yaml#/components/parameters/SubKeyPath"
-        - name: membershipId
-          in: path
-          required: true
-          schema:
-            type: string
-          description: ID of a membership
+        - $ref: "#/components/parameters/MembershipIdPath"
         - $ref: "common.yaml#/components/parameters/IfMatchHeader"
       responses:
         "200":
@@ -1179,12 +1055,7 @@ paths:
       summary: Update membership with complete resource replacement
       parameters:
         - $ref: "common.yaml#/components/parameters/SubKeyPath"
-        - name: membershipId
-          in: path
-          required: true
-          schema:
-            type: string
-          description: ID of a membership
+        - $ref: "#/components/parameters/MembershipIdPath"
         - $ref: "common.yaml#/components/parameters/IfMatchHeader"
       requestBody:
         required: true
@@ -1197,7 +1068,7 @@ paths:
         "200":
           $ref: "#/components/responses/MembershipResponse"
         "400":
-          $ref: "common.yaml#/components/responses/BadRequestResponse"
+          $ref: "common.yaml#/components/responses/BadRequestWriteResponse"
         "401":
           $ref: "common.yaml#/components/responses/UnauthorizedResponse"
         "403":
@@ -1335,6 +1206,55 @@ components:
           schema:
             $ref: "#/components/schemas/MembershipEnvelope"
   parameters:
+    EntityIdPath:
+      name: entityId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: ID of the entity.
+    RelationshipIdPath:
+      name: relationshipId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: ID of the relationship.
+    UserIdPath:
+      name: userId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: ID of the user.
+    ChannelIdPath:
+      name: channelId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: ID of the channel.
+    MembershipIdPath:
+      name: membershipId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: ID of the membership.
+    EntityClassQuery:
+      name: entity_class
+      in: query
+      required: false
+      schema:
+        $ref: "common.yaml#/components/schemas/ClassName"
+      description: Entity class name
+    EntityClassRequiredQuery:
+      name: entity_class
+      in: query
+      required: true
+      schema:
+        $ref: "common.yaml#/components/schemas/ClassName"
+      description: Entity class name
     EntityClassVersionQuery:
       name: entity_class_version
       in: query
@@ -1343,6 +1263,41 @@ components:
         type: integer
         minimum: 1
       description: Version of the entity class. If not provided, the latest version is used.
+    RelationshipClassRequiredQuery:
+      name: relationship_class
+      in: query
+      required: true
+      schema:
+        $ref: "common.yaml#/components/schemas/ClassName"
+      description: Relationship class name
+    EntityAIdQuery:
+      name: entity_a_id
+      in: query
+      required: false
+      schema:
+        type: string
+      description: Filter relationships by entity A ID
+    EntityBIdQuery:
+      name: entity_b_id
+      in: query
+      required: false
+      schema:
+        type: string
+      description: Filter relationships by entity B ID
+    UserIdQuery:
+      name: user_id
+      in: query
+      required: false
+      schema:
+        type: string
+      description: Filter memberships by user ID
+    ChannelIdQuery:
+      name: channel_id
+      in: query
+      required: false
+      schema:
+        type: string
+      description: Filter memberships by channel ID
     RelationshipClassVersionQuery:
       name: relationship_class_version
       in: query
@@ -1372,37 +1327,41 @@ components:
         maximum: 100
         default: 20
       description: Maximum number of items to return per page (default 20, max 100)
-    FilterQuery:
-      name: filter
+    FilterFastQuery:
+      name: filter_fast
       in: query
       schema:
         type: string
         externalDocs:
           url: https://www.pubnub.com/docs/general/metadata/filtering
           description: AppContext Query Language
-      description: Filter expression using AppContext Query Language
-    FilterAdvancedQuery:
-      name: filter_advanced
+      description: Filter expression using AppContext Query Language against strongly consistent storage with limited number of conditions
+    FilterQuery:
+      name: filter
       in: query
       required: false
       schema:
         type: string
       description: |
-        Advanced filter expression for complex queries supporting logical operators and nested conditions.
-        Extends the basic filter parameter with more sophisticated query capabilities.
-        Allows combining multiple filter conditions using logical operators (AND, OR, NOT).
-        Use this for complex filtering scenarios that cannot be expressed with the simple filter parameter.
+        Filter expression using AppContext Query Language against eventually consistent storage
     SortQuery:
       name: sort
       in: query
       schema:
         type: string
-        example: "name:desc,type"
+        example: "createdAt:desc,id"
       description: |
-        Comma-separated list of property names to sort by, each optionally
-        suffixed with `:desc` (ascending by default). Only payload properties
-        with `filtering` other than `none` in the class definition are
-        accepted.
+        Comma-separated list of field names to sort by, each optionally
+        suffixed with `:desc` (ascending by default).
+
+        The built-in fields `id`, `createdAt`, and `updatedAt` are always
+        sortable without declaring them in the class definition. `status` is
+        also sortable by default, but can be restricted by projections: when a
+        class declares it at `/status`, a PAM-authenticated request can use it
+        only if every projection reachable by the token includes `status`.
+
+        Payload properties need `filtering` of at least `simple`, or `full`
+        when `sort` is combined with `filter_advanced`.
 
   securitySchemes:
     pamToken:
@@ -1504,7 +1463,7 @@ components:
 
     UpdateRelationshipRequest:
       description:
-        Request body for updating a relationship with partial resource
+        Request body for updating a relationship with complete resource
         replacement
       allOf:
         - $ref: "common.yaml#/components/schemas/RequestEnvelope"
@@ -1892,6 +1851,7 @@ components:
       allOf:
         - $ref: "common.yaml#/components/schemas/DefaultProperties"
         - type: object
+          required: ["expiresAt"]
           properties:
             expiresAt:
               type: string

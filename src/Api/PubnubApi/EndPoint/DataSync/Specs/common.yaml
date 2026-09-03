@@ -9,76 +9,633 @@ info:
 paths: {}
 
 components:
+  examples:
+    InternalServerError:
+      summary: DS-0000 INTERNAL_SERVER_ERROR
+      value:
+        errors:
+          - errorCode: DS-0000
+            message: Internal server error
+    BadRequest:
+      summary: DS-0002 BAD_REQUEST - required header or query parameter missing
+      value:
+        errors:
+          - errorCode: DS-0002
+            message: Required request parameter 'relationship_class' is missing
+    InvalidJson:
+      summary: DS-0003 INVALID_JSON - body absent or unparseable
+      value:
+        errors:
+          - errorCode: DS-0003
+            message: "Malformed request body: could not parse JSON"
+    ValidationError:
+      summary: DS-0004 VALIDATION_ERROR - one item per failing field
+      value:
+        errors:
+          - errorCode: DS-0004
+            message: must not be blank
+            path: id
+          - errorCode: DS-0004
+            message: size must be between 1 and 100
+            path: status
+    InvalidFilter:
+      summary: DS-0005 INVALID_FILTER - filter expression rejected
+      value:
+        errors:
+          - errorCode: DS-0005
+            message: "Error parsing filter expression at offset 12: expected comparison operator"
+            path: filter
+    InvalidArgument:
+      summary: DS-0006 INVALID_ARGUMENT - unusable parameter value
+      value:
+        errors:
+          - errorCode: DS-0006
+            message: "Unknown sort fields: '[nickname]'. Known sortable fields: [createdAt, id, name, status, updatedAt]"
+            path: sort
+    UnsupportedContentType:
+      summary: DS-0007 UNSUPPORTED_CONTENT_TYPE
+      value:
+        errors:
+          - errorCode: DS-0007
+            message: Content type text/plain is not supported
+    UnexpectedFilterableFieldValue:
+      summary: DS-0008 UNEXPECTED_FILTERABLE_FIELD_VALUE - payload value does not match the declared valueKind
+      value:
+        errors:
+          - errorCode: DS-0008
+            message: "Field at '/payload/score' with value \"high\" is not of expected type 'number'"
+            path: /payload/score
+    ServiceUnavailable:
+      summary: DS-0009 SERVICE_UNAVAILABLE - upstream dependency unavailable
+      value:
+        errors:
+          - errorCode: DS-0009
+            message: Service temporarily unavailable
+    NotFound:
+      summary: DS-0100 NOT_FOUND - addressed resource does not exist
+      value:
+        errors:
+          - errorCode: DS-0100
+            message: "Entity not found: user-42"
+    DatasyncNotEnabled:
+      summary: DS-0200 DATASYNC_NOT_ENABLED - feature not enabled on the keyset
+      value:
+        errors:
+          - errorCode: DS-0200
+            message: Datasync not enabled for this subscribe key
+    AccessDenied:
+      summary: DS-0201 ACCESS_DENIED - credentials recognised but not permitted
+      value:
+        errors:
+          - errorCode: DS-0201
+            message: Access Manager is not enabled for this subscribe key. Please contact PubNub Support.
+    InvalidToken:
+      summary: DS-0202 INVALID_TOKEN - PAM token unparseable or projection not permitted
+      value:
+        errors:
+          - errorCode: DS-0202
+            message: Invalid value for 'auth' parameter
+    Unauthenticated:
+      summary: DS-0203 UNAUTHENTICATED - no credentials supplied
+      value:
+        errors:
+          - errorCode: DS-0203
+            message: "Authentication required: provide either a PAM token via 'auth' parameter or a request signature."
+    ETagMismatch:
+      summary: DS-0300 ETAG_MISMATCH - If-Match did not match the current ETag
+      value:
+        errors:
+          - errorCode: DS-0300
+            message: "ETag mismatch: provided ETag '3' does not match current version"
+    Conflict:
+      summary: DS-0301 CONFLICT - resource already exists
+      value:
+        errors:
+          - errorCode: DS-0301
+            message: "Entity class 'Product' with version 1 already exists"
+    ConfigNotFound:
+      summary: DS-0600 CONFIG_NOT_FOUND - subscribe key unknown to configuration service
+      value:
+        errors:
+          - errorCode: DS-0600
+            message: Resource not found
+    UnsupportedEntityPropertyType:
+      summary: DS-0602 UNSUPPORTED_ENTITY_PROPERTY_TYPE - declared property resolves to a non-scalar node
+      value:
+        errors:
+          - errorCode: DS-0602
+            message: "Entity contains property of unsupported type 'ARRAY' on path '/payload/tags'"
+            path: /payload/tags
+    NonNullableProperty:
+      summary: DS-0650 NON_NULLABLE_PROPERTY - required property missing or null
+      value:
+        errors:
+          - errorCode: DS-0650
+            message: "Non-nullable field at '/payload/name' is null or missing"
+            path: /payload/name
+    ImmutableFieldModification:
+      summary: DS-0700 IMMUTABLE_FIELD_MODIFICATION - patch targets a read-only pointer
+      value:
+        errors:
+          - errorCode: DS-0700
+            message: "Cannot modify immutable field: /id. Only [/payload, /status] can be modified"
+    WrongEntityClassType:
+      summary: DS-0800 WRONG_ENTITY_CLASS_TYPE - endpoint entity class does not satisfy the relationship class
+      value:
+        errors:
+          - errorCode: DS-0800
+            message: "Entity 'ch-1' has class 'User' but relationship expected 'Channel' for side A"
+    CardinalityViolated:
+      summary: DS-0801 CARDINALITY_VIOLATED - relationship class cardinality already satisfied
+      value:
+        errors:
+          - errorCode: DS-0801
+            message: "ONE-TO-ONE relationship violated for relationship class 'Ownership'"
+    GlobalClassModification:
+      summary: DS-0900 GLOBAL_CLASS_MODIFICATION - global class definitions are read-only
+      value:
+        errors:
+          - errorCode: DS-0900
+            message: "Cannot modify global class definition 'User'"
+    ProjectionLimitExceeded:
+      summary: DS-0901 PROJECTION_LIMIT_EXCEEDED
+      value:
+        errors:
+          - errorCode: DS-0901
+            message: "Too many distinct projections: 4. Maximum is 3."
+    InvalidProjectionName:
+      summary: DS-0902 INVALID_PROJECTION_NAME
+      value:
+        errors:
+          - errorCode: DS-0902
+            message: "Projection name 'bad name!' must be alphanumeric (hyphens and underscores allowed) or '__default__'"
+    IncompatibleChildProperty:
+      summary: DS-0903 INCOMPATIBLE_CHILD_PROPERTY - child redeclares an inherited property incompatibly
+      value:
+        errors:
+          - errorCode: DS-0903
+            message: "Property 'name' incompatible with parent: valueKind must be 'STRING' but was 'NUMBER'"
+            path: name
+    ReservedPropertyName:
+      summary: DS-0906 RESERVED_PROPERTY_NAME - property shadows a built-in record field
+      value:
+        errors:
+          - errorCode: DS-0906
+            message: "Property name 'createdAt' is reserved for a built-in record field and cannot be used as a custom property name"
+
   responses:
     DeleteSuccessResponse:
       description: Resource deleted successfully
+
     BadRequestResponse:
-      description: Bad request
+      description: |-
+        Bad request.
+
+        | Code | Constant | Cause |
+        |---|---|---|
+        | `DS-0002` | BAD_REQUEST | Required header or query parameter missing. |
+        | `DS-0004` | VALIDATION_ERROR | Path variable or query parameter failed validation. One error item per violation. |
+        | `DS-0006` | INVALID_ARGUMENT | A parameter value could not be used (wrong type, unusable value). |
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            BadRequest:
+              $ref: "#/components/examples/BadRequest"
+            ValidationError:
+              $ref: "#/components/examples/ValidationError"
+            InvalidArgument:
+              $ref: "#/components/examples/InvalidArgument"
+
+    BadRequestListResponse:
+      description: |-
+        Bad request. Adds the filter, sort and cursor errors specific to list operations.
+
+        | Code | Constant | Cause |
+        |---|---|---|
+        | `DS-0002` | BAD_REQUEST | Required header or query parameter missing. |
+        | `DS-0004` | VALIDATION_ERROR | Path variable or query parameter failed validation. |
+        | `DS-0005` | INVALID_FILTER | `filter` / `filter_advanced` could not be parsed, references an unknown field, or compares a literal against an incompatible `valueKind`. `path` is `filter`. |
+        | `DS-0006` | INVALID_ARGUMENT | `sort` references a field that is not sortable in this request (`path` is `sort`), or `cursor` could not be decoded. |
+
+        The built-in fields `id`, `createdAt`, and `updatedAt` are always sortable. `status` is
+        sortable by default, but can be restricted by projections when it is declared at `/status`:
+        a PAM-authenticated request can use it only if every projection reachable by the token
+        includes `status`. Payload properties additionally need `filtering` of at least `simple` —
+        or `full` when `filter_advanced` is present, because that path resolves sorts in the search
+        index, which only holds `full` properties.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            InvalidFilter:
+              $ref: "#/components/examples/InvalidFilter"
+            InvalidArgument:
+              $ref: "#/components/examples/InvalidArgument"
+            BadRequest:
+              $ref: "#/components/examples/BadRequest"
+            ValidationError:
+              $ref: "#/components/examples/ValidationError"
+
+    BadRequestBodyResponse:
+      description: |-
+        Bad request. For operations that accept a request body but do not evaluate class properties.
+
+        | Code | Constant | Cause |
+        |---|---|---|
+        | `DS-0002` | BAD_REQUEST | Required header or query parameter missing. |
+        | `DS-0003` | INVALID_JSON | Request body absent, empty, or not valid JSON. |
+        | `DS-0004` | VALIDATION_ERROR | Body, path variable or query parameter failed validation. One error item per violation. |
+        | `DS-0006` | INVALID_ARGUMENT | A parameter or body value could not be used. |
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            InvalidJson:
+              $ref: "#/components/examples/InvalidJson"
+            ValidationError:
+              $ref: "#/components/examples/ValidationError"
+            BadRequest:
+              $ref: "#/components/examples/BadRequest"
+            InvalidArgument:
+              $ref: "#/components/examples/InvalidArgument"
+
+    BadRequestWriteResponse:
+      description: |-
+        Bad request. For create and replace operations, which extract and type-check the values of
+        the properties declared on the resource's class.
+
+        | Code | Constant | Cause |
+        |---|---|---|
+        | `DS-0002` | BAD_REQUEST | Required header or query parameter missing. |
+        | `DS-0003` | INVALID_JSON | Request body absent, empty, or not valid JSON. |
+        | `DS-0004` | VALIDATION_ERROR | Body, path variable or query parameter failed validation. |
+        | `DS-0006` | INVALID_ARGUMENT | A parameter or body value could not be used. |
+        | `DS-0008` | UNEXPECTED_FILTERABLE_FIELD_VALUE | A declared property's value does not match its `valueKind`. `path` is the property's JSON Pointer. |
+        | `DS-0602` | UNSUPPORTED_ENTITY_PROPERTY_TYPE | A declared property's path resolves to a non-scalar node (object or array). `path` is the property's JSON Pointer. |
+        | `DS-0650` | NON_NULLABLE_PROPERTY | A property declared `nullable: false` is missing or explicitly `null`. `path` is the property's JSON Pointer. |
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            UnexpectedFilterableFieldValue:
+              $ref: "#/components/examples/UnexpectedFilterableFieldValue"
+            NonNullableProperty:
+              $ref: "#/components/examples/NonNullableProperty"
+            UnsupportedEntityPropertyType:
+              $ref: "#/components/examples/UnsupportedEntityPropertyType"
+            InvalidJson:
+              $ref: "#/components/examples/InvalidJson"
+            ValidationError:
+              $ref: "#/components/examples/ValidationError"
+            BadRequest:
+              $ref: "#/components/examples/BadRequest"
+            InvalidArgument:
+              $ref: "#/components/examples/InvalidArgument"
+
+    BadRequestRelationshipCreateResponse:
+      description: |-
+        Bad request. For relationship and membership creation, which additionally validates that
+        each endpoint entity's class satisfies the relationship class.
+
+        | Code | Constant | Cause |
+        |---|---|---|
+        | `DS-0002` | BAD_REQUEST | Required header or query parameter missing. |
+        | `DS-0003` | INVALID_JSON | Request body absent, empty, or not valid JSON. |
+        | `DS-0004` | VALIDATION_ERROR | Body, path variable or query parameter failed validation. |
+        | `DS-0006` | INVALID_ARGUMENT | A parameter or body value could not be used. |
+        | `DS-0008` | UNEXPECTED_FILTERABLE_FIELD_VALUE | A declared property's value does not match its `valueKind`. |
+        | `DS-0602` | UNSUPPORTED_ENTITY_PROPERTY_TYPE | A declared property's path resolves to a non-scalar node. |
+        | `DS-0650` | NON_NULLABLE_PROPERTY | A property declared `nullable: false` is missing or explicitly `null`. |
+        | `DS-0800` | WRONG_ENTITY_CLASS_TYPE | An endpoint entity's class is not the class the relationship class requires for that side. Create only. |
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            WrongEntityClassType:
+              $ref: "#/components/examples/WrongEntityClassType"
+            UnexpectedFilterableFieldValue:
+              $ref: "#/components/examples/UnexpectedFilterableFieldValue"
+            NonNullableProperty:
+              $ref: "#/components/examples/NonNullableProperty"
+            UnsupportedEntityPropertyType:
+              $ref: "#/components/examples/UnsupportedEntityPropertyType"
+            InvalidJson:
+              $ref: "#/components/examples/InvalidJson"
+            ValidationError:
+              $ref: "#/components/examples/ValidationError"
+            BadRequest:
+              $ref: "#/components/examples/BadRequest"
+            InvalidArgument:
+              $ref: "#/components/examples/InvalidArgument"
+
+    BadRequestPatchResponse:
+      description: |-
+        Bad request. For JSON Patch operations, which additionally reject patches that target
+        immutable pointers.
+
+        | Code | Constant | Cause |
+        |---|---|---|
+        | `DS-0002` | BAD_REQUEST | Required header or query parameter missing. |
+        | `DS-0003` | INVALID_JSON | Patch document absent, empty, or not valid JSON. |
+        | `DS-0004` | VALIDATION_ERROR | Patch document, path variable or query parameter failed validation. |
+        | `DS-0006` | INVALID_ARGUMENT | A patch `path` or `from` is not a valid JSON Pointer, does not resolve to a container, or uses a non-numeric array index. |
+        | `DS-0008` | UNEXPECTED_FILTERABLE_FIELD_VALUE | The patched document's property value does not match its `valueKind`. |
+        | `DS-0602` | UNSUPPORTED_ENTITY_PROPERTY_TYPE | A declared property's path resolves to a non-scalar node after patching. |
+        | `DS-0650` | NON_NULLABLE_PROPERTY | The patch leaves a property declared `nullable: false` missing or `null`. |
+        | `DS-0700` | IMMUTABLE_FIELD_MODIFICATION | The patch targets a pointer outside the mutable set. Patch only - full replace does not raise this. |
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            ImmutableFieldModification:
+              $ref: "#/components/examples/ImmutableFieldModification"
+            UnexpectedFilterableFieldValue:
+              $ref: "#/components/examples/UnexpectedFilterableFieldValue"
+            NonNullableProperty:
+              $ref: "#/components/examples/NonNullableProperty"
+            UnsupportedEntityPropertyType:
+              $ref: "#/components/examples/UnsupportedEntityPropertyType"
+            InvalidJson:
+              $ref: "#/components/examples/InvalidJson"
+            ValidationError:
+              $ref: "#/components/examples/ValidationError"
+            BadRequest:
+              $ref: "#/components/examples/BadRequest"
+            InvalidArgument:
+              $ref: "#/components/examples/InvalidArgument"
+
+    BadRequestEntityClassWriteResponse:
+      description: |-
+        Bad request. For entity class create and replace, which validate projections and, when the
+        class extends a parent, inherited property compatibility.
+
+        | Code | Constant | Cause |
+        |---|---|---|
+        | `DS-0002` | BAD_REQUEST | Required header or query parameter missing. |
+        | `DS-0003` | INVALID_JSON | Request body absent, empty, or not valid JSON. |
+        | `DS-0004` | VALIDATION_ERROR | Body, path variable or query parameter failed validation. |
+        | `DS-0006` | INVALID_ARGUMENT | Neither `config` nor `extends` supplied, or `extends` targets a class at the same or a lower class level. |
+        | `DS-0901` | PROJECTION_LIMIT_EXCEEDED | Distinct projections across all properties exceed the per-class maximum. |
+        | `DS-0902` | INVALID_PROJECTION_NAME | A projection name is too long, malformed, or a property declares an empty projection list. |
+        | `DS-0903` | INCOMPATIBLE_CHILD_PROPERTY | A redeclared inherited property differs from the parent in `path`, `valueKind`, or `nullable`. `path` is the property name. Entity classes only. |
+        | `DS-0906` | RESERVED_PROPERTY_NAME | A property shadows a built-in record field. `status` may be declared only at `/status` to control projections. |
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            IncompatibleChildProperty:
+              $ref: "#/components/examples/IncompatibleChildProperty"
+            ProjectionLimitExceeded:
+              $ref: "#/components/examples/ProjectionLimitExceeded"
+            InvalidProjectionName:
+              $ref: "#/components/examples/InvalidProjectionName"
+            ReservedPropertyName:
+              $ref: "#/components/examples/ReservedPropertyName"
+            InvalidArgument:
+              $ref: "#/components/examples/InvalidArgument"
+            InvalidJson:
+              $ref: "#/components/examples/InvalidJson"
+            ValidationError:
+              $ref: "#/components/examples/ValidationError"
+            BadRequest:
+              $ref: "#/components/examples/BadRequest"
+
+    BadRequestRelationshipClassWriteResponse:
+      description: |-
+        Bad request. For relationship class create and replace. Relationship classes cannot be
+        subclassed, so no inheritance error applies.
+
+        | Code | Constant | Cause |
+        |---|---|---|
+        | `DS-0002` | BAD_REQUEST | Required header or query parameter missing. |
+        | `DS-0003` | INVALID_JSON | Request body absent, empty, or not valid JSON. |
+        | `DS-0004` | VALIDATION_ERROR | Body, path variable or query parameter failed validation. |
+        | `DS-0006` | INVALID_ARGUMENT | A parameter or body value could not be used. |
+        | `DS-0901` | PROJECTION_LIMIT_EXCEEDED | Distinct projections across all properties exceed the per-class maximum. |
+        | `DS-0902` | INVALID_PROJECTION_NAME | A projection name is too long, malformed, or a property declares an empty projection list. |
+        | `DS-0906` | RESERVED_PROPERTY_NAME | A property shadows a built-in record field. `status` may be declared only at `/status` to control projections. |
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            ProjectionLimitExceeded:
+              $ref: "#/components/examples/ProjectionLimitExceeded"
+            InvalidProjectionName:
+              $ref: "#/components/examples/InvalidProjectionName"
+            ReservedPropertyName:
+              $ref: "#/components/examples/ReservedPropertyName"
+            InvalidJson:
+              $ref: "#/components/examples/InvalidJson"
+            ValidationError:
+              $ref: "#/components/examples/ValidationError"
+            BadRequest:
+              $ref: "#/components/examples/BadRequest"
+            InvalidArgument:
+              $ref: "#/components/examples/InvalidArgument"
+
     UnauthorizedResponse:
-      description: Unauthorized
+      description: |-
+        Unauthorized - no usable credentials were supplied.
+
+        | Code | Constant | Cause |
+        |---|---|---|
+        | `DS-0203` | UNAUTHENTICATED | Neither a PAM token (`auth`) nor a request `signature` was supplied, or the portal session token is missing. |
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            Unauthenticated:
+              $ref: "#/components/examples/Unauthenticated"
+
+
     ForbiddenResponse:
-      description: Forbidden - authorization provided but access denied
+      description: |-
+        Forbidden - credentials were recognised but the request is not permitted.
+
+        | Code | Constant | Cause |
+        |---|---|---|
+        | `DS-0200` | DATASYNC_NOT_ENABLED | Datasync is not enabled for this subscribe key. |
+        | `DS-0201` | ACCESS_DENIED | Access Manager is not enabled for the keyset, `auth` and `signature` were both supplied, or the portal authorization check denied the request. |
+        | `DS-0202` | INVALID_TOKEN | The `auth` PAM token could not be decoded, or its projection does not permit the requested fields. |
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            DatasyncNotEnabled:
+              $ref: "#/components/examples/DatasyncNotEnabled"
+            AccessDenied:
+              $ref: "#/components/examples/AccessDenied"
+            InvalidToken:
+              $ref: "#/components/examples/InvalidToken"
+
+    ForbiddenClassModificationResponse:
+      description: |-
+        Forbidden. Adds the global class guard, which applies to class replace and delete.
+
+        | Code | Constant | Cause |
+        |---|---|---|
+        | `DS-0200` | DATASYNC_NOT_ENABLED | Datasync is not enabled for this subscribe key. |
+        | `DS-0201` | ACCESS_DENIED | Access Manager is not enabled for the keyset, or the authorization check denied the request. |
+        | `DS-0202` | INVALID_TOKEN | The `auth` PAM token could not be decoded, or its projection does not permit the requested fields. |
+        | `DS-0900` | GLOBAL_CLASS_MODIFICATION | The target class is a global class definition, which is read-only. Applies to replace and delete only. |
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            GlobalClassModification:
+              $ref: "#/components/examples/GlobalClassModification"
+            DatasyncNotEnabled:
+              $ref: "#/components/examples/DatasyncNotEnabled"
+            AccessDenied:
+              $ref: "#/components/examples/AccessDenied"
+            InvalidToken:
+              $ref: "#/components/examples/InvalidToken"
+
     NotFoundResponse:
-      description: Not found
+      description: |-
+        Not found.
+
+        | Code | Constant | Cause |
+        |---|---|---|
+        | `DS-0100` | NOT_FOUND | The addressed resource does not exist. Also returned when a conditional request supplies no `If-Match` and the resource is absent. |
+        | `DS-0600` | CONFIG_NOT_FOUND | The subscribe key is unknown to the configuration service, or its datasync region is not configured. |
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            NotFound:
+              $ref: "#/components/examples/NotFound"
+            ConfigNotFound:
+              $ref: "#/components/examples/ConfigNotFound"
+
     NotAcceptableResponse:
-      description: Not Acceptable - Accept header doesn't contain supported value
+      description: |-
+        Not Acceptable - the `Accept` header does not contain a supported value.
+
+        This response carries a `text/plain` body and **no** error code.
       content:
         text/plain:
           schema:
             type: string
             example: "Accept header value is not acceptable. Supported values are [application/json]"
+
     ConflictResponse:
-      description: Conflict - resource already exists
+      description: |-
+        Conflict.
+
+        | Code | Constant | Cause |
+        |---|---|---|
+        | `DS-0301` | CONFLICT | A resource with the same identity already exists. |
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            Conflict:
+              $ref: "#/components/examples/Conflict"
+
+    ConflictRelationshipCreateResponse:
+      description: |-
+        Conflict. Adds the cardinality guard, which applies to relationship creation.
+
+        | Code | Constant | Cause |
+        |---|---|---|
+        | `DS-0301` | CONFLICT | A relationship with the same identity already exists, or the two entities are already related through this relationship class. |
+        | `DS-0801` | CARDINALITY_VIOLATED | The relationship class declares ONE-TO-ONE or ONE-TO-MANY and the cardinality is already satisfied. Not raised for MANY-TO-MANY classes. |
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            CardinalityViolated:
+              $ref: "#/components/examples/CardinalityViolated"
+            Conflict:
+              $ref: "#/components/examples/Conflict"
+
+
     PreconditionFailedResponse:
-      description: Precondition Failed - ETag doesn't match current resource version
+      description: |-
+        Precondition Failed.
+
+        | Code | Constant | Cause |
+        |---|---|---|
+        | `DS-0300` | ETAG_MISMATCH | The `If-Match` header does not contain the resource's current ETag. |
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            ETagMismatch:
+              $ref: "#/components/examples/ETagMismatch"
+
     UnsupportedMediaTypeResponse:
-      description: Unsupported Media Type - payload format not supported
+      description: |-
+        Unsupported Media Type.
+
+        | Code | Constant | Cause |
+        |---|---|---|
+        | `DS-0007` | UNSUPPORTED_CONTENT_TYPE | The request `Content-Type` is not supported by this operation. |
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            UnsupportedContentType:
+              $ref: "#/components/examples/UnsupportedContentType"
+
     TooManyRequestsResponse:
-      description: Too Many Requests - rate limit exceeded
+      description: |-
+        Too Many Requests - rate limit exceeded.
+
+        Rate limiting is applied by the edge in front of this service; the service itself defines no
+        error code for this status. Clients should not rely on an error code being present.
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
+
     InternalServerErrorResponse:
-      description: Internal server error
+      description: |-
+        Internal server error.
+
+        | Code | Constant | Cause |
+        |---|---|---|
+        | `DS-0000` | INTERNAL_SERVER_ERROR | An unhandled error occurred, or the request could not be routed because of a server-side configuration problem. |
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            InternalServerError:
+              $ref: "#/components/examples/InternalServerError"
+
     ServiceUnavailableResponse:
-      description: Service Unavailable - service not available
+      description: |-
+        Service Unavailable.
+
+        | Code | Constant | Cause |
+        |---|---|---|
+        | `DS-0009` | SERVICE_UNAVAILABLE | A dependency required to serve the request is unavailable, or the request could not be forwarded to its target region. A `Retry-After` header may be present. |
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            ServiceUnavailable:
+              $ref: "#/components/examples/ServiceUnavailable"
 
   parameters:
     SubKeyPath:
@@ -141,16 +698,110 @@ components:
       properties:
         errorCode:
           type: string
-          description: A machine-readable error code
-          example: SYN_1004
+          description: |-
+            A machine-readable error code. Stable across releases - use this, not `message`, for
+            programmatic branching. The HTTP status for a given code is fixed.
+
+            Codes are grouped by range. Not every code can occur on every operation; each response
+            documents the subset it can return.
+
+            **Generic**
+
+            | Code | Constant | Status | Meaning |
+            |---|---|---|---|
+            | `DS-0000` | INTERNAL_SERVER_ERROR | 500 | Unhandled server error, or a server-side routing configuration problem. |
+            | `DS-0002` | BAD_REQUEST | 400 | Required header or query parameter missing, or request input otherwise unusable. |
+            | `DS-0003` | INVALID_JSON | 400 | Request body absent, empty, or not valid JSON. |
+            | `DS-0004` | VALIDATION_ERROR | 400 | Body, path variable or query parameter failed validation. One error item per violation. |
+            | `DS-0005` | INVALID_FILTER | 400 | `filter` / `filter_advanced` could not be parsed or validated. |
+            | `DS-0006` | INVALID_ARGUMENT | 400 | An argument could not be used - a `sort` field that is not sortable in that request, undecodable `cursor`, malformed JSON Pointer, parameter type mismatch. |
+            | `DS-0007` | UNSUPPORTED_CONTENT_TYPE | 415 | Request `Content-Type` not supported. |
+            | `DS-0008` | UNEXPECTED_FILTERABLE_FIELD_VALUE | 400 | A declared class property's value does not match its `valueKind`. |
+            | `DS-0009` | SERVICE_UNAVAILABLE | 503 | A required dependency is unavailable, or the request could not be forwarded to its region. |
+            | `DS-0010` | NOT_ACCEPTABLE | 406 | *Reserved - not currently emitted.* 406 responses carry a `text/plain` body with no error code. |
+            | `DS-0011` | METHOD_NOT_ALLOWED | 405 | HTTP method not supported for this path. |
+
+            **Resource (01xx)**
+
+            | Code | Constant | Status | Meaning |
+            |---|---|---|---|
+            | `DS-0100` | NOT_FOUND | 404 | The addressed resource does not exist. |
+
+            **Authorization (02xx)**
+
+            | Code | Constant | Status | Meaning |
+            |---|---|---|---|
+            | `DS-0200` | DATASYNC_NOT_ENABLED | 403 | Datasync is not enabled for this subscribe key. |
+            | `DS-0201` | ACCESS_DENIED | 403 | Access Manager not enabled, conflicting credentials supplied, or authorization check denied. |
+            | `DS-0202` | INVALID_TOKEN | 403 | The `auth` PAM token could not be decoded, or its projection does not permit the requested fields. |
+            | `DS-0203` | UNAUTHENTICATED | 401 | No credentials supplied. |
+
+            **State (03xx)**
+
+            | Code | Constant | Status | Meaning |
+            |---|---|---|---|
+            | `DS-0300` | ETAG_MISMATCH | 412 | `If-Match` does not contain the resource's current ETag. |
+            | `DS-0301` | CONFLICT | 409 | A resource with the same identity already exists. |
+
+            **Size limits (04xx)**
+
+            | Code | Constant | Status | Meaning |
+            |---|---|---|---|
+            | `DS-0400` | CONTENT_TOO_LARGE | 413 | *Reserved - not currently emitted.* |
+
+            **Custom fields (05xx)**
+
+            | Code | Constant | Status | Meaning |
+            |---|---|---|---|
+            | `DS-0500` | CUSTOM_NOT_SCALAR | 400 | *Reserved - not currently emitted.* |
+
+            **Configuration (06xx)**
+
+            | Code | Constant | Status | Meaning |
+            |---|---|---|---|
+            | `DS-0600` | CONFIG_NOT_FOUND | 404 | Subscribe key unknown to the configuration service, or its datasync region is not configured. |
+            | `DS-0602` | UNSUPPORTED_ENTITY_PROPERTY_TYPE | 400 | A declared property's path resolves to a non-scalar node (object or array). |
+            | `DS-0650` | NON_NULLABLE_PROPERTY | 400 | A property declared `nullable: false` is missing or explicitly `null`. |
+
+            **Patch (07xx)**
+
+            | Code | Constant | Status | Meaning |
+            |---|---|---|---|
+            | `DS-0700` | IMMUTABLE_FIELD_MODIFICATION | 400 | A patch targets a pointer outside the mutable set. Patch only. |
+
+            **Relationships (08xx)**
+
+            | Code | Constant | Status | Meaning |
+            |---|---|---|---|
+            | `DS-0800` | WRONG_ENTITY_CLASS_TYPE | 400 | An endpoint entity's class does not satisfy the relationship class for that side. Create only. |
+            | `DS-0801` | CARDINALITY_VIOLATED | 409 | ONE-TO-ONE or ONE-TO-MANY cardinality already satisfied. Create only. |
+
+            **Class management (09xx)**
+
+            | Code | Constant | Status | Meaning |
+            |---|---|---|---|
+            | `DS-0900` | GLOBAL_CLASS_MODIFICATION | 403 | Global class definitions are read-only. Replace and delete only. |
+            | `DS-0901` | PROJECTION_LIMIT_EXCEEDED | 400 | Distinct projections across all properties exceed the per-class maximum. |
+            | `DS-0902` | INVALID_PROJECTION_NAME | 400 | Projection name too long or malformed, or a property declares an empty projection list. |
+            | `DS-0903` | INCOMPATIBLE_CHILD_PROPERTY | 400 | A redeclared inherited property differs from the parent in `path`, `valueKind`, or `nullable`. Entity classes only. |
+            | `DS-0904` | MISSING_PARENT_PROPERTY | 400 | *Reserved - not currently emitted.* Missing parent properties are inherited automatically. |
+            | `DS-0905` | CLASS_HAS_CHILDREN | 409 | The class still has subclasses and cannot be deleted. Entity classes only. |
+            | `DS-0906` | RESERVED_PROPERTY_NAME | 400 | A declared property uses the name of a built-in record field (`id`, `createdAt`, `updatedAt`, `status`). Only `status` may be re-declared, and only as `{name: "status", path: "/status"}` to control its projections. |
+          example: DS-0100
         message:
           type: string
-          description: An informative message about the error
-          example: Invalid request
+          description: |-
+            A human-readable description of the error, intended for logs and diagnostics.
+            Not stable across releases - do not parse or branch on it.
+          example: "Entity not found: user-42"
         path:
           type: string
-          description: The path of the request payload that resulted in the error
-          example: /entity_a_id
+          description: |-
+            Location of the input that caused the error. Present only for codes that can identify
+            one. The form depends on the code: a JSON Pointer into the request payload
+            (`DS-0008`, `DS-0602`, `DS-0650`), a query parameter name (`filter` for `DS-0005`,
+            `sort` for `DS-0006`), a field name (`DS-0004`), or a class property name (`DS-0903`).
+          example: /payload/score
 
     Meta:
       description: Cursor-based pagination metadata
@@ -175,28 +826,6 @@ components:
           description: The limit applied to this page (may differ from requested limit)
           example: 20
 
-    Links:
-      description: |
-        HATEOAS links for navigation. Provides hypermedia controls for pagination.
-        May contain additional links beyond the standard pagination links for related resources.
-      type: object
-      required:
-        - self
-      additionalProperties:
-        type: string
-      properties:
-        self:
-          type: string
-          description: Link to current page with all query parameters
-          example: /subkeys/demo/relationships?cursor=TjIw&limit=20&sort=-createdAt
-        next:
-          type: string
-          nullable: true
-          description: |
-            Link to next page (if available). Includes the next_cursor value.
-            Null if there are no more results.
-          example: /subkeys/demo/relationships?cursor=TjQw&limit=20&sort=-createdAt
-
     RequestEnvelope:
       description: Base request envelope (data only)
       type: object
@@ -208,7 +837,7 @@ components:
           description: Request data (specific type defined in extending schemas)
 
     ResponseEnvelope:
-      description: Base response envelope (data + links + meta)
+      description: Base response envelope (data + meta)
       type: object
       required:
         - data
@@ -216,8 +845,6 @@ components:
         data:
           type: object
           description: Response data (specific type defined in extending schemas)
-        links:
-          $ref: "#/components/schemas/Links"
         meta:
           $ref: "#/components/schemas/Meta"
 

@@ -51,7 +51,7 @@ paths:
         '201':
           $ref: "#/components/responses/CreateEntityClassResponse"
         '400':
-          $ref: 'common.yaml#/components/responses/BadRequestResponse'
+          $ref: 'common.yaml#/components/responses/BadRequestEntityClassWriteResponse'
         '401':
           $ref: 'common.yaml#/components/responses/UnauthorizedResponse'
         '403':
@@ -165,7 +165,7 @@ paths:
         "401":
           $ref: "common.yaml#/components/responses/UnauthorizedResponse"
         "403":
-          $ref: "common.yaml#/components/responses/ForbiddenResponse"
+          $ref: "common.yaml#/components/responses/ForbiddenClassModificationResponse"
         "404":
           $ref: "common.yaml#/components/responses/NotFoundResponse"
         "406":
@@ -200,11 +200,11 @@ paths:
         "200":
           $ref: "#/components/responses/EntityClassResponse"
         "400":
-          $ref: "common.yaml#/components/responses/BadRequestResponse"
+          $ref: "common.yaml#/components/responses/BadRequestEntityClassWriteResponse"
         "401":
           $ref: "common.yaml#/components/responses/UnauthorizedResponse"
         "403":
-          $ref: "common.yaml#/components/responses/ForbiddenResponse"
+          $ref: "common.yaml#/components/responses/ForbiddenClassModificationResponse"
         "404":
           $ref: "common.yaml#/components/responses/NotFoundResponse"
         "406":
@@ -269,7 +269,7 @@ paths:
         '201':
           $ref: "#/components/responses/CreateRelationshipClassResponse"
         '400':
-          $ref: 'common.yaml#/components/responses/BadRequestResponse'
+          $ref: 'common.yaml#/components/responses/BadRequestRelationshipClassWriteResponse'
         '401':
           $ref: 'common.yaml#/components/responses/UnauthorizedResponse'
         '403':
@@ -337,11 +337,11 @@ paths:
         "200":
           $ref: "#/components/responses/RelationshipClassResponse"
         "400":
-          $ref: "common.yaml#/components/responses/BadRequestResponse"
+          $ref: "common.yaml#/components/responses/BadRequestRelationshipClassWriteResponse"
         "401":
           $ref: "common.yaml#/components/responses/UnauthorizedResponse"
         "403":
-          $ref: "common.yaml#/components/responses/ForbiddenResponse"
+          $ref: "common.yaml#/components/responses/ForbiddenClassModificationResponse"
         "404":
           $ref: "common.yaml#/components/responses/NotFoundResponse"
         "406":
@@ -375,7 +375,7 @@ paths:
         "401":
           $ref: "common.yaml#/components/responses/UnauthorizedResponse"
         "403":
-          $ref: "common.yaml#/components/responses/ForbiddenResponse"
+          $ref: "common.yaml#/components/responses/ForbiddenClassModificationResponse"
         "404":
           $ref: "common.yaml#/components/responses/NotFoundResponse"
         "406":
@@ -486,7 +486,7 @@ components:
         - type: object
           properties:
             data:
-              $ref: "#/components/schemas/EntityClassProperties"
+              $ref: "#/components/schemas/EntityClassUpdateProperties"
 
     UpdateRelationshipClassRequest:
       description: Request body for updating a relationship class
@@ -504,8 +504,6 @@ components:
         description:
           type: string
           description: Optional description of the relationship class
-        schema:
-          $ref: '#/components/schemas/ClassPropertiesSchema'
         properties:
           type: array
           items:
@@ -588,10 +586,11 @@ components:
       allOf:
         - $ref: '#/components/schemas/EntityClassResourceProperties'
         - $ref: '#/components/schemas/EntityClassProperties'
+        - required: [config]
 
     EntityClassResourceProperties:
-      description: Default properties for entity class responses (without id, since
-        name is the identifier)
+      description: Default properties for entity class responses (without id; a class
+        is identified by the triplet name, level and version)
       type: object
       required:
         - createdAt
@@ -625,7 +624,6 @@ components:
 
     EntityClassProperties:
       type: object
-      required: [config]
       properties:
 
         description:
@@ -634,11 +632,12 @@ components:
           description: Human-readable description documenting semantic intent and
             ownership scope.
 
-        schema:
-          $ref: '#/components/schemas/ClassPropertiesSchema'
-
         config:
-          $ref: '#/components/schemas/EntityClassConfig'
+          description: |
+            Entity class configuration. Required when creating a standalone class (no extends).
+            When extends is provided and config is omitted, the parent's config is inherited.
+          allOf:
+            - $ref: '#/components/schemas/EntityClassConfig'
 
         extends:
           $ref: '#/components/schemas/Extends'
@@ -650,34 +649,14 @@ components:
           description: |
             Optional list of properties for searchable
             properties. If omitted, payload is treated as opaque JSON.
+            When extending a parent class, parent properties are auto-inherited.
+            Child may declare additional properties or override filtering/projections
+            on inherited ones.
       example:
         name: "user-profile"
         description: "Entity class for storing user profile information including basic
           details and preferences"
         version: 1
-        schema:
-          $schema: "http://json-schema.org/draft/2020-12/schema"
-          type: object
-          properties:
-            username:
-              type: string
-              minLength: 3
-              maxLength: 50
-            email:
-              type: string
-              format: email
-            dateOfBirth:
-              type: string
-              format: date
-            isActive:
-              type: boolean
-            score:
-              type: number
-              minimum: 0
-              maximum: 100
-          required:
-            - username
-            - email
         config:
           ttlSec: 2678400
         properties:
@@ -703,6 +682,26 @@ components:
             valueKind: "number"
             filtering: "simple"
 
+    EntityClassUpdateProperties:
+      description: Properties for updating an entity class. Config is always required on update.
+      type: object
+      required: [config, properties]
+      properties:
+        description:
+          type: string
+          maxLength: 1000
+          description: Human-readable description documenting semantic intent and
+            ownership scope.
+        config:
+          $ref: '#/components/schemas/EntityClassConfig'
+        properties:
+          type: array
+          items:
+            $ref: '#/components/schemas/Property'
+          description: |
+            Optional list of properties for searchable
+            properties. If omitted, existing properties are preserved.
+
     Extends:
       type: object
       description: Reference to the parent class this class extends.
@@ -714,14 +713,6 @@ components:
         version:
           type: integer
           description: Version of the parent class.
-
-    ClassPropertiesSchema:
-      type: object
-      description: Json Schema draft 2020-12 for validating user-defined payload.
-      properties:
-        $schema:
-          type: string
-          enum: ["http://json-schema.org/draft/2020-12/schema"]
 
     EntityClassConfig:
       type: object
@@ -808,8 +799,6 @@ components:
           type: string
           maxLength: 1000
           description: Human-readable description documenting the relationship class purpose
-        schema:
-          $ref: '#/components/schemas/ClassPropertiesSchema'
         cardinality:
           $ref: '#/components/schemas/RelationshipClassCardinality'
         entityAClass:

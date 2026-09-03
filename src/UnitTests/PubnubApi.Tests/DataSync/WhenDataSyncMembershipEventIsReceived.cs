@@ -203,7 +203,7 @@ namespace PubnubApi.Tests.DataSync
             var membershipId = UniqueId();
 
             var dataSyncEvent = await CaptureEventAsync(
-                membershipId,
+                user.Id,
                 e => string.Equals(e.Event, "create", StringComparison.OrdinalIgnoreCase)
                      && e.RelationshipData?.Id == membershipId,
                 async () =>
@@ -230,7 +230,7 @@ namespace PubnubApi.Tests.DataSync
             Assert.That(dataSyncEvent.Event, Is.EqualTo("create").IgnoreCase);
             Assert.That(dataSyncEvent.Source, Is.EqualTo("data-sync"));
             Assert.That(dataSyncEvent.Type, Is.EqualTo("relationship").IgnoreCase);
-            Assert.That(dataSyncEvent.Channel, Is.EqualTo(membershipId));
+            Assert.That(dataSyncEvent.Channel, Is.EqualTo(user.Id));
             Assert.That(dataSyncEvent.RelationshipData, Is.Not.Null);
             Assert.That(dataSyncEvent.RelationshipData.Id, Is.EqualTo(membershipId));
             // ChannelId maps to entityAId, UserId maps to entityBId on the wire.
@@ -245,7 +245,7 @@ namespace PubnubApi.Tests.DataSync
             var created = await CreateTestMembership(id: UniqueId(), status: "active");
 
             var dataSyncEvent = await CaptureEventAsync(
-                created.Id,
+                created.UserId,
                 e => string.Equals(e.Event, "update", StringComparison.OrdinalIgnoreCase)
                      && e.RelationshipData?.Id == created.Id,
                 async () =>
@@ -268,7 +268,7 @@ namespace PubnubApi.Tests.DataSync
             Assert.That(dataSyncEvent.Event, Is.EqualTo("update").IgnoreCase);
             Assert.That(dataSyncEvent.Source, Is.EqualTo("data-sync"));
             Assert.That(dataSyncEvent.Type, Is.EqualTo("relationship").IgnoreCase);
-            Assert.That(dataSyncEvent.Channel, Is.EqualTo(created.Id));
+            Assert.That(dataSyncEvent.Channel, Is.EqualTo(created.UserId));
             Assert.That(dataSyncEvent.RelationshipData, Is.Not.Null);
             Assert.That(dataSyncEvent.RelationshipData.Id, Is.EqualTo(created.Id));
         }
@@ -279,7 +279,7 @@ namespace PubnubApi.Tests.DataSync
             var created = await CreateTestMembership(id: UniqueId(), status: "active");
 
             var dataSyncEvent = await CaptureEventAsync(
-                created.Id,
+                created.UserId,
                 e => string.Equals(e.Event, "update", StringComparison.OrdinalIgnoreCase)
                      && e.RelationshipData?.Id == created.Id,
                 async () =>
@@ -304,7 +304,7 @@ namespace PubnubApi.Tests.DataSync
 
             Assert.That(dataSyncEvent.Event, Is.EqualTo("update").IgnoreCase);
             Assert.That(dataSyncEvent.Type, Is.EqualTo("relationship").IgnoreCase);
-            Assert.That(dataSyncEvent.Channel, Is.EqualTo(created.Id));
+            Assert.That(dataSyncEvent.Channel, Is.EqualTo(created.UserId));
             Assert.That(dataSyncEvent.RelationshipData, Is.Not.Null);
             Assert.That(dataSyncEvent.RelationshipData.Id, Is.EqualTo(created.Id));
         }
@@ -315,7 +315,7 @@ namespace PubnubApi.Tests.DataSync
             var created = await CreateTestMembership(id: UniqueId(), status: "active");
 
             var dataSyncEvent = await CaptureEventAsync(
-                created.Id,
+                created.UserId,
                 e => string.Equals(e.Event, "delete", StringComparison.OrdinalIgnoreCase)
                      && e.Id == created.Id,
                 async () =>
@@ -332,7 +332,7 @@ namespace PubnubApi.Tests.DataSync
             Assert.That(dataSyncEvent.Event, Is.EqualTo("delete").IgnoreCase);
             Assert.That(dataSyncEvent.Source, Is.EqualTo("data-sync"));
             Assert.That(dataSyncEvent.Type, Is.EqualTo("relationship").IgnoreCase);
-            Assert.That(dataSyncEvent.Channel, Is.EqualTo(created.Id));
+            Assert.That(dataSyncEvent.Channel, Is.EqualTo(created.UserId));
             Assert.That(dataSyncEvent.Id, Is.EqualTo(created.Id));
             Assert.That(dataSyncEvent.DeletedAt, Is.Not.Null.And.Not.Empty);
         }

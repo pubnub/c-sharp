@@ -170,7 +170,7 @@ namespace PubnubApi.Tests.DataSync
             var relationshipId = UniqueId();
 
             var dataSyncEvent = await CaptureEventAsync(
-                relationshipId,
+                entityA.Id,
                 e => string.Equals(e.Event, "create", StringComparison.OrdinalIgnoreCase)
                      && e.RelationshipData?.Id == relationshipId,
                 async () =>
@@ -198,7 +198,7 @@ namespace PubnubApi.Tests.DataSync
             Assert.That(dataSyncEvent.Event, Is.EqualTo("create").IgnoreCase);
             Assert.That(dataSyncEvent.Source, Is.EqualTo("data-sync"));
             Assert.That(dataSyncEvent.Type, Is.EqualTo("relationship").IgnoreCase);
-            Assert.That(dataSyncEvent.Channel, Is.EqualTo(relationshipId));
+            Assert.That(dataSyncEvent.Channel, Is.EqualTo(entityA.Id));
             Assert.That(dataSyncEvent.RelationshipData, Is.Not.Null);
             Assert.That(dataSyncEvent.RelationshipData.Id, Is.EqualTo(relationshipId));
             Assert.That(dataSyncEvent.RelationshipData.EntityAId, Is.EqualTo(entityA.Id));
@@ -212,7 +212,7 @@ namespace PubnubApi.Tests.DataSync
             var created = await CreateTestRelationship(id: UniqueId(), status: "active");
 
             var dataSyncEvent = await CaptureEventAsync(
-                created.Id,
+                created.EntityAId,
                 e => string.Equals(e.Event, "update", StringComparison.OrdinalIgnoreCase)
                      && e.RelationshipData?.Id == created.Id,
                 async () =>
@@ -235,7 +235,7 @@ namespace PubnubApi.Tests.DataSync
             Assert.That(dataSyncEvent.Event, Is.EqualTo("update").IgnoreCase);
             Assert.That(dataSyncEvent.Source, Is.EqualTo("data-sync"));
             Assert.That(dataSyncEvent.Type, Is.EqualTo("relationship").IgnoreCase);
-            Assert.That(dataSyncEvent.Channel, Is.EqualTo(created.Id));
+            Assert.That(dataSyncEvent.Channel, Is.EqualTo(created.EntityAId));
             Assert.That(dataSyncEvent.RelationshipData, Is.Not.Null);
             Assert.That(dataSyncEvent.RelationshipData.Id, Is.EqualTo(created.Id));
         }
@@ -246,7 +246,7 @@ namespace PubnubApi.Tests.DataSync
             var created = await CreateTestRelationship(id: UniqueId(), status: "active");
 
             var dataSyncEvent = await CaptureEventAsync(
-                created.Id,
+                created.EntityAId,
                 e => string.Equals(e.Event, "update", StringComparison.OrdinalIgnoreCase)
                      && e.RelationshipData?.Id == created.Id,
                 async () =>
@@ -271,7 +271,7 @@ namespace PubnubApi.Tests.DataSync
 
             Assert.That(dataSyncEvent.Event, Is.EqualTo("update").IgnoreCase);
             Assert.That(dataSyncEvent.Type, Is.EqualTo("relationship").IgnoreCase);
-            Assert.That(dataSyncEvent.Channel, Is.EqualTo(created.Id));
+            Assert.That(dataSyncEvent.Channel, Is.EqualTo(created.EntityAId));
             Assert.That(dataSyncEvent.RelationshipData, Is.Not.Null);
             Assert.That(dataSyncEvent.RelationshipData.Id, Is.EqualTo(created.Id));
         }
@@ -282,7 +282,7 @@ namespace PubnubApi.Tests.DataSync
             var created = await CreateTestRelationship(id: UniqueId(), status: "active");
 
             var dataSyncEvent = await CaptureEventAsync(
-                created.Id,
+                created.EntityAId,
                 e => string.Equals(e.Event, "delete", StringComparison.OrdinalIgnoreCase)
                      && e.Id == created.Id,
                 async () =>
@@ -299,7 +299,7 @@ namespace PubnubApi.Tests.DataSync
             Assert.That(dataSyncEvent.Event, Is.EqualTo("delete").IgnoreCase);
             Assert.That(dataSyncEvent.Source, Is.EqualTo("data-sync"));
             Assert.That(dataSyncEvent.Type, Is.EqualTo("relationship").IgnoreCase);
-            Assert.That(dataSyncEvent.Channel, Is.EqualTo(created.Id));
+            Assert.That(dataSyncEvent.Channel, Is.EqualTo(created.EntityAId));
             Assert.That(dataSyncEvent.Id, Is.EqualTo(created.Id));
             Assert.That(dataSyncEvent.DeletedAt, Is.Not.Null.And.Not.Empty);
         }

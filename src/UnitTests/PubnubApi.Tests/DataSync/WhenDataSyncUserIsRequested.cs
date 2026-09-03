@@ -328,7 +328,7 @@ namespace PubnubApi.Tests.DataSync
 
             var response = await pubnub.DataSync.GetUsers(new GetUsersParameters
             {
-                Sort = "-createdAt"
+                Sort = "createdAt:desc"
             });
 
             Assert.That(response.Status.Error, Is.False);

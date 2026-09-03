@@ -138,7 +138,7 @@ namespace PubNubMessaging.Tests
                 "GrantToken() failed.");
         }
 
-        protected static async Task GenerateDataSyncTestToken(Pubnub pubnub)
+        protected static async Task GenerateDataSyncTestToken(Pubnub pubnub, bool withProjections = false)
         {
             if (!string.IsNullOrEmpty(PubnubCommon.GrantToken))
             {
@@ -152,21 +152,23 @@ namespace PubNubMessaging.Tests
                 Origin = PubnubCommon.DataSyncOrigin
             };
             var granter = new Pubnub(config);
-            var grant = await granter.GrantToken()
+            var grantOperation = granter.GrantToken()
                 .TTL(60)
                 .AuthorizedUserId(new UserId(pubnub.PNConfig.UserId))
                 .Patterns(new PNTokenPatterns
                 {
-                    Users = new Dictionary<string, PNTokenAuthValues>(){{".*",fullAccess}},
-                    Channels = new Dictionary<string, PNTokenAuthValues>(){{".*", fullAccess}},
+                    Users = new Dictionary<string, PNTokenAuthValues>() { { ".*", fullAccess } },
+                    Channels = new Dictionary<string, PNTokenAuthValues>() { { ".*", fullAccess } },
                     DataSync = new PNDataSyncTokenScopes
                     {
                         Entities = new Dictionary<string, PNTokenAuthValues> { { ".*", fullAccess } },
                         Relationships = new Dictionary<string, PNTokenAuthValues> { { ".*", fullAccess } },
                         Memberships = new Dictionary<string, PNTokenAuthValues> { { ".*", fullAccess } }
                     }
-                })
-                .DataSyncProjections(new PNDataSyncProjections
+                });
+            if (withProjections)
+            {
+                grantOperation.DataSyncProjections(new PNDataSyncProjections
                 {
                     Patterns = new PNDataSyncProjectionScope
                     {
@@ -174,8 +176,9 @@ namespace PubNubMessaging.Tests
                         Relationships = new Dictionary<string, string> { { ".*", "admin" } },
                         Memberships = new Dictionary<string, string> { { ".*", "admin" } }
                     }
-                })
-                .ExecuteAsync();
+                });
+            }
+            var grant = await grantOperation.ExecuteAsync();
             Assert.That(grant.Status.Error, Is.False,
                 $"Admin grant failed: {grant.Status.ErrorData?.Information}");
             pubnub.SetAuthToken(grant.Result.Token);

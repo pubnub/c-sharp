@@ -341,7 +341,7 @@ namespace PubnubApi.Tests.DataSync
             var response = await pubnub.DataSync.GetEntities(new GetEntitiesParameters
             {
                 EntityClass = DataSyncCommon.IntegrationTestEntityClass,
-                Sort = "-createdAt"
+                Sort = "createdAt:desc"
             });
 
             Assert.That(response.Status.Error, Is.False);
