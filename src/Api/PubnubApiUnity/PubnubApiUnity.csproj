@@ -1027,12 +1027,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Content Include="..\PubnubApi\EndPoint\DataSync\create-api-key.ps1">
-      <Link>EndPoint\DataSync\create-api-key.ps1</Link>
-    </Content>
-    <Content Include="..\PubnubApi\EndPoint\DataSync\create-classes.ps1">
-      <Link>EndPoint\DataSync\create-classes.ps1</Link>
-    </Content>
     <Content Include="..\PubnubApi\EndPoint\DataSync\Entity\C# - DXD data sync Entity API.md">
       <Link>EndPoint\DataSync\Entity\C# - DXD data sync Entity API.md</Link>
     </Content>
