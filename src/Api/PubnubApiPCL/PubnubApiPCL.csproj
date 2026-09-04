@@ -998,9 +998,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Content Include="..\PubnubApi\EndPoint\DataSync\C# DXD - DataSync Users, Channels, and Memberships.md">
-      <Link>EndPoint\DataSync\C# DXD - DataSync Users, Channels, and Memberships.md</Link>
-    </Content>
     <Content Include="..\PubnubApi\EndPoint\DataSync\create-api-key.ps1">
       <Link>EndPoint\DataSync\create-api-key.ps1</Link>
     </Content>
@@ -1013,9 +1010,6 @@
     <Content Include="..\PubnubApi\EndPoint\DataSync\Relationship\C# - DXD data sync Relationship API.md">
       <Link>EndPoint\DataSync\Relationship\C# - DXD data sync Relationship API.md</Link>
     </Content>
-    <Content Include="..\PubnubApi\EndPoint\DataSync\setup-integration-test-classes.ps1">
-      <Link>EndPoint\DataSync\setup-integration-test-classes.ps1</Link>
-    </Content>
     <Content Include="..\PubnubApi\EndPoint\DataSync\Specs\common.yaml">
       <Link>EndPoint\DataSync\Specs\common.yaml</Link>
     </Content>
@@ -1024,12 +1018,6 @@
     </Content>
     <Content Include="..\PubnubApi\EndPoint\DataSync\Specs\v4-metadata.yaml">
       <Link>EndPoint\DataSync\Specs\v4-metadata.yaml</Link>
-    </Content>
-    <Content Include="..\PubnubApi\EndPoint\DataSync\test-entity-api.ps1">
-      <Link>EndPoint\DataSync\test-entity-api.ps1</Link>
-    </Content>
-    <Content Include="..\PubnubApi\EndPoint\DataSync\test-user-membership-api.ps1">
-      <Link>EndPoint\DataSync\test-user-membership-api.ps1</Link>
     </Content>
   </ItemGroup>
   
