@@ -299,6 +299,8 @@ namespace PubnubApi.EndPoint
 			}
 			Dictionary<string, object> flat = new Dictionary<string, object>();
 			FlattenProjections(flat, scope.Entities, "entities");
+			FlattenProjections(flat, scope.Users, "users");
+			FlattenProjections(flat, scope.Channels, "channels");
 			FlattenProjections(flat, scope.Relationships, "relationships");
 			FlattenProjections(flat, scope.Memberships, "memberships");
 			return flat.Count > 0 ? flat : null;

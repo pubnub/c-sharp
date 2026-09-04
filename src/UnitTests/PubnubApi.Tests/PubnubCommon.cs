@@ -14,19 +14,23 @@ namespace PubNubMessaging.Tests
         public static readonly bool SuppressAuthKey = PAMServerSideRun;
         public static readonly bool EnableStubTest = false;
 
-        //USE demo-36 keys for unit tests 
+        //USE demo-36 keys for unit tests
         public static readonly string PublishKey = string.IsNullOrEmpty(EnvPublishKey) ? "demo-36" : EnvPublishKey;
         public static readonly string SubscribeKey = string.IsNullOrEmpty(EnvSubscribeKey) ? "demo-36" : EnvSubscribeKey;
         public static readonly string SecretKey = string.IsNullOrEmpty(EnvSecretKey) ? "demo-36" : EnvSecretKey;
 
         public static readonly string StubOrign = "localhost:9191";
         public static readonly string EncodedSDK = "PubNubCSharp";
-        
+
         public static string GrantToken = "";
 
         public static readonly string NonPAMPublishKey = Environment.GetEnvironmentVariable("PN_PUB_KEY");
         public static readonly string NONPAMSubscribeKey = Environment.GetEnvironmentVariable("PN_SUB_KEY");
-        
+
+        public static readonly string DataSyncSubscribeKey = Environment.GetEnvironmentVariable("PN_DS_SUB_KEY");
+        public static readonly string DataSyncPublishKey = Environment.GetEnvironmentVariable("PN_DS_PUB_KEY");
+        public static readonly string DataSyncSecretKey = Environment.GetEnvironmentVariable("PN_DS_SEC_KEY");
+
         static PubnubCommon()
         {
         }

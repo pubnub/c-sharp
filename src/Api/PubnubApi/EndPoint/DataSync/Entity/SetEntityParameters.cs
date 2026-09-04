@@ -16,7 +16,7 @@ namespace PubnubApi.EndPoint
         /// Schema version of the entity class. Required. Must be >= 1.
         /// Note: entityClass is immutable and cannot be changed after creation.
         /// </summary>
-        public int EntityClassVersion { get; set; }
+        public int EntityClassVersion { get; set; } = 1;
 
         /// <summary>
         /// Entity status (e.g., "active", "inactive"). 1–100 characters.

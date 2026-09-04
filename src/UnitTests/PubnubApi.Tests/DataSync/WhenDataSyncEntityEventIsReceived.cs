@@ -25,7 +25,6 @@ namespace PubnubApi.Tests.DataSync
                 SubscribeKey = PubnubCommon.DataSyncSubscribeKey,
             };
             pubnub = createPubNubInstance(config);
-            config.Origin = PubnubCommon.DataSyncOrigin;
             await GenerateDataSyncTestToken(pubnub);
             createdEntityIds.Clear();
         }
@@ -37,7 +36,6 @@ namespace PubnubApi.Tests.DataSync
                 SubscribeKey = PubnubCommon.DataSyncSubscribeKey,
             };
             pubnub = createPubNubInstance(config);
-            config.Origin = PubnubCommon.DataSyncOrigin;
             await GenerateDataSyncTestToken(pubnub, true);
             createdEntityIds.Clear();
         }
@@ -185,7 +183,6 @@ namespace PubnubApi.Tests.DataSync
                 SecretKey = PubnubCommon.DataSyncSecretKey,
                 SubscribeKey = PubnubCommon.DataSyncSubscribeKey,
                 PublishKey = PubnubCommon.DataSyncPublishKey,
-                Origin = PubnubCommon.DataSyncOrigin
             };
             return new Pubnub(adminConfig);
         }
@@ -198,7 +195,6 @@ namespace PubnubApi.Tests.DataSync
                 PublishKey = PubnubCommon.DataSyncPublishKey,
             };
             var client = createPubNubInstance(config);
-            config.Origin = PubnubCommon.DataSyncOrigin;
             client.SetAuthToken(token);
             return client;
         }

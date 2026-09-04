@@ -12,7 +12,7 @@ namespace PubnubApi.EndPoint
         /// <summary>
         /// Schema version of the entity class. Required. Must be >= 1.
         /// </summary>
-        public int EntityClassVersion { get; set; }
+        public int EntityClassVersion { get; set; } = 1;
 
         /// <summary>
         /// Channel status (e.g., "active", "archived"). 1–100 characters.

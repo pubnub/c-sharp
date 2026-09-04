@@ -148,8 +148,7 @@ namespace PubNubMessaging.Tests
             {
                 SubscribeKey = PubnubCommon.DataSyncSubscribeKey,
                 PublishKey = PubnubCommon.DataSyncPublishKey,
-                SecretKey = PubnubCommon.DataSyncSecretKey,
-                Origin = PubnubCommon.DataSyncOrigin
+                SecretKey = PubnubCommon.DataSyncSecretKey
             };
             var granter = new Pubnub(config);
             var grantOperation = granter.GrantToken()
@@ -173,6 +172,8 @@ namespace PubNubMessaging.Tests
                     Patterns = new PNDataSyncProjectionScope
                     {
                         Entities = new Dictionary<string, string> { { ".*", "admin" } },
+                        Users = new Dictionary<string, string> { { ".*", "admin" } },
+                        Channels = new Dictionary<string, string> { { ".*", "admin" } },
                         Relationships = new Dictionary<string, string> { { ".*", "admin" } },
                         Memberships = new Dictionary<string, string> { { ".*", "admin" } }
                     }

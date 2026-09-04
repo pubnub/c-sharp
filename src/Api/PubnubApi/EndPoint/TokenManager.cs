@@ -265,6 +265,8 @@ namespace PubnubApi.EndPoint
             var scope = new PNDataSyncProjectionScope
             {
                 Entities = new Dictionary<string, string>(),
+                Users = new Dictionary<string, string>(),
+                Channels = new Dictionary<string, string>(),
                 Relationships = new Dictionary<string, string>(),
                 Memberships = new Dictionary<string, string>()
             };
@@ -300,6 +302,12 @@ namespace PubnubApi.EndPoint
                 {
                     case "entities":
                         scope.Entities[resourceId] = projectionName;
+                        break;
+                    case "users":
+                        scope.Users[resourceId] = projectionName;
+                        break;
+                    case "channels":
+                        scope.Channels[resourceId] = projectionName;
                         break;
                     case "relationships":
                         scope.Relationships[resourceId] = projectionName;

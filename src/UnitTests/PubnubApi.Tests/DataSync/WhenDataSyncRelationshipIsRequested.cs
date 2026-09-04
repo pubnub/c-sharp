@@ -24,7 +24,6 @@ namespace PubnubApi.Tests.DataSync
                 SubscribeKey = PubnubCommon.DataSyncSubscribeKey,
             };
             pubnub = createPubNubInstance(config);
-            config.Origin = PubnubCommon.DataSyncOrigin;
             await GenerateDataSyncTestToken(pubnub);
             createdRelationshipIds.Clear();
             createdEntityIds.Clear();
@@ -383,13 +382,15 @@ namespace PubnubApi.Tests.DataSync
         public async Task ThenListFilteredByEntityAIdShouldReturnMatchingResults()
         {
             var entityA = await CreateTestEntity();
-            await CreateTestRelationship(entityAId: entityA.Id);
-            await CreateTestRelationship(entityAId: entityA.Id);
+            var entityB = await CreateTestEntity();
+            var entityC = await CreateTestEntity();
+            await CreateTestRelationship(entityA.Id, entityB.Id);
+            await CreateTestRelationship(entityA.Id, entityC.Id);
 
             var response = await pubnub.DataSync.GetRelationships(new GetRelationshipsParameters
             {
                 RelationshipClass = DataSyncCommon.IntegrationTestRelationshipClass,
-                EntityAId = entityA.Id
+                EntityAId = entityA.Id,
             });
 
             Assert.That(response.Status.Error, Is.False);
@@ -402,9 +403,11 @@ namespace PubnubApi.Tests.DataSync
         [Test]
         public async Task ThenListFilteredByEntityBIdShouldReturnMatchingResults()
         {
+            var entityA = await CreateTestEntity();
             var entityB = await CreateTestEntity();
-            await CreateTestRelationship(entityBId: entityB.Id);
-            await CreateTestRelationship(entityBId: entityB.Id);
+            var entityC = await CreateTestEntity();
+            await CreateTestRelationship(entityA.Id, entityB.Id);
+            await CreateTestRelationship(entityC.Id, entityB.Id);
 
             var response = await pubnub.DataSync.GetRelationships(new GetRelationshipsParameters
             {

@@ -12,7 +12,7 @@ namespace PubnubApi.EndPoint
         /// <summary>
         /// Version of the membership relationship class. Required. Must be >= 1.
         /// </summary>
-        public int RelationshipClassVersion { get; set; }
+        public int RelationshipClassVersion { get; set; } = 1;
 
         /// <summary>
         /// Membership status (e.g., "active", "banned"). 1–100 characters.

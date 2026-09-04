@@ -65,6 +65,9 @@
     <Compile Include="..\PubnubApi.Tests\DataSync\WhenDataSyncEntityIsRequested.cs">
       <Link>DataSync\WhenDataSyncEntityIsRequested.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi.Tests\DataSync\WhenDataSyncEntityProjectionIsRequested.cs">
+      <Link>DataSync\WhenDataSyncEntityProjectionIsRequested.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi.Tests\DataSync\WhenDataSyncGrantIsRequested.cs">
       <Link>DataSync\WhenDataSyncGrantIsRequested.cs</Link>
     </Compile>

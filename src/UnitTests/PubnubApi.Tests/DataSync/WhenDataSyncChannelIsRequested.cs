@@ -25,7 +25,6 @@ namespace PubnubApi.Tests.DataSync
                 SubscribeKey = PubnubCommon.DataSyncSubscribeKey,
             };
             pubnub = createPubNubInstance(config);
-            config.Origin = PubnubCommon.DataSyncOrigin;
             await GenerateDataSyncTestToken(pubnub);
             createdChannelIds.Clear();
         }

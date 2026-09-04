@@ -23,7 +23,13 @@ namespace PubnubApi.EndPoint
         /// <summary>
         /// Schema version of the entity class. Required. Must be >= 1.
         /// </summary>
-        public int EntityClassVersion { get; set; }
+        public int EntityClassVersion { get; set; } = 1;
+
+        /// <summary>
+        /// Class hierarchy level ("Global" or "SubKey") used to disambiguate classes
+        /// with the same name defined at different levels. Optional.
+        /// </summary>
+        public string EntityClassLevel { get; set; }
 
         /// <summary>
         /// Entity status (e.g., "active", "inactive"). 1–100 characters.

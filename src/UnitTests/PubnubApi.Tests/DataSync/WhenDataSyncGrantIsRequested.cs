@@ -28,14 +28,12 @@ namespace PubnubApi.Tests.DataSync
                 SecretKey = PubnubCommon.DataSyncSecretKey,
                 SubscribeKey = PubnubCommon.DataSyncSubscribeKey,
                 PublishKey = PubnubCommon.DataSyncPublishKey,
-                Origin = PubnubCommon.DataSyncOrigin
             };
             admin = new Pubnub(adminConfig);
 
             var creatorConfig = new PNConfiguration(new UserId(EntityCreatorId))
             {
                 SubscribeKey = PubnubCommon.DataSyncSubscribeKey,
-                Origin = PubnubCommon.DataSyncOrigin
             };
             creator = new Pubnub(creatorConfig);
             
@@ -90,7 +88,6 @@ namespace PubnubApi.Tests.DataSync
                 PublishKey = PubnubCommon.DataSyncPublishKey,
             };
             var client = createPubNubInstance(config);
-            config.Origin = PubnubCommon.DataSyncOrigin;
             client.SetAuthToken(token);
             clients.Add(client);
             return client;
