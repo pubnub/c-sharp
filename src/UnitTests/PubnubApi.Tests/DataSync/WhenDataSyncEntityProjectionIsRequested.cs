@@ -40,7 +40,7 @@ namespace PubnubApi.Tests.DataSync
             clients.Clear();
             createdEntityIds.Clear();
 
-            await GenerateDataSyncTestToken(creator);
+            await GenerateDataSyncTestToken(creator, true);
 
             await Task.Delay(1000); // allow token propagation
         }
@@ -103,9 +103,8 @@ namespace PubnubApi.Tests.DataSync
             var result = await creator.DataSync.CreateEntity(new CreateEntityParameters
             {
                 Id = id,
-                EntityClass = DataSyncCommon.IntegrationTestEntityClass,
+                EntityClass = DataSyncCommon.IntegrationTestEntityClassWithProjections,
                 EntityClassVersion = DataSyncCommon.EntityClassVersion,
-                Status = "active",
                 Payload = new Dictionary<string, object>
                 {
                     { "model", "Camry" },
@@ -318,7 +317,6 @@ namespace PubnubApi.Tests.DataSync
             {
                 Id = id,
                 EntityClassVersion = DataSyncCommon.EntityClassVersion,
-                Status = "updated",
                 Payload = new Dictionary<string, object>
                 {
                     { "model", "AdminModel" },
