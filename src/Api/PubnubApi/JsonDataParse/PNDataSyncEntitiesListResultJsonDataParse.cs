@@ -4,7 +4,7 @@ using PubnubApi.EndPoint;
 
 namespace PubnubApi;
 
-public class PNDataSyncEntitiesListResultJsonDataParse
+internal static class PNDataSyncEntitiesListResultJsonDataParse
 {
     internal static PNDataSyncEntitiesListResult GetObject(IJsonPluggableLibrary jsonPlug, List<object> listObject)
     {

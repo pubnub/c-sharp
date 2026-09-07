@@ -181,6 +181,13 @@ namespace PubnubApi.EndPoint
                     parameters.EntityClassVersion.Value.ToString());
             }
 
+            if (!string.IsNullOrEmpty(parameters.EntityClassLevel))
+            {
+                requestQueryStringParams.Add("entity_class_level",
+                    UriUtil.EncodeUriComponent(parameters.EntityClassLevel,
+                        OperationType, false, false, false));
+            }
+
             if (!string.IsNullOrEmpty(parameters.Cursor))
             {
                 requestQueryStringParams.Add("cursor",

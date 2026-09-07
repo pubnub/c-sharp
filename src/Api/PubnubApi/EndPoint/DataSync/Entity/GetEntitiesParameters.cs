@@ -19,6 +19,12 @@ namespace PubnubApi.EndPoint
         public int? EntityClassVersion { get; set; }
 
         /// <summary>
+        /// Class hierarchy level ("Global" or "SubKey") used to disambiguate classes
+        /// with the same name defined at different levels. Optional.
+        /// </summary>
+        public string EntityClassLevel { get; set; }
+
+        /// <summary>
         /// Pagination cursor returned from a previous request.
         /// </summary>
         public string Cursor { get; set; }

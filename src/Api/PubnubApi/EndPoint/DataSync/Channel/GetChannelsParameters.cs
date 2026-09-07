@@ -5,10 +5,22 @@ namespace PubnubApi.EndPoint
     public class GetChannelsParameters
     {
         /// <summary>
+        /// Entity class name to filter by. Optional — if not provided the server returns
+        /// channels of every class descending from "Channel".
+        /// </summary>
+        public string EntityClass { get; set; }
+
+        /// <summary>
         /// Schema version of the entity class. Optional — if not provided the server
         /// returns channels matching the latest version.
         /// </summary>
         public int? EntityClassVersion { get; set; }
+
+        /// <summary>
+        /// Class hierarchy level ("Global" or "SubKey") used to disambiguate classes
+        /// with the same name defined at different levels. Optional.
+        /// </summary>
+        public string EntityClassLevel { get; set; }
 
         /// <summary>
         /// Pagination cursor returned from a previous request.

@@ -159,10 +159,24 @@ namespace PubnubApi.EndPoint
 
             var requestQueryStringParams = new Dictionary<string, string>();
 
+            if (!string.IsNullOrEmpty(parameters.EntityClass))
+            {
+                requestQueryStringParams.Add("entity_class",
+                    UriUtil.EncodeUriComponent(parameters.EntityClass,
+                        OperationType, false, false, false));
+            }
+
             if (parameters.EntityClassVersion.HasValue)
             {
                 requestQueryStringParams.Add("entity_class_version",
                     parameters.EntityClassVersion.Value.ToString());
+            }
+
+            if (!string.IsNullOrEmpty(parameters.EntityClassLevel))
+            {
+                requestQueryStringParams.Add("entity_class_level",
+                    UriUtil.EncodeUriComponent(parameters.EntityClassLevel,
+                        OperationType, false, false, false));
             }
 
             if (!string.IsNullOrEmpty(parameters.Cursor))
