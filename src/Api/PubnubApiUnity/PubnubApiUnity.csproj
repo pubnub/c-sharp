@@ -980,6 +980,7 @@
   <ItemGroup>
     <None Include="..\PubnubApi\LICENSE.txt" Link="LICENSE.txt" Pack="true" PackagePath="" />
     <None Remove="EndPoint\DataSync\**" />
+    <None Remove="EndPoint\DataSync\Specs\**" />
   </ItemGroup>
   
   <ItemGroup>
@@ -1027,12 +1028,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Content Include="..\PubnubApi\EndPoint\DataSync\Entity\C# - DXD data sync Entity API.md">
-      <Link>EndPoint\DataSync\Entity\C# - DXD data sync Entity API.md</Link>
-    </Content>
-    <Content Include="..\PubnubApi\EndPoint\DataSync\Relationship\C# - DXD data sync Relationship API.md">
-      <Link>EndPoint\DataSync\Relationship\C# - DXD data sync Relationship API.md</Link>
-    </Content>
     <Content Include="..\PubnubApi\EndPoint\DataSync\Specs\common.yaml">
       <Link>EndPoint\DataSync\Specs\common.yaml</Link>
     </Content>
@@ -1046,6 +1041,7 @@
   
   <ItemGroup>
     <EmbeddedResource Remove="EndPoint\DataSync\**" />
+    <EmbeddedResource Remove="EndPoint\DataSync\Specs\**" />
   </ItemGroup>
   
   <!--<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.4' ">

@@ -1076,6 +1076,8 @@
     <EmbeddedResource Include="Properties\PubnubApiUWP.rd.xml" />
     <EmbeddedResource Remove="EndPoint\DataSync\**" />
     <None Remove="EndPoint\DataSync\**" />
+    <EmbeddedResource Remove="EndPoint\DataSync\Specs\**" />
+    <None Remove="EndPoint\DataSync\Specs\**" />
   </ItemGroup>
   <!--<ItemGroup>
     <PackageReference Include="NETStandard.Library" Version="1.6.1"/>
@@ -1118,12 +1120,6 @@
     <Folder Include="Helper\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\PubnubApi\EndPoint\DataSync\Entity\C# - DXD data sync Entity API.md">
-      <Link>EndPoint\DataSync\Entity\C# - DXD data sync Entity API.md</Link>
-    </Content>
-    <Content Include="..\PubnubApi\EndPoint\DataSync\Relationship\C# - DXD data sync Relationship API.md">
-      <Link>EndPoint\DataSync\Relationship\C# - DXD data sync Relationship API.md</Link>
-    </Content>
     <Content Include="..\PubnubApi\EndPoint\DataSync\Specs\common.yaml">
       <Link>EndPoint\DataSync\Specs\common.yaml</Link>
     </Content>
