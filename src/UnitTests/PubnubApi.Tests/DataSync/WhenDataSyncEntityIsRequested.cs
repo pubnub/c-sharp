@@ -950,7 +950,8 @@ namespace PubnubApi.Tests.DataSync
             var listResponse = await pubnub.DataSync.GetEntities(new GetEntitiesParameters
             {
                 EntityClass = DataSyncCommon.IntegrationTestEntityClass,
-                EntityClassVersion = DataSyncCommon.EntityClassVersion
+                EntityClassVersion = DataSyncCommon.EntityClassVersion,
+                FilterFast = $"id LIKE \"{entityId}*\""
             });
             Assert.That(listResponse.Status.Error, Is.False);
             Assert.That(listResponse.Result.Data.Any(e => e.Id == entityId), Is.True);

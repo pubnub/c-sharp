@@ -935,7 +935,8 @@ namespace PubnubApi.Tests.DataSync
             // LIST - verify user in listing
             var listResponse = await pubnub.DataSync.GetUsers(new GetUsersParameters
             {
-                EntityClassVersion = TestEntityClassVersion
+                EntityClassVersion = TestEntityClassVersion,
+                FilterFast = $"id LIKE \"{userId}*\""
             });
             Assert.That(listResponse.Status.Error, Is.False);
             Assert.That(listResponse.Result.Data.Any(u => u.Id == userId), Is.True);

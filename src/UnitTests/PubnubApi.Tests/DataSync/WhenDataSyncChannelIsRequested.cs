@@ -931,7 +931,7 @@ namespace PubnubApi.Tests.DataSync
             var listResponse = await pubnub.DataSync.GetChannels(new GetChannelsParameters
             {
                 EntityClassVersion = TestEntityClassVersion,
-                //Filter = $"name LIKE \"{channelId}*\""
+                FilterFast = $"id LIKE \"{channelId}*\""
             });
             Assert.That(listResponse.Status.Error, Is.False);
             Assert.That(listResponse.Result.Data.Any(c => c.Id == channelId), Is.True);
