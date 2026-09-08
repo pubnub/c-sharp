@@ -1001,18 +1001,6 @@ Emit status PNUnexpectedDisconnectCategory when retry attempts exhausted. Instea
   </ItemGroup>
   
   <ItemGroup>
-    <Content Include="..\PubnubApi\EndPoint\DataSync\Specs\common.yaml">
-      <Link>EndPoint\DataSync\Specs\common.yaml</Link>
-    </Content>
-    <Content Include="..\PubnubApi\EndPoint\DataSync\Specs\v4-data.yaml">
-      <Link>EndPoint\DataSync\Specs\v4-data.yaml</Link>
-    </Content>
-    <Content Include="..\PubnubApi\EndPoint\DataSync\Specs\v4-metadata.yaml">
-      <Link>EndPoint\DataSync\Specs\v4-metadata.yaml</Link>
-    </Content>
-  </ItemGroup>
-  
-  <ItemGroup>
     <EmbeddedResource Remove="EndPoint\DataSync\**" />
     <EmbeddedResource Remove="EndPoint\DataSync\Specs\**" />
   </ItemGroup>
