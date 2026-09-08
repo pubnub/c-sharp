@@ -50,7 +50,7 @@ internal static class PNDataSyncEventJsonDataParse
                 result.Id = GetStringValue(data, "id");
                 result.DeletedAt = GetStringValue(data, "deletedAt");
             }
-            else if (type == "entity")
+            else if (type == "entity" || type == "user" || type == "channel")
             {
                 result.EntityData = new PNDataSyncEntityResult
                 {
@@ -67,13 +67,13 @@ internal static class PNDataSyncEventJsonDataParse
                     ExpiresAt = GetStringValue(data, "expiresAt"),
                 };
             }
-            else if (type == "relationship")
+            else if (type == "relationship" || type == "membership")
             {
                 result.RelationshipData = new PNDataSyncRelationshipResult
                 {
                     Id = GetStringValue(data, "id"),
-                    EntityAId = GetStringValue(data, "entityAId"),
-                    EntityBId = GetStringValue(data, "entityBId"),
+                    EntityAId = GetStringValue(data, type == "membership" ? "channelId" : "entityAId"),
+                    EntityBId = GetStringValue(data, type == "membership" ? "userId" : "entityBId"),
                     RelationshipClass = result.ClassName,
                     RelationshipClassVersion = result.ClassVersion,
                     Status = GetStringValue(data, "status"),

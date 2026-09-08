@@ -229,7 +229,7 @@ namespace PubnubApi.Tests.DataSync
 
             Assert.That(dataSyncEvent.Event, Is.EqualTo("create").IgnoreCase);
             Assert.That(dataSyncEvent.Source, Is.EqualTo("data-sync"));
-            Assert.That(dataSyncEvent.Type, Is.EqualTo("relationship").IgnoreCase);
+            Assert.That(dataSyncEvent.Type, Is.EqualTo("membership").IgnoreCase);
             Assert.That(dataSyncEvent.Channel, Is.EqualTo(user.Id));
             Assert.That(dataSyncEvent.RelationshipData, Is.Not.Null);
             Assert.That(dataSyncEvent.RelationshipData.Id, Is.EqualTo(membershipId));
@@ -267,7 +267,7 @@ namespace PubnubApi.Tests.DataSync
 
             Assert.That(dataSyncEvent.Event, Is.EqualTo("update").IgnoreCase);
             Assert.That(dataSyncEvent.Source, Is.EqualTo("data-sync"));
-            Assert.That(dataSyncEvent.Type, Is.EqualTo("relationship").IgnoreCase);
+            Assert.That(dataSyncEvent.Type, Is.EqualTo("membership").IgnoreCase);
             Assert.That(dataSyncEvent.Channel, Is.EqualTo(created.UserId));
             Assert.That(dataSyncEvent.RelationshipData, Is.Not.Null);
             Assert.That(dataSyncEvent.RelationshipData.Id, Is.EqualTo(created.Id));
@@ -303,7 +303,7 @@ namespace PubnubApi.Tests.DataSync
                 });
 
             Assert.That(dataSyncEvent.Event, Is.EqualTo("update").IgnoreCase);
-            Assert.That(dataSyncEvent.Type, Is.EqualTo("relationship").IgnoreCase);
+            Assert.That(dataSyncEvent.Type, Is.EqualTo("membership").IgnoreCase);
             Assert.That(dataSyncEvent.Channel, Is.EqualTo(created.UserId));
             Assert.That(dataSyncEvent.RelationshipData, Is.Not.Null);
             Assert.That(dataSyncEvent.RelationshipData.Id, Is.EqualTo(created.Id));
@@ -331,7 +331,7 @@ namespace PubnubApi.Tests.DataSync
 
             Assert.That(dataSyncEvent.Event, Is.EqualTo("delete").IgnoreCase);
             Assert.That(dataSyncEvent.Source, Is.EqualTo("data-sync"));
-            Assert.That(dataSyncEvent.Type, Is.EqualTo("relationship").IgnoreCase);
+            Assert.That(dataSyncEvent.Type, Is.EqualTo("membership").IgnoreCase);
             Assert.That(dataSyncEvent.Channel, Is.EqualTo(created.UserId));
             Assert.That(dataSyncEvent.Id, Is.EqualTo(created.Id));
             Assert.That(dataSyncEvent.DeletedAt, Is.Not.Null.And.Not.Empty);
