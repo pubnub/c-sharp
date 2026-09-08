@@ -1,8 +1,13 @@
 name: c-sharp
-version: "8.3.4"
+version: "9.0.0"
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog:
+  - date: 2026-09-08
+    version: v9.0.0
+    changes:
+      - type: feature
+        text: "Added Data Sync feature support."
   - date: 2026-07-29
     version: v8.3.4
     changes:
@@ -1053,14 +1058,14 @@ features:
     - QUERY-PARAM
 supported-platforms:
   -
-    version: Pubnub 'C#' 8.3.4
+    version: Pubnub 'C#' 9.0.0
     platforms:
       - Windows 10 and up
       - Windows Server 2008 and up
     frameworks:
       - .Net Framework 4.5+
   -
-    version: PubnubPCL 'C#' 8.3.4
+    version: PubnubPCL 'C#' 9.0.0
     platforms:
       - Xamarin.Android
       - Xamarin.iOS
@@ -1072,7 +1077,7 @@ supported-platforms:
     frameworks:
       - .Net 4.5+
   -
-    version: PubnubUWP 'C#' 8.3.4
+    version: PubnubUWP 'C#' 9.0.0
     platforms:
       - Windows Phone 10
       - Universal Windows Apps
@@ -1096,7 +1101,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: Pubnub
-            location: https://github.com/pubnub/c-sharp/releases/tag/v8.3.4
+            location: https://github.com/pubnub/c-sharp/releases/tag/v9.0.0
             requires:
               -
                 name: ".Net"
@@ -1337,7 +1342,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: PubNubPCL
-            location: https://github.com/pubnub/c-sharp/releases/tag/v8.3.4
+            location: https://github.com/pubnub/c-sharp/releases/tag/v9.0.0
             requires:
               -
                 name: ".Net"
@@ -1688,7 +1693,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: PubnubUWP
-            location: https://github.com/pubnub/c-sharp/releases/tag/v8.3.4
+            location: https://github.com/pubnub/c-sharp/releases/tag/v9.0.0
             requires:
               -
                 name: "Universal Windows Platform Development"
