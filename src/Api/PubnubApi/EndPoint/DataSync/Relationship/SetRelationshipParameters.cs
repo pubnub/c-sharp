@@ -17,7 +17,7 @@ namespace PubnubApi.EndPoint
         /// Note: entityAId, entityBId, and relationshipClass are immutable
         /// and cannot be changed after creation.
         /// </summary>
-        public int RelationshipClassVersion { get; set; } = 1;
+        public int RelationshipClassVersion { get; set; }
 
         /// <summary>
         /// Relationship status (e.g., "active", "inactive"). 1–100 characters.

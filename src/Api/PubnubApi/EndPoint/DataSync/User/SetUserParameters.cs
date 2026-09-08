@@ -12,7 +12,7 @@ namespace PubnubApi.EndPoint
         /// <summary>
         /// Schema version of the entity class. Required. Must be >= 1.
         /// </summary>
-        public int EntityClassVersion { get; set; } = 1;
+        public int EntityClassVersion { get; set; }
 
         /// <summary>
         /// User status (e.g., "active", "inactive"). 1–100 characters.
