@@ -21,6 +21,11 @@ namespace PubnubApi
         public Dictionary<string, PNTokenAuthValues> Users { get; set; }
         public Dictionary<string, PNTokenAuthValues> Spaces { get; set; }
 
+        /// <summary>
+        /// Optional DataSync permission scopes (entities, relationships, memberships).
+        /// </summary>
+        public PNDataSyncTokenScopes DataSync { get; set; }
+
     }
 
 }

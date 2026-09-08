@@ -45,6 +45,9 @@ jobs:
           PN_PUB_KEY: ${{ secrets.SDK_PUB_KEY }}
           PN_SUB_KEY: ${{ secrets.SDK_SUB_KEY }}
           PN_SEC_KEY: ${{ secrets.SDK_SEC_KEY }} 
+          PN_DS_PUB_KEY: ${{ secrets.SDK_DS_PUB_KEY }}
+          PN_DS_SUB_KEY: ${{ secrets.SDK_DS_SUB_KEY }}
+          PN_DS_SEC_KEY: ${{ secrets.SDK_DS_SEC_KEY }} 
           PN_PAM_PUB_KEY: ${{ secrets.SDK_PAM_PUB_KEY }}
           PN_PAM_SUB_KEY: ${{ secrets.SDK_PAM_SUB_KEY }}
           PN_PAM_SEC_KEY: ${{ secrets.SDK_PAM_SEC_KEY }}

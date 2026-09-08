@@ -29,12 +29,21 @@ namespace PubnubApi.EndPoint
 			Users = new Dictionary<string, PNTokenAuthValues>()
 		};
 
+		private const string UuidsUsersConflictMessage = "Either Uuids or Users can be used. Not both.";
+
+		// Channels/Spaces and Uuids/Users are alternative names for the same token scopes, so a
+		// token can only carry one name from each pair. When both are supplied across Resources
+		// and Patterns the classic name wins and the alternative is left out of the request.
+		private const string SpacesIgnoredMessage = "GrantToken: Spaces permissions were supplied together with Channels permissions, so the Spaces permissions were ignored and are NOT included in the token. Channels and Spaces are alternative names for the same scope - supply only one of them across Resources and Patterns.";
+		private const string UsersIgnoredMessage = "GrantToken: Users permissions were supplied together with Uuids permissions, so the Users permissions were ignored and are NOT included in the token. Uuids and Users are alternative names for the same scope - supply only one of them across Resources and Patterns.";
+
 		private int grantTTL = -1;
 		private PNCallback<PNAccessManagerTokenResult> savedCallbackGrantToken;
 		private Dictionary<string, object> queryParam;
 		private Dictionary<string, object> grantMeta;
 		private string pubnubAuthorizedUuid = string.Empty;
 		private string pubnubAuthorizedUserId = string.Empty;
+		private PNDataSyncProjections pubnubDataSyncProjections;
 		
 		public GrantTokenOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, tokenManager, instance)
 		{
@@ -71,9 +80,8 @@ namespace PubnubApi.EndPoint
 					resources.Spaces != null && resources.Spaces.Count > 0) {
 					throw new ArgumentException("Either Channels or Spaces can be used. Not both.");
 				}
-				if (resources.Uuids != null && resources.Uuids.Count > 0 &&
-					resources.Users != null && resources.Users.Count > 0) {
-					throw new ArgumentException("Either Uuids or Users can be used. Not both.");
+				if (HasEntries(resources.Uuids) && HasEntries(resources.Users)) {
+					throw new ArgumentException(UuidsUsersConflictMessage);
 				}
 				pubnubResources = resources;
 				if (pubnubResources.Channels == null) {
@@ -102,9 +110,8 @@ namespace PubnubApi.EndPoint
 					patterns.Spaces != null && patterns.Spaces.Count > 0) {
 					throw new ArgumentException("Either Channels or Spaces can be used. Not both.");
 				}
-				if (patterns.Uuids != null && patterns.Uuids.Count > 0 &&
-					patterns.Users != null && patterns.Users.Count > 0) {
-					throw new ArgumentException("Either Uuids or Users can be used. Not both.");
+				if (HasEntries(patterns.Uuids) && HasEntries(patterns.Users)) {
+					throw new ArgumentException(UuidsUsersConflictMessage);
 				}
 
 				pubnubPatterns = patterns;
@@ -125,6 +132,17 @@ namespace PubnubApi.EndPoint
 				}
 
 			}
+			return this;
+		}
+
+		/// <summary>
+		/// Assigns Data Sync projections to resources/patterns. The projection name
+		/// per resource is encoded into the token's meta "pn-projections" section.
+		/// Entity-level Data Sync permissions are set through <see cref="Resources"/> / <see cref="Patterns"/>.
+		/// </summary>
+		public GrantTokenOperation DataSyncProjections(PNDataSyncProjections projections)
+		{
+			this.pubnubDataSyncProjections = projections;
 			return this;
 		}
 
@@ -214,6 +232,11 @@ namespace PubnubApi.EndPoint
 			});
 		}
 
+		private static bool HasEntries(Dictionary<string, PNTokenAuthValues> perms)
+		{
+			return perms != null && perms.Count > 0;
+		}
+
 		private bool FillPermissionMappingWithMaskValues(Dictionary<string, PNTokenAuthValues> dPerms, bool currentAtleastOnePermission, out Dictionary<string, int> dPermsWithMaskValues)
 		{
 			dPermsWithMaskValues = new Dictionary<string, int>();
@@ -228,6 +251,72 @@ namespace PubnubApi.EndPoint
 				dPermsWithMaskValues.Add(kvp.Key, bitMaskPermissionValue);
 			}
 			return internalAtleastOnePermission;
+		}
+
+		private bool AddDataSyncScopes(Dictionary<string, object> collection, PNDataSyncTokenScopes scopes, bool currentAtleastOnePermission)
+		{
+			bool atleastOnePermission = currentAtleastOnePermission;
+			if (scopes == null) {
+				return atleastOnePermission;
+			}
+			atleastOnePermission = AddDataSyncScope(collection, "datasync:entities", scopes.Entities, atleastOnePermission);
+			atleastOnePermission = AddDataSyncScope(collection, "datasync:relationships", scopes.Relationships, atleastOnePermission);
+			atleastOnePermission = AddDataSyncScope(collection, "datasync:memberships", scopes.Memberships, atleastOnePermission);
+			return atleastOnePermission;
+		}
+
+		private bool AddDataSyncScope(Dictionary<string, object> collection, string key, Dictionary<string, PNTokenAuthValues> perms, bool currentAtleastOnePermission)
+		{
+			if (perms == null || perms.Count == 0) {
+				return currentAtleastOnePermission;
+			}
+			bool atleastOnePermission = FillPermissionMappingWithMaskValues(perms, currentAtleastOnePermission, out Dictionary<string, int> masks);
+			collection[key] = masks;
+			return atleastOnePermission;
+		}
+
+		private Dictionary<string, object> BuildProjectionsMeta()
+		{
+			if (this.pubnubDataSyncProjections == null) {
+				return null;
+			}
+			Dictionary<string, object> pnProjections = new Dictionary<string, object>();
+			Dictionary<string, object> res = BuildProjectionScope(this.pubnubDataSyncProjections.Resources);
+			Dictionary<string, object> pat = BuildProjectionScope(this.pubnubDataSyncProjections.Patterns);
+			if (res != null) {
+				pnProjections["res"] = res;
+			}
+			if (pat != null) {
+				pnProjections["pat"] = pat;
+			}
+			return pnProjections.Count > 0 ? pnProjections : null;
+		}
+
+		private static Dictionary<string, object> BuildProjectionScope(PNDataSyncProjectionScope scope)
+		{
+			if (scope == null) {
+				return null;
+			}
+			Dictionary<string, object> flat = new Dictionary<string, object>();
+			FlattenProjections(flat, scope.Entities, "entities");
+			FlattenProjections(flat, scope.Users, "users");
+			FlattenProjections(flat, scope.Channels, "channels");
+			FlattenProjections(flat, scope.Relationships, "relationships");
+			FlattenProjections(flat, scope.Memberships, "memberships");
+			return flat.Count > 0 ? flat : null;
+		}
+
+		private static void FlattenProjections(Dictionary<string, object> target, Dictionary<string, string> map, string type)
+		{
+			if (map == null) {
+				return;
+			}
+			foreach (KeyValuePair<string, string> kvp in map) {
+				if (string.IsNullOrEmpty(kvp.Key)) {
+					continue;
+				}
+				target[$"datasync:{type}:{kvp.Key}"] = kvp.Value;
+			}
 		}
 
 		internal async Task<PNResult<PNAccessManagerTokenResult>> GrantAccess()
@@ -341,6 +430,9 @@ namespace PubnubApi.EndPoint
 				atleastOnePermission = FillPermissionMappingWithMaskValues(this.pubnubResources.Spaces, atleastOnePermission, out spBitmaskPermCollection);
 				atleastOnePermission = FillPermissionMappingWithMaskValues(this.pubnubPatterns.Spaces, atleastOnePermission, out spPatternBitmaskPermCollection);
 			} else {
+				if (HasEntries(pubnubResources.Spaces) || HasEntries(pubnubPatterns.Spaces)) {
+					config?.Logger?.Warn(SpacesIgnoredMessage);
+				}
 				spBitmaskPermCollection = new Dictionary<string, int>();
 				spPatternBitmaskPermCollection = new Dictionary<string, int>();
 			}
@@ -363,12 +455,11 @@ namespace PubnubApi.EndPoint
 				atleastOnePermission = FillPermissionMappingWithMaskValues(this.pubnubResources.Users, atleastOnePermission, out userBitmaskPermCollection);
 				atleastOnePermission = FillPermissionMappingWithMaskValues(this.pubnubPatterns.Users, atleastOnePermission, out userPatternBitmaskPermCollection);
 			} else {
+				if (HasEntries(pubnubResources.Users) || HasEntries(pubnubPatterns.Users)) {
+					config?.Logger?.Warn(UsersIgnoredMessage);
+				}
 				userBitmaskPermCollection = new Dictionary<string, int>();
 				userPatternBitmaskPermCollection = new Dictionary<string, int>();
-			}
-
-			if (!atleastOnePermission) {
-				config?.Logger?.Warn("GrantToken At least one permission is needed for at least one or more of uuids/users, channels/spaces or groups");
 			}
 
 			Dictionary<string, object> resourcesCollection = new Dictionary<string, object>
@@ -389,9 +480,21 @@ namespace PubnubApi.EndPoint
 				{ "spaces", spPatternBitmaskPermCollection }
 			};
 
+			atleastOnePermission = AddDataSyncScopes(resourcesCollection, this.pubnubResources.DataSync, atleastOnePermission);
+			atleastOnePermission = AddDataSyncScopes(patternsCollection, this.pubnubPatterns.DataSync, atleastOnePermission);
+
+			if (!atleastOnePermission) {
+				config?.Logger?.Warn("GrantToken At least one permission is needed for at least one or more of uuids/users, channels/spaces, groups or datasync entities/relationships/memberships");
+			}
+
 			Dictionary<string, object> optimizedMeta = new Dictionary<string, object>();
 			if (this.grantMeta != null) {
 				optimizedMeta = this.grantMeta;
+			}
+
+			Dictionary<string, object> pnProjections = BuildProjectionsMeta();
+			if (pnProjections != null) {
+				optimizedMeta["pn-projections"] = pnProjections;
 			}
 
 			Dictionary<string, object> permissionCollection = new Dictionary<string, object>

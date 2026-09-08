@@ -38,6 +38,11 @@ public class EventDeserializer
             PNMessageActionEventResult messageActionEvent = PNMessageActionEventJsonDataParse.GetObject(jsonLibrary, json);
             response = (T)Convert.ChangeType(messageActionEvent, typeof(PNMessageActionEventResult), CultureInfo.InvariantCulture);
         }
+        else if (typeof(T) == typeof(PNDataSyncEventResult))
+        {
+            PNDataSyncEventResult dataSyncEvent = PNDataSyncEventJsonDataParse.GetObject(jsonLibrary, json);
+            response = (T)Convert.ChangeType(dataSyncEvent, typeof(PNDataSyncEventResult), CultureInfo.InvariantCulture);
+        }
 
         return response;
     }

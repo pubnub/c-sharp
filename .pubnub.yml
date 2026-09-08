@@ -1,8 +1,13 @@
 name: c-sharp
-version: "8.3.4"
+version: "9.0.0"
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog:
+  - date: 2026-09-08
+    version: v9.0.0
+    changes:
+      - type: feature
+        text: "Added Data Sync feature support."
   - date: 2026-07-29
     version: v8.3.4
     changes:
@@ -1003,6 +1008,41 @@ features:
     - OBJECTS-MANAGE-CHANNEL-MEMBERS-V2
     - OBJECTS-FILTERING
     - OBJECTS-SORTING
+  data-sync:
+    - DATASYNC-USER-CREATE
+    - DATASYNC-USER-GET
+    - DATASYNC-USER-GET-ALL
+    - DATASYNC-USER-UPDATE
+    - DATASYNC-USER-PATCH
+    - DATASYNC-USER-DELETE
+    - DATASYNC-CHANNEL-CREATE
+    - DATASYNC-CHANNEL-GET
+    - DATASYNC-CHANNEL-GET-ALL
+    - DATASYNC-CHANNEL-UPDATE
+    - DATASYNC-CHANNEL-PATCH
+    - DATASYNC-CHANNEL-DELETE
+    - DATASYNC-MEMBERSHIP-CREATE
+    - DATASYNC-MEMBERSHIP-GET
+    - DATASYNC-MEMBERSHIP-GET-ALL
+    - DATASYNC-MEMBERSHIP-UPDATE
+    - DATASYNC-MEMBERSHIP-PATCH
+    - DATASYNC-MEMBERSHIP-DELETE
+    - DATASYNC-ENTITY-CREATE
+    - DATASYNC-ENTITY-GET
+    - DATASYNC-ENTITY-GET-ALL
+    - DATASYNC-ENTITY-UPDATE
+    - DATASYNC-ENTITY-PATCH
+    - DATASYNC-ENTITY-DELETE
+    - DATASYNC-RELATIONSHIP-CREATE
+    - DATASYNC-RELATIONSHIP-GET
+    - DATASYNC-RELATIONSHIP-GET-ALL
+    - DATASYNC-RELATIONSHIP-UPDATE
+    - DATASYNC-RELATIONSHIP-PATCH
+    - DATASYNC-RELATIONSHIP-DELETE
+    - DATASYNC-FILTERING
+    - DATASYNC-SORTING
+    - DATASYNC-EVENTS-LISTENER
+    - DATASYNC-ACCESS-MANAGER
   files:
     - FILES-SEND-FILE
     - FILES-LIST-FILES
@@ -1018,14 +1058,14 @@ features:
     - QUERY-PARAM
 supported-platforms:
   -
-    version: Pubnub 'C#' 8.3.4
+    version: Pubnub 'C#' 9.0.0
     platforms:
       - Windows 10 and up
       - Windows Server 2008 and up
     frameworks:
       - .Net Framework 4.5+
   -
-    version: PubnubPCL 'C#' 8.3.4
+    version: PubnubPCL 'C#' 9.0.0
     platforms:
       - Xamarin.Android
       - Xamarin.iOS
@@ -1037,7 +1077,7 @@ supported-platforms:
     frameworks:
       - .Net 4.5+
   -
-    version: PubnubUWP 'C#' 8.3.4
+    version: PubnubUWP 'C#' 9.0.0
     platforms:
       - Windows Phone 10
       - Universal Windows Apps
@@ -1061,7 +1101,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: Pubnub
-            location: https://github.com/pubnub/c-sharp/releases/tag/v8.3.4
+            location: https://github.com/pubnub/c-sharp/releases/tag/v9.0.0
             requires:
               -
                 name: ".Net"
@@ -1302,7 +1342,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: PubNubPCL
-            location: https://github.com/pubnub/c-sharp/releases/tag/v8.3.4
+            location: https://github.com/pubnub/c-sharp/releases/tag/v9.0.0
             requires:
               -
                 name: ".Net"
@@ -1653,7 +1693,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: PubnubUWP
-            location: https://github.com/pubnub/c-sharp/releases/tag/v8.3.4
+            location: https://github.com/pubnub/c-sharp/releases/tag/v9.0.0
             requires:
               -
                 name: "Universal Windows Platform Development"

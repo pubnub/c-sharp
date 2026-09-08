@@ -182,6 +182,23 @@ namespace PubnubApi.EventEngine.Common
                     }
                 }
             }
+            else if (eventData.MessageType == 5) //DataSync events
+            {
+                Dictionary<string, object> dataSyncEventFields = payload as Dictionary<string, object> ??
+                                                                 (payload as JObject)
+                                                                 ?.ToObject<Dictionary<string, object>>();
+                Dictionary<string, object> dataSyncMetadata = dataSyncEventFields != null
+                                                              && dataSyncEventFields.ContainsKey("metadata")
+                                                              && dataSyncEventFields["metadata"] != null
+                    ? jsonLibrary.ConvertToDictionaryObject(dataSyncEventFields["metadata"])
+                    : null;
+                if (dataSyncMetadata != null
+                    && dataSyncMetadata.TryGetValue("source", out var dataSyncSource)
+                    && dataSyncSource?.ToString() == "data-sync")
+                {
+                    jsonFields.Add("payload", payload);
+                }
+            }
             else
             {
                 if ((configuration.CryptoModule != null || configuration.CipherKey.Length > 0) &&
@@ -435,6 +452,42 @@ namespace PubnubApi.EventEngine.Common
                                 foreach (var l in channelGroupListenersMap[fileMessage.Subscription])
                                 {
                                     SafeInvokeListener(() => l?.File(instance, fileMessage), "File");
+                                }
+                            }
+                        }
+
+                        break;
+                    }
+                    case 5:
+                    {
+                        ResponseBuilder responseBuilder = new ResponseBuilder(configuration, jsonLibrary);
+                        PNDataSyncEventResult dataSyncEvent =
+                            responseBuilder.GetEventResultObject<PNDataSyncEventResult>(jsonFields);
+                        if (dataSyncEvent != null)
+                        {
+                            foreach (var listener in listeners)
+                            {
+                                SafeInvokeListener(() => listener?.DataSyncEvent(instance, dataSyncEvent),
+                                    "DataSyncEvent");
+                            }
+
+                            if (!string.IsNullOrEmpty(dataSyncEvent.Channel) &&
+                                channelListenersMap.ContainsKey(dataSyncEvent.Channel))
+                            {
+                                foreach (var l in channelListenersMap[dataSyncEvent.Channel])
+                                {
+                                    SafeInvokeListener(() => l?.DataSyncEvent(instance, dataSyncEvent),
+                                        "DataSyncEvent");
+                                }
+                            }
+
+                            if (!string.IsNullOrEmpty(dataSyncEvent.Subscription) &&
+                                channelGroupListenersMap.ContainsKey(dataSyncEvent.Subscription))
+                            {
+                                foreach (var l in channelGroupListenersMap[dataSyncEvent.Subscription])
+                                {
+                                    SafeInvokeListener(() => l?.DataSyncEvent(instance, dataSyncEvent),
+                                        "DataSyncEvent");
                                 }
                             }
                         }

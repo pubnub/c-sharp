@@ -1,5 +1,7 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Net;
@@ -80,15 +82,11 @@ namespace PubnubApi
             {
                 HttpRequestMessage requestMessage =
                     new HttpRequestMessage(method: HttpMethod.Get, requestUri: transportRequest.RequestUrl);
+
+                ApplyHeaders(requestMessage.Headers, transportRequest.Headers);
                 ConfigureHttpVersion(requestMessage);
-                if (transportRequest.Headers.Keys.Count > 0)
-                {
-                    foreach (var kvp in transportRequest.Headers)
-                    {
-                        requestMessage.Headers.Add(kvp.Key, kvp.Value);
-                    }
-                }
                 transportLogger?.Request(transportRequest);
+
                 if (transportRequest.Timeout.HasValue)
                 {
                     ctsWithTimeout =
@@ -140,29 +138,27 @@ namespace PubnubApi
                 HttpContent postData = null;
                 if (!string.IsNullOrEmpty(transportRequest.BodyContentString))
                 {
-                    postData = new StringContent(transportRequest.BodyContentString, Encoding.UTF8, "application/json");
+                    var contentType = "application/json";
+                    if (transportRequest.Headers.TryGetValue("Content-Type", out var ct))
+                    {
+                        contentType = ct;
+                    }
+                    postData = new StringContent(transportRequest.BodyContentString, Encoding.UTF8);
+                    postData.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse(contentType);
                 }
                 else if (transportRequest.BodyContentBytes != null)
                 {
                     postData = new ByteArrayContent(transportRequest.BodyContentBytes);
-                    foreach (var transportRequestHeader in transportRequest.Headers)
-                    {
-                        postData.Headers.Add(transportRequestHeader.Key, transportRequestHeader.Value);
-                    }
+                    ApplyHeaders(postData.Headers, transportRequest.Headers);
                 }
                 HttpRequestMessage requestMessage =
                     new HttpRequestMessage(method: HttpMethod.Post, requestUri: transportRequest.RequestUrl)
                         { Content = postData };
+
+                ApplyHeaders(requestMessage.Headers, transportRequest.Headers, excludeKey: "Content-Type");
                 ConfigureHttpVersion(requestMessage);
-                // Set Http Request header, When the header is not a payload content header.
-                if (transportRequest.Headers.Keys.Count > 0 && transportRequest.BodyContentBytes == null)
-                {
-                    foreach (var kvp in transportRequest.Headers)
-                    {
-                        requestMessage.Headers.Add(kvp.Key, kvp.Value);
-                    }
-                }
                 transportLogger?.Request(transportRequest);
+
                 if (transportRequest.Timeout.HasValue)
                 {
                     ctsWithTimeout =
@@ -214,30 +210,28 @@ namespace PubnubApi
 
                 if (!string.IsNullOrEmpty(transportRequest.BodyContentString))
                 {
-                    putData = new StringContent(transportRequest.BodyContentString, Encoding.UTF8, "application/json");
+                    var contentType = "application/json";
+                    if (transportRequest.Headers.TryGetValue("Content-Type", out var ct))
+                    {
+                        contentType = ct;
+                    }
+                    putData = new StringContent(transportRequest.BodyContentString, Encoding.UTF8);
+                    putData.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse(contentType);
                 }
                 else if (transportRequest.BodyContentBytes != null)
                 {
                     putData = new ByteArrayContent(transportRequest.FormData);
-                    foreach (var transportRequestHeader in transportRequest.Headers)
-                    {
-                        putData.Headers.Add(transportRequestHeader.Key, transportRequestHeader.Value);
-                    }
+                    ApplyHeaders(putData.Headers, transportRequest.Headers);
                 }
 
                 HttpRequestMessage requestMessage =
                     new HttpRequestMessage(method: HttpMethod.Put, requestUri: transportRequest.RequestUrl)
                         { Content = putData };
-                ConfigureHttpVersion(requestMessage);
-                if (transportRequest.Headers.Keys.Count > 0)
-                {
-                    foreach (var kvp in transportRequest.Headers)
-                    {
-                        requestMessage.Headers.Add(kvp.Key, kvp.Value);
-                    }
-                }
 
+                ApplyHeaders(requestMessage.Headers, transportRequest.Headers, excludeKey: "Content-Type");
+                ConfigureHttpVersion(requestMessage);
                 transportLogger?.Request(transportRequest);
+				
                 if (transportRequest.Timeout.HasValue)
                 {
                     ctsWithTimeout =
@@ -287,16 +281,11 @@ namespace PubnubApi
             {
                 HttpRequestMessage requestMessage =
                     new HttpRequestMessage(method: HttpMethod.Delete, requestUri: transportRequest.RequestUrl);
+                
+				ApplyHeaders(requestMessage.Headers, transportRequest.Headers);
                 ConfigureHttpVersion(requestMessage);
-                if (transportRequest.Headers.Keys.Count > 0)
-                {
-                    foreach (var kvp in transportRequest.Headers)
-                    {
-                        requestMessage.Headers.Add(kvp.Key, kvp.Value);
-                    }
-                }
-
                 transportLogger?.Request(transportRequest);
+				
                 if (transportRequest.Timeout.HasValue)
                 {
                     ctsWithTimeout =
@@ -348,31 +337,28 @@ namespace PubnubApi
 
                 if (!string.IsNullOrEmpty(transportRequest.BodyContentString))
                 {
-                    patchData = new StringContent(transportRequest.BodyContentString, Encoding.UTF8,
-                        "application/json");
+                    var contentType = "application/json";
+                    if (transportRequest.Headers.TryGetValue("Content-Type", out var ct))
+                    {
+                        contentType = ct;
+                    }
+                    patchData = new StringContent(transportRequest.BodyContentString, Encoding.UTF8);
+                    patchData.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse(contentType);
                 }
                 else if (transportRequest.BodyContentBytes != null)
                 {
                     patchData = new ByteArrayContent(transportRequest.FormData);
-                    foreach (var transportRequestHeader in transportRequest.Headers)
-                    {
-                        patchData.Headers.Add(transportRequestHeader.Key, transportRequestHeader.Value);
-                    }
+                    ApplyHeaders(patchData.Headers, transportRequest.Headers);
                 }
 
                 HttpRequestMessage requestMessage =
                     new HttpRequestMessage(new HttpMethod("PATCH"), requestUri: transportRequest.RequestUrl)
                         { Content = patchData };
-                ConfigureHttpVersion(requestMessage);
-                if (transportRequest.Headers.Keys.Count > 0)
-                {
-                    foreach (var kvp in transportRequest.Headers)
-                    {
-                        requestMessage.Headers.Add(kvp.Key, $"\"{kvp.Value}\"");
-                    }
-                }
 
+                ApplyHeaders(requestMessage.Headers, transportRequest.Headers, excludeKey: "Content-Type");
+                ConfigureHttpVersion(requestMessage);
                 transportLogger?.Request(transportRequest);
+				
                 if (transportRequest.Timeout.HasValue)
                 {
                     ctsWithTimeout =
@@ -413,6 +399,34 @@ namespace PubnubApi
 
             return transportResponse;
         }
+        
+        //This is because server returns eTag in the "someetag" format instead of "\"someetag\"" which is technically wrong,
+        //meaning that HttpHeaders.Add will throw a System.FormattingException, necessitating the usage of TryAddWithoutValidation() in these cases
+        private static readonly HashSet<string> HeadersWithRelaxedValidation = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "If-Match",
+            "If-None-Match"
+        };
+        private static void ApplyHeaders(HttpHeaders target, Dictionary<string, string> source, string excludeKey = null)
+        {
+            foreach (var kvp in source)
+            {
+                if (excludeKey != null && string.Equals(kvp.Key, excludeKey, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                if (HeadersWithRelaxedValidation.Contains(kvp.Key))
+                {
+                    target.TryAddWithoutValidation(kvp.Key, kvp.Value);
+                }
+                else
+                {
+                    target.Add(kvp.Key, kvp.Value);
+                }
+            }
+        }
+
         private TransportResponse GetTransportResponseForTaskCancelation(TransportRequest transportRequest,
             TaskCanceledException taskCanceledException, CancellationTokenSource ctsWithTimeout)
         {

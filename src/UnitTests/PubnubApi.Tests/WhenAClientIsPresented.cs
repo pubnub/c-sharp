@@ -578,7 +578,7 @@ namespace PubNubMessaging.Tests
 
             if (!receivedErrorMessage)
             {
-                if (!PubnubCommon.EnableStubTest) { Thread.Sleep(2000); }
+                if (!PubnubCommon.EnableStubTest) { Thread.Sleep(4000); }
                 else Thread.Sleep(200);
 
                 expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"Presence\", \"uuids\": [\"mytestuuid\"], \"occupancy\": 1}";
@@ -610,7 +610,7 @@ namespace PubNubMessaging.Tests
 
                 pubnub.Unsubscribe<string>().Channels(new[] { channel }).Execute();
 
-                if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
+                if (!PubnubCommon.EnableStubTest) Thread.Sleep(4000);
                 else Thread.Sleep(100);
             }
 
@@ -843,7 +843,7 @@ namespace PubNubMessaging.Tests
 
                 pubnub.Unsubscribe<string>().Channels(new[] { channel }).Execute();
 
-                if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
+                if (!PubnubCommon.EnableStubTest) Thread.Sleep(3000);
                 else Thread.Sleep(100);
             }
 
@@ -2614,7 +2614,7 @@ namespace PubNubMessaging.Tests
             pubnub = createPubNubInstance(config, authToken);
 
             pubnub.Subscribe<string>().Channels(new[] { subscribedChannel }).WithPresence().Execute();
-            await Task.Delay(3000);
+            await Task.Delay(6000);
 
             ManualResetEvent whereNowManualEvent = new ManualResetEvent(false);
             PNWhereNowResult whereNowResult = null;

@@ -14,6 +14,7 @@ namespace PubnubApi
 		public Action<Pubnub, PNSignalResult<object>> signalAction;
 		public Action<Pubnub, PNStatus> statusAction;
 		public Action<Pubnub, PNObjectEventResult> objectEventAction;
+		public Action<Pubnub, PNDataSyncEventResult> dataSyncEventAction;
 		public Action<Pubnub, PNMessageActionEventResult> messageAction;
 		public Action<Pubnub, PNFileEventResult> fileAction;
 
@@ -92,6 +93,17 @@ namespace PubnubApi
 			signalAction = null;
 			statusAction = statusCallback;
 			objectEventAction = objectEventCallback;
+			fileAction = null;
+		}
+
+		public SubscribeCallbackExt(Action<Pubnub, PNDataSyncEventResult> dataSyncEventCallback, Action<Pubnub, PNStatus> statusCallback)
+		{
+			subscribeAction = null;
+			presenceAction = null;
+			signalAction = null;
+			statusAction = statusCallback;
+			objectEventAction = null;
+			dataSyncEventAction = dataSyncEventCallback;
 			fileAction = null;
 		}
 
@@ -189,6 +201,25 @@ namespace PubnubApi
 			messageAction = messageActionCallback;
 			fileAction = fileCallback;
 		}
+		
+		public SubscribeCallbackExt(Action<Pubnub, PNMessageResult<object>> messageCallback,
+			Action<Pubnub, PNPresenceEventResult> presenceCallback,
+			Action<Pubnub, PNSignalResult<object>> signalCallback,
+			Action<Pubnub, PNObjectEventResult> objectEventCallback,
+			Action<Pubnub, PNDataSyncEventResult> dataSyncEventCallback,
+			Action<Pubnub, PNMessageActionEventResult> messageActionCallback,
+			Action<Pubnub, PNFileEventResult> fileCallback,
+			Action<Pubnub, PNStatus> statusCallback)
+		{
+			subscribeAction = messageCallback;
+			presenceAction = presenceCallback;
+			statusAction = statusCallback;
+			signalAction = signalCallback;
+			objectEventAction = objectEventCallback;
+			dataSyncEventAction = dataSyncEventCallback;
+			messageAction = messageActionCallback;
+			fileAction = fileCallback;
+		}
 
 		public override void Message<T>(Pubnub pubnub, PNMessageResult<T> message)
 		{
@@ -231,6 +262,11 @@ namespace PubnubApi
 		public override void ObjectEvent(Pubnub pubnub, PNObjectEventResult objectEvent)
 		{
 			objectEventAction?.Invoke(pubnub, objectEvent);
+		}
+
+		public override void DataSyncEvent(Pubnub pubnub, PNDataSyncEventResult dataSyncEvent)
+		{
+			dataSyncEventAction?.Invoke(pubnub, dataSyncEvent);
 		}
 
 		public override void MessageAction(Pubnub pubnub, PNMessageActionEventResult messageActionEvent)

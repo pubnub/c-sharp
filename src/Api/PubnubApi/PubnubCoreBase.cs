@@ -621,6 +621,25 @@ namespace PubnubApi
                                             continue;
                                         }
                                     }
+                                    else if (currentMessage.MessageType == 5) //DataSync events
+                                    {
+                                        Dictionary<string, object> dataSyncDic = payload as Dictionary<string, object>;
+                                        Dictionary<string, object> dataSyncMetadata = dataSyncDic != null
+                                            && dataSyncDic.ContainsKey("metadata") && dataSyncDic["metadata"] != null
+                                            ? jsonLib.ConvertToDictionaryObject(dataSyncDic["metadata"])
+                                            : null;
+                                        if (dataSyncMetadata != null
+                                            && dataSyncMetadata.ContainsKey("source")
+                                            && dataSyncMetadata["source"].ToString() == "data-sync")
+                                        {
+                                            jsonFields.Add("payload", payload);
+                                        }
+                                        else
+                                        {
+                                            LoggingMethod.WriteToLog(currentLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] ResponseToUserCallback - MessageType = 5 but NOT valid DataSync format to process", currentConfig.LogVerbosity);
+                                            continue;
+                                        }
+                                    }
                                     else
                                     {
                                         if ((currentConfig.CryptoModule != null || currentConfig.CipherKey.Length > 0) && currentMessage.MessageType != 1) //decrypt the subscriber message if cipherkey is available
@@ -765,6 +784,15 @@ namespace PubnubApi
                                                 }
                                             }
                                             Announce(fileMessage);
+                                        }
+                                    }
+                                    else if (currentMessage.MessageType == 5)
+                                    {
+                                        ResponseBuilder responseBuilder = new ResponseBuilder(currentConfig, jsonLib);
+                                        PNDataSyncEventResult dataSyncEvent = responseBuilder.GetEventResultObject<PNDataSyncEventResult>(jsonFields);
+                                        if (dataSyncEvent != null)
+                                        {
+                                            Announce(dataSyncEvent);
                                         }
                                     }
                                     else if (currentMessageChannel.Contains("-pnpres"))
@@ -1053,6 +1081,20 @@ namespace PubnubApi
                         {
                             status = new StatusBuilder(currentConfig, jsonLib).CreateStatusResponse<T>(type, category, asyncRequestState, statusCode, new PNException(jsonString));
                         }
+                    }
+                }
+                else if (deserializeStatus.TryGetValue("errors", out var errorListObject))
+                {
+                    var aggregateErrorsString = errorListObject.ToString();
+                    if (pubnubConfig.TryGetValue(PubnubInstance.InstanceId, out currentConfig))
+                    {
+                        statusCode = asyncRequestState?.Response?.StatusCode ?? 500;
+                        status = new StatusBuilder(currentConfig, jsonLib).CreateStatusResponse<T>(
+                            type, 
+                            PNStatusCategory.PNUnknownCategory,
+                            asyncRequestState, 
+                            statusCode, 
+                            new PNException(aggregateErrorsString));
                     }
                 }
 
@@ -1985,6 +2027,25 @@ namespace PubnubApi
                     try
                     {
                         callbackList[listenerIndex].ObjectEvent(PubnubInstance, objectApiEvent);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger?.Error($"error during event handler function, {ex.Message}");
+                    }
+                }
+            }
+        }
+
+        internal void Announce(PNDataSyncEventResult dataSyncEvent)
+        {
+            if (PubnubInstance != null && SubscribeCallbackListenerList.ContainsKey(PubnubInstance.InstanceId))
+            {
+                List<SubscribeCallback> callbackList = SubscribeCallbackListenerList[PubnubInstance.InstanceId];
+                for (int listenerIndex = 0; listenerIndex < callbackList.Count; listenerIndex++)
+                {
+                    try
+                    {
+                        callbackList[listenerIndex].DataSyncEvent(PubnubInstance, dataSyncEvent);
                     }
                     catch (Exception ex)
                     {

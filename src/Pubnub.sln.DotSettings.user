@@ -1,0 +1,7 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=7e406e57_002D8797_002D4000_002D9ca4_002D6d65da80aeb5/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="WhenDataSyncEntityIsRequested" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;And&gt;&#xD;
+    &lt;Namespace&gt;PubnubApi.Tests.DataSync&lt;/Namespace&gt;&#xD;
+    &lt;Project Location="C:\Users\jakub.grzesiowski\Projects\c-sharp\src\UnitTests\PubnubApi.Tests" Presentation="&amp;lt;UnitTests&amp;gt;\&amp;lt;PubnubApi.Tests&amp;gt;" /&gt;&#xD;
+  &lt;/And&gt;&#xD;
+&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

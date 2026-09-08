@@ -8,6 +8,18 @@ namespace PubNubMessaging.Tests
 {
     public class TestHarness
     {
+        private static readonly PNTokenAuthValues fullAccess = new PNTokenAuthValues()
+        {
+            Read = true,
+            Write = true,
+            Create = true,
+            Get = true,
+            Delete = true,
+            Join = true,
+            Update = true,
+            Manage = true
+        };
+        
         protected static Pubnub createPubNubInstance(PNConfiguration pnConfiguration, string authToken = "")
         {
             Pubnub pubnub = null;
@@ -53,17 +65,6 @@ namespace PubNubMessaging.Tests
             string channelGroupPattern = "foo.*";
             string uuidPattern = "fuu.*";
             
-            var fullAccess = new PNTokenAuthValues()
-            {
-                Read = true,
-                Write = true,
-                Create = true,
-                Get = true,
-                Delete = true,
-                Join = true,
-                Update = true,
-                Manage = true
-            };
             var grantResult = await pubnub.GrantToken().TTL(30).AuthorizedUuid(pubnub.PNConfig.UserId).Resources(
                 new PNTokenResources()
                 {
@@ -135,6 +136,53 @@ namespace PubNubMessaging.Tests
             PubnubCommon.GrantToken = grantResult.Result?.Token;
             Assert.IsTrue(grantResult.Status.Error == false && grantResult.Result != null, 
                 "GrantToken() failed.");
+        }
+
+        protected static async Task GenerateDataSyncTestToken(Pubnub pubnub, bool withProjections = false)
+        {
+            if (!string.IsNullOrEmpty(PubnubCommon.GrantToken))
+            {
+                return;
+            }
+            var config = new PNConfiguration(new UserId("ds_granter"))
+            {
+                SubscribeKey = PubnubCommon.DataSyncSubscribeKey,
+                PublishKey = PubnubCommon.DataSyncPublishKey,
+                SecretKey = PubnubCommon.DataSyncSecretKey
+            };
+            var granter = new Pubnub(config);
+            var grantOperation = granter.GrantToken()
+                .TTL(60)
+                .AuthorizedUserId(new UserId(pubnub.PNConfig.UserId))
+                .Patterns(new PNTokenPatterns
+                {
+                    Users = new Dictionary<string, PNTokenAuthValues>() { { ".*", fullAccess } },
+                    Channels = new Dictionary<string, PNTokenAuthValues>() { { ".*", fullAccess } },
+                    DataSync = new PNDataSyncTokenScopes
+                    {
+                        Entities = new Dictionary<string, PNTokenAuthValues> { { ".*", fullAccess } },
+                        Relationships = new Dictionary<string, PNTokenAuthValues> { { ".*", fullAccess } },
+                        Memberships = new Dictionary<string, PNTokenAuthValues> { { ".*", fullAccess } }
+                    }
+                });
+            if (withProjections)
+            {
+                grantOperation.DataSyncProjections(new PNDataSyncProjections
+                {
+                    Patterns = new PNDataSyncProjectionScope
+                    {
+                        Entities = new Dictionary<string, string> { { ".*", "admin" } },
+                        Users = new Dictionary<string, string> { { ".*", "admin" } },
+                        Channels = new Dictionary<string, string> { { ".*", "admin" } },
+                        Relationships = new Dictionary<string, string> { { ".*", "admin" } },
+                        Memberships = new Dictionary<string, string> { { ".*", "admin" } }
+                    }
+                });
+            }
+            var grant = await grantOperation.ExecuteAsync();
+            Assert.That(grant.Status.Error, Is.False,
+                $"Admin grant failed: {grant.Status.ErrorData?.Information}");
+            pubnub.SetAuthToken(grant.Result.Token);
         }
     }
 }

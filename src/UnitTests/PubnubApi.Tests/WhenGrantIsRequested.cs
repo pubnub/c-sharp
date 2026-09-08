@@ -1190,6 +1190,114 @@ namespace PubNubMessaging.Tests
             });
         }
 
+        [Test]
+        public static void ThenSetUuidPermsFailsWhenUserPermsIsUsedInSameScope()
+        {
+            server.ClearRequests();
+
+            PNConfiguration config = new PNConfiguration(new UserId("newuserid"))
+            {
+                SubscribeKey = "somesubkey",
+                PublishKey = "somepubkey",
+                SecretKey = "someseckey",
+                Secure = false
+            };
+            pubnub = createPubNubInstance(config);
+            server.RunOnHttps(config.Secure);
+
+            Assert.Throws<ArgumentException>(() =>
+            {
+                pubnub.GrantToken()
+                .TTL(5)
+                .Resources(new PNTokenResources()
+                {
+                    Uuids = new Dictionary<string, PNTokenAuthValues>() {
+                                { "uuid1", new PNTokenAuthValues() { Get = true } }
+                            },
+                    Users = new Dictionary<string, PNTokenAuthValues>() {
+                                { "usr1", new PNTokenAuthValues() { Get = true } }
+                            }
+                });
+            });
+        }
+
+        /// <summary>
+        /// Uuids in one scope and Users in another is tolerated for backward compatibility:
+        /// the request is still accepted, the Uuids permissions win, and the ignored Users
+        /// permissions are reported through a warning log rather than an exception.
+        /// </summary>
+        [Test]
+        public static void ThenSetUserPatternPermsWithUuidResourcePermsIsAccepted()
+        {
+            server.ClearRequests();
+
+            PNConfiguration config = new PNConfiguration(new UserId("newuserid"))
+            {
+                SubscribeKey = "somesubkey",
+                PublishKey = "somepubkey",
+                SecretKey = "someseckey",
+                Secure = false
+            };
+            pubnub = createPubNubInstance(config);
+            server.RunOnHttps(config.Secure);
+
+            Assert.DoesNotThrow(() =>
+            {
+                pubnub.GrantToken()
+                .TTL(5)
+                .Resources(new PNTokenResources()
+                {
+                    Uuids = new Dictionary<string, PNTokenAuthValues>() {
+                                { "uuid1", new PNTokenAuthValues() { Get = true } }
+                            }
+                })
+                .Patterns(new PNTokenPatterns()
+                {
+                    Users = new Dictionary<string, PNTokenAuthValues>() {
+                                { "usr-.*", new PNTokenAuthValues() { Get = true } }
+                            }
+                });
+            });
+        }
+
+        /// <summary>
+        /// The Channels/Spaces pair behaves the same way as Uuids/Users when the two names are
+        /// split across scopes: accepted, Channels win, and the drop is logged.
+        /// </summary>
+        [Test]
+        public static void ThenSetSpacePatternPermsWithChannelResourcePermsIsAccepted()
+        {
+            server.ClearRequests();
+
+            PNConfiguration config = new PNConfiguration(new UserId("newuserid"))
+            {
+                SubscribeKey = "somesubkey",
+                PublishKey = "somepubkey",
+                SecretKey = "someseckey",
+                Secure = false
+            };
+            pubnub = createPubNubInstance(config);
+            server.RunOnHttps(config.Secure);
+
+            Assert.DoesNotThrow(() =>
+            {
+                pubnub.GrantToken()
+                .TTL(5)
+                .Resources(new PNTokenResources()
+                {
+                    Channels = new Dictionary<string, PNTokenAuthValues>() {
+                                { "ch1", new PNTokenAuthValues() { Read = true } }
+                            }
+                })
+                .Patterns(new PNTokenPatterns()
+                {
+                    Spaces = new Dictionary<string, PNTokenAuthValues>() {
+                                { "sp-.*", new PNTokenAuthValues() { Read = true } }
+                            }
+                });
+            });
+        }
+
         public static byte[] HexStringToByteArray(string hex)
         {
             return Enumerable.Range(0, hex.Length)
