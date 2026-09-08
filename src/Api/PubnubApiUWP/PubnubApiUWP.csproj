@@ -1077,9 +1077,6 @@ Emit status PNUnexpectedDisconnectCategory when retry attempts exhausted. Instea
     <None Include="..\PubnubApi\LICENSE.txt" Link="LICENSE.txt" Pack="true" PackagePath="" />
     <EmbeddedResource Include="Properties\PubnubApiUWP.rd.xml" />
     <EmbeddedResource Remove="EndPoint\DataSync\**" />
-    <None Remove="EndPoint\DataSync\**" />
-    <EmbeddedResource Remove="EndPoint\DataSync\Specs\**" />
-    <None Remove="EndPoint\DataSync\Specs\**" />
   </ItemGroup>
   <!--<ItemGroup>
     <PackageReference Include="NETStandard.Library" Version="1.6.1"/>
@@ -1120,17 +1117,6 @@ Emit status PNUnexpectedDisconnectCategory when retry attempts exhausted. Instea
     <Folder Include="Model\Derived\Files\" />
     <Folder Include="Model\Derived\Objects\" />
     <Folder Include="Helper\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\PubnubApi\EndPoint\DataSync\Specs\common.yaml">
-      <Link>EndPoint\DataSync\Specs\common.yaml</Link>
-    </Content>
-    <Content Include="..\PubnubApi\EndPoint\DataSync\Specs\v4-data.yaml">
-      <Link>EndPoint\DataSync\Specs\v4-data.yaml</Link>
-    </Content>
-    <Content Include="..\PubnubApi\EndPoint\DataSync\Specs\v4-metadata.yaml">
-      <Link>EndPoint\DataSync\Specs\v4-metadata.yaml</Link>
-    </Content>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
