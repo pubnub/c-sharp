@@ -843,7 +843,7 @@ namespace PubNubMessaging.Tests
 
                 pubnub.Unsubscribe<string>().Channels(new[] { channel }).Execute();
 
-                if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
+                if (!PubnubCommon.EnableStubTest) Thread.Sleep(3000);
                 else Thread.Sleep(100);
             }
 
