@@ -74,8 +74,20 @@ namespace PubnubApi.Security.Crypto.Cryptors
 
                 using(ICryptoTransform decrypto = aesAlg.CreateDecryptor())
                 {
-                    byte[] buffer = decrypto.TransformFinalBlock(dataBytes, 0, dataBytes.Length);
-                    return buffer;
+                    try
+                    {
+                        byte[] buffer = decrypto.TransformFinalBlock(dataBytes, 0, dataBytes.Length);
+                        return buffer;
+                    }
+                    catch (CryptographicException ex)
+                    {
+                        // Collapse every crypto failure mode (bad padding, wrong block length, etc.)
+                        // into one generic error. The native message distinguishes these cases and
+                        // would otherwise expose a padding-oracle bit to a caller submitting ciphertexts.
+                        // The specific cause is kept in the internal log only, never on the thrown exception.
+                        logger?.Error($"Decryption failed: {ex.Message}");
+                        throw new PNException("Decrypt Error");
+                    }
                 }
             }
         }

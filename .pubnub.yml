@@ -1,8 +1,27 @@
 name: c-sharp
-version: "8.3.1"
+version: "8.3.4"
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog:
+  - date: 2026-07-29
+    version: v8.3.4
+    changes:
+      - type: bug
+        text: "Fixed issue related to Reconnect to retain subscription state."
+      - type: improvement
+        text: "Removed value cap from maxRetry in Linear/Exponential policies."
+      - type: improvement
+        text: "Emit status PNUnexpectedDisconnectCategory when retry attempts exhausted. Instead every retry attempt failures."
+  - date: 2026-07-20
+    version: v8.3.3
+    changes:
+      - type: feature
+        text: "Obscure exceptions thrown by cryptors to be available in logs only."
+  - date: 2026-07-15
+    version: v8.3.2
+    changes:
+      - type: bug
+        text: "Added additional checks to ensure that post-reconnection handshaking doesn't start with null values of Channels and ChannelGroups."
   - date: 2026-07-06
     version: v8.3.1
     changes:
@@ -1034,14 +1053,14 @@ features:
     - QUERY-PARAM
 supported-platforms:
   -
-    version: Pubnub 'C#' 8.3.1
+    version: Pubnub 'C#' 8.3.4
     platforms:
       - Windows 10 and up
       - Windows Server 2008 and up
     frameworks:
       - .Net Framework 4.5+
   -
-    version: PubnubPCL 'C#' 8.3.1
+    version: PubnubPCL 'C#' 8.3.4
     platforms:
       - Xamarin.Android
       - Xamarin.iOS
@@ -1053,7 +1072,7 @@ supported-platforms:
     frameworks:
       - .Net 4.5+
   -
-    version: PubnubUWP 'C#' 8.3.1
+    version: PubnubUWP 'C#' 8.3.4
     platforms:
       - Windows Phone 10
       - Universal Windows Apps
@@ -1077,7 +1096,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: Pubnub
-            location: https://github.com/pubnub/c-sharp/releases/tag/v8.3.1
+            location: https://github.com/pubnub/c-sharp/releases/tag/v8.3.4
             requires:
               -
                 name: ".Net"
@@ -1318,7 +1337,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: PubNubPCL
-            location: https://github.com/pubnub/c-sharp/releases/tag/v8.3.1
+            location: https://github.com/pubnub/c-sharp/releases/tag/v8.3.4
             requires:
               -
                 name: ".Net"
@@ -1669,7 +1688,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: PubnubUWP
-            location: https://github.com/pubnub/c-sharp/releases/tag/v8.3.1
+            location: https://github.com/pubnub/c-sharp/releases/tag/v8.3.4
             requires:
               -
                 name: "Universal Windows Platform Development"

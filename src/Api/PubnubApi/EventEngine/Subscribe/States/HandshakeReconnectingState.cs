@@ -39,6 +39,9 @@ namespace PubnubApi.EventEngine.Subscribe.States
 				Events.HandshakeReconnectGiveUpEvent handshakeReconnectGiveUp => new HandshakeFailedState() {
 					Channels = this.Channels,
 					ChannelGroups = this.ChannelGroups,
+					// Preserve the cursor so a Reconnect() after handshake retries are exhausted
+					// resumes from the last known timetoken instead of dropping it.
+					Cursor = this.Cursor,
 				}.With(
 					new EmitStatusInvocation(new PNStatus(handshakeReconnectGiveUp.Status) )
 				),
@@ -58,8 +61,8 @@ namespace PubnubApi.EventEngine.Subscribe.States
 				}.With(new EmitStatusInvocation(handshakeReconnectSuccess.Status)),
 
 				Events.SubscriptionRestoredEvent subscriptionRestored => new HandshakingState() {
-					Channels = subscriptionRestored.Channels,
-					ChannelGroups = subscriptionRestored.ChannelGroups,
+					Channels = subscriptionRestored.Channels?? Enumerable.Empty<string>(),
+					ChannelGroups = subscriptionRestored.ChannelGroups??Enumerable.Empty<string>(),
 					Cursor = subscriptionRestored.Cursor,
 
 				},

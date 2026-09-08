@@ -83,8 +83,8 @@ namespace PubnubApi.EventEngine.Subscribe.Effects
         {
             return await manager.HandshakeRequest(
                 PNOperationType.PNSubscribeOperation,
-                invocation.Channels.ToArray(),
-                invocation.ChannelGroups.ToArray(),
+                invocation.Channels?.ToArray(),
+                invocation.ChannelGroups?.ToArray(),
                 null,
                 null,
                 invocation.InitialSubscribeQueryParams,

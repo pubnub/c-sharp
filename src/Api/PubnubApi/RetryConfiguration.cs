@@ -32,7 +32,7 @@ namespace PubnubApi
 		public LinearRetryPolicy(int delay, int maxRetry)
 		{
 			this.delay = Math.Max(2, delay);
-			this.maxRetry = Math.Min(10, maxRetry);
+			this.maxRetry = maxRetry;
 		}
 
 
@@ -65,14 +65,14 @@ namespace PubnubApi
 		{
 			this.minDelay = Math.Max(2, minDelay);
 			this.maxDelay = Math.Min(150, maxDelay);
-			this.maxRetry = Math.Min(6, maxRetry);
+			this.maxRetry = maxRetry;
 		}
 
 		public int GetDelay(int attemptedRetries, PNStatus status, int? retryAfter)
 		{
 			if (status.StatusCode == 429 && retryAfter.HasValue && retryAfter > 0) return (int)retryAfter;
 			if (attemptedRetries == 0) return minDelay * 1000 + numGenerator.Next(1000);
-			return Math.Min((int)(Math.Pow(2, attemptedRetries) * 1000 + numGenerator.Next(1000)), maxDelay * 1000);
+			return (int)Math.Min(Math.Pow(2, attemptedRetries) * 1000 + numGenerator.Next(1000), maxDelay * 1000.0);
 		}
 
 		public bool ShouldRetry(int attemptedRetries, PNStatus status)

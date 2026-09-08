@@ -166,7 +166,10 @@ namespace PubnubApi
                     {
                         LoggingMethod.WriteToLog(pubnubLog, $"[{DateTime.Now.ToString(CultureInfo.InvariantCulture)}] Error: Decryption Error. {ex}", config.LogVerbosity);
                     }
-                    throw;
+                    // Do not re-throw the raw CryptographicException: its native message (and the
+                    // resulting PNStatusCategory) distinguishes bad padding from wrong block length,
+                    // which is a padding-oracle signal. Surface a single generic error instead.
+                    throw new PNException("Decrypt Error");
                 }
             }
         }
