@@ -96,13 +96,13 @@ namespace PubnubApi.EndPoint
                 return returnValue;
             }
 
-            if (parameters.RelationshipClassVersion < 1)
+            if (parameters.MembershipClassVersion < 1)
             {
                 var errStatus = new PNStatus
                 {
                     Error = true,
-                    ErrorData = new PNErrorData("RelationshipClassVersion must be >= 1",
-                        new ArgumentException("RelationshipClassVersion must be >= 1"))
+                    ErrorData = new PNErrorData("MembershipClassVersion must be >= 1",
+                        new ArgumentException("MembershipClassVersion must be >= 1"))
                 };
                 returnValue.Status = errStatus;
                 return returnValue;
@@ -193,7 +193,7 @@ namespace PubnubApi.EndPoint
 
             dataProperties.Add("channelId", parameters.ChannelId);
             dataProperties.Add("userId", parameters.UserId);
-            dataProperties.Add("relationshipClassVersion", parameters.RelationshipClassVersion);
+            dataProperties.Add("relationshipClassVersion", parameters.MembershipClassVersion);
 
             if (!string.IsNullOrEmpty(parameters.Status))
             {
