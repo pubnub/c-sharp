@@ -133,7 +133,7 @@ namespace PubnubApi.Tests.DataSync
                 Id = id,
                 ChannelId = channel.Id,
                 UserId = user.Id,
-                RelationshipClassVersion = TestRelationshipClassVersion,
+                MembershipClassVersion = TestRelationshipClassVersion,
                 Status = status,
                 Payload = payload ?? new Dictionary<string, object>
                 {
@@ -213,7 +213,7 @@ namespace PubnubApi.Tests.DataSync
                         Id = membershipId,
                         ChannelId = channel.Id,
                         UserId = user.Id,
-                        RelationshipClassVersion = TestRelationshipClassVersion,
+                        MembershipClassVersion = TestRelationshipClassVersion,
                         Status = "active",
                         Payload = new Dictionary<string, object>
                         {

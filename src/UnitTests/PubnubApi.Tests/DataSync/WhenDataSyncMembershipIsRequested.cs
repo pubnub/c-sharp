@@ -140,7 +140,7 @@ namespace PubnubApi.Tests.DataSync
             {
                 ChannelId = channelId,
                 UserId = userId,
-                RelationshipClassVersion = TestRelationshipClassVersion,
+                MembershipClassVersion = TestRelationshipClassVersion,
                 Status = status,
                 Payload = payload ?? new Dictionary<string, object>
                 {
@@ -181,7 +181,7 @@ namespace PubnubApi.Tests.DataSync
             {
                 ChannelId = channel.Id,
                 UserId = user.Id,
-                RelationshipClassVersion = TestRelationshipClassVersion,
+                MembershipClassVersion = TestRelationshipClassVersion,
                 Status = "active",
                 Payload = payload,
                 
@@ -214,7 +214,7 @@ namespace PubnubApi.Tests.DataSync
                 Id = membershipId,
                 ChannelId = channel.Id,
                 UserId = user.Id,
-                RelationshipClassVersion = TestRelationshipClassVersion,
+                MembershipClassVersion = TestRelationshipClassVersion,
                 Status = "active",
                 Payload = new Dictionary<string, object> { { "key", "value" } },
                 
@@ -237,7 +237,7 @@ namespace PubnubApi.Tests.DataSync
             {
                 ChannelId = channel.Id,
                 UserId = user.Id,
-                RelationshipClassVersion = TestRelationshipClassVersion,
+                MembershipClassVersion = TestRelationshipClassVersion,
                 Payload = new Dictionary<string, object> { { "key", "value" } },
                 
             });
@@ -260,7 +260,7 @@ namespace PubnubApi.Tests.DataSync
             {
                 ChannelId = channel.Id,
                 UserId = user.Id,
-                RelationshipClassVersion = TestRelationshipClassVersion,
+                MembershipClassVersion = TestRelationshipClassVersion,
                 
             });
 
@@ -994,7 +994,7 @@ namespace PubnubApi.Tests.DataSync
             {
                 ChannelId = channel.Id,
                 UserId = user.Id,
-                RelationshipClassVersion = TestRelationshipClassVersion,
+                MembershipClassVersion = TestRelationshipClassVersion,
                 Status = "new",
                 Payload = new Dictionary<string, object>
                 {
