@@ -2614,7 +2614,7 @@ namespace PubNubMessaging.Tests
             pubnub = createPubNubInstance(config, authToken);
 
             pubnub.Subscribe<string>().Channels(new[] { subscribedChannel }).WithPresence().Execute();
-            await Task.Delay(3000);
+            await Task.Delay(6000);
 
             ManualResetEvent whereNowManualEvent = new ManualResetEvent(false);
             PNWhereNowResult whereNowResult = null;
