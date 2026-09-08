@@ -578,7 +578,7 @@ namespace PubNubMessaging.Tests
 
             if (!receivedErrorMessage)
             {
-                if (!PubnubCommon.EnableStubTest) { Thread.Sleep(2000); }
+                if (!PubnubCommon.EnableStubTest) { Thread.Sleep(4000); }
                 else Thread.Sleep(200);
 
                 expected = "{\"status\": 200, \"message\": \"OK\", \"service\": \"Presence\", \"uuids\": [\"mytestuuid\"], \"occupancy\": 1}";
@@ -610,7 +610,7 @@ namespace PubNubMessaging.Tests
 
                 pubnub.Unsubscribe<string>().Channels(new[] { channel }).Execute();
 
-                if (!PubnubCommon.EnableStubTest) Thread.Sleep(1000);
+                if (!PubnubCommon.EnableStubTest) Thread.Sleep(4000);
                 else Thread.Sleep(100);
             }
 
