@@ -869,4 +869,598 @@ public class DataSyncSample
         }
         // snippet.end
     }
+
+    // Users - other examples
+
+    public static async Task GetUsersFilterFast()
+    {
+        // snippet.get_users_filter_fast
+        try
+        {
+            PNResult<PNDataSyncUsersListResult> response = await pubnub.DataSync.GetUsers(new GetUsersParameters
+            {
+                FilterFast = "type == \"shopper\"",
+            });
+
+            if (!response.Status.Error)
+            {
+                Console.WriteLine(response.Result.Data.Count);
+            }
+            else
+            {
+                Console.WriteLine($"Request can't be executed due to error: {response.Status.ErrorData.Information}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Request can't be executed due to error: {ex.Message}");
+        }
+        // snippet.end
+    }
+
+    public static async Task GetUsersFilter()
+    {
+        // snippet.get_users_filter
+        try
+        {
+            PNResult<PNDataSyncUsersListResult> response = await pubnub.DataSync.GetUsers(new GetUsersParameters
+            {
+                Filter = "name LIKE \"*Alice*\"",
+            });
+
+            if (!response.Status.Error)
+            {
+                Console.WriteLine(response.Result.Data.Count);
+            }
+            else
+            {
+                Console.WriteLine($"Request can't be executed due to error: {response.Status.ErrorData.Information}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Request can't be executed due to error: {ex.Message}");
+        }
+        // snippet.end
+    }
+
+    public static async Task GetUsersPagination()
+    {
+        // snippet.get_users_pagination
+        try
+        {
+            string cursor = null;
+            bool hasNext = true;
+            int page = 0;
+
+            while (hasNext)
+            {
+                PNResult<PNDataSyncUsersListResult> response = await pubnub.DataSync.GetUsers(new GetUsersParameters
+                {
+                    FilterFast = "type == \"shopper\"",
+                    Limit = 20,
+                    Cursor = cursor,
+                });
+
+                if (!response.Status.Error)
+                {
+                    Console.WriteLine($"Page {++page}: {response.Result.Data.Count}");
+                    cursor = response.Result.Meta.NextCursor;
+                    hasNext = response.Result.Meta.HasNext;
+                }
+                else
+                {
+                    Console.WriteLine($"Request can't be executed due to error: {response.Status.ErrorData.Information}");
+                    hasNext = false;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Request can't be executed due to error: {ex.Message}");
+        }
+        // snippet.end
+    }
+
+    // Channels - other examples
+
+    public static async Task GetChannelsFilterFast()
+    {
+        // snippet.get_channels_filter_fast
+        try
+        {
+            PNResult<PNDataSyncChannelsListResult> response = await pubnub.DataSync.GetChannels(new GetChannelsParameters
+            {
+                FilterFast = "type == \"promotion\"",
+            });
+
+            if (!response.Status.Error)
+            {
+                Console.WriteLine(response.Result.Data.Count);
+            }
+            else
+            {
+                Console.WriteLine($"Request can't be executed due to error: {response.Status.ErrorData.Information}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Request can't be executed due to error: {ex.Message}");
+        }
+        // snippet.end
+    }
+
+    public static async Task GetChannelsFilter()
+    {
+        // snippet.get_channels_filter
+        try
+        {
+            PNResult<PNDataSyncChannelsListResult> response = await pubnub.DataSync.GetChannels(new GetChannelsParameters
+            {
+                Filter = "name LIKE \"*Sale*\"",
+            });
+
+            if (!response.Status.Error)
+            {
+                Console.WriteLine(response.Result.Data.Count);
+            }
+            else
+            {
+                Console.WriteLine($"Request can't be executed due to error: {response.Status.ErrorData.Information}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Request can't be executed due to error: {ex.Message}");
+        }
+        // snippet.end
+    }
+
+    public static async Task GetChannelsPagination()
+    {
+        // snippet.get_channels_pagination
+        try
+        {
+            string cursor = null;
+            bool hasNext = true;
+            int page = 0;
+
+            while (hasNext)
+            {
+                PNResult<PNDataSyncChannelsListResult> response = await pubnub.DataSync.GetChannels(new GetChannelsParameters
+                {
+                    FilterFast = "type == \"promotion\"",
+                    Limit = 20,
+                    Cursor = cursor,
+                });
+
+                if (!response.Status.Error)
+                {
+                    Console.WriteLine($"Page {++page}: {response.Result.Data.Count}");
+                    cursor = response.Result.Meta.NextCursor;
+                    hasNext = response.Result.Meta.HasNext;
+                }
+                else
+                {
+                    Console.WriteLine($"Request can't be executed due to error: {response.Status.ErrorData.Information}");
+                    hasNext = false;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Request can't be executed due to error: {ex.Message}");
+        }
+        // snippet.end
+    }
+
+    // Memberships - other examples
+
+    public static async Task GetMembershipsByChannelId()
+    {
+        // snippet.get_memberships_by_channel_id
+        try
+        {
+            PNResult<PNDataSyncMembershipsListResult> response = await pubnub.DataSync.GetMemberships(new GetMembershipsParameters
+            {
+                ChannelId = "channel-summer-sale",
+                Limit = 20,
+            });
+
+            if (!response.Status.Error)
+            {
+                Console.WriteLine(response.Result.Data.Count);
+            }
+            else
+            {
+                Console.WriteLine($"Request can't be executed due to error: {response.Status.ErrorData.Information}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Request can't be executed due to error: {ex.Message}");
+        }
+        // snippet.end
+    }
+
+    public static async Task GetMembershipsFilterFast()
+    {
+        // snippet.get_memberships_filter_fast
+        try
+        {
+            PNResult<PNDataSyncMembershipsListResult> response = await pubnub.DataSync.GetMemberships(new GetMembershipsParameters
+            {
+                UserId = "user-alice",
+                FilterFast = "role == \"viewer\"",
+            });
+
+            if (!response.Status.Error)
+            {
+                Console.WriteLine(response.Result.Data.Count);
+            }
+            else
+            {
+                Console.WriteLine($"Request can't be executed due to error: {response.Status.ErrorData.Information}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Request can't be executed due to error: {ex.Message}");
+        }
+        // snippet.end
+    }
+
+    public static async Task GetMembershipsFilter()
+    {
+        // snippet.get_memberships_filter
+        try
+        {
+            PNResult<PNDataSyncMembershipsListResult> response = await pubnub.DataSync.GetMemberships(new GetMembershipsParameters
+            {
+                ChannelId = "channel-summer-sale",
+                Filter = "role LIKE \"*mod*\"",
+            });
+
+            if (!response.Status.Error)
+            {
+                Console.WriteLine(response.Result.Data.Count);
+            }
+            else
+            {
+                Console.WriteLine($"Request can't be executed due to error: {response.Status.ErrorData.Information}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Request can't be executed due to error: {ex.Message}");
+        }
+        // snippet.end
+    }
+
+    public static async Task GetMembershipsPagination()
+    {
+        // snippet.get_memberships_pagination
+        try
+        {
+            string cursor = null;
+            bool hasNext = true;
+            int page = 0;
+
+            while (hasNext)
+            {
+                PNResult<PNDataSyncMembershipsListResult> response = await pubnub.DataSync.GetMemberships(new GetMembershipsParameters
+                {
+                    UserId = "user-alice",
+                    Limit = 20,
+                    Cursor = cursor,
+                });
+
+                if (!response.Status.Error)
+                {
+                    Console.WriteLine($"Page {++page}: {response.Result.Data.Count}");
+                    cursor = response.Result.Meta.NextCursor;
+                    hasNext = response.Result.Meta.HasNext;
+                }
+                else
+                {
+                    Console.WriteLine($"Request can't be executed due to error: {response.Status.ErrorData.Information}");
+                    hasNext = false;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Request can't be executed due to error: {ex.Message}");
+        }
+        // snippet.end
+    }
+
+    // Entities - other examples
+
+    public static async Task GetEntitiesFilterFast()
+    {
+        // snippet.get_entities_filter_fast
+        try
+        {
+            PNResult<PNDataSyncEntitiesListResult> response = await pubnub.DataSync.GetEntities(new GetEntitiesParameters
+            {
+                EntityClass = "product",
+                FilterFast = "price < 100 && stock > 0",
+            });
+
+            if (!response.Status.Error)
+            {
+                Console.WriteLine(response.Result.Data.Count);
+            }
+            else
+            {
+                Console.WriteLine($"Request can't be executed due to error: {response.Status.ErrorData.Information}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Request can't be executed due to error: {ex.Message}");
+        }
+        // snippet.end
+    }
+
+    public static async Task GetEntitiesFilter()
+    {
+        // snippet.get_entities_filter
+        try
+        {
+            PNResult<PNDataSyncEntitiesListResult> response = await pubnub.DataSync.GetEntities(new GetEntitiesParameters
+            {
+                EntityClass = "product",
+                Filter = "name LIKE \"*sneaker*\" && !(status == \"discontinued\")",
+            });
+
+            if (!response.Status.Error)
+            {
+                Console.WriteLine(response.Result.Data.Count);
+            }
+            else
+            {
+                Console.WriteLine($"Request can't be executed due to error: {response.Status.ErrorData.Information}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Request can't be executed due to error: {ex.Message}");
+        }
+        // snippet.end
+    }
+
+    public static async Task GetEntitiesPagination()
+    {
+        // snippet.get_entities_pagination
+        try
+        {
+            string cursor = null;
+            bool hasNext = true;
+            int page = 0;
+
+            while (hasNext)
+            {
+                PNResult<PNDataSyncEntitiesListResult> response = await pubnub.DataSync.GetEntities(new GetEntitiesParameters
+                {
+                    EntityClass = "product",
+                    FilterFast = "price < 100",
+                    Limit = 20,
+                    Cursor = cursor,
+                });
+
+                if (!response.Status.Error)
+                {
+                    Console.WriteLine($"Page {++page}: {response.Result.Data.Count}");
+                    cursor = response.Result.Meta.NextCursor;
+                    hasNext = response.Result.Meta.HasNext;
+                }
+                else
+                {
+                    Console.WriteLine($"Request can't be executed due to error: {response.Status.ErrorData.Information}");
+                    hasNext = false;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Request can't be executed due to error: {ex.Message}");
+        }
+        // snippet.end
+    }
+
+    public static async Task UpdateEntityMultipleOperations()
+    {
+        // snippet.update_entity_multiple_operations
+        try
+        {
+            PNResult<PNDataSyncEntityResult> response = await pubnub.DataSync.UpdateEntity(new UpdateEntityParameters
+            {
+                Id = "product-sneaker-42",
+                Operations = new List<JsonPatchOperation>
+                {
+                    new JsonPatchOperation { Op = JsonPatchOperationType.Test, Path = "/payload/stock", Value = 8 },
+                    new JsonPatchOperation { Op = JsonPatchOperationType.Replace, Path = "/payload/price", Value = 74.99 },
+                    new JsonPatchOperation { Op = JsonPatchOperationType.Add, Path = "/payload/tags/-", Value = "clearance" },
+                    new JsonPatchOperation { Op = JsonPatchOperationType.Remove, Path = "/payload/legacy/field" },
+                    new JsonPatchOperation { Op = JsonPatchOperationType.Move, Path = "/payload/displayName", From = "/payload/legacyName" },
+                    new JsonPatchOperation { Op = JsonPatchOperationType.Copy, Path = "/payload/previousName", From = "/payload/displayName" },
+                },
+                IfMatch = "StUvWxYzAbCdEf",
+            });
+
+            if (!response.Status.Error)
+            {
+                Console.WriteLine(response.Result.Id);
+            }
+            else
+            {
+                Console.WriteLine($"Request can't be executed due to error: {response.Status.ErrorData.Information}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Request can't be executed due to error: {ex.Message}");
+        }
+        // snippet.end
+    }
+
+    // Relationships - other examples
+
+    public static async Task GetRelationshipsByEntityBId()
+    {
+        // snippet.get_relationships_by_entity_b_id
+        try
+        {
+            PNResult<PNDataSyncRelationshipsListResult> response = await pubnub.DataSync.GetRelationships(new GetRelationshipsParameters
+            {
+                RelationshipClass = "ProductOwner",
+                EntityBId = "product-sneaker-42",
+                Limit = 20,
+            });
+
+            if (!response.Status.Error)
+            {
+                Console.WriteLine(response.Result.Data.Count);
+            }
+            else
+            {
+                Console.WriteLine($"Request can't be executed due to error: {response.Status.ErrorData.Information}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Request can't be executed due to error: {ex.Message}");
+        }
+        // snippet.end
+    }
+
+    public static async Task GetRelationshipsFilterFast()
+    {
+        // snippet.get_relationships_filter_fast
+        try
+        {
+            PNResult<PNDataSyncRelationshipsListResult> response = await pubnub.DataSync.GetRelationships(new GetRelationshipsParameters
+            {
+                RelationshipClass = "ProductOwner",
+                FilterFast = "tier == \"gold\"",
+            });
+
+            if (!response.Status.Error)
+            {
+                Console.WriteLine(response.Result.Data.Count);
+            }
+            else
+            {
+                Console.WriteLine($"Request can't be executed due to error: {response.Status.ErrorData.Information}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Request can't be executed due to error: {ex.Message}");
+        }
+        // snippet.end
+    }
+
+    public static async Task GetRelationshipsFilter()
+    {
+        // snippet.get_relationships_filter
+        try
+        {
+            PNResult<PNDataSyncRelationshipsListResult> response = await pubnub.DataSync.GetRelationships(new GetRelationshipsParameters
+            {
+                RelationshipClass = "ProductOwner",
+                Filter = "!(tier == \"platinum\")",
+            });
+
+            if (!response.Status.Error)
+            {
+                Console.WriteLine(response.Result.Data.Count);
+            }
+            else
+            {
+                Console.WriteLine($"Request can't be executed due to error: {response.Status.ErrorData.Information}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Request can't be executed due to error: {ex.Message}");
+        }
+        // snippet.end
+    }
+
+    public static async Task GetRelationshipsPagination()
+    {
+        // snippet.get_relationships_pagination
+        try
+        {
+            string cursor = null;
+            bool hasNext = true;
+            int page = 0;
+
+            while (hasNext)
+            {
+                PNResult<PNDataSyncRelationshipsListResult> response = await pubnub.DataSync.GetRelationships(new GetRelationshipsParameters
+                {
+                    RelationshipClass = "ProductOwner",
+                    EntityAId = "seller-bob",
+                    Limit = 20,
+                    Cursor = cursor,
+                });
+
+                if (!response.Status.Error)
+                {
+                    Console.WriteLine($"Page {++page}: {response.Result.Data.Count}");
+                    cursor = response.Result.Meta.NextCursor;
+                    hasNext = response.Result.Meta.HasNext;
+                }
+                else
+                {
+                    Console.WriteLine($"Request can't be executed due to error: {response.Status.ErrorData.Information}");
+                    hasNext = false;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Request can't be executed due to error: {ex.Message}");
+        }
+        // snippet.end
+    }
+
+    // Real-time updates
+
+    public static async Task DataSyncEventListener()
+    {
+        // snippet.data_sync_event_listener
+        Channel channel = pubnub.Channel("product-sneaker-42");
+        Subscription subscription = channel.Subscription();
+
+        subscription.AddListener(new SubscribeCallbackExt(
+            (Pubnub pn, PNDataSyncEventResult dataSyncEvent) =>
+            {
+                string changedId = dataSyncEvent.EntityData?.Id
+                    ?? dataSyncEvent.RelationshipData?.Id
+                    ?? dataSyncEvent.Id;
+                Console.WriteLine($"{dataSyncEvent.Event} {changedId}");
+            },
+            (Pubnub pn, PNStatus status) => { }));
+
+        subscription.Subscribe<object>();
+        // snippet.end
+    }
+
+    // Projection channels
+
+    public static async Task SubscribeToProjectionChannels()
+    {
+        // snippet.subscribe_to_projection_channels
+        // Base projection: the __default__ view of the payload.
+        Subscription baseSubscription = pubnub.Channel("product-sneaker-42").Subscription();
+
+        // admin projection: the admin view of the payload.
+        Subscription adminSubscription = pubnub.Channel("__admin__product-sneaker-42").Subscription();
+        // snippet.end
+    }
 }

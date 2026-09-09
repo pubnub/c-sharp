@@ -1,5 +1,6 @@
 // snippet.using
 using PubnubApi;
+using PubnubApi.EndPoint;
 
 // snippet.end
 
@@ -888,6 +889,125 @@ public class PublishSubscribeSample
         );
 
         pubnub.AddListener(eventListener);
+        // snippet.end
+    }
+
+    public static async Task AddDataSyncListener()
+    {
+        // snippet.add_datasync_listener
+        // Using SubscribeCallbackExt
+        Subscription subscription = pubnub.Channel("product-sneaker-42").Subscription();
+
+        var listener = new SubscribeCallbackExt(
+            (Pubnub pn, PNDataSyncEventResult dataSyncEvent) => { /* handle event */ },
+            (Pubnub pn, PNStatus status) => { /* handle status */ });
+
+        subscription.AddListener(listener);
+        // snippet.end
+    }
+
+    public static async Task HandleDataSyncEvent()
+    {
+        // snippet.handle_datasync_event
+        // Subscribe to the object's id channel and attach the listener
+        const string objectId = "product-sneaker-42";
+        Channel channel = pubnub.Channel(objectId);
+        Subscription subscription = channel.Subscription();
+
+        var listener = new SubscribeCallbackExt(
+            (Pubnub pn, PNDataSyncEventResult dataSyncEvent) =>
+            {
+                // This channel can also receive relationship events and events about
+                // connected entities. Only handle events for the observed product.
+                string changedId = dataSyncEvent.Event == "delete"
+                    ? dataSyncEvent.Id
+                    : dataSyncEvent.EntityData?.Id;
+
+                if (dataSyncEvent.Type != "entity" || changedId != objectId)
+                {
+                    return;
+                }
+
+                switch (dataSyncEvent.Event)
+                {
+                    case "create":
+                        Console.WriteLine("Product created: " + changedId);
+                        break;
+                    case "update":
+                        Dictionary<string, object> payload = dataSyncEvent.EntityData?.Payload;
+                        if (payload != null && payload.TryGetValue("price", out object price))
+                        {
+                            Console.WriteLine("New price: " + price);
+                        }
+                        break;
+                    case "delete":
+                        Console.WriteLine("Product deleted: " + changedId);
+                        break;
+                }
+            },
+            (Pubnub pn, PNStatus status) => { /* handle status */ });
+
+        subscription.AddListener(listener);
+        subscription.Subscribe<object>();
+        // snippet.end
+    }
+
+    public static void DataSyncLocalCopySync()
+    {
+        // snippet.datasync_local_copy_sync
+        PNDataSyncEntityResult localCopy = null;
+
+        async void RefreshLocalCopy()
+        {
+            PNResult<PNDataSyncEntityResult> response = await pubnub.DataSync.GetEntity(new GetEntityParameters
+            {
+                Id = "product-sneaker-42",
+            });
+
+            if (!response.Status.Error)
+            {
+                localCopy = response.Result;
+            }
+        }
+
+        void ApplyEvent(PNDataSyncEventResult dataSyncEvent)
+        {
+            const string objectId = "product-sneaker-42";
+
+            // This channel can also receive relationship events and events about
+            // connected entities. Only apply events for the fetched entity.
+            // `Product` is a class of your own, so its events report Type "entity".
+            // A built-in user, channel, or membership reports "user", "channel", or "membership".
+            if (dataSyncEvent.Type != "entity")
+            {
+                return;
+            }
+
+            if (dataSyncEvent.Event == "delete")
+            {
+                if (dataSyncEvent.Id != objectId)
+                {
+                    return;
+                }
+
+                localCopy = null;
+                return;
+            }
+
+            PNDataSyncEntityResult changedEntity = dataSyncEvent.EntityData;
+            if (changedEntity == null || changedEntity.Id != objectId)
+            {
+                return;
+            }
+
+            // Skip events that are older than what you already have.
+            if (localCopy != null && string.CompareOrdinal(changedEntity.UpdatedAt, localCopy.UpdatedAt) <= 0)
+            {
+                return;
+            }
+
+            localCopy = changedEntity;
+        }
         // snippet.end
     }
 
