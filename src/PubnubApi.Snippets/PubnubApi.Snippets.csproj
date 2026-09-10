@@ -11,6 +11,7 @@
       <Folder Include="AccessManager\" />
       <Folder Include="ChannelGroup\" />
       <Folder Include="Configuration\" />
+      <Folder Include="DataSync\" />
       <Folder Include="Entities\" />
       <Folder Include="Files\" />
       <Folder Include="GettingStarted\" />

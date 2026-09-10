@@ -155,7 +155,95 @@ class AccessManagerSample
         }
         // snippet.end
     }
-    
+
+    static async Task GrantTokenDataSync()
+    {
+        // snippet.grant_token_datasync
+        try
+        {
+            PNResult<PNAccessManagerTokenResult> grantResponse = await pubnub.GrantToken()
+                .TTL(15)
+                .AuthorizedUuid("user-alice")
+                .Resources(new PNTokenResources
+                {
+                    DataSync = new PNDataSyncTokenScopes
+                    {
+                        Entities = new Dictionary<string, PNTokenAuthValues>
+                        {
+                            { "product-sneaker-42", new PNTokenAuthValues { Get = true } },
+                        },
+                    },
+                })
+                .Patterns(new PNTokenPatterns
+                {
+                    DataSync = new PNDataSyncTokenScopes
+                    {
+                        Entities = new Dictionary<string, PNTokenAuthValues>
+                        {
+                            { "product-.*", new PNTokenAuthValues { Get = true } },
+                        },
+                    },
+                })
+                .ExecuteAsync();
+
+            Console.WriteLine(grantResponse.Result.Token);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Request can't be executed due to error: {ex.Message}");
+        }
+        // snippet.end
+    }
+
+    static async Task GrantTokenDataSyncProjection()
+    {
+        // snippet.grant_token_datasync_projection
+        try
+        {
+            PNResult<PNAccessManagerTokenResult> grantResponse = await pubnub.GrantToken()
+                .TTL(15)
+                .AuthorizedUuid("user-alice")
+                .Resources(new PNTokenResources
+                {
+                    DataSync = new PNDataSyncTokenScopes
+                    {
+                        Entities = new Dictionary<string, PNTokenAuthValues>
+                        {
+                            { "product-sneaker-42", new PNTokenAuthValues { Get = true } },
+                        },
+                    },
+                })
+                .Patterns(new PNTokenPatterns
+                {
+                    DataSync = new PNDataSyncTokenScopes
+                    {
+                        Entities = new Dictionary<string, PNTokenAuthValues>
+                        {
+                            { "product-.*", new PNTokenAuthValues { Get = true } },
+                        },
+                    },
+                })
+                .DataSyncProjections(new PNDataSyncProjections
+                {
+                    Resources = new PNDataSyncProjectionScope
+                    {
+                        Entities = new Dictionary<string, string>
+                        {
+                            { "product-sneaker-42", "public" },
+                        },
+                    },
+                })
+                .ExecuteAsync();
+
+            Console.WriteLine(grantResponse.Result.Token);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Request can't be executed due to error: {ex.Message}");
+        }
+        // snippet.end
+    }
+
     static async Task GrantTokenOldBasicUsage()
     {
         // snippet.basic_usage_old
