@@ -7,7 +7,7 @@
     <AssemblyOriginatorKeyFile>pubnub.snk</AssemblyOriginatorKeyFile>
     <DelaySign>False</DelaySign>
     <IncludeSymbols>False</IncludeSymbols>
-    <AssemblyTitle>PubNub C# .NET - Web Data Push API</AssemblyTitle>
+    <AssemblyTitle>PubNub C# .NET SDK</AssemblyTitle>
     <AssemblyName>Pubnub</AssemblyName>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
   </PropertyGroup>
@@ -15,7 +15,7 @@
   <PropertyGroup>
     <PackageId>Pubnub</PackageId>
     <PackageVersion>9.0.0</PackageVersion>
-    <Title>PubNub C# .NET - Web Data Push API</Title>
+    <Title>PubNub C# .NET SDK</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
@@ -23,10 +23,10 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
     <PackageReleaseNotes>Added Data Sync feature support.</PackageReleaseNotes>
-    <PackageTags>Web Data Push Real-time Notifications ESB Message Broadcasting Distributed Computing</PackageTags>
-    <!--<Summary>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Summary>-->
-    <Description>PubNub is a Massively Scalable Web Push Service for Web and Mobile Games.  This is a cloud-based service for broadcasting messages to thousands of web and mobile clients simultaneously</Description>
-    <Copyright>PubNub 2012-2021</Copyright>
+	<PackageProjectUrl>https://www.pubnub.com/docs/sdks/c-sharp</PackageProjectUrl>
+    <PackageTags>Pubnub Realtime Real-time Publish-subscribe Pubsub Messaging Occupancy Presence Message-ordering Message-history Chat Long-poll</PackageTags>
+    <Description>PubNub SDK for C# .NET. Publish/subscribe messaging over HTTP long-poll with server-assigned message ordering, channel occupancy via Here Now, and message history through Message Persistence.</Description>
+    <Copyright>PubNub 2012-2026</Copyright>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   
