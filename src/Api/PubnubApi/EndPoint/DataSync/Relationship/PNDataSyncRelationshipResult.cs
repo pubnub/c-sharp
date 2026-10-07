@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace PubnubApi.EndPoint;
+namespace PubnubApi;
 
 /// <summary>
 /// Result returned by a single-relationship operation (Create, Get, Update, Patch).

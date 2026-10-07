@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace PubnubApi.EndPoint
+namespace PubnubApi
 {
     /// <summary>
     /// Parameters for retrieving an entity by ID via DataSync.

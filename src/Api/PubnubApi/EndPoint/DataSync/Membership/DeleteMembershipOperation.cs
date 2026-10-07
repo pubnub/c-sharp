@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using PubnubApi.EndPoint;
 
-namespace PubnubApi.EndPoint
+namespace PubnubApi
 {
     public class DeleteMembershipOperation : PubnubCoreBase
     {

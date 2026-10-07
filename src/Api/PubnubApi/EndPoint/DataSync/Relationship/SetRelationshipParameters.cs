@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace PubnubApi.EndPoint
+namespace PubnubApi
 {
     /// <summary>
     /// Parameters for updating a relationship with complete resource replacement (PUT) via DataSync.

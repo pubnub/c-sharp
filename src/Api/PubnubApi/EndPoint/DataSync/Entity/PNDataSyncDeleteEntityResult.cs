@@ -1,4 +1,4 @@
-namespace PubnubApi.EndPoint;
+namespace PubnubApi;
 
 public class PNDataSyncDeleteEntityResult
 {

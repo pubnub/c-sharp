@@ -114,10 +114,13 @@ namespace PubnubApi
         {
             if (pubnubConfig[InstanceId].EnableEventEngine)
             {
+                leaveOperation ??=
+                    new LeaveOperation(pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null,
+                        JsonPluggableLibrary, pubnubUnitTest, tokenManager, this);
                 UnsubscribeAllEndpoint<T> unsubscribeAllEndpoint = new UnsubscribeAllEndpoint<T>(
                     pubnubConfig.ContainsKey(InstanceId) ? pubnubConfig[InstanceId] : null, JsonPluggableLibrary,
-                    pubnubUnitTest, tokenManager, subscribeEventEngineFactory, presenceEventengineFactory,
-                    this);
+                    pubnubUnitTest, tokenManager, leaveOperation, subscribeEventEngineFactory,
+                    presenceEventengineFactory, this);
                 return unsubscribeAllEndpoint;
             }
             else

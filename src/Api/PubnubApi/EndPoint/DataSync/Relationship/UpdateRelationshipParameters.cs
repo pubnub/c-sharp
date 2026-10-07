@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace PubnubApi.EndPoint
+namespace PubnubApi
 {
     /// <summary>
     /// Parameters for partially updating a relationship via JSON Patch (RFC 6902).

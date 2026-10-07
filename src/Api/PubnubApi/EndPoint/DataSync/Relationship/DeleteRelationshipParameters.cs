@@ -1,4 +1,4 @@
-namespace PubnubApi.EndPoint
+namespace PubnubApi
 {
     /// <summary>
     /// Parameters for deleting a relationship by ID via DataSync.

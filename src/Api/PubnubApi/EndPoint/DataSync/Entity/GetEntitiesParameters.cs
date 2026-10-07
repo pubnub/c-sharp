@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace PubnubApi.EndPoint
+namespace PubnubApi
 {
     /// <summary>
     /// Parameters for listing entities via DataSync.

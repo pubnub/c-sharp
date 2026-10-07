@@ -100,6 +100,8 @@ namespace PubnubApi.EventEngine.Subscribe
 
 		public void UnsubscribeAll()
 		{
+			Channels.Clear();
+			ChannelGroups.Clear();
 			EventQueue.Enqueue(new UnsubscribeAllEvent());
 		}
 

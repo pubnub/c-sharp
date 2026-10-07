@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
+using PubnubApi.EndPoint;
 
-namespace PubnubApi.EndPoint;
+namespace PubnubApi;
 
 /// <summary>
 /// Entrypoint for PubNub Data Sync operations
