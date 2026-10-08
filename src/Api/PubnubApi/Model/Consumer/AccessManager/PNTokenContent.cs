@@ -17,6 +17,8 @@ namespace PubnubApi
 
         public PNTokenPatterns Patterns { get; set; }
 
+        public PNTokenCategories Categories { get; set; }
+
         public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>

@@ -20,5 +20,10 @@ namespace PubnubApi
 
         public Dictionary<string, Dictionary<string, PNAccessManagerKeyData>> Uuids { get; internal set; }
 
+        /// <summary>
+        /// Category-level permissions keyed by category ("channels", "uuids") and then by auth key.
+        /// </summary>
+        public Dictionary<string, Dictionary<string, PNAccessManagerKeyData>> Categories { get; internal set; }
+
     }
 }

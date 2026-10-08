@@ -244,6 +244,33 @@ class AccessManagerSample
         // snippet.end
     }
 
+    static async Task GrantTokenCategories()
+    {
+        // snippet.grant_token_categories
+        PNResult<PNAccessManagerTokenResult> grantTokenResponse = await pubnub.GrantToken()
+            .TTL(15)
+            .AuthorizedUuid("my-authorized-uuid")
+            .Categories(new PNTokenCategories()
+            {
+                // allow listing all channel metadata
+                Channels = new PNTokenCategoryPermissions() { Get = true },
+                // allow listing all uuid metadata
+                Uuids = new PNTokenCategoryPermissions() { Get = true }
+            })
+            .ExecuteAsync();
+        PNAccessManagerTokenResult grantTokenResult = grantTokenResponse.Result;
+        PNStatus grantTokenStatus = grantTokenResponse.Status;
+        if (!grantTokenStatus.Error && grantTokenResult != null)
+        {
+            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(grantTokenResult));
+        }
+        else
+        {
+            Console.WriteLine(pubnub.JsonPluggableLibrary.SerializeToJsonString(grantTokenStatus));
+        }
+        // snippet.end
+    }
+
     static async Task GrantTokenOldBasicUsage()
     {
         // snippet.basic_usage_old

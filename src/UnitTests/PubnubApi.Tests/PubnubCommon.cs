@@ -31,6 +31,10 @@ namespace PubNubMessaging.Tests
         public static readonly string DataSyncPublishKey = Environment.GetEnvironmentVariable("PN_DS_PUB_KEY");
         public static readonly string DataSyncSecretKey = Environment.GetEnvironmentVariable("PN_DS_SEC_KEY");
 
+        public static readonly string CategorySubscribeKey = Environment.GetEnvironmentVariable("PN_CAT_SUB_KEY");
+        public static readonly string CategoryPublishKey = Environment.GetEnvironmentVariable("PN_CAT_PUB_KEY");
+        public static readonly string CategorySecretKey = Environment.GetEnvironmentVariable("PN_CAT_SEC_KEY");
+
         static PubnubCommon()
         {
         }

@@ -562,6 +562,7 @@
     <Compile Include="..\PubnubApi\EndPoint\TokenManager.cs" Link="EndPoint\TokenManager.cs" />
     <Compile Include="..\PubnubApi\Enum\GrantBitFlag.cs" Link="Enum\GrantBitFlag.cs" />
     <Compile Include="..\PubnubApi\Enum\PNChannelMemberField.cs" Link="Enum\PNChannelMemberField.cs" />
+    <Compile Include="..\PubnubApi\Enum\PNGrantCategory.cs" Link="Enum\PNGrantCategory.cs" />
     <Compile Include="..\PubnubApi\Enum\PNHeartbeatNotificationOption.cs">
       <Link>Enum\PNHeartbeatNotificationOption.cs</Link>
     </Compile>
@@ -659,6 +660,7 @@
     <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNAccessManagerRevokeTokenResult.cs" Link="Model\Consumer\AccessManager\PNAccessManagerRevokeTokenResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNAccessManagerTokenResult.cs" Link="Model\Consumer\AccessManager\PNAccessManagerTokenResult.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNTokenAuthValues.cs" Link="Model\Consumer\AccessManager\PNTokenAuthValues.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNTokenCategories.cs" Link="Model\Consumer\AccessManager\PNTokenCategories.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNTokenContent.cs" Link="Model\Consumer\AccessManager\PNTokenContent.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNTokenPermissionMappingBase.cs" Link="Model\Consumer\AccessManager\PNTokenPermissionMappingBase.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\ChannelGroup\PNChannelGroupsAddChannelResult.cs">

@@ -298,6 +298,11 @@ namespace PubnubApi
                                 }
                             } //end of if uuid
 
+                            if (grantAckPayloadDict.ContainsKey("categories"))
+                            {
+                                ack.Categories = GetResourceAuthKeyData(jsonPlug, grantAckPayloadDict["categories"]);
+                            }
+
                         } //end of else subkey
 
                     }
@@ -306,6 +311,44 @@ namespace PubnubApi
             }
 
             return ack;
+        }
+
+        private static Dictionary<string, Dictionary<string, PNAccessManagerKeyData>> GetResourceAuthKeyData(IJsonPluggableLibrary jsonPlug, object resourceList)
+        {
+            Dictionary<string, Dictionary<string, PNAccessManagerKeyData>> resourceAuthKeyData = new Dictionary<string, Dictionary<string, PNAccessManagerKeyData>>();
+
+            Dictionary<string, object> resourceListDict = jsonPlug.ConvertToDictionaryObject(resourceList);
+            if (resourceListDict == null)
+            {
+                return resourceAuthKeyData;
+            }
+
+            foreach (string resource in resourceListDict.Keys)
+            {
+                Dictionary<string, object> resourceDataDict = jsonPlug.ConvertToDictionaryObject(resourceListDict[resource]);
+                if (resourceDataDict == null || !resourceDataDict.ContainsKey("auths"))
+                {
+                    continue;
+                }
+
+                Dictionary<string, PNAccessManagerKeyData> authKeyDataDict = new Dictionary<string, PNAccessManagerKeyData>();
+                Dictionary<string, object> authListDict = jsonPlug.ConvertToDictionaryObject(resourceDataDict["auths"]);
+                if (authListDict != null)
+                {
+                    foreach (string authKey in authListDict.Keys)
+                    {
+                        Dictionary<string, object> authDataDict = jsonPlug.ConvertToDictionaryObject(authListDict[authKey]);
+                        if (authDataDict != null && authDataDict.Count > 0)
+                        {
+                            authKeyDataDict.Add(authKey, GetAccessManagerKeyData(authDataDict));
+                        }
+                    }
+                }
+
+                resourceAuthKeyData.Add(resource, authKeyDataDict);
+            }
+
+            return resourceAuthKeyData;
         }
 
         private static PNAccessManagerKeyData GetAccessManagerKeyData(Dictionary<string, object> grantAccessDataDict)

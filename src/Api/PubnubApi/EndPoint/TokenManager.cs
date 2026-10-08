@@ -89,6 +89,7 @@ namespace PubnubApi.EndPoint
                             Spaces = new Dictionary<string, PNTokenAuthValues>(),
                             DataSync = NewDataSyncScopes()
                         };
+                        result.Categories = new PNTokenCategories();
                         ParseCBOR(cborDict, ref result);
                     }
                 }
@@ -178,6 +179,34 @@ namespace PubnubApi.EndPoint
             }
         }
 
+        private void FillTokenCategories(Dictionary<object, object> categoryValues, PNTokenCategories categories)
+        {
+            if (categoryValues == null)
+            {
+                return;
+            }
+            foreach (var categoryKvp in categoryValues)
+            {
+                var categoryType = ByteToString(categoryKvp.Key);
+                var categoryPermission = new PNTokenCategoryPermissions
+                {
+                    Get = (Convert.ToInt32(categoryKvp.Value) & (int)GrantBitFlag.GET) != 0
+                };
+                switch (categoryType)
+                {
+                    case "chan":
+                        categories.Channels = categoryPermission;
+                        break;
+                    case "uuid":
+                        categories.Uuids = categoryPermission;
+                        break;
+                    default:
+                        logger?.Error($"Unidentified category when parsing token! {categoryType}");
+                        break;
+                }
+            }
+        }
+
         private void ParseCBOR(Dictionary<object, object> cbor, ref PNTokenContent pnGrantTokenDecoded)
         {
             foreach (var kvp in cbor)
@@ -214,6 +243,9 @@ namespace PubnubApi.EndPoint
                         break;
                     case "pat":
                         FillTokenPermissionMapping(kvp.Value as Dictionary<object, object>, pnGrantTokenDecoded.Patterns);
+                        break;
+                    case "cat":
+                        FillTokenCategories(kvp.Value as Dictionary<object, object>, pnGrantTokenDecoded.Categories);
                         break;
                     default:
                         logger?.Error($"Unidentified key when parsing token! {key}");

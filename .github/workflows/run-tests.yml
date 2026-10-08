@@ -51,6 +51,9 @@ jobs:
           PN_PAM_PUB_KEY: ${{ secrets.SDK_PAM_PUB_KEY }}
           PN_PAM_SUB_KEY: ${{ secrets.SDK_PAM_SUB_KEY }}
           PN_PAM_SEC_KEY: ${{ secrets.SDK_PAM_SEC_KEY }}
+          PN_CAT_PUB_KEY: ${{ secrets.SDK_CAT_PUB_KEY }}
+          PN_CAT_SUB_KEY: ${{ secrets.SDK_CAT_SUB_KEY }}
+          PN_CAT_SEC_KEY: ${{ secrets.SDK_CAT_SEC_KEY }}
         run: dotnet test .\\src\\UnitTests\\PubnubApiPCL.Tests\\PubnubApiPCL.Tests.csproj --verbosity normal --logger "console;verbosity=detailed"
       - name: Cancel workflow runs for commit on error
         if: failure()
