@@ -66,7 +66,7 @@ namespace PubnubApi.EndPoint
                 if (ChannelLocalUserState.TryGetValue(instanceId, out var channelStates)) {
                     channelStates.Clear();
                 }
-                if (ChannelLocalUserState.TryGetValue(instanceId, out var channelGroupStates)) {
+                if (ChannelGroupLocalUserState.TryGetValue(instanceId, out var channelGroupStates)) {
                     channelGroupStates.Clear();
                 }
             }

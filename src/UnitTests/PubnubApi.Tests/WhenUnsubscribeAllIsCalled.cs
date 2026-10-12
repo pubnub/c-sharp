@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using PubnubApi;
@@ -140,6 +142,28 @@ namespace PubNubMessaging.Tests
                 "UnsubscribeAll did not send a leave request for the subscribed channel");
             Assert.IsFalse(recorder.LeaveUrls.Any(url => url.Contains("/channel/,/leave")),
                 "UnsubscribeAll sent a leave request without channels");
+        }
+
+        [Test]
+        public void ThenLocalPresenceStateShouldBeCleared()
+        {
+            var channelStates = SeedLocalUserState("ChannelLocalUserState", RandomChannel("unsub_all_state_ch"));
+            var channelGroupStates = SeedLocalUserState("ChannelGroupLocalUserState", RandomChannel("unsub_all_state_cg"));
+
+            pubnub.UnsubscribeAll<string>();
+
+            Assert.IsEmpty(channelStates, "Channel presence state should be cleared by UnsubscribeAll");
+            Assert.IsEmpty(channelGroupStates, "Channel group presence state should be cleared by UnsubscribeAll");
+        }
+
+        private ConcurrentDictionary<string, Dictionary<string, object>> SeedLocalUserState(string propertyName, string name)
+        {
+            var statesByInstance = (ConcurrentDictionary<string, ConcurrentDictionary<string, Dictionary<string, object>>>)typeof(PubnubCoreBase)
+                .GetProperty(propertyName, BindingFlags.NonPublic | BindingFlags.Static)
+                .GetValue(null);
+            var states = statesByInstance.GetOrAdd(pubnub.InstanceId, _ => new ConcurrentDictionary<string, Dictionary<string, object>>());
+            states[name] = new Dictionary<string, object> { { "mood", "happy" } };
+            return states;
         }
 
         private static string RandomChannel(string prefix) => $"{prefix}_{Guid.NewGuid().ToString().Substring(0, 8)}";

@@ -118,6 +118,7 @@
     <Compile Include="..\PubnubApi.Tests\WhenCategoryGrantIsEnforced.cs" Link="WhenCategoryGrantIsEnforced.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenCategoryGrantIsRequested.cs" Link="WhenCategoryGrantIsRequested.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenChannelGroupIsRequested.cs" Link="WhenChannelGroupIsRequested.cs" />
+    <Compile Include="..\PubnubApi.Tests\WhenDataSyncGrantIsRequested.cs" Link="WhenDataSyncGrantIsRequested.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenDetailedHistoryIsRequested.cs" Link="WhenDetailedHistoryIsRequested.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenFetchHistoryIsRequested.cs" Link="WhenFetchHistoryIsRequested.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenFileIsRequested.cs" Link="WhenFileIsRequested.cs" />
@@ -149,6 +150,7 @@
     <Compile Include="..\PubnubApi.Tests\WhenSubscriptionSplittingIsEnabled.cs">
       <Link>WhenSubscriptionSplittingIsEnabled.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi.Tests\WhenUnsubscribeAllIsCalled.cs" Link="WhenUnsubscribeAllIsCalled.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenUnsubscribedToAChannel.cs" Link="WhenUnsubscribedToAChannel.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenUnsubscribedToAChannelGroup.cs" Link="WhenUnsubscribedToAChannelGroup.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenUserIdInPNConfig.cs" Link="WhenUserIdInPNConfig.cs" />

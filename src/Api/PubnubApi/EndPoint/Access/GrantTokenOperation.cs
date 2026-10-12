@@ -178,6 +178,7 @@ namespace PubnubApi.EndPoint
 		public void Execute(PNCallback<PNAccessManagerTokenResult> callback)
 		{
 			logger?.Trace($"{GetType().Name} Execute invoked");
+			savedCallbackGrantToken = callback;
 			GrantAccess(callback);
 		}
 

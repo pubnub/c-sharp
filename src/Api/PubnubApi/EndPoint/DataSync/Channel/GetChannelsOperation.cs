@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using PubnubApi.EndPoint;
 
-namespace PubnubApi
+namespace PubnubApi.EndPoint
 {
     public class GetChannelsOperation : PubnubCoreBase
     {

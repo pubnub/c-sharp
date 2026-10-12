@@ -17,6 +17,9 @@ namespace PubnubApi
         public PNTokenCategoryPermissions Uuids { get; set; } = new PNTokenCategoryPermissions();
     }
 
+    /// <summary>
+    /// Permissions granted on a single App Context category.
+    /// </summary>
     public class PNTokenCategoryPermissions
     {
         /// <summary>

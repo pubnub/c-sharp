@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using PubnubApi;
@@ -13,6 +14,9 @@ namespace PubNubMessaging.Tests
     [TestFixture]
     public class WhenCategoryGrantIsEnforced : TestHarness
     {
+        private const int PropagationTimeoutMs = 10000;
+        private const int PollIntervalMs = 500;
+
         private Pubnub admin;
         private readonly List<Pubnub> clients = new List<Pubnub>();
 
@@ -76,8 +80,6 @@ namespace PubNubMessaging.Tests
                 .ExecuteAsync();
             Assert.That(grant.Status.Error, Is.False, grant.Status.ErrorData?.Information);
             Assert.That(grant.Result?.Token, Is.Not.Null.And.Not.Empty, "GrantToken returned no token");
-
-            await Task.Delay(1000); // allow token propagation
             return grant.Result.Token;
         }
 
@@ -91,22 +93,34 @@ namespace PubNubMessaging.Tests
                 .ExecuteAsync();
             Assert.That(grant.Status.Error, Is.False, grant.Status.ErrorData?.Information);
             Assert.That(grant.Result, Is.Not.Null, "Grant returned no result");
-
-            await Task.Delay(1000); // allow grant propagation
             return grant;
         }
 
-        private static async Task AssertGetAllChannelMetadata(Pubnub client, bool expectAllowed)
+        private static Task AssertGetAllChannelMetadata(Pubnub client, bool expectAllowed) =>
+            AssertGetAllEventually(async () => (await client.GetAllChannelMetadata().Limit(1).ExecuteAsync()).Status,
+                expectAllowed, "GetAllChannelMetadata");
+
+        private static Task AssertGetAllUuidMetadata(Pubnub client, bool expectAllowed) =>
+            AssertGetAllEventually(async () => (await client.GetAllUuidMetadata().Limit(1).ExecuteAsync()).Status,
+                expectAllowed, "GetAllUuidMetadata");
+
+        // Grants and revokes take effect asynchronously, so retry until the expected outcome or the timeout.
+        private static async Task AssertGetAllEventually(Func<Task<PNStatus>> getAll, bool expectAllowed, string operation)
         {
-            PNResult<PNGetAllChannelMetadataResult> result = await client.GetAllChannelMetadata().Limit(1).ExecuteAsync();
-            AssertGetAllStatus(result.Status, expectAllowed, "GetAllChannelMetadata");
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            PNStatus status = await getAll();
+            while (!HasExpectedOutcome(status, expectAllowed) && stopwatch.ElapsedMilliseconds < PropagationTimeoutMs)
+            {
+                await Task.Delay(PollIntervalMs);
+                status = await getAll();
+            }
+            AssertGetAllStatus(status, expectAllowed, operation);
         }
 
-        private static async Task AssertGetAllUuidMetadata(Pubnub client, bool expectAllowed)
-        {
-            PNResult<PNGetAllUuidMetadataResult> result = await client.GetAllUuidMetadata().Limit(1).ExecuteAsync();
-            AssertGetAllStatus(result.Status, expectAllowed, "GetAllUuidMetadata");
-        }
+        private static bool HasExpectedOutcome(PNStatus status, bool expectAllowed) =>
+            status != null && (expectAllowed
+                ? !status.Error && status.StatusCode == 200
+                : status.Error && status.StatusCode == 403);
 
         private static void AssertGetAllStatus(PNStatus status, bool expectAllowed, string operation)
         {
@@ -209,14 +223,15 @@ namespace PubNubMessaging.Tests
         {
             string authKey = UniqueId("category-auth");
             await GrantCategoriesAsync(authKey, true);
+            Pubnub client = CreateClient(UniqueId("category-client"), config => config.AuthKey = authKey);
+            await AssertGetAllChannelMetadata(client, true);
+            await AssertGetAllUuidMetadata(client, true);
 
             PNResult<PNAccessManagerGrantResult> revoke = await GrantCategoriesAsync(authKey, false);
 
             Assert.That(revoke.Result.Categories?.Keys, Is.EquivalentTo(new[] { "channels", "uuids" }));
             Assert.That(revoke.Result.Categories["channels"][authKey].GetEnabled, Is.False);
             Assert.That(revoke.Result.Categories["uuids"][authKey].GetEnabled, Is.False);
-
-            Pubnub client = CreateClient(UniqueId("category-client"), config => config.AuthKey = authKey);
 
             await AssertGetAllChannelMetadata(client, false);
             await AssertGetAllUuidMetadata(client, false);
