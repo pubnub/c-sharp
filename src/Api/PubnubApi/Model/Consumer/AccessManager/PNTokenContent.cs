@@ -17,6 +17,11 @@ namespace PubnubApi
 
         public PNTokenPatterns Patterns { get; set; }
 
+        /// <summary>
+        /// Category-level App Context permissions decoded from the token's "cat" section.
+        /// </summary>
+        public PNTokenCategories Categories { get; set; }
+
         public Dictionary<string, object> Meta { get; set; }
 
         /// <summary>

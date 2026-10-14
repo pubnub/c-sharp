@@ -1,6 +1,5 @@
 // snippet.using
 using PubnubApi;
-using PubnubApi.EndPoint;
 
 // snippet.end
 

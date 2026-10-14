@@ -12,7 +12,15 @@ namespace PubnubApi.EndPoint
         private readonly TokenManager pubnubTokenManager;
         private Dictionary<string, object> queryParam;
 
-        public UnsubscribeAllOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, tokenManager, instance)
+        public UnsubscribeAllOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, TokenManager tokenManager, Pubnub instance) : this(pubnubConfig, jsonPluggableLibrary, pubnubUnit, tokenManager, instance, true)
+        {
+        }
+
+        /// <param name="runLegacyUnsubscribe">
+        /// When false, the legacy SubscribeManager logic is skipped. Derived types use this to run their own
+        /// unsubscribe logic, which cannot be done through a virtual call from this constructor.
+        /// </param>
+        protected UnsubscribeAllOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, TokenManager tokenManager, Pubnub instance, bool runLegacyUnsubscribe) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, tokenManager, instance)
         {
             config = pubnubConfig;
             jsonLibrary = jsonPluggableLibrary;
@@ -20,7 +28,10 @@ namespace PubnubApi.EndPoint
             pubnubTokenManager = tokenManager;
             CurrentPubnubInstance(instance);
 
-            UnsubscribeAll();
+            if (runLegacyUnsubscribe)
+            {
+                UnsubscribeAll();
+            }
         }
 
         public UnsubscribeAllOperation<T> QueryParam(Dictionary<string, object> customQueryParam)

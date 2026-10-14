@@ -16,6 +16,7 @@ namespace PubnubApi.EndPoint
         private string[] pubnubChannelNames;
         private string[] pubnubChannelGroupNames;
         private string[] pubnubTargetUuids;
+        private PNGrantCategory[] pubnubCategories;
         private string[] pamAuthenticationKeys;
         private bool grantWrite;
         private bool grantRead;
@@ -50,6 +51,16 @@ namespace PubnubApi.EndPoint
         public GrantOperation Uuids(string[] targetUuids)
         {
             pubnubTargetUuids = targetUuids;
+            return this;
+        }
+
+        /// <summary>
+        /// App Context categories whose metadata the auth keys may list in full.
+        /// Requires AuthKeys and accepts only the Get permission: Get(true) grants, Get(false) revokes.
+        /// </summary>
+        public GrantOperation Categories(PNGrantCategory[] categories)
+        {
+            pubnubCategories = categories;
             return this;
         }
 
@@ -129,6 +140,7 @@ namespace PubnubApi.EndPoint
             {
                 throw new InvalidOperationException("Only Get/Update/Delete permissions are allowed for UUID");
             }
+            ValidateCategories();
             savedCallback = callback;
             GrantAccess(callback);
         }
@@ -143,12 +155,46 @@ namespace PubnubApi.EndPoint
             {
                 throw new InvalidOperationException("Only Get/Update/Delete permissions are allowed for UUID");
             }
+            ValidateCategories();
             return await GrantAccess().ConfigureAwait(false);
         }
 
         internal void Retry()
         {
             GrantAccess(savedCallback);
+        }
+
+        private void ValidateCategories()
+        {
+            if (pubnubCategories == null || pubnubCategories.Length == 0)
+            {
+                return;
+            }
+            if (pubnubCategories.Any(category => !Enum.IsDefined(typeof(PNGrantCategory), category)))
+            {
+                throw new InvalidOperationException("Only Channels and Uuids categories are supported");
+            }
+            if (pamAuthenticationKeys == null || !pamAuthenticationKeys.Any(auth => !string.IsNullOrEmpty(auth) && auth.Trim().Length > 0))
+            {
+                throw new InvalidOperationException("Category grants require at least one auth key");
+            }
+            if (grantRead || grantWrite || grantManage || grantDelete || grantUpdate || grantJoin)
+            {
+                throw new InvalidOperationException("Only Get permission is allowed for categories");
+            }
+        }
+
+        private static string GetCategoryQueryValue(PNGrantCategory category)
+        {
+            switch (category)
+            {
+                case PNGrantCategory.Channels:
+                    return "channels";
+                case PNGrantCategory.Uuids:
+                    return "uuids";
+                default:
+                    throw new InvalidOperationException("Only Channels and Uuids categories are supported");
+            }
         }
 
         internal void GrantAccess(PNCallback<PNAccessManagerGrantResult> callback)
@@ -161,6 +207,7 @@ namespace PubnubApi.EndPoint
                 "channels", pubnubChannelNames,
                 "channelGroups", pubnubChannelGroupNames,
                 "uuids", pubnubTargetUuids,
+                "categories", pubnubCategories,
                 "authKeys", pamAuthenticationKeys,
                 "read", grantRead,
                 "write", grantWrite,
@@ -212,6 +259,7 @@ namespace PubnubApi.EndPoint
                 "channels", pubnubChannelNames,
                 "channelGroups", pubnubChannelGroupNames,
                 "uuids", pubnubTargetUuids,
+                "categories", pubnubCategories,
                 "authKeys", pamAuthenticationKeys,
                 "read", grantRead,
                 "write", grantWrite,
@@ -277,6 +325,7 @@ namespace PubnubApi.EndPoint
             List<string> channelList = new List<string>();
             List<string> channelGroupList = new List<string>();
             List<string> uuidList = new List<string>();
+            List<string> categoryList = new List<string>();
             List<string> authList = new List<string>();
 
             if (pubnubChannelNames != null && pubnubChannelNames.Length > 0)
@@ -297,6 +346,11 @@ namespace PubnubApi.EndPoint
                 uuidList = uuidList.Where(uuid => !string.IsNullOrEmpty(uuid) && uuid.Trim().Length > 0).Distinct().ToList();
             }
 
+            if (pubnubCategories != null && pubnubCategories.Length > 0)
+            {
+                categoryList = pubnubCategories.Select(GetCategoryQueryValue).Distinct().ToList();
+            }
+
             if (pamAuthenticationKeys != null && pamAuthenticationKeys.Length > 0)
             {
                 authList = new List<string>(pamAuthenticationKeys);
@@ -306,6 +360,7 @@ namespace PubnubApi.EndPoint
             string channelsCommaDelimited = string.Join(",", channelList.OrderBy(x => x).ToArray());
             string channelGroupsCommaDelimited = string.Join(",", channelGroupList.OrderBy(x => x).ToArray());
             string targetUuidsCommaDelimited = string.Join(",", uuidList.OrderBy(x => x).ToArray());
+            string categoriesCommaDelimited = string.Join(",", categoryList.OrderBy(x => x).ToArray());
             string authKeysCommaDelimited = string.Join(",", authList.OrderBy(x => x).ToArray());
 
             List<string> pathSegments = new List<string>() {
@@ -336,6 +391,11 @@ namespace PubnubApi.EndPoint
             if (!string.IsNullOrEmpty(targetUuidsCommaDelimited))
             {
                 requestQueryStringParams.Add("target-uuid", UriUtil.EncodeUriComponent(targetUuidsCommaDelimited, PNOperationType.PNAccessManagerGrant, false, false, false));
+            }
+
+            if (!string.IsNullOrEmpty(categoriesCommaDelimited))
+            {
+                requestQueryStringParams.Add("category", UriUtil.EncodeUriComponent(categoriesCommaDelimited, PNOperationType.PNAccessManagerGrant, false, false, false));
             }
 
             if (grantTTL > -1)

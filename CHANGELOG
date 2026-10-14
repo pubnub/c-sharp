@@ -1,3 +1,9 @@
+v9.1.0 - October 13 2026
+-----------------------------
+- Added: categories permission support for Grant and GrantToken apis.
+
+- Fixed: ensure unsubscribeAll clears subscription state when event engine is enabled.
+
 v9.0.0 - September 08 2026
 -----------------------------
 - Added: added Data Sync feature support.

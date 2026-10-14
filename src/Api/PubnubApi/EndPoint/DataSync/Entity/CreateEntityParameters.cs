@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace PubnubApi.EndPoint
+namespace PubnubApi
 {
     /// <summary>
     /// Parameters for creating a new entity via DataSync.

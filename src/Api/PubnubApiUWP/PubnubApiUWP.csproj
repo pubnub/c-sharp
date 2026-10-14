@@ -16,7 +16,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubUWP</PackageId>
-    <PackageVersion>9.0.0</PackageVersion>
+    <PackageVersion>9.1.0</PackageVersion>
     <Title>PubNub C# .NET SDK</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -24,7 +24,8 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>Added Data Sync feature support.</PackageReleaseNotes>
+    <PackageReleaseNotes>Categories permission support for Grant and GrantToken apis.
+Ensure unsubscribeAll clears subscription state when event engine is enabled.</PackageReleaseNotes>
     <PackageProjectUrl>https://www.pubnub.com/docs/sdks/c-sharp</PackageProjectUrl>
 	<PackageTags>Pubnub Realtime Real-time Publish-subscribe Pubsub Messaging Occupancy Presence Message-ordering Message-history Chat Long-poll</PackageTags>
     <Description>PubNub SDK for C# .NET. Publish/subscribe messaging over HTTP long-poll with server-assigned message ordering, channel occupancy via Here Now, and message history through Message Persistence.</Description>
@@ -517,6 +518,7 @@
     </Compile>
     <Compile Include="..\PubnubApi\EndPoint\TokenManager.cs" Link="EndPoint\TokenManager.cs" />
     <Compile Include="..\PubnubApi\Enum\GrantBitFlag.cs" Link="Enum\GrantBitFlag.cs" />
+    <Compile Include="..\PubnubApi\Enum\PNGrantCategory.cs" Link="Enum\PNGrantCategory.cs" />
     <Compile Include="..\PubnubApi\Enum\PNHeartbeatNotificationOption.cs">
       <Link>Enum\PNHeartbeatNotificationOption.cs</Link>
     </Compile>
@@ -715,6 +717,7 @@
       <Link>Model\Consumer\AccessManager\PNDataSyncTokenScopes.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNTokenAuthValues.cs" Link="Model\Consumer\AccessManager\PNTokenAuthValues.cs" />
+    <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNTokenCategories.cs" Link="Model\Consumer\AccessManager\PNTokenCategories.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNTokenContent.cs" Link="Model\Consumer\AccessManager\PNTokenContent.cs" />
     <Compile Include="..\PubnubApi\Model\Consumer\AccessManager\PNTokenPermissionMappingBase.cs" Link="Model\Consumer\AccessManager\PNTokenPermissionMappingBase.cs" />
 

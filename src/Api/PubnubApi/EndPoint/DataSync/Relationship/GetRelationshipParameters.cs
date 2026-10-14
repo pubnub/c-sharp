@@ -1,4 +1,4 @@
-namespace PubnubApi.EndPoint
+namespace PubnubApi
 {
     /// <summary>
     /// Parameters for retrieving a relationship by ID via DataSync.

@@ -44,6 +44,7 @@ namespace PubnubApi.EndPoint
 		private string pubnubAuthorizedUuid = string.Empty;
 		private string pubnubAuthorizedUserId = string.Empty;
 		private PNDataSyncProjections pubnubDataSyncProjections;
+		private PNTokenCategories pubnubCategories;
 		
 		public GrantTokenOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary, IPubnubUnitTest pubnubUnit, EndPoint.TokenManager tokenManager, Pubnub instance) : base(pubnubConfig, jsonPluggableLibrary, pubnubUnit, tokenManager, instance)
 		{
@@ -136,6 +137,16 @@ namespace PubnubApi.EndPoint
 		}
 
 		/// <summary>
+		/// Category-level App Context permissions, e.g. listing all channel or uuid metadata.
+		/// Resource-level or pattern Get permissions do not imply them.
+		/// </summary>
+		public GrantTokenOperation Categories(PNTokenCategories categories)
+		{
+			this.pubnubCategories = categories;
+			return this;
+		}
+
+		/// <summary>
 		/// Assigns Data Sync projections to resources/patterns. The projection name
 		/// per resource is encoded into the token's meta "pn-projections" section.
 		/// Entity-level Data Sync permissions are set through <see cref="Resources"/> / <see cref="Patterns"/>.
@@ -167,6 +178,7 @@ namespace PubnubApi.EndPoint
 		public void Execute(PNCallback<PNAccessManagerTokenResult> callback)
 		{
 			logger?.Trace($"{GetType().Name} Execute invoked");
+			savedCallbackGrantToken = callback;
 			GrantAccess(callback);
 		}
 
@@ -194,6 +206,7 @@ namespace PubnubApi.EndPoint
 			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("GrantToken",
 				"resources", pubnubResources,
 				"patterns", pubnubPatterns,
+				"categories", BuildCategoryPermissions(),
 				"ttl", grantTTL,
 				"authorizedUuid", pubnubAuthorizedUuid,
 				"authorizedUserId", pubnubAuthorizedUserId,
@@ -275,6 +288,21 @@ namespace PubnubApi.EndPoint
 			return atleastOnePermission;
 		}
 
+		private Dictionary<string, int> BuildCategoryPermissions()
+		{
+			Dictionary<string, int> categories = new Dictionary<string, int>();
+			if (this.pubnubCategories == null) {
+				return categories;
+			}
+			if (this.pubnubCategories.Channels != null && this.pubnubCategories.Channels.Get) {
+				categories.Add("channels", (int)GrantBitFlag.GET);
+			}
+			if (this.pubnubCategories.Uuids != null && this.pubnubCategories.Uuids.Get) {
+				categories.Add("uuids", (int)GrantBitFlag.GET);
+			}
+			return categories;
+		}
+
 		private Dictionary<string, object> BuildProjectionsMeta()
 		{
 			if (this.pubnubDataSyncProjections == null) {
@@ -332,6 +360,7 @@ namespace PubnubApi.EndPoint
 			logger?.Debug(() => $"{GetType().Name} " + PubnubLogFormatter.Parameters("GrantToken",
 				"resources", pubnubResources,
 				"patterns", pubnubPatterns,
+				"categories", BuildCategoryPermissions(),
 				"ttl", grantTTL,
 				"authorizedUuid", pubnubAuthorizedUuid,
 				"authorizedUserId", pubnubAuthorizedUserId,
@@ -483,8 +512,13 @@ namespace PubnubApi.EndPoint
 			atleastOnePermission = AddDataSyncScopes(resourcesCollection, this.pubnubResources.DataSync, atleastOnePermission);
 			atleastOnePermission = AddDataSyncScopes(patternsCollection, this.pubnubPatterns.DataSync, atleastOnePermission);
 
+			Dictionary<string, int> categoryBitmaskPermCollection = BuildCategoryPermissions();
+			if (categoryBitmaskPermCollection.Count > 0) {
+				atleastOnePermission = true;
+			}
+
 			if (!atleastOnePermission) {
-				config?.Logger?.Warn("GrantToken At least one permission is needed for at least one or more of uuids/users, channels/spaces, groups or datasync entities/relationships/memberships");
+				config?.Logger?.Warn("GrantToken At least one permission is needed for at least one or more of uuids/users, channels/spaces, groups, categories or datasync entities/relationships/memberships");
 			}
 
 			Dictionary<string, object> optimizedMeta = new Dictionary<string, object>();
@@ -503,6 +537,9 @@ namespace PubnubApi.EndPoint
 				{ "patterns", patternsCollection },
 				{ "meta", optimizedMeta }
 			};
+			if (categoryBitmaskPermCollection.Count > 0) {
+				permissionCollection.Add("categories", categoryBitmaskPermCollection);
+			}
 			if (!string.IsNullOrEmpty(this.pubnubAuthorizedUuid) && this.pubnubAuthorizedUuid.Trim().Length > 0) {
 				permissionCollection.Add("uuid", this.pubnubAuthorizedUuid);
 			} else if (!string.IsNullOrEmpty(this.pubnubAuthorizedUserId) && this.pubnubAuthorizedUserId.Trim().Length > 0) {

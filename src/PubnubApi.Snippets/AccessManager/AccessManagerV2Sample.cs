@@ -235,4 +235,38 @@ public class AccessManagerV2Sample
         //PNAccessManagerGrantResult is a parsed and abstracted response from server
         // snippet.end
     }
+
+    static async Task GrantCategories()
+    {
+        // snippet.grant_categories
+        PNResult<PNAccessManagerGrantResult> grantResponse = await pubnub.Grant()
+            .Categories(new PNGrantCategory[] {
+                // allow listing all channel and uuid metadata
+                PNGrantCategory.Channels,
+                PNGrantCategory.Uuids
+            })
+            .Get(true) // the only permission allowed for categories
+            .AuthKeys(new string[] {
+                "my_authkey" // required for categories
+            })
+            .TTL(1440)
+            .ExecuteAsync();
+
+        PNAccessManagerGrantResult grantResult = grantResponse.Result;
+        PNStatus status = grantResponse.Status;
+        //PNAccessManagerGrantResult.Categories holds the granted categories per auth key
+
+        //Revoke by granting the same categories again with Get(false)
+        PNResult<PNAccessManagerGrantResult> revokeResponse = await pubnub.Grant()
+            .Categories(new PNGrantCategory[] {
+                PNGrantCategory.Channels,
+                PNGrantCategory.Uuids
+            })
+            .Get(false)
+            .AuthKeys(new string[] {
+                "my_authkey"
+            })
+            .ExecuteAsync();
+        // snippet.end
+    }
 }
