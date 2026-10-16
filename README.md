@@ -1,3 +1,5 @@
+<img width="1920" height="600" alt="csharp-header" src="https://github.com/user-attachments/assets/55b2b0de-7d0a-4b08-9ca4-d5a4e746b9f0" />
+
 # PubNub C# SDK
 
 [![NuGet](https://img.shields.io/nuget/v/PubnubPCL.svg)](https://www.nuget.org/packages/PubnubPCL)
