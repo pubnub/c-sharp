@@ -11,7 +11,11 @@ namespace PubnubApi.Security.Crypto
         private readonly Dictionary<string, ICryptor> _decryptors;
         public CryptoModule(ICryptor defaultCryptor, IEnumerable<ICryptor> decryptors)
         {
-            _encryptor = defaultCryptor ?? throw new ArgumentNullException(nameof(defaultCryptor));;
+            _encryptor = defaultCryptor ?? throw new ArgumentNullException(nameof(defaultCryptor));
+            if (defaultCryptor is AesGcmCryptor)
+            {
+                throw new ArgumentException("AesGcmCryptor is decrypt-only and cannot be used as the default cryptor. Pass it in the decryptors list instead.", nameof(defaultCryptor));
+            }
             _decryptors = new Dictionary<string, ICryptor>();
             AddDecryptor(_encryptor);
             if (decryptors != null)
@@ -49,6 +53,30 @@ namespace PubnubApi.Security.Crypto
         public static AesCbcCryptor CreateAesCbcCryptor(string cipherKey)
         {
             return new AesCbcCryptor(cipherKey);
+        }
+        public static AesGcmCryptor CreateAesGcmCryptor(string cipherKey, PubnubLogModule log)
+        {
+            return new AesGcmCryptor(cipherKey, log);
+        }
+        public static AesGcmCryptor CreateAesGcmCryptor(string cipherKey)
+        {
+            return new AesGcmCryptor(cipherKey);
+        }
+
+        /// <summary>
+        /// Builds the module the SDK uses when only a cipher key is configured. Every decryptor the
+        /// SDK supports for that key (including the decrypt-only AesGcmCryptor) is registered so data
+        /// written by newer clients can still be read.
+        /// </summary>
+        internal static CryptoModule CreateFromCipherKey(ICryptor encryptor, string cipherKey, PubnubLogModule log, params ICryptor[] additionalDecryptors)
+        {
+            List<ICryptor> decryptors = new List<ICryptor>();
+            if (additionalDecryptors != null)
+            {
+                decryptors.AddRange(additionalDecryptors);
+            }
+            decryptors.Add(new AesGcmCryptor(cipherKey, log));
+            return new CryptoModule(encryptor, decryptors);
         }
         public string Encrypt(string data)
         {

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace PubnubApi.Security.Crypto.Cryptors
 {
-    public class AesCbcCryptor : CryptorBase
+    public class AesCbcCryptor : CbcCryptorBase
     {
         private const string IDENTIFIER = "ACRH";
 

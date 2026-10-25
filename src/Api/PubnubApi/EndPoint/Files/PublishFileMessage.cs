@@ -290,7 +290,7 @@ namespace PubnubApi.EndPoint
 		{
 			string message = jsonLibrary.SerializeToJsonString(originalMessage);
 			if (config.CryptoModule != null || config.CipherKey.Length > 0) {
-				config.CryptoModule ??= new CryptoModule(new LegacyCryptor(config.CipherKey, config.UseRandomInitializationVector, config.Logger), null);
+				config.CryptoModule ??= CryptoModule.CreateFromCipherKey(new LegacyCryptor(config.CipherKey, config.UseRandomInitializationVector, config.Logger), config.CipherKey, config.Logger);
 				string encryptMessage = config.CryptoModule.Encrypt(message);
 				message = jsonLibrary.SerializeToJsonString(encryptMessage);
 			}

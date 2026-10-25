@@ -1347,6 +1347,195 @@ namespace PubNubMessaging.Tests
             Assert.AreEqual(aesBadPadding.GetType(), aesWrongLength.GetType());
         }
 
+        [Test]
+        public void TestAesGcmDecryptString()
+        {
+            string message = "\"Hello ACGM - zażółć gęślą jaźń 😀\"";
+            string payload = Convert.ToBase64String(BuildAcgmPayload("enigma", Encoding.UTF8.GetBytes(message)));
+
+            string decrypted = new AesGcmCryptor("enigma").Decrypt(payload);
+
+            Assert.AreEqual(message, decrypted);
+        }
+
+        [Test]
+        public void TestAesGcmDecryptBytes()
+        {
+            byte[] data = RandomBytes(1000);
+
+            byte[] decrypted = CryptoModule.CreateAesGcmCryptor("enigma").Decrypt(BuildAcgmPayload("enigma", data));
+
+            CollectionAssert.AreEqual(data, decrypted);
+        }
+
+        [Test]
+        public void TestAesGcmDecryptFile()
+        {
+            byte[] data = RandomBytes(4096);
+            string sourceFile = System.IO.Path.GetTempFileName();
+            string destinationFile = System.IO.Path.GetTempFileName();
+            try
+            {
+                System.IO.File.WriteAllBytes(sourceFile, BuildAcgmPayload("enigma", data));
+                CryptoModule cm = new CryptoModule(new AesCbcCryptor("enigma"), new List<ICryptor> { new AesGcmCryptor("enigma") });
+
+                cm.DecryptFile(sourceFile, destinationFile);
+
+                CollectionAssert.AreEqual(data, System.IO.File.ReadAllBytes(destinationFile));
+            }
+            finally
+            {
+                System.IO.File.Delete(sourceFile);
+                System.IO.File.Delete(destinationFile);
+            }
+        }
+
+        [Test]
+        public void TestCryptoModuleRoutesAcgmAcrhAndLegacyData()
+        {
+            string message = "yay!";
+            string acgm = Convert.ToBase64String(BuildAcgmPayload("enigma", Encoding.UTF8.GetBytes(message)));
+            string acrh = new AesCbcCryptor("enigma").Encrypt(message);
+            string legacy = new LegacyCryptor("enigma").Encrypt(message);
+            CryptoModule cm = new CryptoModule(new AesCbcCryptor("enigma"),
+                new List<ICryptor> { new LegacyCryptor("enigma"), new AesGcmCryptor("enigma") });
+
+            Assert.AreEqual(message, cm.Decrypt(acgm));
+            Assert.AreEqual(message, cm.Decrypt(acrh));
+            Assert.AreEqual(message, cm.Decrypt(legacy));
+        }
+
+        [Test]
+        public void TestCryptoModuleWithoutAesGcmDecryptorRejectsAcgmData()
+        {
+            string acgm = Convert.ToBase64String(BuildAcgmPayload("enigma", Encoding.UTF8.GetBytes("yay!")));
+            CryptoModule cm = new CryptoModule(new AesCbcCryptor("enigma"), new List<ICryptor> { new LegacyCryptor("enigma") });
+
+            PNException ex = Assert.Throws<PNException>(() => cm.Decrypt(acgm));
+            Assert.AreEqual("unknown cryptor error", ex.Message);
+        }
+
+        [Test]
+        public void TestAesGcmTamperedDataFailsWithGenericError()
+        {
+            byte[] valid = BuildAcgmPayload("enigma", Encoding.UTF8.GetBytes("a message protected by the GCM authentication tag"));
+            AesGcmCryptor cryptor = new AesGcmCryptor("enigma");
+            Assert.DoesNotThrow(() => cryptor.Decrypt(valid));
+
+            var failures = new List<PNException>
+            {
+                CaptureDecryptFailure(() => cryptor.Decrypt(FlipByte(valid, AcgmCipherTextOffset))),
+                CaptureDecryptFailure(() => cryptor.Decrypt(FlipByte(valid, valid.Length - 1))),
+                CaptureDecryptFailure(() => cryptor.Decrypt(FlipByte(valid, AcgmTagOffset))),
+                CaptureDecryptFailure(() => cryptor.Decrypt(FlipByte(valid, AcgmNonceOffset))),
+                CaptureDecryptFailure(() => new AesGcmCryptor("wrong-key").Decrypt(valid))
+            };
+
+            foreach (PNException ex in failures)
+            {
+                Assert.AreEqual("Decrypt Error", ex.Message, "GCM failures must surface a single generic error");
+                Assert.IsNull(ex.InnerException, "Native crypto exception must not be surfaced as inner exception");
+            }
+        }
+
+        [Test]
+        public void TestAesGcmMalformedPayloadIsRejected()
+        {
+            AesGcmCryptor cryptor = new AesGcmCryptor("enigma");
+            byte[] valid = BuildAcgmPayload("enigma", Encoding.UTF8.GetBytes("yay!"));
+
+            // Header declares a cryptor data size other than nonce (12) + tag (16).
+            Assert.Throws<PNException>(() => cryptor.Decrypt(BuildAcgmPayload("enigma", Encoding.UTF8.GetBytes("yay!"), 16)));
+            // Header, nonce and tag present but no cipher text.
+            Assert.Throws<PNException>(() => cryptor.Decrypt(valid.Take(AcgmCipherTextOffset).ToArray()));
+            // Truncated in the middle of the nonce.
+            Assert.Throws<PNException>(() => cryptor.Decrypt(valid.Take(AcgmNonceOffset + 5).ToArray()));
+            // Valid header of a different cryptor.
+            Assert.Throws<PNException>(() => cryptor.Decrypt(new AesCbcCryptor("enigma").Encrypt("yay!")));
+            // Not Base64 at all.
+            Assert.Throws<PNException>(() => cryptor.Decrypt("this is not base64 !!"));
+        }
+
+        [Test]
+        public void TestAesGcmEncryptionIsNotSupported()
+        {
+            AesGcmCryptor cryptor = new AesGcmCryptor("enigma");
+
+            Assert.Throws<NotSupportedException>(() => cryptor.Encrypt("yay!"));
+            Assert.Throws<NotSupportedException>(() => cryptor.Encrypt(new byte[] { 1, 2, 3 }));
+            Assert.Throws<NotSupportedException>(() => cryptor.EncryptFile("source", "destination"));
+        }
+
+        [Test]
+        public void TestCryptoModuleRejectsAesGcmAsDefaultCryptor()
+        {
+            Assert.Throws<ArgumentException>(() => new CryptoModule(new AesGcmCryptor("enigma"), null));
+        }
+
+        [Test]
+        public void TestCipherKeyOnlyConfigurationDecryptsAcgmData()
+        {
+            string message = "yay!";
+            byte[] payload = BuildAcgmPayload("enigma", Encoding.UTF8.GetBytes(message));
+            PNConfiguration config = CreateTestConfig();
+#pragma warning disable CS0618
+            config.CipherKey = "enigma";
+#pragma warning restore CS0618
+            Pubnub pubnub = new Pubnub(config);
+            try
+            {
+                Assert.AreEqual(message, pubnub.Decrypt(Convert.ToBase64String(payload)));
+                CollectionAssert.AreEqual(Encoding.UTF8.GetBytes(message), pubnub.DecryptFile(payload));
+                Assert.AreEqual(message, pubnub.Decrypt(Convert.ToBase64String(payload), "enigma"));
+            }
+            finally
+            {
+                pubnub.Destroy();
+            }
+        }
+
+        private const int AcgmNonceOffset = 10;
+        private const int AcgmTagOffset = AcgmNonceOffset + 12;
+        private const int AcgmCipherTextOffset = AcgmTagOffset + 16;
+
+        /// <summary>
+        /// Builds an ACGM payload with the platform AesGcm implementation (independent of the
+        /// BouncyCastle-based decryptor under test): PNED | 0x01 | ACGM | size | nonce(12) | tag(16) | cipher text.
+        /// </summary>
+        private static byte[] BuildAcgmPayload(string cipherKey, byte[] plainBytes, byte cryptorDataSize = 28)
+        {
+            byte[] key;
+            using (var sha256 = System.Security.Cryptography.SHA256.Create())
+            {
+                key = sha256.ComputeHash(Encoding.UTF8.GetBytes(cipherKey));
+            }
+            byte[] nonce = new byte[12];
+            System.Security.Cryptography.RandomNumberGenerator.Fill(nonce);
+            byte[] cipherText = new byte[plainBytes.Length];
+            byte[] tag = new byte[16];
+            using (var gcm = new System.Security.Cryptography.AesGcm(key))
+            {
+                gcm.Encrypt(nonce, plainBytes, cipherText, tag);
+            }
+
+            var payload = new List<byte>();
+            payload.AddRange(Encoding.ASCII.GetBytes("PNED"));
+            payload.Add(1);
+            payload.AddRange(Encoding.ASCII.GetBytes("ACGM"));
+            payload.Add(cryptorDataSize);
+            payload.AddRange(nonce);
+            payload.AddRange(tag);
+            payload.AddRange(cipherText);
+            return payload.ToArray();
+        }
+
+        private static byte[] FlipByte(byte[] data, int index)
+        {
+            byte[] copy = (byte[])data.Clone();
+            copy[index] ^= 0x01;
+            return copy;
+        }
+
         private static PNException CaptureDecryptFailure(TestDelegate act)
         {
             return Assert.Throws<PNException>(act);

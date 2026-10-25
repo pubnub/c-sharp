@@ -67,6 +67,9 @@ Ensure unsubscribeAll clears subscription state when event engine is enabled.</P
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="BouncyCastle.Cryptography" Version="2.7.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net35'">

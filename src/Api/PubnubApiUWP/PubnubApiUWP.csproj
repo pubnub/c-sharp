@@ -36,8 +36,9 @@ Ensure unsubscribeAll clears subscription state when event engine is enabled.</P
     <DefineConstants>$(DefineConstants);NETFX_CORE;WINDOWS_UWP;UAP</DefineConstants>
     <NugetTargetMoniker>UAP,Version=v10.0</NugetTargetMoniker>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-    <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.15063.0</TargetPlatformVersion>
-    <TargetPlatformMinVersion>10.0.10586.0</TargetPlatformMinVersion>
+    <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.16299.0</TargetPlatformVersion>
+    <!-- 16299 is the first UWP version supporting .NET Standard 2.0, required by BouncyCastle.Cryptography. -->
+    <TargetPlatformMinVersion>10.0.16299.0</TargetPlatformMinVersion>
     <TargetFrameworkIdentifier>.NETCore</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
@@ -57,8 +58,8 @@ Ensure unsubscribeAll clears subscription state when event engine is enabled.</P
     <AssemblyName>PubnubUWP</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-    <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.15063.0</TargetPlatformVersion>
-    <TargetPlatformMinVersion>10.0.10586.0</TargetPlatformMinVersion>
+    <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.16299.0</TargetPlatformVersion>
+    <TargetPlatformMinVersion>10.0.16299.0</TargetPlatformMinVersion>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -934,6 +935,12 @@ Ensure unsubscribeAll clears subscription state when event engine is enabled.</P
     <Compile Include="..\PubnubApi\PNSDK\IPNSDKSource.cs">
       <Link>PNSDK\IPNSDKSource.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi\Security\Crypto\Cryptors\AesGcmCryptor.cs">
+      <Link>Security\Crypto\Cryptors\AesGcmCryptor.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Security\Crypto\Cryptors\CbcCryptorBase.cs">
+      <Link>Security\Crypto\Cryptors\CbcCryptorBase.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\Transport\HttpClientService.cs" Link="Transport\HttpClientService.cs" />
     <Compile Include="..\PubnubApi\Transport\TransportLogger.cs" Link="Transport\TransportLogger.cs" />
     <Compile Include="..\PubnubApi\Transport\Middleware.cs" Link="Transport\Middleware.cs" />
@@ -1090,6 +1097,9 @@ Ensure unsubscribeAll clears subscription state when event engine is enabled.</P
       <Version>13.0.3</Version>
     </PackageReference>
     <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.0" />
+    <PackageReference Include="BouncyCastle.Cryptography" Version="2.7.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="System.Collections.Concurrent">
       <Version>4.3.0</Version>
       <PrivateAssets>None</PrivateAssets>

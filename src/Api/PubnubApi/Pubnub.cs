@@ -933,9 +933,10 @@ namespace PubnubApi
                     throw new ArgumentException("CryptoModule missing");
                 }
 
-                pubnubConfig[InstanceId].CryptoModule ??= new CryptoModule(
+                pubnubConfig[InstanceId].CryptoModule ??= CryptoModule.CreateFromCipherKey(
                     new LegacyCryptor(pubnubConfig[InstanceId].CipherKey,
-                        pubnubConfig[InstanceId].UseRandomInitializationVector), null);
+                        pubnubConfig[InstanceId].UseRandomInitializationVector),
+                    pubnubConfig[InstanceId].CipherKey, pubnubConfig[InstanceId].Logger);
                 return pubnubConfig[InstanceId].CryptoModule.Decrypt(inputString);
             }
             else
@@ -951,7 +952,7 @@ namespace PubnubApi
                 throw new ArgumentException("inputString is not valid");
             }
 
-            return new CryptoModule(new LegacyCryptor(cipherKey, true), null).Decrypt(inputString);
+            return CryptoModule.CreateFromCipherKey(new LegacyCryptor(cipherKey, true), cipherKey, null).Decrypt(inputString);
         }
 
         public string Encrypt(string inputString)
@@ -969,9 +970,10 @@ namespace PubnubApi
                     throw new MissingMemberException("CryptoModule missing");
                 }
 
-                pubnubConfig[InstanceId].CryptoModule ??= new CryptoModule(
+                pubnubConfig[InstanceId].CryptoModule ??= CryptoModule.CreateFromCipherKey(
                     new LegacyCryptor(pubnubConfig[InstanceId].CipherKey,
-                        pubnubConfig[InstanceId].UseRandomInitializationVector), null);
+                        pubnubConfig[InstanceId].UseRandomInitializationVector),
+                    pubnubConfig[InstanceId].CipherKey, pubnubConfig[InstanceId].Logger);
                 return pubnubConfig[InstanceId].CryptoModule.Encrypt(inputString);
             }
             else
@@ -1005,8 +1007,9 @@ namespace PubnubApi
                     throw new MissingMemberException("CryptoModule missing");
                 }
 
-                pubnubConfig[InstanceId].CryptoModule ??=
-                    new CryptoModule(new LegacyCryptor(pubnubConfig[InstanceId].CipherKey, true), null);
+                pubnubConfig[InstanceId].CryptoModule ??= CryptoModule.CreateFromCipherKey(
+                    new LegacyCryptor(pubnubConfig[InstanceId].CipherKey, true),
+                    pubnubConfig[InstanceId].CipherKey, pubnubConfig[InstanceId].Logger);
                 return pubnubConfig[InstanceId].CryptoModule.Encrypt(inputBytes);
             }
             else
@@ -1106,9 +1109,10 @@ namespace PubnubApi
                     throw new ArgumentException("CryptoModule missing");
                 }
 
-                pubnubConfig[InstanceId].CryptoModule ??= new CryptoModule(
+                pubnubConfig[InstanceId].CryptoModule ??= CryptoModule.CreateFromCipherKey(
                     new LegacyCryptor(pubnubConfig[InstanceId].CipherKey,
-                        pubnubConfig[InstanceId].UseRandomInitializationVector), null);
+                        pubnubConfig[InstanceId].UseRandomInitializationVector),
+                    pubnubConfig[InstanceId].CipherKey, pubnubConfig[InstanceId].Logger);
                 return pubnubConfig[InstanceId].CryptoModule.Decrypt(inputBytes);
             }
             else
@@ -1162,7 +1166,7 @@ namespace PubnubApi
                 throw new ArgumentException("inputBytes is not valid");
             }
 
-            return new CryptoModule(new LegacyCryptor(cipherKey, true), null).Decrypt(inputBytes);
+            return CryptoModule.CreateFromCipherKey(new LegacyCryptor(cipherKey, true), cipherKey, null).Decrypt(inputBytes);
         }
 
         public void DecryptFile(string sourceFile, string destinationFile, string cipherKey)

@@ -903,6 +903,12 @@ Ensure unsubscribeAll clears subscription state when event engine is enabled.</P
     <Compile Include="..\PubnubApi\Security\Crypto\Common\Util.cs" Link="Security\Crypto\Common\Util.cs" />
     <Compile Include="..\PubnubApi\Security\Crypto\CryptoModule.cs" Link="Security\Crypto\CryptoModule.cs" />
     <Compile Include="..\PubnubApi\Security\Crypto\Cryptors\AesCbcCryptor.cs" Link="Security\Crypto\Cryptors\AesCbcCryptor.cs" />
+    <Compile Include="..\PubnubApi\Security\Crypto\Cryptors\AesGcmCryptor.cs">
+      <Link>Security\Crypto\Cryptors\AesGcmCryptor.cs</Link>
+    </Compile>
+    <Compile Include="..\PubnubApi\Security\Crypto\Cryptors\CbcCryptorBase.cs">
+      <Link>Security\Crypto\Cryptors\CbcCryptorBase.cs</Link>
+    </Compile>
     <Compile Include="..\PubnubApi\Security\Crypto\Cryptors\CryptorBase.cs" Link="Security\Crypto\Cryptors\CryptorBase.cs" />
     <Compile Include="..\PubnubApi\Security\Crypto\Cryptors\CryptorHeader.cs" Link="Security\Crypto\Cryptors\CryptorHeader.cs" />
     <Compile Include="..\PubnubApi\Security\Crypto\Cryptors\LegacyCryptor.cs" Link="Security\Crypto\Cryptors\LegacyCryptor.cs" />
@@ -951,6 +957,9 @@ Ensure unsubscribeAll clears subscription state when event engine is enabled.</P
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
+    <PackageReference Include="BouncyCastle.Cryptography" Version="2.7.0">
+      <PrivateAssets>None</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
   
   <ItemGroup>
@@ -998,7 +1007,6 @@ Ensure unsubscribeAll clears subscription state when event engine is enabled.</P
     <Folder Include="Push\Mpns\" />
     <Folder Include="Proxy\" />
     <Folder Include="Security\Crypto\Common\" />
-    <Folder Include="Security\Crypto\Cryptors\" />
   </ItemGroup>
   
   <ItemGroup>
