@@ -14,7 +14,7 @@
 
   <PropertyGroup>
     <PackageId>PubnubPCL</PackageId>
-    <PackageVersion>9.1.0</PackageVersion>
+    <PackageVersion>9.2.0</PackageVersion>
     <Title>PubNub C# .NET SDK</Title>
     <Authors>Pandu Masabathula</Authors>
     <Owners>PubNub</Owners>
@@ -22,8 +22,7 @@
     <PackageIconUrl>http://pubnub.s3.amazonaws.com/2011/powered-by-pubnub/pubnub-icon-600x600.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/pubnub/c-sharp/</RepositoryUrl>
-    <PackageReleaseNotes>Categories permission support for Grant and GrantToken apis.
-Ensure unsubscribeAll clears subscription state when event engine is enabled.</PackageReleaseNotes>
+    <PackageReleaseNotes>Added an implementation of the AES-GCM cryptor - decryption only for now, encryption to be added at a later date.</PackageReleaseNotes>
 	<PackageProjectUrl>https://www.pubnub.com/docs/sdks/c-sharp</PackageProjectUrl>
     <PackageTags>Pubnub Realtime Real-time Publish-subscribe Pubsub Messaging Occupancy Presence Message-ordering Message-history Chat Long-poll</PackageTags>
     <Description>PubNub SDK for C# .NET. Publish/subscribe messaging over HTTP long-poll with server-assigned message ordering, channel occupancy via Here Now, and message history through Message Persistence.</Description>
