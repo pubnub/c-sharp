@@ -988,6 +988,7 @@
   <ItemGroup>
     <None Include="..\PubnubApi\LICENSE.txt" Link="LICENSE.txt" Pack="true" PackagePath="" />
     <None Include="THIRD-PARTY-NOTICES.txt" Pack="true" PackagePath="" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="LICENSE-APACHE-2.0.txt" Pack="true" PackagePath="" CopyToOutputDirectory="PreserveNewest" />
     <None Remove="EndPoint\DataSync\**" />
     <None Remove="EndPoint\DataSync\Specs\**" />
   </ItemGroup>
