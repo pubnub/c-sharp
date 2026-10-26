@@ -508,4 +508,18 @@ class AccessManagerSample
         // snippet.end
         */
     }
+
+    static async Task ParseTokenCategories()
+    {
+        // snippet.parse_token_categories
+        var parsedTokenContent =
+            pubnub.ParseToken(
+                "p0thisAkFl043rhDdHRsCkNyZXisRGNoYW6hanNlY3JldAFDZ3Jwsample3KgQ3NwY6BDcGF0pERjaGFuoENnctokenVzcqBDc3BjoERtZXRhoENzaWdYIGOAeTyWGJI");
+
+        // category permissions are decoded from the `cat` section of the token
+        bool canListAllChannels = parsedTokenContent.Categories?.Channels?.Get ?? false;
+        bool canListAllUuids = parsedTokenContent.Categories?.Uuids?.Get ?? false;
+        Console.WriteLine($"List all channel metadata: {canListAllChannels}, list all uuid metadata: {canListAllUuids}");
+        // snippet.end
+    }
 }
