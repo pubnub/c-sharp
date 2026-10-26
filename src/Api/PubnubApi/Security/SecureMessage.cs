@@ -31,7 +31,7 @@ namespace PubnubApi
 
             if (config.CryptoModule != null || config.CipherKey.Length > 0)
             {
-                config.CryptoModule ??= new CryptoModule(new LegacyCryptor(config.CipherKey, config.UseRandomInitializationVector, pubnubLog), null);
+                config.CryptoModule ??= CryptoModule.CreateFromCipherKey(new LegacyCryptor(config.CipherKey, config.UseRandomInitializationVector, pubnubLog), config.CipherKey, pubnubLog);
                 object[] myObjectArray = (from item in messageList
                                      select item as object).ToArray();
                 object[] enumerable = myObjectArray[0] as object[];
@@ -133,7 +133,7 @@ namespace PubnubApi
                                 {
                                     if (kvpValue.Key == "message" && (config.CryptoModule != null || config.CipherKey.Length > 0))
                                     {
-                                        config.CryptoModule ??= new CryptoModule(new LegacyCryptor(config.CipherKey, config.UseRandomInitializationVector, pubnubLog), null);
+                                        config.CryptoModule ??= CryptoModule.CreateFromCipherKey(new LegacyCryptor(config.CipherKey, config.UseRandomInitializationVector, pubnubLog), config.CipherKey, pubnubLog);
                                         string decryptMessage = "";
                                         try
                                         {

@@ -185,7 +185,7 @@ namespace PubnubApi.EndPoint
             {
                 currentCryptoModule = !string.IsNullOrEmpty(currentFileCipherKey)
                     ? new CryptoModule(new LegacyCryptor(currentFileCipherKey, true), null)
-                    : (config.CryptoModule ??= new CryptoModule(new LegacyCryptor(config.CipherKey, true), null));
+                    : (config.CryptoModule ??= CryptoModule.CreateFromCipherKey(new LegacyCryptor(config.CipherKey, true), config.CipherKey, config.Logger));
             }
 
             byte[] postData = GetMultipartFormData(sendFileByteArray, generateFileUploadUrlResult.FileName,
@@ -325,7 +325,7 @@ namespace PubnubApi.EndPoint
             {
                 currentCryptoModule = !string.IsNullOrEmpty(currentFileCipherKey)
                     ? new CryptoModule(new LegacyCryptor(currentFileCipherKey, true), null)
-                    : (config.CryptoModule ??= new CryptoModule(new LegacyCryptor(config.CipherKey, true), null));
+                    : (config.CryptoModule ??= CryptoModule.CreateFromCipherKey(new LegacyCryptor(config.CipherKey, true), config.CipherKey, config.Logger));
             }
 
             byte[] postData = GetMultipartFormData(sendFileByteArray, generateFileUploadUrlResult.FileName,
@@ -804,10 +804,10 @@ namespace PubnubApi.EndPoint
             string message = jsonLibrary.SerializeToJsonString(originalMessage);
             if (config.CryptoModule != null || config.CipherKey.Length > 0 || currentFileCipherKey != null)
             {
-                config.CryptoModule ??=
-                    new CryptoModule(
-                        new LegacyCryptor(currentFileCipherKey ?? config.CipherKey,
-                            config.UseRandomInitializationVector), null);
+                config.CryptoModule ??= CryptoModule.CreateFromCipherKey(
+                    new LegacyCryptor(currentFileCipherKey ?? config.CipherKey,
+                        config.UseRandomInitializationVector),
+                    currentFileCipherKey ?? config.CipherKey, config.Logger);
                 string encryptMessage = config.CryptoModule.Encrypt(message);
                 message = jsonLibrary.SerializeToJsonString(encryptMessage);
             }

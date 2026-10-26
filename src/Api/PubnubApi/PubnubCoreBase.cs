@@ -645,7 +645,7 @@ namespace PubnubApi
                                         if ((currentConfig.CryptoModule != null || currentConfig.CipherKey.Length > 0) && currentMessage.MessageType != 1) //decrypt the subscriber message if cipherkey is available
                                         {
                                             string decryptMessage = "";
-                                            currentConfig.CryptoModule ??= new CryptoModule(new LegacyCryptor(currentConfig.CipherKey, currentConfig.UseRandomInitializationVector), null);
+                                            currentConfig.CryptoModule ??= CryptoModule.CreateFromCipherKey(new LegacyCryptor(currentConfig.CipherKey, currentConfig.UseRandomInitializationVector), currentConfig.CipherKey, currentConfig.Logger);
                                             try
                                             {
                                                 decryptMessage = currentConfig.CryptoModule.Decrypt(payload.ToString());
