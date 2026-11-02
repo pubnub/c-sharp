@@ -1425,8 +1425,9 @@ namespace PubNubMessaging.Tests
             var failures = new List<PNException>
             {
                 CaptureDecryptFailure(() => cryptor.Decrypt(FlipByte(valid, AcgmCipherTextOffset))),
+                CaptureDecryptFailure(() => cryptor.Decrypt(FlipByte(valid, valid.Length - AcgmTagLength - 1))),
+                CaptureDecryptFailure(() => cryptor.Decrypt(FlipByte(valid, valid.Length - AcgmTagLength))),
                 CaptureDecryptFailure(() => cryptor.Decrypt(FlipByte(valid, valid.Length - 1))),
-                CaptureDecryptFailure(() => cryptor.Decrypt(FlipByte(valid, AcgmTagOffset))),
                 CaptureDecryptFailure(() => cryptor.Decrypt(FlipByte(valid, AcgmNonceOffset))),
                 CaptureDecryptFailure(() => new AesGcmCryptor("wrong-key").Decrypt(valid))
             };
@@ -1444,9 +1445,13 @@ namespace PubNubMessaging.Tests
             AesGcmCryptor cryptor = new AesGcmCryptor("enigma");
             byte[] valid = BuildAcgmPayload("enigma", Encoding.UTF8.GetBytes("yay!"));
 
-            // Header declares a cryptor data size other than nonce (12) + tag (16).
+            // Header declares a cryptor data size other than the 12-byte nonce (28 was the previous nonce + tag layout).
+            Assert.Throws<PNException>(() => cryptor.Decrypt(BuildAcgmPayload("enigma", Encoding.UTF8.GetBytes("yay!"), 28)));
             Assert.Throws<PNException>(() => cryptor.Decrypt(BuildAcgmPayload("enigma", Encoding.UTF8.GetBytes("yay!"), 16)));
             // Header, nonce and tag present but no cipher text.
+            byte[] tagOnly = valid.Take(AcgmCipherTextOffset).Concat(valid.Skip(valid.Length - AcgmTagLength)).ToArray();
+            Assert.Throws<PNException>(() => cryptor.Decrypt(tagOnly));
+            // Header and nonce only.
             Assert.Throws<PNException>(() => cryptor.Decrypt(valid.Take(AcgmCipherTextOffset).ToArray()));
             // Truncated in the middle of the nonce.
             Assert.Throws<PNException>(() => cryptor.Decrypt(valid.Take(AcgmNonceOffset + 5).ToArray()));
@@ -1495,14 +1500,14 @@ namespace PubNubMessaging.Tests
         }
 
         private const int AcgmNonceOffset = 10;
-        private const int AcgmTagOffset = AcgmNonceOffset + 12;
-        private const int AcgmCipherTextOffset = AcgmTagOffset + 16;
+        private const int AcgmCipherTextOffset = AcgmNonceOffset + 12;
+        private const int AcgmTagLength = 16;
 
         /// <summary>
         /// Builds an ACGM payload with the platform AesGcm implementation (independent of the
-        /// BouncyCastle-based decryptor under test): PNED | 0x01 | ACGM | size | nonce(12) | tag(16) | cipher text.
+        /// BouncyCastle-based decryptor under test): PNED | 0x01 | ACGM | size | nonce(12) | cipher text | tag(16).
         /// </summary>
-        private static byte[] BuildAcgmPayload(string cipherKey, byte[] plainBytes, byte cryptorDataSize = 28)
+        private static byte[] BuildAcgmPayload(string cipherKey, byte[] plainBytes, byte cryptorDataSize = 12)
         {
             byte[] key;
             using (var sha256 = System.Security.Cryptography.SHA256.Create())
@@ -1524,8 +1529,8 @@ namespace PubNubMessaging.Tests
             payload.AddRange(Encoding.ASCII.GetBytes("ACGM"));
             payload.Add(cryptorDataSize);
             payload.AddRange(nonce);
-            payload.AddRange(tag);
             payload.AddRange(cipherText);
+            payload.AddRange(tag);
             return payload.ToArray();
         }
 

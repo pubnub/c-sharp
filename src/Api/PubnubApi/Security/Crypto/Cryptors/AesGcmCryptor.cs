@@ -19,7 +19,8 @@ public class AesGcmCryptor : CryptorBase
     private const string IDENTIFIER = "ACGM";
     private const int NONCE_SIZE = 12;
     private const int TAG_SIZE = 16;
-    private const int CRYPTOR_DATA_SIZE = NONCE_SIZE + TAG_SIZE;
+    // The header's cryptor data holds only the nonce; the tag is appended to the cipher text.
+    private const int CRYPTOR_DATA_SIZE = NONCE_SIZE;
     private const string ENCRYPTION_NOT_SUPPORTED = "AesGcmCryptor is decrypt-only. Encryption is not supported yet.";
 
     public AesGcmCryptor(string cipherKey, PubnubLogModule logger) : base(cipherKey, logger)
@@ -138,8 +139,9 @@ public class AesGcmCryptor : CryptorBase
 
             int headerLength = 4 + 1 + header.Identifier.Length + (header.DataSize < 255 ? 1 : 3);
             int cipherTextOffset = headerLength + CRYPTOR_DATA_SIZE;
-            int cipherTextLength = encryptedData.Length - cipherTextOffset;
-            if (cipherTextLength <= 0)
+            int cipherTextWithTagLength = encryptedData.Length - cipherTextOffset;
+            // At least one byte of cipher text followed by the 16-byte authentication tag.
+            if (cipherTextWithTagLength <= TAG_SIZE)
             {
                 throw new PNException("decryption error");
             }
@@ -148,10 +150,8 @@ public class AesGcmCryptor : CryptorBase
             byte[] nonce = new byte[NONCE_SIZE];
             Buffer.BlockCopy(encryptedData, headerLength, nonce, 0, NONCE_SIZE);
 
-            // BouncyCastle expects the authentication tag appended to the cipher text.
-            byte[] cipherTextWithTag = new byte[cipherTextLength + TAG_SIZE];
-            Buffer.BlockCopy(encryptedData, cipherTextOffset, cipherTextWithTag, 0, cipherTextLength);
-            Buffer.BlockCopy(encryptedData, headerLength + NONCE_SIZE, cipherTextWithTag, cipherTextLength, TAG_SIZE);
+            byte[] cipherTextWithTag = new byte[cipherTextWithTagLength];
+            Buffer.BlockCopy(encryptedData, cipherTextOffset, cipherTextWithTag, 0, cipherTextWithTagLength);
 
             byte[] keyBytes = Util.GetEncryptionKeyBytes(CipherKey);
             return GcmDecrypt(cipherTextWithTag, nonce, keyBytes);
