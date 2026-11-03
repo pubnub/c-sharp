@@ -1460,6 +1460,20 @@ public class DataSyncSample
 
         // admin projection: the admin view of the payload.
         Subscription adminSubscription = pubnub.Channel("__admin__product-sneaker-42").Subscription();
+
+        // Attach a listener to each subscription, then activate both.
+        var listener = new SubscribeCallbackExt(
+            (Pubnub pn, PNDataSyncEventResult dataSyncEvent) =>
+            {
+                Console.WriteLine($"{dataSyncEvent.Event} on {dataSyncEvent.Channel}");
+            },
+            (Pubnub pn, PNStatus status) => { });
+
+        baseSubscription.AddListener(listener);
+        adminSubscription.AddListener(listener);
+
+        baseSubscription.Subscribe<object>();
+        adminSubscription.Subscribe<object>();
         // snippet.end
     }
 }
