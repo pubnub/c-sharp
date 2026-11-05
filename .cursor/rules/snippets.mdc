@@ -1,0 +1,15 @@
+---
+description: Documentation snippets in src/PubnubApi.Snippets and the legacy example apps
+globs: src/PubnubApi.Snippets/**/*.cs, src/Examples/**/*.cs
+alwaysApply: false
+---
+
+# Snippets
+
+- **Purpose:** `src/PubnubApi.Snippets` (`net8.0`, references `PubnubApi`) holds the code shown in the public docs, one file per feature (for example `Publish/PublishSubscribeSample.cs` and `DataSync/DataSyncSample.cs`).
+- **Markers:** code between `// snippet.<name>` and `// snippet.end` is extracted by name, so don't rename existing markers.
+- **Compilation:** CI builds the project (`dotnet build src/PubnubApi.Snippets/PubnubApi.Snippets.csproj`) but never runs it. It must still compile after every public API change, so update the snippets when you change or add public APIs.
+- **Content:**
+  - Use `"demo"` or placeholder keys, never real ones, and always set a `UserId`.
+  - Show idiomatic customer code. `ConfigureAwait(false)` is a library-only rule and isn't needed here.
+- **`src/Examples`** holds old sample apps (WinForms, UWP, Xamarin, console) that aren't in `Pubnub.sln` or CI. Don't update them unless asked.

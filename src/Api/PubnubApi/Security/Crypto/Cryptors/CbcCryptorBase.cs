@@ -1,0 +1,92 @@
+using System;
+using System.Security.Cryptography;
+using PubnubApi.Security.Crypto.Common;
+
+namespace PubnubApi.Security.Crypto.Cryptors;
+
+public abstract class CbcCryptorBase : CryptorBase
+{
+    protected const int IV_SIZE = 16;
+    private readonly bool _useDynamicRandomIV;
+
+    protected CbcCryptorBase(string cipherKey, bool useDynamicRandomIV, PubnubLogModule logger) : base(cipherKey, logger)
+    {
+        _useDynamicRandomIV = useDynamicRandomIV;
+    }
+
+    protected byte[] GenerateRandomIV(bool useDynamicRandomIV)
+    {
+        int dataOffset = useDynamicRandomIV ? IV_SIZE : 0;
+        return Util.InitializationVector(useDynamicRandomIV, dataOffset);
+    }
+
+    protected byte[] InternalEncrypt(bool cryptoHeader, byte[] dataBytes, byte[] ivBytes, byte[] keyBytes)
+    {
+        using (Aes aesAlg = Aes.Create())
+        {
+            aesAlg.KeySize = 256;
+            aesAlg.BlockSize = 128;
+            aesAlg.Mode = CipherMode.CBC;
+            aesAlg.Padding = PaddingMode.PKCS7;
+            aesAlg.IV = ivBytes;
+            aesAlg.Key = keyBytes;
+
+            using (ICryptoTransform crypto = aesAlg.CreateEncryptor())
+            {
+                byte[] outputBytes = crypto.TransformFinalBlock(dataBytes, 0, dataBytes.Length);
+                if (cryptoHeader)
+                {
+                    CryptorHeader header = new CryptorHeader(Identifier, ivBytes.Length);
+                    byte[] headerBytes = header.ToBytes();
+                    byte[] buffer = new byte[headerBytes.Length + ivBytes.Length + outputBytes.Length];
+                    Buffer.BlockCopy(headerBytes, 0, buffer, 0, headerBytes.Length);
+                    Buffer.BlockCopy(ivBytes, 0, buffer, headerBytes.Length, ivBytes.Length);
+                    Buffer.BlockCopy(outputBytes, 0, buffer, headerBytes.Length + ivBytes.Length, outputBytes.Length);
+
+                    return buffer;
+                }
+
+                if (_useDynamicRandomIV)
+                {
+                    byte[] buffer = new byte[ivBytes.Length + outputBytes.Length];
+                    Buffer.BlockCopy(ivBytes, 0, buffer, 0, ivBytes.Length);
+                    Buffer.BlockCopy(outputBytes, 0, buffer, ivBytes.Length, outputBytes.Length);
+                    return buffer;
+                }
+
+                return outputBytes;
+            }
+        }
+    }
+
+    protected byte[] InternalDecrypt(byte[] dataBytes, byte[] ivBytes, byte[] keyBytes)
+    {
+        using (Aes aesAlg = Aes.Create())
+        {
+            aesAlg.KeySize = 256;
+            aesAlg.BlockSize = 128;
+            aesAlg.Mode = CipherMode.CBC;
+            aesAlg.Padding = PaddingMode.PKCS7;
+            aesAlg.IV = ivBytes;
+            aesAlg.Key = keyBytes;
+
+            using (ICryptoTransform decrypto = aesAlg.CreateDecryptor())
+            {
+                try
+                {
+                    byte[] buffer = decrypto.TransformFinalBlock(dataBytes, 0, dataBytes.Length);
+                    return buffer;
+                }
+                catch (CryptographicException ex)
+                {
+                    // Collapse every crypto failure mode (bad padding, wrong block length, etc.)
+                    // into one generic error. The native message distinguishes these cases and
+                    // would otherwise expose a padding-oracle bit to a caller submitting ciphertexts.
+                    // The specific cause is kept in the internal log only, never on the thrown exception.
+                    logger?.Error($"Decryption failed: {ex.Message}");
+                    throw new PNException("Decrypt Error");
+                }
+            }
+        }
+    }
+}

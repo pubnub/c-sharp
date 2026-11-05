@@ -1,0 +1,31 @@
+---
+description: Data Sync operations, parameters, results, parsers and events in the PubNub C# SDK
+globs: src/Api/PubnubApi/EndPoint/DataSync/**/*.cs, src/Api/PubnubApi/JsonDataParse/PNDataSync*.cs, src/Api/PubnubApi/Model/Derived/DataSync/**/*.cs, src/Api/PubnubApi/Model/Consumer/AccessManager/PNDataSync*.cs, src/UnitTests/PubnubApi.Tests/DataSync/**/*.cs
+alwaysApply: false
+---
+
+# Data Sync
+
+- **What it is:** typed records (entities, users, channels, memberships, relationships) whose classes and versions are defined in the PubNub portal. It is separate from App Context (`EndPoint/Objects`); don't mix the two.
+- **Entry point:** `pubnub.DataSync` (`EndPoint/DataSync/DataSync.cs`). Each call has a `Task<PNResult<T>> X(XParameters)` overload and an `X(XParameters, PNCallback<T>)` overload.
+- **Per call:** an `XParameters` class plus an `XOperation` with `private const PNOperationType OperationType`. `ExecuteAsync()` is the single implementation and `Execute(callback)` wraps it with `ContinueWith`. This is the cleanest operation template in the codebase.
+- **Path segments:** `v1/datasync/subkeys/{subscribeKey}/{entities|users|channels|memberships|relationships}[/{id}]`.
+- **HTTP methods:**
+
+  | Operation | Method | Notes |
+  | --- | --- | --- |
+  | Create | POST | |
+  | Get, list | GET | |
+  | Set | PUT | Full replace |
+  | Update | PATCH | JSON Patch, `application/json-patch+json` |
+  | Delete | DELETE | |
+
+  Create and Set send `{"data": ...}` with the resource's vendor media type, for example `application/vnd.pubnub.objects.entity+json;version=1`.
+- **Operation type names are swapped**; keep them. `PNDataSyncUpdate*` belongs to the PUT `Set*Operation`, and `PNDataSyncPatch*` to the PATCH `Update*Operation`.
+- **Where things live:**
+  - Results: `EndPoint/DataSync/<Area>/PNDataSync*Result.cs`, in namespace `PubnubApi`.
+  - Parsers: `JsonDataParse/PNDataSync*JsonDataParse.cs`, registered in `DeserializeToInternalObjectUtility.cs`. The list parsers iterate properties by name and are the pattern to copy.
+  - Callback wrappers: `Model/Derived/DataSync/*Ext.cs`.
+- **Events:** message type 5 with `metadata.source == "data-sync"` goes to `SubscribeCallback.DataSyncEvent`, which is virtual. Entities have no Data Sync event.
+- **Access Manager:** Data Sync token scopes and projections are handled by `GrantToken` and the `PNDataSyncTokenScopes`/`PNDataSyncProjections` models.
+- **Tests:** `src/UnitTests/PubnubApi.Tests/DataSync/` holds live tests that need the `PN_DS_*` keys. Link new files into `PubnubApiPCL.Tests`.

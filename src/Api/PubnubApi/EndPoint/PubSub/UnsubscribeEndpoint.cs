@@ -146,7 +146,7 @@ namespace PubnubApi.EndPoint
 					var id = $"{instanceId}-{channel}";
 					if (subscribeEventEngineFactory.HasEventEngine(id)) {
 						var subscribeEventEngine = subscribeEventEngineFactory.GetEventEngine(id);
-						await UnsubscribeInSubscribeEventEngineInstance(subscribeEventEngine, new []{channel}, channelGroups);
+						await UnsubscribeInSubscribeEventEngineInstance(subscribeEventEngine, new []{channel}, channelGroups).ConfigureAwait(false);
 					} else {
 						logger?.Error($"Attempted unsubscribe without event engine instance for this channel");
 					}
@@ -156,7 +156,7 @@ namespace PubnubApi.EndPoint
 			{
 				if (subscribeEventEngineFactory.HasEventEngine(instanceId)) {
 					var subscribeEventEngine = subscribeEventEngineFactory.GetEventEngine(instanceId);
-					await UnsubscribeInSubscribeEventEngineInstance(subscribeEventEngine, channels, channelGroups);
+					await UnsubscribeInSubscribeEventEngineInstance(subscribeEventEngine, channels, channelGroups).ConfigureAwait(false);
 				} else {
 					logger?.Error($"Attempted unsubscribe without event engine");
 				}

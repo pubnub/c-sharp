@@ -90,6 +90,7 @@
       <Link>DataSync\WhenDataSyncUserIsRequested.cs</Link>
     </Compile>
     <Compile Include="..\PubnubApi.Tests\EncryptionTests.cs" Link="EncryptionTests.cs" />
+    <Compile Include="..\PubnubApi.Tests\AesGcmCryptorVectorTests.cs" Link="AesGcmCryptorVectorTests.cs" />
     <Compile Include="..\PubnubApi.Tests\EventEngine\HandshakeFailedStateTransition.cs" Link="EventEngine\HandshakeFailedStateTransition.cs" />
     <Compile Include="..\PubnubApi.Tests\EventEngine\HandshakeReconnectingStateTransition.cs" Link="EventEngine\HandshakeReconnectingStateTransition.cs" />
     <Compile Include="..\PubnubApi.Tests\EventEngine\HandshakeStoppedStateTransition.cs" Link="EventEngine\HandshakeStoppedStateTransition.cs" />

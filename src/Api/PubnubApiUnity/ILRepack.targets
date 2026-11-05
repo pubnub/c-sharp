@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+  Imported automatically by ILRepack.Lib.MSBuild.Task (replaces its default target, which would merge
+  every dependency and clear the output directory).
+
+  Merges BouncyCastle.Cryptography into PubnubApiUnity.dll so the Unity package ships a single DLL.
+  BouncyCastle types are internalized so they cannot clash with another copy of BouncyCastle in a
+  Unity project. Newtonsoft.Json is intentionally NOT merged - Unity provides it.
+
+  The input is the unmerged assembly in obj\ and the output is the assembly in bin\, so repeated
+  builds never try to merge BouncyCastle into an already merged assembly.
+-->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="ILRepackBouncyCastle" AfterTargets="Build" Condition="'$(IsCrossTargetingBuild)' != 'true'">
+    <ItemGroup>
+      <_PubnubRepackInput Include="@(IntermediateAssembly->'%(FullPath)')" />
+      <_PubnubRepackInput Include="@(ReferencePath)" Condition="'%(Filename)' == 'BouncyCastle.Cryptography'" />
+      <_PubnubRepackLibDir Include="@(ReferencePath->'%(RootDir)%(Directory)')" />
+    </ItemGroup>
+
+    <Error Condition="'@(_PubnubRepackInput->Count())' != '2'"
+           Text="ILRepack: BouncyCastle.Cryptography was not resolved for $(TargetFramework); cannot produce a single PubnubApiUnity.dll." />
+
+    <ILRepack InputAssemblies="@(_PubnubRepackInput)"
+              LibraryPath="@(_PubnubRepackLibDir->Distinct())"
+              Internalize="true"
+              TargetKind="Dll"
+              DebugInfo="true"
+              Parallel="true"
+              KeyFile="$(MSBuildProjectDirectory)\$(AssemblyOriginatorKeyFile)"
+              OutputFile="$(TargetPath)" />
+
+    <Message Importance="high" Text="ILRepack: merged BouncyCastle.Cryptography into $(TargetPath)" />
+  </Target>
+</Project>

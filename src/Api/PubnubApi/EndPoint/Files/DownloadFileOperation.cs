@@ -160,9 +160,9 @@ namespace PubnubApi.EndPoint
                     else
                     {
                         CryptoModule currentCryptoModule = !string.IsNullOrEmpty(currentFileCipherKey)
-                            ? new CryptoModule(new LegacyCryptor(currentFileCipherKey, true), null)
-                            : (config.CryptoModule ??=
-                                new CryptoModule(new LegacyCryptor(config.CipherKey, true), null));
+                            ? CryptoModule.CreateFromCipherKey(new LegacyCryptor(currentFileCipherKey, true), currentFileCipherKey, logger)
+                            : (config.CryptoModule ??= CryptoModule.CreateFromCipherKey(
+                                new LegacyCryptor(config.CipherKey, true), config.CipherKey, config.Logger));
                         try
                         {
                             outputBytes = currentCryptoModule.Decrypt(fileContentBytes);

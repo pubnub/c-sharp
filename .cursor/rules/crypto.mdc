@@ -1,0 +1,24 @@
+---
+description: Encryption invariants (CryptoModule, cryptors, header format) shared with all PubNub SDKs
+globs: src/Api/PubnubApi/Security/**/*.cs, src/UnitTests/PubnubApi.Tests/EncryptionTests.cs, src/UnitTests/PubnubApi.Tests/AesGcmCryptorVectorTests.cs
+alwaysApply: false
+---
+
+# Crypto
+
+- **Registry:** `CryptoModule(defaultCryptor, decryptors)`. `Decrypt` dispatches by the header's cryptor ID; data without a header is legacy (`0000`), and an unknown ID throws `PNException("unknown cryptor error")`.
+- **Header**, shared by every PubNub SDK and never to be changed: `"PNED"`, then version `0x01`, then the 4-byte cryptor ID, then the cryptor-data length (1 byte, or `0xFF` followed by 2 bytes), then the cryptor data.
+- **Cryptors** (`Security/Crypto/Cryptors/`):
+
+  | ID | Class | Details |
+  | --- | --- | --- |
+  | `0000` | `LegacyCryptor` | AES-256-CBC. Key is the first 32 hex characters of SHA-256(cipherKey). Static or random IV. No header. |
+  | `ACRH` | `AesCbcCryptor` | AES-256-CBC. Key is raw SHA-256(cipherKey). Random IV as cryptor data. |
+  | `ACGM` | `AesGcmCryptor` | AES-256-GCM, **decrypt-only**. 12-byte nonce as cryptor data; 16-byte tag appended to the ciphertext. `Encrypt*` throws `NotSupportedException`, and the `CryptoModule` constructor rejects it as the default cryptor. |
+
+- **BouncyCastle** implements GCM because `System.Security.Cryptography.AesGcm` doesn't exist in `netstandard2.0` (PCL, Unity). Unity merges it in with ILRepack.
+- **Cipher-key paths:** `CryptoModule.CreateFromCipherKey(encryptor, cipherKey, log, extraDecryptors...)` (internal) always adds the GCM decryptor. The paths that use it assign with `config.CryptoModule ??= ...`.
+- **Failures** throw a generic `PNException("Decrypt Error")` (or `"decryption error"` for structural problems). Never expose BouncyCastle or padding details, and never return partially decrypted data.
+- **Defaults:** changing the default encryptor breaks older clients of every SDK. Ship new formats as decryptors first.
+- **Tests** are offline: known-answer vectors in `AesGcmCryptorVectorTests.cs` and behavioral cases in `EncryptionTests.cs`. Test code is limited to C# 10.
+- **Legacy classes:** `PubnubCrypto` and `PubnubCryptoBase` are `[Obsolete]`; don't build on them.

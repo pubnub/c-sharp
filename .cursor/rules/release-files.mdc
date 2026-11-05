@@ -1,0 +1,27 @@
+---
+description: Version, changelog, package metadata and CI files maintained by the PubNub release tooling
+globs: .pubnub.yml, CHANGELOG, src/Api/PubnubApi/Properties/AssemblyInfo.cs, .github/workflows/**
+alwaysApply: false
+---
+
+# Release files
+
+- **The release bot**, triggered by a PR comment (`commands-handler.yml`):
+  - bumps the version in `.pubnub.yml`, in `AssemblyVersion`/`AssemblyFileVersion` in `AssemblyInfo.cs`, and in `PackageVersion` in the four library `.csproj` files, following `.github/workflows/release/versions.json`
+  - writes the changelog entries in `.pubnub.yml` and `CHANGELOG`
+
+  `pre-publish.js` then writes `PackageReleaseNotes` into the Api, PCL and UWP `.csproj` files.
+- **Merging to `master`** triggers `release.yml`:
+  1. `build-packages.ps1` runs `dotnet pack` for Api and PCL, and `msbuild /t:Pack` for UWP.
+  2. `publish-packages.ps1` pushes `Pubnub`, `PubnubPCL` and `PubnubUWP` to NuGet.
+  3. A GitHub release is created.
+
+  The Unity DLL isn't part of this.
+- **Don't edit versions, release notes or changelog entries by hand** unless the user explicitly asks. Propose the changelog line for the PR description instead.
+- **Formats:**
+  - `CHANGELOG`: `vX.Y.Z - Month DD YYYY`, a line of dashes, then `- Added: ...` / `- Fixed: ...` lines.
+  - `.pubnub.yml`: change types are `feature`, `bug` and `improvement`. CI validates the file (`run-validations.yml`), so keep its structure.
+- **CI** runs on Windows runners with PowerShell:
+  - Unit tests: builds the packages and the snippets, then runs `dotnet test` on `PubnubApiPCL.Tests` with the `PN_*` secrets.
+  - Acceptance tests: copies `sdk-specifications/features/access/*` and runs `AcceptanceTests` against the mock server.
+  - The workflows call private PubNub actions; don't restructure them unless asked.

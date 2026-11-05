@@ -5,7 +5,7 @@ using System.Text;
 
 namespace PubnubApi.Security.Crypto.Cryptors
 {
-    public class LegacyCryptor : CryptorBase
+    public class LegacyCryptor : CbcCryptorBase
     {
         private const string IDENTIFIER = "0000";
 
