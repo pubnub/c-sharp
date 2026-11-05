@@ -1,0 +1,31 @@
+---
+description: Operation classes, request building, response parsing and result models in the PubNub C# SDK
+globs: src/Api/PubnubApi/EndPoint/**/*.cs, src/Api/PubnubApi/Model/**/*.cs, src/Api/PubnubApi/JsonDataParse/**/*.cs, src/Api/PubnubApi/Transport/**/*.cs, src/Api/PubnubApi/Builder/**/*.cs, src/Api/PubnubApi/Pubnub.cs, src/Api/PubnubApi/PubnubCoreBase.cs, src/Api/PubnubApi/Enum/PNOperationType.cs
+alwaysApply: false
+---
+
+# Operations
+
+Every REST call is an operation class in `EndPoint/<Feature>/` that derives from `PubnubCoreBase` and is created by a factory method on `Pubnub` (or on `DataSync`). To add one, follow the `add-endpoint` skill (`.claude/skills/add-endpoint/SKILL.md`).
+
+- **Constructor:** `(PNConfiguration, IJsonPluggableLibrary, IPubnubUnitTest, TokenManager, Pubnub)`, forwarded to `base(...)`; then set `PubnubInstance = instance`.
+- **`ExecuteAsync()` flow:**
+  1. Validate. On invalid input, return a `PNResult<T>` whose `Status` is `new PNStatus { Error = true, ErrorData = new PNErrorData(message, exception) }`.
+  2. Create a `RequestState<T>` with `ResponseType = PNOperationType.X` and `EndPointOperation = this`.
+  3. `CreateRequestParameter()` returns `RequestParameter { RequestType = Constants.GET/POST/..., PathSegment, Query, BodyContentString, Headers }`.
+  4. Call `transportMiddleware.PreapareTransportRequest(...)`, then `await transportMiddleware.Send(...).ConfigureAwait(false)`.
+  5. On success (`transportResponse.Error == null`): call `GetStatusIfError()`. If it returns `null`, set `requestState.GotJsonResponse = true`, build an acknowledgment status with `StatusBuilder.CreateStatusResponse(...)`, and parse with `ProcessJsonResponse()` and `ResponseBuilder.JsonToObject<T>(list, true)`.
+  6. On a transport error: build the status with `PNStatusCodeHelper`, `PNStatusCategoryHelper` and `new PNException(message, error)`.
+
+## Rules
+
+- **Encoding:** path segments are raw strings, and the middleware encodes them. Query values must be encoded with `UriUtil.EncodeUriComponent(value, operationType, false, false, false)`. Merge user `QueryParam` entries without overwriting existing keys. A user key equal to `uuid`, `pnsdk` or `auth` throws while the request is built.
+- **Numbers** in paths and queries use `ToString(CultureInfo.InvariantCulture)`.
+- **`PNOperationType`:** append new members at the end. Add an `internal Retry()` to the operation and a case to the `PNStatus.Retry()` switch.
+- **Auth:** operations that must not send `auth` go into `excludedAuthOperationTypes` in `Transport/Middleware.cs`.
+- **Result models:** `Model/Consumer/<Feature>/PNXxxResult.cs` with public getters and `internal set`. Callback wrapper: `Model/Derived/<Feature>/PNXxxResultExt.cs` (a `PNCallback<T>` wrapping `Action<T, PNStatus>`).
+- **Parsers:** `JsonDataParse/PNXxxJsonDataParse.cs` with `internal static GetObject(IJsonPluggableLibrary, List<object>)`, registered in `DeserializeToInternalObjectUtility.cs`. Look top-level properties up by name, not by position (`listObject[1]`). An unregistered type silently produces `null`.
+- **Callbacks:** implement `Execute(callback)` by wrapping `ExecuteAsync()`. The legacy `ProcessResponseCallbacks` path only fires for types listed in `PubnubCoreBase.ResponseToUserCallback`.
+- **Validation:** throw only for a missing callback (`ArgumentException`). Every other validation failure returns an error status.
+- **Transport:** `HttpClientService` must never throw; failures go into `TransportResponse.Error`. `IHttpClientService` and `ITransportMiddleware` are public extension points, so don't change their members.
+- **Linking:** link new files into the PCL, UWP and Unity projects (`projects-and-builds.mdc`).

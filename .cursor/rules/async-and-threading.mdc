@@ -1,0 +1,34 @@
+---
+description: Async, threading and mandatory ConfigureAwait(false) rules for PubNub C# SDK library code
+globs: src/Api/**/*.cs
+alwaysApply: false
+---
+
+# Async and threading
+
+## Every await uses ConfigureAwait(false)
+
+The SDK runs inside applications with a synchronization context: Unity's main thread, UWP and WinForms UI threads, classic ASP.NET. Resuming on that context can deadlock callers that block on SDK tasks.
+
+```csharp
+// Wrong
+var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest);
+
+// Right
+var transportResponse = await PubnubInstance.transportMiddleware.Send(transportRequest).ConfigureAwait(false);
+await Task.Delay(delay).ConfigureAwait(false);
+return await GetEntityAsync().ConfigureAwait(false);
+```
+
+- **No exceptions in `src/Api`**, including `return await` and awaits on the SDK's own methods. Test code and snippets don't need it.
+- **Check** with `powershell -ExecutionPolicy Bypass -File .claude/skills/run-checks/scripts/Test-ConfigureAwait.ps1`. It scans files changed against `origin/master`; add `-All` to scan the whole library, which currently passes.
+
+## Other rules
+
+- **Don't block on tasks** in new code: no `.Result`, `.Wait()` or `GetAwaiter().GetResult()`. `PublishOperation.Sync()`, `FireOperation.Sync()` and the `SendFileOperation` callback path still do; don't copy them.
+- **Don't add `async void` methods.** An exception escaping one crashes the host process. Existing ones: `Engine.OnEvent`, `SubscribeEndpoint.Subscribe`, `UnsubscribeEndpoint.Unsubscribe`, `Delay.AwaiterLoop`.
+- **`Execute(callback)`** in new operations wraps `ExecuteAsync()` with `ContinueWith`, checking `t.IsFaulted` before reading `t.Result`, as the Data Sync operations do.
+- **Threads:** callbacks and listener events run on thread-pool threads, so never assume a particular thread. Protect shared collections (listener lists, per-channel maps) with locks or concurrent collections.
+- **Don't wrap I/O in `Task.Run` or `Task.Factory.StartNew`**; the transport is already asynchronous.
+- **Cancellation:** the public API takes no `CancellationToken`. Requests are cancelled through the per-request timeout in `TransportRequest`/`HttpClientService`, and by unsubscribe, disconnect and `Destroy()`.
+- **Per-instance state:** `PubnubCoreBase` holds static state shared by every `Pubnub` instance in the process. Key new per-instance state by `InstanceId`.

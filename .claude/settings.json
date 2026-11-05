@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(dotnet build:*)",
+      "Bash(dotnet test:*)",
+      "Bash(dotnet restore:*)",
+      "Bash(dotnet --version)",
+      "Bash(dotnet --list-sdks)",
+      "Bash(powershell -ExecutionPolicy Bypass -File .claude/skills/run-checks/scripts/Test-LinkedSources.ps1:*)",
+      "Bash(powershell -ExecutionPolicy Bypass -File .claude/skills/run-checks/scripts/Test-ConfigureAwait.ps1:*)",
+      "Bash(pwsh -File .claude/skills/run-checks/scripts/Test-LinkedSources.ps1:*)",
+      "Bash(pwsh -File .claude/skills/run-checks/scripts/Test-ConfigureAwait.ps1:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)"
+    ],
+    "deny": [
+      "Edit(./**/bin/**)",
+      "Edit(./**/obj/**)",
+      "Edit(./src/Api/**/pubnub.snk)"
+    ]
+  }
+}

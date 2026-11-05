@@ -1,0 +1,37 @@
+---
+description: C# conventions for the PubNub C# SDK (language level, style, public API compatibility)
+globs: src/**/*.cs
+alwaysApply: false
+---
+
+# C# conventions
+
+- **Language level:**
+  - Library projects use `LangVersion latest` (Unity uses `default`) and are built with the .NET 8+ SDK, so C# 12 syntax compiles. APIs, however, must exist in .NET Standard 2.0; see `projects-and-builds.mdc`.
+  - `PubnubApi.Tests` and `MockServerPubnubApi` pin `LangVersion 10`. Don't use primary constructors, collection expressions, raw string literals or `required` members in test code.
+- **Style:** there is no `.editorconfig`, so follow the file you edit.
+  - Some files use tabs (`Transport/Middleware.cs`, `EventEngine/Core/*`, `Entity/*`, `RetryConfiguration.cs`); most use 4 spaces. New files use 4 spaces.
+  - Keep the file's block or file-scoped namespace.
+- **Naming:** PascalCase for types and public members. Private fields are mostly camelCase without an underscore (`config`, `jsonLibrary`).
+- **Namespaces:**
+
+  | Namespace | Contents |
+  | --- | --- |
+  | `PubnubApi` | Most public types, including the Data Sync parameters and results under `EndPoint/DataSync/` |
+  | `PubnubApi.EndPoint` | Operations |
+  | `PubnubApi.EventEngine.*` | Event engines |
+  | `PubnubApi.Security.Crypto[.Cryptors]` | Crypto |
+
+- **Nullable reference types are off.** Don't add `#nullable` or `?` on reference types.
+- **Culture:** format numbers that go into URLs with `CultureInfo.InvariantCulture`.
+- **Logging:** use the lazy overload for expensive messages, `logger?.Debug(() => $"...")`. Never log keys, tokens or cipher keys.
+- **Visibility:** keep helpers `internal`. There is no `InternalsVisibleTo`, so tests only see the public API. Assemblies are strong-named with `pubnub.snk`.
+- **XML doc comments** on new public members. The Unity build generates documentation and warns (CS1591) about undocumented members.
+
+## Public API is a contract
+
+- Don't remove or rename public types or members, or change signatures incompatibly. Mark replacements `[Obsolete("Use X instead.")]`.
+- Keep historical misspellings: `PreapareTransportRequest`, `PNStatus.AdditonalData`, `PNHereNowResultEx`.
+- Don't add members to public interfaces that customers implement (`IHttpClientService`, `ITransportMiddleware`, `IPubnubLogger`, `IJsonPluggableLibrary`, `ICryptor`); add a new interface instead.
+- New `SubscribeCallback` events must be `virtual` with an empty body, like `DataSyncEvent`.
+- Append new enum members at the end.

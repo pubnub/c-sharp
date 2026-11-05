@@ -1,0 +1,45 @@
+---
+description: Subscribe and presence event engines, legacy subscribe manager, listeners, entities and retries
+globs: src/Api/PubnubApi/EventEngine/**/*.cs, src/Api/PubnubApi/EndPoint/PubSub/Subscribe*.cs, src/Api/PubnubApi/EndPoint/PubSub/Unsubscribe*.cs, src/Api/PubnubApi/EndPoint/PubSub/ListenerManager.cs, src/Api/PubnubApi/EndPoint/Presence/**/*.cs, src/Api/PubnubApi/Entity/**/*.cs, src/Api/PubnubApi/Callbacks/**/*.cs, src/Api/PubnubApi/RetryConfiguration.cs, src/UnitTests/PubnubApi.Tests/EventEngine/**/*.cs
+alwaysApply: false
+---
+
+# Subscribe and presence
+
+- **Two implementations**, chosen on every call by `PNConfiguration.EnableEventEngine` (true by default):
+
+  | Mode | Classes |
+  | --- | --- |
+  | Event engine | `SubscribeEndpoint<T>`, `UnsubscribeEndpoint<T>`, `UnsubscribeAllEndpoint<T>`, `SubscribeManager2`, `EventEngine/`, `EventEngine/Common/EventEmitter.cs` |
+  | Legacy | `SubscribeOperation<T>`, `UnsubscribeOperation<T>`, `UnsubscribeAllOperation<T>`, `SubscribeManager`, `ListenerManager`, `PubnubCoreBase.Announce` |
+
+  Behavior changes usually need both. Entities (`Subscription`, `SubscriptionSet`) work only with the event engine.
+- **Engine core** (`EventEngine/Core`):
+  - `State.Transition(IEvent)` is a pure function that returns the new state plus invocations.
+  - `Engine` runs the old state's `OnExit`, then the invocations, then the new state's `OnEntry`.
+  - `EffectDispatcher` maps invocation types to effect handlers; background handlers are fire-and-forget.
+- **Subscribe states:** Unsubscribed, Handshaking, HandshakeReconnecting, HandshakeFailed, HandshakeStopped, Receiving, ReceiveReconnecting, ReceiveFailed, ReceiveStopped.
+- **Presence states:** Inactive, Heartbeating, Cooldown, Reconnecting, Failed, Stopped. The presence engine only runs when `PresenceInterval > 0`, and it is 0 until `PresenceTimeout` or `SetPresenceTimeoutWithCustomInterval()` is set.
+- **Retries:** `RetryConfiguration` is linear or exponential, with delays in seconds; a 403 is never retried. `ReconnectionPolicy = NONE` doesn't clear it; `RetryConfiguration = null` does.
+- **Dispatch** (`EventEmitter`, by `MessageType`):
+
+  | Message | Callback |
+  | --- | --- |
+  | `-pnpres` channels | `Presence` |
+  | 0 | `Message` |
+  | 1 | `Signal` |
+  | 2, with `source` = `objects` | `ObjectEvent` |
+  | 3 | `MessageAction` |
+  | 4 | `File` |
+  | 5, with `metadata.source` = `data-sync` | `DataSyncEvent` |
+
+  Types 0 and 4 are decrypted when crypto is configured. Events go to global listeners first, then to the per-channel and per-group entity listeners.
+- **A new event type** touches:
+  - the `EventEmitter` switch
+  - `JsonDataParse/EventDeserializer.cs`
+  - a **virtual** method on `SubscribeCallback`
+  - a `SubscribeCallbackExt` constructor overload
+  - the legacy `Announce` path
+  - the entity events on `Subscription`, `SubscriptionSet` and `SubscribeCapable`
+- **Listener exceptions** are caught and logged so they can't stop the subscribe loop; keep it that way. Listeners run on thread-pool threads.
+- **Tests:** state transitions are pure and tested offline in `src/UnitTests/PubnubApi.Tests/EventEngine/*StateTransition.cs` and `EventEngine/Presence/`. Add cases for every new state, event or transition.

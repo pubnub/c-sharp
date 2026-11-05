@@ -184,9 +184,10 @@ src/PNEventEngine/obj/*
 src/PNEventEngineUWP/bin/*
 src/PNEventEngineUWP/obj/*
 
-CLAUDE.md
-.claude/*
-.cursor/*
+# AI agent personal settings #
+##############################
+CLAUDE.local.md
+.claude/settings.local.json
 
 # GitHub Actions #
 ##################

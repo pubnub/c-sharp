@@ -1,0 +1,43 @@
+---
+description: Project files, shared-source linking, target frameworks, dependencies and builds for the PubNub C# SDK
+globs: src/**/*.csproj, src/Pubnub.sln, **/global.json, src/Api/PubnubApiUnity/ILRepack.targets
+alwaysApply: false
+---
+
+# Projects and builds
+
+| Project | Targets | Notes |
+| --- | --- | --- |
+| `src/Api/PubnubApi` | `net6.0` | Source of truth; compiles every `.cs` in its folder. NuGet `Pubnub`. |
+| `src/Api/PubnubApiPCL` | `netstandard2.0;net6.0` | Links each file. NuGet `PubnubPCL`. |
+| `src/Api/PubnubApiUWP` | `uap10.0` | Links each file. Defines `NETFX_CORE;WINDOWS_UWP;UAP`. Windows only, built with MSBuild. NuGet `PubnubUWP`. |
+| `src/Api/PubnubApiUnity` | `net6.0;netstandard2.0` | Links each file. Defines `UNITY`. ILRepack. Not published; see `unity-dll.mdc`. |
+| `src/UnitTests/PubnubApi.Tests` | `net6.0` | NUnit 3, `LangVersion 10`, references `PubnubApi` |
+| `src/UnitTests/PubnubApiPCL.Tests` | `net6.0` | Links the `PubnubApi.Tests` files; the project CI runs |
+| `src/UnitTests/AcceptanceTests` | `net6.0` | SpecFlow + NUnit |
+| `src/PubnubApi.Snippets` | `net8.0` | Docs snippets; built in CI |
+
+## Linking shared files
+
+PCL, UWP and Unity set `EnableDefaultCompileItems=False` and list every file. When you add, rename or delete a file under `src/Api/PubnubApi`, update all three:
+
+```xml
+<Compile Include="..\PubnubApi\EndPoint\Feature\DoThingOperation.cs" Link="EndPoint\Feature\DoThingOperation.cs" />
+```
+
+- Test files go into `src/UnitTests/PubnubApiPCL.Tests/PubnubApiPCL.Tests.csproj` with the `..\PubnubApi.Tests\` prefix.
+- Verify with `powershell -ExecutionPolicy Bypass -File .claude/skills/run-checks/scripts/Test-LinkedSources.ps1`.
+
+## Targets and symbols
+
+- **Library code must compile for `netstandard2.0`.** Guard APIs that need .NET 5 or later with `#if NET6_0_OR_GREATER || NET60` and provide a fallback. Examples: `Convert.FromHexString`, `HttpVersionPolicy`, `System.Security.Cryptography.AesGcm`, `System.Text.Json`.
+- **Symbols:** SDK-style projects define `NET6_0`, `NETSTANDARD2_0` and `NET6_0_OR_GREATER`. `NET60` and `NETSTANDARD20` exist only where a project defines them by hand (Unity, the PCL tests). `UNITY` gates Unity-only code.
+- **Don't add code** for the dead `NETSTANDARD10`/`NETSTANDARD11` or `NET35`–`NET48` branches.
+
+## Build facts
+
+- **SDK:** the .NET 8 SDK or newer is required (C# 12). `src/Api/PubnubApi/global.json` (`"7.0.x"`) is an invalid version pattern and is ignored.
+- **Signing:** assemblies are strong-named with `pubnub.snk`, with `PublicSign` on non-Windows.
+- **Assembly info:** `GenerateAssemblyInfo=false`. The version lives in `src/Api/PubnubApi/Properties/AssemblyInfo.cs`, which every library project links.
+- **Dependencies:** Newtonsoft.Json 13.0.3 and BouncyCastle.Cryptography 2.7.0. A new dependency affects every customer and the Unity DLL, where it must be merged by ILRepack or provided by Unity. Ask before adding one.
+- **Release-owned properties:** `PackageVersion` and `PackageReleaseNotes` are written by the release tooling; don't edit them.

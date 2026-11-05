@@ -1,0 +1,33 @@
+---
+description: How PubNub C# SDK tests are organised, linked and run
+globs: src/UnitTests/**/*.cs, src/UnitTests/**/*.csproj
+alwaysApply: false
+---
+
+# Tests
+
+| Project | Notes |
+| --- | --- |
+| `PubnubApi.Tests` | NUnit 3 on `net6.0` with `LangVersion 10`; the source of all unit tests |
+| `PubnubApiPCL.Tests` | Links the `PubnubApi.Tests` files against `PubnubPCL`. **The only unit test project CI runs.** |
+| `AcceptanceTests` | SpecFlow + NUnit. CI copies Gherkin features from `sdk-specifications` and runs them against PubNub's mock server. |
+| `MockServerPubnubApi*` | Legacy stub server. Stub mode is off (`PubnubCommon.EnableStubTest = false`). |
+
+- **Prefer offline tests.** These need no keys:
+  - pure state transitions in `EventEngine/*StateTransition.cs` and `RetryConfigurationTest`
+  - crypto: `AesGcmCryptorVectorTests` and most of `EncryptionTests`
+  - HTTP tests that inject a handler with `new Pubnub(config, httpTransportService: new HttpClientService(handler, false))` or `new HttpClientService(handler, ...)` (see `WhenHttp2IsConfigured.cs`)
+  - WireMock.Net fixtures (`WireMockServer.Start()`, for example `WhenSubscribeWithDuplicateChannels.cs`)
+
+  The `add-endpoint` skill has a full offline operation test template.
+- **Live tests** derive from `TestHarness`, create clients with `createPubNubInstance(config)`, and read keys from `PubnubCommon`:
+  - `PN_PUB_KEY`, `PN_SUB_KEY`, `PN_SEC_KEY`
+  - `PN_PAM_*`, which default to `demo-36`
+  - `PN_DS_*`, `PN_CAT_*`, `PN_PAM_SERVER_SIDE`
+
+  They publish to real keysets, so run them only when asked. New tests that need a special keyset should call `Assert.Ignore` when its variables are missing.
+- **Structure:** `[TestFixture] public class WhenXxx` with `[Test]` methods in namespace `PubNubMessaging.Tests`.
+- **Linking:** add every new test file to `PubnubApiPCL.Tests.csproj` as `<Compile Include="..\PubnubApi.Tests\Dir\WhenXxx.cs" Link="Dir\WhenXxx.cs" />`. Check with `Test-LinkedSources.ps1`. `AdditionalSubscribeTests.cs` and `WhenHistoryIsRequested.cs` are currently unlinked.
+- **Language:** C# 10 at most; no primary constructors, collection expressions or raw string literals.
+- **Run:** `dotnet test src/UnitTests/PubnubApi.Tests/PubnubApi.Tests.csproj --filter "FullyQualifiedName~WhenXxx"`. The test projects target `net6.0` and need the .NET 6 runtime.
+- **Keys:** never hard-code them; use `PubnubCommon`.

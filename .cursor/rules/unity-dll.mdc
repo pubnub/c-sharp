@@ -1,0 +1,23 @@
+---
+description: The PubnubApiUnity DLL build (ILRepack, not a NuGet package) and Unity compatibility constraints
+globs: src/Api/PubnubApiUnity/**
+alwaysApply: false
+---
+
+# PubnubApiUnity
+
+- **Purpose:** builds `PubnubApiUnity.dll`, which is imported into the separate PubNub Unity SDK project.
+  - **It is not a NuGet package.** `build-packages.ps1` and `publish-packages.ps1` only pack and publish the Api, PCL and UWP projects.
+  - The csproj's `PackageId`/`PackageVersion` exist only so the release bot keeps the version in sync.
+- **Build:** `dotnet build src/Api/PubnubApiUnity/PubnubApiUnity.csproj -c Release`. Output goes to `bin/Release/netstandard2.0/` and `bin/Release/net6.0/`.
+- **ILRepack** (`ILRepack.targets`, run by the `ILRepack.Lib.MSBuild.Task` package after each per-framework build):
+  - Merges `BouncyCastle.Cryptography` into the DLL with `Internalize="true"`, so its types can't clash with another copy of BouncyCastle in a Unity project.
+  - Re-signs the result with `pubnub.snk`.
+  - Reads the unmerged assembly from `obj/` and writes to `bin/`, so rebuilds never merge twice.
+  - A merged DLL is about 6 MB, against about 1 MB unmerged.
+- **Newtonsoft.Json is intentionally not merged**, because Unity provides it.
+- **New dependencies:** each must either ship with Unity or be merged. To merge one, add an `_PubnubRepackInput` item to `ILRepack.targets` and update its input-count check. Never add one silently.
+- **Defines:** `UNITY` (plus `NET60`/`NETSTANDARD20`). `#if UNITY` gates `Pubnub.CleanUp()` and the finalizer.
+- **Compatibility:** the Unity SDK runs this DLL under Mono or IL2CPP (ahead-of-time compilation). Avoid `dynamic`, `Reflection.Emit` and runtime code generation. Keep the IL2CPP workarounds in `NewtonsoftJsonDotNet.cs`.
+- **CI never builds this project.** After adding or renaming files, or changing public APIs, build it locally. Missing `<Compile>` links (see `projects-and-builds.mdc`) otherwise only surface in the Unity SDK.
+- **Warnings:** `GenerateDocumentationFile=true` produces many CS1591 warnings about undocumented public members. They are expected, but document new members.

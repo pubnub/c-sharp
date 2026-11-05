@@ -22,7 +22,7 @@ public class DataSync
     public async Task<PNResult<PNDataSyncEntityResult>> CreateEntity(CreateEntityParameters parameters)
     {
         return await new CreateEntityOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).ExecuteAsync();
+            parameters).ExecuteAsync().ConfigureAwait(false);
     }
 
     public void CreateEntity(CreateEntityParameters parameters, PNDataSyncEntityResultExt callback)
@@ -34,7 +34,7 @@ public class DataSync
     public async Task<PNResult<PNDataSyncEntityResult>> GetEntity(GetEntityParameters parameters)
     {
         return await new GetEntityOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).ExecuteAsync();
+            parameters).ExecuteAsync().ConfigureAwait(false);
     }
     
     public void GetEntity(GetEntityParameters parameters, PNDataSyncEntityResultExt callback)
@@ -46,7 +46,7 @@ public class DataSync
     public async Task<PNResult<PNDataSyncEntitiesListResult>> GetEntities(GetEntitiesParameters parameters)
     {
         return await new GetEntitiesOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).ExecuteAsync();
+            parameters).ExecuteAsync().ConfigureAwait(false);
     }
     
     public void GetEntities(GetEntitiesParameters parameters, PNDataSyncEntitiesListResultExt callback)
@@ -58,7 +58,7 @@ public class DataSync
     public async Task<PNResult<PNDataSyncEntityResult>> SetEntity(SetEntityParameters parameters)
     {
         return await new SetEntityOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).ExecuteAsync();
+            parameters).ExecuteAsync().ConfigureAwait(false);
     }
     
     public void SetEntity(SetEntityParameters parameters, PNDataSyncEntityResultExt callback)
@@ -70,7 +70,7 @@ public class DataSync
     public async Task<PNResult<PNDataSyncEntityResult>> UpdateEntity(UpdateEntityParameters parameters)
     {
         return await new UpdateEntityOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).ExecuteAsync();
+            parameters).ExecuteAsync().ConfigureAwait(false);
     }
     
     public void UpdateEntity(UpdateEntityParameters parameters, PNDataSyncEntityResultExt callback)
@@ -82,7 +82,7 @@ public class DataSync
     public async Task<PNResult<PNDataSyncDeleteEntityResult>> DeleteEntity(DeleteEntityParameters parameters)
     {
         return await new DeleteEntityOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).ExecuteAsync();
+            parameters).ExecuteAsync().ConfigureAwait(false);
     }
     
     public void DeleteEntity(DeleteEntityParameters parameters, PNDataSyncDeleteEntityResultExt callback)
@@ -94,7 +94,7 @@ public class DataSync
     public async Task<PNResult<PNDataSyncRelationshipResult>> CreateRelationship(CreateRelationshipParameters parameters)
     {
         return await new CreateRelationshipOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).ExecuteAsync();
+            parameters).ExecuteAsync().ConfigureAwait(false);
     }
 
     public void CreateRelationship(CreateRelationshipParameters parameters, PNDataSyncRelationshipResultExt callback)
@@ -106,7 +106,7 @@ public class DataSync
     public async Task<PNResult<PNDataSyncRelationshipResult>> GetRelationship(GetRelationshipParameters parameters)
     {
         return await new GetRelationshipOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).ExecuteAsync();
+            parameters).ExecuteAsync().ConfigureAwait(false);
     }
 
     public void GetRelationship(GetRelationshipParameters parameters, PNDataSyncRelationshipResultExt callback)
@@ -118,7 +118,7 @@ public class DataSync
     public async Task<PNResult<PNDataSyncRelationshipsListResult>> GetRelationships(GetRelationshipsParameters parameters)
     {
         return await new GetRelationshipsOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).ExecuteAsync();
+            parameters).ExecuteAsync().ConfigureAwait(false);
     }
 
     public void GetRelationships(GetRelationshipsParameters parameters, PNDataSyncRelationshipsListResultExt callback)
@@ -130,7 +130,7 @@ public class DataSync
     public async Task<PNResult<PNDataSyncRelationshipResult>> SetRelationship(SetRelationshipParameters parameters)
     {
         return await new SetRelationshipOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).ExecuteAsync();
+            parameters).ExecuteAsync().ConfigureAwait(false);
     }
 
     public void SetRelationship(SetRelationshipParameters parameters, PNDataSyncRelationshipResultExt callback)
@@ -142,7 +142,7 @@ public class DataSync
     public async Task<PNResult<PNDataSyncRelationshipResult>> UpdateRelationship(UpdateRelationshipParameters parameters)
     {
         return await new UpdateRelationshipOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).ExecuteAsync();
+            parameters).ExecuteAsync().ConfigureAwait(false);
     }
 
     public void UpdateRelationship(UpdateRelationshipParameters parameters, PNDataSyncRelationshipResultExt callback)
@@ -154,7 +154,7 @@ public class DataSync
     public async Task<PNResult<PNDataSyncDeleteRelationshipResult>> DeleteRelationship(DeleteRelationshipParameters parameters)
     {
         return await new DeleteRelationshipOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).ExecuteAsync();
+            parameters).ExecuteAsync().ConfigureAwait(false);
     }
 
     public void DeleteRelationship(DeleteRelationshipParameters parameters, PNDataSyncDeleteRelationshipResultExt callback)
@@ -168,7 +168,7 @@ public class DataSync
     public async Task<PNResult<PNDataSyncUserResult>> CreateUser(CreateUserParameters parameters)
     {
         return await new CreateUserOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).ExecuteAsync();
+            parameters).ExecuteAsync().ConfigureAwait(false);
     }
 
     public void CreateUser(CreateUserParameters parameters, PNDataSyncUserResultExt callback)
@@ -180,7 +180,7 @@ public class DataSync
     public async Task<PNResult<PNDataSyncUserResult>> GetUser(GetUserParameters parameters)
     {
         return await new GetUserOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).ExecuteAsync();
+            parameters).ExecuteAsync().ConfigureAwait(false);
     }
 
     public void GetUser(GetUserParameters parameters, PNDataSyncUserResultExt callback)
@@ -192,7 +192,7 @@ public class DataSync
     public async Task<PNResult<PNDataSyncUsersListResult>> GetUsers(GetUsersParameters parameters)
     {
         return await new GetUsersOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).ExecuteAsync();
+            parameters).ExecuteAsync().ConfigureAwait(false);
     }
 
     public void GetUsers(GetUsersParameters parameters, PNDataSyncUsersListResultExt callback)
@@ -204,7 +204,7 @@ public class DataSync
     public async Task<PNResult<PNDataSyncUserResult>> SetUser(SetUserParameters parameters)
     {
         return await new SetUserOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).ExecuteAsync();
+            parameters).ExecuteAsync().ConfigureAwait(false);
     }
 
     public void SetUser(SetUserParameters parameters, PNDataSyncUserResultExt callback)
@@ -216,7 +216,7 @@ public class DataSync
     public async Task<PNResult<PNDataSyncUserResult>> UpdateUser(UpdateUserParameters parameters)
     {
         return await new UpdateUserOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).ExecuteAsync();
+            parameters).ExecuteAsync().ConfigureAwait(false);
     }
 
     public void UpdateUser(UpdateUserParameters parameters, PNDataSyncUserResultExt callback)
@@ -228,7 +228,7 @@ public class DataSync
     public async Task<PNResult<PNDataSyncDeleteUserResult>> DeleteUser(DeleteUserParameters parameters)
     {
         return await new DeleteUserOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).ExecuteAsync();
+            parameters).ExecuteAsync().ConfigureAwait(false);
     }
 
     public void DeleteUser(DeleteUserParameters parameters, PNDataSyncDeleteUserResultExt callback)
@@ -242,7 +242,7 @@ public class DataSync
     public async Task<PNResult<PNDataSyncChannelResult>> CreateChannel(CreateChannelParameters parameters)
     {
         return await new CreateChannelOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).ExecuteAsync();
+            parameters).ExecuteAsync().ConfigureAwait(false);
     }
 
     public void CreateChannel(CreateChannelParameters parameters, PNDataSyncChannelResultExt callback)
@@ -254,7 +254,7 @@ public class DataSync
     public async Task<PNResult<PNDataSyncChannelResult>> GetChannel(GetChannelParameters parameters)
     {
         return await new GetChannelOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).ExecuteAsync();
+            parameters).ExecuteAsync().ConfigureAwait(false);
     }
 
     public void GetChannel(GetChannelParameters parameters, PNDataSyncChannelResultExt callback)
@@ -266,7 +266,7 @@ public class DataSync
     public async Task<PNResult<PNDataSyncChannelsListResult>> GetChannels(GetChannelsParameters parameters)
     {
         return await new GetChannelsOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).ExecuteAsync();
+            parameters).ExecuteAsync().ConfigureAwait(false);
     }
 
     public void GetChannels(GetChannelsParameters parameters, PNDataSyncChannelsListResultExt callback)
@@ -278,7 +278,7 @@ public class DataSync
     public async Task<PNResult<PNDataSyncChannelResult>> SetChannel(SetChannelParameters parameters)
     {
         return await new SetChannelOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).ExecuteAsync();
+            parameters).ExecuteAsync().ConfigureAwait(false);
     }
 
     public void SetChannel(SetChannelParameters parameters, PNDataSyncChannelResultExt callback)
@@ -290,7 +290,7 @@ public class DataSync
     public async Task<PNResult<PNDataSyncChannelResult>> UpdateChannel(UpdateChannelParameters parameters)
     {
         return await new UpdateChannelOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).ExecuteAsync();
+            parameters).ExecuteAsync().ConfigureAwait(false);
     }
 
     public void UpdateChannel(UpdateChannelParameters parameters, PNDataSyncChannelResultExt callback)
@@ -302,7 +302,7 @@ public class DataSync
     public async Task<PNResult<PNDataSyncDeleteChannelResult>> DeleteChannel(DeleteChannelParameters parameters)
     {
         return await new DeleteChannelOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).ExecuteAsync();
+            parameters).ExecuteAsync().ConfigureAwait(false);
     }
 
     public void DeleteChannel(DeleteChannelParameters parameters, PNDataSyncDeleteChannelResultExt callback)
@@ -316,7 +316,7 @@ public class DataSync
     public async Task<PNResult<PNDataSyncMembershipResult>> CreateMembership(CreateMembershipParameters parameters)
     {
         return await new CreateMembershipOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).ExecuteAsync();
+            parameters).ExecuteAsync().ConfigureAwait(false);
     }
 
     public void CreateMembership(CreateMembershipParameters parameters, PNDataSyncMembershipResultExt callback)
@@ -328,7 +328,7 @@ public class DataSync
     public async Task<PNResult<PNDataSyncMembershipResult>> GetMembership(GetMembershipParameters parameters)
     {
         return await new GetMembershipOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).ExecuteAsync();
+            parameters).ExecuteAsync().ConfigureAwait(false);
     }
 
     public void GetMembership(GetMembershipParameters parameters, PNDataSyncMembershipResultExt callback)
@@ -340,7 +340,7 @@ public class DataSync
     public async Task<PNResult<PNDataSyncMembershipsListResult>> GetMemberships(GetMembershipsParameters parameters)
     {
         return await new GetDataSyncMembershipsOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).ExecuteAsync();
+            parameters).ExecuteAsync().ConfigureAwait(false);
     }
 
     public void GetMemberships(GetMembershipsParameters parameters, PNDataSyncMembershipsListResultExt callback)
@@ -352,7 +352,7 @@ public class DataSync
     public async Task<PNResult<PNDataSyncMembershipResult>> SetMembership(UpdateMembershipParameters parameters)
     {
         return await new SetMembershipOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).ExecuteAsync();
+            parameters).ExecuteAsync().ConfigureAwait(false);
     }
 
     public void SetMembership(UpdateMembershipParameters parameters, PNDataSyncMembershipResultExt callback)
@@ -364,7 +364,7 @@ public class DataSync
     public async Task<PNResult<PNDataSyncMembershipResult>> UpdateMembership(PatchMembershipParameters parameters)
     {
         return await new UpdateMembershipOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).ExecuteAsync();
+            parameters).ExecuteAsync().ConfigureAwait(false);
     }
 
     public void UpdateMembership(PatchMembershipParameters parameters, PNDataSyncMembershipResultExt callback)
@@ -376,7 +376,7 @@ public class DataSync
     public async Task<PNResult<PNDataSyncDeleteMembershipResult>> DeleteMembership(DeleteMembershipParameters parameters)
     {
         return await new DeleteMembershipOperation(pubnub.PNConfig, pubnub.JsonPluggableLibrary, unit, tokenManager, pubnub,
-            parameters).ExecuteAsync();
+            parameters).ExecuteAsync().ConfigureAwait(false);
     }
 
     public void DeleteMembership(DeleteMembershipParameters parameters, PNDataSyncDeleteMembershipResultExt callback)
