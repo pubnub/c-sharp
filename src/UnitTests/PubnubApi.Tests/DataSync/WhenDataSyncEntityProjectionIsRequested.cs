@@ -311,7 +311,7 @@ namespace PubnubApi.Tests.DataSync
         {
             var id = await CreateVehicleAsync(UniqueId());
             var client = await GrantProjectionClientAsync(id, "admin",
-                new PNTokenAuthValues { Get = true, Update = true });
+                new PNTokenAuthValues { Get = true, Update = true, Create = true});
 
             var update = await client.DataSync.SetEntity(new SetEntityParameters
             {
