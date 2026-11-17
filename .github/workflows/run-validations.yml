@@ -29,9 +29,55 @@ jobs:
       - name: Cancel workflow runs for commit on error
         if: failure()
         uses: ./.github/.release/actions/actions/utils/fast-jobs-failure
+  build-warnings:
+    name: "Check new build warnings"
+    runs-on:
+      group: organization/windows-gh
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Checkout actions
+        uses: actions/checkout@v4
+        with:
+          repository: pubnub/client-engineering-deployment-tools
+          ref: v1
+          token: ${{ secrets.GH_TOKEN }}
+          path: .github/.release/actions
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Build and check new warnings
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+        run: |
+          $base = 'origin/master'
+          if ($env:GITHUB_REF -eq 'refs/heads/master' -and $env:BEFORE_SHA -and $env:BEFORE_SHA -notmatch '^0+$') {
+            $ErrorActionPreference = 'Continue'
+            git cat-file -e "$($env:BEFORE_SHA)^{commit}" 2>$null
+            $base = if ($LASTEXITCODE -eq 0) { $env:BEFORE_SHA } else { 'HEAD~1' }
+            $ErrorActionPreference = 'Stop'
+          }
+          Write-Host "Comparing against $base"
+          .\.github\workflows\build-warnings\Test-NewBuildWarnings.ps1 -Base $base -LogDirectory "$env:RUNNER_TEMP\build-warnings"
+      - name: Upload build warning logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-warnings
+          path: ${{ runner.temp }}/build-warnings/
+          retention-days: 7
+      - name: Cancel workflow runs for commit on error
+        if: failure()
+        uses: ./.github/.release/actions/actions/utils/fast-jobs-failure
   all-validations:
     name: Validations
-    needs: [pubnub-yml]
+    needs: [pubnub-yml, build-warnings]
     runs-on:
       group: organization/Default
     steps:

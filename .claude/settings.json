@@ -11,6 +11,8 @@
       "Bash(powershell -ExecutionPolicy Bypass -File .claude/skills/run-checks/scripts/Test-ConfigureAwait.ps1:*)",
       "Bash(pwsh -File .claude/skills/run-checks/scripts/Test-LinkedSources.ps1:*)",
       "Bash(pwsh -File .claude/skills/run-checks/scripts/Test-ConfigureAwait.ps1:*)",
+      "Bash(powershell -ExecutionPolicy Bypass -File .github/workflows/build-warnings/Test-NewBuildWarnings.ps1:*)",
+      "Bash(pwsh -File .github/workflows/build-warnings/Test-NewBuildWarnings.ps1:*)",
       "Bash(git status:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)",
