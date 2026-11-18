@@ -157,7 +157,7 @@ namespace PubnubApi.Tests.DataSync
                     {
                         Entities = new Dictionary<string, PNTokenAuthValues>
                         {
-                            { $"^{prefix}-.*$", new PNTokenAuthValues { Get = true } }
+                            { $"^{prefix}-.*", new PNTokenAuthValues { Get = true } }
                         }
                     }
                 })

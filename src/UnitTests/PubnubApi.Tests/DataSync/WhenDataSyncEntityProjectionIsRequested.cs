@@ -205,7 +205,7 @@ namespace PubnubApi.Tests.DataSync
                     {
                         Entities = new Dictionary<string, PNTokenAuthValues>
                         {
-                            { $"^{prefix}-.*$", new PNTokenAuthValues { Get = true } }
+                            { $"^{prefix}-.*", new PNTokenAuthValues { Get = true } }
                         }
                     }
                 })
@@ -213,7 +213,7 @@ namespace PubnubApi.Tests.DataSync
                 {
                     Patterns = new PNDataSyncProjectionScope
                     {
-                        Entities = new Dictionary<string, string> { { $"^{prefix}-.*$", "__default__" } }
+                        Entities = new Dictionary<string, string> { { $"^{prefix}-.*", "__default__" } }
                     }
                 })
                 .ExecuteAsync();
