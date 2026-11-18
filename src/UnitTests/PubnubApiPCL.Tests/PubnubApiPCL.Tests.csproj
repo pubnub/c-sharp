@@ -158,13 +158,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3">
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4">
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
       <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
       <PackageReference Include="NUnit" Version="3.14.0" />
       <PackageReference Include="NUnit3TestAdapter" Version="5.2.0" />
-      <PackageReference Include="WireMock.Net" Version="1.15.0" />
+      <PackageReference Include="WireMock.Net" Version="2.30.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Api\PubnubApiPCL\PubnubApiPCL.csproj" />

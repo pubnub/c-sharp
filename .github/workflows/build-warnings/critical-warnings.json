@@ -1,0 +1,26 @@
+{
+  "projects": [
+    { "path": "src/Api/PubnubApi/PubnubApi.csproj", "configuration": "Release" },
+    { "path": "src/Api/PubnubApiPCL/PubnubApiPCL.csproj", "configuration": "Release" },
+    { "path": "src/Api/PubnubApiUnity/PubnubApiUnity.csproj", "configuration": "Release" }
+  ],
+  "critical": {
+    "CS4014": "Async call is not awaited: fire-and-forget, so its exceptions are lost",
+    "CS0108": "Member hides an inherited member without 'new' or 'override'",
+    "CS0114": "Member hides an inherited virtual member without 'override' or 'new'",
+    "CS0252": "Possible unintended reference comparison (left side needs a cast)",
+    "CS0253": "Possible unintended reference comparison (right side needs a cast)",
+    "CS0472": "Value type compared with null: the result is always the same",
+    "CS0665": "Assignment inside a condition is always constant: '=' used instead of '=='",
+    "CS1717": "Assignment made to the same variable",
+    "CS0659": "Equals is overridden but GetHashCode is not",
+    "CS0661": "Operator == or != is defined but GetHashCode is not overridden",
+    "CS0649": "Field is never assigned and always has its default value",
+    "NU1605": "Package downgrade detected",
+    "NU1701": "Package restored for a framework it doesn't support",
+    "NU1903": "Package has a known high severity vulnerability",
+    "NU1904": "Package has a known critical severity vulnerability",
+    "MSB3277": "Conflicting versions of the same assembly",
+    "MSB3245": "Referenced assembly could not be resolved"
+  }
+}

@@ -24,4 +24,5 @@ alwaysApply: false
 - **CI** runs on Windows runners with PowerShell:
   - Unit tests: builds the packages and the snippets, then runs `dotnet test` on `PubnubApiPCL.Tests` with the `PN_*` secrets.
   - Acceptance tests: copies `sdk-specifications/features/access/*` and runs `AcceptanceTests` against the mock server.
+  - Validations (`run-validations.yml`): validates `.pubnub.yml`, and the `build-warnings` job runs `.github/workflows/build-warnings/Test-NewBuildWarnings.ps1`. That script rebuilds the PubnubApi, PCL and Unity projects and fails on critical warnings on changed lines. The base is `origin/master`, or the previous tip (`github.event.before`) for pushes to `master`. The critical IDs and the project list are in `critical-warnings.json` next to the script.
   - The workflows call private PubNub actions; don't restructure them unless asked.

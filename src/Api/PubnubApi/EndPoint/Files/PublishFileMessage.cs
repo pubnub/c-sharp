@@ -260,7 +260,7 @@ namespace PubnubApi.EndPoint
 			}
 
 			if (storeInHistory && ttl >= 0) {
-				requestQueryStringParams.Add("tt1", ttl.ToString(CultureInfo.InvariantCulture));
+				requestQueryStringParams.Add("ttl", ttl.ToString(CultureInfo.InvariantCulture));
 			}
 
 			if (!storeInHistory) {
