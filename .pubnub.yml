@@ -7,7 +7,7 @@ changelog:
     version: v9.2.1
     changes:
       - type: bug
-        text: "Fixed a typo where "ttl" was sent as "tt1" in PublishFileMessage.cs."
+        text: "Fixed a typo where ttl was sent as tt1 in PublishFileMessage.cs."
   - date: 2026-10-26
     version: v9.2.0
     changes:
