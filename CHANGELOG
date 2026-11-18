@@ -1,3 +1,7 @@
+v9.2.1 - November 18 2026
+-----------------------------
+- Fixed: fixed a typo where "ttl" was sent as "tt1" in PublishFileMessage.cs. Fixed the following issues reported by @pcbeingused333: #288.
+
 v9.2.0 - October 26 2026
 -----------------------------
 - Added: added an implementation of the AES-GCM cryptor - decryption only for now, encryption to be added at a later date.

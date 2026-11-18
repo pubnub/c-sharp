@@ -1,8 +1,13 @@
 name: c-sharp
-version: "9.2.0"
+version: "9.2.1"
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog:
+  - date: 2026-11-18
+    version: v9.2.1
+    changes:
+      - type: bug
+        text: "Fixed a typo where "ttl" was sent as "tt1" in PublishFileMessage.cs."
   - date: 2026-10-26
     version: v9.2.0
     changes:
@@ -1070,14 +1075,14 @@ features:
     - QUERY-PARAM
 supported-platforms:
   -
-    version: Pubnub 'C#' 9.2.0
+    version: Pubnub 'C#' 9.2.1
     platforms:
       - Windows 10 and up
       - Windows Server 2008 and up
     frameworks:
       - .Net Framework 4.5+
   -
-    version: PubnubPCL 'C#' 9.2.0
+    version: PubnubPCL 'C#' 9.2.1
     platforms:
       - Xamarin.Android
       - Xamarin.iOS
@@ -1089,7 +1094,7 @@ supported-platforms:
     frameworks:
       - .Net 4.5+
   -
-    version: PubnubUWP 'C#' 9.2.0
+    version: PubnubUWP 'C#' 9.2.1
     platforms:
       - Windows Phone 10
       - Universal Windows Apps
@@ -1113,7 +1118,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: Pubnub
-            location: https://github.com/pubnub/c-sharp/releases/tag/v9.2.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v9.2.1
             requires:
               -
                 name: ".Net"
@@ -1354,7 +1359,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: PubNubPCL
-            location: https://github.com/pubnub/c-sharp/releases/tag/v9.2.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v9.2.1
             requires:
               -
                 name: ".Net"
@@ -1705,7 +1710,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: PubnubUWP
-            location: https://github.com/pubnub/c-sharp/releases/tag/v9.2.0
+            location: https://github.com/pubnub/c-sharp/releases/tag/v9.2.1
             requires:
               -
                 name: "Universal Windows Platform Development"
