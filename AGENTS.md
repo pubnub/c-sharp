@@ -121,6 +121,7 @@ Run from the repository root. Building needs the .NET 8 SDK or newer, because th
 | Build the snippets, as CI does | `dotnet build src/PubnubApi.Snippets/PubnubApi.Snippets.csproj` |
 | One test fixture or test | `dotnet test src/UnitTests/PubnubApi.Tests/PubnubApi.Tests.csproj --filter "FullyQualifiedName~EncryptionTests"` |
 | Unit tests as CI runs them (live keys) | `dotnet test src/UnitTests/PubnubApiPCL.Tests/PubnubApiPCL.Tests.csproj` |
+| New build warnings on changed lines, as CI checks them | `powershell -ExecutionPolicy Bypass -File .github/workflows/build-warnings/Test-NewBuildWarnings.ps1` |
 
 Offline tests (crypto vectors, event-engine transitions and retry configuration; about 200 tests, no keys needed):
 
@@ -136,6 +137,7 @@ dotnet test src/UnitTests/PubnubApi.Tests/PubnubApi.Tests.csproj --filter "Fully
 
   They publish to real keysets, so don't run live tests unless asked. Without keys they fail with network or access errors; that is not a regression from your change.
 - **The `run-checks` skill** has the full verification workflow, including two scripts: `Test-LinkedSources.ps1` checks the hand-maintained project file lists, and `Test-ConfigureAwait.ps1` checks the await rule.
+- **`Test-NewBuildWarnings.ps1`** rebuilds PubnubApi, PCL and Unity (about 4 minutes) and lists the warnings on lines changed against `origin/master`. It fails on IDs listed under `critical` in `.github/workflows/build-warnings/critical-warnings.json`. `-Base <ref>` changes the comparison, `-Scope File` widens it to whole changed files, and `-SkipBuild` reuses the last build logs.
 
 ## Working rules
 
@@ -144,10 +146,11 @@ dotnet test src/UnitTests/PubnubApi.Tests/PubnubApi.Tests.csproj --filter "Fully
   - The SDK runs inside applications that have a synchronization context: Unity's main thread, UWP and WinForms UI threads, classic ASP.NET. Resuming on that context can deadlock callers that block on SDK tasks.
   - Check with `Test-ConfigureAwait.ps1`; the whole library currently passes (`-All`).
 - **Don't add blocking or fire-and-forget async code.** No `.Result`, `.Wait()` or `GetAwaiter().GetResult()` on SDK tasks, and no new `async void` methods; an exception thrown from one crashes the host process.
+- **Don't add critical build warnings.** CI fails when a line you changed produces a warning listed in `.github/workflows/build-warnings/critical-warnings.json`, such as CS4014 (un-awaited call), CS0108 (hidden member) or CS0659 (`Equals` without `GetHashCode`). Fix the code; don't suppress the warning, and don't remove the ID from the list without agreement. Other new warnings are reported but don't fail, so avoid them too.
 - **Link every new, renamed or deleted source file:**
   - For a file under `src/Api/PubnubApi`, add `<Compile Include="..\PubnubApi\Dir\File.cs" Link="Dir\File.cs" />` to `PubnubApiPCL.csproj`, `PubnubApiUWP.csproj` and `PubnubApiUnity.csproj`.
   - For a test file under `PubnubApi.Tests`, add the equivalent link to `PubnubApiPCL.Tests.csproj`, since CI runs only that project.
-  - Then run `Test-LinkedSources.ps1`. CI never builds the Unity project, so a missing Unity link only shows up in the Unity SDK.
+  - Then run `Test-LinkedSources.ps1`. CI builds the Unity project only in the build-warnings validation, so a missing Unity link fails CI only when other code uses the file's types.
 - **Library code must compile for `netstandard2.0`** (PCL and Unity) as well as `net6.0` and `uap10.0`. Don't use APIs missing from .NET Standard 2.0, such as `Convert.FromHexString`, `HttpVersionPolicy` or `System.Text.Json`, without an `#if NET6_0_OR_GREATER || NET60` guard and a fallback. Build PCL and Unity before finishing.
 - **Respect Unity's constraints.** The Unity SDK runs this DLL under IL2CPP (ahead-of-time compilation) on many platforms.
   - Avoid `dynamic`, `Reflection.Emit` and runtime code generation.
