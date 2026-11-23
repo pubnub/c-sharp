@@ -250,7 +250,7 @@ namespace PubnubApi.Tests.DataSync
                      && e.RelationshipData?.Id == created.Id,
                 async () =>
                 {
-                    var response = await pubnub.DataSync.SetMembership(new UpdateMembershipParameters
+                    var response = await pubnub.DataSync.SetMembership(new SetMembershipParameters
                     {
                         Id = created.Id,
                         RelationshipClassVersion = TestRelationshipClassVersion,
@@ -284,7 +284,7 @@ namespace PubnubApi.Tests.DataSync
                      && e.RelationshipData?.Id == created.Id,
                 async () =>
                 {
-                    var response = await pubnub.DataSync.UpdateMembership(new PatchMembershipParameters
+                    var response = await pubnub.DataSync.UpdateMembership(new UpdateMembershipParameters
                     {
                         Id = created.Id,
                         Operations = new List<JsonPatchOperation>

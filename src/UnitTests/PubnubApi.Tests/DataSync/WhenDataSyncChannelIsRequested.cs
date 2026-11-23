@@ -440,6 +440,123 @@ namespace PubnubApi.Tests.DataSync
 
         #endregion
 
+        #region SetChannel (create)
+
+        [Test]
+        public async Task ThenSetNonExistentChannelShouldCreateIt()
+        {
+            var channelId = UniqueId();
+
+            var response = await pubnub.DataSync.SetChannel(new SetChannelParameters
+            {
+                Id = channelId,
+                EntityClassVersion = TestEntityClassVersion,
+                Status = "created-by-set",
+                Payload = new Dictionary<string, object> { { "name", "Set Created" }, { "topic", "upsert" } }
+            });
+            if (response.Result != null)
+            {
+                createdChannelIds.Add(channelId);
+            }
+
+            Assert.That(response.Status.Error, Is.False,
+                $"SetChannel failed: {response.Status.ErrorData?.Information}");
+            Assert.That(response.Status.StatusCode, Is.EqualTo(201));
+            var channel = response.Result;
+            Assert.That(channel, Is.Not.Null);
+            Assert.That(channel.Id, Is.EqualTo(channelId));
+            Assert.That(channel.EntityClass, Is.EqualTo("Channel"));
+            Assert.That(channel.EntityClassVersion, Is.EqualTo(TestEntityClassVersion));
+            Assert.That(channel.Status, Is.EqualTo("created-by-set"));
+            Assert.That(channel.Payload, Contains.Key("name"));
+            Assert.That(channel.ETag, Is.Not.Null.And.Not.Empty);
+
+            var getResponse = await pubnub.DataSync.GetChannel(new GetChannelParameters { Id = channelId });
+            Assert.That(getResponse.Status.Error, Is.False);
+            Assert.That(getResponse.Result.Status, Is.EqualTo("created-by-set"));
+        }
+
+        [Test]
+        public async Task ThenSetNonExistentChannelWithExplicitEntityClassShouldCreateIt()
+        {
+            var channelId = UniqueId();
+
+            var response = await pubnub.DataSync.SetChannel(new SetChannelParameters
+            {
+                Id = channelId,
+                EntityClass = "Channel",
+                EntityClassVersion = TestEntityClassVersion,
+                Status = "active"
+            });
+            if (response.Result != null)
+            {
+                createdChannelIds.Add(channelId);
+            }
+
+            Assert.That(response.Status.Error, Is.False,
+                $"SetChannel failed: {response.Status.ErrorData?.Information}");
+            Assert.That(response.Status.StatusCode, Is.EqualTo(201));
+            Assert.That(response.Result.EntityClass, Is.EqualTo("Channel"));
+        }
+
+        [Test]
+        public async Task ThenSetTwiceShouldCreateAndThenUpdate()
+        {
+            var channelId = UniqueId();
+            var parameters = new SetChannelParameters
+            {
+                Id = channelId,
+                EntityClassVersion = TestEntityClassVersion,
+                Status = "first",
+                Payload = new Dictionary<string, object> { { "original", true } }
+            };
+
+            var first = await pubnub.DataSync.SetChannel(parameters);
+            if (first.Result != null)
+            {
+                createdChannelIds.Add(channelId);
+            }
+            Assert.That(first.Status.Error, Is.False,
+                $"First SetChannel failed: {first.Status.ErrorData?.Information}");
+            Assert.That(first.Status.StatusCode, Is.EqualTo(201));
+
+            parameters.Status = "second";
+            parameters.Payload = new Dictionary<string, object> { { "replaced", true } };
+            var second = await pubnub.DataSync.SetChannel(parameters);
+
+            Assert.That(second.Status.Error, Is.False,
+                $"Second SetChannel failed: {second.Status.ErrorData?.Information}");
+            Assert.That(second.Status.StatusCode, Is.EqualTo(200));
+            Assert.That(second.Result.Status, Is.EqualTo("second"));
+            Assert.That(second.Result.Payload, Contains.Key("replaced"));
+            Assert.That(second.Result.Payload, Does.Not.ContainKey("original"));
+            Assert.That(second.Result.ETag, Is.Not.EqualTo(first.Result.ETag));
+        }
+
+        [Test]
+        public async Task ThenSetNonExistentChannelWithIfMatchShouldNotCreateIt()
+        {
+            var channelId = UniqueId();
+
+            var response = await pubnub.DataSync.SetChannel(new SetChannelParameters
+            {
+                Id = channelId,
+                EntityClassVersion = TestEntityClassVersion,
+                Status = "should-not-exist",
+                IfMatch = "\"non-matching-etag\""
+            });
+            if (response.Result != null)
+            {
+                createdChannelIds.Add(channelId);
+            }
+
+            Assert.That(response.Status.Error, Is.True);
+            var getResponse = await pubnub.DataSync.GetChannel(new GetChannelParameters { Id = channelId });
+            Assert.That(getResponse.Status.Error, Is.True, "Channel should not have been created");
+        }
+
+        #endregion
+
         #region PatchChannel
 
         [Test]

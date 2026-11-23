@@ -452,7 +452,7 @@ public class DataSyncSample
         // snippet.set_membership_basic_usage
         try
         {
-            PNResult<PNDataSyncMembershipResult> response = await pubnub.DataSync.SetMembership(new UpdateMembershipParameters
+            PNResult<PNDataSyncMembershipResult> response = await pubnub.DataSync.SetMembership(new SetMembershipParameters
             {
                 Id = "membership-alice-summer-sale",
                 RelationshipClassVersion = 1,
@@ -483,7 +483,7 @@ public class DataSyncSample
         // snippet.update_membership_basic_usage
         try
         {
-            PNResult<PNDataSyncMembershipResult> response = await pubnub.DataSync.UpdateMembership(new PatchMembershipParameters
+            PNResult<PNDataSyncMembershipResult> response = await pubnub.DataSync.UpdateMembership(new UpdateMembershipParameters
             {
                 Id = "membership-alice-summer-sale",
                 Operations = new List<JsonPatchOperation>

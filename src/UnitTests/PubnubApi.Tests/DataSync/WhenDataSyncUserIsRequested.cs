@@ -444,6 +444,123 @@ namespace PubnubApi.Tests.DataSync
 
         #endregion
 
+        #region SetUser (create)
+
+        [Test]
+        public async Task ThenSetNonExistentUserShouldCreateIt()
+        {
+            var userId = UniqueId();
+
+            var response = await pubnub.DataSync.SetUser(new SetUserParameters
+            {
+                Id = userId,
+                EntityClassVersion = TestEntityClassVersion,
+                Status = "created-by-set",
+                Payload = new Dictionary<string, object> { { "firstName", "Set" }, { "lastName", "Created" } }
+            });
+            if (response.Result != null)
+            {
+                createdUserIds.Add(userId);
+            }
+
+            Assert.That(response.Status.Error, Is.False,
+                $"SetUser failed: {response.Status.ErrorData?.Information}");
+            Assert.That(response.Status.StatusCode, Is.EqualTo(201));
+            var user = response.Result;
+            Assert.That(user, Is.Not.Null);
+            Assert.That(user.Id, Is.EqualTo(userId));
+            Assert.That(user.EntityClass, Is.EqualTo("User"));
+            Assert.That(user.EntityClassVersion, Is.EqualTo(TestEntityClassVersion));
+            Assert.That(user.Status, Is.EqualTo("created-by-set"));
+            Assert.That(user.Payload, Contains.Key("firstName"));
+            Assert.That(user.ETag, Is.Not.Null.And.Not.Empty);
+
+            var getResponse = await pubnub.DataSync.GetUser(new GetUserParameters { Id = userId });
+            Assert.That(getResponse.Status.Error, Is.False);
+            Assert.That(getResponse.Result.Status, Is.EqualTo("created-by-set"));
+        }
+
+        [Test]
+        public async Task ThenSetNonExistentUserWithExplicitEntityClassShouldCreateIt()
+        {
+            var userId = UniqueId();
+
+            var response = await pubnub.DataSync.SetUser(new SetUserParameters
+            {
+                Id = userId,
+                EntityClass = "User",
+                EntityClassVersion = TestEntityClassVersion,
+                Status = "active"
+            });
+            if (response.Result != null)
+            {
+                createdUserIds.Add(userId);
+            }
+
+            Assert.That(response.Status.Error, Is.False,
+                $"SetUser failed: {response.Status.ErrorData?.Information}");
+            Assert.That(response.Status.StatusCode, Is.EqualTo(201));
+            Assert.That(response.Result.EntityClass, Is.EqualTo("User"));
+        }
+
+        [Test]
+        public async Task ThenSetTwiceShouldCreateAndThenUpdate()
+        {
+            var userId = UniqueId();
+            var parameters = new SetUserParameters
+            {
+                Id = userId,
+                EntityClassVersion = TestEntityClassVersion,
+                Status = "first",
+                Payload = new Dictionary<string, object> { { "original", true } }
+            };
+
+            var first = await pubnub.DataSync.SetUser(parameters);
+            if (first.Result != null)
+            {
+                createdUserIds.Add(userId);
+            }
+            Assert.That(first.Status.Error, Is.False,
+                $"First SetUser failed: {first.Status.ErrorData?.Information}");
+            Assert.That(first.Status.StatusCode, Is.EqualTo(201));
+
+            parameters.Status = "second";
+            parameters.Payload = new Dictionary<string, object> { { "replaced", true } };
+            var second = await pubnub.DataSync.SetUser(parameters);
+
+            Assert.That(second.Status.Error, Is.False,
+                $"Second SetUser failed: {second.Status.ErrorData?.Information}");
+            Assert.That(second.Status.StatusCode, Is.EqualTo(200));
+            Assert.That(second.Result.Status, Is.EqualTo("second"));
+            Assert.That(second.Result.Payload, Contains.Key("replaced"));
+            Assert.That(second.Result.Payload, Does.Not.ContainKey("original"));
+            Assert.That(second.Result.ETag, Is.Not.EqualTo(first.Result.ETag));
+        }
+
+        [Test]
+        public async Task ThenSetNonExistentUserWithIfMatchShouldNotCreateIt()
+        {
+            var userId = UniqueId();
+
+            var response = await pubnub.DataSync.SetUser(new SetUserParameters
+            {
+                Id = userId,
+                EntityClassVersion = TestEntityClassVersion,
+                Status = "should-not-exist",
+                IfMatch = "\"non-matching-etag\""
+            });
+            if (response.Result != null)
+            {
+                createdUserIds.Add(userId);
+            }
+
+            Assert.That(response.Status.Error, Is.True);
+            var getResponse = await pubnub.DataSync.GetUser(new GetUserParameters { Id = userId });
+            Assert.That(getResponse.Status.Error, Is.True, "User should not have been created");
+        }
+
+        #endregion
+
         #region PatchUser
 
         [Test]
