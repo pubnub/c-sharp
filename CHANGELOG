@@ -1,3 +1,7 @@
+v9.3.0 - November 23 2026
+-----------------------------
+- Added: added entityClassName and entityClassVersion parameters to DataSync Set() operations to support PUT upsert.
+
 v9.2.1 - November 18 2026
 -----------------------------
 - Fixed: fixed a typo where ttl was sent as tt1 in PublishFileMessage.cs. Fixed the following issues reported by @pcbeingused333: #288.
