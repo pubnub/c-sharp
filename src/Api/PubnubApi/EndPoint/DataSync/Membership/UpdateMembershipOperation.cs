@@ -10,7 +10,7 @@ namespace PubnubApi.EndPoint
         private readonly PNConfiguration config;
         private readonly IJsonPluggableLibrary jsonLibrary;
         private readonly IPubnubUnitTest unit;
-        private readonly PatchMembershipParameters parameters;
+        private readonly UpdateMembershipParameters parameters;
 
         private PNCallback<PNDataSyncMembershipResult> savedCallback;
 
@@ -24,7 +24,7 @@ namespace PubnubApi.EndPoint
 
         public UpdateMembershipOperation(PNConfiguration pubnubConfig, IJsonPluggableLibrary jsonPluggableLibrary,
             IPubnubUnitTest pubnubUnit, TokenManager tokenManager, Pubnub instance,
-            PatchMembershipParameters parameters) : base(pubnubConfig,
+            UpdateMembershipParameters parameters) : base(pubnubConfig,
             jsonPluggableLibrary, pubnubUnit, tokenManager, instance)
         {
             config = pubnubConfig;

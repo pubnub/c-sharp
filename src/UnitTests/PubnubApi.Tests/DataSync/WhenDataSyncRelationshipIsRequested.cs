@@ -616,6 +616,140 @@ namespace PubnubApi.Tests.DataSync
 
         #endregion
 
+        #region SetRelationship (create)
+
+        [Test]
+        public async Task ThenSetNonExistentRelationshipShouldCreateIt()
+        {
+            var entityA = await CreateTestEntity();
+            var entityB = await CreateTestEntity();
+            var relationshipId = UniqueId();
+
+            var response = await pubnub.DataSync.SetRelationship(new SetRelationshipParameters
+            {
+                Id = relationshipId,
+                EntityAId = entityA.Id,
+                EntityBId = entityB.Id,
+                RelationshipClass = DataSyncCommon.IntegrationTestRelationshipClass,
+                RelationshipClassVersion = DataSyncCommon.RelationshipClassVersion,
+                Status = "created-by-set",
+                Payload = new Dictionary<string, object> { { "role", "co-owner" } }
+            });
+            if (response.Result != null)
+            {
+                createdRelationshipIds.Add(relationshipId);
+            }
+
+            Assert.That(response.Status.Error, Is.False,
+                $"SetRelationship failed: {response.Status.ErrorData?.Information}");
+            Assert.That(response.Status.StatusCode, Is.EqualTo(201));
+            var relationship = response.Result;
+            Assert.That(relationship, Is.Not.Null);
+            Assert.That(relationship.Id, Is.EqualTo(relationshipId));
+            Assert.That(relationship.EntityAId, Is.EqualTo(entityA.Id));
+            Assert.That(relationship.EntityBId, Is.EqualTo(entityB.Id));
+            Assert.That(relationship.RelationshipClass, Is.EqualTo(DataSyncCommon.IntegrationTestRelationshipClass));
+            Assert.That(relationship.RelationshipClassVersion, Is.EqualTo(DataSyncCommon.RelationshipClassVersion));
+            Assert.That(relationship.Status, Is.EqualTo("created-by-set"));
+            Assert.That(relationship.Payload, Contains.Key("role"));
+            Assert.That(relationship.ETag, Is.Not.Null.And.Not.Empty);
+
+            var getResponse = await pubnub.DataSync.GetRelationship(
+                new GetRelationshipParameters { Id = relationshipId });
+            Assert.That(getResponse.Status.Error, Is.False);
+            Assert.That(getResponse.Result.Status, Is.EqualTo("created-by-set"));
+        }
+
+        [Test]
+        public async Task ThenSetTwiceShouldCreateAndThenUpdate()
+        {
+            var entityA = await CreateTestEntity();
+            var entityB = await CreateTestEntity();
+            var relationshipId = UniqueId();
+            var parameters = new SetRelationshipParameters
+            {
+                Id = relationshipId,
+                EntityAId = entityA.Id,
+                EntityBId = entityB.Id,
+                RelationshipClass = DataSyncCommon.IntegrationTestRelationshipClass,
+                RelationshipClassVersion = DataSyncCommon.RelationshipClassVersion,
+                Status = "first",
+                Payload = new Dictionary<string, object> { { "original", true } }
+            };
+
+            var first = await pubnub.DataSync.SetRelationship(parameters);
+            if (first.Result != null)
+            {
+                createdRelationshipIds.Add(relationshipId);
+            }
+            Assert.That(first.Status.Error, Is.False,
+                $"First SetRelationship failed: {first.Status.ErrorData?.Information}");
+            Assert.That(first.Status.StatusCode, Is.EqualTo(201));
+
+            parameters.Status = "second";
+            parameters.Payload = new Dictionary<string, object> { { "replaced", true } };
+            var second = await pubnub.DataSync.SetRelationship(parameters);
+
+            Assert.That(second.Status.Error, Is.False,
+                $"Second SetRelationship failed: {second.Status.ErrorData?.Information}");
+            Assert.That(second.Status.StatusCode, Is.EqualTo(200));
+            Assert.That(second.Result.Status, Is.EqualTo("second"));
+            Assert.That(second.Result.EntityAId, Is.EqualTo(entityA.Id));
+            Assert.That(second.Result.EntityBId, Is.EqualTo(entityB.Id));
+            Assert.That(second.Result.Payload, Contains.Key("replaced"));
+            Assert.That(second.Result.Payload, Does.Not.ContainKey("original"));
+            Assert.That(second.Result.ETag, Is.Not.EqualTo(first.Result.ETag));
+        }
+
+        [Test]
+        public async Task ThenSetNonExistentRelationshipWithIfMatchShouldNotCreateIt()
+        {
+            var entityA = await CreateTestEntity();
+            var entityB = await CreateTestEntity();
+            var relationshipId = UniqueId();
+
+            var response = await pubnub.DataSync.SetRelationship(new SetRelationshipParameters
+            {
+                Id = relationshipId,
+                EntityAId = entityA.Id,
+                EntityBId = entityB.Id,
+                RelationshipClass = DataSyncCommon.IntegrationTestRelationshipClass,
+                RelationshipClassVersion = DataSyncCommon.RelationshipClassVersion,
+                Status = "should-not-exist",
+                IfMatch = "\"non-matching-etag\""
+            });
+            if (response.Result != null)
+            {
+                createdRelationshipIds.Add(relationshipId);
+            }
+
+            Assert.That(response.Status.Error, Is.True);
+            var getResponse = await pubnub.DataSync.GetRelationship(
+                new GetRelationshipParameters { Id = relationshipId });
+            Assert.That(getResponse.Status.Error, Is.True, "Relationship should not have been created");
+        }
+
+        [Test]
+        public async Task ThenSetNonExistentRelationshipWithoutClassAndSidesShouldReturnError()
+        {
+            var relationshipId = UniqueId();
+
+            var response = await pubnub.DataSync.SetRelationship(new SetRelationshipParameters
+            {
+                Id = relationshipId,
+                RelationshipClassVersion = DataSyncCommon.RelationshipClassVersion,
+                Status = "missing-class-and-sides"
+            });
+            if (response.Result != null)
+            {
+                createdRelationshipIds.Add(relationshipId);
+            }
+
+            Assert.That(response.Status.Error, Is.True);
+        }
+
+        #endregion
+
         #region PatchRelationship
 
         [Test]

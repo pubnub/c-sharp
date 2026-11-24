@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace PubnubApi
 {
-    public class PatchMembershipParameters
+    public class UpdateMembershipParameters
     {
         /// <summary>
         /// Membership identifier. Required.

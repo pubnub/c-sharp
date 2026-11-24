@@ -210,5 +210,134 @@ namespace PubnubApi.Tests.DataSync
             Assert.That(read.Status.Error, Is.False, "Get should be allowed");
             Assert.That(update.Status.Error, Is.True, "Update should be denied without Update permission");
         }
+
+        private async Task<Pubnub> CreateClientWithEntityGrant(string entityId, PNTokenAuthValues permissions)
+        {
+            var grant = await admin.GrantToken()
+                .TTL(60)
+                .AuthorizedUserId(new UserId(ClientUserId))
+                .Resources(new PNTokenResources
+                {
+                    DataSync = new PNDataSyncTokenScopes
+                    {
+                        Entities = new Dictionary<string, PNTokenAuthValues>
+                        {
+                            { entityId, permissions }
+                        }
+                    }
+                })
+                .ExecuteAsync();
+            Assert.That(grant.Status.Error, Is.False, grant.Status.ErrorData?.Information);
+
+            var client = CreateClientWithToken(grant.Result.Token);
+            await Task.Delay(1000); // allow token propagation
+            return client;
+        }
+
+        private async Task<PNResult<PNDataSyncEntityResult>> SetEntityAsync(Pubnub client, string entityId,
+            string status, string ifMatch = null)
+        {
+            var response = await client.DataSync.SetEntity(new SetEntityParameters
+            {
+                Id = entityId,
+                EntityClass = DataSyncCommon.IntegrationTestEntityClass,
+                EntityClassVersion = DataSyncCommon.EntityClassVersion,
+                Status = status,
+                Payload = new Dictionary<string, object> { { "make", "Honda" } },
+                IfMatch = ifMatch
+            });
+            if (response.Result != null && !createdEntityIds.Contains(entityId))
+            {
+                createdEntityIds.Add(entityId);
+            }
+            return response;
+        }
+
+        [Test]
+        public async Task ThenGetAndCreateGrantShouldAllowSetToCreateEntity()
+        {
+            var entityId = UniqueId();
+            var client = await CreateClientWithEntityGrant(entityId,
+                new PNTokenAuthValues { Get = true, Create = true });
+
+            var response = await SetEntityAsync(client, entityId, "created-by-set");
+
+            Assert.That(response.Status.Error, Is.False,
+                $"Set without IfMatch should create with Get and Create: {response.Status.ErrorData?.Information}");
+            Assert.That(response.Status.StatusCode, Is.EqualTo(201));
+            Assert.That(response.Result.Status, Is.EqualTo("created-by-set"));
+        }
+
+        [Test]
+        public async Task ThenGetAndCreateGrantShouldDenySetOnExistingEntity()
+        {
+            var entityId = await CreateEntityAsync(UniqueId());
+            var client = await CreateClientWithEntityGrant(entityId,
+                new PNTokenAuthValues { Get = true, Create = true });
+
+            var response = await SetEntityAsync(client, entityId, "updated");
+
+            Assert.That(response.Status.Error, Is.True,
+                "Set on an existing entity should be denied without Update permission");
+        }
+
+        [Test]
+        public async Task ThenGetAndUpdateGrantShouldAllowSetWithIfMatch()
+        {
+            var entityId = UniqueId();
+            var created = await creator.DataSync.CreateEntity(new CreateEntityParameters
+            {
+                Id = entityId,
+                EntityClass = DataSyncCommon.IntegrationTestEntityClass,
+                EntityClassVersion = DataSyncCommon.EntityClassVersion,
+                Status = "active"
+            });
+            Assert.That(created.Status.Error, Is.False, created.Status.ErrorData?.Information);
+            createdEntityIds.Add(entityId);
+
+            var client = await CreateClientWithEntityGrant(entityId,
+                new PNTokenAuthValues { Get = true, Update = true });
+
+            var response = await SetEntityAsync(client, entityId, "updated-with-etag", created.Result.ETag);
+
+            Assert.That(response.Status.Error, Is.False,
+                $"Set with IfMatch should update with Get and Update: {response.Status.ErrorData?.Information}");
+            Assert.That(response.Status.StatusCode, Is.EqualTo(200));
+            Assert.That(response.Result.Status, Is.EqualTo("updated-with-etag"));
+        }
+
+        [Test]
+        public async Task ThenGetAndUpdateGrantShouldDenySetCreatingEntity()
+        {
+            var entityId = UniqueId();
+            var client = await CreateClientWithEntityGrant(entityId,
+                new PNTokenAuthValues { Get = true, Update = true });
+
+            var response = await SetEntityAsync(client, entityId, "should-not-exist");
+
+            Assert.That(response.Status.Error, Is.True,
+                "Set creating an entity should be denied without Create permission");
+            var getResponse = await creator.DataSync.GetEntity(new GetEntityParameters { Id = entityId });
+            Assert.That(getResponse.Status.Error, Is.True, "Entity should not have been created");
+        }
+
+        [Test]
+        public async Task ThenGetCreateAndUpdateGrantShouldAllowSetToCreateAndUpdate()
+        {
+            var entityId = UniqueId();
+            var client = await CreateClientWithEntityGrant(entityId,
+                new PNTokenAuthValues { Get = true, Create = true, Update = true });
+
+            var createResponse = await SetEntityAsync(client, entityId, "first");
+            Assert.That(createResponse.Status.Error, Is.False,
+                $"Set should create the entity: {createResponse.Status.ErrorData?.Information}");
+            Assert.That(createResponse.Status.StatusCode, Is.EqualTo(201));
+
+            var updateResponse = await SetEntityAsync(client, entityId, "second");
+            Assert.That(updateResponse.Status.Error, Is.False,
+                $"Set should update the entity: {updateResponse.Status.ErrorData?.Information}");
+            Assert.That(updateResponse.Status.StatusCode, Is.EqualTo(200));
+            Assert.That(updateResponse.Result.Status, Is.EqualTo("second"));
+        }
     }
 }

@@ -128,12 +128,13 @@ namespace PubnubApi.EndPoint
             {
                 var responseString = Encoding.UTF8.GetString(transportResponse.Content);
                 var errorStatus = GetStatusIfError(requestState, responseString);
-                if (errorStatus == null && transportResponse.StatusCode == Constants.HttpRequestSuccessStatusCode)
+                if (errorStatus == null && (transportResponse.StatusCode == Constants.HttpRequestSuccessStatusCode ||
+                                             transportResponse.StatusCode == 201))
                 {
                     requestState.GotJsonResponse = true;
                     var status = new StatusBuilder(config, jsonLibrary).CreateStatusResponse(
                         requestState.ResponseType, PNStatusCategory.PNAcknowledgmentCategory, requestState,
-                        Constants.HttpRequestSuccessStatusCode, null);
+                        transportResponse.StatusCode, null);
                     JsonAndStatusTuple = new Tuple<string, PNStatus>(responseString, status);
                 }
                 else
@@ -174,7 +175,17 @@ namespace PubnubApi.EndPoint
         {
             var dataProperties = new Dictionary<string, object>();
 
+            if (!string.IsNullOrEmpty(parameters.EntityClass))
+            {
+                dataProperties.Add("entityClass", parameters.EntityClass);
+            }
+
             dataProperties.Add("entityClassVersion", parameters.EntityClassVersion);
+
+            if (!string.IsNullOrEmpty(parameters.EntityClassLevel))
+            {
+                dataProperties.Add("entityClassLevel", parameters.EntityClassLevel);
+            }
 
             if (!string.IsNullOrEmpty(parameters.Status))
             {

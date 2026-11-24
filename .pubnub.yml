@@ -1,8 +1,13 @@
 name: c-sharp
-version: "9.2.1"
+version: "9.3.0"
 schema: 1
 scm: github.com/pubnub/c-sharp
 changelog:
+  - date: 2026-11-23
+    version: v9.3.0
+    changes:
+      - type: feature
+        text: "Added entityClassName and entityClassVersion parameters to DataSync Set() operations to support PUT upsert."
   - date: 2026-11-18
     version: v9.2.1
     changes:
@@ -1075,14 +1080,14 @@ features:
     - QUERY-PARAM
 supported-platforms:
   -
-    version: Pubnub 'C#' 9.2.1
+    version: Pubnub 'C#' 9.3.0
     platforms:
       - Windows 10 and up
       - Windows Server 2008 and up
     frameworks:
       - .Net Framework 4.5+
   -
-    version: PubnubPCL 'C#' 9.2.1
+    version: PubnubPCL 'C#' 9.3.0
     platforms:
       - Xamarin.Android
       - Xamarin.iOS
@@ -1094,7 +1099,7 @@ supported-platforms:
     frameworks:
       - .Net 4.5+
   -
-    version: PubnubUWP 'C#' 9.2.1
+    version: PubnubUWP 'C#' 9.3.0
     platforms:
       - Windows Phone 10
       - Universal Windows Apps
@@ -1118,7 +1123,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: Pubnub
-            location: https://github.com/pubnub/c-sharp/releases/tag/v9.2.1
+            location: https://github.com/pubnub/c-sharp/releases/tag/v9.3.0
             requires:
               -
                 name: ".Net"
@@ -1359,7 +1364,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: PubNubPCL
-            location: https://github.com/pubnub/c-sharp/releases/tag/v9.2.1
+            location: https://github.com/pubnub/c-sharp/releases/tag/v9.3.0
             requires:
               -
                 name: ".Net"
@@ -1710,7 +1715,7 @@ sdks:
             distribution-type: source
             distribution-repository: GitHub
             package-name: PubnubUWP
-            location: https://github.com/pubnub/c-sharp/releases/tag/v9.2.1
+            location: https://github.com/pubnub/c-sharp/releases/tag/v9.3.0
             requires:
               -
                 name: "Universal Windows Platform Development"

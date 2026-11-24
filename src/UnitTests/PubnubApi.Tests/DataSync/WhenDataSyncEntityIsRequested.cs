@@ -457,6 +457,123 @@ namespace PubnubApi.Tests.DataSync
 
         #endregion
 
+        #region SetEntity (create)
+
+        [Test]
+        public async Task ThenSetNonExistentEntityShouldCreateIt()
+        {
+            var entityId = UniqueId();
+
+            var response = await pubnub.DataSync.SetEntity(new SetEntityParameters
+            {
+                Id = entityId,
+                EntityClass = DataSyncCommon.IntegrationTestEntityClass,
+                EntityClassVersion = DataSyncCommon.EntityClassVersion,
+                Status = "created-by-set",
+                Payload = new Dictionary<string, object> { { "make", "Mazda" }, { "year", 2026 } }
+            });
+            if (response.Result != null)
+            {
+                createdEntityIds.Add(entityId);
+            }
+
+            Assert.That(response.Status.Error, Is.False,
+                $"SetEntity failed: {response.Status.ErrorData?.Information}");
+            Assert.That(response.Status.StatusCode, Is.EqualTo(201));
+            var entity = response.Result;
+            Assert.That(entity, Is.Not.Null);
+            Assert.That(entity.Id, Is.EqualTo(entityId));
+            Assert.That(entity.EntityClass, Is.EqualTo(DataSyncCommon.IntegrationTestEntityClass));
+            Assert.That(entity.EntityClassVersion, Is.EqualTo(DataSyncCommon.EntityClassVersion));
+            Assert.That(entity.Status, Is.EqualTo("created-by-set"));
+            Assert.That(entity.Payload, Contains.Key("make"));
+            Assert.That(entity.ETag, Is.Not.Null.And.Not.Empty);
+
+            var getResponse = await pubnub.DataSync.GetEntity(new GetEntityParameters { Id = entityId });
+            Assert.That(getResponse.Status.Error, Is.False);
+            Assert.That(getResponse.Result.Status, Is.EqualTo("created-by-set"));
+        }
+
+        [Test]
+        public async Task ThenSetTwiceShouldCreateAndThenUpdate()
+        {
+            var entityId = UniqueId();
+            var parameters = new SetEntityParameters
+            {
+                Id = entityId,
+                EntityClass = DataSyncCommon.IntegrationTestEntityClass,
+                EntityClassVersion = DataSyncCommon.EntityClassVersion,
+                Status = "first",
+                Payload = new Dictionary<string, object> { { "original", true } }
+            };
+
+            var first = await pubnub.DataSync.SetEntity(parameters);
+            if (first.Result != null)
+            {
+                createdEntityIds.Add(entityId);
+            }
+            Assert.That(first.Status.Error, Is.False,
+                $"First SetEntity failed: {first.Status.ErrorData?.Information}");
+            Assert.That(first.Status.StatusCode, Is.EqualTo(201));
+
+            parameters.Status = "second";
+            parameters.Payload = new Dictionary<string, object> { { "replaced", true } };
+            var second = await pubnub.DataSync.SetEntity(parameters);
+
+            Assert.That(second.Status.Error, Is.False,
+                $"Second SetEntity failed: {second.Status.ErrorData?.Information}");
+            Assert.That(second.Status.StatusCode, Is.EqualTo(200));
+            Assert.That(second.Result.Id, Is.EqualTo(entityId));
+            Assert.That(second.Result.Status, Is.EqualTo("second"));
+            Assert.That(second.Result.Payload, Contains.Key("replaced"));
+            Assert.That(second.Result.Payload, Does.Not.ContainKey("original"));
+            Assert.That(second.Result.ETag, Is.Not.EqualTo(first.Result.ETag));
+        }
+
+        [Test]
+        public async Task ThenSetNonExistentEntityWithIfMatchShouldNotCreateIt()
+        {
+            var entityId = UniqueId();
+
+            var response = await pubnub.DataSync.SetEntity(new SetEntityParameters
+            {
+                Id = entityId,
+                EntityClass = DataSyncCommon.IntegrationTestEntityClass,
+                EntityClassVersion = DataSyncCommon.EntityClassVersion,
+                Status = "should-not-exist",
+                IfMatch = "\"non-matching-etag\""
+            });
+            if (response.Result != null)
+            {
+                createdEntityIds.Add(entityId);
+            }
+
+            Assert.That(response.Status.Error, Is.True);
+            var getResponse = await pubnub.DataSync.GetEntity(new GetEntityParameters { Id = entityId });
+            Assert.That(getResponse.Status.Error, Is.True, "Entity should not have been created");
+        }
+
+        [Test]
+        public async Task ThenSetNonExistentEntityWithoutEntityClassShouldReturnError()
+        {
+            var entityId = UniqueId();
+
+            var response = await pubnub.DataSync.SetEntity(new SetEntityParameters
+            {
+                Id = entityId,
+                EntityClassVersion = DataSyncCommon.EntityClassVersion,
+                Status = "missing-class"
+            });
+            if (response.Result != null)
+            {
+                createdEntityIds.Add(entityId);
+            }
+
+            Assert.That(response.Status.Error, Is.True);
+        }
+
+        #endregion
+
         #region PatchEntity
 
         [Test]
