@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -32,12 +33,12 @@ namespace PubnubApi
 
         private const byte INDEFINITE_BREAK = 0b11111111;
 
-        private static readonly byte[] additionalLength = {
-            ADDITIONAL_LENGTH_1B,
-            ADDITIONAL_LENGTH_2B,
-            ADDITIONAL_LENGTH_4B,
-            ADDITIONAL_LENGTH_8B,
-        };
+        private const byte ADDITIONAL_SIMPLE_FALSE = 20;
+        private const byte ADDITIONAL_SIMPLE_TRUE = 21;
+        private const byte ADDITIONAL_SIMPLE_NULL = 22;
+        private const byte ADDITIONAL_SIMPLE_UNDEF = 23;
+
+        private const int MAX_NESTING_DEPTH = 64;
 
         private static readonly Dictionary<byte, int> additionalLengthBytes = new Dictionary<byte, int>
         {
@@ -52,14 +53,6 @@ namespace PubnubApi
         private const string SIMPLE_VALUE_NULL = "F6";
         private const string SIMPLE_VALUE_UNDEF = "F7";
 
-        private static readonly Dictionary<string, object> simpleValues = new Dictionary<string, object>
-        {
-            { SIMPLE_VALUE_FALSE, false },
-            { SIMPLE_VALUE_TRUE, true },
-            { SIMPLE_VALUE_NULL, null },
-            { SIMPLE_VALUE_UNDEF, null }
-        };
-
         /// <summary>
         /// Decode incoming hexadecimal string of data and outputing decoded values
         /// </summary>
@@ -69,133 +62,125 @@ namespace PubnubApi
         public static object Decode(string value)
         {
             value = SanitizeInput(value);
-            var data = SplitIntoBytes(value);
-            return ParseData(ref data);
+            if (value.Length % 2 != 0)
+            {
+                throw new Exception("Invalid Input");
+            }
+            return Decode(HexToBytes(value));
         }
 
-        private static object ParseData(ref List<string> data)
+        /// <summary>
+        /// Decode CBOR encoded bytes and output decoded values
+        /// </summary>
+        /// <param name="data">CBOR encoded bytes to decode</param>
+        /// <returns>Decoded value</returns>
+        /// <exception cref="Exception">Thrown when input is invalid, nested too deeply or of unsupported type</exception>
+        public static object Decode(byte[] data)
         {
-            if (data.Count == 0)
+            if (data == null)
             {
-                throw new Exception("Unexpected end of data");
+                throw new ArgumentNullException(nameof(data));
             }
+            var position = 0;
+            return ParseData(data, ref position, 0);
+        }
 
-            var byteStr = data[0];
-            data.RemoveAt(0);
-
-            if (simpleValues.ContainsKey(byteStr))
-            {
-                return simpleValues[byteStr];
-            }
-
-            var byteValue = Convert.ToByte(byteStr, 16);
-            var type = (byte)(byteValue & TYPE_MASK);
-            var additional = (byte)(byteValue & ADDITIONAL_MASK);
+        private static object ParseData(byte[] data, ref int position, int depth)
+        {
+            var initialByte = ReadByte(data, ref position);
+            var type = (byte)(initialByte & TYPE_MASK);
+            var additional = (byte)(initialByte & ADDITIONAL_MASK);
 
             switch (type)
             {
-                case TYPE_NEGATIVE_INT:
                 case TYPE_UNSIGNED_INT:
-                    long value;
-                    if (additionalLength.Contains(additional))
+                    var unsignedValue = ReadArgument(data, ref position, additional);
+                    return unsignedValue <= long.MaxValue ? (object)(long)unsignedValue : unsignedValue;
+
+                case TYPE_NEGATIVE_INT:
+                    var negativeValue = ReadArgument(data, ref position, additional);
+                    if (negativeValue > long.MaxValue)
                     {
-                        value = Convert.ToInt64(GetData(ref data, additionalLengthBytes[additional]), 16);
+                        throw new Exception("Negative integer out of supported range");
                     }
-                    else
-                    {
-                        value = additional;
-                    }
-                    if (type == TYPE_NEGATIVE_INT)
-                    {
-                        value = -1 - value;
-                    }
-                    return value;
+                    return -1 - (long)negativeValue;
 
                 case TYPE_FLOAT:
-                    if (additional <= 23)
+                    switch (additional)
                     {
-                        return additional;
-                    }
-                    else if (additional == ADDITIONAL_LENGTH_1B)
-                    {
-                        return GetData(ref data);
-                    }
-                    else
-                    {
-                        return DecodeFloat(GetData(ref data, additionalLengthBytes[additional]), additional);
+                        case ADDITIONAL_SIMPLE_FALSE:
+                            return false;
+                        case ADDITIONAL_SIMPLE_TRUE:
+                            return true;
+                        case ADDITIONAL_SIMPLE_NULL:
+                        case ADDITIONAL_SIMPLE_UNDEF:
+                            return null;
+                        case ADDITIONAL_LENGTH_1B:
+                            var simpleValue = ReadByte(data, ref position);
+                            if (simpleValue < 32)
+                            {
+                                throw new Exception($"Invalid simple value {simpleValue}");
+                            }
+                            return simpleValue;
+                        case ADDITIONAL_LENGTH_2B:
+                        case ADDITIONAL_LENGTH_4B:
+                        case ADDITIONAL_LENGTH_8B:
+                            return DecodeFloat(ReadArgument(data, ref position, additional), additional);
+                        case ADDITIONAL_TYPE_INDEFINITE:
+                            throw new Exception("Unexpected break");
+                        default:
+                            if (additional < ADDITIONAL_SIMPLE_FALSE)
+                            {
+                                return additional;
+                            }
+                            throw new Exception($"Unsupported additional information {additional}");
                     }
 
                 case TYPE_BYTE_STRING:
                     // For byte strings, return the raw bytes
-                    byte[] resultBytes;
-                    if (additionalLength.Contains(additional))
-                    {
-                        var length = Convert.ToInt32(GetData(ref data, additionalLengthBytes[additional]), 16);
-                        resultBytes = HexToBytes(GetData(ref data, length));
-                    }
-                    else if (additional == ADDITIONAL_TYPE_INDEFINITE)
-                    {
-                        resultBytes = HexToBytes(GetIndefiniteData(ref data));
-                    }
-                    else
-                    {
-                        resultBytes = HexToBytes(GetData(ref data, additional));
-                    }
-                    return resultBytes;
+                    return ReadStringBytes(data, ref position, type, additional);
 
                 case TYPE_TEXT_STRING:
                     // For text strings, convert to UTF-8 string
-                    string result;
-                    if (additionalLength.Contains(additional))
-                    {
-                        var length = Convert.ToInt32(GetData(ref data, additionalLengthBytes[additional]), 16);
-                        result = HexToBinary(GetData(ref data, length));
-                    }
-                    else if (additional == ADDITIONAL_TYPE_INDEFINITE)
-                    {
-                        result = HexToBinary(GetIndefiniteData(ref data));
-                    }
-                    else
-                    {
-                        result = HexToBinary(GetData(ref data, additional));
-                    }
-                    return result;
+                    return Encoding.UTF8.GetString(ReadStringBytes(data, ref position, type, additional));
 
                 case TYPE_ARRAY:
+                    EnsureNestingDepth(depth);
                     var arrayResult = new List<object>();
-                    int arrayLength;
-                    if (additionalLength.Contains(additional))
+                    if (additional == ADDITIONAL_TYPE_INDEFINITE)
                     {
-                        arrayLength = Convert.ToInt32(GetData(ref data, additionalLengthBytes[additional]), 16);
+                        while (!TryReadBreak(data, ref position))
+                        {
+                            arrayResult.Add(ParseData(data, ref position, depth + 1));
+                        }
                     }
                     else
                     {
-                        arrayLength = additional;
-                    }
-
-                    for (int i = 0; i < arrayLength; i++)
-                    {
-                        arrayResult.Add(ParseData(ref data));
+                        var arrayLength = ReadLength(data, ref position, additional, 1);
+                        for (int i = 0; i < arrayLength; i++)
+                        {
+                            arrayResult.Add(ParseData(data, ref position, depth + 1));
+                        }
                     }
                     return arrayResult;
 
                 case TYPE_HASHMAP:
+                    EnsureNestingDepth(depth);
                     var hashmapResult = new Dictionary<object, object>();
-                    int hashmapLength;
-                    if (additionalLength.Contains(additional))
+                    if (additional == ADDITIONAL_TYPE_INDEFINITE)
                     {
-                        hashmapLength = Convert.ToInt32(GetData(ref data, additionalLengthBytes[additional]), 16);
+                        while (!TryReadBreak(data, ref position))
+                        {
+                            ParseHashmapEntry(data, ref position, depth + 1, hashmapResult);
+                        }
                     }
                     else
                     {
-                        hashmapLength = additional;
-                    }
-
-                    for (int i = 0; i < hashmapLength; i++)
-                    {
-                        var key = ParseData(ref data);
-                        var val = ParseData(ref data);
-                        hashmapResult[key] = val;
+                        var hashmapLength = ReadLength(data, ref position, additional, 2);
+                        for (int i = 0; i < hashmapLength; i++)
+                        {
+                            ParseHashmapEntry(data, ref position, depth + 1, hashmapResult);
+                        }
                     }
                     return hashmapResult;
 
@@ -204,15 +189,29 @@ namespace PubnubApi
             }
         }
 
-        private static double DecodeFloat(string value, byte precision)
+        private static void ParseHashmapEntry(byte[] data, ref int position, int depth, Dictionary<object, object> hashmap)
         {
-            var bytes = Convert.ToUInt64(value, 16);
+            var key = ParseData(data, ref position, depth);
+            var val = ParseData(data, ref position, depth);
+            hashmap[key] = val;
+        }
+
+        private static void EnsureNestingDepth(int depth)
+        {
+            if (depth >= MAX_NESTING_DEPTH)
+            {
+                throw new Exception($"Maximum nesting depth of {MAX_NESTING_DEPTH} exceeded");
+            }
+        }
+
+        private static double DecodeFloat(ulong bits, byte precision)
+        {
             switch (precision)
             {
                 case ADDITIONAL_LENGTH_2B:
-                    var sign = (bytes & 0b1000000000000000) >> 15;
-                    var exp = (bytes & 0b0111110000000000) >> 10;
-                    var mant = bytes & 0b1111111111;
+                    var sign = (bits & 0b1000000000000000) >> 15;
+                    var exp = (int)((bits & 0b0111110000000000) >> 10);
+                    var mant = (int)(bits & 0b1111111111);
                     double result;
                     if (exp == 0)
                     {
@@ -220,78 +219,113 @@ namespace PubnubApi
                     }
                     else if (exp == 0b11111)
                     {
-                        result = double.PositiveInfinity;
+                        result = mant == 0 ? double.PositiveInfinity : double.NaN;
                     }
                     else
                     {
                         result = Math.Pow(2, exp - 15) * (1 + mant / 1024.0);
                     }
-                    return (sign == 1 ? -1 : 1) * result;
+                    return sign == 1 ? -result : result;
 
                 case ADDITIONAL_LENGTH_4B:
-                    var sign32 = (bytes >> 31) == 1 ? -1 : 1;
-                    var x = (bytes & ((1UL << 23) - 1)) + (1UL << 23) * ((bytes >> 31) | 1);
-                    var exp32 = (int)((bytes >> 23) & 0xFF) - 127;
-                    return x * Math.Pow(2, exp32 - 23) * sign32;
+                    return BitConverter.ToSingle(BitConverter.GetBytes((uint)bits), 0);
 
                 case ADDITIONAL_LENGTH_8B:
-                    var sign64 = (bytes >> 63) == 1 ? -1 : 1;
-                    var exp64 = (bytes >> 52) & 0x7ff;
-                    var mant64 = bytes & 0xfffffffffffff;
-
-                    double val;
-                    if (exp64 == 0)
-                    {
-                        val = mant64 * Math.Pow(2, -(1022 + 52));
-                    }
-                    else if (exp64 != 0b11111111111)
-                    {
-                        val = (mant64 + (1UL << 52)) * Math.Pow(2, exp64 - (1023 + 52));
-                    }
-                    else
-                    {
-                        val = mant64 == 0 ? double.PositiveInfinity : double.NaN;
-                    }
-                    return sign64 * val;
+                    return BitConverter.Int64BitsToDouble((long)bits);
 
                 default:
                     throw new Exception($"Unsupported float precision: {precision}");
             }
         }
 
-        private static string GetData(ref List<string> data, int bytes = 1)
+        private static byte ReadByte(byte[] data, ref int position)
         {
-            var result = new StringBuilder();
-            for (int i = 1; i <= bytes; i++)
-            {
-                if (data.Count == 0)
-                {
-                    throw new Exception("Unexpected end of data");
-                }
-                result.Append(data[0]);
-                data.RemoveAt(0);
-            }
-            return result.ToString();
+            EnsureAvailable(data, position, 1);
+            return data[position++];
         }
 
-        private static string GetIndefiniteData(ref List<string> data)
+        private static bool TryReadBreak(byte[] data, ref int position)
         {
-            var result = new StringBuilder();
-            do
+            EnsureAvailable(data, position, 1);
+            if (data[position] != INDEFINITE_BREAK)
             {
-                if (data.Count == 0)
+                return false;
+            }
+            position++;
+            return true;
+        }
+
+        private static void EnsureAvailable(byte[] data, int position, int count)
+        {
+            if (data.Length - position < count)
+            {
+                throw new Exception("Unexpected end of data");
+            }
+        }
+
+        /// <summary>
+        /// Reads the unsigned argument encoded in the additional information of the initial byte and the bytes following it
+        /// </summary>
+        private static ulong ReadArgument(byte[] data, ref int position, byte additional)
+        {
+            if (additional < ADDITIONAL_LENGTH_1B)
+            {
+                return additional;
+            }
+            if (!additionalLengthBytes.TryGetValue(additional, out var byteCount))
+            {
+                throw new Exception($"Unsupported additional information {additional}");
+            }
+            EnsureAvailable(data, position, byteCount);
+            ulong value = 0;
+            for (int i = 0; i < byteCount; i++)
+            {
+                value = (value << 8) | data[position++];
+            }
+            return value;
+        }
+
+        /// <summary>
+        /// Reads a declared length and rejects it when the remaining data cannot hold that many items
+        /// </summary>
+        private static int ReadLength(byte[] data, ref int position, byte additional, int minimumBytesPerItem)
+        {
+            var length = ReadArgument(data, ref position, additional);
+            var remaining = (ulong)(data.Length - position);
+            if (length > remaining / (ulong)minimumBytesPerItem)
+            {
+                throw new Exception($"Declared length {length} exceeds remaining data");
+            }
+            return (int)length;
+        }
+
+        private static byte[] ReadStringBytes(byte[] data, ref int position, byte type, byte additional)
+        {
+            if (additional != ADDITIONAL_TYPE_INDEFINITE)
+            {
+                var length = ReadLength(data, ref position, additional, 1);
+                var result = new byte[length];
+                Buffer.BlockCopy(data, position, result, 0, length);
+                position += length;
+                return result;
+            }
+
+            using (var chunks = new MemoryStream())
+            {
+                while (!TryReadBreak(data, ref position))
                 {
-                    throw new Exception("Unexpected end of data");
+                    var chunkHeader = ReadByte(data, ref position);
+                    var chunkAdditional = (byte)(chunkHeader & ADDITIONAL_MASK);
+                    if ((chunkHeader & TYPE_MASK) != type || chunkAdditional == ADDITIONAL_TYPE_INDEFINITE)
+                    {
+                        throw new Exception("Invalid chunk in indefinite-length string");
+                    }
+                    var chunkLength = ReadLength(data, ref position, chunkAdditional, 1);
+                    chunks.Write(data, position, chunkLength);
+                    position += chunkLength;
                 }
-                var byteStr = data[0];
-                data.RemoveAt(0);
-                if (Convert.ToByte(byteStr, 16) == INDEFINITE_BREAK)
-                {
-                    break;
-                }
-                result.Append(byteStr);
-            } while (data.Count > 0);
-            return result.ToString();
+                return chunks.ToArray();
+            }
         }
 
         /// <summary>
@@ -462,33 +496,6 @@ namespace PubnubApi
                 var header = Convert.ToString(type | length, 16);
                 return header;
             }
-        }
-
-        private static List<string> SplitIntoBytes(string hexString)
-        {
-            var result = new List<string>();
-            for (int i = 0; i < hexString.Length; i += 2)
-            {
-                if (i + 1 < hexString.Length)
-                {
-                    result.Add(hexString.Substring(i, 2));
-                }
-                else
-                {
-                    result.Add(hexString.Substring(i, 1));
-                }
-            }
-            return result;
-        }
-
-        private static string HexToBinary(string hex)
-        {
-            var bytes = new byte[hex.Length / 2];
-            for (int i = 0; i < bytes.Length; i++)
-            {
-                bytes[i] = Convert.ToByte(hex.Substring(i * 2, 2), 16);
-            }
-            return Encoding.UTF8.GetString(bytes);
         }
 
         private static byte[] HexToBytes(string hex)

@@ -132,6 +132,7 @@
     <Compile Include="..\PubnubApi.Tests\WhenHttp2OriginIsUsed.cs">
       <Link>WhenHttp2OriginIsUsed.cs</Link>
     </Compile>
+    <Compile Include="..\PubnubApi.Tests\WhenMalformedTokenIsParsed.cs" Link="WhenMalformedTokenIsParsed.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenMessageAction.cs" Link="WhenMessageAction.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenMessageCountIsRequested.cs" Link="WhenMessageCountIsRequested.cs" />
     <Compile Include="..\PubnubApi.Tests\WhenMessageDeletedFromChannel.cs" Link="WhenMessageDeletedFromChannel.cs" />

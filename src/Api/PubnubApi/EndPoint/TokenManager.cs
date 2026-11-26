@@ -65,7 +65,7 @@ namespace PubnubApi.EndPoint
                     string refinedToken = token.Replace('_', '/').Replace('-', '+');
                     byte[] tokenByteArray = Convert.FromBase64String(refinedToken);
                     
-                    var cborObj = CBOR.Decode(CBOR.BinaryToHex(tokenByteArray));
+                    var cborObj = CBOR.Decode(tokenByteArray);
 
                     if (cborObj is Dictionary<object, object> cborDict)
                     {
